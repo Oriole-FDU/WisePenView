@@ -1,64 +1,65 @@
 import React, { useState } from 'react';
-import { Input, Button, Tooltip } from 'antd';
-import { 
-  RiAddLine, 
-  RiSettings3Line, 
-  RiSearchLine, 
-  RiSendPlaneFill 
-} from 'react-icons/ri';
+import { Input } from 'antd';
+import ActionToolbar from './ActionToolbar';
+import type { Model } from '@/components/ChatPanel/index.type';
 import styles from './style.module.less';
 
-interface Props {
+const { TextArea } = Input;
+
+interface ChatInputProps {
   onSend: (text: string) => void;
-  loading?: boolean;
+  sending: boolean;
+  currentModelId: string;
+  onModelChange: (model: Model) => void;
 }
 
-const ChatInput: React.FC<Props> = ({ onSend, loading }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ 
+  onSend, 
+  sending,
+  currentModelId,
+  onModelChange,
+}) => {
   const [value, setValue] = useState('');
+  const [isComposing, setIsComposing] = useState(false); 
 
   const handleSend = () => {
-    if (!value.trim() || loading) return;
-    onSend(value);
+    if (!value.trim() || sending || !currentModelId) return;
+    onSend(value.trim());
     setValue('');
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
       e.preventDefault();
       handleSend();
     }
   };
 
   return (
-    <div className={styles.inputWrapper}>
+    <div className={styles.container}>
       <div className={styles.inputCard}>
-        <Input.TextArea
+        <TextArea
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="输入消息..."
-          autoSize={{ minRows: 1, maxRows: 5 }}
-          bordered={false}
+          autoSize={{ minRows: 1, maxRows: 8 }}
           className={styles.textarea}
           onKeyDown={handleKeyDown}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
         />
         
-        <div className={styles.toolbar}>
-          <div className={styles.toolsLeft}>
-            <Tooltip title="上传"><Button type="text" size="small" className={styles.toolBtn} icon={<RiAddLine />} /></Tooltip>
-            <Tooltip title="设置"><Button type="text" size="small" className={styles.toolBtn} icon={<RiSettings3Line />} /></Tooltip>
-            <Tooltip title="搜索"><Button type="text" size="small" className={styles.toolBtn} icon={<RiSearchLine />} /></Tooltip>
-          </div>
-          
-          <Button 
-            type="primary" 
-            shape="circle" 
-            icon={<RiSendPlaneFill />} 
-            disabled={!value.trim() || loading}
-            onClick={handleSend}
-          />
-        </div>
+        <ActionToolbar 
+          modelValue={currentModelId}
+          onModelChange={onModelChange}
+          onSend={handleSend}
+          disabledSend={!value.trim() || sending || !currentModelId}
+        />
       </div>
-      <div className={styles.footerTip}>AI 内容仅供参考，请仔细甄别</div>
+      
+      <div className={styles.footerTip}>
+        AI 内容仅供参考，请仔细甄别
+      </div>
     </div>
   );
 };

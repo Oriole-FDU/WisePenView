@@ -1,15 +1,15 @@
 // src/components/ChatPanel/style.module.less
 
-// --- 整体容器 ---
 .panel {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--ant-color-bg-container);
   position: relative;
+  background-color: var(--ant-color-bg-layout); // 整体背景偏灰一点，区分侧边栏
+  overflow: hidden; // 防止整体出现滚动条
 }
 
-// --- 1. 顶部 Header (含模型选择器) ---
+// 顶部栏
 .header {
   height: 60px;
   flex-shrink: 0;
@@ -18,217 +18,32 @@
   justify-content: space-between;
   padding: 0 var(--ant-padding-lg);
   border-bottom: 1px solid var(--ant-color-border-secondary);
-}
+  background-color: var(--ant-color-bg-container);
 
-.modelTrigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  border-radius: var(--ant-border-radius);
-  cursor: pointer;
-  transition: background 0.2s;
-  
-  &:hover {
-    background: var(--ant-color-fill-tertiary);
-  }
-  
-  .modelName {
-    font-weight: 500;
+  .title {
+    font-size: 16px;
+    font-weight: 600;
     color: var(--ant-color-text);
   }
-  
-  .arrow {
-    font-size: 10px;
-    color: var(--ant-color-text-quaternary);
-  }
 }
 
-// --- 2. 中间消息列表 ---
-.messageList {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--ant-padding-lg);
-  scroll-behavior: smooth;
-  
-  // 欢迎页
-  .welcome {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: var(--ant-color-text-tertiary);
-    
-    .mascot {
-      font-size: 64px;
-      margin-bottom: 24px;
-      color: var(--ant-color-primary);
-    }
-    
-    h2 {
-      color: var(--ant-color-text);
-      margin-bottom: 8px;
-    }
-  }
-}
-
-// 消息气泡行
-.messageRow {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-  
-  &.user {
-    flex-direction: row-reverse;
-    
-    .bubble {
-      background: var(--ant-color-fill-secondary); // 稍微深一点的灰
-      border-radius: 20px 20px 4px 20px;
-    }
-  }
-  
-  &.ai {
-    .bubble {
-      background: transparent;
-      padding: 0; // AI 消息通常不需要背景板，或者设为 transparent
-      margin-top: 4px; // 对齐头像
-    }
-  }
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  
-  &.aiAvatar {
-    background: var(--ant-color-primary-bg);
-    color: var(--ant-color-primary);
-  }
-  
-  &.userAvatar {
-    background: var(--ant-color-fill-tertiary);
-    color: var(--ant-color-text-secondary);
-  }
-}
-
-.bubble {
-  max-width: 85%;
-  padding: 10px 16px;
-  font-size: var(--ant-font-size);
-  line-height: 1.6;
-  color: var(--ant-color-text);
-  word-wrap: break-word;
-}
-
-// --- 3. 底部输入框 ---
-.inputWrapper {
-  flex-shrink: 0;
-  padding: var(--ant-padding-md);
-  // 可选：加个顶部渐变遮罩，增加高级感
-  background: linear-gradient(to bottom, rgba(255,255,255,0), var(--ant-color-bg-container) 10%);
-}
-
-.inputCard {
-  background: var(--ant-color-bg-container);
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: 12px;
-  box-shadow: var(--ant-box-shadow-secondary);
-  padding: 12px;
-  transition: all 0.2s;
-  
-  &:focus-within {
-    border-color: var(--ant-color-primary);
-    box-shadow: var(--ant-box-shadow);
-  }
-}
-
-.textarea {
-  resize: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin-bottom: 8px;
-  
-  // 覆盖 Antd textarea focus 样式
-  &:focus {
-     box-shadow: none !important;
-  }
-}
-
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.toolsLeft {
-  display: flex;
-  gap: 4px;
-}
-
-.toolBtn {
-  color: var(--ant-color-text-tertiary);
-  &:hover {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
-  }
-}
-
-.footerTip {
-  text-align: center;
-  font-size: 12px;
-  color: var(--ant-color-text-quaternary);
-  margin-top: 8px;
-}
-
-// --- Popover 内容样式 (对应你的 Selector Panel) ---
-.popoverContent {
-  width: 400px;
-  max-height: 500px;
+// 中间内容区 (MessageList)
+.content {
+  flex: 1; // 占据剩余所有空间
+  min-height: 0; // 关键！防止 Flex 子项溢出导致滚动失效
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-.popoverHeader {
-  padding: 12px 16px;
-  background: var(--ant-color-bg-layout);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  color: var(--ant-color-text-secondary);
-}
-
-.modelList {
-  padding: 8px;
-  overflow-y: auto;
-  max-height: 400px;
-}
-
-.modelItem {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  border-radius: var(--ant-border-radius);
-  cursor: pointer;
-  margin-bottom: 4px;
-  
-  &:hover {
-    background: var(--ant-color-fill-tertiary);
-  }
-  
-  &.active {
-    background: var(--ant-control-item-bg-active);
-    .itemName {
-      color: var(--ant-color-primary);
-      font-weight: 600;
-    }
-  }
+// 底部输入区 (ChatInput)
+.footer {
+  flex-shrink: 0; // 防止被挤压
+  z-index: 10;
+  // 背景渐变，让输入框看起来像浮在内容上
+  background: linear-gradient(
+    to bottom, 
+    rgba(255,255,255,0) 0%, 
+    var(--ant-color-bg-layout) 20%
+  );
 }

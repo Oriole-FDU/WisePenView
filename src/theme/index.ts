@@ -20,6 +20,7 @@ const appTheme: ThemeConfig = {
     fontSize: 14,
     borderRadius: 6,
     controlHeight: 36,
+    colorBgLayout: '#FAFAFA',
     colorBorder: "#E6E8EB",
     colorBorderSecondary: "#F2F4F5",
     boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.03)",

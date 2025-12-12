@@ -1,0 +1,97 @@
+// src/components/ChatPanel/ChatInput/style.module.less
+
+// 1. 最外层容器
+.container {
+  flex-shrink: 0;
+  padding: var(--ant-padding-xxs) var(--ant-padding-xs) var(--ant-padding-sm);
+  background: transparent;
+
+  // 2. 核心卡片 (嵌套在 container 内)
+  .inputCard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--ant-color-bg-container);
+    border: var(--ant-line-width) solid var(--ant-color-border-secondary);
+    // 大圆角
+    border-radius: var(--ant-border-radius-lg);
+    box-shadow: var(--ant-box-shadow-tertiary);
+
+    // 极度紧凑的内边距
+    padding: var(--ant-padding-sm) var(--ant-padding-xs);
+
+    transition: all 0.2s;
+
+    &:focus-within {
+      border-color: var(--ant-color-primary);
+      box-shadow: var(--ant-box-shadow-secondary);
+    }
+
+    // 3. 文本域 (嵌套在 Card 内)
+    .textarea {
+      resize: none !important;
+      border: none !important;
+      box-shadow: none !important;
+
+      padding: 0 var(--ant-padding-xxs) !important;
+      margin-bottom: var(--ant-margin-lg);
+
+      font-size: var(--ant-font-size);
+      line-height: 1.5;
+      color: var(--ant-color-text);
+
+      &::placeholder {
+        color: var(--ant-color-text-placeholder);
+      }
+    }
+
+    // 4. 底部工具栏 (嵌套在 Card 内)
+    .actionToolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      // 确保最小高度，防止图标顶边
+      min-height: var(--ant-control-height-sm);
+
+      // --- 左侧图标组 ---
+      .toolsLeft {
+        display: flex;
+        align-items: center;
+        gap: var(--ant-margin-xs);
+
+        .toolBtn {
+          color: var(--ant-color-text-tertiary);
+          flex-shrink: 0;
+          &:hover {
+            color: var(--ant-color-text);
+            background-color: var(--ant-color-fill-tertiary);
+          }
+        }
+      }
+
+      // --- 右侧操作组 ---
+      .toolsRight {
+        display: flex;
+        align-items: center;
+        gap: var(--ant-margin-xxs); // 12px
+
+        // 发送按钮
+        .sendBtn {
+          flex-shrink: 0; // 防止压扁
+          justify-content: center;
+          box-shadow: var(--ant-box-shadow-sm);
+        }
+      }
+    }
+  }
+
+  // 5. 底部提示 (嵌套在 Container 内)
+  .footerTip {
+    text-align: center;
+    margin-top: var(--ant-margin-xs);
+    font-size: var(--ant-font-size-sm); // 12px
+    color: var(--ant-color-text-quaternary);
+    line-height: 1;
+  }
+}

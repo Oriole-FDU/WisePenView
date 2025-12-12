@@ -30,7 +30,7 @@ import type { Model } from "../index.type";
 
 import styles from "./style.module.less";
 
-const LogoFactory = ({
+export const LogoFactory = ({
   provider,
   size = 20,
 }: {
@@ -69,7 +69,7 @@ const SORT_OPTIONS = [
 
 interface ModelSelectorProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (model: Model) => void;
 }
 
 const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
@@ -78,11 +78,12 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
 
   const { models, loading } = useModelList();
 
+  // 自动选中默认模型
   useEffect(() => {
     if (!loading && models.length > 0) {
-      const isValid = models.some(m => m.id === value); // 检查当前 value 是否有效
-      if (!value || !isValid) { // 如果当前没有选中值，或者选中的值无效
-        onChange(models[0].id); // 自动选择第一个并通知父组件
+      const targetModel = models.find(m => m.id === value);
+      if (!value || !targetModel) {
+        onChange(models[0]);
       }
     }
   }, [loading, models, value, onChange]);
@@ -165,7 +166,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
                 model.id === value && styles.active
               )}
               onClick={() => {
-                onChange(model.id);
+                onChange(model);
                 setOpen(false);
               }}
             >
@@ -207,9 +208,9 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
 
               <div className={styles.itemRight}>
                 {model.multiplier && (
-                  <span className={styles.multiplierTag}>
+                  <Tag className={styles.multiplierTag}>
                     {model.multiplier}
-                  </span>
+                  </Tag>
                 )}
                 {model.id === value && (
                   <RiCheckLine style={{ color: "var(--ant-color-primary)" }} />

@@ -1,0 +1,51 @@
+.aiRow {
+  display: flex;
+  width: 100%;
+  margin-bottom: var(--ant-margin-lg);
+  gap: var(--ant-margin-xs); // 头像与内容间距
+
+  // 头像列
+  .avatarCol {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+  }
+
+  // 内容列
+  .contentCol {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ant-margin-xs);
+
+    // 正文区域
+    .bubble {
+      background: transparent; // AI 无背景
+      padding: 0;
+      color: var(--ant-color-text);
+      font-size: var(--ant-font-size);
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    // 底部操作栏 (常驻)
+    .actions {
+      display: flex;
+      flex-direction: row;
+      gap: var(--ant-margin-sm);
+
+      flex-shrink: 0;
+
+      .actionBtn {
+        color: var(--ant-color-text-tertiary);
+        box-shadow: var(--ant-box-shadow-sm);
+
+        &:hover {
+          color: var(--ant-color-primary);
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+}

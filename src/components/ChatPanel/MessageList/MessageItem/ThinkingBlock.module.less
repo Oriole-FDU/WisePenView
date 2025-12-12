@@ -1,0 +1,74 @@
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.thinkingWrapper {
+  .collapseHeader {
+    padding: 0px 0px !important; // 极致紧凑
+    height: 28px !important;
+    align-items: center !important;
+
+    border-radius: var(--ant-border-radius) !important;
+    color: var(--ant-color-text-description) !important;
+    font-size: var(--ant-font-size-sm) !important;
+    font-weight: 500;
+
+    // 悬停反馈
+    &:hover {
+      background-color: var(--ant-color-fill-tertiary);
+      color: var(--ant-color-text) !important; // 悬停变深色
+    }
+  }
+
+  .collapseContentBox {
+    padding: 0 !important;
+    background-color: var(--ant-color-fill-quaternary); // 极淡的背景
+  }
+}
+
+// 标题栏内部容器
+.headerLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-xs);
+
+  // Loading 图标样式
+  .spinIcon {
+    animation: rotate 1s linear infinite; // 应用旋转动画
+    color: var(--ant-color-primary); // 使用主色调
+    font-size: 14px;
+  }
+}
+
+.durationTag {
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-tertiary);
+  background-color: var(--ant-color-fill-quaternary);
+  height: 16px;
+  padding: 0px var(--ant-padding-xxs);
+  border-radius: var(--ant-border-radius-sm);
+  display: flex;
+  align-items: center;
+  font-family: var(--ant-font-family-code);
+}
+
+.content {
+  margin: 0 !important;
+  margin-top: var(--ant-margin-xs) !important;
+  padding-block: var(--ant-padding-xs) !important;
+  padding-inline: var(--ant-padding-xs) !important;
+  text-align: justify;
+
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size-sm);
+
+  line-height: 1.6;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+}

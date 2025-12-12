@@ -1,0 +1,58 @@
+// src/components/ChatPanel/MessageList/MessageItem/UserMessage.less
+
+.userRow {
+  display: flex;
+  width: 100%;
+  margin-bottom: var(--ant-margin-xs);
+  justify-content: flex-end;
+
+  .contentCol {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: var(--ant-margin-xs); // 8px 间距
+
+    max-width: 100%;
+    @media (min-width: 768px) {
+      max-width: 100%;
+    }
+
+    .actions {
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+      display: flex;
+      flex-direction: row;
+      gap: var(--ant-margin-xxs);
+
+      flex-shrink: 0;
+
+      .actionBtn {
+        color: var(--ant-color-text-tertiary);
+        box-shadow: var(--ant-box-shadow-sm);
+
+        &:hover {
+          color: var(--ant-color-primary);
+          transform: scale(1.1);
+        }
+      }
+    }
+
+    // --- 气泡 ---
+    .bubble {
+      background-color: var(--ant-color-fill-secondary);
+      color: var(--ant-color-text);
+      padding: var(--ant-padding-sm) var(--ant-padding-md);
+      border-radius: 16px var(--ant-border-radius-sm) 16px 16px;
+
+      font-size: var(--ant-font-size);
+      line-height: 1.6; // 这是一个倍数，不需要 px，保持不变
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &:hover .actions {
+    opacity: 1;
+  }
+}

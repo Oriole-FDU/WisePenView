@@ -1,0 +1,54 @@
+// src/components/ChatPanel/MessageList/style.module.less
+
+.container {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--ant-padding-lg);
+  scroll-behavior: smooth;
+  position: relative;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--ant-color-fill-tertiary);
+    border-radius: 3px;
+  }
+
+  .welcomeWrapper {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    .logoIcon {
+      font-size: 64px;
+      margin-bottom: var(--ant-margin-sm);
+      color: var(--ant-color-text);
+      display: flex;
+      svg {
+        stroke-width: 1.5px;
+      }
+    }
+
+    .title {
+      font-size: var(--ant-font-size-heading-3);
+      font-weight: 600;
+      color: var(--ant-color-text);
+      margin-bottom: var(--ant-margin-sm);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: var(--ant-font-size-heading-3);
+      font-weight: 600;
+      color: var(--ant-color-info);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+  }
+}
+

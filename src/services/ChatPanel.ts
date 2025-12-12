@@ -1,5 +1,5 @@
 import { MOCK_MODELS } from './mock/ChatPanel';
-import type { Model } from '@/types/ChatPanel';
+import type { Model } from '@/components/ChatPanel/index.type';
 // import request from '@/utils/request'; // 假设以后有了 axios 封装
 
 export const ModelService = {
