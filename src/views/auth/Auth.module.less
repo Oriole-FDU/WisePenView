@@ -1,0 +1,37 @@
+.authContainer {
+  display: flex;
+  flex-direction: column;
+  width:70%;
+
+  :global(.ant-form-item-label > label) {
+    font-size: var(--ant-font-size-lg);
+    font-weight: bold;
+  }
+
+  :global(button) {
+    font-weight: bold;
+  }
+}
+
+.submitButton {
+  width: 100%;
+  margin-top: var(--ant-margin-sm);
+  margin-bottom: var(--ant-margin-sm);
+}
+
+// 警告框样式，在找回密码界面
+:global(.ant-alert) {
+  margin-top: var(--ant-margin-sm);
+  margin-bottom: var(--ant-margin-xl);
+  
+  :global(.ant-alert-icon) {
+    margin-top: 0;
+    align-self: center;
+    font-size: var(--ant-font-size-lg);
+  }
+  
+  :global(.ant-alert-content) {
+    display: flex;
+    align-items: center;
+  }
+}

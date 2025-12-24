@@ -2,10 +2,14 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 // 引入布局
 import SystemLayout from '@/layouts/SystemLayout';
+import AuthLayout from './layouts/AuthLayout';
 
 // 引入页面 (实际开发中建议使用 lazy load)
 import Home from '@/views/home';
 import Login from '@/views/auth/Login';
+import Register from '@/views/auth/Register';
+import ResetPassword from '@/views/auth/ResetPassword';
+import NewPassword from '@/views/auth/NewPassword';
 import DriveList from '@/views/drive'; // 文档列表页
 // import Editor from '@/views/editor';   // 编辑器页
 
@@ -19,7 +23,43 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <Login />,
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <Login />,
+      },
+    ],
+  },
+  {
+    path: '/register',
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <Register />,
+      },
+    ],
+  },
+  {
+    path: '/reset-pwd',
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <ResetPassword />,
+      },
+    ],
+  },
+  {
+    path: '/new-pwd',
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <NewPassword />,
+      },
+    ],
   },
 
   // ==============================
