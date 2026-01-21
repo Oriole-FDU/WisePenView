@@ -1,65 +1,47 @@
 import React, { useState } from 'react';
+import { Form, Typography, Input, Button, Modal, message as antMessage } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { RiLockLine } from 'react-icons/ri';
+import Axios from '@/utils/Axios';
 import styles from './Auth.module.less';
-import { Form, Typography, Input, Button, Flex, Modal } from 'antd';
-import { RiLockLine, RiMailLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
-import request from '@/utils/request';
-import { message as antMessage } from 'antd';
-import { useLoading } from '@/hooks/useLoading';
-import { useNavigate } from 'react-router-dom';
-interface NewPasswordFormValue {
-    newPassword:string
-}
+import type { NewPasswordFormValue } from './index.type';
 
 const NewPassword: React.FC = () => {
     const [form] = Form.useForm<NewPasswordFormValue>();
     const [messageApi, contextHolder] = antMessage.useMessage();
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const navigate = useNavigate();
-    const { loading, run } = useLoading();
-
+    const [loading, setLoading] = useState(false);
+    
     const onFinish = async (values: NewPasswordFormValue) => {
+
         //token 在url中，url的格式为/new-pwd?token=xxxx
         const token = window.location.search.split('token=')[1];
         console.log(token);
 
-        // 检查token是否存在
         if (!token) {
             messageApi.error('token不存在');
             return;
         }
 
-        // 验证新密码长度必须大于8，且包含字母和数字
-        const newPassword = values.newPassword;
-        const hasLetter = /[a-zA-Z]/.test(newPassword);
-        const hasNumber = /[0-9]/.test(newPassword);
-
-        if (newPassword.length <= 8) {
-            messageApi.error('密码必须大于8位');
-            return;
-        }
-        if (!(hasLetter && hasNumber)) {
-            messageApi.error('密码必须包含字母和数字');
-            return;
-        }
-
-        // 发送请求，设置新密码
         try {
-            await run(
-                () => request.post('/auth/forgot-password/reset', {
-                    newPassword: values.newPassword,
-                    token,
-                }),
-                { showMessage: true, messageText: '正在设置新密码...', messageKey: 'newPasswordLoading' }
-            );
+            setLoading(true);
+            await Axios.post('/auth/forgot-password/reset', {
+                newPassword: values.newPassword,
+                token,
+            });
+            setLoading(false);
             setSuccessModalOpen(true);
         } catch (err: any) {
             messageApi.error(err.response?.data?.msg || '设置失败');
+            setLoading(false);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <Flex vertical className={styles.authContainer}>
+        <div className={styles.authContainer}>
             {contextHolder}
             <Typography.Title>
                 设置新密码
@@ -71,9 +53,17 @@ const NewPassword: React.FC = () => {
                 <Form.Item
                     label="新密码"
                     name="newPassword"
-                    rules={[{ required: true, message: '请输入新密码' }]}
+                    rules={[
+                        { required: true, message: '请输入新密码' },
+                        { min: 9, message: '密码至少长度为9位' },
+                        { pattern: /[a-zA-Z]/, message: '密码必须包含字母' },
+                        { pattern: /[0-9]/, message: '密码必须包含数字' },
+                    ]}
                 >
-                    <Input.Password placeholder='输入新密码' size='large' prefix={<RiLockLine />} />
+                    <Input.Password placeholder='输入新密码' 
+                        size='large' 
+                        prefix={<RiLockLine />} 
+                    />
                 </Form.Item>
 
                 <Form.Item>
@@ -86,13 +76,13 @@ const NewPassword: React.FC = () => {
                     >
                         确认
                     </Button>
-                    <Flex style={{ justifyContent: 'center' }}>
+                    <div className={styles.centerLinks}>
                         <Typography.Text>
                             <Link to="/login">
                                 返回登录
                             </Link>
                         </Typography.Text>
-                    </Flex>
+                    </div>
                 </Form.Item>
             </Form>
             <Modal
@@ -116,7 +106,7 @@ const NewPassword: React.FC = () => {
             >
                 <Typography.Text>恭喜您，密码设置成功！请前往登录页面登录。</Typography.Text>
             </Modal>
-        </Flex>
+        </div>
     );
 };
 

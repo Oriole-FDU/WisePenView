@@ -1,49 +1,46 @@
 import React, { useState } from 'react';
-import styles from './Auth.module.less';
-import { Form, Typography, Input, Button, Flex, Checkbox } from 'antd';
+import { Form, Typography, Input, Button, message as antMessage } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
 import { RiUserLine, RiLockLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
-import request from '@/utils/request';
+import Axios from '@/utils/Axios';
+import styles from './Auth.module.less';
 import ServiceAgreement from './ServiceAgreement';
-import { message as antMessage } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { useLoading } from '@/hooks/useLoading';
-interface LoginFormValues {
-    account:string;
-    password:string;
-}
+import type { LoginFormValues } from './index.type';
 
 const Login: React.FC = () => {
     const [contractOpen, setContractOpen] = useState(false);
     const [form] = Form.useForm<LoginFormValues>()
     const [messageApi, contextHolder] = antMessage.useMessage();
     const navigate = useNavigate();
-    const { loading, run } = useLoading();
+    const [loading, setLoading] = useState(false);
 
     const onFinish = async (values: LoginFormValues) => {
         try {
-            await run(
-                () => request.post('/auth/login', values),
-                { showMessage: true, messageText: '正在登录...', messageKey: 'loginLoading' }
-            );
+            setLoading(true);
+            await Axios.post('/auth/login', values);
+            setLoading(false);
             navigate('/app/drive');
         } catch (err: any) {
             messageApi.error(err.response?.data?.msg || '登录失败');
+            setLoading(false);
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
-        <Flex vertical className={styles.authContainer}>
+        <div className={styles.authContainer}>
             {contextHolder}
+
             <Typography.Title>
                 登录
             </Typography.Title>
+
             <Form layout="vertical"
                 form={form}
                 onFinish={onFinish}
                 requiredMark={false}>
                 <Form.Item
-
                     label="学工号/用户名"
                     name="account"
                     rules={[{ required: true, message: '请输入学工号或用户名' }]}
@@ -69,19 +66,18 @@ const Login: React.FC = () => {
                     >
                         登录
                     </Button>
-                    <Flex style={{ justifyContent: 'center' }}>
-                        <Flex style={{ gap: 'var(--ant-margin-sm)', marginLeft: 'auto' }}>
+                        <div className={styles.rightLinks}>
                             <Link to="/register">
                                 注册
                             </Link>
                             <Link to="/reset-pwd">
                                 忘记密码
                             </Link>
-                        </Flex>
-                    </Flex>
+                        </div>
                 </Form.Item>
             </Form>
-            <Flex style={{ marginTop: 'var(--ant-margin-sm)' }}>
+
+            <div className={styles.leftBottomLinks}>
                 <Typography.Text>
                     登录系统即视为接受
                 </Typography.Text>
@@ -90,12 +86,13 @@ const Login: React.FC = () => {
                 >
                     用户协议
                 </Link>
-            </Flex>
+            </div>
+
             <ServiceAgreement
                 open={contractOpen}
                 onCancel={() => setContractOpen(false)}
             />
-        </Flex>
+        </div>
     );
 };
 

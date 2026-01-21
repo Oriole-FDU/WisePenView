@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
+import { Checkbox, Form, Typography, Input, Button, Modal, message as antMessage } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { RiUserLine, RiLockLine } from 'react-icons/ri';
+import Axios from '@/utils/Axios';
 import styles from './Auth.module.less';
-import { Checkbox, Form, Typography, Input, Button, Flex, message as antMessage, Modal } from 'antd';
-import { RiUserLine, RiLockLine, RiMailLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
-import request from '@/utils/request';
 import ServiceAgreement from './ServiceAgreement';
-import { useNavigate } from 'react-router-dom';
-import { useLoading } from '@/hooks/useLoading';
-interface RegisterFormValues {
-  username:string;
-  password:string;
-}
+import type { RegisterFormValues } from './index.type';
 
 const Register: React.FC = () => {
   const [contractOpen, setContractOpen] = useState(false);
@@ -19,45 +14,31 @@ const Register: React.FC = () => {
   const [form] = Form.useForm<RegisterFormValues>();
   const [messageApi, contextHolder] = antMessage.useMessage();
   const navigate = useNavigate();
-  const { loading, run } = useLoading();
+  const [loading, setLoading] = useState(false);
 
   const onFinish = async (values: RegisterFormValues) => {
-    // 未接受用户协议时，提示错误，中断提交
+
     if (!agreement) {
       messageApi.error('请接受用户协议');
       return;
     }
 
-    // 密码长度必须大于8，且包含字母和数字
-    const password = values.password;
-    const hasLetter = /[a-zA-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-
-    if (password.length <= 8) {
-      messageApi.error('密码必须大于8位');
-      return;
-    }
-
-    if (!(hasLetter && hasNumber)) {
-      messageApi.error('密码必须包含字母和数字');
-      return;
-    }
-
-    //通过验证后，发送注册请求
     try {
-      await run(
-        () => request.post('/auth/register', values),
-        { showMessage: true, messageText: '正在注册...', messageKey: 'registerLoading' }
-      );
+      setLoading(true);
+      await Axios.post('/auth/register', values);
+      setLoading(false);
       setContractOpen(false);
       setSuccessModalOpen(true);
     } catch (err: any) {
       messageApi.error(err.response?.data?.msg || '注册失败');
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Flex vertical className={styles.authContainer}>
+    <div className={styles.authContainer}>
       {contextHolder}
       <Typography.Title>
         注册
@@ -78,13 +59,17 @@ const Register: React.FC = () => {
         <Form.Item
           label="密码"
           name="password"
-          rules={[{ required: true, message: '请输入密码' }]}
+          rules={[
+            { required: true, message: '请输入密码' },
+            { min: 9, message: '密码至少长度为9位' },
+            { pattern: /[a-zA-Z]/, message: '密码必须包含字母' },
+            { pattern: /[0-9]/, message: '密码必须包含数字' },
+          ]}
         >
           <Input.Password placeholder='输入密码' size='large' prefix={<RiLockLine />} />
         </Form.Item>
 
-        <Form.Item style={{ marginTop: 'var(--ant-margin-sm)' }}>
-          <Flex>
+        <Form.Item>
             <Checkbox checked={agreement} onChange={(e) => setAgreement(e.target.checked)}>
               我已阅读并接受
             </Checkbox>
@@ -93,8 +78,8 @@ const Register: React.FC = () => {
             >
               用户协议
             </Link>
-          </Flex>
         </Form.Item>
+
         <Form.Item>
           <Button 
             type="primary" 
@@ -105,14 +90,14 @@ const Register: React.FC = () => {
           >
             注册
           </Button>
-          <Flex style={{ justifyContent: 'center' }}>
+          <div className={styles.centerLinks}>
             <Typography.Text>
               已有账号？
               <Link to="/login">
                 登录
               </Link>
             </Typography.Text>
-          </Flex>
+          </div>
         </Form.Item>
       </Form>
         <ServiceAgreement
@@ -126,7 +111,7 @@ const Register: React.FC = () => {
           footer={[
             <Button key="stay" onClick={() => {
               setSuccessModalOpen(false);
-              form.resetFields(); // 清空表单
+              form.resetFields(); 
               setAgreement(false);
             }}>
               留在当前页面
@@ -142,7 +127,7 @@ const Register: React.FC = () => {
         >
           <Typography.Text>恭喜您，注册成功！请前往登录页面登录。</Typography.Text>
         </Modal>
-    </Flex>
+    </div>
   );
 };
 

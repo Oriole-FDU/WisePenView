@@ -1,35 +1,32 @@
-import React from 'react';
-import styles from './Auth.module.less';
-import { Alert, Form, Typography, Input, Button, Flex, Select } from 'antd';
-import { RiMailLine } from 'react-icons/ri';
+import React, { useState } from 'react';
+import { Alert, Form, Typography, Input, Button, message as antMessage } from 'antd';
 import { Link } from 'react-router-dom';
-import request from '@/utils/request';
-import { message as antMessage } from 'antd';
-import { useLoading } from '@/hooks/useLoading';
-
-interface ResetPasswordFormValues {
-    campusNum:string
-}
+import { RiMailLine } from 'react-icons/ri';
+import Axios from '@/utils/Axios';
+import styles from './Auth.module.less';
+import type { ResetPasswordFormValues } from './index.type';
 
 const ResetPassword: React.FC = () => {
     const [form] = Form.useForm<ResetPasswordFormValues>();
     const [messageApi, contextHolder] = antMessage.useMessage();
-    const { loading, run } = useLoading();
+    const [loading, setLoading] = useState(false);
 
     const onFinish = async (values: ResetPasswordFormValues) => {
         try {
-            await run(
-                () => request.post('/auth/forgot-password/email', values),
-                { showMessage: true, messageText: '正在发送邮件...', messageKey: 'resetPasswordLoading' }
-            );
+            setLoading(true);
+            await Axios.post('/auth/forgot-password/email', values);
+            setLoading(false);
             messageApi.info("邮件将发送至您的学工号邮箱，请注意查收。");
         } catch (err: any) {
             messageApi.error(err.response?.data?.msg || '发送失败');
+            setLoading(false);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <Flex vertical className={styles.authContainer}>
+        <div className={styles.authContainer}>
             {contextHolder}
             <Typography.Title>
                 找回密码
@@ -70,16 +67,16 @@ const ResetPassword: React.FC = () => {
                     >
                         发送验证码
                     </Button>
-                    <Flex style={{ justifyContent: 'center' }}>
+                    <div className={styles.centerLinks}>
                         <Typography.Text>
                             <Link to="/login">
                                 返回登录
                             </Link>
                         </Typography.Text>
-                    </Flex>
+                    </div>
                 </Form.Item>
             </Form>
-        </Flex>
+        </div>
     );
 };
 
