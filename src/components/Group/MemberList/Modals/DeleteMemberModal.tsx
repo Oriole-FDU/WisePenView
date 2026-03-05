@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert, message } from 'antd';
 import { GroupServices } from '@/services/Group';
+import type { KickMembersRequest } from '@/services/Group';
 import { useMemberEditGuard } from './useMemberEditGuard';
 import type { DeleteMemberModalProps } from './index.type';
 import { toNumberIds } from '@/utils/number';
@@ -26,10 +27,11 @@ const DeleteMemberModal: React.FC<DeleteMemberModalProps> = ({
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      await GroupServices.kickMembers({
+      const params: KickMembersRequest = {
         groupId: toNumberIds(groupId),
         targetUserIds: memberIds,
-      });
+      };
+      await GroupServices.kickMembers(params);
       message.success(`已删除 ${memberIds.length} 位成员`);
       onSuccess?.();
       onCancel();

@@ -3,6 +3,7 @@ import { Modal, Button, Form, Input, Select, Upload, message } from 'antd';
 import type { UploadFile } from 'antd';
 import { LuUpload } from 'react-icons/lu';
 import { GroupServices } from '@/services/Group';
+import type { CreateGroupRequest } from '@/services/Group';
 import { useUserStore } from '@/store/useUserStore';
 import { GROUP_TYPE, GROUP_TYPE_LABELS, ALLOWED_GROUP_TYPES_MAP } from '@/constants/group';
 import type { CreateGroupModalProps } from './index.type';
@@ -17,7 +18,7 @@ const groupTypeOptionsBase = Object.entries(GROUP_TYPE_LABELS).map(([value, labe
 }));
 
 const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onSuccess }) => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<CreateGroupRequest>();
   const [submitting, setSubmitting] = useState(false);
 
   const identityType = useUserStore((state) => state.user?.identityType);
@@ -36,13 +37,9 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onS
 
   const handleConfirm = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await form.validateFields() as CreateGroupRequest;
       setSubmitting(true);
-      await GroupServices.createGroup({
-        groupName: values.groupName,
-        description: values.description,
-        groupType: values.groupType,
-      });
+      await GroupServices.createGroup(values);
       message.success('创建成功');
       form.resetFields();
       onCancel();

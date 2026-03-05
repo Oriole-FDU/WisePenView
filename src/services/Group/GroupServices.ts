@@ -5,6 +5,7 @@ import type { Group, GroupMember, MemberListPage } from '@/types/group';
 import { ROLE_REVERSE_MAP } from '@/types/group';
 import type { ApiResponse } from '@/types/api';
 import type {
+  FetchGroupListRequest,
   FetchGroupListResponse,
   CreateGroupRequest,
   EditGroupRequest,
@@ -16,10 +17,9 @@ import type {
 } from './index.type';
 
 const fetchGroupList = async (
-  relationType: 1 | 2,
-  page: number,
-  pageSize: number
+  params: FetchGroupListRequest
 ): Promise<{ groups: Group[]; total: number }> => {
+  const { relationType, page, pageSize } = params;
   const res = (await Axios.get('/group/list', {
     params: { relationType, page, size: pageSize },
   })) as ApiResponse<FetchGroupListResponse>;

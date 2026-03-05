@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Input, Alert, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { GroupServices } from '@/services/Group';
+import type { DeleteGroupRequest } from '@/services/Group';
 import { toNumberIds } from '@/utils/number';
 import type { DissolveGroupModalProps } from './index.type';
 import styles from './style.module.less';
@@ -28,7 +29,8 @@ const DissolveGroupModal: React.FC<DissolveGroupModalProps> = ({
     }
     try {
       setLoading(true);
-      await GroupServices.deleteGroup({ groupId: toNumberIds(groupId) });
+      const params: DeleteGroupRequest = { groupId: toNumberIds(groupId) };
+      await GroupServices.deleteGroup(params);
       message.success('已解散小组');
       setConfirmName('');
       onSuccess?.();

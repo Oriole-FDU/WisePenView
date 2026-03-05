@@ -11,7 +11,7 @@ import {
 } from '@/components/Group/GroupModals';
 import { GroupServices } from '@/services/Group';
 import type { Group } from '@/types/group';
-import { GROUP_TYPE } from '@/constants/group';
+import { GROUP_TYPE, getGroupTypeLabel } from '@/constants/group';
 import styles from './style.module.less';
 
 const GroupDetail: React.FC = () => {
@@ -58,7 +58,7 @@ const GroupDetail: React.FC = () => {
   const [exitGroupModalOpen, setExitGroupModalOpen] = useState(false);
 
   const permissionConfig = useMemo(
-    () => (group ? getPermissionConfig(group.type, currentUserRole) : null),
+    () => (group ? getPermissionConfig(getGroupTypeLabel(group.type), currentUserRole) : null),
     [group, currentUserRole]
   );
 

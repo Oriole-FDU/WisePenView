@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Select, Alert, message } from 'antd';
 import { GroupServices } from '@/services/Group';
+import type { UpdateMemberRoleRequest } from '@/services/Group';
 import { useMemberEditGuard } from './useMemberEditGuard';
 import type { EditPermissionModalProps } from './index.type';
 import { ROLE_MAP } from '@/types/group';
@@ -35,13 +36,14 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
       const role = ROLE_MAP[selectedPermission] ?? 3;
       const groupIdNum = toNumberIds(groupId);
       await Promise.all(
-        memberIds.map((targetUserId) =>
-          GroupServices.updateMemberRole({
+        memberIds.map((targetUserId) => {
+          const params: UpdateMemberRoleRequest = {
             groupId: groupIdNum,
             targetUserId,
             role,
-          })
-        )
+          };
+          return GroupServices.updateMemberRole(params);
+        })
       );
       message.success(`已修改 ${memberIds.length} 位成员的权限`);
       onSuccess?.();

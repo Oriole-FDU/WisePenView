@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, Button, Row, Col, Pagination, Empty, Spin, message } from 'antd';
 import { AiOutlinePlus, AiOutlineUserAdd } from 'react-icons/ai';
 import GroupCard from '@/components/Group/GroupCard';
-import { GroupServices } from '@/services/Group';
+import { GroupServices, type FetchGroupListRequest } from '@/services/Group';
 import type { Group } from '@/types/group';
 import { RELATION_TYPE_MAP } from '@/constants/group';
 import { JoinGroupModal, CreateGroupModal } from '@/components/Group/GroupModals';
@@ -25,11 +25,12 @@ const MyGroup: React.FC = () => {
   const fetchGroups = useCallback(async () => {
     setLoading(true);
     try {
-      const { groups: list, total: totalCount } = await GroupServices.fetchGroupList(
+      const params: FetchGroupListRequest = {
         relationType,
         page,
-        pageSize
-      );
+        pageSize,
+      };
+      const { groups: list, total: totalCount } = await GroupServices.fetchGroupList(params);
       setGroups(list);
       setTotal(totalCount);
     } catch (error) {

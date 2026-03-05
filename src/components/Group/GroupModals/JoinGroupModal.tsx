@@ -1,25 +1,20 @@
 import React from 'react';
 import { Modal, Button, Form, Input, message } from 'antd';
 import { GroupServices } from '@/services/Group';
+import type { JoinGroupRequest } from '@/services/Group';
 import type { JoinGroupModalProps } from './index.type';
 import styles from './style.module.less';
 
 const INVITE_CODE_LENGTH = 6;
 
 const JoinGroupModal: React.FC<JoinGroupModalProps> = ({ open, onCancel, onSuccess }) => {
-  const [form] = Form.useForm();
-  const inviteCode = Form.useWatch('inviteCode', form) ?? '';
-  const isConfirmDisabled = inviteCode.trim().length !== INVITE_CODE_LENGTH;
+  const [form] = Form.useForm<JoinGroupRequest>();
+  const isConfirmDisabled = Form.useWatch('inviteCode', form)?.trim().length !== INVITE_CODE_LENGTH;
 
   const handleConfirm = async () => {
     try {
-      const values = await form.validateFields();
-      const inviteCode = values.inviteCode?.trim?.();
-      if (!inviteCode) {
-        message.error('请输入邀请码');
-        return;
-      }
-      await GroupServices.joinGroup({ inviteCode });
+      const params = (await form.validateFields()) as JoinGroupRequest;
+      await GroupServices.joinGroup(params);
       message.success('加入小组成功');
       form.resetFields();
       onSuccess?.();
