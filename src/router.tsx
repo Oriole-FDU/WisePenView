@@ -6,7 +6,11 @@ import AuthLayout from '@/layouts/AuthLayout';
 
 // 引入页面 (实际开发中建议使用 lazy load)
 import Home from '@/views/home';
-import DriveList from '@/views/drive'; // 文档列表页
+import DriveList from '@/views/drive';
+import MyGroup from '@/views/group/MyGroup';
+import GroupDetail from '@/views/group/GroupDetail';
+// import PermissionConfigPreview from '@/views/group/PermissionConfigPreview';
+import Usage from '@/views/profile/Usage';
 import Login from '@/views/auth/Login';
 import Register from '@/views/auth/Register';
 import ResetPassword from '@/views/auth/ResetPassword';
@@ -79,6 +83,23 @@ const router = createBrowserRouter([
         path: 'drive',
         element: <DriveList />,
       },
+      {
+        path: 'my-group',
+        element: <MyGroup />,
+      },
+      {
+        path: 'my-group/:id',
+        element: <GroupDetail />,
+      },
+      {
+        path: 'profile/usage',
+        element: <Usage />,
+      },
+      // 权限配置预览（界面保留，需要时取消注释）
+      // {
+      //   path: 'permission-preview',
+      //   element: <PermissionConfigPreview />,
+      // },
     //   // 具体文档编辑页 (例如 /app/editor/123)
     //   {
     //     path: 'editor/:id',

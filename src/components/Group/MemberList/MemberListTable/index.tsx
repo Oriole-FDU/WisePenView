@@ -1,0 +1,197 @@
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { Table, message } from 'antd';
+import type { TableProps, TablePaginationConfig } from 'antd';
+import type { GroupMember } from '@/types/group';
+import type { MemberListPaginationConfig, MemberListTableProps } from './index.type';
+import { getColumns } from './TableConfig';
+import styles from './style.module.less';
+import { GroupServices } from '@/services/Group';
+
+type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
+
+const MemberListTable: React.FC<MemberListTableProps> = ({
+  groupId,
+  permissionConfig,
+  pagination,
+  isEditMode,
+  selectedRowKeys,
+  onSelectedRowKeysChange,
+  onSelectedMembersChange,
+  onTotalChange,
+  refreshTrigger,
+  mockMembers,
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(pagination?.defaultPageSize ?? 5);
+  const [loading, setLoading] = useState(false);
+  const [members, setMembers] = useState<GroupMember[]>(mockMembers ?? []);
+  const [total, setTotal] = useState(mockMembers?.length ?? 0);
+
+  const selectedMembersMapRef = useRef<Map<number, GroupMember>>(new Map());
+
+  const fetchMembers = async (page: number, size: number) => {
+    if (mockMembers != null) return;
+    try {
+      setLoading(true);
+      const { members: newMembers, total: newTotal } = await GroupServices.fetchGroupMembers(
+        groupId,
+        page,
+        size
+      );
+      setMembers(newMembers);
+      setTotal(newTotal);
+      onTotalChange?.(newTotal);
+    } catch {
+      message.error('获取成员列表失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (mockMembers != null) {
+      setMembers(mockMembers);
+      setTotal(mockMembers.length);
+      onTotalChange?.(mockMembers.length);
+      return;
+    }
+    fetchMembers(1, pageSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, mockMembers]);
+
+  useEffect(() => {
+    if (mockMembers != null) return;
+    setCurrentPage(1);
+    fetchMembers(1, pageSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize]);
+
+  useEffect(() => {
+    if (mockMembers != null) return;
+    if (refreshTrigger != null && refreshTrigger > 0) {
+      fetchMembers(currentPage, pageSize);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
+
+  const paginationConfig: Required<MemberListPaginationConfig> = {
+    defaultPageSize: pagination?.defaultPageSize ?? 5,
+    pageSizeOptions: pagination?.pageSizeOptions ?? [5, 10, 20, 50],
+    showSizeChanger: pagination?.showSizeChanger ?? true,
+  };
+
+  const dataSource = useMemo(
+    () =>
+      members.map((member) => ({
+        ...member,
+        key: member.userId,
+      })),
+    [members]
+  );
+
+  useEffect(() => {
+    members.forEach((member) => {
+      const key = member.userId;
+      if (selectedRowKeys.some((k) => Number(k) === key)) {
+        selectedMembersMapRef.current.set(key, member);
+      }
+    });
+
+    if (onSelectedMembersChange) {
+      const selectedMembers = selectedRowKeys
+        .map((k) => selectedMembersMapRef.current.get(Number(k)))
+        .filter((member): member is GroupMember => member !== undefined);
+      onSelectedMembersChange(selectedMembers);
+    }
+  }, [members, selectedRowKeys, onSelectedMembersChange]);
+
+  const columns = useMemo(() => getColumns(permissionConfig, styles), [permissionConfig]);
+
+  const rowSelection: TableRowSelection<GroupMember & { key: React.Key }> = useMemo(() => {
+    if (!isEditMode) return undefined;
+
+    const currentPageKeysSet = new Set(dataSource.map((item) => String(item.key)));
+
+    return {
+      selectedRowKeys: selectedRowKeys.filter((key) => currentPageKeysSet.has(String(key))),
+      onChange: (newSelectedRowKeys: React.Key[]) => {
+        const validNewKeys: (string | number)[] = newSelectedRowKeys.filter(
+          (key): key is string | number => typeof key === 'string' || typeof key === 'number'
+        );
+
+        const otherPageKeys = selectedRowKeys.filter((key) => !currentPageKeysSet.has(String(key)));
+        const finalSelectedKeys = [...otherPageKeys, ...validNewKeys];
+        onSelectedRowKeysChange(finalSelectedKeys);
+
+        validNewKeys.forEach((key) => {
+          const numKey = typeof key === 'string' ? parseInt(key, 10) : key;
+          const member = members.find((m) => m.userId === numKey);
+          if (member) selectedMembersMapRef.current.set(numKey, member);
+        });
+
+        const validNewKeysSet = new Set(validNewKeys.map((k) => String(k)));
+        const previousCurrentPageKeys = selectedRowKeys.filter((key) =>
+          currentPageKeysSet.has(String(key))
+        );
+        previousCurrentPageKeys.forEach((key) => {
+          if (!validNewKeysSet.has(String(key))) {
+            const numKey = typeof key === 'string' ? parseInt(key, 10) : key;
+            selectedMembersMapRef.current.delete(numKey);
+          }
+        });
+      },
+    };
+  }, [isEditMode, selectedRowKeys, dataSource, members, onSelectedRowKeysChange]);
+
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+    _filters: unknown,
+    _sorter: unknown
+  ) => {
+    let newPage = currentPage;
+    let newPageSize = pageSize;
+    let pageChanged = false;
+
+    if (pagination.current !== undefined && pagination.current !== currentPage) {
+      newPage = pagination.current;
+      setCurrentPage(newPage);
+      pageChanged = true;
+    }
+
+    if (pagination.pageSize !== undefined && pagination.pageSize !== pageSize) {
+      newPageSize = pagination.pageSize;
+      setPageSize(newPageSize);
+      if (pagination.current === undefined) {
+        newPage = 1;
+        setCurrentPage(1);
+      }
+      pageChanged = true;
+    }
+
+    if (pageChanged) {
+      await fetchMembers(newPage, newPageSize);
+    }
+  };
+
+  return (
+    <Table<GroupMember & { key: React.Key }>
+      rowSelection={rowSelection}
+      columns={columns}
+      dataSource={dataSource}
+      className={styles.tableWrapper}
+      onChange={handleTableChange}
+      loading={loading}
+      pagination={{
+        size: 'small',
+        current: currentPage,
+        pageSize,
+        total,
+        pageSizeOptions: paginationConfig.pageSizeOptions,
+        showSizeChanger: paginationConfig.showSizeChanger,
+        showTotal: (total) => `共 ${total} 人`,
+      }}
+    />
+  );
+};
+
+export default MemberListTable;

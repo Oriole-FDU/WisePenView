@@ -2,12 +2,13 @@ import React from 'react';
 import { Menu, Avatar, Dropdown } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
-import { 
-  RiIndentDecrease, 
+import {
+  RiIndentDecrease,
   RiIndentIncrease,
-  RiAddCircleFill, 
+  RiAddCircleFill,
   RiFileTextLine,
-  RiArrowDownSLine
+  RiGroupFill,
+  RiArrowDownSLine,
 } from 'react-icons/ri';
 
 import styles from './style.module.less';
@@ -36,6 +37,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
       key: '/app/drive',
       icon: <RiFileTextLine size={18} />,
       label: '文档与云盘',
+    },
+    {
+      key: '/app/my-group',
+      icon: <RiGroupFill size={18} />,
+      label: '我的小组',
     },
     {
       type: 'group',

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Avatar, Dropdown } from 'antd';
-// 保持使用 type 导入，避免报错
 import type { MenuProps } from 'antd';
 import clsx from 'clsx';
+import { useNavigate } from 'react-router-dom';
+import { useUserStore } from '@/store/useUserStore';
 
 import { 
   RiArrowDownSLine, 
@@ -22,7 +23,37 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
-  // 定义菜单项
+  const navigate = useNavigate();
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    switch (key) {
+      case 'subscription':
+        navigate('/app/profile/subscription');
+        break;
+      case 'usage':
+        navigate('/app/profile/usage');
+        break;
+      case 'account':
+        navigate('/app/profile/account');
+        break;
+      case 'feedback':
+        navigate('/app/profile/feedback');
+        break;
+      case 'language':
+        console.log('打开语言设置');
+        break;
+      case 'theme':
+        console.log('打开主题设置');
+        break;
+      case 'logout':
+        useUserStore.getState().clearUser();
+        navigate('/login', { replace: true });
+        break;
+      default:
+        break;
+    }
+  };
+
   const items: MenuProps['items'] = [
     // --- 第一组：订阅与财务 ---
     {
@@ -75,10 +106,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
 
   // 下拉菜单配置
   const dropdownProps = {
-    menu: { 
+    menu: {
       items,
-      // 这里的样式控制下拉框的宽度，让右侧文字不拥挤
-      style: { minWidth: 240 } 
+      onClick: handleMenuClick,
+      style: { minWidth: 240 },
     },
     trigger: ['click'] as ('click' | 'hover' | 'contextMenu')[],
     placement: 'topLeft' as const, 
