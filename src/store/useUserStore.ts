@@ -1,8 +1,7 @@
 import { create } from 'zustand';
-import Axios from '@/utils/Axios';
-import type { APIUserInfo, User } from '@/types/user';
-
-import type { ApiResponse } from '@/types/api';
+import { UserServices } from '@/services/User';
+import type { GetUserInfoResponse } from '@/services/User';
+import type { User } from '@/types/user';
 
 type UserStore = {
   user: User | null;
@@ -16,8 +15,7 @@ export const useUserStore = create<UserStore>((set) => ({
   setUser: (user) => set({ user }),
   clearUser: () => set({ user: null }),
   fetchUserInfo: async () => {
-    const res = (await Axios.get('/user/info')) as ApiResponse<APIUserInfo>;
-    const apiData: APIUserInfo = res.data;
+    const apiData: GetUserInfoResponse = await UserServices.fetchUserInfo();
     const user: User = {
       id: apiData.id,
       username: apiData.username,

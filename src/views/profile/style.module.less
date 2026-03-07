@@ -11,6 +11,37 @@
   margin-bottom: var(--ant-margin-lg);
 }
 
+.statusGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ant-margin-xs);
+  flex-shrink: 0;
+}
+
+.statusText {
+  font-size: var(--ant-font-size-base);
+  color: var(--ant-color-text-secondary);
+}
+
+.statusIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+
+  .statusIconBanned {
+    color: var(--ant-color-error);
+  }
+
+  .statusIconUnverified {
+    color: #faad14;
+  }
+
+  .statusIconVerified {
+    color: var(--ant-color-success);
+  }
+}
+
 .pageTitle {
   font-size: var(--ant-font-size-heading-3);
   margin: 0 0 var(--ant-margin-xxs) 0;
@@ -18,4 +49,187 @@
 
 .pageSubtitle {
   color: var(--ant-color-text-secondary);
+}
+
+.statusBanner {
+  margin-bottom: var(--ant-margin-lg);
+  display: flex;
+  align-items: center;
+
+  :global(.ant-alert-icon) {
+    margin-top: 0;
+  }
+}
+
+.sectionDivider {
+  margin: var(--ant-margin-lg) 0;
+}
+
+.formSection {
+  flex: 1;
+  min-width: 0;
+  padding: var(--ant-padding-lg);
+  background-color: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--ant-margin-lg) 0;
+  font-size: var(--ant-font-size-heading-4);
+  font-weight: 500;
+  color: var(--ant-color-text);
+}
+
+/* 头部信息 */
+.accountHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ant-margin-lg);
+}
+
+.accountHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-lg);
+}
+
+.avatar {
+  flex-shrink: 0;
+  background-color: var(--ant-color-fill-secondary);
+  color: var(--ant-color-text);
+  font-size: var(--ant-font-size-heading-3);
+  font-weight: 500;
+}
+
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-xs);
+}
+
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ant-margin-sm);
+}
+
+.nickname {
+  font-size: var(--ant-font-size-heading-4);
+  font-weight: 500;
+  color: var(--ant-color-text);
+}
+
+.username {
+  font-size: var(--ant-font-size-base);
+  color: var(--ant-color-text-secondary);
+}
+
+.identityTag {
+  display: inline-block;
+  padding: var(--ant-padding-xxs) var(--ant-padding-sm);
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-primary);
+  background-color: var(--ant-color-primary-bg);
+  border-radius: var(--ant-border-radius-sm);
+  width: fit-content;
+}
+
+.descriptions {
+  :global(.ant-descriptions-item-label) {
+    color: var(--ant-color-text-tertiary);
+  }
+}
+
+/* 基本档案 */
+.profileSection {
+  margin-top: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--ant-margin-lg);
+
+  .sectionTitle {
+    margin-bottom: 0;
+  }
+}
+
+.formFieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ant-margin-md) var(--ant-margin-lg);
+  margin-bottom: 0;
+
+  :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.editableInput {
+  background-color: var(--ant-color-bg-container) !important;
+}
+
+.readOnlyField {
+  padding: var(--ant-padding-sm) 0;
+  min-height: 32px;
+  line-height: 22px;
+}
+
+.profileForm {
+  :global(.ant-form-item) {
+    margin-bottom: var(--ant-margin-md);
+  }
+
+  .formFieldsGrid :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitItem {
+  margin-bottom: 0 !important;
+  margin-top: var(--ant-margin-md);
+}
+
+.cancelBtn {
+  margin-left: var(--ant-margin-sm);
+}
+
+/* 验证邮箱 Modal */
+.verifyForm {
+  padding-top: var(--ant-padding-sm);
+
+  :global(.ant-form-item) {
+    margin-bottom: var(--ant-margin-md);
+  }
+}
+
+.verifyEmailGroup {
+  display: flex;
+  width: 100%;
+}
+
+.verifyEmailPrefix {
+  flex-shrink: 0;
+  width: 120px !important;
+  border-right: none !important;
+  background-color: var(--ant-color-fill-tertiary) !important;
+  color: var(--ant-color-text-secondary);
+}
+
+.verifyEmailSelect {
+  flex: 1;
+  min-width: 0;
+
+  :global(.ant-select-selector) {
+    border-radius: 0 var(--ant-border-radius) var(--ant-border-radius) 0 !important;
+  }
 }

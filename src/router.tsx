@@ -9,12 +9,14 @@ import Home from '@/views/home';
 import DriveList from '@/views/drive';
 import MyGroup from '@/views/group/MyGroup';
 import GroupDetail from '@/views/group/GroupDetail';
+import Account from '@/views/profile/Account';
 // import PermissionConfigPreview from '@/views/group/PermissionConfigPreview';
 import Usage from '@/views/profile/Usage';
 import Login from '@/views/auth/Login';
 import Register from '@/views/auth/Register';
 import ResetPassword from '@/views/auth/ResetPassword';
 import NewPassword from '@/views/auth/NewPassword';
+import VerifyEmail from '@/views/auth/VerifyEmail';
 // import Editor from '@/views/editor';   // 编辑器页
 
 const router = createBrowserRouter([
@@ -65,6 +67,16 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: '/verify-email',
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true,
+        element: <VerifyEmail />,
+      },
+    ],
+  },
 
   // ==============================
   // 内部系统区域
@@ -95,16 +107,20 @@ const router = createBrowserRouter([
         path: 'profile/usage',
         element: <Usage />,
       },
+      {
+        path: 'profile/account',
+        element: <Account />,
+      },
       // 权限配置预览（界面保留，需要时取消注释）
       // {
       //   path: 'permission-preview',
       //   element: <PermissionConfigPreview />,
       // },
-    //   // 具体文档编辑页 (例如 /app/editor/123)
-    //   {
-    //     path: 'editor/:id',
-    //     element: <Editor />,
-    //   }
+      //   // 具体文档编辑页 (例如 /app/editor/123)
+      //   {
+      //     path: 'editor/:id',
+      //     element: <Editor />,
+      //   }
     ],
   },
 
@@ -114,7 +130,7 @@ const router = createBrowserRouter([
   {
     path: '*',
     element: <div>404 Not Found</div>,
-  }
+  },
 ]);
 
 export default router;
