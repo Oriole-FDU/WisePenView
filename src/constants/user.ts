@@ -1,5 +1,5 @@
 /** 邮箱后缀类型（发起邮箱验证用）：0 -> @m.fudan.edu.cn；1 -> @fudan.edu.cn */
-export const EMAIL_SUFFIX_TYPE = { MOBILE: 0, DESKTOP: 1 } as const;
+export const EMAIL_SUFFIX_TYPE = { M_FUDAN: 0, FUDAN: 1 } as const;
 export const EMAIL_SUFFIX_LABELS: Record<number, string> = {
   0: '@m.fudan.edu.cn',
   1: '@fudan.edu.cn',

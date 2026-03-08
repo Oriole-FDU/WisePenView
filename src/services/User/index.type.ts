@@ -1,5 +1,3 @@
-import type { EmailSuffixType } from '@/types/user';
-
 /** 确认邮箱验证请求参数 */
 export interface ConfirmEmailVerifyRequest {
   token: string;
@@ -8,7 +6,7 @@ export interface ConfirmEmailVerifyRequest {
 /** 发起邮箱验证请求参数 */
 export interface SendEmailVerifyRequest {
   /** 0 -> @m.fudan.edu.cn；1 -> @fudan.edu.cn */
-  suffixType: EmailSuffixType;
+  suffixType: number;
 }
 
 /** 更新用户档案请求参数（仅基本档案可编辑字段） */

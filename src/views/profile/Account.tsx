@@ -134,7 +134,7 @@ const Account: React.FC = () => {
   };
 
   const handleVerify = () => {
-    verifyForm.setFieldsValue({ suffixType: EMAIL_SUFFIX_TYPE.MOBILE });
+    verifyForm.setFieldsValue({ suffixType: EMAIL_SUFFIX_TYPE.M_FUDAN });
     setVerifyModalOpen(true);
   };
 
