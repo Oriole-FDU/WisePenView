@@ -6,7 +6,8 @@ import AuthLayout from '@/layouts/AuthLayout';
 
 // 引入页面 (实际开发中建议使用 lazy load)
 import Home from '@/views/home';
-import DriveList from '@/views/drive';
+import Drive from '@/views/drive/Drive';
+import TagManager from '@/views/drive/TagManager';
 import MyGroup from '@/views/group/MyGroup';
 import GroupDetail from '@/views/group/GroupDetail';
 import Account from '@/views/profile/Account';
@@ -97,7 +98,11 @@ const router = createBrowserRouter([
       // 文档与云盘页
       {
         path: 'drive',
-        element: <DriveList />,
+        element: <Drive />,
+      },
+      {
+        path: 'drive/tags',
+        element: <TagManager />,
       },
       {
         path: 'my-group',

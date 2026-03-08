@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Button } from 'antd';
+import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import ChatPanel from '@/components/ChatPanel';
@@ -9,7 +9,6 @@ const { Content, Sider } = Layout;
 
 const SystemLayout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   const [showChat, setShowChat] = useState(true);
 
   return (
@@ -17,13 +16,13 @@ const SystemLayout: React.FC = () => {
       {/* 左侧 Sidebar */}
       <Sider
         className={styles.leftSider}
-        width={240} 
+        width={240}
         theme="light"
         collapsed={sidebarCollapsed}
       >
-        <Sidebar 
-           collapsed={sidebarCollapsed} 
-           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
       </Sider>
 
@@ -44,7 +43,7 @@ const SystemLayout: React.FC = () => {
         trigger={null}
       >
         <div className={styles.rightSiderInner}>
-            <ChatPanel />
+          <ChatPanel />
         </div>
       </Sider>
     </Layout>

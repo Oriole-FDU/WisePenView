@@ -1,0 +1,36 @@
+.splitterWrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.splitter {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.splitterLeft {
+  overflow: auto;
+}
+
+.splitterRight {
+  overflow: hidden !important;
+}
+
+.nodeDetail {
+  height: 100%;
+  padding: var(--ant-padding-lg);
+}
+
+.nodeDetailEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+  color: var(--ant-color-text-tertiary);
+  font-size: var(--ant-font-size-lg);
+}
