@@ -16,6 +16,23 @@
   overflow: auto;
 }
 
+.leftPanelWrapper {
+  position: relative;
+  height: 100%;
+  min-height: 100%;
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.06);
+  z-index: 10;
+  border-radius: var(--ant-border-radius-sm);
+}
+
 .splitterRight {
   overflow: hidden !important;
 }
@@ -27,10 +44,93 @@
 
 .nodeDetailEmpty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  min-height: 200px;
+  height: 80%; // center vertically
+}
+
+.addRootForm {
+  padding-top: var(--ant-margin-md);
+}
+
+.addChildForm {
+  padding-top: var(--ant-margin-md);
+}
+
+.treeWrapper {
+  position: relative;
+  padding: var(--ant-padding-md);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:has(.tree) {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+
+.tree {
+  font-size: var(--ant-font-size-sm);
+
+  :global(.ant-tree-treenode) {
+    padding: 2px 0;
+  }
+
+  :global(.ant-tree-switcher) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(.ant-tree-switcher-icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.tagNode {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-size: 18px;
+  padding: 2px 8px;
+  line-height: 1.5;
+}
+
+.switcherIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.form {
+  padding: var(--ant-padding-md) 0;
+}
+
+.sectionTitle {
+  font-size: var(--ant-font-size-base);
+  font-weight: var(--ant-font-weight-md);
+  margin-bottom: var(--ant-margin-md);
+  color: var(--ant-color-text);
+}
+
+.nodeActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ant-margin-sm);
+  margin-top: var(--ant-margin-md);
+}
+
+.emptyHint {
   color: var(--ant-color-text-tertiary);
-  font-size: var(--ant-font-size-lg);
+  font-size: var(--ant-font-size-base);
+  padding: var(--ant-padding-md);
+  margin: var(--ant-margin-md);
 }
