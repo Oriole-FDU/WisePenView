@@ -20,7 +20,7 @@ const MyGroup: React.FC = () => {
   const [joinGroupModalOpen, setJoinGroupModalOpen] = useState(false);
   const [createGroupModalOpen, setCreateGroupModalOpen] = useState(false);
 
-  const relationType = RELATION_TYPE_MAP[activeTab] ?? 2;
+  const relationType = RELATION_TYPE_MAP[activeTab] ?? RELATION_TYPE_MAP.joined;
 
   const fetchGroups = useCallback(async () => {
     setLoading(true);
