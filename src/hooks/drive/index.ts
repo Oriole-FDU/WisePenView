@@ -1,0 +1,1 @@
+export { useClickFile } from './useClickFile';

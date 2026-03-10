@@ -1,0 +1,49 @@
+.wrapper {
+  position: relative;
+}
+
+/* 下拉菜单打开时覆盖表格的透明遮罩，阻断 hover 与点击 */
+.mask {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+/* 与表格行 hover 保持同风格 */
+.rowSelected,
+.rowSelected:hover {
+  background: var(--ant-table-row-hover-bg) !important;
+}
+
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tagList {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--ant-margin-xs);
+}
+
+.optionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ant-padding-xs);
+  color: var(--ant-color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--ant-border-radius-sm);
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+
+  &:hover {
+    color: var(--ant-color-text);
+    background-color: var(--ant-color-fill-tertiary);
+  }
+}

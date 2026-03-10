@@ -20,7 +20,7 @@ import { TagServices } from '@/services/Tag';
 import type {
   CreateTagRequest,
   UpdateTagRequest,
-  TagTreeResponse,
+  TagTreeNode,
 } from '@/services/Tag';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { TagManagerProps } from './index.type';
@@ -29,14 +29,14 @@ import styles from './style.module.less';
 const { TextArea } = Input;
 
 /** 判断节点是否有效（排除空叶子节点） */
-const isValidNode = (node: TagTreeResponse): boolean =>
+const isValidNode = (node: TagTreeNode): boolean =>
   Boolean(node?.tagId && (node.tagName ?? '').trim());
 
 /** 在树中按 tagId 查找节点 */
 const findNodeByTagId = (
-  nodes: TagTreeResponse[],
+  nodes: TagTreeNode[],
   tagId: string
-): TagTreeResponse | null => {
+): TagTreeNode | null => {
   for (const node of nodes) {
     if (node.tagId === tagId) return node;
     if (node.children?.length) {
@@ -49,7 +49,7 @@ const findNodeByTagId = (
 
 /** 在树中查找某节点的父节点 tagId，根节点返回 undefined */
 const findParentTagId = (
-  nodes: TagTreeResponse[],
+  nodes: TagTreeNode[],
   childTagId: string,
   parentTagId?: string
 ): string | undefined => {
@@ -63,8 +63,8 @@ const findParentTagId = (
   return undefined;
 };
 
-/** 将 TagTreeResponse 转为 antd Tree 的 DataNode */
-const toTreeDataNode = (node: TagTreeResponse): DataNode | null => {
+/** 将 TagTreeNode 转为 antd Tree 的 DataNode */
+const toTreeDataNode = (node: TagTreeNode): DataNode | null => {
   if (!isValidNode(node)) return null;
   const validChildren = node.children
     ?.map(toTreeDataNode)
@@ -82,12 +82,12 @@ const toTreeDataNode = (node: TagTreeResponse): DataNode | null => {
 };
 
 const TagManager: React.FC<TagManagerProps> = ({ groupId }) => {
-  const [selectedTag, setSelectedTag] = useState<TagTreeResponse | null>(null);
+  const [selectedTag, setSelectedTag] = useState<TagTreeNode | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [treeLoading, setTreeLoading] = useState(true);
   const [dropLoading, setDropLoading] = useState(false);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
-  const [rawList, setRawList] = useState<TagTreeResponse[]>([]);
+  const [rawList, setRawList] = useState<TagTreeNode[]>([]);
   const [addRootModalOpen, setAddRootModalOpen] = useState(false);
   const [addRootLoading, setAddRootLoading] = useState(false);
   const [addChildModalOpen, setAddChildModalOpen] = useState(false);
@@ -106,7 +106,7 @@ const TagManager: React.FC<TagManagerProps> = ({ groupId }) => {
     const fetch = async () => {
       setTreeLoading(true);
       try {
-        const list = await TagServices.getTagTree(groupId ? { groupId } : undefined);
+        const list = await TagServices.getUserTagTree(groupId ? { groupId } : undefined);
         setRawList(list);
         const nodes = list
           .map(toTreeDataNode)
@@ -177,7 +177,7 @@ const TagManager: React.FC<TagManagerProps> = ({ groupId }) => {
     try {
       const values = await addRootForm.validateFields();
       setAddRootLoading(true);
-      await TagServices.createTag({
+      await TagServices.addTag({
         tagName: values.tagName,
         tagDesc: values.tagDesc,
         ...(groupId ? { groupId } : {}),
@@ -200,7 +200,7 @@ const TagManager: React.FC<TagManagerProps> = ({ groupId }) => {
       setUpdateLoading(true);
       await TagServices.updateTag({
         targetTagId: selectedTag.tagId,
-        tagName: values.tagName,
+        tagName: values.tagName ?? '',
         tagDesc: values.tagDesc,
         ...(groupId ? { groupId } : {}),
       });
@@ -237,7 +237,7 @@ const TagManager: React.FC<TagManagerProps> = ({ groupId }) => {
     try {
       const values = await addChildForm.validateFields();
       setAddChildLoading(true);
-      await TagServices.createTag({
+      await TagServices.addTag({
         tagName: values.tagName,
         parentId: selectedTag.tagId,
         tagDesc: values.tagDesc,
