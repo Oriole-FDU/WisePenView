@@ -56,8 +56,6 @@ const MemberList: React.FC<MemberListProps> = ({
 
   return (
     <div>
-      <h3 className={styles.titleList}>成员列表</h3>
-
       <MemberListToolbar
         isEditMode={isEditMode}
         total={total}
