@@ -17,6 +17,8 @@
 }
 
 .leftPanelWrapper {
+  display: flex;
+  flex-direction: column;
   position: relative;
   height: 100%;
   min-height: 100%;
@@ -65,6 +67,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* 空态/加载态：占满左侧面板，使 Empty/Spin 垂直居中 */
+  &:not(:has(.tree)) {
+    flex: 1;
+  }
 
   &:has(.tree) {
     justify-content: flex-start;
