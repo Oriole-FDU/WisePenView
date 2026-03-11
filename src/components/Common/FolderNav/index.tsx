@@ -273,17 +273,17 @@ const FolderNav: React.FC<FolderNavProps> = ({
         </Button>
       )}
       <Tree
-        showLine
         loadData={handleLoadData}
         treeData={treeData}
         className={styles.tree}
         selectedKeys={selectedKey ? [selectedKey] : []}
         onSelect={handleSelect}
         switcherIcon={
-          <span className={styles.switcherIcon}>
+          <span>
             <LuChevronDown size={14} />
           </span>
         }
+        defaultExpandedKeys={[rootPath]}
         defaultExpandAll={false}
         blockNode={true}
       />
