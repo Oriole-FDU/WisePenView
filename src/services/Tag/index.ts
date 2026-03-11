@@ -11,4 +11,6 @@ export type {
   UpdateTagRequest,
   MoveTagRequest,
   DeleteTagRequest,
+  TagVisibilityMode,
 } from './index.type';
+export { TAG_VISIBILITY_MODE } from './index.type';

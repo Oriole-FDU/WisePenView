@@ -145,7 +145,7 @@ const getListByPath = async (params: GetListByPathRequest): Promise<FolderListBy
 };
 
 /**
- * 更新标签（兼容旧接口 tagId）
+ * 更新标签（与 changeTag 共用 OpenAPI changeTag 接口）
  * 与 OpenAPI TagUpdateRequest 对应
  */
 const updateTag = async (params: UpdateTagRequest): Promise<void> => {
@@ -155,13 +155,13 @@ const updateTag = async (params: UpdateTagRequest): Promise<void> => {
     }
     return;
   }
-  const res = (await Axios.post('/tag/update', params)) as ApiResponse;
+  const res = (await Axios.post('/resource/tag/changeTag', params)) as ApiResponse;
   checkResponse(res);
 };
 
 /**
  * 创建标签，返回新创建的 tagId
- * 与 OpenAPI addTag 对应
+ * 对应 OpenAPI POST /resource/tag/addTag
  */
 const addTag = async (params: AddTagRequest): Promise<string> => {
   if (USE_TAG_MOCK) {
@@ -175,14 +175,14 @@ const addTag = async (params: AddTagRequest): Promise<string> => {
     }
     return `mock-tag-${Date.now()}`;
   }
-  const res = (await Axios.post('/tag/add', params)) as ApiResponse<string>;
+  const res = (await Axios.post('/resource/tag/addTag', params)) as ApiResponse<string>;
   checkResponse(res);
   return res.data ?? '';
 };
 
 /**
  * 修改标签（使用 targetTagId）
- * 与 OpenAPI changeTag 对应
+ * 对应 OpenAPI POST /resource/tag/changeTag
  */
 const changeTag = async (params: ChangeTagRequest): Promise<void> => {
   if (USE_TAG_MOCK) {
@@ -191,33 +191,33 @@ const changeTag = async (params: ChangeTagRequest): Promise<void> => {
     }
     return;
   }
-  const res = (await Axios.post('/tag/change', params)) as ApiResponse;
+  const res = (await Axios.post('/resource/tag/changeTag', params)) as ApiResponse;
   checkResponse(res);
 };
 
 /**
- * 删除标签
- * 与 OpenAPI removeTag 对应
+ * 级联删除标签
+ * 对应 OpenAPI POST /resource/tag/removeTag
  */
 const removeTag = async (params: RemoveTagRequest): Promise<void> => {
   if (USE_TAG_MOCK) {
     await removePathTagMock(params.targetTagId);
     return;
   }
-  const res = (await Axios.post('/tag/remove', params)) as ApiResponse;
+  const res = (await Axios.post('/resource/tag/removeTag', params)) as ApiResponse;
   checkResponse(res);
 };
 
 /**
- * 移动/拖拽标签到新父节点
- * 与 OpenAPI TagMoveRequest 对应
+ * 拖拽/移动标签到新父节点
+ * 对应 OpenAPI POST /resource/tag/moveTag
  */
 const moveTag = async (params: MoveTagRequest): Promise<void> => {
   if (USE_TAG_MOCK) {
     await moveFolderToFolderMock(params.targetTagId, params.newParentId || 'path-root');
     return;
   }
-  const res = (await Axios.post('/tag/move', params)) as ApiResponse;
+  const res = (await Axios.post('/resource/tag/moveTag', params)) as ApiResponse;
   checkResponse(res);
 };
 

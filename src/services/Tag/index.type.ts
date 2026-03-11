@@ -76,7 +76,17 @@ export interface DeleteTagRequest {
   groupId?: string;
 }
 
-/** 创建标签请求参数（OpenAPI addTag） */
+/**  visibilityMode 字符串枚举，用于创建标签 */
+export const TAG_VISIBILITY_MODE = {
+  ALL: 'ALL',
+  ONLY_ADMIN: 'ONLY_ADMIN',
+  WHITELIST: 'WHITELIST',
+  BLACKLIST: 'BLACKLIST',
+} as const;
+
+export type TagVisibilityMode = (typeof TAG_VISIBILITY_MODE)[keyof typeof TAG_VISIBILITY_MODE];
+
+/** 创建标签请求参数（与 OpenAPI TagCreateRequest 一致） */
 export interface AddTagRequest {
   /** 父节点 ID */
   parentId?: string;
@@ -84,7 +94,12 @@ export interface AddTagRequest {
   tagName: string;
   /** 标签描述 */
   tagDesc?: string;
+  /** 小组 ID */
   groupId?: string;
+  /** 权限配置（小组标签用） */
+  visibilityMode?: TagVisibilityMode;
+  /** 白名单/黑名单 userId 列表 */
+  specifiedUsers?: string[];
 }
 
 /** 修改标签请求参数（OpenAPI changeTag，使用 targetTagId） */
