@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Modal, Button, message } from 'antd';
-import type { TagTreeNode } from '@/services/Tag/index.type';
+import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
 import { useResourceService, useTagService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -17,7 +17,7 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
 }) => {
   const resourceService = useResourceService();
   const tagService = useTagService();
-  const [selectedFolder, setSelectedFolder] = useState<TagTreeNode | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
   }, [open]);
 
   const handleFolderSelect = useCallback(
-    (item: { type: 'file'; data: ResourceItem } | { type: 'folder'; data: TagTreeNode }) => {
+    (item: { type: 'file'; data: ResourceItem } | { type: 'folder'; data: Folder }) => {
       if (item.type === 'folder') {
         setSelectedFolder(item.data);
       }

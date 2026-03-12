@@ -1,1 +1,1 @@
-export type { IFolderService } from './index.type';
+export type { IFolderService, GetResByFolderRequest } from './index.type';

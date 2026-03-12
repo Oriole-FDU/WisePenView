@@ -36,7 +36,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
     if (!file || !open) return;
     setInitDone(false);
     try {
-      const userTagTree = await tagService.getUserTagTree(groupId ? { groupId } : undefined);
+      const userTagTree = await tagService.getTagTree(groupId ? { groupId } : undefined);
       const nameToId = new Map<string, string>();
       buildTagNameToIdMap(userTagTree, nameToId);
       setTagMap(nameToId);

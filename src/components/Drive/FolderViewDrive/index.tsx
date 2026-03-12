@@ -16,8 +16,8 @@ import {
 import { formatSize } from '@/utils/format';
 import { getPathSegments, getFolderDisplayName } from '@/utils/path';
 import type { ResourceItem } from '@/types/resource';
-import type { TagTreeNode } from '@/services/Tag/index.type';
-import { useResourceService, useTagService } from '@/contexts/ServicesContext';
+import type { Folder } from '@/types/folder';
+import { useFolderService, useResourceService, useTagService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import {
   NewFolderModal,
@@ -38,10 +38,11 @@ const DRAG_TYPE_FILE = 'application/x-wisepen-folder-file';
 const DRAG_TYPE_FOLDER = 'application/x-wisepen-folder-folder';
 
 type RowItem =
-  | { key: string; _type: 'folder'; data: TagTreeNode }
+  | { key: string; _type: 'folder'; data: Folder }
   | { key: string; _type: 'file'; data: ResourceItem };
 
 const FolderViewDrive: React.FC = () => {
+  const folderService = useFolderService();
   const resourceService = useResourceService();
   const tagService = useTagService();
   const clickFile = useClickFile();
@@ -62,14 +63,14 @@ const FolderViewDrive: React.FC = () => {
   const [moveToFolderModalOpen, setMoveToFolderModalOpen] = useState(false);
 
   // 模态框目标
-  const [renameFolderTarget, setRenameFolderTarget] = useState<TagTreeNode | null>(null);
-  const [deleteFolderTarget, setDeleteFolderTarget] = useState<TagTreeNode | null>(null);
+  const [renameFolderTarget, setRenameFolderTarget] = useState<Folder | null>(null);
+  const [deleteFolderTarget, setDeleteFolderTarget] = useState<Folder | null>(null);
   const [renameFileTarget, setRenameFileTarget] = useState<ResourceItem | null>(null);
   const [deleteFileTarget, setDeleteFileTarget] = useState<ResourceItem | null>(null);
   const [moveToFolderTarget, setMoveToFolderTarget] = useState<MoveToFolderTarget | null>(null);
 
   // 列表状态
-  const [folders, setFolders] = useState<TagTreeNode[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [folderFiles, setFolderFiles] = useState<ResourceItem[]>([]);
   const [totalFolderFiles, setTotalFolderFiles] = useState(0);
   const [folderLoading, setFolderLoading] = useState(false);
@@ -93,7 +94,7 @@ const FolderViewDrive: React.FC = () => {
         setFolderLoadingMore(true);
       }
       try {
-        const res = await tagService.getListByPath({
+        const res = await folderService.getResByFolder({
           path,
           filePage,
           filePageSize: FOLDER_FILE_PAGE_SIZE,
@@ -117,7 +118,7 @@ const FolderViewDrive: React.FC = () => {
         setFolderLoadingMore(false);
       }
     },
-    [tagService]
+    [folderService]
   );
 
   // 刷新列表
@@ -157,7 +158,7 @@ const FolderViewDrive: React.FC = () => {
 
   // 处理文件夹点击
   const handleFolderClick = useCallback(
-    (folder: TagTreeNode) => {
+    (folder: Folder) => {
       navigateTo(folder.tagName ?? '/');
     },
     [navigateTo]
@@ -200,7 +201,7 @@ const FolderViewDrive: React.FC = () => {
   }, []);
 
   // 处理重命名文件夹
-  const handleRenameFolder = useCallback((folder: TagTreeNode) => {
+  const handleRenameFolder = useCallback((folder: Folder) => {
     setRenameFolderTarget(folder);
     setRenameFolderModalOpen(true);
   }, []);
@@ -212,7 +213,7 @@ const FolderViewDrive: React.FC = () => {
   }, []);
 
   // 处理删除文件夹
-  const handleDeleteFolder = useCallback((folder: TagTreeNode) => {
+  const handleDeleteFolder = useCallback((folder: Folder) => {
     setDeleteFolderTarget(folder);
     setDeleteFolderModalOpen(true);
   }, []);
@@ -261,7 +262,7 @@ const FolderViewDrive: React.FC = () => {
 
   // 处理拖拽文件到文件夹
   const handleDrop = useCallback(
-    async (file: ResourceItem, targetFolder: TagTreeNode) => {
+    async (file: ResourceItem, targetFolder: Folder) => {
       const targetPath = targetFolder.tagName ?? '/';
       try {
         await resourceService.updateResourcePath({
@@ -279,7 +280,7 @@ const FolderViewDrive: React.FC = () => {
 
   // 处理拖拽文件夹到文件夹
   const handleDropFolder = useCallback(
-    async (folder: TagTreeNode, targetFolder: TagTreeNode) => {
+    async (folder: Folder, targetFolder: Folder) => {
       try {
         await tagService.moveTag({
           targetTagId: folder.tagId,
@@ -397,7 +398,7 @@ const FolderViewDrive: React.FC = () => {
               }
             } else if (folderRaw) {
               try {
-                const folder = JSON.parse(folderRaw) as TagTreeNode;
+                const folder = JSON.parse(folderRaw) as Folder;
                 const target = record.data;
                 if (folder.tagId === target.tagId) return;
                 if ((target.tagName ?? '').startsWith((folder.tagName ?? '') + '/')) return;

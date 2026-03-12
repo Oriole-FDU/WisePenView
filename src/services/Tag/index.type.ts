@@ -3,14 +3,9 @@
  * 与 resource.openapi.json 中 Tag 相关 schema 对齐
  */
 
-import type { FolderListByPathResponse } from '@/types/folder';
-
 /** TagService 接口：供依赖注入使用 */
 export interface ITagService {
-  getUserTagTree(params?: GetTagTreeRequest): Promise<TagTreeNode[]>;
-  getPathTagTree(): Promise<TagTreeNode[]>;
-  getPathTagNode(path: string): Promise<TagTreeNode | null>;
-  getListByPath(params: GetListByPathRequest): Promise<FolderListByPathResponse>;
+  getTagTree(params?: GetTagTreeRequest): Promise<TagTreeNode[]>;
   updateTag(params: UpdateTagRequest): Promise<void>;
   addTag(params: AddTagRequest): Promise<string>;
   changeTag(params: ChangeTagRequest): Promise<void>;
@@ -45,16 +40,6 @@ export type TagTreeResponse = TagTreeNode;
 export interface GetTagTreeRequest {
   /** 小组 ID，不传则获取个人标签树 */
   groupId?: string;
-}
-
-/** 按路径获取文件夹与文件列表的请求参数（个人路径，无 groupId） */
-export interface GetListByPathRequest {
-  /** 路径，如 '/' 或 '/path/to/a' */
-  path: string;
-  /** 文件分页：页码，默认 1 */
-  filePage?: number;
-  /** 文件分页：每页条数，默认 20 */
-  filePageSize?: number;
 }
 
 /** 更新标签请求参数（与 TagUpdateRequest 一致） */

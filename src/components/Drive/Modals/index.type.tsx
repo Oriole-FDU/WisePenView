@@ -1,5 +1,5 @@
+import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
-import type { TagTreeNode } from '@/services/Tag/index.type';
 
 export interface NewFolderModalProps {
   open: boolean;
@@ -13,14 +13,14 @@ export interface RenameFolderModalProps {
   open: boolean;
   onCancel: () => void;
   onSuccess?: () => void;
-  folder: TagTreeNode | null;
+  folder: Folder | null;
 }
 
 export interface DeleteFolderModalProps {
   open: boolean;
   onCancel: () => void;
   onSuccess?: () => void;
-  folder: TagTreeNode | null;
+  folder: Folder | null;
 }
 
 export interface RenameFileModalProps {
@@ -49,7 +49,7 @@ export interface EditTagModalProps {
 /** 移动到文件夹的目标：文件或文件夹 */
 export type MoveToFolderTarget =
   | { type: 'file'; data: ResourceItem }
-  | { type: 'folder'; data: TagTreeNode };
+  | { type: 'folder'; data: Folder };
 
 export interface MoveToFolderModalProps {
   open: boolean;

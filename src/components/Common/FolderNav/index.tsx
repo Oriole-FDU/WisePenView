@@ -4,8 +4,8 @@ import type { DataNode } from 'antd/es/tree';
 import { AiOutlineFolder } from 'react-icons/ai';
 import FileTypeIcon from '@/components/Common/FileTypeIcon';
 import { LuFolderPlus, LuChevronDown } from 'react-icons/lu';
-import { useTagService } from '@/contexts/ServicesContext';
-import type { TagTreeNode } from '@/services/Tag/index.type';
+import { useFolderService } from '@/contexts/ServicesContext';
+import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
 import { getFolderDisplayName } from '@/utils/path';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -17,8 +17,8 @@ const FOLDER_NAV_FILE_PAGE_SIZE = 5;
 const ROOT_PATH = '/';
 const ROOT_DISPLAY_NAME = '~';
 
-/** 根节点对应的 TagTreeNode（用于 onSelect 回传） */
-const ROOT_TAG_NODE: TagTreeNode = {
+/** 根节点对应的 Folder（用于 onSelect 回传） */
+const ROOT_FOLDER: Folder = {
   tagId: 'path-root',
   tagName: ROOT_PATH,
 };
@@ -45,16 +45,13 @@ function updateNodeChildren(
   });
 }
 
-type ItemMap = Map<
-  string,
-  { type: 'file'; data: ResourceItem } | { type: 'folder'; data: TagTreeNode }
->;
+type ItemMap = Map<string, { type: 'file'; data: ResourceItem } | { type: 'folder'; data: Folder }>;
 
 /** 创建文件夹节点（根与子文件夹共用） */
 function createFolderNode(
   path: string,
   displayName: string,
-  folderData: TagTreeNode,
+  folderData: Folder,
   itemMap: ItemMap,
   children?: DataNode[]
 ): DataNode {
@@ -72,11 +69,11 @@ function createFolderNode(
   };
 }
 
-/** 将 getListByPath 响应转为 DataNode[] */
+/** 将 getResByFolder 响应转为 DataNode[] */
 function toDataNodes(
   itemMap: ItemMap,
   path: string,
-  folders: TagTreeNode[],
+  folders: Folder[],
   files: ResourceItem[],
   totalFiles: number
 ): DataNode[] {
@@ -130,7 +127,7 @@ const FolderNav: React.FC<FolderNavProps> = ({
   rootPath = ROOT_PATH,
   className,
 }) => {
-  const tagService = useTagService();
+  const folderService = useFolderService();
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
@@ -142,14 +139,14 @@ const FolderNav: React.FC<FolderNavProps> = ({
   /** 拉取某路径下的子节点 */
   const fetchChildren = useCallback(
     async (path: string): Promise<DataNode[]> => {
-      const res = await tagService.getListByPath({
+      const res = await folderService.getResByFolder({
         path,
         filePage: 1,
         filePageSize: FOLDER_NAV_FILE_PAGE_SIZE,
       });
       return toDataNodes(itemMapRef.current, path, res.folders, res.files, res.totalFiles);
     },
-    [tagService]
+    [folderService]
   );
 
   /** 拉取根节点（与子节点拉取共用 fetchChildren，根多一层 createFolderNode 包装） */
@@ -161,7 +158,7 @@ const FolderNav: React.FC<FolderNavProps> = ({
       const rootNode = createFolderNode(
         rootPath,
         ROOT_DISPLAY_NAME,
-        ROOT_TAG_NODE,
+        ROOT_FOLDER,
         itemMapRef.current,
         children
       );

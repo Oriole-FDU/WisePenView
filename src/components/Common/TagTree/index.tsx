@@ -58,7 +58,7 @@ const TagTree: React.FC<TagTreeProps> = ({
     const fetch = async () => {
       setLoading(true);
       try {
-        const list = await tagService.getUserTagTree(groupId ? { groupId } : undefined);
+        const list = await tagService.getTagTree(groupId ? { groupId } : undefined);
         setRawList(list);
         const nodes = list.map(toTreeDataNode).filter((n): n is DataNode => n != null);
         setTreeData(nodes);

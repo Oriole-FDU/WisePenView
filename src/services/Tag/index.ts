@@ -1,7 +1,6 @@
 export type { ITagService } from './index.type';
 export type {
   GetTagTreeRequest,
-  GetListByPathRequest,
   TagTreeNode,
   TagTreeResponse,
   CreateTagRequest,
