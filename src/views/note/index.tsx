@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';
+import { message } from 'antd';
 
 import Note from '@/components/Note';
 import SaveStatusLight from '@/components/Note/SaveStatusLight';
-import { UploadPipeline, type SaveStatus } from '@/components/Note/Pipeline';
+import { UploadPipeline, type SaveStatus, type ConnectionState } from '@/components/Note/Pipeline';
 import { useNoteService, useResourceService } from '@/contexts/ServicesContext';
 import type { Block } from '@/types/note';
 
@@ -37,9 +38,11 @@ const NotePage: React.FC = () => {
   const [noteData, setNoteData] = useState<NoteData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const [connectionState, setConnectionState] = useState<ConnectionState>('online');
   const noteSnapshotGetterRef = useRef<(() => Promise<{ blocks: Block[]; title?: string }>) | null>(
     null
   );
+  const pendingTitleRenameRef = useRef<string | null>(null);
 
   // 加载或创建笔记
   const loadOrCreateNote = useCallback(async () => {
@@ -110,6 +113,7 @@ const NotePage: React.FC = () => {
         }
         throw new Error('Note snapshot getter is not ready');
       },
+      onConnectionStateChange: setConnectionState,
       onSaveStatusChange: setSaveStatus,
     });
   }, [noteService, noteData]);
@@ -118,6 +122,17 @@ const NotePage: React.FC = () => {
     async (title: string) => {
       const trimmed = title.trim();
       if (!trimmed || !noteData) return;
+
+      const isNavigatorOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+      const isPipelineOffline = connectionState === 'offline';
+
+      // 离线模式：提醒用户并记录 pending rename，等待恢复在线后再补发
+      if (isNavigatorOffline || isPipelineOffline) {
+        pendingTitleRenameRef.current = trimmed;
+        message.info('当前离线，标题修改将在网络恢复后生效');
+        return;
+      }
+
       try {
         await resourceService.renameResource({
           resourceId: noteData.resourceId,
@@ -127,8 +142,28 @@ const NotePage: React.FC = () => {
         // 重命名失败由上层或后续统一处理，此处仅静默
       }
     },
-    [noteData, resourceService]
+    [connectionState, noteData, resourceService]
   );
+
+  // 当连接从 offline 恢复为 online 时，如果存在 pending rename，则补发一次重命名
+  useEffect(() => {
+    if (connectionState !== 'online') return;
+    const pendingTitle = pendingTitleRenameRef.current;
+    if (!pendingTitle || !noteData) return;
+
+    pendingTitleRenameRef.current = null;
+
+    void (async () => {
+      try {
+        await resourceService.renameResource({
+          resourceId: noteData.resourceId,
+          newName: pendingTitle,
+        });
+      } catch {
+        // 若补发失败，暂时静默处理，后续可按需接入统一错误提示
+      }
+    })();
+  }, [connectionState, noteData, resourceService]);
 
   // 清理 Pipeline
   useEffect(() => {
