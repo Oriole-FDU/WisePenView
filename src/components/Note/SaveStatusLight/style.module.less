@@ -15,7 +15,7 @@
   height: 8px;
   border-radius: 50%;
 
-  /* 保存中-蓝 已保存-绿 保存失败-红 */
+  /* 保存中-蓝 已保存-绿 离线-灰 */
   &[data-status='saving'] {
     background: var(--ant-color-primary);
   }
@@ -24,7 +24,7 @@
     background: var(--ant-color-success);
   }
 
-  &[data-status='error'] {
-    background: var(--ant-color-error);
+  &[data-status='offline'] {
+    background: var(--ant-color-text-quaternary);
   }
 }

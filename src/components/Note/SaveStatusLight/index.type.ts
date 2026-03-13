@@ -1,4 +1,4 @@
-export type SaveStatus = 'saving' | 'saved' | 'error';
+export type SaveStatus = 'saving' | 'saved' | 'offline';
 
 export interface SaveStatusLightProps {
   status: SaveStatus;
