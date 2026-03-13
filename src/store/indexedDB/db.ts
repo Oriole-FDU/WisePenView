@@ -4,7 +4,7 @@
  */
 
 import { openDB, type IDBPDatabase } from 'idb';
-import type { JsonDelta } from '@/types/note';
+import type { JsonDelta, Block } from '@/types/note';
 
 const DB_NAME = 'WisePenDB';
 const DB_VERSION = 1;
@@ -17,11 +17,25 @@ export interface PendingDeltaRecord {
   createdAt: number;
 }
 
+/** Note 快照记录：用于断网瞬间的文档快照 */
+export interface NoteSnapshotRecord {
+  noteId: string;
+  version: number;
+  blocks: Block[];
+  title?: string;
+  createdAt: number;
+}
+
 export interface WisePenDB {
   pendingDeltas: {
     key: number;
     value: PendingDeltaRecord;
     indexes: { noteId: string };
+  };
+  noteSnapshots: {
+    key: string;
+    value: NoteSnapshotRecord;
+    indexes: {};
   };
 }
 
@@ -33,13 +47,19 @@ export async function getDB(): Promise<IDBPDatabase<WisePenDB>> {
   }
 
   dbInstance = await openDB<WisePenDB>(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
       if (!db.objectStoreNames.contains('pendingDeltas')) {
         const store = db.createObjectStore('pendingDeltas', {
           keyPath: 'id',
           autoIncrement: true,
         });
         store.createIndex('noteId', 'noteId', { unique: false });
+      }
+
+      if (!db.objectStoreNames.contains('noteSnapshots')) {
+        db.createObjectStore('noteSnapshots', {
+          keyPath: 'noteId',
+        });
       }
     },
   });

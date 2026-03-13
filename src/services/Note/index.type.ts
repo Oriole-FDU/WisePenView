@@ -38,6 +38,8 @@ export interface CreateNoteRequest {
   initial_content?: Block[];
   /** 文档标题，可由首段内容推断 */
   title?: string;
+  /** 源文档 ID，用于从已有文档创建副本；普通创建留空 */
+  source?: string;
 }
 
 /** 创建副本请求参数 */

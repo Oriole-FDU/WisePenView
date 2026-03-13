@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Block } from '@/types/note';
 import type { NoteProps } from './index.type';
 import NoteTitle from './NoteTitle';
@@ -26,8 +26,10 @@ const Note: React.FC<NoteProps> = ({
   lastEditedAt,
   isNewlyCreated,
   onTitleStable,
+  onRegisterGetSnapshot,
 }) => {
   const contentRef = useRef<NoteContentRef>(null);
+  const titleRef = useRef<string | undefined>(undefined);
 
   const { headingBlock, contentBlocks } = useMemo(() => {
     const blocks = initialBlocks ?? [];
@@ -38,9 +40,30 @@ const Note: React.FC<NoteProps> = ({
     };
   }, [initialBlocks]);
 
+  const handleTitleStable = useCallback(
+    (title: string) => {
+      titleRef.current = title;
+      onTitleStable?.(title);
+    },
+    [onTitleStable]
+  );
+
   const focusContent = useCallback(() => {
     contentRef.current?.focus();
   }, []);
+
+  const getSnapshot = useCallback(async () => {
+    const blocks = contentRef.current?.getBlocks() ?? [];
+    return {
+      blocks,
+      title: titleRef.current,
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!onRegisterGetSnapshot) return;
+    onRegisterGetSnapshot(getSnapshot);
+  }, [getSnapshot, onRegisterGetSnapshot]);
 
   const metaLabel = isNewlyCreated
     ? '新创建'
@@ -54,7 +77,7 @@ const Note: React.FC<NoteProps> = ({
         initialBlock={headingBlock}
         onEnterKey={focusContent}
         focusOnMount={isNewlyCreated}
-        onTitleStable={onTitleStable}
+        onTitleStable={handleTitleStable}
       />
       {metaLabel && <p className={styles.lastEditedAt}>{metaLabel}</p>}
       <NoteContent ref={contentRef} pipeline={pipeline} initialBlocks={contentBlocks} />

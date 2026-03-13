@@ -17,10 +17,7 @@ export {
 export {
   getDB,
   closeDB,
-  appendPendingDelta,
   appendPendingDeltas,
   getPendingDeltas,
   clearPendingDeltas,
-  hasPendingDeltas,
-  getNotesWithPendingDeltas,
 } from './indexedDB';

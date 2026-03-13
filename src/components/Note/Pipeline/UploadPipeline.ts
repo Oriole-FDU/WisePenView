@@ -15,12 +15,19 @@
  * - offline 模式：send 写入 IndexedDB，指数退避重试恢复连接
  */
 
-import type { DeltaOp, NoteChange, JsonDelta, SyncPayload } from '@/types/note';
+import type { DeltaOp, NoteChange, JsonDelta, SyncPayload, Block } from '@/types/note';
 import type { INoteService } from '@/services/Note';
 import { UpdateBuffer } from './UpdateBuffer';
 import { PendingQueue } from './PendingQueue';
 import { OnFlightList } from './OnFlightList';
-import { appendPendingDeltas, getPendingDeltas, clearPendingDeltas } from '@/store/indexedDB';
+import {
+  appendPendingDeltas,
+  getPendingDeltas,
+  clearPendingDeltas,
+  saveNoteSnapshot,
+  getNoteSnapshot,
+  clearNoteSnapshot,
+} from '@/store/indexedDB';
 
 /** 网络连接状态 */
 export type ConnectionState = 'online' | 'offline';
@@ -42,6 +49,11 @@ export interface UploadPipelineOptions {
   noteService: INoteService;
   resourceId: string;
   initialVersion: number;
+  /**
+   * 获取当前文档快照（用于断网瞬间保存，用于版本冲突时创建副本）
+   * 只需在首次进入 offline 时调用一次
+   */
+  getSnapshot?: () => Promise<{ blocks: Block[]; title?: string }>;
   /** 发送失败时的回调，上层可用于触发 recovery / 本地缓存 */
   onSyncFail?: (error: unknown) => void;
   /** 连接状态变化回调，用于 UI 展示 */
@@ -67,8 +79,9 @@ export class UploadPipeline {
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
 
   private readonly noteService: INoteService;
-  private readonly resourceId: string;
+  private resourceId: string;
   private baseVersion: number;
+  private readonly getSnapshot?: () => Promise<{ blocks: Block[]; title?: string }>;
   private readonly onSyncFail?: (error: unknown) => void;
   private readonly onConnectionStateChange?: (state: ConnectionState) => void;
   private readonly onSaveStatusChange?: (status: SaveStatus) => void;
@@ -85,11 +98,14 @@ export class UploadPipeline {
   private savingDisplayTimer: ReturnType<typeof setTimeout> | null = null;
   /** 是否正在显示"保存中"状态（用于最小显示时间控制） */
   private isSavingDisplayLocked = false;
+  /** 是否已为当前 resourceId 保存过断网快照 */
+  private snapshotSaved = false;
 
   constructor(options: UploadPipelineOptions) {
     this.noteService = options.noteService;
     this.resourceId = options.resourceId;
     this.baseVersion = options.initialVersion;
+    this.getSnapshot = options.getSnapshot;
     this.onSyncFail = options.onSyncFail;
     this.onConnectionStateChange = options.onConnectionStateChange;
     this.onSaveStatusChange = options.onSaveStatusChange;
@@ -366,6 +382,11 @@ export class UploadPipeline {
     const deltas = this.onFlightList.getAll();
     this.onFlightList.removeAll();
 
+    if (this.isVersionConflictError(error)) {
+      void this.handleVersionConflict(deltas);
+      return;
+    }
+
     // 进入 offline 模式
     this.enterOfflineMode();
 
@@ -391,6 +412,9 @@ export class UploadPipeline {
     this.retryCount = 0;
     this.onConnectionStateChange?.('offline');
     this.updateSaveStatus();
+
+    // 首次进入 offline 时保存断网快照
+    void this.ensureSnapshotSaved();
 
     this.scheduleRetry();
   }
@@ -477,11 +501,16 @@ export class UploadPipeline {
         // 恢复 online 模式
         this.enterOnlineMode();
       })
-      .catch(() => {
-        // 重试失败，把数据写回 IndexedDB
+      .catch((error: unknown) => {
         const failedDeltas = this.onFlightList.getAll();
         this.onFlightList.removeAll();
 
+        if (this.isVersionConflictError(error)) {
+          void this.handleVersionConflict(failedDeltas);
+          return;
+        }
+
+        // 重试失败，把数据写回 IndexedDB
         if (failedDeltas.length > 0) {
           appendPendingDeltas(this.resourceId, failedDeltas).catch(() => {
             // 写回失败，放入内存队列
@@ -560,6 +589,108 @@ export class UploadPipeline {
       appendPendingDeltas(this.resourceId, allDeltas).catch(() => {
         // 忽略写入失败
       });
+    }
+  }
+
+  /** 首次进入 offline 时保存当前文档快照 */
+  private async ensureSnapshotSaved(): Promise<void> {
+    if (this.snapshotSaved || !this.getSnapshot) return;
+    try {
+      const snapshot = await this.getSnapshot();
+      await saveNoteSnapshot(this.resourceId, {
+        version: this.baseVersion,
+        blocks: snapshot.blocks,
+        title: snapshot.title,
+      });
+      this.snapshotSaved = true;
+    } catch {
+      // 忽略快照失败，避免影响主流程
+    }
+  }
+
+  /** 判断是否为版本冲突错误（后端返回 409） */
+  private isVersionConflictError(error: unknown): boolean {
+    const err = error as { response?: { status?: number } };
+    return !!err?.response && err.response.status === 409;
+  }
+
+  /**
+   * 版本冲突处理：
+   * - 使用离线快照创建「xxx - 副本」
+   * - 将失败及未发送的 deltas 迁移到新文档并重放
+   */
+  private async handleVersionConflict(failedDeltas: JsonDelta[]): Promise<void> {
+    try {
+      const snapshot = await getNoteSnapshot(this.resourceId);
+      if (!snapshot) {
+        // 无快照时退化为 offline 行为
+        this.enterOfflineMode();
+        if (failedDeltas.length > 0) {
+          await appendPendingDeltas(this.resourceId, failedDeltas).catch(() => {
+            this.pendingQueue.prepend(failedDeltas);
+          });
+        }
+        this.onSyncFail?.(new Error('Version conflict without snapshot'));
+        return;
+      }
+
+      const originalTitle =
+        snapshot.title && snapshot.title.trim().length > 0 ? snapshot.title : '未命名笔记';
+      const copyTitle = `${originalTitle} - 副本`;
+
+      const created = await this.noteService.createNote({
+        initial_content: snapshot.blocks,
+        title: copyTitle,
+        source: snapshot.noteId,
+      });
+
+      const newResourceId = created.doc_id;
+      const newBaseVersion = created.version;
+
+      // 收集旧文档在 IndexedDB 中的离线 deltas
+      let offlineDeltas: JsonDelta[] = [];
+      try {
+        offlineDeltas = await getPendingDeltas(this.resourceId);
+      } catch {
+        offlineDeltas = [];
+      }
+
+      // 清理旧文档的 pending 及快照
+      await clearPendingDeltas(this.resourceId).catch(() => {});
+      await clearNoteSnapshot(this.resourceId).catch(() => {});
+
+      // 收集当前内存中的 deltas
+      const inMemoryPending = this.pendingQueue.flush();
+      const onFlight = this.onFlightList.getAll();
+      this.onFlightList.removeAll();
+
+      const allDeltas: JsonDelta[] = [
+        ...offlineDeltas,
+        ...failedDeltas,
+        ...inMemoryPending,
+        ...onFlight,
+      ];
+
+      // 切换到新文档
+      this.resourceId = newResourceId;
+      this.baseVersion = newBaseVersion;
+      this.snapshotSaved = false;
+
+      if (allDeltas.length > 0) {
+        this.pendingQueue.prepend(allDeltas);
+        this.send();
+      } else {
+        this.updateSaveStatus();
+      }
+    } catch (e) {
+      // 副本创建或迁移失败时退化为 offline 流程，避免丢数据
+      this.enterOfflineMode();
+      if (failedDeltas.length > 0) {
+        await appendPendingDeltas(this.resourceId, failedDeltas).catch(() => {
+          this.pendingQueue.prepend(failedDeltas);
+        });
+      }
+      this.onSyncFail?.(e);
     }
   }
 }

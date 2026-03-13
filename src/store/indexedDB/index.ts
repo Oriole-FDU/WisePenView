@@ -5,10 +5,10 @@
 
 export { getDB, closeDB } from './db';
 export {
-  appendPendingDelta,
   appendPendingDeltas,
   getPendingDeltas,
   clearPendingDeltas,
-  hasPendingDeltas,
-  getNotesWithPendingDeltas,
+  saveNoteSnapshot,
+  getNoteSnapshot,
+  clearNoteSnapshot,
 } from './noteStore';

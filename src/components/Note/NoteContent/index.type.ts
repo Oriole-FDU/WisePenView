@@ -10,4 +10,6 @@ export interface NoteContentProps {
 
 export interface NoteContentRef {
   focus: () => void;
+  /** 获取当前正文的完整 Block 数组（用于快照） */
+  getBlocks: () => Block[];
 }

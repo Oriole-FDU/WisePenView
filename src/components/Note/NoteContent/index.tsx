@@ -6,7 +6,7 @@ import { zh, en } from '@blocknote/core/locales';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
-import type { NoteChange } from '@/types/note';
+import type { NoteChange, Block } from '@/types/note';
 import type { NoteContentProps, NoteContentRef } from './index.type';
 import styles from './style.module.less';
 
@@ -46,6 +46,7 @@ const NoteContent = React.forwardRef<NoteContentRef, NoteContentProps>(
       ref,
       () => ({
         focus: () => editor.focus(),
+        getBlocks: () => editor.document as unknown as Block[],
       }),
       [editor]
     );

@@ -3,21 +3,8 @@
  * 使用 append-only 模式缓存离线期间未同步的变更
  */
 
-import { getDB, type PendingDeltaRecord } from './db';
-import type { JsonDelta } from '@/types/note';
-
-/**
- * 追加单个 pending delta
- */
-export async function appendPendingDelta(noteId: string, delta: JsonDelta): Promise<void> {
-  const db = await getDB();
-  const record: PendingDeltaRecord = {
-    noteId,
-    delta,
-    createdAt: Date.now(),
-  };
-  await db.add('pendingDeltas', record);
-}
+import { getDB, type PendingDeltaRecord, type NoteSnapshotRecord } from './db';
+import type { JsonDelta, Block } from '@/types/note';
 
 /**
  * 批量追加 pending deltas
@@ -76,4 +63,39 @@ export async function getNotesWithPendingDeltas(): Promise<string[]> {
   const records = await db.getAll('pendingDeltas');
   const noteIds = new Set(records.map((r) => r.noteId));
   return Array.from(noteIds);
+}
+
+/**
+ * 保存指定笔记的快照（会覆盖同 noteId 的旧快照）
+ */
+export async function saveNoteSnapshot(
+  noteId: string,
+  snapshot: { version: number; blocks: Block[]; title?: string }
+): Promise<void> {
+  const db = await getDB();
+  const record: NoteSnapshotRecord = {
+    noteId,
+    version: snapshot.version,
+    blocks: snapshot.blocks,
+    title: snapshot.title,
+    createdAt: Date.now(),
+  };
+  await db.put('noteSnapshots', record);
+}
+
+/**
+ * 获取指定笔记的快照
+ */
+export async function getNoteSnapshot(noteId: string): Promise<NoteSnapshotRecord | null> {
+  const db = await getDB();
+  const record = await db.get('noteSnapshots', noteId);
+  return record ?? null;
+}
+
+/**
+ * 清除指定笔记的快照
+ */
+export async function clearNoteSnapshot(noteId: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('noteSnapshots', noteId);
 }

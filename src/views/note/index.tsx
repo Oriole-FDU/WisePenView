@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';
 
@@ -33,6 +33,9 @@ const NotePage: React.FC = () => {
   const [noteData, setNoteData] = useState<NoteData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const noteSnapshotGetterRef = useRef<(() => Promise<{ blocks: Block[]; title?: string }>) | null>(
+    null
+  );
 
   // 加载或创建笔记
   const loadOrCreateNote = useCallback(async () => {
@@ -79,6 +82,12 @@ const NotePage: React.FC = () => {
       noteService,
       resourceId: noteData.resourceId,
       initialVersion: noteData.version,
+      getSnapshot: async () => {
+        if (noteSnapshotGetterRef.current) {
+          return noteSnapshotGetterRef.current();
+        }
+        throw new Error('Note snapshot getter is not ready');
+      },
       onSaveStatusChange: setSaveStatus,
     });
   }, [noteService, noteData]);
@@ -141,6 +150,9 @@ const NotePage: React.FC = () => {
           lastEditedAt={noteData.lastEditedAt}
           isNewlyCreated={isNewlyCreated}
           onTitleStable={handleTitleStable}
+          onRegisterGetSnapshot={(getter) => {
+            noteSnapshotGetterRef.current = getter;
+          }}
         />
       </div>
     </div>
