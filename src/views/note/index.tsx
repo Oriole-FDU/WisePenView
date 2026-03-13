@@ -43,6 +43,7 @@ const NotePage: React.FC = () => {
     null
   );
   const pendingTitleRenameRef = useRef<string | null>(null);
+  const previousConnectionStateRef = useRef<ConnectionState>('online');
 
   // 加载或创建笔记
   const loadOrCreateNote = useCallback(async () => {
@@ -91,7 +92,16 @@ const NotePage: React.FC = () => {
         });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      const isNavigatorOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+      const errorWithCode = err as { code?: string } | null;
+      const isAxiosNetworkError = errorWithCode?.code === 'ERR_NETWORK';
+      const isNetworkError = isNavigatorOffline || isAxiosNetworkError;
+
+      if (isNetworkError) {
+        setError('加载失败，请检查网络后重试');
+      } else {
+        setError(err instanceof Error ? err.message : '未知错误');
+      }
       setLoadState('error');
     }
   }, [resourceIdFromRoute, isNewlyCreated, locationState, noteService, navigate]);
@@ -164,6 +174,16 @@ const NotePage: React.FC = () => {
       }
     })();
   }, [connectionState, noteData, resourceService]);
+
+  // 监听连接状态变化：从 online -> offline 时，提醒用户已进入离线模式，但继续允许编辑
+  useEffect(() => {
+    if (previousConnectionStateRef.current !== 'offline' && connectionState === 'offline') {
+      message.warning(
+        '当前已进入离线模式，后续编辑内容会优先保存在本地，网络恢复后将自动重试同步，但仍存在少量无法保存的风险，请注意备份重要内容。'
+      );
+    }
+    previousConnectionStateRef.current = connectionState;
+  }, [connectionState]);
 
   // 清理 Pipeline
   useEffect(() => {
