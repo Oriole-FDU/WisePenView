@@ -3,7 +3,7 @@
  * 移植自 blocknote OnFlightList
  */
 
-import type { JsonDelta } from '@/types/editor';
+import type { JsonDelta } from '@/types/note';
 
 export class OnFlightList {
   private list: JsonDelta[] = [];

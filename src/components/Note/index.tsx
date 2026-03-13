@@ -4,11 +4,11 @@ import { BlockNoteView } from '@blocknote/mantine';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
-import type { EditorChange } from '@/types/editor';
-import type { EditorProps } from './index.type';
+import type { NoteChange } from '@/types/note';
+import type { NoteProps } from './index.type';
 import styles from './style.module.less';
 
-const Editor: React.FC<EditorProps> = ({ pipeline }) => {
+const Note: React.FC<NoteProps> = ({ pipeline }) => {
   const editor = useCreateBlockNote({
     trailingBlock: false,
   });
@@ -21,8 +21,8 @@ const Editor: React.FC<EditorProps> = ({ pipeline }) => {
       }
     ) => {
       const raw = ctx.getChanges();
-      const changes: EditorChange[] = raw.map((c) => ({
-        type: c.type as EditorChange['type'],
+      const changes: NoteChange[] = raw.map((c) => ({
+        type: c.type as NoteChange['type'],
         block: c.block,
       }));
       pipeline.refresh(changes);
@@ -37,4 +37,4 @@ const Editor: React.FC<EditorProps> = ({ pipeline }) => {
   );
 };
 
-export default Editor;
+export default Note;

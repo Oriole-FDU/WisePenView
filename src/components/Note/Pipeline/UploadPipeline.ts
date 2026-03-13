@@ -11,24 +11,29 @@
  * - 内容变更（update）→ UpdateBuffer 防抖后由计时器 flush 入 pendingQueue
  */
 
-import type { DeltaOp, EditorChange, JsonDelta } from '@/types/editor';
+import type { DeltaOp, NoteChange, JsonDelta, SyncPayload } from '@/types/note';
+import type { INoteService } from '@/services/Note';
 import { UpdateBuffer } from './UpdateBuffer';
 import { PendingQueue } from './PendingQueue';
 import { OnFlightList } from './OnFlightList';
 
-interface PipelineConfig {
-  debounceMs: number;
-  idleSendMs: number;
-  pendingQueueLimit: number;
-}
-
-const Config: PipelineConfig = {
-  debounceMs: 500,
-  idleSendMs: 60000,
-  pendingQueueLimit: 100,
+// pipeline配置参数
+const Config = {
+  debounceMs: 500, // debounce防抖时长，控制debounce粒度
+  idleSendMs: 10000, // idleSendMs，用户长时间无编辑同步
+  pendingQueueLimit: 100, // pendingQueue容量，满则同步
 };
 
-export class EditorUploadPipeline {
+/** Pipeline 构造参数 */
+export interface UploadPipelineOptions {
+  noteService: INoteService;
+  docId: string;
+  initialVersion: number;
+  /** 发送失败时的回调，上层可用于触发 recovery / 本地缓存 */
+  onSyncFail?: (error: unknown) => void;
+}
+
+export class UploadPipeline {
   private seqCounter = 0;
   private readonly updateBuffer = new UpdateBuffer();
   private readonly pendingQueue = new PendingQueue();
@@ -40,6 +45,28 @@ export class EditorUploadPipeline {
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private idleSendTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private readonly noteService: INoteService;
+  private readonly docId: string;
+  private baseVersion: number;
+  private readonly onSyncFail?: (error: unknown) => void;
+
+  constructor(options: UploadPipelineOptions) {
+    this.noteService = options.noteService;
+    this.docId = options.docId;
+    this.baseVersion = options.initialVersion;
+    this.onSyncFail = options.onSyncFail;
+  }
+
+  /** Sender 是否繁忙（有请求在飞） */
+  isSenderBusy(): boolean {
+    return !this.onFlightList.isEmpty();
+  }
+
+  /** 获取当前 base_version */
+  getBaseVersion(): number {
+    return this.baseVersion;
+  }
 
   /** 开启防抖计时 */
   private triggerDebounceFlushTimer(): void {
@@ -74,7 +101,7 @@ export class EditorUploadPipeline {
   }
 
   /** 将结构变更（insert/delete/move）入队，入队时分配 seqId */
-  private enqueueStructureChange(structureChanges: EditorChange[]): void {
+  private enqueueStructureChange(structureChanges: NoteChange[]): void {
     if (structureChanges.length === 0) return;
     this.pendingQueue.enqueue(
       structureChanges.map((c) => {
@@ -112,7 +139,7 @@ export class EditorUploadPipeline {
    * 保证防抖区域优先写队列。
    * seqId 统一在入队时分配。
    */
-  refresh(changes: EditorChange[]): void {
+  refresh(changes: NoteChange[]): void {
     //
     this.triggerDebounceFlushTimer();
     this.triggerIdleSendTimer();
@@ -150,25 +177,59 @@ export class EditorUploadPipeline {
     }
   }
 
-  /** send() 会被overFlow 或 timeout触发，是队列内部事件，作为private */
+  /**
+   * 发送 pending 队列中的 deltas 到云端
+   * - 若 senderBusy（onFlight 非空），跳过本次调用
+   * - 异步执行，不阻塞主流程
+   */
   private send(): void {
-    const sendmsg: JsonDelta[] = this.pendingQueue.flush();
-    this.onFlightList.add(sendmsg);
+    // 阻塞写
+    if (this.isSenderBusy()) {
+      return;
+    }
+
+    // 无pending不写
+    const deltas = this.pendingQueue.flush();
+    if (deltas.length === 0) {
+      return;
+    }
+
+    this.onFlightList.add(deltas);
+
+    const payload: SyncPayload = {
+      base_version: this.baseVersion,
+      send_timestamp: Date.now(),
+      deltas,
+    };
+
+    this.noteService
+      .syncNote(this.docId, payload)
+      .then((res) => {
+        this.confirmSendSuccess(res.new_version);
+      })
+      .catch((error: unknown) => {
+        this.requeueOnSendFail(error);
+      });
   }
 
-  // ── sendFail：onFlight 回滚到 syncQueue ──
-  requeueOnSendFail(): void {
-    const deltas = this.onFlightList.getAll();
+  /** 发送成功：清空 onFlight，更新 baseVersion */
+  private confirmSendSuccess(newVersion: number): void {
     this.onFlightList.removeAll();
-    if (deltas.length > 0) {
-      this.pendingQueue.enqueue(deltas);
-      this.checkOverflowAndSend();
+    this.baseVersion = newVersion;
+    // 如果 pendingQueue 还有数据，继续发送
+    if (!this.pendingQueue.isEmpty()) {
+      this.send();
     }
   }
 
-  /** 发送成功，清空 onFlight */
-  confirmSendSuccess(): void {
+  /** 发送失败：onFlight 回滚到 pendingQueue 头部，通知上层 */
+  private requeueOnSendFail(error: unknown): void {
+    const deltas = this.onFlightList.getAll();
     this.onFlightList.removeAll();
+    if (deltas.length > 0) {
+      this.pendingQueue.prepend(deltas);
+    }
+    this.onSyncFail?.(error);
   }
 
   // ── 状态查询（供 SaveStatusLight 等 UI 使用）──
@@ -182,5 +243,17 @@ export class EditorUploadPipeline {
 
   hasPending(): boolean {
     return !this.pendingQueue.isEmpty() || !this.onFlightList.isEmpty();
+  }
+
+  /** 清理 timer，组件卸载时调用 */
+  dispose(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    if (this.idleSendTimer) {
+      clearTimeout(this.idleSendTimer);
+      this.idleSendTimer = null;
+    }
   }
 }

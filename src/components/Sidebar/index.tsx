@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
         onClick: () => console.log('Create New Chat'),
       },
       {
-        key: '/app/editor',
+        key: '/app/note',
         icon: <RiPenNibFill size={18} />,
         label: '新建笔记',
       },
