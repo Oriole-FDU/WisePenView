@@ -4,7 +4,7 @@ import { AiOutlineTag, AiOutlineCloudUpload } from 'react-icons/ai';
 import { TagManager } from '@/components/Tag';
 import FlatViewDrive from '@/components/Drive/FlatViewDrive';
 import FolderViewDrive from '@/components/Drive/FolderViewDrive';
-import { useDrivePreferencesStore, type DriveViewMode } from '@/store/useDrivePreferencesStore';
+import { useDrivePreferencesStore, type DriveViewMode } from '@/store';
 
 import styles from './style.module.less';
 

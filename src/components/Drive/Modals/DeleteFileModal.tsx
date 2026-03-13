@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Alert, message } from 'antd';
 import { useResourceService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
-import { useRecentFilesStore } from '@/store/useRecentFilesStore';
+import { useRecentFilesStore } from '@/store';
 import type { DeleteFileModalProps } from './index.type';
 
 const DeleteFileModal: React.FC<DeleteFileModalProps> = ({ open, onCancel, onSuccess, file }) => {

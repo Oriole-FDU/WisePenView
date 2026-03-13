@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ResourceItem } from '@/types/resource';
-import { useRecentFilesStore } from '@/store/useRecentFilesStore';
+import { useRecentFilesStore } from '@/store';
 
 /**
  * 根据资源类型决定打开方式：NOTE 跳转编辑器，其他类型预览

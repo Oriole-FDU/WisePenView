@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Input, message } from 'antd';
 import { useResourceService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
-import { useRecentFilesStore } from '@/store/useRecentFilesStore';
+import { useRecentFilesStore } from '@/store';
 import type { RenameFileModalProps } from './index.type';
 
 const RenameFileModal: React.FC<RenameFileModalProps> = ({ open, onCancel, onSuccess, file }) => {

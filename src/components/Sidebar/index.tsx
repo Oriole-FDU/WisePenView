@@ -16,7 +16,7 @@ import styles from './style.module.less';
 import logoImg from '@/assets/images/logo-icon.png';
 
 import UserProfile from '@/components/UserProfile';
-import { useRecentFilesStore } from '@/store/useRecentFilesStore';
+import { useRecentFilesStore } from '@/store';
 import { useClickFile } from '@/hooks/drive';
 
 interface SidebarProps {

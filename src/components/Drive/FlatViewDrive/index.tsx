@@ -6,7 +6,7 @@ import FileFilter from './FileFilter';
 import { TAG_QUERY_LOGIC_MODE, RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/services/Resource';
 import type { FileFilterValue } from './FileFilter/index.type';
 import type { FlatViewDriveProps } from './index.type';
-import { useDrivePreferencesStore } from '@/store/useDrivePreferencesStore';
+import { useDrivePreferencesStore } from '@/store';
 import styles from './style.module.less';
 
 const DEFAULT_FILTER: FileFilterValue = {
