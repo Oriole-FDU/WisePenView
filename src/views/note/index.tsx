@@ -26,8 +26,12 @@ const NotePage: React.FC = () => {
   const location = useLocation();
   const noteService = useNoteService();
   const resourceService = useResourceService();
+  const locationState = location.state as {
+    fromCreate?: boolean;
+    initialNoteData?: NoteData;
+  } | null;
   /** 从创建流程跳转进入时由 navigate state 传入 */
-  const isNewlyCreated = (location.state as { fromCreate?: boolean } | null)?.fromCreate === true;
+  const isNewlyCreated = locationState?.fromCreate === true;
 
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [noteData, setNoteData] = useState<NoteData | null>(null);
@@ -44,6 +48,12 @@ const NotePage: React.FC = () => {
 
     try {
       if (resourceIdFromRoute) {
+        // 如果是从创建流程跳转过来且带有初始 noteData，则直接使用这份数据，避免依赖首次 loadNote 成功
+        if (isNewlyCreated && locationState?.initialNoteData) {
+          setNoteData(locationState.initialNoteData);
+          setLoadState('success');
+          return;
+        }
         // 有 resourceId，加载已有笔记
         const res = await noteService.loadNote(resourceIdFromRoute);
         if (!res.ok) {
@@ -62,14 +72,26 @@ const NotePage: React.FC = () => {
         if (!res.ok) {
           throw new Error('创建笔记失败');
         }
-        // 创建成功后跳转到新笔记页面
-        navigate(`/app/note/${res.doc_id}`, { replace: true, state: { fromCreate: true } });
+        const createdNoteData: NoteData = {
+          resourceId: res.doc_id,
+          version: res.version,
+          blocks: res.blocks,
+          lastEditedAt: res.created_at,
+        };
+        // 先用 createNote 返回值初始化当前页面，避免后续 loadNote 失败时出现「刚创建就加载失败」
+        setNoteData(createdNoteData);
+        setLoadState('success');
+        // 创建成功后跳转到新笔记页面，并通过 state 传递初始 noteData，供新路由复用
+        navigate(`/app/note/${res.doc_id}`, {
+          replace: true,
+          state: { fromCreate: true, initialNoteData: createdNoteData },
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '未知错误');
       setLoadState('error');
     }
-  }, [resourceIdFromRoute, noteService, navigate]);
+  }, [resourceIdFromRoute, isNewlyCreated, locationState, noteService, navigate]);
 
   useEffect(() => {
     loadOrCreateNote();
