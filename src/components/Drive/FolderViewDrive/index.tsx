@@ -12,12 +12,18 @@ import {
   LuChevronRight,
   LuFolderPlus,
   LuFolderInput,
+  LuCopy,
 } from 'react-icons/lu';
 import { formatSize } from '@/utils/format';
 import { getPathSegments, getFolderDisplayName } from '@/utils/path';
 import type { ResourceItem } from '@/types/resource';
 import type { Folder } from '@/types/folder';
-import { useFolderService, useResourceService, useTagService } from '@/contexts/ServicesContext';
+import {
+  useFolderService,
+  useResourceService,
+  useTagService,
+  useNoteService,
+} from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import {
   NewFolderModal,
@@ -45,6 +51,7 @@ const FolderViewDrive: React.FC = () => {
   const folderService = useFolderService();
   const resourceService = useResourceService();
   const tagService = useTagService();
+  const noteService = useNoteService();
   const clickFile = useClickFile();
 
   // 路径状态
@@ -247,6 +254,28 @@ const FolderViewDrive: React.FC = () => {
     setDeleteFileModalOpen(false);
     setDeleteFileTarget(null);
   }, []);
+
+  // 处理创建副本（仅 NOTE 类型）
+  const handleDuplicateNote = useCallback(
+    async (file: ResourceItem) => {
+      try {
+        const res = await noteService.duplicateNote({ source: file.resourceId });
+        if (res.ok && res.doc_id) {
+          message.success('副本已创建');
+          refresh();
+          clickFile({
+            ...file,
+            resourceId: res.doc_id,
+            resourceName: `${file.resourceName || '未命名'}（副本）`,
+            resourceType: 'NOTE',
+          });
+        }
+      } catch (err) {
+        message.error(parseErrorMessage(err, '创建副本失败'));
+      }
+    },
+    [noteService, refresh, clickFile]
+  );
 
   // 处理移动到文件夹
   const handleMoveToFolder = useCallback((target: MoveToFolderTarget) => {
@@ -507,6 +536,20 @@ const FolderViewDrive: React.FC = () => {
                 },
               ]
             : [
+                ...(record.data.resourceType === 'NOTE'
+                  ? [
+                      {
+                        key: 'duplicate',
+                        label: '创建副本',
+                        icon: <LuCopy size={14} />,
+                        onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                          info.domEvent.stopPropagation();
+                          setOpenDropdownKey(null);
+                          handleDuplicateNote(record.data);
+                        },
+                      },
+                    ]
+                  : []),
                 {
                   key: 'move',
                   label: '移动到文件夹',

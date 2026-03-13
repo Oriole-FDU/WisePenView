@@ -270,8 +270,11 @@ export class UploadPipeline {
    * seqId 统一在入队时分配。
    */
   refresh(changes: NoteChange[]): void {
-    //
-    this.triggerDebounceFlushTimer();
+    // 顶部清零：取消未到期的防抖计时器，避免与后续逻辑竞态
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
     this.triggerIdleSendTimer();
 
     // 分离 update 和结构变更，不关心顺序
@@ -295,14 +298,9 @@ export class UploadPipeline {
       this.enqueueStructureChange(structureChanges);
     }
 
-    // 仅内容变更：由计时器触发 flush，无结构变更时 mutual exclusion
+    // 仅内容变更：在此处启动防抖计时器，到期后由 timer 触发 flush
     if (updateChanges.length > 0 && structureChanges.length === 0) {
-      // 关于竞态问题：timer到期时，refresh被触发，二者可能对queue做时间上非常接近的写操作
-      // js单线程，因此二者会互相阻塞
-      // 如果refresh先执行，那计时器被取消，enqueueUpdateBuffer不会被执行
-      // 如果计时器先执行，那refresh被阻塞，flush的都是update操作，不会影响还原
-      // 因此这里的时序问题不需要担心
-      this.enqueueUpdateBuffer();
+      // 底部开启：开始500ms，会被refresh打断
       this.triggerDebounceFlushTimer();
     }
   }

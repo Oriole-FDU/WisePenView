@@ -8,6 +8,8 @@ import type {
   LoadNoteResponse,
   CreateNoteRequest,
   CreateNoteResponse,
+  DuplicateNoteRequest,
+  DuplicateNoteResponse,
 } from './index.type';
 
 /**
@@ -40,8 +42,19 @@ const createNote = async (params?: CreateNoteRequest): Promise<CreateNoteRespons
   return res.data;
 };
 
+/**
+ * 创建副本：从源文档复制创建新文档
+ * POST /api/v1/note/duplicate
+ */
+const duplicateNote = async (params: DuplicateNoteRequest): Promise<DuplicateNoteResponse> => {
+  const res = (await Axios.post('/note/duplicate', params)) as ApiResponse<DuplicateNoteResponse>;
+  checkResponse(res);
+  return res.data;
+};
+
 export const NoteServicesImpl: INoteService = {
   syncNote,
   loadNote,
   createNote,
+  duplicateNote,
 };

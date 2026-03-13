@@ -13,6 +13,8 @@ export interface INoteService {
   loadNote(docId: string): Promise<LoadNoteResponse>;
   /** 新建文档：创建新文档，可传入初始内容 */
   createNote(params?: CreateNoteRequest): Promise<CreateNoteResponse>;
+  /** 创建副本：从源文档复制创建新文档 */
+  duplicateNote(params: DuplicateNoteRequest): Promise<DuplicateNoteResponse>;
 }
 
 /** 增量保存响应 */
@@ -36,8 +38,12 @@ export interface CreateNoteRequest {
   initial_content?: Block[];
   /** 文档标题，可由首段内容推断 */
   title?: string;
-  /** 源文档 ID，用于创建副本（可扩展） */
-  source?: string;
+}
+
+/** 创建副本请求参数 */
+export interface DuplicateNoteRequest {
+  /** 源文档 ID */
+  source: string;
 }
 
 /** 新建文档响应 */
@@ -48,3 +54,6 @@ export interface CreateNoteResponse {
   blocks: Block[];
   created_at?: string;
 }
+
+/** 创建副本响应（与新建文档结构一致） */
+export type DuplicateNoteResponse = CreateNoteResponse;

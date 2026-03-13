@@ -2,6 +2,22 @@
   "resourceListPage": {
     "list": [
       {
+        "resourceId": "mock-note-1",
+        "resourceName": "第一份 Mock 笔记",
+        "resourceType": "NOTE",
+        "ownerId": "1",
+        "path": "/",
+        "tagNames": []
+      },
+      {
+        "resourceId": "mock-note-2",
+        "resourceName": "第二份 Mock 笔记",
+        "resourceType": "NOTE",
+        "ownerId": "1",
+        "path": "/",
+        "tagNames": []
+      },
+      {
         "resourceId": "res-001",
         "resourceName": "示例文档.pdf",
         "resourceType": "file",
@@ -21,7 +37,7 @@
         "tagNames": []
       }
     ],
-    "total": 2,
+    "total": 4,
     "page": 1,
     "size": 20,
     "totalPage": 1
