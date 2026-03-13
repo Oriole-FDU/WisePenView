@@ -36,6 +36,8 @@ export interface CreateNoteRequest {
   initial_content?: Block[];
   /** 文档标题，可由首段内容推断 */
   title?: string;
+  /** 源文档 ID，用于创建副本（可扩展） */
+  source?: string;
 }
 
 /** 新建文档响应 */
