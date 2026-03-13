@@ -8,6 +8,9 @@
 
 .header {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: var(--ant-padding-md) var(--ant-padding-xl);
   border-bottom: 1px solid var(--ant-color-border-secondary);
 }
@@ -26,11 +29,9 @@
   }
 }
 
-.editorWrapper {
+.editorArea {
   flex: 1;
   min-height: 0;
-  padding: var(--ant-padding-lg) var(--ant-padding-xl);
-  margin-top: 20px;
   max-width: 900px;
   width: 100%;
 }

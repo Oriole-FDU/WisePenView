@@ -1,0 +1,30 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ant-margin-xs);
+}
+
+.text {
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-secondary);
+}
+
+.light {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  /* 保存中-蓝 已保存-绿 保存失败-红 */
+  &[data-status='saving'] {
+    background: var(--ant-color-primary);
+  }
+
+  &[data-status='saved'] {
+    background: var(--ant-color-success);
+  }
+
+  &[data-status='error'] {
+    background: var(--ant-color-error);
+  }
+}
