@@ -35,3 +35,32 @@
   max-width: 900px;
   width: 100%;
 }
+
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size);
+}
+
+.errorContainer {
+  gap: var(--ant-margin-md);
+
+  button {
+    padding: var(--ant-padding-xs) var(--ant-padding-md);
+    border: 1px solid var(--ant-color-border);
+    border-radius: var(--ant-border-radius);
+    background: var(--ant-color-bg-container);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--ant-color-primary);
+      color: var(--ant-color-primary);
+    }
+  }
+}

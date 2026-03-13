@@ -91,6 +91,10 @@ const router = createBrowserRouter([
         element: <Navigate to="/app/drive" replace />,
       },
       {
+        path: 'note',
+        element: <NotePage />,
+      },
+      {
         path: 'note/:noteId',
         element: <NotePage />,
       },
