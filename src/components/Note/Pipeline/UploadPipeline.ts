@@ -100,6 +100,9 @@ export class UploadPipeline {
   private isSavingDisplayLocked = false;
   /** 是否已为当前 resourceId 保存过断网快照 */
   private snapshotSaved = false;
+  /** window online/offline 事件监听函数引用，便于卸载时移除 */
+  private readonly onlineListener: () => void;
+  private readonly offlineListener: () => void;
 
   constructor(options: UploadPipelineOptions) {
     this.noteService = options.noteService;
@@ -109,6 +112,18 @@ export class UploadPipeline {
     this.onSyncFail = options.onSyncFail;
     this.onConnectionStateChange = options.onConnectionStateChange;
     this.onSaveStatusChange = options.onSaveStatusChange;
+
+    this.onlineListener = () => {
+      this.handleOnline();
+    };
+    this.offlineListener = () => {
+      this.handleOffline();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', this.onlineListener);
+      window.addEventListener('offline', this.offlineListener);
+    }
 
     // 启动时检查并同步 IndexedDB 中的离线数据
     this.syncOnInit();
@@ -556,6 +571,11 @@ export class UploadPipeline {
       this.savingDisplayTimer = null;
     }
 
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('online', this.onlineListener);
+      window.removeEventListener('offline', this.offlineListener);
+    }
+
     // 如果有未发送的数据，写入 IndexedDB 保存
     this.flushAllToIndexedDB();
   }
@@ -606,6 +626,21 @@ export class UploadPipeline {
     } catch {
       // 忽略快照失败，避免影响主流程
     }
+  }
+
+  /** 浏览器触发 online 事件时，尽快触发一次重连尝试 */
+  private handleOnline(): void {
+    if (this.connectionState !== 'offline') {
+      return;
+    }
+    this.currentRetryMs = this.retryBaseMs;
+    this.retryCount = 0;
+    void this.attemptReconnect();
+  }
+
+  /** 浏览器触发 offline 事件时，立即进入 offline 模式以更新状态 */
+  private handleOffline(): void {
+    this.enterOfflineMode();
   }
 
   /** 判断是否为版本冲突错误（后端返回 409） */
