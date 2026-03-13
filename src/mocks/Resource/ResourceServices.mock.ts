@@ -1,4 +1,4 @@
-import type { IResourceService } from '@/services/Resource';
+import type { IResourceService, RenameResourceRequest } from '@/services/Resource';
 import type { ResourceListPage } from '@/types/resource';
 import mockdata from './mockdata.json';
 
@@ -11,7 +11,8 @@ const getUserResources = async (): Promise<ResourceListPage> => {
   return resourceListPage;
 };
 
-const renameResource = async (): Promise<void> => {
+const renameResource = async (params: RenameResourceRequest): Promise<void> => {
+  console.log('[ResourceServices.mock] renameResource', params);
   await delay(150);
 };
 

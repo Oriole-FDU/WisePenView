@@ -1,3 +1,4 @@
+import type { SyncPayload } from '@/types/note';
 import type {
   INoteService,
   SyncNoteResponse,
@@ -42,7 +43,34 @@ const MOCK_NOTE_2: Omit<LoadNoteResponse, 'doc_id'> = {
   updated_at: new Date().toISOString(),
 };
 
-const syncNote = async (): Promise<SyncNoteResponse> => {
+const syncNote = async (docId: string, payload: SyncPayload): Promise<SyncNoteResponse> => {
+  const { base_version, send_timestamp, deltas } = payload;
+  console.log('[NoteServices.mock] syncNote', {
+    docId,
+    baseVersion: base_version,
+    sendTimestamp: send_timestamp,
+    deltas: deltas.map((delta) => {
+      const { op, blockId, firstOp, data } = delta;
+      const dataSummary =
+        data && typeof data === 'object'
+          ? (() => {
+              const d = data as Record<string, unknown>;
+              return {
+                ...(d.id !== undefined && { id: d.id }),
+                ...(d.type !== undefined && { type: d.type }),
+                ...(d.content !== undefined && { content: d.content }),
+                ...(d.props !== undefined && { props: d.props }),
+              };
+            })()
+          : { type: typeof data };
+      return {
+        op,
+        blockId,
+        firstOp,
+        ...dataSummary,
+      };
+    }),
+  });
   await delay(200);
   return { new_version: Date.now() };
 };

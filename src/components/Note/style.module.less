@@ -1,8 +1,20 @@
-.editorWrapper {
+// 标题、元信息、正文共用：最大宽度与水平缩进一致
+@note-content-max-width: 900px;
+@note-content-padding-x: var(--ant-padding-xl);
+
+.noteWrapper {
   flex: 1;
   min-height: 0;
-  padding: var(--ant-padding-lg) var(--ant-padding-xl);
-  margin-top: 20px;
-  max-width: 900px;
+  display: flex;
+  flex-direction: column;
   width: 100%;
+}
+
+.lastEditedAt {
+  max-width: @note-content-max-width;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: calc(54px + @note-content-padding-x);
+  font-size: var(--ant-font-size-md);
+  color: var(--ant-color-text-tertiary);
 }

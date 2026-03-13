@@ -40,7 +40,7 @@ export type SaveStatus = 'saving' | 'saved' | 'offline';
 /** Pipeline 构造参数 */
 export interface UploadPipelineOptions {
   noteService: INoteService;
-  docId: string;
+  resourceId: string;
   initialVersion: number;
   /** 发送失败时的回调，上层可用于触发 recovery / 本地缓存 */
   onSyncFail?: (error: unknown) => void;
@@ -67,7 +67,7 @@ export class UploadPipeline {
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
 
   private readonly noteService: INoteService;
-  private readonly docId: string;
+  private readonly resourceId: string;
   private baseVersion: number;
   private readonly onSyncFail?: (error: unknown) => void;
   private readonly onConnectionStateChange?: (state: ConnectionState) => void;
@@ -88,7 +88,7 @@ export class UploadPipeline {
 
   constructor(options: UploadPipelineOptions) {
     this.noteService = options.noteService;
-    this.docId = options.docId;
+    this.resourceId = options.resourceId;
     this.baseVersion = options.initialVersion;
     this.onSyncFail = options.onSyncFail;
     this.onConnectionStateChange = options.onConnectionStateChange;
@@ -164,11 +164,11 @@ export class UploadPipeline {
   /** 初始化时同步 IndexedDB 中可能存在的离线数据 */
   private async syncOnInit(): Promise<void> {
     try {
-      const offlineDeltas = await getPendingDeltas(this.docId);
+      const offlineDeltas = await getPendingDeltas(this.resourceId);
       if (offlineDeltas.length > 0) {
         // 有离线数据，入队并发送
         this.pendingQueue.prepend(offlineDeltas);
-        await clearPendingDeltas(this.docId);
+        await clearPendingDeltas(this.resourceId);
         this.send();
       }
     } catch {
@@ -325,7 +325,7 @@ export class UploadPipeline {
 
     // offline 模式：append 到 IndexedDB（作为离线后端）
     if (this.connectionState === 'offline') {
-      appendPendingDeltas(this.docId, deltas).catch(() => {
+      appendPendingDeltas(this.resourceId, deltas).catch(() => {
         // 写入失败，回滚到 pendingQueue
         this.pendingQueue.prepend(deltas);
       });
@@ -341,7 +341,7 @@ export class UploadPipeline {
     };
 
     this.noteService
-      .syncNote(this.docId, payload)
+      .syncNote(this.resourceId, payload)
       .then((res) => {
         this.confirmSendSuccess(res.new_version);
       })
@@ -371,7 +371,7 @@ export class UploadPipeline {
 
     // 失败的数据写入 IndexedDB（作为离线后端）
     if (deltas.length > 0) {
-      appendPendingDeltas(this.docId, deltas).catch(() => {
+      appendPendingDeltas(this.resourceId, deltas).catch(() => {
         // 写入失败，回滚到 pendingQueue 等待重试
         this.pendingQueue.prepend(deltas);
       });
@@ -439,7 +439,7 @@ export class UploadPipeline {
     // 从 IndexedDB 读取离线数据
     let deltas: JsonDelta[] = [];
     try {
-      deltas = await getPendingDeltas(this.docId);
+      deltas = await getPendingDeltas(this.resourceId);
     } catch {
       // 读取失败，继续重试
       this.scheduleRetry();
@@ -454,7 +454,7 @@ export class UploadPipeline {
 
     // 发送前先清除 IndexedDB（发送过程中新增的数据会重新写入）
     try {
-      await clearPendingDeltas(this.docId);
+      await clearPendingDeltas(this.resourceId);
     } catch {
       // 清除失败，继续重试
       this.scheduleRetry();
@@ -470,7 +470,7 @@ export class UploadPipeline {
     };
 
     this.noteService
-      .syncNote(this.docId, payload)
+      .syncNote(this.resourceId, payload)
       .then((res) => {
         this.onFlightList.removeAll();
         this.baseVersion = res.new_version;
@@ -483,7 +483,7 @@ export class UploadPipeline {
         this.onFlightList.removeAll();
 
         if (failedDeltas.length > 0) {
-          appendPendingDeltas(this.docId, failedDeltas).catch(() => {
+          appendPendingDeltas(this.resourceId, failedDeltas).catch(() => {
             // 写回失败，放入内存队列
             this.pendingQueue.prepend(failedDeltas);
           });
@@ -557,7 +557,7 @@ export class UploadPipeline {
 
     // 写入 IndexedDB
     if (allDeltas.length > 0) {
-      appendPendingDeltas(this.docId, allDeltas).catch(() => {
+      appendPendingDeltas(this.resourceId, allDeltas).catch(() => {
         // 忽略写入失败
       });
     }

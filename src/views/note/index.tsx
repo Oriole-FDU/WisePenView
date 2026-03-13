@@ -1,27 +1,33 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';
 
 import Note from '@/components/Note';
 import SaveStatusLight from '@/components/Note/SaveStatusLight';
 import { UploadPipeline, type SaveStatus } from '@/components/Note/Pipeline';
-import { useNoteService } from '@/contexts/ServicesContext';
+import { useNoteService, useResourceService } from '@/contexts/ServicesContext';
 import type { Block } from '@/types/note';
 
 import styles from './style.module.less';
 
 interface NoteData {
-  docId: string;
+  resourceId: string;
   version: number;
   blocks: Block[];
+  /** 最近编辑时间（来自 loadNote 的 updated_at） */
+  lastEditedAt?: string;
 }
 
 type LoadState = 'loading' | 'success' | 'error';
 
 const NotePage: React.FC = () => {
-  const { noteId } = useParams<{ noteId: string }>();
+  const { noteId: resourceIdFromRoute } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const noteService = useNoteService();
+  const resourceService = useResourceService();
+  /** 从创建流程跳转进入时由 navigate state 传入 */
+  const isNewlyCreated = (location.state as { fromCreate?: boolean } | null)?.fromCreate === true;
 
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [noteData, setNoteData] = useState<NoteData | null>(null);
@@ -34,32 +40,33 @@ const NotePage: React.FC = () => {
     setError(null);
 
     try {
-      if (noteId) {
-        // 有 noteId，加载已有笔记
-        const res = await noteService.loadNote(noteId);
+      if (resourceIdFromRoute) {
+        // 有 resourceId，加载已有笔记
+        const res = await noteService.loadNote(resourceIdFromRoute);
         if (!res.ok) {
           throw new Error('加载笔记失败');
         }
         setNoteData({
-          docId: res.doc_id,
+          resourceId: res.doc_id,
           version: res.version,
           blocks: res.blocks,
+          lastEditedAt: res.updated_at,
         });
         setLoadState('success');
       } else {
-        // 无 noteId，创建新笔记
+        // 无 resourceId，创建新笔记
         const res = await noteService.createNote();
         if (!res.ok) {
           throw new Error('创建笔记失败');
         }
         // 创建成功后跳转到新笔记页面
-        navigate(`/app/note/${res.doc_id}`, { replace: true });
+        navigate(`/app/note/${res.doc_id}`, { replace: true, state: { fromCreate: true } });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '未知错误');
       setLoadState('error');
     }
-  }, [noteId, noteService, navigate]);
+  }, [resourceIdFromRoute, noteService, navigate]);
 
   useEffect(() => {
     loadOrCreateNote();
@@ -70,11 +77,27 @@ const NotePage: React.FC = () => {
     if (!noteData) return null;
     return new UploadPipeline({
       noteService,
-      docId: noteData.docId,
+      resourceId: noteData.resourceId,
       initialVersion: noteData.version,
       onSaveStatusChange: setSaveStatus,
     });
   }, [noteService, noteData]);
+
+  const handleTitleStable = useCallback(
+    async (title: string) => {
+      const trimmed = title.trim();
+      if (!trimmed || !noteData) return;
+      try {
+        await resourceService.renameResource({
+          resourceId: noteData.resourceId,
+          newName: trimmed,
+        });
+      } catch {
+        // 重命名失败由上层或后续统一处理，此处仅静默
+      }
+    },
+    [noteData, resourceService]
+  );
 
   // 清理 Pipeline
   useEffect(() => {
@@ -112,7 +135,13 @@ const NotePage: React.FC = () => {
         <SaveStatusLight status={saveStatus} />
       </header>
       <div className={styles.editorArea}>
-        <Note pipeline={pipeline} initialBlocks={noteData.blocks} />
+        <Note
+          pipeline={pipeline}
+          initialBlocks={noteData.blocks}
+          lastEditedAt={noteData.lastEditedAt}
+          isNewlyCreated={isNewlyCreated}
+          onTitleStable={handleTitleStable}
+        />
       </div>
     </div>
   );

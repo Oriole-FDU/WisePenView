@@ -6,4 +6,10 @@ export interface NoteProps {
   pipeline: UploadPipeline;
   /** 初始 Block 内容（从服务端加载） */
   initialBlocks?: Block[];
+  /** 最近编辑时间（ISO 字符串，来自 loadNote 的 updated_at） */
+  lastEditedAt?: string;
+  /** 是否为新创建的文档（创建后跳转进入时为 true，用于展示「新创建」） */
+  isNewlyCreated?: boolean;
+  /** 标题防抖稳定后回调，用于调用 renameResource */
+  onTitleStable?: (title: string) => void;
 }
