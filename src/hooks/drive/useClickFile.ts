@@ -16,7 +16,7 @@ export const useClickFile = () => {
       const { resourceId, resourceName, resourceType, preview } = item;
       addFile({ resourceId, resourceName, resourceType });
       if (resourceType === 'NOTE') {
-        navigate(`/app/editor/${resourceId}`);
+        navigate(`/app/note/${resourceId}`);
       } else {
         if (preview) {
           window.open(preview, '_blank');
