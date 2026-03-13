@@ -1,16 +1,14 @@
 /**
  * IndexedDB 存储模块入口
- * 仅缓存 pending 队列，确保未发送变更不丢失
+ * 用于缓存离线期间未同步的变更（append-only）
  */
 
 export { getDB, closeDB } from './db';
 export {
-  savePendingCache,
-  getPendingCache,
-  deletePendingCache,
-  getAllPendingCaches,
-  clearAllPendingCaches,
-  hasPendingCache,
-  getNotesWithPendingChanges,
+  appendPendingDelta,
+  appendPendingDeltas,
+  getPendingDeltas,
+  clearPendingDeltas,
+  hasPendingDeltas,
+  getNotesWithPendingDeltas,
 } from './noteStore';
-export type { NotePendingCache } from './types';

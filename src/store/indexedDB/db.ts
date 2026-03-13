@@ -1,23 +1,27 @@
 /**
  * IndexedDB 数据库初始化
- * 使用 idb 库封装 IndexedDB 操作
+ * 用于缓存离线期间未同步的变更（append-only）
  */
 
 import { openDB, type IDBPDatabase } from 'idb';
+import type { JsonDelta } from '@/types/note';
 
 const DB_NAME = 'WisePenDB';
 const DB_VERSION = 1;
 
+/** Pending Delta 记录（append-only 存储） */
+export interface PendingDeltaRecord {
+  id?: number; // 自增 ID，保证顺序
+  noteId: string;
+  delta: JsonDelta;
+  createdAt: number;
+}
+
 export interface WisePenDB {
-  notes: {
-    key: string;
-    value: {
-      noteId: string;
-      baseVersion: number;
-      seqCounter: number;
-      pendingQueue: unknown[];
-      updatedAt: number;
-    };
+  pendingDeltas: {
+    key: number;
+    value: PendingDeltaRecord;
+    indexes: { noteId: string };
   };
 }
 
@@ -30,8 +34,12 @@ export async function getDB(): Promise<IDBPDatabase<WisePenDB>> {
 
   dbInstance = await openDB<WisePenDB>(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      if (!db.objectStoreNames.contains('notes')) {
-        db.createObjectStore('notes', { keyPath: 'noteId' });
+      if (!db.objectStoreNames.contains('pendingDeltas')) {
+        const store = db.createObjectStore('pendingDeltas', {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+        store.createIndex('noteId', 'noteId', { unique: false });
       }
     },
   });

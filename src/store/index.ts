@@ -2,7 +2,7 @@
  * Store 统一入口
  *
  * - zustand/: 内存状态管理（UI 状态、临时数据）
- * - indexedDB/: 持久化存储（pending 队列缓存）
+ * - indexedDB/: 离线缓存（未同步的变更）
  */
 
 // Zustand stores
@@ -13,16 +13,14 @@ export {
   type RecentFileItem,
 } from './zustand';
 
-// IndexedDB stores
+// IndexedDB (离线缓存)
 export {
   getDB,
   closeDB,
-  savePendingCache,
-  getPendingCache,
-  deletePendingCache,
-  getAllPendingCaches,
-  clearAllPendingCaches,
-  hasPendingCache,
-  getNotesWithPendingChanges,
-  type NotePendingCache,
+  appendPendingDelta,
+  appendPendingDeltas,
+  getPendingDeltas,
+  clearPendingDeltas,
+  hasPendingDeltas,
+  getNotesWithPendingDeltas,
 } from './indexedDB';
