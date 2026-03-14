@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { List, Avatar } from 'antd';
 import type { GroupMember } from '@/types/group';
 import type { SelectedMemberListProps } from './index.type';
@@ -14,13 +14,15 @@ const SelectedMemberList: React.FC<SelectedMemberListProps> = ({ members }) => {
     return parts.join(' ') || undefined;
   };
 
-  if (!members || members.length === 0) return null;
+  const dataSource = useMemo(() => members ?? [], [members]);
+
+  if (!dataSource.length) return null;
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.title}>选中成员 ({members.length} 人)</div>
+      <div className={styles.title}>选中成员 ({dataSource.length} 人)</div>
       <List
-        dataSource={members}
+        dataSource={dataSource}
         renderItem={(member) => (
           <List.Item>
             <List.Item.Meta

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { message, Breadcrumb, Table, Spin, Dropdown, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import { AiOutlineFolder } from 'react-icons/ai';
@@ -308,18 +308,22 @@ const FolderViewDrive: React.FC = () => {
 
   // 获取路径段
   const pathSegments = getPathSegments(folderPath);
-  const dataSource: RowItem[] = [
-    ...folders.map((f) => ({
-      key: `folder-${f.tagId}`,
-      _type: 'folder' as const,
-      data: f,
-    })),
-    ...folderFiles.map((f) => ({
-      key: `file-${f.resourceId}`,
-      _type: 'file' as const,
-      data: f,
-    })),
-  ];
+
+  const dataSource = useMemo<RowItem[]>(
+    () => [
+      ...folders.map((f) => ({
+        key: `folder-${f.tagId}`,
+        _type: 'folder' as const,
+        data: f,
+      })),
+      ...folderFiles.map((f) => ({
+        key: `file-${f.resourceId}`,
+        _type: 'file' as const,
+        data: f,
+      })),
+    ],
+    [folders, folderFiles]
+  );
 
   // 处理滚动
   useEffect(() => {
@@ -426,143 +430,153 @@ const FolderViewDrive: React.FC = () => {
     [handleRowClick, handleDrop, handleDropFolder]
   );
 
-  const columns = [
-    {
-      title: <span className={styles.nameHeader}>名称</span>,
-      dataIndex: '_',
-      key: 'name',
-      render: (_: unknown, record: RowItem) => (
-        <div className={styles.nameCell}>
-          {record._type === 'folder' ? (
-            <AiOutlineFolder size={20} color="var(--ant-color-warning)" />
-          ) : (
-            <FileTypeIcon
-              resourceType={record.data.resourceType}
-              size={18}
-              color="var(--ant-color-text-secondary)"
-            />
-          )}
-          <span>
-            {record._type === 'folder'
-              ? getFolderDisplayName(record.data.tagName)
-              : record.data.resourceName || '未命名'}
-          </span>
-        </div>
-      ),
-    },
-    {
-      title: '大小',
-      key: 'size',
-      width: 100,
-      render: (_: unknown, record: RowItem) =>
-        record._type === 'file' ? formatSize(record.data.size) : '-',
-    },
-    {
-      title: '类型',
-      key: 'type',
-      width: 100,
-      render: (_: unknown, record: RowItem) =>
-        record._type === 'folder' ? '文件夹' : (record.data.resourceType ?? '-'),
-    },
-    {
-      title: '',
-      key: 'action',
-      width: 56,
-      align: 'right' as const,
-      render: (_: unknown, record: RowItem) => {
-        const rowKey = record.key;
-        const menuItems: MenuProps['items'] =
-          record._type === 'folder'
-            ? [
-                {
-                  key: 'move',
-                  label: '移动到文件夹',
-                  icon: <LuFolderInput size={14} />,
-                  onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                    info.domEvent.stopPropagation();
-                    setOpenDropdownKey(null);
-                    handleMoveToFolder({ type: 'folder', data: record.data });
-                  },
-                },
-                {
-                  key: 'rename',
-                  label: '重命名',
-                  icon: <LuPencil size={14} />,
-                  onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                    info.domEvent.stopPropagation();
-                    setOpenDropdownKey(null);
-                    handleRenameFolder(record.data);
-                  },
-                },
-                {
-                  key: 'delete',
-                  label: '删除',
-                  icon: <LuTrash2 size={14} />,
-                  danger: true,
-                  onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                    info.domEvent.stopPropagation();
-                    setOpenDropdownKey(null);
-                    handleDeleteFolder(record.data);
-                  },
-                },
-              ]
-            : [
-                {
-                  key: 'move',
-                  label: '移动到文件夹',
-                  icon: <LuFolderInput size={14} />,
-                  onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                    info.domEvent.stopPropagation();
-                    setOpenDropdownKey(null);
-                    handleMoveToFolder({ type: 'file', data: record.data });
-                  },
-                },
-                {
-                  key: 'rename',
-                  label: '重命名',
-                  icon: <LuPencil size={14} />,
-                  onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                    info.domEvent.stopPropagation();
-                    setOpenDropdownKey(null);
-                    handleRenameFile(record.data);
-                  },
-                },
-                {
-                  key: 'delete',
-                  label: '删除',
-                  icon: <LuTrash2 size={14} />,
-                  danger: true,
-                  onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                    info.domEvent.stopPropagation();
-                    setOpenDropdownKey(null);
-                    handleDeleteFile(record.data);
-                  },
-                },
-              ].filter(Boolean);
-        if (menuItems.length === 0) return null;
-        return (
-          <Dropdown
-            menu={{ items: menuItems }}
-            trigger={['click']}
-            placement="bottomRight"
-            arrow={{ pointAtCenter: true }}
-            getPopupContainer={() => document.body}
-            open={openDropdownKey === rowKey}
-            onOpenChange={(open) => setOpenDropdownKey(open ? rowKey : null)}
-          >
-            <button
-              type="button"
-              className={styles.optionBtn}
-              aria-label="更多操作"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <LuEllipsisVertical size={18} />
-            </button>
-          </Dropdown>
-        );
+  const columns = useMemo(
+    () => [
+      {
+        title: <span className={styles.nameHeader}>名称</span>,
+        dataIndex: '_',
+        key: 'name',
+        render: (_: unknown, record: RowItem) => (
+          <div className={styles.nameCell}>
+            {record._type === 'folder' ? (
+              <AiOutlineFolder size={20} color="var(--ant-color-warning)" />
+            ) : (
+              <FileTypeIcon
+                resourceType={record.data.resourceType}
+                size={18}
+                color="var(--ant-color-text-secondary)"
+              />
+            )}
+            <span>
+              {record._type === 'folder'
+                ? getFolderDisplayName(record.data.tagName)
+                : record.data.resourceName || '未命名'}
+            </span>
+          </div>
+        ),
       },
-    },
-  ];
+      {
+        title: '大小',
+        key: 'size',
+        width: 100,
+        render: (_: unknown, record: RowItem) =>
+          record._type === 'file' ? formatSize(record.data.size) : '-',
+      },
+      {
+        title: '类型',
+        key: 'type',
+        width: 100,
+        render: (_: unknown, record: RowItem) =>
+          record._type === 'folder' ? '文件夹' : (record.data.resourceType ?? '-'),
+      },
+      {
+        title: '',
+        key: 'action',
+        width: 56,
+        align: 'right' as const,
+        render: (_: unknown, record: RowItem) => {
+          const rowKey = record.key;
+          const menuItems: MenuProps['items'] =
+            record._type === 'folder'
+              ? [
+                  {
+                    key: 'move',
+                    label: '移动到文件夹',
+                    icon: <LuFolderInput size={14} />,
+                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                      info.domEvent.stopPropagation();
+                      setOpenDropdownKey(null);
+                      handleMoveToFolder({ type: 'folder', data: record.data });
+                    },
+                  },
+                  {
+                    key: 'rename',
+                    label: '重命名',
+                    icon: <LuPencil size={14} />,
+                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                      info.domEvent.stopPropagation();
+                      setOpenDropdownKey(null);
+                      handleRenameFolder(record.data);
+                    },
+                  },
+                  {
+                    key: 'delete',
+                    label: '删除',
+                    icon: <LuTrash2 size={14} />,
+                    danger: true,
+                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                      info.domEvent.stopPropagation();
+                      setOpenDropdownKey(null);
+                      handleDeleteFolder(record.data);
+                    },
+                  },
+                ]
+              : [
+                  {
+                    key: 'move',
+                    label: '移动到文件夹',
+                    icon: <LuFolderInput size={14} />,
+                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                      info.domEvent.stopPropagation();
+                      setOpenDropdownKey(null);
+                      handleMoveToFolder({ type: 'file', data: record.data });
+                    },
+                  },
+                  {
+                    key: 'rename',
+                    label: '重命名',
+                    icon: <LuPencil size={14} />,
+                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                      info.domEvent.stopPropagation();
+                      setOpenDropdownKey(null);
+                      handleRenameFile(record.data);
+                    },
+                  },
+                  {
+                    key: 'delete',
+                    label: '删除',
+                    icon: <LuTrash2 size={14} />,
+                    danger: true,
+                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                      info.domEvent.stopPropagation();
+                      setOpenDropdownKey(null);
+                      handleDeleteFile(record.data);
+                    },
+                  },
+                ].filter(Boolean);
+          if (menuItems.length === 0) return null;
+          return (
+            <Dropdown
+              menu={{ items: menuItems }}
+              trigger={['click']}
+              placement="bottomRight"
+              arrow={{ pointAtCenter: true }}
+              getPopupContainer={() => document.body}
+              open={openDropdownKey === rowKey}
+              onOpenChange={(open) => setOpenDropdownKey(open ? rowKey : null)}
+            >
+              <button
+                type="button"
+                className={styles.optionBtn}
+                aria-label="更多操作"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <LuEllipsisVertical size={18} />
+              </button>
+            </Dropdown>
+          );
+        },
+      },
+    ],
+    [
+      openDropdownKey,
+      handleMoveToFolder,
+      handleRenameFolder,
+      handleDeleteFolder,
+      handleRenameFile,
+      handleDeleteFile,
+    ]
+  );
 
   return (
     <>

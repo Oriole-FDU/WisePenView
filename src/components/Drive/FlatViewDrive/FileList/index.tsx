@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Table, Tag, Dropdown, message } from 'antd';
 import type { MenuProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -225,19 +225,27 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
     setPageSize(newPageSize);
   }, []);
 
-  const dataSource = list.map((item) => ({
-    ...item,
-    key: item.resourceId,
-  }));
+  const dataSource = useMemo(
+    () =>
+      list.map((item) => ({
+        ...item,
+        key: item.resourceId,
+      })),
+    [list]
+  );
 
-  const columns = buildColumns({
-    onDelete: handleDeleteFile,
-    onRename: handleRenameFile,
-    onEditTag: handleEditTag,
-    onCloseDropdown: () => setOpenDropdownKey(null),
-    openDropdownKey,
-    setOpenDropdownKey,
-  });
+  const columns = useMemo(
+    () =>
+      buildColumns({
+        onDelete: handleDeleteFile,
+        onRename: handleRenameFile,
+        onEditTag: handleEditTag,
+        onCloseDropdown: () => setOpenDropdownKey(null),
+        openDropdownKey,
+        setOpenDropdownKey,
+      }),
+    [handleDeleteFile, handleRenameFile, handleEditTag, openDropdownKey]
+  );
 
   const handleRowClick = useCallback(
     (record: ResourceItem) => ({

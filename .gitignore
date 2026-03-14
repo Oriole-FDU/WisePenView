@@ -20,6 +20,7 @@ dist-ssr
 .idea
 .DS_Store
 .cursorrules
+.cursorignore
 *.suo
 *.ntvs*
 *.njsproj
