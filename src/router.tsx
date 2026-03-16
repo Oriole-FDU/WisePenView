@@ -18,7 +18,7 @@ const Register = lazy(() => import('@/views/auth/Register'));
 const ResetPassword = lazy(() => import('@/views/auth/ResetPassword'));
 const NewPassword = lazy(() => import('@/views/auth/NewPassword'));
 const VerifyEmail = lazy(() => import('@/views/auth/VerifyEmail'));
-const Editor = lazy(() => import('@/views/editor/Editor'));
+const NotePage = lazy(() => import('@/views/note'));
 
 const router = createBrowserRouter([
   // ==============================
@@ -92,8 +92,12 @@ const router = createBrowserRouter([
         element: <Navigate to="/app/drive" replace />,
       },
       {
-        path: 'editor',
-        element: <Editor />,
+        path: 'note',
+        element: <NotePage />,
+      },
+      {
+        path: 'note/:noteId',
+        element: <NotePage />,
       },
       // 文档与云盘页
       {

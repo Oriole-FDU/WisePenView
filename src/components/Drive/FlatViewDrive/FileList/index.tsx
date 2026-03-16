@@ -3,10 +3,10 @@ import { Table, Tag, Dropdown, message } from 'antd';
 import type { MenuProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import FileTypeIcon from '@/components/Common/FileTypeIcon';
-import { LuEllipsisVertical, LuPencil, LuTrash2, LuTag } from 'react-icons/lu';
+import { LuEllipsisVertical, LuPencil, LuTrash2, LuTag, LuCopy } from 'react-icons/lu';
 import { formatSize } from '@/utils/format';
 import type { ResourceItem } from '@/types/resource';
-import { useResourceService } from '@/contexts/ServicesContext';
+import { useResourceService, useNoteService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { RenameFileModal, DeleteFileModal, EditTagModal } from '@/components/Drive/Modals';
 import { useClickFile } from '@/hooks/drive';
@@ -20,6 +20,7 @@ interface ColumnBuildProps {
   onDelete: (record: ResourceItem) => void;
   onRename: (record: ResourceItem) => void;
   onEditTag: (record: ResourceItem) => void;
+  onDuplicateNote: (record: ResourceItem) => void;
   onCloseDropdown: () => void;
   openDropdownKey: string | null;
   setOpenDropdownKey: (key: string | null) => void;
@@ -76,6 +77,20 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
     align: 'right',
     render: (_: unknown, record: ResourceItem) => {
       const menuItems: MenuProps['items'] = [
+        ...(record.resourceType === 'NOTE'
+          ? [
+              {
+                key: 'duplicate',
+                label: '创建副本',
+                icon: <LuCopy size={14} />,
+                onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
+                  info.domEvent.stopPropagation();
+                  props.onCloseDropdown();
+                  props.onDuplicateNote(record);
+                },
+              },
+            ]
+          : []),
         {
           key: 'editTag',
           label: '编辑标签',
@@ -135,6 +150,7 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
 
 const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
   const resourceService = useResourceService();
+  const noteService = useNoteService();
   const clickFile = useClickFile();
   const [openDropdownKey, setOpenDropdownKey] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -220,6 +236,27 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
     setDeleteFileTarget(null);
   }, []);
 
+  const handleDuplicateNote = useCallback(
+    async (file: ResourceItem) => {
+      try {
+        const res = await noteService.duplicateNote({ source: file.resourceId });
+        if (res.ok && res.doc_id) {
+          message.success('副本已创建');
+          fetchList();
+          clickFile({
+            ...file,
+            resourceId: res.doc_id,
+            resourceName: `${file.resourceName || '未命名'}（副本）`,
+            resourceType: 'NOTE',
+          });
+        }
+      } catch (err) {
+        message.error(parseErrorMessage(err, '创建副本失败'));
+      }
+    },
+    [noteService, fetchList, clickFile]
+  );
+
   const handlePageChange = useCallback((newPage: number, newPageSize: number) => {
     setPage(newPage);
     setPageSize(newPageSize);
@@ -240,11 +277,12 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
         onDelete: handleDeleteFile,
         onRename: handleRenameFile,
         onEditTag: handleEditTag,
+        onDuplicateNote: handleDuplicateNote,
         onCloseDropdown: () => setOpenDropdownKey(null),
         openDropdownKey,
         setOpenDropdownKey,
       }),
-    [handleDeleteFile, handleRenameFile, handleEditTag, openDropdownKey]
+    [handleDeleteFile, handleRenameFile, handleEditTag, handleDuplicateNote, openDropdownKey]
   );
 
   const handleRowClick = useCallback(

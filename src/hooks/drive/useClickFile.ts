@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ResourceItem } from '@/types/resource';
-import { useRecentFilesStore } from '@/store/useRecentFilesStore';
+import { useRecentFilesStore } from '@/store';
 
 /**
  * 根据资源类型决定打开方式：NOTE 跳转编辑器，其他类型预览
@@ -16,7 +16,7 @@ export const useClickFile = () => {
       const { resourceId, resourceName, resourceType, preview } = item;
       addFile({ resourceId, resourceName, resourceType });
       if (resourceType === 'NOTE') {
-        navigate(`/app/editor/${resourceId}`);
+        navigate(`/app/note/${resourceId}`);
       } else {
         if (preview) {
           window.open(preview, '_blank');
