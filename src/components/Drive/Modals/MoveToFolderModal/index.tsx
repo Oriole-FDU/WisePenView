@@ -5,9 +5,9 @@ import type { ResourceItem } from '@/types/resource';
 import { useResourceService, useTagService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { isValidFolderMove } from '@/utils/path';
-import FolderNav from '@/components/Common/FolderNav';
-import type { MoveToFolderModalProps } from '../index.type';
-import styles from './style.module.less';
+import TreeNav from '@/components/Common/TreeNav';
+import type { MoveToFolderModalProps } from './index.type';
+import styles from './index.module.less';
 
 const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
   open,
@@ -101,11 +101,7 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
         <div className={styles.targetName}>即将移动：{displayName}</div>
         <div className={styles.treeSection}>
           <span className={styles.treeLabel}>选择目标文件夹：</span>
-          <FolderNav
-            onSelect={handleFolderSelect}
-            showNewFolderButton
-            className={styles.folderNav}
-          />
+          <TreeNav onSelect={handleFolderSelect} showNewFolderButton className={styles.treeNav} />
         </div>
       </div>
     </Modal>

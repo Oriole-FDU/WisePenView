@@ -1,48 +1,77 @@
 {
   "tagTree": [
     {
-      "tagId": "tag-1",
+      "tagId": "tag-work",
       "parentId": "",
-      "tagName": "/",
-      "tagDesc": "根路径",
+      "tagName": "工作",
+      "tagDesc": "工作相关",
       "children": [
         {
-          "tagId": "tag-2",
-          "parentId": "tag-1",
-          "tagName": "/documents",
-          "tagDesc": "文档",
-          "children": [
-            {
-              "tagId": "tag-3",
-              "parentId": "tag-2",
-              "tagName": "/documents/notes",
-              "tagDesc": "笔记",
-              "children": []
-            }
-          ]
+          "tagId": "tag-work-project-a",
+          "parentId": "tag-work",
+          "tagName": "项目A",
+          "tagDesc": "项目 A",
+          "children": []
+        },
+        {
+          "tagId": "tag-work-project-b",
+          "parentId": "tag-work",
+          "tagName": "项目B",
+          "tagDesc": "项目 B",
+          "children": []
+        },
+        {
+          "tagId": "tag-work-meeting",
+          "parentId": "tag-work",
+          "tagName": "会议记录",
+          "tagDesc": "会议纪要",
+          "children": []
+        }
+      ]
+    },
+    {
+      "tagId": "tag-study",
+      "parentId": "",
+      "tagName": "学习",
+      "tagDesc": "学习与笔记",
+      "children": [
+        {
+          "tagId": "tag-study-tech",
+          "parentId": "tag-study",
+          "tagName": "技术",
+          "tagDesc": "技术笔记",
+          "children": []
+        },
+        {
+          "tagId": "tag-study-lang",
+          "parentId": "tag-study",
+          "tagName": "语言",
+          "tagDesc": "语言学习",
+          "children": []
+        }
+      ]
+    },
+    {
+      "tagId": "tag-life",
+      "parentId": "",
+      "tagName": "生活",
+      "tagDesc": "生活与兴趣",
+      "children": [
+        {
+          "tagId": "tag-life-travel",
+          "parentId": "tag-life",
+          "tagName": "旅行",
+          "tagDesc": "旅行记录",
+          "children": []
+        },
+        {
+          "tagId": "tag-life-reading",
+          "parentId": "tag-life",
+          "tagName": "阅读",
+          "tagDesc": "读书笔记",
+          "children": []
         }
       ]
     }
-  ],
-  "listByPath": {
-    "folders": [
-      {
-        "tagId": "tag-2",
-        "parentId": "tag-1",
-        "tagName": "/documents",
-        "tagDesc": "文档",
-        "children": []
-      }
-    ],
-    "files": [
-      {
-        "resourceId": "res-001",
-        "resourceName": "示例文档.pdf",
-        "resourceType": "file",
-        "path": "/",
-        "tagNames": ["笔记"]
-      }
-    ],
-    "totalFiles": 1
-  }
+  ]
 }

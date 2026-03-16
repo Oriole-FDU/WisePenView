@@ -1,0 +1,34 @@
+.container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  gap: var(--ant-margin-md);
+  padding: var(--ant-padding-md);
+}
+
+.panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ant-color-border);
+  border-radius: var(--ant-border-radius-lg);
+  overflow: hidden;
+}
+
+.panelTitle {
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--ant-padding-sm) var(--ant-padding-md);
+  font-size: var(--ant-font-size-base);
+  font-weight: 600;
+  border-bottom: 1px solid var(--ant-color-border);
+  background: var(--ant-color-fill-quaternary);
+}
+
+.panelContent {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

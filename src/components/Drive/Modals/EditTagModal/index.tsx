@@ -5,8 +5,8 @@ import { useResourceService, useTagService } from '@/contexts/ServicesContext';
 import type { TagTreeNode } from '@/services/Tag';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import TagTree from '@/components/Common/TagTree';
-import type { EditTagModalProps } from '../index.type';
-import styles from './style.module.less';
+import type { EditTagModalProps } from './index.type';
+import styles from './index.module.less';
 
 /** 递归收集 tagName -> tagId 映射 */
 const buildTagNameToIdMap = (nodes: TagTreeNode[], map: Map<string, string>): void => {

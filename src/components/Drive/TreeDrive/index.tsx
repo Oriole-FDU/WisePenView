@@ -1,20 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { message, Breadcrumb, Table, Spin, Dropdown, Button } from 'antd';
-import type { MenuProps } from 'antd';
-import { AiOutlineFolder } from 'react-icons/ai';
-import FileTypeIcon from '@/components/Common/FileTypeIcon';
-import {
-  LuEllipsisVertical,
-  LuPencil,
-  LuTrash2,
-  LuFilePen,
-  LuChevronLeft,
-  LuChevronRight,
-  LuFolderPlus,
-  LuFolderInput,
-} from 'react-icons/lu';
-import { formatSize } from '@/utils/format';
-import { getPathSegments, getFolderDisplayName } from '@/utils/path';
+import { message, Breadcrumb, Table, Spin, Button, Tag } from 'antd';
+import { LuChevronLeft, LuChevronRight, LuFolderPlus } from 'react-icons/lu';
+import { getPathSegments } from '@/utils/path';
 import type { ResourceItem } from '@/types/resource';
 import type { Folder } from '@/types/folder';
 import { useFolderService, useResourceService, useTagService } from '@/contexts/ServicesContext';
@@ -26,22 +13,23 @@ import {
   RenameFileModal,
   DeleteFileModal,
   MoveToFolderModal,
+  AddTagModal,
 } from '@/components/Drive/Modals';
 import type { MoveToFolderTarget } from '@/components/Drive/Modals';
-import { useClickFile } from '@/hooks/drive';
+import { useClickFile, useTreeDriveDrop } from '@/hooks/drive';
+import type { RowItem, TreeDriveMode, TreeDriveProps } from './index.type';
+import { buildTableDataSource } from './index.type';
+import { getTreeDriveColumns, type TreeDriveColumnConfigOptions } from './config/columnConfig';
+import {
+  getTreeDriveRowProps,
+  createOnRowClick,
+  type TreeDriveRowConfigOptions,
+} from './config/rowConfig';
 import styles from './style.module.less';
 
 const FOLDER_FILE_PAGE_SIZE = 20;
 
-// html5原生拖拽
-const DRAG_TYPE_FILE = 'application/x-wisepen-folder-file';
-const DRAG_TYPE_FOLDER = 'application/x-wisepen-folder-folder';
-
-type RowItem =
-  | { key: string; _type: 'folder'; data: Folder }
-  | { key: string; _type: 'file'; data: ResourceItem };
-
-const FolderViewDrive: React.FC = () => {
+const TreeDrive: React.FC<TreeDriveProps> = ({ mode = 'folder' }) => {
   const folderService = useFolderService();
   const resourceService = useResourceService();
   const tagService = useTagService();
@@ -68,6 +56,8 @@ const FolderViewDrive: React.FC = () => {
   const [renameFileTarget, setRenameFileTarget] = useState<ResourceItem | null>(null);
   const [deleteFileTarget, setDeleteFileTarget] = useState<ResourceItem | null>(null);
   const [moveToFolderTarget, setMoveToFolderTarget] = useState<MoveToFolderTarget | null>(null);
+  const [addTagModalOpen, setAddTagModalOpen] = useState(false);
+  const [addTagTarget, setAddTagTarget] = useState<MoveToFolderTarget | null>(null);
 
   // 列表状态
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -126,6 +116,12 @@ const FolderViewDrive: React.FC = () => {
     folderFilePageRef.current = 1;
     fetchFolderList(folderPath, 1, false);
   }, [folderPath, fetchFolderList]);
+
+  const { handleDrop, handleDropFolder } = useTreeDriveDrop({
+    resourceService,
+    tagService,
+    refresh,
+  });
 
   // 路径变化时，重新获取列表
   useEffect(() => {
@@ -260,40 +256,16 @@ const FolderViewDrive: React.FC = () => {
     setMoveToFolderTarget(null);
   }, []);
 
-  // 处理拖拽文件到文件夹
-  const handleDrop = useCallback(
-    async (file: ResourceItem, targetFolder: Folder) => {
-      const targetPath = targetFolder.tagName ?? '/';
-      try {
-        await resourceService.updateResourcePath({
-          resourceId: file.resourceId,
-          path: targetPath,
-        });
-        message.success(`已移动到 ~${targetPath === '/' ? '根目录' : targetPath}`);
-        refresh();
-      } catch (err) {
-        message.error(parseErrorMessage(err, '移动失败'));
-      }
-    },
-    [resourceService, refresh]
-  );
+  // 处理添加标签（tag 模式下更多操作第一项，仅对 file 有效）
+  const handleAddTag = useCallback((target: MoveToFolderTarget) => {
+    setAddTagTarget(target);
+    setAddTagModalOpen(true);
+  }, []);
 
-  // 处理拖拽文件夹到文件夹
-  const handleDropFolder = useCallback(
-    async (folder: Folder, targetFolder: Folder) => {
-      try {
-        await tagService.moveTag({
-          targetTagId: folder.tagId,
-          newParentId: targetFolder.tagId,
-        });
-        message.success(`已将「${folder.tagName}」移动到「${targetFolder.tagName}」下`);
-        refresh();
-      } catch (err) {
-        message.error(parseErrorMessage(err, '移动失败'));
-      }
-    },
-    [tagService, refresh]
-  );
+  const handleAddTagModalClose = useCallback(() => {
+    setAddTagModalOpen(false);
+    setAddTagTarget(null);
+  }, []);
 
   // 处理加载更多
   const handleLoadMore = useCallback(() => {
@@ -310,18 +282,7 @@ const FolderViewDrive: React.FC = () => {
   const pathSegments = getPathSegments(folderPath);
 
   const dataSource = useMemo<RowItem[]>(
-    () => [
-      ...folders.map((f) => ({
-        key: `folder-${f.tagId}`,
-        _type: 'folder' as const,
-        data: f,
-      })),
-      ...folderFiles.map((f) => ({
-        key: `file-${f.resourceId}`,
-        _type: 'file' as const,
-        data: f,
-      })),
-    ],
+    () => buildTableDataSource(folders, folderFiles),
     [folders, folderFiles]
   );
 
@@ -341,236 +302,48 @@ const FolderViewDrive: React.FC = () => {
     return () => io.disconnect();
   }, [hasMore, folderLoadingMore, folderLoading, handleLoadMore]);
 
-  // 处理行点击
-  const handleRowClick = useCallback(
-    (record: RowItem) => {
-      if (isDraggingRef.current) return;
-      if (record._type === 'folder') {
-        handleFolderClick(record.data);
-      } else {
-        clickFile(record.data);
-      }
-    },
+  const handleRowClick = useMemo(
+    () =>
+      createOnRowClick({
+        isDraggingRef,
+        onFolderClick: handleFolderClick,
+        onFileClick: clickFile,
+      }),
     [handleFolderClick, clickFile]
   );
 
-  // 获取行属性
-  const getRowProps = useCallback(
-    (record: RowItem): React.HTMLAttributes<HTMLTableRowElement> => {
-      const base = {
-        onClick: () => handleRowClick(record),
-        style: { cursor: 'pointer' as const },
-      };
-
-      if (record._type === 'file') {
-        return {
-          ...base,
-          draggable: true,
-          onDragStart: (e: React.DragEvent) => {
-            isDraggingRef.current = true;
-            e.dataTransfer.setData(DRAG_TYPE_FILE, JSON.stringify(record.data));
-            e.dataTransfer.effectAllowed = 'move';
-          },
-          onDragEnd: () => {
-            isDraggingRef.current = false;
-          },
-        };
-      }
-
-      if (record._type === 'folder') {
-        const rowProps: React.HTMLAttributes<HTMLTableRowElement> = {
-          ...base,
-          onDragOver: (e: React.DragEvent) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            e.currentTarget.classList.add(styles.droppableOver);
-          },
-          onDragLeave: (e: React.DragEvent) => {
-            e.currentTarget.classList.remove(styles.droppableOver);
-          },
-          onDrop: (e: React.DragEvent) => {
-            e.preventDefault();
-            e.currentTarget.classList.remove(styles.droppableOver);
-            const fileRaw = e.dataTransfer.getData(DRAG_TYPE_FILE);
-            const folderRaw = e.dataTransfer.getData(DRAG_TYPE_FOLDER);
-            if (fileRaw) {
-              try {
-                const file = JSON.parse(fileRaw) as ResourceItem;
-                handleDrop(file, record.data);
-              } catch {
-                // ignore
-              }
-            } else if (folderRaw) {
-              try {
-                const folder = JSON.parse(folderRaw) as Folder;
-                const target = record.data;
-                if (folder.tagId === target.tagId) return;
-                if ((target.tagName ?? '').startsWith((folder.tagName ?? '') + '/')) return;
-                handleDropFolder(folder, target);
-              } catch {
-                // ignore
-              }
-            }
-          },
-          draggable: true,
-          onDragStart: (e: React.DragEvent) => {
-            isDraggingRef.current = true;
-            e.dataTransfer.setData(DRAG_TYPE_FOLDER, JSON.stringify(record.data));
-            e.dataTransfer.effectAllowed = 'move';
-          },
-          onDragEnd: () => {
-            isDraggingRef.current = false;
-          },
-        };
-        return rowProps;
-      }
-
-      return base;
-    },
-    [handleRowClick, handleDrop, handleDropFolder]
+  const getRowProps = useMemo(
+    () =>
+      getTreeDriveRowProps({
+        mode,
+        isDraggingRef,
+        styles: styles as TreeDriveRowConfigOptions['styles'],
+        onRowClick: handleRowClick,
+        onDropFile: handleDrop,
+        onDropFolder: handleDropFolder,
+      }),
+    [mode, handleRowClick, handleDrop, handleDropFolder]
   );
 
   const columns = useMemo(
-    () => [
-      {
-        title: <span className={styles.nameHeader}>名称</span>,
-        dataIndex: '_',
-        key: 'name',
-        render: (_: unknown, record: RowItem) => (
-          <div className={styles.nameCell}>
-            {record._type === 'folder' ? (
-              <AiOutlineFolder size={20} color="var(--ant-color-warning)" />
-            ) : (
-              <FileTypeIcon
-                resourceType={record.data.resourceType}
-                size={18}
-                color="var(--ant-color-text-secondary)"
-              />
-            )}
-            <span>
-              {record._type === 'folder'
-                ? getFolderDisplayName(record.data.tagName)
-                : record.data.resourceName || '未命名'}
-            </span>
-          </div>
-        ),
-      },
-      {
-        title: '大小',
-        key: 'size',
-        width: 100,
-        render: (_: unknown, record: RowItem) =>
-          record._type === 'file' ? formatSize(record.data.size) : '-',
-      },
-      {
-        title: '类型',
-        key: 'type',
-        width: 100,
-        render: (_: unknown, record: RowItem) =>
-          record._type === 'folder' ? '文件夹' : (record.data.resourceType ?? '-'),
-      },
-      {
-        title: '',
-        key: 'action',
-        width: 56,
-        align: 'right' as const,
-        render: (_: unknown, record: RowItem) => {
-          const rowKey = record.key;
-          const menuItems: MenuProps['items'] =
-            record._type === 'folder'
-              ? [
-                  {
-                    key: 'move',
-                    label: '移动到文件夹',
-                    icon: <LuFolderInput size={14} />,
-                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                      info.domEvent.stopPropagation();
-                      setOpenDropdownKey(null);
-                      handleMoveToFolder({ type: 'folder', data: record.data });
-                    },
-                  },
-                  {
-                    key: 'rename',
-                    label: '重命名',
-                    icon: <LuPencil size={14} />,
-                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                      info.domEvent.stopPropagation();
-                      setOpenDropdownKey(null);
-                      handleRenameFolder(record.data);
-                    },
-                  },
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: <LuTrash2 size={14} />,
-                    danger: true,
-                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                      info.domEvent.stopPropagation();
-                      setOpenDropdownKey(null);
-                      handleDeleteFolder(record.data);
-                    },
-                  },
-                ]
-              : [
-                  {
-                    key: 'move',
-                    label: '移动到文件夹',
-                    icon: <LuFolderInput size={14} />,
-                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                      info.domEvent.stopPropagation();
-                      setOpenDropdownKey(null);
-                      handleMoveToFolder({ type: 'file', data: record.data });
-                    },
-                  },
-                  {
-                    key: 'rename',
-                    label: '重命名',
-                    icon: <LuPencil size={14} />,
-                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                      info.domEvent.stopPropagation();
-                      setOpenDropdownKey(null);
-                      handleRenameFile(record.data);
-                    },
-                  },
-                  {
-                    key: 'delete',
-                    label: '删除',
-                    icon: <LuTrash2 size={14} />,
-                    danger: true,
-                    onClick: (info: Parameters<NonNullable<MenuProps['onClick']>>[0]) => {
-                      info.domEvent.stopPropagation();
-                      setOpenDropdownKey(null);
-                      handleDeleteFile(record.data);
-                    },
-                  },
-                ].filter(Boolean);
-          if (menuItems.length === 0) return null;
-          return (
-            <Dropdown
-              menu={{ items: menuItems }}
-              trigger={['click']}
-              placement="bottomRight"
-              arrow={{ pointAtCenter: true }}
-              getPopupContainer={() => document.body}
-              open={openDropdownKey === rowKey}
-              onOpenChange={(open) => setOpenDropdownKey(open ? rowKey : null)}
-            >
-              <button
-                type="button"
-                className={styles.optionBtn}
-                aria-label="更多操作"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <LuEllipsisVertical size={18} />
-              </button>
-            </Dropdown>
-          );
-        },
-      },
-    ],
+    () =>
+      getTreeDriveColumns({
+        mode,
+        styles: styles as TreeDriveColumnConfigOptions['styles'],
+        openDropdownKey,
+        setOpenDropdownKey,
+        onMoveToFolder: handleMoveToFolder,
+        onAddTag: handleAddTag,
+        onRenameFolder: handleRenameFolder,
+        onDeleteFolder: handleDeleteFolder,
+        onRenameFile: handleRenameFile,
+        onDeleteFile: handleDeleteFile,
+      }),
     [
+      mode,
       openDropdownKey,
       handleMoveToFolder,
+      handleAddTag,
       handleRenameFolder,
       handleDeleteFolder,
       handleRenameFile,
@@ -604,34 +377,46 @@ const FolderViewDrive: React.FC = () => {
               </div>
               <Breadcrumb
                 className={styles.breadcrumb}
-                items={pathSegments.map((seg) => ({
-                  title: (
-                    <button
-                      type="button"
-                      onClick={() => handlePathClick(seg.path)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
-                        cursor: 'pointer',
-                        color: 'inherit',
-                        fontSize: 'inherit',
-                      }}
-                    >
-                      {seg.label}
-                    </button>
-                  ),
-                }))}
+                separator={mode === 'tag' ? '>' : '/'}
+                items={
+                  mode === 'tag'
+                    ? pathSegments.slice(1).map((seg) => ({
+                        title: (
+                          <Button
+                            type="text"
+                            size="small"
+                            ghost
+                            onClick={() => handlePathClick(seg.path)}
+                            className={styles.breadcrumbTagBtn}
+                          >
+                            <Tag>{seg.label}</Tag>
+                          </Button>
+                        ),
+                      }))
+                    : pathSegments.map((seg) => ({
+                        title: (
+                          <button
+                            type="button"
+                            onClick={() => handlePathClick(seg.path)}
+                            className={styles.breadcrumbLink}
+                          >
+                            {seg.label}
+                          </button>
+                        ),
+                      }))
+                }
               />
             </div>
-            <Button
-              type="default"
-              size="small"
-              icon={<LuFolderPlus size={16} />}
-              onClick={handleCreateFolder}
-            >
-              新建文件夹
-            </Button>
+            {mode === 'folder' && (
+              <Button
+                type="default"
+                size="small"
+                icon={<LuFolderPlus size={16} />}
+                onClick={handleCreateFolder}
+              >
+                新建文件夹
+              </Button>
+            )}
           </div>
           <div ref={scrollRef} className={styles.scrollArea}>
             <div className={styles.tableWrapper}>
@@ -695,8 +480,16 @@ const FolderViewDrive: React.FC = () => {
         onSuccess={refresh}
         target={moveToFolderTarget}
       />
+
+      <AddTagModal
+        open={addTagModalOpen}
+        onCancel={handleAddTagModalClose}
+        onSuccess={refresh}
+        target={addTagTarget}
+      />
     </>
   );
 };
 
-export default FolderViewDrive;
+export default TreeDrive;
+export type { TreeDriveProps, TreeDriveMode, RowItem } from './index.type';

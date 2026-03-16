@@ -1,3 +1,197 @@
 {
-  "description": "Folder 服务依赖 Tag 服务，无独立响应数据结构；mock 仅做空操作或委托 TagMock"
+  "folderTree": [
+    {
+      "tagId": "folder-root",
+      "parentId": "",
+      "tagName": "/",
+      "tagDesc": "根目录",
+      "children": [
+        {
+          "tagId": "folder-docs",
+          "parentId": "folder-root",
+          "tagName": "/文档",
+          "tagDesc": "文档库",
+          "children": [
+            {
+              "tagId": "folder-docs-2024",
+              "parentId": "folder-docs",
+              "tagName": "/文档/2024",
+              "tagDesc": "2024 年文档",
+              "children": []
+            },
+            {
+              "tagId": "folder-docs-templates",
+              "parentId": "folder-docs",
+              "tagName": "/文档/模板",
+              "tagDesc": "文档模板",
+              "children": []
+            }
+          ]
+        },
+        {
+          "tagId": "folder-projects",
+          "parentId": "folder-root",
+          "tagName": "/项目",
+          "tagDesc": "项目文件夹",
+          "children": [
+            {
+              "tagId": "folder-projects-alpha",
+              "parentId": "folder-projects",
+              "tagName": "/项目/Alpha",
+              "tagDesc": "Alpha 项目",
+              "children": []
+            },
+            {
+              "tagId": "folder-projects-beta",
+              "parentId": "folder-projects",
+              "tagName": "/项目/Beta",
+              "tagDesc": "Beta 项目",
+              "children": []
+            }
+          ]
+        },
+        {
+          "tagId": "folder-archive",
+          "parentId": "folder-root",
+          "tagName": "/归档",
+          "tagDesc": "已归档",
+          "children": []
+        }
+      ]
+    }
+  ],
+  "listByPathByPath": {
+    "/": {
+      "folders": [
+        {
+          "tagId": "folder-docs",
+          "parentId": "folder-root",
+          "tagName": "/文档",
+          "tagDesc": "文档库",
+          "children": []
+        },
+        {
+          "tagId": "folder-projects",
+          "parentId": "folder-root",
+          "tagName": "/项目",
+          "tagDesc": "项目文件夹",
+          "children": []
+        },
+        {
+          "tagId": "folder-archive",
+          "parentId": "folder-root",
+          "tagName": "/归档",
+          "tagDesc": "已归档",
+          "children": []
+        }
+      ],
+      "files": [
+        {
+          "resourceId": "res-root-001",
+          "resourceName": "README.md",
+          "resourceType": "file",
+          "path": "/",
+          "tagNames": []
+        }
+      ],
+      "totalFiles": 1
+    },
+    "/文档": {
+      "folders": [
+        {
+          "tagId": "folder-docs-2024",
+          "parentId": "folder-docs",
+          "tagName": "/文档/2024",
+          "tagDesc": "2024 年文档",
+          "children": []
+        },
+        {
+          "tagId": "folder-docs-templates",
+          "parentId": "folder-docs",
+          "tagName": "/文档/模板",
+          "tagDesc": "文档模板",
+          "children": []
+        }
+      ],
+      "files": [
+        {
+          "resourceId": "res-docs-001",
+          "resourceName": "年度总结.docx",
+          "resourceType": "file",
+          "path": "/文档",
+          "tagNames": ["文档"]
+        }
+      ],
+      "totalFiles": 1
+    },
+    "/项目": {
+      "folders": [
+        {
+          "tagId": "folder-projects-alpha",
+          "parentId": "folder-projects",
+          "tagName": "/项目/Alpha",
+          "tagDesc": "Alpha 项目",
+          "children": []
+        },
+        {
+          "tagId": "folder-projects-beta",
+          "parentId": "folder-projects",
+          "tagName": "/项目/Beta",
+          "tagDesc": "Beta 项目",
+          "children": []
+        }
+      ],
+      "files": [],
+      "totalFiles": 0
+    },
+    "/文档/2024": {
+      "folders": [],
+      "files": [
+        {
+          "resourceId": "res-2024-001",
+          "resourceName": "Q1 报告.pdf",
+          "resourceType": "file",
+          "path": "/文档/2024",
+          "tagNames": []
+        }
+      ],
+      "totalFiles": 1
+    },
+    "/文档/模板": {
+      "folders": [],
+      "files": [
+        {
+          "resourceId": "res-tpl-001",
+          "resourceName": "会议纪要模板.docx",
+          "resourceType": "file",
+          "path": "/文档/模板",
+          "tagNames": []
+        }
+      ],
+      "totalFiles": 1
+    },
+    "/项目/Alpha": {
+      "folders": [],
+      "files": [
+        {
+          "resourceId": "res-alpha-001",
+          "resourceName": "需求文档.md",
+          "resourceType": "file",
+          "path": "/项目/Alpha",
+          "tagNames": []
+        }
+      ],
+      "totalFiles": 1
+    },
+    "/项目/Beta": {
+      "folders": [],
+      "files": [],
+      "totalFiles": 0
+    },
+    "/归档": {
+      "folders": [],
+      "files": [],
+      "totalFiles": 0
+    }
+  }
 }

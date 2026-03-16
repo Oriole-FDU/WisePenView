@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Button, Input, message } from 'antd';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
+import type { Folder } from '@/types/folder';
+import type { ResourceItem } from '@/types/resource';
 import type { NewFolderModalProps } from './index.type';
-import { getFolderDisplayName } from '@/utils/path';
+import TreeNav from '@/components/Common/TreeNav';
+
+import styles from './index.module.less';
 
 const NewFolderModal: React.FC<NewFolderModalProps> = ({
   open,
@@ -14,10 +18,23 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
   const folderService = useFolderService();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedParentPath, setSelectedParentPath] = useState(parentPath ?? '/');
 
   useEffect(() => {
-    if (open) setName('');
-  }, [open]);
+    if (open) {
+      setName('');
+      setSelectedParentPath(parentPath ?? '/');
+    }
+  }, [open, parentPath]);
+
+  const handleFolderSelect = useCallback(
+    (item: { type: 'file'; data: ResourceItem } | { type: 'folder'; data: Folder }) => {
+      if (item.type === 'folder') {
+        setSelectedParentPath(item.data.tagName ?? '/');
+      }
+    },
+    []
+  );
 
   const handleSubmit = async () => {
     const trimmed = name.trim();
@@ -27,7 +44,7 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
     }
     try {
       setLoading(true);
-      await folderService.createFolder(parentPath, trimmed);
+      await folderService.createFolder(selectedParentPath, trimmed);
       message.success('新建成功');
       onSuccess?.();
       onCancel();
@@ -43,7 +60,7 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
     onCancel();
   };
 
-  const displayPath = parentPath === '/' || !parentPath ? '~' : getFolderDisplayName(parentPath);
+  const displayPath = `~${selectedParentPath || '/'}`;
 
   return (
     <Modal
@@ -58,17 +75,26 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
           创建
         </Button>,
       ]}
-      width={400}
+      width={420}
     >
-      <div style={{ marginBottom: 8, color: 'var(--ant-color-text-secondary)', fontSize: 12 }}>
-        位置：{displayPath}
+      <div className={styles.pathHint}>选择路径：</div>
+      <div className={styles.treeWrap}>
+        <TreeNav
+          mode="folder"
+          embedMode
+          defaultSelectedKey={selectedParentPath}
+          onSelect={handleFolderSelect}
+          className={styles.treeNav}
+        />
       </div>
+      <div className={styles.pathHint}>当前路径：{displayPath}</div>
       <Input
         placeholder="请输入文件夹名称"
         value={name}
         onChange={(e) => setName(e.target.value)}
         onPressEnter={handleSubmit}
         autoFocus
+        className={styles.input}
       />
     </Modal>
   );

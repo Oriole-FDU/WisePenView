@@ -8,6 +8,7 @@ import AuthLayout from '@/layouts/AuthLayout';
 // 页面使用 lazy load，按路由切分 chunk
 const Home = lazy(() => import('@/views/home'));
 const Drive = lazy(() => import('@/views/drive/Drive'));
+const DrivePreview = lazy(() => import('@/views/drive/DrivePreview'));
 const MyGroup = lazy(() => import('@/views/group/MyGroup'));
 const GroupDetail = lazy(() => import('@/views/group/GroupDetail'));
 const Account = lazy(() => import('@/views/profile/Account'));
@@ -98,6 +99,10 @@ const router = createBrowserRouter([
       {
         path: 'drive',
         element: <Drive />,
+      },
+      {
+        path: 'preview/drive',
+        element: <DrivePreview />,
       },
       {
         path: 'my-group',

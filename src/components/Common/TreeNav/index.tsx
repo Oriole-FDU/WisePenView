@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Tree, Spin, Empty, Button, message } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import { AiOutlineFolder } from 'react-icons/ai';
+import { AiOutlineFolder, AiOutlineTag } from 'react-icons/ai';
 import FileTypeIcon from '@/components/Common/FileTypeIcon';
 import { LuFolderPlus, LuChevronDown } from 'react-icons/lu';
-import { useFolderService } from '@/contexts/ServicesContext';
+import { useFolderService, useTagService } from '@/contexts/ServicesContext';
 import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
+import type { TagTreeNode } from '@/services/Tag/index.type';
 import { getFolderDisplayName } from '@/utils/path';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { NewFolderModal } from '@/components/Drive/Modals';
-import type { FolderNavProps } from './index.type';
+import type { TreeNavProps } from './index.type';
 import styles from './style.module.less';
 
 const FOLDER_NAV_FILE_PAGE_SIZE = 5;
@@ -69,6 +70,29 @@ function createFolderNode(
   };
 }
 
+/** 将 TagTreeNode 转为 DataNode（仅 tag 结构，无文件），并写入 itemMap */
+function tagTreeNodeToDataNode(node: TagTreeNode, itemMap: ItemMap): DataNode {
+  const key = node.tagId;
+  itemMap.set(key, { type: 'folder', data: node as Folder });
+  const children = node.children?.map((c) => tagTreeNodeToDataNode(c, itemMap)) ?? [];
+  return {
+    key,
+    title: (
+      <span className={styles.nodeTitle}>
+        <AiOutlineTag size={14} color="var(--ant-color-primary)" />
+        {node.tagName || '未命名'}
+      </span>
+    ),
+    isLeaf: children.length === 0,
+    children: children.length > 0 ? children : undefined,
+  };
+}
+
+/** 将全量 tag 树转为 DataNode[] */
+function tagTreeToDataNodes(nodes: TagTreeNode[], itemMap: ItemMap): DataNode[] {
+  return nodes.map((node) => tagTreeNodeToDataNode(node, itemMap));
+}
+
 /** 将 getResByFolder 响应转为 DataNode[] */
 function toDataNodes(
   itemMap: ItemMap,
@@ -121,22 +145,26 @@ function toDataNodes(
   return nodes;
 }
 
-const FolderNav: React.FC<FolderNavProps> = ({
+const TreeNav: React.FC<TreeNavProps> = ({
   onSelect,
   showNewFolderButton = true,
   rootPath = ROOT_PATH,
   className,
+  mode = 'folder',
+  embedMode = false,
+  defaultSelectedKey,
 }) => {
   const folderService = useFolderService();
+  const tagService = useTagService();
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
+  const [selectedKey, setSelectedKey] = useState<React.Key | null>(defaultSelectedKey ?? null);
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
 
   const cacheRef = useRef<Map<string, DataNode[]>>(new Map());
   const itemMapRef = useRef<ItemMap>(new Map());
 
-  /** 拉取某路径下的子节点 */
+  /** 拉取某路径下的子节点（folder mode） */
   const fetchChildren = useCallback(
     async (path: string): Promise<DataNode[]> => {
       const res = await folderService.getResByFolder({
@@ -149,7 +177,7 @@ const FolderNav: React.FC<FolderNavProps> = ({
     [folderService]
   );
 
-  /** 拉取根节点（与子节点拉取共用 fetchChildren，根多一层 createFolderNode 包装） */
+  /** 拉取根节点（folder mode） */
   const fetchRoot = useCallback(async () => {
     setLoading(true);
     try {
@@ -171,12 +199,39 @@ const FolderNav: React.FC<FolderNavProps> = ({
     }
   }, [rootPath, fetchChildren]);
 
+  /** 拉取全量 tag 树（tag mode） */
+  const fetchTagTree = useCallback(async () => {
+    setLoading(true);
+    try {
+      itemMapRef.current.clear();
+      const nodes = await tagService.getTagTree();
+      const data = tagTreeToDataNodes(nodes, itemMapRef.current);
+      setTreeData(data);
+    } catch (err) {
+      message.error(parseErrorMessage(err, '获取标签树失败'));
+      setTreeData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [tagService]);
+
   useEffect(() => {
-    fetchRoot();
-  }, [fetchRoot]);
+    if (mode === 'tag') {
+      fetchTagTree();
+    } else {
+      fetchRoot();
+    }
+  }, [mode, fetchRoot, fetchTagTree]);
+
+  useEffect(() => {
+    if (embedMode && defaultSelectedKey !== undefined) {
+      setSelectedKey(defaultSelectedKey || null);
+    }
+  }, [embedMode, defaultSelectedKey]);
 
   const handleLoadData = useCallback(
     async (node: DataNode) => {
+      if (mode === 'tag') return;
       const path = node.key as string;
       if (cacheRef.current.has(path)) return;
 
@@ -188,7 +243,7 @@ const FolderNav: React.FC<FolderNavProps> = ({
         message.error(parseErrorMessage(err, '加载子节点失败'));
       }
     },
-    [fetchChildren]
+    [mode, fetchChildren]
   );
 
   const handleSelect = useCallback(
@@ -211,11 +266,8 @@ const FolderNav: React.FC<FolderNavProps> = ({
 
   const handleNewFolderSuccess = useCallback(() => {
     const path = (selectedKey as string) ?? rootPath;
-    /** 删除当前选中节点路径缓存 */
     cacheRef.current.delete(path);
-    /** 关闭新建文件夹弹窗 */
     setNewFolderModalOpen(false);
-    /** 重新拉取根节点 */
     if (path === rootPath) {
       fetchRoot();
     } else {
@@ -243,8 +295,8 @@ const FolderNav: React.FC<FolderNavProps> = ({
   if (!loading && treeData.length === 0) {
     return (
       <div className={`${styles.wrapper} ${className ?? ''}`}>
-        <Empty description="暂无内容" />
-        {showNewFolderButton && (
+        <Empty description={mode === 'tag' ? '暂无标签' : '暂无内容'} />
+        {!embedMode && showNewFolderButton && mode === 'folder' && (
           <Button
             type="link"
             size="small"
@@ -255,19 +307,21 @@ const FolderNav: React.FC<FolderNavProps> = ({
             新建文件夹
           </Button>
         )}
-        <NewFolderModal
-          open={newFolderModalOpen}
-          onCancel={handleNewFolderCancel}
-          onSuccess={handleNewFolderSuccess}
-          parentPath={parentPath}
-        />
+        {!embedMode && (
+          <NewFolderModal
+            open={newFolderModalOpen}
+            onCancel={handleNewFolderCancel}
+            onSuccess={handleNewFolderSuccess}
+            parentPath={parentPath}
+          />
+        )}
       </div>
     );
   }
 
   return (
     <div className={`${styles.wrapper} ${className ?? ''}`}>
-      {showNewFolderButton && (
+      {!embedMode && showNewFolderButton && mode === 'folder' && (
         <Button
           type="text"
           size="small"
@@ -289,18 +343,20 @@ const FolderNav: React.FC<FolderNavProps> = ({
             <LuChevronDown size={14} />
           </span>
         }
-        defaultExpandedKeys={[rootPath]}
+        defaultExpandedKeys={mode === 'folder' ? [rootPath] : treeData[0] ? [treeData[0].key] : []}
         defaultExpandAll={false}
         blockNode={true}
       />
-      <NewFolderModal
-        open={newFolderModalOpen}
-        onCancel={handleNewFolderCancel}
-        onSuccess={handleNewFolderSuccess}
-        parentPath={parentPath}
-      />
+      {!embedMode && (
+        <NewFolderModal
+          open={newFolderModalOpen}
+          onCancel={handleNewFolderCancel}
+          onSuccess={handleNewFolderSuccess}
+          parentPath={parentPath}
+        />
+      )}
     </div>
   );
 };
 
-export default FolderNav;
+export default TreeNav;
