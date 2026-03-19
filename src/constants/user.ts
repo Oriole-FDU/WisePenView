@@ -21,11 +21,11 @@ export const IDENTITY_TYPE_LABELS: Record<number, string> = {
 export const getIdentityTypeLabel = (v: number) => IDENTITY_TYPE_LABELS[v] ?? String(v);
 
 /** 性别 */
-export const SEX = { UNKNOWN: 0, MALE: 1, FEMALE: 2 } as const;
+export const SEX = { MALE: 0, FEMALE: 1, UNKNOWN: 2 } as const;
 export const SEX_LABELS: Record<number, string> = {
-  0: '未知',
-  1: '男',
-  2: '女',
+  0: '男',
+  1: '女',
+  2: '未知',
 };
 export const getSexLabel = (v: number) => SEX_LABELS[v] ?? String(v);
 
