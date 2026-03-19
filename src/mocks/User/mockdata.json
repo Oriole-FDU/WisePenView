@@ -1,23 +1,26 @@
 {
   "userInfo": {
     "id": 1,
-    "username": "mockuser",
     "nickname": "Mock User",
+    "realName": "张三",
     "avatar": "",
     "identityType": 1,
-    "realName": "张三",
+    "username": "mockuser",
     "campusNo": "20300000000",
-    "academicTitle": "学生",
-    "className": "计算机1班",
-    "college": "计算机科学技术学院",
-    "createTime": "2024-01-01T00:00:00.000Z",
-    "degreeLevel": 1,
     "email": "mock@example.com",
-    "enrollmentYear": "2023",
-    "major": "计算机科学与技术",
     "mobile": "13800138000",
+    "verificationMode": null,
+    "status": 1
+  },
+  "userProfile": {
     "sex": 1,
-    "status": 1,
-    "university": "复旦大学"
-  }
+    "university": "复旦大学",
+    "college": "计算机科学技术学院",
+    "major": "计算机科学与技术",
+    "className": "计算机1班",
+    "enrollmentYear": "2023",
+    "degreeLevel": 1,
+    "academicTitle": "学生"
+  },
+  "readonlyFields": null
 }
