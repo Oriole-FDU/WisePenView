@@ -5,7 +5,7 @@ import type { JoinGroupRequest } from '@/services/Group';
 import type { JoinGroupModalProps } from './index.type';
 import styles from './style.module.less';
 
-const INVITE_CODE_LENGTH = 6;
+const INVITE_CODE_LENGTH = 8;
 
 const JoinGroupModal: React.FC<JoinGroupModalProps> = ({ open, onCancel, onSuccess }) => {
   const groupService = useGroupService();
@@ -54,7 +54,7 @@ const JoinGroupModal: React.FC<JoinGroupModalProps> = ({ open, onCancel, onSucce
           name="inviteCode"
           rules={[{ required: true, message: '请输入邀请码' }]}
         >
-          <Input placeholder="请输入 6 位邀请码" maxLength={INVITE_CODE_LENGTH} />
+          <Input placeholder="请输入 8 位邀请码" maxLength={INVITE_CODE_LENGTH} />
         </Form.Item>
       </Form>
     </Modal>
