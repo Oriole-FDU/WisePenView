@@ -10,7 +10,7 @@ export const baseServerAddr = '10.176.44.11:9080';
 export const baseURL = 'http://' + baseServerAddr + '/';
 
 const Axios = axios.create({
-  baseURL: baseURL,
+  baseURL: '/api',
   timeout: 5000,
   withCredentials: true,
 });
