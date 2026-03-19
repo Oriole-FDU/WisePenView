@@ -12,11 +12,6 @@ const SystemLayout: React.FC = () => {
   const userService = useUserService();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showChat, setShowChat] = useState(true);
-  useEffect(() => {
-    userService.getUserInfo().catch(() => {
-      // 401 会由 Axios 拦截器跳转登录，此处静默即可
-    });
-  }, [userService]);
 
   return (
     <Layout className={styles.root}>
