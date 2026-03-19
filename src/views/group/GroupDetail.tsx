@@ -34,7 +34,6 @@ const GroupDetail: React.FC = () => {
         groupService.fetchGroupInfo(id),
         groupService.fetchMyRoleInGroup(id),
       ]);
-      console.log(groupData, role);
       setGroup(groupData);
       setCurrentUserRole(role);
     } catch {
@@ -49,11 +48,17 @@ const GroupDetail: React.FC = () => {
     loadGroup();
   }, [loadGroup]);
 
-  const handleModalSuccess = () => {
+  /** 仅关闭弹窗；解散/退出后会 navigate 离开本页，不应再拉详情（否则多一次失败请求） */
+  const handleModalCloseOnly = () => {
     setEditGroupModalOpen(false);
     setDissolveGroupModalOpen(false);
     setExitGroupModalOpen(false);
-    loadGroup();
+  };
+
+  /** 编辑成功后留在详情页，需重新拉取小组与角色 */
+  const handleEditSuccess = () => {
+    handleModalCloseOnly();
+    void loadGroup();
   };
 
   const [editGroupModalOpen, setEditGroupModalOpen] = useState(false);
@@ -181,21 +186,21 @@ const GroupDetail: React.FC = () => {
         cover={cover}
         groupId={groupId}
         groupType={group.groupType}
-        onSuccess={handleModalSuccess}
+        onSuccess={handleEditSuccess}
       />
       <DissolveGroupModal
         open={dissolveGroupModalOpen}
         onCancel={() => setDissolveGroupModalOpen(false)}
         groupName={groupName}
         groupId={groupId}
-        onSuccess={handleModalSuccess}
+        onSuccess={handleModalCloseOnly}
       />
       <ExitGroupModal
         open={exitGroupModalOpen}
         onCancel={() => setExitGroupModalOpen(false)}
         groupName={groupName}
         groupId={groupId}
-        onSuccess={handleModalSuccess}
+        onSuccess={handleModalCloseOnly}
       />
     </div>
   );
