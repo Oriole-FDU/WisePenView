@@ -73,6 +73,7 @@ const Account: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const [verifyMode, setVerifyMode] = useState<VerifyModalMode>('uis');
+  const [verifySubmitting, setVerifySubmitting] = useState(false);
   const [form] = Form.useForm<ProfileFormValues>();
   const [verifyForm] = Form.useForm<VerifyModalFormValues>();
 
@@ -168,12 +169,14 @@ const Account: React.FC = () => {
   const handleVerify = () => {
     verifyForm.resetFields();
     setVerifyMode('uis');
+    setVerifySubmitting(false);
     setVerifyModalOpen(true);
   };
 
   const handleVerifyModalCancel = () => {
     verifyForm.resetFields();
     setVerifyMode('uis');
+    setVerifySubmitting(false);
     setVerifyModalOpen(false);
   };
 
@@ -181,6 +184,7 @@ const Account: React.FC = () => {
 
   const handleVerifySubmit = async () => {
     try {
+      setVerifySubmitting(true);
       if (verifyMode === 'email') {
         const values = await verifyForm.validateFields(['email']);
         const email = (values.email ?? '').trim();
@@ -203,6 +207,8 @@ const Account: React.FC = () => {
     } catch (err) {
       if (err && typeof err === 'object' && 'errorFields' in err) return;
       message.error(parseErrorMessage(err, '提交失败'));
+    } finally {
+      setVerifySubmitting(false);
     }
   };
 
@@ -411,10 +417,15 @@ const Account: React.FC = () => {
         onCancel={handleVerifyModalCancel}
         destroyOnHidden
         footer={[
-          <Button key="cancel" onClick={handleVerifyModalCancel}>
+          <Button key="cancel" onClick={handleVerifyModalCancel} disabled={verifySubmitting}>
             取消
           </Button>,
-          <Button key="verify" type="primary" onClick={handleVerifySubmit}>
+          <Button
+            key="verify"
+            type="primary"
+            loading={verifySubmitting}
+            onClick={handleVerifySubmit}
+          >
             {verifyMode === 'email' ? '发送验证邮件' : '发起 UIS 认证'}
           </Button>,
         ]}
