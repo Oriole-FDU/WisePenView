@@ -24,8 +24,10 @@ export interface SendEmailVerifyRequest {
   suffixType: number;
 }
 
-/** 更新用户档案请求参数（仅基本档案可编辑字段） */
+/** 更新用户档案请求参数（账号可编辑：学工号、手机号；基本档案可编辑字段；邮箱只读） */
 export interface UpdateUserProfileRequest {
+  campusNo?: string;
+  mobile?: string;
   nickname?: string;
   realName?: string;
   sex?: number;
@@ -38,26 +40,36 @@ export interface UpdateUserProfileRequest {
   academicTitle?: string;
 }
 
+/** 获取用户信息接口响应 data 中的 userInfo */
+export interface GetUserInfoResponseUserInfo {
+  id?: number;
+  nickname: string | null;
+  realName: string | null;
+  avatar: string | null;
+  identityType: number;
+  username: string;
+  campusNo: string;
+  email: string | null;
+  mobile: string | null;
+  verificationMode: number | string | null;
+  status: number;
+}
+
+/** 获取用户信息接口响应 data 中的 userProfile */
+export interface GetUserInfoResponseUserProfile {
+  sex: number;
+  university: string | null;
+  college: string | null;
+  major: string | null;
+  className: string | null;
+  enrollmentYear: string | null;
+  degreeLevel: number | null;
+  academicTitle: string | null;
+}
+
 /** 获取用户信息接口的响应 data 类型 */
 export interface GetUserInfoResponse {
-  id: number;
-  username: string;
-  nickname?: string;
-  avatar?: string;
-  identityType: number;
-  realName?: string;
-  campusNo?: string;
-  academicTitle?: string;
-  className?: string;
-  college?: string;
-  createTime?: string;
-  degreeLevel?: number;
-  email?: string;
-  enrollmentYear?: string;
-  major?: string;
-  mobile?: string;
-  password?: string | null;
-  sex?: number;
-  status?: number;
-  university?: string | null;
+  userInfo: GetUserInfoResponseUserInfo;
+  userProfile: GetUserInfoResponseUserProfile;
+  readonlyFields: string[] | null;
 }
