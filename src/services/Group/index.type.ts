@@ -29,7 +29,7 @@ export interface FetchGroupListResponse {
 export interface FetchGroupListRequest {
   relationType: 1 | 2;
   page: number;
-  pageSize: number;
+  size: number;
 }
 
 /** 创建小组请求参数（与 OpenAPI addGroup 对齐） */
