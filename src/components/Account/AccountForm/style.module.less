@@ -1,0 +1,66 @@
+.descriptions {
+  :global(.ant-descriptions-item-label) {
+    color: var(--ant-color-text-tertiary);
+  }
+}
+
+.profileSection {
+  margin-top: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--ant-margin-lg);
+
+  .sectionTitle {
+    margin-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  margin: 0 0 var(--ant-margin-lg) 0;
+  font-size: var(--ant-font-size-heading-4);
+  font-weight: 500;
+  color: var(--ant-color-text);
+}
+
+.formFieldsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ant-margin-md) var(--ant-margin-lg);
+  margin-bottom: 0;
+
+  :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.editableInput {
+  background-color: var(--ant-color-bg-container) !important;
+}
+
+.profileForm {
+  :global(.ant-form-item) {
+    margin-bottom: var(--ant-margin-md);
+  }
+
+  .formFieldsGrid :global(.ant-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitItem {
+  margin-bottom: 0 !important;
+  margin-top: var(--ant-margin-md);
+}
+
+.cancelBtn {
+  margin-left: var(--ant-margin-sm);
+}

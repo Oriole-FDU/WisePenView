@@ -1,0 +1,108 @@
+.statusGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ant-margin-xs);
+  flex-shrink: 0;
+}
+
+.statusText {
+  font-size: var(--ant-font-size-base);
+  color: var(--ant-color-text-secondary);
+}
+
+.statusIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
+
+  .statusIconBanned {
+    color: var(--ant-color-error);
+  }
+
+  .statusIconUnverified {
+    color: #faad14;
+  }
+
+  .statusIconVerified {
+    color: var(--ant-color-success);
+  }
+}
+
+.accountHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ant-margin-lg);
+}
+
+.accountHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-lg);
+}
+
+.avatarWrap {
+  flex-shrink: 0;
+  display: inline-flex;
+  cursor: pointer;
+  border-radius: 50%;
+  outline: none;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--ant-color-primary);
+  }
+}
+
+.avatar {
+  flex-shrink: 0;
+  background-color: var(--ant-color-fill-secondary);
+  border: 1px solid var(--ant-color-border);
+  color: var(--ant-color-text);
+  font-size: var(--ant-font-size-heading-3);
+  font-weight: 500;
+}
+
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-xs);
+}
+
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ant-margin-sm);
+}
+
+.nickname {
+  font-size: var(--ant-font-size-heading-3);
+  font-weight: 500;
+  color: var(--ant-color-text);
+}
+
+.username {
+  font-size: var(--ant-font-size-base);
+  color: var(--ant-color-text-secondary);
+}
+
+.avatarModalHint {
+  margin: 0 0 var(--ant-margin-md) 0;
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-secondary);
+}
+
+.identityTag {
+  display: inline-block;
+  padding: var(--ant-padding-xxs) var(--ant-padding-sm);
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-primary);
+  background-color: var(--ant-color-primary-bg);
+  border-radius: var(--ant-border-radius-sm);
+  width: fit-content;
+}
