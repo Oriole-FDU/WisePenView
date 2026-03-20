@@ -11,6 +11,11 @@ const getUserResources = async (): Promise<ResourceListPage> => {
   return resourceListPage;
 };
 
+const getGroupResources = async (): Promise<ResourceListPage> => {
+  await delay(200);
+  return resourceListPage;
+};
+
 const renameResource = async (params: RenameResourceRequest): Promise<void> => {
   console.log('[ResourceServices.mock] renameResource', params);
   await delay(150);
@@ -30,6 +35,7 @@ const updateResourceTags = async (): Promise<void> => {
 
 export const ResourceServicesMock: IResourceService = {
   getUserResources,
+  getGroupResources,
   renameResource,
   deleteResource,
   updateResourcePath,

@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Table, message } from 'antd';
+import { Table } from 'antd';
 import type { TableProps, TablePaginationConfig } from 'antd';
 import type { GroupMember } from '@/types/group';
 import type { MemberListPaginationConfig, MemberListTableProps } from './index.type';
 import { getColumns } from './TableConfig';
 import styles from './style.module.less';
 import { useGroupService } from '@/contexts/ServicesContext';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
@@ -22,6 +23,7 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
   mockMembers,
 }) => {
   const groupService = useGroupService();
+  const message = useAppMessage();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(pagination?.defaultPageSize ?? 5);
   const [loading, setLoading] = useState(false);

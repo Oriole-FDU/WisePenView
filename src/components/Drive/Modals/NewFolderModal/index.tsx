@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Button, Input, message } from 'antd';
+import { Modal, Button, Input } from 'antd';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
 import type { NewFolderModalProps } from './index.type';
 import TreeNav from '@/components/Common/TreeNav';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 import styles from './index.module.less';
 
@@ -16,6 +17,7 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
   parentPath,
 }) => {
   const folderService = useFolderService();
+  const message = useAppMessage();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedParentPath, setSelectedParentPath] = useState(parentPath ?? '/');

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Alert, Button, Modal, Typography, message as antMessage } from 'antd';
+import { Alert, Button, Modal, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useUserService } from '@/contexts/ServicesContext';
 import { usePendingVerifyEmailStore } from '@/store';
 import type { ConfirmEmailVerifyRequest } from '@/services/User';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import auth from '../Auth.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const VerifyEmail: React.FC = () => {
   const userService = useUserService();
+  const message = useAppMessage();
   const clearPendingEmail = usePendingVerifyEmailStore((s) => s.clear);
 
   /** 首帧同步读：先 localStorage（与发起验证同源），再 URL ?email=（后端若在链接中带邮箱） */
@@ -20,7 +22,6 @@ const VerifyEmail: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [messageApi, contextHolder] = antMessage.useMessage();
   const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(window.location.search);
@@ -28,7 +29,7 @@ const VerifyEmail: React.FC = () => {
 
   const onVerify = async () => {
     if (loading || !token) {
-      if (!token) messageApi.error('链接无效或已过期');
+      if (!token) message.error('链接无效或已过期');
       return;
     }
 
@@ -36,11 +37,11 @@ const VerifyEmail: React.FC = () => {
     try {
       const params: ConfirmEmailVerifyRequest = { token };
       await userService.confirmEmailVerify(params);
-      messageApi.success('邮箱验证成功');
+      message.success('邮箱验证成功');
       clearPendingEmail();
       setSuccessModalOpen(true);
     } catch (err) {
-      messageApi.error(parseErrorMessage(err, '验证失败'));
+      message.error(parseErrorMessage(err, '验证失败'));
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,6 @@ const VerifyEmail: React.FC = () => {
 
   return (
     <div className={auth.authContainer}>
-      {contextHolder}
       <Typography.Title>邮箱验证</Typography.Title>
       <Alert
         className={auth.bindAlert}

@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { Modal, Button, Alert, message } from 'antd';
+import { Modal, Button, Alert } from 'antd';
 import { useResourceService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { useRecentFilesStore } from '@/store';
 import type { DeleteFileModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const DeleteFileModal: React.FC<DeleteFileModalProps> = ({ open, onCancel, onSuccess, file }) => {
   const resourceService = useResourceService();
+  const message = useAppMessage();
   const [loading, setLoading] = useState(false);
   const removeFile = useRecentFilesStore((s) => s.removeFile);
 
   const handleConfirm = async () => {
-    if (!file) return;
+    if (!file?.resourceId) return;
     try {
       setLoading(true);
       await resourceService.deleteResource(file.resourceId);

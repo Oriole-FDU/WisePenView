@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { message, Breadcrumb, Table, Spin, Button, Tag } from 'antd';
+import { Breadcrumb, Table, Spin, Button, Tag } from 'antd';
 import { AiOutlineTag } from 'react-icons/ai';
 import { LuChevronLeft, LuChevronRight, LuFolderPlus } from 'react-icons/lu';
 import { getPathSegments } from '@/utils/path';
@@ -24,6 +24,7 @@ import {
 } from '@/components/Drive/Modals';
 import type { MoveToFolderTarget } from '@/components/Drive/Modals';
 import { useClickFile, useTreeDriveDrop } from '@/hooks/drive';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import type { RowItem, TreeDriveMode, TreeDriveProps } from './index.type';
 import { buildTableDataSource } from './index.type';
 import { getTreeDriveColumns, type TreeDriveColumnConfigOptions } from './config/columnConfig';
@@ -41,6 +42,7 @@ const TreeDrive: React.FC<TreeDriveProps> = ({ mode = 'folder', groupId }) => {
   const resourceService = useResourceService();
   const tagService = useTagService();
   const noteService = useNoteService();
+  const message = useAppMessage();
   const clickFile = useClickFile();
 
   // 路径状态
@@ -117,7 +119,7 @@ const TreeDrive: React.FC<TreeDriveProps> = ({ mode = 'folder', groupId }) => {
         setFolderLoadingMore(false);
       }
     },
-    [folderService]
+    [folderService, message]
   );
 
   // 刷新列表
@@ -272,7 +274,7 @@ const TreeDrive: React.FC<TreeDriveProps> = ({ mode = 'folder', groupId }) => {
         message.error(parseErrorMessage(err, '创建副本失败'));
       }
     },
-    [noteService, refresh, clickFile]
+    [noteService, refresh, clickFile, message]
   );
 
   // 处理移动到文件夹

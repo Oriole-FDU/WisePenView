@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { Tag, Radio, Select, Spin, Empty, message } from 'antd';
+import { Tag, Radio, Select, Spin, Empty } from 'antd';
 import { LuX } from 'react-icons/lu';
 import { useTagService } from '@/contexts/ServicesContext';
 import { TAG_QUERY_LOGIC_MODE, RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/services/Resource';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { FileFilterProps, FileFilterValue } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import styles from './style.module.less';
 
 const DEFAULT_VALUE: FileFilterValue = {
@@ -37,6 +38,7 @@ const toPoolItems = (
 
 const FileFilter: React.FC<FileFilterProps> = ({ groupId, value, onChange }) => {
   const tagService = useTagService();
+  const message = useAppMessage();
   const [innerValue, setInnerValue] = useState<FileFilterValue>(DEFAULT_VALUE);
   const isControlled = value !== undefined;
   const current = isControlled ? value : innerValue;
@@ -65,7 +67,7 @@ const FileFilter: React.FC<FileFilterProps> = ({ groupId, value, onChange }) => 
     return () => {
       cancelled = true;
     };
-  }, [groupId, tagService]);
+  }, [groupId, tagService, message]);
 
   const updateValue = useCallback(
     (next: FileFilterValue) => {

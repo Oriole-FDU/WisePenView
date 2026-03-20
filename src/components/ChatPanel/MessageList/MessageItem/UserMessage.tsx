@@ -1,9 +1,10 @@
 import React from 'react';
 import { LuCopy, LuPencil, LuCheck } from 'react-icons/lu';
-import { Button, message as antMessage } from 'antd';
+import { Button } from 'antd';
 import MessageContent from './MessageContent';
 import styles from './UserMessage.module.less';
 import type { Message } from '@/components/ChatPanel/index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 interface UserMessageProps {
   message: Message;
@@ -11,7 +12,7 @@ interface UserMessageProps {
 }
 
 const UserMessage: React.FC<UserMessageProps> = ({ message, onEdit }) => {
-  const [messageApi, contextHolder] = antMessage.useMessage();
+  const messageApi = useAppMessage();
   const [copied, setCopied] = React.useState(false);
 
   const handleCopy = async () => {
@@ -35,8 +36,6 @@ const UserMessage: React.FC<UserMessageProps> = ({ message, onEdit }) => {
 
   return (
     <div className={styles.userRow}>
-      {contextHolder}
-
       <div className={styles.contentCol}>
         {/* 左侧悬浮操作栏 */}
         <div className={styles.actions}>

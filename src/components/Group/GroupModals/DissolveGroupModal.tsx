@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Input, Alert, message } from 'antd';
+import { Modal, Button, Input, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { DeleteGroupRequest } from '@/services/Group';
 import type { DissolveGroupModalProps } from './index.type';
 import styles from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const DissolveGroupModal: React.FC<DissolveGroupModalProps> = ({
   open,
@@ -14,6 +15,7 @@ const DissolveGroupModal: React.FC<DissolveGroupModalProps> = ({
   onSuccess,
 }) => {
   const groupService = useGroupService();
+  const message = useAppMessage();
   const [loading, setLoading] = useState(false);
   const [confirmName, setConfirmName] = useState('');
   const navigate = useNavigate();

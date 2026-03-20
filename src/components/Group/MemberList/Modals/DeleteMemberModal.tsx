@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Button, Alert, message } from 'antd';
+import { Modal, Button, Alert } from 'antd';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { KickMembersRequest } from '@/services/Group';
 import { useMemberEditGuard } from './useMemberEditGuard';
 import type { DeleteMemberModalProps } from './index.type';
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const DeleteMemberModal: React.FC<DeleteMemberModalProps> = ({
   open,
@@ -16,6 +17,7 @@ const DeleteMemberModal: React.FC<DeleteMemberModalProps> = ({
   permissionConfig,
 }) => {
   const groupService = useGroupService();
+  const message = useAppMessage();
   const [loading, setLoading] = useState(false);
 
   const { memberContainsOwner, canEdit, confirmDisabled } = useMemberEditGuard(

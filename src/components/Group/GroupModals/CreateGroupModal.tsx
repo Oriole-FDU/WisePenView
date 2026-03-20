@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Form, Input, Select, Upload, message } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Modal, Button, Form, Input, Select, Upload } from 'antd';
 import type { UploadFile } from 'antd';
 import { LuUpload } from 'react-icons/lu';
 import { useGroupService, useImageService, useUserService } from '@/contexts/ServicesContext';
 import type { CreateGroupRequest } from '@/services/Group';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
-import { beforeUploadImageWithinLimit } from '@/utils/image';
+import { createBeforeUploadImageWithinLimit } from '@/utils/image';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import { GROUP_TYPE, GROUP_TYPE_LABELS, ALLOWED_GROUP_TYPES_MAP } from '@/constants/group';
 import type { CreateGroupModalProps } from './index.type';
 import styles from './style.module.less';
@@ -32,6 +33,11 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onS
   const groupService = useGroupService();
   const imageService = useImageService();
   const userService = useUserService();
+  const message = useAppMessage();
+  const beforeUploadCover = useMemo(
+    () => createBeforeUploadImageWithinLimit((text) => message.error(text)),
+    [message]
+  );
   const [form] = Form.useForm<CreateGroupFormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [identityType, setIdentityType] = useState<number | undefined>();
@@ -142,12 +148,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onS
           valuePropName="fileList"
           getValueFromEvent={normalizeUpload}
         >
-          <Upload
-            name="file"
-            beforeUpload={beforeUploadImageWithinLimit}
-            accept="image/*"
-            maxCount={1}
-          >
+          <Upload name="file" beforeUpload={beforeUploadCover} accept="image/*" maxCount={1}>
             <Button icon={<LuUpload />}>点击上传</Button>
           </Upload>
         </Form.Item>

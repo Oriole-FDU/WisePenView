@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, Button, message } from 'antd';
+import { Modal, Button } from 'antd';
 import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
 import { useResourceService, useTagService } from '@/contexts/ServicesContext';
@@ -7,6 +7,7 @@ import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { isValidFolderMove } from '@/utils/path';
 import TreeNav from '@/components/Common/TreeNav';
 import type { MoveToFolderModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import styles from './index.module.less';
 
 const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
@@ -17,6 +18,7 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
 }) => {
   const resourceService = useResourceService();
   const tagService = useTagService();
+  const message = useAppMessage();
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,9 +48,11 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
     setSubmitting(true);
     try {
       if (target.type === 'file') {
+        const rid = target.data.resourceId;
+        if (rid == null || rid === '') return;
         const targetPath = selectedFolder.tagName ?? '/';
         await resourceService.updateResourcePath({
-          resourceId: target.data.resourceId,
+          resourceId: rid,
           path: targetPath,
         });
         message.success(`已移动到 ~${targetPath === '/' ? '根目录' : targetPath}`);
@@ -68,7 +72,7 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
     } finally {
       setSubmitting(false);
     }
-  }, [resourceService, tagService, target, selectedFolder, onSuccess, onCancel]);
+  }, [resourceService, tagService, target, selectedFolder, onSuccess, onCancel, message]);
 
   const handleCancel = useCallback(() => {
     setSelectedFolder(null);

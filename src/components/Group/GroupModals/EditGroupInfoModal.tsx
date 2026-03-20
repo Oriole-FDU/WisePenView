@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Input, Upload, message } from 'antd';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Modal, Button, Form, Input, Upload } from 'antd';
 import type { UploadFile } from 'antd';
 import { LuUpload } from 'react-icons/lu';
 import { useGroupService, useImageService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
-import { beforeUploadImageWithinLimit } from '@/utils/image';
+import { createBeforeUploadImageWithinLimit } from '@/utils/image';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import type { EditGroupRequest } from '@/services/Group';
 import { GROUP_TYPE } from '@/constants/group';
 import type { EditGroupInfoModalProps } from './index.type';
@@ -35,6 +36,11 @@ const EditGroupInfoModal: React.FC<EditGroupInfoModalProps> = ({
 }) => {
   const groupService = useGroupService();
   const imageService = useImageService();
+  const message = useAppMessage();
+  const beforeUploadCover = useMemo(
+    () => createBeforeUploadImageWithinLimit((text) => message.error(text)),
+    [message]
+  );
   const [form] = Form.useForm<EditGroupFormValues>();
   const [loading, setLoading] = useState(false);
 
@@ -117,12 +123,7 @@ const EditGroupInfoModal: React.FC<EditGroupInfoModalProps> = ({
           valuePropName="fileList"
           getValueFromEvent={normalizeUpload}
         >
-          <Upload
-            name="file"
-            beforeUpload={beforeUploadImageWithinLimit}
-            accept="image/*"
-            maxCount={1}
-          >
+          <Upload name="file" beforeUpload={beforeUploadCover} accept="image/*" maxCount={1}>
             <Button icon={<LuUpload />}>点击上传</Button>
           </Upload>
         </Form.Item>

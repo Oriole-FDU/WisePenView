@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Input, message } from 'antd';
+import { Modal, Button, Input } from 'antd';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getFolderDisplayName } from '@/utils/path';
 import type { RenameFolderModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const RenameFolderModal: React.FC<RenameFolderModalProps> = ({
   open,
@@ -12,6 +13,7 @@ const RenameFolderModal: React.FC<RenameFolderModalProps> = ({
   folder,
 }) => {
   const folderService = useFolderService();
+  const message = useAppMessage();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 

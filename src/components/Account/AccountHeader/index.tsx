@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Avatar, Button, message, Modal, Tooltip, Upload } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Avatar, Button, Modal, Tooltip, Upload } from 'antd';
 import type { UploadFile } from 'antd';
 import { RiCheckLine, RiCloseLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useImageService, useUserService } from '@/contexts/ServicesContext';
 import { getIdentityTypeLabel, getVerificationModeLabel, USER_STATUS } from '@/constants/user';
-import { beforeUploadImageWithinLimit } from '@/utils/image';
+import { createBeforeUploadImageWithinLimit } from '@/utils/image';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { AccountHeaderProps } from './index.type';
 import styles from './style.module.less';
@@ -12,6 +13,11 @@ import styles from './style.module.less';
 const AccountHeader: React.FC<AccountHeaderProps> = ({ user, onUserInfoUpdated }) => {
   const userService = useUserService();
   const imageService = useImageService();
+  const message = useAppMessage();
+  const beforeUploadAvatar = useMemo(
+    () => createBeforeUploadImageWithinLimit((text) => message.error(text)),
+    [message]
+  );
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [avatarFileList, setAvatarFileList] = useState<UploadFile[]>([]);
   const [avatarSubmitting, setAvatarSubmitting] = useState(false);
@@ -153,7 +159,7 @@ const AccountHeader: React.FC<AccountHeaderProps> = ({ user, onUserInfoUpdated }
           accept="image/*"
           maxCount={1}
           fileList={avatarFileList}
-          beforeUpload={beforeUploadImageWithinLimit}
+          beforeUpload={beforeUploadAvatar}
           onChange={({ fileList }) => setAvatarFileList(fileList)}
         >
           <Button type="default">选择图片</Button>

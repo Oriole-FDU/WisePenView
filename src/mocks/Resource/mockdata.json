@@ -7,7 +7,7 @@
         "resourceType": "NOTE",
         "ownerId": "1",
         "path": "/",
-        "tagNames": []
+        "currentTags": []
       },
       {
         "resourceId": "mock-note-2",
@@ -15,7 +15,7 @@
         "resourceType": "NOTE",
         "ownerId": "1",
         "path": "/",
-        "tagNames": []
+        "currentTags": []
       },
       {
         "resourceId": "res-001",
@@ -25,7 +25,7 @@
         "preview": "",
         "size": 102400,
         "path": "/",
-        "tagNames": ["笔记"]
+        "currentTags": ["笔记"]
       },
       {
         "resourceId": "res-002",
@@ -34,7 +34,7 @@
         "ownerId": "1",
         "size": 51200,
         "path": "/documents",
-        "tagNames": []
+        "currentTags": []
       }
     ],
     "total": 4,

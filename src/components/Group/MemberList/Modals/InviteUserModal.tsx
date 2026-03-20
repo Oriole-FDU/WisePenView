@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Modal, Button, message } from 'antd';
+import { Modal, Button } from 'antd';
 import { LuCopy } from 'react-icons/lu';
 import type { InviteUserModalProps } from './index.type';
 import styles from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, onCancel, inviteCode }) => {
+  const message = useAppMessage();
   const [copied, setCopied] = useState(false);
 
   const handleCancel = () => {

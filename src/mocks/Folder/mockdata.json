@@ -91,7 +91,7 @@
           "resourceName": "README.md",
           "resourceType": "file",
           "path": "/",
-          "tagNames": []
+          "currentTags": []
         }
       ],
       "totalFiles": 1
@@ -119,7 +119,7 @@
           "resourceName": "年度总结.docx",
           "resourceType": "file",
           "path": "/文档",
-          "tagNames": ["文档"]
+          "currentTags": ["文档"]
         }
       ],
       "totalFiles": 1
@@ -152,7 +152,7 @@
           "resourceName": "Q1 报告.pdf",
           "resourceType": "file",
           "path": "/文档/2024",
-          "tagNames": []
+          "currentTags": []
         }
       ],
       "totalFiles": 1
@@ -165,7 +165,7 @@
           "resourceName": "会议纪要模板.docx",
           "resourceType": "file",
           "path": "/文档/模板",
-          "tagNames": []
+          "currentTags": []
         }
       ],
       "totalFiles": 1
@@ -178,7 +178,7 @@
           "resourceName": "需求文档.md",
           "resourceType": "file",
           "path": "/项目/Alpha",
-          "tagNames": []
+          "currentTags": []
         }
       ],
       "totalFiles": 1

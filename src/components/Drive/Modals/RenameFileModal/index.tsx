@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Input, message } from 'antd';
+import { Modal, Button, Input } from 'antd';
 import { useResourceService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { useRecentFilesStore } from '@/store';
 import type { RenameFileModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const RenameFileModal: React.FC<RenameFileModalProps> = ({ open, onCancel, onSuccess, file }) => {
   const resourceService = useResourceService();
+  const message = useAppMessage();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const updateFileName = useRecentFilesStore((s) => s.updateFileName);
@@ -18,7 +20,7 @@ const RenameFileModal: React.FC<RenameFileModalProps> = ({ open, onCancel, onSuc
   }, [open, file]);
 
   const handleSubmit = async () => {
-    if (!file) return;
+    if (!file?.resourceId) return;
     const trimmed = name.trim();
     if (!trimmed) {
       message.warning('请输入文件名称');

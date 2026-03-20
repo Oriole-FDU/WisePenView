@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Button, Descriptions, Form, Input, Select, message } from 'antd';
+import { Button, Descriptions, Form, Input, Select } from 'antd';
 import type { InputRef } from 'antd/es/input';
 import { RiPencilLine } from 'react-icons/ri';
 import {
@@ -13,6 +13,7 @@ import type { UpdateUserInfoRequest } from '@/services/User';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getProfileDisplayString } from './profileDisplay';
 import type { AccountFormProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import styles from './style.module.less';
 
 const { Option } = Select;
@@ -54,6 +55,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
   onCancel,
 }) => {
   const userService = useUserService();
+  const message = useAppMessage();
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {

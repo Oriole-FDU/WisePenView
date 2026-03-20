@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Typography, Input, Button, message as antMessage } from 'antd';
+import { Form, Typography, Input, Button } from 'antd';
 import { RiUserLine, RiLockLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import ServiceAgreement from '@/components/ServiceAgreement/index';
@@ -7,13 +7,14 @@ import { useAuthService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import auth from '../Auth.module.less';
 import type { LoginRequest } from '@/services/Auth';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const Login: React.FC = () => {
   const authService = useAuthService();
+  const message = useAppMessage();
   const [contractOpen, setContractOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<LoginRequest>();
-  const [messageApi, contextHolder] = antMessage.useMessage();
   const navigate = useNavigate();
 
   const onFinish = async (values: LoginRequest) => {
@@ -23,7 +24,7 @@ const Login: React.FC = () => {
       await authService.login(values);
       navigate('/app/drive');
     } catch (err) {
-      messageApi.error(parseErrorMessage(err, '登录失败'));
+      message.error(parseErrorMessage(err, '登录失败'));
     } finally {
       setLoading(false);
     }
@@ -31,7 +32,6 @@ const Login: React.FC = () => {
 
   return (
     <div className={auth.authContainer}>
-      {contextHolder}
       <Typography.Title>登录</Typography.Title>
 
       <Form layout="vertical" form={form} onFinish={onFinish} requiredMark={false}>

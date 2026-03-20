@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { ConfigProvider, Spin } from 'antd';
+import { App as AntdApp, ConfigProvider, Spin } from 'antd';
 import { RouterProvider } from 'react-router-dom';
 import router from './router';
 import zhCN from 'antd/locale/zh_CN';
@@ -18,9 +18,11 @@ const App: React.FC = () => {
   return (
     <ServicesProvider>
       <ConfigProvider locale={zhCN} theme={appTheme}>
-        <Suspense fallback={<PageLoadingFallback />}>
-          <RouterProvider router={router} />
-        </Suspense>
+        <AntdApp>
+          <Suspense fallback={<PageLoadingFallback />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </AntdApp>
       </ConfigProvider>
     </ServicesProvider>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Avatar, Button, Spin, Tabs, message } from 'antd';
+import { Avatar, Button, Spin, Tabs } from 'antd';
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineLogout } from 'react-icons/ai';
 import FlatDrive from '@/components/Drive/FlatDrive';
 import MemberList from '@/components/Group/MemberList';
@@ -15,9 +15,11 @@ import type { Group } from '@/types/group';
 import { GROUP_TYPE, getGroupTypeLabel } from '@/constants/group';
 import layout from '../style.module.less';
 import page from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const GroupDetail: React.FC = () => {
   const groupService = useGroupService();
+  const message = useAppMessage();
   const { id } = useParams<{ id: string }>();
   const [group, setGroup] = useState<Group | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<'OWNER' | 'ADMIN' | 'MEMBER'>('MEMBER');
@@ -43,7 +45,7 @@ const GroupDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [groupService, id]);
+  }, [groupService, id, message]);
 
   useEffect(() => {
     loadGroup();

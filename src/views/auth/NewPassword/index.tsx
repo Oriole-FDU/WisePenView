@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { Form, Typography, Input, Button, Modal, message as antMessage } from 'antd';
+import { Form, Typography, Input, Button, Modal } from 'antd';
 import { RiLockLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import auth from '../Auth.module.less';
 import type { NewPasswordRequest } from '@/services/Auth';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const NewPassword: React.FC = () => {
   const authService = useAuthService();
+  const message = useAppMessage();
   const [loading, setLoading] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [form] = Form.useForm<Pick<NewPasswordRequest, 'newPassword'>>();
-  const [messageApi, contextHolder] = antMessage.useMessage();
   const navigate = useNavigate();
 
   const onFinish = async (values: Pick<NewPasswordRequest, 'newPassword'>) => {
@@ -22,7 +23,7 @@ const NewPassword: React.FC = () => {
     const token = window.location.search.split('token=')[1];
 
     if (!token) {
-      messageApi.error('token不存在');
+      message.error('token不存在');
       return;
     }
 
@@ -31,7 +32,7 @@ const NewPassword: React.FC = () => {
       await authService.newPassword({ newPassword: values.newPassword, token });
       setSuccessModalOpen(true);
     } catch (err) {
-      messageApi.error(parseErrorMessage(err, '设置失败'));
+      message.error(parseErrorMessage(err, '设置失败'));
     } finally {
       setLoading(false);
     }
@@ -39,7 +40,6 @@ const NewPassword: React.FC = () => {
 
   return (
     <div className={auth.authContainer}>
-      {contextHolder}
       <Typography.Title>设置新密码</Typography.Title>
       <Form layout="vertical" form={form} onFinish={onFinish} requiredMark={false}>
         <Form.Item

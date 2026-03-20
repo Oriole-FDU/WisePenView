@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, Button, Tag, message } from 'antd';
+import { Modal, Button, Tag } from 'antd';
 import { LuX } from 'react-icons/lu';
 import { useResourceService, useTagService } from '@/contexts/ServicesContext';
 import type { TagTreeNode } from '@/services/Tag';
@@ -8,6 +8,7 @@ import type { ResourceItem } from '@/types/resource';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import TreeNav from '@/components/Common/TreeNav';
 import type { EditTagModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import styles from './index.module.less';
 
 /** 递归收集 tagName -> tagId 映射 */
@@ -28,6 +29,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
 }) => {
   const resourceService = useResourceService();
   const tagService = useTagService();
+  const message = useAppMessage();
   const [tagIds, setTagIds] = useState<string[]>([]);
   const [tagNames, setTagNames] = useState<string[]>([]);
   const [tagMap, setTagMap] = useState<Map<string, string>>(new Map());
@@ -43,7 +45,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
       buildTagNameToIdMap(userTagTree, nameToId);
       setTagMap(nameToId);
 
-      const existingNames = file.tagNames ?? [];
+      const existingNames = file.currentTags ?? [];
       const resolved: { tagId: string; tagName: string }[] = [];
       for (const name of existingNames) {
         const id = nameToId.get(name);
@@ -101,7 +103,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
   );
 
   const handleSubmit = async () => {
-    if (!file) return;
+    if (!file?.resourceId) return;
     try {
       setLoading(true);
       await resourceService.updateResourceTags({

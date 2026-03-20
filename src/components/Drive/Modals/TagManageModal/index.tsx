@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, Button, Form, Input, message, Popconfirm, Divider } from 'antd';
+import { Modal, Button, Form, Input, Popconfirm, Divider } from 'antd';
 import { LuPlus } from 'react-icons/lu';
 import TreeNav from '@/components/Common/TreeNav';
 import { useTagService } from '@/contexts/ServicesContext';
@@ -8,6 +8,7 @@ import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { TagManageModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import styles from './style.module.less';
 
 const { TextArea } = Input;
@@ -21,6 +22,7 @@ function withGroupId<T extends Record<string, unknown>>(
 
 const TagManageModal: React.FC<TagManageModalProps> = ({ open, onCancel, groupId }) => {
   const tagService = useTagService();
+  const message = useAppMessage();
   const [selectedTag, setSelectedTag] = useState<TagTreeNode | null>(null);
   const [treeRefreshKey, setTreeRefreshKey] = useState(0);
   const [addRootModalOpen, setAddRootModalOpen] = useState(false);

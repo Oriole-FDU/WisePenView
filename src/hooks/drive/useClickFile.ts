@@ -14,7 +14,12 @@ export const useClickFile = () => {
   const openResource = useCallback(
     (item: ResourceItem) => {
       const { resourceId, resourceName, resourceType, preview } = item;
-      addFile({ resourceId, resourceName, resourceType });
+      if (resourceId == null || resourceId === '') return;
+      addFile({
+        resourceId,
+        resourceName: resourceName ?? '',
+        resourceType,
+      });
       if (resourceType === 'NOTE') {
         navigate(`/app/note/${resourceId}`);
       } else {

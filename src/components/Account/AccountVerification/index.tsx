@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Form, Input, message, Modal, Radio } from 'antd';
+import { Alert, Button, Form, Input, Modal, Radio } from 'antd';
 import { RiMailLine, RiShieldUserLine } from 'react-icons/ri';
 import { useUserService } from '@/contexts/ServicesContext';
 import type { InitiateUISVerifyRequest, SendEmailVerifyRequest } from '@/services/User';
@@ -15,9 +15,11 @@ import type {
   VerifyModalMode,
 } from './index.type';
 import styles from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const AccountVerification: React.FC<AccountVerificationProps> = ({ user, onUserInfoUpdated }) => {
   const userService = useUserService();
+  const message = useAppMessage();
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const [verifyMode, setVerifyMode] = useState<VerifyModalMode>('uis');
   const [verifySubmitting, setVerifySubmitting] = useState(false);

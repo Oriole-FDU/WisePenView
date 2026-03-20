@@ -1,4 +1,4 @@
-import { message, Upload } from 'antd';
+import { Upload } from 'antd';
 import { IMAGE_UPLOAD_MAX_BYTES, IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/services/Image';
 
 /**
@@ -14,11 +14,16 @@ export const PLACEHOLDER_IMAGE =
 /**
  * 用于 Ant Design Upload `beforeUpload`：超过图床代理上限时不进入 fileList，并提示。
  * 返回 `false` 表示不自动上传（由业务在提交时再调 ImageService）。
+ * `onOversize` 请传入 `useAppMessage().error` 等，避免使用静态 message。
  */
-export const beforeUploadImageWithinLimit = (file: File): boolean | typeof Upload.LIST_IGNORE => {
-  if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
-    message.error(`图片大小不能超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`);
-    return Upload.LIST_IGNORE;
-  }
-  return false;
+export const createBeforeUploadImageWithinLimit = (
+  onOversize: (text: string) => void
+): ((file: File) => boolean | typeof Upload.LIST_IGNORE) => {
+  return (file: File) => {
+    if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
+      onOversize(`图片大小不能超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`);
+      return Upload.LIST_IGNORE;
+    }
+    return false;
+  };
 };

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { message } from 'antd';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import type { ResourceItem } from '@/types/resource';
 import type { Folder } from '@/types/folder';
 import type { IResourceService } from '@/services/Resource';
@@ -25,9 +25,11 @@ export function useTreeDriveDrop(params: UseTreeDriveDropParams): {
   handleDropFolder: OnDropFolder;
 } {
   const { resourceService, tagService, refresh } = params;
+  const message = useAppMessage();
 
   const handleDrop = useCallback<OnDropFile>(
     async (file, targetFolder) => {
+      if (file.resourceId == null || file.resourceId === '') return;
       const targetPath = targetFolder.tagName ?? '/';
       try {
         await resourceService.updateResourcePath({
@@ -40,7 +42,7 @@ export function useTreeDriveDrop(params: UseTreeDriveDropParams): {
         message.error(parseErrorMessage(err, '移动失败'));
       }
     },
-    [resourceService, refresh]
+    [resourceService, refresh, message]
   );
 
   const handleDropFolder = useCallback<OnDropFolder>(
@@ -56,7 +58,7 @@ export function useTreeDriveDrop(params: UseTreeDriveDropParams): {
         message.error(parseErrorMessage(err, '移动失败'));
       }
     },
-    [tagService, refresh]
+    [tagService, refresh, message]
   );
 
   return { handleDrop, handleDropFolder };

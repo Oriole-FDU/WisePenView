@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tabs, Button, Row, Col, Pagination, Empty, Spin, message } from 'antd';
+import { Tabs, Button, Row, Col, Pagination, Empty, Spin } from 'antd';
 import { AiOutlinePlus, AiOutlineUserAdd } from 'react-icons/ai';
 import GroupCard from '@/components/Group/GroupCard';
 import { useGroupService } from '@/contexts/ServicesContext';
@@ -10,9 +10,11 @@ import { RELATION_TYPE_MAP } from '@/constants/group';
 import { JoinGroupModal, CreateGroupModal } from '@/components/Group/GroupModals';
 import layout from '../style.module.less';
 import page from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const MyGroup: React.FC = () => {
   const groupService = useGroupService();
+  const message = useAppMessage();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('joined');
   const [pageNum, setPageNum] = useState(1);
@@ -44,7 +46,7 @@ const MyGroup: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [groupService, relationType, pageNum, size]);
+  }, [groupService, relationType, pageNum, size, message]);
 
   useEffect(() => {
     fetchGroups();

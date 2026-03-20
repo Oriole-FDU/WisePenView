@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Descriptions, Divider, Form, message, Spin } from 'antd';
+import { Descriptions, Divider, Form, Spin } from 'antd';
 import { useUserService } from '@/contexts/ServicesContext';
 import type { GetUserInfoResponse } from '@/services/User';
 import { IDENTITY_TYPE } from '@/constants/user';
@@ -14,9 +14,11 @@ import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getProfileFieldConfig, PROFILE_FIELDS } from '../profile.config';
 import type { ProfileFieldKey } from '../profile.config';
 import layout from '../style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const Account: React.FC = () => {
   const userService = useUserService();
+  const message = useAppMessage();
   const [user, setUser] = useState<GetUserInfoResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -41,7 +43,7 @@ const Account: React.FC = () => {
       }
     };
     void loadUser();
-  }, [form]);
+  }, [form, userService, message]);
 
   const identityType = user?.userInfo?.identityType ?? IDENTITY_TYPE.STUDENT;
   const fieldConfig = getProfileFieldConfig(identityType);

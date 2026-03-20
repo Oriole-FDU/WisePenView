@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Modal, Button, Tree, Spin, message, Tag } from 'antd';
+import { Modal, Button, Tree, Spin, Tag } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { useTagService, useResourceService } from '@/contexts/ServicesContext';
 import type { TagTreeNode } from '@/services/Tag/index.type';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { AddTagModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 import styles from './index.module.less';
 
@@ -24,6 +25,7 @@ function tagTreeToDataNodes(nodes: TagTreeNode[]): DataNode[] {
 const AddTagModal: React.FC<AddTagModalProps> = ({ open, onCancel, onSuccess, target }) => {
   const tagService = useTagService();
   const resourceService = useResourceService();
+  const message = useAppMessage();
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -43,7 +45,7 @@ const AddTagModal: React.FC<AddTagModalProps> = ({ open, onCancel, onSuccess, ta
     } finally {
       setLoading(false);
     }
-  }, [tagService]);
+  }, [tagService, message]);
 
   useEffect(() => {
     if (open) {

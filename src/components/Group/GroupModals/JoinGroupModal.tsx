@@ -1,14 +1,16 @@
 import React from 'react';
-import { Modal, Button, Form, Input, message } from 'antd';
+import { Modal, Button, Form, Input } from 'antd';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { JoinGroupRequest } from '@/services/Group';
 import type { JoinGroupModalProps } from './index.type';
 import styles from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const INVITE_CODE_LENGTH = 8;
 
 const JoinGroupModal: React.FC<JoinGroupModalProps> = ({ open, onCancel, onSuccess }) => {
   const groupService = useGroupService();
+  const message = useAppMessage();
   const [form] = Form.useForm<JoinGroupRequest>();
   const isConfirmDisabled = Form.useWatch('inviteCode', form)?.trim().length !== INVITE_CODE_LENGTH;
 

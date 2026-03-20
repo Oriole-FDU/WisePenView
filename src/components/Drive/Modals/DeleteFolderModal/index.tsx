@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Button, Alert, message } from 'antd';
+import { Modal, Button, Alert } from 'antd';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getFolderDisplayName } from '@/utils/path';
 import type { DeleteFolderModalProps } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const DeleteFolderModal: React.FC<DeleteFolderModalProps> = ({
   open,
@@ -12,6 +13,7 @@ const DeleteFolderModal: React.FC<DeleteFolderModalProps> = ({
   folder,
 }) => {
   const folderService = useFolderService();
+  const message = useAppMessage();
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {

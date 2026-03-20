@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, InputNumber, Form, Alert, message } from 'antd';
+import { Modal, Button, InputNumber, Form, Alert } from 'antd';
 import { useQuotaService } from '@/contexts/ServicesContext';
 import { useMemberEditGuard } from './useMemberEditGuard';
 import type { AssignQuotaModalProps } from './index.type';
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
 import styles from './style.module.less';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const AssignQuotaModal: React.FC<AssignQuotaModalProps> = ({
   open,
@@ -16,6 +17,7 @@ const AssignQuotaModal: React.FC<AssignQuotaModalProps> = ({
   permissionConfig,
 }) => {
   const quotaService = useQuotaService();
+  const message = useAppMessage();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [groupQuota, setGroupQuotaState] = useState<{ used: number; limit: number }>({

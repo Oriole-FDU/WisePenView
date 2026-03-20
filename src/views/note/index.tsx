@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';
-import { message } from 'antd';
-
 import Note from '@/components/Note';
 import SaveStatusLight from '@/components/Note/SaveStatusLight';
 import { UploadPipeline, type SaveStatus, type ConnectionState } from '@/components/Note/Pipeline';
 import { useNoteService, useResourceService } from '@/contexts/ServicesContext';
 import type { Block } from '@/types/note';
 import type { NotePageLoadState, NotePageLocationState, NotePageNoteData } from './index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 import styles from './style.module.less';
 
@@ -16,6 +15,7 @@ const NotePage: React.FC = () => {
   const { noteId: resourceIdFromRoute } = useParams<{ noteId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const message = useAppMessage();
   const noteService = useNoteService();
   const resourceService = useResourceService();
   const locationState = location.state as NotePageLocationState | null;
@@ -143,7 +143,7 @@ const NotePage: React.FC = () => {
         // 重命名失败由上层或后续统一处理，此处仅静默
       }
     },
-    [connectionState, noteData, resourceService]
+    [connectionState, noteData, resourceService, message]
   );
 
   // 当连接从 offline 恢复为 online 时，如果存在 pending rename，则补发一次重命名
@@ -174,7 +174,7 @@ const NotePage: React.FC = () => {
       );
     }
     previousConnectionStateRef.current = connectionState;
-  }, [connectionState]);
+  }, [connectionState, message]);
 
   // 清理 Pipeline
   useEffect(() => {

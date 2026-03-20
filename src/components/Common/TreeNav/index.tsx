@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Tree, Spin, Empty, Button, message } from 'antd';
+import { Tree, Spin, Empty, Button } from 'antd';
 import type { TreeProps } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { AiOutlineFolder, AiOutlineTag } from 'react-icons/ai';
@@ -12,6 +12,7 @@ import type { TagTreeNode } from '@/services/Tag/index.type';
 import { getFolderDisplayName } from '@/utils/path';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { NewFolderModal } from '@/components/Drive/Modals';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import type { TreeNavProps } from './index.type';
 import styles from './style.module.less';
 
@@ -191,6 +192,7 @@ const TreeNav: React.FC<TreeNavProps> = ({
 }) => {
   const folderService = useFolderService();
   const tagService = useTagService();
+  const message = useAppMessage();
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedKey, setSelectedKey] = useState<React.Key | null>(defaultSelectedKey ?? null);
@@ -234,7 +236,7 @@ const TreeNav: React.FC<TreeNavProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [rootPath, fetchChildren]);
+  }, [rootPath, fetchChildren, message]);
 
   const loadTagTreeData = useCallback(async (): Promise<void> => {
     const nodes = await tagService.getTagTree(
@@ -256,7 +258,7 @@ const TreeNav: React.FC<TreeNavProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [loadTagTreeData, tagTreeRefreshTrigger]);
+  }, [loadTagTreeData, tagTreeRefreshTrigger, message]);
 
   const handleTagDrop = useCallback(
     async (info: Parameters<NonNullable<TreeProps['onDrop']>>[0]) => {
@@ -290,7 +292,7 @@ const TreeNav: React.FC<TreeNavProps> = ({
         setTagDropLoading(false);
       }
     },
-    [tagService, tagTreeGroupId, loadTagTreeData, onTagTreeStructureChange]
+    [tagService, tagTreeGroupId, loadTagTreeData, onTagTreeStructureChange, message]
   );
 
   useEffect(() => {
@@ -323,7 +325,7 @@ const TreeNav: React.FC<TreeNavProps> = ({
         message.error(parseErrorMessage(err, '加载子节点失败'));
       }
     },
-    [mode, fetchChildren]
+    [mode, fetchChildren, message]
   );
 
   const isTagControlled = mode === 'tag' && tagSelectionControlled;

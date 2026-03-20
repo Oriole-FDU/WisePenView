@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Table, Tag, Dropdown, message } from 'antd';
+import { Table, Tag, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import FileTypeIcon from '@/components/Common/FileTypeIcon';
@@ -10,6 +10,7 @@ import { useResourceService, useNoteService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { RenameFileModal, DeleteFileModal, EditTagModal } from '@/components/Drive/Modals';
 import { useClickFile } from '@/hooks/drive';
+import { useAppMessage } from '@/hooks/useAppMessage';
 import type { FileListProps } from './index.type';
 import styles from './style.module.less';
 
@@ -40,13 +41,13 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
   },
   {
     title: '标签',
-    dataIndex: 'tagNames',
-    key: 'tagNames',
+    dataIndex: 'currentTags',
+    key: 'currentTags',
     width: 200,
-    render: (tagNames?: string[]) =>
-      tagNames?.length ? (
+    render: (currentTags?: string[]) =>
+      currentTags?.length ? (
         <span className={styles.tagList}>
-          {tagNames.map((t) => (
+          {currentTags.map((t) => (
             <Tag variant="outlined" key={t}>
               {t}
             </Tag>
@@ -132,7 +133,9 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
           arrow={{ pointAtCenter: true }}
           getPopupContainer={() => document.body}
           open={props.openDropdownKey === record.resourceId}
-          onOpenChange={(open) => props.setOpenDropdownKey(open ? record.resourceId : null)}
+          onOpenChange={(open) =>
+            props.setOpenDropdownKey(open && record.resourceId != null ? record.resourceId : null)
+          }
         >
           <button
             type="button"
@@ -151,6 +154,7 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
 const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
   const resourceService = useResourceService();
   const noteService = useNoteService();
+  const message = useAppMessage();
   const clickFile = useClickFile();
   const [openDropdownKey, setOpenDropdownKey] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -168,15 +172,17 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
   const fetchList = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await resourceService.getUserResources({
+      const listParams = {
         page,
         size: pageSize,
         sortBy: filter.sortBy,
         sortDir: filter.sortDir,
         tagQueryLogicMode: filter.tagQueryLogicMode,
         ...(filter.tagIds.length > 0 && { tagIds: filter.tagIds }),
-        ...(groupId && { groupId }),
-      });
+      };
+      const res = groupId
+        ? await resourceService.getGroupResources({ ...listParams, groupId })
+        : await resourceService.getUserResources(listParams);
       setList(res.list);
       setTotal(res.total);
     } catch (err) {
@@ -195,6 +201,7 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
     filter.sortDir,
     filter.tagQueryLogicMode,
     filter.tagIds,
+    message,
   ]);
 
   useEffect(() => {
@@ -254,7 +261,7 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
         message.error(parseErrorMessage(err, '创建副本失败'));
       }
     },
-    [noteService, fetchList, clickFile]
+    [noteService, fetchList, clickFile, message]
   );
 
   const handlePageChange = useCallback((newPage: number, newPageSize: number) => {

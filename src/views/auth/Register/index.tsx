@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Checkbox, Form, Typography, Input, Button, Modal, message as antMessage } from 'antd';
+import { Checkbox, Form, Typography, Input, Button, Modal } from 'antd';
 import { RiUserLine, RiLockLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import ServiceAgreement from '@/components/ServiceAgreement/index';
@@ -8,21 +8,22 @@ import { USERNAME_MAX_LENGTH, USERNAME_PATTERN, USERNAME_PATTERN_MESSAGE } from 
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import auth from '../Auth.module.less';
 import type { RegisterRequest } from '@/services/Auth';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const Register: React.FC = () => {
   const authService = useAuthService();
+  const message = useAppMessage();
   const [agreement, setAgreement] = useState(false);
   const [contractOpen, setContractOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
 
   const [form] = Form.useForm<RegisterRequest>();
-  const [messageApi, contextHolder] = antMessage.useMessage();
   const navigate = useNavigate();
 
   const onFinish = async (values: RegisterRequest) => {
     if (!agreement) {
-      messageApi.error('请接受用户协议');
+      message.error('请接受用户协议');
       return;
     }
 
@@ -31,7 +32,7 @@ const Register: React.FC = () => {
       await authService.register(values);
       setSuccessModalOpen(true);
     } catch (err) {
-      messageApi.error(parseErrorMessage(err, '注册失败'));
+      message.error(parseErrorMessage(err, '注册失败'));
     } finally {
       setLoading(false);
     }
@@ -39,7 +40,6 @@ const Register: React.FC = () => {
 
   return (
     <div className={auth.authContainer}>
-      {contextHolder}
       <Typography.Title>注册</Typography.Title>
       <Form layout="vertical" form={form} onFinish={onFinish} requiredMark={false}>
         <Form.Item
