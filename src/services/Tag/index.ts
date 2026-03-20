@@ -1,16 +1,15 @@
 export type { ITagService } from './index.type';
 export type {
   FlatTagTreeNode,
+  FlatTagTreeResponse,
   GetTagTreeRequest,
   TagTreeNode,
   TagTreeResponse,
-  CreateTagRequest,
-  AddTagRequest,
-  ChangeTagRequest,
-  RemoveTagRequest,
-  UpdateTagRequest,
-  MoveTagRequest,
-  DeleteTagRequest,
+  TagCreateRequest,
+  TagUpdateRequest,
+  TagDeleteRequest,
+  TagMoveRequest,
   TagVisibilityMode,
+  TagVisibilityModeString,
 } from './index.type';
 export { TAG_VISIBILITY_MODE } from './index.type';

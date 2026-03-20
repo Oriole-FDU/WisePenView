@@ -12,8 +12,7 @@ import type { IFolderService, GetResByFolderRequest } from './index.type';
 const getFolderTree = async (): Promise<Folder[]> => {
   const res = (await Axios.get('/resource/tag/getTagTree')) as ApiResponse<Folder[]>;
   checkResponse(res);
-  const raw = res.data ?? [];
-  return filterPathTagsOnly(raw);
+  return filterPathTagsOnly(res.data ?? []);
 };
 
 const getFolder = async (path: string): Promise<Folder | null> => {
@@ -54,14 +53,14 @@ const renameFolder = async (folder: Folder, newName: string): Promise<void> => {
   const parts = tagName.split('/').filter(Boolean);
   parts[parts.length - 1] = newName.trim();
   const newPath = '/' + parts.join('/');
-  await TagServicesImpl.changeTag({
+  await TagServicesImpl.updateTag({
     targetTagId: folder.tagId,
     tagName: newPath,
   });
 };
 
 const deleteFolder = async (folder: Folder): Promise<void> => {
-  await TagServicesImpl.removeTag({ targetTagId: folder.tagId });
+  await TagServicesImpl.deleteTag({ targetTagId: folder.tagId });
 };
 
 const createFolder = async (parentPath: string, folderName: string): Promise<void> => {

@@ -33,11 +33,7 @@ const addTag = async (): Promise<string> => {
   return 'tag-new-id';
 };
 
-const changeTag = async (): Promise<void> => {
-  await delay(150);
-};
-
-const removeTag = async (): Promise<void> => {
+const deleteTag = async (): Promise<void> => {
   await delay(150);
 };
 
@@ -50,7 +46,6 @@ export const TagServicesMock: ITagService = {
   getFlatTagTree,
   updateTag,
   addTag,
-  changeTag,
-  removeTag,
+  deleteTag,
   moveTag,
 };

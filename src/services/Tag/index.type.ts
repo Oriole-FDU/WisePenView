@@ -1,127 +1,88 @@
 /**
- * Tag 相关 API 请求/响应类型
- * 与 resource.openapi.json 中 Tag 相关 schema 对齐
+ * Tag 相关类型与 ITagService
+ * 与 docs/apis/resource.openapi.json 中 Tag 相关 schema、路径一致（无字段重命名）
  */
 
 /** TagService 接口：供依赖注入使用 */
 export interface ITagService {
-  getTagTree(params?: GetTagTreeRequest): Promise<TagTreeNode[]>;
-  getFlatTagTree(params?: GetTagTreeRequest): Promise<FlatTagTreeNode[]>;
-  updateTag(params: UpdateTagRequest): Promise<void>;
-  addTag(params: AddTagRequest): Promise<string>;
-  changeTag(params: ChangeTagRequest): Promise<void>;
-  removeTag(params: RemoveTagRequest): Promise<void>;
-  moveTag(params: MoveTagRequest): Promise<void>;
+  getTagTree(params?: GetTagTreeRequest): Promise<TagTreeResponse[]>;
+  getFlatTagTree(params?: GetTagTreeRequest): Promise<FlatTagTreeResponse[]>;
+  updateTag(params: TagUpdateRequest): Promise<void>;
+  addTag(params: TagCreateRequest): Promise<string>;
+  deleteTag(params: TagDeleteRequest): Promise<void>;
+  moveTag(params: TagMoveRequest): Promise<void>;
 }
 
-/** 标签树节点（递归结构，与 OpenAPI TagTreeResponse 一致） */
-export interface TagTreeNode {
-  /** 标签 ID */
-  tagId: string;
-  /** 父节点 ID */
-  parentId?: string;
-  /** 标签名称 */
-  tagName: string;
-  /** 标签描述 */
-  tagDesc?: string;
-  /** 隔离不同用户组的 Tag 树 */
-  groupId?: string;
-  /** 权限配置 1:ALL 2:ONLY_ADMIN 3:WHITELIST 4:BLACKLIST */
-  visibilityMode?: number | null;
-  /** 配合白名单/黑名单使用的 userId 列表 */
-  specifiedUsers?: string[] | null;
-  /** 子节点列表 */
-  children?: TagTreeNode[];
-}
+/** OpenAPI TagTreeResponse.visibilityMode / TagCreateRequest / TagUpdateRequest */
+export type TagVisibilityModeString = '0' | '1' | '2' | '3';
 
-/** 平铺标签节点（无 children，与 getFlatTagTree 返回项一致） */
-export type FlatTagTreeNode = Omit<TagTreeNode, 'children'>;
-
-/** API 返回类型别名，与 OpenAPI TagTreeResponse 对应 */
-export type TagTreeResponse = TagTreeNode;
-
-/** 获取标签树请求参数 */
-export interface GetTagTreeRequest {
-  /** 小组 ID，不传则获取个人标签树 */
-  groupId?: string;
-}
-
-/** 更新标签请求参数（与 TagUpdateRequest 一致） */
-export interface UpdateTagRequest {
-  /** 待更新的标签 ID */
-  targetTagId: string;
-  /** 标签名称 */
-  tagName: string;
-  /** 标签描述 */
-  tagDesc?: string;
-  /** 小组 ID，更新小组标签时必传 */
-  groupId?: string;
-  /** 权限配置 1:ALL 2:ONLY_ADMIN 3:WHITELIST 4:BLACKLIST */
-  visibilityMode?: number | null;
-  /** 配合白名单/黑名单使用的 userId 列表 */
-  specifiedUsers?: string[] | null;
-}
-
-/** 移动/拖拽标签请求参数（与 TagMoveRequest 一致） */
-export interface MoveTagRequest {
-  /** 待移动的标签 ID */
-  targetTagId: string;
-  /** 新的父节点 ID，不传或传空则移至根节点 */
-  newParentId?: string;
-  /** 小组 ID，操作小组标签时必传 */
-  groupId?: string;
-}
-
-/** 删除标签请求参数（与 TagDeleteRequest 一致） */
-export interface DeleteTagRequest {
-  /** 待删除的标签 ID（级联删除其子孙节点） */
-  targetTagId: string;
-  /** 小组 ID，删除小组标签时必传 */
-  groupId?: string;
-}
-
-/**  visibilityMode 字符串枚举，用于创建标签 */
+/** 与 OpenAPI 文档语义对应的别名，值为接口要求的字符串 */
 export const TAG_VISIBILITY_MODE = {
-  ALL: 'ALL',
-  ONLY_ADMIN: 'ONLY_ADMIN',
-  WHITELIST: 'WHITELIST',
-  BLACKLIST: 'BLACKLIST',
-} as const;
+  ALL: '0',
+  ONLY_ADMIN: '1',
+  WHITELIST: '2',
+  BLACKLIST: '3',
+} as const satisfies Record<string, TagVisibilityModeString>;
 
 export type TagVisibilityMode = (typeof TAG_VISIBILITY_MODE)[keyof typeof TAG_VISIBILITY_MODE];
 
-/** 创建标签请求参数（与 OpenAPI TagCreateRequest 一致） */
-export interface AddTagRequest {
-  /** 父节点 ID */
-  parentId?: string;
-  /** 标签名称 */
+/**
+ * 标签树节点（OpenAPI TagTreeResponse）
+ * 接口实际始终返回 tagId、tagName；其余字段与文档一致。children 为树形递归。
+ */
+export interface TagTreeResponse {
+  tagId: string;
   tagName: string;
-  /** 标签描述 */
-  tagDesc?: string;
-  /** 小组 ID */
   groupId?: string;
-  /** 权限配置（小组标签用） */
-  visibilityMode?: TagVisibilityMode;
-  /** 白名单/黑名单 userId 列表 */
+  tagDesc?: string;
+  visibilityMode?: TagVisibilityModeString;
+  specifiedUsers?: string[];
+  parentId?: string;
+  children?: TagTreeResponse[];
+}
+
+/** 领域别名：路径文件夹语义（与 TagTreeResponse 相同结构） */
+export type TagTreeNode = TagTreeResponse;
+
+/** 平铺节点（无 children） */
+export type FlatTagTreeResponse = Omit<TagTreeResponse, 'children'>;
+
+export type FlatTagTreeNode = FlatTagTreeResponse;
+
+/** GET /resource/tag/getTagTree */
+export interface GetTagTreeRequest {
+  groupId?: string;
+}
+
+/** POST /resource/tag/addTag */
+export interface TagCreateRequest {
+  groupId?: string;
+  parentId?: string;
+  tagName: string;
+  tagDesc?: string;
+  visibilityMode?: TagVisibilityModeString;
   specifiedUsers?: string[];
 }
 
-/** 修改标签请求参数（OpenAPI changeTag，使用 targetTagId） */
-export interface ChangeTagRequest {
-  /** 目标标签 ID */
-  targetTagId: string;
-  /** 标签名称 */
-  tagName: string;
-  /** 标签描述 */
+/** POST /resource/tag/changeTag */
+export interface TagUpdateRequest {
+  groupId?: string;
+  tagName?: string;
   tagDesc?: string;
-  groupId?: string;
-}
-
-/** 删除标签请求参数（OpenAPI removeTag） */
-export interface RemoveTagRequest {
+  visibilityMode?: TagVisibilityModeString;
+  specifiedUsers?: string[];
   targetTagId: string;
-  groupId?: string;
 }
 
-/** CreateTagRequest 与 AddTagRequest 等同，用于创建标签 */
-export type CreateTagRequest = AddTagRequest;
+/** POST /resource/tag/removeTag */
+export interface TagDeleteRequest {
+  groupId?: string;
+  targetTagId: string;
+}
+
+/** POST /resource/tag/moveTag */
+export interface TagMoveRequest {
+  groupId?: string;
+  targetTagId: string;
+  newParentId?: string;
+}

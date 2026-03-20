@@ -3,7 +3,7 @@ import { Modal, Button, Form, Input, Popconfirm, Divider } from 'antd';
 import { LuPlus } from 'react-icons/lu';
 import TreeNav from '@/components/Common/TreeNav';
 import { useTagService } from '@/contexts/ServicesContext';
-import type { AddTagRequest, UpdateTagRequest, TagTreeNode } from '@/services/Tag';
+import type { TagCreateRequest, TagUpdateRequest, TagTreeNode } from '@/services/Tag';
 import type { Folder } from '@/types/folder';
 import type { ResourceItem } from '@/types/resource';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -31,9 +31,9 @@ const TagManageModal: React.FC<TagManageModalProps> = ({ open, onCancel, groupId
   const [addChildLoading, setAddChildLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [addRootForm] = Form.useForm<Pick<AddTagRequest, 'tagName' | 'tagDesc'>>();
-  const [editForm] = Form.useForm<Pick<UpdateTagRequest, 'tagName' | 'tagDesc'>>();
-  const [addChildForm] = Form.useForm<Pick<AddTagRequest, 'tagName' | 'tagDesc'>>();
+  const [addRootForm] = Form.useForm<Pick<TagCreateRequest, 'tagName' | 'tagDesc'>>();
+  const [editForm] = Form.useForm<Pick<TagUpdateRequest, 'tagName' | 'tagDesc'>>();
+  const [addChildForm] = Form.useForm<Pick<TagCreateRequest, 'tagName' | 'tagDesc'>>();
 
   const bumpTree = useCallback(() => {
     setTreeRefreshKey((k) => k + 1);
@@ -116,7 +116,7 @@ const TagManageModal: React.FC<TagManageModalProps> = ({ open, onCancel, groupId
     if (!selectedTag?.tagId) return;
     try {
       setDeleteLoading(true);
-      await tagService.removeTag(withGroupId({ targetTagId: selectedTag.tagId }, groupId));
+      await tagService.deleteTag(withGroupId({ targetTagId: selectedTag.tagId }, groupId));
       message.success('标签已删除');
       setSelectedTag(null);
       bumpTree();
