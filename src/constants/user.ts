@@ -43,10 +43,18 @@ export const USER_STATUS_LABELS: Record<number, string> = {
 export const getStatusLabel = (v: number) => USER_STATUS_LABELS[v] ?? String(v);
 
 /** 学历层次（学生用） */
-export const DEGREE_LEVEL = { BACHELOR: 1, MASTER: 2, DOCTOR: 3 } as const;
+export const DEGREE_LEVEL = {
+  UNKNOWN: 0,
+  UNDERGRADUATE: 1,
+  MASTER: 2,
+  DOCTOR: 3,
+} as const;
+export type DegreeLevel = (typeof DEGREE_LEVEL)[keyof typeof DEGREE_LEVEL];
+
 export const DEGREE_LEVEL_LABELS: Record<number, string> = {
-  1: '本科',
-  2: '硕士',
-  3: '博士',
+  [DEGREE_LEVEL.UNKNOWN]: '未知',
+  [DEGREE_LEVEL.UNDERGRADUATE]: '本科',
+  [DEGREE_LEVEL.MASTER]: '硕士',
+  [DEGREE_LEVEL.DOCTOR]: '博士',
 };
 export const getDegreeLevelLabel = (v: number) => DEGREE_LEVEL_LABELS[v] ?? String(v);

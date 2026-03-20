@@ -1,4 +1,5 @@
 import type { User } from '@/types/user';
+import type { DegreeLevel } from '@/constants/user';
 
 /** UserService 接口：供依赖注入使用 */
 export interface IUserService {
@@ -73,7 +74,7 @@ export interface UpdateUserInfoRequest {
   major?: string;
   className?: string;
   enrollmentYear?: string;
-  degreeLevel?: number;
+  degreeLevel?: DegreeLevel;
   academicTitle?: string;
 }
 
@@ -100,7 +101,7 @@ export interface GetUserInfoResponseUserProfile {
   major: string | null;
   className: string | null;
   enrollmentYear: string | null;
-  degreeLevel: number | null;
+  degreeLevel: DegreeLevel | null;
   academicTitle: string | null;
 }
 
