@@ -95,9 +95,27 @@
   gap: var(--ant-margin-lg);
 }
 
+.avatarWrap {
+  flex-shrink: 0;
+  display: inline-flex;
+  cursor: pointer;
+  border-radius: 50%;
+  outline: none;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px var(--ant-color-primary);
+  }
+}
+
 .avatar {
   flex-shrink: 0;
   background-color: var(--ant-color-fill-secondary);
+  border: 1px solid var(--ant-color-border);
   color: var(--ant-color-text);
   font-size: var(--ant-font-size-heading-3);
   font-weight: 500;
@@ -116,13 +134,19 @@
 }
 
 .nickname {
-  font-size: var(--ant-font-size-heading-4);
+  font-size: var(--ant-font-size-heading-3);
   font-weight: 500;
   color: var(--ant-color-text);
 }
 
 .username {
   font-size: var(--ant-font-size-base);
+  color: var(--ant-color-text-secondary);
+}
+
+.avatarModalHint {
+  margin: 0 0 var(--ant-margin-md) 0;
+  font-size: var(--ant-font-size-sm);
   color: var(--ant-color-text-secondary);
 }
 

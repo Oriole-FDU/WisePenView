@@ -110,12 +110,34 @@ const updateUserInfo = async (
   params: Parameters<IUserService['updateUserInfo']>[0]
 ): Promise<void> => {
   await delay(200);
-  const { nickname, realName, ...profileParams } = params;
+  const {
+    nickname,
+    realName,
+    avatar,
+    sex,
+    university,
+    college,
+    major,
+    className,
+    enrollmentYear,
+    degreeLevel,
+    academicTitle,
+  } = params;
   Object.assign(fullUserInfo.userInfo, {
     ...(nickname !== undefined && { nickname }),
     ...(realName !== undefined && { realName }),
+    ...(avatar !== undefined && { avatar }),
   });
-  Object.assign(fullUserInfo.userProfile, profileParams);
+  Object.assign(fullUserInfo.userProfile, {
+    ...(sex !== undefined && { sex }),
+    ...(university !== undefined && { university }),
+    ...(college !== undefined && { college }),
+    ...(major !== undefined && { major }),
+    ...(className !== undefined && { className }),
+    ...(enrollmentYear !== undefined && { enrollmentYear }),
+    ...(degreeLevel !== undefined && { degreeLevel }),
+    ...(academicTitle !== undefined && { academicTitle }),
+  });
 };
 
 const clearUserCache = (): void => {};

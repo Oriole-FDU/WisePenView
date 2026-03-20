@@ -12,7 +12,10 @@ import {
   Radio,
   Select,
   Spin,
+  Tooltip,
+  Upload,
 } from 'antd';
+import type { UploadFile } from 'antd';
 import type { InputRef } from 'antd/es/input';
 import {
   RiCheckLine,
@@ -22,7 +25,7 @@ import {
   RiPencilLine,
   RiShieldUserLine,
 } from 'react-icons/ri';
-import { useUserService } from '@/contexts/ServicesContext';
+import { useImageService, useUserService } from '@/contexts/ServicesContext';
 import type {
   GetUserInfoResponse,
   InitiateUISVerifyRequest,
@@ -39,6 +42,7 @@ import {
   USER_STATUS,
 } from '@/constants/user';
 import { usePendingVerifyEmailStore } from '@/store';
+import { beforeUploadImageWithinLimit } from '@/utils/image';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getProfileFieldConfig, PROFILE_FIELDS } from '../profile.config';
 import type { ProfileFieldKey } from '../profile.config';
@@ -154,6 +158,7 @@ type UisOutcomeState = {
 
 const Account: React.FC = () => {
   const userService = useUserService();
+  const imageService = useImageService();
   const [user, setUser] = useState<GetUserInfoResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -166,6 +171,9 @@ const Account: React.FC = () => {
   const uisPollAbortRef = useRef<AbortController | null>(null);
   const [form] = Form.useForm<ProfileFormValues>();
   const [verifyForm] = Form.useForm<VerifyModalFormValues>();
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [avatarFileList, setAvatarFileList] = useState<UploadFile[]>([]);
+  const [avatarSubmitting, setAvatarSubmitting] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -266,6 +274,51 @@ const Account: React.FC = () => {
       form.resetFields();
     }
     setEditMode(false);
+  };
+
+  const openAvatarModal = () => {
+    setAvatarFileList([]);
+    setAvatarModalOpen(true);
+  };
+
+  const handleAvatarModalCancel = () => {
+    setAvatarFileList([]);
+    setAvatarModalOpen(false);
+  };
+
+  const handleAvatarModalOk = async () => {
+    const raw = avatarFileList[0]?.originFileObj;
+    if (!(raw instanceof File)) {
+      message.warning('请选择头像图片');
+      return Promise.reject(new Error('no_avatar_file'));
+    }
+    if (!user) {
+      message.error('用户信息未加载，请稍后重试');
+      return Promise.reject(new Error('no_user'));
+    }
+    setAvatarSubmitting(true);
+    try {
+      const { publicUrl } = await imageService.uploadImage({
+        file: raw,
+        isPublic: true,
+        bizPath: 'user/avatar',
+      });
+      await userService.updateUserInfo({
+        nickname: user.userInfo.nickname ?? undefined,
+        realName: user.userInfo.realName ?? undefined,
+        avatar: publicUrl,
+      });
+      const data = await userService.getFullUserInfo();
+      setUser(data);
+      form.setFieldsValue(buildProfileFormValues(data));
+      message.success('头像已更新');
+      setAvatarFileList([]);
+      setAvatarModalOpen(false);
+    } catch (err: unknown) {
+      message.error(parseErrorMessage(err, '头像更新失败'));
+    } finally {
+      setAvatarSubmitting(false);
+    }
   };
 
   const handleVerify = () => {
@@ -422,9 +475,29 @@ const Account: React.FC = () => {
           {/* 头部信息 */}
           <div className={layout.accountHeader}>
             <div className={layout.accountHeaderLeft}>
-              <Avatar size={64} className={layout.avatar}>
-                {avatarLetter}
-              </Avatar>
+              <Tooltip title="修改头像">
+                <span
+                  className={layout.avatarWrap}
+                  role="button"
+                  tabIndex={0}
+                  onClick={openAvatarModal}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openAvatarModal();
+                    }
+                  }}
+                >
+                  <Avatar
+                    size={96}
+                    draggable={false}
+                    className={layout.avatar}
+                    src={user?.userInfo?.avatar ?? undefined}
+                  >
+                    {avatarLetter}
+                  </Avatar>
+                </span>
+              </Tooltip>
               <div className={layout.accountInfo}>
                 <div className={layout.nameRow}>
                   <span className={layout.nickname}>{nickname}</span>
@@ -729,6 +802,30 @@ const Account: React.FC = () => {
             )}
           </div>
         )}
+      </Modal>
+
+      <Modal
+        title="更换头像"
+        open={avatarModalOpen}
+        onCancel={handleAvatarModalCancel}
+        destroyOnHidden
+        confirmLoading={avatarSubmitting}
+        okText="上传并保存"
+        cancelText="取消"
+        onOk={handleAvatarModalOk}
+        width={440}
+      >
+        <p className={layout.avatarModalHint}>支持 JPG、PNG、GIF、WebP，单张不超过 5MB。</p>
+        <Upload
+          name="avatar"
+          accept="image/*"
+          maxCount={1}
+          fileList={avatarFileList}
+          beforeUpload={beforeUploadImageWithinLimit}
+          onChange={({ fileList }) => setAvatarFileList(fileList)}
+        >
+          <Button type="default">选择图片</Button>
+        </Upload>
       </Modal>
     </div>
   );

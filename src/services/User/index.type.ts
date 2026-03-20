@@ -65,6 +65,8 @@ export interface PollFudanUISVerifyOptions {
 export interface UpdateUserInfoRequest {
   nickname?: string;
   realName?: string;
+  /** 头像 URL（图床上传后的公开地址，与后端 UserInfoUpdateRequest.avatar 对齐） */
+  avatar?: string;
   sex?: number;
   university?: string | null;
   college?: string;

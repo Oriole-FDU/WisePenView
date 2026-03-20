@@ -49,29 +49,40 @@ const getUserInfo = async (options?: { forceRefresh?: boolean }): Promise<User> 
   return cachedUserInfo;
 };
 
-/** 更新用户信息：仅两次 PUT，不与 GET 耦合；成功后使展示缓存失效，侧栏等下次 getUserInfo 会重新拉取 */
+/** 更新用户信息：按实际传入字段分别 PUT，避免「只改头像」时带空 body 误伤资料表 */
 const updateUserInfo = async (params: UpdateUserInfoRequest): Promise<void> => {
-  const userInfoPayload = {
-    nickname: params.nickname,
-    realName: params.realName,
-  };
-  const userProfilePayload = {
-    sex: params.sex,
-    university: params.university,
-    college: params.college,
-    major: params.major,
-    className: params.className,
-    enrollmentYear: params.enrollmentYear,
-    degreeLevel: params.degreeLevel,
-    academicTitle: params.academicTitle,
-  };
+  const userInfoPayload: Record<string, string | undefined> = {};
+  if (params.nickname !== undefined) userInfoPayload.nickname = params.nickname;
+  if (params.realName !== undefined) userInfoPayload.realName = params.realName;
+  if (params.avatar !== undefined) userInfoPayload.avatar = params.avatar;
 
-  const [resInfo, resProfile] = await Promise.all([
-    Axios.put('/user/changeUserInfo', userInfoPayload) as Promise<ApiResponse<unknown>>,
-    Axios.put('/user/changeUserProfile', userProfilePayload) as Promise<ApiResponse<unknown>>,
-  ]);
-  checkResponse(resInfo);
-  checkResponse(resProfile);
+  const userProfilePayload: Record<string, string | number | null | undefined> = {};
+  if (params.sex !== undefined) userProfilePayload.sex = params.sex;
+  if (params.university !== undefined) userProfilePayload.university = params.university;
+  if (params.college !== undefined) userProfilePayload.college = params.college;
+  if (params.major !== undefined) userProfilePayload.major = params.major;
+  if (params.className !== undefined) userProfilePayload.className = params.className;
+  if (params.enrollmentYear !== undefined)
+    userProfilePayload.enrollmentYear = params.enrollmentYear;
+  if (params.degreeLevel !== undefined) userProfilePayload.degreeLevel = params.degreeLevel;
+  if (params.academicTitle !== undefined) userProfilePayload.academicTitle = params.academicTitle;
+
+  const tasks: Promise<ApiResponse<unknown>>[] = [];
+  if (Object.keys(userInfoPayload).length > 0) {
+    tasks.push(Axios.put('/user/changeUserInfo', userInfoPayload) as Promise<ApiResponse<unknown>>);
+  }
+  if (Object.keys(userProfilePayload).length > 0) {
+    tasks.push(
+      Axios.put('/user/changeUserProfile', userProfilePayload) as Promise<ApiResponse<unknown>>
+    );
+  }
+  if (tasks.length === 0) {
+    return;
+  }
+  const results = await Promise.all(tasks);
+  results.forEach((res) => {
+    checkResponse(res);
+  });
 
   cachedUserInfo = null;
 };
