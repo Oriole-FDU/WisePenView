@@ -4,7 +4,7 @@ import type { ResourceItem } from '@/types/resource';
 import { useRecentFilesStore } from '@/store';
 
 /**
- * 根据资源类型决定打开方式：NOTE 跳转编辑器，其他类型预览
+ * 根据资源类型：NOTE 跳转笔记编辑器，其他类型跳转站内 PDF 预览（/app/pdf/:resourceId）
  * 点击文件会加入最近使用列表
  */
 export const useClickFile = () => {
@@ -13,7 +13,7 @@ export const useClickFile = () => {
 
   const openResource = useCallback(
     (item: ResourceItem) => {
-      const { resourceId, resourceName, resourceType, preview } = item;
+      const { resourceId, resourceName, resourceType } = item;
       if (resourceId == null || resourceId === '') return;
       addFile({
         resourceId,
@@ -23,10 +23,7 @@ export const useClickFile = () => {
       if (resourceType === 'NOTE') {
         navigate(`/app/note/${resourceId}`);
       } else {
-        if (preview) {
-          window.open(preview, '_blank');
-        }
-        // TODO: 其他类型的预览逻辑
+        navigate(`/app/pdf/${encodeURIComponent(resourceId)}`);
       }
     },
     [navigate, addFile]

@@ -28,6 +28,7 @@ import React, { createContext, useContext } from 'react';
 
 // 第一步：导入该服务的接口类型
 import type { IAuthService } from '@/services/Auth';
+import type { IDocumentService } from '@/services/Document';
 import type { IFolderService } from '@/services/Folder';
 import type { IGroupService } from '@/services/Group';
 import type { IImageService } from '@/services/Image';
@@ -39,6 +40,7 @@ import type { IUserService } from '@/services/User';
 
 // 第二步：导入真实实现（*Services.impl.ts，调用后端 API）
 import { AuthServicesImpl } from '@/services/Auth/AuthServices.impl';
+import { DocumentServicesImpl } from '@/services/Document/DocumentServices.impl';
 import { FolderServicesImpl } from '@/services/Folder/FolderServices.impl';
 import { GroupServicesImpl } from '@/services/Group/GroupServices.impl';
 import { ImageServicesImpl } from '@/services/Image/ImageServices.impl';
@@ -50,6 +52,7 @@ import { UserServicesImpl } from '@/services/User/UserServices.impl';
 
 // 第三步：导入 Mock 实现（src/mocks/Xxx/XxxServices.mock.ts，用于 MODE === 'mock' 时）
 import { AuthServicesMock } from '@/mocks/Auth/AuthServices.mock';
+import { DocumentServicesMock } from '@/mocks/Document/DocumentServices.mock';
 import { FolderServicesMock } from '@/mocks/Folder/FolderServices.mock';
 import { GroupServicesMock } from '@/mocks/Group/GroupServices.mock';
 import { ImageServicesMock } from '@/mocks/Image/ImageServices.mock';
@@ -63,6 +66,7 @@ import { UserServicesMock } from '@/mocks/User/UserServices.mock';
 // Context 通过此 interface 与 Service/Mock 层约定「有哪些服务可被注入」
 export interface ServicesContextValue {
   auth: IAuthService;
+  document: IDocumentService;
   folder: IFolderService;
   group: IGroupService;
   image: IImageService;
@@ -76,6 +80,7 @@ export interface ServicesContextValue {
 // 第五步：在 servicesValue 中绑定真实实现
 const servicesValue: ServicesContextValue = {
   auth: AuthServicesImpl,
+  document: DocumentServicesImpl,
   folder: FolderServicesImpl,
   group: GroupServicesImpl,
   image: ImageServicesImpl,
@@ -89,6 +94,7 @@ const servicesValue: ServicesContextValue = {
 // 第六步：在 mockServicesValue 中绑定 Mock 实现
 const mockServicesValue: ServicesContextValue = {
   auth: AuthServicesMock,
+  document: DocumentServicesMock,
   folder: FolderServicesMock,
   group: GroupServicesMock,
   image: ImageServicesMock,
@@ -101,6 +107,7 @@ const mockServicesValue: ServicesContextValue = {
 
 // 第七步：导出 useXxxService hook，组件内通过 useOrderService() 等获取实例
 export const useAuthService = (): IAuthService => useServicesContext().auth;
+export const useDocumentService = (): IDocumentService => useServicesContext().document;
 export const useFolderService = (): IFolderService => useServicesContext().folder;
 export const useGroupService = (): IGroupService => useServicesContext().group;
 export const useImageService = (): IImageService => useServicesContext().image;

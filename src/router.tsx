@@ -110,7 +110,7 @@ const router = createBrowserRouter([
         element: <DrivePreview />,
       },
       {
-        path: 'pdf',
+        path: 'pdf/:resourceId',
         element: <Pdf />,
       },
       {
