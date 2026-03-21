@@ -18,6 +18,4 @@ export interface MemberListTableProps {
   onTotalChange?: (total: number) => void;
   /** 变化时触发重新拉取成员列表（如编辑权限、删除成员、分配配额成功后递增） */
   refreshTrigger?: number;
-  /** 预览模式：传入后使用 mock 数据，跳过 API 请求 */
-  mockMembers?: GroupMember[];
 }

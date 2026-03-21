@@ -24,7 +24,7 @@ export const API_MY_ROLE_MAP: Record<number, 'OWNER' | 'ADMIN' | 'MEMBER'> = {
   2: 'MEMBER',
 };
 
-/** 角色文案（供 TableConfig、PermissionConfigPreview 等复用） */
+/** 角色文案（供 TableConfig 等复用） */
 export const ROLE_LABEL: Record<string, string> = {
   MEMBER: '成员',
   ADMIN: '管理员',

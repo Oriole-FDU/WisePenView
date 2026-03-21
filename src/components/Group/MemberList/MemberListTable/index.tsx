@@ -20,20 +20,18 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
   onSelectedMembersChange,
   onTotalChange,
   refreshTrigger,
-  mockMembers,
 }) => {
   const groupService = useGroupService();
   const message = useAppMessage();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(pagination?.defaultPageSize ?? 5);
   const [loading, setLoading] = useState(false);
-  const [members, setMembers] = useState<GroupMember[]>(mockMembers ?? []);
-  const [total, setTotal] = useState(mockMembers?.length ?? 0);
+  const [members, setMembers] = useState<GroupMember[]>([]);
+  const [total, setTotal] = useState(0);
 
   const selectedMembersMapRef = useRef<Map<string, GroupMember>>(new Map());
 
   const fetchMembers = async (page: number, size: number) => {
-    if (mockMembers != null) return;
     try {
       setLoading(true);
       const { members: newMembers, total: newTotal } = await groupService.fetchGroupMembers(
@@ -52,25 +50,17 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
   };
 
   useEffect(() => {
-    if (mockMembers != null) {
-      setMembers(mockMembers);
-      setTotal(mockMembers.length);
-      onTotalChange?.(mockMembers.length);
-      return;
-    }
     fetchMembers(1, pageSize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, mockMembers]);
+  }, [groupId]);
 
   useEffect(() => {
-    if (mockMembers != null) return;
     setCurrentPage(1);
     fetchMembers(1, pageSize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize]);
 
   useEffect(() => {
-    if (mockMembers != null) return;
     if (refreshTrigger != null && refreshTrigger > 0) {
       fetchMembers(currentPage, pageSize);
     }

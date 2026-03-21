@@ -124,11 +124,6 @@ const router = createBrowserRouter([
         path: 'profile/account',
         element: <Account />,
       },
-      // 权限配置预览（界面保留，需要时取消注释）
-      // {
-      //   path: 'permission-preview',
-      //   element: <PermissionConfigPreview />, // lazy: import('@/views/group/PermissionConfigPreview')
-      // },
       //   // 具体文档编辑页 (例如 /app/editor/123)
       //   {
       //     path: 'editor/:id',

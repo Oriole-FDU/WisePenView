@@ -196,17 +196,4 @@ export const canEditSelectedMembersForQuota = (
 /** 选中有不可编辑成员时的提示文案（权限/删除） */
 export const UNAUTHORIZED_TARGET_MESSAGE = '您不能编辑组长/管理员的权限/配额。';
 
-/** 用于遍历全部配置（组类型 × 角色） */
-export const PERMISSION_CONFIG_ENTRIES: readonly [number, string][] = [
-  [GROUP_TYPE.NORMAL, 'MEMBER'],
-  [GROUP_TYPE.NORMAL, 'ADMIN'],
-  [GROUP_TYPE.NORMAL, 'OWNER'],
-  [GROUP_TYPE.ADVANCED, 'MEMBER'],
-  [GROUP_TYPE.ADVANCED, 'ADMIN'],
-  [GROUP_TYPE.ADVANCED, 'OWNER'],
-  [GROUP_TYPE.PUBLIC, 'MEMBER'],
-  [GROUP_TYPE.PUBLIC, 'ADMIN'],
-  [GROUP_TYPE.PUBLIC, 'OWNER'],
-];
-
 export default PermissionConfigs;

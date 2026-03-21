@@ -17,7 +17,6 @@ const MemberList: React.FC<MemberListProps> = ({
   pagination,
   groupId,
   inviteCode,
-  mockMembers,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
@@ -81,7 +80,6 @@ const MemberList: React.FC<MemberListProps> = ({
         onSelectedMembersChange={setSelectedMembersList}
         onTotalChange={setTotal}
         refreshTrigger={refreshTrigger}
-        mockMembers={mockMembers}
       />
 
       <InviteUserModal
