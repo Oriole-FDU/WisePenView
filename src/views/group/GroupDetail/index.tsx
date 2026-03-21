@@ -69,7 +69,7 @@ const GroupDetail: React.FC = () => {
   const [exitGroupModalOpen, setExitGroupModalOpen] = useState(false);
 
   const permissionConfig = useMemo(
-    () => (group ? getPermissionConfig(getGroupTypeLabel(group.groupType), currentUserRole) : null),
+    () => (group ? getPermissionConfig(group.groupType, currentUserRole) : null),
     [group, currentUserRole]
   );
 

@@ -31,10 +31,10 @@ export interface PermissionConfig {
   canRemoveMember: boolean;
 }
 
-const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
-  NORMAL: {
+const PermissionConfigs: Record<number, Record<string, PermissionConfig>> = {
+  [GROUP_TYPE.NORMAL]: {
     MEMBER: {
-      groupType: 1,
+      groupType: GROUP_TYPE.NORMAL,
       userRole: 'MEMBER',
       showRealName: false,
       showQuotas: false,
@@ -46,7 +46,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: false,
     },
     ADMIN: {
-      groupType: 1,
+      groupType: GROUP_TYPE.NORMAL,
       userRole: 'ADMIN',
       showRealName: false,
       showQuotas: false,
@@ -58,7 +58,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: true,
     },
     OWNER: {
-      groupType: 1,
+      groupType: GROUP_TYPE.NORMAL,
       userRole: 'OWNER',
       showRealName: false,
       showQuotas: false,
@@ -70,9 +70,9 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: true,
     },
   },
-  ADVANCED: {
+  [GROUP_TYPE.ADVANCED]: {
     MEMBER: {
-      groupType: 2,
+      groupType: GROUP_TYPE.ADVANCED,
       userRole: 'MEMBER',
       showRealName: true,
       showQuotas: false,
@@ -84,7 +84,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: false,
     },
     ADMIN: {
-      groupType: 2,
+      groupType: GROUP_TYPE.ADVANCED,
       userRole: 'ADMIN',
       showRealName: true,
       showQuotas: true,
@@ -96,7 +96,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: true,
     },
     OWNER: {
-      groupType: 2,
+      groupType: GROUP_TYPE.ADVANCED,
       userRole: 'OWNER',
       showRealName: true,
       showQuotas: true,
@@ -108,9 +108,9 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: true,
     },
   },
-  PUBLIC: {
+  [GROUP_TYPE.PUBLIC]: {
     MEMBER: {
-      groupType: 3,
+      groupType: GROUP_TYPE.PUBLIC,
       userRole: 'MEMBER',
       showRealName: true,
       showQuotas: false,
@@ -122,7 +122,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: false,
     },
     ADMIN: {
-      groupType: 3,
+      groupType: GROUP_TYPE.PUBLIC,
       userRole: 'ADMIN',
       showRealName: true,
       showQuotas: true,
@@ -134,7 +134,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
       canRemoveMember: true,
     },
     OWNER: {
-      groupType: 3,
+      groupType: GROUP_TYPE.PUBLIC,
       userRole: 'OWNER',
       showRealName: true,
       showQuotas: true,
@@ -148,7 +148,7 @@ const PermissionConfigs: Record<string, Record<string, PermissionConfig>> = {
   },
 };
 
-export const getPermissionConfig = (groupType: string, userRole: string): PermissionConfig => {
+export const getPermissionConfig = (groupType: number, userRole: string): PermissionConfig => {
   const config = PermissionConfigs[groupType]?.[userRole];
 
   return (
