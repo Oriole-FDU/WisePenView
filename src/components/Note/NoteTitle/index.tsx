@@ -7,6 +7,8 @@ import { zh } from '@blocknote/core/locales';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
+import { useNoteService } from '@/contexts/ServicesContext';
+
 import type { NoteTitleProps } from './index.type';
 import styles from './style.module.less';
 
@@ -54,17 +56,12 @@ function toHeadingBlock(block: BlockNoteBlock | undefined): BlockNoteBlock[] {
   return [normalized];
 }
 
-const NoteTitle: React.FC<NoteTitleProps> = ({
-  initialBlock,
-  onEnterKey,
-  focusOnMount,
-  onTitleStable,
-}) => {
+const NoteTitle: React.FC<NoteTitleProps> = ({ id, onEnterKey, focusOnMount }) => {
+  const noteService = useNoteService();
   const titleDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const initialContent = useMemo(
-    () => toHeadingBlock(initialBlock as unknown as BlockNoteBlock | undefined),
-    [initialBlock]
-  );
+
+  /** 云端拉取标题未接前：空 H1；后续可与笔记详情接口返回的标题对齐后由上层驱动更新策略 */
+  const initialContent = useMemo(() => toHeadingBlock(undefined), []);
 
   const editor = useCreateBlockNote({
     initialContent,
@@ -75,38 +72,45 @@ const NoteTitle: React.FC<NoteTitleProps> = ({
         heading: '请输入标题',
       },
     },
+    trailingBlock: false,
   });
 
   useEffect(() => {
     if (!focusOnMount) return;
-    const id = setTimeout(() => editor.focus(), 0);
-    return () => clearTimeout(id);
+    const timer = setTimeout(() => {
+      editor.focus();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [editor, focusOnMount]);
 
+  /** 标题稳定后调用 NoteService.syncTitle（与 Pipeline 防抖一致） */
   const triggerTitleDebounceTimer = useCallback(() => {
+    if (!id) return;
     if (titleDebounceTimerRef.current) {
       clearTimeout(titleDebounceTimerRef.current);
       titleDebounceTimerRef.current = null;
     }
-    if (!onTitleStable) return;
     titleDebounceTimerRef.current = setTimeout(() => {
       titleDebounceTimerRef.current = null;
       const firstBlock = editor.document[0];
       const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
       const trimmed = raw.trim();
-      if (trimmed) onTitleStable(trimmed);
+      if (!trimmed) return;
+      void noteService.syncTitle({ resourceId: id, newName: trimmed }).catch(() => {
+        // 后续可接全局错误提示
+      });
     }, TITLE_DEBOUNCE_MS);
-  }, [editor, onTitleStable]);
+  }, [editor, id, noteService]);
 
   useEffect(() => {
-    if (!onTitleStable) return;
+    if (!id) return;
     const cleanup = editor.onChange(() => {
       const firstBlock = editor.document[0];
       if (!firstBlock) return;
       triggerTitleDebounceTimer();
     });
     return cleanup;
-  }, [editor, onTitleStable, triggerTitleDebounceTimer]);
+  }, [editor, id, triggerTitleDebounceTimer]);
 
   useEffect(() => {
     return () => {
@@ -117,6 +121,7 @@ const NoteTitle: React.FC<NoteTitleProps> = ({
     };
   }, []);
 
+  // 防止标题被删除或修改
   useEffect(() => {
     const cleanup = editor.onBeforeChange(({ getChanges }) => {
       const firstBlock = editor.document[0];
@@ -142,6 +147,7 @@ const NoteTitle: React.FC<NoteTitleProps> = ({
     return cleanup;
   }, [editor]);
 
+  // 关注点迁移
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -183,8 +189,18 @@ const NoteTitle: React.FC<NoteTitleProps> = ({
   };
 
   return (
-    <div className={styles.titleWrapper} onKeyDownCapture={handleKeyDown}>
-      <BlockNoteView editor={editor} theme="light" sideMenu={false} slashMenu={false} />
+    <div className={styles.wrapper} onKeyDownCapture={handleKeyDown}>
+      <BlockNoteView
+        editor={editor}
+        theme="light"
+        sideMenu={false}
+        slashMenu={false}
+        formattingToolbar={false}
+        linkToolbar={false}
+        filePanel={false}
+        tableHandles={false}
+        emojiPicker={false}
+      />
     </div>
   );
 };

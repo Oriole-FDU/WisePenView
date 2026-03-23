@@ -5,7 +5,7 @@ import { usePdfPreviewProgressStore, useRecentFilesStore } from '@/store';
 
 /**
  * 根据资源类型：NOTE 跳转笔记编辑器，其他类型跳转站内 PDF 预览（/app/pdf/:resourceId）
- * 点击文件会加入最近使用列表
+ * 点击文件会加入最近使用列表。
  */
 export const useClickFile = () => {
   const navigate = useNavigate();

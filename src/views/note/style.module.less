@@ -1,66 +1,48 @@
-.pageContainer {
+/* 与 `views/drive/Drive` 的 `.pageContainer` 一致：与 SystemLayout 中间区边缘留出间距，内容区居中限宽 */
+.root {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 100%;
-  background: var(--ant-color-bg-container);
+  width: 100%;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--ant-padding-lg) var(--ant-padding-xl);
 }
 
-.header {
+.pageHeader {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--ant-padding-md) var(--ant-padding-xl);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  margin-bottom: var(--ant-margin-lg);
 }
 
 .backLink {
   display: inline-flex;
   align-items: center;
   gap: var(--ant-margin-xs);
+  margin-bottom: var(--ant-margin-md);
   color: var(--ant-color-text-secondary);
   text-decoration: none;
   font-size: var(--ant-font-size);
-  transition: color 0.2s;
 
   &:hover {
     color: var(--ant-color-text);
   }
 }
 
-.editorArea {
+.pageHeading {
+  margin: 0 !important;
+}
+
+.titleDivider {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.body {
   flex: 1;
   min-height: 0;
-  max-width: 900px;
-  width: 100%;
-}
-
-.loadingContainer,
-.errorContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--ant-color-text-secondary);
-  font-size: var(--ant-font-size);
-}
-
-.errorContainer {
-  gap: var(--ant-margin-md);
-
-  button {
-    padding: var(--ant-padding-xs) var(--ant-padding-md);
-    border: 1px solid var(--ant-color-border);
-    border-radius: var(--ant-border-radius);
-    background: var(--ant-color-bg-container);
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      border-color: var(--ant-color-primary);
-      color: var(--ant-color-primary);
-    }
-  }
+  /* 与上方 Divider 拉开距离，避免正文编辑器贴线 */
+  margin-top: var(--ant-margin-lg);
 }

@@ -1,8 +1,14 @@
-@import '../style.module.less';
-
-.titleWrapper {
-  max-width: @note-content-max-width;
+.wrapper {
+  flex-shrink: 0;
   width: 100%;
-  margin: var(--ant-margin-lg) auto;
-  padding: var(--ant-padding-lg) @note-content-padding-x 0;
+  min-height: 0;
+
+  /* 单行视觉：限制块级高度，避免换行撑开过多区域 */
+  :global(.bn-editor) {
+    padding-block: var(--ant-padding-xs);
+  }
+
+  :global(.bn-block-outer) {
+    margin-block: 0;
+  }
 }
