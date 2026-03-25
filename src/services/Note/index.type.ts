@@ -6,6 +6,7 @@
 import type { SyncPayload, Block } from '@/types/note';
 
 /** NoteService 接口：供依赖注入使用 */
+/** web-socket服务放在了yjs目录下 */
 export interface INoteService {
   syncTitle(params: SyncTitleRequest): Promise<void>;
 }

@@ -1,10 +1,40 @@
-/* 与 `views/drive/Drive` 的 `.pageContainer` 一致：与 SystemLayout 中间区边缘留出间距，内容区居中限宽 */
+/* 相对 SystemLayout.middleContent（position: relative）铺满中间栏，不盖住侧栏与右侧面板 */
+.pageWrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 会话未就绪时仍挂载子树（跑 Yjs / BlockNote），但不交互、不可见 */
+.noteContent {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.noteContentVisible {
+  overflow-y: auto;
+  opacity: 1;
+  pointer-events: auto;
+  user-select: auto;
+}
+
 .root {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  min-height: 100vh;
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--ant-padding-lg) var(--ant-padding-xl);
@@ -38,11 +68,31 @@
   margin: 0;
 }
 
+.wsAlert {
+  flex-shrink: 0;
+  margin-bottom: var(--ant-margin-lg);
+}
+
 .body {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  /* 与上方 Divider 拉开距离，避免正文编辑器贴线 */
   margin-top: var(--ant-margin-lg);
+}
+
+/* 仅盖住中间栏可视区域（pageWrap 即 middleContent 一屏范围） */
+.middleOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ant-color-bg-container);
+}
+
+.middleOverlayInner {
+  max-width: 480px;
+  padding: var(--ant-padding-lg);
 }
