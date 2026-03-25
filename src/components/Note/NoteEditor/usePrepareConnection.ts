@@ -4,13 +4,13 @@ import { IndexeddbPersistence } from 'y-indexeddb';
 
 import { WisepenProvider, noteYjsIdbRoomName } from '@/services/Note/yjs';
 
-import type { NoteYjsEditorProps } from './index.type';
+import type { NoteEditorProps } from './index.type';
 import type { SessionConnectionCallbacks } from '@/services/Note/yjs/WisepenProvider';
 
 const SESSION_CONNECT_TIMEOUT_MS = 5_000;
 
 export type UsePrepareConnectionParams = Pick<
-  NoteYjsEditorProps,
+  NoteEditorProps,
   'resourceId' | 'userId' | 'onSessionReady' | 'onSessionError' | 'onSessionStatusChange'
 >;
 
@@ -135,6 +135,6 @@ export function usePrepareConnection({
     };
   }, [resourceId, userId]);
 
-  // 供 NoteYjsEditor 使用；未就绪前为 null
+  // 供 NoteEditor 使用；未就绪前为 null
   return { doc, provider };
 }

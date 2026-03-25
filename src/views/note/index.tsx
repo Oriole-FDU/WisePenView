@@ -15,8 +15,8 @@ import { Link, useParams } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';
 import clsx from 'clsx';
 
-import NoteYjsEditor from '@/components/Note/YjsEditor';
-import type { NoteYjsEditorHandle } from '@/components/Note/YjsEditor/index.type';
+import NoteEditor from '@/components/Note/NoteEditor';
+import type { NoteEditorHandle } from '@/components/Note/NoteEditor/index.type';
 import NoteTitle from '@/components/Note/NoteTitle';
 import { useUserService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -42,7 +42,7 @@ const NoteView: React.FC = () => {
   const [sessionErrorMessage, setSessionErrorMessage] = useState<string | null>(null);
   const [editorRetryToken, setEditorRetryToken] = useState(0);
   const [sessionStatus, setSessionStatus] = useState<'connected' | 'disconnected'>('disconnected');
-  const bodyEditorRef = useRef<NoteYjsEditorHandle>(null);
+  const bodyEditorRef = useRef<NoteEditorHandle>(null);
 
   const loadUser = useCallback(async () => {
     if (devFixedUserId) {
@@ -119,7 +119,7 @@ const NoteView: React.FC = () => {
               title="无法打开笔记"
               extra={
                 <Link to="/app/drive">
-                  <Button type="primary">返回云盘</Button>
+                  <Button type="default">返回云盘</Button>
                 </Link>
               }
             />
@@ -154,7 +154,7 @@ const NoteView: React.FC = () => {
             <NoteTitle id={noteId} focusOnMount={editorSessionReady} onEnterKey={focusBody} />
             <Divider className={styles.titleDivider} />
             <div className={styles.body}>
-              <NoteYjsEditor
+              <NoteEditor
                 key={editorRetryToken}
                 ref={bodyEditorRef}
                 resourceId={resourceId}
@@ -178,7 +178,7 @@ const NoteView: React.FC = () => {
               title="加载失败"
               subTitle={userLoad.message}
               extra={
-                <Button type="primary" onClick={retryUser}>
+                <Button type="default" onClick={retryUser}>
                   重试
                 </Button>
               }

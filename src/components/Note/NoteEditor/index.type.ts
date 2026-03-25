@@ -1,9 +1,9 @@
 /** 供笔记页正文与标题之间的焦点链使用 */
-export interface NoteYjsEditorHandle {
+export interface NoteEditorHandle {
   focus: () => void;
 }
 
-export interface NoteYjsEditorProps {
+export interface NoteEditorProps {
   resourceId: string;
   userId: string;
   /** Yjs / WebSocket 会话可用（如已 connected）时调用，至多一次 */

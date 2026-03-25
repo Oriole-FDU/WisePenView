@@ -19,6 +19,7 @@ const ResetPassword = lazy(() => import('@/views/auth/ResetPassword'));
 const NewPassword = lazy(() => import('@/views/auth/NewPassword'));
 const VerifyEmail = lazy(() => import('@/views/auth/VerifyEmail'));
 const NoteView = lazy(() => import('@/views/note'));
+const NoteBlockNoteDemo = lazy(() => import('@/views/note/Demo'));
 const Pdf = lazy(() => import('@/views/pdf'));
 
 const router = createBrowserRouter([
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
       {
         path: 'note/:noteId',
         element: <NoteView />,
+      },
+      {
+        path: 'note-demo',
+        element: <NoteBlockNoteDemo />,
       },
       // 文档与云盘页
       {

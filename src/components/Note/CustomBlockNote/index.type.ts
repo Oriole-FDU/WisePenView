@@ -2,7 +2,8 @@ import type { Doc } from 'yjs';
 
 import type { WisepenProvider } from '@/services/Note/yjs/WisepenProvider';
 
-export interface NoteYjsBlockNoteProps {
+export interface CustomBlockNoteProps {
+  resourceId: string;
   doc: Doc;
   provider: WisepenProvider;
   userId: string;
