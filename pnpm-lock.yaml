@@ -20,6 +20,9 @@ importers:
       '@lobehub/icons':
         specifier: ^2.45.0
         version: 2.45.0(@babel/core@7.28.5)(@types/mdast@4.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(antd@6.1.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(framer-motion@12.23.26(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(micromark-util-types@2.0.2)(micromark@4.0.2)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@tiptap/pm':
+        specifier: 3.20.1
+        version: 3.20.1
       '@types/spark-md5':
         specifier: ^3.0.5
         version: 3.0.5

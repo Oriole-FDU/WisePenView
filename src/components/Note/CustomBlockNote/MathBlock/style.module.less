@@ -1,25 +1,128 @@
-.mathRoot {
-  cursor: pointer;
-  min-height: 24px;
-  padding: 8px;
+.mathShell {
+  position: relative;
+  width: 100%;
   box-sizing: border-box;
 }
 
+.mathShellInline {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  vertical-align: baseline;
+}
+
+.mathShellBlock {
+  display: block;
+}
+
+.mathRoot {
+  cursor: pointer;
+  min-height: 32px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  outline: none;
+
+  &:focus,
+  &:focus-visible,
+  &:focus-within {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.mathRootInline {
+  min-height: auto;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+
 .mathPreview {
+  min-height: 1.25em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.mathPreviewInline {
   min-height: 1em;
+  justify-content: flex-start;
+  text-align: left;
+
+  :global(.katex) {
+    font-size: 1em;
+  }
 }
 
 .mathPlaceholder {
   color: #aaa;
   font-style: italic;
+  user-select: none;
 }
 
-.mathInputWrap {
-  width: 100%;
-}
-
-.mathInput {
-  width: 100%;
-  padding: 4px;
+.editFloat {
+  position: relative;
+  z-index: 2;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
+}
+
+.mathShellBlock .editFloat {
+  /* 独立公式块：编辑区不必与正文同宽，避免整行铺满 */
+  max-width: min(100%, 26rem);
+}
+
+.mathShellInline .editFloat {
+  min-width: 240px;
+}
+
+.editFloatHeader {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.editTextarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 8px;
+  box-sizing: border-box;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    'Liberation Mono',
+    'Courier New',
+    monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  resize: vertical;
+  outline: none;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: #d9d9d9;
+    box-shadow: none;
+  }
+}
+
+.editFloatHint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #999;
 }

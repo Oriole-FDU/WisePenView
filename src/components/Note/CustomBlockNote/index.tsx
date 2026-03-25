@@ -14,6 +14,7 @@ import type { CustomBlockNoteProps } from './index.type';
 import { useNoteCaptureKeyEvent } from '../NoteEditor/useNoteCaptureKeyEvent';
 import { buildNoteSlashMenuItems } from './slashMenuConfig';
 import { blockNoteSchema } from './BlockSchema/blockNoteSchema';
+import { stripEscapeCharExtension, stripEscapeEditorProps } from './stripEscapeCharExtension';
 import styles from './style.module.less';
 
 type CreateBlockNoteOptions = NonNullable<Parameters<typeof useCreateBlockNote>[0]>;
@@ -43,8 +44,12 @@ const CustomBlockNote = forwardRef<NoteEditorHandle, CustomBlockNoteProps>(
     const editor = useCreateBlockNote({
       schema: blockNoteSchema,
       dictionary: zh,
-      trailingBlock: false,
+      trailingBlock: true,
       uploadFile,
+      extensions: [stripEscapeCharExtension],
+      _tiptapOptions: {
+        editorProps: stripEscapeEditorProps,
+      },
       collaboration: {
         provider: provider as BlockNoteCollaborationConfig['provider'],
         fragment: doc.getXmlFragment(NOTE_YJS_DOCUMENT_FRAGMENT),
