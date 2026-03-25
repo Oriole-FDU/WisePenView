@@ -13,6 +13,7 @@ import type { NoteEditorHandle } from '../NoteEditor/index.type';
 import type { CustomBlockNoteProps } from './index.type';
 import { useNoteCaptureKeyEvent } from '../NoteEditor/useNoteCaptureKeyEvent';
 import { buildNoteSlashMenuItems } from './slashMenuConfig';
+import { blockNoteSchema } from './BlockSchema/blockNoteSchema';
 import styles from './style.module.less';
 
 type CreateBlockNoteOptions = NonNullable<Parameters<typeof useCreateBlockNote>[0]>;
@@ -40,6 +41,7 @@ const CustomBlockNote = forwardRef<NoteEditorHandle, CustomBlockNoteProps>(
     );
 
     const editor = useCreateBlockNote({
+      schema: blockNoteSchema,
       dictionary: zh,
       trailingBlock: false,
       uploadFile,

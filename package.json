@@ -21,6 +21,7 @@
     "ant-design": "^1.0.0",
     "antd": "^6.1.0",
     "clsx": "^2.1.1",
+    "katex": "^0.16.42",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/katex": "^0.16.8",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

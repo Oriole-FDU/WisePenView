@@ -1,6 +1,13 @@
-import type { BlockNoteEditor } from '@blocknote/core';
+import { createElement } from 'react';
+import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { getDefaultReactSlashMenuItems } from '@blocknote/react';
+import { RiFunctions } from 'react-icons/ri';
+
+import type {
+  CustomBlockNoteEditor,
+  CustomBlockNotePartialBlock,
+} from './BlockSchema/blockNoteSchema';
 
 /**
  * BlockNote 在 `getDefaultSlashMenuItems`（@blocknote/core/extensions）里为每个默认项设置了稳定字段 `key`，
@@ -25,6 +32,26 @@ function shouldHideMenuItem(item: DefaultReactSuggestionItem): boolean {
   return key !== undefined && NOTE_SLASH_MENU_BLOCKED_KEYS.has(key);
 }
 
-export function buildNoteSlashMenuItems(editor: BlockNoteEditor): DefaultReactSuggestionItem[] {
-  return getDefaultReactSlashMenuItems(editor).filter((item) => !shouldHideMenuItem(item));
+function createMathSlashMenuItem(editor: CustomBlockNoteEditor): DefaultReactSuggestionItem {
+  const mathBlock: CustomBlockNotePartialBlock = {
+    type: 'math',
+    props: { expression: '' },
+  };
+  return {
+    title: '公式',
+    group: '高级',
+    aliases: ['math', 'katex', 'latex', '公式', 'equation'],
+    subtext: '插入 KaTeX 数学公式',
+    icon: createElement(RiFunctions, { size: 18 }),
+    onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, mathBlock),
+  };
+}
+
+export function buildNoteSlashMenuItems(
+  editor: CustomBlockNoteEditor
+): DefaultReactSuggestionItem[] {
+  const defaults = getDefaultReactSlashMenuItems(editor as unknown as CustomBlockNoteEditor).filter(
+    (item) => !shouldHideMenuItem(item)
+  );
+  return [...defaults, createMathSlashMenuItem(editor)];
 }
