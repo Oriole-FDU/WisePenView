@@ -13,6 +13,7 @@ function textContainsEsc(text: string): boolean {
 }
 
 /**
+ * 部分环境下 Esc 会以 insertText 写入 U+001B；拦截后不影响 BlockNote 用 Esc 关菜单/失焦（走 keydown）
  * 在编辑器视图上拦截含 U+001B 的 insertText / insertCompositionText（PM 会对返回 true 的事件 preventDefault）。
  * appendTransaction 负责协同等不经过 DOM 输入的路径。
  */

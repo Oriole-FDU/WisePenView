@@ -20,7 +20,7 @@ function renderKatexInto(
   if (!trimmed) {
     const span = document.createElement('span');
     span.className = placeholderClass;
-    span.textContent = '点击输入公式…';
+    span.textContent = '点击输入公式...';
     el.appendChild(span);
     return;
   }
