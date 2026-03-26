@@ -13,7 +13,8 @@ import type { NoteEditorHandle } from '../NoteEditor/index.type';
 import type { CustomBlockNoteProps } from './index.type';
 import { useNoteCaptureKeyEvent } from '../NoteEditor/useNoteCaptureKeyEvent';
 import { buildNoteSlashMenuItems } from './slashMenuConfig';
-import { blockNoteSchema, type CustomBlockNoteEditor } from './BlockSchema/blockNoteSchema';
+import { blockNoteSchema, type CustomBlockNoteEditor } from './blockNoteSchema';
+import { inlineMathDollarExtension } from './LatexSupport/inlineMathDollarExtension';
 import { stripEscapeCharExtension, stripEscapeEditorProps } from './stripEscapeCharExtension';
 import styles from './style.module.less';
 
@@ -84,7 +85,7 @@ const CustomBlockNote = forwardRef<NoteEditorHandle, CustomBlockNoteProps>(
       dictionary: zh,
       trailingBlock: true,
       uploadFile,
-      extensions: [stripEscapeCharExtension],
+      extensions: [stripEscapeCharExtension, inlineMathDollarExtension()],
       _tiptapOptions: {
         editorProps: stripEscapeEditorProps,
       },

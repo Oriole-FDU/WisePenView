@@ -1,13 +1,17 @@
 import { BlockNoteSchema } from '@blocknote/core';
 
-import { createMathBlockSpec } from '../MathBlock';
+import { inlineMathContentSpec } from './LatexSupport/InlineMath';
+import { createMathBlockSpec } from './LatexSupport/MathBlock';
 
 /**
- * 笔记正文编辑器 schema：在 BlockNote 默认块集上扩展 KaTeX 公式块（type: math）。
+ * 笔记正文编辑器 schema：在 BlockNote 默认块集上扩展 KaTeX 公式块（type: math）与行内公式（inlineMath）。
  */
 export const blockNoteSchema = BlockNoteSchema.create().extend({
   blockSpecs: {
     math: createMathBlockSpec(),
+  },
+  inlineContentSpecs: {
+    inlineMath: inlineMathContentSpec,
   },
 });
 

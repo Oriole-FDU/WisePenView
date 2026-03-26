@@ -1,0 +1,45 @@
+.mathShell {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mathShellBlock {
+  display: block;
+}
+
+.mathRoot {
+  cursor: pointer;
+  min-height: 32px;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  outline: none;
+
+  &:focus,
+  &:focus-visible,
+  &:focus-within {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.mathPreview {
+  min-height: 1.25em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.mathPlaceholder {
+  color: #aaa;
+  font-style: italic;
+  user-select: none;
+}
+
+/** Portal 浮层内：独立公式块允许纵向拉伸编辑区（与原先块内 textarea 一致） */
+.blockPopoverTextarea {
+  resize: vertical;
+  min-height: 88px;
+}

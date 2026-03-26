@@ -2,12 +2,9 @@ import { createElement } from 'react';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { getDefaultReactSlashMenuItems } from '@blocknote/react';
-import { RiFormula, RiTextWrap } from 'react-icons/ri';
+import { RiFormula } from 'react-icons/ri';
 
-import type {
-  CustomBlockNoteEditor,
-  CustomBlockNotePartialBlock,
-} from './BlockSchema/blockNoteSchema';
+import type { CustomBlockNoteEditor, CustomBlockNotePartialBlock } from './blockNoteSchema';
 
 /**
  * BlockNote 在 `getDefaultSlashMenuItems`（@blocknote/core/extensions）里为每个默认项设置了稳定字段 `key`，
@@ -32,41 +29,23 @@ function shouldHideMenuItem(item: DefaultReactSuggestionItem): boolean {
   return key !== undefined && NOTE_SLASH_MENU_BLOCKED_KEYS.has(key);
 }
 
-function createInlineMathSlashMenuItem(editor: CustomBlockNoteEditor): DefaultReactSuggestionItem {
-  const mathBlock: CustomBlockNotePartialBlock = {
-    type: 'math',
-    props: { expression: '', variant: 'inline', autoEdit: true },
-  };
-  return {
-    title: '行内公式',
-    group: '高级',
-    aliases: ['math', 'katex', 'latex', 'inline', '行内', '公式'],
-    subtext: '插入与正文同行的 KaTeX 公式',
-    icon: createElement(RiTextWrap, { size: 18 }),
-    onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, mathBlock),
-  };
-}
-
-function createBlockMathSlashMenuItem(editor: CustomBlockNoteEditor): DefaultReactSuggestionItem {
-  const mathBlock: CustomBlockNotePartialBlock = {
-    type: 'math',
-    props: { expression: '', variant: 'block', autoEdit: true },
-  };
-  return {
-    title: '独立公式',
-    group: '高级',
-    aliases: ['math', 'katex', 'latex', 'block', '块', 'equation', '独立'],
-    subtext: '插入独占一行的块级 KaTeX 公式',
-    icon: createElement(RiFormula, { size: 18 }),
-    onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, mathBlock),
-  };
-}
-
 export function buildNoteSlashMenuItems(
   editor: CustomBlockNoteEditor
 ): DefaultReactSuggestionItem[] {
   const defaults = getDefaultReactSlashMenuItems(editor as unknown as CustomBlockNoteEditor).filter(
     (item) => !shouldHideMenuItem(item)
   );
-  return [...defaults, createInlineMathSlashMenuItem(editor), createBlockMathSlashMenuItem(editor)];
+  const mathBlock: CustomBlockNotePartialBlock = {
+    type: 'math',
+    props: { expression: '', autoEdit: true },
+  };
+  const formulaItem: DefaultReactSuggestionItem = {
+    title: '公式',
+    group: '高级',
+    aliases: ['math', 'katex', 'latex', 'block', '块', 'equation', '独立'],
+    subtext: '插入独占一行的块级 KaTeX 公式',
+    icon: createElement(RiFormula, { size: 18 }),
+    onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, mathBlock),
+  };
+  return [...defaults, formulaItem];
 }
