@@ -1,4 +1,9 @@
-import type { INoteService, SyncTitleRequest } from './index.type';
+import type {
+  INoteService,
+  SyncTitleRequest,
+  CreateNoteRequest,
+  CreateNoteResponse,
+} from './index.type';
 import Axios from '@/utils/Axios';
 import { checkResponse } from '@/utils/response';
 import type { ApiResponse } from '@/types/api';
@@ -13,6 +18,11 @@ const syncTitle = async (params: SyncTitleRequest): Promise<void> => {
   checkResponse(res);
 };
 
+const createNote = async (_params: CreateNoteRequest): Promise<CreateNoteResponse> => {
+  return { ok: false };
+};
+
 export const NoteServicesImpl: INoteService = {
   syncTitle,
+  createNote,
 };
