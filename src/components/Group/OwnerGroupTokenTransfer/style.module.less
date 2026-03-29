@@ -1,0 +1,94 @@
+// 与 Wallet/ComputeWallet 卡片风格对齐：同 token 变量与圆角边框
+
+.card {
+  padding: var(--ant-padding-lg);
+  margin-bottom: var(--ant-margin-lg);
+  background-color: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+}
+
+.intro {
+  margin: 0 0 var(--ant-margin-md) 0;
+  color: var(--ant-color-text-secondary);
+  line-height: 1.6;
+  font-size: var(--ant-font-size);
+}
+
+/* 标题与刷新按钮紧邻排布，不撑满整行到最右侧 */
+.balanceHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ant-margin-sm);
+  margin-bottom: var(--ant-margin-md);
+}
+
+.balanceTitle {
+  margin: 0;
+  font-size: var(--ant-font-size-heading-5);
+  font-weight: 500;
+}
+
+.balanceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ant-margin-lg);
+  margin-bottom: var(--ant-margin-lg);
+}
+
+.balanceItem {
+  flex: 1;
+  min-width: 160px;
+}
+
+.balanceLabel {
+  margin: 0 0 var(--ant-margin-xs) 0;
+  font-size: var(--ant-font-size);
+  color: var(--ant-color-text-secondary);
+}
+
+.balanceValue {
+  margin: 0;
+  font-size: var(--ant-font-size-heading-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-text);
+}
+
+.unit {
+  margin-left: var(--ant-margin-xs);
+  font-size: var(--ant-font-size);
+  font-weight: 500;
+  color: var(--ant-color-text-secondary);
+}
+
+.divider {
+  margin: var(--ant-margin-lg) 0;
+  border: 0;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.transferTitle {
+  margin: 0 0 var(--ant-margin-sm) 0;
+  font-size: var(--ant-font-size);
+  font-weight: 500;
+  color: var(--ant-color-text);
+}
+
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ant-margin-md);
+}
+
+.amountInput {
+  width: 200px;
+  max-width: 100%;
+}
+
+.balanceSkeleton {
+  width: 120px;
+  min-width: 120px;
+}

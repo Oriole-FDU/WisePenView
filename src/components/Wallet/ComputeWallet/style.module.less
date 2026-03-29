@@ -1,0 +1,103 @@
+// 通用钱包：资产区 + 流水表格 + 充值/消费配色（与需求「绿充红消」一致）
+
+.card {
+  padding: var(--ant-padding-lg);
+  margin-bottom: var(--ant-margin-lg);
+  background-color: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+}
+
+.assetRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ant-margin-md);
+}
+
+.balanceBlock {
+  flex: 1;
+  min-width: 200px;
+}
+
+.balanceLabel {
+  margin: 0 0 var(--ant-margin-xs) 0;
+  font-size: var(--ant-font-size);
+  color: var(--ant-color-text-secondary);
+}
+
+.balanceValue {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-text);
+}
+
+.unit {
+  margin-left: var(--ant-margin-xs);
+  font-size: var(--ant-font-size-lg);
+  font-weight: 500;
+  color: var(--ant-color-text-secondary);
+}
+
+.panelTitle {
+  margin: 0 0 var(--ant-margin-md) 0;
+  font-size: var(--ant-font-size-heading-5);
+  font-weight: 500;
+}
+
+.tabs {
+  margin-bottom: var(--ant-margin-md);
+}
+
+.amountRecharge {
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-success);
+  font-weight: 500;
+}
+
+.amountSpend {
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-error);
+  font-weight: 500;
+}
+
+.typeCell {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-xs);
+}
+
+.summaryMain {
+  font-weight: 500;
+}
+
+.summarySub {
+  margin-top: 2px;
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-tertiary);
+}
+
+.empty {
+  padding: var(--ant-padding-xl);
+  text-align: center;
+  color: var(--ant-color-text-tertiary);
+}
+
+// 充值成功后首行短暂高亮（rowClassName 控制）
+.rowFlash {
+  animation: walletRowFlash 1.2s ease-out 2;
+}
+
+@keyframes walletRowFlash {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  25% {
+    background-color: var(--ant-color-success-bg);
+  }
+}
