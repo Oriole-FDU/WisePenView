@@ -1,0 +1,36 @@
+{
+  "tokenBalance": 3200,
+  "tokenUsed": 180,
+  "transactions": {
+    "total": 3,
+    "records": [
+      {
+        "traceId": "mock-1",
+        "time": "2025-12-20 14:30:00",
+        "type": "RECHARGE",
+        "amount": 1000,
+        "title": "点卡充值",
+        "subTitle": "****8829",
+        "operatorName": "张三"
+      },
+      {
+        "traceId": "mock-2",
+        "time": "2025-12-21 09:15:00",
+        "type": "SPEND",
+        "amount": -120,
+        "title": "AI 服务调用",
+        "subTitle": "GPT-4-Turbo",
+        "operatorName": "张三"
+      },
+      {
+        "traceId": "mock-3",
+        "time": "2025-12-22 11:00:00",
+        "type": "RECHARGE",
+        "amount": 500,
+        "title": "点卡充值",
+        "subTitle": "****1001",
+        "operatorName": "李四"
+      }
+    ]
+  }
+}

@@ -38,6 +38,8 @@ import type { IResourceService } from '@/services/Resource';
 import type { ITagService } from '@/services/Tag';
 import type { IStickerService } from '@/services/Sticker';
 import type { IUserService } from '@/services/User';
+/** 计算点钱包：余额 / 点卡核销 / 交易明细分页 */
+import type { IWalletService } from '@/services/Wallet';
 
 // 第二步：导入真实实现（*Services.impl.ts，调用后端 API）
 import { AuthServicesImpl } from '@/services/Auth/AuthServices.impl';
@@ -51,6 +53,7 @@ import { ResourceServicesImpl } from '@/services/Resource/ResourceServices.impl'
 import { TagServicesImpl } from '@/services/Tag/TagServices.impl';
 import { StickerServicesImpl } from '@/services/Sticker/StickerServices.impl';
 import { UserServicesImpl } from '@/services/User/UserServices.impl';
+import { WalletServicesImpl } from '@/services/Wallet/WalletServices.impl';
 
 // 第三步：导入 Mock 实现（src/mocks/Xxx/XxxServices.mock.ts，用于 MODE === 'mock' 时）
 import { AuthServicesMock } from '@/mocks/Auth/AuthServices.mock';
@@ -64,6 +67,7 @@ import { ResourceServicesMock } from '@/mocks/Resource/ResourceServices.mock';
 import { TagServicesMock } from '@/mocks/Tag/TagServices.mock';
 import { StickerServicesMock } from '@/mocks/Sticker/StickerServices.mock';
 import { UserServicesMock } from '@/mocks/User/UserServices.mock';
+import { WalletServicesMock } from '@/mocks/Wallet/WalletServices.mock';
 
 // 第四步：在 ServicesContextValue 中新增该服务的类型
 // Context 通过此 interface 与 Service/Mock 层约定「有哪些服务可被注入」
@@ -79,6 +83,8 @@ export interface ServicesContextValue {
   sticker: IStickerService;
   tag: ITagService;
   user: IUserService;
+  /** 见 src/services/Wallet */
+  wallet: IWalletService;
 }
 
 // 第五步：在 servicesValue 中绑定真实实现
@@ -94,6 +100,7 @@ const servicesValue: ServicesContextValue = {
   sticker: StickerServicesImpl,
   tag: TagServicesImpl,
   user: UserServicesImpl,
+  wallet: WalletServicesImpl,
 };
 
 // 第六步：在 mockServicesValue 中绑定 Mock 实现
@@ -109,6 +116,7 @@ const mockServicesValue: ServicesContextValue = {
   sticker: StickerServicesMock,
   tag: TagServicesMock,
   user: UserServicesMock,
+  wallet: WalletServicesMock,
 };
 
 // 第七步：导出 useXxxService hook，组件内通过 useOrderService() 等获取实例
@@ -123,6 +131,8 @@ export const useResourceService = (): IResourceService => useServicesContext().r
 export const useStickerService = (): IStickerService => useServicesContext().sticker;
 export const useTagService = (): ITagService => useServicesContext().tag;
 export const useUserService = (): IUserService => useServicesContext().user;
+/** 个人中心钱包、高级组 token 相关页注入 */
+export const useWalletService = (): IWalletService => useServicesContext().wallet;
 
 // ==================== 以上为新增服务时的 7 步注册 ====================
 
