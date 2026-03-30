@@ -4,6 +4,7 @@ import type { Folder, FolderListByPathResponse } from '@/types/folder';
 import { mapTagToFolder } from '@/types/folder';
 import type { TagTreeResponse } from '@/services/Tag/index.type';
 import Axios from '@/utils/Axios';
+import { normalizeTagGroupId } from '@/utils/normalizeTagGroupId';
 import { checkResponse } from '@/utils/response';
 import { ResourceServicesImpl } from '@/services/Resource/ResourceServices.impl';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/services/Resource/index.type';
@@ -26,13 +27,14 @@ const buildFlatMap = (root: Folder): Map<string, Folder> => {
 };
 
 const getFolderTree = async (params: GetFolderTreeRequest = {}): Promise<Folder> => {
-  const cacheKey = params.groupId ?? CACHE_KEY_DEFAULT;
+  const normalizedGroupId = normalizeTagGroupId(params.groupId);
+  const cacheKey = normalizedGroupId ?? CACHE_KEY_DEFAULT;
   const cached = folderTreeCache.get(cacheKey);
   if (cached) {
     return cached;
   }
   const res = (await Axios.get('/resource/tag/getTagTree', {
-    params: params.groupId ? { groupId: params.groupId } : undefined,
+    params: normalizedGroupId ? { groupId: normalizedGroupId } : undefined,
   })) as ApiResponse<TagTreeResponse[]>;
   checkResponse(res);
   const tags = res.data ?? [];
@@ -47,14 +49,15 @@ const getFolderTree = async (params: GetFolderTreeRequest = {}): Promise<Folder>
 };
 
 const getFolderById = (tagId: string, groupId?: string): Folder | undefined => {
-  const cacheKey = groupId ?? CACHE_KEY_DEFAULT;
+  const cacheKey = normalizeTagGroupId(groupId) ?? CACHE_KEY_DEFAULT;
   return folderFlatCache.get(cacheKey)?.get(tagId);
 };
 
 const clearFolderTreeCache = (groupId?: string): void => {
   if (groupId !== undefined) {
-    folderTreeCache.delete(groupId);
-    folderFlatCache.delete(groupId);
+    const cacheKey = normalizeTagGroupId(groupId) ?? CACHE_KEY_DEFAULT;
+    folderTreeCache.delete(cacheKey);
+    folderFlatCache.delete(cacheKey);
   } else {
     folderTreeCache.clear();
     folderFlatCache.clear();

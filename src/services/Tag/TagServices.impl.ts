@@ -1,5 +1,6 @@
 import type { ApiResponse } from '@/types/api';
 import Axios from '@/utils/Axios';
+import { normalizeTagGroupId } from '@/utils/normalizeTagGroupId';
 import { checkResponse } from '@/utils/response';
 import { ResourceServicesImpl } from '@/services/Resource/ResourceServices.impl';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/services/Resource/index.type';
@@ -33,8 +34,9 @@ const buildFlatMap = (roots: TagTreeNode[]): Map<string, TagTreeNode> => {
 
 const clearTagTreeCache = (groupId?: string): void => {
   if (groupId !== undefined) {
-    tagTreeCache.delete(groupId);
-    tagFlatCache.delete(groupId);
+    const cacheKey = normalizeTagGroupId(groupId) ?? CACHE_KEY_DEFAULT;
+    tagTreeCache.delete(cacheKey);
+    tagFlatCache.delete(cacheKey);
   } else {
     tagTreeCache.clear();
     tagFlatCache.clear();
@@ -42,13 +44,15 @@ const clearTagTreeCache = (groupId?: string): void => {
 };
 
 const getTagTree = async (groupId?: string): Promise<TagTreeNode[]> => {
-  const cacheKey = groupId ?? CACHE_KEY_DEFAULT;
+  const normalizedGroupId = normalizeTagGroupId(groupId);
+
+  const cacheKey = normalizedGroupId ?? CACHE_KEY_DEFAULT;
   const cached = tagTreeCache.get(cacheKey);
   if (cached) {
     return cached;
   }
 
-  const params = groupId ? { groupId } : undefined;
+  const params = normalizedGroupId ? { groupId: normalizedGroupId } : undefined;
   const res = (await Axios.get('/resource/tag/getTagTree', { params })) as ApiResponse<
     TagTreeResponse[]
   >;
@@ -65,7 +69,7 @@ const getTagTree = async (groupId?: string): Promise<TagTreeNode[]> => {
 };
 
 const getTagById = (tagId: string, groupId?: string): TagTreeNode | undefined => {
-  const cacheKey = groupId ?? CACHE_KEY_DEFAULT;
+  const cacheKey = normalizeTagGroupId(groupId) ?? CACHE_KEY_DEFAULT;
   return tagFlatCache.get(cacheKey)?.get(tagId);
 };
 
