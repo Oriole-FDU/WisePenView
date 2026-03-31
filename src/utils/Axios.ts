@@ -1,11 +1,7 @@
 // axios request 封装
 import axios from 'axios';
 
-// 正式提交部署时使用
-export const baseServerAddr = '10.176.44.11:9080';
-
-// 本地开发时使用
-// export const baseServerAddr = '127.0.0.1:4523/m1/7566244-7303851-default';
+export const baseServerAddr = 'wisepen-dev-server:9080';
 
 export const baseURL = 'http://' + baseServerAddr + '/';
 
