@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useRequest } from 'ahooks';
 import { Modal, Button, Input } from 'antd';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -17,13 +18,27 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
   const folderService = useFolderService();
   const message = useAppMessage();
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = useCallback((visible: boolean) => {
+    if (visible) {
       setName('');
     }
-  }, [open]);
+  }, []);
+
+  const { loading, run: runCreateFolder } = useRequest(
+    async (trimmed: string) => folderService.createFolder(parentFolder!, trimmed),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('新建成功');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '新建失败'));
+      },
+    }
+  );
 
   const handleSubmit = async () => {
     const trimmed = name.trim();
@@ -35,17 +50,7 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
       message.warning('当前目录未就绪，请关闭后重试');
       return;
     }
-    try {
-      setLoading(true);
-      await folderService.createFolder(parentFolder, trimmed);
-      message.success('新建成功');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '新建失败'));
-    } finally {
-      setLoading(false);
-    }
+    await runCreateFolder(trimmed);
   };
 
   const handleCancel = () => {
@@ -58,6 +63,7 @@ const NewFolderModal: React.FC<NewFolderModalProps> = ({
       title="新建文件夹"
       open={open}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button } from 'antd';
+import { useRequest } from 'ahooks';
 import type { TagTreeNode } from '@/services/Tag/index.type';
 import type { ResourceItem } from '@/types/resource';
 import { useFolderService } from '@/contexts/ServicesContext';
@@ -20,36 +21,46 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
   const folderService = useFolderService();
   const message = useAppMessage();
   const [selectedNode, setSelectedNode] = useState<TagTreeNode | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (open) setSelectedNode(null);
-  }, [open]);
+  const handleOpenChange = useCallback((visible: boolean) => {
+    if (visible) {
+      setSelectedNode(null);
+    }
+  }, []);
 
   const handleTreeNavChange = useCallback((selected: TagTreeNode[], _leaves: ResourceItem[]) => {
     setSelectedNode(selected.length > 0 ? selected[0] : null);
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    if (!target || !selectedNode) return;
-
-    setSubmitting(true);
-    try {
+  const { loading: submitting, run: runMove } = useRequest(
+    async () => {
+      if (!target || !selectedNode) return;
       if (target.type === 'file') {
         await folderService.moveResourceToFolder(selectedNode, target.data);
-        message.success('文件已移动');
-      } else {
-        await folderService.moveFolderToFolder(target.data, selectedNode);
-        message.success('文件夹已移动');
+        return '文件已移动';
       }
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '移动失败'));
-    } finally {
-      setSubmitting(false);
+      await folderService.moveFolderToFolder(target.data, selectedNode);
+      return '文件夹已移动';
+    },
+    {
+      manual: true,
+      onSuccess: (successText) => {
+        if (successText) {
+          message.success(successText);
+        }
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '移动失败'));
+      },
     }
-  }, [folderService, target, selectedNode, onSuccess, onCancel, message]);
+  );
+
+  const handleSubmit = useCallback(async () => {
+    if (!target || !selectedNode) return;
+    runMove();
+  }, [target, selectedNode, runMove]);
 
   const handleCancel = useCallback(() => {
     setSelectedNode(null);
@@ -66,6 +77,7 @@ const MoveToFolderModal: React.FC<MoveToFolderModalProps> = ({
       title="移动到文件夹"
       open={open && !!target}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Modal, Input } from 'antd';
+import { useRequest } from 'ahooks';
 import { useStickerService } from '@/contexts/ServicesContext';
 import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -10,11 +11,8 @@ const AddStickerModal: React.FC<AddStickerModalProps> = ({ open, onCancel, onSuc
   const message = useAppMessage();
 
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-
   const reset = useCallback(() => {
     setName('');
-    setLoading(false);
   }, []);
 
   const handleCancel = useCallback(() => {
@@ -22,20 +20,26 @@ const AddStickerModal: React.FC<AddStickerModalProps> = ({ open, onCancel, onSuc
     onCancel();
   }, [reset, onCancel]);
 
+  const { loading, run: runAddSticker } = useRequest(
+    async (trimmed: string) => stickerService.addSticker({ stickerName: trimmed }),
+    {
+      manual: true,
+      onSuccess: () => {
+        onSuccess?.();
+        reset();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '新增标签失败'));
+      },
+    }
+  );
+
   const handleOk = useCallback(async () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    setLoading(true);
-    try {
-      const tagId = await stickerService.addSticker({ stickerName: trimmed });
-      onSuccess?.({ tagId, tagName: trimmed });
-      reset();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '新增标签失败'));
-      setLoading(false);
-    }
-  }, [name, stickerService, message, onSuccess, onCancel, reset]);
+    runAddSticker(trimmed);
+  }, [name, runAddSticker]);
 
   return (
     <Modal
@@ -45,7 +49,7 @@ const AddStickerModal: React.FC<AddStickerModalProps> = ({ open, onCancel, onSuc
       onCancel={handleCancel}
       confirmLoading={loading}
       okButtonProps={{ disabled: !name.trim() }}
-      destroyOnClose
+      destroyOnHidden
     >
       <Input
         value={name}

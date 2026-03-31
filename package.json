@@ -17,6 +17,7 @@
     "@blocknote/react": "^0.47.1",
     "@lobehub/icons": "^2.45.0",
     "@types/spark-md5": "^3.0.5",
+    "ahooks": "^3.9.7",
     "ant-design": "^1.0.0",
     "antd": "^6.1.0",
     "clsx": "^2.1.1",

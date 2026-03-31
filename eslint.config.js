@@ -22,6 +22,35 @@ export default defineConfig([
     rules: {
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'react',
+              importNames: ['useEffect'],
+              message: '项目约定禁止使用 useEffect，请改为事件驱动、显式回调或更合适的数据流方案。',
+            },
+          ],
+        },
+      ],
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'React',
+          property: 'useEffect',
+          message: '项目约定禁止使用 useEffect，请改为事件驱动、显式回调或更合适的数据流方案。',
+        },
+      ],
+    },
+  },
+  {
+    // 全局禁止 useEffect，只有统一封装入口允许直接调用原生 useEffect。
+    // 请勿删除此白名单，否则 useEffectForce 无法工作。
+    files: ['src/hooks/useEffectForce.ts'],
+    rules: {
+      'no-restricted-imports': 'off',
+      'no-restricted-properties': 'off',
     },
   },
 ]);

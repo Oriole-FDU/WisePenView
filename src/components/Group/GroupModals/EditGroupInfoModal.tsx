@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Modal, Button, Form, Input, Upload } from 'antd';
 import type { UploadFile } from 'antd';
+import { useRequest } from 'ahooks';
 import { LuUpload } from 'react-icons/lu';
 import { useGroupService, useImageService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -42,25 +43,8 @@ const EditGroupInfoModal: React.FC<EditGroupInfoModalProps> = ({
     [message]
   );
   const [form] = Form.useForm<EditGroupFormValues>();
-  const [loading, setLoading] = useState(false);
-
-  const normalizeUpload = (e: { fileList?: UploadFile[] } | UploadFile[]) =>
-    Array.isArray(e) ? e : (e?.fileList ?? []);
-
-  useEffect(() => {
-    if (open) {
-      form.setFieldsValue({ groupName, groupDesc: description });
-    }
-  }, [open, form, groupName, description]);
-
-  const handleConfirm = async () => {
-    if (!groupId) {
-      message.error('小组ID不存在');
-      return;
-    }
-    try {
-      const formValues = (await form.validateFields()) as EditGroupFormValues;
-      setLoading(true);
+  const { loading, run: runEditGroup } = useRequest(
+    async (formValues: EditGroupFormValues) => {
       const newFile = fileFromCoverField(formValues.cover);
       let groupCoverUrl = cover ?? '';
       if (newFile) {
@@ -72,28 +56,50 @@ const EditGroupInfoModal: React.FC<EditGroupInfoModalProps> = ({
         groupCoverUrl = publicUrl;
       }
       const params: EditGroupRequest = {
-        groupId,
+        groupId: groupId!,
         groupName: formValues.groupName,
         groupDesc: formValues.groupDesc,
         groupCoverUrl,
         groupType,
       };
       await groupService.editGroup(params);
-      message.success('小组信息已更新');
-      form.resetFields();
-      onSuccess?.();
-      onCancel();
-    } catch (error: unknown) {
-      message.error(parseErrorMessage(error, '编辑小组信息失败，请重试'));
-    } finally {
-      setLoading(false);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('小组信息已更新');
+        form.resetFields();
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (error: unknown) => {
+        message.error(parseErrorMessage(error, '编辑小组信息失败，请重试'));
+      },
     }
+  );
+
+  const normalizeUpload = (e: { fileList?: UploadFile[] } | UploadFile[]) =>
+    Array.isArray(e) ? e : (e?.fileList ?? []);
+
+  const handleOpenChange = (visible: boolean) => {
+    if (!visible) return;
+    form.setFieldsValue({ groupName, groupDesc: description });
+  };
+
+  const handleConfirm = async () => {
+    if (!groupId) {
+      message.error('小组ID不存在');
+      return;
+    }
+    const formValues = await form.validateFields();
+    runEditGroup(formValues);
   };
 
   return (
     <Modal
       title="编辑小组信息"
       open={open}
+      afterOpenChange={handleOpenChange}
       onCancel={onCancel}
       destroyOnHidden
       footer={[

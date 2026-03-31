@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, InputNumber, Form, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useQuotaService } from '@/contexts/ServicesContext';
 import { useMemberEditGuard } from './useMemberEditGuard';
 import type { AssignQuotaModalProps } from './index.type';
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
 import styles from './style.module.less';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { parseErrorMessage } from '@/utils/parseErrorMessage';
 
 const AssignQuotaModal: React.FC<AssignQuotaModalProps> = ({
   open,
@@ -19,7 +21,6 @@ const AssignQuotaModal: React.FC<AssignQuotaModalProps> = ({
   const quotaService = useQuotaService();
   const message = useAppMessage();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
   const [groupQuota, setGroupQuotaState] = useState<{ used: number; limit: number }>({
     used: 0,
     limit: 0,
@@ -32,43 +33,50 @@ const AssignQuotaModal: React.FC<AssignQuotaModalProps> = ({
     { checkOwner: false, forQuota: true }
   );
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = useCallback(
+    (visible: boolean) => {
+      if (!visible) return;
       form.resetFields();
       quotaService
         .fetchGroupQuota(groupId)
         .then(setGroupQuotaState)
         .catch(() => setGroupQuotaState({ used: 0, limit: 0 }));
-    }
-  }, [open, form, groupId, quotaService]);
+    },
+    [form, groupId, quotaService]
+  );
 
-  const handleConfirm = async () => {
-    try {
-      const value = form.getFieldValue('quota');
-      if (!value || value <= 0) {
-        message.error('请输入有效的配额值');
-        return;
-      }
-      if (value < maxUsed) {
-        message.error(`配额限额不能小于成员的当前用量（最大用量：${maxUsed.toLocaleString()}）`);
-        return;
-      }
-      setLoading(true);
-      await quotaService.setGroupQuota({
+  const { loading, run: runSetQuota } = useRequest(
+    async (value: number) =>
+      quotaService.setGroupQuota({
         groupId,
         targetUserIds: memberIds,
         newTokenLimit: Math.floor(value),
-      });
-      message.success(`已为 ${memberIds.length} 位成员分配配额`);
-      form.resetFields();
-      onSuccess?.();
-      onCancel();
-    } catch (error) {
-      console.error('分配配额失败:', error);
-      message.error('分配配额失败，请稍后重试');
-    } finally {
-      setLoading(false);
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success(`已为 ${memberIds.length} 位成员分配配额`);
+        form.resetFields();
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '分配配额失败'));
+      },
     }
+  );
+
+  const handleConfirm = () => {
+    const value = form.getFieldValue('quota');
+    if (!value || value <= 0) {
+      message.warning('请输入有效的配额值');
+      return;
+    }
+    if (value < maxUsed) {
+      message.warning(`配额限额不能小于成员的当前用量（最大用量：${maxUsed.toLocaleString()}）`);
+      return;
+    }
+    runSetQuota(value);
   };
 
   return (
@@ -76,6 +84,7 @@ const AssignQuotaModal: React.FC<AssignQuotaModalProps> = ({
       title="分配配额"
       open={open}
       onCancel={onCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={onCancel}>

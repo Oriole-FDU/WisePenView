@@ -70,38 +70,6 @@ const checkFudanUISVerify = async (): Promise<FudanUISVerifyStatusData> => {
   };
 };
 
-const pollFudanUISVerifyUntilComplete: IUserService['pollFudanUISVerifyUntilComplete'] = async (
-  options
-) => {
-  const intervalMs = options?.intervalMs ?? 2000;
-  const { signal, onProgress } = options ?? {};
-  for (;;) {
-    if (signal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-    const status = await checkFudanUISVerify();
-    onProgress?.(status);
-    if (status.completed) {
-      return status;
-    }
-    await new Promise<void>((resolve, reject) => {
-      const t = window.setTimeout(resolve, intervalMs);
-      const onAbort = () => {
-        window.clearTimeout(t);
-        reject(new DOMException('Aborted', 'AbortError'));
-      };
-      if (signal) {
-        if (signal.aborted) {
-          window.clearTimeout(t);
-          reject(new DOMException('Aborted', 'AbortError'));
-          return;
-        }
-        signal.addEventListener('abort', onAbort, { once: true });
-      }
-    });
-  }
-};
-
 const confirmEmailVerify = async (): Promise<void> => {
   await delay(200);
 };
@@ -149,7 +117,6 @@ export const UserServicesMock: IUserService = {
   sendEmailVerify,
   initiateUISVerify,
   checkFudanUISVerify,
-  pollFudanUISVerifyUntilComplete,
   confirmEmailVerify,
   clearUserCache,
 };

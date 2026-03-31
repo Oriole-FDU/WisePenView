@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Table, Tag, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { usePagination } from 'ahooks';
 import FileTypeIcon from '@/components/Common/FileTypeIcon';
 import { LuEllipsisVertical, LuPencil, LuTrash2, LuTag, LuCopy } from 'react-icons/lu';
 import { formatSize } from '@/utils/format';
@@ -159,11 +160,8 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
   const message = useAppMessage();
   const clickFile = useClickFile();
   const [openDropdownKey, setOpenDropdownKey] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [list, setList] = useState<ResourceItem[]>([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [renameFileModalOpen, setRenameFileModalOpen] = useState(false);
   const [deleteFileModalOpen, setDeleteFileModalOpen] = useState(false);
   const [editStickerModalOpen, setEditStickerModalOpen] = useState(false);
@@ -171,49 +169,53 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
   const [deleteFileTarget, setDeleteFileTarget] = useState<ResourceItem | null>(null);
   const [editStickerTarget, setEditStickerTarget] = useState<ResourceItem | null>(null);
 
-  const fetchList = useCallback(async () => {
-    setLoading(true);
-    try {
+  const {
+    loading,
+    refresh: fetchList,
+    pagination: { current: page = 1, pageSize = DEFAULT_PAGE_SIZE, onChange: onPageChange },
+  } = usePagination(
+    async ({ current, pageSize }) => {
       const listParams = {
-        page,
+        page: current,
         size: pageSize,
         sortBy: filter.sortBy,
         sortDir: filter.sortDir,
         tagQueryLogicMode: filter.tagQueryLogicMode,
         ...(filter.tagIds.length > 0 && { tagIds: filter.tagIds }),
       };
-      const res = groupId
+      return groupId
         ? await resourceService.getGroupResources({ ...listParams, groupId })
         : await resourceService.getUserResources(listParams);
-      setList(res.list);
-      setTotal(res.total);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '获取资源列表失败'));
-      setList([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
+    },
+    {
+      defaultCurrent: 1,
+      defaultPageSize: DEFAULT_PAGE_SIZE,
+      refreshDeps: [
+        resourceService,
+        groupId,
+        filter.sortBy,
+        filter.sortDir,
+        filter.tagQueryLogicMode,
+        filter.tagIds,
+      ],
+      refreshDepsAction: () => {
+        if (page !== 1) {
+          onPageChange(1, pageSize);
+          return;
+        }
+        void fetchList();
+      },
+      onSuccess: (res) => {
+        setList(res.list);
+        setTotal(res.total);
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '获取资源列表失败'));
+        setList([]);
+        setTotal(0);
+      },
     }
-  }, [
-    resourceService,
-    page,
-    pageSize,
-    groupId,
-    filter.sortBy,
-    filter.sortDir,
-    filter.tagQueryLogicMode,
-    filter.tagIds,
-    message,
-  ]);
-
-  useEffect(() => {
-    fetchList();
-  }, [fetchList]);
-
-  const filterTagIdsKey = filter.tagIds.join(',');
-  useEffect(() => {
-    setPage(1);
-  }, [filterTagIdsKey, filter.tagQueryLogicMode, filter.sortBy, filter.sortDir]);
+  );
 
   const handleRenameFile = useCallback((file: ResourceItem) => {
     setRenameFileTarget(file);
@@ -266,11 +268,6 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
     [noteService, fetchList, clickFile, message]
   );
 
-  const handlePageChange = useCallback((newPage: number, newPageSize: number) => {
-    setPage(newPage);
-    setPageSize(newPageSize);
-  }, []);
-
   const dataSource = useMemo(
     () =>
       list.map((item) => ({
@@ -321,7 +318,7 @@ const FileList: React.FC<FileListProps> = ({ groupId, filter }) => {
                   showSizeChanger: true,
                   pageSizeOptions: PAGE_SIZE_OPTIONS,
                   showTotal: (t) => `共 ${t} 项`,
-                  onChange: handlePageChange,
+                  onChange: onPageChange,
                 }
               : false
           }

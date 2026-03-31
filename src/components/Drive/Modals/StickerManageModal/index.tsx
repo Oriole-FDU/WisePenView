@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import clsx from 'clsx';
 import { Modal, Button, Input, Popconfirm, Tag } from 'antd';
+import { useRequest } from 'ahooks';
 import { LuPlus } from 'react-icons/lu';
 import { useStickerService } from '@/contexts/ServicesContext';
 import type { Sticker } from '@/services/Sticker';
@@ -17,29 +18,80 @@ const StickerManageModal: React.FC<StickerManageModalProps> = ({ open, onCancel 
   const [selectedSticker, setSelectedSticker] = useState<Sticker | null>(null);
   const [editName, setEditName] = useState('');
   const [addName, setAddName] = useState('');
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [addLoading, setAddLoading] = useState(false);
-
-  const fetchStickers = useCallback(async () => {
-    try {
-      const list = await stickerService.getStickerList();
+  const { run: runFetchStickers } = useRequest(() => stickerService.getStickerList(), {
+    manual: true,
+    onSuccess: (list) => {
       setStickers(list);
-    } catch (err) {
+    },
+    onError: (err) => {
       message.error(parseErrorMessage(err, '获取标签列表失败'));
       setStickers([]);
-    }
-  }, [stickerService, message]);
+    },
+  });
 
-  useEffect(() => {
-    if (open) {
-      fetchStickers();
-    } else {
+  const { loading: updateLoading, run: runUpdateSticker } = useRequest(
+    async (trimmed: string) =>
+      stickerService.updateSticker({
+        stickerId: selectedSticker!.tagId,
+        stickerName: trimmed,
+      }),
+    {
+      manual: true,
+      onSuccess: (_, [trimmed]) => {
+        message.success('标签已更新');
+        const updated = { ...selectedSticker!, tagName: trimmed };
+        setStickers((prev) => prev.map((s) => (s.tagId === updated.tagId ? updated : s)));
+        setSelectedSticker(updated);
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '更新标签失败'));
+      },
+    }
+  );
+
+  const { loading: deleteLoading, run: runDeleteSticker } = useRequest(
+    async () => stickerService.deleteSticker({ stickerId: selectedSticker!.tagId }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('标签已删除');
+        setStickers((prev) => prev.filter((s) => s.tagId !== selectedSticker!.tagId));
+        setSelectedSticker(null);
+        setEditName('');
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '删除标签失败'));
+      },
+    }
+  );
+
+  const { loading: addLoading, run: runAddSticker } = useRequest(
+    async (trimmed: string) => stickerService.addSticker({ stickerName: trimmed }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('标签已创建');
+        void runFetchStickers();
+        setAddName('');
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '创建标签失败'));
+      },
+    }
+  );
+
+  const handleOpenChange = useCallback(
+    (visible: boolean) => {
+      if (visible) {
+        void runFetchStickers();
+        return;
+      }
       setSelectedSticker(null);
       setEditName('');
       setAddName('');
-    }
-  }, [open, fetchStickers]);
+    },
+    [runFetchStickers]
+  );
 
   const handleSelect = useCallback((sticker: Sticker) => {
     setSelectedSticker((prev) => {
@@ -63,38 +115,13 @@ const StickerManageModal: React.FC<StickerManageModalProps> = ({ open, onCancel 
       message.warning('标签名称不能以 / 开头');
       return;
     }
-    try {
-      setUpdateLoading(true);
-      await stickerService.updateSticker({
-        stickerId: selectedSticker.tagId,
-        stickerName: trimmed,
-      });
-      message.success('标签已更新');
-      const updated = { ...selectedSticker, tagName: trimmed };
-      setStickers((prev) => prev.map((s) => (s.tagId === updated.tagId ? updated : s)));
-      setSelectedSticker(updated);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '更新标签失败'));
-    } finally {
-      setUpdateLoading(false);
-    }
-  }, [selectedSticker, editName, stickerService, message]);
+    await runUpdateSticker(trimmed);
+  }, [selectedSticker, editName, runUpdateSticker, message]);
 
   const handleDelete = useCallback(async () => {
     if (!selectedSticker) return;
-    try {
-      setDeleteLoading(true);
-      await stickerService.deleteSticker({ stickerId: selectedSticker.tagId });
-      message.success('标签已删除');
-      setStickers((prev) => prev.filter((s) => s.tagId !== selectedSticker.tagId));
-      setSelectedSticker(null);
-      setEditName('');
-    } catch (err) {
-      message.error(parseErrorMessage(err, '删除标签失败'));
-    } finally {
-      setDeleteLoading(false);
-    }
-  }, [selectedSticker, stickerService, message]);
+    await runDeleteSticker();
+  }, [selectedSticker, runDeleteSticker]);
 
   const handleAdd = useCallback(async () => {
     const trimmed = addName.trim();
@@ -106,25 +133,15 @@ const StickerManageModal: React.FC<StickerManageModalProps> = ({ open, onCancel 
       message.warning('标签名称不能以 / 开头');
       return;
     }
-    try {
-      setAddLoading(true);
-      const tagId = await stickerService.addSticker({ stickerName: trimmed });
-      message.success('标签已创建');
-      const newSticker: Sticker = { tagId, tagName: trimmed };
-      setStickers((prev) => [...prev, newSticker]);
-      setAddName('');
-    } catch (err) {
-      message.error(parseErrorMessage(err, '创建标签失败'));
-    } finally {
-      setAddLoading(false);
-    }
-  }, [addName, stickerService, message]);
+    await runAddSticker(trimmed);
+  }, [addName, runAddSticker, message]);
 
   return (
     <Modal
       title="管理标签"
       open={open}
       onCancel={onCancel}
+      afterOpenChange={handleOpenChange}
       footer={null}
       width={640}
       destroyOnHidden

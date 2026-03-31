@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { usePagination } from 'ahooks';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, Button, Row, Col, Pagination, Empty, Spin } from 'antd';
 import { AiOutlinePlus, AiOutlineUserAdd } from 'react-icons/ai';
@@ -17,58 +18,49 @@ const MyGroup: React.FC = () => {
   const message = useAppMessage();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('joined');
-  const [pageNum, setPageNum] = useState(1);
-  const [size, setSize] = useState(8);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [joinGroupModalOpen, setJoinGroupModalOpen] = useState(false);
   const [createGroupModalOpen, setCreateGroupModalOpen] = useState(false);
 
   const relationType = RELATION_TYPE_MAP[activeTab] ?? RELATION_TYPE_MAP.joined;
 
-  const fetchGroups = useCallback(async () => {
-    setLoading(true);
-    try {
+  const {
+    data: groupsData,
+    loading,
+    refresh: refreshGroups,
+    pagination: { current: pageNum, pageSize: size, onChange: onPageChange },
+  } = usePagination(
+    async ({ current, pageSize }) => {
       const params: FetchGroupListRequest = {
         relationType,
-        page: pageNum,
-        size,
+        page: current,
+        size: pageSize,
       };
-      const { groups: list, total: totalCount } = await groupService.fetchGroupList(params);
-      setGroups(list);
-      setTotal(totalCount);
-    } catch (error) {
-      console.log(error);
-      message.error('获取小组列表失败');
-      setGroups([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
+      const { groups, total } = await groupService.fetchGroupList(params);
+      return { list: groups, total };
+    },
+    {
+      defaultCurrent: 1,
+      defaultPageSize: 8,
+      refreshDeps: [relationType],
+      onError: () => {
+        message.error('获取小组列表失败');
+      },
     }
-  }, [groupService, relationType, pageNum, size, message]);
-
-  useEffect(() => {
-    fetchGroups();
-  }, [fetchGroups]);
+  );
+  const groups: Group[] = groupsData?.list ?? [];
+  const total = groupsData?.total ?? 0;
 
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    setPageNum(1);
-  };
-
-  const handlePageChange = (newPage: number, newPageSize?: number) => {
-    setPageNum(newPage);
-    if (newPageSize && newPageSize !== size) {
-      setSize(newPageSize);
-      setPageNum(1);
+    if (pageNum !== 1) {
+      onPageChange(1, size);
     }
   };
 
   const handleModalSuccess = () => {
     setJoinGroupModalOpen(false);
     setCreateGroupModalOpen(false);
-    fetchGroups();
+    void refreshGroups();
   };
 
   const handleGroupClick = (group: Group) => {
@@ -134,7 +126,7 @@ const MyGroup: React.FC = () => {
               showSizeChanger
               showTotal={(t) => `共 ${t} 条`}
               pageSizeOptions={['8', '16', '32', '64']}
-              onChange={handlePageChange}
+              onChange={onPageChange}
             />
           </div>
         )}

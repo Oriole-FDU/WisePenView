@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useTagService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { DeleteTagModalProps } from './index.type';
@@ -14,24 +15,28 @@ const DeleteTagModal: React.FC<DeleteTagModalProps> = ({
 }) => {
   const tagService = useTagService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
+  const { loading, run: runDeleteTag } = useRequest(
+    async () =>
+      tagService.deleteTag({
+        groupId: tag!.groupId ?? groupId,
+        targetTagId: tag!.tagId!,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('标签已删除');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '删除失败'));
+      },
+    }
+  );
 
   const handleConfirm = async () => {
     if (!tag?.tagId) return;
-    try {
-      setLoading(true);
-      await tagService.deleteTag({
-        groupId: tag.groupId ?? groupId,
-        targetTagId: tag.tagId,
-      });
-      message.success('标签已删除');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '删除失败'));
-    } finally {
-      setLoading(false);
-    }
+    runDeleteTag();
   };
 
   const displayName = tag?.tagName || '未命名';

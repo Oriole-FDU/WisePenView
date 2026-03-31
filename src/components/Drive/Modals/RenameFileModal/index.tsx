@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, Input } from 'antd';
+import { useRequest } from 'ahooks';
 import { useResourceService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { RenameFileModalProps } from './index.type';
@@ -9,13 +10,34 @@ const RenameFileModal: React.FC<RenameFileModalProps> = ({ open, onCancel, onSuc
   const resourceService = useResourceService();
   const message = useAppMessage();
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (open && file) {
-      setName(file.resourceName || '');
+  const handleOpenChange = useCallback(
+    (visible: boolean) => {
+      if (visible && file) {
+        setName(file.resourceName || '');
+      }
+    },
+    [file]
+  );
+
+  const { loading, run: runRenameFile } = useRequest(
+    async (trimmed: string) =>
+      resourceService.renameResource({
+        resourceId: file!.resourceId!,
+        newName: trimmed,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('重命名成功');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '重命名失败'));
+      },
     }
-  }, [open, file]);
+  );
 
   const handleSubmit = async () => {
     if (!file?.resourceId) return;
@@ -24,20 +46,7 @@ const RenameFileModal: React.FC<RenameFileModalProps> = ({ open, onCancel, onSuc
       message.warning('请输入文件名称');
       return;
     }
-    try {
-      setLoading(true);
-      await resourceService.renameResource({
-        resourceId: file.resourceId,
-        newName: trimmed,
-      });
-      message.success('重命名成功');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '重命名失败'));
-    } finally {
-      setLoading(false);
-    }
+    runRenameFile(trimmed);
   };
 
   const handleCancel = () => {
@@ -50,6 +59,7 @@ const RenameFileModal: React.FC<RenameFileModalProps> = ({ open, onCancel, onSuc
       title="重命名文件"
       open={open && !!file}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

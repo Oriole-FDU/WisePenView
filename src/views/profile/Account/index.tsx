@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useRequest } from 'ahooks';
 import { Descriptions, Divider, Form, Spin } from 'antd';
 import { useUserService } from '@/contexts/ServicesContext';
 import type { GetUserInfoResponse } from '@/services/User';
@@ -20,7 +21,6 @@ const Account: React.FC = () => {
   const userService = useUserService();
   const message = useAppMessage();
   const [user, setUser] = useState<GetUserInfoResponse | null>(null);
-  const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [form] = Form.useForm<ProfileFormValues>();
 
@@ -29,21 +29,15 @@ const Account: React.FC = () => {
     form.setFieldsValue(buildProfileFormValues(data));
   };
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        setLoading(true);
-        const data = await userService.getFullUserInfo();
-        setUser(data);
-        form.setFieldsValue(buildProfileFormValues(data));
-      } catch (err) {
-        message.error(parseErrorMessage(err, '获取用户信息失败'));
-      } finally {
-        setLoading(false);
-      }
-    };
-    void loadUser();
-  }, [form, userService, message]);
+  const { loading } = useRequest(() => userService.getFullUserInfo(), {
+    onSuccess: (data) => {
+      setUser(data);
+      form.setFieldsValue(buildProfileFormValues(data));
+    },
+    onError: (err: unknown) => {
+      message.error(parseErrorMessage(err, '获取用户信息失败'));
+    },
+  });
 
   const identityType = user?.userInfo?.identityType ?? IDENTITY_TYPE.STUDENT;
   const fieldConfig = getProfileFieldConfig(identityType);

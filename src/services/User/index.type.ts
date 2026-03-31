@@ -15,13 +15,6 @@ export interface IUserService {
   initiateUISVerify(params: InitiateUISVerifyRequest): Promise<void>;
   /** 查询复旦 UIS 认证状态（单次，与 checkFudanUISVerify 对齐） */
   checkFudanUISVerify(): Promise<FudanUISVerifyStatusData>;
-  /**
-   * 每 intervalMs 轮询 checkFudanUISVerify，直到 data.completed 为 true。
-   * 未完成前每次响应可通过 onProgress 更新 UI（如先展示二维码，再持续轮询直至完成）。
-   */
-  pollFudanUISVerifyUntilComplete(
-    options?: PollFudanUISVerifyOptions
-  ): Promise<FudanUISVerifyStatusData>;
   confirmEmailVerify(params: ConfirmEmailVerifyRequest): Promise<void>;
   /** 退出登录时清理缓存 */
   clearUserCache(): void;
@@ -51,16 +44,6 @@ export interface FudanUISVerifyStatusData {
   /** 需用户操作时：二维码图片的 base64 字符（PNG/JPEG）；可选带 data:image/*;base64, 前缀 */
   actionPayload: string;
   message: string;
-}
-
-/** pollFudanUISVerifyUntilComplete 选项 */
-export interface PollFudanUISVerifyOptions {
-  /** 轮询间隔，默认 2000ms */
-  intervalMs?: number;
-  /** 取消轮询（如关闭弹窗、离开页面） */
-  signal?: AbortSignal;
-  /** 每次 check 返回后调用（含 completed 仍为 false 的中间态） */
-  onProgress?: (status: FudanUISVerifyStatusData) => void;
 }
 
 /** 更新用户信息请求参数（仅基本档案可编辑；账号栏只读；impl 内按 userInfo / userProfile 拆成两次 PUT） */

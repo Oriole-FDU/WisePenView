@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useMount } from 'ahooks';
 import { Avatar, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import clsx from 'clsx';
@@ -29,9 +30,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ collapsed }) => {
   const userService = useUserService();
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
+  useMount(() => {
     void userService.getUserInfo().then(setUser);
-  }, [userService]);
+  });
 
   const displayName = user?.nickname || user?.username || '未登录';
   const identityLabel =

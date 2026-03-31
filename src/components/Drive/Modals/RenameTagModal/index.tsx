@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, Input } from 'antd';
+import { useRequest } from 'ahooks';
 import { useTagService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { RenameTagModalProps } from './index.type';
@@ -15,13 +16,34 @@ const RenameTagModal: React.FC<RenameTagModalProps> = ({
   const tagService = useTagService();
   const message = useAppMessage();
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (open && tag) {
-      setName(tag.tagName ?? '');
+  const { loading, run: runUpdateTag } = useRequest(
+    async (trimmed: string) =>
+      tagService.updateTag({
+        groupId: tag!.groupId ?? groupId,
+        targetTagId: tag!.tagId!,
+        tagName: trimmed,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('重命名成功');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '重命名失败'));
+      },
     }
-  }, [open, tag]);
+  );
+
+  const handleOpenChange = useCallback(
+    (visible: boolean) => {
+      if (visible && tag) {
+        setName(tag.tagName ?? '');
+      }
+    },
+    [tag]
+  );
 
   const handleSubmit = async () => {
     if (!tag?.tagId) return;
@@ -30,21 +52,7 @@ const RenameTagModal: React.FC<RenameTagModalProps> = ({
       message.warning('请输入标签名称');
       return;
     }
-    try {
-      setLoading(true);
-      await tagService.updateTag({
-        groupId: tag.groupId ?? groupId,
-        targetTagId: tag.tagId,
-        tagName: trimmed,
-      });
-      message.success('重命名成功');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '重命名失败'));
-    } finally {
-      setLoading(false);
-    }
+    runUpdateTag(trimmed);
   };
 
   const handleCancel = () => {
@@ -57,6 +65,7 @@ const RenameTagModal: React.FC<RenameTagModalProps> = ({
       title="重命名标签"
       open={open && !!tag}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

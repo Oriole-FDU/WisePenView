@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useRequest } from 'ahooks';
 import { getTreeDriveCwdStore } from '@/store';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { useAppMessage } from '@/hooks/useAppMessage';
@@ -33,7 +34,6 @@ export function useTreeDrive({
   const useCwdStore = useMemo(() => getTreeDriveCwdStore(persistedCwdKey), [persistedCwdKey]);
 
   const [treeData, setTreeData] = useState<TreeRowItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [loadingMoreKeys, setLoadingMoreKeys] = useState<Set<string>>(new Set());
@@ -45,59 +45,49 @@ export function useTreeDrive({
 
   const currentTagId = breadcrumb.length > 0 ? breadcrumb[breadcrumb.length - 1].tagId : null;
 
-  useEffect(() => {
-    let cancelled = false;
+  const { loading } = useRequest(
+    async (): Promise<TreeRowItem[] | null> => {
+      const root = await adapter.loadTree(groupId);
 
-    const init = async () => {
-      setLoading(true);
-      try {
-        const root = await adapter.loadTree(groupId);
-
-        let currentNode: TreeDriveNode;
-        if (currentTagId) {
-          const found = adapter.getNodeById(currentTagId, groupId);
-          if (!found) {
-            if (!cancelled) resetCwd();
-            return;
-          }
-          currentNode = found;
-        } else {
-          currentNode = root;
+      let currentNode: TreeDriveNode;
+      if (currentTagId) {
+        const found = adapter.getNodeById(currentTagId, groupId);
+        if (!found) {
+          resetCwd();
+          return null;
         }
-
-        const res = await adapter.getNodeContents({
-          node: currentNode,
-          filePage: 1,
-          filePageSize: FILE_PAGE_SIZE,
-        });
-
-        if (!cancelled) {
-          setTreeData(
-            buildCurrentNodeView(
-              res.childNodes,
-              res.files,
-              currentNode,
-              res.totalFiles,
-              FILE_PAGE_SIZE
-            )
-          );
-          setExpandedKeys([]);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          message.error(parseErrorMessage(err, '加载内容失败'));
-          setTreeData([]);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
+        currentNode = found;
+      } else {
+        currentNode = root;
       }
-    };
 
-    void init();
-    return () => {
-      cancelled = true;
-    };
-  }, [adapter, groupId, currentTagId, refreshTrigger, message, resetCwd]);
+      const res = await adapter.getNodeContents({
+        node: currentNode,
+        filePage: 1,
+        filePageSize: FILE_PAGE_SIZE,
+      });
+
+      return buildCurrentNodeView(
+        res.childNodes,
+        res.files,
+        currentNode,
+        res.totalFiles,
+        FILE_PAGE_SIZE
+      );
+    },
+    {
+      refreshDeps: [adapter, groupId, currentTagId, refreshTrigger],
+      onSuccess: (rows) => {
+        if (rows == null) return;
+        setTreeData(rows);
+        setExpandedKeys([]);
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '加载内容失败'));
+        setTreeData([]);
+      },
+    }
+  );
 
   const refresh = useCallback(() => setRefreshTrigger((c) => c + 1), []);
 

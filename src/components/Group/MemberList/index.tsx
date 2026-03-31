@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { usePagination } from 'ahooks';
 import type { GroupMember } from '@/types/group';
 import type { MemberListProps } from './index.type';
 import { toIdString } from '@/utils/number';
@@ -11,6 +12,8 @@ import {
   AssignQuotaModal,
 } from './Modals';
 import styles from './style.module.less';
+import { useGroupService } from '@/contexts/ServicesContext';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const MemberList: React.FC<MemberListProps> = ({
   groupDisplayConfig,
@@ -18,14 +21,42 @@ const MemberList: React.FC<MemberListProps> = ({
   groupId,
   inviteCode,
 }) => {
+  const groupService = useGroupService();
+  const message = useAppMessage();
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [selectedMembersList, setSelectedMembersList] = useState<GroupMember[]>([]);
-  const [total, setTotal] = useState(0);
   const [activeModal, setActiveModal] = useState<
     'invite' | 'editPermission' | 'deleteMember' | 'assignQuota' | null
   >(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const defaultPageSize = pagination?.defaultPageSize ?? 5;
+  const {
+    data: membersData,
+    loading,
+    refresh,
+    pagination: { current: currentPage = 1, pageSize = defaultPageSize, onChange: onPageChange },
+  } = usePagination(
+    async ({ current, pageSize: nextPageSize }) => {
+      const { members, total } = await groupService.fetchGroupMembers(
+        groupId,
+        current,
+        nextPageSize
+      );
+      return { list: members, total };
+    },
+    {
+      defaultCurrent: 1,
+      defaultPageSize,
+      refreshDeps: [groupId],
+      onError: () => {
+        message.error('获取成员列表失败');
+      },
+    }
+  );
+
+  const members = membersData?.list ?? [];
+  const total = membersData?.total ?? 0;
 
   const clearSelectedMembers = () => {
     setSelectedRowKeys([]);
@@ -44,7 +75,7 @@ const MemberList: React.FC<MemberListProps> = ({
   const onSuccessModal = () => {
     setActiveModal(null);
     clearSelectedMembers();
-    setRefreshTrigger((t) => t + 1);
+    void refresh();
   };
 
   const handleEdit = (action: 'editPermission' | 'assignQuota' | 'deleteMember') => {
@@ -71,15 +102,18 @@ const MemberList: React.FC<MemberListProps> = ({
       />
 
       <MemberListTable
-        groupId={groupId}
         groupDisplayConfig={groupDisplayConfig}
         pagination={pagination}
+        members={members}
+        loading={loading}
+        total={total}
+        currentPage={currentPage}
+        pageSize={pageSize}
         isEditMode={isEditMode}
         selectedRowKeys={selectedRowKeys}
+        onPageChange={onPageChange}
         onSelectedRowKeysChange={setSelectedRowKeys}
         onSelectedMembersChange={setSelectedMembersList}
-        onTotalChange={setTotal}
-        refreshTrigger={refreshTrigger}
       />
 
       <InviteUserModal

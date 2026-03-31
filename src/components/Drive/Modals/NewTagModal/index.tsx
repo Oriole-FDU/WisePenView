@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, Input } from 'antd';
+import { useRequest } from 'ahooks';
 import { useTagService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import type { NewTagModalProps } from './index.type';
@@ -18,13 +19,31 @@ const NewTagModal: React.FC<NewTagModalProps> = ({
   const tagService = useTagService();
   const message = useAppMessage();
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { loading, run: runAddTag } = useRequest(
+    async (trimmed: string) =>
+      tagService.addTag({
+        groupId,
+        ...(parentTagId ? { parentId: parentTagId } : {}),
+        tagName: trimmed,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('新建成功');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '新建失败'));
+      },
+    }
+  );
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = useCallback((visible: boolean) => {
+    if (visible) {
       setName('');
     }
-  }, [open]);
+  }, []);
 
   const handleSubmit = async () => {
     const trimmed = name.trim();
@@ -32,21 +51,7 @@ const NewTagModal: React.FC<NewTagModalProps> = ({
       message.warning('请输入标签名称');
       return;
     }
-    try {
-      setLoading(true);
-      await tagService.addTag({
-        groupId,
-        ...(parentTagId ? { parentId: parentTagId } : {}),
-        tagName: trimmed,
-      });
-      message.success('新建成功');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '新建失败'));
-    } finally {
-      setLoading(false);
-    }
+    runAddTag(trimmed);
   };
 
   const handleCancel = () => {
@@ -63,6 +68,7 @@ const NewTagModal: React.FC<NewTagModalProps> = ({
       title="新建标签"
       open={open}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

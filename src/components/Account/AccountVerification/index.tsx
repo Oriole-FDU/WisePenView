@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert, Button, Form, Input, Modal, Radio } from 'antd';
 import { RiMailLine, RiShieldUserLine } from 'react-icons/ri';
+import { useRequest, useUnmount } from 'ahooks';
 import { useUserService } from '@/contexts/ServicesContext';
 import type { InitiateUISVerifyRequest, SendEmailVerifyRequest } from '@/services/User';
 import { USER_STATUS } from '@/constants/user';
@@ -22,39 +23,129 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({ user, onUserI
   const message = useAppMessage();
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const [verifyMode, setVerifyMode] = useState<VerifyModalMode>('uis');
-  const [verifySubmitting, setVerifySubmitting] = useState(false);
   const [uisOutcomeOpen, setUisOutcomeOpen] = useState(false);
   const [uisOutcome, setUisOutcome] = useState<UisOutcomeState | null>(null);
-  const uisPollAbortRef = useRef<AbortController | null>(null);
+  const uisPollingActiveRef = useRef(false);
+  const uisPollLoadingRef = useRef<(() => void) | null>(null);
   const [verifyForm] = Form.useForm<VerifyModalFormValues>();
   const setPendingVerifyEmail = usePendingVerifyEmailStore((s) => s.setEmail);
 
-  useEffect(
-    () => () => {
-      uisPollAbortRef.current?.abort();
-    },
-    []
+  const endUisPolling = () => {
+    uisPollingActiveRef.current = false;
+    cancelUisPolling();
+    uisPollLoadingRef.current?.();
+    uisPollLoadingRef.current = null;
+  };
+
+  const { run: runUisPolling, cancel: cancelUisPolling } = useRequest(
+    () => userService.checkFudanUISVerify(),
+    {
+      manual: true,
+      pollingInterval: 2000,
+      onSuccess: (status) => {
+        if (!uisPollingActiveRef.current) return;
+        if (status.requireAction && status.actionPayload.trim() !== '') {
+          uisPollLoadingRef.current?.();
+          uisPollLoadingRef.current = null;
+          setUisOutcome({
+            pollingCompleted: false,
+            requireAction: true,
+            actionPayload: status.actionPayload,
+            message: status.message,
+          });
+          setUisOutcomeOpen(true);
+        }
+        if (status.completed) {
+          endUisPolling();
+          setUisOutcome({
+            pollingCompleted: true,
+            requireAction: status.requireAction,
+            actionPayload: status.actionPayload,
+            message: status.message,
+          });
+          setUisOutcomeOpen(true);
+        }
+      },
+      onError: (pollErr) => {
+        if (!uisPollingActiveRef.current) return;
+        endUisPolling();
+        message.error(parseErrorMessage(pollErr, '确认认证状态失败'));
+      },
+    }
   );
 
+  const { loading: emailSubmitting, run: runEmailVerifySubmit } = useRequest(
+    async () => {
+      const values = await verifyForm.validateFields(['email']);
+      const email = (values.email ?? '').trim();
+      const params: SendEmailVerifyRequest = { email };
+      await userService.sendEmailVerify(params);
+      return { email };
+    },
+    {
+      manual: true,
+      onSuccess: ({ email }) => {
+        setPendingVerifyEmail(email);
+        message.success('验证邮件已发送，请查收');
+        verifyForm.resetFields();
+        setVerifyMode('uis');
+        setVerifyModalOpen(false);
+      },
+      onError: (err) => {
+        if (err && typeof err === 'object' && 'errorFields' in err) return;
+        message.error(parseErrorMessage(err, '提交失败'));
+      },
+    }
+  );
+
+  const { loading: uisSubmitting, run: runUisVerifySubmit } = useRequest(
+    async () => {
+      const values = await verifyForm.validateFields(['uisAccount', 'uisPassword']);
+      const params: InitiateUISVerifyRequest = {
+        uisAccount: (values.uisAccount ?? '').trim(),
+        uisPassword: values.uisPassword ?? '',
+      };
+      await userService.initiateUISVerify(params);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        verifyForm.resetFields();
+        setVerifyMode('uis');
+        setVerifyModalOpen(false);
+        endUisPolling();
+        uisPollingActiveRef.current = true;
+        uisPollLoadingRef.current = message.loading('正在确认 UIS 认证状态…', 0);
+        runUisPolling();
+      },
+      onError: (err) => {
+        if (err && typeof err === 'object' && 'errorFields' in err) return;
+        message.error(parseErrorMessage(err, '提交失败'));
+      },
+    }
+  );
+
+  const verifySubmitting = emailSubmitting || uisSubmitting;
+
+  useUnmount(() => {
+    endUisPolling();
+  });
+
   const handleVerify = () => {
-    uisPollAbortRef.current?.abort();
-    uisPollAbortRef.current = null;
+    endUisPolling();
     verifyForm.resetFields();
     setVerifyMode('uis');
-    setVerifySubmitting(false);
     setVerifyModalOpen(true);
   };
 
   const handleVerifyModalCancel = () => {
     verifyForm.resetFields();
     setVerifyMode('uis');
-    setVerifySubmitting(false);
     setVerifyModalOpen(false);
   };
 
   const handleUisOutcomeModalClose = () => {
-    uisPollAbortRef.current?.abort();
-    uisPollAbortRef.current = null;
+    endUisPolling();
     setUisOutcomeOpen(false);
     setUisOutcome(null);
     void (async () => {
@@ -67,78 +158,12 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({ user, onUserI
     })();
   };
 
-  const handleVerifySubmit = async () => {
-    try {
-      setVerifySubmitting(true);
-      if (verifyMode === 'email') {
-        const values = await verifyForm.validateFields(['email']);
-        const email = (values.email ?? '').trim();
-        const params: SendEmailVerifyRequest = { email };
-        await userService.sendEmailVerify(params);
-        setPendingVerifyEmail(email);
-        message.success('验证邮件已发送，请查收');
-      } else {
-        const values = await verifyForm.validateFields(['uisAccount', 'uisPassword']);
-        const params: InitiateUISVerifyRequest = {
-          uisAccount: (values.uisAccount ?? '').trim(),
-          uisPassword: values.uisPassword ?? '',
-        };
-        await userService.initiateUISVerify(params);
-        verifyForm.resetFields();
-        setVerifyMode('uis');
-        setVerifyModalOpen(false);
-        setVerifySubmitting(false);
-
-        uisPollAbortRef.current?.abort();
-        const controller = new AbortController();
-        uisPollAbortRef.current = controller;
-        let destroyPollLoading: (() => void) | null = message.loading('正在确认 UIS 认证状态…', 0);
-        const endPollLoading = () => {
-          destroyPollLoading?.();
-          destroyPollLoading = null;
-        };
-        try {
-          const result = await userService.pollFudanUISVerifyUntilComplete({
-            signal: controller.signal,
-            onProgress: (status) => {
-              if (status.requireAction && status.actionPayload.trim() !== '') {
-                endPollLoading();
-                setUisOutcome({
-                  pollingCompleted: false,
-                  requireAction: true,
-                  actionPayload: status.actionPayload,
-                  message: status.message,
-                });
-                setUisOutcomeOpen(true);
-              }
-            },
-          });
-          endPollLoading();
-          setUisOutcome({
-            pollingCompleted: true,
-            requireAction: result.requireAction,
-            actionPayload: result.actionPayload,
-            message: result.message,
-          });
-          setUisOutcomeOpen(true);
-        } catch (pollErr) {
-          endPollLoading();
-          if (pollErr instanceof DOMException && pollErr.name === 'AbortError') {
-            return;
-          }
-          message.error(parseErrorMessage(pollErr, '确认认证状态失败'));
-        }
-        return;
-      }
-      verifyForm.resetFields();
-      setVerifyMode('uis');
-      setVerifyModalOpen(false);
-    } catch (err) {
-      if (err && typeof err === 'object' && 'errorFields' in err) return;
-      message.error(parseErrorMessage(err, '提交失败'));
-    } finally {
-      setVerifySubmitting(false);
+  const handleVerifySubmit = () => {
+    if (verifyMode === 'email') {
+      runEmailVerifySubmit();
+      return;
     }
+    runUisVerifySubmit();
   };
 
   const uisQrImageSrc = resolveUisQrImageDataUrl(uisOutcome?.actionPayload ?? '');

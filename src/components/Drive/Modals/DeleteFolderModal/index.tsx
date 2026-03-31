@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getFolderDisplayName } from '@/utils/path';
@@ -14,21 +15,24 @@ const DeleteFolderModal: React.FC<DeleteFolderModalProps> = ({
 }) => {
   const folderService = useFolderService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
+  const { loading, run: runDeleteFolder } = useRequest(
+    async () => folderService.deleteFolder(folder!),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('文件夹已删除');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '删除失败'));
+      },
+    }
+  );
 
   const handleConfirm = async () => {
     if (!folder?.tagId) return;
-    try {
-      setLoading(true);
-      await folderService.deleteFolder(folder);
-      message.success('文件夹已删除');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '删除失败'));
-    } finally {
-      setLoading(false);
-    }
+    runDeleteFolder();
   };
 
   const displayName = folder ? getFolderDisplayName(folder.tagName ?? '') : '未命名';

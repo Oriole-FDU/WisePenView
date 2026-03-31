@@ -1,23 +1,44 @@
 import React, { useMemo } from 'react';
+import { usePagination } from 'ahooks';
 import { Table } from 'antd';
 import type { TableColumnsType, TablePaginationConfig } from 'antd';
 import QuotaBar from '@/components/Common/QuotaBar';
 import type { QuotaByGroupProps, UserGroupQuota } from './index.type';
+import { useQuotaService } from '@/contexts/ServicesContext';
+import { useAppMessage } from '@/hooks/useAppMessage';
+import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import styles from './style.module.less';
 
 type QuotaRecord = UserGroupQuota & { key: React.Key };
 
-const QuotaByGroup: React.FC<QuotaByGroupProps> = ({
-  quotas = [],
-  pagination,
-  total,
-  current,
-  pageSize: externalPageSize,
-  onPageChange,
-  loading = false,
-}) => {
-  const currentPage = current ?? 1;
-  const pageSize = externalPageSize ?? pagination?.defaultPageSize ?? 10;
+const QuotaByGroup: React.FC<QuotaByGroupProps> = ({ pagination }) => {
+  const quotaService = useQuotaService();
+  const message = useAppMessage();
+
+  const {
+    data: quotaData,
+    loading,
+    pagination: {
+      current: currentPage = 1,
+      pageSize = pagination?.defaultPageSize ?? 10,
+      onChange,
+    },
+  } = usePagination(
+    async ({ current, pageSize: nextPageSize }) => {
+      const { quotas, total } = await quotaService.fetchUserGroupQuotas(current, nextPageSize);
+      return { list: quotas, total };
+    },
+    {
+      defaultCurrent: 1,
+      defaultPageSize: pagination?.defaultPageSize ?? 10,
+      onError: (error: unknown) => {
+        message.error(parseErrorMessage(error, '获取配额数据失败'));
+      },
+    }
+  );
+
+  const quotas: UserGroupQuota[] = useMemo(() => quotaData?.list ?? [], [quotaData?.list]);
+  const total = quotaData?.total ?? 0;
 
   const paginationConfig = {
     defaultPageSize: pagination?.defaultPageSize ?? 10,
@@ -73,7 +94,7 @@ const QuotaByGroup: React.FC<QuotaByGroupProps> = ({
         newPage = 1;
       }
     }
-    onPageChange?.(newPage, newPageSize);
+    onChange(newPage, newPageSize);
   };
 
   return (

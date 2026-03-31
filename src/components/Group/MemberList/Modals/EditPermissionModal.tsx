@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Select, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { UpdateMemberRoleRequest } from '@/services/Group';
 import { useMemberEditGuard } from './useMemberEditGuard';
@@ -8,6 +9,7 @@ import { ROLE_MAP } from '@/constants/group';
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
 import styles from './style.module.less';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { parseErrorMessage } from '@/utils/parseErrorMessage';
 
 const { Option } = Select;
 
@@ -23,7 +25,25 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
   const groupService = useGroupService();
   const message = useAppMessage();
   const [selectedPermission, setSelectedPermission] = useState<string>('MEMBER');
-  const [loading, setLoading] = useState(false);
+  const { loading, run: runUpdatePermission } = useRequest(
+    async (role: number) =>
+      groupService.updateMemberRole({
+        groupId,
+        targetUserIds: memberIds,
+        role,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success(`已修改 ${memberIds.length} 位成员的权限`);
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '修改权限失败'));
+      },
+    }
+  );
 
   const { memberContainsOwner, canEdit, confirmDisabled } = useMemberEditGuard(
     members,
@@ -32,25 +52,9 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
   );
   const canPromoteToAdmin = groupDisplayConfig.canModifyPermission;
 
-  const handleConfirm = async () => {
-    try {
-      setLoading(true);
-      const role = ROLE_MAP[selectedPermission] ?? ROLE_MAP['MEMBER'];
-      const params: UpdateMemberRoleRequest = {
-        groupId,
-        targetUserIds: memberIds,
-        role,
-      };
-      await groupService.updateMemberRole(params);
-      message.success(`已修改 ${memberIds.length} 位成员的权限`);
-      onSuccess?.();
-      onCancel();
-    } catch (error) {
-      console.error('修改权限失败:', error);
-      message.error('修改权限失败，请重试');
-    } finally {
-      setLoading(false);
-    }
+  const handleConfirm = () => {
+    const role = ROLE_MAP[selectedPermission] ?? ROLE_MAP['MEMBER'];
+    runUpdatePermission(role);
   };
 
   return (

@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import clsx from 'clsx';
 import { Tag, Radio, Select, Spin } from 'antd';
 import { LuX, LuPlus } from 'react-icons/lu';
+import { useRequest } from 'ahooks';
 import { useStickerService } from '@/contexts/ServicesContext';
 import { TAG_QUERY_LOGIC_MODE, RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/services/Resource';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -39,29 +40,16 @@ const FileFilter: React.FC<FileFilterProps> = ({ value, onChange }) => {
   const current = isControlled ? value : innerValue;
 
   const [stickers, setStickers] = useState<Sticker[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const list = await stickerService.getStickerList();
-        if (!cancelled) setStickers(list);
-      } catch (err) {
-        if (!cancelled) {
-          message.error(parseErrorMessage(err, '获取标签列表失败'));
-          setStickers([]);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [stickerService, message]);
+  const { loading, run: reloadStickers } = useRequest(async () => stickerService.getStickerList(), {
+    refreshDeps: [stickerService],
+    onSuccess: (list) => {
+      setStickers(list);
+    },
+    onError: (err) => {
+      message.error(parseErrorMessage(err, '获取标签列表失败'));
+      setStickers([]);
+    },
+  });
 
   const updateValue = useCallback(
     (patch: Partial<FileFilterValue>) => {
@@ -181,7 +169,9 @@ const FileFilter: React.FC<FileFilterProps> = ({ value, onChange }) => {
       <AddStickerModal
         open={addModalOpen}
         onCancel={() => setAddModalOpen(false)}
-        onSuccess={(sticker) => setStickers((prev) => [...prev, sticker])}
+        onSuccess={() => {
+          void reloadStickers();
+        }}
       />
     </div>
   );

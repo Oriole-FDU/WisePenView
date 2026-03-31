@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useNavigate } from 'react-router-dom';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { QuitGroupRequest } from '@/services/Group';
 import type { ExitGroupModalProps } from './index.type';
 import styles from './style.module.less';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { parseErrorMessage } from '@/utils/parseErrorMessage';
 
 const ExitGroupModal: React.FC<ExitGroupModalProps> = ({
   open,
@@ -16,28 +18,33 @@ const ExitGroupModal: React.FC<ExitGroupModalProps> = ({
 }) => {
   const groupService = useGroupService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleConfirm = async () => {
+  const { loading, run: runExitGroup } = useRequest(
+    async () => {
+      const params: QuitGroupRequest = { groupId: groupId! };
+      await groupService.quitGroup(params);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('已退出小组');
+        onSuccess?.();
+        onCancel();
+        navigate('/app/my-group');
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '退出小组失败'));
+      },
+    }
+  );
+
+  const handleConfirm = () => {
     if (!groupId) {
       message.error('小组ID不存在');
       return;
     }
-    try {
-      setLoading(true);
-      const params: QuitGroupRequest = { groupId };
-      await groupService.quitGroup(params);
-      message.success('已退出小组');
-      onSuccess?.();
-      onCancel();
-      navigate('/app/my-group');
-    } catch (error) {
-      console.error('退出小组失败:', error);
-      message.error('退出小组失败，请重试');
-    } finally {
-      setLoading(false);
-    }
+    runExitGroup();
   };
 
   return (

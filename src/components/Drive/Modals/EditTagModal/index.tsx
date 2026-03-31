@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Modal, Button } from 'antd';
+import { useRequest } from 'ahooks';
 import type { TagTreeNode } from '@/services/Tag/index.type';
 import type { ResourceItem } from '@/types/resource';
 import { useResourceService } from '@/contexts/ServicesContext';
@@ -19,7 +20,6 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
   const resourceService = useResourceService();
   const message = useAppMessage();
   const [selectedNodes, setSelectedNodes] = useState<TagTreeNode[]>([]);
-  const [submitting, setSubmitting] = useState(false);
 
   const isFile = target?.type === 'file';
   const resourceId = isFile ? target.data.resourceId : undefined;
@@ -29,33 +29,42 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
     return Object.keys(target.data.currentTags ?? {});
   }, [open, target]);
 
-  useEffect(() => {
-    if (!open) setSelectedNodes([]);
-  }, [open]);
+  const handleOpenChange = useCallback((visible: boolean) => {
+    if (!visible) {
+      setSelectedNodes([]);
+    }
+  }, []);
 
   const handleTreeChange = useCallback((selected: TagTreeNode[], _leaves: ResourceItem[]) => {
     setSelectedNodes(selected);
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    if (!resourceId) return;
-
-    setSubmitting(true);
-    try {
+  const { loading: submitting, run: runUpdateTags } = useRequest(
+    async () => {
+      if (!resourceId) return;
       await resourceService.updateResourceTags({
         resourceId,
         tagIds: selectedNodes.map((n) => n.tagId),
         ...(groupId ? { groupId } : {}),
       });
-      message.success('标签已更新');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '更新标签失败'));
-    } finally {
-      setSubmitting(false);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('标签已更新');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '更新标签失败'));
+      },
     }
-  }, [resourceService, resourceId, selectedNodes, groupId, onSuccess, onCancel, message]);
+  );
+
+  const handleSubmit = useCallback(async () => {
+    if (!resourceId) return;
+    runUpdateTags();
+  }, [resourceId, runUpdateTags]);
 
   const handleCancel = useCallback(() => {
     setSelectedNodes([]);
@@ -69,6 +78,7 @@ const EditTagModal: React.FC<EditTagModalProps> = ({
       title="编辑标签"
       open={open && !!target && isFile}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { KickMembersRequest } from '@/services/Group';
 import { useMemberEditGuard } from './useMemberEditGuard';
 import type { DeleteMemberModalProps } from './index.type';
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { parseErrorMessage } from '@/utils/parseErrorMessage';
 
 const DeleteMemberModal: React.FC<DeleteMemberModalProps> = ({
   open,
@@ -18,7 +20,24 @@ const DeleteMemberModal: React.FC<DeleteMemberModalProps> = ({
 }) => {
   const groupService = useGroupService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
+  const { loading, run: runDeleteMembers } = useRequest(
+    async () =>
+      groupService.kickMembers({
+        groupId,
+        targetUserIds: memberIds,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success(`已删除 ${memberIds.length} 位成员`);
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '删除成员失败'));
+      },
+    }
+  );
 
   const { memberContainsOwner, canEdit, confirmDisabled } = useMemberEditGuard(
     members,
@@ -26,23 +45,8 @@ const DeleteMemberModal: React.FC<DeleteMemberModalProps> = ({
     { checkOwner: true }
   );
 
-  const handleConfirm = async () => {
-    try {
-      setLoading(true);
-      const params: KickMembersRequest = {
-        groupId,
-        targetUserIds: memberIds,
-      };
-      await groupService.kickMembers(params);
-      message.success(`已删除 ${memberIds.length} 位成员`);
-      onSuccess?.();
-      onCancel();
-    } catch (error) {
-      console.error('删除成员失败:', error);
-      message.error('删除成员失败，请重试');
-    } finally {
-      setLoading(false);
-    }
+  const handleConfirm = () => {
+    runDeleteMembers();
   };
 
   return (

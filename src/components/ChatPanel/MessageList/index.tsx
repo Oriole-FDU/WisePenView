@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- ChatPanel 待重构：暂时允许 useEffect
 import React, { useEffect, useRef } from 'react';
 import MessageItem from './MessageItem';
 import Welcome from './Welcome';

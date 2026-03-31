@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRequest } from 'ahooks';
 import { Checkbox, Form, Typography, Input, Button, Modal } from 'antd';
 import { RiUserLine, RiLockLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,27 +16,30 @@ const Register: React.FC = () => {
   const message = useAppMessage();
   const [agreement, setAgreement] = useState(false);
   const [contractOpen, setContractOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
 
   const [form] = Form.useForm<RegisterRequest>();
   const navigate = useNavigate();
 
-  const onFinish = async (values: RegisterRequest) => {
+  const { loading, run: submitRegister } = useRequest(
+    (values: RegisterRequest) => authService.register(values),
+    {
+      manual: true,
+      onSuccess: () => {
+        setSuccessModalOpen(true);
+      },
+      onError: (err: unknown) => {
+        message.error(parseErrorMessage(err, '注册失败'));
+      },
+    }
+  );
+
+  const onFinish = (values: RegisterRequest) => {
     if (!agreement) {
       message.error('请接受用户协议');
       return;
     }
-
-    setLoading(true);
-    try {
-      await authService.register(values);
-      setSuccessModalOpen(true);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '注册失败'));
-    } finally {
-      setLoading(false);
-    }
+    submitRegister(values);
   };
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRequest } from 'ahooks';
 import { Alert, Form, Typography, Input, Button } from 'antd';
 import { RiMailLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -11,20 +12,23 @@ import { useAppMessage } from '@/hooks/useAppMessage';
 const ResetPassword: React.FC = () => {
   const authService = useAuthService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<ResetPasswordRequest>();
 
-  const onFinish = async (values: ResetPasswordRequest) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      await authService.resetPassword(values);
-      message.info('邮件将发送至您的学工号邮箱，请注意查收。');
-    } catch (err) {
-      message.error(parseErrorMessage(err, '发送失败'));
-    } finally {
-      setLoading(false);
+  const { loading, run: submitResetPassword } = useRequest(
+    (values: ResetPasswordRequest) => authService.resetPassword(values),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.info('邮件将发送至您的学工号邮箱，请注意查收。');
+      },
+      onError: (err: unknown) => {
+        message.error(parseErrorMessage(err, '发送失败'));
+      },
     }
+  );
+
+  const onFinish = (values: ResetPasswordRequest) => {
+    submitResetPassword(values);
   };
 
   return (

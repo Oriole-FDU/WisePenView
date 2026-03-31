@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRequest } from 'ahooks';
 import { Alert, Button, Modal, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useUserService } from '@/contexts/ServicesContext';
@@ -20,31 +21,36 @@ const VerifyEmail: React.FC = () => {
     const fromUrl = new URLSearchParams(window.location.search).get('email');
     return fromUrl ? decodeURIComponent(fromUrl) : null;
   });
-  const [loading, setLoading] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get('token');
 
-  const onVerify = async () => {
+  const { loading, run: runVerify } = useRequest(
+    (verifyToken: string) => {
+      const params: ConfirmEmailVerifyRequest = { token: verifyToken };
+      return userService.confirmEmailVerify(params);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('邮箱验证成功');
+        clearPendingEmail();
+        setSuccessModalOpen(true);
+      },
+      onError: (err: unknown) => {
+        message.error(parseErrorMessage(err, '验证失败'));
+      },
+    }
+  );
+
+  const onVerify = () => {
     if (loading || !token) {
       if (!token) message.error('链接无效或已过期');
       return;
     }
-
-    setLoading(true);
-    try {
-      const params: ConfirmEmailVerifyRequest = { token };
-      await userService.confirmEmailVerify(params);
-      message.success('邮箱验证成功');
-      clearPendingEmail();
-      setSuccessModalOpen(true);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '验证失败'));
-    } finally {
-      setLoading(false);
-    }
+    runVerify(token);
   };
 
   const goToAccount = () => {

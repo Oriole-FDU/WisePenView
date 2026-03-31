@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import ChatPanel from '@/components/ChatPanel';
-import { useUserService } from '@/contexts/ServicesContext';
 import styles from './SystemLayout.module.less';
 
 const { Content, Sider } = Layout;
 
 const SystemLayout: React.FC = () => {
-  const userService = useUserService();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showChat, setShowChat] = useState(true);
 
   return (
     <Layout className={styles.root}>
@@ -35,7 +32,6 @@ const SystemLayout: React.FC = () => {
         className={styles.rightSider}
         width={380}
         theme="light"
-        collapsed={!showChat}
         collapsedWidth={0}
         trigger={null}
       >

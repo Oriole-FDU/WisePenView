@@ -1,21 +1,23 @@
 /**
  * 小组详情：展示/ Tab / 小组盘只读等由 getGroupDisplayConfig（如 showWalletTabs、driveReadOnlyMode）驱动。
  */
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
+import { useRequest } from 'ahooks';
 import { useParams } from 'react-router-dom';
 import { Avatar, Button, Spin, Tabs } from 'antd';
+import type { TabsProps } from 'antd';
 import { AiOutlineEdit, AiOutlineDelete, AiOutlineLogout } from 'react-icons/ai';
+import { getGroupDisplayConfig } from '@/components/Group/GroupDisplayConfig';
 import FolderDrive from '@/components/Drive/TreeDrive/FolderDrive';
 import TagDrive from '@/components/Drive/TreeDrive/TagDrive';
 import MemberList from '@/components/Group/MemberList';
-import ComputeWallet from '@/components/Wallet/ComputeWallet';
-import OwnerGroupTokenTransfer from '@/components/Group/OwnerGroupTokenTransfer';
-import { getGroupDisplayConfig } from '@/components/Group/GroupDisplayConfig';
 import {
   EditGroupInfoModal,
   DissolveGroupModal,
   ExitGroupModal,
 } from '@/components/Group/GroupModals';
+import ComputeWallet from '@/components/Wallet/ComputeWallet';
+import OwnerGroupTokenTransfer from '@/components/Group/OwnerGroupTokenTransfer';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { Group } from '@/types/group';
 import { GROUP_TYPE } from '@/constants/group';
@@ -24,43 +26,46 @@ import layout from '../style.module.less';
 import page from './style.module.less';
 import { useAppMessage } from '@/hooks/useAppMessage';
 import type { GroupResConfig } from '@/types/group';
+import type { ComputeWalletRef } from '@/components/Wallet/ComputeWallet/index.type';
+
+type GroupDetailLoaded = {
+  group: Group;
+  currentUserRole: 'OWNER' | 'ADMIN' | 'MEMBER';
+  resConfig: GroupResConfig;
+};
 
 const GroupDetail: React.FC = () => {
   const groupService = useGroupService();
   const message = useAppMessage();
   const { id } = useParams<{ id: string }>();
-  const [group, setGroup] = useState<Group | null>(null);
-  const [currentUserRole, setCurrentUserRole] = useState<'OWNER' | 'ADMIN' | 'MEMBER'>('MEMBER');
-  const [loading, setLoading] = useState(true);
-  const [resConfig, setResConfig] = useState<GroupResConfig | null>(null);
-  const loadGroup = useCallback(async () => {
-    if (!id) {
-      setGroup(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      const [groupData, role, resConfig] = await Promise.all([
-        groupService.fetchGroupInfo(id),
-        groupService.fetchMyRoleInGroup(id),
-        groupService.fetchGroupResConfig(id),
-      ]);
-      setGroup(groupData);
-      setCurrentUserRole(role);
-      setResConfig(resConfig);
-    } catch {
-      message.error('获取小组详情失败');
-      setGroup(null);
-      setResConfig(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [groupService, id, message]);
 
-  useEffect(() => {
-    loadGroup();
-  }, [loadGroup]);
+  const { loading, data, refresh } = useRequest(
+    async (): Promise<GroupDetailLoaded> => {
+      const [groupData, role, cfg] = await Promise.all([
+        groupService.fetchGroupInfo(id!),
+        groupService.fetchMyRoleInGroup(id!),
+        groupService.fetchGroupResConfig(id!),
+      ]);
+      return { group: groupData, currentUserRole: role, resConfig: cfg };
+    },
+    {
+      refreshDeps: [id],
+      ready: Boolean(id),
+      onError: () => {
+        message.error('获取小组详情失败');
+      },
+    }
+  );
+
+  // 解包 data, 默认 currentUserRole 为 MEMBER, resConfig 为 undefined
+  const { group, currentUserRole = 'MEMBER', resConfig } = data ?? {};
+
+  const groupDisplayConfig = useMemo(() => {
+    if (!group) {
+      return null;
+    }
+    return getGroupDisplayConfig(group.groupType, currentUserRole);
+  }, [group, currentUserRole]);
 
   /** 仅关闭弹窗；解散/退出后会 navigate 离开本页，不应再拉详情（否则多一次失败请求） */
   const handleModalCloseOnly = () => {
@@ -72,39 +77,37 @@ const GroupDetail: React.FC = () => {
   /** 编辑成功后留在详情页，需重新拉取小组与角色 */
   const handleEditSuccess = () => {
     handleModalCloseOnly();
-    void loadGroup();
+    void refresh();
   };
 
   const [editGroupModalOpen, setEditGroupModalOpen] = useState(false);
   const [dissolveGroupModalOpen, setDissolveGroupModalOpen] = useState(false);
   const [exitGroupModalOpen, setExitGroupModalOpen] = useState(false);
-  /** 组长完成 Token 划拨后递增，传给 ComputeWallet.syncRevision 以静默刷新「token明细」Tab 内余额与流水 */
-  const [walletSyncRevision, setWalletSyncRevision] = useState(0);
-  /** Tabs 受控，避免 items 因 syncRevision 更新而重置当前选中的 Tab */
-  const [detailTabKey, setDetailTabKey] = useState<string>('files');
+  const walletRef = useRef<ComputeWalletRef | null>(null);
+  const handleTransferSuccess = useCallback(() => {
+    void walletRef.current?.refresh();
+  }, []);
 
-  const groupDisplayConfig = useMemo(
-    () => (group ? getGroupDisplayConfig(group.groupType, currentUserRole) : null),
-    [group, currentUserRole]
-  );
+  /** Tabs 受控，避免 items 更新时重置当前选中的 Tab */
+  const [detailTabKey, setDetailTabKey] = useState<string>('files');
 
   /**
    * Tabs 配置必须在任意 early return 之前计算，以符合 Hooks 规则。
    * group/groupDisplayConfig 为空时返回空数组（加载中或无效态不会渲染到 Tabs）。
    */
-  const tabItems = useMemo(() => {
-    if (!group || !groupDisplayConfig) {
+  const tabItems = useMemo<NonNullable<TabsProps['items']>>(() => {
+    if (!group || !resConfig || !groupDisplayConfig) {
       return [];
     }
+
     const gid = group.groupId || id || '';
-    const { groupName: name, groupDesc: desc } = group;
-    const items = [
+    const items: NonNullable<TabsProps['items']> = [
       {
         key: 'files',
         label: '文件',
         children: (
           <div className={layout.tabPane}>
-            {resConfig?.fileOrgLogic === 'FOLDER' ? (
+            {resConfig.fileOrgLogic === 'FOLDER' ? (
               <FolderDrive
                 groupId={gid}
                 readOnlyMode={groupDisplayConfig.driveReadOnlyMode}
@@ -136,6 +139,7 @@ const GroupDetail: React.FC = () => {
         ),
       },
     ];
+
     if (groupDisplayConfig.showWalletTabs) {
       items.push({
         key: 'wallet',
@@ -146,9 +150,9 @@ const GroupDetail: React.FC = () => {
               targetType={WALLET_TARGET_TYPE.GROUP}
               targetId={gid}
               canRecharge
-              groupDisplayName={name}
+              groupDisplayName={group.groupName}
               showOperatorColumn
-              syncRevision={walletSyncRevision}
+              ref={walletRef}
             />
           </div>
         ),
@@ -158,35 +162,39 @@ const GroupDetail: React.FC = () => {
         label: 'token 划拨',
         children: (
           <div className={layout.tabPane}>
-            <OwnerGroupTokenTransfer
-              groupId={gid}
-              onTransferSuccess={() => setWalletSyncRevision((k) => k + 1)}
-            />
+            <OwnerGroupTokenTransfer groupId={gid} onTransferSuccess={handleTransferSuccess} />
           </div>
         ),
       });
     }
+
     items.push({
       key: 'description',
       label: '描述',
       children: (
         <div className={layout.tabPane}>
-          <p className={layout.sectionContent}>{desc || '暂无描述'}</p>
+          <p className={layout.sectionContent}>{group.groupDesc || '暂无描述'}</p>
         </div>
       ),
     });
+
     return items;
-  }, [group, id, groupDisplayConfig, walletSyncRevision, resConfig?.fileOrgLogic]);
+  }, [group, id, groupDisplayConfig, resConfig, handleTransferSuccess]);
 
   const detailTabKeys = useMemo(() => tabItems.map((item) => String(item.key)), [tabItems]);
 
-  useEffect(() => {
-    if (detailTabKeys.length === 0) return;
-    if (!detailTabKeys.includes(detailTabKey)) {
-      setDetailTabKey(detailTabKeys[0] ?? 'files');
+  const handleDetailTabChange = (nextKey: string) => {
+    if (detailTabKeys.includes(nextKey)) {
+      setDetailTabKey(nextKey);
     }
-  }, [detailTabKeys, detailTabKey]);
+  };
 
+  const activeDetailTabKey =
+    detailTabKeys.length > 0 && !detailTabKeys.includes(detailTabKey)
+      ? (detailTabKeys[0] ?? 'files')
+      : detailTabKey;
+
+  // 渲染 UI
   if (loading) {
     return (
       <div className={`${layout.pageContainer} ${page.loadingWrap}`}>
@@ -230,8 +238,8 @@ const GroupDetail: React.FC = () => {
 
       <Tabs
         className={layout.detailTabs}
-        activeKey={detailTabKey}
-        onChange={setDetailTabKey}
+        activeKey={activeDetailTabKey}
+        onChange={handleDetailTabChange}
         items={tabItems}
       />
 

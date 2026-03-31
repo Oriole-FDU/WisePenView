@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, Input, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useNavigate } from 'react-router-dom';
 import { useGroupService } from '@/contexts/ServicesContext';
 import type { DeleteGroupRequest } from '@/services/Group';
 import type { DissolveGroupModalProps } from './index.type';
 import styles from './style.module.less';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { parseErrorMessage } from '@/utils/parseErrorMessage';
 
 const DissolveGroupModal: React.FC<DissolveGroupModalProps> = ({
   open,
@@ -16,34 +18,41 @@ const DissolveGroupModal: React.FC<DissolveGroupModalProps> = ({
 }) => {
   const groupService = useGroupService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
   const [confirmName, setConfirmName] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (open) setConfirmName('');
-  }, [open]);
+  const handleOpenChange = useCallback((visible: boolean) => {
+    if (visible) {
+      setConfirmName('');
+    }
+  }, []);
 
-  const handleConfirm = async () => {
+  const { loading, run: runDissolveGroup } = useRequest(
+    async () => {
+      const params: DeleteGroupRequest = { groupId: groupId! };
+      await groupService.deleteGroup(params);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('已解散小组');
+        setConfirmName('');
+        onSuccess?.();
+        onCancel();
+        navigate('/app/my-group');
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '解散小组失败'));
+      },
+    }
+  );
+
+  const handleConfirm = () => {
     if (!groupId) {
-      message.error('解散失败');
+      message.warning('小组ID不存在');
       return;
     }
-    try {
-      setLoading(true);
-      const params: DeleteGroupRequest = { groupId };
-      await groupService.deleteGroup(params);
-      message.success('已解散小组');
-      setConfirmName('');
-      onSuccess?.();
-      onCancel();
-      navigate('/app/my-group');
-    } catch (error) {
-      console.error('解散小组失败:', error);
-      message.error('解散小组失败，请重试');
-    } finally {
-      setLoading(false);
-    }
+    runDissolveGroup();
   };
 
   return (
@@ -51,6 +60,7 @@ const DissolveGroupModal: React.FC<DissolveGroupModalProps> = ({
       title="解散小组"
       open={open}
       onCancel={onCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={onCancel}>

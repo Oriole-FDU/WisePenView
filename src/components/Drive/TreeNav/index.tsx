@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Tree, Spin, Empty } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import { LuChevronDown } from 'react-icons/lu';
+import { useRequest } from 'ahooks';
 import { useFolderService, useTagService } from '@/contexts/ServicesContext';
 import type { TagTreeNode } from '@/services/Tag/index.type';
 import { mapFolderToTagTreeNode } from '@/types/folder';
@@ -80,7 +81,6 @@ const TreeNav: React.FC<TreeNavProps> = ({
   }, [viewMode, folderService, tagService]);
 
   const [treeData, setTreeData] = useState<DataNode[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [checkedTagKeys, setCheckedTagKeys] = useState<React.Key[]>([]);
   const [checkedFileKeys, setCheckedFileKeys] = useState<React.Key[]>([]);
@@ -141,17 +141,11 @@ const TreeNav: React.FC<TreeNavProps> = ({
     [adapter, message, showFiles, selectMode, viewMode]
   );
 
-  useEffect(() => {
-    handleLoadMoreRef.current = handleLoadMore;
-  }, [handleLoadMore]);
+  handleLoadMoreRef.current = handleLoadMore;
 
   // folder
-  useEffect(() => {
-    if (viewMode !== 'folder') return;
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
+  const { loading: folderLoading } = useRequest(
+    async (): Promise<DataNode[]> => {
       nodeMapRef.current.clear();
       loadMoreMetaRef.current.clear();
       resourceByIdRef.current.clear();
@@ -166,96 +160,74 @@ const TreeNav: React.FC<TreeNavProps> = ({
         onLoadMoreClick: (k) => void handleLoadMoreRef.current(k),
       };
 
-      try {
-        const root = await folderService.getFolderTree({ groupId });
-        if (cancelled) return;
-
-        const childNodes = await buildFolderNavChildren(root, ctx, folderService);
-        if (cancelled) return;
-
-        const rootNode: DataNode = {
-          ...createFolderDataNode(root, nodeMapRef.current, ROOT_DISPLAY),
-          checkable: false,
-          selectable: selectMode === 'nodes',
-          children: childNodes,
-        };
-
-        setTreeData([rootNode]);
+      const root = await folderService.getFolderTree({ groupId });
+      const childNodes = await buildFolderNavChildren(root, ctx, folderService);
+      const rootNode: DataNode = {
+        ...createFolderDataNode(root, nodeMapRef.current, ROOT_DISPLAY),
+        checkable: false,
+        selectable: selectMode === 'nodes',
+        children: childNodes,
+      };
+      return [rootNode];
+    },
+    {
+      ready: viewMode === 'folder',
+      refreshDeps: [viewMode, groupId, refreshTrigger, folderService, showFiles, selectMode],
+      onSuccess: (data) => {
+        setTreeData(data);
         setSelectedKeys([]);
         setCheckedFileKeys([]);
         onChangeRef.current?.([], []);
-      } catch (err) {
-        if (cancelled) return;
+      },
+      onError: (err) => {
         message.error(parseErrorMessage(err, '获取文件夹树失败'));
         setTreeData([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [viewMode, groupId, refreshTrigger, folderService, message, showFiles, selectMode]);
+      },
+    }
+  );
 
   // tag + nodes（完整树，无文件）
-  useEffect(() => {
-    if (viewMode !== 'tag' || selectMode !== 'nodes') return;
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
+  const { loading: tagNodesLoading } = useRequest(
+    async (): Promise<DataNode[]> => {
       nodeMapRef.current.clear();
       loadMoreMetaRef.current.clear();
       resourceByIdRef.current.clear();
 
-      try {
-        const nodes = await tagService.getTagTree(groupId);
-        if (cancelled) return;
-
-        const dataNodes = nodes
-          .map((n) => tagToDataNode(n, nodeMapRef.current))
-          .filter((n): n is DataNode => n != null);
-
-        setTreeData(dataNodes);
+      const nodes = await tagService.getTagTree(groupId);
+      return nodes
+        .map((n) => tagToDataNode(n, nodeMapRef.current))
+        .filter((n): n is DataNode => n != null);
+    },
+    {
+      ready: viewMode === 'tag' && selectMode === 'nodes',
+      refreshDeps: [
+        viewMode,
+        selectMode,
+        groupId,
+        refreshTrigger,
+        tagService,
+        tagInitialCheckKey,
+        tagInitialCheckedIds,
+      ],
+      onSuccess: (data) => {
+        setTreeData(data);
         const initialIds = (tagInitialCheckedIds ?? []).filter((id) => nodeMapRef.current.has(id));
         setCheckedTagKeys(initialIds);
         const selectedNodes = initialIds
           .map((k) => nodeMapRef.current.get(String(k)))
           .filter((n): n is TagTreeNode => n != null);
         onChangeRef.current?.(selectedNodes, []);
-      } catch (err) {
-        if (cancelled) return;
+      },
+      onError: (err) => {
         message.error(parseErrorMessage(err, '获取标签树失败'));
         setTreeData([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    viewMode,
-    selectMode,
-    groupId,
-    refreshTrigger,
-    tagService,
-    message,
-    tagInitialCheckKey,
-    tagInitialCheckedIds,
-  ]);
+      },
+    }
+  );
 
   // tag + leaves（懒加载子标签与文件）
-  useEffect(() => {
-    if (viewMode !== 'tag' || selectMode !== 'leaves') return;
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
+  const { loading: tagLeavesLoading } = useRequest(
+    async (): Promise<DataNode[]> => {
       nodeMapRef.current.clear();
       loadMoreMetaRef.current.clear();
       resourceByIdRef.current.clear();
@@ -270,31 +242,25 @@ const TreeNav: React.FC<TreeNavProps> = ({
         onLoadMoreClick: (k) => void handleLoadMoreRef.current(k),
       };
 
-      try {
-        const nodes = await tagService.getTagTree(groupId);
-        if (cancelled) return;
-
-        const dataNodes = nodes
-          .map((n) => tagToLazyNavDataNode(n, ctx))
-          .filter((n): n is DataNode => n != null);
-
-        setTreeData(dataNodes);
+      const nodes = await tagService.getTagTree(groupId);
+      return nodes.map((n) => tagToLazyNavDataNode(n, ctx)).filter((n): n is DataNode => n != null);
+    },
+    {
+      ready: viewMode === 'tag' && selectMode === 'leaves',
+      refreshDeps: [viewMode, selectMode, groupId, refreshTrigger, tagService],
+      onSuccess: (data) => {
+        setTreeData(data);
         setCheckedFileKeys([]);
         onChangeRef.current?.([], []);
-      } catch (err) {
-        if (cancelled) return;
+      },
+      onError: (err) => {
         message.error(parseErrorMessage(err, '获取标签树失败'));
         setTreeData([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
+      },
+    }
+  );
 
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [viewMode, selectMode, groupId, refreshTrigger, tagService, message]);
+  const loading = folderLoading || tagNodesLoading || tagLeavesLoading;
 
   const handleLoadFolderData = useCallback(
     async (treeNode: DataNode) => {

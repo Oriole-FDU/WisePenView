@@ -1,8 +1,9 @@
 /**
  * 高级组组长：个人计算点与小组池之间的 Token 划拨（giveTokenToGroup / giveTokenToOwner）。
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, InputNumber, Skeleton } from 'antd';
+import { useRequest } from 'ahooks';
 import { useUserService, useWalletService } from '@/contexts/ServicesContext';
 import { WALLET_TARGET_TYPE } from '@/constants/wallet';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -19,37 +20,27 @@ const OwnerGroupTokenTransfer: React.FC<OwnerGroupTokenTransferProps> = ({
   const message = useAppMessage();
 
   const [userId, setUserId] = useState<string | null>(null);
-  const [userLoading, setUserLoading] = useState(true);
   const [personalBal, setPersonalBal] = useState(0);
   const [groupBal, setGroupBal] = useState(0);
-  const [balanceLoading, setBalanceLoading] = useState(false);
   const [amtToGroup, setAmtToGroup] = useState<number | null>(null);
   const [amtToOwner, setAmtToOwner] = useState<number | null>(null);
-  const [submittingToGroup, setSubmittingToGroup] = useState(false);
-  const [submittingToOwner, setSubmittingToOwner] = useState(false);
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setUserLoading(true);
-        const u = await userService.getUserInfo();
-        setUserId(u.id);
-      } catch {
-        setUserId(null);
-        message.error('获取当前用户失败');
-      } finally {
-        setUserLoading(false);
+  const { loading: userLoading } = useRequest(async () => userService.getUserInfo(), {
+    refreshDeps: [userService],
+    onSuccess: (user) => {
+      setUserId(user.id);
+    },
+    onError: () => {
+      setUserId(null);
+      message.error('获取当前用户失败');
+    },
+  });
+
+  const { loading: balanceLoading, runAsync: loadBalances } = useRequest(
+    async () => {
+      if (!userId || !groupId) {
+        return null;
       }
-    };
-    void run();
-  }, [userService, message]);
-
-  const loadBalances = useCallback(async () => {
-    if (!userId || !groupId) {
-      return;
-    }
-    setBalanceLoading(true);
-    try {
       const [p, g] = await Promise.all([
         walletService.getWalletInfo({
           targetType: WALLET_TARGET_TYPE.USER,
@@ -60,24 +51,57 @@ const OwnerGroupTokenTransfer: React.FC<OwnerGroupTokenTransferProps> = ({
           targetId: groupId,
         }),
       ]);
-      setPersonalBal(p.balance);
-      setGroupBal(g.balance);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '获取余额失败'));
-    } finally {
-      setBalanceLoading(false);
+      return { personalBal: p.balance, groupBal: g.balance };
+    },
+    {
+      ready: Boolean(userId && groupId),
+      refreshDeps: [userId, groupId, walletService],
+      onSuccess: (res) => {
+        if (!res) return;
+        setPersonalBal(res.personalBal);
+        setGroupBal(res.groupBal);
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '获取余额失败'));
+      },
     }
-  }, [userId, groupId, walletService, message]);
-
-  useEffect(() => {
-    void loadBalances();
-  }, [loadBalances]);
+  );
 
   /** 接口成功后统一：重拉本页两侧余额，并通知父级刷新「token明细」Tab 内钱包 */
   const refreshAfterTransfer = useCallback(async () => {
     await loadBalances();
     onTransferSuccess?.();
   }, [loadBalances, onTransferSuccess]);
+
+  const { loading: submittingToGroup, runAsync: runGiveToGroup } = useRequest(
+    async (amount: number) => walletService.giveTokenToGroup({ groupId, amount }),
+    {
+      manual: true,
+      onSuccess: async () => {
+        message.success('已转入小组池');
+        setAmtToGroup(null);
+        await refreshAfterTransfer();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '转入失败'));
+      },
+    }
+  );
+
+  const { loading: submittingToOwner, runAsync: runGiveToOwner } = useRequest(
+    async (amount: number) => walletService.giveTokenToOwner({ groupId, amount }),
+    {
+      manual: true,
+      onSuccess: async () => {
+        message.success('已转回组长账户');
+        setAmtToOwner(null);
+        await refreshAfterTransfer();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '转回失败'));
+      },
+    }
+  );
 
   const handleGiveToGroup = async () => {
     const n = amtToGroup;
@@ -89,17 +113,7 @@ const OwnerGroupTokenTransfer: React.FC<OwnerGroupTokenTransferProps> = ({
       message.warning('组长个人计算点不足');
       return;
     }
-    setSubmittingToGroup(true);
-    try {
-      await walletService.giveTokenToGroup({ groupId, amount: Math.floor(n) });
-      message.success('已转入小组池');
-      setAmtToGroup(null);
-      await refreshAfterTransfer();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '转入失败'));
-    } finally {
-      setSubmittingToGroup(false);
-    }
+    await runGiveToGroup(Math.floor(n));
   };
 
   const handleGiveToOwner = async () => {
@@ -112,17 +126,7 @@ const OwnerGroupTokenTransfer: React.FC<OwnerGroupTokenTransferProps> = ({
       message.warning('小组池计算点不足');
       return;
     }
-    setSubmittingToOwner(true);
-    try {
-      await walletService.giveTokenToOwner({ groupId, amount: Math.floor(n) });
-      message.success('已转回组长账户');
-      setAmtToOwner(null);
-      await refreshAfterTransfer();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '转回失败'));
-    } finally {
-      setSubmittingToOwner(false);
-    }
+    await runGiveToOwner(Math.floor(n));
   };
 
   if (userLoading) {

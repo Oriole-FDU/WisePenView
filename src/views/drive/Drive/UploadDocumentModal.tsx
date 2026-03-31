@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Upload, Progress, Button } from 'antd';
 import type { UploadFile, UploadProps } from 'antd';
+import { useRequest } from 'ahooks';
 import { AiOutlineInbox } from 'react-icons/ai';
 
 import { useDocumentService } from '@/contexts/ServicesContext';
@@ -23,28 +24,55 @@ export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({ open, 
   const navigate = useNavigate();
   const message = useAppMessage();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [uploading, setUploading] = useState(false);
   const [phase, setPhase] = useState<'idle' | 'hash' | 'upload'>('idle');
   const [percent, setPercent] = useState(0);
 
   const resetState = useCallback(() => {
     setFileList([]);
-    setUploading(false);
     setPhase('idle');
     setPercent(0);
   }, []);
+
+  const { loading: uploading, run: submitUpload } = useRequest(
+    (file: File) =>
+      documentService.uploadDocument({
+        file,
+        onHashProgress: (p) => {
+          setPhase('hash');
+          setPercent(p);
+        },
+        onUploadProgress: (p) => {
+          setPhase('upload');
+          setPercent(p);
+        },
+      }),
+    {
+      manual: true,
+      onBefore: () => {
+        setPhase('hash');
+        setPercent(0);
+      },
+      onSuccess: (result) => {
+        message.success('上传成功');
+        resetState();
+        onClose();
+        navigate(`/app/pdf/${encodeURIComponent(result.documentId)}`);
+      },
+      onError: (err: unknown) => {
+        message.error(parseErrorMessage(err, '上传失败'));
+      },
+      onFinally: () => {
+        setPhase('idle');
+        setPercent(0);
+      },
+    }
+  );
 
   const handleClose = () => {
     if (uploading) return;
     resetState();
     onClose();
   };
-
-  useEffect(() => {
-    if (!open) {
-      resetState();
-    }
-  }, [open, resetState]);
 
   const uploadProps: UploadProps = {
     maxCount: 1,
@@ -65,32 +93,7 @@ export const UploadDocumentModal: React.FC<UploadDocumentModalProps> = ({ open, 
       message.warning('请选择要上传的文件');
       return;
     }
-    setUploading(true);
-    setPhase('hash');
-    setPercent(0);
-    try {
-      const result = await documentService.uploadDocument({
-        file: raw,
-        onHashProgress: (p) => {
-          setPhase('hash');
-          setPercent(p);
-        },
-        onUploadProgress: (p) => {
-          setPhase('upload');
-          setPercent(p);
-        },
-      });
-      message.success('上传成功');
-      resetState();
-      onClose();
-      navigate(`/app/pdf/${encodeURIComponent(result.documentId)}`);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '上传失败'));
-    } finally {
-      setUploading(false);
-      setPhase('idle');
-      setPercent(0);
-    }
+    submitUpload(raw as File);
   };
 
   return (

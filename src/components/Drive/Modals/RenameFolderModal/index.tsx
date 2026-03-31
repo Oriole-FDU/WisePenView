@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, Input } from 'antd';
+import { useRequest } from 'ahooks';
 import { useFolderService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { getFolderDisplayName } from '@/utils/path';
@@ -15,13 +16,30 @@ const RenameFolderModal: React.FC<RenameFolderModalProps> = ({
   const folderService = useFolderService();
   const message = useAppMessage();
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (open && folder) {
-      setName(getFolderDisplayName(folder.tagName ?? ''));
+  const handleOpenChange = useCallback(
+    (visible: boolean) => {
+      if (visible && folder) {
+        setName(getFolderDisplayName(folder.tagName ?? ''));
+      }
+    },
+    [folder]
+  );
+
+  const { loading, run: runRenameFolder } = useRequest(
+    async (trimmed: string) => folderService.renameFolder(folder!, trimmed),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('重命名成功');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '重命名失败'));
+      },
     }
-  }, [open, folder]);
+  );
 
   const handleSubmit = async () => {
     if (!folder) return;
@@ -30,17 +48,7 @@ const RenameFolderModal: React.FC<RenameFolderModalProps> = ({
       message.warning('请输入文件夹名称');
       return;
     }
-    try {
-      setLoading(true);
-      await folderService.renameFolder(folder, trimmed);
-      message.success('重命名成功');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '重命名失败'));
-    } finally {
-      setLoading(false);
-    }
+    await runRenameFolder(trimmed);
   };
 
   const handleCancel = () => {
@@ -53,6 +61,7 @@ const RenameFolderModal: React.FC<RenameFolderModalProps> = ({
       title="重命名文件夹"
       open={open && !!folder}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
         <Button key="cancel" onClick={handleCancel}>

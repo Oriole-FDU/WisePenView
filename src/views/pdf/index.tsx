@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { useDocumentService } from '@/contexts/ServicesContext';
 import { type PdfPreviewProgress, usePdfPreviewProgressStore } from '@/store';
 
 import styles from './style.module.less';
+import { useParamsEffect } from '@/hooks/useParamsEffect';
 
 /**
  * PDF 阅读器：iframe 嵌入 pdf.js（`public/pdfjs-5/web/viewer.html`）。
@@ -17,6 +18,7 @@ const Pdf: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const setProgress = usePdfPreviewProgressStore((s) => s.setProgress);
 
+  // 记录当前的阅读进度
   const routeProgress = useMemo<PdfPreviewProgress | null>(() => {
     const qs = new URLSearchParams(location.search);
     const pageRaw = qs.get('page');
@@ -29,6 +31,7 @@ const Pdf: React.FC = () => {
     return { page, zoom };
   }, [location.search]);
 
+  // 生成 iframe 的 src
   const iframeSrc = useMemo(() => {
     const id = resourceId?.trim();
     if (!id) {
@@ -49,8 +52,9 @@ const Pdf: React.FC = () => {
       : `/pdfjs-5/web/viewer.html?${qs.toString()}`;
   }, [documentService, resourceId, routeProgress]);
 
-  useEffect(() => {
-    const id = resourceId?.trim();
+  // 在 resourceId 变化时，更新 iframe 的 src
+  useParamsEffect([resourceId], (nextResourceId) => {
+    const id = nextResourceId?.trim();
     const iframe = iframeRef.current;
     if (!id || iframe == null) {
       return;
@@ -90,7 +94,7 @@ const Pdf: React.FC = () => {
       iframe.removeEventListener('load', handleLoad);
       unbind?.();
     };
-  }, [resourceId, setProgress]);
+  });
 
   return (
     <div className={styles.container}>

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- Note 待重构：暂时允许 useEffect
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';

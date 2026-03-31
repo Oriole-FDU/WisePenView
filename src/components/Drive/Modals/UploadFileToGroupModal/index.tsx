@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, Button, Steps } from 'antd';
+import { useRequest } from 'ahooks';
 import type { TagTreeNode } from '@/services/Tag/index.type';
 import type { ResourceItem } from '@/types/resource';
 import { useResourceService } from '@/contexts/ServicesContext';
@@ -22,20 +23,15 @@ const UploadFileToGroupModal: React.FC<UploadFileToGroupModalProps> = ({
   const [navRefreshKey, setNavRefreshKey] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState<ResourceItem[]>([]);
   const [selectedTags, setSelectedTags] = useState<TagTreeNode[]>([]);
-  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!open) {
-      setStep(0);
-      setSelectedFiles([]);
-      setSelectedTags([]);
-      return;
-    }
+  const handleOpenChange = useCallback((visible: boolean) => {
     setStep(0);
     setSelectedFiles([]);
     setSelectedTags([]);
-    setNavRefreshKey((k) => k + 1);
-  }, [open]);
+    if (visible) {
+      setNavRefreshKey((k) => k + 1);
+    }
+  }, []);
 
   const handleCancel = useCallback(() => {
     onCancel();
@@ -58,6 +54,30 @@ const UploadFileToGroupModal: React.FC<UploadFileToGroupModalProps> = ({
     setStep(0);
   }, []);
 
+  const { loading: submitting, run: runUploadToGroup } = useRequest(
+    async ({ validIds, tagIds }: { validIds: string[]; tagIds: string[] }) => {
+      for (const resourceId of validIds) {
+        await resourceService.updateResourceTags({
+          resourceId,
+          tagIds,
+          groupId,
+        });
+      }
+      return validIds.length;
+    },
+    {
+      manual: true,
+      onSuccess: (count) => {
+        message.success(`已上传 ${count} 个文件`);
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '上传失败'));
+      },
+    }
+  );
+
   const handleSubmit = useCallback(async () => {
     const validIds = selectedFiles
       .map((f) => f.resourceId)
@@ -66,24 +86,8 @@ const UploadFileToGroupModal: React.FC<UploadFileToGroupModalProps> = ({
 
     if (validIds.length === 0 || tagIds.length === 0) return;
 
-    setSubmitting(true);
-    try {
-      for (const resourceId of validIds) {
-        await resourceService.updateResourceTags({
-          resourceId,
-          tagIds,
-          groupId,
-        });
-      }
-      message.success(`已上传 ${validIds.length} 个文件`);
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '上传失败'));
-    } finally {
-      setSubmitting(false);
-    }
-  }, [selectedFiles, selectedTags, resourceService, groupId, message, onSuccess, onCancel]);
+    runUploadToGroup({ validIds, tagIds });
+  }, [selectedFiles, selectedTags, runUploadToGroup]);
 
   const hasFileIds = selectedFiles.some((f) => Boolean(f.resourceId?.trim()));
   const canNext = hasFileIds;
@@ -100,6 +104,7 @@ const UploadFileToGroupModal: React.FC<UploadFileToGroupModalProps> = ({
       title="上传文件到小组"
       open={open}
       onCancel={handleCancel}
+      afterOpenChange={handleOpenChange}
       destroyOnHidden
       width={560}
       footer={null}

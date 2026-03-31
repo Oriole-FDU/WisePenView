@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- Note 待重构：暂时允许 useEffect
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Block } from '@/types/note';
 import type { NoteProps } from './index.type';

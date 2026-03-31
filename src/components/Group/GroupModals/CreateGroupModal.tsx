@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Modal, Button, Form, Input, Radio, Select, Upload } from 'antd';
 import type { UploadFile } from 'antd';
+import { useRequest } from 'ahooks';
 import { LuUpload } from 'react-icons/lu';
 import { useGroupService, useImageService, useUserService } from '@/contexts/ServicesContext';
 import type { CreateGroupRequest } from '@/services/Group';
@@ -41,12 +42,13 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onS
     [message]
   );
   const [form] = Form.useForm<CreateGroupFormValues>();
-  const [submitting, setSubmitting] = useState(false);
   const [identityType, setIdentityType] = useState<number | undefined>();
 
-  useEffect(() => {
-    void userService.getUserInfo().then((u) => setIdentityType(u.identityType));
-  }, [userService]);
+  useRequest(() => userService.getUserInfo(), {
+    onSuccess: (u) => {
+      setIdentityType(u.identityType);
+    },
+  });
 
   const allowedGroupTypes = ALLOWED_GROUP_TYPES_MAP[identityType ?? 3];
   const groupTypeOptions = groupTypeOptionsBase.filter((opt) =>
@@ -61,10 +63,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onS
   const normalizeUpload = (e: { fileList?: UploadFile[] } | UploadFile[]) =>
     Array.isArray(e) ? e : (e?.fileList ?? []);
 
-  const handleConfirm = async () => {
-    try {
-      const values = await form.validateFields();
-      setSubmitting(true);
+  const { loading: submitting, run: runCreateGroup } = useRequest(
+    async (values: CreateGroupFormValues) => {
       const coverFile = fileFromCoverField(values.cover);
       let groupCoverUrl = '';
       if (coverFile) {
@@ -92,21 +92,30 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, onCancel, onS
           parseErrorMessage(configErr, '小组已创建，但文件管理方式未保存，请稍后在小组内重试')
         );
       }
-      form.resetFields();
-      onCancel();
-      onSuccess?.();
-    } catch (err: unknown) {
-      const isValidationError =
-        err != null &&
-        typeof err === 'object' &&
-        'errorFields' in err &&
-        Array.isArray((err as { errorFields?: unknown }).errorFields);
-      if (!isValidationError) {
-        message.error(parseErrorMessage(err, '创建失败'));
-      }
-    } finally {
-      setSubmitting(false);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        form.resetFields();
+        onCancel();
+        onSuccess?.();
+      },
+      onError: (err: unknown) => {
+        const isValidationError =
+          err != null &&
+          typeof err === 'object' &&
+          'errorFields' in err &&
+          Array.isArray((err as { errorFields?: unknown }).errorFields);
+        if (!isValidationError) {
+          message.error(parseErrorMessage(err, '创建失败'));
+        }
+      },
     }
+  );
+
+  const handleConfirm = async () => {
+    const values = await form.validateFields();
+    runCreateGroup(values);
   };
 
   return (

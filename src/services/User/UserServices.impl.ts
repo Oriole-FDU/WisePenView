@@ -8,7 +8,6 @@ import type {
   FudanUISVerifyStatusData,
   GetUserInfoResponse,
   InitiateUISVerifyRequest,
-  PollFudanUISVerifyOptions,
   SendEmailVerifyRequest,
   UpdateUserInfoRequest,
 } from './index.type';
@@ -132,43 +131,6 @@ const checkFudanUISVerify = async (): Promise<FudanUISVerifyStatusData> => {
   return normalizeFudanUISVerifyData(res.data);
 };
 
-const throwIfAborted = (signal: AbortSignal | undefined): void => {
-  if (signal?.aborted) {
-    throw new DOMException('Aborted', 'AbortError');
-  }
-};
-
-const sleep = (ms: number, signal: AbortSignal | undefined): Promise<void> =>
-  new Promise((resolve, reject) => {
-    throwIfAborted(signal);
-    const timer = window.setTimeout(() => {
-      signal?.removeEventListener('abort', onAbort);
-      resolve();
-    }, ms);
-    const onAbort = () => {
-      window.clearTimeout(timer);
-      reject(new DOMException('Aborted', 'AbortError'));
-    };
-    signal?.addEventListener('abort', onAbort, { once: true });
-  });
-
-const pollFudanUISVerifyUntilComplete = async (
-  options?: PollFudanUISVerifyOptions
-): Promise<FudanUISVerifyStatusData> => {
-  const intervalMs = options?.intervalMs ?? 2000;
-  const { signal, onProgress } = options ?? {};
-
-  for (;;) {
-    throwIfAborted(signal);
-    const status = await checkFudanUISVerify();
-    onProgress?.(status);
-    if (status.completed) {
-      return status;
-    }
-    await sleep(intervalMs, signal);
-  }
-};
-
 const confirmEmailVerify = async (params: ConfirmEmailVerifyRequest): Promise<void> => {
   const res = (await Axios.get('/user/verify/checkEmailVerify', {
     params: { token: params.token },
@@ -183,7 +145,6 @@ export const UserServicesImpl: IUserService = {
   sendEmailVerify,
   initiateUISVerify,
   checkFudanUISVerify,
-  pollFudanUISVerifyUntilComplete,
   confirmEmailVerify,
   clearUserCache,
 };

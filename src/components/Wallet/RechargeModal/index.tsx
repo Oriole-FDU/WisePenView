@@ -7,8 +7,9 @@
  * - 提交：剔除横杠与空格，仅传 16 位纯字符。
  * - 防重复提交：进行中按钮文案为「充值中...」并禁用。
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Input, Modal } from 'antd';
+import { useRequest } from 'ahooks';
 import type { RechargeModalProps } from './index.type';
 import styles from './style.module.less';
 
@@ -32,47 +33,47 @@ const RechargeModal: React.FC<RechargeModalProps> = ({
   onSubmit,
 }) => {
   const [value, setValue] = useState('');
-  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!open) {
-      setValue('');
-      setSubmitting(false);
-    }
-  }, [open]);
+  const handleCancel = () => {
+    setValue('');
+    onCancel();
+  };
 
   const title =
     groupDisplayName != null && groupDisplayName.length > 0
       ? `为「${groupDisplayName}」充值`
       : '个人充值';
 
-  const handleOk = async () => {
+  const { loading: submitting, run: runRecharge } = useRequest(
+    async (code: string) => onSubmit(code),
+    {
+      manual: true,
+      onSuccess: () => {
+        handleCancel();
+      },
+    }
+  );
+
+  const handleOk = () => {
     const code = toSubmitCode(value);
     if (code.length !== 16) {
       return;
     }
-    setSubmitting(true);
-    try {
-      await onSubmit(code);
-      setValue('');
-      onCancel();
-    } finally {
-      setSubmitting(false);
-    }
+    runRecharge(code);
   };
 
   return (
     <Modal
       title={title}
       open={open}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       onOk={() => void handleOk()}
       okText={submitting ? '充值中...' : '确认充值'}
       okButtonProps={{
         disabled: toSubmitCode(value).length !== 16 || submitting,
         loading: submitting,
       }}
-      destroyOnClose
+      destroyOnHidden
     >
       <Input
         size="large"

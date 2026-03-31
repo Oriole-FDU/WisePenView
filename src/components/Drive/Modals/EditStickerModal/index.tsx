@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { Modal, Tag, Spin, Divider } from 'antd';
+import { useRequest } from 'ahooks';
 import { LuPlus } from 'react-icons/lu';
 import { useStickerService } from '@/contexts/ServicesContext';
 import type { Sticker } from '@/services/Sticker';
@@ -15,36 +16,50 @@ const EditStickerModal: React.FC<EditStickerModalProps> = ({ open, onCancel, onS
   const message = useAppMessage();
 
   const [stickers, setStickers] = useState<Sticker[]>([]);
-  const [stickerLoading, setStickerLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [submitLoading, setSubmitLoading] = useState(false);
 
-  useEffect(() => {
-    if (!open || !file) return;
-    let cancelled = false;
-    const load = async () => {
-      setStickerLoading(true);
-      try {
-        const list = await stickerService.getStickerList();
-        if (cancelled) return;
+  const { loading: stickerLoading } = useRequest(
+    async () => {
+      if (!file) return null;
+      const list = await stickerService.getStickerList();
+      return { list, currentFile: file };
+    },
+    {
+      ready: Boolean(open && file),
+      refreshDeps: [open, file, stickerService],
+      onSuccess: (res) => {
+        if (!res) return;
+        const { list, currentFile } = res;
         setStickers(list);
-        const initial = file.currentTags ? Object.keys(file.currentTags) : [];
+        const initial = currentFile.currentTags ? Object.keys(currentFile.currentTags) : [];
         setSelectedIds(initial);
-      } catch (err) {
-        if (!cancelled) {
-          message.error(parseErrorMessage(err, '获取标签列表失败'));
-          setStickers([]);
-          setSelectedIds([]);
-        }
-      } finally {
-        if (!cancelled) setStickerLoading(false);
-      }
-    };
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [open, file, stickerService, message]);
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '获取标签列表失败'));
+        setStickers([]);
+        setSelectedIds([]);
+      },
+    }
+  );
+
+  const { loading: submitLoading, run: runUpdateStickers } = useRequest(
+    async () =>
+      stickerService.updateResourceStickers({
+        resourceId: file!.resourceId!,
+        stickerIds: selectedIds,
+      }),
+    {
+      manual: true,
+      onSuccess: () => {
+        message.success('标签已更新');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '更新标签失败'));
+      },
+    }
+  );
 
   const handleToggle = useCallback((tagId: string) => {
     setSelectedIds((prev) =>
@@ -54,10 +69,16 @@ const EditStickerModal: React.FC<EditStickerModalProps> = ({ open, onCancel, onS
 
   const [addModalOpen, setAddModalOpen] = useState(false);
 
-  const handleAddSuccess = useCallback((sticker: Sticker) => {
-    setStickers((prev) => [...prev, sticker]);
-    setSelectedIds((prev) => [...prev, sticker.tagId]);
-  }, []);
+  const handleAddSuccess = useCallback(() => {
+    void (async () => {
+      try {
+        const list = await stickerService.getStickerList();
+        setStickers(list);
+      } catch (err) {
+        message.error(parseErrorMessage(err, '获取标签列表失败'));
+      }
+    })();
+  }, [stickerService, message]);
 
   const { unselected, selected } = useMemo(() => {
     const idSet = new Set(selectedIds);
@@ -69,21 +90,8 @@ const EditStickerModal: React.FC<EditStickerModalProps> = ({ open, onCancel, onS
 
   const handleSubmit = useCallback(async () => {
     if (!file?.resourceId) return;
-    setSubmitLoading(true);
-    try {
-      await stickerService.updateResourceStickers({
-        resourceId: file.resourceId,
-        stickerIds: selectedIds,
-      });
-      message.success('标签已更新');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '更新标签失败'));
-    } finally {
-      setSubmitLoading(false);
-    }
-  }, [file, selectedIds, stickerService, message, onSuccess, onCancel]);
+    await runUpdateStickers();
+  }, [file, runUpdateStickers]);
 
   return (
     <>

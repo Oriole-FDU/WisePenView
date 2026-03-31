@@ -4,7 +4,6 @@ export type {
   FudanUISVerifyStatusData,
   GetUserInfoResponse,
   InitiateUISVerifyRequest,
-  PollFudanUISVerifyOptions,
   SendEmailVerifyRequest,
   UpdateUserInfoRequest,
 } from './index.type';

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { useState, useEffect } from 'react';
 import { ModelService } from '@/services/ChatPanel';
 import type { Model } from '@/components/ChatPanel/index.type';

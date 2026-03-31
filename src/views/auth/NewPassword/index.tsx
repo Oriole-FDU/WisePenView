@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useMount, useRequest } from 'ahooks';
 import { Form, Typography, Input, Button, Modal } from 'antd';
 import { RiLockLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,34 +9,41 @@ import auth from '../Auth.module.less';
 import type { NewPasswordRequest } from '@/services/Auth';
 import { useAppMessage } from '@/hooks/useAppMessage';
 
+type NewPasswordFormValues = Pick<NewPasswordRequest, 'newPassword'>;
+
 const NewPassword: React.FC = () => {
   const authService = useAuthService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState('');
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [form] = Form.useForm<Pick<NewPasswordRequest, 'newPassword'>>();
+  const [form] = Form.useForm<NewPasswordFormValues>();
   const navigate = useNavigate();
 
-  const onFinish = async (values: Pick<NewPasswordRequest, 'newPassword'>) => {
-    if (loading) return;
+  useMount(() => {
+    const queryToken = new URLSearchParams(window.location.search).get('token') ?? '';
+    setToken(queryToken);
+  });
 
-    //token 在url中，url的格式为/new-pwd?token=xxxx
-    const token = window.location.search.split('token=')[1];
+  const { loading, run: submitNewPassword } = useRequest(
+    async (values: NewPasswordFormValues) =>
+      authService.newPassword({ newPassword: values.newPassword, token }),
+    {
+      manual: true,
+      onSuccess: () => {
+        setSuccessModalOpen(true);
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '设置失败'));
+      },
+    }
+  );
 
+  const onFinish = (values: NewPasswordFormValues) => {
     if (!token) {
       message.error('token不存在');
       return;
     }
-
-    setLoading(true);
-    try {
-      await authService.newPassword({ newPassword: values.newPassword, token });
-      setSuccessModalOpen(true);
-    } catch (err) {
-      message.error(parseErrorMessage(err, '设置失败'));
-    } finally {
-      setLoading(false);
-    }
+    submitNewPassword(values);
   };
 
   return (

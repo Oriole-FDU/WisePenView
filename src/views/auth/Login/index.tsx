@@ -8,26 +8,30 @@ import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import auth from '../Auth.module.less';
 import type { LoginRequest } from '@/services/Auth';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { useRequest } from 'ahooks';
 
 const Login: React.FC = () => {
   const authService = useAuthService();
   const message = useAppMessage();
   const [contractOpen, setContractOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<LoginRequest>();
   const navigate = useNavigate();
 
-  const onFinish = async (values: LoginRequest) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      await authService.login(values);
-      navigate('/app/drive');
-    } catch (err) {
-      message.error(parseErrorMessage(err, '登录失败'));
-    } finally {
-      setLoading(false);
+  const { loading, run: submitLogin } = useRequest(
+    (values: LoginRequest) => authService.login(values),
+    {
+      manual: true,
+      onSuccess: () => {
+        navigate('/app/drive');
+      },
+      onError: (err: unknown) => {
+        message.error(parseErrorMessage(err, '登录失败'));
+      },
     }
+  );
+
+  const onFinish = (values: LoginRequest) => {
+    submitLogin(values);
   };
 
   return (

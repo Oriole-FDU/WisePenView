@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- ChatPanel 待重构：暂时允许 useEffect
 import React, { useState, useMemo, useEffect } from 'react';
 import { Popover, Dropdown, Tooltip, Tag, Spin, Empty } from 'antd';
 import type { MenuProps } from 'antd';

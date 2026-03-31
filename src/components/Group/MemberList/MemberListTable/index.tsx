@@ -1,77 +1,33 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Table } from 'antd';
 import type { TableProps, TablePaginationConfig } from 'antd';
 import type { GroupMember } from '@/types/group';
 import type { MemberListPaginationConfig, MemberListTableProps } from './index.type';
 import { getColumns } from './TableConfig';
 import styles from './style.module.less';
-import { useGroupService } from '@/contexts/ServicesContext';
-import { useAppMessage } from '@/hooks/useAppMessage';
 
 type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
 const MemberListTable: React.FC<MemberListTableProps> = ({
-  groupId,
   groupDisplayConfig,
   pagination,
+  members,
+  loading,
+  total,
+  currentPage,
+  pageSize,
   isEditMode,
   selectedRowKeys,
+  onPageChange,
   onSelectedRowKeysChange,
   onSelectedMembersChange,
-  onTotalChange,
-  refreshTrigger,
 }) => {
-  const groupService = useGroupService();
-  const message = useAppMessage();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(pagination?.defaultPageSize ?? 5);
-  const [loading, setLoading] = useState(false);
-  const [members, setMembers] = useState<GroupMember[]>([]);
-  const [total, setTotal] = useState(0);
-
-  const selectedMembersMapRef = useRef<Map<string, GroupMember>>(new Map());
-
-  const fetchMembers = async (page: number, size: number) => {
-    try {
-      setLoading(true);
-      const { members: newMembers, total: newTotal } = await groupService.fetchGroupMembers(
-        groupId,
-        page,
-        size
-      );
-      setMembers(newMembers);
-      setTotal(newTotal);
-      onTotalChange?.(newTotal);
-    } catch {
-      message.error('获取成员列表失败');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMembers(1, pageSize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    fetchMembers(1, pageSize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize]);
-
-  useEffect(() => {
-    if (refreshTrigger != null && refreshTrigger > 0) {
-      fetchMembers(currentPage, pageSize);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger]);
-
   const paginationConfig: Required<MemberListPaginationConfig> = {
     defaultPageSize: pagination?.defaultPageSize ?? 5,
     pageSizeOptions: pagination?.pageSizeOptions ?? [5, 10, 20, 50],
     showSizeChanger: pagination?.showSizeChanger ?? true,
   };
+  const selectedMembersMapRef = useRef<Map<string, GroupMember>>(new Map());
 
   const dataSource = useMemo(
     () =>
@@ -82,21 +38,16 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
     [members]
   );
 
-  useEffect(() => {
-    members.forEach((member) => {
-      const key = String(member.userId);
-      if (selectedRowKeys.some((k) => String(k) === key)) {
-        selectedMembersMapRef.current.set(key, member);
-      }
-    });
-
-    if (onSelectedMembersChange) {
-      const selectedMembers = selectedRowKeys
-        .map((k) => selectedMembersMapRef.current.get(String(k)))
+  const emitSelectedMembersChange = useCallback(
+    (keys: Array<string | number>) => {
+      if (!onSelectedMembersChange) return;
+      const selectedMembers = keys
+        .map((key) => selectedMembersMapRef.current.get(String(key)))
         .filter((member): member is GroupMember => member !== undefined);
       onSelectedMembersChange(selectedMembers);
-    }
-  }, [members, selectedRowKeys, onSelectedMembersChange]);
+    },
+    [onSelectedMembersChange]
+  );
 
   const columns = useMemo(() => getColumns(groupDisplayConfig, styles), [groupDisplayConfig]);
 
@@ -131,11 +82,20 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
             selectedMembersMapRef.current.delete(String(key));
           }
         });
+
+        emitSelectedMembersChange(finalSelectedKeys);
       },
     };
-  }, [isEditMode, selectedRowKeys, dataSource, members, onSelectedRowKeysChange]);
+  }, [
+    isEditMode,
+    selectedRowKeys,
+    dataSource,
+    members,
+    onSelectedRowKeysChange,
+    emitSelectedMembersChange,
+  ]);
 
-  const handleTableChange = async (
+  const handleTableChange = (
     pagination: TablePaginationConfig,
     _filters: unknown,
     _sorter: unknown
@@ -146,22 +106,19 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
 
     if (pagination.current !== undefined && pagination.current !== currentPage) {
       newPage = pagination.current;
-      setCurrentPage(newPage);
       pageChanged = true;
     }
 
     if (pagination.pageSize !== undefined && pagination.pageSize !== pageSize) {
       newPageSize = pagination.pageSize;
-      setPageSize(newPageSize);
       if (pagination.current === undefined) {
         newPage = 1;
-        setCurrentPage(1);
       }
       pageChanged = true;
     }
 
     if (pageChanged) {
-      await fetchMembers(newPage, newPageSize);
+      onPageChange(newPage, newPageSize);
     }
   };
 
@@ -180,7 +137,7 @@ const MemberListTable: React.FC<MemberListTableProps> = ({
         total,
         pageSizeOptions: paginationConfig.pageSizeOptions,
         showSizeChanger: paginationConfig.showSizeChanger,
-        showTotal: (total) => `共 ${total} 人`,
+        showTotal: (tableTotal) => `共 ${tableTotal} 人`,
       }}
     />
   );

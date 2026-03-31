@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Alert } from 'antd';
+import { useRequest } from 'ahooks';
 import { useDocumentService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
 import { useRecentFilesStore } from '@/store';
@@ -10,8 +11,23 @@ import { RESOURCE_TYPE } from '@/constants/resource';
 const DeleteFileModal: React.FC<DeleteFileModalProps> = ({ open, onCancel, onSuccess, file }) => {
   const documentService = useDocumentService();
   const message = useAppMessage();
-  const [loading, setLoading] = useState(false);
   const removeFile = useRecentFilesStore((s) => s.removeFile);
+
+  const { loading, run: runDeleteFile } = useRequest(
+    async () => documentService.deleteDocument(file!.resourceId!),
+    {
+      manual: true,
+      onSuccess: () => {
+        removeFile(file!.resourceId!);
+        message.success('文件已删除');
+        onSuccess?.();
+        onCancel();
+      },
+      onError: (err) => {
+        message.error(parseErrorMessage(err, '删除失败'));
+      },
+    }
+  );
 
   const handleConfirm = async () => {
     if (!file?.resourceId) return;
@@ -19,18 +35,7 @@ const DeleteFileModal: React.FC<DeleteFileModalProps> = ({ open, onCancel, onSuc
       message.warning('暂不支持删除笔记');
       return;
     }
-    try {
-      setLoading(true);
-      await documentService.deleteDocument(file.resourceId);
-      removeFile(file.resourceId);
-      message.success('文件已删除');
-      onSuccess?.();
-      onCancel();
-    } catch (err) {
-      message.error(parseErrorMessage(err, '删除失败'));
-    } finally {
-      setLoading(false);
-    }
+    runDeleteFile();
   };
 
   const displayName = file?.resourceName || '未命名';
