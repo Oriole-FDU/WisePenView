@@ -10,13 +10,13 @@ echo ==^> WisePenView setup (Windows)
 where node >nul 2>nul
 if errorlevel 1 (
   echo Error: Node.js is not installed. Please install Node.js first.
-  exit /b 1
+  goto :fail
 )
 
 where npm >nul 2>nul
 if errorlevel 1 (
   echo Error: npm is not available. Please reinstall Node.js.
-  exit /b 1
+  goto :fail
 )
 
 for /f %%i in ('node -v') do set "NODE_VERSION=%%i"
@@ -37,7 +37,7 @@ if not errorlevel 1 (
 where pnpm >nul 2>nul
 if errorlevel 1 (
   echo Error: pnpm installation failed.
-  exit /b 1
+  goto :fail
 )
 
 for /f %%i in ('pnpm -v') do set "PNPM_VERSION=%%i"
@@ -49,13 +49,13 @@ call pnpm install
 if errorlevel 1 (
   popd
   echo Error: pnpm install failed.
-  exit /b 1
+  goto :fail
 )
 popd
 
 if not exist "%HOSTS_SCRIPT%" (
   echo Error: hosts setup script not found at %HOSTS_SCRIPT%
-  exit /b 1
+  goto :fail
 )
 
 where python >nul 2>nul
@@ -67,7 +67,7 @@ if not errorlevel 1 (
     set "PYTHON_CMD=py"
   ) else (
     echo Error: Python is not installed. Cannot run hosts setup script.
-    exit /b 1
+    goto :fail
   )
 )
 
@@ -82,4 +82,11 @@ echo   npm run mock
 echo or
 echo   npm run dev
 echo If hosts setup failed due to permissions, re-run this file as Administrator.
+pause
 exit /b 0
+
+:fail
+echo.
+echo Setup failed. Press any key to close this window.
+pause
+exit /b 1
