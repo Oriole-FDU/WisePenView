@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
 Copyright 2012 Mozilla Foundation
 
@@ -553,17 +553,17 @@ See https://github.com/adobe-type-tools/cmap-resources
 
                 <div id="editorModeSeparator" class="verticalToolbarSeparator"></div>
 
-                <div class="toolbarHorizontalGroup hiddenMediumView">
-                  <button id="printButton" class="toolbarButton" type="button" tabindex="0" data-l10n-id="pdfjs-print-button">
+                <div class="toolbarHorizontalGroup hiddenMediumView" hidden="true">
+                  <button id="printButton" class="toolbarButton" type="button" tabindex="0" data-l10n-id="pdfjs-print-button" hidden="true">
                     <span data-l10n-id="pdfjs-print-button-label"></span>
                   </button>
 
-                  <button id="downloadButton" class="toolbarButton" type="button" tabindex="0" data-l10n-id="pdfjs-save-button">
+                  <button id="downloadButton" class="toolbarButton" type="button" tabindex="0" data-l10n-id="pdfjs-save-button" hidden="true">
                     <span data-l10n-id="pdfjs-save-button-label"></span>
                   </button>
                 </div>
 
-                <div class="verticalToolbarSeparator hiddenMediumView"></div>
+                <div class="verticalToolbarSeparator hiddenMediumView" hidden="true"></div>
 
                 <div id="secondaryToolbarToggle" class="toolbarButtonWithContainer">
                   <button
@@ -580,32 +580,32 @@ See https://github.com/adobe-type-tools/cmap-resources
                   </button>
                   <div id="secondaryToolbar" class="hidden doorHangerRight menu">
                     <div id="secondaryToolbarButtonContainer" class="menuContainer">
-                      <button id="secondaryOpenFile" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-open-file-button">
+                      <button id="secondaryOpenFile" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-open-file-button" hidden="true">
                         <span data-l10n-id="pdfjs-open-file-button-label"></span>
                       </button>
 
-                      <div class="visibleMediumView">
-                        <button id="secondaryPrint" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-print-button">
+                      <div class="visibleMediumView" hidden="true">
+                        <button id="secondaryPrint" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-print-button" hidden="true">
                           <span data-l10n-id="pdfjs-print-button-label"></span>
                         </button>
 
-                        <button id="secondaryDownload" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-save-button">
+                        <button id="secondaryDownload" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-save-button" hidden="true">
                           <span data-l10n-id="pdfjs-save-button-label"></span>
                         </button>
 
                       </div>
 
-                      <div class="horizontalToolbarSeparator"></div>
+                      <div class="horizontalToolbarSeparator" hidden="true"></div>
 
-                      <button id="presentationMode" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-presentation-mode-button">
+                      <button id="presentationMode" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-presentation-mode-button" hidden="true">
                         <span data-l10n-id="pdfjs-presentation-mode-button-label"></span>
                       </button>
 
-                      <a href="#" id="viewBookmark" class="toolbarButton labeled" tabindex="0" data-l10n-id="pdfjs-bookmark-button">
+                      <a href="#" id="viewBookmark" class="toolbarButton labeled" tabindex="0" data-l10n-id="pdfjs-bookmark-button" hidden="true">
                         <span data-l10n-id="pdfjs-bookmark-button-label"></span>
                       </a>
 
-                      <div id="viewBookmarkSeparator" class="horizontalToolbarSeparator"></div>
+                      <div id="viewBookmarkSeparator" class="horizontalToolbarSeparator" hidden="true"></div>
 
                       <button id="firstPage" class="toolbarButton labeled" type="button" tabindex="0" data-l10n-id="pdfjs-first-page-button">
                         <span data-l10n-id="pdfjs-first-page-button-label"></span>
@@ -749,7 +749,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                         <span data-l10n-id="pdfjs-image-alt-text-settings-button-label"></span>
                       </button>
 
-                      <div class="horizontalToolbarSeparator"></div>
+                      <div class="horizontalToolbarSeparator" hidden="true"></div>
 
                       <button
                         id="documentProperties"
@@ -758,6 +758,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                         tabindex="0"
                         data-l10n-id="pdfjs-document-properties-button"
                         aria-controls="documentPropertiesDialog"
+                        hidden="true"
                       >
                         <span data-l10n-id="pdfjs-document-properties-button-label"></span>
                       </button>
