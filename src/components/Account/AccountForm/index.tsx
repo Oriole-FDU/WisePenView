@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Button, Descriptions, Form, Input, Select } from 'antd';
 import type { InputRef } from 'antd/es/input';
+import { useRequest } from 'ahooks';
 import { RiPencilLine } from 'react-icons/ri';
 import {
   DEGREE_LEVEL_LABELS,
@@ -56,12 +57,10 @@ const AccountForm: React.FC<AccountFormProps> = ({
 }) => {
   const userService = useUserService();
   const message = useAppMessage();
-  const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
-    try {
+  const { loading: saving, runAsync: runSave } = useRequest(
+    async () => {
       const values = await form.validateFields();
-      setSaving(true);
       const rf = new Set(user?.readonlyFields ?? []);
       const params: UpdateUserInfoRequest = {
         nickname:
@@ -105,17 +104,21 @@ const AccountForm: React.FC<AccountFormProps> = ({
             : (user?.userProfile?.academicTitle ?? undefined),
       };
       await userService.updateUserInfo(params);
-      const data = await userService.getFullUserInfo();
-      onUserInfoUpdated(data);
-      onEditModeChange(false);
-      message.success('保存成功');
-    } catch (err) {
-      if (err && typeof err === 'object' && 'errorFields' in err) return;
-      message.error(parseErrorMessage(err, '保存失败'));
-    } finally {
-      setSaving(false);
+      return userService.getFullUserInfo();
+    },
+    {
+      manual: true,
+      onSuccess: (data) => {
+        onUserInfoUpdated(data);
+        onEditModeChange(false);
+        message.success('保存成功');
+      },
+      onError: (err) => {
+        if (err && typeof err === 'object' && 'errorFields' in err) return;
+        message.error(parseErrorMessage(err, '保存失败'));
+      },
     }
-  };
+  );
 
   const optionsMap = useMemo(
     () =>
@@ -195,7 +198,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
           </div>
           <div className={styles.formActions}>
             <Form.Item className={styles.submitItem}>
-              <Button type="primary" onClick={() => void handleSave()} loading={saving}>
+              <Button type="primary" onClick={() => void runSave()} loading={saving}>
                 保存
               </Button>
               <Button onClick={onCancel} className={styles.cancelBtn}>

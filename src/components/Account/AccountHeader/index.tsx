@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Avatar, Button, Modal, Tooltip, Upload } from 'antd';
 import type { UploadFile } from 'antd';
+import { useRequest } from 'ahooks';
 import { RiCheckLine, RiCloseLine, RiErrorWarningLine } from 'react-icons/ri';
 import { useImageService, useUserService } from '@/contexts/ServicesContext';
 import { getIdentityTypeLabel, getVerificationModeLabel, USER_STATUS } from '@/constants/user';
@@ -20,7 +21,34 @@ const AccountHeader: React.FC<AccountHeaderProps> = ({ user, onUserInfoUpdated }
   );
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [avatarFileList, setAvatarFileList] = useState<UploadFile[]>([]);
-  const [avatarSubmitting, setAvatarSubmitting] = useState(false);
+
+  const { loading: avatarSubmitting, runAsync: runUpdateAvatar } = useRequest(
+    async (raw: File, currentUser: NonNullable<AccountHeaderProps['user']>) => {
+      const { publicUrl } = await imageService.uploadImage({
+        file: raw,
+        isPublic: true,
+        bizPath: 'user/avatar',
+      });
+      await userService.updateUserInfo({
+        nickname: currentUser.userInfo.nickname ?? undefined,
+        realName: currentUser.userInfo.realName ?? undefined,
+        avatar: publicUrl,
+      });
+      return userService.getFullUserInfo();
+    },
+    {
+      manual: true,
+      onSuccess: (data) => {
+        onUserInfoUpdated(data);
+        message.success('头像已更新');
+        setAvatarFileList([]);
+        setAvatarModalOpen(false);
+      },
+      onError: (err: unknown) => {
+        message.error(parseErrorMessage(err, '头像更新失败'));
+      },
+    }
+  );
 
   const openAvatarModal = () => {
     setAvatarFileList([]);
@@ -42,28 +70,7 @@ const AccountHeader: React.FC<AccountHeaderProps> = ({ user, onUserInfoUpdated }
       message.error('用户信息未加载，请稍后重试');
       return Promise.reject(new Error('no_user'));
     }
-    setAvatarSubmitting(true);
-    try {
-      const { publicUrl } = await imageService.uploadImage({
-        file: raw,
-        isPublic: true,
-        bizPath: 'user/avatar',
-      });
-      await userService.updateUserInfo({
-        nickname: user.userInfo.nickname ?? undefined,
-        realName: user.userInfo.realName ?? undefined,
-        avatar: publicUrl,
-      });
-      const data = await userService.getFullUserInfo();
-      onUserInfoUpdated(data);
-      message.success('头像已更新');
-      setAvatarFileList([]);
-      setAvatarModalOpen(false);
-    } catch (err: unknown) {
-      message.error(parseErrorMessage(err, '头像更新失败'));
-    } finally {
-      setAvatarSubmitting(false);
-    }
+    return runUpdateAvatar(raw, user);
   };
 
   const nickname = user?.userInfo?.nickname ?? user?.userInfo?.username ?? '未设置昵称';

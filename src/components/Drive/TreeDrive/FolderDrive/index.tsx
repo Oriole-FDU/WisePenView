@@ -122,18 +122,23 @@ const FolderDrive: React.FC<FolderDriveProps> = ({
   const [deleteFolderTarget, setDeleteFolderTarget] = useState<Folder | null>(null);
   const [moveTarget, setMoveTarget] = useState<MoveToFolderTarget | null>(null);
 
+  // 作为useMemo的依赖，使用useCallback来避免重复创建函数导致不断更新
   const handleRenameFolder = useCallback((node: TagTreeNode) => {
     setRenameFolderTarget(node as Folder);
   }, []);
+
   const handleDeleteFolder = useCallback((node: TagTreeNode) => {
     setDeleteFolderTarget(node as Folder);
   }, []);
+
   const handleRenameFile = useCallback((file: ResourceItem) => {
     setRenameFileTarget(file);
   }, []);
+
   const handleDeleteFile = useCallback((file: ResourceItem) => {
     setDeleteFileTarget(file);
   }, []);
+
   const handleMoveToFolder = useCallback((t: MoveToFolderTarget) => {
     setMoveTarget(t);
   }, []);
