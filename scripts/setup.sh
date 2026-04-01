@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-HOSTS_SCRIPT="${SCRIPT_DIR}/setup_hosts_v2.py"
+HOSTS_SCRIPT="${SCRIPT_DIR}/setup_hosts_v3.py"
 
 echo "==> WisePenView setup (macOS/Linux)"
 

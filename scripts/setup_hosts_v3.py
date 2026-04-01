@@ -8,7 +8,7 @@ import datetime
 # 使用字典来管理多组映射，方便后续扩展
 HOSTS_MAPPINGS = {
     "wisepen-prod-server": "10.176.44.11",
-    "wisepen-dev-server": "10.20.8.251"
+    "wisepen-dev-server": "10.162.161.201"
 }
 # =================================================
 
