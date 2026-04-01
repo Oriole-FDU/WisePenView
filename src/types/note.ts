@@ -3,6 +3,9 @@
  * 与 blocknote/docs/API.md、design-editor-final 对齐
  */
 
+import type { ResourceItem } from './resource';
+import type { UserDisplayBase } from './user';
+
 export type DeltaOp = 'insert' | 'update' | 'delete' | 'move';
 
 export interface JsonDelta {
@@ -64,3 +67,15 @@ export interface CustomInlineContent {
 
 /** 表格内容占位类型 */
 export type TableContent = unknown;
+
+/** Note 元信息（对齐 WisepenCloud noteService 的 NoteInfoBase） */
+export interface NoteMetaInfo {
+  lastUpdatedAt?: string;
+  authors?: UserDisplayBase[];
+}
+
+/** 获取 Note 信息返回体（对齐 /note/getNoteInfo） */
+export interface NoteInfoResponse {
+  resourceInfo: ResourceItem;
+  noteInfo: NoteMetaInfo;
+}

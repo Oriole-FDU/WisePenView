@@ -4,4 +4,7 @@ export type {
   CreateNoteRequest,
   CreateNoteResponse,
   DeleteNoteRequest,
+  GetNoteInfoRequest,
+  NoteInfoDisplayData,
+  NoteInfoDisplayAuthor,
 } from './index.type';

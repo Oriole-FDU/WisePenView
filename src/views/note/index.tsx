@@ -1,12 +1,13 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useMount, useUpdateEffect } from 'ahooks';
-import { Alert, Button, Divider, Result, Spin } from 'antd';
+import { useMount, useRequest, useUpdateEffect } from 'ahooks';
+import { Alert, Button, Result, Spin } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { RiArrowLeftLine } from 'react-icons/ri';
 import clsx from 'clsx';
 
 import NoteEditor from '@/components/Note/NoteEditor';
 import type { NoteEditorHandle } from '@/components/Note/NoteEditor/index.type';
+import NoteInfoBar from '@/components/Note/NoteInfoBar';
 import NoteTitle from '@/components/Note/NoteTitle';
 import { useUserService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -102,7 +103,6 @@ const NoteView: React.FC = () => {
   }, []);
 
   const userId = userLoad.phase === 'ready' ? userLoad.userId : null;
-
   const mountEditorSubtree = Boolean(resourceId) && userId !== null && sessionErrorMessage === null;
 
   const showFullPageSpin =
@@ -154,7 +154,7 @@ const NoteView: React.FC = () => {
               />
             ) : null}
             <NoteTitle id={noteId} focusOnMount={editorSessionReady} onEnterKey={focusBody} />
-            <Divider className={styles.titleDivider} />
+            <NoteInfoBar resourceId={resourceId} />
             <div className={styles.body}>
               <NoteEditor
                 ref={bodyEditorRef}

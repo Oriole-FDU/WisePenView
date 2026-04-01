@@ -8,3 +8,11 @@ export interface User {
   realName?: string;
   campusNo?: string;
 }
+
+/** 后端 UserDisplayBase：用于作者/创建者等轻量展示 */
+export interface UserDisplayBase {
+  nickname?: string;
+  realName?: string;
+  avatar?: string;
+  identityType?: number;
+}

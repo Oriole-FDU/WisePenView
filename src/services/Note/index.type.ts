@@ -13,6 +13,18 @@ export interface INoteService {
   createNote(params: CreateNoteRequest): Promise<CreateNoteResponse>;
   /** 删除 Note（后端会做权限校验并移除资源） */
   deleteNote(params: DeleteNoteRequest): Promise<void>;
+  /** 获取可直接渲染的 Note 信息（作者展示 + 编辑时间文案） */
+  getNoteInfoDisplay(params: GetNoteInfoRequest): Promise<NoteInfoDisplayData>;
+}
+
+export interface NoteInfoDisplayAuthor {
+  name: string;
+  avatar?: string;
+}
+
+export interface NoteInfoDisplayData {
+  authors: NoteInfoDisplayAuthor[];
+  lastEditedAtText: string;
 }
 
 /** 与 docs/apis/note-api.md「新建文档接口」请求体一致 */
@@ -35,4 +47,8 @@ export interface DeleteNoteRequest {
 export interface SyncTitleRequest {
   resourceId: string;
   newName: string;
+}
+
+export interface GetNoteInfoRequest {
+  resourceId: string;
 }
