@@ -1,3 +1,7 @@
+import type * as Y from 'yjs';
+
+import type { NoteYjsSocket } from '@/connection/plugins/note';
+
 /** 供笔记页正文与标题之间的焦点链使用 */
 export interface NoteEditorHandle {
   focus: () => void;
@@ -6,10 +10,7 @@ export interface NoteEditorHandle {
 
 export interface NoteEditorProps {
   resourceId: string;
-  /** Yjs / WebSocket 会话可用（如已 connected）时调用，至多一次 */
-  onSessionReady?: () => void;
-  /** 长时间未连上或连接失败时由子层上报 */
-  onSessionError?: (message: string) => void;
-  /** WebSocket 连接状态变化时回调，true 表示已连接，false 表示断开 */
-  onSessionStatusChange?: (isConnected: boolean) => void;
+  doc: Y.Doc;
+  /** Yjs WebSocket 通道；BlockNote 侧在 {@link CustomBlockNote} 内再断言为 collaboration provider */
+  provider: NoteYjsSocket;
 }

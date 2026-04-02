@@ -36,6 +36,7 @@ import type { DependencyList, EffectCallback } from 'react';
 export const useEffectForce = (effect: EffectCallback, deps?: DependencyList): void => {
   // 这里是项目内 useEffect 的统一封装出口：
   // 依赖数组由调用方显式传入，react-hooks 无法对“非字面量依赖”做静态分析，故在此处集中豁免。
+  // 必须把 effect 的返回值交给 React，否则 cleanup（如 connection 池 release）永远不会执行。
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => effect(), deps);
+  useEffect(effect, deps);
 };

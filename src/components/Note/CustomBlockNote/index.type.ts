@@ -1,9 +1,9 @@
 import type { Doc } from 'yjs';
 
-import type { WisepenProvider } from '@/services/Note/yjs/WisepenProvider';
+import type { NoteYjsSocket } from '@/connection/plugins/note';
 
 export interface CustomBlockNoteProps {
   resourceId: string;
   doc: Doc;
-  provider: WisepenProvider;
+  provider: NoteYjsSocket;
 }

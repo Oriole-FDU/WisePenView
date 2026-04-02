@@ -7,7 +7,7 @@ import { useLatest, useMount, useUnmount } from 'ahooks';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
-import { NOTE_YJS_DOCUMENT_FRAGMENT } from '@/services/Note/yjs';
+import { NOTE_YJS_DOCUMENT_FRAGMENT } from '@/connection/plugins/note';
 import { useImageService } from '@/contexts/ServicesContext';
 
 import type { NoteEditorHandle } from '../NoteEditor/index.type';

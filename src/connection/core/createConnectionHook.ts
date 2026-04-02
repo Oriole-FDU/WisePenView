@@ -3,6 +3,7 @@ import { useMemo, useSyncExternalStore } from 'react';
 import type { ConnectionAdapter } from './ConnectionAdapter';
 import type { ConnectionDataFlow, ConnectionDataFlowConstructor } from './ConnectionDataFlow';
 import { ConnectionManager } from './ConnectionManager';
+import type { RetryStrategy } from './RetryStrategies';
 import { useEffectForce } from '@/hooks/useEffectForce';
 
 /** The object in the pool needs to be released when the reference is zero */
@@ -11,20 +12,30 @@ type DisposableConnection = {
   data: ConnectionDataFlow;
 };
 
+type PoolEntry = {
+  instance: DisposableConnection;
+  refCount: number;
+  lingerTimerId?: ReturnType<typeof setTimeout>;
+};
+
 /**
  * Reference-counted pool keyed by `instanceId` so the same logical connection can be reused.
  *
- * - `acquire`: if an entry exists, increment `refCount` and return that instance; otherwise create via `factory` and store it.
- * - `release`: decrement `refCount`; when it reaches zero, call the instance's `dispose()` and remove it from the pool.
+ * - `acquire`: if an entry exists, cancel any pending linger dispose, increment `refCount`, return instance; otherwise create via `factory`.
+ * - `release`: decrement `refCount`; at zero, either dispose immediately or after `lingerTime` ms if provided.
  *
  * Used by `createConnectionHook` when multiple subscribers share one underlying Adapter/Manager for the same id.
  */
 class ConnectionPool {
-  private pool = new Map<string, { instance: DisposableConnection; refCount: number }>();
+  private pool = new Map<string, PoolEntry>();
 
   acquire<T extends DisposableConnection>(id: string, factory: () => T): T {
     const entry = this.pool.get(id);
     if (entry) {
+      if (entry.lingerTimerId !== undefined) {
+        clearTimeout(entry.lingerTimerId);
+        entry.lingerTimerId = undefined;
+      }
       entry.refCount++;
       return entry.instance as T;
     }
@@ -33,14 +44,25 @@ class ConnectionPool {
     return instance;
   }
 
-  release(id: string) {
+  release(id: string, lingerTimeMs?: number) {
     const entry = this.pool.get(id);
     if (!entry) return;
     entry.refCount--;
-    if (entry.refCount <= 0) {
-      entry.instance.dispose();
-      this.pool.delete(id);
+    if (entry.refCount > 0) return;
+
+    const linger = lingerTimeMs !== undefined && lingerTimeMs > 0 ? lingerTimeMs : 0;
+    if (linger > 0) {
+      entry.lingerTimerId = setTimeout(() => {
+        const current = this.pool.get(id);
+        if (!current || current.refCount > 0) return;
+        current.instance.dispose();
+        this.pool.delete(id);
+      }, linger);
+      return;
     }
+
+    entry.instance.dispose();
+    this.pool.delete(id);
   }
 }
 
@@ -54,6 +76,12 @@ const internalPool = new ConnectionPool();
  * status;
  * data;
  */
+export type ConnectionUnitConfig = {
+  retryStrategy?: RetryStrategy;
+  /** When last subscriber unmounts, delay dispose by this many ms so quick remounts reuse the same connection. */
+  lingerTime?: number;
+};
+
 export function createConnectionHook<
   TDataFlow extends ConnectionDataFlow,
   TAdapter extends ConnectionAdapter,
@@ -61,7 +89,11 @@ export function createConnectionHook<
   type: string;
   Adapter: new (id: string) => TAdapter;
   DataFlow: ConnectionDataFlowConstructor<TDataFlow, TAdapter>;
+  config?: ConnectionUnitConfig;
 }) {
+  const lingerTime = unit.config?.lingerTime;
+  const retryStrategy = unit.config?.retryStrategy;
+
   return (id: string) => {
     const instanceId = `${unit.type}-${id}`;
 
@@ -70,7 +102,7 @@ export function createConnectionHook<
       () =>
         internalPool.acquire(instanceId, () => {
           const adapter = new unit.Adapter(id);
-          const manager = new ConnectionManager(adapter);
+          const manager = new ConnectionManager(adapter, retryStrategy);
           const data = new unit.DataFlow(adapter, manager);
           return {
             manager,
@@ -96,9 +128,9 @@ export function createConnectionHook<
     useEffectForce(() => {
       void connection.manager.connect();
       return () => {
-        internalPool.release(instanceId);
+        internalPool.release(instanceId, lingerTime);
       };
-    }, [connection, instanceId]);
+    }, [connection, instanceId, lingerTime]);
 
     return { status, data: connection.data };
   };
