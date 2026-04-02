@@ -3,7 +3,6 @@ setlocal
 
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_ROOT=%SCRIPT_DIR%.."
-set "HOSTS_SCRIPT=%SCRIPT_DIR%setup_hosts_v2.py"
 
 echo ==^> WisePenView setup (Windows)
 
@@ -52,28 +51,6 @@ if errorlevel 1 (
   goto :fail
 )
 popd
-
-if not exist "%HOSTS_SCRIPT%" (
-  echo Error: hosts setup script not found at %HOSTS_SCRIPT%
-  goto :fail
-)
-
-where python >nul 2>nul
-if not errorlevel 1 (
-  set "PYTHON_CMD=python"
-) else (
-  where py >nul 2>nul
-  if not errorlevel 1 (
-    set "PYTHON_CMD=py"
-  ) else (
-    echo Error: Python is not installed. Cannot run hosts setup script.
-    goto :fail
-  )
-)
-
-echo ==^> Running hosts setup script...
-echo Note: Please run this .bat as Administrator for hosts modification.
-call %PYTHON_CMD% "%HOSTS_SCRIPT%"
 
 echo.
 echo Setup finished.

@@ -4,7 +4,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-HOSTS_SCRIPT="${SCRIPT_DIR}/setup_hosts_v3.py"
 
 echo "==> WisePenView setup (macOS/Linux)"
 
@@ -48,24 +47,6 @@ echo "pnpm version: $(pnpm -v)"
 echo "==> Installing dependencies with pnpm..."
 cd "${PROJECT_ROOT}"
 pnpm install
-
-if [[ ! -f "${HOSTS_SCRIPT}" ]]; then
-  echo "Error: hosts setup script not found at ${HOSTS_SCRIPT}"
-  exit 1
-fi
-
-if command -v python3 >/dev/null 2>&1; then
-  PYTHON_CMD="python3"
-elif command -v python >/dev/null 2>&1; then
-  PYTHON_CMD="python"
-else
-  echo "Error: Python is not installed. Cannot run hosts setup script."
-  exit 1
-fi
-
-echo "==> Running hosts setup script..."
-echo "Note: This step may require sudo/admin permission."
-"${PYTHON_CMD}" "${HOSTS_SCRIPT}" || true
 
 echo
 echo "Setup finished."
