@@ -1,5 +1,7 @@
 /* 相对 SystemLayout.middleContent（position: relative）铺满中间栏，不盖住侧栏与右侧面板 */
 .pageWrap {
+  --resource-view-max-width: 1200px;
+
   position: absolute;
   inset: 0;
   width: 100%;
@@ -7,6 +9,15 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+}
+
+/* 顶栏下方主区：失败/加载态 overlay 相对此层定位，不盖住 ResourceViewerHeader */
+.statesBelowHeader {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 会话未就绪时仍挂载子树（跑 Yjs / BlockNote），但不交互、不可见 */
@@ -29,25 +40,6 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--ant-padding-lg) var(--ant-padding-xl);
-}
-
-.pageHeader {
-  flex-shrink: 0;
-  margin-bottom: var(--ant-margin-sm);
-}
-
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ant-margin-xs);
-  margin-bottom: var(--ant-margin-sm);
-  color: var(--ant-color-text-secondary);
-  text-decoration: none;
-  font-size: var(--ant-font-size);
-
-  &:hover {
-    color: var(--ant-color-text);
-  }
 }
 
 .pageHeading {

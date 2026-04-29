@@ -2,8 +2,8 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Alert, Button, Result, Spin } from 'antd';
 import { useRequest, useUnmount } from 'ahooks';
 import { Link, useParams } from 'react-router-dom';
-import { RiArrowLeftLine } from 'react-icons/ri';
 
+import ResourceViewerHeader from '@/components/Common/ResourceViewerHeader';
 import CustomBlockNote from '@/components/Note/CustomBlockNote';
 import type { NoteBodyEditorHandle } from '@/components/Note/CustomBlockNote/index.type';
 import NoteInfoBar from '@/components/Note/NoteInfoBar';
@@ -63,14 +63,20 @@ const NoteViewConnected: React.FC<NoteViewConnectedProps> = ({
 
   return (
     <div className={styles.pageWrap}>
+      <ResourceViewerHeader
+        lastEditedAtText={noteInfoDisplay.lastEditedAtText}
+        titleBlock={
+          <NoteTitle
+            key={`${resourceId}-${noteInfoDisplay?.noteTitle ?? ''}`}
+            id={noteId}
+            initialContent={noteInfoDisplay?.noteTitle}
+            focusOnMount={isConnected}
+            onEnterKey={focusBody}
+          />
+        }
+      />
       <div className={styles.noteContent}>
         <div className={styles.root}>
-          <header className={styles.pageHeader}>
-            <Link to="/app/drive" className={styles.backLink}>
-              <RiArrowLeftLine size={18} aria-hidden />
-              <span>返回云盘</span>
-            </Link>
-          </header>
           {isDisconnected ? (
             <Alert
               className={styles.wsAlert}
@@ -88,13 +94,6 @@ const NoteViewConnected: React.FC<NoteViewConnectedProps> = ({
               }
             />
           ) : null}
-          <NoteTitle
-            key={`${resourceId}-${noteInfoDisplay?.noteTitle ?? ''}`}
-            id={noteId}
-            initialContent={noteInfoDisplay?.noteTitle}
-            focusOnMount={isConnected}
-            onEnterKey={focusBody}
-          />
           <NoteInfoBar noteInfoDisplay={noteInfoDisplay} />
           <div className={styles.body}>
             <CustomBlockNote
@@ -137,17 +136,20 @@ const NoteView: React.FC = () => {
   if (!resourceId) {
     return (
       <div className={styles.pageWrap}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="无法打开笔记"
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="无法打开笔记"
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -157,18 +159,21 @@ const NoteView: React.FC = () => {
   if (noteInfoError) {
     return (
       <div className={styles.pageWrap}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="无法打开笔记"
-              subTitle={parseErrorMessage(noteInfoError, '笔记不存在或无访问权限')}
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="无法打开笔记"
+                subTitle={parseErrorMessage(noteInfoError, '笔记不存在或无访问权限')}
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -178,10 +183,13 @@ const NoteView: React.FC = () => {
   if (isNoteInfoLoading) {
     return (
       <div className={styles.pageWrap}>
-        <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
-          <div className={styles.middleOverlayLoading}>
-            <Spin size="large" />
-            <span className={styles.middleOverlayText}>正在加载笔记信息...</span>
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
+            <div className={styles.middleOverlayLoading}>
+              <Spin size="large" />
+              <span className={styles.middleOverlayText}>正在加载笔记信息...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -191,18 +199,21 @@ const NoteView: React.FC = () => {
   if (!noteInfoDisplay) {
     return (
       <div className={styles.pageWrap}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="无法打开笔记"
-              subTitle="笔记信息为空，请稍后重试"
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="无法打开笔记"
+                subTitle="笔记信息为空，请稍后重试"
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>

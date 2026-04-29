@@ -1,4 +1,6 @@
 .container {
+  --resource-view-max-width: 1400px;
+
   position: absolute;
   inset: 0;
   width: 100%;
@@ -6,6 +8,14 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+}
+
+.statesBelowHeader {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
@@ -27,37 +37,6 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--ant-padding-lg) var(--ant-padding-xl);
-}
-
-.pageHeader {
-  flex-shrink: 0;
-  margin-bottom: var(--ant-margin-sm);
-}
-
-.headerMain {
-  display: flex;
-  align-items: center;
-  gap: var(--ant-margin-sm);
-  min-height: 24px;
-}
-
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ant-margin-xs);
-  color: var(--ant-color-text-secondary);
-  text-decoration: none;
-  font-size: var(--ant-font-size);
-
-  &:hover {
-    color: var(--ant-color-text);
-  }
-}
-
-.metaText {
-  color: var(--ant-color-text-tertiary);
-  font-size: var(--ant-font-size-sm);
-  line-height: 1.4;
 }
 
 .middleOverlay {

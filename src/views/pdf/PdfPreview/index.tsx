@@ -2,8 +2,9 @@ import React, { useCallback, useState } from 'react';
 import { Button, Result, Spin } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { useRequest } from 'ahooks';
-import { RiArrowLeftLine } from 'react-icons/ri';
 import { RiFileTextLine } from 'react-icons/ri';
+import ResourceViewerHeader from '@/components/Common/ResourceViewerHeader';
+import rvhStyles from '@/components/Common/ResourceViewerHeader/style.module.less';
 import PdfViewer from '@/components/Pdf/PdfViewer/index';
 import { useDocumentService } from '@/contexts/ServicesContext';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
@@ -44,17 +45,20 @@ const PdfPreview: React.FC = () => {
   if (!resourceId) {
     return (
       <div className={styles.container}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="无法打开文档"
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="无法打开文档"
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -64,18 +68,21 @@ const PdfPreview: React.FC = () => {
   if (docInfoError) {
     return (
       <div className={styles.container}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="无法打开文档"
-              subTitle={parseErrorMessage(docInfoError, '文档不存在或无访问权限')}
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="无法打开文档"
+                subTitle={parseErrorMessage(docInfoError, '文档不存在或无访问权限')}
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -85,10 +92,13 @@ const PdfPreview: React.FC = () => {
   if (isDocInfoLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
-          <div className={styles.middleOverlayLoading}>
-            <Spin size="large" />
-            <span className={styles.middleOverlayText}>正在加载文档信息...</span>
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
+            <div className={styles.middleOverlayLoading}>
+              <Spin size="large" />
+              <span className={styles.middleOverlayText}>正在加载文档信息...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -98,18 +108,21 @@ const PdfPreview: React.FC = () => {
   if (!docInfo) {
     return (
       <div className={styles.container}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="无法打开文档"
-              subTitle="文档信息为空，请稍后重试"
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="无法打开文档"
+                subTitle="文档信息为空，请稍后重试"
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -119,18 +132,28 @@ const PdfPreview: React.FC = () => {
   if (viewerError) {
     return (
       <div className={styles.container}>
-        <div className={styles.middleOverlay}>
-          <div className={styles.middleOverlayInner}>
-            <Result
-              status="warning"
-              title="文档预览失败"
-              subTitle={parseErrorMessage(viewerError, '文档预览地址无效或已失效')}
-              extra={
-                <Link to="/app/drive">
-                  <Button type="default">返回云盘</Button>
-                </Link>
-              }
-            />
+        <ResourceViewerHeader
+          inlineTitle={
+            <>
+              <RiFileTextLine aria-hidden />
+              <span className={rvhStyles.inlineTitleText}>{docInfo.resourceInfo.resourceName}</span>
+            </>
+          }
+        />
+        <div className={styles.statesBelowHeader}>
+          <div className={styles.middleOverlay}>
+            <div className={styles.middleOverlayInner}>
+              <Result
+                status="warning"
+                title="文档预览失败"
+                subTitle={parseErrorMessage(viewerError, '文档预览地址无效或已失效')}
+                extra={
+                  <Link to="/app/drive">
+                    <Button type="default">返回云盘</Button>
+                  </Link>
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -139,18 +162,16 @@ const PdfPreview: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <ResourceViewerHeader
+        inlineTitle={
+          <>
+            <RiFileTextLine aria-hidden />
+            <span className={rvhStyles.inlineTitleText}>{docInfo.resourceInfo.resourceName}</span>
+          </>
+        }
+      />
       <div className={styles.content}>
         <div className={styles.root}>
-          <header className={styles.pageHeader}>
-            <div className={styles.headerMain}>
-              <Link to="/app/drive" className={styles.backLink}>
-                <RiArrowLeftLine size={18} aria-hidden />
-                <span>返回云盘</span>
-              </Link>
-              <RiFileTextLine />
-              <span> {docInfo?.resourceInfo.resourceName} </span>
-            </div>
-          </header>
           <PdfViewer key={resourceId} resourceId={resourceId} onLoadError={handleViewerLoadError} />
         </div>
       </div>
