@@ -27,6 +27,18 @@ const fileFromCoverField = (fileList?: UploadFile[]): File | undefined => {
   return raw instanceof File ? raw : undefined;
 };
 
+const fileListFromCover = (cover?: string): UploadFile[] =>
+  cover
+    ? [
+        {
+          uid: '-1',
+          name: 'cover',
+          status: 'done',
+          url: cover,
+        },
+      ]
+    : [];
+
 function EditGroupInfoModal({
   open,
   onCancel,
@@ -84,7 +96,7 @@ function EditGroupInfoModal({
 
   const handleOpenChange = (visible: boolean) => {
     if (!visible) return;
-    form.setFieldsValue({ groupName, groupDesc: description });
+    form.setFieldsValue({ groupName, groupDesc: description, cover: fileListFromCover(cover) });
   };
 
   const handleConfirm = async () => {
@@ -130,7 +142,13 @@ function EditGroupInfoModal({
           valuePropName="fileList"
           getValueFromEvent={normalizeUpload}
         >
-          <Upload name="file" beforeUpload={beforeUploadCover} accept="image/*" maxCount={1}>
+          <Upload
+            name="file"
+            beforeUpload={beforeUploadCover}
+            accept="image/*"
+            maxCount={1}
+            listType="picture-card"
+          >
             <Button>
               <IconText icon={<LuUpload />} iconSize={16}>
                 点击上传
