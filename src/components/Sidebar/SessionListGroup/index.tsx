@@ -1,8 +1,8 @@
 ﻿import { useChatService } from '@/domains';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { ChatSession } from '@/domains/Chat';
 import { useAppMessage } from '@/hooks/useAppMessage';
-import { useCurrentChatSessionStore } from '@/store';
+import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
 import { useMount, useRequest } from 'ahooks';
 import type { MenuProps } from 'antd';
@@ -25,7 +25,10 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
   const currentSessionId = useCurrentChatSessionStore((state) => state.currentSessionId);
   const setCurrentSession = useCurrentChatSessionStore((state) => state.setCurrentSession);
   const clearCurrentSession = useCurrentChatSessionStore((state) => state.clearCurrentSession);
+  const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isChatPage = location.pathname.startsWith('/app/chat');
 
   const { runAsync: runListSessions, loading: sessionListLoading } = useRequest(
     async (page: number) =>
@@ -100,7 +103,12 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
     (session: ChatSession): MenuItem => ({
       key: `session-${session.id}`,
       onClick: () => {
+        if (isChatPage) {
         navigate('/app/chat/' + session.id);
+      } else {
+        setCurrentSession({ id: session.id, title: session.title });
+        setChatPanelCollapsed(false);
+      }
       },
       label: (
         <SessionMenuItem
@@ -112,7 +120,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
         />
       ),
     }),
-    [handleDeleted, loadSessionPage, navigate]
+    [handleDeleted, loadSessionPage, navigate, isChatPage, setCurrentSession, setChatPanelCollapsed]
   );
 
   const menuItems = useMemo<MenuItem[]>(() => {
