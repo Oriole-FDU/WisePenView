@@ -1,12 +1,11 @@
-import ChatPanel from '@/components/ChatPanel';
-import Sidebar from '@/components/Sidebar';
-import ResourceSidebar from '@/components/Sidebar/ResourceSidebar';
-import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
-import { useMount, useUpdateEffect } from 'ahooks';
+﻿import React, { useCallback, useRef, useState } from 'react';
 import { Layout } from 'antd';
-import React, { useCallback, useRef, useState } from 'react';
+import { useMount, useUpdateEffect } from 'ahooks';
 import { LuBot } from 'react-icons/lu';
 import { Outlet, useLocation } from 'react-router-dom';
+import Sidebar from '@/components/Sidebar';
+import ChatPanel from '@/components/ChatPanel';
+import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
 import styles from './SystemLayout.module.less';
 
 const { Content, Sider } = Layout;
@@ -22,31 +21,39 @@ const getMaxChatPanelWidth = (): number => {
   return Math.max(MIN_CHAT_PANEL_WIDTH, Math.min(MAX_CHAT_PANEL_WIDTH, viewportBasedMax));
 };
 
-const RESOURCE_SIDEBAR_PATH_REGEX = /^\/app\/(note|pdf)\//;
-
-function SystemLayout() {
+const SystemLayout: React.FC = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const chatResizeGuideRef = useRef<HTMLDivElement | null>(null);
+  const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [chatResizing, setChatResizing] = useState(false);
-  const location = useLocation();
-  const isResourceContext = RESOURCE_SIDEBAR_PATH_REGEX.test(location.pathname);
   const chatPanelCollapsed = useChatPanelStore((state) => state.chatPanelCollapsed);
   const chatPanelWidth = useChatPanelStore((state) => state.chatPanelWidth);
+  const chatPanelDraftOpen = useChatPanelStore((state) => state.chatPanelDraftOpen);
   const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
   const setChatPanelWidth = useChatPanelStore((state) => state.setChatPanelWidth);
+  const setChatPanelDraftOpen = useChatPanelStore((state) => state.setChatPanelDraftOpen);
   const chatPanelWidthRef = useRef(chatPanelWidth);
   const currentSessionId = useCurrentChatSessionStore((state) => state.currentSessionId);
+  const isChatPage = location.pathname.startsWith('/app/chat');
   const hasSessionId = Boolean(currentSessionId);
-  const safeChatPanelCollapsed = !hasSessionId || chatPanelCollapsed;
+  const shouldRenderChatPanel = hasSessionId || chatPanelDraftOpen;
+  const safeChatPanelCollapsed = !shouldRenderChatPanel || chatPanelCollapsed;
 
   useUpdateEffect(() => {
-    if (hasSessionId) {
+    if (shouldRenderChatPanel) {
       setChatPanelCollapsed(false);
       return;
     }
     setChatPanelCollapsed(true);
-  }, [hasSessionId, setChatPanelCollapsed]);
+  }, [setChatPanelCollapsed, shouldRenderChatPanel]);
+
+  useUpdateEffect(() => {
+    if (!hasSessionId && !chatPanelDraftOpen) return;
+    if (hasSessionId) {
+      setChatPanelDraftOpen(false);
+    }
+  }, [chatPanelDraftOpen, hasSessionId, setChatPanelDraftOpen]);
 
   useMount(() => {
     const normalizedWidth = clampWidth(
@@ -123,9 +130,9 @@ function SystemLayout() {
   );
 
   const handleChatExpand = useCallback(() => {
-    if (!hasSessionId) return;
+    if (!shouldRenderChatPanel) return;
     setChatPanelCollapsed(false);
-  }, [hasSessionId, setChatPanelCollapsed]);
+  }, [setChatPanelCollapsed, shouldRenderChatPanel]);
 
   return (
     <Layout
@@ -134,30 +141,23 @@ function SystemLayout() {
       style={{ ['--chat-panel-width' as string]: `${chatPanelWidth}px` }}
     >
       {chatResizing && <div ref={chatResizeGuideRef} className={styles.chatResizeGuide} />}
-      {/* 左侧 Sidebar：note/pdf 路由下切换为 ResourceSidebar 形态 */}
+      {/* Left Sidebar */}
       <Sider className={styles.leftSider} width={308} theme="light" collapsed={sidebarCollapsed}>
-        {isResourceContext ? (
-          <ResourceSidebar
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-        ) : (
-          <Sidebar
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-        )}
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
       </Sider>
 
-      {/* 中间布局 */}
+      {/* Middle Layout */}
       <Layout className={styles.middleLayout}>
-        {hasSessionId && safeChatPanelCollapsed && (
+        {shouldRenderChatPanel && safeChatPanelCollapsed && !isChatPage && (
           <div className={styles.chatHandleZone}>
             <button
               type="button"
               className={styles.chatExpandHandle}
               onClick={handleChatExpand}
-              aria-label="展开右侧对话栏"
+              aria-label="expand chat panel"
             >
               <LuBot />
             </button>
@@ -168,29 +168,31 @@ function SystemLayout() {
         </Content>
       </Layout>
 
-      {/* 右侧 AI Panel */}
-      <Sider
-        className={styles.rightSider}
-        width="var(--chat-panel-width)"
-        theme="light"
-        collapsed={safeChatPanelCollapsed}
-        collapsedWidth={0}
-        trigger={null}
-      >
-        {!safeChatPanelCollapsed && (
-          <button
-            type="button"
-            className={`${styles.chatResizeHandle} ${chatResizing ? styles.chatResizeHandleActive : ''}`}
-            onMouseDown={handleChatResizeStart}
-            aria-label="调整右侧边栏宽度"
-          />
-        )}
-        <div className={styles.rightSiderInner}>
-          {hasSessionId ? <ChatPanel collapsed={safeChatPanelCollapsed} /> : null}
-        </div>
-      </Sider>
+      {/* Right AI Panel — hidden on chat page */}
+      {!isChatPage && (
+        <Sider
+          className={styles.rightSider}
+          width="var(--chat-panel-width)"
+          theme="light"
+          collapsed={safeChatPanelCollapsed}
+          collapsedWidth={0}
+          trigger={null}
+        >
+          {!safeChatPanelCollapsed && (
+            <button
+              type="button"
+              className={`${styles.chatResizeHandle} ${chatResizing ? styles.chatResizeHandleActive : ''}`}
+              onMouseDown={handleChatResizeStart}
+              aria-label="resize chat panel"
+            />
+          )}
+          <div className={styles.rightSiderInner}>
+            {shouldRenderChatPanel ? <ChatPanel collapsed={safeChatPanelCollapsed} /> : null}
+          </div>
+        </Sider>
+      )}
     </Layout>
   );
-}
+};
 
 export default SystemLayout;

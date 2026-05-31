@@ -1,14 +1,25 @@
-﻿import { useChatService, useNoteService } from '@/domains';
+﻿import React, { useCallback } from 'react';
+import { Menu } from 'antd';
+import type { MenuProps } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  RiAddCircleFill,
+  RiFileTextLine,
+  RiGroupFill,
+  RiPenNibFill,
+  RiRobot2Line,
+} from 'react-icons/ri';
+import { useChatService, useNoteService } from '@/domains';
 import { useAppMessage } from '@/hooks/useAppMessage';
-import { useNewChatSessionStore, useNewNoteStore } from '@/store';
+import {
+  clearNewChatSessionStore,
+  useChatPanelStore,
+  useCurrentChatSessionStore,
+  useNewChatSessionStore,
+  useNewNoteStore,
+} from '@/store';
 import { parseErrorMessage } from '@/utils/error';
 import { useRequest } from 'ahooks';
-import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
-import { useCallback } from 'react';
-import { RiAddCircleFill, RiFileTextLine, RiGroupFill, RiPenNibFill,
-  RiRobot2Line } from 'react-icons/ri';
-import { useLocation, useNavigate } from 'react-router-dom';
 import type { HeaderNavProps } from './index.type';
 import styles from './style.module.less';
 
@@ -18,11 +29,21 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
   const chatService = useChatService();
   const noteService = useNoteService();
   const messageApi = useAppMessage();
+  const clearCurrentSession = useCurrentChatSessionStore((s) => s.clearCurrentSession);
+  const setChatPanelCollapsed = useChatPanelStore((s) => s.setChatPanelCollapsed);
+  const setChatPanelDraftOpen = useChatPanelStore((s) => s.setChatPanelDraftOpen);
 
   const isDriveActive = location.pathname.startsWith('/app/drive');
   const isGroupActive = location.pathname.startsWith('/app/my-group');
   const isChatActive = location.pathname.startsWith('/app/chat');
-  const selectedKeys = isChatActive ? ['/app/chat'] : isDriveActive ? ['/app/drive'] : isGroupActive ? ['/app/my-group'] : [];
+  const selectedKeys = isChatActive
+    ? ['/app/chat']
+    : isDriveActive
+      ? ['/app/drive']
+      : isGroupActive
+        ? ['/app/my-group']
+        : [];
+
   const { run: runCreateSession, loading: createSessionLoading } = useRequest(
     async () => chatService.createSession(),
     {
@@ -41,14 +62,19 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
   );
 
   const handleCreateSession = useCallback(() => {
-    if (createSessionLoading) return;
-    const { newChatSessionId, newChatSessionTitle } = useNewChatSessionStore.getState();
-    if (newChatSessionId != null && newChatSessionId !== '') {
-      onSessionCreated(newChatSessionId, newChatSessionTitle);
+    if (isChatActive) {
+      clearCurrentSession();
+      clearNewChatSessionStore();
+      setChatPanelDraftOpen(false);
+      navigate('/app/chat');
       return;
     }
-    runCreateSession();
-  }, [createSessionLoading, onSessionCreated, runCreateSession]);
+
+    clearCurrentSession();
+    clearNewChatSessionStore();
+    setChatPanelDraftOpen(true);
+    setChatPanelCollapsed(false);
+  }, [clearCurrentSession, isChatActive, navigate, setChatPanelCollapsed, setChatPanelDraftOpen]);
 
   const { loading: creatingNote, run: runCreateNote } = useRequest(
     async () => {

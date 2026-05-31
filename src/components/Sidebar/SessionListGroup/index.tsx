@@ -1,8 +1,7 @@
 import { useChatService } from '@/domains';
-import { useLocation, useNavigate } from 'react-router-dom';
 import type { ChatSession } from '@/domains/Chat';
 import { useAppMessage } from '@/hooks/useAppMessage';
-import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
+import { useChatPanelStore, useChatAgentStore, useCurrentChatSessionStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
 import { useMount, useRequest } from 'ahooks';
 import type { MenuProps } from 'antd';
@@ -26,9 +25,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
   const setCurrentSession = useCurrentChatSessionStore((state) => state.setCurrentSession);
   const clearCurrentSession = useCurrentChatSessionStore((state) => state.clearCurrentSession);
   const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const isChatPage = location.pathname.startsWith('/app/chat');
+  const clearSessionAgent = useChatAgentStore((state) => state.clearSessionAgent);
 
   const { runAsync: runListSessions, loading: sessionListLoading } = useRequest(
     async (page: number) =>
@@ -91,12 +88,13 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
 
   const handleDeleted = useCallback(
     (sessionId: string) => {
+      clearSessionAgent(sessionId);
       if (currentSessionId === sessionId) {
         clearCurrentSession();
       }
       onActiveSessionMenuKeyChange?.(undefined);
     },
-    [clearCurrentSession, currentSessionId, onActiveSessionMenuKeyChange]
+    [clearCurrentSession, clearSessionAgent, currentSessionId, onActiveSessionMenuKeyChange]
   );
 
   const createSessionItem = useCallback(
@@ -104,11 +102,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
       key: `session-${session.id}`,
       onClick: () => {
         setCurrentSession({ id: session.id, title: session.title });
-        if (isChatPage) {
-          navigate('/app/chat/' + session.id);
-        } else {
-          setChatPanelCollapsed(false);
-        }
+        setChatPanelCollapsed(false);
       },
       label: (
         <SessionMenuItem
@@ -120,7 +114,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
         />
       ),
     }),
-    [handleDeleted, isChatPage, loadSessionPage, navigate, setChatPanelCollapsed, setCurrentSession]
+    [handleDeleted, loadSessionPage, setChatPanelCollapsed, setCurrentSession]
   );
 
   const menuItems = useMemo<MenuItem[]>(() => {
