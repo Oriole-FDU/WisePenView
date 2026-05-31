@@ -494,7 +494,6 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
                 canLoadMoreHistory={Boolean(currentSessionId) && historyPage < historyTotalPage}
                 loadingMoreHistory={loadingMoreHistory}
                 onLoadMoreHistory={loadMoreHistoryMessages}
-                onPromptClick={handleSend}
               />
             </div>
           </div>
