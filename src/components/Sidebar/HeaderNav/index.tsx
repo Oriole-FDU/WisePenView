@@ -6,7 +6,8 @@ import { useRequest } from 'ahooks';
 import type { MenuProps } from 'antd';
 import { Menu } from 'antd';
 import { useCallback } from 'react';
-import { RiAddCircleFill, RiFileTextLine, RiGroupFill, RiPenNibFill } from 'react-icons/ri';
+import { RiAddCircleFill, RiFileTextLine, RiGroupFill, RiPenNibFill,
+  RiRobot2Line } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { HeaderNavProps } from './index.type';
 import styles from './style.module.less';
@@ -20,7 +21,8 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
 
   const isDriveActive = location.pathname.startsWith('/app/drive');
   const isGroupActive = location.pathname.startsWith('/app/my-group');
-  const selectedKeys = isDriveActive ? ['/app/drive'] : isGroupActive ? ['/app/my-group'] : [];
+  const isChatActive = location.pathname.startsWith('/app/chat');
+  const selectedKeys = isChatActive ? ['/app/chat'] : isDriveActive ? ['/app/drive'] : isGroupActive ? ['/app/my-group'] : [];
   const { run: runCreateSession, loading: createSessionLoading } = useRequest(
     async () => chatService.createSession(),
     {
@@ -50,7 +52,7 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
 
   const { loading: creatingNote, run: runCreateNote } = useRequest(
     async () => {
-      const { resourceId } = await noteService.createNote({ title: '未命名笔记' });
+      const { resourceId } = await noteService.createNote({ title: '未命名笔�? });
       if (!resourceId) {
         throw new Error('创建笔记失败：未获取到资源ID');
       }
@@ -94,10 +96,16 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
       label: '新建笔记',
     },
     {
+    {
+      key: '/app/chat',
+      icon: <RiRobot2Line size={18} />,
+      onClick: () => navigate('/app/chat'),
+      label: 'AI �Ի�',
+    },
       key: '/app/drive',
       icon: <RiFileTextLine size={18} />,
       onClick: () => navigate('/app/drive'),
-      label: '文档与云盘',
+      label: '文档与云�?,
     },
     {
       key: '/app/my-group',
