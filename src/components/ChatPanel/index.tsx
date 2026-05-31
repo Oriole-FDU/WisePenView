@@ -1,35 +1,29 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { useMount, useRequest, useUpdateEffect } from 'ahooks';
-import { RiIndentIncrease } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
-import MessageList from './MessageList';
-import ChatInput from './ChatInput';
-import AgentSelector from './AgentSelector';
-import AdvancedModeToggle from './AdvancedModeToggle';
-import NewChatButton from './NewChatButton';
-import type { Message, Model, ChatPanelProps } from '@/components/ChatPanel/index.type';
-import { useChatService, useGroupService, useResourceService } from '@/domains';
+import type { ChatPanelProps, Message, Model } from '@/components/ChatPanel/index.type';
 import type { SkillSummary } from '@/domains';
+import { useChatService, useGroupService, useResourceService } from '@/domains';
+import { mapApiModelsToFlatModels } from '@/domains/Chat';
 import { useAppMessage } from '@/hooks/useAppMessage';
+import { useChatSession } from '@/session/chat/useChatSession';
 import {
+  clearChatPageStore,
   clearNewChatSessionStore,
   useAdvancedModeStore,
   useChatAgentStore,
+  useChatCapabilityStore,
   useChatPanelStore,
   useCurrentChatSessionStore,
   useNewChatSessionStore,
   useNoteSelectionStore,
 } from '@/store';
-import { clearChatPageStore } from '@/store';
-import { useChatSession } from '@/session/chat/useChatSession';
-import { mapApiModelsToFlatModels } from '@/domains/Chat';
 import { parseErrorMessage } from '@/utils/parseErrorMessage';
+import { useMount, useRequest, useUpdateEffect } from 'ahooks';
+import { useCallback, useMemo, useState } from 'react';
+import { RiIndentIncrease } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import AdvancedModeToggle from './AdvancedModeToggle';
 import { buildDefaultPersonalAgent, buildGroupAgent } from './agent';
-import {
-  buildAdvancedSkillTreeGroups,
-  getAllowedSkillsForChat,
-  getPrimarySkillsForAgent,
-} from './skillScope';
+import AgentSelector from './AgentSelector';
+import ChatInput from './ChatInput';
 import {
   HISTORY_PAGE_SIZE,
   buildPanelMessages,
@@ -38,9 +32,16 @@ import {
   mapHistoryMessage,
   type ModelMeta,
 } from './ChatPanel';
+import MessageList from './MessageList';
+import NewChatButton from './NewChatButton';
+import {
+  buildAdvancedSkillTreeGroups,
+  getAllowedSkillsForChat,
+  getPrimarySkillsForAgent,
+} from './skillScope';
 import styles from './style.module.less';
 
-const ChatPanel: React.FC<ChatPanelProps> = ({ collapsed, fullWidth = false, onNewChat }) => {
+function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) {
   const navigate = useNavigate();
   const chatService = useChatService();
   const groupService = useGroupService();
@@ -65,6 +66,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ collapsed, fullWidth = false, onN
   const setDraftAgent = useChatAgentStore((state) => state.setDraftAgent);
   const setSessionAgent = useChatAgentStore((state) => state.setSessionAgent);
   const advancedMode = useAdvancedModeStore((state) => state.advancedMode);
+  const selectedSkills = useChatCapabilityStore((state) => state.selectedSkills);
   const [currentModel, setCurrentModel] = useState<Model | null>(null);
   const [historyMessages, setHistoryMessages] = useState<Message[]>([]);
   const [historyPage, setHistoryPage] = useState(1);
@@ -343,6 +345,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ collapsed, fullWidth = false, onN
         }
       }
 
+      const selectedSkillIds = selectedSkills.map((s) => s.skillId);
+
       const sendPromise = sendSessionMessage(text, {
         model: currentModel.id,
         enableSelected: hasSelectedContext,
@@ -354,6 +358,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ collapsed, fullWidth = false, onN
           advanced_mode_enabled: advancedMode,
         },
         allowedSkillIds,
+        selectedSkillIds: selectedSkillIds.length > 0 ? selectedSkillIds : undefined,
       });
 
       if (hasSelectedContext) {
@@ -374,6 +379,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ collapsed, fullWidth = false, onN
       navigate,
       runCreateSession,
       selectedAgent,
+      selectedSkills,
       sendSessionMessage,
       setChatPanelDraftOpen,
       setCurrentSession,
@@ -513,6 +519,6 @@ const ChatPanel: React.FC<ChatPanelProps> = ({ collapsed, fullWidth = false, onN
       )}
     </div>
   );
-};
+}
 
 export default ChatPanel;

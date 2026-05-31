@@ -35,6 +35,7 @@ interface ChatRequestBody {
   resource_refs?: ChatResourceRef[];
   agent_context?: ChatAgentContext;
   allowed_skill_ids?: string[];
+  selected_skill_ids?: string[];
 }
 
 interface UseChatSessionOptions {
@@ -44,10 +45,10 @@ interface UseChatSessionOptions {
 }
 
 export type {
-  ChatState,
-  ChatAttachmentRef,
-  ChatResourceRef,
-  ChatRequestBody,
   ChatAgentContext,
+  ChatAttachmentRef,
+  ChatRequestBody,
+  ChatResourceRef,
+  ChatState,
   UseChatSessionOptions,
 };

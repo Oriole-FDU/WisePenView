@@ -1,14 +1,14 @@
+import { getApiBaseURL } from '@/apis/apiServerAddr';
+import { useChatPageStore, useNoteSelectionStore } from '@/store';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { useCallback } from 'react';
-import { useNoteSelectionStore, useChatPageStore } from '@/store';
-import { getApiBaseURL } from '@/apis/apiServerAddr';
 import type {
-  ChatState,
-  ChatRequestBody,
   ChatAgentContext,
   ChatAttachmentRef,
+  ChatRequestBody,
   ChatResourceRef,
+  ChatState,
   UseChatSessionOptions,
 } from './index.type';
 
@@ -25,6 +25,7 @@ const buildRequestBody = ({
   activeAttachments,
   agentContext,
   allowedSkillIds,
+  selectedSkillIds,
 }: {
   sessionId: string;
   query: string;
@@ -35,6 +36,7 @@ const buildRequestBody = ({
   activeAttachments?: { attachmentId: string; filename: string; enabled: boolean }[];
   agentContext?: ChatAgentContext;
   allowedSkillIds?: string[];
+  selectedSkillIds?: string[];
 }): ChatRequestBody => {
   const normalizedStates: ChatState[] = [];
   const selectedValue = selected?.trim();
@@ -73,6 +75,9 @@ const buildRequestBody = ({
     ...(allowedSkillIds && allowedSkillIds.length > 0
       ? { allowed_skill_ids: allowedSkillIds }
       : {}),
+    ...(selectedSkillIds && selectedSkillIds.length > 0
+      ? { selected_skill_ids: selectedSkillIds }
+      : {}),
   };
 };
 
@@ -108,6 +113,7 @@ export const useChatSession = ({
         sessionId?: string;
         agentContext?: ChatAgentContext;
         allowedSkillIds?: string[];
+        selectedSkillIds?: string[];
       }
     ) => {
       const targetSessionId = options?.sessionId ?? sessionId;
@@ -123,6 +129,7 @@ export const useChatSession = ({
         activeAttachments: chatPageState.activeAttachments,
         agentContext: options?.agentContext,
         allowedSkillIds: options?.allowedSkillIds,
+        selectedSkillIds: options?.selectedSkillIds,
       });
       await chat.sendMessage({ text: query }, { body: requestBody });
     },

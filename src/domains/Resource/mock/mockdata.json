@@ -41,5 +41,79 @@
     "page": 1,
     "size": 20,
     "totalPage": 1
+  },
+  "skillResources": {
+    "personal": [
+      {
+        "resourceId": "skill-personal-translation",
+        "resourceName": "翻译助手",
+        "resourceType": "SKILL",
+        "ownerId": "1",
+        "path": "/",
+        "currentTags": []
+      },
+      {
+        "resourceId": "skill-personal-codereview",
+        "resourceName": "代码审查",
+        "resourceType": "SKILL",
+        "ownerId": "1",
+        "path": "/",
+        "currentTags": []
+      },
+      {
+        "resourceId": "skill-personal-summary",
+        "resourceName": "文档总结",
+        "resourceType": "SKILL",
+        "ownerId": "1",
+        "path": "/",
+        "currentTags": []
+      },
+      {
+        "resourceId": "skill-personal-math",
+        "resourceName": "数学计算",
+        "resourceType": "SKILL",
+        "ownerId": "1",
+        "path": "/",
+        "currentTags": []
+      }
+    ],
+    "groups": {
+      "1": [
+        {
+          "resourceId": "skill-group-1-weekly",
+          "resourceName": "团队周报生成",
+          "resourceType": "SKILL",
+          "ownerId": "1",
+          "path": "/",
+          "currentTags": []
+        },
+        {
+          "resourceId": "skill-group-1-tracker",
+          "resourceName": "项目进度追踪",
+          "resourceType": "SKILL",
+          "ownerId": "1",
+          "path": "/",
+          "currentTags": []
+        }
+      ],
+      "2": [
+        {
+          "resourceId": "skill-group-2-component",
+          "resourceName": "组件生成器",
+          "resourceType": "SKILL",
+          "ownerId": "1",
+          "path": "/",
+          "currentTags": []
+        },
+        {
+          "resourceId": "skill-group-2-lint",
+          "resourceName": "样式检查",
+          "resourceType": "SKILL",
+          "ownerId": "1",
+          "path": "/",
+          "currentTags": []
+        }
+      ]
+    }
   }
 }
