@@ -1,7 +1,8 @@
-import { useChatService } from '@/domains';
+﻿import { useChatService } from '@/domains';
+import { useNavigate } from 'react-router-dom';
 import type { ChatSession } from '@/domains/Chat';
 import { useAppMessage } from '@/hooks/useAppMessage';
-import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
+import { useCurrentChatSessionStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
 import { useMount, useRequest } from 'ahooks';
 import type { MenuProps } from 'antd';
@@ -24,7 +25,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
   const currentSessionId = useCurrentChatSessionStore((state) => state.currentSessionId);
   const setCurrentSession = useCurrentChatSessionStore((state) => state.setCurrentSession);
   const clearCurrentSession = useCurrentChatSessionStore((state) => state.clearCurrentSession);
-  const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
+  const navigate = useNavigate();
 
   const { runAsync: runListSessions, loading: sessionListLoading } = useRequest(
     async (page: number) =>
@@ -99,8 +100,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
     (session: ChatSession): MenuItem => ({
       key: `session-${session.id}`,
       onClick: () => {
-        setCurrentSession({ id: session.id, title: session.title });
-        setChatPanelCollapsed(false);
+        navigate('/app/chat/' + session.id);
       },
       label: (
         <SessionMenuItem
@@ -112,7 +112,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
         />
       ),
     }),
-    [handleDeleted, loadSessionPage, setChatPanelCollapsed, setCurrentSession]
+    [handleDeleted, loadSessionPage, navigate]
   );
 
   const menuItems = useMemo<MenuItem[]>(() => {
