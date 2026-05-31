@@ -4,6 +4,7 @@ import { useMount, useUpdateEffect } from 'ahooks';
 import { LuBot } from 'react-icons/lu';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
+import ResourceSidebar from '@/components/Sidebar/ResourceSidebar';
 import ChatPanel from '@/components/ChatPanel';
 import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
 import styles from './SystemLayout.module.less';
@@ -21,11 +22,15 @@ const getMaxChatPanelWidth = (): number => {
   return Math.max(MIN_CHAT_PANEL_WIDTH, Math.min(MAX_CHAT_PANEL_WIDTH, viewportBasedMax));
 };
 
+const RESOURCE_SIDEBAR_PATH_REGEX = /^\/app\/(note|pdf)\//;
+
+
 const SystemLayout: React.FC = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const chatResizeGuideRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const isResourceContext = RESOURCE_SIDEBAR_PATH_REGEX.test(location.pathname);
   const [chatResizing, setChatResizing] = useState(false);
   const chatPanelCollapsed = useChatPanelStore((state) => state.chatPanelCollapsed);
   const chatPanelWidth = useChatPanelStore((state) => state.chatPanelWidth);
@@ -143,10 +148,17 @@ const SystemLayout: React.FC = () => {
       {chatResizing && <div ref={chatResizeGuideRef} className={styles.chatResizeGuide} />}
       {/* Left Sidebar */}
       <Sider className={styles.leftSider} width={308} theme="light" collapsed={sidebarCollapsed}>
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+        {isResourceContext ? (
+          <ResourceSidebar
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        ) : (
+          <Sidebar
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        )}
       </Sider>
 
       {/* Middle Layout */}
