@@ -22,11 +22,14 @@ interface ChatPageState {
   addAttachment: (att: ActiveAttachment) => void;
   removeAttachment: (attachmentId: string) => void;
   setAttachmentEnabled: (attachmentId: string, enabled: boolean) => void;
+  autoSaveToLibrary: boolean;
+  setAutoSaveToLibrary: (value: boolean) => void;
 }
 
 const initialState = {
   activeDocRefs: [],
   activeAttachments: [],
+  autoSaveToLibrary: false,
 };
 
 export const useChatPageStore = create<ChatPageState>()((set) => ({
@@ -69,11 +72,15 @@ export const useChatPageStore = create<ChatPageState>()((set) => ({
         a.attachmentId === attachmentId ? { ...a, enabled } : a
       ),
     })),
+
+  autoSaveToLibrary: false,
+  setAutoSaveToLibrary: (value) => set({ autoSaveToLibrary: value }),
 }));
 
 export const clearChatPageStore = (): void => {
   useChatPageStore.setState({
     activeDocRefs: [],
     activeAttachments: [],
+    autoSaveToLibrary: false,
   });
 };
