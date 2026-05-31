@@ -1,4 +1,4 @@
-﻿import { useChatService } from '@/domains';
+import { useChatService } from '@/domains';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { ChatSession } from '@/domains/Chat';
 import { useAppMessage } from '@/hooks/useAppMessage';
@@ -103,12 +103,12 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
     (session: ChatSession): MenuItem => ({
       key: `session-${session.id}`,
       onClick: () => {
-        if (isChatPage) {
-        navigate('/app/chat/' + session.id);
-      } else {
         setCurrentSession({ id: session.id, title: session.title });
-        setChatPanelCollapsed(false);
-      }
+        if (isChatPage) {
+          navigate('/app/chat/' + session.id);
+        } else {
+          setChatPanelCollapsed(false);
+        }
       },
       label: (
         <SessionMenuItem
@@ -120,7 +120,7 @@ export const useSessionListGroup = ({ onActiveSessionMenuKeyChange }: SessionLis
         />
       ),
     }),
-    [handleDeleted, loadSessionPage, navigate, isChatPage, setCurrentSession, setChatPanelCollapsed]
+    [handleDeleted, isChatPage, loadSessionPage, navigate, setChatPanelCollapsed, setCurrentSession]
   );
 
   const menuItems = useMemo<MenuItem[]>(() => {
