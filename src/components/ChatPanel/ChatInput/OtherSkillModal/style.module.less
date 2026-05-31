@@ -1,0 +1,68 @@
+﻿.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-md);
+}
+
+.hint {
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-secondary);
+}
+
+.treeNav {
+  flex: 1;
+  min-height: 280px;
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid var(--ant-color-border);
+  border-radius: var(--ant-border-radius-lg);
+  padding: var(--ant-padding-sm);
+}
+
+.tree {
+  font-size: var(--ant-font-size-md);
+
+  :global(.ant-tree-treenode) {
+    padding: 1px 0;
+  }
+
+  :global(.ant-tree-switcher) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+  }
+
+  :global(.ant-tree-switcher-icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+  }
+
+  :global(.ant-tree-checkbox) {
+    display: none;
+  }
+
+  :global(.ant-tree-node-content-wrapper) {
+    min-height: 22px;
+    border-radius: var(--ant-border-radius);
+    transition: background-color 0.2s;
+  }
+
+  :global(.ant-tree-node-selected) {
+    background-color: var(--ant-color-primary-bg) !important;
+  }
+
+  :global(.ant-tree-title) {
+    line-height: 22px;
+  }
+}
+
+.nodeTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ant-margin-xxs);
+}

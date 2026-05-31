@@ -1,4 +1,4 @@
-import type { Model as BackendModel } from '@/domains/Chat';
+import type { Model as BackendModel } from '@/types/model';
 
 export interface ChatSession {
   id: string;

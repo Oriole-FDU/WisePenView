@@ -1,12 +1,12 @@
+import { MODEL_TYPE } from '@/types/model';
+import type { IChatService } from '@/domains/Chat';
 import type {
   ChatSession,
-  IChatService,
-  ListHistoryMessagesRequest,
   ListSessionsRequest,
+  ListHistoryMessagesRequest,
   MessageResponse,
   PageResult,
 } from '@/domains/Chat';
-import { MODEL_TYPE } from '@/domains/Chat';
 
 type MockModelSeed = {
   name: string;

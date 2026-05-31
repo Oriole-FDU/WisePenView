@@ -1,5 +1,5 @@
 /**
- * Mock 服务注册表：仅绑定 *Services.mock.ts
+ * Mock 服务注册表：仅绑�?*Services.mock.ts
  */
 import { AuthServicesMock } from '@/domains/Auth/mock/AuthServices.mock';
 import { ChatServicesMock } from '@/domains/Chat/mock/ChatServices.mock';
@@ -14,6 +14,7 @@ import { StickerServicesMock } from '@/domains/Sticker/mock/StickerServices.mock
 import { TagServicesMock } from '@/domains/Tag/mock/TagServices.mock';
 import { UserServicesMock } from '@/domains/User/mock/UserServices.mock';
 import { WalletServicesMock } from '@/domains/Wallet/mock/WalletServices.mock';
+import { SkillServicesMock } from '@/domains/Skill/mock/SkillServices.mock';
 
 import type { ServicesContextValue } from './registry.types';
 
@@ -31,6 +32,7 @@ const mockServicesValue: ServicesContextValue = {
   tagService: TagServicesMock,
   userService: UserServicesMock,
   walletService: WalletServicesMock,
+  skillService: SkillServicesMock,
 };
 
 export function getContextValue(): ServicesContextValue {

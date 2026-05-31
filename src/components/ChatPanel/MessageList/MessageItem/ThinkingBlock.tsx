@@ -1,7 +1,8 @@
-import { Collapse, Tag, Typography } from 'antd';
+import React from 'react';
+import { Collapse, Typography, Tag } from 'antd';
+const { Paragraph } = Typography;
 import { LuChevronRight, LuLoader } from 'react-icons/lu';
 import styles from './ThinkingBlock.module.less';
-const { Paragraph } = Typography;
 
 interface ThinkingBlockProps {
   content: string;
@@ -9,7 +10,7 @@ interface ThinkingBlockProps {
   loading?: boolean;
 }
 
-function ThinkingBlock({ content, duration, loading }: ThinkingBlockProps) {
+const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ content, duration, loading }) => {
   // 如果没有任何内容且不在加载中，则不渲染
   if (!content && !loading) return null;
 
@@ -69,6 +70,6 @@ function ThinkingBlock({ content, duration, loading }: ThinkingBlockProps) {
       />
     </div>
   );
-}
+};
 
 export default ThinkingBlock;

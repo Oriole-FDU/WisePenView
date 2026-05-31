@@ -1,16 +1,12 @@
-export type { Model as BackendModel, Model } from './entity/model';
-export { MODEL_PROVIDER_ID, MODEL_TYPE } from './enum';
-export type { ModelProviderId, ModelType } from './enum';
-export { mapApiModelsToFlatModels } from './mapper/model.mapper';
+export type { IChatService } from './service/index.type';
+export type { ModelListResponse } from './service/index.type';
 export type {
-  ChatSession,
-  CreateSessionRequest,
   DeleteSessionRequest,
-  IChatService,
-  ListHistoryMessagesRequest,
   ListSessionsRequest,
+  ListHistoryMessagesRequest,
   MessageResponse,
-  ModelListResponse,
   PageResult,
   RenameSessionRequest,
 } from './service/index.type';
+export type { CreateSessionRequest, ChatSession } from './service/index.type';
+export { mapApiModelsToFlatModels } from './mapper/model.mapper';

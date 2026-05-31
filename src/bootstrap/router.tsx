@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-// 引入布局（保持同步加载，保证首屏壳子稳定）
+// 引入布局（保持同步加载，保证首屏壳子稳定�?
 import AuthLayout from '@/layouts/AuthLayout';
 import HomeLayout from '@/layouts/HomeLayout';
 import SystemLayout from '@/layouts/SystemLayout';
@@ -21,6 +21,7 @@ const VerifyEmail = lazy(() => import('@/views/auth/VerifyEmail'));
 const NoteView = lazy(() => import('@/views/note'));
 const PdfPreview = lazy(() => import('@/views/pdf/PdfPreview'));
 const ResourceNotFound = lazy(() => import('@/views/error/ResourceNotFound'));
+const ChatPage = lazy(() => import('@/views/chat'));
 const AppError = lazy(() => import('@/views/error/AppError'));
 
 const router = createBrowserRouter([
@@ -99,7 +100,7 @@ const router = createBrowserRouter([
   // ==============================
   {
     path: '/app',
-    element: <SystemLayout />, // 承载：左侧导航 + 右侧助手 + 中间内容
+    element: <SystemLayout />, // 承载：左侧导�?+ 右侧助手 + 中间内容
     errorElement: <AppError />,
     children: [
       // 默认重定向到文档列表
@@ -110,6 +111,14 @@ const router = createBrowserRouter([
       {
         path: 'note',
         element: <NoteView />,
+      },
+      {
+        path: 'chat',
+        element: <ChatPage />,
+      },
+      {
+        path: 'chat/:sessionId',
+        element: <ChatPage />,
       },
       {
         path: 'note/:noteId',

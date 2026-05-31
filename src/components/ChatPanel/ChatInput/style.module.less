@@ -1,144 +1,305 @@
 // src/components/ChatPanel/ChatInput/style.module.less
+// 娴ｈ法鏁ら弽鍥у櫙 Ant Design 閺嶅嘲绱?
+.menuItemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  min-width: 0;
+}
 
-// 1. 最外层容器
+.capabilityCheck {
+  color: var(--ant-color-info);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .container {
   flex-shrink: 0;
-  padding: var(--ant-padding-xxs) var(--ant-padding-xs) var(--ant-padding-sm);
+  padding: var(--ant-padding-sm) var(--ant-padding-lg) var(--ant-padding-md);
   background: transparent;
 
-  // 2. 核心卡片 (嵌套在 container 内)
   .inputCard {
     position: relative;
     display: flex;
     flex-direction: column;
-
-    background-color: var(--ant-color-bg-container);
-    border: var(--ant-line-width) solid var(--ant-color-border-secondary);
-    // 大圆角
+    background: var(--ant-color-bg-container);
+    border: 1px solid var(--ant-color-border);
     border-radius: var(--ant-border-radius-lg);
-    box-shadow: var(--ant-box-shadow-tertiary);
-
-    // 极度紧凑的内边距
-    padding: var(--ant-padding-sm) var(--ant-padding-xs);
-
-    transition: all 0.2s;
+    box-shadow: var(--ant-box-shadow-secondary);
+    padding: var(--ant-padding-sm) var(--ant-padding-md);
+    transition: border-color 0.2s, box-shadow 0.2s;
 
     &:focus-within {
       border-color: var(--ant-color-primary);
-      box-shadow: var(--ant-box-shadow-secondary);
-    }
-
-    .selectedHint {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--ant-margin-xs);
-      margin-bottom: var(--ant-margin-sm);
-      align-self: flex-start;
-      max-width: 100%;
-      border: var(--ant-line-width) solid color-mix(in srgb, var(--ant-color-primary) 28%, white);
-      border-radius: 999px;
-      padding: 3px var(--ant-padding-xs) 3px 4px;
-      background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--ant-color-primary-bg) 75%, white) 0%,
-        color-mix(in srgb, var(--ant-color-primary-bg-hover) 48%, white) 100%
-      );
-    }
-
-    .selectedHintText {
-      min-width: 0;
-      font-size: var(--ant-font-size-sm);
-      color: var(--ant-color-text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.4;
-    }
-
-    .clearSelectedHintBtn {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: none;
-      background: color-mix(in srgb, var(--ant-color-bg-container) 86%, transparent);
-      color: color-mix(in srgb, var(--ant-color-text) 50%, var(--ant-color-primary));
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: all 0.2s ease;
-
-      &:hover {
-        color: var(--ant-color-primary);
-        background: color-mix(in srgb, var(--ant-color-bg-container) 100%, transparent);
-      }
-    }
-
-    // 3. 文本域 (嵌套在 Card 内)
-    .textarea {
-      resize: none !important;
-      border: none !important;
-      box-shadow: none !important;
-
-      padding: 0 var(--ant-padding-xxs) !important;
-      margin-bottom: var(--ant-margin-lg);
-
-      font-size: var(--ant-font-size);
-      line-height: 1.5;
-      color: var(--ant-color-text);
-
-      &::placeholder {
-        color: var(--ant-color-text-placeholder);
-      }
-    }
-
-    // 4. 底部工具栏 (嵌套在 Card 内)
-    .actionToolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      // 确保最小高度，防止图标顶边
-      min-height: var(--ant-control-height-sm);
-
-      // --- 左侧图标组 ---
-      .toolsLeft {
-        display: flex;
-        align-items: center;
-        gap: var(--ant-margin-xs);
-
-        .toolBtn {
-          color: var(--ant-color-text-tertiary);
-          flex-shrink: 0;
-          &:hover {
-            color: var(--ant-color-text);
-            background-color: var(--ant-color-fill-tertiary);
-          }
-        }
-      }
-
-      // --- 右侧操作组 ---
-      .toolsRight {
-        display: flex;
-        align-items: center;
-        gap: var(--ant-margin-sm); // 12px
-
-        // 发送按钮
-        .sendBtn {
-          flex-shrink: 0; // 防止压扁
-          justify-content: center;
-          box-shadow: var(--ant-box-shadow-sm);
-        }
-      }
+      box-shadow: 0 0 0 2px var(--ant-color-primary-bg);
     }
   }
 
-  // 5. 底部提示 (嵌套在 Container 内)
+  .selectedHint {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ant-margin-xs);
+    margin-bottom: var(--ant-margin-sm);
+    align-self: flex-start;
+    max-width: 100%;
+    border: 1px solid var(--ant-color-primary-border);
+    border-radius: var(--ant-border-radius);
+    padding: 2px var(--ant-padding-xs);
+    background: var(--ant-color-primary-bg);
+  }
+
+  .selectedHintText {
+    min-width: 0;
+    font-size: var(--ant-font-size-sm);
+    color: var(--ant-color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .clearSelectedHintBtn {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--ant-color-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+
+    &:hover {
+      color: var(--ant-color-primary);
+      background: var(--ant-color-fill-tertiary);
+    }
+  }
+
+  .textareaWrap {
+    position: relative;
+    background: transparent;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--ant-margin-sm);
+  }
+
+  .textarea {
+    flex: 1;
+    resize: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: var(--ant-padding-xs) 0 !important;
+    font-size: var(--ant-font-size);
+    line-height: 1.6;
+    color: var(--ant-color-text);
+
+    :global(.ant-input) {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+
+    &::placeholder {
+      color: var(--ant-color-text-placeholder);
+    }
+  }
+
+  .inlineError {
+    margin-top: var(--ant-margin-xxs);
+    margin-bottom: var(--ant-margin-sm);
+    padding: 0 var(--ant-padding-xxs);
+    color: var(--ant-color-error);
+    font-size: var(--ant-font-size-sm);
+  }
+
+  .actionArea {
+    position: relative;
+    margin-top: 0;
+  }
+
+  .actionToolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--ant-margin-sm);
+    min-height: 36px;
+    min-width: 280px;
+  }
+
+  .toolbarLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--ant-margin-sm);
+    min-width: 0;
+  }
+
+  .toolsRight {
+    display: flex;
+    align-items: center;
+    gap: var(--ant-margin-sm);
+    margin-left: auto;
+  }
+
+  .toolbarCircleBtn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    line-height: 1;
+  }
+
+  .capabilityButton {
+    min-width: 72px;
+    height: 32px;
+    padding: 0 var(--ant-padding-sm);
+    border-radius: 999px;
+    font-weight: 400;
+    font-size: var(--ant-font-size-sm);
+    background: var(--ant-color-bg-container);
+    border-color: var(--ant-color-border);
+    color: var(--ant-color-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    &:hover,
+    &:focus {
+      color: var(--ant-color-primary) !important;
+      border-color: var(--ant-color-primary) !important;
+    }
+  }
+
+  .floatingPanel {
+    border-radius: var(--ant-border-radius-lg);
+    overflow: hidden;
+  }
+
+  .contentMenu {
+    min-width: 200px;
+  }
+
+  .capabilityPanel {
+    width: 240px;
+    overflow: hidden;
+    border-radius: var(--ant-border-radius-lg);
+  }
+
+  .contentPanel {
+    min-width: 200px;
+    padding: var(--ant-padding-xs);
+  }
+
+  .capabilityMenu {
+    border-inline-end: none !important;
+    background: transparent !important;
+  }
+
+  .capabilitySourceText {
+    font-size: var(--ant-font-size-sm);
+    color: var(--ant-color-text-secondary);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .capabilityActionRow {
+    width: 100%;
+    height: 32px;
+    border: none;
+    border-radius: var(--ant-border-radius);
+    padding: 0 var(--ant-padding-sm);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: var(--ant-margin-xs);
+    background: transparent;
+    color: var(--ant-color-text);
+    cursor: pointer;
+    font-size: var(--ant-font-size-sm);
+    font-weight: 500;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--ant-color-fill-tertiary);
+    }
+  }
+
+  .capabilityEmpty {
+    padding: var(--ant-padding-sm) 0;
+  }
+
+  .otherSkillModal {
+    :global(.ant-modal-content) {
+      border-radius: var(--ant-border-radius-lg);
+      overflow: hidden;
+    }
+
+    :global(.ant-modal-header) {
+      border-bottom: 1px solid var(--ant-color-border-secondary);
+    }
+
+    :global(.ant-modal-title) {
+      font-size: var(--ant-font-size);
+      font-weight: 500;
+      color: var(--ant-color-text);
+    }
+
+    :global(.ant-modal-body) {
+      padding: var(--ant-padding-sm);
+      max-height: 56vh;
+      overflow: auto;
+    }
+  }
+
+  .treeItemLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ant-margin-xs);
+  }
+
+  .otherSkillTree {
+    background: transparent !important;
+
+    :global(.ant-tree-treenode) {
+      padding: 2px 0;
+    }
+
+    :global(.ant-tree-node-content-wrapper) {
+      height: 32px;
+      line-height: 32px;
+      border-radius: var(--ant-border-radius);
+      padding: 0 var(--ant-padding-sm) !important;
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-color-text);
+
+      &:hover {
+        background: var(--ant-color-fill-tertiary) !important;
+      }
+    }
+
+    :global(.ant-tree-node-selected) {
+      background: transparent !important;
+    }
+
+    :global(.ant-tree-node-content-wrapper.ant-tree-node-selected) {
+      background: var(--ant-color-primary-bg) !important;
+      color: var(--ant-color-text) !important;
+      font-weight: 500;
+    }
+  }
+
   .footerTip {
     text-align: center;
-    margin-top: var(--ant-margin-xs);
-    font-size: var(--ant-font-size-sm); // 12px
+    margin-top: var(--ant-margin-xxs);
+    font-size: var(--ant-font-size-sm);
     color: var(--ant-color-text-quaternary);
     line-height: 1;
   }

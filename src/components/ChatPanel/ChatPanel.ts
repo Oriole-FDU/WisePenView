@@ -1,5 +1,5 @@
+import type { Message, Model, MessageRole } from './index.type';
 import type { MessageResponse } from '@/domains/Chat';
-import type { Message, MessageRole, Model } from './index.type';
 
 export const HISTORY_PAGE_SIZE = 100;
 

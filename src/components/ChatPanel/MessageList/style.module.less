@@ -49,6 +49,39 @@
       line-height: 1;
       letter-spacing: -0.02em;
     }
+
+    .promptSection {
+      margin-top: var(--ant-margin-xl);
+    }
+
+    .promptChips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--ant-margin-xs);
+    }
+
+    .promptChip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid var(--ant-color-border-secondary);
+      border-radius: 20px;
+      background: var(--ant-color-bg-container);
+      font-size: 13px;
+      color: var(--ant-color-text-secondary);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+
+      &:hover {
+        border-color: var(--ant-color-primary);
+        color: var(--ant-color-primary);
+      }
+    }
+
+    .promptIcon {
+      font-size: 14px;
+    }
   }
 }
 

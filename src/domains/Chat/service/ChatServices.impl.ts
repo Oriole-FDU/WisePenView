@@ -1,12 +1,12 @@
-import { useCurrentChatSessionStore, useNewChatSessionStore, useNoteSelectionStore } from '@/store';
 import { ChatApi, ChatSessionApi } from '../apis/ChatApi';
+import { useCurrentChatSessionStore, useNewChatSessionStore, useNoteSelectionStore } from '@/store';
 import type {
   ChatSession,
   CreateSessionRequest,
   DeleteSessionRequest,
   IChatService,
-  ListHistoryMessagesRequest,
   ListSessionsRequest,
+  ListHistoryMessagesRequest,
   MessageResponse,
   ModelListResponse,
   PageResult,

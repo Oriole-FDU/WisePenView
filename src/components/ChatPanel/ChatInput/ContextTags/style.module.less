@@ -1,0 +1,36 @@
+.tags {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.docTag {
+  background-color: var(--ant-color-fill-tertiary);
+  color: var(--ant-color-text);
+}
+
+.attachmentTag {
+  background-color: var(--ant-color-fill-quaternary);
+  color: var(--ant-color-text);
+}
+
+.tagRemove {
+  cursor: pointer;
+  opacity: 0.55;
+  font-size: 11px;
+  margin-left: 2px;
+
+  &:hover {
+    opacity: 1;
+  }
+}

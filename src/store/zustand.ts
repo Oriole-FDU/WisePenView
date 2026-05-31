@@ -1,5 +1,5 @@
 /**
- * Zustand 状态管理模块入口
+ * Zustand 状态管理模块入�?
  */
 
 export { clearAllZustandStores } from './clearAllStores';
@@ -28,3 +28,9 @@ export {
   type PdfPreviewProgress,
 } from './usePdfPreviewProgressStore';
 export { clearTrashTagStore, useTrashTagStore } from './useTrashTagStore';
+
+export { useChatPageStore, clearChatPageStore } from './useChatPageStore';
+export type { ActiveDocRef, ActiveAttachment } from './useChatPageStore';
+export { useChatAgentStore, clearChatAgentStore, type ChatAgentOption, type ChatAgentType } from './useChatAgentStore';
+export { useAdvancedModeStore, clearAdvancedModeStore } from './useAdvancedModeStore';
+export { useChatCapabilityStore, clearChatCapabilityStore, type TemporarySkillSelection, type TemporaryToolSelection } from './useChatCapabilityStore';

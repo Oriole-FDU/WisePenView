@@ -1,5 +1,5 @@
 /**
- * domains - 业务 Domain Service 统一对外入口（barrel）
+ * domains - 业务 Domain Service 统一对外入口（barrel�?
  */
 export {
   ServicesProvider,
@@ -16,5 +16,15 @@ export {
   useTagService,
   useUserService,
   useWalletService,
+  useSkillService,
 } from './_registry';
 export type { ServicesContextValue } from './_registry';
+
+export type {
+  ISkillService,
+  SkillSummary,
+  SkillDetail,
+  SkillVersion,
+  SkillScopeType,
+} from './Skill';
+

@@ -1,0 +1,37 @@
+import React from 'react';
+import { useChatPageStore } from '@/store/zustand';
+import type { ContextTagsProps } from './index.type';
+import styles from './style.module.less';
+
+const ContextTags: React.FC<ContextTagsProps> = () => {
+  const activeDocRefs = useChatPageStore((state) => state.activeDocRefs);
+  const activeAttachments = useChatPageStore((state) => state.activeAttachments);
+  const removeDocRef = useChatPageStore((state) => state.removeDocRef);
+  const removeAttachment = useChatPageStore((state) => state.removeAttachment);
+
+  const hasAny = activeDocRefs.length > 0 || activeAttachments.length > 0;
+  if (!hasAny) return null;
+
+  return (
+    <div className={styles.tags}>
+      {activeDocRefs.map((ref) => (
+        <span key={ref.resourceId} className={`${styles.tag} ${styles.docTag}`}>
+          引用 {ref.resourceName}
+          <span className={styles.tagRemove} onClick={() => removeDocRef(ref.resourceId)}>
+            ×
+          </span>
+        </span>
+      ))}
+      {activeAttachments.map((att) => (
+        <span key={att.attachmentId} className={`${styles.tag} ${styles.attachmentTag}`}>
+          附件 {att.filename}
+          <span className={styles.tagRemove} onClick={() => removeAttachment(att.attachmentId)}>
+            ×
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+};
+
+export default ContextTags;

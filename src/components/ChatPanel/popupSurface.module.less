@@ -1,0 +1,54 @@
+﻿// src/components/ChatPanel/popupSurface.module.less
+// simplified
+
+.surface {
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-secondary);
+  background: var(--ant-color-bg-container);
+  overflow: hidden;
+}
+
+// menu items via :global
+:global {
+  .ant-menu-item,
+  .ant-dropdown-menu-item {
+    min-height: 32px !important;
+    margin: 0 0 2px !important;
+    border-radius: var(--ant-border-radius) !important;
+    font-weight: 400;
+    font-size: var(--ant-font-size-sm);
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--ant-color-fill-tertiary) !important;
+    }
+  }
+
+  .ant-menu-item-selected,
+  .ant-dropdown-menu-item-selected {
+    background: var(--ant-color-primary-bg) !important;
+  }
+}
+
+.menu {
+  border-inline-end: none !important;
+  background: var(--ant-color-bg-container) !important;
+  padding: var(--ant-padding-xs);
+  font-size: var(--ant-font-size-sm);
+  font-weight: 400;
+}
+
+.menuLabel {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-weight: 500;
+}
+
+.dropdownOverlay :global(.ant-dropdown-menu) {
+  min-width: 200px;
+  padding: var(--ant-padding-xs);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-secondary);
+  background: var(--ant-color-bg-container);
+}

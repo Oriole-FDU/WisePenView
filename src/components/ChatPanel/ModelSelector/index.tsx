@@ -1,24 +1,24 @@
+import React, { useState, useMemo } from 'react';
 import { useRequest, useUpdateEffect } from 'ahooks';
+import { Popover, Dropdown, Tag, Spin, Empty } from 'antd';
 import type { MenuProps } from 'antd';
-import { Dropdown, Empty, Popover, Spin, Tag } from 'antd';
-import clsx from 'clsx';
-import { useMemo, useState } from 'react';
 import {
-  RiAppsLine,
   RiArrowDownSLine,
   RiArrowUpSLine,
-  RiBarChartLine,
   RiCheckLine,
   RiSortAsc,
+  RiAppsLine,
+  RiBarChartLine,
 } from 'react-icons/ri';
+import clsx from 'clsx';
 
-import { Claude, DeepSeek, Doubao, Gemini, Grok, Meta, Mistral, OpenAI } from '@lobehub/icons';
+import { OpenAI, Claude, Grok, DeepSeek, Doubao, Meta, Mistral, Gemini } from '@lobehub/icons';
 
-import IconText from '@/components/Common/IconText';
 import { useChatService } from '@/domains';
 import { mapApiModelsToFlatModels } from '@/domains/Chat';
 import { useChatModelPreferenceStore } from '@/store/useChatModelPreferenceStore';
 import type { Model } from '../index.type';
+import type { ModelSelectorProps } from './index.type';
 
 import styles from './style.module.less';
 
@@ -52,12 +52,7 @@ const SORT_OPTIONS = [
   { label: '深度思考模型', value: 'thinking', icon: RiAppsLine },
 ];
 
-interface ModelSelectorProps {
-  value: string;
-  onChange: (model: Model) => void;
-}
-
-function ModelSelector({ value, onChange }: ModelSelectorProps) {
+const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const [currentSort, setCurrentSort] = useState<string>('ratio');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -125,11 +120,8 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
 
   const sortMenuItems: MenuProps['items'] = SORT_OPTIONS.map((opt) => ({
     key: opt.value,
-    label: (
-      <IconText icon={<opt.icon />} iconSize={14} gap="var(--ant-margin-xs)">
-        {opt.label}
-      </IconText>
-    ),
+    label: opt.label,
+    icon: <opt.icon />,
     onClick: () => setCurrentSort(opt.value),
     className: currentSort === opt.value ? 'ant-dropdown-menu-item-selected' : '',
   }));
@@ -145,13 +137,8 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
             onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
             aria-label={sortOrder === 'asc' ? '切换为降序' : '切换为升序'}
           >
-            <IconText
-              icon={sortOrder === 'asc' ? <RiArrowUpSLine /> : <RiArrowDownSLine />}
-              iconSize={14}
-              gap={2}
-            >
-              {sortOrder === 'asc' ? '升序' : '降序'}
-            </IconText>
+            {sortOrder === 'asc' ? <RiArrowUpSLine /> : <RiArrowDownSLine />}
+            {sortOrder === 'asc' ? '升序' : '降序'}
           </button>
 
           <Dropdown
@@ -164,9 +151,8 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
             placement="bottomRight"
           >
             <div className={styles.sortTrigger}>
-              <IconText icon={<RiArrowDownSLine />} iconPosition="end" iconSize={10} gap={4}>
-                {SORT_OPTIONS.find((o) => o.value === currentSort)?.label}
-              </IconText>
+              {SORT_OPTIONS.find((o) => o.value === currentSort)?.label}
+              <RiArrowDownSLine className={styles.sortArrow} />
             </div>
           </Dropdown>
         </div>
@@ -174,11 +160,11 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
 
       <div className={styles.modelList}>
         {loading ? (
-          <div style={{ padding: '40px 0', textAlign: 'center' }}>
+          <div className={styles.loadingWrap}>
             <Spin size="small" />
           </div>
         ) : processedModels.length === 0 ? (
-          <div style={{ padding: '20px 0' }}>
+          <div className={styles.emptyWrap}>
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无模型" />
           </div>
         ) : (
@@ -195,16 +181,12 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
               {currentSort === 'ratio' && <div className={styles.rankNum}>#{index + 1}</div>}
 
               <div className={styles.itemLeft}>
-                <IconText
-                  className={styles.modelTitle}
-                  textClassName={styles.modelName}
-                  icon={<LogoFactory provider={model.provider} size={20} />}
-                  iconSize={20}
-                  gap="var(--ant-margin-xs)"
-                  ellipsis
-                >
-                  {model.name}
-                </IconText>
+                <div className={styles.logoWrapper}>
+                  {/* 使用 Provider 字段动态生成 Logo */}
+                  <LogoFactory provider={model.provider} size={20} />
+                </div>
+
+                <div className={styles.modelName}>{model.name}</div>
 
                 {/* {model.vision && (
                   <Tooltip title="支持视觉识别" classNames={{ container: styles.tooltipBody }}>
@@ -225,9 +207,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
 
               <div className={styles.itemRight}>
                 {model.multiplier && <Tag className={styles.multiplierTag}>{model.multiplier}</Tag>}
-                {model.id === value && (
-                  <RiCheckLine style={{ color: 'var(--ant-color-primary)' }} />
-                )}
+                {model.id === value && <RiCheckLine className={styles.checkIcon} />}
               </div>
             </div>
           ))
@@ -248,24 +228,17 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
     >
       <div className={styles.trigger}>
         {/* 如果正在加载，显示 Loading 图标或占位符 */}
-        <IconText
-          icon={
-            loading ? (
-              <Spin size="small" />
-            ) : (
-              <LogoFactory provider={currentModel?.provider ?? 'openai'} size={16} />
-            )
-          }
-          iconSize={16}
-          gap="var(--ant-margin-xxs)"
-          ellipsis
-        >
-          {loading ? '模型加载中' : (currentModel?.name ?? '请选择模型')}
-        </IconText>
-        <IconText icon={<RiArrowDownSLine />} iconSize={10} aria-hidden />
+        {loading ? (
+          <Spin size="small" className={styles.loadingSpin} />
+        ) : (
+          <LogoFactory provider={currentModel?.provider ?? 'openai'} size={16} />
+        )}
+
+        <span>{loading ? '模型加载中' : (currentModel?.name ?? '请选择模型')}</span>
+        <RiArrowDownSLine className={styles.triggerArrow} />
       </div>
     </Popover>
   );
-}
+};
 
 export default ModelSelector;

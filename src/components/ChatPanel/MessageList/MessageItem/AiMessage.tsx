@@ -1,20 +1,19 @@
-import type { Message } from '@/components/ChatPanel/index.type';
-import IconText from '@/components/Common/IconText';
-import { useAppMessage } from '@/hooks/useAppMessage';
-import { useInterval } from 'ahooks';
-import { Button, Spin } from 'antd';
 import React from 'react';
 import { LuCheck, LuCopy } from 'react-icons/lu';
+import { Button, Spin } from 'antd';
+import { useInterval } from 'ahooks';
 import { LogoFactory } from '../../ModelSelector';
-import styles from './AiMessage.module.less';
 import MessageContent from './MessageContent';
 import ThinkingBlock from './ThinkingBlock';
 import ToolCallBlock from './ToolCallBlock';
+import styles from './AiMessage.module.less';
+import type { Message } from '@/components/ChatPanel/index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 const LOADING_HINTS = ['正在生成回复...', '请稍等片刻...', '正在组织答案...'];
 const LOADING_HINT_SWITCH_MS = 2000;
 
-function AiMessage({ message }: { message: Message }) {
+const AiMessage: React.FC<{ message: Message }> = ({ message }) => {
   const hasReasoning = message.reasoningContent !== undefined;
   const showLoadingIndicator = Boolean(message.loading && !message.content);
   const messageApi = useAppMessage();
@@ -64,15 +63,12 @@ function AiMessage({ message }: { message: Message }) {
         )}
         <ToolCallBlock content={message.toolContent || ''} />
         {showLoadingIndicator && (
-          <IconText
-            className={styles.loadingHint}
-            textClassName={styles.loadingHintText}
-            icon={<Spin size="small" />}
-            iconSize={14}
-            gap="var(--ant-margin-xs)"
-          >
-            <span key={loadingHintIndex}>{LOADING_HINTS[loadingHintIndex]}</span>
-          </IconText>
+          <div className={styles.loadingHint}>
+            <Spin size="small" />
+            <span key={loadingHintIndex} className={styles.loadingHintText}>
+              {LOADING_HINTS[loadingHintIndex]}
+            </span>
+          </div>
         )}
         {/* 正文内容 */}
         {/* 只有当正文有内容，或者没有思考过程且非 loading 时（避免空白占位），才渲染正文 */}
@@ -111,6 +107,6 @@ function AiMessage({ message }: { message: Message }) {
       </div>
     </div>
   );
-}
+};
 
 export default AiMessage;

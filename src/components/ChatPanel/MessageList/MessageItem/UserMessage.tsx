@@ -1,17 +1,17 @@
-import type { Message } from '@/components/ChatPanel/index.type';
-import { useAppMessage } from '@/hooks/useAppMessage';
-import { Button } from 'antd';
 import React from 'react';
-import { LuCheck, LuCopy } from 'react-icons/lu';
+import { LuCopy, LuCheck } from 'react-icons/lu';
+import { Button } from 'antd';
 import MessageContent from './MessageContent';
 import styles from './UserMessage.module.less';
+import type { Message } from '@/components/ChatPanel/index.type';
+import { useAppMessage } from '@/hooks/useAppMessage';
 
 interface UserMessageProps {
   message: Message;
   onEdit?: (content: string) => void;
 }
 
-function UserMessage({ message }: UserMessageProps) {
+const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
   const messageApi = useAppMessage();
   const [copied, setCopied] = React.useState(false);
 
@@ -50,6 +50,6 @@ function UserMessage({ message }: UserMessageProps) {
       </div>
     </div>
   );
-}
+};
 
 export default UserMessage;

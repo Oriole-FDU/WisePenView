@@ -1,14 +1,14 @@
 /**
  * 真实服务注册表：Service 依赖装配入口
  *
- * 统一形态：每个 *Services.impl.ts 均导出 createXxxServices(deps?): IXxxService 工厂。
+ * 统一形态：每个 *Services.impl.ts 均导�?createXxxServices(deps?): IXxxService 工厂�?
  *
- * 装配规则：
- * - Level 0：无跨 service 依赖，工厂无参。
- * - Level 1：依赖 Level 0，通过参数注入依赖后构建。
+ * 装配规则�?
+ * - Level 0：无�?service 依赖，工厂无参�?
+ * - Level 1：依�?Level 0，通过参数注入依赖后构建�?
  *
- * 为避免循环依赖与隐式耦合，service 间不得互相直接 import 实现，必须经此装配。
- * 新增更深层级（Level 2+）时在此文件延展，保持"分层 + 显式注入"。
+ * 为避免循环依赖与隐式耦合，service 间不得互相直�?import 实现，必须经此装配�?
+ * 新增更深层级（Level 2+）时在此文件延展，保�?分层 + 显式注入"�?
  */
 import { createAuthServices } from '@/domains/Auth/service/AuthServices.impl';
 import { createChatServices } from '@/domains/Chat/service/ChatServices.impl';
@@ -23,10 +23,11 @@ import { createStickerServices } from '@/domains/Sticker/service/StickerServices
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
 import { createUserServices } from '@/domains/User/service/UserServices.impl';
 import { createWalletServices } from '@/domains/Wallet/service/WalletServices.impl';
+import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl';
 
 import type { ServicesContextValue } from './registry.types';
 
-// Level 0：无跨 service 依赖
+// Level 0：无�?service 依赖
 const authService = createAuthServices();
 const chatService = createChatServices();
 const documentService = createDocumentServices();
@@ -37,8 +38,9 @@ const quotaService = createQuotaServices();
 const resourceService = createResourceServices();
 const userService = createUserServices();
 const walletService = createWalletServices();
+const skillService = createSkillServices();
 
-// Level 1：依赖 Level 0
+// Level 1：依�?Level 0
 const tagService = createTagServices({ resourceService: resourceService });
 const stickerService = createStickerServices({ resourceService: resourceService });
 const driveService = createDriveServices({
@@ -60,6 +62,7 @@ const servicesValue: ServicesContextValue = {
   tagService: tagService,
   userService: userService,
   walletService: walletService,
+  skillService: skillService,
 };
 
 export function getContextValue(): ServicesContextValue {

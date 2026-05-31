@@ -20,6 +20,12 @@ export interface Model {
 
 export type MessageRole = 'user' | 'ai' | 'system';
 
+export interface ChatPanelProps {
+  collapsed: boolean;
+  fullWidth?: boolean;
+  onNewChat?: () => void;
+}
+
 export interface Message {
   id: string;
   role: MessageRole;
