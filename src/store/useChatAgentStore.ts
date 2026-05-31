@@ -48,7 +48,7 @@ export const useChatAgentStore = create<ChatAgentState>()((set) => ({
         sessionAgentBySessionId: nextSessionAgentBySessionId,
       };
     }),
-})),
+}));
 
 
 export const clearChatAgentStore = (): void => {
