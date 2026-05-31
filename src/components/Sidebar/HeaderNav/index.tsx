@@ -1,4 +1,4 @@
-import { useChatService, useNoteService } from '@/domains';
+﻿import { useChatService, useNoteService } from '@/domains';
 import { useAppMessage } from '@/hooks/useAppMessage';
 import { useNewChatSessionStore, useNewNoteStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
@@ -52,7 +52,7 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
 
   const { loading: creatingNote, run: runCreateNote } = useRequest(
     async () => {
-      const { resourceId } = await noteService.createNote({ title: '未命名笔�? });
+      const { resourceId } = await noteService.createNote({ title: '未命名笔记' });
       if (!resourceId) {
         throw new Error('创建笔记失败：未获取到资源ID');
       }
@@ -96,16 +96,16 @@ function HeaderNav({ collapsed, onSessionCreated }: HeaderNavProps) {
       label: '新建笔记',
     },
     {
-    {
       key: '/app/chat',
       icon: <RiRobot2Line size={18} />,
       onClick: () => navigate('/app/chat'),
-      label: 'AI �Ի�',
+      label: 'AI 对话',
     },
+    {
       key: '/app/drive',
       icon: <RiFileTextLine size={18} />,
       onClick: () => navigate('/app/drive'),
-      label: '文档与云�?,
+      label: '文档与云盘',
     },
     {
       key: '/app/my-group',
