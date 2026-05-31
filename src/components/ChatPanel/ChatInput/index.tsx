@@ -5,6 +5,7 @@ import { LuX } from 'react-icons/lu';
 import ActionToolbar from './ActionToolbar';
 import CapabilityPicker from './CapabilityPicker';
 import ContentPicker from './ContentPicker';
+import DocumentPickerModal from './DocumentPickerModal';
 import ContextTags from './ContextTags';
 import OtherSkillModal from './OtherSkillModal';
 import { CHAT_V4_TOOL_OPTIONS, type CapabilityToolOption } from './capability';
@@ -33,6 +34,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [isComposing, setIsComposing] = useState(false);
   const [capabilityOpen, setCapabilityOpen] = useState(false);
   const [contentPickOpen, setContentPickOpen] = useState(false);
+  const [docPickerOpen, setDocPickerOpen] = useState(false);
   const [otherSkillModalOpen, setOtherSkillModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputCardRef = useRef<HTMLDivElement>(null);
@@ -155,7 +157,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
       open
       onClose={() => setContentPickOpen(false)}
       onSelectUpload={() => setContentPickOpen(false)}
-      onSelectLibrary={() => setContentPickOpen(false)}
+      onSelectLibrary={() => {
+          setContentPickOpen(false);
+          setDocPickerOpen(true);
+        }}
     />
   );
 
@@ -219,6 +224,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
         selectedSkills={normalizedSelectedSkills}
         onClose={() => setOtherSkillModalOpen(false)}
         onConfirm={handleOtherSkillConfirm}
+      />
+
+      <DocumentPickerModal
+        open={docPickerOpen}
+        onClose={() => setDocPickerOpen(false)}
       />
 
       <div className={styles.footerTip}>AI 内容仅供参考，请仔细甄别</div>
