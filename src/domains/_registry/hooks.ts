@@ -43,4 +43,3 @@ export const useUserService = (): IUserService => useServicesContext().userServi
 /** 个人中心钱包、高级组 token 相关页注�?*/
 export const useWalletService = (): IWalletService => useServicesContext().walletService;
 export const useSkillService = (): ISkillService => useServicesContext().skillService;
-export const useWalletService = (): IWalletService => useServicesContext().walletService;
