@@ -13,6 +13,6 @@ function MessageItem({ message }) {
   }
 
   return <AiMessage message={message} />;
-};
+}
 
 export default MessageItem;

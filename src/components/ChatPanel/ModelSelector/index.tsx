@@ -44,7 +44,7 @@ export const LogoFactory = ({ provider, size = 20 }: { provider: string; size?: 
     default:
       return <OpenAI.Avatar {...props} />;
   }
-};
+}
 
 const SORT_OPTIONS = [
   { label: '按费率', value: 'ratio', icon: RiBarChartLine },
@@ -239,6 +239,6 @@ function ModelSelector({ value, onChange }) {
       </div>
     </Popover>
   );
-};
+}
 
 export default ModelSelector;

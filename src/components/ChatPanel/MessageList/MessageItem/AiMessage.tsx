@@ -107,6 +107,6 @@ function AiMessage({ message }) {
       </div>
     </div>
   );
-};
+}
 
 export default AiMessage;

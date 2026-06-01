@@ -41,6 +41,6 @@ function Welcome({ onPromptClick }) {
       </div>
     </div>
   );
-};
+}
 
 export default Welcome;

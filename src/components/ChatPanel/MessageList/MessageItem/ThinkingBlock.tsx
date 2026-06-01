@@ -70,6 +70,6 @@ function ThinkingBlock({ content, duration, loading }) {
       />
     </div>
   );
-};
+}
 
 export default ThinkingBlock;

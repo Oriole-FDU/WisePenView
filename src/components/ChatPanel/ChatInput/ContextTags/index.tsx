@@ -32,6 +32,6 @@ function ContextTags() {
       ))}
     </div>
   );
-};
+}
 
 export default ContextTags;

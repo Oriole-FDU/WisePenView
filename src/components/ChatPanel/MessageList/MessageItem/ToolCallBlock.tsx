@@ -20,6 +20,6 @@ function ToolCallBlock({ content }) {
   if (!displayText) return null;
 
   return <div className={styles.toolWrapper}>调用工具：{displayText}</div>;
-};
+}
 
 export default ToolCallBlock;

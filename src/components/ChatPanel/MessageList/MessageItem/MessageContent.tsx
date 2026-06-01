@@ -18,6 +18,6 @@ function MessageContent({ content, renderAsMarkdown = false }) {
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
   );
-};
+}
 
 export default MessageContent;
