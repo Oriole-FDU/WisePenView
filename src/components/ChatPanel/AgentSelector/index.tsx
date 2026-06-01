@@ -7,17 +7,17 @@ import type { AgentSelectorProps } from './index.type';
 import styles from '../style.module.less';
 import popupStyles from '../popupSurface.module.less';
 
-function AgentSelector({
+const AgentSelector: React.FC<AgentSelectorProps> = ({
   value,
   options,
   onChange,
   compact = false,
-}) {
+}) => {
   const normalizedValue = value?.agentId ?? options[0]?.agentId;
 
   const items = useMemo<Required<MenuProps>['items']>(
     () =>
-      options.map((option) {{
+      options.map((option) => ({
         key: option.agentId,
         label: (
           <span className={styles.agentMenuItemLabel}>
@@ -40,7 +40,7 @@ function AgentSelector({
         items,
         selectable: true,
         selectedKeys: normalizedValue ? [normalizedValue] : [],
-        onClick: ({ key }) {
+        onClick: ({ key }) => {
           const target = options.find((option) => option.agentId === key);
           if (!target) return;
           onChange(target);
@@ -58,6 +58,6 @@ function AgentSelector({
       </button>
     </Dropdown>
   );
-}
+};
 
 export default AgentSelector;

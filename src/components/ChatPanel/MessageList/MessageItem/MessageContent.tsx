@@ -8,7 +8,7 @@ interface MessageContentProps {
   renderAsMarkdown?: boolean;
 }
 
-function MessageContent({ content, renderAsMarkdown = false }) {
+const MessageContent: React.FC<MessageContentProps> = ({ content, renderAsMarkdown = false }) => {
   if (!renderAsMarkdown) {
     return <div className={styles.plainText}>{content}</div>;
   }
@@ -18,6 +18,6 @@ function MessageContent({ content, renderAsMarkdown = false }) {
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
   );
-}
+};
 
 export default MessageContent;

@@ -51,6 +51,6 @@ function UserMessage({ message }: UserMessageProps) {
       </div>
     </div>
   );
-}
+};
 
 export default UserMessage;

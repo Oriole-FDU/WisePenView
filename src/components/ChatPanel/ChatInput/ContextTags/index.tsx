@@ -3,7 +3,7 @@ import { useChatPageStore } from '@/store/zustand';
 import type { ContextTagsProps } from './index.type';
 import styles from './style.module.less';
 
-function ContextTags() {
+const ContextTags: React.FC<ContextTagsProps> = () => {
   const activeDocRefs = useChatPageStore((state) => state.activeDocRefs);
   const activeAttachments = useChatPageStore((state) => state.activeAttachments);
   const removeDocRef = useChatPageStore((state) => state.removeDocRef);
@@ -32,6 +32,6 @@ function ContextTags() {
       ))}
     </div>
   );
-}
+};
 
 export default ContextTags;

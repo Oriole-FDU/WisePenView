@@ -5,7 +5,7 @@ interface ToolCallBlockProps {
   content: string;
 }
 
-function ToolCallBlock({ content }) {
+const ToolCallBlock: React.FC<ToolCallBlockProps> = ({ content }) => {
   if (!content) return null;
 
   const toolNames = Array.from(
@@ -20,6 +20,6 @@ function ToolCallBlock({ content }) {
   if (!displayText) return null;
 
   return <div className={styles.toolWrapper}>调用工具：{displayText}</div>;
-}
+};
 
 export default ToolCallBlock;

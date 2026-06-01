@@ -7,7 +7,7 @@ import styles from './style.module.less';
 
 const BASE = '/app/chat';
 
-function ChatPage() {
+const ChatPage: React.FC = () => {
   const { sessionId: routeSessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const currentSessionId = useCurrentChatSessionStore((s) => s.currentSessionId);

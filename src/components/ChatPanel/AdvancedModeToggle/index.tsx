@@ -4,7 +4,7 @@ import { useAdvancedModeStore } from '@/store';
 import type { AdvancedModeToggleProps } from './index.type';
 import styles from '../style.module.less';
 
-function AdvancedModeToggle({ compact = false }) {
+const AdvancedModeToggle: React.FC<AdvancedModeToggleProps> = ({ compact = false }) => {
   const advancedMode = useAdvancedModeStore((state) => state.advancedMode);
   const setAdvancedMode = useAdvancedModeStore((state) => state.setAdvancedMode);
 
@@ -27,6 +27,6 @@ function AdvancedModeToggle({ compact = false }) {
       />
     </button>
   );
-}
+};
 
 export default AdvancedModeToggle;

@@ -13,7 +13,7 @@ const SUGGESTED_PROMPTS = [
   { icon: '🔍', label: '分析一组数据', text: '请帮我分析这组数据并给出改进建议' },
 ];
 
-function Welcome({ onPromptClick }) {
+const Welcome: React.FC<WelcomeProps> = ({ onPromptClick }) => {
   return (
     <div className={styles.welcomeWrapper}>
       <div className={styles.logoIcon}>
@@ -41,6 +41,6 @@ function Welcome({ onPromptClick }) {
       </div>
     </div>
   );
-}
+};
 
 export default Welcome;

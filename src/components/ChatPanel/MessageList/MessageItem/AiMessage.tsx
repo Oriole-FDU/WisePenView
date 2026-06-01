@@ -13,7 +13,7 @@ import { useAppMessage } from '@/hooks/useAppMessage';
 const LOADING_HINTS = ['正在生成回复...', '请稍等片刻...', '正在组织答案...'];
 const LOADING_HINT_SWITCH_MS = 2000;
 
-function AiMessage({ message }) {
+const AiMessage: React.FC<{ message: Message }> = ({ message }) => {
   const hasReasoning = message.reasoningContent !== undefined;
   const showLoadingIndicator = Boolean(message.loading && !message.content);
   const messageApi = useAppMessage();
@@ -107,6 +107,6 @@ function AiMessage({ message }) {
       </div>
     </div>
   );
-}
+};
 
 export default AiMessage;

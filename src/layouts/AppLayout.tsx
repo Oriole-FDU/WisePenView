@@ -25,7 +25,7 @@ const getMaxChatPanelWidth = (): number => {
 const RESOURCE_SIDEBAR_PATH_REGEX = /^\/app\/(note|pdf)\//;
 
 
-function SystemLayout() {
+const SystemLayout: React.FC = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const chatResizeGuideRef = useRef<HTMLDivElement | null>(null);
   const location = useLocation();

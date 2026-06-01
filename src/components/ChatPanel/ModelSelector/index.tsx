@@ -44,7 +44,7 @@ export const LogoFactory = ({ provider, size = 20 }: { provider: string; size?: 
     default:
       return <OpenAI.Avatar {...props} />;
   }
-}
+};
 
 const SORT_OPTIONS = [
   { label: '按费率', value: 'ratio', icon: RiBarChartLine },
@@ -52,7 +52,7 @@ const SORT_OPTIONS = [
   { label: '深度思考模型', value: 'thinking', icon: RiAppsLine },
 ];
 
-function ModelSelector({ value, onChange }) {
+const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
   const [open, setOpen] = useState(false);
   const [currentSort, setCurrentSort] = useState<string>('ratio');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -239,6 +239,6 @@ function ModelSelector({ value, onChange }) {
       </div>
     </Popover>
   );
-}
+};
 
 export default ModelSelector;

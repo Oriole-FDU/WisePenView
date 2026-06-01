@@ -7,12 +7,12 @@ interface MessageItemProps {
   message: Message;
 }
 
-function MessageItem({ message }) {
+const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
   if (message.role === 'user') {
     return <UserMessage message={message} />;
   }
 
   return <AiMessage message={message} />;
-}
+};
 
 export default MessageItem;
