@@ -9,14 +9,14 @@ import type { ChatAgentOption } from '@/store';
 import { buildAgentFromSkillTreeGroup } from '../../agent';
 import styles from './style.module.less';
 
-const OtherSkillModal: React.FC<OtherSkillModalProps> = ({
+function OtherSkillModal({
   open,
   groups,
   currentAgent,
   selectedSkills,
   onClose,
   onConfirm,
-}) => {
+}) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
 
   const visibleGroups = useMemo(
@@ -29,9 +29,9 @@ const OtherSkillModal: React.FC<OtherSkillModalProps> = ({
     [currentAgent, groups]
   );
 
-  const { skillMap, treeData } = useMemo(() => {
+  const { skillMap, treeData } = useMemo(() {
     const mapping = new Map<string, { skill: SkillSummary; sourceAgent: ChatAgentOption | null }>();
-    const data: TreeDataNode[] = visibleGroups.map((group) => {
+    const data: TreeDataNode[] = visibleGroups.map((group) {
       const sourceAgent = buildAgentFromSkillTreeGroup(group, currentAgent);
       return {
         key: group.key,
@@ -42,7 +42,7 @@ const OtherSkillModal: React.FC<OtherSkillModalProps> = ({
           </span>
         ),
         selectable: false,
-        children: group.skills.map((skill) => {
+        children: group.skills.map((skill) {
           mapping.set(skill.skillId, { skill, sourceAgent });
           return {
             key: skill.skillId,
@@ -56,7 +56,7 @@ const OtherSkillModal: React.FC<OtherSkillModalProps> = ({
   }, [currentAgent, visibleGroups]);
 
   const handleOpenChange = useCallback(
-    (visible: boolean) => {
+    (visible: boolean) {
       if (visible) {
         setSelectedKeys(selectedSkills.filter((s) => s.external).map((s) => s.skillId));
       }
@@ -64,15 +64,15 @@ const OtherSkillModal: React.FC<OtherSkillModalProps> = ({
     [selectedSkills]
   );
 
-  const handleSelect = useCallback((keys: React.Key[]) => {
+  const handleSelect = useCallback((keys: React.Key[]) {
     setSelectedKeys(keys);
   }, []);
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = useCallback(() {
     onClose();
   }, [onClose]);
 
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = useCallback(() {
     const selected = selectedKeys
       .map((key) => skillMap.get(String(key)))
       .filter(Boolean) as Array<{ skill: SkillSummary; sourceAgent: ChatAgentOption | null }>;
@@ -118,6 +118,6 @@ const OtherSkillModal: React.FC<OtherSkillModalProps> = ({
       </div>
     </Modal>
   );
-};
+}
 
 export default OtherSkillModal;

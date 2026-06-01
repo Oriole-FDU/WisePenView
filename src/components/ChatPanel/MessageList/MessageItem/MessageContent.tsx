@@ -8,7 +8,7 @@ interface MessageContentProps {
   renderAsMarkdown?: boolean;
 }
 
-const MessageContent: React.FC<MessageContentProps> = ({ content, renderAsMarkdown = false }) => {
+function MessageContent({ content, renderAsMarkdown = false }) {
   if (!renderAsMarkdown) {
     return <div className={styles.plainText}>{content}</div>;
   }

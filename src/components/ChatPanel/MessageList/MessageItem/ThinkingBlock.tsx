@@ -10,7 +10,7 @@ interface ThinkingBlockProps {
   loading?: boolean;
 }
 
-const ThinkingBlock: React.FC<ThinkingBlockProps> = ({ content, duration, loading }) => {
+function ThinkingBlock({ content, duration, loading }) {
   // 如果没有任何内容且不在加载中，则不渲染
   if (!content && !loading) return null;
 

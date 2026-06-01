@@ -6,7 +6,7 @@ import ModelSelector from '../../ModelSelector';
 import type { ActionToolbarProps } from './index.type';
 import styles from '../style.module.less';
 
-const ActionToolbar: React.FC<ActionToolbarProps> = ({
+function ActionToolbar({
   modelValue,
   onModelChange,
   onSend,
@@ -19,7 +19,7 @@ const ActionToolbar: React.FC<ActionToolbarProps> = ({
   onContentPickOpenChange,
   contentPickDropdownContent,
   getPopupContainer,
-}) => {
+}) {
   return (
     <div className={styles.actionToolbar}>
       <div className={styles.toolbarLeft}>
@@ -75,6 +75,6 @@ const ActionToolbar: React.FC<ActionToolbarProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default ActionToolbar;

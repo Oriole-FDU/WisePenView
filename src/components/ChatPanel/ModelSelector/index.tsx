@@ -52,7 +52,7 @@ const SORT_OPTIONS = [
   { label: '深度思考模型', value: 'thinking', icon: RiAppsLine },
 ];
 
-const ModelSelector: React.FC<ModelSelectorProps> = ({ value, onChange }) => {
+function ModelSelector({ value, onChange }) {
   const [open, setOpen] = useState(false);
   const [currentSort, setCurrentSort] = useState<string>('ratio');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');

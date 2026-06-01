@@ -9,7 +9,7 @@ import chatInputStyles from '../style.module.less';
 import popupStyles from '@/components/ChatPanel/popupSurface.module.less';
 import styles from './style.module.less';
 
-const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
+function CapabilityPicker({
   open,
   advancedMode,
   primarySkills,
@@ -23,13 +23,13 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
   currentAgent,
   otherSkillGroups,
   onMenuInteract,
-}) => {
+}) {
   const selectedSkillKeys = useMemo(() => selectedSkills.map((s) => s.skillId), [selectedSkills]);
   const selectedToolKeys = useMemo(() => selectedTools.map((t) => t.toolId), [selectedTools]);
 
   const primarySkillItems = useMemo<MenuProps['items']>(
     () =>
-      primarySkills.map((skill) => {
+      primarySkills.map((skill) {
         const checked = selectedSkillKeys.includes(skill.skillId);
         return {
           key: skill.skillId,
@@ -51,7 +51,7 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
 
   const toolItems = useMemo<MenuProps['items']>(
     () =>
-      toolOptions.map((tool) => {
+      toolOptions.map((tool) {
         const checked = selectedToolKeys.includes(tool.toolId);
         return {
           key: tool.toolId,
@@ -71,17 +71,17 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
     [toolOptions, selectedToolKeys]
   );
 
-  const externalSkills = useMemo(() => {
+  const externalSkills = useMemo(() {
     const currentGroupId = currentAgent?.groupId;
     const orderMap = new Map(otherSkillGroups.map((group, index) => [group.key, index]));
     return selectedSkills
-      .filter((item) => {
+      .filter((item) {
         if (currentAgent?.agentType === 'GROUP') {
           return item.groupId !== currentGroupId;
         }
         return item.scopeType === 'GROUP';
       })
-      .sort((a, b) => {
+      .sort((a, b) {
         const aKey = a.groupId ? `group-${a.groupId}` : 'personal';
         const bKey = b.groupId ? `group-${b.groupId}` : 'personal';
         return (
@@ -99,7 +99,7 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
         <Menu
           mode="inline"
           selectedKeys={selectedSkillKeys}
-          onClick={({ key }) => {
+          onClick={({ key }) {
             onMenuInteract?.();
             const skill = primarySkills.find((item) => item.skillId === key);
             if (skill) onToggleSkill(skill);
@@ -120,7 +120,7 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
           <Menu
             mode="inline"
             selectedKeys={externalSkills.map((s) => s.skillId)}
-            onClick={({ key }) => {
+            onClick={({ key }) {
               onMenuInteract?.();
               if (key === '__select-other__') {
                 onOpenOtherSkillModal();
@@ -129,7 +129,7 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
               onRemoveExternalSkill(key);
             }}
             items={[
-              ...externalSkills.map((skill) => ({
+              ...externalSkills.map((skill) {{
                 key: skill.skillId,
                 icon: <RiToolsLine size={16} />,
                 label: (
@@ -165,7 +165,7 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
       <Menu
         mode="inline"
         selectedKeys={selectedToolKeys}
-        onClick={({ key }) => {
+        onClick={({ key }) {
           onMenuInteract?.();
           const tool = toolOptions.find((item) => item.toolId === key);
           if (tool) onToggleTool(tool);
@@ -175,6 +175,6 @@ const CapabilityPicker: React.FC<CapabilityPickerProps> = ({
       />
     </div>
   );
-};
+}
 
 export default CapabilityPicker;

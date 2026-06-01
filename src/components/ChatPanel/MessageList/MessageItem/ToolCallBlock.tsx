@@ -5,7 +5,7 @@ interface ToolCallBlockProps {
   content: string;
 }
 
-const ToolCallBlock: React.FC<ToolCallBlockProps> = ({ content }) => {
+function ToolCallBlock({ content }) {
   if (!content) return null;
 
   const toolNames = Array.from(

@@ -13,45 +13,45 @@ interface MessageListProps {
   onPromptClick?: (text: string) => void;
 }
 
-const MessageList: React.FC<MessageListProps> = ({
+function MessageList({
   messages,
   canLoadMoreHistory,
   loadingMoreHistory,
   onLoadMoreHistory,
   onPromptClick,
-}) => {
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastMessage = messages[messages.length - 1];
 
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = useCallback(() {
     const element = scrollRef.current;
     if (!element) return;
     element.scrollTop = element.scrollHeight;
   }, []);
 
   const restoreScrollPositionWithoutSmooth = useCallback(
-    (element: HTMLDivElement, nextScrollTop: number) => {
+    (element: HTMLDivElement, nextScrollTop: number) {
       const previousScrollBehavior = element.style.scrollBehavior;
       element.style.scrollBehavior = 'auto';
       element.scrollTop = nextScrollTop;
-      requestAnimationFrame(() => {
+      requestAnimationFrame(() {
         element.style.scrollBehavior = previousScrollBehavior;
       });
     },
     []
   );
 
-  useMount(() => {
-    requestAnimationFrame(() => {
+  useMount(() {
+    requestAnimationFrame(() {
       scrollToBottom();
     });
   });
 
-  useUpdateEffect(() => {
+  useUpdateEffect(() {
     scrollToBottom();
   }, [lastMessage?.id, lastMessage?.content, scrollToBottom]);
 
-  const handleLoadMore = useCallback(async () => {
+  const handleLoadMore = useCallback(async () {
     if (loadingMoreHistory) return;
     const element = scrollRef.current;
     if (!element) {
@@ -63,7 +63,7 @@ const MessageList: React.FC<MessageListProps> = ({
     const previousScrollHeight = element.scrollHeight;
     await onLoadMoreHistory();
 
-    requestAnimationFrame(() => {
+    requestAnimationFrame(() {
       const currentElement = scrollRef.current;
       if (!currentElement) return;
       const scrollHeightDelta = currentElement.scrollHeight - previousScrollHeight;
@@ -89,13 +89,13 @@ const MessageList: React.FC<MessageListProps> = ({
               </button>
             </div>
           )}
-          {messages.map((msg) => (
+          {messages.map((msg) {
             <MessageItem key={msg.id} message={msg} />
           ))}
         </div>
       )}
     </div>
   );
-};
+}
 
 export default MessageList;

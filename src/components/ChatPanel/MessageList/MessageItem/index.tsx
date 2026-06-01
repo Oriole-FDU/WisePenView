@@ -7,7 +7,7 @@ interface MessageItemProps {
   message: Message;
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
+function MessageItem({ message }) {
   if (message.role === 'user') {
     return <UserMessage message={message} />;
   }

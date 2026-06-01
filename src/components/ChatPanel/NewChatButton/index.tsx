@@ -3,7 +3,7 @@ import { RiAddLine } from 'react-icons/ri';
 import type { NewChatButtonProps } from './index.type';
 import styles from '../style.module.less';
 
-const NewChatButton: React.FC<NewChatButtonProps> = ({ onClick, compact = false }) => (
+function NewChatButton({ onClick, compact = false }) {
   <button
     type="button"
     className={`${styles.newChatButton} ${compact ? styles.compactNewChatButton : ''}`}

@@ -277,7 +277,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
         setHistoryTotalPage(1);
       }
     },
-    [clearCurrentSession, currentModel, modelMetaMap, runLoadSessionHistory, setLiveMessages]
+    [clearCurrentSession, currentModel, messageApi, modelMetaMap, runLoadSessionHistory, setLiveMessages]
   );
 
   const loadMoreHistoryMessages = useCallback(async () => {
@@ -307,6 +307,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
     historyPage,
     historyTotalPage,
     loadingMoreHistory,
+    messageApi,
     modelMetaMap,
     runLoadSessionHistory,
   ]);
