@@ -26,6 +26,7 @@ const getNoteInfoDisplay = async (_params: GetNoteInfoRequest): Promise<NoteInfo
     noteTitle: '未命名笔记',
     authors: [],
     lastEditedAtText: '暂无',
+    readCount: 12,
   };
 };
 

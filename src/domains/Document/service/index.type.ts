@@ -1,5 +1,22 @@
-import type { DocumentResourceType } from '@/domains/Document/service/DocumentServices.impl';
 import type { ResourceItem } from '@/domains/Resource';
+
+/** 小写扩展名，不含点 */
+export const DOCUMENT_ALLOWED_EXTENSIONS = [
+  'pdf',
+  'doc',
+  'docx',
+  'ppt',
+  'pptx',
+  'xls',
+  'xlsx',
+] as const;
+
+export type DocumentAllowedExtension = (typeof DOCUMENT_ALLOWED_EXTENSIONS)[number];
+
+/** 文档资源类型（与后端 ResourceType 枚举序列化值对齐） */
+export const DOCUMENT_RESOURCE_TYPES = [...DOCUMENT_ALLOWED_EXTENSIONS, 'unknown'] as const;
+
+export type DocumentResourceType = (typeof DOCUMENT_RESOURCE_TYPES)[number];
 
 /** `POST /document/initDocUpload` 请求体，与后端 DocumentUploadInitRequest 一致 */
 export interface DocumentUploadInitRequestBody {

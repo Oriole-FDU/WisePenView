@@ -6,6 +6,8 @@ import type {
   GroupResConfig,
   IGroupService,
 } from '@/domains/Group';
+import { GROUP_FILE_ORG_LOGIC } from '@/domains/Group';
+import { TAG_RESOURCE_ACTION } from '@/domains/Tag';
 import mockdata from './mockdata.json';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -32,7 +34,15 @@ const getGroupWalletInfo = async (_params: GetGroupWalletInfoRequest): Promise<n
 
 const fetchGroupResConfig = async (groupId: string): Promise<GroupResConfig> => {
   await delay(100);
-  return { groupId, fileOrgLogic: 'FOLDER' };
+  return {
+    groupId,
+    fileOrgLogic: GROUP_FILE_ORG_LOGIC.FOLDER,
+    defaultMemberActions: [
+      TAG_RESOURCE_ACTION.DISCOVER,
+      TAG_RESOURCE_ACTION.VIEW,
+      TAG_RESOURCE_ACTION.DOWNLOAD_WATERMARK,
+    ],
+  };
 };
 
 const updateGroupResConfig = async (): Promise<void> => {

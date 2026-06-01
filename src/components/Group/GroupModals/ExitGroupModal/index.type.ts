@@ -1,6 +1,6 @@
 export interface ExitGroupModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   groupName: string;
   groupId?: string;

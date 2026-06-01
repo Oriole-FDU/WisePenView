@@ -7,7 +7,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { createElement } from 'react';
 import { RiSparklingLine } from 'react-icons/ri';
 
-import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note/enum';
+import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { getAiDiffDisplayModeSnapshot, useAiDiffDisplayStore } from '@/store/useAiDiffDisplayStore';
 import type { NoteEditorPlugin } from '../types';
 import {

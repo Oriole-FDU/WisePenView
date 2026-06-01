@@ -1,8 +1,7 @@
 import { useDriveService } from '@/domains';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, Modal, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Alert, Button, Modal } from 'antd';
 import type { DeleteNodeModalProps } from './index.type';
 
 function getNodeName(node: DeleteNodeModalProps['node']): string {
@@ -11,10 +10,8 @@ function getNodeName(node: DeleteNodeModalProps['node']): string {
   return node.title;
 }
 
-function DeleteNodeModal({ open, node, groupId, onCancel, onSuccess }: DeleteNodeModalProps) {
+function DeleteNodeModal({ isOpen, node, groupId, onOpenChange, onSuccess }: DeleteNodeModalProps) {
   const driveService = useDriveService();
-  const message = useAppMessage();
-
   const { loading, run: runDeleteNode } = useRequest(
     async () => {
       if (!node) return;
@@ -23,12 +20,12 @@ function DeleteNodeModal({ open, node, groupId, onCancel, onSuccess }: DeleteNod
     {
       manual: true,
       onSuccess: () => {
-        message.success('删除成功');
+        toast.success('删除成功');
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -45,22 +42,29 @@ function DeleteNodeModal({ open, node, groupId, onCancel, onSuccess }: DeleteNod
     : `确定删除「${getNodeName(node)}」吗？此操作不可撤销。`;
 
   return (
-    <Modal
-      title={title}
-      open={open && !!node}
-      onCancel={onCancel}
-      destroyOnHidden
-      width={500}
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          取消
-        </Button>,
-        <Button key="confirm" type="primary" danger onClick={handleConfirm} loading={loading}>
-          删除
-        </Button>,
-      ]}
-    >
-      <Alert type="warning" showIcon description={description} />
+    <Modal isOpen={isOpen && !!node} onOpenChange={onOpenChange}>
+      <Modal.Backdrop isDismissable={!loading}>
+        <Modal.Container size="sm" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>{title}</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="rounded-medium bg-danger/10 px-4 py-3 text-sm text-danger">
+                {description}
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" isDisabled={loading} onPress={() => onOpenChange(false)}>
+                取消
+              </Button>
+              <Button variant="danger" isDisabled={loading} onPress={() => void handleConfirm()}>
+                删除
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

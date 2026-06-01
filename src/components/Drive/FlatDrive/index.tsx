@@ -1,4 +1,4 @@
-import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource/enum';
+import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
 import { useState } from 'react';
 import FileFilter from './FileFilter';
 import type { FileFilterValue } from './FileFilter/index.type';

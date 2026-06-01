@@ -28,6 +28,7 @@
  */
 
 export {
+  useAdminService,
   useAuthService,
   useChatService,
   useDocumentService,

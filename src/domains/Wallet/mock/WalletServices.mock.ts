@@ -2,7 +2,8 @@
  * 钱包 Mock：MODE === 'mock'；接口形态与 /user/wallet 对齐。
  */
 import type { IWalletService, WalletTransactionRecord } from '@/domains/Wallet';
-import { WALLET_TX_TAB_MERGE_FETCH_CAP } from '@/domains/Wallet/enum';
+import { WALLET_TX_TAB_MERGE_FETCH_CAP } from '@/domains/Wallet';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import mockdata from './mockdata.json';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,13 +26,13 @@ const redeemVoucher: IWalletService['redeemVoucher'] = async (params) => {
   await delay(400);
   const code = params.voucherCode.replace(/[\s-]/g, '').toUpperCase();
   if (code.length !== 16) {
-    throw new Error('请输入 16 位兑换码');
+    throw createClientError(FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_CODE_INVALID);
   }
   if (code === '0000000000000000') {
-    throw new Error('点卡已使用');
+    throw createClientError(FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_USED);
   }
   if (code === 'FFFFFFFFFFFFFFFF') {
-    throw new Error('无效兑换码');
+    throw createClientError(FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_INVALID);
   }
   const amount = 500;
   mockPersonalBalance += amount;

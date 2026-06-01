@@ -9,8 +9,8 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { useNoteService } from '@/domains';
 import { useNewNoteStore } from '@/store';
 
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { toast } from '@heroui/react';
 import type { NoteTitleProps } from './index.type';
 import styles from './style.module.less';
 
@@ -62,7 +62,6 @@ function toHeadingBlockFromTitle(title?: string): BlockNoteBlock[] {
 
 function NoteTitle({ id, initialContent, onEnterKey, focusOnMount }: NoteTitleProps) {
   const noteService = useNoteService();
-  const message = useAppMessage();
   const latestIdRef = useRef(id);
   const titleDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,10 +113,10 @@ function NoteTitle({ id, initialContent, onEnterKey, focusOnMount }: NoteTitlePr
       const trimmed = raw.trim();
       const nextTitle = trimmed || '未命名笔记';
       void noteService.syncTitle({ resourceId: currentId, newName: nextTitle }).catch((error) => {
-        message.error(parseErrorMessage(error));
+        toast.danger(parseErrorMessage(error));
       });
     }, TITLE_DEBOUNCE_MS);
-  }, [editor, message, noteService]);
+  }, [editor, noteService]);
 
   useMount(() => {
     onChangeCleanupRef.current = editor.onChange(() => {

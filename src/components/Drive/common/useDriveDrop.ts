@@ -1,7 +1,7 @@
 import { useDriveService } from '@/domains';
 import type { DriveNode } from '@/domains/Drive';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { toast } from '@heroui/react';
 import { useCallback } from 'react';
 
 /** drop dataTransfer 单一 mime：序列化整个 DriveNode；source 节点的 type 由接收端读 node.type 判断 */
@@ -62,14 +62,12 @@ const buildSuccessMessage = (source: DriveNode, target: DriveNode): string => {
  * - target：容器节点（folder / trash）
  * - 内部校验：source 必须可拖；target 必须可放；不能拖到自己；同 parent 不动
  * - service.moveNode 兜底剩余业务校验（如 folder 拖到自身子孙等需要 path 信息的场景）
- * - 成功后 toast + 调用方传入的 refresh；失败统一走 message.error
+ * - 成功后 toast + 调用方传入的 refresh；失败统一走 toast.danger
  *
  * 注：调用方负责 HTML5 拖拽事件装配（onDragStart 写入 DRAG_TYPE_DRIVE_NODE、onDrop 读取后传入 onDrop）。
  */
 export function useDriveDrop({ refresh, groupId }: UseDriveDropParams): UseDriveDropReturn {
   const driveService = useDriveService();
-  const message = useAppMessage();
-
   const onDrop = useCallback<OnDriveNodeDrop>(
     async (source, target) => {
       if (!isDraggableDriveNode(source)) return;
@@ -83,13 +81,13 @@ export function useDriveDrop({ refresh, groupId }: UseDriveDropParams): UseDrive
           newParentId: target.id,
           groupId,
         });
-        message.success(buildSuccessMessage(source, target));
+        toast.success(buildSuccessMessage(source, target));
         refresh();
       } catch (err) {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       }
     },
-    [driveService, groupId, refresh, message]
+    [driveService, groupId, refresh]
   );
 
   return { onDrop };

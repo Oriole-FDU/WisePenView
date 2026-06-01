@@ -3,7 +3,7 @@ import {
   canEditSelectedMembers,
   canEditSelectedMembersForQuota,
 } from '@/components/Group/GroupDisplayConfig';
-import type { ROLE } from '@/domains/Group/enum';
+import type { ROLE } from '@/domains/Group';
 import type { EnumKey } from '@/utils/enum';
 import { useMemo } from 'react';
 

@@ -1,10 +1,10 @@
 import type { ResourceItem } from '@/domains/Resource';
-import type { TagListByTagResponse } from '@/domains/Tag';
 import type {
   GetResByTagRequest,
   ITagService,
+  TagListByTagResponse,
   TagTreeNode,
-} from '@/domains/Tag/service/index.type';
+} from '@/domains/Tag';
 import mockdata from './mockdata.json';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

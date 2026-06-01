@@ -1,4 +1,4 @@
-import { RESOURCE_TYPE } from '@/domains/Resource/enum';
+import { RESOURCE_TYPE } from '@/domains/Resource';
 import { useActiveDriveScopeStore, usePdfPreviewProgressStore } from '@/store';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';

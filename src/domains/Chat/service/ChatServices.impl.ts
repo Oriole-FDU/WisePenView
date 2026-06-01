@@ -1,4 +1,5 @@
 import { useCurrentChatSessionStore, useNewChatSessionStore, useNoteSelectionStore } from '@/store';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { ChatApi, ChatSessionApi } from '../apis/ChatApi';
 import type {
   ChatSession,
@@ -32,7 +33,7 @@ const createSession = async (params?: CreateSessionRequest): Promise<ChatSession
 
   const data = await ChatSessionApi.createSession(payload);
   if (!data) {
-    throw new Error('创建会话失败');
+    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_CREATE_SESSION_FAILED);
   }
   return data;
 };
@@ -48,7 +49,7 @@ const renameSession = async (params: RenameSessionRequest): Promise<ChatSession>
     newTitle: payload.new_title,
   });
   if (!data) {
-    throw new Error('重命名会话失败');
+    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_RENAME_SESSION_FAILED);
   }
   return data;
 };

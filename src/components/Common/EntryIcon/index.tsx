@@ -1,4 +1,4 @@
-import { RESOURCE_TYPE } from '@/domains/Resource/enum';
+import { RESOURCE_TYPE } from '@/domains/Resource';
 import { AiOutlineFolder, AiOutlineLink } from 'react-icons/ai';
 import { LuTrash2 } from 'react-icons/lu';
 import { RiFileTextLine, RiPenNibFill } from 'react-icons/ri';

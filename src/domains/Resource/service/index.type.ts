@@ -3,8 +3,12 @@
  * 与 resource.openapi.json 对齐
  */
 
-import type { ResourceItem } from '@/domains/Resource';
-import type { ResourceSortBy, ResourceSortDir, TagQueryLogicMode } from '@/domains/Resource/enum';
+import type {
+  ResourceItem,
+  ResourceSortBy,
+  ResourceSortDir,
+  TagQueryLogicMode,
+} from '@/domains/Resource';
 
 /** 资源列表分页（与 OpenAPI PageResultResourceItemResponse 一致） */
 export interface ResourceListPage {
@@ -21,6 +25,10 @@ export interface IResourceService {
   getGroupResources(params: GetGroupResourceRequest): Promise<ResourceListPage>;
   renameResource(params: RenameResourceRequest): Promise<void>;
   updateResourceTags(params: UpdateResourceTagsRequest): Promise<void>;
+  /** 点赞 / 取消点赞，返回操作后最新状态 */
+  interactToggleLike(params: InteractToggleLikeRequest): Promise<InteractToggleLikeResult>;
+  /** 评分（1–5），支持覆盖，返回最新 userScore */
+  interactRate(params: InteractRateRequest): Promise<InteractRateResult>;
 }
 
 /** 重命名资源请求参数（对齐 OpenAPI ResourceRenameRequest，POST /resource/item/renameRes） */
@@ -56,3 +64,25 @@ export interface GetUserResourcesRequest {
 export type GetGroupResourceRequest = GetUserResourcesRequest & {
   groupId: string;
 };
+
+/** 点赞 / 取消点赞请求参数（对齐 POST /resource/interact/toggleLike） */
+export interface InteractToggleLikeRequest {
+  resourceId: string;
+}
+
+/** 点赞操作响应：返回操作后的最新点赞状态 */
+export interface InteractToggleLikeResult {
+  liked: boolean;
+}
+
+/** 评分请求参数（对齐 POST /resource/interact/rate） */
+export interface InteractRateRequest {
+  resourceId: string;
+  /** 1–5 整数，支持覆盖提交 */
+  score: number;
+}
+
+/** 评分操作响应：返回最新 userScore */
+export interface InteractRateResult {
+  userScore: number;
+}

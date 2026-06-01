@@ -11,7 +11,7 @@ interface UserMessageProps {
   onEdit?: (content: string) => void;
 }
 
-const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
+function UserMessage({ message }: UserMessageProps) {
   const messageApi = useAppMessage();
   const [copied, setCopied] = React.useState(false);
 
@@ -32,15 +32,16 @@ const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
         {/* 左侧悬浮操作栏 */}
         <div className={styles.actions}>
           <Button
-            type="text"
-            shape="circle"
-            size="small"
+            variant="ghost"
+            isIconOnly
+            size="sm"
             className={styles.actionBtn}
-            icon={copied ? <LuCheck size={14} /> : <LuCopy size={14} />}
-            onClick={handleCopy}
-            title="复制"
+            onPress={handleCopy}
+            aria-label="复制"
             style={copied ? { color: 'var(--ant-color-success)' } : undefined}
-          />
+          >
+            {copied ? <LuCheck size={14} /> : <LuCopy size={14} />}
+          </Button>
         </div>
 
         {/* 气泡 */}

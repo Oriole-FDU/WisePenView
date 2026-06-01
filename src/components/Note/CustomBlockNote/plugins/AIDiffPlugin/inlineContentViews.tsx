@@ -6,7 +6,7 @@ import type { EditorView } from '@tiptap/pm/view';
 import type { RefObject } from 'react';
 import { useCallback, useRef } from 'react';
 
-import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note/enum';
+import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useAiDiffDisplayModeContext } from './displayModeContext';
 import { applyAiDiffActionForKey, isInlineContentEffectivelyEmpty } from './patch';
 import styles from './style.module.less';

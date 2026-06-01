@@ -2,11 +2,11 @@
  * 高级组组长：个人计算点与小组池之间的 Token 划拨（transferTokenBetweenGroupAndUser）。
  */
 import { useGroupService, useWalletService } from '@/domains';
-import { WALLET_TOKEN_TRANSFER_TYPE } from '@/domains/Wallet/enum';
-import { useAppMessage } from '@/hooks/useAppMessage';
+import { WALLET_TOKEN_TRANSFER_TYPE } from '@/domains/Wallet';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Button, InputNumber, Skeleton } from 'antd';
+import { InputNumber, Skeleton } from 'antd';
 import { useCallback, useState } from 'react';
 import type { OwnerGroupTokenTransferProps } from './index.type';
 import styles from './style.module.less';
@@ -14,8 +14,6 @@ import styles from './style.module.less';
 function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupTokenTransferProps) {
   const walletService = useWalletService();
   const groupService = useGroupService();
-  const message = useAppMessage();
-
   const [personalBal, setPersonalBal] = useState(0);
   const [groupBal, setGroupBal] = useState(0);
   const [amtToGroup, setAmtToGroup] = useState<number | null>(null);
@@ -42,7 +40,7 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
         setGroupBal(res.groupBal);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -62,12 +60,12 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
     {
       manual: true,
       onSuccess: async () => {
-        message.success('已转入小组池');
+        toast.success('已转入小组池');
         setAmtToGroup(null);
         await refreshAfterTransfer();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -82,12 +80,12 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
     {
       manual: true,
       onSuccess: async () => {
-        message.success('已转回组长账户');
+        toast.success('已转回组长账户');
         setAmtToOwner(null);
         await refreshAfterTransfer();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -95,11 +93,11 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
   const handleGiveToGroup = async () => {
     const n = amtToGroup;
     if (n == null || !Number.isFinite(n) || n <= 0) {
-      message.warning('请输入大于 0 的整数');
+      toast.warning('请输入大于 0 的整数');
       return;
     }
     if (n > personalBal) {
-      message.warning('组长个人计算点不足');
+      toast.warning('组长个人计算点不足');
       return;
     }
     await runTransferToGroup(Math.floor(n));
@@ -108,11 +106,11 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
   const handleGiveToOwner = async () => {
     const n = amtToOwner;
     if (n == null || !Number.isFinite(n) || n <= 0) {
-      message.warning('请输入大于 0 的整数');
+      toast.warning('请输入大于 0 的整数');
       return;
     }
     if (n > groupBal) {
-      message.warning('小组池计算点不足');
+      toast.warning('小组池计算点不足');
       return;
     }
     await runTransferToOwner(Math.floor(n));
@@ -130,7 +128,7 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
 
       <div className={styles.balanceHeader}>
         <h3 className={styles.balanceTitle}>当前余额</h3>
-        <Button onClick={() => void loadBalances()} disabled={balanceLoading}>
+        <Button onPress={() => void loadBalances()} isDisabled={balanceLoading}>
           刷新
         </Button>
       </div>
@@ -174,10 +172,9 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
           disabled={submittingToGroup || balanceLoading}
         />
         <Button
-          type="primary"
-          loading={submittingToGroup}
-          disabled={balanceLoading}
-          onClick={() => void handleGiveToGroup()}
+          variant="primary"
+          isDisabled={submittingToGroup || balanceLoading}
+          onPress={() => void handleGiveToGroup()}
         >
           确认转入小组
         </Button>
@@ -198,10 +195,9 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
           disabled={submittingToOwner || balanceLoading}
         />
         <Button
-          type="primary"
-          loading={submittingToOwner}
-          disabled={balanceLoading}
-          onClick={() => void handleGiveToOwner()}
+          variant="primary"
+          isDisabled={submittingToOwner || balanceLoading}
+          onPress={() => void handleGiveToOwner()}
         >
           确认转回组长
         </Button>

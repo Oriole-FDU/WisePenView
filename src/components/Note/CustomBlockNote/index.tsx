@@ -1,18 +1,19 @@
-import { zh } from '@blocknote/core/locales';
-import { BlockNoteView } from '@blocknote/mantine';
-import '@blocknote/mantine/style.css';
-import { useCreateBlockNote } from '@blocknote/react';
-import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
-import { useCallback, useImperativeHandle, useMemo, useRef, type Ref } from 'react';
 import { useChatService, useImageService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import {
   useChatPanelStore,
   useCurrentChatSessionStore,
   useNewNoteStore,
   useNoteSelectionStore,
 } from '@/store';
+import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { zh } from '@blocknote/core/locales';
+import { BlockNoteView } from '@blocknote/mantine';
+import '@blocknote/mantine/style.css';
+import { useCreateBlockNote } from '@blocknote/react';
+import { toast } from '@heroui/react';
+import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
+import { useCallback, useImperativeHandle, useMemo, useRef, type Ref } from 'react';
 import NoteSlashMenu from '../NoteSlashMenu';
 import NoteToolbar from '../NoteToolbar';
 import { blockNoteSchema } from './blockNoteSchema';
@@ -51,7 +52,6 @@ function CustomBlockNote({
 }: CustomBlockNoteProps & { ref?: Ref<NoteBodyEditorHandle> }) {
   const imageService = useImageService();
   const chatService = useChatService();
-  const message = useAppMessage();
   const currentSessionId = useCurrentChatSessionStore((state) => state.currentSessionId);
   const setCurrentSession = useCurrentChatSessionStore((state) => state.setCurrentSession);
   const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
@@ -73,13 +73,12 @@ function CustomBlockNote({
     async (file: File) => {
       // 只拦截图片：非图片文件让 BlockNote 走默认行为（或抛错以阻止插入）
       if (!file.type.startsWith('image/')) {
-        throw new Error('仅支持插入图片文件');
+        throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
       }
       try {
         assertImageProxyUploadLimit(file);
       } catch (error) {
-        const text = error instanceof Error ? error.message : '图片上传失败';
-        message.error(text);
+        toast.danger(parseErrorMessage(error));
         throw error;
       }
       const { publicUrl } = await imageService.uploadImage({
@@ -89,7 +88,7 @@ function CustomBlockNote({
       });
       return publicUrl;
     },
-    [imageService, message, resourceId]
+    [imageService, resourceId]
   );
 
   const editor = useCreateBlockNote({
@@ -239,7 +238,7 @@ function CustomBlockNote({
     let targetSessionId = currentSessionId;
     const selectedSnapshot = editor.getSelectedText().trim() || selectedText.trim();
     if (!selectedSnapshot) {
-      message.info('请先选中一段文字再问 AI');
+      toast.info('请先选中一段文字再问 AI');
       return;
     }
 
@@ -250,7 +249,7 @@ function CustomBlockNote({
         setCurrentSession({ id: createdSession.id, title: createdSession.title });
       } catch (error) {
         const text = error instanceof Error ? error.message : '新建聊天失败';
-        message.error(text);
+        toast.danger(text);
         return;
       }
     }
@@ -262,7 +261,6 @@ function CustomBlockNote({
     chatService,
     currentSessionId,
     editor,
-    message,
     selectedText,
     setChatPanelCollapsed,
     setCurrentSession,

@@ -1,4 +1,4 @@
 export interface ContractModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }

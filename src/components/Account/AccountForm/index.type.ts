@@ -1,6 +1,5 @@
 import type { GetUserInfoResponse, UpdateUserInfoRequest } from '@/domains/User';
-import type { ProfileFieldConfig, ProfileFieldKey } from '@/views/profile/profile.config';
-import type { FormInstance } from 'antd/es/form';
+import type { ProfileFieldConfig, ProfileFieldKey } from '@/views/app/profile/profile.config';
 
 export type ProfileFormValues = UpdateUserInfoRequest;
 
@@ -16,7 +15,6 @@ export type ProfileFieldItem = {
 export interface AccountFormProps {
   show: boolean;
   user: GetUserInfoResponse | null;
-  form: FormInstance<ProfileFormValues>;
   fieldConfig: ProfileFieldConfig;
   visibleFields: readonly ProfileFieldItem[];
   readonlyFieldSet: ReadonlySet<ProfileFieldKey>;

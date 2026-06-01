@@ -1,4 +1,5 @@
 import type { Group, GroupFileOrgLogic } from '@/domains/Group';
+import type { TagResourceAction, TagResourceActionKey } from '@/domains/Tag';
 
 export interface ListGroupApiRequest {
   groupRoleFilter: 'JOINED' | 'MANAGED';
@@ -42,11 +43,13 @@ export interface GetGroupConfigApiRequest {
 export interface GetGroupConfigApiResponse {
   groupId?: string | number;
   fileOrgLogic?: GroupFileOrgLogic | string;
+  defaultMemberActions?: Array<TagResourceAction | string | number>;
 }
 
 export interface ChangeGroupConfigApiRequest {
   groupId: string;
   fileOrgLogic: GroupFileOrgLogic;
+  defaultMemberActions?: TagResourceActionKey[];
 }
 
 export interface JoinGroupApiRequest {

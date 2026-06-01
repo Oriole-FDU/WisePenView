@@ -1,17 +1,14 @@
 import { useDocumentService, useNoteService } from '@/domains';
-import { RESOURCE_TYPE } from '@/domains/Resource/enum';
-import { useAppMessage } from '@/hooks/useAppMessage';
+import { RESOURCE_TYPE } from '@/domains/Resource';
 import { useNewNoteStore, usePdfPreviewProgressStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, Modal, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Alert, Button, Modal } from 'antd';
 import type { DeleteFileModalProps } from './index.type';
 
-function DeleteFileModal({ open, onCancel, onSuccess, file }: DeleteFileModalProps) {
+function DeleteFileModal({ isOpen, onOpenChange, onSuccess, file }: DeleteFileModalProps) {
   const documentService = useDocumentService();
   const noteService = useNoteService();
-  const message = useAppMessage();
-
   const { loading, run: runDeleteFile } = useRequest(
     async () => {
       const resourceId = file!.resourceId!;
@@ -30,12 +27,12 @@ function DeleteFileModal({ open, onCancel, onSuccess, file }: DeleteFileModalPro
           usePdfPreviewProgressStore.getState().removeProgress(deletedResourceId);
           useNewNoteStore.getState().clearNewNoteResourceId(deletedResourceId);
         }
-        message.success('文件已删除');
+        toast.success('文件已删除');
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -48,26 +45,29 @@ function DeleteFileModal({ open, onCancel, onSuccess, file }: DeleteFileModalPro
   const displayName = file?.resourceName || '未命名';
 
   return (
-    <Modal
-      title="删除文件"
-      open={open && !!file}
-      onCancel={onCancel}
-      destroyOnHidden
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          取消
-        </Button>,
-        <Button key="confirm" danger type="primary" onClick={handleConfirm} loading={loading}>
-          删除
-        </Button>,
-      ]}
-      width={500}
-    >
-      <Alert
-        description={`确定要删除「${displayName}」吗？此操作不可撤销！`}
-        type="warning"
-        showIcon
-      />
+    <Modal isOpen={isOpen && !!file} onOpenChange={onOpenChange}>
+      <Modal.Backdrop isDismissable={!loading}>
+        <Modal.Container size="sm" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>删除文件</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="rounded-medium bg-danger/10 px-4 py-3 text-sm text-danger">
+                {`确定要删除「${displayName}」吗？此操作不可撤销！`}
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" isDisabled={loading} onPress={() => onOpenChange(false)}>
+                取消
+              </Button>
+              <Button variant="danger" isDisabled={loading} onPress={() => void handleConfirm()}>
+                删除
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

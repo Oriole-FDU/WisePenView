@@ -1,27 +1,32 @@
 .title {
-  font-size: var(--ant-font-size-lg);
-  font-weight: var(--ant-font-weight-md);
-  margin-bottom: var(--ant-margin-md);
-  color: var(--ant-color-text-heading);
+  margin: 0 0 16px;
+  color: var(--foreground);
+  font-size: 18px;
+  font-weight: 600;
 }
 
-.tableWrapper {
-  border: 1px solid var(--ant-color-border);
-  border-radius: var(--ant-border-radius-lg);
-  overflow: hidden;
-  background-color: var(--ant-color-bg-container);
-
-  :global(.ant-pagination) {
-    margin: var(--ant-margin-md) 0;
-    padding: 0 var(--ant-padding-md);
-  }
+.tableContent {
+  min-width: 560px;
 }
 
 .groupNameItem {
-  font-weight: var(--ant-font-weight-md);
-  color: var(--ant-color-text-heading);
+  font-weight: 500;
 }
 
 .quotaItem {
+  width: 100%;
+}
+
+.emptyText {
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.tableFooter {
+  padding: 12px 16px;
+}
+
+.pagination {
   width: 100%;
 }

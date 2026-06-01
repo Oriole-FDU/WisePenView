@@ -1,28 +1,39 @@
 import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-// 引入布局（保持同步加载，保证首屏壳子稳定�?
+// 引入布局（保持同步加载，保证首屏壳子稳定）
+import AdminLayout from '@/layouts/AdminLayout';
+import AppLayout from '@/layouts/AppLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import HomeLayout from '@/layouts/HomeLayout';
-import SystemLayout from '@/layouts/SystemLayout';
+import AdminRouteGuard from '@/views/admin/guard/AdminRouteGuard';
 
 // 页面使用 lazy load，按路由切分 chunk
-const Home = lazy(() => import('@/views/home'));
-const Drive = lazy(() => import('@/views/drive/Drive'));
-const MyGroup = lazy(() => import('@/views/group/MyGroup'));
-const GroupDetail = lazy(() => import('@/views/group/GroupDetail'));
-const Account = lazy(() => import('@/views/profile/Account'));
-const Usage = lazy(() => import('@/views/profile/Usage'));
-const Login = lazy(() => import('@/views/auth/Login'));
-const Register = lazy(() => import('@/views/auth/Register'));
-const ResetPassword = lazy(() => import('@/views/auth/ResetPassword'));
-const NewPassword = lazy(() => import('@/views/auth/NewPassword'));
-const VerifyEmail = lazy(() => import('@/views/auth/VerifyEmail'));
-const NoteView = lazy(() => import('@/views/note'));
-const PdfPreview = lazy(() => import('@/views/pdf/PdfPreview'));
-const ResourceNotFound = lazy(() => import('@/views/error/ResourceNotFound'));
+const UserManagement = lazy(() => import('@/views/admin/UserManagement'));
+const ResourceManagement = lazy(() => import('@/views/admin/ResourceManagement'));
+const GroupManagement = lazy(() => import('@/views/admin/GroupManagement'));
+const AnnouncementManagement = lazy(() => import('@/views/admin/AnnouncementManagement'));
+const DataStatistics = lazy(() => import('@/views/admin/DataStatistics'));
+const PermissionManagement = lazy(() => import('@/views/admin/PermissionManagement'));
+const SystemSettings = lazy(() => import('@/views/admin/SystemSettings'));
+const LogAudit = lazy(() => import('@/views/admin/LogAudit'));
+const TaskCenter = lazy(() => import('@/views/admin/TaskCenter'));
+const Home = lazy(() => import('@/views/app/home'));
+const Drive = lazy(() => import('@/views/app/drive/Drive'));
+const MyGroup = lazy(() => import('@/views/app/group/MyGroup'));
+const GroupDetail = lazy(() => import('@/views/app/group/GroupDetail'));
+const Account = lazy(() => import('@/views/app/profile/Account'));
+const Usage = lazy(() => import('@/views/app/profile/Usage'));
+const Login = lazy(() => import('@/views/app/auth/Login'));
+const Register = lazy(() => import('@/views/app/auth/Register'));
+const ResetPassword = lazy(() => import('@/views/app/auth/ResetPassword'));
+const NewPassword = lazy(() => import('@/views/app/auth/NewPassword'));
+const VerifyEmail = lazy(() => import('@/views/app/auth/VerifyEmail'));
+const NoteView = lazy(() => import('@/views/app/note'));
+const PdfPreview = lazy(() => import('@/views/app/pdf/PdfPreview'));
 const ChatPage = lazy(() => import('@/views/chat'));
-const AppError = lazy(() => import('@/views/error/AppError'));
+const ResourceNotFound = lazy(() => import('@/views/app/error/ResourceNotFound'));
+const AppError = lazy(() => import('@/views/app/error/AppError'));
 
 const router = createBrowserRouter([
   // ==============================
@@ -100,7 +111,7 @@ const router = createBrowserRouter([
   // ==============================
   {
     path: '/app',
-    element: <SystemLayout />, // 承载：左侧导�?+ 右侧助手 + 中间内容
+    element: <AppLayout />, // 承载：左侧导航 + 右侧助手 + 中间内容
     errorElement: <AppError />,
     children: [
       // 默认重定向到文档列表
@@ -146,8 +157,68 @@ const router = createBrowserRouter([
         element: <Account />,
       },
       {
+        path: 'profile/appearance',
+        element: <Appearance />,
+      },
+      {
         path: 'pdf/:resourceId',
         element: <PdfPreview />,
+      },
+    ],
+  },
+
+  // ==============================
+  // 管理后台区域
+  // ==============================
+  {
+    path: '/admin',
+    element: <AdminRouteGuard />,
+    errorElement: <AppError />,
+    children: [
+      {
+        element: <AdminLayout />, // 承载：admin 根页面内容
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/admin/users" replace />,
+          },
+          {
+            path: 'users',
+            element: <UserManagement />,
+          },
+          {
+            path: 'resources',
+            element: <ResourceManagement />,
+          },
+          {
+            path: 'groups',
+            element: <GroupManagement />,
+          },
+          {
+            path: 'announcements',
+            element: <AnnouncementManagement />,
+          },
+          {
+            path: 'statistics',
+            element: <DataStatistics />,
+          },
+          {
+            path: 'permissions',
+            element: <PermissionManagement />,
+          },
+          {
+            path: 'settings',
+            element: <SystemSettings />,
+          },
+          {
+            path: 'logs',
+            element: <LogAudit />,
+          },
+          {
+            path: 'tasks',
+            element: <TaskCenter />,
+          },
+        ],
       },
     ],
   },

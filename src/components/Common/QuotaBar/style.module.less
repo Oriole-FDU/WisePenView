@@ -1,18 +1,16 @@
 .quotaBar {
-  display: flex;
-  align-items: center;
-  gap: var(--ant-margin-sm);
   width: 100%;
-  padding: 0 var(--ant-padding);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'track output';
+  align-items: center;
+  column-gap: 12px;
 }
 
-.quotaBarProgress {
-  flex: 1;
+.quotaBarTrack {
+  grid-area: track;
 }
 
 .quotaBarText {
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-secondary);
+  grid-area: output;
   white-space: nowrap;
-  text-align: right;
 }

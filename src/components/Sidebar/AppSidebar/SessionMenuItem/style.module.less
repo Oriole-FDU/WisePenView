@@ -1,0 +1,56 @@
+.sessionMenuLabel {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sessionMenuLabelText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sessionActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sessionActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--ant-color-text-tertiary);
+  border-radius: var(--ant-border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--ant-color-text);
+    background: var(--ant-color-fill-tertiary);
+  }
+}
+
+.sessionDeleteBtn {
+  color: var(--ant-color-error);
+
+  &:hover {
+    color: var(--ant-color-error-hover);
+    background: var(--ant-color-error-bg);
+  }
+}
+
+.sessionMenuLabel:hover .sessionActions {
+  opacity: 1;
+}

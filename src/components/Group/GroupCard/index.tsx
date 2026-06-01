@@ -1,11 +1,10 @@
 import UserCapsule from '@/components/Common/UserCapsule';
-import { GROUP_TYPE } from '@/domains/Group/enum';
+import { GROUP_TYPE } from '@/domains/Group';
 import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
-import { Badge, Card, Image } from 'antd';
+import { Card } from '@heroui/react';
+import type { KeyboardEvent, SyntheticEvent } from 'react';
 import type { GroupCardProps } from './index.type';
 import styles from './style.module.less';
-
-const { Meta } = Card;
 
 function GroupCard({ group, onClick }: GroupCardProps) {
   const {
@@ -20,54 +19,54 @@ function GroupCard({ group, onClick }: GroupCardProps) {
     onClick?.(group);
   };
 
-  const ownerName = ownerInfo?.nickname ?? '';
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleCardClick();
+    }
+  };
 
-  const cardContent = (
+  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
+    if (event.currentTarget.src !== PLACEHOLDER_IMAGE) {
+      event.currentTarget.src = PLACEHOLDER_IMAGE;
+    }
+  };
+
+  const ownerName = ownerInfo?.nickname ?? '';
+  const groupTypeLabel = GROUP_TYPE.getLabel(groupType);
+  const isSpecialGroup = groupType === GROUP_TYPE.ADVANCED || groupType === GROUP_TYPE.PUBLIC;
+  const badgeClassName =
+    groupType === GROUP_TYPE.PUBLIC ? `${styles.badge} ${styles.publicBadge}` : styles.badge;
+
+  return (
     <Card
-      hoverable
-      onClick={handleCardClick}
       className={styles.card}
-      cover={
-        <div className={styles.cover}>
-          <Image
-            src={cover || PLACEHOLDER_IMAGE}
-            alt={groupName}
-            preview={false}
-            fallback={PLACEHOLDER_IMAGE}
-            className={styles.image}
-          />
-        </div>
-      }
+      role="button"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
     >
-      <Meta
-        title={groupName}
-        description={
-          <div className={styles.metaDescription}>
-            {ownerInfo && <UserCapsule name={ownerName} avatar={ownerInfo.avatar} />}
-            <span className={styles.memberCount}>{memberCount} 成员</span>
-          </div>
-        }
-      />
+      <div className={styles.cover}>
+        <img
+          src={cover || PLACEHOLDER_IMAGE}
+          alt={groupName}
+          loading="lazy"
+          onError={handleImageError}
+          className={styles.image}
+        />
+      </div>
+      <div className={styles.body}>
+        {isSpecialGroup && <span className={badgeClassName}>{groupTypeLabel}</span>}
+        <Card.Header className={styles.header}>
+          <Card.Title className={styles.title}>{groupName}</Card.Title>
+        </Card.Header>
+        <Card.Footer className={styles.footer}>
+          {ownerInfo && <UserCapsule name={ownerName} avatar={ownerInfo.avatar} />}
+          <span className={styles.memberCount}>{memberCount} 成员</span>
+        </Card.Footer>
+      </div>
     </Card>
   );
-
-  if (groupType === GROUP_TYPE.ADVANCED) {
-    return (
-      <Badge.Ribbon text={GROUP_TYPE.getLabel(groupType)} color="#faad14">
-        {cardContent}
-      </Badge.Ribbon>
-    );
-  }
-
-  if (groupType === GROUP_TYPE.PUBLIC) {
-    return (
-      <Badge.Ribbon text={GROUP_TYPE.getLabel(groupType)} color="#722ed1">
-        {cardContent}
-      </Badge.Ribbon>
-    );
-  }
-
-  return cardContent;
 }
 
 export default GroupCard;

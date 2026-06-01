@@ -1,9 +1,10 @@
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import type { DriveNode, FolderNode, LinkNode, ResourceNode, TrashNode } from '@/domains/Drive';
 import type { IResourceService, ResourceItem } from '@/domains/Resource';
-import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource/enum';
+import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
 import type { ITagService, TagTreeNode } from '@/domains/Tag';
 import { useTrashTagStore } from '@/store';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
 import {
   buildDriveRootNode,
@@ -98,7 +99,7 @@ export const createDriveServices = (
     const roots = await readRawRoots(groupId);
     const rootTag = roots.find((item) => item.tagName === '/');
     if (!rootTag) {
-      throw new Error('未找到个人云盘根目录');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_PERSONAL_ROOT_NOT_FOUND);
     }
     personalRootTagIdByGroup.set(groupKey, rootTag.tagId);
     return rootTag;
@@ -122,7 +123,7 @@ export const createDriveServices = (
   const getNodeOrThrow = (nodeId: string): DriveNode => {
     const node = nodeMap.get(nodeId);
     if (!node) {
-      throw new Error(`未找到节点：${nodeId}`);
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, { nodeId });
     }
     return node;
   };
@@ -250,7 +251,7 @@ export const createDriveServices = (
     await readRawRoots(groupId);
     trashTagId = useTrashTagStore.getState().getTrashTagId(groupId);
     if (!trashTagId) {
-      throw new Error('未找到回收站标签');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TRASH_TAG_NOT_FOUND);
     }
     return trashTagId;
   };
@@ -289,7 +290,7 @@ export const createDriveServices = (
   ): Promise<void> => {
     const sourceItem = resourceItemByNodeId.get(source.id);
     if (!sourceItem) {
-      throw new Error('未找到资源标签信息，请先重新加载列表后再移动');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_RESOURCE_TAG_INFO_MISSING);
     }
     const currentTags = sourceItem.currentTags ?? {};
     const nonFolderTagIds = Object.entries(currentTags)
@@ -305,7 +306,7 @@ export const createDriveServices = (
 
   const getDriveTree: IDriveService['getDriveTree'] = async ({ rootId, groupId }) => {
     if (rootId !== DRIVE_ROOT_ID) {
-      throw new Error(`不支持的根节点: ${rootId}`);
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_UNSUPPORTED_ROOT, { rootId });
     }
     await readRawRoots(groupId);
     return resolveRootNode(groupId);
@@ -375,7 +376,7 @@ export const createDriveServices = (
     const groupId =
       normalizeTagGroupId(params.groupId) ?? getNodeGroupId(nodeId) ?? getNodeGroupId(newParentId);
     if (target.type !== 'folder' && target.type !== 'trash') {
-      throw new Error('目标节点不支持放置');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TARGET_UNSUPPORTED_DROP);
     }
     if (source.type === 'folder') {
       const newParentTagId =
@@ -392,7 +393,7 @@ export const createDriveServices = (
     } else if (source.type === 'resource' || source.type === 'link') {
       await moveResourceNode(source, target.tagId, groupId);
     } else {
-      throw new Error('当前节点不支持移动');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
     }
     clearCache();
   };
@@ -411,7 +412,7 @@ export const createDriveServices = (
     } else if (source.type === 'resource' || source.type === 'link') {
       await moveResourceNode(source, trashTagId, groupId);
     } else {
-      throw new Error('当前节点不支持删除');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
     }
     clearCache();
   };
@@ -438,15 +439,15 @@ export const createDriveServices = (
       return;
     }
     if (source.type === 'link') {
-      throw new Error('快捷方式不支持重命名，请在主位置操作');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_LINK_UNSUPPORTED_RENAME);
     }
-    throw new Error('当前节点不支持重命名');
+    throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_RENAME);
   };
 
   const createNode: IDriveService['createNode'] = async (params) => {
     const { parentId, name, type } = params;
     if (type !== 'folder') {
-      throw new Error(`Drive 暂不支持创建 ${type} 节点`);
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_UNSUPPORTED_CREATE_TYPE, { type });
     }
     const groupId = normalizeTagGroupId(params.groupId) ?? getNodeGroupId(parentId);
     const decodedParent = decodeNodeId(parentId);
@@ -456,7 +457,7 @@ export const createDriveServices = (
     } else if (decodedParent.kind === 'folder') {
       targetParentTagId = decodedParent.tagId;
     } else {
-      throw new Error('仅支持在文件夹下创建子目录');
+      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_CREATE_FOLDER_ONLY);
     }
     await tagService.addTag({
       groupId,

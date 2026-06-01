@@ -1,46 +1,36 @@
-import type { ProgressProps } from 'antd';
-import { Progress } from 'antd';
+import { ProgressBar } from '@heroui/react';
 import type { QuotaBarProps } from './index.type';
 import styles from './style.module.less';
 
-// 样式参考https://ant.design/components/progress-cn的"自定义语义结构的样式和类"章节
+type ProgressColor = 'accent' | 'warning' | 'danger';
 
 function QuotaBar({ used = 0, limit }: QuotaBarProps) {
   const percentage = limit > 0 ? Math.min((used / limit) * 100, 100) : 0;
 
-  const getProgressColor = (): string => {
+  const getProgressColor = (): ProgressColor => {
     if (percentage >= 100) {
-      return '#ff4d4f'; // 红色
+      return 'danger';
     } else if (percentage >= 80) {
-      return '#faad14'; // 黄色
+      return 'warning';
     } else {
-      return '#1890ff'; // 蓝色
+      return 'accent';
     }
   };
 
-  const stylesFn: ProgressProps['styles'] = () => {
-    return {
-      rail: {
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        borderRadius: '6px',
-      },
-      track: {
-        backgroundColor: getProgressColor(),
-        borderRadius: '6px',
-        transition: 'all 0.3s ease',
-      },
-    } satisfies ProgressProps['styles'];
-  };
-
   return (
-    <div className={styles.quotaBar}>
-      <div className={styles.quotaBarProgress}>
-        <Progress styles={stylesFn} percent={percentage} showInfo={false} />
-      </div>
-      <span className={styles.quotaBarText}>
-        {`${used.toLocaleString()} / ${limit.toLocaleString()}`}
-      </span>
-    </div>
+    <ProgressBar
+      aria-label="额度使用进度"
+      className={styles.quotaBar}
+      color={getProgressColor()}
+      size="sm"
+      value={percentage}
+      valueLabel={`${used.toLocaleString()} / ${limit.toLocaleString()}`}
+    >
+      <ProgressBar.Track className={styles.quotaBarTrack}>
+        <ProgressBar.Fill />
+      </ProgressBar.Track>
+      <ProgressBar.Output className={styles.quotaBarText} />
+    </ProgressBar>
   );
 }
 

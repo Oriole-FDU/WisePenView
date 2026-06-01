@@ -1,12 +1,12 @@
 import IconText from '@/components/Common/IconText';
 import StickerManageModal from '@/components/Drive/Modals/StickerManageModal';
 import { useStickerService } from '@/domains';
-import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource/enum';
+import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
 import type { Sticker } from '@/domains/Sticker';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Button, Radio, Select, Spin, Tag } from 'antd';
+import { Radio, Select, Spin, Tag } from 'antd';
 import clsx from 'clsx';
 import { useCallback, useState } from 'react';
 import { LuPlus, LuTags, LuX } from 'react-icons/lu';
@@ -24,7 +24,6 @@ const DEFAULT_VALUE: FileFilterValue = {
 
 function FileFilter({ value, onChange }: FileFilterProps) {
   const stickerService = useStickerService();
-  const message = useAppMessage();
   const [innerValue, setInnerValue] = useState<FileFilterValue>(DEFAULT_VALUE);
   const isControlled = value !== undefined;
   const current = isControlled ? value : innerValue;
@@ -36,7 +35,7 @@ function FileFilter({ value, onChange }: FileFilterProps) {
       setStickers(list);
     },
     onError: (err) => {
-      message.error(parseErrorMessage(err));
+      toast.danger(parseErrorMessage(err));
       setStickers([]);
     },
   });
@@ -153,7 +152,7 @@ function FileFilter({ value, onChange }: FileFilterProps) {
           />
         </div>
         <div className={styles.toolbarRight}>
-          <Button type="default" onClick={() => setStickerManageModalOpen(true)}>
+          <Button variant="secondary" onPress={() => setStickerManageModalOpen(true)}>
             <IconText icon={<LuTags />} iconSize={16}>
               管理标签
             </IconText>
@@ -162,8 +161,8 @@ function FileFilter({ value, onChange }: FileFilterProps) {
       </div>
 
       <AddStickerModal
-        open={addModalOpen}
-        onCancel={() => setAddModalOpen(false)}
+        isOpen={addModalOpen}
+        onOpenChange={setAddModalOpen}
         onSuccess={() => {
           void reloadStickers();
         }}

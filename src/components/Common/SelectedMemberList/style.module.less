@@ -1,15 +1,78 @@
 .wrapper {
-  margin-top: var(--ant-margin-md);
+  margin-top: 16px;
 }
 
 .title {
-  margin-bottom: var(--ant-margin-sm);
-  font-weight: var(--ant-font-weight-md);
-  color: var(--ant-color-text-secondary);
+  margin-bottom: 8px;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .list {
   overflow-y: auto;
-  margin-bottom: var(--ant-margin-md);
+  margin-bottom: 16px;
   max-height: 300px;
+}
+
+.memberItem {
+  border-radius: 6px;
+}
+
+.memberItemReadOnly {
+  cursor: default;
+
+  &[data-disabled='true'] {
+    opacity: 1;
+  }
+
+  &:hover,
+  &[data-hover='true'],
+  &[data-hovered='true'],
+  &[data-pressed='true'],
+  &[data-focus-visible='true'] {
+    background: transparent;
+    background-color: transparent;
+    outline: none;
+  }
+}
+
+.memberContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 4px 0;
+  color: #111827;
+}
+
+.avatar {
+  flex: 0 0 auto;
+}
+
+.avatarFallback {
+  font-size: 14px;
+}
+
+.memberInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.memberName,
+.memberDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberName {
+  color: #111827;
+  font-weight: 500;
+}
+
+.memberDescription {
+  color: #6b7280;
+  font-size: 13px;
 }

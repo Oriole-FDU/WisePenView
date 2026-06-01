@@ -1,16 +1,13 @@
 import { useStickerService } from '@/domains';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
 import { validateReservedName } from '@/utils/tag/validateReservedName';
+import { Button, Input, Modal, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Input, Modal } from 'antd';
 import { useCallback, useState } from 'react';
 import type { AddStickerModalProps } from './index.type';
 
-function AddStickerModal({ open, onCancel, onSuccess }: AddStickerModalProps) {
+function AddStickerModal({ isOpen, onOpenChange, onSuccess }: AddStickerModalProps) {
   const stickerService = useStickerService();
-  const message = useAppMessage();
-
   const [name, setName] = useState('');
   const reset = useCallback(() => {
     setName('');
@@ -18,8 +15,8 @@ function AddStickerModal({ open, onCancel, onSuccess }: AddStickerModalProps) {
 
   const handleCancel = useCallback(() => {
     reset();
-    onCancel();
-  }, [reset, onCancel]);
+    onOpenChange(false);
+  }, [reset, onOpenChange]);
 
   const { loading, run: runAddSticker } = useRequest(
     async (trimmed: string) => stickerService.addSticker({ stickerName: trimmed }),
@@ -28,10 +25,10 @@ function AddStickerModal({ open, onCancel, onSuccess }: AddStickerModalProps) {
       onSuccess: () => {
         onSuccess?.();
         reset();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -41,29 +38,48 @@ function AddStickerModal({ open, onCancel, onSuccess }: AddStickerModalProps) {
     if (!trimmed) return;
     const validation = validateReservedName(trimmed);
     if (!validation.valid) {
-      message.warning(validation.reason);
+      toast.warning(validation.reason);
       return;
     }
     runAddSticker(trimmed);
-  }, [name, runAddSticker, message]);
+  }, [name, runAddSticker]);
 
   return (
-    <Modal
-      title="新增标签"
-      open={open}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      confirmLoading={loading}
-      okButtonProps={{ disabled: !name.trim() }}
-      destroyOnHidden
-    >
-      <Input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onPressEnter={handleOk}
-        placeholder="请输入标签名称"
-        autoFocus
-      />
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal.Backdrop isDismissable={!loading}>
+        <Modal.Container size="sm" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>新增标签</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <TextField aria-label="标签名称" value={name} autoFocus onChange={setName}>
+                <Input
+                  placeholder="请输入标签名称"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      void handleOk();
+                    }
+                  }}
+                />
+              </TextField>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onPress={handleCancel} isDisabled={loading}>
+                取消
+              </Button>
+              <Button
+                variant="primary"
+                onPress={() => void handleOk()}
+                isDisabled={!name.trim() || loading}
+              >
+                确定
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

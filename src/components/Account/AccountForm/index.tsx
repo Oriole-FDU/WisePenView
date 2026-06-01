@@ -1,50 +1,43 @@
 import IconText from '@/components/Common/IconText';
 import { useUserService } from '@/domains';
 import type { UpdateUserInfoRequest } from '@/domains/User';
-import { DEGREE, SEX } from '@/domains/User/enum';
-import { useAppMessage } from '@/hooks/useAppMessage';
+import { DEGREE, SEX } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
+import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
+import { Button, Form, Input, Label, ListBox, Select, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Button, Descriptions, Form, Input, Select } from 'antd';
-import type { InputRef } from 'antd/es/input';
-import { useMemo, type Ref } from 'react';
-import { RiPencilLine } from 'react-icons/ri';
+import { useCallback, useMemo, useState, type FormEvent, type Key } from 'react';
+import { RiCloseLine, RiPencilLine } from 'react-icons/ri';
+import { buildProfileFormValues } from './buildProfileFormValues';
 import type { AccountFormProps } from './index.type';
 import { getProfileDisplayString } from './profileDisplay';
 import styles from './style.module.less';
 
-const { Option } = Select;
+type FormDraft = {
+  user: AccountFormProps['user'];
+  values: UpdateUserInfoRequest;
+};
 
-function SexReadonlyInput({ value, ref }: { value?: number | null; ref?: Ref<InputRef> }) {
-  return (
-    <Input
-      ref={ref}
-      disabled
-      readOnly
-      value={value != null ? SEX.getLabel(value) : '-'}
-      className={styles.editableInput}
-    />
-  );
+function getFieldValue(values: UpdateUserInfoRequest, key: ProfileFieldKey) {
+  return values[key as keyof UpdateUserInfoRequest];
 }
-SexReadonlyInput.displayName = 'SexReadonlyInput';
 
-function DegreeLevelReadonlyInput({ value, ref }: { value?: number | null; ref?: Ref<InputRef> }) {
-  return (
-    <Input
-      ref={ref}
-      disabled
-      readOnly
-      value={value != null ? DEGREE.getLabel(value) : '-'}
-      className={styles.editableInput}
-    />
-  );
+function getFieldInputValue(values: UpdateUserInfoRequest, key: ProfileFieldKey) {
+  const value = getFieldValue(values, key);
+  return value == null ? '' : String(value);
 }
-DegreeLevelReadonlyInput.displayName = 'DegreeLevelReadonlyInput';
+
+function getReadonlyInputValue(values: UpdateUserInfoRequest, key: ProfileFieldKey) {
+  const value = getFieldValue(values, key);
+  if (value == null || value === '') return '-';
+  if (key === 'sex') return SEX.getLabel(Number(value));
+  if (key === 'degreeLevel') return DEGREE.getLabel(Number(value));
+  return String(value);
+}
 
 function AccountForm({
   show,
   user,
-  form,
   fieldConfig,
   visibleFields,
   readonlyFieldSet,
@@ -54,51 +47,55 @@ function AccountForm({
   onCancel,
 }: AccountFormProps) {
   const userService = useUserService();
-  const message = useAppMessage();
+  const [formDraft, setFormDraft] = useState<FormDraft | null>(null);
+  const userFormValues = useMemo<UpdateUserInfoRequest>(
+    () => (user ? buildProfileFormValues(user) : {}),
+    [user]
+  );
+  const formValues = editMode && formDraft?.user === user ? formDraft.values : userFormValues;
 
   const { loading: saving, runAsync: runSave } = useRequest(
     async () => {
-      const values = await form.validateFields();
       const rf = new Set(user?.readonlyFields ?? []);
       const params: UpdateUserInfoRequest = {
         nickname:
           fieldConfig.nickname && !rf.has('nickname')
-            ? values.nickname
+            ? formValues.nickname
             : (user?.userInfo?.nickname ?? undefined),
         realName:
           fieldConfig.realName && !rf.has('realName')
-            ? values.realName
+            ? formValues.realName
             : (user?.userInfo?.realName ?? undefined),
-        sex: fieldConfig.sex && !rf.has('sex') ? values.sex : user?.userProfile?.sex,
+        sex: fieldConfig.sex && !rf.has('sex') ? formValues.sex : user?.userProfile?.sex,
         university:
           fieldConfig.university && !rf.has('university')
-            ? (values.university ?? null)
+            ? (formValues.university ?? null)
             : (user?.userProfile?.university ?? null),
         college:
           fieldConfig.college && !rf.has('college')
-            ? values.college
+            ? formValues.college
             : (user?.userProfile?.college ?? undefined),
         major:
           fieldConfig.major && !rf.has('major')
-            ? values.major
+            ? formValues.major
             : (user?.userProfile?.major ?? undefined),
         className:
           fieldConfig.className && !rf.has('className')
-            ? values.className
+            ? formValues.className
             : (user?.userProfile?.className ?? undefined),
         enrollmentYear:
           fieldConfig.enrollmentYear && !rf.has('enrollmentYear')
-            ? values.enrollmentYear
+            ? formValues.enrollmentYear
             : (user?.userProfile?.enrollmentYear ?? undefined),
         degreeLevel:
           fieldConfig.degreeLevel && !rf.has('degreeLevel')
-            ? values.degreeLevel
+            ? formValues.degreeLevel
             : typeof user?.userProfile?.degreeLevel === 'number'
               ? user.userProfile.degreeLevel
               : undefined,
         academicTitle:
           fieldConfig.academicTitle && !rf.has('academicTitle')
-            ? values.academicTitle
+            ? formValues.academicTitle
             : (user?.userProfile?.academicTitle ?? undefined),
       };
       await userService.updateUserInfo(params);
@@ -107,13 +104,14 @@ function AccountForm({
     {
       manual: true,
       onSuccess: (data) => {
+        setFormDraft(null);
         onUserInfoUpdated(data);
         onEditModeChange(false);
-        message.success('保存成功');
+        toast.success('保存成功');
       },
       onError: (err) => {
         if (err && typeof err === 'object' && 'errorFields' in err) return;
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -121,18 +119,45 @@ function AccountForm({
   const optionsMap = useMemo(
     () =>
       ({
-        sex: SEX.options.map(({ value, label }) => (
-          <Option key={value} value={value}>
-            {label}
-          </Option>
-        )),
-        degreeLevel: DEGREE.options.map(({ value, label }) => (
-          <Option key={value} value={value}>
-            {label}
-          </Option>
-        )),
+        sex: SEX.options,
+        degreeLevel: DEGREE.options,
       }) as const,
     []
+  );
+
+  const updateFormValue = useCallback(
+    (key: ProfileFieldKey, value: string | number | undefined) => {
+      setFormDraft((prev) => ({
+        user,
+        values: { ...(prev?.user === user ? prev.values : userFormValues), [key]: value },
+      }));
+    },
+    [user, userFormValues]
+  );
+
+  const handleSelectChange = useCallback(
+    (key: ProfileFieldKey, value: Key | Key[] | null) => {
+      updateFormValue(key, value == null || Array.isArray(value) ? undefined : Number(value));
+    },
+    [updateFormValue]
+  );
+
+  const handleCancel = useCallback(() => {
+    setFormDraft(null);
+    onCancel();
+  }, [onCancel]);
+
+  const handleStartEdit = useCallback(() => {
+    setFormDraft({ user, values: userFormValues });
+    onEditModeChange(true);
+  }, [onEditModeChange, user, userFormValues]);
+
+  const handleSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      void runSave();
+    },
+    [runSave]
   );
 
   if (!show) return null;
@@ -142,7 +167,7 @@ function AccountForm({
       <div className={styles.sectionHeader}>
         <h3 className={styles.sectionTitle}>基本档案</h3>
         {!editMode ? (
-          <Button type="primary" onClick={() => onEditModeChange(true)}>
+          <Button variant="primary" onPress={handleStartEdit}>
             <IconText icon={<RiPencilLine />} iconSize={16}>
               编辑资料
             </IconText>
@@ -150,67 +175,102 @@ function AccountForm({
         ) : null}
       </div>
       {editMode ? (
-        <Form form={form} layout="vertical" className={styles.profileForm}>
+        <Form onSubmit={handleSubmit} className={styles.profileForm}>
           <div className={styles.formFieldsGrid}>
             {visibleFields.map((field) => {
               const lockedByServer = readonlyFieldSet.has(field.key);
               if (lockedByServer) {
-                if (field.key === 'sex') {
-                  return (
-                    <Form.Item key={field.key} name={field.key} label={field.label}>
-                      <SexReadonlyInput />
-                    </Form.Item>
-                  );
-                }
-                if (field.key === 'degreeLevel') {
-                  return (
-                    <Form.Item key={field.key} name={field.key} label={field.label}>
-                      <DegreeLevelReadonlyInput />
-                    </Form.Item>
-                  );
-                }
                 return (
-                  <Form.Item key={field.key} name={field.key} label={field.label}>
-                    <Input disabled readOnly className={styles.editableInput} />
-                  </Form.Item>
+                  <TextField
+                    key={field.key}
+                    aria-label={field.label}
+                    value={getReadonlyInputValue(formValues, field.key)}
+                    isDisabled
+                    className={styles.formField}
+                  >
+                    <Label>{field.label}</Label>
+                    <Input readOnly className={styles.editableInput} />
+                  </TextField>
                 );
               }
               return (
-                <Form.Item key={field.key} name={field.key} label={field.label}>
+                <div key={field.key} className={styles.formField}>
                   {field.type === 'input' ? (
-                    <Input placeholder={field.placeholder} className={styles.editableInput} />
+                    <TextField
+                      aria-label={field.label}
+                      value={getFieldInputValue(formValues, field.key)}
+                      onChange={(value) => updateFormValue(field.key, value)}
+                    >
+                      <Label>{field.label}</Label>
+                      <Input placeholder={field.placeholder} className={styles.editableInput} />
+                    </TextField>
                   ) : (
                     <Select
+                      aria-label={field.label}
                       placeholder={field.placeholder}
-                      allowClear
+                      value={getFieldInputValue(formValues, field.key) || null}
+                      onChange={(value) => handleSelectChange(field.key, value)}
                       className={styles.editableInput}
                     >
-                      {field.optionsKey ? optionsMap[field.optionsKey] : null}
+                      <Label>{field.label}</Label>
+                      <Select.Trigger>
+                        <Select.Value />
+                        {getFieldValue(formValues, field.key) != null ? (
+                          <button
+                            type="button"
+                            aria-label={`清空${field.label}`}
+                            className={styles.clearSelectButton}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              updateFormValue(field.key, undefined);
+                            }}
+                          >
+                            <RiCloseLine />
+                          </button>
+                        ) : null}
+                        <Select.Indicator />
+                      </Select.Trigger>
+                      <Select.Popover>
+                        <ListBox>
+                          {(field.optionsKey ? optionsMap[field.optionsKey] : []).map(
+                            ({ value, label }) => (
+                              <ListBox.Item
+                                key={String(value)}
+                                id={String(value)}
+                                textValue={label}
+                              >
+                                {label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            )
+                          )}
+                        </ListBox>
+                      </Select.Popover>
                     </Select>
                   )}
-                </Form.Item>
+                </div>
               );
             })}
           </div>
           <div className={styles.formActions}>
-            <Form.Item className={styles.submitItem}>
-              <Button type="primary" onClick={() => void runSave()} loading={saving}>
-                保存
-              </Button>
-              <Button onClick={onCancel} className={styles.cancelBtn}>
-                取消
-              </Button>
-            </Form.Item>
+            <Button type="submit" variant="primary" isDisabled={saving}>
+              保存
+            </Button>
+            <Button onPress={handleCancel} className={styles.cancelBtn}>
+              取消
+            </Button>
           </div>
         </Form>
       ) : (
-        <Descriptions column={2} layout="vertical" size="small" className={styles.descriptions}>
+        <dl className={styles.descriptions}>
           {visibleFields.map((field) => (
-            <Descriptions.Item key={field.key} label={field.label}>
-              {getProfileDisplayString(user, field.key)}
-            </Descriptions.Item>
+            <div key={field.key} className={styles.descriptionItem}>
+              <dt>{field.label}</dt>
+              <dd>{getProfileDisplayString(user, field.key)}</dd>
+            </div>
           ))}
-        </Descriptions>
+        </dl>
       )}
     </div>
   );

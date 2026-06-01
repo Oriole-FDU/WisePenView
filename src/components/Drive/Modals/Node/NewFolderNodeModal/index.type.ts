@@ -1,9 +1,9 @@
 export interface NewFolderNodeModalProps {
-  open: boolean;
+  isOpen: boolean;
   parentId: string;
   groupId?: string;
   parentLabel?: string;
   existingFolderNames?: string[];
-  onCancel: () => void;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }

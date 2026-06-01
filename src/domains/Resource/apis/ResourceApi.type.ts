@@ -1,4 +1,5 @@
 import type { ResourceItem } from '@/domains/Resource';
+import type { AccessControlScope, TagResourceActionKey } from '@/domains/Tag';
 
 export interface ResourceListPageApiResponse {
   list: ResourceItem[];
@@ -39,26 +40,32 @@ export interface AddTagApiRequest {
   parentId?: string;
   tagName: string;
   tagDesc?: string;
+  tagIcon?: string;
+  tagColor?: string;
+  tagCreator?: string;
+  isPath?: boolean;
   visibilityMode?: string;
-  aclGrantMode?: number;
-  resourceMountMode?: number;
-  aclGrantSpecifiedUsers?: string[];
-  resourceMountSpecifiedUsers?: string[];
-  mountSpecifiedUsers?: string[];
-  grantedActions?: number[];
+  taggedResourceAclGrantScope?: AccessControlScope;
+  taggedResourceAclGrantSpecifiedUsers?: string[];
+  tagMountPermissionScope?: AccessControlScope;
+  tagMountSpecifiedUsers?: string[];
+  grantedActions?: TagResourceActionKey[];
 }
 
 export interface ChangeTagApiRequest {
   groupId?: string;
   tagName?: string;
   tagDesc?: string;
+  tagIcon?: string;
+  tagColor?: string;
+  tagCreator?: string;
+  isPath?: boolean;
   visibilityMode?: string;
-  aclGrantMode?: number;
-  resourceMountMode?: number;
-  aclGrantSpecifiedUsers?: string[];
-  resourceMountSpecifiedUsers?: string[];
-  mountSpecifiedUsers?: string[];
-  grantedActions?: number[];
+  taggedResourceAclGrantScope?: AccessControlScope;
+  taggedResourceAclGrantSpecifiedUsers?: string[];
+  tagMountPermissionScope?: AccessControlScope;
+  tagMountSpecifiedUsers?: string[];
+  grantedActions?: TagResourceActionKey[];
   targetTagId: string;
 }
 
@@ -82,12 +89,16 @@ export interface TagTreeResponse {
   tagName: string;
   groupId?: string;
   tagDesc?: string;
+  tagIcon?: string;
+  tagColor?: string;
+  tagCreator?: string;
+  isPath?: boolean;
   visibilityMode?: string;
-  aclGrantMode?: number;
-  resourceMountMode?: number;
-  aclGrantSpecifiedUsers?: string[];
-  resourceMountSpecifiedUsers?: string[];
-  mountSpecifiedUsers?: string[];
+  taggedResourceAclGrantScope?: AccessControlScope;
+  taggedResourceAclGrantSpecifiedUsers?: string[];
+  taggedResourceGrantedActionsMask?: number;
+  tagMountPermissionScope?: AccessControlScope;
+  tagMountSpecifiedUsers?: string[];
   grantedActions?: number[];
   parentId?: string;
   children?: TagTreeResponse[];

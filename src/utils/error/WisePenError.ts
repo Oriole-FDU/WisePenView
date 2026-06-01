@@ -5,6 +5,7 @@ export interface WisePenErrorOptions {
   source: WisePenErrorSource;
   serverMsg?: string;
   message?: string;
+  meta?: Record<string, unknown>;
   cause?: unknown;
 }
 
@@ -13,6 +14,7 @@ export class WisePenError extends Error {
   readonly code: number;
   readonly source: WisePenErrorSource;
   readonly serverMsg?: string;
+  readonly meta?: Record<string, unknown>;
 
   constructor(options: WisePenErrorOptions) {
     const displayMessage = options.message ?? options.serverMsg ?? `Error ${options.code}`;
@@ -21,6 +23,7 @@ export class WisePenError extends Error {
     this.code = options.code;
     this.source = options.source;
     this.serverMsg = options.serverMsg;
+    this.meta = options.meta;
   }
 }
 

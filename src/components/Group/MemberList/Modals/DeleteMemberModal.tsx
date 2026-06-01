@@ -1,15 +1,14 @@
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
 import { useGroupService } from '@/domains';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, Modal, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Alert, Button, Modal } from 'antd';
 import type { DeleteMemberModalProps } from './index.type';
 import { useMemberEditGuard } from './useMemberEditGuard';
 
 function DeleteMemberModal({
-  open,
-  onCancel,
+  isOpen,
+  onOpenChange,
   onSuccess,
   memberIds,
   members,
@@ -17,7 +16,6 @@ function DeleteMemberModal({
   groupDisplayConfig,
 }: DeleteMemberModalProps) {
   const groupService = useGroupService();
-  const message = useAppMessage();
   const { loading, run: runDeleteMembers } = useRequest(
     async () =>
       groupService.kickMembers({
@@ -27,12 +25,12 @@ function DeleteMemberModal({
     {
       manual: true,
       onSuccess: () => {
-        message.success(`已删除 ${memberIds.length} 位成员`);
+        toast.success(`已删除 ${memberIds.length} 位成员`);
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -48,36 +46,44 @@ function DeleteMemberModal({
   };
 
   return (
-    <Modal
-      title="删除成员"
-      open={open}
-      onCancel={onCancel}
-      destroyOnHidden
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          取消
-        </Button>,
-        <Button
-          key="confirm"
-          danger
-          type="primary"
-          onClick={handleConfirm}
-          disabled={confirmDisabled}
-          loading={loading}
-        >
-          删除
-        </Button>,
-      ]}
-      width={500}
-    >
-      {memberContainsOwner ? (
-        <Alert description="选中成员中有小组创建者，不可删除！" type="error" showIcon />
-      ) : !canEdit ? (
-        <Alert description={'您不能删除组长/管理员。'} type="error" showIcon />
-      ) : (
-        <Alert description="确定要删除以下成员吗？此操作不可撤销！" type="warning" showIcon />
-      )}
-      <SelectedMemberList members={members} />
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal.Backdrop isDismissable={!loading}>
+        <Modal.Container size="md" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>删除成员</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              {memberContainsOwner ? (
+                <div className="rounded-medium bg-danger/10 px-4 py-3 text-sm text-danger">
+                  选中成员中有小组创建者，不可删除！
+                </div>
+              ) : !canEdit ? (
+                <div className="rounded-medium bg-danger/10 px-4 py-3 text-sm text-danger">
+                  您不能删除组长/管理员。
+                </div>
+              ) : (
+                <div className="rounded-medium bg-warning/10 px-4 py-3 text-sm text-warning">
+                  确定要删除以下成员吗？此操作不可撤销！
+                </div>
+              )}
+              <SelectedMemberList members={members} />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" isDisabled={loading} onPress={() => onOpenChange(false)}>
+                取消
+              </Button>
+              <Button
+                variant="danger"
+                isDisabled={confirmDisabled || loading}
+                onPress={() => void handleConfirm()}
+              >
+                删除
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

@@ -15,7 +15,7 @@ import {
   useNewChatSessionStore,
   useNoteSelectionStore,
 } from '@/store';
-import { parseErrorMessage } from '@/utils/parseErrorMessage';
+import { parseErrorMessage } from '@/utils/error';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { useCallback, useMemo, useState } from 'react';
 import { RiIndentIncrease } from 'react-icons/ri';
@@ -271,20 +271,13 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
           setLiveMessages([]);
           return;
         }
-        messageApi.error(errorMessage);
+        toast.danger(errorMessage);
         setHistoryMessages([]);
         setHistoryPage(1);
         setHistoryTotalPage(1);
       }
     },
-    [
-      clearCurrentSession,
-      currentModel,
-      messageApi,
-      modelMetaMap,
-      runLoadSessionHistory,
-      setLiveMessages,
-    ]
+    [clearCurrentSession, currentModel, modelMetaMap, runLoadSessionHistory, setLiveMessages]
   );
 
   const loadMoreHistoryMessages = useCallback(async () => {
@@ -314,7 +307,6 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
     historyPage,
     historyTotalPage,
     loadingMoreHistory,
-    messageApi,
     modelMetaMap,
     runLoadSessionHistory,
   ]);

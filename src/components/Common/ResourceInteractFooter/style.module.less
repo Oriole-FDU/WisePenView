@@ -1,0 +1,162 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 48px 0 64px;
+  margin-top: 24px;
+  border-top: 1px solid var(--color-border, #e4e4e7);
+}
+
+/* ——— 点赞区 ——— */
+.likeSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.likeBigBtn {
+  position: relative; /* 彩带粒子定位基准 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary, #006fee);
+  background: transparent;
+  color: var(--color-primary, #006fee);
+  cursor: pointer;
+  overflow: visible; /* 彩带粒子可飞出按钮范围 */
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-primary, #006fee) 12%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary, #006fee) 12%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.likeBigBtnActive {
+  background: var(--color-warning, #f5a524);
+  border-color: var(--color-warning, #f5a524);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: #d58900;
+    border-color: #d58900;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-warning, #f5a524) 18%, transparent);
+  }
+}
+
+/* 点赞时按钮弹跳 */
+@keyframes likePop {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.28);
+  }
+  58% {
+    transform: scale(0.88);
+  }
+  80% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.likeBigBtnPopping {
+  animation: likePop 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* 图标切换弹入 */
+@keyframes iconBounceIn {
+  0% {
+    transform: scale(0.4) rotate(-18deg);
+    opacity: 0.5;
+  }
+  55% {
+    transform: scale(1.2) rotate(6deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.likeBtnIcon {
+  animation: iconBounceIn 0.32s ease forwards;
+}
+
+/* ——— 彩带粒子 ——— */
+.burstLayer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes particleFly {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(0)
+      rotate(var(--rot, 180deg));
+  }
+}
+
+.burstParticle {
+  position: absolute;
+  animation: particleFly 0.75s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+}
+
+/* 点赞区与评分区共用文字标签：两侧带细横线装饰 */
+.interactLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted-foreground, #71717a);
+  white-space: nowrap;
+
+  &::before,
+  &::after {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: var(--color-border, #e4e4e7);
+  }
+}
+
+/* ——— 评分区 ——— */
+.rateSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.rateWrap {
+  display: flex;
+  align-items: center;
+}

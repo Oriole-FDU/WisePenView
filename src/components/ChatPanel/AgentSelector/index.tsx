@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Dropdown } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { LuChevronDown as DownOutlined } from 'react-icons/lu';
 import type { MenuProps } from 'antd';
 import type { ChatAgentOption } from '@/store';
 import type { AgentSelectorProps } from './index.type';

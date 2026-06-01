@@ -5,12 +5,12 @@ import {
   isDocumentCancelableStatus,
   isDocumentRetryableStatus,
   isDocumentTerminalStatus,
-} from '@/domains/Document/enum';
-import { useAppMessage } from '@/hooks/useAppMessage';
+} from '@/domains/Document';
 import { parseErrorMessage } from '@/utils/error';
 import { formatFileSize } from '@/utils/format/formatFileSize';
+import { Button, toast } from '@heroui/react';
 import { useInterval, useMount, useRequest, useUnmount } from 'ahooks';
-import { Button, Empty, Space, Table } from 'antd';
+import { Empty, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useImperativeHandle, useMemo, useState, type Ref } from 'react';
 import styles from './style.module.less';
@@ -28,7 +28,6 @@ export interface UploadQueueTabRef {
 
 function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
   const documentService = useDocumentService();
-  const message = useAppMessage();
   const [list, setList] = useState<PendingDocItem[]>([]);
   const [pollingActive, setPollingActive] = useState(false);
   const [retryingId, setRetryingId] = useState<string | null>(null);
@@ -63,7 +62,7 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
       },
       onError: (err) => {
         setPollingActive(false);
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -79,11 +78,11 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
         setRetryingId(params[0] ?? null);
       },
       onSuccess: () => {
-        message.success('已提交重试');
+        toast.success('已提交重试');
         runFetchPendingList(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
       onFinally: () => {
         setRetryingId(null);
@@ -102,11 +101,11 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
         setCancelingId(params[0] ?? null);
       },
       onSuccess: () => {
-        message.success('已取消处理');
+        toast.success('已取消处理');
         runFetchPendingList(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
       onFinally: () => {
         setCancelingId(null);
@@ -182,23 +181,20 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
           return (
             <Space size={4}>
               <Button
-                type="link"
-                size="small"
-                disabled={retryDisabled}
-                loading={retryingId === record.documentId}
-                onClick={() => {
+                variant="ghost"
+                size="sm"
+                isDisabled={retryDisabled || retryingId === record.documentId}
+                onPress={() => {
                   if (record.documentId) runRetryPendingDoc(record.documentId);
                 }}
               >
                 重试
               </Button>
               <Button
-                type="link"
-                size="small"
-                danger
-                disabled={cancelDisabled}
-                loading={cancelingId === record.documentId}
-                onClick={() => {
+                variant="danger"
+                size="sm"
+                isDisabled={cancelDisabled || cancelingId === record.documentId}
+                onPress={() => {
                   if (record.documentId) runCancelPendingDoc(record.documentId);
                 }}
               >

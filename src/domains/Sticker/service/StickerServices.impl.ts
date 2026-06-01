@@ -1,5 +1,5 @@
-import type { IResourceService } from '@/domains/Resource/service/index.type';
-import type { TagTreeResponse } from '@/domains/Tag/service/index.type';
+import type { IResourceService } from '@/domains/Resource';
+import type { TagTreeResponse } from '@/domains/Tag';
 import { ResourceTagApi } from '../apis/ResourceApi';
 import type {
   AddStickerRequest,

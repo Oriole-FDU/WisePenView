@@ -1,4 +1,5 @@
 import type { Group, GroupFileOrgLogic, GroupMemberList, GroupResConfig } from '@/domains/Group';
+import type { TagResourceAction } from '@/domains/Tag';
 
 /** GroupService 接口：供依赖注入使用 */
 export interface IGroupService {
@@ -113,4 +114,5 @@ export interface KickMembersRequest {
 export interface UpdateGroupResConfigRequest {
   groupId: string;
   fileOrgLogic: GroupFileOrgLogic;
+  defaultMemberActions?: TagResourceAction[];
 }

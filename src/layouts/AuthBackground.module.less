@@ -1,0 +1,180 @@
+.root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+}
+
+.blobPrimary {
+  top: -10rem;
+  left: -10rem;
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--accent) 25%, transparent) 0%,
+    color-mix(in oklch, var(--accent) 12%, transparent) 100%
+  );
+}
+
+.blobAccent {
+  top: 33.333%;
+  right: -8rem;
+  width: 20rem;
+  height: 20rem;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--focus) 25%, transparent) 0%,
+    color-mix(in oklch, var(--focus) 12%, transparent) 100%
+  );
+}
+
+.blobBlend {
+  bottom: -8rem;
+  left: 33.333%;
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--accent) 18%, transparent) 0%,
+    color-mix(in oklch, var(--focus) 8%, transparent) 100%
+  );
+}
+
+.dot {
+  position: absolute;
+  border-radius: 9999px;
+}
+
+.dotSm {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.dotMd {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.dotPrimary {
+  background-color: var(--accent);
+}
+
+.dotPrimaryHover {
+  background-color: color-mix(in oklch, var(--accent) 85%, var(--foreground));
+}
+
+.dotPrimarySoft {
+  background-color: color-mix(in oklch, var(--accent) 45%, var(--background));
+}
+
+.dotFocus {
+  background-color: var(--focus);
+}
+
+.dotTopLeft {
+  top: 5rem;
+  left: 8%;
+}
+
+.dotTopRight {
+  top: 33.333%;
+  right: 8%;
+}
+
+.dotBottomLeft {
+  bottom: 25%;
+  left: 10%;
+}
+
+.dotBottomRight {
+  top: 66.666%;
+  right: 10%;
+}
+
+.decorSvg {
+  position: absolute;
+  opacity: 0.3;
+}
+
+.decorCurve {
+  top: 2.5rem;
+  right: 5rem;
+}
+
+.decorCircle {
+  bottom: 5rem;
+  left: 5rem;
+}
+
+.decorPath {
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: none;
+}
+
+.decorCircleStroke {
+  stroke: var(--focus);
+  stroke-width: 2;
+  fill: none;
+  stroke-dasharray: 5, 5;
+}
+
+@keyframes authPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes authFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.pulse {
+  animation: authPulse 4s ease-in-out infinite;
+}
+
+.float {
+  animation: authFloat 3s ease-in-out infinite;
+}
+
+.delay05 {
+  animation-delay: 0.5s;
+}
+
+.delay1 {
+  animation-delay: 1s;
+}
+
+.delay15 {
+  animation-delay: 1.5s;
+}
+
+.delay2 {
+  animation-delay: 2s;
+}
+
+@media (max-width: 767px) {
+  .root {
+    opacity: 0.35;
+  }
+}

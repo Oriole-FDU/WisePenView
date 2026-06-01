@@ -1,5 +1,5 @@
 export interface CreateGroupModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
   onSuccess?: () => void;
 }

@@ -1,7 +1,7 @@
 import QuotaBar from '@/components/Common/QuotaBar';
 import type { GroupDisplayConfig } from '@/components/Group/GroupDisplayConfig';
 import type { GroupMember } from '@/domains/Group';
-import { ROLE } from '@/domains/Group/enum';
+import { ROLE } from '@/domains/Group';
 import type { EnumKey } from '@/utils/enum';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import type { TableColumnsType } from 'antd';

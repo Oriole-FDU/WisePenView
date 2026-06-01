@@ -1,5 +1,5 @@
 export interface AddStickerModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }

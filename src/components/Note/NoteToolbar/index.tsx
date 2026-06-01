@@ -11,7 +11,8 @@ import {
   TextAlignButton,
   UnnestBlockButton,
 } from '@blocknote/react';
-import { Button } from 'antd';
+import { Button } from '@heroui/react';
+
 import { RiSparklingLine } from 'react-icons/ri';
 
 import IconText from '@/components/Common/IconText';
@@ -23,18 +24,14 @@ const NoteToolbar = ({ onAskAi }: NoteToolbarProps) => (
     formattingToolbar={() => (
       <FormattingToolbar>
         <Button
-          type="primary"
-          size="small"
+          variant="primary"
+          size="sm"
           className={styles.askAiBtn}
           onMouseDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
           }}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onAskAi();
-          }}
+          onPress={onAskAi}
         >
           <IconText icon={<RiSparklingLine />} iconSize={14}>
             问AI

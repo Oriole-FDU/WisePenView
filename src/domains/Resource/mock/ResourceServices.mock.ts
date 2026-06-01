@@ -1,6 +1,10 @@
 import type {
   GetGroupResourceRequest,
   GetUserResourcesRequest,
+  InteractRateRequest,
+  InteractRateResult,
+  InteractToggleLikeRequest,
+  InteractToggleLikeResult,
   IResourceService,
   RenameResourceRequest,
   ResourceItem,
@@ -123,9 +127,23 @@ const updateResourceTags = async (): Promise<void> => {
   await delay(150);
 };
 
+const interactToggleLike = async (
+  _params: InteractToggleLikeRequest
+): Promise<InteractToggleLikeResult> => {
+  await delay(100);
+  return { liked: true };
+};
+
+const interactRate = async (params: InteractRateRequest): Promise<InteractRateResult> => {
+  await delay(100);
+  return { userScore: params.score };
+};
+
 export const ResourceServicesMock: IResourceService = {
   getUserResources,
   getGroupResources,
   renameResource,
   updateResourceTags,
+  interactToggleLike,
+  interactRate,
 };

@@ -3,10 +3,10 @@ import IconText from '@/components/Common/IconText';
 import { DeleteFileModal, EditStickerModal, RenameFileModal } from '@/components/Drive/Modals';
 import { useResourceService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { useNavigateResource } from '@/hooks/useNavigateResource';
 import { parseErrorMessage } from '@/utils/error';
 import { formatFileSize } from '@/utils/format/formatFileSize';
+import { toast } from '@heroui/react';
 import { usePagination } from 'ahooks';
 import type { MenuProps } from 'antd';
 import { Dropdown, Table, Tag } from 'antd';
@@ -148,7 +148,6 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
 
 function FileList({ groupId, filter }: FileListProps) {
   const resourceService = useResourceService();
-  const message = useAppMessage();
   const navigateResource = useNavigateResource(groupId);
   const [openDropdownKey, setOpenDropdownKey] = useState<string | null>(null);
   const [list, setList] = useState<ResourceItem[]>([]);
@@ -201,7 +200,7 @@ function FileList({ groupId, filter }: FileListProps) {
         setTotal(res.total);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
         setList([]);
         setTotal(0);
       },
@@ -298,16 +297,18 @@ function FileList({ groupId, filter }: FileListProps) {
         {openDropdownKey && <div className={styles.mask} aria-hidden />}
       </div>
 
-      <RenameFileModal
-        open={renameFileModalOpen}
-        file={renameFileTarget}
-        onCancel={handleRenameFileModalClose}
-        onSuccess={fetchList}
-      />
+      {renameFileTarget ? (
+        <RenameFileModal
+          isOpen={renameFileModalOpen}
+          file={renameFileTarget}
+          onOpenChange={(open) => !open && handleRenameFileModalClose()}
+          onSuccess={fetchList}
+        />
+      ) : null}
       <DeleteFileModal
-        open={deleteFileModalOpen}
+        isOpen={deleteFileModalOpen}
         file={deleteFileTarget}
-        onCancel={handleDeleteFileModalClose}
+        onOpenChange={(open) => !open && handleDeleteFileModalClose()}
         onSuccess={fetchList}
       />
       <EditStickerModal

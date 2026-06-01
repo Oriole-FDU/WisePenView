@@ -1,7 +1,57 @@
-// 兑换码输入框下方说明文案
+.codeInput {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0;
+}
+
+.codeInputHidden {
+  cursor: text;
+}
+
+.codeGroup {
+  min-width: 0;
+  flex: 0 1 auto;
+  gap: 6px;
+}
+
+.codeSlot {
+  width: 38px;
+  min-width: 0;
+  height: 44px;
+  flex: 0 1 38px;
+  font-size: 15px;
+}
+
+.codeSeparator {
+  width: 6px;
+  flex: 0 0 6px;
+}
+
+@media (max-width: 520px) {
+  .codeInput {
+    gap: 4px;
+  }
+
+  .codeGroup {
+    flex: 1 1 0;
+    gap: 3px;
+  }
+
+  .codeSlot {
+    width: auto;
+    flex: 1 1 0;
+  }
+
+  .codeSeparator {
+    width: 4px;
+    flex-basis: 4px;
+  }
+}
 
 .hint {
-  margin-top: var(--ant-margin-sm);
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-tertiary);
+  margin-top: 8px;
+  font-size: 13px;
+  color: #6b7280;
 }

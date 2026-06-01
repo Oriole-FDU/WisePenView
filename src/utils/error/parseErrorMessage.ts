@@ -29,6 +29,11 @@ const extractErrorCode = (err: unknown): number | undefined => {
   return undefined;
 };
 
+const extractErrorMeta = (err: unknown): Record<string, unknown> | undefined => {
+  if (isWisePenError(err)) return err.meta;
+  return undefined;
+};
+
 const extractServerMsg = (err: unknown): string | undefined => {
   if (isWisePenError(err)) return err.serverMsg ?? err.message;
   const axiosErr = err as AxiosError<ApiErrorBody>;
@@ -39,9 +44,9 @@ const extractServerMsg = (err: unknown): string | undefined => {
   return undefined;
 };
 
-const translateByCode = (code: number): string | undefined => {
+const translateByCode = (code: number, meta?: Record<string, unknown>): string | undefined => {
   const key = `code.${code}`;
-  const translated = i18n.t(key, { ns: I18N_NAMESPACES.ERRORS });
+  const translated = i18n.t(key, { ns: I18N_NAMESPACES.ERRORS, ...meta });
   if (translated === key || translated === `${I18N_NAMESPACES.ERRORS}:${key}`) {
     return undefined;
   }
@@ -52,7 +57,7 @@ const translateByCode = (code: number): string | undefined => {
 export const parseErrorMessage = (err: unknown): string => {
   const code = extractErrorCode(err);
   if (code !== undefined) {
-    const i18nMsg = translateByCode(code);
+    const i18nMsg = translateByCode(code, extractErrorMeta(err));
     if (i18nMsg) return i18nMsg;
   }
 

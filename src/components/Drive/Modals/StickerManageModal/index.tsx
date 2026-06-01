@@ -1,10 +1,10 @@
 import IconText from '@/components/Common/IconText';
 import { useStickerService } from '@/domains';
 import type { Sticker } from '@/domains/Sticker';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Button, Input, Modal, Popconfirm, Tag } from 'antd';
+import { Input, Modal, Popconfirm, Tag } from 'antd';
 import clsx from 'clsx';
 import { useCallback, useState } from 'react';
 import { LuPlus } from 'react-icons/lu';
@@ -13,8 +13,6 @@ import styles from './style.module.less';
 
 function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalProps) {
   const stickerService = useStickerService();
-  const message = useAppMessage();
-
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<Sticker | null>(null);
   const [editName, setEditName] = useState('');
@@ -25,7 +23,7 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
       setStickers(list);
     },
     onError: (err) => {
-      message.error(parseErrorMessage(err));
+      toast.danger(parseErrorMessage(err));
       setStickers([]);
     },
   });
@@ -39,14 +37,14 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
     {
       manual: true,
       onSuccess: (_, [trimmed]) => {
-        message.success('标签已更新');
+        toast.success('标签已更新');
         const updated = { ...selectedSticker!, tagName: trimmed };
         setStickers((prev) => prev.map((s) => (s.tagId === updated.tagId ? updated : s)));
         setSelectedSticker(updated);
         onSuccess?.();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -56,14 +54,14 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
     {
       manual: true,
       onSuccess: () => {
-        message.success('标签已删除');
+        toast.success('标签已删除');
         setStickers((prev) => prev.filter((s) => s.tagId !== selectedSticker!.tagId));
         setSelectedSticker(null);
         setEditName('');
         onSuccess?.();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -73,13 +71,13 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
     {
       manual: true,
       onSuccess: () => {
-        message.success('标签已创建');
+        toast.success('标签已创建');
         void runFetchStickers();
         setAddName('');
         onSuccess?.();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -112,15 +110,15 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
     if (!selectedSticker) return;
     const trimmed = editName.trim();
     if (!trimmed) {
-      message.warning('请输入标签名称');
+      toast.warning('请输入标签名称');
       return;
     }
     if (trimmed.startsWith('/')) {
-      message.warning('标签名称不能以 / 开头');
+      toast.warning('标签名称不能以 / 开头');
       return;
     }
     await runUpdateSticker(trimmed);
-  }, [selectedSticker, editName, runUpdateSticker, message]);
+  }, [selectedSticker, editName, runUpdateSticker]);
 
   const handleDelete = useCallback(async () => {
     if (!selectedSticker) return;
@@ -130,15 +128,15 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
   const handleAdd = useCallback(async () => {
     const trimmed = addName.trim();
     if (!trimmed) {
-      message.warning('请输入标签名称');
+      toast.warning('请输入标签名称');
       return;
     }
     if (trimmed.startsWith('/')) {
-      message.warning('标签名称不能以 / 开头');
+      toast.warning('标签名称不能以 / 开头');
       return;
     }
     await runAddSticker(trimmed);
-  }, [addName, runAddSticker, message]);
+  }, [addName, runAddSticker]);
 
   return (
     <Modal
@@ -187,11 +185,15 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
                 />
               </div>
               <div className={styles.formActions}>
-                <Button type="default" onClick={() => void handleUpdate()} loading={updateLoading}>
+                <Button
+                  variant="secondary"
+                  onPress={() => void handleUpdate()}
+                  isDisabled={updateLoading}
+                >
                   保存修改
                 </Button>
                 <Popconfirm title="确定删除该标签？" onConfirm={() => void handleDelete()}>
-                  <Button danger loading={deleteLoading}>
+                  <Button variant="danger" isDisabled={deleteLoading}>
                     删除
                   </Button>
                 </Popconfirm>
@@ -207,9 +209,9 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
                   onChange={(e) => setAddName(e.target.value)}
                 />
                 <Button
-                  type="default"
-                  onClick={() => void handleAdd()}
-                  loading={addLoading}
+                  variant="secondary"
+                  onPress={() => void handleAdd()}
+                  isDisabled={addLoading}
                   style={{ marginTop: 12 }}
                 >
                   <IconText icon={<LuPlus />} iconSize={16}>

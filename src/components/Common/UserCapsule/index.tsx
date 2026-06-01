@@ -1,9 +1,7 @@
-import { Avatar } from 'antd';
+import { Avatar } from '@heroui/react';
 
 import type { UserCapsuleProps } from './index.type';
 import styles from './style.module.less';
-
-const AVATAR_SIZE = 20;
 
 function UserCapsule({ name, avatar, variant = 'bare' }: UserCapsuleProps) {
   const displayName = name.trim() || '-';
@@ -11,8 +9,9 @@ function UserCapsule({ name, avatar, variant = 'bare' }: UserCapsuleProps) {
 
   return (
     <span className={`${styles.userCapsule} ${styles[variant]}`}>
-      <Avatar size={AVATAR_SIZE} src={avatar} alt={displayName} className={styles.avatar}>
-        {avatarText}
+      <Avatar aria-label={displayName} className={styles.avatar}>
+        {avatar && <Avatar.Image alt={displayName} src={avatar} />}
+        <Avatar.Fallback className={styles.avatarFallback}>{avatarText}</Avatar.Fallback>
       </Avatar>
       <span className={styles.name}>{displayName}</span>
     </span>

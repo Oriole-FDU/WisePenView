@@ -1,17 +1,21 @@
 import { useGroupService } from '@/domains';
 import type { QuitGroupRequest } from '@/domains/Group';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, Modal, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Alert, Button, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import type { ExitGroupModalProps } from './index.type';
 
 import styles from './index.module.less';
 
-function ExitGroupModal({ open, onCancel, groupName, groupId, onSuccess }: ExitGroupModalProps) {
+function ExitGroupModal({
+  isOpen,
+  onOpenChange,
+  groupName,
+  groupId,
+  onSuccess,
+}: ExitGroupModalProps) {
   const groupService = useGroupService();
-  const message = useAppMessage();
   const navigate = useNavigate();
 
   const { loading, run: runExitGroup } = useRequest(
@@ -22,47 +26,50 @@ function ExitGroupModal({ open, onCancel, groupName, groupId, onSuccess }: ExitG
     {
       manual: true,
       onSuccess: () => {
-        message.success('已退出小组');
+        toast.success('已退出小组');
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
         navigate('/app/my-group');
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
 
   const handleConfirm = () => {
     if (!groupId) {
-      message.error('小组ID不存在');
+      toast.danger('小组ID不存在');
       return;
     }
     runExitGroup();
   };
 
   return (
-    <Modal
-      title="退出小组"
-      open={open}
-      onCancel={onCancel}
-      destroyOnHidden
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          取消
-        </Button>,
-        <Button key="confirm" danger type="primary" onClick={handleConfirm} loading={loading}>
-          确认退出
-        </Button>,
-      ]}
-      width={500}
-    >
-      <div className={styles.exitGroupName}>将要退出：{groupName}</div>
-      <Alert
-        description="退出小组后，您将无法访问该小组的资源和历史数据，且需要重新邀请才能再次加入。"
-        type="warning"
-        showIcon
-      />
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal.Backdrop isDismissable={!loading}>
+        <Modal.Container size="sm" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>退出小组</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <div className={styles.exitGroupName}>将要退出：{groupName}</div>
+              <div className="rounded-medium bg-warning/10 px-4 py-3 text-sm text-warning">
+                退出小组后，您将无法访问该小组的资源和历史数据，且需要重新邀请才能再次加入。
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" isDisabled={loading} onPress={() => onOpenChange(false)}>
+                取消
+              </Button>
+              <Button variant="danger" isDisabled={loading} onPress={() => void handleConfirm()}>
+                确认退出
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

@@ -26,6 +26,16 @@ export interface NoteInfoDisplayData {
   noteTitle: string;
   authors: NoteInfoDisplayAuthor[];
   lastEditedAtText: string;
+  /** 有效阅读量，null 表示暂无数据 */
+  readCount?: number | null;
+  /** 资源总点赞数 */
+  likeCount?: number | null;
+  /** 平均评分，null = 暂无评分 */
+  scoreAvg?: number | null;
+  /** 当前用户是否已点赞 */
+  liked?: boolean;
+  /** 当前用户评分（1-5），null = 未评分 */
+  userScore?: number | null;
 }
 
 /** 与 docs/apis/note-api.md「新建文档接口」请求体一致 */

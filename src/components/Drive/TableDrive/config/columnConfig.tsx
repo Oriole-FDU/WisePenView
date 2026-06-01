@@ -21,6 +21,7 @@ export interface TableDriveColumnConfigOptions {
     loadMoreCell: string;
     optionBtn: string;
   };
+  loadingMoreParentId: string | null;
   actionConfig?: TableDriveActionConfig;
   openDropdownKey: string | null;
   setOpenDropdownKey: (key: string | null) => void;
@@ -61,7 +62,14 @@ function renderRowName(record: DriveRow): string {
 export function getTableDriveColumns(
   options: TableDriveColumnConfigOptions
 ): ColumnsType<DriveRow> {
-  const { styles, actionConfig, openDropdownKey, setOpenDropdownKey, onRowAction } = options;
+  const {
+    styles,
+    loadingMoreParentId,
+    actionConfig,
+    openDropdownKey,
+    setOpenDropdownKey,
+    onRowAction,
+  } = options;
 
   return [
     {
@@ -73,10 +81,13 @@ export function getTableDriveColumns(
       render: (_: unknown, record: DriveRow) => {
         // loadMore 行跨整行渲染（colSpan = 全部列数）
         if (record.type === 'loadMore') {
+          const isLoadingMore = loadingMoreParentId === record.parentId;
           return {
             children: (
-              <button type="button" className={styles.loadMoreCell}>
-                加载更多（已加载 {record.loaded} / 共 {record.total}）
+              <button type="button" className={styles.loadMoreCell} disabled={isLoadingMore}>
+                {isLoadingMore
+                  ? '加载中...'
+                  : `加载更多（已加载 ${record.loaded} / 共 ${record.total}）`}
               </button>
             ),
             props: { colSpan: TOTAL_COLUMNS },

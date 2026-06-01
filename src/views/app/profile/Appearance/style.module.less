@@ -1,0 +1,114 @@
+.panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-md, 16px);
+  padding: var(--ant-padding-lg, 24px);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-md, 16px);
+}
+
+.divider {
+  margin: var(--ant-margin-xs, 8px) 0;
+}
+
+.modeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-sm, 12px);
+}
+
+.modeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ant-margin-sm, 12px);
+  padding: var(--ant-padding-sm, 12px) var(--ant-padding-md, 16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.modeContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-xxs, 4px);
+}
+
+.modeLabel {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.modeDescription {
+  font-size: var(--ant-font-size-sm, 13px);
+  color: var(--muted);
+}
+
+.schemeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: var(--ant-margin-sm, 12px);
+}
+
+.schemeGroup {
+  display: contents;
+}
+
+.schemeOption:global(.toggle-button) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-xs, 8px);
+  align-items: stretch;
+  width: 100%;
+  height: auto;
+  padding: var(--ant-padding-xs, 8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  background: var(--surface);
+  text-align: left;
+  white-space: normal;
+
+  &[data-selected='true'],
+  &[aria-pressed='true'] {
+    border-color: var(--accent);
+  }
+}
+
+.schemePreview {
+  display: flex;
+  gap: var(--ant-margin-xxs, 4px);
+}
+
+.schemeSwatch {
+  flex: 1;
+  height: 1.25rem;
+  border-radius: var(--radius, 4px);
+
+  &:first-child {
+    background: var(--preview-primary);
+  }
+
+  &:last-child {
+    background: var(--preview-accent);
+  }
+}
+
+.schemeLabel {
+  font-size: var(--ant-font-size-sm, 13px);
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.schemeDescription {
+  font-size: var(--ant-font-size-sm, 12px);
+  color: var(--muted);
+}

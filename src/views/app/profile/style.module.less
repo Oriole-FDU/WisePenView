@@ -1,0 +1,49 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 32px;
+}
+
+.pageHeader {
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  font-size: 24px;
+  margin: 0 0 16px 0;
+  color: var(--foreground);
+}
+
+.pageSubtitle {
+  color: var(--muted);
+}
+
+.sectionDivider {
+  margin: 24px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.formSection {
+  flex: 1;
+  min-width: 0;
+  padding: 24px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.sectionTitle {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.descriptions {
+  :global(.ant-descriptions-item-label) {
+    color: var(--ant-color-text-tertiary);
+  }
+}

@@ -1,7 +1,7 @@
 import { useDriveService } from '@/domains';
 import type { DriveNode, LoadMoreNode } from '@/domains/Drive';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { toast } from '@heroui/react';
 import { useCallback, useState } from 'react';
 
 interface UseDriveTreeChildrenParams {
@@ -19,7 +19,6 @@ export function useDriveTreeChildren({
   groupId,
 }: UseDriveTreeChildrenParams): UseDriveTreeChildrenReturn {
   const driveService = useDriveService();
-  const message = useAppMessage();
   const [childrenMap, setChildrenMap] = useState<Map<string, DriveNode[]>>(new Map());
 
   const setNodeChildren = useCallback((nodeId: string, children: DriveNode[]) => {
@@ -37,11 +36,11 @@ export function useDriveTreeChildren({
         setNodeChildren(nodeId, children);
         return children;
       } catch (err) {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
         return [];
       }
     },
-    [driveService, groupId, message, setNodeChildren]
+    [driveService, groupId, setNodeChildren]
   );
 
   const loadMore = useCallback(
@@ -51,11 +50,11 @@ export function useDriveTreeChildren({
         setNodeChildren(node.parentId, children);
         return children;
       } catch (err) {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
         return [];
       }
     },
-    [driveService, groupId, message, setNodeChildren]
+    [driveService, groupId, setNodeChildren]
   );
 
   const reset = useCallback(() => {

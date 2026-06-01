@@ -1,0 +1,59 @@
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted, #d4d4d8);
+  cursor: pointer;
+  transition: color 0.16s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--color-warning, #f5a524);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-warning, #f5a524);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+}
+
+.itemActive {
+  color: var(--color-warning, #f5a524);
+}
+
+.itemPressed {
+  animation: starPress 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.star {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+}
+
+@keyframes starPress {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(0.88);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

@@ -3,7 +3,7 @@
  */
 
 import type { ResourceItem } from '@/domains/Resource';
-import type { TagTreeNode } from '@/domains/Tag/service/index.type';
+import type { TagTreeNode } from '@/domains/Tag';
 
 /** 按标签获取的子标签+文件列表响应（getResByTag 用） */
 export interface TagListByTagResponse {

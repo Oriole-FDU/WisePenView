@@ -1,6 +1,8 @@
 import type { NoteInfoResponse } from '@/domains/Note';
 import { useNewNoteStore, useNoteSelectionStore, usePdfPreviewProgressStore } from '@/store';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
+import { normalizeResourceItem } from '@/utils/normalize/normalizeResourceItem';
 import { NoteApi } from '../apis/NoteApi';
 import { ResourceItemApi } from '../apis/ResourceApi';
 import type {
@@ -42,11 +44,13 @@ const deleteNote = async (params: DeleteNoteRequest): Promise<void> => {
 const getNoteInfoDisplay = async (params: GetNoteInfoRequest): Promise<NoteInfoDisplayData> => {
   const noteInfoData = (await NoteApi.getNoteInfo(params)) as NoteInfoResponse;
   if (!noteInfoData?.resourceInfo || !noteInfoData?.noteInfo) {
-    throw new Error('笔记不存在或已被删除');
+    throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_NOT_FOUND);
   }
+  // readCount/likeCount 后端以字符串返回（Java Long），归一化为 number
+  const resourceInfo = normalizeResourceItem(noteInfoData.resourceInfo);
   const authorIds = noteInfoData.noteInfo.authors ?? [];
   return {
-    noteTitle: noteInfoData.resourceInfo.resourceName,
+    noteTitle: resourceInfo.resourceName,
     authors: authorIds.map((authorId) => {
       const author = noteInfoData.authorsDisplay?.[authorId];
       return {
@@ -55,6 +59,11 @@ const getNoteInfoDisplay = async (params: GetNoteInfoRequest): Promise<NoteInfoD
       };
     }),
     lastEditedAtText: formatTimestampToDateTime(noteInfoData.noteInfo.lastUpdatedAt) || '暂无',
+    readCount: resourceInfo.readCount ?? null,
+    likeCount: resourceInfo.likeCount ?? null,
+    scoreAvg: resourceInfo.scoreAvg ?? null,
+    liked: resourceInfo.liked ?? false,
+    userScore: resourceInfo.userScore ?? null,
   };
 };
 

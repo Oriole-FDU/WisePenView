@@ -1,0 +1,15 @@
+.navBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--ant-color-fill-tertiary);
+    border-radius: 2px;
+  }
+}

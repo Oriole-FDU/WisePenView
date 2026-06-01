@@ -1,8 +1,8 @@
 import AddStickerModal from '@/components/Drive/FlatDrive/FileFilter/AddStickerModal';
 import { useStickerService } from '@/domains';
 import type { Sticker } from '@/domains/Sticker';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Divider, Modal, Spin, Tag } from 'antd';
 import clsx from 'clsx';
@@ -13,8 +13,6 @@ import type { EditStickerModalProps } from './index.type';
 
 function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalProps) {
   const stickerService = useStickerService();
-  const message = useAppMessage();
-
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -35,7 +33,7 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
         setSelectedIds(initial);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
         setStickers([]);
         setSelectedIds([]);
       },
@@ -51,12 +49,12 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
     {
       manual: true,
       onSuccess: () => {
-        message.success('标签已更新');
+        toast.success('标签已更新');
         onSuccess?.();
         onCancel();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -75,10 +73,10 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
         const list = await stickerService.getStickerList();
         setStickers(list);
       } catch (err) {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       }
     })();
-  }, [stickerService, message]);
+  }, [stickerService]);
 
   const { unselected, selected } = useMemo(() => {
     const idSet = new Set(selectedIds);
@@ -154,8 +152,8 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
       </Modal>
 
       <AddStickerModal
-        open={addModalOpen}
-        onCancel={() => setAddModalOpen(false)}
+        isOpen={addModalOpen}
+        onOpenChange={setAddModalOpen}
         onSuccess={handleAddSuccess}
       />
     </>

@@ -1,8 +1,7 @@
 export type { TagListByTagResponse } from './entity/tag';
 export {
-  TAG_ACL_GRANT_MODE,
+  ACCESS_CONTROL_SCOPE,
   TAG_RESOURCE_ACTION,
-  TAG_RESOURCE_MOUNT_MODE,
   TAG_VISIBILITY_MODE,
   actionsToPermissionCode,
   getResourceActionImpliedActions,
@@ -10,11 +9,13 @@ export {
   hasResourceAction,
   normalizeResourceActions,
   permissionCodeToActions,
+  resourceActionsToApiKeys,
 } from './enum';
 export type {
-  TagAclGrantMode,
+  AccessControlScope,
+  AccessControlScopeKey,
   TagResourceAction,
-  TagResourceMountMode,
+  TagResourceActionKey,
   TagVisibilityMode,
   TagVisibilityModeString,
 } from './enum';

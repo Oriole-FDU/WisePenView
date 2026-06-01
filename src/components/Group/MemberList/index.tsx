@@ -1,7 +1,7 @@
 import { useGroupService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { normalizeId } from '@/utils/normalize/normalizeId';
+import { toast } from '@heroui/react';
 import { usePagination } from 'ahooks';
 import { useMemo, useState } from 'react';
 import type { MemberListProps } from './index.type';
@@ -16,7 +16,6 @@ import {
 
 function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: MemberListProps) {
   const groupService = useGroupService();
-  const message = useAppMessage();
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [selectedMembersList, setSelectedMembersList] = useState<GroupMember[]>([]);
@@ -44,7 +43,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       defaultPageSize,
       refreshDeps: [groupId],
       onError: () => {
-        message.error('获取成员列表失败');
+        toast.danger('获取成员列表失败');
       },
     }
   );
@@ -111,8 +110,8 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       />
 
       <InviteUserModal
-        open={activeModal === 'invite'}
-        onCancel={onCancelModal}
+        isOpen={activeModal === 'invite'}
+        onOpenChange={(open) => !open && onCancelModal()}
         inviteCode={inviteCode}
       />
 
@@ -127,8 +126,8 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       />
 
       <DeleteMemberModal
-        open={activeModal === 'deleteMember'}
-        onCancel={onCancelModal}
+        isOpen={activeModal === 'deleteMember'}
+        onOpenChange={(open) => !open && onCancelModal()}
         memberIds={selectedMemberIds}
         members={selectedMembersList}
         onSuccess={onSuccessModal}

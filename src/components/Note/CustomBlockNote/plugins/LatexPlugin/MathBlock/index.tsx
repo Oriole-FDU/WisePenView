@@ -8,7 +8,7 @@ import type {
 import { createReactBlockSpec, type ReactCustomBlockRenderProps } from '@blocknote/react';
 import { useCallback, useRef, useState } from 'react';
 
-import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note/enum';
+import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useEffectForce } from '@/hooks/useEffectForce';
 import 'katex/dist/katex.min.css';
 import { useAiDiffDisplayModeContext } from '../../AIDiffPlugin/displayModeContext';

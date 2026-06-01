@@ -1,7 +1,8 @@
 .descriptions {
-  :global(.ant-descriptions-item-label) {
-    color: var(--ant-color-text-tertiary);
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+  margin: 0;
 }
 
 .profileSection {
@@ -12,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--ant-margin-lg);
+  margin-bottom: 24px;
 
   .sectionTitle {
     margin-bottom: 0;
@@ -20,47 +21,87 @@
 }
 
 .sectionTitle {
-  margin: 0 0 var(--ant-margin-lg) 0;
-  font-size: var(--ant-font-size-heading-4);
+  margin: 0 0 24px 0;
+  font-size: 20px;
   font-weight: 500;
-  color: var(--ant-color-text);
+  color: #1f2937;
 }
 
 .formFieldsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--ant-margin-md) var(--ant-margin-lg);
+  gap: 16px 24px;
   margin-bottom: 0;
-
-  :global(.ant-form-item) {
-    margin-bottom: 0;
-  }
 }
 
 .editableInput {
-  background-color: var(--ant-color-bg-container) !important;
+  background-color: #ffffff;
 }
 
 .profileForm {
-  :global(.ant-form-item) {
-    margin-bottom: var(--ant-margin-md);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-  .formFieldsGrid :global(.ant-form-item) {
-    margin-bottom: 0;
-  }
+.formField {
+  min-width: 0;
 }
 
 .formActions {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.submitItem {
-  margin-bottom: 0 !important;
-  margin-top: var(--ant-margin-md);
+.clearSelectButton {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #71717a;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+
+  &:hover {
+    background: #f4f4f5;
+    color: #27272a;
+  }
 }
 
 .cancelBtn {
-  margin-left: var(--ant-margin-sm);
+  margin-left: 0;
+}
+
+.descriptionItem {
+  min-width: 0;
+
+  dt {
+    margin-bottom: 6px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  dd {
+    margin: 0;
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 768px) {
+  .descriptions,
+  .formFieldsGrid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,3 +1,89 @@
-.modalFormPadding {
-  padding: var(--ant-padding-lg) 0;
+.modalForm {
+  display: contents;
+}
+
+.modalBody {
+  gap: 18px;
+}
+
+.coverField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  color: #27272a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sectionCard {
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  padding: var(--ant-padding-md);
+  background: var(--ant-color-bg-container);
+
+  & + & {
+    margin-top: var(--ant-margin-md);
+  }
+}
+
+.sectionTitle {
+  font-size: var(--ant-font-size-base);
+  font-weight: 600;
+  margin-bottom: var(--ant-margin-sm);
+}
+
+.modeRow {
+  margin-bottom: 0;
+}
+
+.modeHint {
+  margin-top: var(--ant-margin-xs);
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-tertiary);
+  opacity: 0.8;
+}
+
+.modeDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.actionGroup {
+  margin-bottom: 0;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-lg);
+}
+
+.actionItem {
+  padding: var(--ant-padding-xs) var(--ant-padding-sm);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--ant-color-bg-container);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.actionItemHighlight {
+  background: rgba(22, 119, 255, 0.1);
+  border-color: var(--ant-color-primary-border);
+}
+
+.actionLabel {
+  font-weight: 500;
+}
+
+.actionHint {
+  margin-left: 24px;
+  margin-top: var(--ant-margin-xxs);
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-tertiary);
+  opacity: 0.8;
 }

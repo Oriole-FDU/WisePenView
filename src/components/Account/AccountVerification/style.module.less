@@ -1,29 +1,35 @@
 /* 账号验证 Modal（邮箱 / UIS） */
-.verifyModeRadio {
-  display: flex;
+.verifyModeTabs {
   width: 100%;
-  margin-bottom: var(--ant-margin-md);
+  margin-bottom: 16px;
+}
 
-  :global(.ant-radio-button-wrapper) {
-    flex: 1;
-    text-align: center;
-  }
+.verifyModeTabsListContainer,
+.verifyModeTabsList {
+  width: 100%;
+}
+
+.verifyModeTabsList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.verifyModeTab {
+  justify-content: center;
 }
 
 .verifyModeAlert {
-  margin-bottom: var(--ant-margin-md);
+  margin-bottom: 16px;
 }
 
 .verifyForm {
-  padding-top: 0;
-
-  :global(.ant-form-item) {
-    margin-bottom: var(--ant-margin-md);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.verifyEmailIcon {
-  color: var(--ant-color-text-tertiary);
+.verifyInputIcon {
+  color: rgb(107 114 128);
   margin-right: 0;
 }
 
@@ -31,7 +37,7 @@
 .uisOutcomeBody {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-md);
+  gap: 16px;
 }
 
 .uisQrWrap {

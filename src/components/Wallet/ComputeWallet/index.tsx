@@ -5,52 +5,21 @@
  * 个人「充值」仅 REFILL；小组「充值」与「消费」通过 walletService.listMergedTransactions 合并两类流水；其余走 listTransactions。
  * 数据请求使用 ahooks（不使用 useEffect）。
  */
-import IconText from '@/components/Common/IconText';
 import RechargeModal from '@/components/Wallet/RechargeModal';
 import { useGroupService, useWalletService } from '@/domains';
-import {
-  WALLET_TRANSACTION_KIND,
-  type WalletTransactionKind,
-  type WalletTransactionRecord,
-} from '@/domains/Wallet';
-import { WALLET_TARGET_TYPE, WALLET_TOKEN_TX_TYPE } from '@/domains/Wallet/enum';
-import { useAppMessage } from '@/hooks/useAppMessage';
+import { WALLET_TARGET_TYPE, WALLET_TOKEN_TX_TYPE } from '@/domains/Wallet';
 import type { EnumValue } from '@/utils/enum';
 import { parseErrorMessage } from '@/utils/error';
-import { formatCompactNumber } from '@/utils/format/formatNumber';
-import { formatTimestampToDateTime } from '@/utils/format/formatTime';
+import { toast } from '@heroui/react';
 import { usePagination, useRequest, useUnmount } from 'ahooks';
-import { Button, Pagination, Skeleton, Table, Tabs } from 'antd';
-import React, {
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-  type Ref,
-} from 'react';
-import { RiAddLine, RiArrowDownLine, RiArrowUpLine, RiSubtractLine } from 'react-icons/ri';
+import { useCallback, useImperativeHandle, useRef, useState, type Ref } from 'react';
 import type { ComputeWalletProps, ComputeWalletRef } from './index.type';
 import styles from './style.module.less';
-
-const PAGE_SIZE = 20;
-
-type TxTabKey = 'all' | 'recharge' | 'spend';
+import WalletBalanceHeader from './WalletBalanceHeader';
+import { PAGE_SIZE, tabToListType, type TxTabKey } from './walletHelpers';
+import WalletTransactionTable from './WalletTransactionTable';
 
 type WalletTxTypeQueryCode = EnumValue<typeof WALLET_TOKEN_TX_TYPE>;
-
-const tabToListType = (key: TxTabKey): number | undefined => {
-  if (key === 'recharge') return WALLET_TOKEN_TX_TYPE.REFILL;
-  if (key === 'spend') return WALLET_TOKEN_TX_TYPE.SPEND;
-  return undefined;
-};
-
-const isInflowKind = (k: WalletTransactionKind): boolean =>
-  k === WALLET_TRANSACTION_KIND.RECHARGE || k === WALLET_TRANSACTION_KIND.TRANSFER_IN;
-
-/** 掩码行展示：全角 *、- 与半角混排时视觉大小不一，先规范再交给 summarySub 等宽样式 */
-const normalizeMaskDisplayText = (s: string): string =>
-  s.replace(/\uFF0A/g, '*').replace(/\uFF0D/g, '-');
 
 function ComputeWallet({
   targetType,
@@ -63,8 +32,6 @@ function ComputeWallet({
 }: ComputeWalletProps & { ref?: Ref<ComputeWalletRef> }) {
   const walletService = useWalletService();
   const groupService = useGroupService();
-  const message = useAppMessage();
-
   const effectiveGroupId = targetType === WALLET_TARGET_TYPE.GROUP ? (targetId ?? '').trim() : '';
   const walletReady = targetType === WALLET_TARGET_TYPE.USER || Boolean(effectiveGroupId);
 
@@ -138,7 +105,7 @@ function ComputeWallet({
         }
       },
       onError: (err, params) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
         const options = params?.[0];
         if (!options?.silent) {
           setLoadingWallet(false);
@@ -197,7 +164,7 @@ function ComputeWallet({
       defaultPageSize: PAGE_SIZE,
       refreshDeps: [walletService, targetType, effectiveGroupId, txTab],
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -230,14 +197,14 @@ function ComputeWallet({
       manual: true,
       onSuccess: async () => {
         const from = displayBalanceRef.current;
-        message.success('充值成功');
+        toast.success('充值成功');
         await loadBalance({ animateFrom: from, silent: true });
         onTxPageChange(1, PAGE_SIZE);
         setFlashFirstRow(true);
         window.setTimeout(() => setFlashFirstRow(false), 2400);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -256,166 +223,25 @@ function ComputeWallet({
     onTxPageChange(1, PAGE_SIZE);
   };
 
-  type Row = WalletTransactionRecord & { key: React.Key };
-
-  const columns = useMemo(() => {
-    const cols: {
-      title: string;
-      dataIndex?: string;
-      key: string;
-      width?: number;
-      align?: 'right';
-      render?: (v: unknown, row: Row) => React.ReactNode;
-    }[] = [
-      {
-        title: '时间',
-        dataIndex: 'time',
-        key: 'time',
-        width: 180,
-        render: (time: unknown) => formatTimestampToDateTime(time as string | number | null) || '—',
-      },
-      {
-        title: '类型',
-        dataIndex: 'type',
-        key: 'type',
-        width: 120,
-        render: (t: unknown) => {
-          const kind = t as WalletTransactionKind;
-          const inflow = isInflowKind(kind);
-          return (
-            <IconText
-              className={styles.typeCell}
-              icon={
-                inflow ? (
-                  <span className={styles.typeIconStack}>
-                    <RiArrowUpLine size={16} className={styles.amountRecharge} />
-                    <RiAddLine size={14} className={styles.amountRecharge} />
-                  </span>
-                ) : (
-                  <span className={styles.typeIconStack}>
-                    <RiArrowDownLine size={16} className={styles.amountSpend} />
-                    <RiSubtractLine size={14} className={styles.amountSpend} />
-                  </span>
-                )
-              }
-              iconSize={32}
-              gap="var(--ant-margin-xs)"
-            >
-              {WALLET_TRANSACTION_KIND.getLabel(kind)}
-            </IconText>
-          );
-        },
-      },
-      {
-        title: '摘要 / 备注',
-        key: 'summary',
-        render: (_: unknown, row: Row) => (
-          <div>
-            <div className={styles.summaryMain}>{row.title || '—'}</div>
-            <div className={styles.summarySub}>
-              {row.subTitle ? normalizeMaskDisplayText(row.subTitle) : '—'}
-            </div>
-          </div>
-        ),
-      },
-      {
-        title: '变动金额',
-        dataIndex: 'amount',
-        key: 'amount',
-        width: 120,
-        align: 'right',
-        render: (amount: unknown, row: Row) => {
-          const inflow = isInflowKind(row.type);
-          const n = Number(amount);
-          const prefix = n > 0 ? '+' : '';
-          return (
-            <span className={inflow ? styles.amountRecharge : styles.amountSpend}>
-              {prefix}
-              {formatCompactNumber(n)}
-            </span>
-          );
-        },
-      },
-    ];
-    if (showOperatorColumn) {
-      cols.push({
-        title: '操作人',
-        dataIndex: 'operatorName',
-        key: 'operatorName',
-        width: 120,
-        render: (name: unknown) => (name != null && String(name).length > 0 ? String(name) : '—'),
-      });
-    }
-    return cols;
-  }, [showOperatorColumn]);
-
-  const dataSource = useMemo(
-    () =>
-      (txData?.list ?? []).map((r: WalletTransactionRecord) => ({
-        ...r,
-        key: r.traceId || r.time,
-      })),
-    [txData?.list]
-  );
-
   const rootClass = surface === 'plain' ? styles.plain : styles.card;
 
   return (
     <div className={rootClass}>
-      <div className={styles.assetRow}>
-        <div className={styles.balanceBlock}>
-          <p className={styles.balanceLabel}>计算点余额</p>
-          {loadingWallet ? (
-            <Skeleton.Input active style={{ width: 200, height: 44 }} />
-          ) : (
-            <p className={styles.balanceValue}>
-              {displayBalance}
-              <span className={styles.unit}>计算点</span>
-            </p>
-          )}
-        </div>
-        {personalRecharge ? (
-          <Button type="primary" onClick={() => setRechargeOpen(true)}>
-            充值
-          </Button>
-        ) : null}
-      </div>
-
-      <h3 className={styles.panelTitle}>交易明细</h3>
-      <Tabs
-        className={styles.tabs}
-        activeKey={txTab}
-        onChange={handleTxTabChange}
-        items={[
-          { key: 'all', label: '全部' },
-          { key: 'recharge', label: '充值' },
-          { key: 'spend', label: '消费' },
-        ]}
+      <WalletBalanceHeader
+        balance={displayBalance}
+        loading={loadingWallet}
+        canRecharge={Boolean(personalRecharge)}
+        onRecharge={() => setRechargeOpen(true)}
       />
 
-      <Table
-        size="small"
-        columns={columns}
-        dataSource={dataSource}
+      <WalletTransactionTable
+        activeTab={txTab}
+        records={txData?.list ?? []}
         loading={loadingTx}
-        pagination={false}
-        locale={{
-          emptyText: <div className={styles.empty}>暂无交易明细</div>,
-        }}
-        rowClassName={(_, index) => (flashFirstRow && index === 0 ? styles.rowFlash : '')}
+        flashFirstRow={flashFirstRow}
+        showOperatorColumn={showOperatorColumn}
+        onTabChange={handleTxTabChange}
       />
-
-      {total > 0 && Math.ceil(total / PAGE_SIZE) > 1 ? (
-        <Pagination
-          style={{ marginTop: 16, textAlign: 'right' }}
-          current={page}
-          pageSize={PAGE_SIZE}
-          total={total}
-          showSizeChanger={false}
-          onChange={onTxPageChange}
-          showTotal={(t) => `共 ${t} 条`}
-        />
-      ) : null}
 
       <RechargeModal
         open={rechargeOpen}

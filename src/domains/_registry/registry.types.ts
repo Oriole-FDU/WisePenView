@@ -1,4 +1,4 @@
-// 第四步：�?ServicesContextValue 中新增该服务的类�?
+import type { IAdminService } from '@/domains/Admin';
 import type { IAuthService } from '@/domains/Auth';
 import type { IChatService } from '@/domains/Chat';
 import type { IDocumentService } from '@/domains/Document';
@@ -15,6 +15,7 @@ import type { IWalletService } from '@/domains/Wallet';
 import type { ISkillService } from '@/domains/Skill';
 
 export interface ServicesContextValue {
+  adminService: IAdminService;
   authService: IAuthService;
   chatService: IChatService;
   documentService: IDocumentService;

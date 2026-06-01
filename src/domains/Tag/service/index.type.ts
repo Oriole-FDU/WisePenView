@@ -3,13 +3,12 @@
  * 与 docs/apis/resource.openapi.json 中 Tag 相关 schema、路径一致（无字段重命名）
  */
 
-import type { TagListByTagResponse } from '@/domains/Tag';
 import type {
-  TagAclGrantMode,
+  AccessControlScope,
+  TagListByTagResponse,
   TagResourceAction,
-  TagResourceMountMode,
   TagVisibilityModeString,
-} from '@/domains/Tag/enum';
+} from '@/domains/Tag';
 
 /** TagService 接口：供依赖注入使用 */
 export interface ITagService {
@@ -36,7 +35,7 @@ export interface GetResByTagRequest {
   filePageSize?: number;
 }
 
-export type { TagAclGrantMode, TagResourceAction, TagResourceMountMode, TagVisibilityModeString };
+export type { AccessControlScope, TagResourceAction, TagVisibilityModeString };
 
 /**
  * 标签树节点（OpenAPI TagTreeResponse）
@@ -47,12 +46,16 @@ export interface TagTreeResponse {
   tagName: string;
   groupId?: string;
   tagDesc?: string;
+  tagIcon?: string;
+  tagColor?: string;
+  tagCreator?: string;
+  isPath?: boolean;
   visibilityMode?: TagVisibilityModeString;
-  aclGrantMode?: TagAclGrantMode;
-  resourceMountMode?: TagResourceMountMode;
-  aclGrantSpecifiedUsers?: string[];
-  resourceMountSpecifiedUsers?: string[];
-  mountSpecifiedUsers?: string[];
+  taggedResourceAclGrantScope?: AccessControlScope;
+  taggedResourceAclGrantSpecifiedUsers?: string[];
+  taggedResourceGrantedActionsMask?: number;
+  tagMountPermissionScope?: AccessControlScope;
+  tagMountSpecifiedUsers?: string[];
   grantedActions?: TagResourceAction[];
   parentId?: string;
   children?: TagTreeResponse[];
@@ -67,12 +70,15 @@ export interface TagCreateRequest {
   parentId?: string;
   tagName: string;
   tagDesc?: string;
+  tagIcon?: string;
+  tagColor?: string;
+  tagCreator?: string;
+  isPath?: boolean;
   visibilityMode?: TagVisibilityModeString;
-  aclGrantMode?: TagAclGrantMode;
-  resourceMountMode?: TagResourceMountMode;
-  aclGrantSpecifiedUsers?: string[];
-  resourceMountSpecifiedUsers?: string[];
-  mountSpecifiedUsers?: string[];
+  taggedResourceAclGrantScope?: AccessControlScope;
+  taggedResourceAclGrantSpecifiedUsers?: string[];
+  tagMountPermissionScope?: AccessControlScope;
+  tagMountSpecifiedUsers?: string[];
   grantedActions?: TagResourceAction[];
 }
 
@@ -81,12 +87,15 @@ export interface TagUpdateRequest {
   groupId?: string;
   tagName?: string;
   tagDesc?: string;
+  tagIcon?: string;
+  tagColor?: string;
+  tagCreator?: string;
+  isPath?: boolean;
   visibilityMode?: TagVisibilityModeString;
-  aclGrantMode?: TagAclGrantMode;
-  resourceMountMode?: TagResourceMountMode;
-  aclGrantSpecifiedUsers?: string[];
-  resourceMountSpecifiedUsers?: string[];
-  mountSpecifiedUsers?: string[];
+  taggedResourceAclGrantScope?: AccessControlScope;
+  taggedResourceAclGrantSpecifiedUsers?: string[];
+  tagMountPermissionScope?: AccessControlScope;
+  tagMountSpecifiedUsers?: string[];
   grantedActions?: TagResourceAction[];
   targetTagId: string;
 }

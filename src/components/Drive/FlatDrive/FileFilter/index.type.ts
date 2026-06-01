@@ -1,4 +1,4 @@
-import type { ResourceSortBy, ResourceSortDir, TagQueryLogicMode } from '@/domains/Resource/enum';
+import type { ResourceSortBy, ResourceSortDir, TagQueryLogicMode } from '@/domains/Resource';
 
 /** FileFilter 维护的筛选/排序数据，可直接用于 GetUserResourcesRequest */
 export interface FileFilterValue {

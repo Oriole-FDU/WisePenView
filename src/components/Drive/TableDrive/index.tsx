@@ -1,6 +1,7 @@
 import IconText from '@/components/Common/IconText';
 import type { DriveNode } from '@/domains/Drive';
-import { Button, Table } from 'antd';
+import { Button } from '@heroui/react';
+import { Table } from 'antd';
 import React, { useCallback, useMemo, useRef, type HTMLAttributes } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu';
@@ -28,6 +29,7 @@ function TableDrive({ groupId, rootId, scope, actions }: TableDriveProps) {
     dataSource,
     pathNodes,
     loading,
+    loadingMoreParentId,
     expandedRowKeys,
     enterFolder,
     handleLoadMore,
@@ -125,12 +127,13 @@ function TableDrive({ groupId, rootId, scope, actions }: TableDriveProps) {
           loadMoreCell: styles.loadMoreCell,
           optionBtn: styles.optionBtn,
         },
+        loadingMoreParentId,
         actionConfig: actions,
         onRowAction,
         openDropdownKey,
         setOpenDropdownKey,
       }),
-    [actions, onRowAction, openDropdownKey, setOpenDropdownKey]
+    [actions, loadingMoreParentId, onRowAction, openDropdownKey, setOpenDropdownKey]
   );
 
   const expandIcon = useCallback(
@@ -169,19 +172,19 @@ function TableDrive({ groupId, rootId, scope, actions }: TableDriveProps) {
           <Breadcrumb pathNodes={pathNodes} onJump={(node) => enterFolder(node.id)} />
           <div className={styles.toolbarActions}>
             {showUploadToGroup ? (
-              <Button type="default" size="small" onClick={openUploadToGroup}>
+              <Button variant="secondary" size="sm" onPress={openUploadToGroup}>
                 <IconText icon={<AiOutlineCloudUpload />} iconSize={16}>
                   上传文件
                 </IconText>
               </Button>
             ) : null}
             {showManagePermission ? (
-              <Button type="default" size="small" onClick={openTagPermission}>
+              <Button variant="secondary" size="sm" onPress={openTagPermission}>
                 标签权限管理
               </Button>
             ) : null}
             {showCreateFolder ? (
-              <Button type="default" size="small" onClick={openNewFolder}>
+              <Button variant="secondary" size="sm" onPress={openNewFolder}>
                 新建文件夹
               </Button>
             ) : null}

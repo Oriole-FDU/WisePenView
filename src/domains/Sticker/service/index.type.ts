@@ -4,7 +4,7 @@
  * 装配层：组合 TagService 能力，对上屏蔽底层 Tag API 细节
  */
 
-import type { TagTreeNode } from '@/domains/Tag/service/index.type';
+import type { TagTreeNode } from '@/domains/Tag';
 
 /** 贴纸节点，TagTreeNode 的语义别名 */
 export type Sticker = Pick<TagTreeNode, 'tagId' | 'tagName'>;

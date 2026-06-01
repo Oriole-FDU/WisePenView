@@ -2,8 +2,8 @@
 // 设计：OWNER 全部权限，ADMIN 可修改 MEMBER 的配额、可踢出 MEMBER，MEMBER 无编辑权限
 // 注意：组长(OWNER)的权限修改和删除不被允许；配额单独用 editableRolesForQuota，组长可修改自己的配额
 
-import type { ROLE } from '@/domains/Group/enum';
-import { GROUP_TYPE } from '@/domains/Group/enum';
+import type { ROLE } from '@/domains/Group';
+import { GROUP_TYPE } from '@/domains/Group';
 import type { EnumKey } from '@/utils/enum';
 
 export type EditableRole = Exclude<EnumKey<typeof ROLE>, 'OWNER'>;

@@ -2,7 +2,7 @@ import type { KeyboardEvent } from 'react';
 import { useCallback } from 'react';
 import type * as Y from 'yjs';
 
-import type { WisepenProvider } from '@/session/note/WisepenProvider';
+import type { WisepenProvider } from '@/domains/Note';
 
 /**
  * 捕获阶段接管撤销/重做快捷键，统一走 Y.UndoManager。

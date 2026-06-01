@@ -1,3 +1,4 @@
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import type { DriveNode, FolderNode, TrashNode } from '../entity/drive';
 import type {
   CreateDriveServiceOptions,
@@ -84,7 +85,11 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
     async getDriveTree(params: GetDriveTreeParams) {
       await delay(NETWORK_DELAY_MS);
       const node = nodes.get(params.rootId);
-      if (!node) throw new Error(`Drive node not found: ${params.rootId}`);
+      if (!node) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
+          nodeId: params.rootId,
+        });
+      }
       return node;
     },
 
@@ -105,7 +110,11 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
       await delay(NETWORK_DELAY_MS);
       const path: DriveNode[] = [];
       let cur: DriveNode | undefined = nodes.get(params.nodeId);
-      if (!cur) throw new Error(`Drive node not found: ${params.nodeId}`);
+      if (!cur) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
+          nodeId: params.nodeId,
+        });
+      }
       while (cur) {
         path.unshift(cur);
         cur = cur.parentId ? nodes.get(cur.parentId) : undefined;
@@ -117,7 +126,11 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
       await delay(NETWORK_DELAY_MS);
       const node = nodes.get(params.nodeId);
       const newParent = getFolder(params.newParentId);
-      if (!node || !newParent) throw new Error('moveNode: node or parent not found');
+      if (!node || !newParent) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
+          nodeId: node ? params.newParentId : params.nodeId,
+        });
+      }
       detachFromParent(params.nodeId);
       node.parentId = params.newParentId;
       newParent.childrenIds.push(params.nodeId);
@@ -132,7 +145,11 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
     async renameNode(params: RenameNodeParams) {
       await delay(NETWORK_DELAY_MS);
       const node = nodes.get(params.nodeId);
-      if (!node) throw new Error('renameNode: node not found');
+      if (!node) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
+          nodeId: params.nodeId,
+        });
+      }
       if (node.type === 'folder') {
         node.name = params.newName;
       } else if (node.type === 'resource' || node.type === 'link') {
@@ -143,7 +160,11 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
     async createNode(params: CreateNodeParams) {
       await delay(NETWORK_DELAY_MS);
       const parent = getFolder(params.parentId);
-      if (!parent) throw new Error('createNode: parent not found');
+      if (!parent) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
+          nodeId: params.parentId,
+        });
+      }
       const newId = `${params.type}-mock-${Date.now()}`;
       let node: DriveNode;
       if (params.type === 'folder') {
@@ -183,7 +204,9 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
           childrenIds: [],
         };
       } else {
-        throw new Error(`createNode: unsupported type ${params.type}`);
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_UNSUPPORTED_CREATE_TYPE, {
+          type: params.type,
+        });
       }
       nodes.set(newId, node);
       parent.childrenIds.push(newId);

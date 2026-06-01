@@ -1,5 +1,6 @@
 import { use } from 'react';
 
+import type { IAdminService } from '@/domains/Admin';
 import type { IAuthService } from '@/domains/Auth';
 import type { IChatService } from '@/domains/Chat';
 import type { IDocumentService } from '@/domains/Document';
@@ -18,7 +19,7 @@ import type { ISkillService } from '@/domains/Skill';
 import { ServicesContext } from './context';
 import type { ServicesContextValue } from './registry';
 
-/** 内部 hook，供�?useXxxService 复用；必须在 ServicesProvider 内使�?*/
+/** 内部 hook，供�?useXxxService 复用；必须在 ServicesProvider 内使�?*/
 function useServicesContext(): ServicesContextValue {
   const ctx = use(ServicesContext);
   if (!ctx) {
@@ -27,7 +28,7 @@ function useServicesContext(): ServicesContextValue {
   return ctx;
 }
 
-// 第七步：导出 useXxxService hook，组件内通过 useOrderService() 等获取实�?
+export const useAdminService = (): IAdminService => useServicesContext().adminService;
 export const useAuthService = (): IAuthService => useServicesContext().authService;
 export const useChatService = (): IChatService => useServicesContext().chatService;
 export const useDocumentService = (): IDocumentService => useServicesContext().documentService;
@@ -40,6 +41,6 @@ export const useResourceService = (): IResourceService => useServicesContext().r
 export const useStickerService = (): IStickerService => useServicesContext().stickerService;
 export const useTagService = (): ITagService => useServicesContext().tagService;
 export const useUserService = (): IUserService => useServicesContext().userService;
-/** 个人中心钱包、高级组 token 相关页注�?*/
+/** 个人中心钱包、高级组 token 相关页注入 */
 export const useWalletService = (): IWalletService => useServicesContext().walletService;
 export const useSkillService = (): ISkillService => useServicesContext().skillService;

@@ -1,31 +1,23 @@
 import { useDriveService } from '@/domains';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
 import { validateReservedName } from '@/utils/tag/validateReservedName';
+import { Button, Input, Modal, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Button, Input, Modal } from 'antd';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import type { NewFolderNodeModalProps } from './index.type';
 import styles from './style.module.less';
 
 function NewFolderNodeModal({
-  open,
+  isOpen,
   parentId,
   groupId,
   parentLabel,
   existingFolderNames = [],
-  onCancel,
+  onOpenChange,
   onSuccess,
 }: NewFolderNodeModalProps) {
   const driveService = useDriveService();
-  const message = useAppMessage();
   const [name, setName] = useState('');
-
-  const handleOpenChange = useCallback((visible: boolean) => {
-    if (visible) {
-      setName('');
-    }
-  }, []);
 
   const { loading, run: runCreateFolder } = useRequest(
     async (trimmed: string) =>
@@ -33,12 +25,12 @@ function NewFolderNodeModal({
     {
       manual: true,
       onSuccess: () => {
-        message.success('新建成功');
+        toast.success('新建成功');
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -46,16 +38,16 @@ function NewFolderNodeModal({
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      message.warning('请输入文件夹名称');
+      toast.warning('请输入文件夹名称');
       return;
     }
     const validation = validateReservedName(trimmed);
     if (!validation.valid) {
-      message.warning(validation.reason);
+      toast.warning(validation.reason);
       return;
     }
     if (existingFolderNames.includes(trimmed)) {
-      message.warning('当前目录下已存在同名文件夹');
+      toast.warning('当前目录下已存在同名文件夹');
       return;
     }
     runCreateFolder(trimmed);
@@ -63,37 +55,50 @@ function NewFolderNodeModal({
 
   const handleCancel = () => {
     setName('');
-    onCancel();
+    onOpenChange(false);
   };
 
   return (
-    <Modal
-      title="新建文件夹"
-      open={open}
-      onCancel={handleCancel}
-      afterOpenChange={handleOpenChange}
-      destroyOnHidden
-      width={420}
-      footer={[
-        <Button key="cancel" onClick={handleCancel}>
-          取消
-        </Button>,
-        <Button key="confirm" type="primary" onClick={handleSubmit} loading={loading}>
-          创建
-        </Button>,
-      ]}
-    >
-      <div className={styles.pathHint}>
-        {parentLabel ? `创建到「${parentLabel}」下` : '当前目录'}
-      </div>
-      <Input
-        className={styles.input}
-        placeholder="请输入文件夹名称"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onPressEnter={handleSubmit}
-        autoFocus
-      />
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal.Backdrop isDismissable={!loading}>
+        <Modal.Container size="sm" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>新建文件夹</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <div className={styles.pathHint}>
+                {parentLabel ? `创建到「${parentLabel}」下` : '当前目录'}
+              </div>
+              <TextField
+                aria-label="文件夹名称"
+                className={styles.input}
+                value={name}
+                autoFocus
+                onChange={setName}
+              >
+                <Input
+                  placeholder="请输入文件夹名称"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      handleSubmit();
+                    }
+                  }}
+                />
+              </TextField>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onPress={handleCancel} isDisabled={loading}>
+                取消
+              </Button>
+              <Button variant="primary" onPress={handleSubmit} isDisabled={loading}>
+                创建
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

@@ -1,9 +1,9 @@
 import SelectedMemberList from '@/components/Common/SelectedMemberList';
 import { useQuotaService } from '@/domains';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Alert, Button, Form, InputNumber, Modal } from 'antd';
+import { Alert, Form, InputNumber, Modal } from 'antd';
 import { useCallback, useState } from 'react';
 import type { AssignQuotaModalProps } from './index.type';
 import styles from './style.module.less';
@@ -21,7 +21,6 @@ function AssignQuotaModal({
   groupDisplayConfig,
 }: AssignQuotaModalProps) {
   const quotaService = useQuotaService();
-  const message = useAppMessage();
   const [form] = Form.useForm();
   const [groupQuota, setGroupQuotaState] = useState<{ used: number; limit: number }>({
     used: 0,
@@ -59,13 +58,13 @@ function AssignQuotaModal({
     {
       manual: true,
       onSuccess: () => {
-        message.success(`已为 ${memberIds.length} 位成员分配配额`);
+        toast.success(`已为 ${memberIds.length} 位成员分配配额`);
         form.resetFields();
         onSuccess?.();
         onCancel();
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
@@ -73,17 +72,17 @@ function AssignQuotaModal({
   const handleConfirm = () => {
     const value = form.getFieldValue('quota');
     if (!value || value <= 0) {
-      message.warning('请输入有效的配额值');
+      toast.warning('请输入有效的配额值');
       return;
     }
     if (value > GROUP_MEMBER_TOKEN_LIMIT_MAX) {
-      message.warning(
+      toast.warning(
         `配额限额不能超过 ${GROUP_MEMBER_TOKEN_LIMIT_MAX.toLocaleString()}（避免超出整型上限）`
       );
       return;
     }
     if (value < maxUsed) {
-      message.warning(`配额限额不能小于成员的当前用量（最大用量：${maxUsed.toLocaleString()}）`);
+      toast.warning(`配额限额不能小于成员的当前用量（最大用量：${maxUsed.toLocaleString()}）`);
       return;
     }
     runSetQuota(value);
@@ -97,15 +96,14 @@ function AssignQuotaModal({
       afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
-        <Button key="cancel" onClick={onCancel}>
+        <Button key="cancel" onPress={onCancel}>
           取消
         </Button>,
         <Button
           key="confirm"
-          type="primary"
-          onClick={handleConfirm}
-          loading={loading}
-          disabled={confirmDisabled || quotaOverGlobalMax}
+          variant="primary"
+          onPress={handleConfirm}
+          isDisabled={loading || confirmDisabled || quotaOverGlobalMax}
         >
           确定
         </Button>,

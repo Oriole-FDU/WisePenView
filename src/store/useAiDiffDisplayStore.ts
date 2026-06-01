@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note/enum';
+import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { zustandSessionStorage } from './sessionStorage';
 
 export const DEFAULT_AI_DIFF_DISPLAY_MODE = AI_DIFF_DISPLAY_MODE.COMPARE;

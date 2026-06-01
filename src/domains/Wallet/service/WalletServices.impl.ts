@@ -2,11 +2,12 @@
  * 钱包 Service：/user/wallet/*，成功码与全局一致 `code === 200`。
  */
 import {
+  WALLET_TOKEN_TX_TYPE,
   WALLET_TRANSACTION_KIND,
+  WALLET_TX_TAB_MERGE_FETCH_CAP,
   type WalletTransactionKind,
   type WalletTransactionRecord,
 } from '@/domains/Wallet';
-import { WALLET_TOKEN_TX_TYPE, WALLET_TX_TAB_MERGE_FETCH_CAP } from '@/domains/Wallet/enum';
 import { UserWalletApi } from '../apis/UserApi';
 import type {
   GetWalletInfoResponse,

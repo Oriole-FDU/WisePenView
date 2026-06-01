@@ -1,12 +1,12 @@
+import UploadZone from '@/components/Common/UploadZone';
 import { useImageService, useUserService } from '@/domains';
-import { getVerificationModeLabel, IDENTITY, USER_STATUS } from '@/domains/User/enum';
-import { useAppMessage } from '@/hooks/useAppMessage';
+import { assertImageProxyUploadLimit } from '@/domains/Image';
+import { getVerificationModeLabel, IDENTITY, USER_STATUS } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
-import { createBeforeUploadImageWithinLimit } from '@/utils/image/uploadLimit';
+import { IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/image/uploadLimit';
+import { Avatar, Button, Modal, toast, Tooltip } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import type { UploadFile } from 'antd';
-import { Avatar, Button, Modal, Tooltip, Upload } from 'antd';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { RiCheckLine, RiCloseLine, RiErrorWarningLine } from 'react-icons/ri';
 import type { AccountHeaderProps } from './index.type';
 import styles from './style.module.less';
@@ -14,15 +14,10 @@ import styles from './style.module.less';
 function AccountHeader({ user, onUserInfoUpdated }: AccountHeaderProps) {
   const userService = useUserService();
   const imageService = useImageService();
-  const message = useAppMessage();
-  const beforeUploadAvatar = useMemo(
-    () => createBeforeUploadImageWithinLimit((text) => message.error(text)),
-    [message]
-  );
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
-  const [avatarFileList, setAvatarFileList] = useState<UploadFile[]>([]);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
-  const { loading: avatarSubmitting, runAsync: runUpdateAvatar } = useRequest(
+  const { loading: avatarSubmitting, run: runUpdateAvatar } = useRequest(
     async (raw: File, currentUser: NonNullable<AccountHeaderProps['user']>) => {
       const { publicUrl } = await imageService.uploadImage({
         file: raw,
@@ -40,37 +35,59 @@ function AccountHeader({ user, onUserInfoUpdated }: AccountHeaderProps) {
       manual: true,
       onSuccess: (data) => {
         onUserInfoUpdated(data);
-        message.success('头像已更新');
-        setAvatarFileList([]);
+        toast.success('头像已更新');
+        setAvatarFile(null);
         setAvatarModalOpen(false);
       },
       onError: (err: unknown) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
 
   const openAvatarModal = () => {
-    setAvatarFileList([]);
+    setAvatarFile(null);
     setAvatarModalOpen(true);
   };
 
-  const handleAvatarModalCancel = () => {
-    setAvatarFileList([]);
+  const handleAvatarModalClose = () => {
+    if (avatarSubmitting) return;
+    setAvatarFile(null);
     setAvatarModalOpen(false);
   };
 
-  const handleAvatarModalOk = async () => {
-    const raw = avatarFileList[0]?.originFileObj;
-    if (!(raw instanceof File)) {
-      message.warning('请选择头像图片');
-      return Promise.reject(new Error('no_avatar_file'));
+  const handleAvatarModalOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      handleAvatarModalClose();
+      return;
+    }
+    setAvatarModalOpen(true);
+  };
+
+  const handleAvatarFileChange = (file: File | null) => {
+    if (!file) {
+      setAvatarFile(null);
+      return;
+    }
+    try {
+      assertImageProxyUploadLimit(file);
+      setAvatarFile(file);
+    } catch (err) {
+      toast.danger(parseErrorMessage(err));
+      setAvatarFile(null);
+    }
+  };
+
+  const handleAvatarModalOk = () => {
+    if (!avatarFile) {
+      toast.warning('请选择头像图片');
+      return;
     }
     if (!user) {
-      message.error('用户信息未加载，请稍后重试');
-      return Promise.reject(new Error('no_user'));
+      toast.danger('用户信息未加载，请稍后重试');
+      return;
     }
-    return runUpdateAvatar(raw, user);
+    runUpdateAvatar(avatarFile, user);
   };
 
   const nickname = user?.userInfo?.nickname ?? user?.userInfo?.username ?? '未设置昵称';
@@ -85,28 +102,31 @@ function AccountHeader({ user, onUserInfoUpdated }: AccountHeaderProps) {
     <>
       <div className={styles.accountHeader}>
         <div className={styles.accountHeaderLeft}>
-          <Tooltip title="修改头像">
-            <span
-              className={styles.avatarWrap}
-              role="button"
-              tabIndex={0}
-              onClick={openAvatarModal}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  openAvatarModal();
-                }
-              }}
-            >
-              <Avatar
-                size={96}
-                draggable={false}
-                className={styles.avatar}
-                src={user?.userInfo?.avatar ?? undefined}
+          <Tooltip>
+            <Tooltip.Trigger>
+              <span
+                className={styles.avatarWrap}
+                role="button"
+                tabIndex={0}
+                onClick={openAvatarModal}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openAvatarModal();
+                  }
+                }}
               >
-                {avatarLetter}
-              </Avatar>
-            </span>
+                <Avatar aria-label={nickname} className={styles.avatar}>
+                  {user?.userInfo?.avatar && (
+                    <Avatar.Image alt={nickname} draggable={false} src={user.userInfo.avatar} />
+                  )}
+                  <Avatar.Fallback className={styles.avatarFallback}>
+                    {avatarLetter}
+                  </Avatar.Fallback>
+                </Avatar>
+              </span>
+            </Tooltip.Trigger>
+            <Tooltip.Content>修改头像</Tooltip.Content>
           </Tooltip>
           <div className={styles.accountInfo}>
             <div className={styles.nameRow}>
@@ -149,28 +169,45 @@ function AccountHeader({ user, onUserInfoUpdated }: AccountHeaderProps) {
         )}
       </div>
 
-      <Modal
-        title="更换头像"
-        open={avatarModalOpen}
-        onCancel={handleAvatarModalCancel}
-        destroyOnHidden
-        confirmLoading={avatarSubmitting}
-        okText="上传并保存"
-        cancelText="取消"
-        onOk={handleAvatarModalOk}
-        width={440}
-      >
-        <p className={styles.avatarModalHint}>支持 JPG、PNG、GIF、WebP，单张不超过 5MB。</p>
-        <Upload
-          name="avatar"
-          accept="image/*"
-          maxCount={1}
-          fileList={avatarFileList}
-          beforeUpload={beforeUploadAvatar}
-          onChange={({ fileList }) => setAvatarFileList(fileList)}
-        >
-          <Button type="default">选择图片</Button>
-        </Upload>
+      <Modal isOpen={avatarModalOpen} onOpenChange={handleAvatarModalOpenChange}>
+        <Modal.Backdrop isDismissable={!avatarSubmitting}>
+          <Modal.Container size="sm" placement="center">
+            <Modal.Dialog>
+              <Modal.Header>
+                <Modal.Heading>更换头像</Modal.Heading>
+              </Modal.Header>
+              <Modal.Body>
+                <p className={styles.avatarModalHint}>
+                  支持 JPG、PNG、GIF、WebP，单张不超过 {IMAGE_UPLOAD_MAX_SIZE_LABEL}。
+                </p>
+                <UploadZone
+                  file={avatarFile}
+                  disabled={avatarSubmitting}
+                  accept="image/*"
+                  label="点击或拖拽头像图片到此区域"
+                  description={`支持 JPG、PNG、GIF、WebP，单张不超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`}
+                  onFileChange={handleAvatarFileChange}
+                />
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  isDisabled={avatarSubmitting}
+                  onPress={handleAvatarModalClose}
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="primary"
+                  isDisabled={!avatarFile || avatarSubmitting}
+                  onPress={handleAvatarModalOk}
+                >
+                  上传并保存
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

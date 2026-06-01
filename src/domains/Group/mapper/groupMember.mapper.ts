@@ -1,5 +1,5 @@
 import type { GroupMember } from '@/domains/Group';
-import { ROLE } from '@/domains/Group/enum';
+import { ROLE } from '@/domains/Group';
 import type { GroupMemberRawResponse } from '../service/index.type';
 
 /** OpenAPI GroupMemberDetailResponse -> 领域 GroupMember（userId <- memberId） */

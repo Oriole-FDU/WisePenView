@@ -1,4 +1,4 @@
-import type { WalletTargetType } from '@/domains/Wallet/enum';
+import type { WalletTargetType } from '@/domains/Wallet';
 
 export interface ComputeWalletRef {
   /** 显式刷新余额与当前页流水 */

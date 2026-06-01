@@ -10,3 +10,4 @@ export type {
 } from './service/index.type';
 export type { CreateSessionRequest, ChatSession } from './service/index.type';
 export { mapApiModelsToFlatModels } from './mapper/model.mapper';
+export { useChatSession } from './session/useChatSession';

@@ -2,8 +2,8 @@ import type { GroupDisplayConfig } from '@/components/Group/GroupDisplayConfig';
 import type { GroupMember } from '@/domains/Group';
 
 export interface InviteUserModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   inviteCode?: string;
 }
@@ -19,8 +19,8 @@ export interface EditPermissionModalProps {
 }
 
 export interface DeleteMemberModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   memberIds: string[];
   members: GroupMember[];

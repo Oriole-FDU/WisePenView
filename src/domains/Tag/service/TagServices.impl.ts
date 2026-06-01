@@ -1,7 +1,7 @@
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
-import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource/enum';
-import type { IResourceService } from '@/domains/Resource/service/index.type';
-import type { TagListByTagResponse } from '@/domains/Tag';
+import type { IResourceService } from '@/domains/Resource';
+import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
+import { resourceActionsToApiKeys, type TagListByTagResponse } from '@/domains/Tag';
 import { useTrashTagStore } from '@/store';
 import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
 import { ResourceTagApi } from '../apis/ResourceApi';
@@ -140,12 +140,18 @@ export const createTagServices = (deps: TagServicesDeps): ITagService => {
   };
 
   const updateTag = async (params: TagUpdateRequest): Promise<void> => {
-    await ResourceTagApi.changeTag(params);
+    await ResourceTagApi.changeTag({
+      ...params,
+      grantedActions: resourceActionsToApiKeys(params.grantedActions),
+    });
     clearTagTreeCache(params.groupId);
   };
 
   const addTag = async (params: TagCreateRequest): Promise<string> => {
-    const data = await ResourceTagApi.addTag(params);
+    const data = await ResourceTagApi.addTag({
+      ...params,
+      grantedActions: resourceActionsToApiKeys(params.grantedActions),
+    });
     clearTagTreeCache(params.groupId);
     return data ?? '';
   };

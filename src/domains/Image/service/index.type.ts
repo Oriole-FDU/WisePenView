@@ -2,6 +2,7 @@
  * 图床 / 对象存储代理上传（对齐 WisePenCloud `POST /storage/imageUpload`）
  */
 
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { IMAGE_UPLOAD_MAX_BYTES, IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/image/uploadLimit';
 
 /**
@@ -9,7 +10,9 @@ import { IMAGE_UPLOAD_MAX_BYTES, IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/ima
  */
 export function assertImageProxyUploadLimit(file: File): void {
   if (file.size > IMAGE_UPLOAD_MAX_BYTES) {
-    throw new Error(`图片大小不能超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`);
+    throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_FILE_TOO_LARGE, {
+      maxSize: IMAGE_UPLOAD_MAX_SIZE_LABEL,
+    });
   }
 }
 

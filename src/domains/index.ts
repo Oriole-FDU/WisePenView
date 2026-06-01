@@ -3,6 +3,7 @@
  */
 export {
   ServicesProvider,
+  useAdminService,
   useAuthService,
   useChatService,
   useDocumentService,

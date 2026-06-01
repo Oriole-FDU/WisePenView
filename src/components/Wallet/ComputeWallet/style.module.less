@@ -1,11 +1,11 @@
 // 通用钱包：资产区 + 流水表格 + 充值/消费配色（与需求「绿充红消」一致）
 
 .card {
-  padding: var(--ant-padding-lg);
-  margin-bottom: var(--ant-margin-lg);
-  background-color: var(--ant-color-bg-container);
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: var(--ant-border-radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
 }
 
 /** 嵌入父级容器时使用，避免与外层 formSection 形成双层边框 */
@@ -22,7 +22,7 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--ant-margin-md);
+  gap: 16px;
 }
 
 .balanceBlock {
@@ -31,9 +31,9 @@
 }
 
 .balanceLabel {
-  margin: 0 0 var(--ant-margin-xs) 0;
-  font-size: var(--ant-font-size);
-  color: var(--ant-color-text-secondary);
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #4b5563;
 }
 
 .balanceValue {
@@ -42,48 +42,51 @@
   font-weight: 600;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-text);
+  color: #111827;
 }
 
 .unit {
-  margin-left: var(--ant-margin-xs);
-  font-size: var(--ant-font-size-lg);
+  margin-left: 8px;
+  font-size: 16px;
   font-weight: 500;
-  color: var(--ant-color-text-secondary);
+  color: #4b5563;
 }
 
 .panelTitle {
-  margin: var(--ant-margin-md) 0 0 0;
-  font-size: var(--ant-font-size-heading-5);
+  margin: 16px 0 0 0;
+  font-size: 16px;
   font-weight: 500;
 }
 
 .tabs {
-  margin: var(--ant-margin-md) 0;
+  margin: 16px 0;
+}
+
+.balanceSkeleton {
+  width: 200px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.tableContent {
+  min-width: 760px;
 }
 
 .amountRecharge {
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-success);
+  color: #16a34a;
   font-weight: 500;
 }
 
 .amountSpend {
   font-variant-numeric: tabular-nums;
-  color: var(--ant-color-error);
+  color: #dc2626;
   font-weight: 500;
 }
 
-.typeCell {
-  color: var(--ant-color-text);
-}
-
-.typeIconStack {
-  display: inline-flex;
-  align-items: center;
+.typeChip {
+  min-width: 72px;
   justify-content: center;
-  gap: 2px;
-  line-height: 0;
 }
 
 .summaryMain {
@@ -92,18 +95,32 @@
 
 .summarySub {
   margin-top: 2px;
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-tertiary);
+  font-size: 13px;
+  color: #6b7280;
   // 点卡尾号等掩码行：* 与数字在比例字体下宽窄不一，等宽栈 + tabular 数字对齐
   font-family:
     ui-monospace, SFMono-Regular, 'Segoe UI Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   font-variant-numeric: tabular-nums;
 }
 
+.timeCell {
+  white-space: nowrap;
+}
+
+.amountColumn,
+.amountCell {
+  text-align: right;
+}
+
 .empty {
-  padding: var(--ant-padding-xl);
+  padding: 32px;
   text-align: center;
-  color: var(--ant-color-text-tertiary);
+  color: #6b7280;
+}
+
+.pagination {
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
 // 充值成功后首行短暂高亮（rowClassName 控制）
@@ -117,6 +134,6 @@
     background-color: transparent;
   }
   25% {
-    background-color: var(--ant-color-success-bg);
+    background-color: #dcfce7;
   }
 }

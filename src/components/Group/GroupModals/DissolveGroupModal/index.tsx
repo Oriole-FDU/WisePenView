@@ -1,9 +1,9 @@
 import { useGroupService } from '@/domains';
 import type { DeleteGroupRequest } from '@/domains/Group';
-import { useAppMessage } from '@/hooks/useAppMessage';
 import { parseErrorMessage } from '@/utils/error';
+import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Alert, Button, Input, Modal } from 'antd';
+import { Alert, Input, Modal } from 'antd';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { DissolveGroupModalProps } from './index.type';
@@ -18,7 +18,6 @@ function DissolveGroupModal({
   onSuccess,
 }: DissolveGroupModalProps) {
   const groupService = useGroupService();
-  const message = useAppMessage();
   const [confirmName, setConfirmName] = useState('');
   const navigate = useNavigate();
 
@@ -36,21 +35,21 @@ function DissolveGroupModal({
     {
       manual: true,
       onSuccess: () => {
-        message.success('已解散小组');
+        toast.success('已解散小组');
         setConfirmName('');
         onSuccess?.();
         onCancel();
         navigate('/app/my-group');
       },
       onError: (err) => {
-        message.error(parseErrorMessage(err));
+        toast.danger(parseErrorMessage(err));
       },
     }
   );
 
   const handleConfirm = () => {
     if (!groupId) {
-      message.warning('小组ID不存在');
+      toast.warning('小组ID不存在');
       return;
     }
     runDissolveGroup();
@@ -64,16 +63,14 @@ function DissolveGroupModal({
       afterOpenChange={handleOpenChange}
       destroyOnHidden
       footer={[
-        <Button key="cancel" onClick={onCancel}>
+        <Button key="cancel" onPress={onCancel}>
           取消
         </Button>,
         <Button
           key="confirm"
-          danger
-          type="primary"
-          onClick={handleConfirm}
-          disabled={confirmName !== groupName}
-          loading={loading}
+          variant="danger"
+          onPress={handleConfirm}
+          isDisabled={confirmName !== groupName || loading}
         >
           解散
         </Button>,
