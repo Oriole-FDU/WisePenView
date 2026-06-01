@@ -1,4 +1,3 @@
-import IconText from '@/components/Common/IconText';
 import React from 'react';
 import { LuCheck, LuCopy } from 'react-icons/lu';
 import { Button, Spin } from 'antd';
@@ -17,6 +16,7 @@ const LOADING_HINT_SWITCH_MS = 2000;
 const AiMessage: React.FC<{ message: Message }> = ({ message }) => {
   const hasReasoning = message.reasoningContent !== undefined;
   const showLoadingIndicator = Boolean(message.loading && !message.content);
+  const messageApi = useAppMessage();
   const [copied, setCopied] = React.useState(false);
   const [loadingHintIndex, setLoadingHintIndex] = React.useState(0);
   const displayProvider = message.meta?.provider || 'openai';
@@ -32,11 +32,11 @@ const AiMessage: React.FC<{ message: Message }> = ({ message }) => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message.content || '');
-      toast.success('复制成功');
+      messageApi.success('复制成功');
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (err) {
-      toast.danger('复制失败');
+      messageApi.error('复制失败');
     }
   };
 
@@ -81,17 +81,27 @@ const AiMessage: React.FC<{ message: Message }> = ({ message }) => {
         {/* 底部操作栏 (非 Loading 时显示) */}
         {!message.loading && (
           <div className={styles.actions}>
-            {/* 系统当前不支持点赞、点踩、重新生成 */}
+            {/* 系统当前不支持点赞 */}
+            {/* <Button type="text" shape="circle" size="small" className={styles.actionBtn}>
+              <LuThumbsUp size={14} />
+            </Button> */}
+            {/* 系统当前不支持点踩 */}
+            {/* <Button type="text" shape="circle" size="small" className={styles.actionBtn}>
+              <LuThumbsDown size={14} />
+            </Button> */}
+            {/* 系统当前不支持重新生成 */}
+            {/* <Button type="text" shape="circle" size="small" className={styles.actionBtn}>
+              <LuRotateCw size={14} />
+            </Button> */}
             <Button
-              variant="ghost"
-              isIconOnly
-              size="sm"
+              type="text"
+              shape="circle"
+              size="small"
               className={`${styles.actionBtn} ${copied ? styles.actionBtnCopied : ''}`}
-              onPress={handleCopy}
-              aria-label="复制"
-            >
-              {copied ? <LuCheck size={14} /> : <LuCopy size={14} />}
-            </Button>
+              icon={copied ? <LuCheck size={14} /> : <LuCopy size={14} />}
+              onClick={handleCopy}
+              title="复制"
+            />
           </div>
         )}
       </div>

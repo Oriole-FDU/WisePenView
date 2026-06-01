@@ -19,7 +19,7 @@ import type { ISkillService } from '@/domains/Skill';
 import { ServicesContext } from './context';
 import type { ServicesContextValue } from './registry';
 
-/** 内部 hook，供�?useXxxService 复用；必须在 ServicesProvider 内使�?*/
+/** 内部 hook，供 useXxxService 复用；必须在 ServicesProvider 内使用 */
 function useServicesContext(): ServicesContextValue {
   const ctx = use(ServicesContext);
   if (!ctx) {

@@ -262,7 +262,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
         setHistoryPage(payload.page ?? 1);
         setHistoryTotalPage(payload.total_page ?? 1);
       } catch (error) {
-        const errorMessage = parseErrorMessage(error, '拉取历史消息失败');
+        const errorMessage = parseErrorMessage(error);
         if (isSessionInvalidMessage(errorMessage)) {
           clearCurrentSession();
           setHistoryMessages([]);
@@ -271,7 +271,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
           setLiveMessages([]);
           return;
         }
-        toast.danger(errorMessage);
+        messageApi.error(errorMessage);
         setHistoryMessages([]);
         setHistoryPage(1);
         setHistoryTotalPage(1);
@@ -297,7 +297,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
       setHistoryPage(payload.page ?? nextPage);
       setHistoryTotalPage(payload.total_page ?? historyTotalPage);
     } catch (error) {
-      messageApi.error(parseErrorMessage(error, '加载更多历史消息失败'));
+      messageApi.error(parseErrorMessage(error));
     } finally {
       setLoadingMoreHistory(false);
     }
@@ -332,7 +332,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
             navigate(`/app/chat/${createdSession.id}`, { replace: true });
           }
         } catch (error) {
-          messageApi.error(parseErrorMessage(error, '新建聊天失败'));
+          messageApi.error(parseErrorMessage(error));
           return;
         }
       }
@@ -500,7 +500,6 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat }: ChatPanelProps) 
               selectedContextText={selectedContextText}
               onClearSelectedContext={handleClearSelectedContext}
               selectedAgent={selectedAgent}
-              allSkills={allSkills}
               primarySkills={primarySkills}
               advancedMode={advancedMode}
               advancedSkillGroups={advancedSkillGroups}
