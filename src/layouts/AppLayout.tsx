@@ -3,14 +3,14 @@ import { Layout } from 'antd';
 import { useMount, useUpdateEffect } from 'ahooks';
 import { LuBot } from 'react-icons/lu';
 import { Outlet, useLocation } from 'react-router-dom';
-import Sidebar from '@/components/Sidebar';
-import ResourceSidebar from '@/components/Sidebar/ResourceSidebar';
+import Sidebar from '@/components/Sidebar/AppSidebar';
+import ResourceSidebar from '@/components/Sidebar/DriveSidebar';
 import ChatPanel from '@/components/ChatPanel';
 import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
 import styles from './AppLayout.module.less';
 
 const { Content, Sider } = Layout;
-const MIN_CHAT_PANEL_WIDTH = 320;
+const MIN_CHAT_PANEL_WIDTH = 400;
 const MAX_CHAT_PANEL_WIDTH = 1020;
 
 const clampWidth = (width: number, min: number, max: number): number =>

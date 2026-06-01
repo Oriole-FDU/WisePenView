@@ -24,6 +24,7 @@ const MyGroup = lazy(() => import('@/views/app/group/MyGroup'));
 const GroupDetail = lazy(() => import('@/views/app/group/GroupDetail'));
 const Account = lazy(() => import('@/views/app/profile/Account'));
 const Usage = lazy(() => import('@/views/app/profile/Usage'));
+const Appearance = lazy(() => import('@/views/app/profile/Appearance'));
 const Login = lazy(() => import('@/views/app/auth/Login'));
 const Register = lazy(() => import('@/views/app/auth/Register'));
 const ResetPassword = lazy(() => import('@/views/app/auth/ResetPassword'));

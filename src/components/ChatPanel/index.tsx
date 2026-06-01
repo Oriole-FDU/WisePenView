@@ -3,7 +3,7 @@ import type { SkillSummary } from '@/domains';
 import { useChatService, useGroupService, useResourceService } from '@/domains';
 import { mapApiModelsToFlatModels } from '@/domains/Chat';
 import { useAppMessage } from '@/hooks/useAppMessage';
-import { useChatSession } from '@/session/chat/useChatSession';
+import { useChatSession } from '@/domains/Chat/session/useChatSession';
 import {
   clearChatPageStore,
   clearNewChatSessionStore,
