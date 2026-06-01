@@ -8,6 +8,7 @@ export interface IChatService {
   deleteSession(params: DeleteSessionRequest): Promise<void>;
   listSessions(params?: ListSessionsRequest): Promise<PageResult<ChatSession>>;
   listHistoryMessages(params: ListHistoryMessagesRequest): Promise<PageResult<MessageResponse>>;
+  getTools(): Promise<ToolOption[]>;
 }
 
 /** `GET /model/listModels` 的 data 字段结构 */

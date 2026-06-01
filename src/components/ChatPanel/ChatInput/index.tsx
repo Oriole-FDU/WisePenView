@@ -1,23 +1,24 @@
-import React, { useMemo, useRef, useState, useCallback } from 'react';
-import { useUpdateEffect } from 'ahooks';
+import type { SkillSummary } from '@/domains';
+import { useChatService } from '@/domains';
+import type { ChatAgentOption, TemporarySkillSelection } from '@/store';
+import { useChatCapabilityStore } from '@/store';
+import { useRequest, useUpdateEffect } from 'ahooks';
 import { Input } from 'antd';
+import { type KeyboardEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { LuX } from 'react-icons/lu';
 import ActionToolbar from './ActionToolbar';
 import CapabilityPicker from './CapabilityPicker';
 import ContentPicker from './ContentPicker';
-import DocumentPickerModal from './DocumentPickerModal';
 import ContextTags from './ContextTags';
+import DocumentPickerModal from './DocumentPickerModal';
 import OtherSkillModal from './OtherSkillModal';
-import { CHAT_V4_TOOL_OPTIONS, type CapabilityToolOption } from './capability';
-import { useChatCapabilityStore } from '@/store';
-import type { SkillSummary } from '@/domains';
-import type { ChatAgentOption, TemporarySkillSelection } from '@/store';
+import { type CapabilityToolOption } from './capability';
 import type { ChatInputProps } from './index.type';
 import styles from './style.module.less';
 
 const { TextArea } = Input;
 
-const ChatInput: React.FC<ChatInputProps> = ({
+function ChatInput({
   onSend,
   sending,
   currentModelId,
@@ -29,7 +30,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   primarySkills,
   advancedMode,
   advancedSkillGroups,
-}) => {
+}: ChatInputProps) {
   const [value, setValue] = useState('');
   const [isComposing, setIsComposing] = useState(false);
   const [capabilityOpen, setCapabilityOpen] = useState(false);
@@ -45,6 +46,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const removeSkill = useChatCapabilityStore((state) => state.removeSkill);
   const toggleTool = useChatCapabilityStore((state) => state.toggleTool);
   const clearCapabilities = useChatCapabilityStore((state) => state.clearCapabilities);
+  const chatService = useChatService();
 
   const selectedPreviewChars = Array.from(selectedContextText);
   const selectedPreview =
@@ -52,7 +54,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
       ? selectedContextText
       : `${selectedPreviewChars.slice(0, 5).join('')}...${selectedPreviewChars.slice(-5).join('')}`;
 
-  const toolOptions = useMemo<CapabilityToolOption[]>(() => CHAT_V4_TOOL_OPTIONS, []);
+  const { data: toolOptionsData } = useRequest(() => chatService.getTools(), { refreshDeps: [] });
+  const toolOptions = useMemo<CapabilityToolOption[]>(
+    () => toolOptionsData ?? [],
+    [toolOptionsData]
+  );
 
   const otherSkillGroups = useMemo(
     () =>
@@ -95,7 +101,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     clearCapabilities();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
       e.preventDefault();
       void handleSend();
@@ -158,9 +164,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
       onClose={() => setContentPickOpen(false)}
       onSelectUpload={() => setContentPickOpen(false)}
       onSelectLibrary={() => {
-          setContentPickOpen(false);
-          setDocPickerOpen(true);
-        }}
+        setContentPickOpen(false);
+        setDocPickerOpen(true);
+      }}
     />
   );
 
@@ -196,7 +202,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
             onCompositionStart={() => setIsComposing(true)}
             onCompositionEnd={() => setIsComposing(false)}
           />
-
         </div>
 
         <div className={styles.actionArea}>
@@ -226,14 +231,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
         onConfirm={handleOtherSkillConfirm}
       />
 
-      <DocumentPickerModal
-        open={docPickerOpen}
-        onClose={() => setDocPickerOpen(false)}
-      />
+      <DocumentPickerModal open={docPickerOpen} onClose={() => setDocPickerOpen(false)} />
 
       <div className={styles.footerTip}>AI 内容仅供参考，请仔细甄别</div>
     </div>
   );
-};
+}
 
 export default ChatInput;

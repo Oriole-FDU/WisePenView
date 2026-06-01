@@ -52,3 +52,9 @@ export type ListSessionsApiRequest = { page?: number; size?: number };
 export type ListSessionsApiResponse = PageResult<ChatSession>;
 export type ListHistoryMessagesApiRequest = { sessionId: string; page?: number; size?: number };
 export type ListHistoryMessagesApiResponse = PageResult<MessageResponse>;
+
+export interface ToolOption {
+  toolId: string;
+  label: string;
+}
+export type ListToolsApiResponse = ToolOption[];

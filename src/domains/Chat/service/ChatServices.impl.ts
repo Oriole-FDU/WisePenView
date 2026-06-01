@@ -1,16 +1,17 @@
-import { ChatApi, ChatSessionApi } from '../apis/ChatApi';
 import { useCurrentChatSessionStore, useNewChatSessionStore, useNoteSelectionStore } from '@/store';
+import { ChatApi, ChatSessionApi } from '../apis/ChatApi';
 import type {
   ChatSession,
   CreateSessionRequest,
   DeleteSessionRequest,
   IChatService,
-  ListSessionsRequest,
   ListHistoryMessagesRequest,
+  ListSessionsRequest,
   MessageResponse,
   ModelListResponse,
   PageResult,
   RenameSessionRequest,
+  ToolOption,
 } from './index.type';
 
 const getModels = async (): Promise<ModelListResponse> => {
@@ -90,6 +91,10 @@ const listHistoryMessages = async (
   };
 };
 
+const getTools = async (): Promise<ToolOption[]> => {
+  return await ChatApi.getTools();
+};
+
 export const createChatServices = (): IChatService => ({
   getModels,
   createSession,
@@ -97,4 +102,5 @@ export const createChatServices = (): IChatService => ({
   deleteSession,
   listSessions,
   listHistoryMessages,
+  getTools,
 });
