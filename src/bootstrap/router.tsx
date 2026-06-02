@@ -32,6 +32,7 @@ const NewPassword = lazy(() => import('@/views/app/auth/NewPassword'));
 const VerifyEmail = lazy(() => import('@/views/app/auth/VerifyEmail'));
 const NoteView = lazy(() => import('@/views/app/note'));
 const PdfPreview = lazy(() => import('@/views/app/pdf/PdfPreview'));
+const ChatPage = lazy(() => import('@/views/chat'));
 const ResourceNotFound = lazy(() => import('@/views/app/error/ResourceNotFound'));
 const AppError = lazy(() => import('@/views/app/error/AppError'));
 
@@ -122,6 +123,14 @@ const router = createBrowserRouter([
       {
         path: 'note',
         element: <NoteView />,
+      },
+      {
+        path: 'chat',
+        element: <ChatPage />,
+      },
+      {
+        path: 'chat/:sessionId',
+        element: <ChatPage />,
       },
       {
         path: 'note/:noteId',

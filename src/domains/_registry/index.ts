@@ -38,6 +38,7 @@ export {
   useNoteService,
   useQuotaService,
   useResourceService,
+  useSkillService,
   useStickerService,
   useTagService,
   useUserService,

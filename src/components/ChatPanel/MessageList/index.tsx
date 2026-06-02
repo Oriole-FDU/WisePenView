@@ -1,4 +1,4 @@
-import type { Message } from '@/components/ChatPanel/index.type'; // 假设你有这个类型定义
+import type { Message } from '@/components/ChatPanel/index.type';
 import { useMount, useUpdateEffect } from 'ahooks';
 import { useRef } from 'react';
 import MessageItem from './MessageItem';
@@ -10,6 +10,7 @@ interface MessageListProps {
   canLoadMoreHistory: boolean;
   loadingMoreHistory: boolean;
   onLoadMoreHistory: () => Promise<void>;
+  onPromptClick?: (text: string) => void;
 }
 
 function MessageList({
@@ -17,6 +18,7 @@ function MessageList({
   canLoadMoreHistory,
   loadingMoreHistory,
   onLoadMoreHistory,
+  onPromptClick,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastMessage = messages[messages.length - 1];
@@ -69,7 +71,7 @@ function MessageList({
   return (
     <div className={styles.container} ref={scrollRef}>
       {messages.length === 0 ? (
-        <Welcome />
+        <Welcome onPromptClick={onPromptClick} />
       ) : (
         <div>
           {canLoadMoreHistory && (

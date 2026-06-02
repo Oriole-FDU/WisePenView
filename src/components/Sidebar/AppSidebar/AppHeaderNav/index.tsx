@@ -1,10 +1,22 @@
 import { useChatService, useNoteService } from '@/domains';
-import { useNewChatSessionStore, useNewNoteStore } from '@/store';
+import {
+  clearNewChatSessionStore,
+  useChatPanelStore,
+  useCurrentChatSessionStore,
+  useNewChatSessionStore,
+  useNewNoteStore,
+} from '@/store';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { ListBox, ListBoxItem, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import clsx from 'clsx';
-import { RiAddCircleFill, RiFileTextLine, RiGroupFill, RiPenNibFill } from 'react-icons/ri';
+import {
+  RiAddCircleFill,
+  RiFileTextLine,
+  RiGroupFill,
+  RiPenNibFill,
+  RiRobot2Line,
+} from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { AppHeaderNavProps } from './index.type';
 import styles from './style.module.less';
@@ -14,9 +26,21 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
   const location = useLocation();
   const chatService = useChatService();
   const noteService = useNoteService();
+  const clearCurrentSession = useCurrentChatSessionStore((s) => s.clearCurrentSession);
+  const setChatPanelCollapsed = useChatPanelStore((s) => s.setChatPanelCollapsed);
+  const setChatPanelDraftOpen = useChatPanelStore((s) => s.setChatPanelDraftOpen);
+
   const isDriveActive = location.pathname.startsWith('/app/drive');
   const isGroupActive = location.pathname.startsWith('/app/my-group');
-  const selectedKeys = isDriveActive ? ['/app/drive'] : isGroupActive ? ['/app/my-group'] : [];
+  const isChatActive = location.pathname.startsWith('/app/chat');
+  const selectedKeys = isChatActive
+    ? ['/app/chat']
+    : isDriveActive
+      ? ['/app/drive']
+      : isGroupActive
+        ? ['/app/my-group']
+        : [];
+
   const { run: runCreateSession, loading: createSessionLoading } = useRequest(
     async () => chatService.createSession(),
     {
@@ -36,12 +60,19 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
 
   const handleCreateSession = () => {
     if (createSessionLoading) return;
-    const { newChatSessionId, newChatSessionTitle } = useNewChatSessionStore.getState();
-    if (newChatSessionId != null && newChatSessionId !== '') {
-      onSessionCreated(newChatSessionId, newChatSessionTitle);
+
+    if (isChatActive) {
+      clearCurrentSession();
+      clearNewChatSessionStore();
+      setChatPanelDraftOpen(false);
+      navigate('/app/chat');
       return;
     }
-    runCreateSession();
+
+    clearCurrentSession();
+    clearNewChatSessionStore();
+    setChatPanelDraftOpen(true);
+    setChatPanelCollapsed(false);
   };
 
   const { loading: creatingNote, run: runCreateNote } = useRequest(
@@ -104,6 +135,17 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
           <RiPenNibFill size={18} />
         </span>
         {!collapsed && <span className={styles.menuLabel}>新建笔记</span>}
+      </ListBoxItem>
+      <ListBoxItem
+        id="/app/chat"
+        textValue="AI 对话"
+        className={clsx(styles.menuItem, collapsed && styles.menuItemCollapsed)}
+        onPress={() => navigate('/app/chat')}
+      >
+        <span className={styles.menuIcon}>
+          <RiRobot2Line size={18} />
+        </span>
+        {!collapsed && <span className={styles.menuLabel}>AI 对话</span>}
       </ListBoxItem>
       <ListBoxItem
         id="/app/drive"

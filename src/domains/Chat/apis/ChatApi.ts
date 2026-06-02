@@ -9,6 +9,7 @@ import type {
   ListModelsApiResponse,
   ListSessionsApiRequest,
   ListSessionsApiResponse,
+  ListToolsApiResponse,
   RenameSessionApiRequest,
   RenameSessionApiResponse,
 } from './ChatApi.type';
@@ -19,8 +20,13 @@ function listModels(): Promise<ListModelsApiResponse> {
   return apiGet('/chat/model/listModels');
 }
 
+function getTools(): Promise<ListToolsApiResponse> {
+  return apiGet('/chat/tools');
+}
+
 export const ChatApi = {
   listModels,
+  getTools,
 };
 
 /** Chat Session API: /chat/session/* */

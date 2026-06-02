@@ -6,14 +6,20 @@ import { zustandSessionStorage } from './sessionStorage';
 interface ChatPanelState {
   chatPanelCollapsed: boolean;
   chatPanelWidth: number;
+  chatPanelDraftOpen: boolean;
   setChatPanelCollapsed: (collapsed: boolean) => void;
+  setChatPanelDraftOpen: (open: boolean) => void;
   setChatPanelWidth: (width: number) => void;
   toggleChatPanelCollapsed: () => void;
 }
 
-const DEFAULT_CHAT_PANEL_STATE: Pick<ChatPanelState, 'chatPanelCollapsed' | 'chatPanelWidth'> = {
+const DEFAULT_CHAT_PANEL_STATE: Pick<
+  ChatPanelState,
+  'chatPanelCollapsed' | 'chatPanelWidth' | 'chatPanelDraftOpen'
+> = {
   chatPanelCollapsed: true,
   chatPanelWidth: 500,
+  chatPanelDraftOpen: false,
 };
 
 export const useChatPanelStore = create<ChatPanelState>()(
@@ -33,6 +39,13 @@ export const useChatPanelStore = create<ChatPanelState>()(
             return state;
           }
           return { chatPanelWidth: width };
+        }),
+      setChatPanelDraftOpen: (open) =>
+        set((state) => {
+          if (state.chatPanelDraftOpen === open) {
+            return state;
+          }
+          return { chatPanelDraftOpen: open };
         }),
       toggleChatPanelCollapsed: () =>
         set((state) => ({ chatPanelCollapsed: !state.chatPanelCollapsed })),

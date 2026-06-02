@@ -15,24 +15,40 @@ const { Content, Sider } = Layout;
 const RESOURCE_SIDEBAR_PATH_REGEX = /^\/app\/(note|pdf)\//;
 
 function AppLayout() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const isResourceContext = RESOURCE_SIDEBAR_PATH_REGEX.test(location.pathname);
+  const isChatPage = location.pathname.startsWith('/app/chat');
   const chatPanelCollapsed = useChatPanelStore((state) => state.chatPanelCollapsed);
+  const chatPanelDraftOpen = useChatPanelStore((state) => state.chatPanelDraftOpen);
   const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
+  const setChatPanelDraftOpen = useChatPanelStore((state) => state.setChatPanelDraftOpen);
   const currentSessionId = useCurrentChatSessionStore((state) => state.currentSessionId);
   const hasSessionId = Boolean(currentSessionId);
-  const safeChatPanelCollapsed = !hasSessionId || chatPanelCollapsed;
+  const shouldRenderChatPanel = hasSessionId || chatPanelDraftOpen;
+  const safeChatPanelCollapsed = !shouldRenderChatPanel || chatPanelCollapsed;
   const { rootRef, chatResizeGuideRef, chatPanelWidth, chatResizing, onResizeStart } =
     useChatPanelResize();
 
   useUpdateEffect(() => {
-    if (hasSessionId) {
+    if (shouldRenderChatPanel) {
       setChatPanelCollapsed(false);
       return;
     }
     setChatPanelCollapsed(true);
-  }, [hasSessionId, setChatPanelCollapsed]);
+  }, [setChatPanelCollapsed, shouldRenderChatPanel]);
+
+  useUpdateEffect(() => {
+    if (!hasSessionId && !chatPanelDraftOpen) return;
+    if (hasSessionId) {
+      setChatPanelDraftOpen(false);
+    }
+  }, [chatPanelDraftOpen, hasSessionId, setChatPanelDraftOpen]);
+
+  const handleChatExpand = () => {
+    if (!shouldRenderChatPanel) return;
+    setChatPanelCollapsed(false);
+  };
 
   return (
     <Layout
@@ -41,7 +57,6 @@ function AppLayout() {
       style={{ ['--chat-panel-width' as string]: `${chatPanelWidth}px` }}
     >
       {chatResizing && <div ref={chatResizeGuideRef} className={styles.chatResizeGuide} />}
-      {/* 左侧 Sidebar：note/pdf 路由下切换为 DriveSidebar 形态 */}
       <Sider className={styles.leftSider} width={308} theme="light" collapsed={sidebarCollapsed}>
         {isResourceContext ? (
           <DriveSidebar
@@ -56,15 +71,14 @@ function AppLayout() {
         )}
       </Sider>
 
-      {/* 中间布局 */}
       <Layout className={styles.middleLayout}>
-        {hasSessionId && safeChatPanelCollapsed && (
+        {shouldRenderChatPanel && safeChatPanelCollapsed && !isChatPage && (
           <div className={styles.chatHandleZone}>
             <button
               type="button"
               className={styles.chatExpandHandle}
-              onClick={() => setChatPanelCollapsed(false)}
-              aria-label="展开右侧对话栏"
+              onClick={handleChatExpand}
+              aria-label="展开聊天面板"
             >
               <LuBot />
             </button>
@@ -75,27 +89,28 @@ function AppLayout() {
         </Content>
       </Layout>
 
-      {/* 右侧 AI Panel */}
-      <Sider
-        className={styles.rightSider}
-        width="var(--chat-panel-width)"
-        theme="light"
-        collapsed={safeChatPanelCollapsed}
-        collapsedWidth={0}
-        trigger={null}
-      >
-        {!safeChatPanelCollapsed && (
-          <button
-            type="button"
-            className={`${styles.chatResizeHandle} ${chatResizing ? styles.chatResizeHandleActive : ''}`}
-            onMouseDown={onResizeStart}
-            aria-label="调整右侧边栏宽度"
-          />
-        )}
-        <div className={styles.rightSiderInner}>
-          {hasSessionId ? <ChatPanel collapsed={safeChatPanelCollapsed} /> : null}
-        </div>
-      </Sider>
+      {!isChatPage && (
+        <Sider
+          className={styles.rightSider}
+          width="var(--chat-panel-width)"
+          theme="light"
+          collapsed={safeChatPanelCollapsed}
+          collapsedWidth={0}
+          trigger={null}
+        >
+          {!safeChatPanelCollapsed && (
+            <button
+              type="button"
+              className={`${styles.chatResizeHandle} ${chatResizing ? styles.chatResizeHandleActive : ''}`}
+              onMouseDown={onResizeStart}
+              aria-label="调整聊天面板宽度"
+            />
+          )}
+          <div className={styles.rightSiderInner}>
+            {shouldRenderChatPanel ? <ChatPanel collapsed={safeChatPanelCollapsed} /> : null}
+          </div>
+        </Sider>
+      )}
     </Layout>
   );
 }

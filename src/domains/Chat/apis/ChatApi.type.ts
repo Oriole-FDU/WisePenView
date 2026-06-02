@@ -1,4 +1,4 @@
-import type { Model as BackendModel } from '@/domains/Chat';
+import type { Model as BackendModel } from '@/types/model';
 
 export interface ChatSession {
   id: string;
@@ -55,3 +55,9 @@ export type ListSessionsApiRequest = { page?: number; size?: number };
 export type ListSessionsApiResponse = PageResult<ChatSession>;
 export type ListHistoryMessagesApiRequest = { sessionId: string; page?: number; size?: number };
 export type ListHistoryMessagesApiResponse = PageResult<MessageResponse>;
+
+export interface ToolOption {
+  toolId: string;
+  label: string;
+}
+export type ListToolsApiResponse = ToolOption[];

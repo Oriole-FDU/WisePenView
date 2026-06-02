@@ -5,8 +5,9 @@ import type {
   ListSessionsRequest,
   MessageResponse,
   PageResult,
+  ToolOption,
 } from '@/domains/Chat';
-import { MODEL_TYPE } from '@/domains/Chat';
+import { MODEL_TYPE } from '@/types/model';
 
 type MockModelSeed = {
   name: string;
@@ -239,6 +240,13 @@ const listHistoryMessages: IChatService['listHistoryMessages'] = async (
   };
 };
 
+const getTools = async (): Promise<ToolOption[]> => {
+  return [
+    { toolId: 'search_historical_messages', label: 'Search History' },
+    { toolId: 'mock-tool-2', label: 'Mock Tool 2' },
+  ];
+};
+
 export const ChatServicesMock: IChatService = {
   getModels,
   createSession,
@@ -246,4 +254,5 @@ export const ChatServicesMock: IChatService = {
   deleteSession,
   listSessions,
   listHistoryMessages,
+  getTools,
 };

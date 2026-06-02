@@ -11,6 +11,7 @@ import { ImageServicesMock } from '@/domains/Image/mock/ImageServices.mock';
 import { NoteServicesMock } from '@/domains/Note/mock/NoteServices.mock';
 import { QuotaServicesMock } from '@/domains/Quota/mock/QuotaServices.mock';
 import { ResourceServicesMock } from '@/domains/Resource/mock/ResourceServices.mock';
+import { SkillServicesMock } from '@/domains/Skill/mock/SkillServices.mock';
 import { StickerServicesMock } from '@/domains/Sticker/mock/StickerServices.mock';
 import { TagServicesMock } from '@/domains/Tag/mock/TagServices.mock';
 import { UserServicesMock } from '@/domains/User/mock/UserServices.mock';
@@ -33,6 +34,7 @@ const mockServicesValue: ServicesContextValue = {
   tagService: TagServicesMock,
   userService: UserServicesMock,
   walletService: WalletServicesMock,
+  skillService: SkillServicesMock,
 };
 
 export function getContextValue(): ServicesContextValue {

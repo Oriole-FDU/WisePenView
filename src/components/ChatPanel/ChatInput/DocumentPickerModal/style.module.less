@@ -1,0 +1,115 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-md);
+}
+
+.hint {
+  font-size: var(--ant-font-size-sm);
+  color: var(--ant-color-text-secondary);
+}
+
+.treeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ant-margin-xs);
+  max-height: 420px;
+  overflow: hidden;
+}
+
+.navTree {
+  flex: 1;
+  min-height: 280px;
+  overflow: auto;
+  border: 1px solid var(--ant-color-border);
+  border-radius: var(--ant-border-radius-lg);
+}
+
+.tree {
+  padding: var(--ant-padding-sm);
+  font-size: var(--ant-font-size-md);
+
+  :global(.ant-tree-treenode) {
+    align-items: center;
+    min-height: 24px;
+    padding: 1px 0;
+  }
+
+  :global(.ant-tree-checkbox) {
+    align-self: center;
+    margin-block-start: 0;
+  }
+
+  :global(.ant-tree-indent),
+  :global(.ant-tree-switcher),
+  :global(.ant-tree-checkbox),
+  :global(.ant-tree-node-content-wrapper) {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+  }
+
+  :global(.ant-tree-switcher),
+  :global(.ant-tree-switcher-icon) {
+    justify-content: center;
+    width: 18px;
+    height: 22px;
+    line-height: 22px;
+  }
+
+  :global(.ant-tree-indent-unit) {
+    height: 22px;
+  }
+
+  :global(.ant-tree-node-content-wrapper) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    line-height: 22px;
+  }
+
+  :global(.ant-tree-title) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    line-height: 22px;
+  }
+
+  :global(.ant-tree-title > span),
+  :global(.ant-tree-title [class*='nodeTitle']) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    line-height: 22px;
+    vertical-align: middle;
+  }
+
+  :global(.ant-tree-title [class*='icon']) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+}
+
+.scopeTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ant-margin-xxs);
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  padding: var(--ant-padding-sm);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--ant-margin-sm);
+  width: 100%;
+}

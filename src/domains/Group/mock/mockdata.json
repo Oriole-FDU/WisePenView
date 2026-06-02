@@ -3,7 +3,7 @@
     {
       "groupId": "1",
       "groupName": "示例小组",
-      "groupDesc": "这是一个 mock 小组",
+      "groupDesc": "这是一个 mock 小组，用于测试小组 Skill",
       "groupCoverUrl": "",
       "groupType": 2,
       "ownerId": "1",
@@ -18,6 +18,25 @@
       "inviteCode": "ABC123",
       "tokenUsed": 100,
       "tokenBalance": 900
+    },
+    {
+      "groupId": "2",
+      "groupName": "前端开发组",
+      "groupDesc": "前端技术小组，用于测试跨组 Skill 选择",
+      "groupCoverUrl": "",
+      "groupType": 2,
+      "ownerId": "1",
+      "ownerInfo": {
+        "nickname": "李四",
+        "realName": "李四",
+        "avatar": "",
+        "identityType": 1
+      },
+      "memberCount": 12,
+      "createTime": "2024-02-15T00:00:00.000Z",
+      "inviteCode": "DEF456",
+      "tokenUsed": 500,
+      "tokenBalance": 1500
     }
   ],
   "groupDetail": {

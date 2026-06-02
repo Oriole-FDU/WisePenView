@@ -38,38 +38,85 @@ const buildStressMockItems = (count: number): ResourceItem[] =>
     };
   });
 
-const fullMockResourceList: ResourceItem[] = [
+const personalSkillResources: ResourceItem[] = (
+  (mockdata as Record<string, unknown>).skillResources as Record<string, unknown>
+)?.personal
+  ? (
+      ((mockdata as Record<string, unknown>).skillResources as Record<string, unknown>)
+        .personal as Array<Record<string, unknown>>
+    ).map((item) => toResourceItem(item as Parameters<typeof toResourceItem>[0]))
+  : [];
+
+const groupSkillResourcesMap: Record<string, ResourceItem[]> = {};
+const skillGroupsData = (
+  (mockdata as Record<string, unknown>).skillResources as Record<string, unknown>
+)?.groups as Record<string, Array<Record<string, unknown>>> | undefined;
+if (skillGroupsData) {
+  Object.entries(skillGroupsData).forEach(([groupId, items]) => {
+    groupSkillResourcesMap[groupId] = items.map((item) =>
+      toResourceItem(item as Parameters<typeof toResourceItem>[0])
+    );
+  });
+}
+
+const baseMockResourceList: ResourceItem[] = [
   ...(mockdata.resourceListPage as unknown as ResourceListPage).list.map(toResourceItem),
   ...buildStressMockItems(MOCK_STRESS_FILE_COUNT),
 ];
 
-const paginateMockResources = (params: GetUserResourcesRequest): ResourceListPage => {
-  const { page, size } = params;
-  let rows = fullMockResourceList;
-  if (params.resourceType != null && params.resourceType !== '') {
-    rows = rows.filter((r) => r.resourceType === params.resourceType);
-  }
+/** 个人资源列表：不含小组 Skill（个人 Skill 单独管理），查询 SKILL 时只返回 personalSkillResources */
+const fullMockPersonalResourceList: ResourceItem[] = [
+  ...baseMockResourceList,
+  ...personalSkillResources,
+];
+
+/** 完整资源列表（含所有 Skill），供 getGroupResources 使用 */
+const fullMockGroupResourceList: ResourceItem[] = [
+  ...baseMockResourceList,
+  ...personalSkillResources,
+  ...Object.values(groupSkillResourcesMap).flat(),
+];
+
+const paginateList = (rows: ResourceItem[], page: number, size: number): ResourceListPage => {
   const total = rows.length;
   const totalPage = Math.max(1, Math.ceil(total / size));
   const start = (page - 1) * size;
   const list = rows.slice(start, start + size);
-  return {
-    list,
-    total,
-    page,
-    size,
-    totalPage,
-  };
+  return { list, total, page, size, totalPage };
+};
+
+const filterByType = (rows: ResourceItem[], resourceType?: string): ResourceItem[] => {
+  if (resourceType != null && resourceType !== '') {
+    return rows.filter((r) => r.resourceType === resourceType);
+  }
+  return rows;
 };
 
 const getUserResources = async (params: GetUserResourcesRequest): Promise<ResourceListPage> => {
   await delay(200);
-  return paginateMockResources(params);
+  let rows = fullMockPersonalResourceList;
+  if (params.resourceType === 'SKILL') {
+    rows = personalSkillResources;
+    return paginateList(rows, params.page, params.size);
+  }
+  return paginateList(filterByType(rows, params.resourceType), params.page, params.size);
 };
 
 const getGroupResources = async (params: GetGroupResourceRequest): Promise<ResourceListPage> => {
   await delay(200);
-  return paginateMockResources(params);
+  if (params.resourceType === 'SKILL') {
+    const groupSkills = groupSkillResourcesMap[params.groupId] ?? [];
+    const total = groupSkills.length;
+    const totalPage = Math.max(1, Math.ceil(total / params.size));
+    const start = (params.page - 1) * params.size;
+    const list = groupSkills.slice(start, start + params.size);
+    return { list, total, page: params.page, size: params.size, totalPage };
+  }
+  return paginateList(
+    filterByType(fullMockGroupResourceList, params.resourceType),
+    params.page,
+    params.size
+  );
 };
 
 const renameResource = async (_params: RenameResourceRequest): Promise<void> => {

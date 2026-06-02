@@ -1,5 +1,5 @@
 import type { Model } from '@/components/ChatPanel/index.type';
-import { MODEL_TYPE } from '@/domains/Chat';
+import { MODEL_TYPE } from '@/types/model';
 import type { ModelListResponse } from '../service/index.type';
 
 const VENDOR_PROVIDER_MAP: Record<string, string> = {

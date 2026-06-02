@@ -3,12 +3,12 @@
  */
 
 export { clearAllZustandStores } from './clearAllStores';
+export { clearActiveDriveScopeStore, useActiveDriveScopeStore } from './useActiveDriveScopeStore';
 export {
   clearAiDiffDisplayStore,
   getAiDiffDisplayModeSnapshot,
   useAiDiffDisplayStore,
 } from './useAiDiffDisplayStore';
-export { clearActiveDriveScopeStore, useActiveDriveScopeStore } from './useActiveDriveScopeStore';
 export { clearChatPanelStore, useChatPanelStore } from './useChatPanelStore';
 export {
   clearCurrentChatSessionStore,
@@ -28,3 +28,19 @@ export {
   type PdfPreviewProgress,
 } from './usePdfPreviewProgressStore';
 export { clearTrashTagStore, useTrashTagStore } from './useTrashTagStore';
+
+export { clearAdvancedModeStore, useAdvancedModeStore } from './useAdvancedModeStore';
+export {
+  clearChatAgentStore,
+  useChatAgentStore,
+  type ChatAgentOption,
+  type ChatAgentType,
+} from './useChatAgentStore';
+export {
+  clearChatCapabilityStore,
+  useChatCapabilityStore,
+  type TemporarySkillSelection,
+  type TemporaryToolSelection,
+} from './useChatCapabilityStore';
+export { clearChatPageStore, useChatPageStore } from './useChatPageStore';
+export type { ActiveAttachment, ActiveDocRef } from './useChatPageStore';

@@ -13,6 +13,7 @@ import type {
   ModelListResponse,
   PageResult,
   RenameSessionRequest,
+  ToolOption,
 } from './index.type';
 
 const getModels = async (): Promise<ModelListResponse> => {
@@ -59,6 +60,10 @@ const listHistoryMessages = async (
   return ChatServicesMap.mapListHistoryMessagesFromApi(payload);
 };
 
+const getTools = async (): Promise<ToolOption[]> => {
+  return await ChatApi.getTools();
+};
+
 export const createChatServices = (): IChatService => ({
   getModels,
   createSession,
@@ -66,4 +71,5 @@ export const createChatServices = (): IChatService => ({
   deleteSession,
   listSessions,
   listHistoryMessages,
+  getTools,
 });

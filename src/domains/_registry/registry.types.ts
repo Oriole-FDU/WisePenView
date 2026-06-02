@@ -8,6 +8,7 @@ import type { IImageService } from '@/domains/Image';
 import type { INoteService } from '@/domains/Note';
 import type { IQuotaService } from '@/domains/Quota';
 import type { IResourceService } from '@/domains/Resource';
+import type { ISkillService } from '@/domains/Skill';
 import type { IStickerService } from '@/domains/Sticker';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
@@ -28,4 +29,5 @@ export interface ServicesContextValue {
   tagService: ITagService;
   userService: IUserService;
   walletService: IWalletService;
+  skillService: ISkillService;
 }
