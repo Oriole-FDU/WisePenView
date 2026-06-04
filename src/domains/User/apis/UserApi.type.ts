@@ -1,7 +1,6 @@
 import type { DegreeLevel, UserVerificationMode } from '@/domains/User';
 
 export interface GetUserInfoApiResponseUserInfo {
-  id?: string;
   nickname: string | null;
   realName: string | null;
   avatar: string | null;
@@ -26,6 +25,7 @@ export interface GetUserInfoApiResponseUserProfile {
 }
 
 export interface GetUserInfoApiResponse {
+  userId?: string | number;
   userInfo: GetUserInfoApiResponseUserInfo;
   userProfile: GetUserInfoApiResponseUserProfile;
   readonlyFields: string[] | null;

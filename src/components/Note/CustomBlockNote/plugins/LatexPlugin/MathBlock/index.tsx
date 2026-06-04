@@ -11,6 +11,7 @@ import { useCallback, useRef, useState } from 'react';
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useEffectForce } from '@/hooks/useEffectForce';
 import 'katex/dist/katex.min.css';
+import { useNoteEditorReadOnlyContext } from '../../../editorReadOnly';
 import { useAiDiffDisplayModeContext } from '../../AIDiffPlugin/displayModeContext';
 import aiDiffStyles from '../../AIDiffPlugin/style.module.less';
 import popoverStyles from '../InlineMath/style.module.less';
@@ -135,6 +136,10 @@ function clearMathAiDiffProps(props: MathBlockRenderProps['block']['props']) {
 }
 
 function MathDiffActionButtons({ onApply }: { onApply: (mode: MathAiDiffActionMode) => void }) {
+  const readOnly = useNoteEditorReadOnlyContext();
+  if (readOnly) {
+    return null;
+  }
   return (
     <span
       className={`${aiDiffStyles.aiActionsAnchor} ${styles.mathDiffActions}`}
@@ -182,6 +187,7 @@ function MathDiffActionButtons({ onApply }: { onApply: (mode: MathAiDiffActionMo
 }
 
 function MathBlockView(props: MathBlockRenderProps) {
+  const readOnly = useNoteEditorReadOnlyContext();
   const aiDiffDisplayMode = useAiDiffDisplayModeContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -228,6 +234,7 @@ function MathBlockView(props: MathBlockRenderProps) {
   useFocusPopoverTextarea(isEditing, popoverPos, inputRef);
 
   useEffectForce(() => {
+    if (readOnly) return;
     if (!props.block.props.autoEdit) return;
     openValueRef.current = props.block.props.expression;
     setValue(props.block.props.expression);
@@ -299,6 +306,7 @@ function MathBlockView(props: MathBlockRenderProps) {
   };
 
   const enterEdit = () => {
+    if (readOnly) return;
     openValueRef.current = props.block.props.expression;
     setValue(props.block.props.expression);
     setIsEditing(true);
@@ -333,7 +341,7 @@ function MathBlockView(props: MathBlockRenderProps) {
     replace: aiDiffReplace,
   });
   const hasPendingAiDiff = viewState.hasDiff;
-  const canEnterEdit = !hasPendingAiDiff && !isEditing;
+  const canEnterEdit = !readOnly && !hasPendingAiDiff && !isEditing;
   const rootClass = canEnterEdit
     ? styles.mathRoot
     : `${styles.mathRoot} ${styles.mathRootReadonly}`;

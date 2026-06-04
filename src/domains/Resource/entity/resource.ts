@@ -1,4 +1,5 @@
 import type { UserDisplayBase } from '@/domains/User';
+import type { ResourceAction } from '../enum';
 /**
  * Resource 领域模型
  * path 与 tags：path 为路径/文件夹归属；currentTags 与 docs/apis/resource.openapi.json ResourceItemResponse 字段一致
@@ -8,6 +9,7 @@ import type { UserDisplayBase } from '@/domains/User';
 export interface ResourceItem {
   resourceId: string;
   resourceName: string;
+  ownerId?: string;
   ownerInfo: UserDisplayBase;
   resourceType?: string;
   preview?: string;
@@ -22,6 +24,13 @@ export interface ResourceItem {
   mainTagId?: string;
   /** 链接挂载标签（currentTags 去掉 mainTagId 后的其余项） */
   linkTagIds?: string[];
+  /** 当前用户对该资源已生效的权限动作（详情接口返回） */
+  currentActions?: ResourceAction[] | null;
+  // ---- 权限配置字段 ----
+  /** 资源级覆盖权限，仅 owner 查询资源详情时返回 */
+  overrideGrantedActions?: ResourceAction[] | null;
+  /** 指定用户资源权限，key 为 userId，仅 owner 查询资源详情时返回 */
+  specifiedUsersGrantedActions?: Record<string, ResourceAction[]> | null;
   // ---- 互动字段 ----
   /** 资源总点赞数，后端不为 null */
   likeCount?: number | null;

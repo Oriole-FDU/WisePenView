@@ -21,7 +21,7 @@ type CachedUserSafe = Pick<User, 'id' | 'username' | 'nickname' | 'avatar' | 'id
 const mapUserSafeFromApi = (data: GetUserInfoApiResponse): CachedUserSafe => {
   const { userInfo } = data;
   return {
-    id: normalizeId(userInfo.id),
+    id: normalizeId(data.userId),
     username: userInfo.username,
     nickname: userInfo.nickname ?? undefined,
     avatar: userInfo.avatar ?? undefined,

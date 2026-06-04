@@ -27,6 +27,7 @@ const getNoteInfoDisplay = async (_params: GetNoteInfoRequest): Promise<NoteInfo
     authors: [],
     lastEditedAtText: '暂无',
     readCount: 12,
+    canCollaborativeEdit: true,
   };
 };
 
@@ -35,4 +36,9 @@ export const NoteServicesMock: INoteService = {
   createNote,
   deleteNote,
   getNoteInfoDisplay,
+  getNotePermissionConfig: async () => ({
+    resourceId: '123',
+    overrideGrantedActions: null,
+    specifiedUsersGrantedActions: null,
+  }),
 };

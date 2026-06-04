@@ -8,17 +8,25 @@ import {
   useNewNoteStore,
   useNoteSelectionStore,
 } from '@/store';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import {
+  createClientError,
+  FRONTEND_CLIENT_ERROR,
+  parseErrorMessage,
+  WisePenError,
+} from '@/utils/error';
+import { createExtension } from '@blocknote/core';
 import { zh } from '@blocknote/core/locales';
 import { BlockNoteView } from '@blocknote/mantine';
 import '@blocknote/mantine/style.css';
 import { useCreateBlockNote } from '@blocknote/react';
 import { toast } from '@heroui/react';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import { useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
 import NoteSlashMenu from '../NoteSlashMenu';
 import NoteToolbar from '../NoteToolbar';
 import { blockNoteSchema } from './blockNoteSchema';
+import { mergeReadOnlyEditorProps, NoteEditorReadOnlyProvider } from './editorReadOnly';
 import { useAttachNoteYjsUndoStack, useNoteCaptureKeyEvent, useNoteYjsUndoManager } from './hooks';
 import type { CustomBlockNoteProps, NoteBodyEditorHandle } from './index.type';
 import {
@@ -59,6 +67,7 @@ function CustomBlockNote({
   provider,
   aiDiffDisplayMode,
   readOnly = false,
+  blockLocalDocWrites = false,
   onOutlineChange,
   onActiveHeadingChange,
   ref,
@@ -76,10 +85,29 @@ function CustomBlockNote({
   const clearSelectedText = useNoteSelectionStore((state) => state.clearSelectedText);
   const newNoteBodyOnChangeCleanupRef = useRef<(() => void) | null>(null);
   const flatBlocksRef = useRef<{ id: string; type: string }[]>([]);
-  const uploadContextRef = useRef({ imageService, resourceId });
-  uploadContextRef.current = { imageService, resourceId };
+  const [pmWriteGuardReady, setPmWriteGuardReady] = useState(false);
+  const effectiveBlockLocalDocWrites = blockLocalDocWrites && pmWriteGuardReady;
+  const blockLocalDocWritesPropRef = useRef(blockLocalDocWrites);
+  blockLocalDocWritesPropRef.current = blockLocalDocWrites;
+  const blockLocalDocWritesRef = useRef(effectiveBlockLocalDocWrites);
+  blockLocalDocWritesRef.current = effectiveBlockLocalDocWrites;
+  const uploadContextRef = useRef({ imageService, resourceId, readOnly });
+  uploadContextRef.current = { imageService, resourceId, readOnly };
   const uploadFile = useRef(async (file: File) => {
-    const { imageService: imageSvc, resourceId: noteResourceId } = uploadContextRef.current;
+    const {
+      imageService: imageSvc,
+      resourceId: noteResourceId,
+      readOnly: isReadOnly,
+    } = uploadContextRef.current;
+    if (isReadOnly) {
+      const err = new WisePenError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        message: '当前笔记为只读，无法上传图片',
+      });
+      toast.danger(parseErrorMessage(err));
+      throw err;
+    }
     if (!file.type.startsWith('image/')) {
       throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
     }
@@ -102,8 +130,39 @@ function CustomBlockNote({
   const { noteFragment, undoManager } = useNoteYjsUndoManager(doc);
 
   const plugins = useMemo(() => getNoteEditorPlugins(), []);
-  const editorExtensions = useMemo(() => collectNoteEditorExtensions(plugins), [plugins]);
-  const editorProps = useMemo(() => collectNoteEditorProps(plugins), [plugins]);
+  const editorExtensions = useMemo(
+    () => [
+      ...collectNoteEditorExtensions(plugins),
+      createExtension({
+        key: 'noteReadOnlyFilter',
+        prosemirrorPlugins: [
+          new Plugin({
+            key: new PluginKey('noteReadOnlyFilter'),
+            filterTransaction(tr) {
+              if (!blockLocalDocWritesRef.current) {
+                return true;
+              }
+              if (!tr.docChanged) {
+                return true;
+              }
+              if (tr.getMeta('y-sync$') !== undefined) {
+                return true;
+              }
+              if (tr.getMeta('addToHistory') === false) {
+                return true;
+              }
+              return false;
+            },
+          }),
+        ],
+      }),
+    ],
+    [plugins]
+  );
+  const editorProps = useMemo(
+    () => mergeReadOnlyEditorProps(collectNoteEditorProps(plugins), effectiveBlockLocalDocWrites),
+    [plugins, effectiveBlockLocalDocWrites]
+  );
 
   const editor = useCreateBlockNote({
     schema: blockNoteSchema,
@@ -143,12 +202,31 @@ function CustomBlockNote({
 
   useAttachNoteYjsUndoStack(doc, editor, undoManager);
 
+  useUpdateEffect(() => {
+    try {
+      editor.prosemirrorView.setProps(editorProps);
+    } catch {
+      void 0;
+    }
+  }, [editorProps, editor]);
+
   useMount(() => {
     setSelectedText(resourceId, editor.getSelectedText());
   });
 
   useMount(() => {
+    let writeGuardActivated = false;
+    const activateWriteGuard = () => {
+      if (writeGuardActivated || !blockLocalDocWritesPropRef.current) {
+        return;
+      }
+      writeGuardActivated = true;
+      setPmWriteGuardReady(true);
+    };
+
     newNoteBodyOnChangeCleanupRef.current = editor.onChange(() => {
+      activateWriteGuard();
+
       const isNoteEmpty = composeNoteBlocksToMarkdownLossy(editor, plugins).trim().length === 0;
       useNewNoteStore.getState().syncNewNoteBodyFromEditor(resourceId, isNoteEmpty);
 
@@ -165,7 +243,17 @@ function CustomBlockNote({
         }
       }
     });
+
+    if (blockLocalDocWritesPropRef.current) {
+      window.requestAnimationFrame(activateWriteGuard);
+    }
   });
+
+  useUpdateEffect(() => {
+    if (!blockLocalDocWrites) {
+      setPmWriteGuardReady(false);
+    }
+  }, [blockLocalDocWrites]);
 
   useUnmount(() => {
     if (newNoteBodyOnChangeCleanupRef.current) {
@@ -305,19 +393,21 @@ function CustomBlockNote({
 
   return (
     <div className={styles.editorShell} onKeyDownCapture={onKeyDownCapture}>
-      <AiDiffDisplayModeProvider value={effectiveAiDiffDisplayMode}>
-        <BlockNoteView
-          editor={editor}
-          theme="light"
-          formattingToolbar={false}
-          slashMenu={false}
-          editable={!readOnly}
-          onSelectionChange={handleSelectionChange}
-        >
-          <NoteToolbar onAskAi={handleAskAi} />
-          <NoteSlashMenu editor={editor} plugins={plugins} />
-        </BlockNoteView>
-      </AiDiffDisplayModeProvider>
+      <NoteEditorReadOnlyProvider value={readOnly}>
+        <AiDiffDisplayModeProvider value={effectiveAiDiffDisplayMode}>
+          <BlockNoteView
+            editor={editor}
+            theme="light"
+            formattingToolbar={false}
+            slashMenu={false}
+            editable={!readOnly}
+            onSelectionChange={handleSelectionChange}
+          >
+            <NoteToolbar onAskAi={handleAskAi} />
+            <NoteSlashMenu editor={editor} plugins={plugins} />
+          </BlockNoteView>
+        </AiDiffDisplayModeProvider>
+      </NoteEditorReadOnlyProvider>
     </div>
   );
 }

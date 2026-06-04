@@ -9,6 +9,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import { useEffectForce } from '@/hooks/useEffectForce';
 import 'katex/dist/katex.min.css';
+import { useNoteEditorReadOnlyContext } from '../../../editorReadOnly';
 import { renderKatexInto } from '../katexRender';
 import { LatexEditPopover } from '../LatexEditPopover';
 import {
@@ -84,6 +85,7 @@ function InlineMathView(
   props: ReactCustomInlineContentRenderProps<typeof inlineMathConfig, DefaultStyleSchema>
 ) {
   const { contentRef, updateInlineContent, inlineContent, editor } = props;
+  const readOnly = useNoteEditorReadOnlyContext();
   const expression = inlineContent.props.expression as string;
   const autoOpenEdit = inlineContent.props.autoOpenEdit as boolean;
 
@@ -136,6 +138,7 @@ function InlineMathView(
   }, [displayLatex]);
 
   useEffectForce(() => {
+    if (readOnly) return;
     if (!autoOpenEdit) return;
     const openExpr = inlineContent.props.expression as string;
     updateInlineContent({
@@ -188,9 +191,12 @@ function InlineMathView(
   };
 
   const enterEdit = () => {
+    if (readOnly) return;
     setValue(expression);
     setIsEditing(true);
   };
+
+  const canEnterEdit = !readOnly && !isEditing;
 
   const setShellRef = useCallback(
     (el: HTMLSpanElement | null) => {
@@ -226,14 +232,15 @@ function InlineMathView(
     >
       <span
         className={popoverStyles.mathRootInline}
-        role="button"
-        tabIndex={isEditing ? -1 : 0}
-        aria-label={isEditing ? undefined : '编辑行内公式'}
+        role={canEnterEdit ? 'button' : undefined}
+        tabIndex={canEnterEdit ? 0 : -1}
+        aria-readonly={readOnly || undefined}
+        aria-label={canEnterEdit ? '编辑行内公式' : undefined}
         onClick={() => {
-          if (!isEditing) enterEdit();
+          if (canEnterEdit) enterEdit();
         }}
         onKeyDown={(e) => {
-          if (isEditing) return;
+          if (!canEnterEdit) return;
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             e.stopPropagation();

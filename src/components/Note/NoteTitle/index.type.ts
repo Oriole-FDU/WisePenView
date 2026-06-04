@@ -14,4 +14,6 @@ export interface NoteTitleProps {
   onEnterKey?: () => void;
   /** 挂载后聚焦标题编辑器 */
   focusOnMount?: boolean;
+  /** 无协同编辑权限时为只读，不触发标题同步 */
+  readOnly?: boolean;
 }

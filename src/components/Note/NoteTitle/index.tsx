@@ -66,6 +66,7 @@ function NoteTitle({
   initialContent,
   onEnterKey,
   focusOnMount,
+  readOnly = false,
   ref,
 }: NoteTitleProps & { ref?: Ref<NoteTitleHandle> }) {
   const noteService = useNoteService();
@@ -74,10 +75,12 @@ function NoteTitle({
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onChangeCleanupRef = useRef<(() => void) | null>(null);
   const beforeChangeCleanupRef = useRef<(() => void) | null>(null);
+  const readOnlyRef = useRef(readOnly);
 
   useUpdateEffect(() => {
     latestIdRef.current = id;
-  }, [id]);
+    readOnlyRef.current = readOnly;
+  }, [id, readOnly]);
 
   /** 标题初始值由上层传入（未就绪时回退为空 H1） */
   const initialTitleBlocks = useMemo(
@@ -119,31 +122,44 @@ function NoteTitle({
     }, 0);
   });
 
-  /** 标题稳定后调用 NoteService.syncTitle（与 Pipeline 防抖一致） */
-  const triggerTitleDebounceTimer = () => {
-    const currentId = latestIdRef.current;
-    if (!currentId) return;
-    if (titleDebounceTimerRef.current) {
-      clearTimeout(titleDebounceTimerRef.current);
-      titleDebounceTimerRef.current = null;
+  const detachTitleHandlers = () => {
+    if (onChangeCleanupRef.current) {
+      onChangeCleanupRef.current();
+      onChangeCleanupRef.current = null;
     }
-    titleDebounceTimerRef.current = setTimeout(() => {
-      titleDebounceTimerRef.current = null;
-      const firstBlock = editor.document[0];
-      const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
-      const trimmed = raw.trim();
-      const nextTitle = trimmed || '未命名笔记';
-      void noteService.syncTitle({ resourceId: currentId, newName: nextTitle }).catch((error) => {
-        toast.danger(parseErrorMessage(error));
-      });
-    }, TITLE_DEBOUNCE_MS);
+    if (beforeChangeCleanupRef.current) {
+      beforeChangeCleanupRef.current();
+      beforeChangeCleanupRef.current = null;
+    }
   };
 
-  useMount(() => {
+  const attachTitleHandlers = () => {
+    detachTitleHandlers();
+
     onChangeCleanupRef.current = editor.onChange(() => {
       const firstBlock = editor.document[0];
       if (!firstBlock) return;
-      triggerTitleDebounceTimer();
+
+      if (!readOnlyRef.current) {
+        const currentId = latestIdRef.current;
+        if (currentId) {
+          if (titleDebounceTimerRef.current) {
+            clearTimeout(titleDebounceTimerRef.current);
+            titleDebounceTimerRef.current = null;
+          }
+          titleDebounceTimerRef.current = setTimeout(() => {
+            titleDebounceTimerRef.current = null;
+            const block = editor.document[0];
+            const raw = getBlockPlainText(block as { content?: unknown[] } | undefined);
+            const nextTitle = raw.trim() || '未命名笔记';
+            void noteService
+              .syncTitle({ resourceId: currentId, newName: nextTitle })
+              .catch((error) => {
+                toast.danger(parseErrorMessage(error));
+              });
+          }, TITLE_DEBOUNCE_MS);
+        }
+      }
 
       const currentId = latestIdRef.current;
       if (currentId != null && currentId !== '') {
@@ -152,10 +168,7 @@ function NoteTitle({
         useNewNoteStore.getState().syncNewNoteTitleFromEditor(currentId, isTitleEmpty);
       }
     });
-  });
 
-  // 防止标题被删除或修改
-  useMount(() => {
     beforeChangeCleanupRef.current = editor.onBeforeChange(({ getChanges }) => {
       const firstBlock = editor.document[0];
       if (!firstBlock) return true;
@@ -177,17 +190,25 @@ function NoteTitle({
       }
       return true;
     });
+  };
+
+  useMount(() => {
+    if (!readOnly) {
+      attachTitleHandlers();
+    }
+    return detachTitleHandlers;
   });
 
+  useUpdateEffect(() => {
+    detachTitleHandlers();
+    if (!readOnly) {
+      attachTitleHandlers();
+    }
+    return detachTitleHandlers;
+  }, [readOnly, editor]);
+
   useUnmount(() => {
-    if (onChangeCleanupRef.current) {
-      onChangeCleanupRef.current();
-      onChangeCleanupRef.current = null;
-    }
-    if (beforeChangeCleanupRef.current) {
-      beforeChangeCleanupRef.current();
-      beforeChangeCleanupRef.current = null;
-    }
+    detachTitleHandlers();
     if (focusTimerRef.current) {
       clearTimeout(focusTimerRef.current);
       focusTimerRef.current = null;
@@ -251,6 +272,7 @@ function NoteTitle({
         filePanel={false}
         tableHandles={false}
         emojiPicker={false}
+        editable={!readOnly}
       />
     </div>
   );

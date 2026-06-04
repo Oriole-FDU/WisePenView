@@ -60,9 +60,8 @@ export interface UpdateUserInfoRequest {
   academicTitle?: string;
 }
 
-/** 获取用户信息接口响应 data 中的 userInfo；id 用 string 避免大数精度丢失 */
+/** 获取用户信息接口响应 data 中的 userInfo */
 export interface GetUserInfoResponseUserInfo {
-  id?: string;
   nickname: string | null;
   realName: string | null;
   avatar: string | null;
@@ -87,8 +86,9 @@ export interface GetUserInfoResponseUserProfile {
   academicTitle: string | null;
 }
 
-/** 获取用户信息接口的响应 data 类型 */
+/** 获取用户信息接口的响应 data 类型；userId 归一化后映射为前端 User.id */
 export interface GetUserInfoResponse {
+  userId?: string | number;
   userInfo: GetUserInfoResponseUserInfo;
   userProfile: GetUserInfoResponseUserProfile;
   readonlyFields: string[] | null;

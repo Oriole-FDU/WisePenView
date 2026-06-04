@@ -1,3 +1,4 @@
+import { useNoteEditorReadOnlyContext } from '@/components/Note/CustomBlockNote/editorReadOnly';
 import { filterSuggestionItems } from '@blocknote/core/extensions';
 import { SuggestionMenuController } from '@blocknote/react';
 import {
@@ -22,6 +23,11 @@ const NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET = new Set<string>(
 );
 
 const NoteSlashMenu = ({ editor, plugins }: NoteSlashMenuProps) => {
+  const readOnly = useNoteEditorReadOnlyContext();
+  if (readOnly) {
+    return null;
+  }
+
   const getItems = async (query: string) => {
     const items = [
       ...getFilteredDefaultReactSlashMenuItems(

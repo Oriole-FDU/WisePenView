@@ -17,7 +17,13 @@ export interface CustomBlockNoteProps {
   doc: Doc;
   provider: WisepenProvider;
   aiDiffDisplayMode: AiDiffDisplayMode;
+  /** UI/editable：连接中或无 EDIT 时为 true */
   readOnly?: boolean;
+  /**
+   * PM 层拦截本地改 doc：仅「已连接且无协同编辑权」时为 true。
+   * 连接中须为 false，否则 filter 会拦 BlockNote 初始化（Block doesn't have id）。
+   */
+  blockLocalDocWrites?: boolean;
   onOutlineChange?: (items: NoteOutlineItem[]) => void;
   onActiveHeadingChange?: (activeId: string | undefined) => void;
 }

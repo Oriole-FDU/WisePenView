@@ -12,7 +12,6 @@ import type {
   UpdateUserInfoRequest,
 } from './index.type';
 
-/** 仅缓存展示用字段和 id，不含 realName、campusNo 等敏感信息；id 归一化为 string 避免大数精度丢失 */
 type CachedUserSafe = Pick<User, 'id' | 'username' | 'nickname' | 'avatar' | 'identityType'>;
 
 /** 全量拉取，为 Account 等页服务，不缓存 */

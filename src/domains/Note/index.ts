@@ -6,9 +6,11 @@ export type {
   CreateNoteResponse,
   DeleteNoteRequest,
   GetNoteInfoRequest,
+  GetNotePermissionConfigRequest,
   INoteService,
   NoteInfoDisplayAuthor,
   NoteInfoDisplayData,
+  NotePermissionConfig,
   SyncTitleRequest,
 } from './service/index.type';
 export { NoteStatusObserver } from './session/NoteStatusObserver';

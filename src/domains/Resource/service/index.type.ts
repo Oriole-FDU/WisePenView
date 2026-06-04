@@ -4,6 +4,7 @@
  */
 
 import type {
+  ResourceAction,
   ResourceItem,
   ResourceSortBy,
   ResourceSortDir,
@@ -25,6 +26,7 @@ export interface IResourceService {
   getGroupResources(params: GetGroupResourceRequest): Promise<ResourceListPage>;
   renameResource(params: RenameResourceRequest): Promise<void>;
   updateResourceTags(params: UpdateResourceTagsRequest): Promise<void>;
+  updateResourceActionPermission(params: UpdateResourceActionPermissionRequest): Promise<void>;
   /** 点赞 / 取消点赞，返回操作后最新状态 */
   interactToggleLike(params: InteractToggleLikeRequest): Promise<InteractToggleLikeResult>;
   /** 评分（1–5），支持覆盖，返回最新 userScore */
@@ -42,6 +44,13 @@ export interface UpdateResourceTagsRequest {
   resourceId: string;
   tagIds: string[];
   groupId?: string;
+}
+
+/** 更新单个资源的动作权限配置 */
+export interface UpdateResourceActionPermissionRequest {
+  resourceId: string;
+  overrideGrantedActions?: ResourceAction[] | null;
+  specifiedUsersGrantedActions?: Record<string, ResourceAction[]> | null;
 }
 
 /**

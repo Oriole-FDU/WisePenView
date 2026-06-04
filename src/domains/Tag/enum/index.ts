@@ -1,3 +1,13 @@
+import {
+  actionsToPermissionCode,
+  getResourceActionImpliedActions,
+  getResourceActionImpliedMask,
+  hasResourceAction,
+  normalizeResourceActions,
+  permissionCodeToActions,
+  RESOURCE_ACTION,
+  type ResourceAction,
+} from '@/domains/Resource';
 import type { EnumKey, EnumValue } from '@/utils/enum';
 import { createEnum } from '@/utils/enum';
 
@@ -25,60 +35,18 @@ export const ACCESS_CONTROL_SCOPE = createEnum([
 export type AccessControlScope = EnumValue<typeof ACCESS_CONTROL_SCOPE>;
 export type AccessControlScopeKey = EnumKey<typeof ACCESS_CONTROL_SCOPE>;
 
-/** 资源访问权限（与 OpenAPI ResourceAction 对齐） */
-export const TAG_RESOURCE_ACTION = createEnum([
-  { value: 1, key: 'DISCOVER', label: '查看资源列表' },
-  { value: 2, key: 'VIEW', label: '阅读' },
-  { value: 4, key: 'EDIT', label: '编辑' },
-  { value: 8, key: 'DOWNLOAD_WATERMARK', label: '带水印下载' },
-  { value: 16, key: 'DOWNLOAD_ORIGINAL', label: '下载源文件' },
-] as const);
+/** 资源访问权限（兼容旧 Tag 导出名，根定义位于 Resource domain） */
+export const TAG_RESOURCE_ACTION = RESOURCE_ACTION;
 
-export type TagResourceAction = EnumValue<typeof TAG_RESOURCE_ACTION>;
-export type TagResourceActionKey = EnumKey<typeof TAG_RESOURCE_ACTION>;
+export type TagResourceAction = ResourceAction;
 
-const RESOURCE_ACTION_IMPLIED_MASK: Record<TagResourceAction, number> = {
-  [TAG_RESOURCE_ACTION.DISCOVER]: TAG_RESOURCE_ACTION.DISCOVER,
-  [TAG_RESOURCE_ACTION.VIEW]: TAG_RESOURCE_ACTION.VIEW | TAG_RESOURCE_ACTION.DISCOVER,
-  [TAG_RESOURCE_ACTION.EDIT]:
-    TAG_RESOURCE_ACTION.EDIT | TAG_RESOURCE_ACTION.VIEW | TAG_RESOURCE_ACTION.DISCOVER,
-  [TAG_RESOURCE_ACTION.DOWNLOAD_WATERMARK]:
-    TAG_RESOURCE_ACTION.DOWNLOAD_WATERMARK |
-    TAG_RESOURCE_ACTION.VIEW |
-    TAG_RESOURCE_ACTION.DISCOVER,
-  [TAG_RESOURCE_ACTION.DOWNLOAD_ORIGINAL]:
-    TAG_RESOURCE_ACTION.DOWNLOAD_ORIGINAL |
-    TAG_RESOURCE_ACTION.DOWNLOAD_WATERMARK |
-    TAG_RESOURCE_ACTION.VIEW |
-    TAG_RESOURCE_ACTION.DISCOVER,
-};
-
-const RESOURCE_ACTION_ORDER = TAG_RESOURCE_ACTION.options.map(
-  (item) => item.value as TagResourceAction
-);
-
-export const getResourceActionImpliedMask = (action: TagResourceAction): number =>
-  RESOURCE_ACTION_IMPLIED_MASK[action] ?? action;
-
-export const permissionCodeToActions = (permissionCode: number): TagResourceAction[] =>
-  TAG_RESOURCE_ACTION.options
-    .map((item) => item.value as TagResourceAction)
-    .filter((action) => (permissionCode & action) !== 0);
-
-export const actionsToPermissionCode = (actions?: TagResourceAction[]): number => {
-  if (!actions || actions.length === 0) return 0;
-  return actions.map((action) => getResourceActionImpliedMask(action)).reduce((a, b) => a | b, 0);
-};
-
-export const hasResourceAction = (permissionCode: number, action: TagResourceAction): boolean =>
-  (permissionCode & action) !== 0;
-
-export const getResourceActionImpliedActions = (action: TagResourceAction): TagResourceAction[] =>
-  permissionCodeToActions(getResourceActionImpliedMask(action)).filter((item) => item !== action);
-
-export const normalizeResourceActions = (actions?: TagResourceAction[]): TagResourceAction[] => {
-  const normalized = permissionCodeToActions(actionsToPermissionCode(actions));
-  return RESOURCE_ACTION_ORDER.filter((value) => normalized.includes(value));
+export {
+  actionsToPermissionCode,
+  getResourceActionImpliedActions,
+  getResourceActionImpliedMask,
+  hasResourceAction,
+  normalizeResourceActions,
+  permissionCodeToActions,
 };
 
 export const resourceActionsToApiKeys = (

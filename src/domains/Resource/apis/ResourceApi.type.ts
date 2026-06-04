@@ -1,4 +1,4 @@
-import type { ResourceItem } from '@/domains/Resource';
+import type { ResourceActionKey, ResourceItem } from '@/domains/Resource';
 import type { AccessControlScope, TagResourceActionKey } from '@/domains/Tag';
 
 export interface ResourceListPageApiResponse {
@@ -29,6 +29,12 @@ export interface ChangeResourceTagsApiRequest {
   resourceId: string;
   tagIds: string[];
   groupId?: string;
+}
+
+export interface ChangeResourceActionPermissionApiRequest {
+  resourceId: string;
+  overrideGrantedActions?: ResourceActionKey[] | null;
+  specifiedUsersGrantedActions?: Record<string, ResourceActionKey[]> | null;
 }
 
 export interface RemoveResourcesApiRequest {

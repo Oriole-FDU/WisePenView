@@ -4,6 +4,7 @@
  */
 
 import type { Block } from '@/domains/Note';
+import type { ResourceAction } from '@/domains/Resource';
 
 /** NoteService 接口：供依赖注入使用 */
 /** web-socket服务放在了yjs目录下 */
@@ -15,6 +16,8 @@ export interface INoteService {
   deleteNote(params: DeleteNoteRequest): Promise<void>;
   /** 获取可直接渲染的 Note 信息（作者展示 + 编辑时间文案） */
   getNoteInfoDisplay(params: GetNoteInfoRequest): Promise<NoteInfoDisplayData>;
+  /** 获取 Note 权限配置所需的最小数据 */
+  getNotePermissionConfig(params: GetNotePermissionConfigRequest): Promise<NotePermissionConfig>;
 }
 
 export interface NoteInfoDisplayAuthor {
@@ -24,6 +27,7 @@ export interface NoteInfoDisplayAuthor {
 
 export interface NoteInfoDisplayData {
   noteTitle: string;
+  ownerId?: string;
   authors: NoteInfoDisplayAuthor[];
   lastEditedAtText: string;
   /** 有效阅读量，null 表示暂无数据 */
@@ -36,6 +40,14 @@ export interface NoteInfoDisplayData {
   liked?: boolean;
   /** 当前用户评分（1-5），null = 未评分 */
   userScore?: number | null;
+  /** 当前用户是否具备协同编辑（EDIT）权限 */
+  canCollaborativeEdit: boolean;
+}
+
+export interface NotePermissionConfig {
+  resourceId: string;
+  overrideGrantedActions?: ResourceAction[] | null;
+  specifiedUsersGrantedActions?: Record<string, ResourceAction[]> | null;
 }
 
 /** 与 docs/apis/note-api.md「新建文档接口」请求体一致 */
@@ -61,5 +73,9 @@ export interface SyncTitleRequest {
 }
 
 export interface GetNoteInfoRequest {
+  resourceId: string;
+}
+
+export interface GetNotePermissionConfigRequest {
   resourceId: string;
 }

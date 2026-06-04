@@ -2,15 +2,17 @@ import type { ResourceItem } from '@/domains/Resource';
 import { normalizeResourceItem } from '@/utils/normalize/normalizeResourceItem';
 import type { RateApiResponse, ToggleLikeApiResponse } from '../apis/InteractApi.type';
 import type {
+  ChangeResourceActionPermissionApiRequest,
   ListResourceItemsApiRequest,
   ResourceListPageApiResponse,
 } from '../apis/ResourceApi.type';
-import { TAG_QUERY_LOGIC_MODE } from '../enum';
+import { resourceActionsToApiKeys, TAG_QUERY_LOGIC_MODE } from '../enum';
 import type {
   GetUserResourcesRequest,
   InteractRateResult,
   InteractToggleLikeResult,
   ResourceListPage,
+  UpdateResourceActionPermissionRequest,
 } from '../service/index.type';
 
 /** Service 入参 → GET /resource/item/listResources query */
@@ -75,9 +77,32 @@ const mapInteractRateFromApi = (data: RateApiResponse): InteractRateResult => ({
   userScore: data.userScore,
 });
 
+const mapChangeResourceActionPermissionRequest = (
+  params: UpdateResourceActionPermissionRequest
+): ChangeResourceActionPermissionApiRequest => {
+  const specifiedUsersGrantedActions =
+    params.specifiedUsersGrantedActions === null
+      ? null
+      : params.specifiedUsersGrantedActions
+        ? Object.fromEntries(
+            Object.entries(params.specifiedUsersGrantedActions).map(([userId, actions]) => [
+              userId,
+              resourceActionsToApiKeys(actions) ?? [],
+            ])
+          )
+        : undefined;
+
+  return {
+    resourceId: params.resourceId,
+    overrideGrantedActions: resourceActionsToApiKeys(params.overrideGrantedActions),
+    specifiedUsersGrantedActions,
+  };
+};
+
 export const ResourceServicesMap = {
   mapListResourceItemsRequest,
   mapResourceListPageFromApi,
   mapInteractToggleLikeFromApi,
   mapInteractRateFromApi,
+  mapChangeResourceActionPermissionRequest,
 };
