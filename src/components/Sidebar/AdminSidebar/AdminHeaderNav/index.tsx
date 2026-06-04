@@ -2,16 +2,16 @@ import { ADMIN_PAGE_CONFIGS } from '@/views/admin/pages';
 import { ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
 import clsx from 'clsx';
 import {
-  RiFileList3Line,
-  RiGroupLine,
-  RiLockPasswordLine,
-  RiMegaphoneLine,
-  RiSettings3Line,
-  RiShieldKeyholeLine,
-  RiStackLine,
-  RiTaskLine,
-  RiUserSettingsLine,
-} from 'react-icons/ri';
+  Layers,
+  List,
+  ListTodo,
+  LockKeyhole,
+  Megaphone,
+  Settings,
+  Shield,
+  UserCog,
+  Users,
+} from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '../../AppSidebar/AppHeaderNav/style.module.less';
 import type { AdminHeaderNavProps } from './index.type';
@@ -40,7 +40,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(users.path)}
         >
           <span className={styles.menuIcon}>
-            <RiUserSettingsLine size={18} />
+            <UserCog size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{users.title}</span>}
         </ListBoxItem>
@@ -51,7 +51,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(resources.path)}
         >
           <span className={styles.menuIcon}>
-            <RiFileList3Line size={18} />
+            <List size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{resources.title}</span>}
         </ListBoxItem>
@@ -62,7 +62,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(groups.path)}
         >
           <span className={styles.menuIcon}>
-            <RiGroupLine size={18} />
+            <Users size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{groups.title}</span>}
         </ListBoxItem>
@@ -73,7 +73,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(announcements.path)}
         >
           <span className={styles.menuIcon}>
-            <RiMegaphoneLine size={18} />
+            <Megaphone size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{announcements.title}</span>}
         </ListBoxItem>
@@ -84,7 +84,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(statistics.path)}
         >
           <span className={styles.menuIcon}>
-            <RiStackLine size={18} />
+            <Layers size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{statistics.title}</span>}
         </ListBoxItem>
@@ -97,7 +97,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(permissions.path)}
         >
           <span className={styles.menuIcon}>
-            <RiShieldKeyholeLine size={18} />
+            <Shield size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{permissions.title}</span>}
         </ListBoxItem>
@@ -108,7 +108,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(settings.path)}
         >
           <span className={styles.menuIcon}>
-            <RiSettings3Line size={18} />
+            <Settings size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{settings.title}</span>}
         </ListBoxItem>
@@ -119,7 +119,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(logs.path)}
         >
           <span className={styles.menuIcon}>
-            <RiLockPasswordLine size={18} />
+            <LockKeyhole size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{logs.title}</span>}
         </ListBoxItem>
@@ -130,7 +130,7 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
           onPress={() => navigate(tasks.path)}
         >
           <span className={styles.menuIcon}>
-            <RiTaskLine size={18} />
+            <ListTodo size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{tasks.title}</span>}
         </ListBoxItem>

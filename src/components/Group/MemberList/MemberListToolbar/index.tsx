@@ -1,8 +1,7 @@
 import IconText from '@/components/Common/IconText';
 import { Button } from '@heroui/react';
+import { CircleDollarSign, Trash2, User } from 'lucide-react';
 
-import { AiOutlineDelete } from 'react-icons/ai';
-import { RiMoneyDollarCircleLine, RiUserLine } from 'react-icons/ri';
 import type { MemberListToolbarProps } from './index.type';
 import styles from './style.module.less';
 
@@ -24,21 +23,21 @@ function MemberListToolbar({
           <div className={styles.toolbarEditContentLeft}>
             {groupDisplayConfig.canModifyPermission && (
               <Button onPress={onModifyPermission} isDisabled={selectedCount === 0}>
-                <IconText icon={<RiUserLine />} iconSize={16}>
+                <IconText icon={<User />} iconSize={16}>
                   修改权限
                 </IconText>
               </Button>
             )}
             {groupDisplayConfig.canAssignQuota && (
               <Button onPress={onAssignQuota} isDisabled={selectedCount === 0}>
-                <IconText icon={<RiMoneyDollarCircleLine />} iconSize={16}>
+                <IconText icon={<CircleDollarSign />} iconSize={16}>
                   分配配额
                 </IconText>
               </Button>
             )}
             {groupDisplayConfig.canRemoveMember && (
               <Button variant="danger" onPress={onDelete} isDisabled={selectedCount === 0}>
-                <IconText icon={<AiOutlineDelete />} iconSize={16}>
+                <IconText icon={<Trash2 />} iconSize={16}>
                   删除成员
                 </IconText>
               </Button>

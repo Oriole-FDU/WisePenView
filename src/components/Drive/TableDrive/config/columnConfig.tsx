@@ -3,8 +3,8 @@ import IconText from '@/components/Common/IconText';
 import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { EllipsisVertical, FolderInput, Pencil, Shield, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { LuEllipsisVertical, LuFolderInput, LuPencil, LuShield, LuTrash2 } from 'react-icons/lu';
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { isDriveActionTarget } from '../../common/driveComponentModel';
 import type { DriveRow, DriveRowPredicate, TableDriveActionConfig } from '../index.type';
@@ -166,7 +166,7 @@ export function getTableDriveColumns(
               aria-label="更多操作"
               onClick={(e) => e.stopPropagation()}
             >
-              <LuEllipsisVertical size={18} />
+              <EllipsisVertical size={18} />
             </button>
           </Dropdown>
         );
@@ -201,7 +201,7 @@ function buildMenuItems(
     menuItems.push({
       key: 'rename',
       label: '重命名',
-      icon: <LuPencil size={14} />,
+      icon: <Pencil size={14} />,
       action: 'rename',
     });
   }
@@ -209,7 +209,7 @@ function buildMenuItems(
     menuItems.push({
       key: 'move',
       label: '移动到文件夹',
-      icon: <LuFolderInput size={14} />,
+      icon: <FolderInput size={14} />,
       action: 'move',
     });
   }
@@ -217,7 +217,7 @@ function buildMenuItems(
     menuItems.push({
       key: 'permission',
       label: '标签权限管理',
-      icon: <LuShield size={14} />,
+      icon: <Shield size={14} />,
       action: 'permission',
     });
   }
@@ -225,7 +225,7 @@ function buildMenuItems(
     menuItems.push({
       key: 'delete',
       label: '删除',
-      icon: <LuTrash2 size={14} />,
+      icon: <Trash2 size={14} />,
       danger: true,
       action: 'delete',
     });

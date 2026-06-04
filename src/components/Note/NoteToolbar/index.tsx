@@ -12,8 +12,7 @@ import {
   UnnestBlockButton,
 } from '@blocknote/react';
 import { Button } from '@heroui/react';
-
-import { RiSparklingLine } from 'react-icons/ri';
+import { Sparkles } from 'lucide-react';
 
 import IconText from '@/components/Common/IconText';
 import type { NoteToolbarProps } from './index.type';
@@ -33,7 +32,7 @@ const NoteToolbar = ({ onAskAi }: NoteToolbarProps) => (
           }}
           onPress={onAskAi}
         >
-          <IconText icon={<RiSparklingLine />} iconSize={14}>
+          <IconText icon={<Sparkles />} iconSize={14}>
             问AI
           </IconText>
         </Button>

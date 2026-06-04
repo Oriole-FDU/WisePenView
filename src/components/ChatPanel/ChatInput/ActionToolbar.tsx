@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react';
-import { LuSend } from 'react-icons/lu';
+import { Send } from 'lucide-react';
 
 import type { Model } from '@/components/ChatPanel/index.type';
 import ModelSelector from '../ModelSelector';
@@ -30,7 +30,7 @@ function ActionToolbar({ modelValue, onModelChange, onSend, disabledSend }: Acti
           isDisabled={disabledSend}
           className={styles.sendBtn}
         >
-          <LuSend size={14} />
+          <Send size={14} />
         </Button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
+import { Sigma } from 'lucide-react';
 import { createElement } from 'react';
-import { RiFormula } from 'react-icons/ri';
 
 import type { PluginEditor } from '../types';
 
@@ -21,7 +21,7 @@ export function createMathSlashMenuItem(editor: PluginEditor): DefaultReactSugge
     group: '高级',
     aliases: ['math', 'katex', 'latex', 'block', '块', 'equation', '独立'],
     subtext: '插入独占一行的块级 KaTeX 公式',
-    icon: createElement(RiFormula, { size: 18 }),
+    icon: createElement(Sigma, { size: 18 }),
     onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, mathBlock),
   };
 }

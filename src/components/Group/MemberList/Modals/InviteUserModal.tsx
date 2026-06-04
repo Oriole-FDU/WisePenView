@@ -1,7 +1,7 @@
 import IconText from '@/components/Common/IconText';
 import { Button, Modal, toast } from '@heroui/react';
+import { Copy } from 'lucide-react';
 import { useState } from 'react';
-import { LuCopy } from 'react-icons/lu';
 import type { InviteUserModalProps } from './index.type';
 import styles from './style.module.less';
 
@@ -46,7 +46,7 @@ function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalPr
                 关闭
               </Button>
               <Button variant="primary" onPress={handleCopy} isDisabled={!inviteCode}>
-                <IconText icon={<LuCopy />} iconSize={16}>
+                <IconText icon={<Copy />} iconSize={16}>
                   {copied ? '已复制' : '复制'}
                 </IconText>
               </Button>

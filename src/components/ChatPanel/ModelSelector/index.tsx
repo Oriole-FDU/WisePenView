@@ -2,15 +2,8 @@ import { useRequest, useUpdateEffect } from 'ahooks';
 import type { MenuProps } from 'antd';
 import { Dropdown, Empty, Popover, Spin, Tag } from 'antd';
 import clsx from 'clsx';
+import { ArrowUpAZ, ChartBar, Check, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import {
-  RiAppsLine,
-  RiArrowDownSLine,
-  RiArrowUpSLine,
-  RiBarChartLine,
-  RiCheckLine,
-  RiSortAsc,
-} from 'react-icons/ri';
 
 import { Claude, DeepSeek, Doubao, Gemini, Grok, Meta, Mistral, OpenAI } from '@lobehub/icons';
 
@@ -47,9 +40,9 @@ export const LogoFactory = ({ provider, size = 20 }: { provider: string; size?: 
 };
 
 const SORT_OPTIONS = [
-  { label: '按费率', value: 'ratio', icon: RiBarChartLine },
-  { label: '按名字', value: 'name', icon: RiSortAsc },
-  { label: '深度思考模型', value: 'thinking', icon: RiAppsLine },
+  { label: '按费率', value: 'ratio', icon: ChartBar },
+  { label: '按名字', value: 'name', icon: ArrowUpAZ },
+  { label: '深度思考模型', value: 'thinking', icon: LayoutGrid },
 ];
 
 interface ModelSelectorProps {
@@ -146,7 +139,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
             aria-label={sortOrder === 'asc' ? '切换为降序' : '切换为升序'}
           >
             <IconText
-              icon={sortOrder === 'asc' ? <RiArrowUpSLine /> : <RiArrowDownSLine />}
+              icon={sortOrder === 'asc' ? <ChevronUp /> : <ChevronDown />}
               iconSize={14}
               gap={2}
             >
@@ -164,7 +157,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
             placement="bottomRight"
           >
             <div className={styles.sortTrigger}>
-              <IconText icon={<RiArrowDownSLine />} iconPosition="end" iconSize={10} gap={4}>
+              <IconText icon={<ChevronDown />} iconPosition="end" iconSize={10} gap={4}>
                 {SORT_OPTIONS.find((o) => o.value === currentSort)?.label}
               </IconText>
             </div>
@@ -209,7 +202,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
                 {/* {model.vision && (
                   <Tooltip title="支持视觉识别" classNames={{ container: styles.tooltipBody }}>
                     <div className={styles.visionWrapper}>
-                      <RiEyeLine />
+                      <Eye />
                     </div>
                   </Tooltip>
                 )} */}
@@ -225,9 +218,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
 
               <div className={styles.itemRight}>
                 {model.multiplier && <Tag className={styles.multiplierTag}>{model.multiplier}</Tag>}
-                {model.id === value && (
-                  <RiCheckLine style={{ color: 'var(--ant-color-primary)' }} />
-                )}
+                {model.id === value && <Check style={{ color: 'var(--ant-color-primary)' }} />}
               </div>
             </div>
           ))
@@ -262,7 +253,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
         >
           {loading ? '模型加载中' : (currentModel?.name ?? '请选择模型')}
         </IconText>
-        <IconText icon={<RiArrowDownSLine />} iconSize={10} aria-hidden />
+        <IconText icon={<ChevronDown />} iconSize={10} aria-hidden />
       </div>
     </Popover>
   );

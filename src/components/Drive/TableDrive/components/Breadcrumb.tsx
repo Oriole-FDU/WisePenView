@@ -2,8 +2,8 @@ import IconText from '@/components/Common/IconText';
 import type { DriveNode } from '@/domains/Drive';
 import type { BreadcrumbProps as AntBreadcrumbProps } from 'antd';
 import { Breadcrumb as AntBreadcrumb } from 'antd';
+import { House } from 'lucide-react';
 import { useMemo } from 'react';
-import { LuHouse } from 'react-icons/lu';
 import styles from './Breadcrumb.style.module.less';
 
 export interface BreadcrumbProps {
@@ -35,7 +35,7 @@ function Breadcrumb({ pathNodes, onJump }: BreadcrumbProps) {
       const label = getNodeDisplayName(node);
 
       const title = isRoot ? (
-        <IconText icon={<LuHouse />} iconSize={14} gap={4}>
+        <IconText icon={<House />} iconSize={14} gap={4}>
           {label}
         </IconText>
       ) : (

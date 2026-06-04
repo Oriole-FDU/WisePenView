@@ -6,8 +6,8 @@ import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Divider, Modal, Spin, Tag } from 'antd';
 import clsx from 'clsx';
+import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { LuPlus } from 'react-icons/lu';
 import styles from './index.module.less';
 import type { EditStickerModalProps } from './index.type';
 
@@ -125,7 +125,7 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
                   <span className={styles.allPickedHint}>所有标签均已选中</span>
                 )}
                 <Tag className={styles.addTag} onClick={() => setAddModalOpen(true)}>
-                  <LuPlus size={14} />
+                  <Plus size={14} />
                 </Tag>
               </div>
 

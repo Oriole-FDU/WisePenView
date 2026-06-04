@@ -1,7 +1,7 @@
 import type { Model } from '@/components/ChatPanel/index.type';
 import { Input } from 'antd';
+import { X } from 'lucide-react';
 import React, { useState } from 'react';
-import { LuX } from 'react-icons/lu';
 import ActionToolbar from './ActionToolbar';
 import styles from './style.module.less';
 
@@ -58,7 +58,7 @@ function ChatInput({
               onClick={onClearSelectedContext}
               aria-label="清除已选内容"
             >
-              <LuX size={12} />
+              <X size={12} />
             </button>
             <span className={styles.selectedHintText} title={selectedContextText}>
               选中内容：“{selectedPreview}”

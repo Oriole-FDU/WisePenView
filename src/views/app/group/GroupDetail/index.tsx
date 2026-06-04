@@ -1,3 +1,4 @@
+import { LogOut, Pencil, Trash2 } from 'lucide-react';
 /**
  * 小组详情：展示/ Tab / 小组盘只读等由 getGroupDisplayConfig（如 showWalletTabs、driveReadOnlyMode）驱动。
  */
@@ -22,7 +23,6 @@ import { useRequest } from 'ahooks';
 import type { TabsProps } from 'antd';
 import { Spin, Tabs } from 'antd';
 import { useMemo, useRef, useState } from 'react';
-import { AiOutlineDelete, AiOutlineEdit, AiOutlineLogout } from 'react-icons/ai';
 import { useParams } from 'react-router-dom';
 import layout from '../style.module.less';
 import page from './style.module.less';
@@ -242,19 +242,19 @@ function GroupDetail() {
         {currentUserRole === 'OWNER' ? (
           <div className={layout.actionsRow}>
             <Button onPress={() => setEditGroupModalOpen(true)}>
-              <IconText icon={<AiOutlineEdit />} iconSize={16}>
+              <IconText icon={<Pencil />} iconSize={16}>
                 编辑小组信息
               </IconText>
             </Button>
             <Button variant="danger" onPress={() => setDissolveGroupModalOpen(true)}>
-              <IconText icon={<AiOutlineDelete />} iconSize={16}>
+              <IconText icon={<Trash2 />} iconSize={16}>
                 解散小组
               </IconText>
             </Button>
           </div>
         ) : (
           <Button variant="danger" onPress={() => setExitGroupModalOpen(true)}>
-            <IconText icon={<AiOutlineLogout />} iconSize={16}>
+            <IconText icon={<LogOut />} iconSize={16}>
               退出小组
             </IconText>
           </Button>

@@ -1,7 +1,7 @@
 import { formatFileSize } from '@/utils/format/formatFileSize';
 import { Button } from '@heroui/react';
+import { Inbox } from 'lucide-react';
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react';
-import { AiOutlineInbox } from 'react-icons/ai';
 import type { UploadZoneProps } from './index.type';
 import styles from './style.module.less';
 
@@ -86,7 +86,7 @@ function UploadZone({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          <AiOutlineInbox className={styles.uploadIcon} size={44} />
+          <Inbox className={styles.uploadIcon} size={44} />
           <span className={styles.uploadText}>{label}</span>
           <span className={styles.uploadHint}>{description}</span>
         </button>

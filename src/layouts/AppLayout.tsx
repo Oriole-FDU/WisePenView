@@ -4,8 +4,8 @@ import DriveSidebar from '@/components/Sidebar/DriveSidebar';
 import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
 import { useUpdateEffect } from 'ahooks';
 import { Layout } from 'antd';
+import { Bot } from 'lucide-react';
 import { useState } from 'react';
-import { LuBot } from 'react-icons/lu';
 import { Outlet, useLocation } from 'react-router-dom';
 import styles from './AppLayout.module.less';
 import { useChatPanelResize } from './useChatPanelResize';
@@ -66,7 +66,7 @@ function AppLayout() {
               onClick={() => setChatPanelCollapsed(false)}
               aria-label="展开右侧对话栏"
             >
-              <LuBot />
+              <Bot />
             </button>
           </div>
         )}

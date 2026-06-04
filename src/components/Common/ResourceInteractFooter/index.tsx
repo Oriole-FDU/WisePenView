@@ -1,7 +1,7 @@
 /** 文档末尾互动区（Note 与 PDF 详情页通用）：大圆形点赞按钮 + 星级评分 */
 import { useUnmount } from 'ahooks';
+import { ThumbsUp } from 'lucide-react';
 import React, { useRef, useState } from 'react';
-import { RiThumbUpFill, RiThumbUpLine } from 'react-icons/ri';
 
 import Rating from '@/components/Common/Rating';
 import type { ResourceInteractFooterProps } from './index.type';
@@ -102,9 +102,15 @@ function ResourceInteractFooter({
               })}
           </span>
           {liked ? (
-            <RiThumbUpFill key="fill" size={16} className={styles.likeBtnIcon} aria-hidden />
+            <ThumbsUp
+              key="fill"
+              size={16}
+              className={styles.likeBtnIcon}
+              aria-hidden
+              fill="currentColor"
+            />
           ) : (
-            <RiThumbUpLine key="line" size={16} className={styles.likeBtnIcon} aria-hidden />
+            <ThumbsUp key="line" size={16} className={styles.likeBtnIcon} aria-hidden />
           )}
         </button>
         <span className={styles.interactLabel}>{liked ? '你已赞' : '真诚点赞，手留余香'}</span>

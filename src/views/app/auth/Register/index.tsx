@@ -5,9 +5,9 @@ import { parseErrorMessage } from '@/utils/error';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Checkbox, Form, Input, Modal, Typography } from 'antd';
+import { Lock, User } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiLockLine, RiUserLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
@@ -60,7 +60,7 @@ function Register() {
           <Input
             placeholder={t('register.usernamePlaceholder')}
             size="large"
-            prefix={<RiUserLine />}
+            prefix={<User />}
             maxLength={USERNAME_MAX_LENGTH}
           />
         </Form.Item>
@@ -78,7 +78,7 @@ function Register() {
           <Input.Password
             placeholder={t('register.passwordPlaceholder')}
             size="large"
-            prefix={<RiLockLine />}
+            prefix={<Lock />}
           />
         </Form.Item>
 

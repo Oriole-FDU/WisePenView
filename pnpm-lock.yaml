@@ -20,12 +20,6 @@ importers:
       '@blocknote/react':
         specifier: ^0.47.1
         version: 0.47.1(@floating-ui/dom@1.7.6)(@types/hast@3.0.4)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      '@commitlint/cli':
-        specifier: ^20.5.0
-        version: 20.5.0(@types/node@24.10.2)(conventional-commits-parser@6.4.0)(typescript@5.9.3)
-      '@commitlint/config-conventional':
-        specifier: ^20.5.0
-        version: 20.5.0
       '@embedpdf/react-pdf-viewer':
         specifier: ^2.14.0
         version: 2.14.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(svelte@5.55.1)(vue@3.5.32(typescript@5.9.3))
@@ -44,21 +38,18 @@ importers:
       '@tiptap/pm':
         specifier: 3.20.1
         version: 3.20.1
-      '@types/spark-md5':
-        specifier: ^3.0.5
-        version: 3.0.5
       ahooks:
         specifier: ^3.9.7
         version: 3.9.7(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       ai:
         specifier: ^6.0.154
         version: 6.0.154(zod@4.1.13)
-      ant-design:
-        specifier: ^1.0.0
-        version: 1.0.0
       antd:
         specifier: ^6.1.0
         version: 6.1.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      axios:
+        specifier: ^1.13.2
+        version: 1.13.2
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -68,6 +59,9 @@ importers:
       katex:
         specifier: ^0.16.42
         version: 0.16.42
+      lucide-react:
+        specifier: ^0.575.0
+        version: 0.575.0(react@19.2.1)
       react:
         specifier: ^19.2.0
         version: 19.2.1
@@ -77,9 +71,6 @@ importers:
       react-i18next:
         specifier: ^17.0.7
         version: 17.0.7(i18next@26.0.10(typescript@5.9.3))(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(typescript@5.9.3)
-      react-icons:
-        specifier: ^5.5.0
-        version: 5.5.0(react@19.2.1)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.2.7)(react@19.2.1)
@@ -105,6 +96,12 @@ importers:
         specifier: ^5.0.9
         version: 5.0.9(@types/react@19.2.7)(immer@10.2.0)(react@19.2.1)(use-sync-external-store@1.6.0(react@19.2.1))
     devDependencies:
+      '@commitlint/cli':
+        specifier: ^20.5.0
+        version: 20.5.0(@types/node@24.10.2)(conventional-commits-parser@6.4.0)(typescript@5.9.3)
+      '@commitlint/config-conventional':
+        specifier: ^20.5.0
+        version: 20.5.0
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
@@ -120,12 +117,12 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      '@types/spark-md5':
+        specifier: ^3.0.5
+        version: 3.0.5
       '@vitejs/plugin-react':
         specifier: ^5.1.1
         version: 5.1.2(vite@7.2.7(@types/node@24.10.2)(jiti@2.6.1)(less@4.4.2)(lightningcss@1.32.0)(sass@1.95.1)(yaml@2.8.2))
-      axios:
-        specifier: ^1.13.2
-        version: 1.13.2
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
@@ -2766,9 +2763,6 @@ packages:
     resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
-  ant-design@1.0.0:
-    resolution: {integrity: sha512-EiN9oXroImi01yz1xwpDzExb1U5ddi4MYiCTaTLVl8SA3QHXYClJn0BikAYS2IMPzmpmAYhwOgGA2HE/sL/c9g==}
-
   antd-style@3.7.1:
     resolution: {integrity: sha512-CQOfddVp4aOvBfCepa+Kj2e7ap+2XBINg1Kn2osdE3oQvrD7KJu/K0sfnLcFLkgCJygbxmuazYdWLKb+drPDYA==}
     peerDependencies:
@@ -4112,6 +4106,11 @@ packages:
 
   lucide-react@0.553.0:
     resolution: {integrity: sha512-BRgX5zrWmNy/lkVAe0dXBgd7XQdZ3HTf+Hwe3c9WK6dqgnj9h+hxV+MDncM88xDWlCq27+TKvHGE70ViODNILw==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide-react@0.575.0:
+    resolution: {integrity: sha512-VuXgKZrk0uiDlWjGGXmKV6MSk9Yy4l10qgVvzGn2AWBx1Ylt0iBexKOAoA6I7JO3m+M9oeovJd3yYENfkUbOeg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -8682,8 +8681,6 @@ snapshots:
 
   ansi-styles@6.2.3: {}
 
-  ant-design@1.0.0: {}
-
   antd-style@3.7.1(@types/react@19.2.7)(antd@6.1.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
     dependencies:
       '@ant-design/cssinjs': 1.24.0(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -10198,6 +10195,10 @@ snapshots:
       react: 19.2.1
 
   lucide-react@0.553.0(react@19.2.1):
+    dependencies:
+      react: 19.2.1
+
+  lucide-react@0.575.0(react@19.2.1):
     dependencies:
       react: 19.2.1
 

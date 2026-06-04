@@ -1,11 +1,11 @@
-import { LuBot } from 'react-icons/lu';
+import { Bot } from 'lucide-react';
 import styles from './style.module.less';
 
 function Welcome() {
   return (
     <div className={styles.welcomeWrapper}>
       <div className={styles.logoIcon}>
-        <LuBot />
+        <Bot />
       </div>
 
       {/* 标题 */}

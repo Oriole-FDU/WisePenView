@@ -6,8 +6,8 @@ import { parseErrorMessage } from '@/utils/error';
 import { IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/image/uploadLimit';
 import { Avatar, Button, Modal, toast, Tooltip } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { Check, TriangleAlert, X } from 'lucide-react';
 import { useState } from 'react';
-import { RiCheckLine, RiCloseLine, RiErrorWarningLine } from 'react-icons/ri';
 import type { AccountHeaderProps } from './index.type';
 import styles from './style.module.less';
 
@@ -158,11 +158,11 @@ function AccountHeader({ user, onUserInfoUpdated }: AccountHeaderProps) {
               }
             >
               {user.userInfo.status === USER_STATUS.BANNED ? (
-                <RiCloseLine size={24} className={styles.statusIconBanned} />
+                <X size={24} className={styles.statusIconBanned} />
               ) : user.userInfo.status === USER_STATUS.UNVERIFIED ? (
-                <RiErrorWarningLine size={24} className={styles.statusIconUnverified} />
+                <TriangleAlert size={24} className={styles.statusIconUnverified} />
               ) : (
-                <RiCheckLine size={24} className={styles.statusIconVerified} />
+                <Check size={24} className={styles.statusIconVerified} />
               )}
             </span>
           </span>

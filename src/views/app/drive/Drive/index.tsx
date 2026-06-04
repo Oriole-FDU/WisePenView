@@ -7,9 +7,8 @@ import UploadQueueTab from '@/components/Drive/UploadQueueTab';
 import { useDrivePreferencesStore, type DriveViewMode } from '@/store';
 import { Button } from '@heroui/react';
 import { Tabs } from 'antd';
+import { CloudUpload, Tags } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { LuTags } from 'react-icons/lu';
 
 import { UploadDocumentModal } from './UploadDocumentModal';
 import styles from './style.module.less';
@@ -43,12 +42,12 @@ function Drive() {
         </div>
         <div className={styles.actionsRow}>
           <Button variant="secondary" onPress={() => setStickerManageOpen(true)}>
-            <IconText icon={<LuTags />} iconSize={16}>
+            <IconText icon={<Tags />} iconSize={16}>
               管理标签
             </IconText>
           </Button>
           <Button variant="primary" onPress={() => setUploadModalOpen(true)}>
-            <IconText icon={<AiOutlineCloudUpload />} iconSize={16}>
+            <IconText icon={<CloudUpload />} iconSize={16}>
               上传文件
             </IconText>
           </Button>

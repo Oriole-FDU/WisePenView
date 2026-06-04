@@ -11,8 +11,8 @@ import {
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
+import { IndentIncrease } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { RiIndentIncrease } from 'react-icons/ri';
 import ChatInput from './ChatInput';
 import {
   HISTORY_PAGE_SIZE,
@@ -250,7 +250,7 @@ function ChatPanel({ collapsed }: ChatPanelProps) {
               className={styles.triggerBtn}
               aria-label="收起聊天面板"
             >
-              <RiIndentIncrease size={18} />
+              <IndentIncrease size={18} />
             </button>
           )}
           {!collapsed && (

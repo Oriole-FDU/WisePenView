@@ -1,5 +1,5 @@
 import { Collapse, Tag, Typography } from 'antd';
-import { LuChevronRight, LuLoader } from 'react-icons/lu';
+import { ChevronRight, Loader } from 'lucide-react';
 import styles from './ThinkingBlock.module.less';
 const { Paragraph } = Typography;
 
@@ -18,7 +18,7 @@ function ThinkingBlock({ content, duration, loading }: ThinkingBlockProps) {
     <div className={styles.headerLabel}>
       {loading ? (
         <>
-          <LuLoader className={styles.spinIcon} />
+          <Loader className={styles.spinIcon} />
           <span>深度思考中...</span>
         </>
       ) : (
@@ -43,7 +43,7 @@ function ThinkingBlock({ content, duration, loading }: ThinkingBlockProps) {
           body: styles.collapseContentBox,
         }}
         expandIcon={({ isActive }) => (
-          <LuChevronRight
+          <ChevronRight
             size={14}
             style={{
               // 手动控制旋转，实现丝滑动画

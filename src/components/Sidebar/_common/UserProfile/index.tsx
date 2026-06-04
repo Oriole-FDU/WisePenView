@@ -4,19 +4,18 @@ import { IDENTITY } from '@/domains/User';
 import { Avatar, Button, Dropdown, Modal } from '@heroui/react';
 import { useMount } from 'ahooks';
 import clsx from 'clsx';
+import {
+  ChartPie,
+  Home,
+  LogOut,
+  MessageSquare,
+  Palette,
+  Settings,
+  Shield,
+  ShieldUser,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import {
-  RiFeedbackLine,
-  RiHomeLine,
-  RiLogoutBoxRLine,
-  RiPaletteLine,
-  RiPieChartLine,
-  RiSettings3Line,
-  RiShieldKeyholeLine,
-  RiShieldUserLine,
-} from 'react-icons/ri';
 
 import { useAuthService } from '@/domains';
 import styles from './style.module.less';
@@ -107,7 +106,7 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
                 <span className={styles.tag}>{identityLabel}</span>
               </div>
               <Dropdown.Trigger aria-label="打开用户设置菜单" className={styles.menuTrigger}>
-                <RiSettings3Line className={styles.icon} />
+                <Settings className={styles.icon} />
               </Dropdown.Trigger>
             </>
           )}
@@ -125,11 +124,11 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
                   textValue="回到用户端"
                   className={styles.profileMenuItem}
                 >
-                  <RiHomeLine size={16} />
+                  <Home size={16} />
                   <span>回到用户端</span>
                 </Dropdown.Item>
                 <Dropdown.Item id="logout" textValue="退出登录" className={styles.profileMenuItem}>
-                  <RiLogoutBoxRLine size={16} />
+                  <LogOut size={16} />
                   <span>退出登录</span>
                 </Dropdown.Item>
               </>
@@ -140,15 +139,15 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
                   textValue="余额与使用量"
                   className={styles.profileMenuItem}
                 >
-                  <RiPieChartLine size={16} />
+                  <ChartPie size={16} />
                   <span>余额与使用量</span>
                 </Dropdown.Item>
                 <Dropdown.Item id="account" textValue="账号" className={styles.profileMenuItem}>
-                  <RiShieldUserLine size={16} />
+                  <ShieldUser size={16} />
                   <span>账号</span>
                 </Dropdown.Item>
                 <Dropdown.Item id="appearance" textValue="外观" className={styles.profileMenuItem}>
-                  <RiPaletteLine size={16} />
+                  <Palette size={16} />
                   <span>外观</span>
                 </Dropdown.Item>
                 <Dropdown.Item
@@ -156,7 +155,7 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
                   textValue="用户反馈"
                   className={styles.profileMenuItem}
                 >
-                  <RiFeedbackLine size={16} />
+                  <MessageSquare size={16} />
                   <span>用户反馈</span>
                 </Dropdown.Item>
                 {isAdmin && (
@@ -165,12 +164,12 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
                     textValue="进入管理"
                     className={styles.profileMenuItem}
                   >
-                    <RiShieldKeyholeLine size={16} />
+                    <Shield size={16} />
                     <span>进入管理</span>
                   </Dropdown.Item>
                 )}
                 <Dropdown.Item id="logout" textValue="退出登录" className={styles.profileMenuItem}>
-                  <RiLogoutBoxRLine size={16} />
+                  <LogOut size={16} />
                   <span>退出登录</span>
                 </Dropdown.Item>
               </>

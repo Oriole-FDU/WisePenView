@@ -2,9 +2,8 @@ import IconText from '@/components/Common/IconText';
 import type { DriveNode } from '@/domains/Drive';
 import { Button } from '@heroui/react';
 import { Table } from 'antd';
+import { ChevronDown, ChevronRight, CloudUpload } from 'lucide-react';
 import React, { useMemo, useRef, type HTMLAttributes } from 'react';
-import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { LuChevronDown, LuChevronRight } from 'react-icons/lu';
 import { resolveDriveScope } from '../common/driveComponentModel';
 import { useClickNode } from '../common/useClickNode';
 import {
@@ -154,7 +153,7 @@ function TableDrive({ groupId, rootId, scope, actions }: TableDriveProps) {
           onExpand(record, e);
         }}
       >
-        {expanded ? <LuChevronDown size={14} /> : <LuChevronRight size={14} />}
+        {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
       </button>
     );
   };
@@ -167,7 +166,7 @@ function TableDrive({ groupId, rootId, scope, actions }: TableDriveProps) {
           <div className={styles.toolbarActions}>
             {showUploadToGroup ? (
               <Button variant="secondary" size="sm" onPress={openUploadToGroup}>
-                <IconText icon={<AiOutlineCloudUpload />} iconSize={16}>
+                <IconText icon={<CloudUpload />} iconSize={16}>
                   上传文件
                 </IconText>
               </Button>

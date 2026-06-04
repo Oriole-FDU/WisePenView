@@ -11,9 +11,9 @@ import {
 import type { Transaction } from '@tiptap/pm/state';
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
+import { Link, Type, Unlink } from 'lucide-react';
 import type { ChangeEvent, KeyboardEvent, ReactNode, Ref, RefObject } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { RiLink, RiLinkUnlink, RiText } from 'react-icons/ri';
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useAiDiffDisplayModeContext } from './displayModeContext';
@@ -353,7 +353,7 @@ function AiLinkToolbarEditButton({
           <Components.Generic.Form.TextInput
             className="bn-text-input"
             name="url"
-            icon={<RiLink />}
+            icon={<Link />}
             autoFocus={true}
             placeholder={dict.link_toolbar.form.url_placeholder}
             value={currentUrl}
@@ -364,7 +364,7 @@ function AiLinkToolbarEditButton({
           <Components.Generic.Form.TextInput
             className="bn-text-input"
             name="title"
-            icon={<RiText />}
+            icon={<Type />}
             placeholder={dict.link_toolbar.form.title_placeholder}
             value={currentText}
             onKeyDown={handleEnter}
@@ -403,7 +403,7 @@ function AiLinkToolbarDeleteButton({
         clearLink();
         setToolbarOpen(false);
       }}
-      icon={<RiLinkUnlink />}
+      icon={<Unlink />}
     />
   );
 }

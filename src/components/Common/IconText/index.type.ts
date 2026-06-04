@@ -5,7 +5,7 @@ export type IconTextIconPosition = 'start' | 'end';
 export type IconTextAlign = 'center' | 'baseline';
 
 export interface IconTextBaseProps {
-  /** 图标节点，支持 react-icons、antd icon、自定义 svg 或图片。 */
+  /** 图标节点，支持 lucide-react、antd icon、自定义 svg 或图片。 */
   icon?: ReactNode;
   /** 文本或任意 inline 内容。 */
   children?: ReactNode;

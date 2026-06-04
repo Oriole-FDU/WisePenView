@@ -16,15 +16,9 @@ import {
   toast,
 } from '@heroui/react';
 import { useRequest, useUnmount } from 'ahooks';
+import { CircleCheck, Info, Mail, ShieldUser, TriangleAlert } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useRef, useState } from 'react';
-import {
-  RiCheckboxCircleLine,
-  RiErrorWarningLine,
-  RiInformationLine,
-  RiMailLine,
-  RiShieldUserLine,
-} from 'react-icons/ri';
 import VerifyBanner from '../VerifyBanner';
 import type { AccountVerificationProps, UisOutcomeState, VerifyModalMode } from './index.type';
 import { resolveUisQrImageDataUrl } from './resolveUisQrImageDataUrl';
@@ -278,7 +272,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                     <>
                       <Alert className={styles.verifyModeAlert} status="accent">
                         <Alert.Indicator>
-                          <RiInformationLine size={18} />
+                          <Info size={18} />
                         </Alert.Indicator>
                         <Alert.Content>
                           <Alert.Description>
@@ -298,7 +292,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                         <Label>邮箱</Label>
                         <InputGroup>
                           <InputGroup.Prefix>
-                            <RiMailLine size={18} className={styles.verifyInputIcon} />
+                            <Mail size={18} className={styles.verifyInputIcon} />
                           </InputGroup.Prefix>
                           <InputGroup.Input type="email" placeholder="请输入完整邮箱地址" />
                         </InputGroup>
@@ -309,7 +303,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                     <>
                       <Alert className={styles.verifyModeAlert} status="accent">
                         <Alert.Indicator>
-                          <RiInformationLine size={18} />
+                          <Info size={18} />
                         </Alert.Indicator>
                         <Alert.Content>
                           <Alert.Description>
@@ -329,7 +323,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                         <Label>UIS 账号</Label>
                         <InputGroup>
                           <InputGroup.Prefix>
-                            <RiShieldUserLine size={18} className={styles.verifyInputIcon} />
+                            <ShieldUser size={18} className={styles.verifyInputIcon} />
                           </InputGroup.Prefix>
                           <InputGroup.Input
                             placeholder="学工号或 UIS 账号"
@@ -406,7 +400,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                         {uisOutcome.actionPayload.trim() === '' ? (
                           <Alert status="warning">
                             <Alert.Indicator>
-                              <RiErrorWarningLine size={18} />
+                              <TriangleAlert size={18} />
                             </Alert.Indicator>
                             <Alert.Content>
                               <Alert.Title>未返回二维码数据，请稍后重试或联系管理员</Alert.Title>
@@ -416,7 +410,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                           <>
                             <Alert className={styles.uisOutcomeHint} status="accent">
                               <Alert.Indicator>
-                                <RiInformationLine size={18} />
+                                <Info size={18} />
                               </Alert.Indicator>
                               <Alert.Content>
                                 <Alert.Title>
@@ -435,7 +429,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                         ) : (
                           <Alert status="warning">
                             <Alert.Indicator>
-                              <RiErrorWarningLine size={18} />
+                              <TriangleAlert size={18} />
                             </Alert.Indicator>
                             <Alert.Content>
                               <Alert.Title>二维码图片数据无效</Alert.Title>
@@ -450,7 +444,7 @@ function AccountVerification({ user, onUserInfoUpdated }: AccountVerificationPro
                     ) : (
                       <Alert status="success">
                         <Alert.Indicator>
-                          <RiCheckboxCircleLine size={18} />
+                          <CircleCheck size={18} />
                         </Alert.Indicator>
                         <Alert.Content>
                           <Alert.Title>认证成功</Alert.Title>

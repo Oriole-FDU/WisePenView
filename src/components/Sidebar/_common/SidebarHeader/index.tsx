@@ -1,6 +1,6 @@
 import logoImg from '@/assets/images/logo-icon.png';
 import clsx from 'clsx';
-import { RiIndentDecrease, RiIndentIncrease } from 'react-icons/ri';
+import { IndentDecrease, IndentIncrease } from 'lucide-react';
 import type { SidebarHeaderProps } from './index.type';
 import styles from './style.module.less';
 
@@ -15,9 +15,9 @@ function SidebarHeader({ collapsed, onToggle, title = 'WisePen', nav }: SidebarH
           aria-label="切换侧边栏"
         >
           {collapsed ? (
-            <RiIndentIncrease size={18} style={{ transform: 'rotate(180deg)' }} />
+            <IndentIncrease size={18} style={{ transform: 'rotate(180deg)' }} />
           ) : (
-            <RiIndentDecrease size={18} style={{ transform: 'rotate(180deg)' }} />
+            <IndentDecrease size={18} style={{ transform: 'rotate(180deg)' }} />
           )}
         </button>
 

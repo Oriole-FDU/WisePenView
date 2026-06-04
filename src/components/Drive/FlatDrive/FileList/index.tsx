@@ -11,8 +11,8 @@ import { usePagination } from 'ahooks';
 import type { MenuProps } from 'antd';
 import { Dropdown, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { EllipsisVertical, Pencil, Tag as TagIcon, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { LuEllipsisVertical, LuPencil, LuTag, LuTrash2 } from 'react-icons/lu';
 import type { FileListProps } from './index.type';
 import styles from './style.module.less';
 
@@ -90,7 +90,7 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
         {
           key: 'editTag',
           label: '编辑标签',
-          icon: <LuTag size={14} />,
+          icon: <TagIcon size={14} />,
           onClick: (info) => {
             // 防止点击事件冒泡到父级元素，导致文件打开
             info.domEvent.stopPropagation();
@@ -101,7 +101,7 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
         {
           key: 'rename',
           label: '重命名',
-          icon: <LuPencil size={14} />,
+          icon: <Pencil size={14} />,
           onClick: (info) => {
             info.domEvent.stopPropagation();
             props.onCloseDropdown();
@@ -111,7 +111,7 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
         {
           key: 'delete',
           label: '删除',
-          icon: <LuTrash2 size={14} />,
+          icon: <Trash2 size={14} />,
           danger: true,
           onClick: (info) => {
             info.domEvent.stopPropagation();
@@ -138,7 +138,7 @@ const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
             aria-label="更多操作"
             onClick={(e) => e.stopPropagation()}
           >
-            <LuEllipsisVertical size={18} />
+            <EllipsisVertical size={18} />
           </button>
         </Dropdown>
       );

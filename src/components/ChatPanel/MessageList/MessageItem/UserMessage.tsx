@@ -1,8 +1,8 @@
 import type { Message } from '@/components/ChatPanel/index.type';
 import { Button, toast } from '@heroui/react';
+import { Check, Copy } from 'lucide-react';
 
 import React from 'react';
-import { LuCheck, LuCopy } from 'react-icons/lu';
 import MessageContent from './MessageContent';
 import styles from './UserMessage.module.less';
 
@@ -39,7 +39,7 @@ function UserMessage({ message }: UserMessageProps) {
             aria-label="复制"
             style={copied ? { color: 'var(--ant-color-success)' } : undefined}
           >
-            {copied ? <LuCheck size={14} /> : <LuCopy size={14} />}
+            {copied ? <Check size={14} /> : <Copy size={14} />}
           </Button>
         </div>
 

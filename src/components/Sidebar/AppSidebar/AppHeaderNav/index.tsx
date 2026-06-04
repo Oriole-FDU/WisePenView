@@ -4,7 +4,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/u
 import { ListBox, ListBoxItem, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import clsx from 'clsx';
-import { RiAddCircleFill, RiFileTextLine, RiGroupFill, RiPenNibFill } from 'react-icons/ri';
+import { CirclePlus, FileText, PenTool, Users } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { AppHeaderNavProps } from './index.type';
 import styles from './style.module.less';
@@ -89,7 +89,7 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
         onPress={handleCreateSession}
       >
         <span className={styles.menuIcon}>
-          <RiAddCircleFill size={18} />
+          <CirclePlus size={18} />
         </span>
         {!collapsed && <span className={styles.menuLabel}>新建对话</span>}
       </ListBoxItem>
@@ -101,7 +101,7 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
         onPress={handleCreateNote}
       >
         <span className={styles.menuIcon}>
-          <RiPenNibFill size={18} />
+          <PenTool size={18} />
         </span>
         {!collapsed && <span className={styles.menuLabel}>新建笔记</span>}
       </ListBoxItem>
@@ -112,7 +112,7 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
         onPress={() => navigate('/app/drive')}
       >
         <span className={styles.menuIcon}>
-          <RiFileTextLine size={18} />
+          <FileText size={18} />
         </span>
         {!collapsed && <span className={styles.menuLabel}>文档与云盘</span>}
       </ListBoxItem>
@@ -123,7 +123,7 @@ function AppHeaderNav({ collapsed, onSessionCreated }: AppHeaderNavProps) {
         onPress={() => navigate('/app/my-group')}
       >
         <span className={styles.menuIcon}>
-          <RiGroupFill size={18} />
+          <Users size={18} />
         </span>
         {!collapsed && <span className={styles.menuLabel}>我的小组</span>}
       </ListBoxItem>

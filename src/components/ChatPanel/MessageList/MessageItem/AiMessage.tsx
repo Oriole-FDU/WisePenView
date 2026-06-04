@@ -3,8 +3,8 @@ import IconText from '@/components/Common/IconText';
 import { Button, toast } from '@heroui/react';
 import { useInterval } from 'ahooks';
 import { Spin } from 'antd';
+import { Check, Copy } from 'lucide-react';
 import React from 'react';
-import { LuCheck, LuCopy } from 'react-icons/lu';
 import { LogoFactory } from '../../ModelSelector';
 import styles from './AiMessage.module.less';
 import MessageContent from './MessageContent';
@@ -93,7 +93,7 @@ function AiMessage({ message }: { message: Message }) {
               onPress={handleCopy}
               aria-label="复制"
             >
-              {copied ? <LuCheck size={14} /> : <LuCopy size={14} />}
+              {copied ? <Check size={14} /> : <Copy size={14} />}
             </Button>
           </div>
         )}

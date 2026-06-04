@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { RiArrowLeftLine } from 'react-icons/ri';
+import { ArrowLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import IconText from '@/components/Common/IconText';
@@ -33,7 +33,7 @@ function ResourceViewerHeader({
       <div className={styles.bar}>
         <div className={styles.toolbar}>
           <button type="button" className={styles.backLink} onClick={handleBack}>
-            <IconText icon={<RiArrowLeftLine />} iconSize={18} gap="var(--ant-margin-xs)">
+            <IconText icon={<ArrowLeft />} iconSize={18} gap="var(--ant-margin-xs)">
               {backLabel}
             </IconText>
           </button>

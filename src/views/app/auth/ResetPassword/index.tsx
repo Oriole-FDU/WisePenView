@@ -4,8 +4,8 @@ import { parseErrorMessage } from '@/utils/error';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Alert, Form, Input, Typography } from 'antd';
+import { Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { RiMailLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
@@ -60,7 +60,7 @@ function ResetPassword() {
           <Input
             placeholder={t('resetPassword.campusNumPlaceholder')}
             size="large"
-            prefix={<RiMailLine />}
+            prefix={<Mail />}
           />
         </Form.Item>
 

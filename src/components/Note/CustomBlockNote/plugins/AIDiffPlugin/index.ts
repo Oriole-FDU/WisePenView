@@ -4,8 +4,8 @@ import type { Transaction } from '@tiptap/pm/state';
 import { NodeSelection, Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 import type { EditorProps, EditorView } from '@tiptap/pm/view';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Sparkles } from 'lucide-react';
 import { createElement } from 'react';
-import { RiSparklingLine } from 'react-icons/ri';
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import type { NoteEditorPlugin } from '../types';
@@ -344,7 +344,7 @@ function createMockAskAiSlashMenuItem(editor: unknown) {
     group: 'AI',
     aliases: ['ai', 'ask', 'askai', '问', '问ai', 'ai-diff', 'diff'],
     subtext: 'Mock：用 AIDiff_proto.mock.ts 数据模拟 AI 修改笔记内容',
-    icon: createElement(RiSparklingLine, { size: 18 }),
+    icon: createElement(Sparkles, { size: 18 }),
     onItemClick: () => {
       if (import.meta.env.MODE !== 'mock') {
         return;

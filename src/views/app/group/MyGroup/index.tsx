@@ -7,8 +7,8 @@ import { GROUP_ROLE_FILTER_MAP } from '@/domains/Group';
 import { Button, Pagination, toast } from '@heroui/react';
 import { usePagination } from 'ahooks';
 import { Col, Empty, Row, Spin, Tabs } from 'antd';
+import { Plus, UserPlus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { AiOutlinePlus, AiOutlineUserAdd } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import layout from '../style.module.less';
 import page from './style.module.less';
@@ -110,12 +110,12 @@ function MyGroup() {
         </div>
         <div className={layout.actionsRow}>
           <Button onPress={() => setJoinGroupModalOpen(true)}>
-            <IconText icon={<AiOutlineUserAdd />} iconSize={16}>
+            <IconText icon={<UserPlus />} iconSize={16}>
               加入小组
             </IconText>
           </Button>
           <Button variant="primary" onPress={() => setCreateGroupModalOpen(true)}>
-            <IconText icon={<AiOutlinePlus />} iconSize={16}>
+            <IconText icon={<Plus />} iconSize={16}>
               新建小组
             </IconText>
           </Button>

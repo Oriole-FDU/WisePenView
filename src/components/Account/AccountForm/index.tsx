@@ -6,8 +6,8 @@ import { parseErrorMessage } from '@/utils/error';
 import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
 import { Button, Form, Input, Label, ListBox, Select, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { Pencil, X } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
-import { RiCloseLine, RiPencilLine } from 'react-icons/ri';
 import { buildProfileFormValues } from './buildProfileFormValues';
 import type { AccountFormProps } from './index.type';
 import { getProfileDisplayString } from './profileDisplay';
@@ -149,7 +149,7 @@ function AccountForm({
         <h3 className={styles.sectionTitle}>基本档案</h3>
         {!editMode ? (
           <Button variant="primary" onPress={handleStartEdit}>
-            <IconText icon={<RiPencilLine />} iconSize={16}>
+            <IconText icon={<Pencil />} iconSize={16}>
               编辑资料
             </IconText>
           </Button>
@@ -212,7 +212,7 @@ function AccountForm({
                               updateFormValue(field.key, undefined);
                             }}
                           >
-                            <RiCloseLine />
+                            <X />
                           </button>
                         ) : null}
                         <Select.Indicator />

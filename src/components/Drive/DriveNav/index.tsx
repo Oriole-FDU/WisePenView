@@ -3,8 +3,8 @@ import type { DriveNode, LoadMoreNode } from '@/domains/Drive';
 import { useRequest } from 'ahooks';
 import { Empty, Spin, Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
+import { ChevronDown } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { LuChevronDown } from 'react-icons/lu';
 import { resolveDriveScope, toDriveSelectionItem } from '../common/driveComponentModel';
 import { useDriveTreeChildren } from '../common/useDriveTreeChildren';
 import { buildDriveTreeData, replaceTreeNodeChildren } from './buildTreeData';
@@ -249,7 +249,7 @@ function DriveNav({
         defaultExpandedKeys={[finalRootId]}
         switcherIcon={
           <span>
-            <LuChevronDown size={14} />
+            <ChevronDown size={14} />
           </span>
         }
       />

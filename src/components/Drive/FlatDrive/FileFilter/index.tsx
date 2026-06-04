@@ -8,8 +8,8 @@ import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Radio, Select, Spin, Tag } from 'antd';
 import clsx from 'clsx';
+import { Plus, Tags, X } from 'lucide-react';
 import { useState } from 'react';
-import { LuPlus, LuTags, LuX } from 'react-icons/lu';
 import AddStickerModal from './AddStickerModal';
 import type { FileFilterProps, FileFilterValue } from './index.type';
 import styles from './style.module.less';
@@ -79,7 +79,7 @@ function FileFilter({ value, onChange }: FileFilterProps) {
                 variant="outlined"
                 closable
                 onClose={() => handleRemoveTag(tagId)}
-                closeIcon={<LuX size={13} />}
+                closeIcon={<X size={13} />}
                 className={styles.selectedTag}
               >
                 {current.tagNames[i] ?? tagId}
@@ -119,7 +119,7 @@ function FileFilter({ value, onChange }: FileFilterProps) {
               </Tag>
             ))}
             <Tag className={styles.addTag} onClick={() => setAddModalOpen(true)}>
-              <LuPlus size={14} />
+              <Plus size={14} />
             </Tag>
           </>
         )}
@@ -144,7 +144,7 @@ function FileFilter({ value, onChange }: FileFilterProps) {
         </div>
         <div className={styles.toolbarRight}>
           <Button variant="secondary" onPress={() => setStickerManageModalOpen(true)}>
-            <IconText icon={<LuTags />} iconSize={16}>
+            <IconText icon={<Tags />} iconSize={16}>
               管理标签
             </IconText>
           </Button>

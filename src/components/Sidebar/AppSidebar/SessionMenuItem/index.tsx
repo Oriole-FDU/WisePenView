@@ -3,8 +3,8 @@ import { parseErrorMessage } from '@/utils/error';
 import { Button, Input, Modal, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import clsx from 'clsx';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { RiDeleteBinLine, RiEditLine } from 'react-icons/ri';
 import type { SessionMenuItemProps } from './index.type';
 import styles from './style.module.less';
 
@@ -85,7 +85,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
             setRenameModalOpen(true);
           }}
         >
-          <RiEditLine size={16} />
+          <Pencil size={16} />
         </button>
         <button
           type="button"
@@ -101,7 +101,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
             setDeleteConfirmOpen(true);
           }}
         >
-          <RiDeleteBinLine size={16} />
+          <Trash2 size={16} />
         </button>
       </div>
       <Modal isOpen={renameModalOpen} onOpenChange={setRenameModalOpen}>

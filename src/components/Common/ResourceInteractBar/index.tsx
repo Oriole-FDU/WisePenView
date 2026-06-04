@@ -1,6 +1,6 @@
+import { Eye, Star, ThumbsUp } from 'lucide-react';
 /** 详情页顶部互动信息展示条（只读，Note 与 PDF 详情页共用） */
 import { Divider } from 'antd';
-import { RiEyeLine, RiStarLine, RiThumbUpLine } from 'react-icons/ri';
 
 import { formatReadCount } from '@/utils/format/formatNumber';
 import type { ResourceInteractBarProps } from './index.type';
@@ -16,7 +16,7 @@ function ResourceInteractBar({ readCount, likeCount, scoreAvg }: ResourceInterac
       {showReadCount && (
         <>
           <div className={styles.interactItem}>
-            <RiEyeLine size={14} aria-hidden className={styles.interactIcon} />
+            <Eye size={14} aria-hidden className={styles.interactIcon} />
             <span>{formatReadCount(readCount)}</span>
           </div>
           <Divider orientation="vertical" className={styles.interactDivider} />
@@ -25,7 +25,7 @@ function ResourceInteractBar({ readCount, likeCount, scoreAvg }: ResourceInterac
 
       {/* 点赞量 */}
       <div className={styles.interactItem}>
-        <RiThumbUpLine size={14} aria-hidden className={styles.interactIcon} />
+        <ThumbsUp size={14} aria-hidden className={styles.interactIcon} />
         <span>{formatReadCount(likeCount)}</span>
       </div>
 
@@ -33,7 +33,7 @@ function ResourceInteractBar({ readCount, likeCount, scoreAvg }: ResourceInterac
 
       {/* 平均分 */}
       <div className={styles.interactItem}>
-        <RiStarLine
+        <Star
           size={14}
           aria-hidden
           className={hasScoreAvg ? styles.interactIcon : styles.interactIconMuted}

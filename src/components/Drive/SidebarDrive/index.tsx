@@ -5,8 +5,8 @@ import { useActiveDriveScopeStore } from '@/store';
 import { useRequest } from 'ahooks';
 import { Empty, Spin, Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
+import { ChevronDown } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { LuChevronDown } from 'react-icons/lu';
 
 import { DEFAULT_DRIVE_ROOT_ID } from '../common/driveComponentModel';
 import { useDriveTreeChildren } from '../common/useDriveTreeChildren';
@@ -116,7 +116,7 @@ function SidebarDrive() {
           defaultExpandedKeys={[DEFAULT_DRIVE_ROOT_ID]}
           switcherIcon={
             <span>
-              <LuChevronDown size={14} />
+              <ChevronDown size={14} />
             </span>
           }
         />

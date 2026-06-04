@@ -1,5 +1,5 @@
 import { Collapse, Result, Space, Tooltip, Typography } from 'antd';
-import { RiFileCopyLine } from 'react-icons/ri';
+import { Copy } from 'lucide-react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 
 import LandingNavbar from '@/components/LandingNavbar';
@@ -108,7 +108,7 @@ function AppError() {
                     <span onClick={(event) => event.stopPropagation()}>
                       <Tooltip title="复制错误详情">
                         <Button variant="ghost" size="sm" isIconOnly onPress={handleCopyDetail}>
-                          <RiFileCopyLine />
+                          <Copy />
                         </Button>
                       </Tooltip>
                     </span>

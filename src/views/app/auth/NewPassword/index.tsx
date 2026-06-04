@@ -4,9 +4,9 @@ import { parseErrorMessage } from '@/utils/error';
 import { Button, toast } from '@heroui/react';
 import { useMount, useRequest } from 'ahooks';
 import { Form, Input, Modal, Typography } from 'antd';
+import { Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiLockLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
@@ -64,7 +64,7 @@ function NewPassword() {
           <Input.Password
             placeholder={t('newPassword.passwordPlaceholder')}
             size="large"
-            prefix={<RiLockLine />}
+            prefix={<Lock />}
           />
         </Form.Item>
 

@@ -2,8 +2,8 @@ import { WALLET_TRANSACTION_KIND, type WalletTransactionRecord } from '@/domains
 import { formatCompactNumber } from '@/utils/format/formatNumber';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { Chip, Table, Tabs } from '@heroui/react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useMemo } from 'react';
-import { RiArrowDownLine, RiArrowUpLine } from 'react-icons/ri';
 import styles from './style.module.less';
 import { isInflowKind, normalizeMaskDisplayText, TX_TABS, type TxTabKey } from './walletHelpers';
 
@@ -93,7 +93,7 @@ function WalletTransactionTable({
                         size="md"
                         variant="soft"
                       >
-                        {inflow ? <RiArrowUpLine size={14} /> : <RiArrowDownLine size={14} />}
+                        {inflow ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
                         <Chip.Label>{WALLET_TRANSACTION_KIND.getLabel(row.type)}</Chip.Label>
                       </Chip>
                     </Table.Cell>

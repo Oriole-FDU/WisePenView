@@ -1,7 +1,7 @@
 import { useRequest, useUnmount } from 'ahooks';
 import { Alert, Result, Segmented, Spin } from 'antd';
+import { ChevronsLeft, Menu } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
-import { RiArrowLeftDoubleLine, RiMenuLine } from 'react-icons/ri';
 import { Link, useParams } from 'react-router-dom';
 
 import EntryIcon from '@/components/Common/EntryIcon';
@@ -284,7 +284,7 @@ function NoteViewConnected({
                     aria-label="收起目录"
                     onClick={() => setIsOutlineOpen(false)}
                   >
-                    <RiArrowLeftDoubleLine size={20} />
+                    <ChevronsLeft size={20} />
                   </button>
                 </div>
                 <div className={styles.outlineScrollArea}>
@@ -322,7 +322,7 @@ function NoteViewConnected({
                   aria-label="展开目录"
                   onClick={() => setIsOutlineOpen(true)}
                 >
-                  <RiMenuLine size={20} />
+                  <Menu size={20} />
                 </button>
               </div>
             )}

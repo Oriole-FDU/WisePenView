@@ -5,9 +5,9 @@ import { parseErrorMessage } from '@/utils/error';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Form, Input, Typography } from 'antd';
+import { Lock, User } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiLockLine, RiUserLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
@@ -45,7 +45,7 @@ function Login() {
           name="account"
           rules={[{ required: true, message: t('login.accountRequired') }]}
         >
-          <Input placeholder={t('login.accountPlaceholder')} size="large" prefix={<RiUserLine />} />
+          <Input placeholder={t('login.accountPlaceholder')} size="large" prefix={<User />} />
         </Form.Item>
 
         <Form.Item
@@ -56,7 +56,7 @@ function Login() {
           <Input.Password
             placeholder={t('login.passwordPlaceholder')}
             size="large"
-            prefix={<RiLockLine />}
+            prefix={<Lock />}
           />
         </Form.Item>
 

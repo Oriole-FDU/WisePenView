@@ -6,8 +6,8 @@ import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Input, Modal, Popconfirm, Tag } from 'antd';
 import clsx from 'clsx';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { LuPlus } from 'react-icons/lu';
 import type { StickerManageModalProps } from './index.type';
 import styles from './style.module.less';
 
@@ -211,7 +211,7 @@ function StickerManageModal({ open, onCancel, onSuccess }: StickerManageModalPro
                   isDisabled={addLoading}
                   style={{ marginTop: 12 }}
                 >
-                  <IconText icon={<LuPlus />} iconSize={16}>
+                  <IconText icon={<Plus />} iconSize={16}>
                     新建标签
                   </IconText>
                 </Button>
