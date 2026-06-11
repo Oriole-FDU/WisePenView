@@ -32,23 +32,35 @@ const mapNoteInfoDisplayFromApi = (data: NoteInfoResponse): NoteInfoDisplayData 
   const ownerId = normalizeId(resourceInfo.ownerId) || undefined;
   // authors 可能缺失，按空数组处理
   const authorIds = data.noteInfo.authors ?? [];
+  const currentActions = coerceResourceActions(
+    resourceInfo.currentActions as unknown[] | undefined
+  );
+  const authorsById = Object.fromEntries(
+    authorIds.map((authorId) => {
+      const author = data.authorsDisplay?.[authorId];
+      return [
+        authorId,
+        {
+          // fallback：作者展示名缺失时显示未知用户
+          name: author?.nickname || author?.realName || '未知用户',
+          avatar: author?.avatar,
+        },
+      ];
+    })
+  );
 
   return {
     noteTitle: resourceInfo.resourceName,
     ownerId,
-    authors: authorIds.map((authorId) => {
-      const author = data.authorsDisplay?.[authorId];
-      return {
-        // fallback：作者展示名缺失时显示未知用户
-        name: author?.nickname || author?.realName || '未知用户',
-        avatar: author?.avatar,
-      };
-    }),
+    authors: authorIds.map((authorId) => authorsById[authorId]),
+    authorsById,
     // 更新时间缺失时使用占位文案
     lastEditedAtText: formatTimestampToDateTime(data.noteInfo.lastUpdatedAt) || '暂无',
     // 资源实体（已归一化），供展示阅读量/点赞/评分等统计字段
     resourceInfo,
-    canCollaborativeEdit: resourceActionsInclude(resourceInfo.currentActions, RESOURCE_ACTION.EDIT),
+    canCollaborativeEdit: resourceActionsInclude(currentActions, RESOURCE_ACTION.EDIT),
+    commentsEnabled: resourceActionsInclude(currentActions, RESOURCE_ACTION.VIEW),
+    canEditComments: resourceActionsInclude(currentActions, RESOURCE_ACTION.COMMENT_EDIT),
   };
 };
 

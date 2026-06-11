@@ -1,0 +1,276 @@
+.withCommentsSidebar {
+  .bodyBlockNoteView {
+    box-sizing: border-box;
+    padding-right: var(--comments-sidebar-width, 300px);
+  }
+}
+
+.threadsSidebarSurface {
+  :global(.bn-threads-sidebar) {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: visible;
+    padding: 8px;
+  }
+
+  /* 覆盖 BlockNote Mantine 默认 min-width: 350px，避免窄容器裁切操作按钮 */
+  :global(.bn-mantine .bn-thread) {
+    min-width: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    gap: 10px;
+    box-sizing: border-box;
+  }
+
+  :global(.bn-thread) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  :global(.bn-thread *) {
+    box-sizing: border-box;
+  }
+
+  :global(.bn-thread .bn-header-text) {
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  :global(.bn-thread-comments) {
+    gap: 8px !important;
+  }
+
+  :global(.bn-thread-comment > .mantine-Group-root) {
+    gap: 8px !important;
+    flex-wrap: wrap;
+  }
+
+  :global(.bn-comment-editor),
+  :global(.bn-thread-comment) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* 正文编辑区有 padding-bottom: 60vh，批注内嵌编辑器需重置 */
+  :global(.bn-thread .bn-editor),
+  :global(.bn-comment-editor .bn-editor) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding-bottom: 0 !important;
+    min-height: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  :global(.bn-thread-comment-content),
+  :global(.bn-comment-content),
+  :global(.bn-comment-body) {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  :global(.bn-comment-actions-wrapper),
+  :global(.bn-comment-actions),
+  :global(.bn-action-toolbar) {
+    min-width: 0;
+    max-width: 100%;
+    flex-shrink: 0;
+  }
+
+  :global(.bn-menu-dropdown) {
+    max-height: none !important;
+    overflow: visible !important;
+    z-index: 20;
+  }
+
+  :global(.bn-thread-comment:has(.bn-menu-dropdown)) {
+    z-index: 30;
+  }
+}
+
+.historyThreadsSurface {
+  --bn-colors-editor-text: var(--ant-color-text, #3f3f3f);
+  --bn-colors-editor-background: var(--ant-color-bg-container, #ffffff);
+  --bn-colors-menu-text: var(--ant-color-text, #3f3f3f);
+  --bn-colors-menu-background: var(--ant-color-bg-container, #ffffff);
+  --bn-colors-hovered-background: var(--ant-color-fill-tertiary, #f5f5f5);
+  --bn-colors-border: var(--ant-color-border-secondary, #efefef);
+  --bn-colors-shadow: transparent;
+  --bn-border-radius: var(--ant-border-radius, 6px);
+  --bn-ui-base-z-index: 1000;
+
+  width: min(100%, 360px);
+  margin: 0 auto;
+
+  :global(.bn-threads-sidebar) {
+    max-height: min(62vh, 500px);
+    padding: 0;
+    gap: 10px;
+  }
+
+  :global(.bn-thread) {
+    border: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+    box-shadow: none;
+  }
+
+  :global(.bn-comment-actions),
+  :global(.bn-comment-reactions),
+  :global(.bn-thread-composer) {
+    display: none !important;
+  }
+}
+
+.historyThreadItem {
+  position: relative;
+}
+
+.historyThreadReopenWrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+}
+
+.historyThreadReopenTrigger {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.historyThreadReopenButton {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ant-border-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ant-color-text-secondary);
+  background: transparent;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ant-color-primary);
+    background: var(--ant-color-fill-tertiary);
+  }
+}
+
+.threadsSidebarPanel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--comments-sidebar-width, 300px);
+  min-width: var(--comments-sidebar-min-width, 280px);
+  height: 100%;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+  background: var(--ant-color-bg-container, #fff);
+  overflow: visible;
+}
+
+.threadsSidebarPanelResizing {
+  user-select: none;
+}
+
+.threadsSidebarResizeHandle {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 8px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: col-resize;
+  z-index: 3;
+
+  &:hover,
+  .threadsSidebarPanelResizing & {
+    background: color-mix(in srgb, var(--ant-color-primary, #1677ff) 20%, transparent);
+  }
+}
+
+.hiddenCommentReactionAction {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hiddenCommentReactionTrigger {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+}
+
+.floatingCommentComposer {
+  width: 260px;
+  max-width: calc(100vw - 32px);
+
+  :global(.bn-thread) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  :global(.bn-comment-editor) {
+    width: 100%;
+    min-width: 0;
+  }
+
+  :global(.bn-comment-editor .bn-editor) {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 8px 10px;
+    padding-bottom: 8px !important;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  :global(.bn-comment-actions-wrapper) {
+    margin-top: 6px;
+  }
+
+  :global(.bn-comment-actions) {
+    padding: 2px;
+  }
+}
+
+.editorShellWithComments {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

@@ -29,8 +29,13 @@ export class NoteStatusObserver {
     const observable = provider as unknown as YWebSocketObservable;
 
     const onStatus = (...args: unknown[]) => {
-      if (parseStatusPayload(args[0]) === 'disconnected') {
+      const payload = parseStatusPayload(args[0]);
+      if (payload === 'disconnected') {
         this.updateStatus('disconnected');
+        return;
+      }
+      if (payload === 'connected') {
+        this.updateStatus('connected');
       }
     };
 
@@ -51,6 +56,11 @@ export class NoteStatusObserver {
 
   detach(): void {
     this._detachFns.splice(0).forEach((fn) => fn());
+  }
+
+  reset(): void {
+    this._status = 'connecting';
+    this._subscribers.forEach((fn) => fn());
   }
 
   private updateStatus(next: NoteSessionStatus): void {

@@ -1,0 +1,42 @@
+.formulaCommentButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--ant-color-border-secondary, #f0f0f0);
+  border-radius: 6px;
+  background: var(--ant-color-bg-container, #fff);
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.65));
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    color: var(--ant-color-primary, #1677ff);
+    border-color: var(--ant-color-primary-border, #91caff);
+  }
+}
+
+:global(.bn-math-block-root:hover) .formulaCommentButton,
+:global(.bn-inline-math-root:hover) .formulaCommentButton,
+:global(.bn-math-block-root:focus-within) .formulaCommentButton,
+:global(.bn-inline-math-root:focus-within) .formulaCommentButton {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+:global(.bn-inline-math-root) .formulaCommentButton {
+  top: -2px;
+  right: -2px;
+}

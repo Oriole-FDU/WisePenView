@@ -1,12 +1,13 @@
 import { useRequest, useUnmount } from 'ahooks';
 import { Alert, Result, Segmented, Spin } from 'antd';
-import { ChevronsLeft, Menu } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { ChevronsLeft, Menu, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import EntryIcon from '@/components/Common/EntryIcon';
 import IconText from '@/components/Common/IconText';
 import CustomBlockNote from '@/components/Note/CustomBlockNote';
+import { useCommentSettingsSync } from '@/components/Note/CustomBlockNote/comments';
 import type { NoteBodyEditorHandle } from '@/components/Note/CustomBlockNote/index.type';
 import NoteOutline from '@/components/Note/NoteOutline';
 import {
@@ -23,8 +24,9 @@ import { RESOURCE_TYPE } from '@/domains/Resource';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useSmoothFlag } from '@/hooks/useSmoothFlag';
 import { useAiDiffDisplayStore } from '@/store';
+import { useNoteCommentsSidebarStore } from '@/store/useNoteCommentsSidebarStore';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, Dropdown, toast } from '@heroui/react';
+import { Button, Checkbox, Dropdown, Modal, Switch, Tooltip, toast } from '@heroui/react';
 import NoteInfoBar from './_components/NoteInfoBar';
 import NotePermissionModal from './_components/NotePermissionModal';
 import NoteTitle from './_components/NoteTitle';
@@ -75,9 +77,12 @@ function NoteViewConnected({
   const [isReconnectLoading, setIsReconnectLoading] = useState(false);
   const [isOutlineOpen, setIsOutlineOpen] = useState(true);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
+  const [isCommentHistoryOpen, setIsCommentHistoryOpen] = useState(false);
   const [outlineItems, setOutlineItems] = useState<NoteOutlineItem[]>([]);
   const [activeHeadingId, setActiveHeadingId] = useState<string | undefined>(undefined);
   const [pdfExportLoading, setPdfExportLoading] = useState(false);
+  const [isPdfExportModalOpen, setIsPdfExportModalOpen] = useState(false);
+  const [pdfIncludeComments, setPdfIncludeComments] = useState(false);
   const [isDownloadingMarkdown, setIsDownloadingMarkdown] = useState(false);
   const [aiDiffPresence, setAiDiffPresence] = useState<{
     resourceId: string;
@@ -86,14 +91,30 @@ function NoteViewConnected({
     resourceId,
     hasAiDiffContent: false,
   });
-  const { status, doc, provider, reconnect } = useNoteSession(resourceId);
+  const { status, doc, provider, reconnect, idbSynced } = useNoteSession(resourceId);
+  const threadsSidebarCollapsed = useNoteCommentsSidebarStore(
+    (state) => state.collapsedByResourceId[resourceId] ?? false
+  );
+  const toggleNoteCommentsSidebar = useNoteCommentsSidebarStore(
+    (state) => state.toggleNoteCommentsSidebarCollapsed
+  );
+  const commentsSidebarWidth = useNoteCommentsSidebarStore((state) =>
+    state.getNoteCommentsSidebarWidth(resourceId)
+  );
+  const setNoteCommentsSidebarWidth = useNoteCommentsSidebarStore(
+    (state) => state.setNoteCommentsSidebarWidth
+  );
+  const { settings: commentSettings, setCollaboratorVisibility } = useCommentSettingsSync(
+    status === 'connected' ? doc : null
+  );
 
   const isConnected = status === 'connected';
   const isDisconnected = useSmoothFlag(status === 'disconnected', 2000, 2000);
   const isEditorReadOnly = status === 'connecting' || !noteInfoDisplay.canCollaborativeEdit;
   const isTitleReadOnly = !noteInfoDisplay.canCollaborativeEdit;
   const blockLocalDocWrites = isConnected && !noteInfoDisplay.canCollaborativeEdit;
-  const showFullPageSpin = status === 'connecting';
+  // IndexedDB 就绪或 WebSocket 已连通即可进入编辑；避免仅因 Yjs sync 未完成而一直遮罩
+  const showFullPageSpin = status === 'connecting' && !idbSynced;
 
   const userService = useUserService();
   const resourceService = useResourceService();
@@ -150,14 +171,11 @@ function NoteViewConnected({
   const showAiDiffDisplayModeSwitch =
     aiDiffPresence.resourceId === resourceId && aiDiffPresence.hasAiDiffContent;
 
-  const handleAiDiffPresenceChange = useCallback(
-    (hasAiDiffContent: boolean) => {
-      setAiDiffPresence({ resourceId, hasAiDiffContent });
-    },
-    [resourceId]
-  );
+  const handleAiDiffPresenceChange = (hasAiDiffContent: boolean) => {
+    setAiDiffPresence({ resourceId, hasAiDiffContent });
+  };
 
-  const handlePrintPdf = async () => {
+  const handlePrintPdf = async (includeComments: boolean) => {
     const bodyApi = bodyEditorRef.current;
     if (!bodyApi) {
       toast.info('编辑器未就绪');
@@ -168,11 +186,12 @@ function NoteViewConnected({
     const titleRoot = titleApi?.getProseMirrorRoot() ?? null;
     try {
       setPdfExportLoading(true);
-      await bodyApi.exportPdf({ title, titleRoot });
+      await bodyApi.exportPdf({ title, titleRoot, includeComments });
     } catch (err) {
       toast.danger(parseErrorMessage(err));
     } finally {
       setPdfExportLoading(false);
+      setIsPdfExportModalOpen(false);
     }
   };
 
@@ -198,14 +217,20 @@ function NoteViewConnected({
   const headerMorePending = pdfExportLoading || isDownloadingMarkdown;
   const canManageNotePermission =
     Boolean(noteInfoDisplay.ownerId) && currentUser?.id === noteInfoDisplay.ownerId;
+  const commentsSidebarToggleLabel = threadsSidebarCollapsed ? '展开批注栏' : '收起批注栏';
 
   const handleMoreAction = (key: React.Key) => {
     if (key === 'permission') {
       setIsPermissionModalOpen(true);
       return;
     }
+    if (key === 'comment-history') {
+      setIsCommentHistoryOpen(true);
+      return;
+    }
     if (key === 'print-pdf') {
-      void handlePrintPdf();
+      setPdfIncludeComments(false);
+      setIsPdfExportModalOpen(true);
       return;
     }
     if (key === 'download-md') {
@@ -230,35 +255,86 @@ function NoteViewConnected({
                 onChange={(value) => setAiDiffDisplayMode(value as AiDiffDisplayMode)}
               />
             ) : null}
-            <div className={styles.headerMoreWrap}>
-              <Dropdown>
-                <Dropdown.Trigger>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    isPending={headerMorePending}
-                    isDisabled={showFullPageSpin}
-                    aria-label="更多"
-                  >
-                    更多
-                  </Button>
-                </Dropdown.Trigger>
-                <Dropdown.Popover placement="bottom end">
-                  <Dropdown.Menu aria-label="笔记更多操作" onAction={handleMoreAction}>
+            <div className={styles.headerActionsEnd}>
+              <div className={styles.headerMoreWrap}>
+                <Dropdown>
+                  <Dropdown.Trigger>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      isPending={headerMorePending}
+                      isDisabled={showFullPageSpin}
+                      aria-label="更多"
+                    >
+                      更多
+                    </Button>
+                  </Dropdown.Trigger>
+                  <Dropdown.Popover placement="bottom end" className={styles.noteMorePopover}>
                     {canManageNotePermission ? (
-                      <Dropdown.Item id="permission" textValue="权限配置">
-                        权限配置
-                      </Dropdown.Item>
+                      <div
+                        className={styles.ownerCommentPolicyRow}
+                        onPointerDown={(event) => event.stopPropagation()}
+                      >
+                        <span className={styles.ownerCommentPolicyLabel}>
+                          协作者仅可见自己的批注
+                        </span>
+                        <Switch
+                          aria-label="协作者仅可见自己的批注"
+                          isSelected={commentSettings.collaboratorVisibility === 'own_only'}
+                          isDisabled={!isConnected}
+                          onChange={(selected) =>
+                            setCollaboratorVisibility(selected ? 'own_only' : 'all')
+                          }
+                          size="sm"
+                        >
+                          <Switch.Control>
+                            <Switch.Thumb />
+                          </Switch.Control>
+                        </Switch>
+                      </div>
                     ) : null}
-                    <Dropdown.Item id="print-pdf" textValue="打印为pdf">
-                      打印为pdf
-                    </Dropdown.Item>
-                    <Dropdown.Item id="download-md" textValue="下载为md">
-                      下载为md
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown.Popover>
-              </Dropdown>
+                    <Dropdown.Menu aria-label="笔记更多操作" onAction={handleMoreAction}>
+                      {canManageNotePermission ? (
+                        <Dropdown.Item id="permission" textValue="权限配置">
+                          权限配置
+                        </Dropdown.Item>
+                      ) : null}
+                      {noteInfoDisplay.commentsEnabled ? (
+                        <Dropdown.Item id="comment-history" textValue="历史批注">
+                          历史批注
+                        </Dropdown.Item>
+                      ) : null}
+                      <Dropdown.Item id="print-pdf" textValue="打印为pdf">
+                        打印为pdf
+                      </Dropdown.Item>
+                      <Dropdown.Item id="download-md" textValue="下载为md">
+                        下载为md
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown.Popover>
+                </Dropdown>
+              </div>
+              {noteInfoDisplay.commentsEnabled ? (
+                <Tooltip>
+                  <Tooltip.Trigger>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      isDisabled={showFullPageSpin}
+                      aria-label={commentsSidebarToggleLabel}
+                      aria-expanded={!threadsSidebarCollapsed}
+                      onPress={() => toggleNoteCommentsSidebar(resourceId)}
+                    >
+                      {threadsSidebarCollapsed ? (
+                        <PanelRightOpen size={16} />
+                      ) : (
+                        <PanelRightClose size={16} />
+                      )}
+                    </Button>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>{commentsSidebarToggleLabel}</Tooltip.Content>
+                </Tooltip>
+              ) : null}
             </div>
           </div>
         }
@@ -363,6 +439,21 @@ function NoteViewConnected({
                     onOutlineChange={setOutlineItems}
                     onActiveHeadingChange={setActiveHeadingId}
                     onAiDiffPresenceChange={handleAiDiffPresenceChange}
+                    commentsEnabled={noteInfoDisplay.commentsEnabled}
+                    commentsUiEnabled={isConnected && noteInfoDisplay.commentsEnabled}
+                    commentsAuthorizable={noteInfoDisplay.canEditComments}
+                    commentsWritable={isConnected && noteInfoDisplay.canEditComments}
+                    commentUserId={currentUser?.id}
+                    commentUsersById={noteInfoDisplay.authorsById}
+                    isNoteOwner={canManageNotePermission}
+                    collaboratorVisibility={commentSettings.collaboratorVisibility}
+                    commentsSidebarCollapsed={threadsSidebarCollapsed}
+                    commentsSidebarWidth={commentsSidebarWidth}
+                    onCommentsSidebarWidthChange={(width) =>
+                      setNoteCommentsSidebarWidth(resourceId, width)
+                    }
+                    commentHistoryOpen={isCommentHistoryOpen}
+                    onCommentHistoryOpenChange={setIsCommentHistoryOpen}
                   />
                 </div>
                 <ResourceInteractFooter resourceId={resourceId} onRateSuccess={onRefreshNoteInfo} />
@@ -386,6 +477,55 @@ function NoteViewConnected({
         onOpenChange={setIsPermissionModalOpen}
         onSuccess={onRefreshNoteInfo}
       />
+      <Modal isOpen={isPdfExportModalOpen} onOpenChange={setIsPdfExportModalOpen}>
+        <Modal.Backdrop isDismissable>
+          <Modal.Container size="sm" placement="center">
+            <Modal.Dialog>
+              <Modal.Header>
+                <Modal.Heading>打印为 PDF</Modal.Heading>
+              </Modal.Header>
+              <Modal.Body>
+                {noteInfoDisplay.commentsEnabled ? (
+                  <div
+                    className={styles.pdfExportOptionRow}
+                    onPointerDown={(event) => event.stopPropagation()}
+                  >
+                    <Checkbox
+                      isSelected={pdfIncludeComments}
+                      isDisabled={pdfExportLoading}
+                      onChange={setPdfIncludeComments}
+                      variant="secondary"
+                    >
+                      <Checkbox.Control>
+                        <Checkbox.Indicator />
+                      </Checkbox.Control>
+                      <Checkbox.Content>
+                        <span>包含批注</span>
+                      </Checkbox.Content>
+                    </Checkbox>
+                  </div>
+                ) : null}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  isDisabled={pdfExportLoading}
+                  onPress={() => setIsPdfExportModalOpen(false)}
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="primary"
+                  isPending={pdfExportLoading}
+                  onPress={() => void handlePrintPdf(pdfIncludeComments)}
+                >
+                  确认打印
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </div>
   );
 }
@@ -493,6 +633,7 @@ function NoteView() {
 
   return (
     <NoteViewConnected
+      key={resourceId}
       noteId={noteId}
       resourceId={resourceId}
       noteInfoDisplay={noteInfoDisplay}

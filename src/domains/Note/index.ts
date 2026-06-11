@@ -8,6 +8,7 @@ export type {
   GetNoteInfoRequest,
   GetNotePermissionConfigRequest,
   INoteService,
+  NoteCommentUserDisplayRecord,
   NoteInfoDisplayAuthor,
   NoteInfoDisplayData,
   NotePermissionConfig,

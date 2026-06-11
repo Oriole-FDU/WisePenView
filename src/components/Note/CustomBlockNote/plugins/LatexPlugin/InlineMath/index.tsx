@@ -5,11 +5,15 @@ import { createReactInlineContentSpec } from '@blocknote/react';
 import type { Transaction } from '@tiptap/pm/state';
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note/enum';
 import { useEffectForce } from '@/hooks/useEffectForce';
 import 'katex/dist/katex.min.css';
+import type { FormulaThreadAnchor } from '../../../comments/commentThreadConstants';
+import { useLatexComment } from '../../../comments/formula/latexCommentContext';
+import { captureInlineMathAnchor } from '../../../comments/formula/latexCommentSupport';
+import { LatexFormulaCommentButton } from '../../../comments/formula/LatexFormulaCommentButton';
 import { useNoteEditorReadOnlyContext } from '../../../editorReadOnly';
 import { useAiDiffDisplayModeContext } from '../../AIDiffPlugin/displayModeContext';
 import aiDiffStyles from '../../AIDiffPlugin/style.module.less';
@@ -80,11 +84,6 @@ function InlineMathFormulaPreview({
 }) {
   const mathRef = useRef<HTMLSpanElement>(null);
 
-  /**
-   * 执行时机：expression 变化后，把最新 LaTeX 渲染到当前 span DOM。
-   * 不可替代原因：KaTeX 需要命令式写入真实 DOM，无法通过 React 派生状态完成。
-   * cleanup：renderKatexInto 会覆盖容器内容，无需额外释放订阅或计时器。
-   */
   useEffectForce(() => {
     const el = mathRef.current;
     if (!el) return;
@@ -300,6 +299,7 @@ function InlineMathView(
   const aiDiffDisplayMode = useAiDiffDisplayModeContext();
   const { contentRef, updateInlineContent, inlineContent, editor } = props;
   const readOnly = useNoteEditorReadOnlyContext();
+  const latexComment = useLatexComment();
   const expression = inlineContent.props.expression as string;
   const autoOpenEdit = inlineContent.props.autoOpenEdit as boolean;
   const aiDiffType = String(inlineContent.props.aiDiffType ?? '');
@@ -316,6 +316,37 @@ function InlineMathView(
     left: number;
     width: number;
   } | null>(null);
+  const anchorRef = useRef<FormulaThreadAnchor | null>(null);
+
+  useLayoutEffect(() => {
+    if (!shellRef.current) {
+      return;
+    }
+    const next = captureInlineMathAnchor(editor, shellRef.current);
+    if (next) {
+      anchorRef.current = next;
+    }
+  }, [editor, expression, isEditing]);
+
+  const getInlineFormulaAnchor = () =>
+    (shellRef.current ? captureInlineMathAnchor(editor, shellRef.current) : null) ??
+    anchorRef.current;
+
+  const updateInlineFormulaReference = (
+    nextExpression: string,
+    anchor = getInlineFormulaAnchor(),
+    persist = false
+  ) => {
+    if (!anchor) {
+      return;
+    }
+    latexComment?.updateFormulaCommentReference({
+      anchor,
+      expression: nextExpression,
+      kind: 'inline',
+      persist,
+    });
+  };
 
   const clearPopoverPos = useCallback(() => {
     setPopoverPos(null);
@@ -349,13 +380,7 @@ function InlineMathView(
   const hasPendingAiDiff = viewState.hasDiff;
   const canEnterEdit = !readOnly && !hasPendingAiDiff && !isEditing;
 
-  /**
-   * 执行时机：外部 expression 变化且当前不在编辑态时，同步本地输入草稿。
-   * 不可替代原因：编辑态 value 是用户未提交草稿，非编辑态 value 又要跟随 BlockNote 节点属性；二者边界由渲染后的 isEditing 决定。
-   * cleanup：只做本地 state 同步，不注册外部资源。
-   *
-   * TODO: latexSupport 后续整体重构时，优先改为更明确的草稿状态模型。
-   */
+  // TODO: 重构，不使用useEffect，使用更合适的语义以增加可读性，但是latexSupport有完全重构的可能，因此暂时保留
   useEffectForce(() => {
     if (isEditing) return;
     setValue(expression);
@@ -363,11 +388,6 @@ function InlineMathView(
 
   const displayLatex = isEditing ? value : expression;
 
-  /**
-   * 执行时机：插件把 autoOpenEdit 置为 true 后，消费该标记并打开行内公式编辑器。
-   * 不可替代原因：autoOpenEdit 来自 BlockNote 插件写入的节点属性，不是当前组件内的点击事件。
-   * cleanup：同步清除 autoOpenEdit 标记，不额外持有订阅或计时器。
-   */
   useEffectForce(() => {
     if (readOnly) return;
     if (!autoOpenEdit) return;
@@ -393,6 +413,13 @@ function InlineMathView(
       textareaBlurTimerRef.current = null;
     }
     setValue(expression);
+    updateInlineFormulaReference(expression);
+    const anchor = getInlineFormulaAnchor();
+    if (anchor) {
+      window.setTimeout(() => {
+        latexComment?.clearFormulaCommentReferenceOverride(anchor);
+      }, 0);
+    }
     setIsEditing(false);
   };
 
@@ -497,7 +524,11 @@ function InlineMathView(
       hint="Enter / Shift+Enter 确定 · Esc 取消 · 不可换行"
       textareaClassName={popoverStyles.inlineEditTextarea}
       value={value}
-      onChange={(e) => setValue(e.target.value.replace(/\n/g, ''))}
+      onChange={(e) => {
+        const nextValue = e.target.value.replace(/\n/g, '');
+        setValue(nextValue);
+        updateInlineFormulaReference(nextValue);
+      }}
       onCommit={commit}
       commitEnterUnlessShift={false}
       onCancel={cancel}
@@ -526,6 +557,9 @@ function InlineMathView(
       className={`${popoverStyles.mathShellInline} bn-inline-math-root`}
       contentEditable={false}
     >
+      {!isEditing && !hasPendingAiDiff ? (
+        <LatexFormulaCommentButton expression={expression} kind="inline" shellRef={shellRef} />
+      ) : null}
       {viewState.mode === 'plain' ? (
         <span
           className={

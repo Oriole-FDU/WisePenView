@@ -4,6 +4,50 @@
   display: flex;
   flex-direction: column;
 
+  /* 批注侧栏：覆盖 BlockNote Mantine 默认 min-width:350px，避免窄栏裁切 */
+  :global(.wise-pen-comments-sidebar-panel .bn-thread) {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    gap: 10px;
+  }
+
+  :global(.wise-pen-comments-sidebar-panel .bn-threads-sidebar) {
+    overflow-x: visible;
+  }
+
+  :global(.wise-pen-comments-sidebar-panel .bn-thread .bn-header-text) {
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  :global(.wise-pen-comments-sidebar-panel .bn-thread-comment > .mantine-Group-root) {
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+
+  :global(.wise-pen-comments-sidebar-panel .bn-thread .bn-editor),
+  :global(.wise-pen-comments-sidebar-panel .bn-comment-editor .bn-editor) {
+    padding-bottom: 0 !important;
+    min-height: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* 正文批注原文高亮 */
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark:not([data-orphan='true'])) {
+    background: #ffc80026;
+    border-radius: 2px;
+  }
+
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark.bn-thread-mark-selected:not([data-orphan='true'])),
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark .bn-thread-mark-selected) {
+    background: #ffc80040;
+  }
+
   /* BlockNote 默认会有自己的字体变量，这里统一到应用字体栈（仅作用正文编辑区） */
   :global(.bn-container),
   :global(.bn-editor),
@@ -13,8 +57,8 @@
     font-family: var(--app-font-family);
   }
 
-  /* 贴近飞书文档的正文与标题字阶（仅作用正文编辑区） */
-  :global(.bn-editor) {
+  /* 贴近飞书文档的正文与标题字阶（仅作用正文编辑区，不影响侧栏/浮层批注编辑器） */
+  :global(.bodyBlockNoteView .bn-editor) {
     font-size: 16px;
     padding-bottom: 60vh;
   }

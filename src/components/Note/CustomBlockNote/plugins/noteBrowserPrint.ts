@@ -6,6 +6,8 @@ export interface PrintNotePdfOptions {
   title?: string;
   /** 克隆自 NoteTitle 的 ProseMirror 根；有则不再插入合成 h1 */
   titleRoot?: HTMLElement | null;
+  /** 打印 DOM 末尾追加的批注摘要区 */
+  commentsSection?: HTMLElement | null;
 }
 
 const PRINT_IFRAME_STYLE =
@@ -48,6 +50,15 @@ const PRINT_SUPPLEMENTAL_CSS = `
   .note-print-content {
     margin: 0;
   }
+  .note-print-layout {
+    display: block;
+  }
+  .note-print-layout-with-comments {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 58mm;
+    column-gap: 8mm;
+    align-items: start;
+  }
   .note-print-body {
     color: #111;
   }
@@ -65,6 +76,88 @@ const PRINT_SUPPLEMENTAL_CSS = `
   .note-print-body .bn-editor .katex-display,
   .note-print-title .katex-display {
     margin: 0.6em 0 !important;
+  }
+  .note-print-comments {
+    margin: 0;
+    padding: 0 0 0 6mm;
+    border-left: 1px solid #e5e7eb;
+    page-break-before: auto;
+  }
+  .note-print-comments-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 0.75em;
+    color: #111;
+  }
+  .note-print-comment-thread {
+    margin: 0 0 1em;
+    padding: 0.65em;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fafafa;
+    page-break-inside: avoid;
+  }
+  .note-print-comment-reference {
+    margin: 0 0 0.5em;
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+  }
+  .note-print-comment-status {
+    margin: 0 0 0.5em;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .note-print-comment-list {
+    margin: 0;
+    padding-left: 0;
+    font-size: 13px;
+    color: #111;
+    list-style: none;
+  }
+  .note-print-comment-item {
+    margin: 0.5em 0;
+  }
+  .note-print-comment-author {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111827;
+  }
+  .note-print-comment-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+    background: #e5e7eb;
+  }
+  .note-print-comment-avatar-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #4b5563;
+  }
+  .note-print-comment-username {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .note-print-comment-text {
+    display: block;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #111827;
+    overflow-wrap: anywhere;
+  }
+  @media print {
+    .note-print-layout-with-comments {
+      grid-template-columns: minmax(0, 1fr) 58mm;
+    }
   }
   .note-print-body [data-ai-diff-block-display-hidden='true'],
   .note-print-body .bn-block-outer:has(> .bn-block-content [data-ai-diff-block-display-hidden='true']),
@@ -199,10 +292,21 @@ function buildPrintDocument(
     article.appendChild(h1);
   }
 
+  const layout = doc.createElement('div');
+  layout.className = options?.commentsSection
+    ? 'note-print-layout note-print-layout-with-comments'
+    : 'note-print-layout';
+
   const contentHost = doc.createElement('div');
   contentHost.className = 'note-print-content';
   contentHost.appendChild(doc.importNode(proseMirrorRoot, true));
-  article.appendChild(contentHost);
+  layout.appendChild(contentHost);
+
+  if (options?.commentsSection) {
+    layout.appendChild(doc.importNode(options.commentsSection, true));
+  }
+
+  article.appendChild(layout);
   doc.body.appendChild(article);
 }
 

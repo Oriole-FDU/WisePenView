@@ -54,6 +54,7 @@ export const RESOURCE_ACTION = createEnum([
   { value: 4, key: 'EDIT', label: '协同编辑' },
   { value: 8, key: 'DOWNLOAD_WATERMARK', label: '导出/下载带水印' },
   { value: 16, key: 'DOWNLOAD_ORIGINAL', label: '下载源文件' },
+  { value: 32, key: 'COMMENT_EDIT', label: '编辑批注' },
 ] as const);
 
 export type TagQueryLogicMode = EnumValue<typeof TAG_QUERY_LOGIC_MODE>;
@@ -95,6 +96,8 @@ const RESOURCE_ACTION_IMPLIED_MASK: Record<ResourceAction, number> = {
     RESOURCE_ACTION.DOWNLOAD_WATERMARK |
     RESOURCE_ACTION.VIEW |
     RESOURCE_ACTION.DISCOVER,
+  [RESOURCE_ACTION.COMMENT_EDIT]:
+    RESOURCE_ACTION.COMMENT_EDIT | RESOURCE_ACTION.VIEW | RESOURCE_ACTION.DISCOVER,
 };
 
 const RESOURCE_ACTION_ORDER = RESOURCE_ACTION.options.map((item) => item.value as ResourceAction);

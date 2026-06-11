@@ -10,6 +10,7 @@ import { clearCurrentChatSessionStore } from './useCurrentChatSessionStore';
 import { clearDrivePreferencesStore } from './useDrivePreferencesStore';
 import { clearNewChatSessionStore } from './useNewChatSessionStore';
 import { clearNewNoteStore } from './useNewNoteStore';
+import { clearNoteCommentsSidebarStore } from './useNoteCommentsSidebarStore';
 import { clearNoteSelectionStore } from './useNoteSelectionStore';
 import { clearPdfPreviewProgressStore } from './usePdfPreviewProgressStore';
 import { clearResourceDisplayNameStore } from './useResourceDisplayNameStore';
@@ -24,6 +25,7 @@ export function clearAllZustandStores(): void {
   clearPdfPreviewProgressStore();
   clearDrivePreferencesStore();
   clearAiDiffDisplayStore();
+  clearNoteCommentsSidebarStore();
   clearNoteSelectionStore();
   clearTrashTagStore();
   clearNewNoteStore();

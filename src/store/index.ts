@@ -47,3 +47,8 @@ export {
   type TemporarySkillSelection,
   type TemporaryToolSelection,
 } from './zustand';
+
+export {
+  clearNoteCommentsSidebarStore,
+  useNoteCommentsSidebarStore,
+} from './useNoteCommentsSidebarStore';

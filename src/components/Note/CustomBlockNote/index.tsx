@@ -1,7 +1,8 @@
-import { useChatService, useImageService } from '@/domains';
+import { useChatService, useImageService, useUserService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
 import type { AiDiffDisplayMode } from '@/domains/Note';
 import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
+import type { User } from '@/domains/User';
 import {
   useChatPanelStore,
   useCurrentChatSessionStore,
@@ -19,12 +20,39 @@ import { BlockNoteView } from '@blocknote/mantine';
 import '@blocknote/mantine/style.css';
 import { useCreateBlockNote } from '@blocknote/react';
 import { toast } from '@heroui/react';
+import { TextSelection } from '@tiptap/pm/state';
 import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
-import { useCallback, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
+import clsx from 'clsx';
+import {
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type Ref,
+} from 'react';
 import NoteSlashMenu from '../NoteSlashMenu';
 import NoteToolbar from '../NoteToolbar';
 import { hasAiDiffContentFromEditor } from './AiDiffPresence';
-import { blockNoteSchema } from './blockNoteSchema';
+import { blockNoteSchema, type CustomBlockNoteEditor } from './blockNoteSchema';
+import {
+  buildCommentsExtension,
+  buildPrintCommentsSection,
+  capturePendingCommentSelection,
+  commentStyles,
+  getBlockNoteCommentUsersYMap,
+  getBlockNoteThreadsYMap,
+  isCommentableSelection,
+  LatexCommentProvider,
+  NoteCommentsUi,
+  resolveActiveCommentUserProfile,
+  resolveBlockNoteCommentUsers,
+  useFormulaComments,
+  useSyncCommentDocumentMarks,
+  type PendingCommentReference,
+  type PendingCommentSelection,
+} from './comments';
+import { syncCommentUserProfileToYMap } from './comments/commentUserProfile';
 import { mergeReadOnlyEditorProps, NoteEditorReadOnlyProvider } from './editorReadOnly';
 import { useAttachNoteYjsUndoStack, useNoteCaptureKeyEvent, useNoteYjsUndoManager } from './hooks';
 import type { CustomBlockNoteProps, NoteBodyEditorHandle } from './index.type';
@@ -72,7 +100,7 @@ function blockHasNestedChildren(block: { children?: readonly unknown[] }): boole
   return Array.isArray(block.children) && block.children.length > 0;
 }
 
-function CustomBlockNote({
+function CustomBlockNoteEditor({
   resourceId,
   doc,
   provider,
@@ -82,8 +110,23 @@ function CustomBlockNote({
   onOutlineChange,
   onActiveHeadingChange,
   onAiDiffPresenceChange,
+  commentsEnabled = false,
+  commentsUiEnabled,
+  commentsAuthorizable = false,
+  commentsWritable = false,
+  commentUserId,
+  commentUsersById,
+  commentDocumentRole = 'editor',
+  isNoteOwner = false,
+  collaboratorVisibility = 'all',
+  commentsSidebarCollapsed = false,
+  commentsSidebarWidth = 300,
+  onCommentsSidebarWidthChange,
+  commentHistoryOpen = false,
+  onCommentHistoryOpenChange,
+  commentUser,
   ref,
-}: CustomBlockNoteProps & { ref?: Ref<NoteBodyEditorHandle> }) {
+}: CustomBlockNoteProps & { commentUser: User | null; ref?: Ref<NoteBodyEditorHandle> }) {
   const imageService = useImageService();
   const chatService = useChatService();
   const currentSessionId = useCurrentChatSessionStore((state) => state.currentSessionId);
@@ -141,16 +184,103 @@ function CustomBlockNote({
   const effectiveAiDiffDisplayMode = exportDisplayModeOverride ?? aiDiffDisplayMode;
   const lastAiDiffPresenceRef = useRef<boolean | null>(null);
   const [hasAiDiffContent, setHasAiDiffContent] = useState(false);
+  const pendingCommentReferenceRef = useRef<PendingCommentReference | null>(null);
+  /** 与 reference 分离：applyPendingCommentReference 会在 createThread 时清空 reference，但 mark 仍需选区 */
+  const pendingCommentSelectionRef = useRef<PendingCommentSelection | null>(null);
+  const editorRef = useRef<CustomBlockNoteEditor | null>(null);
+  const commitPendingReferenceForThreadRef = useRef<(threadId: string) => void>(() => undefined);
+  const rememberPendingCommentReferenceRef = useRef<() => void>(() => undefined);
   const { noteFragment, undoManager } = useNoteYjsUndoManager(doc);
+  const showCommentsUi = (commentsUiEnabled ?? commentsEnabled) && commentsEnabled;
+  const threadsYMap = getBlockNoteThreadsYMap(doc);
+  const commentUsersYMap = getBlockNoteCommentUsersYMap(doc);
+  const { activeCommentUserId, activeCommentUsername, activeCommentAvatarUrl } =
+    resolveActiveCommentUserProfile(commentUser, commentUserId);
+  const activeCommentUserIdRef = useRef(activeCommentUserId);
+  activeCommentUserIdRef.current = activeCommentUserId;
+
+  const commentResolverContextRef = useRef({
+    activeCommentUserId,
+    activeCommentUsername,
+    activeCommentAvatarUrl,
+    commentUsersById,
+    commentUsersYMap,
+  });
+
+  useUpdateEffect(() => {
+    if (commentsEnabled) {
+      syncCommentUserProfileToYMap(commentUsersYMap, activeCommentUserId, {
+        username: activeCommentUsername,
+        avatarUrl: activeCommentAvatarUrl,
+      });
+    }
+  }, [
+    activeCommentAvatarUrl,
+    activeCommentUserId,
+    activeCommentUsername,
+    commentUsersYMap,
+    commentsEnabled,
+  ]);
+
+  useUpdateEffect(() => {
+    commentResolverContextRef.current = {
+      activeCommentUserId,
+      activeCommentUsername,
+      activeCommentAvatarUrl,
+      commentUsersById,
+      commentUsersYMap,
+    };
+  }, [
+    activeCommentAvatarUrl,
+    activeCommentUserId,
+    activeCommentUsername,
+    commentUsersById,
+    commentUsersYMap,
+  ]);
 
   const plugins = useMemo(() => getNoteEditorPlugins(), []);
-  const editorExtensions = useMemo(
-    () => [
+  const editorExtensions = useMemo(() => {
+    const extensions = [
       ...collectNoteEditorExtensions(plugins),
       createNoteReadOnlyFilterExtension(() => blockLocalDocWritesRef.current),
-    ],
-    [plugins]
-  );
+    ];
+    if (commentsEnabled) {
+      extensions.push(
+        buildCommentsExtension({
+          activeCommentUserId,
+          getActiveCommentUserId: () => activeCommentUserIdRef.current,
+          commentsAuthorizable,
+          isNoteOwner,
+          commentDocumentRole,
+          threadsYMap,
+          doc,
+          resolveUsers: (userIds) =>
+            Promise.resolve(
+              resolveBlockNoteCommentUsers(userIds, commentResolverContextRef.current)
+            ),
+          getEditor: () => editorRef.current,
+          getPendingCommentSelection: () => pendingCommentSelectionRef.current,
+          clearPendingCommentSelection: () => {
+            pendingCommentSelectionRef.current = null;
+          },
+          onThreadDocumentMarked: (threadId) => {
+            commitPendingReferenceForThreadRef.current(threadId);
+          },
+          canAddThreadToDocument: isCommentableSelection,
+        })
+      );
+    }
+    return extensions;
+  }, [
+    activeCommentUserId,
+    commentDocumentRole,
+    commentsEnabled,
+    commentsAuthorizable,
+    isNoteOwner,
+    plugins,
+    threadsYMap,
+    doc,
+  ]);
   const editorProps = useMemo(
     () => mergeReadOnlyEditorProps(collectNoteEditorProps(plugins), effectiveBlockLocalDocWrites),
     [plugins, effectiveBlockLocalDocWrites]
@@ -175,6 +305,11 @@ function CustomBlockNote({
       },
     },
   });
+  editorRef.current = editor;
+
+  useUpdateEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
 
   useMount(() => {
     try {
@@ -206,7 +341,7 @@ function CustomBlockNote({
     setSelectedText(resourceId, editor.getSelectedText());
   });
 
-  const syncAiDiffPresence = useCallback(() => {
+  const syncAiDiffPresence = () => {
     const nextHasAiDiffContent = hasAiDiffContentFromEditor(editor);
     if (lastAiDiffPresenceRef.current === nextHasAiDiffContent) {
       return;
@@ -215,7 +350,7 @@ function CustomBlockNote({
     lastAiDiffPresenceRef.current = nextHasAiDiffContent;
     setHasAiDiffContent(nextHasAiDiffContent);
     onAiDiffPresenceChange?.(nextHasAiDiffContent);
-  }, [editor, onAiDiffPresenceChange]);
+  };
 
   useMount(() => {
     syncAiDiffPresence();
@@ -271,6 +406,55 @@ function CustomBlockNote({
     clearSelectedText(resourceId);
   });
 
+  const {
+    latexCommentProviderProps,
+    rememberPendingCommentReference,
+    commitPendingReferenceForThread,
+    bumpFormulaState,
+    visibleThreadReferenceTexts,
+    formulaThreadPositions,
+  } = useFormulaComments({
+    editor,
+    doc,
+    resourceId,
+    commentsEnabled,
+    commentsWritable,
+    readOnly,
+    pendingCommentReferenceRef,
+    pendingCommentSelectionRef,
+  });
+
+  commitPendingReferenceForThreadRef.current = commitPendingReferenceForThread;
+  rememberPendingCommentReferenceRef.current = rememberPendingCommentReference;
+
+  useSyncCommentDocumentMarks({
+    editor,
+    doc,
+    provider,
+    commentsEnabled,
+    onAfterDocumentMarksSync: bumpFormulaState,
+  });
+
+  useUpdateEffect(() => {
+    if (!commentsEnabled || !commentsWritable) {
+      return;
+    }
+    const extension = editor.getExtension('comments') as
+      | { startPendingComment?: () => void }
+      | undefined;
+    if (!extension?.startPendingComment) {
+      return;
+    }
+    const originalStartPendingComment = extension.startPendingComment.bind(extension);
+    extension.startPendingComment = () => {
+      rememberPendingCommentReferenceRef.current();
+      originalStartPendingComment();
+    };
+    return () => {
+      extension.startPendingComment = originalStartPendingComment;
+    };
+  }, [commentsEnabled, commentsWritable, editor]);
+
   useImperativeHandle(
     ref,
     () => ({
@@ -313,9 +497,26 @@ function CustomBlockNote({
           setExportDisplayModeOverride(AI_DIFF_DISPLAY_MODE.OLD_ONLY);
           syncAiDiffBlockFoldDisplayMode(editor.prosemirrorView, AI_DIFF_DISPLAY_MODE.OLD_ONLY);
           await waitForEditorPaint();
+          const commentsSection =
+            options?.includeComments && commentsEnabled
+              ? buildPrintCommentsSection({
+                  editor,
+                  doc,
+                  visibilityContext: {
+                    currentUserId: activeCommentUserId,
+                    isOwner: isNoteOwner,
+                    collaboratorVisibility,
+                  },
+                  localThreadReferenceTexts: visibleThreadReferenceTexts,
+                  commentUsersById,
+                  commentUsersYMap,
+                  formulaThreadPositions,
+                })
+              : null;
           await printNotePdfViaBrowser(editor, {
             title: options?.title,
             titleRoot: options?.titleRoot,
+            commentsSection,
           });
         } finally {
           setExportDisplayModeOverride(null);
@@ -349,13 +550,69 @@ function CustomBlockNote({
         URL.revokeObjectURL(url);
       },
     }),
-    [aiDiffDisplayMode, editor, plugins]
+    [
+      activeCommentUserId,
+      aiDiffDisplayMode,
+      collaboratorVisibility,
+      commentUsersById,
+      commentUsersYMap,
+      commentsEnabled,
+      doc,
+      editor,
+      formulaThreadPositions,
+      isNoteOwner,
+      plugins,
+      visibleThreadReferenceTexts,
+    ]
   );
 
   const onKeyDownCapture = useNoteCaptureKeyEvent({ provider, undoManager, readOnly });
 
+  const syncDomSelectionToProseMirror = () => {
+    const domSelection = editor.prosemirrorView.root.getSelection?.() ?? document.getSelection();
+    if (!domSelection || domSelection.isCollapsed || domSelection.rangeCount === 0) {
+      return;
+    }
+    const editorDom = editor.prosemirrorView.dom;
+    const anchorNode = domSelection.anchorNode;
+    const focusNode = domSelection.focusNode;
+    if (!anchorNode || !focusNode) {
+      return;
+    }
+    const anchorElement =
+      anchorNode.nodeType === Node.ELEMENT_NODE ? anchorNode : anchorNode.parentElement;
+    const focusElement =
+      focusNode.nodeType === Node.ELEMENT_NODE ? focusNode : focusNode.parentElement;
+    if (!anchorElement || !focusElement) {
+      return;
+    }
+    if (!editorDom.contains(anchorElement) || !editorDom.contains(focusElement)) {
+      return;
+    }
+    try {
+      const anchor = editor.prosemirrorView.posAtDOM(anchorNode, domSelection.anchorOffset);
+      const head = editor.prosemirrorView.posAtDOM(focusNode, domSelection.focusOffset);
+      if (anchor === head) {
+        return;
+      }
+      editor.prosemirrorView.dispatch(
+        editor.prosemirrorView.state.tr.setSelection(
+          TextSelection.create(editor.prosemirrorView.state.doc, anchor, head)
+        )
+      );
+    } catch {
+      void 0;
+    }
+  };
+
   const handleSelectionChange = () => {
     setSelectedText(resourceId, editor.getSelectedText());
+    if (commentsEnabled && commentsWritable && isCommentableSelection(editor)) {
+      const selection = capturePendingCommentSelection(editor);
+      if (selection) {
+        pendingCommentSelectionRef.current = selection;
+      }
+    }
     if (!onActiveHeadingChange) {
       return;
     }
@@ -394,87 +651,97 @@ function CustomBlockNote({
       }
     }
 
-    setSelectedText(targetSessionId, selectedSnapshot);
+    useNoteSelectionStore.getState().setSelectedText(targetSessionId, selectedSnapshot);
     setEnableSelectedText(targetSessionId, true);
     setChatPanelCollapsed(false);
   };
 
-  const applyAllAiDiffActions = useCallback(
-    (mode: AiDiffActionMode) => {
-      if (readOnly) {
-        return;
+  const applyAllAiDiffActions = (mode: AiDiffActionMode) => {
+    if (readOnly) {
+      return;
+    }
+
+    const blocks: Parameters<Parameters<typeof editor.forEachBlock>[0]>[0][] = [];
+    editor.forEachBlock((block) => {
+      blocks.push(block);
+      return true;
+    });
+
+    const updates: Array<{
+      block: (typeof blocks)[number];
+      update: Parameters<typeof editor.updateBlock>[1];
+    }> = [];
+    const blocksToRemove: Parameters<typeof editor.removeBlocks>[0] = [];
+
+    for (const block of blocks) {
+      const propsAction = applyAiDiffActionToProps(block.props, mode);
+      const nextContent = applyAllAiDiffActionsToContent(block.content, mode);
+
+      if (propsAction.kind === 'remove') {
+        blocksToRemove.push(block);
+        continue;
       }
 
-      const blocks: Parameters<Parameters<typeof editor.forEachBlock>[0]>[0][] = [];
-      editor.forEachBlock((block) => {
-        blocks.push(block);
-        return true;
-      });
-
-      const updates: Array<{
-        block: (typeof blocks)[number];
-        update: Parameters<typeof editor.updateBlock>[1];
-      }> = [];
-      const blocksToRemove: Parameters<typeof editor.removeBlocks>[0] = [];
-
-      for (const block of blocks) {
-        const propsAction = applyAiDiffActionToProps(block.props, mode);
-        const nextContent = applyAllAiDiffActionsToContent(block.content, mode);
-
-        if (propsAction.kind === 'remove') {
+      if (nextContent && isInlineContentEffectivelyEmpty(nextContent)) {
+        if (!blockHasNestedChildren(block)) {
           blocksToRemove.push(block);
           continue;
         }
-
-        if (nextContent && isInlineContentEffectivelyEmpty(nextContent)) {
-          if (!blockHasNestedChildren(block)) {
-            blocksToRemove.push(block);
-            continue;
-          }
-        }
-
-        if (!nextContent && propsAction.kind !== 'update') {
-          continue;
-        }
-
-        updates.push({
-          block,
-          update: {
-            ...(nextContent ? { content: nextContent } : {}),
-            ...(propsAction.kind === 'update' ? { props: propsAction.props } : {}),
-          } as Parameters<typeof editor.updateBlock>[1],
-        });
       }
 
-      for (const item of updates) {
-        try {
-          editor.updateBlock(item.block, item.update);
-        } catch {
-          void 0;
-        }
+      if (!nextContent && propsAction.kind !== 'update') {
+        continue;
       }
 
-      for (let i = blocksToRemove.length - 1; i >= 0; i -= 1) {
-        try {
-          const block = blocksToRemove[i];
-          if (block) {
-            editor.removeBlocks([block]);
-          }
-        } catch {
-          void 0;
-        }
-      }
+      updates.push({
+        block,
+        update: {
+          ...(nextContent ? { content: nextContent } : {}),
+          ...(propsAction.kind === 'update' ? { props: propsAction.props } : {}),
+        } as Parameters<typeof editor.updateBlock>[1],
+      });
+    }
 
-      editor.focus();
-      syncAiDiffPresence();
-    },
-    [editor, readOnly, syncAiDiffPresence]
-  );
+    for (const item of updates) {
+      try {
+        editor.updateBlock(item.block, item.update);
+      } catch {
+        void 0;
+      }
+    }
+
+    for (let i = blocksToRemove.length - 1; i >= 0; i -= 1) {
+      try {
+        const block = blocksToRemove[i];
+        if (block) {
+          editor.removeBlocks([block]);
+        }
+      } catch {
+        void 0;
+      }
+    }
+
+    editor.focus();
+    syncAiDiffPresence();
+  };
   const showAiBulkActions =
     hasAiDiffContent && !readOnly && aiDiffDisplayMode === AI_DIFF_DISPLAY_MODE.COMPARE;
 
+  const editorShellStyle =
+    showCommentsUi && !commentsSidebarCollapsed
+      ? ({ ['--comments-sidebar-width' as string]: `${commentsSidebarWidth}px` } as CSSProperties)
+      : undefined;
+
   return (
-    <div className={styles.editorShell} onKeyDownCapture={onKeyDownCapture}>
+    <div
+      className={clsx(
+        styles.editorShell,
+        showCommentsUi && commentStyles.editorShellWithComments,
+        showCommentsUi && !commentsSidebarCollapsed && commentStyles.withCommentsSidebar
+      )}
+      style={editorShellStyle}
+      onKeyDownCapture={onKeyDownCapture}
+    >
       {showAiBulkActions ? (
         <div className={styles.aiBulkActions} contentEditable={false}>
           <button
@@ -513,20 +780,106 @@ function CustomBlockNote({
       ) : null}
       <NoteEditorReadOnlyProvider value={readOnly}>
         <AiDiffDisplayModeProvider value={effectiveAiDiffDisplayMode}>
-          <BlockNoteView
-            editor={editor}
-            theme="light"
-            formattingToolbar={false}
-            slashMenu={false}
-            editable={!readOnly}
-            onSelectionChange={handleSelectionChange}
-          >
-            <NoteToolbar onAskAi={handleAskAi} />
-            <NoteSlashMenu editor={editor} plugins={plugins} />
-          </BlockNoteView>
+          <LatexCommentProvider {...latexCommentProviderProps}>
+            <BlockNoteView
+              className={commentStyles.bodyBlockNoteView}
+              editor={editor}
+              theme="light"
+              formattingToolbar={false}
+              slashMenu={false}
+              comments={false}
+              editable={!readOnly}
+              onSelectionChange={handleSelectionChange}
+            >
+              <NoteToolbar
+                onAskAi={handleAskAi}
+                showAddComment={commentsWritable}
+                onRememberPendingCommentReference={() => {
+                  syncDomSelectionToProseMirror();
+                  rememberPendingCommentReference();
+                }}
+              />
+              <NoteSlashMenu editor={editor} plugins={plugins} />
+              {showCommentsUi ? (
+                <NoteCommentsUi
+                  editor={editor}
+                  doc={doc}
+                  commentsEnabled={commentsEnabled}
+                  commentsWritable={commentsWritable}
+                  commentUserId={activeCommentUserId}
+                  commentUsername={activeCommentUsername}
+                  commentAvatarUrl={activeCommentAvatarUrl}
+                  commentUsersById={commentUsersById}
+                  isNoteOwner={isNoteOwner}
+                  collaboratorVisibility={collaboratorVisibility}
+                  sidebarCollapsed={commentsSidebarCollapsed}
+                  sidebarWidth={commentsSidebarWidth}
+                  onSidebarWidthChange={onCommentsSidebarWidthChange ?? (() => undefined)}
+                  commentHistoryOpen={commentHistoryOpen}
+                  onCommentHistoryOpenChange={onCommentHistoryOpenChange ?? (() => undefined)}
+                  pendingCommentReferenceRef={pendingCommentReferenceRef}
+                  localThreadReferenceTexts={visibleThreadReferenceTexts}
+                  formulaThreadPositions={formulaThreadPositions}
+                  onBumpThreadsSidebar={bumpFormulaState}
+                />
+              ) : null}
+            </BlockNoteView>
+          </LatexCommentProvider>
         </AiDiffDisplayModeProvider>
       </NoteEditorReadOnlyProvider>
     </div>
+  );
+}
+
+function CustomBlockNote(props: CustomBlockNoteProps & { ref?: Ref<NoteBodyEditorHandle> }) {
+  const { ref, commentsEnabled = false, ...rest } = props;
+  const userService = useUserService();
+  const [commentUser, setCommentUser] = useState<User | null>(null);
+  const commentUserRequestSeqRef = useRef(0);
+
+  const syncCommentUser = () => {
+    const requestSeq = commentUserRequestSeqRef.current + 1;
+    commentUserRequestSeqRef.current = requestSeq;
+
+    if (!commentsEnabled) {
+      setCommentUser(null);
+      return;
+    }
+
+    void userService
+      .getUserInfo()
+      .then((user) => {
+        if (commentUserRequestSeqRef.current === requestSeq) {
+          setCommentUser(user);
+        }
+      })
+      .catch(() => {
+        if (commentUserRequestSeqRef.current === requestSeq) {
+          setCommentUser(null);
+        }
+      });
+  };
+
+  useMount(() => {
+    syncCommentUser();
+  });
+
+  useUpdateEffect(() => {
+    syncCommentUser();
+  }, [commentsEnabled, userService]);
+
+  useUnmount(() => {
+    commentUserRequestSeqRef.current += 1;
+  });
+
+  return (
+    <CustomBlockNoteEditor
+      key={rest.resourceId}
+      {...rest}
+      commentsEnabled={commentsEnabled}
+      ref={ref}
+      commentUser={commentUser}
+    />
   );
 }
 
