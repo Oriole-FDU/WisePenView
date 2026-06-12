@@ -10,3 +10,11 @@ export function getProseMirrorRoot(editor: EditorWithProseMirrorDom): HTMLElemen
   if (pm?.dom) return pm.dom;
   return editor._tiptapEditor?.view?.dom ?? null;
 }
+
+/** Document 才有 getSelection；ShadowRoot 回退到全局 document。 */
+export function getRootDomSelection(root: Document | ShadowRoot): Selection | null {
+  if (root instanceof Document) {
+    return root.getSelection();
+  }
+  return document.getSelection();
+}

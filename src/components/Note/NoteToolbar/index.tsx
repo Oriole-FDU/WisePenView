@@ -14,12 +14,14 @@ import {
 } from '@blocknote/react';
 import { Button } from '@heroui/react';
 import { TextSelection } from '@tiptap/pm/state';
+import type { EditorView } from '@tiptap/pm/view';
 import { useMount, useUnmount } from 'ahooks';
 import { Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import IconText from '@/components/Common/IconText';
 import { useNoteEditorReadOnlyContext } from '@/components/Note/CustomBlockNote/editorReadOnly';
+import { getRootDomSelection } from '@/components/Note/CustomBlockNote/plugins/editorProseMirrorRoot';
 import type { NoteToolbarProps } from './index.type';
 import styles from './style.module.less';
 
@@ -29,12 +31,12 @@ type ToolbarState = {
   top: number;
 };
 
-function getDomSelectionToolbarState(editor: ReturnType<typeof useBlockNoteEditor>): ToolbarState {
-  const selection = editor.prosemirrorView.root.getSelection?.() ?? document.getSelection();
+function getDomSelectionToolbarState(view: EditorView): ToolbarState {
+  const selection = getRootDomSelection(view.root);
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
     return { visible: false, left: 0, top: 0 };
   }
-  const editorDom = editor.prosemirrorView.dom;
+  const editorDom = view.dom;
   const range = selection.getRangeAt(0);
   const anchorNode = range.commonAncestorContainer;
   if (
@@ -55,17 +57,16 @@ function getDomSelectionToolbarState(editor: ReturnType<typeof useBlockNoteEdito
   };
 }
 
-function getSafeToolbarState(editor: ReturnType<typeof useBlockNoteEditor>): ToolbarState {
-  const view = editor.prosemirrorView;
+function getSafeToolbarState(view: EditorView): ToolbarState {
   const { selection, doc } = view.state;
   if (selection.empty) {
-    return getDomSelectionToolbarState(editor);
+    return getDomSelectionToolbarState(view);
   }
   if (
     selection instanceof TextSelection &&
     doc.textBetween(selection.from, selection.to).length === 0
   ) {
-    return getDomSelectionToolbarState(editor);
+    return getDomSelectionToolbarState(view);
   }
 
   try {
@@ -79,7 +80,7 @@ function getSafeToolbarState(editor: ReturnType<typeof useBlockNoteEditor>): Too
       top: Math.max(8, top - 10),
     };
   } catch {
-    return getDomSelectionToolbarState(editor);
+    return getDomSelectionToolbarState(view);
   }
 }
 
@@ -103,7 +104,7 @@ const NoteToolbar = ({
     }
     frameRef.current = window.requestAnimationFrame(() => {
       frameRef.current = null;
-      const next = getSafeToolbarState(editor);
+      const next = getSafeToolbarState(editor.prosemirrorView);
       setToolbarState((prev) =>
         prev.visible === next.visible && prev.left === next.left && prev.top === next.top
           ? prev

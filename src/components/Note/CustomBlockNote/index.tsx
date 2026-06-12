@@ -80,6 +80,7 @@ import {
   type AiDiffActionMode,
 } from './plugins/AIDiffPlugin/patch';
 import aiDiffStyles from './plugins/AIDiffPlugin/style.module.less';
+import { getRootDomSelection } from './plugins/editorProseMirrorRoot';
 import { printNotePdfViaBrowser, waitForEditorPaint } from './plugins/noteBrowserPrint';
 import styles from './style.module.less';
 
@@ -569,7 +570,7 @@ function CustomBlockNoteEditor({
   const onKeyDownCapture = useNoteCaptureKeyEvent({ provider, undoManager, readOnly });
 
   const syncDomSelectionToProseMirror = () => {
-    const domSelection = editor.prosemirrorView.root.getSelection?.() ?? document.getSelection();
+    const domSelection = getRootDomSelection(editor.prosemirrorView.root);
     if (!domSelection || domSelection.isCollapsed || domSelection.rangeCount === 0) {
       return;
     }
