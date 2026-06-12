@@ -3,21 +3,21 @@ import { CommentMark, CommentsExtension, YjsThreadStore } from '@blocknote/core/
 import type * as Y from 'yjs';
 import type { Doc } from 'yjs';
 
-import type { CustomBlockNoteEditor } from '../blockNoteSchema';
-import { bindDynamicCommentUserId } from './bindDynamicCommentUserId';
+import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
+import type { BlockNoteCommentDocumentRole } from '../comments.types';
+import { bindDynamicCommentUserId } from '../core/bindDynamicCommentUserId';
 import {
   getBlockNoteThreadDocumentSelectionsYMap,
   persistThreadDocumentSelection,
-} from './commentDocumentSelection';
-import { WISEPEN_COMMENT_MARK_SYNC_META } from './commentMarkSync';
-import type { BlockNoteCommentDocumentRole } from './comments.types';
+} from '../core/commentDocumentSelection';
+import { WISEPEN_COMMENT_MARK_SYNC_META } from '../core/commentMarkSync';
 import {
   getBlockNoteFormulaThreadAnchorsYMap,
   getBlockNoteThreadReferencesYMap,
-} from './commentThreadConstants';
-import type { PendingCommentSelection } from './pendingCommentReference';
-import { ReadOnlyThreadStoreAuth } from './readOnlyThreadStoreAuth';
-import { WisePenThreadStoreAuth } from './wisePenThreadStoreAuth';
+} from '../core/commentThreadConstants';
+import type { PendingCommentSelection } from '../core/pendingCommentReference';
+import { ReadOnlyThreadStoreAuth } from '../core/readOnlyThreadStoreAuth';
+import { WisePenThreadStoreAuth } from '../core/wisePenThreadStoreAuth';
 
 export type AddThreadToDocumentArgs = {
   threadId: string;

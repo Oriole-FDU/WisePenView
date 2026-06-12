@@ -5,23 +5,23 @@ import type * as Y from 'yjs';
 import type { Doc } from 'yjs';
 
 import CommentHistoryModal from '@/components/Note/CommentHistoryModal';
-import type { CustomBlockNoteEditor } from '../blockNoteSchema';
-import type { CommentUserDisplayRecord } from './comments.types';
-import type { CollaboratorCommentVisibility } from './commentSettings';
-import { CommentsSidebarPanel } from './CommentsSidebarPanel';
-import commentStyles from './commentStyles.module.less';
-import { isFormulaCommentSyncing, isWisePenFormulaYjsTransaction } from './commentSyncGuard';
+import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
+import type { CommentUserDisplayRecord } from '../comments.types';
+import type { CollaboratorCommentVisibility } from '../core/commentSettings';
+import { isFormulaCommentSyncing, isWisePenFormulaYjsTransaction } from '../core/commentSyncGuard';
 import {
   getBlockNoteCommentUsersYMap,
   getBlockNoteFormulaThreadAnchorsYMap,
   getBlockNoteThreadReferencesYMap,
   getBlockNoteThreadsYMap,
-} from './commentThreadConstants';
-import { syncCommentUserProfileToYMap } from './commentUserProfile';
-import type { PendingCommentReference } from './pendingCommentReference';
-import { getThreadComments, type ThreadPosition } from './threadReferenceText';
+} from '../core/commentThreadConstants';
+import { syncCommentUserProfileToYMap } from '../core/commentUserProfile';
+import type { PendingCommentReference } from '../core/pendingCommentReference';
+import { getThreadComments, type ThreadPosition } from '../core/threadReferenceText';
+import type { ThreadVisibilityContext } from '../core/threadVisibility';
+import { CommentsSidebarPanel } from './CommentsSidebarPanel';
+import commentStyles from './commentStyles.module.less';
 import { CustomThreadsSidebar } from './threadsSidebar/CustomThreadsSidebar';
-import type { ThreadVisibilityContext } from './threadVisibility';
 
 export type NoteCommentsUiProps = {
   editor: CustomBlockNoteEditor;

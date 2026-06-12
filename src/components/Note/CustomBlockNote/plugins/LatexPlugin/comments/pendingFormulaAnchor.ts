@@ -1,7 +1,7 @@
 import type * as Y from 'yjs';
 
-import { WISEPEN_FORMULA_YJS_ORIGIN } from '../commentSyncGuard';
-import type { FormulaThreadAnchor } from '../commentThreadConstants';
+import { WISEPEN_FORMULA_YJS_ORIGIN } from '../../../comments/core/commentSyncGuard';
+import type { FormulaThreadAnchor } from '../../../comments/core/commentThreadConstants';
 
 export type PendingFormulaAnchor = {
   anchor: FormulaThreadAnchor;

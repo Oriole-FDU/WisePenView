@@ -10,7 +10,7 @@ import { BlockNoteSchema, createExtension } from '@blocknote/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import type { EditorProps } from '@tiptap/pm/view';
 
-import { isWisePenCommentMarkSyncTransaction } from '../comments/commentMarkSync';
+import { isWisePenCommentMarkSyncTransaction } from '../comments/core/commentMarkSync';
 import type { NoteEditorPlugin, NoteInlineContentSpecs, PluginEditor } from './types';
 
 type DOMEventHandlers = NonNullable<EditorProps['handleDOMEvents']>;

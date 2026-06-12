@@ -1,4 +1,4 @@
-import type { FormulaThreadAnchor } from '../commentThreadConstants';
+import type { FormulaThreadAnchor } from '../../../comments/core/commentThreadConstants';
 import type { FormulaCommentKind } from './latexCommentSupport';
 
 export type StartFormulaCommentOptions = {

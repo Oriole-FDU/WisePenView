@@ -7,7 +7,7 @@ export {
   setCommentSettingsOnDoc,
   type CollaboratorCommentVisibility,
   type CommentSettings,
-} from './commentSettings';
+} from './core/commentSettings';
 
 export {
   BLOCKNOTE_YJS_COMMENT_USERS_MAP,
@@ -19,22 +19,22 @@ export {
   getBlockNoteThreadReferencesYMap,
   getBlockNoteThreadsYMap,
   type FormulaThreadAnchor,
-} from './commentThreadConstants';
+} from './core/commentThreadConstants';
 
-export { ReadOnlyThreadStoreAuth } from './readOnlyThreadStoreAuth';
+export { ReadOnlyThreadStoreAuth } from './core/readOnlyThreadStoreAuth';
 
 export {
   filterThreadsByVisibility,
   isThreadVisibleToUser,
   isUserParticipantInThread,
   type ThreadVisibilityContext,
-} from './threadVisibility';
+} from './core/threadVisibility';
 
 export {
   blockHasAiDiff,
   isCommentableSelection,
   shouldHideFormattingToolbarForMathBlock,
-} from './isCommentableSelection';
+} from './core/isCommentableSelection';
 
 export {
   DEFAULT_COMMENTS_SIDEBAR_WIDTH,
@@ -44,13 +44,13 @@ export {
   useCommentsSidebarResize,
   type UseCommentsSidebarResizeOptions,
   type UseCommentsSidebarResizeResult,
-} from './useCommentsSidebarResize';
+} from './hooks/useCommentsSidebarResize';
 
 export {
   normalizeAvatarUrl,
   type CommentUserDisplay,
   type CommentUserProfile,
-} from './commentUserProfile';
+} from './core/commentUserProfile';
 
 export {
   filterThreadsByResolvedState,
@@ -59,7 +59,7 @@ export {
   sortCommentThreads,
   type ThreadPosition,
   type ThreadResolvedFilter,
-} from './threadReferenceText';
+} from './core/threadReferenceText';
 
 export {
   CommentsExtension,
@@ -67,42 +67,45 @@ export {
   buildCommentsExtension,
   type AddThreadToDocumentArgs,
   type BuildCommentsExtensionOptions,
-} from './useCommentsExtension';
+} from './hooks/useCommentsExtension';
 
 export type { BlockNoteCommentDocumentRole, CommentUserDisplayRecord } from './comments.types';
 
-export { CommentsSidebarPanel, type CommentsSidebarPanelProps } from './CommentsSidebarPanel';
+export { CommentsSidebarPanel, type CommentsSidebarPanelProps } from './ui/CommentsSidebarPanel';
 
 export {
   CustomThreadsSidebar,
   type CustomThreadsSidebarProps,
-} from './threadsSidebar/CustomThreadsSidebar';
+} from './ui/threadsSidebar/CustomThreadsSidebar';
 
-export { CustomThreadItem } from './threadsSidebar/CustomThreadItem';
+export { CustomThreadItem } from './ui/threadsSidebar/CustomThreadItem';
 
-export { NoteCommentsUi } from './NoteCommentsUi';
-export type { NoteCommentsUiProps } from './NoteCommentsUi';
+export { NoteCommentsUi } from './ui/NoteCommentsUi';
+export type { NoteCommentsUiProps } from './ui/NoteCommentsUi';
 
 export {
   resolveActiveCommentUserProfile,
   resolveBlockNoteCommentUsers,
-} from './commentUserProfile';
+} from './core/commentUserProfile';
 
-export { getFormulaCommentReferenceText } from './formula/formulaCommentReference';
-export { LatexCommentProvider, useLatexComment } from './formula/latexCommentContext';
-export { LatexFormulaCommentButton } from './formula/LatexFormulaCommentButton';
-export { useFormulaComments } from './formula/useFormulaComments';
+export {
+  LatexCommentProvider,
+  LatexFormulaCommentButton,
+  getFormulaCommentReferenceText,
+  useFormulaComments,
+  useLatexComment,
+} from '../plugins/LatexPlugin/comments';
 
 export {
   applyPendingCommentReference,
   capturePendingCommentSelection,
   type PendingCommentReference,
   type PendingCommentSelection,
-} from './pendingCommentReference';
+} from './core/pendingCommentReference';
 
-export { useCommentSettingsSync } from './useCommentSettingsSync';
-export { useSyncCommentDocumentMarks } from './useSyncCommentDocumentMarks';
+export { useCommentSettingsSync } from './hooks/useCommentSettingsSync';
+export { useSyncCommentDocumentMarks } from './hooks/useSyncCommentDocumentMarks';
 
-export { buildPrintCommentsSection } from './buildPrintCommentsSection';
+export { buildPrintCommentsSection } from './core/buildPrintCommentsSection';
 
-export { default as commentStyles } from './commentStyles.module.less';
+export { default as commentStyles } from './ui/commentStyles.module.less';

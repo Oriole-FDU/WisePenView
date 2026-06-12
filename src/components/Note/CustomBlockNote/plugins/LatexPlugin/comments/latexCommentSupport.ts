@@ -5,10 +5,10 @@ import { NodeSelection, TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import type * as Y from 'yjs';
 
-import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
-import { WISEPEN_COMMENT_MARK_SYNC_META } from '../commentMarkSync';
-import { WISEPEN_FORMULA_YJS_ORIGIN } from '../commentSyncGuard';
-import type { FormulaThreadAnchor } from '../commentThreadConstants';
+import type { CustomBlockNoteEditor } from '../../../blockNoteSchema';
+import { WISEPEN_COMMENT_MARK_SYNC_META } from '../../../comments/core/commentMarkSync';
+import { WISEPEN_FORMULA_YJS_ORIGIN } from '../../../comments/core/commentSyncGuard';
+import type { FormulaThreadAnchor } from '../../../comments/core/commentThreadConstants';
 
 export const INLINE_MATH_PM_TYPE = 'inlineMath';
 /** @deprecated 使用 WISEPEN_COMMENT_MARK_SYNC_META */

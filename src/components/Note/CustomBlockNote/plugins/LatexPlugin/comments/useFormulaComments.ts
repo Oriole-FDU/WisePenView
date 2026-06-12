@@ -4,21 +4,21 @@ import { useCallback, useRef, useState, type RefObject } from 'react';
 import type { Doc } from 'yjs';
 
 import { useNoteCommentsSidebarStore } from '@/store/useNoteCommentsSidebarStore';
-import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
-import { runWithFormulaCommentSync } from '../commentSyncGuard';
+import type { CustomBlockNoteEditor } from '../../../blockNoteSchema';
+import { runWithFormulaCommentSync } from '../../../comments/core/commentSyncGuard';
 import {
   getBlockNoteFormulaThreadAnchorsYMap,
   getBlockNoteThreadReferencesYMap,
   getBlockNoteThreadsYMap,
   type FormulaThreadAnchor,
-} from '../commentThreadConstants';
+} from '../../../comments/core/commentThreadConstants';
 import {
   applyPendingCommentReference,
   capturePendingCommentSelection,
   type PendingCommentReference,
   type PendingCommentSelection,
-} from '../pendingCommentReference';
-import type { ThreadPosition } from '../threadReferenceText';
+} from '../../../comments/core/pendingCommentReference';
+import type { ThreadPosition } from '../../../comments/core/threadReferenceText';
 import {
   getFormulaCommentReferenceText,
   isSameFormulaThreadAnchor,

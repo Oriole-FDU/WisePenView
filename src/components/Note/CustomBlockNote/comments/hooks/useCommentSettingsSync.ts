@@ -8,7 +8,7 @@ import {
   setCommentSettingsOnDoc,
   type CollaboratorCommentVisibility,
   type CommentSettings,
-} from './commentSettings';
+} from '../core/commentSettings';
 
 export function useCommentSettingsSync(doc: Doc | null | undefined) {
   const [settings, setSettings] = useState<CommentSettings>(() =>

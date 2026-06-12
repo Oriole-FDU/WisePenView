@@ -1,8 +1,11 @@
 import clsx from 'clsx';
 import type { CSSProperties, ReactNode } from 'react';
 
+import {
+  MIN_COMMENTS_SIDEBAR_WIDTH,
+  useCommentsSidebarResize,
+} from '../hooks/useCommentsSidebarResize';
 import styles from './commentStyles.module.less';
-import { MIN_COMMENTS_SIDEBAR_WIDTH, useCommentsSidebarResize } from './useCommentsSidebarResize';
 
 export type CommentsSidebarPanelProps = {
   width: number;

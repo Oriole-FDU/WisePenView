@@ -2,13 +2,13 @@ import type { ThreadData } from '@blocknote/core/comments';
 import { CommentMark } from '@blocknote/core/comments';
 import type { Doc } from 'yjs';
 
-import type { CustomBlockNoteEditor } from '../blockNoteSchema';
+import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
+import type { CommentUserDisplayRecord } from '../comments.types';
 import {
   getBlockNoteThreadReferencesYMap,
   getBlockNoteThreadsYMap,
 } from './commentThreadConstants';
 import { normalizeAvatarUrl, type CommentUserProfile } from './commentUserProfile';
-import type { CommentUserDisplayRecord } from './comments.types';
 import {
   filterThreadsByResolvedState,
   getThreadComments,

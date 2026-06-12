@@ -3,15 +3,15 @@ import { useRef } from 'react';
 import type { Doc } from 'yjs';
 
 import type { WisepenProvider } from '@/domains/Note';
-import type { CustomBlockNoteEditor } from '../blockNoteSchema';
+import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
 import {
   getBlockNoteThreadDocumentSelectionsYMap,
   syncPlainTextCommentDocumentMarks,
-} from './commentDocumentSelection';
+} from '../core/commentDocumentSelection';
 import {
   getBlockNoteFormulaThreadAnchorsYMap,
   getBlockNoteThreadsYMap,
-} from './commentThreadConstants';
+} from '../core/commentThreadConstants';
 
 export type UseSyncCommentDocumentMarksOptions = {
   editor: CustomBlockNoteEditor;

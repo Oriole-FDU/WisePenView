@@ -2,15 +2,18 @@ import type { ThreadData } from '@blocknote/core/comments';
 import { CommentsExtension } from '@blocknote/core/comments';
 import { useExtensionState, useThreads } from '@blocknote/react';
 
-import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
+import type { CustomBlockNoteEditor } from '../../../blockNoteSchema';
 import {
   filterThreadsByResolvedState,
   getThreadReferenceText,
   sortCommentThreads,
   type ThreadPosition,
   type ThreadResolvedFilter,
-} from '../threadReferenceText';
-import { filterThreadsByVisibility, type ThreadVisibilityContext } from '../threadVisibility';
+} from '../../core/threadReferenceText';
+import {
+  filterThreadsByVisibility,
+  type ThreadVisibilityContext,
+} from '../../core/threadVisibility';
 import { CustomThreadItem } from './CustomThreadItem';
 
 export type CustomThreadsSidebarProps = {

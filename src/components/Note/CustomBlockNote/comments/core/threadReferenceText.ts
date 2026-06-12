@@ -1,6 +1,6 @@
 import type { ThreadData } from '@blocknote/core/comments';
 
-import type { CustomBlockNoteEditor } from '../blockNoteSchema';
+import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
 
 export type ThreadPosition = { from: number; to: number };
 

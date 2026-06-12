@@ -1,7 +1,7 @@
 import type { CommentData, CommentReactionData, ThreadData } from '@blocknote/core/comments';
 import { ThreadStoreAuth } from '@blocknote/core/comments';
 
-import type { BlockNoteCommentDocumentRole } from './comments.types';
+import type { BlockNoteCommentDocumentRole } from '../comments.types';
 
 function getThreadComments(thread: ThreadData): ThreadData['comments'] {
   return Array.isArray(thread.comments) ? thread.comments : [];

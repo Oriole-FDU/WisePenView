@@ -8,11 +8,11 @@ import {
 } from 'y-prosemirror';
 import * as Y from 'yjs';
 
-import type { CustomBlockNoteEditor } from '../blockNoteSchema';
+import type { CustomBlockNoteEditor } from '../../blockNoteSchema';
+import { isThreadActive } from '../../plugins/LatexPlugin/comments/latexCommentSupport';
 import { WISEPEN_COMMENT_MARK_SYNC_META } from './commentMarkSync';
 import { WISEPEN_FORMULA_YJS_ORIGIN } from './commentSyncGuard';
 import { getBlockNoteThreadsYMap, type FormulaThreadAnchor } from './commentThreadConstants';
-import { isThreadActive } from './formula/latexCommentSupport';
 
 export const BLOCKNOTE_YJS_THREAD_DOCUMENT_SELECTIONS_MAP = 'thread-document-selections' as const;
 

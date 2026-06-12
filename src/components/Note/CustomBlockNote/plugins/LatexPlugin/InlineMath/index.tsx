@@ -10,13 +10,13 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note/enum';
 import { useEffectForce } from '@/hooks/useEffectForce';
 import 'katex/dist/katex.min.css';
-import type { FormulaThreadAnchor } from '../../../comments/commentThreadConstants';
-import { useLatexComment } from '../../../comments/formula/latexCommentContext';
-import { captureInlineMathAnchor } from '../../../comments/formula/latexCommentSupport';
-import { LatexFormulaCommentButton } from '../../../comments/formula/LatexFormulaCommentButton';
+import type { FormulaThreadAnchor } from '../../../comments/core/commentThreadConstants';
 import { useNoteEditorReadOnlyContext } from '../../../editorReadOnly';
 import { useAiDiffDisplayModeContext } from '../../AIDiffPlugin/displayModeContext';
 import aiDiffStyles from '../../AIDiffPlugin/style.module.less';
+import { useLatexComment } from '../comments/latexCommentContext';
+import { captureInlineMathAnchor } from '../comments/latexCommentSupport';
+import { LatexFormulaCommentButton } from '../comments/LatexFormulaCommentButton';
 import { renderKatexInto } from '../katexRender';
 import { LatexEditPopover } from '../LatexEditPopover';
 import {

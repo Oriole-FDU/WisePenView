@@ -52,7 +52,7 @@ import {
   type PendingCommentReference,
   type PendingCommentSelection,
 } from './comments';
-import { syncCommentUserProfileToYMap } from './comments/commentUserProfile';
+import { syncCommentUserProfileToYMap } from './comments/core/commentUserProfile';
 import { mergeReadOnlyEditorProps, NoteEditorReadOnlyProvider } from './editorReadOnly';
 import { useAttachNoteYjsUndoStack, useNoteCaptureKeyEvent, useNoteYjsUndoManager } from './hooks';
 import type { CustomBlockNoteProps, NoteBodyEditorHandle } from './index.type';
