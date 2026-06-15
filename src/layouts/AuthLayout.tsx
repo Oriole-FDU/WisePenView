@@ -1,20 +1,19 @@
 import loginImage from '@/assets/images/login.png';
-import { Flex, Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
 import AuthBackground from './AuthBackground';
 import styles from './AuthLayout.module.less';
 
 function AuthLayout() {
   return (
-    <Layout className={styles.root}>
+    <main className={styles.root}>
       <AuthBackground />
-      <Flex className={styles.authSheet}>
+      <div className={styles.authSheet}>
         <img src={loginImage} className={styles.loginImage} alt="" />
-        <Flex className={styles.formSection}>
+        <section className={styles.formSection} aria-label="认证表单">
           <Outlet />
-        </Flex>
-      </Flex>
-    </Layout>
+        </section>
+      </div>
+    </main>
   );
 }
 

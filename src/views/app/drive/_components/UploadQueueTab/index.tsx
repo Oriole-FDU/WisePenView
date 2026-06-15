@@ -1,3 +1,5 @@
+import { Empty } from '@/components/Common/Feedback';
+import { DataTable, type DataTableColumn } from '@/components/Table';
 import { useDocumentService } from '@/domains';
 import type { PendingDocItem } from '@/domains/Document';
 import {
@@ -10,8 +12,6 @@ import { parseErrorMessage } from '@/utils/error';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 import { Button, toast } from '@heroui/react';
 import { useInterval, useMount, useRequest, useUnmount } from 'ahooks';
-import { Empty, Space, Table } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
 import { useImperativeHandle, useMemo, useState, type Ref } from 'react';
 import styles from './style.module.less';
 
@@ -20,6 +20,10 @@ const SYNC_INTERVAL_MS = 5000;
 const formatFileType = (fileType: string): string => {
   const value = fileType.toUpperCase();
   return value === '' ? 'UNKNOWN' : value;
+};
+
+type UploadQueueRow = PendingDocItem & {
+  queueRowKey: string;
 };
 
 export interface UploadQueueTabRef {
@@ -139,53 +143,64 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
     [runFetchPendingList]
   );
 
-  const columns = useMemo<ColumnsType<PendingDocItem>>(
+  const items = useMemo<UploadQueueRow[]>(
+    () =>
+      list.map((item, index) => ({
+        ...item,
+        queueRowKey:
+          item.documentId ??
+          `${item.uploadMeta.documentName}-${item.uploadMeta.uploaderId ?? 'unknown'}-${String(index)}`,
+      })),
+    [list]
+  );
+
+  const columns = useMemo<DataTableColumn<UploadQueueRow>[]>(
     () => [
       {
-        title: '文件名',
-        dataIndex: ['uploadMeta', 'documentName'],
-        key: 'filename',
-        render: (value: string) => <span className={styles.nameText}>{value || '未命名文档'}</span>,
+        id: 'filename',
+        label: '文件名',
+        width: 'fill',
+        isRowHeader: true,
+        renderCell: (row) => (
+          <span className={styles.nameText}>{row.uploadMeta.documentName || '未命名文档'}</span>
+        ),
       },
       {
-        title: '类型',
-        dataIndex: ['uploadMeta', 'fileType'],
-        key: 'fileType',
-        width: 120,
-        render: (value: string) => formatFileType(value),
+        id: 'fileType',
+        label: '类型',
+        width: 'sm',
+        renderCell: (row) => formatFileType(row.uploadMeta.fileType),
       },
       {
-        title: '大小',
-        dataIndex: ['uploadMeta', 'size'],
-        key: 'size',
-        width: 120,
-        render: (value: number) => formatFileSize(value),
+        id: 'size',
+        label: '大小',
+        width: 'sm',
+        renderCell: (row) => formatFileSize(row.uploadMeta.size),
       },
       {
-        title: '状态',
-        dataIndex: ['documentStatus', 'status'],
-        key: 'status',
-        width: 160,
-        render: (value: string) => DOCUMENT_PROCESS.getLabel(value),
+        id: 'status',
+        label: '状态',
+        width: 'md',
+        renderCell: (row) => DOCUMENT_PROCESS.getLabel(row.documentStatus.status),
       },
       {
-        title: '',
-        key: 'action',
-        width: 180,
-        align: 'right',
-        render: (_: unknown, record: PendingDocItem) => {
-          const status = record.documentStatus.status;
-          const hasDocumentId = record.documentId != null && record.documentId !== '';
+        id: 'action',
+        label: '',
+        width: 'md',
+        align: 'end',
+        renderCell: (row) => {
+          const status = row.documentStatus.status;
+          const hasDocumentId = row.documentId != null && row.documentId !== '';
           const retryDisabled = !hasDocumentId || !isDocumentRetryableStatus(status);
           const cancelDisabled = !hasDocumentId || !isDocumentCancelableStatus(status);
           return (
-            <Space size={4}>
+            <div className={styles.actionGroup}>
               <Button
                 variant="ghost"
                 size="sm"
-                isDisabled={retryDisabled || retryingId === record.documentId}
+                isDisabled={retryDisabled || retryingId === row.documentId}
                 onPress={() => {
-                  if (record.documentId) runRetryPendingDoc(record.documentId);
+                  if (row.documentId) runRetryPendingDoc(row.documentId);
                 }}
               >
                 重试
@@ -193,14 +208,14 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
               <Button
                 variant="danger"
                 size="sm"
-                isDisabled={cancelDisabled || cancelingId === record.documentId}
+                isDisabled={cancelDisabled || cancelingId === row.documentId}
                 onPress={() => {
-                  if (record.documentId) runCancelPendingDoc(record.documentId);
+                  if (row.documentId) runCancelPendingDoc(row.documentId);
                 }}
               >
                 取消
               </Button>
-            </Space>
+            </div>
           );
         },
       },
@@ -211,16 +226,15 @@ function UploadQueueTab({ ref }: { ref?: Ref<UploadQueueTabRef> }) {
   return (
     <div className={styles.wrapper}>
       <main className={styles.listArea}>
-        <Table<PendingDocItem>
-          rowKey={(record, index) =>
-            record.documentId ??
-            `${record.uploadMeta.documentName}-${record.uploadMeta.uploaderId ?? 'unknown'}-${String(index ?? 0)}`
-          }
-          dataSource={list}
+        <DataTable<UploadQueueRow>
+          ariaLabel="上传队列"
+          rowKey="queueRowKey"
+          items={items}
           columns={columns}
           loading={listLoading}
-          pagination={false}
-          locale={{ emptyText: <Empty description="暂无上传队列" /> }}
+          emptyText="暂无上传队列"
+          emptyIcon={<Empty description="暂无上传队列" />}
+          summary={false}
         />
       </main>
     </div>

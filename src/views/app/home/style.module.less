@@ -25,7 +25,7 @@
 
 .hero {
   background: linear-gradient(165deg, #ffffff 0%, #f8fafc 42%, #f0f7fc 100%);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .heroGrid {
@@ -68,17 +68,18 @@
 }
 
 .heroLead {
-  margin: 0 0 28px !important;
+  margin: 0 0 28px;
   max-width: 36em;
   font-size: 16px;
-  line-height: 1.65 !important;
+  line-height: 1.65;
+  color: var(--muted);
 }
 
 .heroActions {
   margin-top: 0;
-}
-
-.heroActions:global(.ant-space) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: flex-start;
 }
 
@@ -143,8 +144,10 @@
 
 .sectionLead {
   display: block;
+  margin: 0;
   font-size: 16px;
   line-height: 1.65;
+  color: var(--muted);
 }
 
 .cardsGrid {
@@ -156,8 +159,8 @@
 .featureCard {
   border-radius: 14px !important;
   overflow: hidden;
-  border: 1px solid var(--ant-color-border-secondary) !important;
-  background: var(--ant-color-bg-container) !important;
+  border: 1px solid var(--border-light) !important;
+  background: var(--surface) !important;
   box-shadow: @shadow-card;
   transition:
     transform 0.22s ease,
@@ -171,24 +174,23 @@
   border-color: rgba(87, 144, 200, 0.35) !important;
 }
 
-.featureCard :global(.ant-card-body) {
+.cardBody {
   padding: 20px 22px 22px;
 }
 
-.featureCard :global(.ant-card-meta-title) {
-  font-size: 17px !important;
-  font-weight: 600 !important;
-  margin-bottom: 8px !important;
-}
-
-.featureCard :global(.ant-card-meta-description) {
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  color: var(--ant-color-text-secondary) !important;
-}
-
 .cardTitle {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
   color: @text-strong;
+}
+
+.cardDescription {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
 }
 
 .cardCoverWrap {
@@ -199,8 +201,8 @@
   align-items: center;
   justify-content: center;
   aspect-ratio: 350 / 190;
-  background: var(--ant-color-fill-quaternary);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  background: var(--surface-secondary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .cardCover {
@@ -228,11 +230,11 @@
   }
 
   .heroLead {
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .heroActions:global(.ant-space) {
+  .heroActions {
     justify-content: center;
   }
 

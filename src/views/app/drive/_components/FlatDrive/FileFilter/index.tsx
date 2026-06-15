@@ -1,12 +1,13 @@
+import { Spin } from '@/components/Common/Feedback';
 import IconText from '@/components/Common/IconText';
+import SegmentedTabs from '@/components/Common/SegmentedTabs';
 import StickerManageModal from '@/components/Drive/Modals/StickerManageModal';
 import { useStickerService } from '@/domains';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
 import type { Sticker } from '@/domains/Sticker';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, toast } from '@heroui/react';
+import { Button, Chip, ListBox, Select, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Radio, Select, Spin, Tag } from 'antd';
 import clsx from 'clsx';
 import { Plus, Tags, X } from 'lucide-react';
 import { useState } from 'react';
@@ -74,26 +75,31 @@ function FileFilter({ value, onChange }: FileFilterProps) {
             <span className={styles.selectedPlaceholder}>点击下方标签加入筛选</span>
           ) : (
             current.tagIds.map((tagId, i) => (
-              <Tag
-                key={tagId}
-                variant="outlined"
-                closable
-                onClose={() => handleRemoveTag(tagId)}
-                closeIcon={<X size={13} />}
-                className={styles.selectedTag}
-              >
+              <Chip key={tagId} variant="secondary" className={styles.selectedTag}>
                 {current.tagNames[i] ?? tagId}
-              </Tag>
+                <button
+                  type="button"
+                  aria-label={`移除标签 ${current.tagNames[i] ?? tagId}`}
+                  className={styles.selectedTagClose}
+                  onClick={() => handleRemoveTag(tagId)}
+                >
+                  <X size={13} />
+                </button>
+              </Chip>
             ))
           )}
         </div>
         <div className={styles.selectedMatch}>
           <span className={styles.selectedMatchLabel}>匹配</span>
-          <Radio.Group
-            value={current.tagQueryLogicMode}
-            onChange={(e) => updateValue({ tagQueryLogicMode: e.target.value })}
-            size="middle"
-            options={[...TAG_QUERY_LOGIC_MODE.options]}
+          <SegmentedTabs
+            ariaLabel="标签匹配方式"
+            size="sm"
+            items={TAG_QUERY_LOGIC_MODE.options.map((item) => ({
+              key: item.value,
+              label: item.label,
+            }))}
+            selectedKey={current.tagQueryLogicMode}
+            onSelectionChange={(tagQueryLogicMode) => updateValue({ tagQueryLogicMode })}
           />
         </div>
       </div>
@@ -106,9 +112,9 @@ function FileFilter({ value, onChange }: FileFilterProps) {
         ) : (
           <>
             {stickers.map(({ tagId, tagName }) => (
-              <Tag
+              <Chip
                 key={tagId}
-                variant="outlined"
+                variant="secondary"
                 className={clsx(
                   styles.stickerTag,
                   current.tagIds.includes(tagId) && styles.stickerTagPicked
@@ -116,11 +122,15 @@ function FileFilter({ value, onChange }: FileFilterProps) {
                 onClick={() => handlePickTag(tagId, tagName)}
               >
                 {tagName}
-              </Tag>
+              </Chip>
             ))}
-            <Tag className={styles.addTag} onClick={() => setAddModalOpen(true)}>
+            <Chip
+              className={styles.addTag}
+              variant="secondary"
+              onClick={() => setAddModalOpen(true)}
+            >
               <Plus size={14} />
-            </Tag>
+            </Chip>
           </>
         )}
       </div>
@@ -129,17 +139,38 @@ function FileFilter({ value, onChange }: FileFilterProps) {
         <div className={styles.toolbarLeft}>
           <span className={styles.optionLabel}>排序</span>
           <Select
-            size="middle"
+            aria-label="排序字段"
             value={current.sortBy}
-            onChange={(val) => updateValue({ sortBy: val })}
-            options={[...RESOURCE_SORT_BY.options]}
+            onChange={(val) => {
+              if (val == null || Array.isArray(val)) return;
+              updateValue({ sortBy: val as FileFilterValue['sortBy'] });
+            }}
             className={styles.sortSelect}
-          />
-          <Radio.Group
-            value={current.sortDir}
-            onChange={(e) => updateValue({ sortDir: e.target.value })}
-            size="middle"
-            options={[...RESOURCE_SORT_DIR.options]}
+          >
+            <Select.Trigger>
+              <Select.Value />
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                {RESOURCE_SORT_BY.options.map((item) => (
+                  <ListBox.Item key={item.key} id={item.value} textValue={item.label}>
+                    {item.label}
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </Select.Popover>
+          </Select>
+          <SegmentedTabs
+            ariaLabel="排序方向"
+            size="sm"
+            items={RESOURCE_SORT_DIR.options.map((item) => ({
+              key: item.value,
+              label: item.label,
+            }))}
+            selectedKey={current.sortDir}
+            onSelectionChange={(sortDir) => updateValue({ sortDir })}
           />
         </div>
         <div className={styles.toolbarRight}>
@@ -159,8 +190,8 @@ function FileFilter({ value, onChange }: FileFilterProps) {
         }}
       />
       <StickerManageModal
-        open={stickerManageModalOpen}
-        onCancel={() => setStickerManageModalOpen(false)}
+        isOpen={stickerManageModalOpen}
+        onOpenChange={setStickerManageModalOpen}
         onSuccess={() => {
           void reloadStickers();
         }}

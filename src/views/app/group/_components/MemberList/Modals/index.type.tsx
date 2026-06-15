@@ -9,8 +9,8 @@ export interface InviteUserModalProps {
 }
 
 export interface EditPermissionModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   groupId: string;
   memberIds: string[];
@@ -29,8 +29,8 @@ export interface DeleteMemberModalProps {
 }
 
 export interface AssignQuotaModalProps {
-  open: boolean;
-  onCancel: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   groupId: string;
   memberIds: string[];

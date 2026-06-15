@@ -9,25 +9,38 @@
 
 .thinkingWrapper {
   .collapseHeader {
+    display: flex;
+    align-items: center;
+    width: 100%;
     padding: 0px 0px !important; // 极致紧凑
     height: 28px !important;
-    align-items: center !important;
-
-    border-radius: var(--ant-border-radius) !important;
-    color: var(--ant-color-text-description) !important;
-    font-size: var(--ant-font-size-sm) !important;
+    border: 0;
+    border-radius: var(--radius) !important;
+    background: transparent;
+    color: var(--text-tertiary) !important;
+    font-size: var(--font-size-sm) !important;
     font-weight: 500;
+    cursor: pointer;
 
     // 悬停反馈
     &:hover {
-      background-color: var(--ant-color-fill-tertiary);
-      color: var(--ant-color-text) !important; // 悬停变深色
+      background-color: var(--surface-tertiary);
+      color: var(--foreground) !important; // 悬停变深色
     }
+  }
+
+  .expandIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    opacity: 0.6;
+    transition: transform 0.2s;
   }
 
   .collapseContentBox {
     padding: 0 !important;
-    background-color: var(--ant-color-fill-quaternary); // 极淡的背景
+    background-color: var(--surface-secondary); // 极淡的背景
   }
 }
 
@@ -35,40 +48,40 @@
 .headerLabel {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
 
   // Loading 图标样式
   .spinIcon {
     animation: rotate 1s linear infinite; // 应用旋转动画
-    color: var(--ant-color-primary); // 使用主色调
+    color: var(--accent); // 使用主色调
     font-size: 14px;
   }
 }
 
 .durationTag {
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-tertiary);
-  background-color: var(--ant-color-fill-quaternary);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  background-color: var(--surface-secondary);
   height: 16px;
-  padding: 0px var(--ant-padding-xxs);
-  border-radius: var(--ant-border-radius-sm);
+  padding: 0px 4px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  font-family: var(--ant-font-family-code);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .content {
   margin: 0 !important;
-  margin-top: var(--ant-margin-xs) !important;
-  padding-block: var(--ant-padding-xs) !important;
-  padding-inline: var(--ant-padding-xs) !important;
+  margin-top: var(--space-xs) !important;
+  padding-block: var(--space-xs) !important;
+  padding-inline: var(--space-xs) !important;
   max-height: min(36vh, 260px);
   overflow-y: auto;
   overscroll-behavior: contain;
   text-align: justify;
 
-  color: var(--ant-color-text-secondary);
-  font-size: var(--ant-font-size-sm);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
 
   line-height: 1.6;
 
@@ -81,6 +94,6 @@
 
   &::-webkit-scrollbar-thumb {
     border-radius: 3px;
-    background-color: var(--ant-color-fill-secondary);
+    background-color: var(--surface-secondary);
   }
 }

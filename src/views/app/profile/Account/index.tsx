@@ -1,10 +1,11 @@
+import DescriptionGrid from '@/components/Common/DescriptionGrid';
+import { Spin } from '@/components/Common/Feedback';
 import { useUserService } from '@/domains';
 import type { UserAccountProfile } from '@/domains/User';
 import { IDENTITY } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
+import { Separator, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Descriptions, Divider, Spin } from 'antd';
 import { useMemo, useState } from 'react';
 import { AccountForm, AccountHeader, AccountVerification } from '../_components/Account';
 import type { ProfileFieldKey } from '../profile.config';
@@ -32,6 +33,24 @@ function Account() {
     () => new Set((user?.readonlyFields ?? []) as ProfileFieldKey[]),
     [user?.readonlyFields]
   );
+  const accountItems = useMemo(
+    () => [
+      { key: 'username', label: '用户名', value: user?.userInfo?.username ?? '-' },
+      {
+        key: 'campusNo',
+        label: '学工号',
+        value: user?.userInfo?.campusNo === 'PENDING' ? '-' : (user?.userInfo?.campusNo ?? '-'),
+      },
+      { key: 'email', label: '邮箱', value: user?.userInfo?.email ?? '-' },
+      { key: 'mobile', label: '手机号', value: user?.userInfo?.mobile ?? '-' },
+    ],
+    [
+      user?.userInfo?.campusNo,
+      user?.userInfo?.email,
+      user?.userInfo?.mobile,
+      user?.userInfo?.username,
+    ]
+  );
 
   return (
     <div className={layout.pageContainer}>
@@ -44,19 +63,12 @@ function Account() {
         <div className={layout.formSection}>
           <AccountHeader user={user} onUserInfoReload={reloadUserInfo} />
 
-          <Divider className={layout.sectionDivider} />
+          <Separator className={layout.sectionDivider} />
 
           <h3 className={layout.sectionTitle}>账号</h3>
-          <Descriptions column={2} layout="vertical" size="small" className={layout.descriptions}>
-            <Descriptions.Item label="用户名">{user?.userInfo?.username ?? '-'}</Descriptions.Item>
-            <Descriptions.Item label="学工号">
-              {user?.userInfo?.campusNo === 'PENDING' ? '-' : (user?.userInfo?.campusNo ?? '-')}
-            </Descriptions.Item>
-            <Descriptions.Item label="邮箱">{user?.userInfo?.email ?? '-'}</Descriptions.Item>
-            <Descriptions.Item label="手机号">{user?.userInfo?.mobile ?? '-'}</Descriptions.Item>
-          </Descriptions>
+          <DescriptionGrid items={accountItems} columns={2} className={layout.descriptions} />
 
-          <Divider className={layout.sectionDivider} />
+          <Separator className={layout.sectionDivider} />
 
           <AccountForm
             show={fieldConfig.showProfileSection}

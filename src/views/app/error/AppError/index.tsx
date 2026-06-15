@@ -1,10 +1,11 @@
-import { Collapse, Result, Space, Tooltip, Typography } from 'antd';
 import { Copy } from 'lucide-react';
+import { useState } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 
+import { ResultState } from '@/components/Common/Feedback';
 import LandingNavbar from '@/components/LandingNavbar';
 import ResourceNotFound from '@/views/app/error/ResourceNotFound';
-import { Button, toast } from '@heroui/react';
+import { Button, toast, Tooltip } from '@heroui/react';
 import styles from './style.module.less';
 
 interface AppErrorInfo {
@@ -52,6 +53,7 @@ const buildAppErrorInfo = (error: unknown): AppErrorInfo => {
 function AppError() {
   const navigate = useNavigate();
   const error = useRouteError();
+  const [detailOpen, setDetailOpen] = useState(false);
   // 路由未命中抛出的 404 走专用 ResourceNotFound 页，避免通用错误壳与业务 404 语义混淆
   if (isRouteErrorResponse(error) && error.status === 404) {
     return <ResourceNotFound />;
@@ -80,54 +82,58 @@ function AppError() {
       </div>
 
       <main className={styles.main}>
-        <Result
+        <ResultState
           className={styles.result}
           status={errorInfo.status}
           title={errorInfo.title}
           subTitle={errorInfo.subTitle}
           extra={
-            <Space size="middle" wrap>
+            <div className={styles.actionGroup}>
               <Button variant="primary" size="lg" onPress={() => window.location.reload()}>
                 刷新页面
               </Button>
               <Button size="lg" onPress={() => navigate(-1)}>
                 返回上一页
               </Button>
-            </Space>
+            </div>
           }
         >
           {hasErrorDetail ? (
-            <Collapse
-              className={styles.errorCollapse}
-              bordered={false}
-              items={[
-                {
-                  key: 'error-detail',
-                  label: <Typography.Text type="secondary">查看错误详情</Typography.Text>,
-                  extra: (
-                    <span onClick={(event) => event.stopPropagation()}>
-                      <Tooltip title="复制错误详情">
-                        <Button variant="ghost" size="sm" isIconOnly onPress={handleCopyDetail}>
-                          <Copy />
-                        </Button>
-                      </Tooltip>
-                    </span>
-                  ),
-                  children: (
-                    <div className={styles.errorDetailPanel}>
-                      <Typography.Paragraph className={styles.errorDetail}>
-                        {errorInfo.detail}
-                      </Typography.Paragraph>
-                      <Typography.Text type="secondary" className={styles.contactTip}>
-                        如问题持续，请复制错误详情并联系开发者
-                      </Typography.Text>
-                    </div>
-                  ),
-                },
-              ]}
-            />
+            <div className={styles.errorCollapse}>
+              <div className={styles.errorCollapseHeader}>
+                <button
+                  type="button"
+                  className={styles.errorCollapseToggle}
+                  aria-expanded={detailOpen}
+                  onClick={() => setDetailOpen((open) => !open)}
+                >
+                  查看错误详情
+                </button>
+                <Tooltip>
+                  <Tooltip.Trigger>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      isIconOnly
+                      aria-label="复制错误详情"
+                      onPress={handleCopyDetail}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <Copy />
+                    </Button>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>复制错误详情</Tooltip.Content>
+                </Tooltip>
+              </div>
+              {detailOpen ? (
+                <div className={styles.errorDetailPanel}>
+                  <pre className={styles.errorDetail}>{errorInfo.detail}</pre>
+                  <span className={styles.contactTip}>如问题持续，请复制错误详情并联系开发者</span>
+                </div>
+              ) : null}
+            </div>
           ) : null}
-        </Result>
+        </ResultState>
       </main>
 
       <footer className={styles.footerMini}>WisePen · 学术英语写作平台</footer>

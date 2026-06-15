@@ -1,7 +1,7 @@
 export interface TagPermissionModalProps {
-  open: boolean;
+  isOpen: boolean;
   groupId?: string;
   initialTagId?: string;
-  onCancel: () => void;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }

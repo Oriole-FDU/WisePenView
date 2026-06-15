@@ -1,29 +1,30 @@
 import AdminSidebar from '@/components/Sidebar/AdminSidebar';
-import { Layout } from 'antd';
+import clsx from 'clsx';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import styles from './AdminLayout.module.less';
-
-const { Content, Sider } = Layout;
 
 function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <Layout className={styles.root}>
-      <Sider className={styles.leftSider} width={308} theme="light" collapsed={sidebarCollapsed}>
+    <div className={styles.root}>
+      <aside
+        className={clsx(styles.leftSider, sidebarCollapsed && styles.leftSiderCollapsed)}
+        aria-label="管理侧边栏"
+      >
         <AdminSidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
-      </Sider>
+      </aside>
 
-      <Layout className={styles.middleLayout}>
-        <Content className={styles.middleContent}>
+      <div className={styles.middleLayout}>
+        <main className={styles.middleContent}>
           <Outlet />
-        </Content>
-      </Layout>
-    </Layout>
+        </main>
+      </div>
+    </div>
   );
 }
 

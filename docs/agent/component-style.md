@@ -1,6 +1,6 @@
 # 样式与 UI 规范
 
-WisePenView 使用 Less、CSS Modules，并处于 HeroUI 与 Ant Design 迁移期。新增代码优先遵循 HeroUI 和项目现有设计语言。
+WisePenView 使用 Less、CSS Modules 和 HeroUI。新增代码都应遵循 HeroUI 风格与项目现有设计语言。
 
 ## 一、样式组织
 
@@ -19,13 +19,10 @@ ComponentName/
 └── style.module.less
 ```
 
-## 二、HeroUI 与 AntD 迁移
+## 二、HeroUI 使用
 
-- 新增 Modal、Button、Input、Select、Checkbox 等基础交互控件，优先使用 HeroUI。
-- 迁移以 HeroUI 设计语言为准，不复刻 AntD 视觉。
-- 不新增 AntD Modal 专用属性风格，例如 `footer` 数组、`destroyOnHidden`、`onCancel`。
-- 覆盖 AntD 样式时使用 `:global(.ant-xxx)`，并限定在当前组件根类下。
-- 旧 AntD 代码只在相关任务中渐进迁移，不做无关大改。
+- Modal、Button、Input、Select、Checkbox 等基础交互控件使用 HeroUI 或项目已有封装。
+- 组件 API 遵循 HeroUI 语义，例如 `footer` 数组、`destroyOnHidden`、`onCancel`。
 
 ## 三、Modal 约定
 
@@ -67,7 +64,7 @@ Modal.Footer
 
 - [ ] 样式使用 Less + CSS Modules。
 - [ ] 没有非必要内联样式。
-- [ ] 新增交互控件优先 HeroUI。
-- [ ] AntD 样式覆盖被限制在当前组件根类下。
+- [ ] 交互控件使用 HeroUI 或项目已有封装。
+- [ ] 没有新增 antd 依赖、API 形态或 `.ant-xxx` 样式覆盖。
 - [ ] 文本和控件在常见宽度下不会重叠或溢出。
 - [ ] 没有无意义装饰和卡片套卡片。

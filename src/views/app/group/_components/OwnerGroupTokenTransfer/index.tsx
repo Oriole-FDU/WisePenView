@@ -4,9 +4,8 @@
 import { useGroupService, useWalletService } from '@/domains';
 import { WALLET_TOKEN_TRANSFER_TYPE } from '@/domains/Wallet';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, toast } from '@heroui/react';
+import { Button, Input, Skeleton, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { InputNumber, Skeleton } from 'antd';
 import { useState } from 'react';
 import type { OwnerGroupTokenTransferProps } from './index.type';
 import styles from './style.module.less';
@@ -136,7 +135,7 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
         <div className={styles.balanceItem}>
           <p className={styles.balanceLabel}>组长个人计算点</p>
           {balanceLoading ? (
-            <Skeleton.Input active className={styles.balanceSkeleton} size="small" />
+            <Skeleton className={styles.balanceSkeleton} />
           ) : (
             <p className={styles.balanceValue}>
               {personalBal}
@@ -147,7 +146,7 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
         <div className={styles.balanceItem}>
           <p className={styles.balanceLabel}>小组池计算点</p>
           {balanceLoading ? (
-            <Skeleton.Input active className={styles.balanceSkeleton} size="small" />
+            <Skeleton className={styles.balanceSkeleton} />
           ) : (
             <p className={styles.balanceValue}>
               {groupBal}
@@ -161,16 +160,28 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
 
       <h4 className={styles.transferTitle}>划入小组池</h4>
       <div className={styles.formRow}>
-        <InputNumber
+        <TextField
+          aria-label="转入小组池数量"
           className={styles.amountInput}
-          min={1}
-          max={personalBal > 0 ? personalBal : undefined}
-          precision={0}
-          placeholder="数量"
-          value={amtToGroup ?? undefined}
-          onChange={(v) => setAmtToGroup(typeof v === 'number' ? v : null)}
-          disabled={submittingToGroup || balanceLoading}
-        />
+          value={amtToGroup != null ? String(amtToGroup) : ''}
+          onChange={(nextValue) => {
+            if (nextValue === '') {
+              setAmtToGroup(null);
+              return;
+            }
+            const parsed = Number(nextValue);
+            setAmtToGroup(Number.isFinite(parsed) ? parsed : null);
+          }}
+          isDisabled={submittingToGroup || balanceLoading}
+        >
+          <Input
+            type="number"
+            min={1}
+            max={personalBal > 0 ? personalBal : undefined}
+            step={1}
+            placeholder="数量"
+          />
+        </TextField>
         <Button
           variant="primary"
           isDisabled={submittingToGroup || balanceLoading}
@@ -184,16 +195,28 @@ function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupToken
 
       <h4 className={styles.transferTitle}>从小组池转回组长</h4>
       <div className={styles.formRow}>
-        <InputNumber
+        <TextField
+          aria-label="转回组长数量"
           className={styles.amountInput}
-          min={1}
-          max={groupBal > 0 ? groupBal : undefined}
-          precision={0}
-          placeholder="数量"
-          value={amtToOwner ?? undefined}
-          onChange={(v) => setAmtToOwner(typeof v === 'number' ? v : null)}
-          disabled={submittingToOwner || balanceLoading}
-        />
+          value={amtToOwner != null ? String(amtToOwner) : ''}
+          onChange={(nextValue) => {
+            if (nextValue === '') {
+              setAmtToOwner(null);
+              return;
+            }
+            const parsed = Number(nextValue);
+            setAmtToOwner(Number.isFinite(parsed) ? parsed : null);
+          }}
+          isDisabled={submittingToOwner || balanceLoading}
+        >
+          <Input
+            type="number"
+            min={1}
+            max={groupBal > 0 ? groupBal : undefined}
+            step={1}
+            placeholder="数量"
+          />
+        </TextField>
         <Button
           variant="primary"
           isDisabled={submittingToOwner || balanceLoading}

@@ -1,10 +1,10 @@
 import IconText from '@/components/Common/IconText';
+import SegmentedTabs from '@/components/Common/SegmentedTabs';
 import GlobalSearchBox from '@/components/Drive/GlobalSearchBox';
 import { StickerManageModal } from '@/components/Drive/Modals';
 import TableDrive from '@/components/Drive/TableDrive';
 import { useDrivePreferencesStore, type DriveViewMode } from '@/store';
 import { Button } from '@heroui/react';
-import { Tabs } from 'antd';
 import { CloudUpload, Tags } from 'lucide-react';
 import { useRef, useState } from 'react';
 
@@ -56,9 +56,10 @@ function Drive() {
         </div>
       </div>
 
-      <Tabs
-        activeKey={activeViewMode}
-        onChange={(k) => setViewMode(k as DriveViewMode)}
+      <SegmentedTabs<DriveViewMode>
+        ariaLabel="云盘视图"
+        selectedKey={activeViewMode}
+        onSelectionChange={setViewMode}
         items={VIEW_TABS}
         className={styles.detailTabs}
       />
@@ -74,7 +75,7 @@ function Drive() {
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
       />
-      <StickerManageModal open={stickerManageOpen} onCancel={() => setStickerManageOpen(false)} />
+      <StickerManageModal isOpen={stickerManageOpen} onOpenChange={setStickerManageOpen} />
     </div>
   );
 }

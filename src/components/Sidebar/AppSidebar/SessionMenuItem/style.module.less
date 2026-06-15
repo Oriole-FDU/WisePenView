@@ -31,23 +31,23 @@
   border: none;
   padding: 0;
   background: transparent;
-  color: var(--ant-color-text-tertiary);
-  border-radius: var(--ant-border-radius-sm);
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm, 4px);
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background: var(--surface-tertiary);
   }
 }
 
 .sessionDeleteBtn {
-  color: var(--ant-color-error);
+  color: var(--error);
 
   &:hover {
-    color: var(--ant-color-error-hover);
-    background: var(--ant-color-error-bg);
+    color: var(--danger);
+    background: color-mix(in srgb, var(--error) 12%, var(--surface));
   }
 }
 

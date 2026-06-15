@@ -30,7 +30,7 @@ function DriveTreeNodeTitle({ node }: DriveTreeNodeTitleProps) {
       className={styles.nodeTitle}
       icon={<EntryIcon entryType={node.type} resourceType={resourceType} size={14} />}
       iconSize={14}
-      gap="var(--ant-margin-xxs)"
+      gap="4px"
       ellipsis
     >
       {getNodeDisplayName(node, resourceName)}

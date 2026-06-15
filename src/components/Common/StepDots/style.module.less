@@ -1,0 +1,58 @@
+.steps {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.item {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: calc(50% + 12px);
+  right: calc(-50% + 12px);
+  height: 1px;
+  background: var(--border);
+}
+
+.dot {
+  position: relative;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.active {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.active .dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.done .dot {
+  border-color: var(--accent);
+}
+
+.title {
+  text-align: center;
+  overflow-wrap: anywhere;
+}

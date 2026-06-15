@@ -1,7 +1,7 @@
 import { Eye, Star, ThumbsUp } from 'lucide-react';
 /** 详情页顶部互动信息展示条（只读，Note 与 PDF 详情页共用） */
+import { Separator } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Divider } from 'antd';
 
 import { useResourceService } from '@/domains';
 import { formatReadCount } from '@/utils/format/formatNumber';
@@ -29,7 +29,7 @@ function ResourceInteractBar({ resourceId }: ResourceInteractBarProps) {
             <Eye size={14} aria-hidden className={styles.interactIcon} />
             <span>{formatReadCount(readCount)}</span>
           </div>
-          <Divider orientation="vertical" className={styles.interactDivider} />
+          <Separator orientation="vertical" className={styles.interactDivider} />
         </>
       )}
 
@@ -39,7 +39,7 @@ function ResourceInteractBar({ resourceId }: ResourceInteractBarProps) {
         <span>{formatReadCount(likeCount)}</span>
       </div>
 
-      <Divider orientation="vertical" className={styles.interactDivider} />
+      <Separator orientation="vertical" className={styles.interactDivider} />
 
       {/* 平均分 */}
       <div className={styles.interactItem}>

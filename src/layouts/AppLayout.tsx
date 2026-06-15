@@ -3,14 +3,12 @@ import AppSidebar from '@/components/Sidebar/AppSidebar';
 import DriveSidebar from '@/components/Sidebar/DriveSidebar';
 import { useChatPanelStore, useCurrentChatSessionStore } from '@/store';
 import { useUpdateEffect } from 'ahooks';
-import { Layout } from 'antd';
+import clsx from 'clsx';
 import { Bot } from 'lucide-react';
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import styles from './AppLayout.module.less';
 import { useChatPanelResize } from './useChatPanelResize';
-
-const { Content, Sider } = Layout;
 
 const RESOURCE_SIDEBAR_PATH_REGEX = /^\/app\/(note|pdf)\//;
 
@@ -51,13 +49,16 @@ function AppLayout() {
   };
 
   return (
-    <Layout
+    <div
       ref={rootRef}
       className={styles.root}
       style={{ ['--chat-panel-width' as string]: `${chatPanelWidth}px` }}
     >
       {chatResizing && <div ref={chatResizeGuideRef} className={styles.chatResizeGuide} />}
-      <Sider className={styles.leftSider} width={308} theme="light" collapsed={sidebarCollapsed}>
+      <aside
+        className={clsx(styles.leftSider, sidebarCollapsed && styles.leftSiderCollapsed)}
+        aria-label="应用侧边栏"
+      >
         {isResourceContext ? (
           <DriveSidebar
             collapsed={sidebarCollapsed}
@@ -69,9 +70,9 @@ function AppLayout() {
             onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
         )}
-      </Sider>
+      </aside>
 
-      <Layout className={styles.middleLayout}>
+      <div className={styles.middleLayout}>
         {shouldRenderChatPanel && safeChatPanelCollapsed && !isChatPage && (
           <div className={styles.chatHandleZone}>
             <button
@@ -84,19 +85,16 @@ function AppLayout() {
             </button>
           </div>
         )}
-        <Content className={styles.middleContent}>
+        <main className={styles.middleContent}>
           <Outlet />
-        </Content>
-      </Layout>
+        </main>
+      </div>
 
       {!isChatPage && (
-        <Sider
-          className={styles.rightSider}
-          width="var(--chat-panel-width)"
-          theme="light"
-          collapsed={safeChatPanelCollapsed}
-          collapsedWidth={0}
-          trigger={null}
+        <aside
+          className={clsx(styles.rightSider, safeChatPanelCollapsed && styles.rightSiderCollapsed)}
+          aria-label="聊天面板"
+          aria-hidden={safeChatPanelCollapsed ? true : undefined}
         >
           {!safeChatPanelCollapsed && (
             <button
@@ -109,9 +107,9 @@ function AppLayout() {
           <div className={styles.rightSiderInner}>
             {shouldRenderChatPanel ? <ChatPanel collapsed={safeChatPanelCollapsed} /> : null}
           </div>
-        </Sider>
+        </aside>
       )}
-    </Layout>
+    </div>
   );
 }
 

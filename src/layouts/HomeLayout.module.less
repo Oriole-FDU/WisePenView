@@ -19,7 +19,7 @@
   width: 100%;
   flex-shrink: 0;
   background-color: rgba(255, 255, 255, 0.88);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  border-bottom: 1px solid var(--border-light);
   backdrop-filter: saturate(180%) blur(10px);
 }
 
@@ -54,10 +54,6 @@
   gap: 0;
 }
 
-.footer :global(.ant-divider-horizontal) {
-  margin: clamp(12px, 1.5vh, 16px) 0;
-}
-
 .waveWrap {
   position: absolute;
   top: -2px;
@@ -86,15 +82,25 @@
   font-weight: 500;
 }
 
+.footerBrand {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 .divider {
   width: 100%;
   max-width: @content-max;
-  border-color: rgba(216, 203, 187, 0.12);
+  height: 1px;
+  margin: clamp(12px, 1.5vh, 16px) 0;
+  background-color: rgba(216, 203, 187, 0.12);
 }
 
 .copyright {
   width: 100%;
   max-width: @content-max;
+  display: flex;
+  justify-content: flex-end;
   text-align: right;
   color: #a0aec0;
   font-size: clamp(11px, 1.4vh, 13px);

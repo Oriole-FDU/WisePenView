@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-md);
+  gap: var(--space-md);
   width: 100%;
 }
 
@@ -9,18 +9,18 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-sm);
-  padding: var(--ant-padding-sm) var(--ant-padding-md);
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   min-height: 44px;
-  border: 1px solid var(--ant-color-border);
-  border-radius: var(--ant-border-radius-lg);
-  background: var(--ant-color-fill-quaternary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-secondary);
 }
 
 .selectedBarLabel {
   flex-shrink: 0;
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--muted);
   line-height: 24px;
 }
 
@@ -29,33 +29,39 @@
   flex: 1;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
   min-width: 0;
 }
 
 .selectedPlaceholder {
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-quaternary);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
   line-height: 24px;
 }
 
 .selectedTag {
   margin: 0;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 20px;
   padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
 
-  :global(.ant-tag-close-icon) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-inline-start: 4px;
-    vertical-align: middle;
-    line-height: 1;
+.selectedTagClose {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
 
-    svg {
-      display: block;
-    }
+  svg {
+    display: block;
   }
 }
 
@@ -64,15 +70,15 @@
   flex-shrink: 0;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
   margin-left: auto;
-  padding-left: var(--ant-padding-sm);
-  border-left: 1px solid var(--ant-color-border-secondary);
+  padding-left: var(--space-sm);
+  border-left: 1px solid var(--border-light);
 }
 
 .selectedMatchLabel {
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -80,28 +86,28 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-lg);
-  row-gap: var(--ant-margin-sm);
+  gap: var(--space-lg);
+  row-gap: var(--space-sm);
 }
 
 .toolbarLeft {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
 }
 
 .toolbarRight {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
   margin-left: auto;
 }
 
 .optionLabel {
   flex-shrink: 0;
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--muted);
 }
 
 .sortSelect {
@@ -112,8 +118,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-xs);
-  padding: var(--ant-padding-sm) 0;
+  gap: var(--space-xs);
+  padding: var(--space-sm) 0;
   width: 100%;
 }
 
@@ -127,7 +133,7 @@
 
 .stickerTag {
   margin: 0;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 20px;
   padding: 4px 11px;
   cursor: pointer;
@@ -137,16 +143,16 @@
     background 0.2s;
 
   &:not(.stickerTagPicked):hover {
-    color: var(--ant-color-primary);
-    border-color: var(--ant-color-primary);
+    color: var(--accent);
+    border-color: var(--accent);
   }
 }
 
 .stickerTagPicked {
   cursor: default;
-  color: var(--ant-color-primary);
-  border-color: var(--ant-color-primary);
-  background: var(--ant-color-primary-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .addTag {
@@ -155,7 +161,7 @@
   align-items: center;
   justify-content: center;
   padding: 4px 10px;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 20px;
   cursor: pointer;
   border-style: dashed;
@@ -164,7 +170,7 @@
     border-color 0.2s;
 
   &:hover {
-    color: var(--ant-color-primary);
-    border-color: var(--ant-color-primary);
+    color: var(--accent);
+    border-color: var(--accent);
   }
 }

@@ -15,13 +15,13 @@
 }
 
 .docTag {
-  background-color: var(--ant-color-fill-tertiary);
-  color: var(--ant-color-text);
+  background-color: var(--surface-tertiary);
+  color: var(--foreground);
 }
 
 .attachmentTag {
-  background-color: var(--ant-color-fill-quaternary);
-  color: var(--ant-color-text);
+  background-color: var(--surface-secondary);
+  color: var(--foreground);
 }
 
 .tagRemove {
@@ -37,8 +37,8 @@
 }
 
 .imageTag {
-  background-color: var(--ant-color-primary-bg);
-  color: var(--ant-color-text);
+  background-color: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--foreground);
 }
 
 .imageThumb {
@@ -49,13 +49,13 @@
 }
 
 .uploadingTag {
-  background-color: var(--ant-color-warning-bg);
-  color: var(--ant-color-text);
+  background-color: color-mix(in srgb, var(--warning) 14%, transparent);
+  color: var(--foreground);
 }
 
 .failedTag {
-  background-color: var(--ant-color-error-bg);
-  color: var(--ant-color-error);
+  background-color: color-mix(in srgb, var(--error) 12%, transparent);
+  color: var(--error);
 }
 
 @keyframes spin {

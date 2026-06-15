@@ -1,8 +1,9 @@
+import { Empty, Spin } from '@/components/Common/Feedback';
+import type { DataNode } from '@/components/Common/Tree';
+import Tree from '@/components/Common/Tree';
 import { useDriveService } from '@/domains';
 import type { DriveNode, LoadMoreNode } from '@/domains/Drive';
 import { useRequest } from 'ahooks';
-import { Empty, Spin, Tree } from 'antd';
-import type { DataNode } from 'antd/es/tree';
 import { ChevronDown } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { resolveDriveScope, toDriveSelectionItem } from '../common/driveComponentModel';

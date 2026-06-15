@@ -9,9 +9,8 @@ import type { ChatAgentOption } from '@/store';
 import { useChatCapabilityStore, useChatPageStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
 import { base64ToFile, fileToBase64, generateThumbnail } from '@/utils/file/upload';
-import { toast } from '@heroui/react';
+import { TextArea, toast } from '@heroui/react';
 import { useRequest, useUpdateEffect } from 'ahooks';
-import { Input } from 'antd';
 import { X } from 'lucide-react';
 import { type ClipboardEvent, type DragEvent, type KeyboardEvent, useRef, useState } from 'react';
 import ActionToolbar from './ActionToolbar';
@@ -23,8 +22,6 @@ import DropOverlay from './DropOverlay';
 import OtherSkillModal from './OtherSkillModal';
 import type { ChatInputProps, PendingImagePayload } from './index.type';
 import styles from './style.module.less';
-
-const { TextArea } = Input;
 
 const MAX_IMAGE_BASE64_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGE_RAW_BYTES_APPROX = Math.floor(MAX_IMAGE_BASE64_BYTES * 0.75);
@@ -392,12 +389,12 @@ function ChatInput({
 
         <ContextTags />
 
-        <div className={styles.textareaWrap}>
+        <div>
           <TextArea
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="输入消息..."
-            autoSize={{ minRows: 1, maxRows: 8 }}
+            rows={1}
             className={styles.textarea}
             onKeyDown={handleKeyDown}
             onCompositionStart={() => setIsComposing(true)}
@@ -429,7 +426,6 @@ function ChatInput({
               setContentPickOpen(open);
             }}
             contentPickDropdownContent={contentPickDropdownContent}
-            getPopupContainer={() => inputCardRef.current || document.body}
           />
         </div>
       </div>

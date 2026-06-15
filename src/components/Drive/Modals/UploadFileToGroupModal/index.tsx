@@ -1,17 +1,18 @@
+import StepDots from '@/components/Common/StepDots';
 import DriveNav from '@/components/Drive/DriveNav';
 import { useResourceService } from '@/domains';
+import { useEffectForce } from '@/hooks/useEffectForce';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, toast } from '@heroui/react';
+import { Button, Modal, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Modal, Steps } from 'antd';
 import { useState } from 'react';
 import type { DriveSelectionItem } from '../../common/driveComponentModel';
 import styles from './index.module.less';
 import type { UploadFileToGroupModalProps } from './index.type';
 
 function UploadFileToGroupModal({
-  open,
-  onCancel,
+  isOpen,
+  onOpenChange,
   groupId,
   onSuccess,
 }: UploadFileToGroupModalProps) {
@@ -21,13 +22,10 @@ function UploadFileToGroupModal({
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const [selectedTargetTagId, setSelectedTargetTagId] = useState<string>();
 
-  const handleOpenChange = (visible: boolean) => {
+  const resetState = () => {
     setStep(0);
     setSelectedFileIds([]);
     setSelectedTargetTagId(undefined);
-    if (visible) {
-      setNavRefreshKey((k) => k + 1);
-    }
   };
 
   const handleFilesChange = (nodes: DriveSelectionItem[]) => {
@@ -57,7 +55,7 @@ function UploadFileToGroupModal({
       onSuccess: (count) => {
         toast.success(`已上传 ${count} 个文件`);
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
         toast.danger(parseErrorMessage(err));
@@ -73,74 +71,107 @@ function UploadFileToGroupModal({
   const canNext = selectedFileIds.length > 0;
   const canSubmit = canNext && Boolean(selectedTargetTagId);
 
+  // TODO: refactor
+  useEffectForce(() => {
+    if (!isOpen) return;
+    resetState();
+    setNavRefreshKey((k) => k + 1);
+  }, [isOpen]);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      if (submitting) return;
+      resetState();
+      onOpenChange(false);
+    }
+  };
+
   return (
-    <Modal
-      title="上传文件到小组"
-      open={open}
-      onCancel={onCancel}
-      afterOpenChange={handleOpenChange}
-      destroyOnHidden
-      width={560}
-      footer={null}
-    >
-      <div className={styles.wrapper}>
-        <div className={styles.stepsRow}>
-          <Steps
-            size="small"
-            type="dot"
-            current={step}
-            items={[{ title: '选择个人文件' }, { title: '选择目标文件夹' }]}
-          />
-        </div>
-
-        <div className={styles.slideViewport}>
-          <div className={`${styles.slideTrack} ${step === 1 ? styles.slideTrackShift : ''}`}>
-            <div className={styles.slidePane}>
-              <div className={styles.treeSection}>
-                <div className={styles.hint}>选择要上传的文件（可多选）</div>
-                <div className={styles.navTree}>
-                  <DriveNav
-                    key={`personal-${navRefreshKey}`}
-                    renderableTypes={['folder', 'resource', 'link']}
-                    selectableTypes={['resource', 'link']}
-                    multiple
-                    refreshTrigger={navRefreshKey}
-                    onChange={handleFilesChange}
+    <Modal isOpen={isOpen} onOpenChange={handleOpenChange}>
+      <Modal.Backdrop isDismissable={!submitting}>
+        <Modal.Container size="md" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>上传文件到小组</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <div className={styles.wrapper}>
+                <div className={styles.stepsRow}>
+                  <StepDots
+                    current={step}
+                    items={[{ title: '选择个人文件' }, { title: '选择目标文件夹' }]}
                   />
                 </div>
-              </div>
-            </div>
-            <div className={styles.slidePane}>
-              <div className={styles.treeSection}>
-                <div className={styles.hint}>选择文件要上传到的小组文件夹（只能选择一个）</div>
-                <div className={styles.navTree}>
-                  <DriveNav
-                    key={`group-tree-tag-${groupId}-${navRefreshKey}`}
-                    scope={{ type: 'group', groupId }}
-                    renderableTypes={['folder']}
-                    selectableTypes={['folder']}
-                    onChange={handleTagsChange}
-                  />
+
+                <div className={styles.slideViewport}>
+                  <div
+                    className={`${styles.slideTrack} ${step === 1 ? styles.slideTrackShift : ''}`}
+                  >
+                    <div className={styles.slidePane}>
+                      <div className={styles.treeSection}>
+                        <div className={styles.hint}>选择要上传的文件（可多选）</div>
+                        <div className={styles.navTree}>
+                          <DriveNav
+                            key={`personal-${navRefreshKey}`}
+                            renderableTypes={['folder', 'resource', 'link']}
+                            selectableTypes={['resource', 'link']}
+                            multiple
+                            refreshTrigger={navRefreshKey}
+                            onChange={handleFilesChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.slidePane}>
+                      <div className={styles.treeSection}>
+                        <div className={styles.hint}>
+                          选择文件要上传到的小组文件夹（只能选择一个）
+                        </div>
+                        <div className={styles.navTree}>
+                          <DriveNav
+                            key={`group-tree-tag-${groupId}-${navRefreshKey}`}
+                            scope={{ type: 'group', groupId }}
+                            renderableTypes={['folder']}
+                            selectableTypes={['folder']}
+                            onChange={handleTagsChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.footer}>
-          <Button onPress={onCancel}>取消</Button>
-          {step === 1 && <Button onPress={() => setStep(0)}>上一步</Button>}
-          {step === 0 ? (
-            <Button variant="primary" onPress={() => setStep(1)} isDisabled={!canNext}>
-              下一步
-            </Button>
-          ) : (
-            <Button variant="primary" onPress={handleSubmit} isDisabled={submitting || !canSubmit}>
-              确定
-            </Button>
-          )}
-        </div>
-      </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onPress={() => onOpenChange(false)}
+                isDisabled={submitting}
+              >
+                取消
+              </Button>
+              {step === 1 && (
+                <Button variant="secondary" onPress={() => setStep(0)} isDisabled={submitting}>
+                  上一步
+                </Button>
+              )}
+              {step === 0 ? (
+                <Button variant="primary" onPress={() => setStep(1)} isDisabled={!canNext}>
+                  下一步
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onPress={handleSubmit}
+                  isDisabled={submitting || !canSubmit}
+                >
+                  确定
+                </Button>
+              )}
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

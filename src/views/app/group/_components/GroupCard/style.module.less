@@ -6,20 +6,20 @@
   padding: 0;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid var(--ant-color-border);
+  border: 1px solid var(--border);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     transform 0.2s ease;
 
   &:hover {
-    border-color: var(--ant-color-primary);
-    box-shadow: var(--ant-box-shadow-secondary);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--ant-color-primary);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
 }
@@ -28,7 +28,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: var(--ant-color-fill-tertiary);
+  background: var(--surface-tertiary);
 }
 
 .image {
@@ -42,16 +42,16 @@
 .body {
   position: relative;
   flex: 1;
-  background: var(--ant-color-bg-container);
+  background: var(--surface);
 }
 
 .header {
-  padding: var(--ant-padding) calc(var(--ant-padding) + 64px) 0 var(--ant-padding);
+  padding: var(--space-md) calc(var(--space-md) + 64px) 0 var(--space-md);
 }
 
 .title {
   overflow: hidden;
-  font-size: var(--ant-font-size-lg);
+  font-size: var(--font-size-lg);
   font-weight: 600;
   line-height: 1.4;
   text-overflow: ellipsis;
@@ -61,33 +61,33 @@
 .footer {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-xxs);
-  padding: var(--ant-padding-sm) var(--ant-padding) var(--ant-padding);
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
 }
 
 .memberCount {
   flex-shrink: 0;
   margin-left: auto;
-  color: var(--ant-color-text-secondary);
-  font-size: var(--ant-font-size-sm);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
 }
 
 .badge {
   position: absolute;
-  top: var(--ant-margin-sm);
-  right: var(--ant-margin);
+  top: var(--space-sm);
+  right: var(--space-md);
   z-index: 1;
-  max-width: calc(100% - var(--ant-margin-lg));
-  padding: 2px var(--ant-padding-xs);
+  max-width: calc(100% - var(--space-lg));
+  padding: 2px var(--space-xs);
   overflow: hidden;
   color: #fff;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
   background: #faad14;
-  border-radius: var(--ant-border-radius-sm);
-  box-shadow: var(--ant-box-shadow-tertiary);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .publicBadge {

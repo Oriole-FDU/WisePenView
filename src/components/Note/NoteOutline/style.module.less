@@ -7,14 +7,14 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-xxs);
+  gap: var(--space-2xs);
   min-height: 0;
 }
 
 .empty {
-  padding: var(--ant-padding-xxs) var(--ant-padding-xs);
-  color: var(--ant-color-text-tertiary);
-  font-size: var(--ant-font-size-sm);
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
 }
 
 .item {
@@ -22,12 +22,12 @@
   text-align: left;
   border: 0;
   background: transparent;
-  padding: var(--ant-padding-xxs) var(--ant-padding-xs);
-  border-radius: var(--ant-border-radius);
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  color: var(--ant-color-text);
-  font-size: var(--ant-font-size-sm);
-  line-height: var(--ant-line-height);
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
   position: relative;
 
   display: -webkit-box;
@@ -37,51 +37,51 @@
   overflow: hidden;
 
   &:hover {
-    background: var(--ant-color-fill-tertiary);
+    background: var(--surface-tertiary);
   }
 }
 
 .titleItem {
-  color: var(--ant-color-text);
+  color: var(--foreground);
   font-weight: 600;
 }
 
 .active {
-  background: var(--ant-color-fill-secondary);
-  color: var(--ant-color-text);
+  background: var(--surface-secondary);
+  color: var(--foreground);
   font-weight: 500;
 
   &::before {
     content: '';
     position: absolute;
     left: 0;
-    top: var(--ant-padding-xxs);
-    bottom: var(--ant-padding-xxs);
-    width: calc(2 * var(--ant-line-width));
-    border-radius: var(--ant-border-radius-sm);
-    background: var(--ant-color-primary);
+    top: var(--space-2xs);
+    bottom: var(--space-2xs);
+    width: calc(2 * var(--line-width));
+    border-radius: var(--radius-sm);
+    background: var(--accent);
   }
 }
 
 /* Indentation by heading level */
 .level0 {
-  padding-left: var(--ant-padding-xxs);
+  padding-left: var(--space-2xs);
 }
 .level1 {
-  padding-left: var(--ant-padding-xs);
+  padding-left: var(--space-xs);
 }
 .level2 {
-  padding-left: calc(var(--ant-padding-xs) + var(--ant-padding-sm));
+  padding-left: calc(var(--space-xs) + var(--space-sm));
 }
 .level3 {
-  padding-left: calc(var(--ant-padding-xs) + var(--ant-padding-sm) * 2);
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 2);
 }
 .level4 {
-  padding-left: calc(var(--ant-padding-xs) + var(--ant-padding-sm) * 3);
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 3);
 }
 .level5 {
-  padding-left: calc(var(--ant-padding-xs) + var(--ant-padding-sm) * 4);
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 4);
 }
 .level6 {
-  padding-left: calc(var(--ant-padding-xs) + var(--ant-padding-sm) * 5);
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 5);
 }

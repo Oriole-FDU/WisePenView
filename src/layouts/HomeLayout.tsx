@@ -1,4 +1,3 @@
-import { Divider, Flex } from 'antd';
 import { Outlet } from 'react-router-dom';
 
 import LandingNavbar from '@/components/LandingNavbar';
@@ -6,7 +5,7 @@ import styles from './HomeLayout.module.less';
 
 function HomeLayout() {
   return (
-    <Flex vertical align="stretch" className={styles.root}>
+    <div className={styles.root}>
       <div className={styles.navShell}>
         <LandingNavbar activeKey="1" />
       </div>
@@ -15,7 +14,7 @@ function HomeLayout() {
         <Outlet />
       </div>
 
-      <Flex vertical align="stretch" className={styles.footer} gap={0}>
+      <footer className={styles.footer}>
         <div className={styles.waveWrap} aria-hidden>
           <svg
             className={styles.waveSvg}
@@ -32,18 +31,18 @@ function HomeLayout() {
         </div>
 
         <div className={styles.footerInner}>
-          <Flex align="flex-end" gap={10}>
+          <div className={styles.footerBrand}>
             <div className={styles.footerBrandText}>WisePen</div>
-          </Flex>
+          </div>
 
-          <Divider className={styles.divider} />
+          <div className={styles.divider} role="separator" aria-hidden />
 
-          <Flex className={styles.copyright} justify="flex-end">
+          <div className={styles.copyright}>
             <div>Copyright © 2026. Fudan University & Oriole Software All rights reserved.</div>
-          </Flex>
+          </div>
         </div>
-      </Flex>
-    </Flex>
+      </footer>
+    </div>
   );
 }
 

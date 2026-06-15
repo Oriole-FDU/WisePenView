@@ -19,20 +19,20 @@
 }
 
 .sectionCard {
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: var(--ant-border-radius-lg);
-  padding: var(--ant-padding-md);
-  background: var(--ant-color-bg-container);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  background: var(--surface);
 
   & + & {
-    margin-top: var(--ant-margin-md);
+    margin-top: var(--space-md);
   }
 }
 
 .sectionTitle {
-  font-size: var(--ant-font-size-base);
+  font-size: var(--font-size-base);
   font-weight: 600;
-  margin-bottom: var(--ant-margin-sm);
+  margin-bottom: var(--space-sm);
 }
 
 .modeRow {
@@ -40,9 +40,9 @@
 }
 
 .modeHint {
-  margin-top: var(--ant-margin-xs);
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-tertiary);
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
   opacity: 0.8;
 }
 
@@ -58,14 +58,14 @@
 .actionList {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-lg);
+  gap: var(--space-lg);
 }
 
 .actionItem {
-  padding: var(--ant-padding-xs) var(--ant-padding-sm);
+  padding: var(--space-xs) var(--space-sm);
   border: 1px solid transparent;
   border-radius: 10px;
-  background: var(--ant-color-bg-container);
+  background: var(--surface);
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease;
@@ -73,7 +73,7 @@
 
 .actionItemHighlight {
   background: rgba(22, 119, 255, 0.1);
-  border-color: var(--ant-color-primary-border);
+  border-color: var(--accent-border);
 }
 
 .actionLabel {
@@ -82,8 +82,8 @@
 
 .actionHint {
   margin-left: 24px;
-  margin-top: var(--ant-margin-xxs);
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-tertiary);
+  margin-top: var(--space-2xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
   opacity: 0.8;
 }

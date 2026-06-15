@@ -7,8 +7,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ant-margin-xs);
-  padding: var(--ant-padding-xs) 0;
+  gap: var(--space-xs);
+  padding: var(--space-xs) 0;
 }
 
 .stickerLoading {
@@ -21,7 +21,7 @@
 
 .stickerTag {
   margin: 0;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 20px;
   padding: 4px 11px;
   cursor: pointer;
@@ -31,16 +31,16 @@
     background 0.2s;
 
   &:not(.stickerTagPicked):hover {
-    color: var(--ant-color-primary);
-    border-color: var(--ant-color-primary);
+    color: var(--accent);
+    border-color: var(--accent);
   }
 }
 
 .stickerTagPicked {
   cursor: pointer;
-  color: var(--ant-color-primary);
-  border-color: var(--ant-color-primary);
-  background: var(--ant-color-primary-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .addTag {
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: center;
   padding: 4px 10px;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 20px;
   cursor: pointer;
   border-style: dashed;
@@ -58,13 +58,13 @@
     border-color 0.2s;
 
   &:hover {
-    color: var(--ant-color-primary);
-    border-color: var(--ant-color-primary);
+    color: var(--accent);
+    border-color: var(--accent);
   }
 }
 
 .allPickedHint {
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-quaternary);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
   line-height: 28px;
 }

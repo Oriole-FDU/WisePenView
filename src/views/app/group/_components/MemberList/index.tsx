@@ -310,8 +310,8 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       />
 
       <EditPermissionModal
-        open={activeModal === 'editPermission'}
-        onCancel={onCancelModal}
+        isOpen={activeModal === 'editPermission'}
+        onOpenChange={(open) => !open && onCancelModal()}
         groupId={groupId}
         memberIds={selectedMemberIds}
         members={selectedMembersList}
@@ -330,8 +330,8 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       />
 
       <AssignQuotaModal
-        open={activeModal === 'assignQuota'}
-        onCancel={onCancelModal}
+        isOpen={activeModal === 'assignQuota'}
+        onOpenChange={(open) => !open && onCancelModal()}
         groupId={groupId}
         memberIds={selectedMemberIds}
         members={selectedMembersList}

@@ -1,0 +1,137 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--foreground);
+  font-size: 14px;
+  outline: none;
+}
+
+.blockNode {
+  width: 100%;
+}
+
+.row {
+  --tree-node-level: 0;
+
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 28px;
+  color: var(--muted);
+}
+
+.disabled {
+  color: var(--text-disabled, #9ca3af);
+  cursor: not-allowed;
+}
+
+.indent {
+  flex: 0 0 calc(var(--tree-node-level) * 18px);
+  width: calc(var(--tree-node-level) * 18px);
+  height: 1px;
+}
+
+.switcher,
+.switcherPlaceholder {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease;
+
+  &:hover {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+  }
+
+  &[data-expanded='true'] .switcherIcon {
+    transform: rotate(90deg);
+  }
+}
+
+.switcherIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.16s ease;
+}
+
+.loadingIcon {
+  animation: tree-loading-spin 0.8s linear infinite;
+}
+
+.checkbox {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  margin: 0 6px 0 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  min-height: 26px;
+  padding: 2px 8px;
+  color: inherit;
+  text-align: left;
+  border-radius: 6px;
+  cursor: default;
+  outline: none;
+  transition:
+    color 0.16s ease,
+    background-color 0.16s ease;
+
+  &[data-selectable='true'] {
+    cursor: pointer;
+
+    &:hover {
+      color: var(--foreground);
+      background: var(--surface-tertiary);
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus, var(--primary)) 36%, transparent);
+  }
+}
+
+.selected .content {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.title {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  line-height: 22px;
+}
+
+@keyframes tree-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

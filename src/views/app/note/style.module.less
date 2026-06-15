@@ -26,7 +26,7 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  padding: var(--ant-padding-lg);
+  padding: var(--space-lg);
 }
 
 .root {
@@ -51,7 +51,7 @@
 .headerToolbarExtra {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
   min-width: 0;
 }
 
@@ -97,13 +97,13 @@
 
 .aiDiffDisplayModeSwitch {
   flex-shrink: 0;
-
   flex: 1;
   min-width: 0;
+}
 
-  :global(.ant-segmented-item-label) {
-    padding-inline: var(--ant-padding-xs);
-  }
+.wsAlertAction {
+  flex-shrink: 0;
+  margin-left: var(--space-sm);
 }
 
 .pageHeading {
@@ -117,7 +117,7 @@
 
 .wsAlert {
   flex-shrink: 0;
-  margin-bottom: var(--ant-margin-lg);
+  margin-bottom: var(--space-lg);
 }
 
 .contentRow {
@@ -126,7 +126,7 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
 }
 
 .mainCol {
@@ -149,16 +149,16 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  margin-top: var(--ant-margin-lg);
+  margin-top: var(--space-lg);
 }
 
 .outlineAside {
   flex: 0 0 auto;
   /* 目录侧栏：跟随主题尺寸 token 缩放，目标落在 240~280 观感区间 */
   width: clamp(
-    calc(6 * var(--ant-control-height-lg)),
-    calc(7 * var(--ant-control-height-lg)),
-    calc(8 * var(--ant-control-height-lg))
+    calc(6 * var(--control-height-lg)),
+    calc(7 * var(--control-height-lg)),
+    calc(8 * var(--control-height-lg))
   );
   min-height: 0;
   padding: 0;
@@ -169,20 +169,20 @@
   position: sticky;
   top: 0;
   align-self: flex-start;
-  max-height: calc(100vh - var(--ant-padding-lg) * 2);
+  max-height: calc(100vh - var(--space-lg) * 2);
 }
 
 .outlineTopRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--ant-margin-xs);
-  padding: var(--ant-padding-sm) var(--ant-padding-sm);
-  color: var(--ant-color-text-secondary);
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-sm);
+  color: var(--muted);
 }
 
 .outlineTopTitle {
-  font-size: var(--ant-font-size);
+  font-size: var(--font-size-base);
   font-weight: 500;
 }
 
@@ -195,11 +195,11 @@
 
 /* 滚动条：默认透明，hover 时显示 */
 .outlineScrollArea::-webkit-scrollbar {
-  width: var(--ant-scrollbar-width);
+  width: var(--scrollbar-width);
 }
 .outlineScrollArea::-webkit-scrollbar-thumb {
   background-color: transparent;
-  border-radius: var(--ant-border-radius-sm);
+  border-radius: var(--radius-sm);
   transition: background-color 0.15s ease;
 }
 .outlineScrollArea::-webkit-scrollbar-track {
@@ -207,28 +207,28 @@
 }
 
 .outlineScrollArea:hover::-webkit-scrollbar-thumb {
-  background-color: var(--ant-color-fill-secondary);
+  background-color: var(--surface-secondary);
 }
 
 .outlineCollapsedCol {
   flex: 0 0 auto;
-  width: calc(var(--ant-control-height-sm) + var(--ant-margin-xxs));
+  width: calc(var(--control-height-sm) + var(--space-2xs));
   min-height: 0;
   position: sticky;
   top: 0;
   align-self: flex-start;
-  padding: var(--ant-padding-sm) 0;
+  padding: var(--space-sm) 0;
 }
 
 .outlineToggleBtn {
-  --outline-toggle-size: calc(var(--ant-control-height-sm) + var(--ant-margin-xxs));
+  --outline-toggle-size: calc(var(--control-height-sm) + var(--space-2xs));
   width: var(--outline-toggle-size);
   height: var(--outline-toggle-size);
   border: 0;
   background: transparent;
-  border-radius: var(--ant-border-radius);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted);
   line-height: var(--outline-toggle-size);
   text-align: center;
   display: inline-flex;
@@ -236,8 +236,8 @@
   justify-content: center;
 
   &:hover {
-    background: var(--ant-color-fill-tertiary);
-    color: var(--ant-color-text);
+    background: var(--surface-tertiary);
+    color: var(--foreground);
   }
 }
 
@@ -249,21 +249,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ant-color-bg-container);
+  background: var(--surface);
 }
 
 .middleOverlayLoading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--ant-margin-lg);
+  gap: var(--space-lg);
 }
 
 .middleOverlayText {
-  color: var(--ant-color-text-secondary);
+  color: var(--muted);
 }
 
 .middleOverlayInner {
   max-width: 480px;
-  padding: var(--ant-padding-lg);
+  padding: var(--space-lg);
 }

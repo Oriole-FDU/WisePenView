@@ -6,31 +6,31 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-md, 16px);
-  padding: var(--ant-padding-lg, 24px);
+  gap: var(--space-md, 16px);
+  padding: var(--space-lg, 24px);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-md, 16px);
+  gap: var(--space-md, 16px);
 }
 
 .divider {
-  margin: var(--ant-margin-xs, 8px) 0;
+  margin: var(--space-xs, 8px) 0;
 }
 
 .modeGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-sm, 12px);
+  gap: var(--space-sm, 12px);
 }
 
 .modeOption {
   display: flex;
   align-items: flex-start;
-  gap: var(--ant-margin-sm, 12px);
-  padding: var(--ant-padding-sm, 12px) var(--ant-padding-md, 16px);
+  gap: var(--space-sm, 12px);
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
   border: 1px solid var(--border);
   border-radius: var(--radius, 8px);
   background: var(--surface);
@@ -40,7 +40,7 @@
 .modeContent {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-xxs, 4px);
+  gap: var(--space-2xs, 4px);
 }
 
 .modeLabel {
@@ -49,14 +49,14 @@
 }
 
 .modeDescription {
-  font-size: var(--ant-font-size-sm, 13px);
+  font-size: var(--font-size-sm, 13px);
   color: var(--muted);
 }
 
 .schemeGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
-  gap: var(--ant-margin-sm, 12px);
+  gap: var(--space-sm, 12px);
 }
 
 .schemeGroup {
@@ -66,11 +66,11 @@
 .schemeOption:global(.toggle-button) {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-xs, 8px);
+  gap: var(--space-xs, 8px);
   align-items: stretch;
   width: 100%;
   height: auto;
-  padding: var(--ant-padding-xs, 8px);
+  padding: var(--space-xs, 8px);
   border: 1px solid var(--border);
   border-radius: var(--radius, 8px);
   background: var(--surface);
@@ -85,7 +85,7 @@
 
 .schemePreview {
   display: flex;
-  gap: var(--ant-margin-xxs, 4px);
+  gap: var(--space-2xs, 4px);
 }
 
 .schemeSwatch {
@@ -103,12 +103,12 @@
 }
 
 .schemeLabel {
-  font-size: var(--ant-font-size-sm, 13px);
+  font-size: var(--font-size-sm, 13px);
   font-weight: 500;
   color: var(--foreground);
 }
 
 .schemeDescription {
-  font-size: var(--ant-font-size-sm, 12px);
+  font-size: var(--font-size-sm, 12px);
   color: var(--muted);
 }

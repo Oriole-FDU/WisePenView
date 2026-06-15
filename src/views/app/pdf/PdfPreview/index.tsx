@@ -1,4 +1,5 @@
 import EntryIcon from '@/components/Common/EntryIcon';
+import { ResultState, Spin } from '@/components/Common/Feedback';
 import IconText from '@/components/Common/IconText';
 import PdfViewer from '@/components/Pdf/PdfViewer/index';
 import ResourceInteractBar from '@/components/Resource/ResourceInteractBar';
@@ -10,7 +11,6 @@ import { RESOURCE_TYPE } from '@/domains/Resource';
 import { parseErrorMessage } from '@/utils/error';
 import { Button } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Result, Spin } from 'antd';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styles from './style.module.less';
@@ -62,7 +62,7 @@ function PdfPreview() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="无法打开文档"
                 extra={
@@ -85,7 +85,7 @@ function PdfPreview() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="无法打开文档"
                 subTitle={parseErrorMessage(docInfoError)}
@@ -126,7 +126,7 @@ function PdfPreview() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="无法打开文档"
                 subTitle="文档信息为空，请稍后重试"
@@ -157,7 +157,7 @@ function PdfPreview() {
                 />
               }
               iconSize={18}
-              gap="var(--ant-margin-sm)"
+              gap="var(--space-sm)"
               ellipsis
             >
               {docInfo.resourceInfo.resourceName}
@@ -167,7 +167,7 @@ function PdfPreview() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="文档预览失败"
                 subTitle={parseErrorMessage(viewerError)}
@@ -197,7 +197,7 @@ function PdfPreview() {
               />
             }
             iconSize={18}
-            gap="var(--ant-margin-sm)"
+            gap="var(--space-sm)"
             ellipsis
           >
             {docInfo.resourceInfo.resourceName}

@@ -1,7 +1,8 @@
+import { ResultState, Spin } from '@/components/Common/Feedback';
+import SegmentedTabs from '@/components/Common/SegmentedTabs';
 import { useRequest, useUnmount } from 'ahooks';
-import { Alert, Result, Segmented, Spin } from 'antd';
-import { ChevronsLeft, Menu, PanelRightClose, PanelRightOpen } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { ChevronsLeft, Menu } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import EntryIcon from '@/components/Common/EntryIcon';
@@ -26,7 +27,7 @@ import { useSmoothFlag } from '@/hooks/useSmoothFlag';
 import { useAiDiffDisplayStore } from '@/store';
 import { useNoteCommentsSidebarStore } from '@/store/useNoteCommentsSidebarStore';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, Checkbox, Dropdown, Modal, Switch, Tooltip, toast } from '@heroui/react';
+import { Alert, Button, Checkbox, Dropdown, Modal, Switch, Tooltip, toast } from '@heroui/react';
 import NoteInfoBar from './_components/NoteInfoBar';
 import NotePermissionModal from './_components/NotePermissionModal';
 import NoteTitle from './_components/NoteTitle';
@@ -53,7 +54,7 @@ function NoteToolbarTitle({ resourceId, fallbackTitle }: NoteToolbarTitleProps) 
       className={rvhStyles.inlineTitleText}
       icon={<EntryIcon entryType="resource" resourceType={RESOURCE_TYPE.NOTE} />}
       iconSize={18}
-      gap="var(--ant-margin-sm)"
+      gap="var(--space-sm)"
       ellipsis
     >
       {title}
@@ -247,12 +248,16 @@ function NoteViewConnected({
         extra={
           <div className={styles.headerToolbarExtra}>
             {showAiDiffDisplayModeSwitch ? (
-              <Segmented
-                value={aiDiffDisplayMode}
+              <SegmentedTabs<AiDiffDisplayMode>
+                ariaLabel="AI 差异展示模式"
+                selectedKey={aiDiffDisplayMode}
                 className={styles.aiDiffDisplayModeSwitch}
-                options={aiDiffDisplayOptions}
-                disabled={showFullPageSpin}
-                onChange={(value) => setAiDiffDisplayMode(value as AiDiffDisplayMode)}
+                items={aiDiffDisplayOptions.map((option) => ({
+                  key: option.value,
+                  label: option.label,
+                  disabled: showFullPageSpin,
+                }))}
+                onSelectionChange={setAiDiffDisplayMode}
               />
             ) : null}
             <div className={styles.headerActionsEnd}>
@@ -398,11 +403,14 @@ function NoteViewConnected({
             <div className={styles.mainCol}>
               <div className={styles.root}>
                 {isDisconnected ? (
-                  <Alert
-                    className={styles.wsAlert}
-                    type="warning"
-                    description="网络连接已断开，当前可继续本地编辑；网络恢复后会自动同步到云端。"
-                    action={
+                  <Alert className={styles.wsAlert} status="warning">
+                    <Alert.Indicator />
+                    <Alert.Content>
+                      <Alert.Description>
+                        网络连接已断开，当前可继续本地编辑；网络恢复后会自动同步到云端。
+                      </Alert.Description>
+                    </Alert.Content>
+                    <div className={styles.wsAlertAction}>
                       <Button
                         variant="secondary"
                         size="sm"
@@ -411,8 +419,8 @@ function NoteViewConnected({
                       >
                         重试
                       </Button>
-                    }
-                  />
+                    </div>
+                  </Alert>
                 ) : null}
                 <div ref={titleAnchorRef}>
                   <NoteTitle
@@ -551,7 +559,7 @@ function NoteView() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="无法打开笔记"
                 extra={
@@ -574,7 +582,7 @@ function NoteView() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="无法打开笔记"
                 subTitle={parseErrorMessage(noteInfoError)}
@@ -614,7 +622,7 @@ function NoteView() {
         <div className={styles.statesBelowHeader}>
           <div className={styles.middleOverlay}>
             <div className={styles.middleOverlayInner}>
-              <Result
+              <ResultState
                 status="warning"
                 title="无法打开笔记"
                 subTitle="笔记信息为空，请稍后重试"

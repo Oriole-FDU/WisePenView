@@ -1,8 +1,8 @@
 .aiRow {
   display: flex;
   width: 100%;
-  margin-bottom: var(--ant-margin-lg);
-  gap: var(--ant-margin-xs); // 头像与内容间距
+  margin-bottom: var(--space-lg);
+  gap: var(--space-xs); // 头像与内容间距
 
   // 头像列
   .avatarCol {
@@ -17,14 +17,14 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--ant-margin-xs);
+    gap: var(--space-xs);
 
     .modelMeta {
       display: inline-flex;
       align-items: center;
-      gap: var(--ant-margin-xxs);
-      color: var(--ant-color-text-tertiary);
-      font-size: var(--ant-font-size-sm);
+      gap: 4px;
+      color: var(--text-tertiary);
+      font-size: var(--font-size-sm);
       line-height: 1;
       width: fit-content;
 
@@ -37,8 +37,8 @@
     .bubble {
       background: transparent; // AI 无背景
       padding: 0;
-      color: var(--ant-color-text);
-      font-size: var(--ant-font-size);
+      color: var(--foreground);
+      font-size: var(--font-size-base);
       line-height: 1.6;
       text-align: justify;
     }
@@ -46,9 +46,9 @@
     .loadingHint {
       display: inline-flex;
       align-items: center;
-      gap: var(--ant-margin-xs);
-      color: var(--ant-color-text-tertiary);
-      font-size: var(--ant-font-size-sm);
+      gap: var(--space-xs);
+      color: var(--text-tertiary);
+      font-size: var(--font-size-sm);
 
       .loadingHintText {
         display: inline-block;
@@ -61,22 +61,22 @@
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
-      gap: var(--ant-margin-sm);
+      gap: var(--space-sm);
 
       flex-shrink: 0;
 
       .actionBtn {
-        color: var(--ant-color-text-tertiary);
-        box-shadow: var(--ant-box-shadow-sm);
+        color: var(--text-tertiary);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 
         &:hover {
-          color: var(--ant-color-primary);
+          color: var(--accent);
           transform: scale(1.1);
         }
       }
 
       .actionBtnCopied {
-        color: var(--ant-color-success);
+        color: var(--success);
       }
     }
   }

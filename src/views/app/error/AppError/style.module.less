@@ -17,7 +17,7 @@
   width: 100%;
   flex-shrink: 0;
   background-color: rgba(255, 255, 255, 0.88);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  border-bottom: 1px solid var(--border-light);
   backdrop-filter: saturate(180%) blur(10px);
 }
 
@@ -35,58 +35,47 @@
   max-width: 620px;
 }
 
-.result:global(.ant-result) {
-  padding: clamp(24px, 4vh, 40px) 0;
-}
-
-.result :global(.ant-result-title) {
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: rgba(0, 0, 0, 0.88);
-}
-
-.result :global(.ant-result-subtitle) {
-  font-size: 16px;
-  line-height: 1.65;
-  max-width: 460px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.result :global(.ant-result-icon) {
-  margin-bottom: 8px;
-}
-
-.result :global(.ant-result-icon .anticon) {
-  color: @accent;
+.actionGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm, 12px);
 }
 
 .errorCollapse {
   margin-top: 8px;
   text-align: left;
-  background: transparent;
-}
-
-.errorCollapse:global(.ant-collapse) {
-  border: 1px solid var(--ant-color-border-secondary);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.66);
 }
 
-.errorCollapse :global(.ant-collapse-header) {
-  font-weight: 500;
-  color: var(--ant-color-text-secondary);
+.errorCollapseHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
 }
 
-.errorCollapse :global(.ant-collapse-content-box) {
-  padding-top: 0 !important;
+.errorCollapseToggle {
+  flex: 1;
+  min-height: 28px;
+  border: 0;
+  background: transparent;
+  font-weight: 500;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
 }
 
 .errorDetailPanel {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 0 12px 12px;
 }
 
 .errorDetail {
@@ -95,7 +84,7 @@
   padding: 12px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.04);
-  color: var(--ant-color-text-secondary);
+  color: var(--muted);
   font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
   font-size: 12px;
   line-height: 1.5;
@@ -112,6 +101,6 @@
   text-align: center;
   padding: 16px @landing-inline 24px;
   font-size: 12px;
-  color: var(--ant-color-text-tertiary);
+  color: var(--text-tertiary);
   line-height: 1.5;
 }

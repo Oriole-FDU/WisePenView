@@ -12,5 +12,4 @@ export interface ActionToolbarProps {
   contentPickOpen: boolean;
   onContentPickOpenChange: (open: boolean) => void;
   contentPickDropdownContent: React.ReactNode;
-  getPopupContainer: () => HTMLElement;
 }

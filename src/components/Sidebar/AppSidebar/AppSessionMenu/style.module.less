@@ -9,7 +9,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--ant-color-fill-tertiary);
+    background: var(--surface-tertiary);
     border-radius: 2px;
   }
 }
@@ -37,7 +37,7 @@
 
 .sectionTitle {
   padding: 8px 12px 6px;
-  color: var(--ant-color-text-tertiary);
+  color: var(--text-tertiary);
   font-size: 12px;
   line-height: 18px;
 }
@@ -49,7 +49,7 @@
   align-items: center;
   border-radius: 8px;
   padding: 0 12px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted);
   cursor: pointer;
   outline: none;
   transition:
@@ -59,18 +59,18 @@
   &:hover,
   &[data-hovered],
   &[data-focused] {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background: var(--surface-tertiary);
   }
 
   &[data-selected] {
-    color: var(--ant-color-primary);
-    background: var(--ant-color-primary-bg);
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface));
     font-weight: 500;
   }
 
   &[data-disabled] {
-    color: var(--ant-color-text-quaternary);
+    color: var(--text-disabled);
     cursor: not-allowed;
     background: transparent;
   }
@@ -89,12 +89,12 @@
   width: 100%;
   justify-content: flex-start;
   padding: 0;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted);
   background: transparent;
 
   &:hover,
   &[data-hovered] {
-    color: var(--ant-color-text);
+    color: var(--foreground);
     background: transparent;
   }
 }

@@ -1,5 +1,5 @@
+import type { DataNode } from '@/components/Common/Tree';
 import type { DriveNode, LoadMoreNode } from '@/domains/Drive';
-import type { DataNode } from 'antd/es/tree';
 import DriveTreeNodeTitle from './DriveTreeNodeTitle';
 import styles from './style.module.less';
 

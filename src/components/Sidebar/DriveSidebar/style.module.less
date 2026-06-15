@@ -2,8 +2,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--ant-color-bg-container);
-  border-right: 1px solid var(--ant-color-border-secondary);
+  background: var(--surface);
+  border-right: 1px solid var(--border-light);
 }
 
 .collapsed {
@@ -13,14 +13,14 @@
 .header {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-xxs);
-  padding: var(--ant-padding-sm) var(--ant-padding-sm);
-  border-bottom: 1px solid var(--ant-color-border-secondary);
+  gap: 4px;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .sider.collapsed .header {
   justify-content: center;
-  padding: var(--ant-padding-sm) 0;
+  padding: 12px 0;
 }
 
 .iconBtn {
@@ -29,8 +29,8 @@
   height: 32px;
   border: none;
   background: transparent;
-  border-radius: var(--ant-border-radius);
-  color: var(--ant-color-text-secondary);
+  border-radius: var(--radius, 8px);
+  color: var(--muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -38,8 +38,8 @@
   transition: all 0.2s ease;
 
   &:hover {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background: var(--surface-tertiary);
   }
 }
 
@@ -47,21 +47,21 @@
   flex: 1;
   min-width: 0;
   height: 32px;
-  padding: 0 var(--ant-padding-xs);
+  padding: 0 8px;
   border: none;
   background: transparent;
-  border-radius: var(--ant-border-radius);
-  color: var(--ant-color-text-secondary);
+  border-radius: var(--radius, 8px);
+  color: var(--muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: var(--ant-margin-xxs);
-  font-size: var(--ant-font-size);
+  gap: 4px;
+  font-size: var(--font-size-md, 14px);
   transition: all 0.2s ease;
 
   &:hover {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background: var(--surface-tertiary);
   }
 }
 

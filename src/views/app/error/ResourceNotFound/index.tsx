@@ -1,7 +1,7 @@
 import { Button } from '@heroui/react';
-import { Result, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
+import { ResultState } from '@/components/Common/Feedback';
 import LandingNavbar from '@/components/LandingNavbar';
 import styles from './style.module.less';
 
@@ -15,20 +15,20 @@ function ResourceNotFound() {
       </div>
 
       <main className={styles.main}>
-        <Result
+        <ResultState
           className={styles.result}
           status="404"
           title="页面不存在"
           subTitle="抱歉，您访问的链接可能已失效，或页面已被移动。请返回首页或上一页继续浏览。"
           extra={
-            <Space size="middle" wrap>
+            <div className={styles.actionGroup}>
               <Button variant="primary" size="lg" onPress={() => navigate('/')}>
                 返回首页
               </Button>
               <Button size="lg" onPress={() => navigate(-1)}>
                 返回上一页
               </Button>
-            </Space>
+            </div>
           }
         />
       </main>

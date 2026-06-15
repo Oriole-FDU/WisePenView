@@ -3,63 +3,69 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--ant-color-bg-container);
+  background: var(--surface);
   overflow: auto;
-  padding: var(--ant-padding-xs) 0;
+  padding: 8px 0;
 }
 
 .sidebar::-webkit-scrollbar {
-  width: var(--ant-scrollbar-width);
+  width: 6px;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
   background-color: transparent;
-  border-radius: var(--ant-border-radius-sm);
+  border-radius: var(--radius-sm, 4px);
   transition: background-color 0.15s ease;
 }
 
 .sidebar:hover::-webkit-scrollbar-thumb {
-  background-color: var(--ant-color-fill-secondary);
+  background-color: var(--surface-tertiary);
 }
 
 .stateBlock {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--ant-padding-lg) var(--ant-padding-sm);
+  padding: 24px 12px;
 }
 
 .tree {
-  font-size: var(--ant-font-size-md);
+  color: var(--foreground);
+  font-size: var(--font-size-md, 14px);
 
-  :global(.ant-tree-treenode) {
+  :global(.wisepen-tree__item) {
     padding: 1px 0;
     width: 100%;
   }
 
-  :global(.ant-tree-node-content-wrapper) {
+  :global(.wisepen-tree__content) {
     min-height: 24px;
     flex: 1;
     min-width: 0;
+    color: var(--muted);
+    border-radius: var(--radius-sm, 4px);
+
+    &:hover {
+      color: var(--foreground);
+      background: var(--surface-tertiary);
+    }
   }
 
-  :global(.ant-tree-switcher) {
+  :global(.wisepen-tree__item[aria-selected='true'] .wisepen-tree__content) {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface)) !important;
+  }
+
+  :global(.wisepen-tree__switcher) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 18px;
     height: 18px;
+    color: var(--muted);
   }
 
-  :global(.ant-tree-switcher-icon) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-  }
-
-  :global(.ant-tree-title) {
+  :global(.wisepen-tree__title) {
     line-height: 22px;
     width: 100%;
     min-width: 0;

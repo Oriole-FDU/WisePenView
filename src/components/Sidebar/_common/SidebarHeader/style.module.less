@@ -22,14 +22,14 @@
   border: none;
   background: transparent;
   padding: 4px;
-  border-radius: var(--ant-border-radius);
-  color: var(--ant-color-text-secondary);
+  border-radius: var(--radius, 8px);
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.3s;
 
   &:hover {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background: var(--surface-tertiary);
   }
 }
 
@@ -49,7 +49,7 @@
 .logoText {
   white-space: nowrap;
   overflow: hidden;
-  color: var(--ant-color-text);
+  color: var(--foreground);
   font-size: 18px;
   font-weight: 600;
   -webkit-font-smoothing: antialiased;

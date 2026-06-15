@@ -11,17 +11,17 @@
   justify-content: center;
 
   border: none;
-  padding: 0 var(--ant-padding-sm);
+  padding: 0 12px;
   background: transparent;
   color: inherit;
 
   transition: all 0.2s;
 
-  border-top: 1px solid var(--ant-color-border-secondary);
+  border-top: 1px solid var(--border-light);
 
   &.expanded {
     justify-content: flex-start;
-    padding: 0 var(--ant-padding);
+    padding: 0 16px;
   }
 }
 
@@ -35,14 +35,14 @@
   gap: 8px;
   min-height: 36px;
   padding: 0 12px;
-  color: var(--ant-color-text-secondary);
+  color: var(--muted);
   border-radius: 8px;
   outline: none;
   cursor: pointer;
 
   &:hover {
-    color: var(--ant-color-text);
-    background: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background: var(--surface-tertiary);
   }
 }
 
@@ -50,8 +50,8 @@
 .profileMenuItem[data-focused],
 .profileMenu :global([data-slot='menu-item'][data-hovered]),
 .profileMenu :global([data-slot='menu-item'][data-focused]) {
-  color: var(--ant-color-text);
-  background: var(--ant-color-fill-tertiary) !important;
+  color: var(--foreground);
+  background: var(--surface-tertiary) !important;
 }
 
 .feedbackModal {
@@ -60,11 +60,11 @@
 
 .avatar {
   flex-shrink: 0;
-  background-color: var(--ant-color-fill-secondary);
-  color: var(--ant-color-text);
+  background-color: var(--surface-tertiary);
+  color: var(--foreground);
   font-weight: @font-weight-semibold;
-  font-size: var(--ant-font-size-sm);
-  border: 1px solid var(--ant-color-border-secondary);
+  font-size: var(--font-size-sm, 12px);
+  border: 1px solid var(--border-light);
 }
 
 .avatarTrigger,
@@ -77,11 +77,11 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
-  border-radius: var(--ant-border-radius-sm);
+  border-radius: var(--radius-sm, 4px);
   outline: none;
 
   &:focus-visible {
-    box-shadow: 0 0 0 2px var(--ant-color-primary-border);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 }
 
@@ -91,20 +91,20 @@
 }
 
 .info {
-  margin-left: var(--ant-margin-sm);
+  margin-left: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   flex: 1;
-  line-height: var(--ant-line-height);
+  line-height: 1.5;
   overflow: hidden;
 }
 
 .username {
   width: 100%;
-  font-size: var(--ant-font-size);
+  font-size: var(--font-size-md, 14px);
   font-weight: @font-weight-medium;
-  color: var(--ant-color-text);
+  color: var(--foreground);
   white-space: nowrap;
   text-align: left;
 }
@@ -112,14 +112,14 @@
 .tag {
   width: 100%;
   font-size: 10px;
-  color: var(--ant-color-text-tertiary);
+  color: var(--text-tertiary);
   margin-top: -2px;
   text-align: left;
 }
 
 .icon {
-  font-size: var(--ant-font-size-lg);
-  color: var(--ant-color-text-tertiary);
+  font-size: var(--font-size-lg, 16px);
+  color: var(--text-tertiary);
 }
 
 .menuTrigger {
@@ -131,11 +131,11 @@
 .feedbackIframeWrap {
   width: 100%;
   height: min(70vh, 640px);
-  margin-top: var(--ant-margin-xs);
+  margin-top: 8px;
   overflow: hidden;
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: var(--ant-border-radius);
-  background-color: var(--ant-color-fill-quaternary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius, 8px);
+  background-color: var(--surface-secondary);
 }
 
 .feedbackIframe {
@@ -146,11 +146,11 @@
 }
 
 .feedbackFallback {
-  margin-top: var(--ant-margin-xs);
-  color: var(--ant-color-text-secondary);
-  font-size: var(--ant-font-size);
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: var(--font-size-md, 14px);
 }
 
 .feedbackFallbackLink {
-  margin-left: var(--ant-margin-xxs);
+  margin-left: 4px;
 }

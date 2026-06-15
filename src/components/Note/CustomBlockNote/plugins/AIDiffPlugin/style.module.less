@@ -34,7 +34,7 @@
   opacity: 1;
   pointer-events: auto;
   transition:
-    opacity var(--ant-motion-duration-fast),
+    opacity var(--motion-duration-fast),
     visibility 0s linear 0s;
 }
 
@@ -42,8 +42,8 @@
 .aiDeleteRoot {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  background: var(--ant-color-error-bg);
-  color: var(--ant-color-text-tertiary);
+  background: var(--error-soft);
+  color: var(--text-tertiary);
   text-decoration: line-through;
 }
 
@@ -51,13 +51,13 @@
 .aiAddRoot {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  background: var(--ant-color-success-bg-hover);
+  background: var(--success-soft);
   color: inherit;
   font-weight: 600;
 }
 
 .aiLinkText {
-  color: var(--ant-color-link);
+  color: var(--accent);
   text-decoration: none;
 
   &:hover,
@@ -90,14 +90,14 @@
   display: inline-flex;
   gap: 6px;
   padding: 4px;
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: var(--ant-border-radius-lg);
-  background: var(--ant-color-bg-elevated);
-  box-shadow: var(--ant-box-shadow-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--overlay);
+  box-shadow: var(--shadow-md);
   /* Delay hide so the pointer can cross the gap toward buttons without flicker */
   transition:
-    opacity var(--ant-motion-duration-fast) var(--ant-motion-duration-mid, 0.2s),
-    visibility 0s linear var(--ant-motion-duration-mid, 0.2s);
+    opacity var(--motion-duration-fast) var(--motion-duration-mid, 0.2s),
+    visibility 0s linear var(--motion-duration-mid, 0.2s);
 }
 
 .aiActionBtn {
@@ -109,64 +109,64 @@
   min-width: 56px;
   padding: 0 12px;
   margin: 0;
-  border: 1px solid var(--ant-color-border-secondary);
-  border-radius: var(--ant-border-radius-lg);
-  color: var(--ant-color-text);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  color: var(--foreground);
   cursor: pointer;
   line-height: 1;
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
   transition:
-    background var(--ant-motion-duration-fast),
-    border-color var(--ant-motion-duration-fast),
-    box-shadow var(--ant-motion-duration-fast);
+    background var(--motion-duration-fast),
+    border-color var(--motion-duration-fast),
+    box-shadow var(--motion-duration-fast);
 
   &:focus-visible {
-    outline: 2px solid var(--ant-color-primary);
+    outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
 }
 
 .aiActionAccept {
-  background: var(--ant-color-success);
-  border-color: var(--ant-color-success);
+  background: var(--success);
+  border-color: var(--success);
   color: #fff;
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--ant-color-success-active) 40%, transparent);
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--success-active) 40%, transparent);
 
   &:hover,
   &:focus-visible:not(:disabled) {
-    background: var(--ant-color-success-hover);
-    border-color: var(--ant-color-success-hover);
+    background: var(--success-hover);
+    border-color: var(--success-hover);
     color: #fff;
   }
 
   &:active {
-    background: var(--ant-color-success-active);
-    border-color: var(--ant-color-success-active);
-    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--ant-color-success-active) 60%, transparent);
+    background: var(--success-active);
+    border-color: var(--success-active);
+    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--success-active) 60%, transparent);
     color: #fff;
   }
 }
 
 .aiActionDiscard {
-  background: var(--ant-color-fill-tertiary);
-  border-color: var(--ant-color-border-secondary);
-  color: var(--ant-color-text);
+  background: var(--surface-tertiary);
+  border-color: var(--border-light);
+  color: var(--foreground);
   box-shadow: none;
 
   &:hover,
   &:focus-visible:not(:disabled) {
-    background: var(--ant-color-fill-secondary);
-    border-color: var(--ant-color-border);
-    color: var(--ant-color-text);
+    background: var(--surface-secondary);
+    border-color: var(--border);
+    color: var(--foreground);
   }
 
   &:active {
-    background: var(--ant-color-fill);
-    border-color: var(--ant-color-border);
+    background: var(--surface-secondary);
+    border-color: var(--border);
     box-shadow: inset 0 1px 2px
-      color-mix(in srgb, var(--ant-color-text-quaternary) 45%, transparent);
-    color: var(--ant-color-text);
+      color-mix(in srgb, var(--text-tertiary) 45%, transparent);
+    color: var(--foreground);
   }
 }

@@ -8,7 +8,7 @@
 }
 
 .capabilityCheck {
-  color: var(--ant-color-info);
+  color: var(--info);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -17,43 +17,43 @@
 
 .container {
   flex-shrink: 0;
-  padding: var(--ant-padding-sm) var(--ant-padding-lg) var(--ant-padding-md);
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
   background: transparent;
 
   .inputCard {
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--ant-color-bg-container);
-    border: 1px solid var(--ant-color-border);
-    border-radius: var(--ant-border-radius-lg);
-    box-shadow: var(--ant-box-shadow-secondary);
-    padding: var(--ant-padding-sm) var(--ant-padding-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--card-shadow);
+    padding: var(--space-sm) var(--space-md);
     transition: border-color 0.2s, box-shadow 0.2s;
 
     &:focus-within {
-      border-color: var(--ant-color-primary);
-      box-shadow: 0 0 0 2px var(--ant-color-primary-bg);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 12%, transparent);
     }
   }
 
   .selectedHint {
     display: inline-flex;
     align-items: center;
-    gap: var(--ant-margin-xs);
-    margin-bottom: var(--ant-margin-sm);
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
     align-self: flex-start;
     max-width: 100%;
-    border: 1px solid var(--ant-color-primary-border);
-    border-radius: var(--ant-border-radius);
-    padding: 2px var(--ant-padding-xs);
-    background: var(--ant-color-primary-bg);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+    border-radius: var(--radius);
+    padding: 2px var(--space-xs);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
   }
 
   .selectedHintText {
     min-width: 0;
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-secondary);
+    font-size: var(--font-size-sm);
+    color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -65,7 +65,7 @@
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: var(--ant-color-text-secondary);
+    color: var(--muted);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -75,8 +75,8 @@
     transition: all 0.2s;
 
     &:hover {
-      color: var(--ant-color-primary);
-      background: var(--ant-color-fill-tertiary);
+      color: var(--accent);
+      background: var(--surface-tertiary);
     }
   }
 
@@ -85,7 +85,7 @@
     background: transparent;
     display: flex;
     align-items: flex-end;
-    gap: var(--ant-margin-sm);
+    gap: var(--space-sm);
   }
 
   .textarea {
@@ -94,29 +94,22 @@
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
-    padding: var(--ant-padding-xs) 0 !important;
-    font-size: var(--ant-font-size);
+    padding: var(--space-xs) 0 !important;
+    font-size: var(--font-size-base);
     line-height: 1.6;
-    color: var(--ant-color-text);
-
-    :global(.ant-input) {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      padding: 0 !important;
-    }
+    color: var(--foreground);
 
     &::placeholder {
-      color: var(--ant-color-text-placeholder);
+      color: var(--field-placeholder);
     }
   }
 
   .inlineError {
-    margin-top: var(--ant-margin-xxs);
-    margin-bottom: var(--ant-margin-sm);
-    padding: 0 var(--ant-padding-xxs);
-    color: var(--ant-color-error);
-    font-size: var(--ant-font-size-sm);
+    margin-top: 4px;
+    margin-bottom: var(--space-sm);
+    padding: 0 4px;
+    color: var(--error);
+    font-size: var(--font-size-sm);
   }
 
   .actionArea {
@@ -128,7 +121,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--ant-margin-sm);
+    gap: var(--space-sm);
     min-height: 36px;
     min-width: 280px;
   }
@@ -136,14 +129,14 @@
   .toolbarLeft {
     display: flex;
     align-items: center;
-    gap: var(--ant-margin-sm);
+    gap: var(--space-sm);
     min-width: 0;
   }
 
   .toolsRight {
     display: flex;
     align-items: center;
-    gap: var(--ant-margin-sm);
+    gap: var(--space-sm);
     margin-left: auto;
   }
 
@@ -152,33 +145,67 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
     padding: 0 !important;
     line-height: 1;
+  }
+
+  .toolbarPopover {
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    background: var(--overlay);
+    box-shadow: var(--card-shadow);
+  }
+
+  .capabilityTriggerWrap {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .capabilityBadge {
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    z-index: 1;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--info);
+    color: #fff;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
   }
 
   .capabilityButton {
     min-width: 72px;
     height: 32px;
-    padding: 0 var(--ant-padding-sm);
+    padding: 0 var(--space-sm);
     border-radius: 999px;
     font-weight: 400;
-    font-size: var(--ant-font-size-sm);
-    background: var(--ant-color-bg-container);
-    border-color: var(--ant-color-border);
-    color: var(--ant-color-text);
+    font-size: var(--font-size-sm);
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--foreground);
     display: inline-flex;
     align-items: center;
     gap: 4px;
 
     &:hover,
-    &:focus {
-      color: var(--ant-color-primary) !important;
-      border-color: var(--ant-color-primary) !important;
+    &:focus-visible {
+      color: var(--accent) !important;
+      border-color: var(--accent) !important;
     }
   }
 
   .floatingPanel {
-    border-radius: var(--ant-border-radius-lg);
+    border-radius: var(--radius-xl);
     overflow: hidden;
   }
 
@@ -189,12 +216,12 @@
   .capabilityPanel {
     width: 240px;
     overflow: hidden;
-    border-radius: var(--ant-border-radius-lg);
+    border-radius: var(--radius-xl);
   }
 
   .contentPanel {
     min-width: 200px;
-    padding: var(--ant-padding-xs);
+    padding: var(--space-xs);
   }
 
   .capabilityMenu {
@@ -203,8 +230,8 @@
   }
 
   .capabilitySourceText {
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-secondary);
+    font-size: var(--font-size-sm);
+    color: var(--muted);
     font-weight: 400;
     white-space: nowrap;
   }
@@ -213,93 +240,70 @@
     width: 100%;
     height: 32px;
     border: none;
-    border-radius: var(--ant-border-radius);
-    padding: 0 var(--ant-padding-sm);
+    border-radius: var(--radius);
+    padding: 0 var(--space-sm);
     margin-bottom: 2px;
     display: flex;
     align-items: center;
-    gap: var(--ant-margin-xs);
+    gap: var(--space-xs);
     background: transparent;
-    color: var(--ant-color-text);
+    color: var(--foreground);
     cursor: pointer;
-    font-size: var(--ant-font-size-sm);
+    font-size: var(--font-size-sm);
     font-weight: 500;
     transition: background 0.2s;
 
     &:hover {
-      background: var(--ant-color-fill-tertiary);
+      background: var(--surface-tertiary);
     }
   }
 
   .capabilityEmpty {
-    padding: var(--ant-padding-sm) 0;
-  }
-
-  .otherSkillModal {
-    :global(.ant-modal-content) {
-      border-radius: var(--ant-border-radius-lg);
-      overflow: hidden;
-    }
-
-    :global(.ant-modal-header) {
-      border-bottom: 1px solid var(--ant-color-border-secondary);
-    }
-
-    :global(.ant-modal-title) {
-      font-size: var(--ant-font-size);
-      font-weight: 500;
-      color: var(--ant-color-text);
-    }
-
-    :global(.ant-modal-body) {
-      padding: var(--ant-padding-sm);
-      max-height: 56vh;
-      overflow: auto;
-    }
+    padding: var(--space-sm) 0;
   }
 
   .treeItemLabel {
     display: inline-flex;
     align-items: center;
-    gap: var(--ant-margin-xs);
+    gap: var(--space-xs);
   }
 
   .otherSkillTree {
     background: transparent !important;
 
-    :global(.ant-tree-treenode) {
+    :global(.wisepen-tree__item) {
       padding: 2px 0;
     }
 
-    :global(.ant-tree-node-content-wrapper) {
+    :global(.wisepen-tree__content) {
       height: 32px;
       line-height: 32px;
-      border-radius: var(--ant-border-radius);
-      padding: 0 var(--ant-padding-sm) !important;
-      font-size: var(--ant-font-size-sm);
-      color: var(--ant-color-text);
+      border-radius: var(--radius);
+      padding: 0 var(--space-sm) !important;
+      font-size: var(--font-size-sm);
+      color: var(--foreground);
 
       &:hover {
-        background: var(--ant-color-fill-tertiary) !important;
+        background: var(--surface-tertiary) !important;
       }
     }
 
-    :global(.ant-tree-node-selected) {
+    :global(.wisepen-tree__item[aria-selected='true']) {
       background: transparent !important;
     }
 
-    :global(.ant-tree-node-content-wrapper.ant-tree-node-selected) {
-      background: var(--ant-color-primary-bg) !important;
-      color: var(--ant-color-text) !important;
+    :global(.wisepen-tree__item[aria-selected='true'] .wisepen-tree__content) {
+      background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+      color: var(--foreground) !important;
       font-weight: 500;
     }
   }
 
   .footerTip {
     text-align: center;
-    margin-top: var(--ant-margin-xxs);
-    font-size: var(--ant-font-size-sm);
-    color: var(--ant-color-text-quaternary);
+    margin-top: 4px;
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
     line-height: 1;
   }
 }

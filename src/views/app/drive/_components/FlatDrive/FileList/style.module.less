@@ -13,39 +13,72 @@
 /* 与表格行 hover 保持同风格 */
 .rowSelected,
 .rowSelected:hover {
-  background: var(--ant-table-row-hover-bg) !important;
+  :global(.table__cell) {
+    background: var(--table-row-hover-bg) !important;
+  }
+}
+
+.clickableRow {
+  cursor: pointer;
 }
 
 .nameCell {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-sm);
+  min-width: 0;
+  gap: var(--space-sm);
   font-weight: 500;
+  cursor: pointer;
+}
+
+.cellButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  border: 0;
   cursor: pointer;
 }
 
 .tagList {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
+}
+
+.tagChip {
+  max-width: 100%;
 }
 
 .optionBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--ant-padding-xs);
-  color: var(--ant-color-text-secondary);
+  padding: var(--space-xs);
+  color: var(--muted);
   background: transparent;
   border: none;
-  border-radius: var(--ant-border-radius-sm);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
     color 0.2s,
     background-color 0.2s;
 
   &:hover {
-    color: var(--ant-color-text);
-    background-color: var(--ant-color-fill-tertiary);
+    color: var(--foreground);
+    background-color: var(--surface-tertiary);
   }
+}
+
+.actionDropdownPopover {
+  min-width: 128px;
+}
+
+.pageSizeSelect {
+  min-width: 104px;
 }

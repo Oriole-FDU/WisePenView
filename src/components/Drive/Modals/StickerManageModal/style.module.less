@@ -1,5 +1,5 @@
 .modalBody {
-  padding: var(--ant-padding-md);
+  padding: var(--space-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -19,13 +19,13 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-right: 1px solid var(--ant-color-border-secondary);
-  padding-right: var(--ant-padding-md);
+  border-right: 1px solid var(--border-light);
+  padding-right: var(--space-md);
 }
 
 .listPaneTitle {
   font-weight: 600;
-  margin-bottom: var(--ant-margin-sm);
+  margin-bottom: var(--space-sm);
   flex-shrink: 0;
 }
 
@@ -33,14 +33,14 @@
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
   flex: 1;
   overflow: auto;
 }
 
 .stickerTag {
   margin: 0;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   line-height: 20px;
   padding: 4px 11px;
   cursor: pointer;
@@ -48,17 +48,18 @@
     color 0.2s,
     border-color 0.2s,
     background 0.2s;
+  user-select: none;
 
   &:hover {
-    color: var(--ant-color-primary);
-    border-color: var(--ant-color-primary);
+    color: var(--accent);
+    border-color: var(--accent);
   }
 }
 
 .stickerTagSelected {
-  color: var(--ant-color-primary);
-  border-color: var(--ant-color-primary);
-  background: var(--ant-color-primary-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .detailPane {
@@ -66,12 +67,12 @@
   min-width: 0;
   min-height: 0;
   overflow: auto;
-  padding-left: var(--ant-padding-md);
+  padding-left: var(--space-md);
 }
 
 .sectionTitle {
   font-weight: 600;
-  margin-bottom: var(--ant-margin-sm);
+  margin-bottom: var(--space-sm);
 }
 
 .form {
@@ -79,25 +80,48 @@
 }
 
 .fieldGroup {
-  margin-bottom: var(--ant-margin-md);
+  margin-bottom: var(--space-md);
 }
 
 .fieldLabel {
   display: block;
-  margin-bottom: var(--ant-margin-xs);
-  font-size: var(--ant-font-size-sm);
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-size-sm);
 }
 
 .formActions {
   display: flex;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
+}
+
+.deleteButton {
+  min-height: 32px;
+  padding: 0 14px;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+  background: var(--danger, var(--error));
+  border: 0;
+  border-radius: var(--radius-md);
+  transition:
+    opacity 0.2s,
+    background 0.2s;
+
+  &:hover {
+    background: var(--danger-hover, var(--error-hover));
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
 }
 
 .emptyDetail {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-md);
-  padding: var(--ant-padding-lg) 0;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
 }
 
 .addForm {
@@ -105,7 +129,7 @@
 }
 
 .emptyHint {
-  color: var(--ant-color-text-secondary);
-  font-size: var(--ant-font-size-sm);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
   margin: 0;
 }

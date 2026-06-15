@@ -1,4 +1,7 @@
+import { EmptyState, LoadingState } from '@/components/Common/Feedback';
 import IconText from '@/components/Common/IconText';
+import type { DataNode } from '@/components/Common/Tree';
+import Tree from '@/components/Common/Tree';
 import {
   buildDriveTreeData,
   replaceTreeNodeChildren,
@@ -7,10 +10,8 @@ import { useDriveService, useGroupService } from '@/domains';
 import type { DriveNode, LoadMoreNode } from '@/domains/Drive';
 import { useChatPageStore } from '@/store';
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
+import { Button, Modal, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Button, Empty, Modal, Spin, Tree } from 'antd';
-import type { DataNode } from 'antd/es/tree';
 import { Folder, Users } from 'lucide-react';
 import type { Key } from 'react';
 import { useRef, useState } from 'react';
@@ -61,21 +62,15 @@ function prefixTreeKeys(scopeKey: string, nodes: DataNode[]): DataNode[] {
 function buildScopeRootNode(key: string, title: string, scopeType: 'personal' | 'group'): DataNode {
   const icon =
     scopeType === 'personal' ? (
-      <Folder size={14} color="var(--ant-color-warning)" />
+      <Folder size={14} color="var(--warning)" />
     ) : (
-      <Users size={14} color="var(--ant-color-primary)" />
+      <Users size={14} color="var(--accent)" />
     );
 
   return {
     key,
     title: (
-      <IconText
-        className={styles.scopeTitle}
-        icon={icon}
-        iconSize={14}
-        gap="var(--ant-margin-xxs)"
-        ellipsis
-      >
+      <IconText className={styles.scopeTitle} icon={icon} iconSize={14} gap="4px" ellipsis>
         {title}
       </IconText>
     ),
@@ -261,6 +256,23 @@ function DocumentPickerModal({ open, onClose }: DocumentPickerModalProps) {
     setCheckedKeys(normalizeSelectableKeys(keys));
   }
 
+  function resetModalState(): void {
+    scopeMapRef.current.clear();
+    scopedDriveNodeMapRef.current.clear();
+    setTreeData([]);
+    setCheckedKeys([]);
+  }
+
+  function handleClose(): void {
+    resetModalState();
+    onClose();
+  }
+
+  function handleOpenChange(visible: boolean): void {
+    if (visible) return;
+    handleClose();
+  }
+
   function handleConfirm(): void {
     for (const key of checkedKeys) {
       const driveNode = scopedDriveNodeMapRef.current.get(key);
@@ -273,63 +285,65 @@ function DocumentPickerModal({ open, onClose }: DocumentPickerModalProps) {
         enabled: true,
       });
     }
-    onClose();
+    handleClose();
   }
 
   return (
-    <Modal
-      title="文档库选择"
-      open={open}
-      onCancel={onClose}
-      afterOpenChange={(visible) => {
-        if (visible) return;
-        scopeMapRef.current.clear();
-        scopedDriveNodeMapRef.current.clear();
-        setTreeData([]);
-        setCheckedKeys([]);
-      }}
-      destroyOnHidden
-      width={560}
-      footer={null}
-    >
-      <div className={styles.wrapper}>
-        <div className={styles.treeSection}>
-          <div className={styles.hint}>选择要引用的文档（可多选）</div>
-          <div className={styles.navTree}>
-            {loadingScopes && treeData.length === 0 ? (
-              <div className={styles.emptyState}>
-                <Spin />
+    <Modal isOpen={open} onOpenChange={handleOpenChange}>
+      <Modal.Backdrop isDismissable>
+        <Modal.Container size="md" placement="center">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>文档库选择</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body>
+              <div className={styles.wrapper}>
+                <div className={styles.treeSection}>
+                  <div className={styles.hint}>选择要引用的文档（可多选）</div>
+                  <div className={styles.navTree}>
+                    {loadingScopes && treeData.length === 0 ? (
+                      <div className={styles.emptyState}>
+                        <LoadingState />
+                      </div>
+                    ) : treeData.length === 0 ? (
+                      <div className={styles.emptyState}>
+                        <EmptyState title="暂无可选文档" />
+                      </div>
+                    ) : (
+                      <Tree
+                        className={styles.tree}
+                        treeData={treeData}
+                        blockNode
+                        checkable
+                        checkStrictly
+                        selectable
+                        multiple
+                        selectedKeys={[]}
+                        checkedKeys={checkedKeys}
+                        onSelect={handleSelect}
+                        onCheck={handleCheck}
+                        loadData={handleLoadData}
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
-            ) : treeData.length === 0 ? (
-              <div className={styles.emptyState}>
-                <Empty description="暂无可选文档" />
-              </div>
-            ) : (
-              <Tree
-                className={styles.tree}
-                treeData={treeData}
-                blockNode
-                checkable
-                checkStrictly
-                selectable
-                multiple
-                selectedKeys={[]}
-                checkedKeys={checkedKeys}
-                onSelect={handleSelect}
-                onCheck={handleCheck}
-                loadData={handleLoadData}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className={styles.footer}>
-          <Button onClick={onClose}>取消</Button>
-          <Button type="primary" onClick={handleConfirm} disabled={checkedKeys.length === 0}>
-            确定
-          </Button>
-        </div>
-      </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onPress={handleClose}>
+                取消
+              </Button>
+              <Button
+                variant="primary"
+                onPress={handleConfirm}
+                isDisabled={checkedKeys.length === 0}
+              >
+                确定
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

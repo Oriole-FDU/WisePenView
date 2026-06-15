@@ -1,0 +1,32 @@
+.grid {
+  --description-grid-columns: 2;
+
+  display: grid;
+  grid-template-columns: repeat(var(--description-grid-columns), minmax(0, 1fr));
+  gap: var(--space-md, 16px) var(--space-xl, 24px);
+}
+
+.item {
+  min-width: 0;
+}
+
+.label {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+}
+
+.value {
+  min-width: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

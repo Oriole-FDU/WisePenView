@@ -1,4 +1,4 @@
-import { Divider } from 'antd';
+import { Separator } from '@heroui/react';
 
 import UserCapsule from '@/components/Common/UserCapsule';
 import ResourceInteractBar from '@/components/Resource/ResourceInteractBar';
@@ -29,7 +29,7 @@ function NoteInfoBar({ noteInfoDisplay }: NoteInfoBarProps) {
             )}
           </div>
         </div>
-        <Divider orientation="vertical" className={styles.infoDivider} />
+        <Separator orientation="vertical" className={styles.infoDivider} />
         <div className={styles.noteInfoItem}>
           <span className={styles.noteInfoLabel}>上次编辑</span>
           <span className={styles.noteInfoValue}>{lastEditedAtText}</span>

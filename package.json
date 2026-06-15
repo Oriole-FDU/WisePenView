@@ -27,7 +27,6 @@
     "@tiptap/pm": "3.20.1",
     "ahooks": "^3.9.7",
     "ai": "^6.0.154",
-    "antd": "^6.1.0",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "i18next": "^26.0.10",
@@ -49,8 +48,8 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
-    "@hey-api/openapi-ts": "0.98.1",
     "@eslint/js": "^9.39.1",
+    "@hey-api/openapi-ts": "0.98.1",
     "@types/katex": "^0.16.8",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

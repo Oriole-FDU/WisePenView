@@ -2,20 +2,28 @@ import ServiceAgreement from '@/components/ServiceAgreement/index';
 import { useAuthService } from '@/domains';
 import type { LoginRequest } from '@/domains/Auth';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, toast } from '@heroui/react';
+import { Button, Form, Input, Label, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Form, Input, Typography } from 'antd';
 import { Lock, User } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
+import { hasFieldErrors, runFieldValidation, type FieldErrors } from '../formValidation';
+
+type LoginField = keyof LoginRequest;
+
+const DEFAULT_LOGIN_VALUES: LoginRequest = {
+  account: '',
+  password: '',
+};
 
 function Login() {
   const authService = useAuthService();
   const { t } = useTranslation('auth');
   const [contractOpen, setContractOpen] = useState(false);
-  const [form] = Form.useForm<LoginRequest>();
+  const [formValues, setFormValues] = useState<LoginRequest>(DEFAULT_LOGIN_VALUES);
+  const [formErrors, setFormErrors] = useState<FieldErrors<LoginField>>({});
   const navigate = useNavigate();
 
   const { loading, run: submitLogin } = useRequest(
@@ -31,36 +39,73 @@ function Login() {
     }
   );
 
-  const onFinish = (values: LoginRequest) => {
-    submitLogin(values);
+  const updateFormValue = (field: LoginField, value: string) => {
+    setFormValues((prev) => ({ ...prev, [field]: value }));
+    setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  const validateForm = () => {
+    const nextErrors: FieldErrors<LoginField> = {
+      account: runFieldValidation([
+        { test: () => formValues.account.trim().length > 0, message: t('login.accountRequired') },
+      ]),
+      password: runFieldValidation([
+        { test: () => formValues.password.length > 0, message: t('login.passwordRequired') },
+      ]),
+    };
+    setFormErrors(nextErrors);
+    return !hasFieldErrors(nextErrors);
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!validateForm()) return;
+    submitLogin({
+      account: formValues.account.trim(),
+      password: formValues.password,
+    });
   };
 
   return (
     <div className={auth.authContainer}>
-      <Typography.Title>{t('login.title')}</Typography.Title>
+      <h1 className={auth.title}>{t('login.title')}</h1>
 
-      <Form layout="vertical" form={form} onFinish={onFinish} requiredMark={false}>
-        <Form.Item
-          label={t('login.accountLabel')}
-          name="account"
-          rules={[{ required: true, message: t('login.accountRequired') }]}
+      <Form onSubmit={handleSubmit} className={auth.form}>
+        <TextField
+          aria-label={t('login.accountLabel')}
+          value={formValues.account}
+          onChange={(value) => updateFormValue('account', value)}
+          isInvalid={formErrors.account != null}
+          isRequired
         >
-          <Input placeholder={t('login.accountPlaceholder')} size="large" prefix={<User />} />
-        </Form.Item>
+          <Label>{t('login.accountLabel')}</Label>
+          <div className={auth.inputWithIcon}>
+            <User className={auth.inputIcon} size={18} />
+            <Input placeholder={t('login.accountPlaceholder')} autoComplete="username" />
+          </div>
+          {formErrors.account ? <p className={auth.fieldError}>{formErrors.account}</p> : null}
+        </TextField>
 
-        <Form.Item
-          label={t('login.passwordLabel')}
-          name="password"
-          rules={[{ required: true, message: t('login.passwordRequired') }]}
+        <TextField
+          aria-label={t('login.passwordLabel')}
+          value={formValues.password}
+          onChange={(value) => updateFormValue('password', value)}
+          isInvalid={formErrors.password != null}
+          isRequired
         >
-          <Input.Password
-            placeholder={t('login.passwordPlaceholder')}
-            size="large"
-            prefix={<Lock />}
-          />
-        </Form.Item>
+          <Label>{t('login.passwordLabel')}</Label>
+          <div className={auth.inputWithIcon}>
+            <Lock className={auth.inputIcon} size={18} />
+            <Input
+              type="password"
+              placeholder={t('login.passwordPlaceholder')}
+              autoComplete="current-password"
+            />
+          </div>
+          {formErrors.password ? <p className={auth.fieldError}>{formErrors.password}</p> : null}
+        </TextField>
 
-        <Form.Item>
+        <div className={auth.formActions}>
           <Button
             variant="primary"
             size="lg"
@@ -74,11 +119,11 @@ function Login() {
             <Link to="/register">{t('login.register')}</Link>
             <Link to="/reset-pwd">{t('login.forgotPassword')}</Link>
           </div>
-        </Form.Item>
+        </div>
       </Form>
 
       <div className={auth.leftBottomLinks}>
-        <Typography.Text>{t('login.agreementPrefix')}</Typography.Text>
+        <span>{t('login.agreementPrefix')}</span>
         <Link to="#" onClick={() => setContractOpen(true)}>
           {t('login.agreementLink')}
         </Link>

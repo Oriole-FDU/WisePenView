@@ -1,6 +1,6 @@
 import popupStyles from '@/components/ChatPanel/popupSurface.module.less';
 import { useChatPageStore } from '@/store';
-import { Menu, Switch } from 'antd';
+import { Switch } from '@heroui/react';
 import { Library, Upload } from 'lucide-react';
 import type { ContentPickerProps } from './index.type';
 import styles from './style.module.less';
@@ -13,34 +13,43 @@ function ContentPicker({ open, onClose, onSelectUpload, onSelectLibrary }: Conte
 
   return (
     <div className={`${styles.panel} ${popupStyles.surface}`} role="dialog" aria-label="添加内容">
-      <Menu
-        mode="inline"
-        selectable={false}
-        className={popupStyles.menu}
-        items={[
-          {
-            key: 'upload',
-            icon: <Upload size={16} />,
-            label: <span className={popupStyles.menuLabel}>上传附件</span>,
-            onClick: () => {
-              onSelectUpload();
-              onClose();
-            },
-          },
-          {
-            key: 'library',
-            icon: <Library size={16} />,
-            label: <span className={popupStyles.menuLabel}>从文档库选择</span>,
-            onClick: () => {
-              onSelectLibrary();
-              onClose();
-            },
-          },
-        ]}
-      />
+      <div className={popupStyles.menu}>
+        <button
+          type="button"
+          className={popupStyles.menuButton}
+          onClick={() => {
+            onSelectUpload();
+            onClose();
+          }}
+        >
+          <Upload size={16} />
+          <span className={popupStyles.menuLabel}>上传附件</span>
+        </button>
+        <button
+          type="button"
+          className={popupStyles.menuButton}
+          onClick={() => {
+            onSelectLibrary();
+            onClose();
+          }}
+        >
+          <Library size={16} />
+          <span className={popupStyles.menuLabel}>从文档库选择</span>
+        </button>
+      </div>
       <div className={styles.toggleRow}>
-        <span className={styles.toggleLabel}>将附件上传到个人文档库</span>
-        <Switch size="small" checked={autoSaveToLibrary} onChange={setAutoSaveToLibrary} />
+        <Switch
+          size="sm"
+          isSelected={autoSaveToLibrary}
+          onChange={setAutoSaveToLibrary}
+          aria-label="将附件上传到个人文档库"
+          className={styles.toggle}
+        >
+          <Switch.Content className={styles.label}>将附件上传到个人文档库</Switch.Content>
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch>
       </div>
     </div>
   );

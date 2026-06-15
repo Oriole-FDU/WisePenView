@@ -1,11 +1,12 @@
 .tableWrapper {
+  position: relative;
   min-width: 0;
 }
 
 .userCell {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
   min-width: 0;
 }
 
@@ -15,7 +16,7 @@
 
 .primaryText {
   overflow: hidden;
-  color: var(--ant-color-text);
+  color: var(--foreground);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -23,16 +24,46 @@
 
 .secondaryText {
   overflow: hidden;
-  color: var(--ant-color-text-tertiary);
-  font-size: var(--ant-font-size-sm);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .emptyText {
-  color: var(--ant-color-text-quaternary);
+  color: var(--text-tertiary);
 }
 
 .clickableRow {
   cursor: pointer;
+}
+
+.cellButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.pageSizeSelect {
+  min-width: 104px;
+}
+
+.statusSuccess {
+  color: var(--success, #16a34a);
+}
+
+.statusDanger {
+  color: var(--danger, #dc2626);
+}
+
+.statusWarning {
+  color: var(--warning, #d97706);
 }

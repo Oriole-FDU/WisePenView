@@ -31,7 +31,7 @@ function GlobalSearchBox({ className }: GlobalSearchBoxProps) {
         </IconText>
         <kbd className={styles.triggerKbd}>{SHORTCUT_LABEL}</kbd>
       </Button>
-      <SearchModal open={open} onCancel={() => setOpen(false)} />
+      <SearchModal isOpen={open} onOpenChange={setOpen} />
     </>
   );
 }

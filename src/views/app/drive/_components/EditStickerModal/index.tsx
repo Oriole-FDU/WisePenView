@@ -1,9 +1,9 @@
+import { Spin } from '@/components/Common/Feedback';
 import { useStickerService } from '@/domains';
 import type { Sticker } from '@/domains/Sticker';
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
+import { Button, Chip, Modal, Separator, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { Divider, Modal, Spin, Tag } from 'antd';
 import clsx from 'clsx';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -11,7 +11,7 @@ import AddStickerModal from '../AddStickerModal';
 import styles from './index.module.less';
 import type { EditStickerModalProps } from './index.type';
 
-function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalProps) {
+function EditStickerModal({ isOpen, onOpenChange, onSuccess, file }: EditStickerModalProps) {
   const stickerService = useStickerService();
   const [stickers, setStickers] = useState<Sticker[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -23,8 +23,8 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
       return { list, currentFile: file };
     },
     {
-      ready: Boolean(open && file),
-      refreshDeps: [open, file, stickerService],
+      ready: Boolean(isOpen && file),
+      refreshDeps: [isOpen, file, stickerService],
       onSuccess: (res) => {
         if (!res) return;
         const { list, currentFile } = res;
@@ -51,7 +51,7 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
       onSuccess: () => {
         toast.success('标签已更新');
         onSuccess?.();
-        onCancel();
+        onOpenChange(false);
       },
       onError: (err) => {
         toast.danger(parseErrorMessage(err));
@@ -91,64 +91,91 @@ function EditStickerModal({ open, onCancel, onSuccess, file }: EditStickerModalP
     await runUpdateStickers();
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen && submitLoading) return;
+    onOpenChange(nextOpen);
+  };
+
   return (
     <>
-      <Modal
-        title="编辑标签"
-        open={open && !!file}
-        onOk={handleSubmit}
-        onCancel={onCancel}
-        confirmLoading={submitLoading}
-        okButtonProps={{ disabled: stickerLoading }}
-        destroyOnHidden
-        width={400}
-      >
-        <div className={styles.wrapper}>
-          {stickerLoading ? (
-            <div className={styles.stickerLoading}>
-              <Spin size="small" />
-            </div>
-          ) : (
-            <>
-              <div className={styles.stickerList}>
-                {unselected.map(({ tagId, tagName }) => (
-                  <Tag
-                    key={tagId}
-                    variant="outlined"
-                    className={styles.stickerTag}
-                    onClick={() => handleToggle(tagId)}
-                  >
-                    {tagName}
-                  </Tag>
-                ))}
-                {stickers.length > 0 && unselected.length === 0 && (
-                  <span className={styles.allPickedHint}>所有标签均已选中</span>
-                )}
-                <Tag className={styles.addTag} onClick={() => setAddModalOpen(true)}>
-                  <Plus size={14} />
-                </Tag>
-              </div>
+      <Modal isOpen={isOpen && !!file} onOpenChange={handleOpenChange}>
+        <Modal.Backdrop isDismissable={!submitLoading}>
+          <Modal.Container size="sm" placement="center">
+            <Modal.Dialog>
+              <Modal.Header>
+                <Modal.Heading>编辑标签</Modal.Heading>
+              </Modal.Header>
+              <Modal.Body>
+                <div className={styles.wrapper}>
+                  {stickerLoading ? (
+                    <div className={styles.stickerLoading}>
+                      <Spin size="small" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className={styles.stickerList}>
+                        {unselected.map(({ tagId, tagName }) => (
+                          <Chip
+                            key={tagId}
+                            variant="secondary"
+                            className={styles.stickerTag}
+                            onClick={() => handleToggle(tagId)}
+                          >
+                            {tagName}
+                          </Chip>
+                        ))}
+                        {stickers.length > 0 && unselected.length === 0 && (
+                          <span className={styles.allPickedHint}>所有标签均已选中</span>
+                        )}
+                        <Chip
+                          className={styles.addTag}
+                          variant="secondary"
+                          onClick={() => setAddModalOpen(true)}
+                        >
+                          <Plus size={14} />
+                        </Chip>
+                      </div>
 
-              {selected.length > 0 && (
-                <>
-                  <Divider />
-                  <div className={styles.stickerList}>
-                    {selected.map(({ tagId, tagName }) => (
-                      <Tag
-                        key={tagId}
-                        variant="outlined"
-                        className={clsx(styles.stickerTag, styles.stickerTagPicked)}
-                        onClick={() => handleToggle(tagId)}
-                      >
-                        {tagName}
-                      </Tag>
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
-          )}
-        </div>
+                      {selected.length > 0 && (
+                        <>
+                          <Separator />
+                          <div className={styles.stickerList}>
+                            {selected.map(({ tagId, tagName }) => (
+                              <Chip
+                                key={tagId}
+                                className={clsx(styles.stickerTag, styles.stickerTagPicked)}
+                                variant="secondary"
+                                onClick={() => handleToggle(tagId)}
+                              >
+                                {tagName}
+                              </Chip>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onPress={() => onOpenChange(false)}
+                  isDisabled={submitLoading}
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="primary"
+                  onPress={() => void handleSubmit()}
+                  isDisabled={submitLoading || stickerLoading}
+                >
+                  确定
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
 
       <AddStickerModal

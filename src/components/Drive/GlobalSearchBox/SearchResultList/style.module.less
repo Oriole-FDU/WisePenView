@@ -1,37 +1,37 @@
 .list {
   max-height: 60vh;
   overflow-y: auto;
-  padding: var(--ant-padding-xs) 0;
+  padding: var(--space-xs) 0;
   scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
     width: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background: var(--ant-color-border);
-    border-radius: var(--ant-border-radius-sm);
+    background: var(--border);
+    border-radius: var(--radius-sm);
   }
 }
 
 .emptyWrapper {
-  padding: var(--ant-padding-lg) var(--ant-padding);
+  padding: var(--space-lg) var(--space-md);
 }
 
 .group {
   & + & {
-    margin-top: var(--ant-margin-xs);
+    margin-top: var(--space-xs);
   }
 }
 
 .groupHeader {
-  padding: var(--ant-padding-xs) var(--ant-padding);
-  background: var(--ant-color-bg-elevated);
-  color: var(--ant-color-text-secondary);
-  font-size: var(--ant-font-size-sm);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--overlay);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--ant-color-split);
+  border-bottom: 1px solid var(--separator);
 }
 
 .groupItems {
@@ -43,19 +43,19 @@
 .row {
   display: flex;
   align-items: flex-start;
-  gap: var(--ant-margin-sm);
-  padding: var(--ant-padding-sm) var(--ant-padding);
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   transition: background-color 0.15s ease;
   border-left: 2px solid transparent;
 
   &:hover,
   &.rowActive {
-    background: var(--ant-color-fill-tertiary);
+    background: var(--surface-tertiary);
   }
 
   &.rowActive {
-    border-left-color: var(--ant-color-primary);
+    border-left-color: var(--accent);
   }
 }
 
@@ -72,8 +72,8 @@
 }
 
 .rowTitle {
-  font-size: var(--ant-font-size);
-  color: var(--ant-color-text);
+  font-size: var(--font-size-base);
+  color: var(--foreground);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -82,8 +82,8 @@
 
 .rowSnippet {
   margin-top: 2px;
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--muted);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -93,7 +93,7 @@
 
 // 后端发来 `<em class="wp-highlight">…</em>` 高亮包裹，全局命中即上色
 :global(.wp-highlight) {
-  color: var(--ant-color-error);
+  color: var(--error);
   font-style: normal;
   font-weight: 600;
 }
@@ -101,12 +101,12 @@
 .loadingMore {
   display: flex;
   justify-content: center;
-  padding: var(--ant-padding-sm) 0;
+  padding: var(--space-sm) 0;
 }
 
 .footerHint {
-  padding: var(--ant-padding-sm) 0;
+  padding: var(--space-sm) 0;
   text-align: center;
-  color: var(--ant-color-text-tertiary);
-  font-size: var(--ant-font-size-sm);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
 }

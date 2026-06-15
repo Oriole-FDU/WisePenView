@@ -1,7 +1,7 @@
+import { Spin } from '@/components/Common/Feedback';
 import { useUserService } from '@/domains';
 import { IDENTITY } from '@/domains/User';
 import { useMount, useUpdateEffect } from 'ahooks';
-import { Spin } from 'antd';
 import { useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import styles from './AdminRouteGuard.module.less';

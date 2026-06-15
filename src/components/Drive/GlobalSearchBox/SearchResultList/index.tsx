@@ -1,4 +1,5 @@
 import EntryIcon from '@/components/Common/EntryIcon';
+import { Empty, Spin } from '@/components/Common/Feedback';
 import { useResourceService } from '@/domains';
 import type { SearchHitItem, SearchResultPage } from '@/domains/Resource';
 import { groupSearchHits } from '@/domains/Resource';
@@ -6,7 +7,6 @@ import { useNavigateResource } from '@/hooks/useNavigateResource';
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useInfiniteScroll, useKeyPress, useUpdateEffect } from 'ahooks';
-import { Empty, Spin } from 'antd';
 import clsx from 'clsx';
 import { useMemo, useRef, useState } from 'react';
 import type { SearchResultListProps } from './index.type';

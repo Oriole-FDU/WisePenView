@@ -1,4 +1,4 @@
-import { Badge, Button, Dropdown } from 'antd';
+import { Button, Popover } from '@heroui/react';
 import { Plus, Send, Wrench } from 'lucide-react';
 import ModelSelector from '../../ModelSelector';
 import styles from '../style.module.less';
@@ -16,60 +16,59 @@ function ActionToolbar({
   contentPickOpen,
   onContentPickOpenChange,
   contentPickDropdownContent,
-  getPopupContainer,
 }: ActionToolbarProps) {
   return (
     <div className={styles.actionToolbar}>
       <div className={styles.toolbarLeft}>
-        <Dropdown
-          open={contentPickOpen}
-          onOpenChange={onContentPickOpenChange}
-          trigger={['click']}
-          dropdownRender={() => contentPickDropdownContent}
-          placement="topLeft"
-          overlayStyle={{ padding: 0 }}
-          getPopupContainer={getPopupContainer}
-        >
-          <Button
-            shape="circle"
-            icon={<Plus size={18} />}
-            className={styles.toolbarCircleBtn}
-            aria-label="添加内容"
-          />
-        </Dropdown>
-
-        <Dropdown
-          open={capabilityOpen}
-          onOpenChange={onCapabilityOpenChange}
-          trigger={['click']}
-          dropdownRender={() => capabilityDropdownContent}
-          placement="topLeft"
-          overlayStyle={{ padding: 0 }}
-          getPopupContainer={getPopupContainer}
-        >
-          <Badge
-            count={capabilityCount}
-            size="small"
-            offset={[-4, 4]}
-            color="var(--ant-color-info)"
-          >
-            <Button icon={<Wrench size={16} />} className={styles.capabilityButton}>
-              能力
+        <Popover isOpen={contentPickOpen} onOpenChange={onContentPickOpenChange}>
+          <Popover.Trigger>
+            <Button
+              variant="ghost"
+              size="sm"
+              isIconOnly
+              className={styles.toolbarCircleBtn}
+              aria-label="添加内容"
+            >
+              <Plus size={18} />
             </Button>
-          </Badge>
-        </Dropdown>
+          </Popover.Trigger>
+          <Popover.Content className={styles.toolbarPopover} placement="top">
+            <Popover.Dialog>{contentPickDropdownContent}</Popover.Dialog>
+          </Popover.Content>
+        </Popover>
+
+        <Popover isOpen={capabilityOpen} onOpenChange={onCapabilityOpenChange}>
+          <Popover.Trigger>
+            <div className={styles.capabilityTriggerWrap}>
+              {capabilityCount > 0 ? (
+                <span className={styles.capabilityBadge}>{capabilityCount}</span>
+              ) : null}
+              <Button variant="ghost" size="sm" className={styles.capabilityButton}>
+                <Wrench size={16} />
+                <span>能力</span>
+              </Button>
+            </div>
+          </Popover.Trigger>
+          <Popover.Content className={styles.toolbarPopover} placement="top">
+            <Popover.Dialog>{capabilityDropdownContent}</Popover.Dialog>
+          </Popover.Content>
+        </Popover>
       </div>
 
       <div className={styles.toolsRight}>
         <ModelSelector value={modelValue} onChange={onModelChange} />
 
         <Button
-          shape="circle"
-          onClick={onSend}
-          disabled={disabledSend}
+          variant="primary"
+          size="sm"
+          isIconOnly
+          onPress={onSend}
+          isDisabled={disabledSend}
           className={styles.toolbarCircleBtn}
-          icon={<Send size={18} />}
-        />
+          aria-label="发送消息"
+        >
+          <Send size={18} />
+        </Button>
       </div>
     </div>
   );

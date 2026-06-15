@@ -1,35 +1,25 @@
 import { useAdvancedModeStore } from '@/store';
-import { Switch } from 'antd';
-import styles from '../style.module.less';
+import { Switch } from '@heroui/react';
 import type { AdvancedModeToggleProps } from './index.type';
+import styles from './style.module.less';
 
 function AdvancedModeToggle({ compact = false }: AdvancedModeToggleProps) {
   const advancedMode = useAdvancedModeStore((state) => state.advancedMode);
   const setAdvancedMode = useAdvancedModeStore((state) => state.setAdvancedMode);
 
   return (
-    <div
-      className={`${styles.advancedModeToggle} ${compact ? styles.compactToggle : ''}`}
-      onClick={(e) => {
-        if (!(e.target as HTMLElement).closest('.ant-switch')) {
-          setAdvancedMode(!advancedMode);
-        }
-      }}
-      role="button"
-      tabIndex={0}
-      aria-pressed={advancedMode}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          if (!(e.target as HTMLElement).closest('.ant-switch')) {
-            setAdvancedMode(!advancedMode);
-          }
-        }
-      }}
+    <Switch
+      size="sm"
+      isSelected={advancedMode}
+      onChange={setAdvancedMode}
+      aria-label="高级模式"
+      className={`${styles.toggle} ${compact ? styles.compact : ''}`}
     >
-      <span className={styles.advancedModeText}>高级模式</span>
-      <Switch size="small" checked={advancedMode} onChange={setAdvancedMode} />
-    </div>
+      <Switch.Content className={styles.label}>高级模式</Switch.Content>
+      <Switch.Control>
+        <Switch.Thumb />
+      </Switch.Control>
+    </Switch>
   );
 }
 

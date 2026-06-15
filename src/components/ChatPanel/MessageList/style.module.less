@@ -3,7 +3,7 @@
 .container {
   flex: 1;
   overflow-y: auto;
-  padding: var(--ant-padding-lg);
+  padding: var(--space-lg);
   scroll-behavior: smooth;
   position: relative;
 
@@ -11,7 +11,7 @@
     width: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: var(--ant-color-fill-tertiary);
+    background-color: var(--surface-tertiary);
     border-radius: 3px;
   }
 
@@ -25,8 +25,8 @@
 
     .logoIcon {
       font-size: 64px;
-      margin-bottom: var(--ant-margin-sm);
-      color: var(--ant-color-text);
+      margin-bottom: var(--space-sm);
+      color: var(--foreground);
       display: flex;
       svg {
         stroke-width: 1.5px;
@@ -34,30 +34,30 @@
     }
 
     .title {
-      font-size: var(--ant-font-size-heading-3);
+      font-size: 20px;
       font-weight: 600;
-      color: var(--ant-color-text);
-      margin-bottom: var(--ant-margin-sm);
+      color: var(--foreground);
+      margin-bottom: var(--space-sm);
       line-height: 1;
       letter-spacing: -0.02em;
     }
 
     .subtitle {
-      font-size: var(--ant-font-size-heading-3);
+      font-size: 20px;
       font-weight: 600;
-      color: var(--ant-color-info);
+      color: var(--info);
       line-height: 1;
       letter-spacing: -0.02em;
     }
 
     .promptSection {
-      margin-top: var(--ant-margin-xl);
+      margin-top: 24px;
     }
 
     .promptChips {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--ant-margin-xs);
+      gap: var(--space-xs);
     }
 
     .promptChip {
@@ -65,17 +65,17 @@
       align-items: center;
       gap: 6px;
       padding: 8px 16px;
-      border: 1px solid var(--ant-color-border-secondary);
+      border: 1px solid var(--border-light);
       border-radius: 20px;
-      background: var(--ant-color-bg-container);
+      background: var(--surface);
       font-size: 13px;
-      color: var(--ant-color-text-secondary);
+      color: var(--muted);
       cursor: pointer;
       transition: border-color 0.2s, color 0.2s;
 
       &:hover {
-        border-color: var(--ant-color-primary);
-        color: var(--ant-color-primary);
+        border-color: var(--accent);
+        color: var(--accent);
       }
     }
 
@@ -88,16 +88,16 @@
 .loadMoreWrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: var(--ant-margin-sm);
+  margin-bottom: var(--space-sm);
 }
 
 .loadMoreBtn {
-  border: 1px solid var(--ant-color-border);
-  border-radius: var(--ant-border-radius);
-  background-color: var(--ant-color-bg-container);
-  color: var(--ant-color-text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  color: var(--foreground);
   padding: 2px 10px;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
   cursor: pointer;
 
   &:disabled {

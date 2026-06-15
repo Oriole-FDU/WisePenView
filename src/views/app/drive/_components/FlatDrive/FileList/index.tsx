@@ -1,17 +1,15 @@
 import EntryIcon from '@/components/Common/EntryIcon';
 import IconText from '@/components/Common/IconText';
+import { DataTable, type DataTableColumn } from '@/components/Table';
 import { useResourceService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useNavigateResource } from '@/hooks/useNavigateResource';
 import { parseErrorMessage } from '@/utils/error';
 import { formatFileSize } from '@/utils/format/formatFileSize';
-import { toast } from '@heroui/react';
+import { Chip, Dropdown, ListBox, Select, toast } from '@heroui/react';
 import { usePagination } from 'ahooks';
-import type { MenuProps } from 'antd';
-import { Dropdown, Table, Tag } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
 import { EllipsisVertical, Pencil, Tag as TagIcon, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import DeleteFileModal from '../../DeleteFileModal';
 import EditStickerModal from '../../EditStickerModal';
 import RenameFileModal from '../../RenameFileModal';
@@ -21,127 +19,158 @@ import styles from './style.module.less';
 const DEFAULT_PAGE_SIZE = 10;
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
+type ResourceTableRow = ResourceItem & {
+  tableRowKey: string;
+};
+
 interface ColumnBuildProps {
-  onDelete: (record: ResourceItem) => void;
-  onRename: (record: ResourceItem) => void;
-  onEditSticker: (record: ResourceItem) => void;
+  onDelete: (record: ResourceTableRow) => void;
+  onRename: (record: ResourceTableRow) => void;
+  onEditSticker: (record: ResourceTableRow) => void;
+  onOpenResource: (record: ResourceTableRow) => void;
   onCloseDropdown: () => void;
   openDropdownKey: string | null;
   setOpenDropdownKey: (key: string | null) => void;
 }
 
-const buildColumns = (props: ColumnBuildProps): ColumnsType<ResourceItem> => [
+const buildColumns = (props: ColumnBuildProps): DataTableColumn<ResourceTableRow>[] => [
   {
-    title: '名称',
-    dataIndex: 'resourceName',
-    key: 'resourceName',
-    render: (text: string, record: ResourceItem) => (
-      <IconText
-        as="div"
-        className={styles.nameCell}
-        icon={<EntryIcon entryType="resource" resourceType={record.resourceType} color="#666" />}
-        iconSize={18}
-        gap="var(--ant-margin-sm)"
-        ellipsis
+    id: 'resourceName',
+    label: '名称',
+    width: 'fill',
+    isRowHeader: true,
+    renderCell: (record) => (
+      <button
+        type="button"
+        className={styles.cellButton}
+        onClick={() => props.onOpenResource(record)}
       >
-        {text || '未命名'}
-      </IconText>
+        <IconText
+          className={styles.nameCell}
+          icon={<EntryIcon entryType="resource" resourceType={record.resourceType} color="#666" />}
+          iconSize={18}
+          gap="var(--space-sm)"
+          ellipsis
+        >
+          {record.resourceName || '未命名'}
+        </IconText>
+      </button>
     ),
   },
   {
-    title: '标签',
-    dataIndex: 'currentTags',
-    key: 'currentTags',
-    width: 200,
-    render: (raw?: Record<string, string>) => {
+    id: 'currentTags',
+    label: '标签',
+    width: 'lg',
+    renderCell: (record) => {
+      const raw = record.currentTags;
       const entries = raw ? Object.entries(raw).filter(([, name]) => !name.startsWith('/')) : [];
-      return entries.length ? (
-        <span className={styles.tagList}>
-          {entries.map(([id, name]) => (
-            <Tag variant="outlined" key={id}>
-              {name}
-            </Tag>
-          ))}
-        </span>
-      ) : (
-        '-'
+      return (
+        <button
+          type="button"
+          className={styles.cellButton}
+          onClick={() => props.onOpenResource(record)}
+        >
+          {entries.length ? (
+            <span className={styles.tagList}>
+              {entries.map(([id, name]) => (
+                <Chip key={id} size="sm" variant="secondary" className={styles.tagChip}>
+                  <Chip.Label>{name}</Chip.Label>
+                </Chip>
+              ))}
+            </span>
+          ) : (
+            '-'
+          )}
+        </button>
       );
     },
   },
   {
-    title: '类型',
-    dataIndex: 'resourceType',
-    key: 'resourceType',
-    width: 120,
-    render: (t: string) => t || '-',
+    id: 'resourceType',
+    label: '类型',
+    width: 'sm',
+    renderCell: (record) => (
+      <button
+        type="button"
+        className={styles.cellButton}
+        onClick={() => props.onOpenResource(record)}
+      >
+        {record.resourceType || '-'}
+      </button>
+    ),
   },
   {
-    title: '大小',
-    dataIndex: 'size',
-    key: 'size',
-    width: 100,
-    render: (size: number) => formatFileSize(size),
+    id: 'size',
+    label: '大小',
+    width: 'sm',
+    renderCell: (record) => (
+      <button
+        type="button"
+        className={styles.cellButton}
+        onClick={() => props.onOpenResource(record)}
+      >
+        {formatFileSize(record.size)}
+      </button>
+    ),
   },
   {
-    title: '',
-    key: 'action',
-    width: 56,
-    align: 'right',
-    render: (_: unknown, record: ResourceItem) => {
-      const menuItems: MenuProps['items'] = [
-        {
-          key: 'editTag',
-          label: '编辑标签',
-          icon: <TagIcon size={14} />,
-          onClick: (info) => {
-            // 防止点击事件冒泡到父级元素，导致文件打开
-            info.domEvent.stopPropagation();
-            props.onCloseDropdown();
-            props.onEditSticker(record);
-          },
-        },
-        {
-          key: 'rename',
-          label: '重命名',
-          icon: <Pencil size={14} />,
-          onClick: (info) => {
-            info.domEvent.stopPropagation();
-            props.onCloseDropdown();
-            props.onRename(record);
-          },
-        },
-        {
-          key: 'delete',
-          label: '删除',
-          icon: <Trash2 size={14} />,
-          danger: true,
-          onClick: (info) => {
-            info.domEvent.stopPropagation();
-            props.onCloseDropdown();
-            props.onDelete(record);
-          },
-        },
-      ];
+    id: 'action',
+    label: '',
+    width: 'sm',
+    align: 'end',
+    renderCell: (record) => {
       return (
         <Dropdown
-          menu={{ items: menuItems }}
-          trigger={['click']}
-          placement="bottomRight"
-          arrow={{ pointAtCenter: true }}
-          getPopupContainer={() => document.body}
-          open={props.openDropdownKey === record.resourceId}
-          onOpenChange={(open) =>
-            props.setOpenDropdownKey(open && record.resourceId != null ? record.resourceId : null)
-          }
+          isOpen={props.openDropdownKey === record.resourceId}
+          onOpenChange={(open) => {
+            props.setOpenDropdownKey(open && record.resourceId != null ? record.resourceId : null);
+          }}
         >
-          <button
-            type="button"
-            className={styles.optionBtn}
-            aria-label="更多操作"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <EllipsisVertical size={18} />
-          </button>
+          <Dropdown.Trigger>
+            <button
+              type="button"
+              className={styles.optionBtn}
+              aria-label="更多操作"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <EllipsisVertical size={18} />
+            </button>
+          </Dropdown.Trigger>
+          <Dropdown.Popover placement="bottom end" className={styles.actionDropdownPopover}>
+            <Dropdown.Menu
+              aria-label="文件操作"
+              onAction={(key) => {
+                props.onCloseDropdown();
+                if (key === 'editTag') {
+                  props.onEditSticker(record);
+                  return;
+                }
+                if (key === 'rename') {
+                  props.onRename(record);
+                  return;
+                }
+                if (key === 'delete') {
+                  props.onDelete(record);
+                }
+              }}
+            >
+              <Dropdown.Item key="editTag" id="editTag" textValue="编辑标签">
+                <IconText icon={<TagIcon />} iconSize={14} gap="var(--space-xs)">
+                  编辑标签
+                </IconText>
+              </Dropdown.Item>
+              <Dropdown.Item key="rename" id="rename" textValue="重命名">
+                <IconText icon={<Pencil />} iconSize={14} gap="var(--space-xs)">
+                  重命名
+                </IconText>
+              </Dropdown.Item>
+              <Dropdown.Item key="delete" id="delete" textValue="删除" variant="danger">
+                <IconText icon={<Trash2 />} iconSize={14} gap="var(--space-xs)">
+                  删除
+                </IconText>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown.Popover>
         </Dropdown>
       );
     },
@@ -224,13 +253,21 @@ function FileList({ groupId, filter }: FileListProps) {
     setDeleteFileTarget(null);
   };
 
-  const dataSource = useMemo(
+  const dataSource = useMemo<ResourceTableRow[]>(
     () =>
       list.map((item) => ({
         ...item,
-        key: item.resourceId,
+        tableRowKey: item.resourceId ?? `${item.resourceName}-${item.resourceType}`,
       })),
     [list]
+  );
+
+  const handleOpenResource = useCallback(
+    (record: ResourceItem) => {
+      if (!record.resourceId) return;
+      navigateResource(record.resourceId, record.resourceType);
+    },
+    [navigateResource]
   );
 
   const columns = useMemo(
@@ -248,30 +285,26 @@ function FileList({ groupId, filter }: FileListProps) {
           setEditStickerTarget(file);
           setEditStickerModalOpen(true);
         },
+        onOpenResource: handleOpenResource,
         onCloseDropdown: () => setOpenDropdownKey(null),
         openDropdownKey,
         setOpenDropdownKey,
       }),
-    [openDropdownKey]
+    [handleOpenResource, openDropdownKey]
   );
-
-  const handleRowClick = (record: ResourceItem) => ({
-    onClick: () => {
-      if (!record.resourceId) return;
-      navigateResource(record.resourceId, record.resourceType);
-    },
-  });
 
   return (
     <>
       <div className={styles.wrapper} data-dropdown-open={!!openDropdownKey}>
-        <Table<ResourceItem>
-          dataSource={dataSource}
+        <DataTable<ResourceTableRow>
+          ariaLabel="文件列表"
+          rowKey="tableRowKey"
+          items={dataSource}
           columns={columns}
           loading={loading}
-          onRow={handleRowClick}
-          rowClassName={(record) =>
-            openDropdownKey === record.resourceId ? styles.rowSelected : ''
+          emptyText="暂无文件"
+          getRowClassName={(record) =>
+            `${styles.clickableRow} ${openDropdownKey === record.resourceId ? styles.rowSelected : ''}`
           }
           pagination={
             total > 0
@@ -279,12 +312,38 @@ function FileList({ groupId, filter }: FileListProps) {
                   current: page,
                   pageSize,
                   total,
-                  showSizeChanger: true,
-                  pageSizeOptions: PAGE_SIZE_OPTIONS,
-                  showTotal: (t) => `共 ${t} 项`,
+                  summary: `共 ${total} 项`,
                   onChange: onPageChange,
+                  pageSizeControl: (
+                    <Select
+                      aria-label="每页数量"
+                      value={String(pageSize)}
+                      onChange={(key) => {
+                        if (key == null || Array.isArray(key)) return;
+                        onPageChange(1, Number(key));
+                      }}
+                      className={styles.pageSizeSelect}
+                    >
+                      <Select.Trigger>
+                        <Select.Value />
+                      </Select.Trigger>
+                      <Select.Popover>
+                        <ListBox>
+                          {PAGE_SIZE_OPTIONS.map((size) => (
+                            <ListBox.Item
+                              key={String(size)}
+                              id={String(size)}
+                              textValue={`${size} 条/页`}
+                            >
+                              {size} 条/页
+                            </ListBox.Item>
+                          ))}
+                        </ListBox>
+                      </Select.Popover>
+                    </Select>
+                  ),
                 }
-              : false
+              : undefined
           }
         />
         {openDropdownKey && <div className={styles.mask} aria-hidden />}
@@ -305,9 +364,9 @@ function FileList({ groupId, filter }: FileListProps) {
         onSuccess={fetchList}
       />
       <EditStickerModal
-        open={editStickerModalOpen}
+        isOpen={editStickerModalOpen}
         file={editStickerTarget}
-        onCancel={handleEditStickerModalClose}
+        onOpenChange={(open) => !open && handleEditStickerModalClose()}
         onSuccess={fetchList}
       />
     </>

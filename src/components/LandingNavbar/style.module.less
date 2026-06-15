@@ -1,7 +1,3 @@
-:global(.ant-menu-horizontal) {
-  border-bottom: unset;
-}
-
 @landing-inline: clamp(16px, 4vw, 40px);
 @content-max: 1160px;
 
@@ -35,24 +31,45 @@
   display: block;
 }
 
-.menuWrap {
+.navWrap {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
   justify-content: flex-end;
+  gap: 4px;
 }
 
-.menuWrap :global(.ant-menu.ant-menu-horizontal) {
-  justify-content: flex-end;
+.navButton {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  color: var(--muted);
   font-size: 14px;
-  line-height: 1.5;
-  max-width: 100%;
+  font-weight: 500;
+  line-height: 36px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
+
+  &:hover {
+    background: var(--surface-tertiary);
+    color: var(--foreground);
+  }
+}
+
+.navButtonActive {
+  color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .brandText {
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--ant-color-text);
+  color: var(--foreground);
   white-space: nowrap;
 }

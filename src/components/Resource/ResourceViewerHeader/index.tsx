@@ -33,7 +33,7 @@ function ResourceViewerHeader({
       <div className={styles.bar}>
         <div className={styles.toolbar}>
           <button type="button" className={styles.backLink} onClick={handleBack}>
-            <IconText icon={<ArrowLeft />} iconSize={18} gap="var(--ant-margin-xs)">
+            <IconText icon={<ArrowLeft />} iconSize={18} gap="var(--space-xs)">
               {backLabel}
             </IconText>
           </button>

@@ -24,7 +24,7 @@
 
 - `component-boundary.md`：组件放置位置、复用边界、迁移方向。
 - `component-react.md`：React、Hooks、JSX、TypeScript 编码规范。
-- `component-style.md`：Less、CSS Modules、HeroUI 与 AntD 迁移规则。
+- `component-style.md`：Less、CSS Modules、HeroUI 与样式规则。
 
 推荐阅读顺序：`component-boundary.md -> component-react.md -> component-style.md`。
 
@@ -44,6 +44,6 @@ view/component -> service -> mapper -> api -> entity/enum
 - 新增可复用组件：`component-boundary.md`、`component-react.md`、`component-style.md`。
 - 提交或写 PR：`commit.md`。
 
-## 五、迁移态约定
+## 五、收敛约定
 
-项目中已有一些代码处于迁移中。新增代码必须遵循本目录描述的最终形态；修改旧代码时，只收敛与当前任务相关的部分，不做无关大重构。
+新增代码必须遵循本目录描述的最终形态；修改旧代码时，只收敛与当前任务相关的部分，不做无关大重构。

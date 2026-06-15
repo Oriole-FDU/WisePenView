@@ -562,7 +562,7 @@
     --preview-accent: #a78bfa;
   }
 
-  /* WisePen 排版 / 间距 / Table 行高；Table 正文对齐侧边栏 --ant-font-size（16px） */
+  /* WisePen 排版 / 间距 / Table 行高 */
   :root,
   .light,
   .default,
@@ -574,17 +574,30 @@
     --font-size-sm: 14px;
     --font-size-xs: 12px;
     --font-size-2xs: 11px;
+    --font-size-md: var(--font-size-base);
+    --font-size-lg: 18px;
+    --font-size-heading-3: 24px;
+    --font-size-heading-5: 16px;
     --font-weight-regular: 400;
     --font-weight-medium: 500;
     --line-height-base: 22px;
+    --line-height-sm: 20px;
     --line-height-md: 22px;
     --line-height-xs: 18px;
     --line-height-2xs: 16px;
     --font-sans: var(--app-font-family);
+    --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    --space-2xs: 4px;
     --space-xs: 8px;
     --space-sm: 12px;
     --space-md: 16px;
     --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 40px;
+    --radius-sm: 4px;
+    --radius-md: var(--radius);
+    --radius-lg: 8px;
+    --radius-field: var(--field-radius);
     --table-row-height: 60px;
     --row-height-comfortable: var(--table-row-height);
     --row-height-compact: var(--table-row-height);
@@ -622,26 +635,37 @@
     --table-chip-min-height: 28px;
     --table-chip-padding-block: 4px;
     --table-chip-padding-inline: 14px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-md: var(--card-shadow);
+    --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);
+    --scrollbar-width: 8px;
+    --control-height-sm: 28px;
+    --control-height: 36px;
+    --control-height-lg: 40px;
+    --line-width: 1px;
+    --motion-duration-fast: 0.1s;
+    --motion-duration-mid: 0.2s;
+    --table-row-hover-bg: var(--surface-hover);
+    --surface-muted: var(--surface-tertiary);
+    --accent-hover: var(--primary-hover);
+    --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+    --accent-softer: color-mix(in srgb, var(--accent) 8%, transparent);
+    --accent-border: color-mix(in srgb, var(--accent) 32%, var(--border));
+    --info-soft: color-mix(in srgb, var(--info) 12%, transparent);
+    --warning-soft: color-mix(in srgb, var(--warning) 14%, transparent);
+    --warning-border: color-mix(in srgb, var(--warning) 36%, var(--border));
+    --error-soft: color-mix(in srgb, var(--error) 12%, transparent);
+    --error-hover: color-mix(in srgb, var(--error) 88%, #000 12%);
+    --error-border: color-mix(in srgb, var(--error) 36%, var(--border));
+    --danger-hover: var(--error-hover);
+    --success-soft: color-mix(in srgb, var(--success) 12%, transparent);
+    --success-hover: color-mix(in srgb, var(--success) 88%, #000 12%);
+    --success-active: color-mix(in srgb, var(--success) 78%, #000 22%);
+    --success-border: color-mix(in srgb, var(--success) 36%, var(--border));
+    --color-primary: var(--accent);
+    --color-warning: var(--warning);
+    --color-muted: var(--text-tertiary);
+    --color-muted-foreground: var(--muted);
+    --color-border: var(--border);
   }
 }
-
-/* Ant Design 迁移*/
-:root,
-.light,
-.default,
-.dark,
-[data-theme='light'],
-[data-theme='default'],
-[data-theme='dark'] {
-  --ant-color-primary: var(--accent);
-  --ant-color-bg-layout: var(--background);
-  --ant-color-bg-container: var(--surface);
-  --ant-color-border: var(--border);
-  --ant-color-text: var(--foreground);
-  --ant-color-text-secondary: var(--muted);
-  --ant-color-text-tertiary: var(--text-tertiary);
-  --ant-color-text-disabled: var(--text-disabled);
-  --ant-color-info: var(--info);
-  --ant-color-error: var(--error);
-  --ant-color-bg-layout-alt: var(--background-alt);
-  --ant-color-border-secondary: var(--border-light);}

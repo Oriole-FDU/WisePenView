@@ -1,10 +1,11 @@
+import { Empty, Spin } from '@/components/Common/Feedback';
 import IconText from '@/components/Common/IconText';
+import SegmentedTabs from '@/components/Common/SegmentedTabs';
 import { useGroupService } from '@/domains';
 import type { FetchGroupListRequest, Group } from '@/domains/Group';
 import { GROUP_ROLE_FILTER_MAP } from '@/domains/Group';
 import { Button, Pagination, toast } from '@heroui/react';
 import { usePagination } from 'ahooks';
-import { Col, Empty, Row, Spin, Tabs } from 'antd';
 import { Plus, UserPlus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -122,14 +123,16 @@ function MyGroup() {
         </div>
       </div>
 
-      <Tabs
-        activeKey={activeTab}
-        onChange={handleTabChange}
+      <SegmentedTabs
+        ariaLabel="小组筛选"
+        selectedKey={activeTab}
+        onSelectionChange={handleTabChange}
         items={[
           { key: 'joined', label: '我加入的' },
           { key: 'managed', label: '我管理的' },
         ]}
         className={layout.detailTabs}
+        size="sm"
       />
 
       <Spin spinning={loading}>
@@ -138,13 +141,13 @@ function MyGroup() {
             <Empty description="暂无小组" />
           </div>
         ) : (
-          <Row gutter={[24, 24]}>
+          <div className={page.groupGrid}>
             {groups.map((group) => (
-              <Col key={group.groupId} xs={24} sm={12} md={8} lg={6}>
+              <div key={group.groupId} className={page.groupGridItem}>
                 <GroupCard group={group} onClick={handleGroupClick} />
-              </Col>
+              </div>
             ))}
-          </Row>
+          </div>
         )}
 
         {total > 0 && (

@@ -1,13 +1,13 @@
 .statusGroup {
   display: inline-flex;
   align-items: center;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
   flex-shrink: 0;
 }
 
 .statusText {
-  font-size: var(--ant-font-size-base);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-base);
+  color: var(--muted);
 }
 
 .statusIcon {
@@ -17,7 +17,7 @@
   cursor: default;
 
   .statusIconBanned {
-    color: var(--ant-color-error);
+    color: var(--error);
   }
 
   .statusIconUnverified {
@@ -25,7 +25,7 @@
   }
 
   .statusIconVerified {
-    color: var(--ant-color-success);
+    color: var(--success);
   }
 }
 
@@ -33,13 +33,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--ant-margin-lg);
+  gap: var(--space-lg);
 }
 
 .accountHeaderLeft {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-lg);
+  gap: var(--space-lg);
 }
 
 .avatarWrap {
@@ -56,7 +56,7 @@
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 2px var(--ant-color-primary);
+    box-shadow: 0 0 0 2px var(--accent);
   }
 }
 
@@ -67,9 +67,9 @@
   overflow: hidden;
   border-radius: 50%;
   aspect-ratio: 1;
-  background-color: var(--ant-color-fill-secondary);
-  border: 1px solid var(--ant-color-border);
-  color: var(--ant-color-text);
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border);
+  color: var(--foreground);
   font-weight: 500;
 
   img {
@@ -87,44 +87,44 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: var(--ant-font-size-heading-3);
+  font-size: var(--font-size-heading-3);
 }
 
 .accountInfo {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-xs);
+  gap: var(--space-xs);
 }
 
 .nameRow {
   display: flex;
   align-items: baseline;
-  gap: var(--ant-margin-sm);
+  gap: var(--space-sm);
 }
 
 .nickname {
-  font-size: var(--ant-font-size-heading-3);
+  font-size: var(--font-size-heading-3);
   font-weight: 500;
-  color: var(--ant-color-text);
+  color: var(--foreground);
 }
 
 .username {
-  font-size: var(--ant-font-size-base);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-base);
+  color: var(--muted);
 }
 
 .avatarModalHint {
-  margin: 0 0 var(--ant-margin-md) 0;
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-secondary);
+  margin: 0 0 var(--space-md) 0;
+  font-size: var(--font-size-sm);
+  color: var(--muted);
 }
 
 .identityTag {
   display: inline-block;
-  padding: var(--ant-padding-xxs) var(--ant-padding-sm);
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-primary);
-  background-color: var(--ant-color-primary-bg);
-  border-radius: var(--ant-border-radius-sm);
+  padding: var(--space-2xs) var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--accent);
+  background-color: var(--accent-soft);
+  border-radius: var(--radius-sm);
   width: fit-content;
 }

@@ -176,28 +176,34 @@ export function useTableDriveActions({
           onSuccess={refresh}
         />
         <MoveNodeModal
-          open={moveTarget !== null}
+          isOpen={moveTarget !== null}
           node={moveTarget}
           rootId={rootId}
           groupId={groupId}
-          onCancel={() => setMoveTarget(null)}
+          onOpenChange={(open) => {
+            if (!open) {
+              setMoveTarget(null);
+            }
+          }}
           onSuccess={refresh}
         />
         {groupId ? (
           <UploadFileToGroupModal
-            open={uploadOpen}
+            isOpen={uploadOpen}
             groupId={groupId}
-            onCancel={() => setUploadOpen(false)}
+            onOpenChange={setUploadOpen}
             onSuccess={refresh}
           />
         ) : null}
         <TagPermissionModal
-          open={tagPermissionOpen}
+          isOpen={tagPermissionOpen}
           groupId={groupId}
           initialTagId={tagPermissionTagId}
-          onCancel={() => {
-            setTagPermissionOpen(false);
-            setTagPermissionTagId(undefined);
+          onOpenChange={(open) => {
+            if (!open) {
+              setTagPermissionOpen(false);
+              setTagPermissionTagId(undefined);
+            }
           }}
           onSuccess={refresh}
         />

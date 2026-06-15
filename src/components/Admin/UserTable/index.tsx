@@ -1,12 +1,13 @@
+import { DataTable, type DataTableColumn } from '@/components/Table';
 import type { AdminUser } from '@/domains/Admin';
 import { IDENTITY, USER_STATUS } from '@/domains/User/enum';
-import { Avatar, Table, Tag } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { useMemo } from 'react';
+import { Chip, ListBox, Select } from '@heroui/react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import type { AdminUserTableProps } from './index.type';
 import styles from './style.module.less';
 
 const EMPTY_TEXT = '-';
+const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
 const formatOptionalText = (value?: string): string => {
   return value && value.trim() ? value : EMPTY_TEXT;
@@ -25,101 +26,154 @@ function AdminUserTable({
   onPageChange,
   onRowClick,
 }: AdminUserTableProps) {
-  const columns = useMemo<ColumnsType<AdminUser>>(
+  const renderRowButton = useCallback(
+    (record: AdminUser, children: ReactNode) => (
+      <button
+        type="button"
+        className={styles.cellButton}
+        onClick={() => onRowClick(record.id)}
+        aria-label={`查看用户 ${getDisplayName(record)}`}
+      >
+        {children}
+      </button>
+    ),
+    [onRowClick]
+  );
+
+  const columns = useMemo<DataTableColumn<AdminUser>[]>(
     () => [
       {
-        title: '用户',
-        dataIndex: 'realName',
-        key: 'user',
-        width: 220,
-        ellipsis: true,
-        render: (_value, record) => (
-          <div className={styles.userCell}>
-            <Avatar size={32} src={record.avatar}>
-              {getDisplayName(record).slice(0, 1)}
-            </Avatar>
-            <div className={styles.userMeta}>
-              <div className={styles.primaryText}>{getDisplayName(record)}</div>
-              <div className={styles.secondaryText}>{formatOptionalText(record.nickname)}</div>
-            </div>
-          </div>
-        ),
+        id: 'user',
+        label: '用户',
+        width: 'lg',
+        isRowHeader: true,
+        renderCell: (record) =>
+          renderRowButton(
+            record,
+            <DataTable.MemberCell
+              name={getDisplayName(record)}
+              subline={formatOptionalText(record.nickname)}
+              avatarSrc={record.avatar}
+            />
+          ),
       },
       {
-        title: '用户名',
-        dataIndex: 'username',
-        key: 'username',
-        width: 160,
-        ellipsis: true,
-        render: (value?: string) => formatOptionalText(value),
+        id: 'username',
+        label: '用户名',
+        width: 'md',
+        renderCell: (record) =>
+          renderRowButton(
+            record,
+            <DataTable.TextCell>{formatOptionalText(record.username)}</DataTable.TextCell>
+          ),
       },
       {
-        title: '学工号',
-        dataIndex: 'campusNo',
-        key: 'campusNo',
-        width: 140,
-        ellipsis: true,
-        render: (value?: string) => formatOptionalText(value),
+        id: 'campusNo',
+        label: '学工号',
+        width: 'md',
+        renderCell: (record) =>
+          renderRowButton(
+            record,
+            <DataTable.TextCell>{formatOptionalText(record.campusNo)}</DataTable.TextCell>
+          ),
       },
       {
-        title: '身份',
-        dataIndex: 'identityType',
-        key: 'identityType',
-        width: 96,
-        render: (value: number) => <Tag>{IDENTITY.getLabel(value) || EMPTY_TEXT}</Tag>,
+        id: 'identityType',
+        label: '身份',
+        width: 'sm',
+        renderCell: (record) =>
+          renderRowButton(
+            record,
+            <Chip size="sm" variant="soft">
+              <Chip.Label>{IDENTITY.getLabel(record.identityType) || EMPTY_TEXT}</Chip.Label>
+            </Chip>
+          ),
       },
       {
-        title: '状态',
-        dataIndex: 'status',
-        key: 'status',
-        width: 96,
-        render: (value: number) => {
-          const color = value === 1 ? 'success' : value === -2 ? 'error' : 'warning';
-          return <Tag color={color}>{USER_STATUS.getLabel(value) || EMPTY_TEXT}</Tag>;
+        id: 'status',
+        label: '状态',
+        width: 'sm',
+        renderCell: (record) => {
+          const statusClassName =
+            record.status === 1
+              ? styles.statusSuccess
+              : record.status === -2
+                ? styles.statusDanger
+                : styles.statusWarning;
+          return renderRowButton(
+            record,
+            <Chip size="sm" variant="soft" className={statusClassName}>
+              <Chip.Label>{USER_STATUS.getLabel(record.status) || EMPTY_TEXT}</Chip.Label>
+            </Chip>
+          );
         },
       },
       {
-        title: '邮箱',
-        dataIndex: 'email',
-        key: 'email',
-        width: 220,
-        ellipsis: true,
-        render: (value?: string) => formatOptionalText(value),
+        id: 'email',
+        label: '邮箱',
+        width: 'lg',
+        renderCell: (record) =>
+          renderRowButton(
+            record,
+            <DataTable.TextCell>{formatOptionalText(record.email)}</DataTable.TextCell>
+          ),
       },
       {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
-        width: 180,
-        ellipsis: true,
-        render: (value?: string) => formatOptionalText(value),
+        id: 'createTime',
+        label: '创建时间',
+        width: 'lg',
+        renderCell: (record) =>
+          renderRowButton(
+            record,
+            <DataTable.TextCell>{formatOptionalText(record.createTime)}</DataTable.TextCell>
+          ),
       },
     ],
-    []
+    [renderRowButton]
   );
 
   return (
     <div className={styles.tableWrapper}>
-      <Table<AdminUser>
+      <DataTable<AdminUser>
+        ariaLabel="用户列表"
         rowKey="id"
-        size="small"
+        items={users}
         loading={loading}
         columns={columns}
-        dataSource={users}
-        scroll={{ x: 1112 }}
+        emptyText="暂无用户"
+        getRowClassName={() => styles.clickableRow}
         pagination={{
           total,
           current: currentPage,
           pageSize,
-          showSizeChanger: true,
-          showTotal: (value) => `共 ${value} 条`,
+          summary: `共 ${total} 条`,
           onChange: onPageChange,
-          onShowSizeChange: onPageChange,
+          pageSizeControl: (
+            <Select
+              aria-label="每页数量"
+              value={String(pageSize)}
+              onChange={(key) => {
+                if (key == null || Array.isArray(key)) return;
+                onPageChange(1, Number(key));
+              }}
+              className={styles.pageSizeSelect}
+            >
+              <Select.Trigger>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <ListBox.Item key={String(size)} id={String(size)} textValue={`${size} 条/页`}>
+                      {size} 条/页
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
+          ),
         }}
-        onRow={(record) => ({
-          className: styles.clickableRow,
-          onClick: () => onRowClick(record.id),
-        })}
+        maxBodyHeight={520}
       />
     </div>
   );

@@ -1,20 +1,19 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--ant-margin-xs);
-  padding: var(--ant-padding-sm);
+  gap: var(--space-xs);
+  padding: var(--space-sm);
   min-height: 80px;
 }
 
 .tree {
-  font-size: var(--ant-font-size-md);
+  font-size: var(--font-size-base);
 
-  :global(.ant-tree-treenode) {
+  :global(.wisepen-tree__item) {
     padding: 1px 0;
   }
 
-  :global(.ant-tree-switcher),
-  :global(.ant-tree-switcher-icon) {
+  :global(.wisepen-tree__switcher) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -22,11 +21,11 @@
     height: 18px;
   }
 
-  :global(.ant-tree-node-content-wrapper) {
+  :global(.wisepen-tree__content) {
     min-height: 22px;
   }
 
-  :global(.ant-tree-title) {
+  :global(.wisepen-tree__title) {
     line-height: 22px;
   }
 }
@@ -34,13 +33,13 @@
 .nodeTitle {
   display: inline-flex;
   align-items: center;
-  gap: var(--ant-margin-xxs);
+  gap: var(--space-2xs);
 }
 
 .loadMoreBtn {
-  color: var(--ant-color-primary);
+  color: var(--accent);
   cursor: pointer;
-  font-size: var(--ant-font-size-sm);
+  font-size: var(--font-size-sm);
 
   &:hover {
     opacity: 0.85;

@@ -1,10 +1,10 @@
 import type { DriveActionTarget } from '../../../common/driveComponentModel';
 
 export interface MoveNodeModalProps {
-  open: boolean;
+  isOpen: boolean;
   node: DriveActionTarget | null;
   rootId: string;
   groupId?: string;
-  onCancel: () => void;
+  onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }

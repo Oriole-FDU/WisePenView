@@ -2,8 +2,8 @@ import { RESOURCE_TYPE } from '@/domains/Resource';
 import { FileText, Folder, Link, PenTool, Trash2 } from 'lucide-react';
 import type { EntryIconProps } from './index.type';
 
-const COLOR_SECONDARY = 'var(--ant-color-text-secondary)';
-const COLOR_FOLDER = 'var(--ant-color-warning)';
+const COLOR_SECONDARY = 'var(--muted)';
+const COLOR_FOLDER = 'var(--warning)';
 
 function renderResourceIcon(resourceType?: string, size = 18, color = COLOR_SECONDARY) {
   if (resourceType === RESOURCE_TYPE.NOTE) {

@@ -1,12 +1,12 @@
+import { Chip, Dropdown, Popover, Spinner } from '@heroui/react';
 import { useRequest, useUpdateEffect } from 'ahooks';
-import type { MenuProps } from 'antd';
-import { Dropdown, Empty, Popover, Spin, Tag } from 'antd';
 import clsx from 'clsx';
 import { ArrowUpAZ, ChartBar, Check, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { Claude, DeepSeek, Doubao, Gemini, Grok, Meta, Mistral, OpenAI } from '@lobehub/icons';
 
+import { EmptyState } from '@/components/Common/Feedback';
 import IconText from '@/components/Common/IconText';
 import { useChatService } from '@/domains';
 import { useChatModelPreferenceStore } from '@/store/useChatModelPreferenceStore';
@@ -114,17 +114,6 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
     }
   }, [currentSort, models, sortOrder]);
 
-  const sortMenuItems: MenuProps['items'] = SORT_OPTIONS.map((opt) => ({
-    key: opt.value,
-    label: (
-      <IconText icon={<opt.icon />} iconSize={14} gap="var(--ant-margin-xs)">
-        {opt.label}
-      </IconText>
-    ),
-    onClick: () => setCurrentSort(opt.value),
-    className: currentSort === opt.value ? 'ant-dropdown-menu-item-selected' : '',
-  }));
-
   const content = (
     <div className={styles.selectorPanel}>
       <div className={styles.panelHeader}>
@@ -145,32 +134,47 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
             </IconText>
           </button>
 
-          <Dropdown
-            classNames={{
-              itemContent: styles.dropdownItemContent,
-              itemIcon: styles.dropdownItemIcon,
-            }}
-            menu={{ items: sortMenuItems }}
-            trigger={['click']}
-            placement="bottomRight"
-          >
-            <div className={styles.sortTrigger}>
-              <IconText icon={<ChevronDown />} iconPosition="end" iconSize={10} gap={4}>
-                {SORT_OPTIONS.find((o) => o.value === currentSort)?.label}
-              </IconText>
-            </div>
+          <Dropdown>
+            <Dropdown.Trigger>
+              <button type="button" className={styles.sortTrigger}>
+                <IconText icon={<ChevronDown />} iconPosition="end" iconSize={10} gap={4}>
+                  {SORT_OPTIONS.find((o) => o.value === currentSort)?.label}
+                </IconText>
+              </button>
+            </Dropdown.Trigger>
+            <Dropdown.Popover placement="bottom end" className={styles.sortDropdownPopover}>
+              <Dropdown.Menu
+                aria-label="模型排序方式"
+                selectedKeys={[currentSort]}
+                selectionMode="single"
+                onAction={(key) => setCurrentSort(String(key))}
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <Dropdown.Item
+                    key={opt.value}
+                    id={opt.value}
+                    textValue={opt.label}
+                    className={styles.sortDropdownItem}
+                  >
+                    <IconText icon={<opt.icon />} iconSize={14} gap="var(--space-xs)">
+                      {opt.label}
+                    </IconText>
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown.Popover>
           </Dropdown>
         </div>
       </div>
 
       <div className={styles.modelList}>
         {loading ? (
-          <div style={{ padding: '40px 0', textAlign: 'center' }}>
-            <Spin size="small" />
+          <div className={styles.loadingWrap}>
+            <Spinner size="sm" />
           </div>
         ) : processedModels.length === 0 ? (
-          <div style={{ padding: '20px 0' }}>
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无模型" />
+          <div className={styles.emptyWrap}>
+            <EmptyState title="暂无模型" />
           </div>
         ) : (
           processedModels.map((model, index) => (
@@ -191,7 +195,7 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
                   textClassName={styles.modelName}
                   icon={<LogoFactory provider={model.provider} size={20} />}
                   iconSize={20}
-                  gap="var(--ant-margin-xs)"
+                  gap="var(--space-xs)"
                   ellipsis
                 >
                   {model.name}
@@ -207,16 +211,20 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
 
                 <div className={styles.tagsRow}>
                   {model.tags.map((tag, idx) => (
-                    <Tag key={idx} color={tag.type} className={styles.miniTag}>
-                      {tag.text}
-                    </Tag>
+                    <Chip key={idx} size="sm" variant="soft" className={styles.miniTag}>
+                      <Chip.Label>{tag.text}</Chip.Label>
+                    </Chip>
                   ))}
                 </div>
               </div>
 
               <div className={styles.itemRight}>
-                {model.multiplier && <Tag className={styles.multiplierTag}>{model.multiplier}</Tag>}
-                {model.id === value && <Check style={{ color: 'var(--ant-color-primary)' }} />}
+                {model.multiplier && (
+                  <Chip size="sm" variant="soft" className={styles.multiplierTag}>
+                    <Chip.Label>{model.multiplier}</Chip.Label>
+                  </Chip>
+                )}
+                {model.id === value && <Check style={{ color: 'var(--accent)' }} />}
               </div>
             </div>
           ))
@@ -226,33 +234,30 @@ function ModelSelector({ value, onChange }: ModelSelectorProps) {
   );
 
   return (
-    <Popover
-      content={content}
-      trigger="click"
-      open={open}
-      onOpenChange={setOpen}
-      placement="bottomLeft"
-      arrow={false}
-      classNames={{ content: styles.popoverBody }}
-    >
-      <div className={styles.trigger}>
-        {/* 如果正在加载，显示 Loading 图标或占位符 */}
-        <IconText
-          icon={
-            loading ? (
-              <Spin size="small" />
-            ) : (
-              <LogoFactory provider={currentModel?.provider ?? 'openai'} size={16} />
-            )
-          }
-          iconSize={16}
-          gap="var(--ant-margin-xxs)"
-          ellipsis
-        >
-          {loading ? '模型加载中' : (currentModel?.name ?? '请选择模型')}
-        </IconText>
-        <IconText icon={<ChevronDown />} iconSize={10} aria-hidden />
-      </div>
+    <Popover isOpen={open} onOpenChange={setOpen}>
+      <Popover.Trigger>
+        <button type="button" className={styles.trigger}>
+          {/* 如果正在加载，显示 Loading 图标或占位符 */}
+          <IconText
+            icon={
+              loading ? (
+                <Spinner size="sm" />
+              ) : (
+                <LogoFactory provider={currentModel?.provider ?? 'openai'} size={16} />
+              )
+            }
+            iconSize={16}
+            gap="4px"
+            ellipsis
+          >
+            {loading ? '模型加载中' : (currentModel?.name ?? '请选择模型')}
+          </IconText>
+          <IconText icon={<ChevronDown />} iconSize={10} aria-hidden />
+        </button>
+      </Popover.Trigger>
+      <Popover.Content className={styles.popoverBody} placement="bottom">
+        <Popover.Dialog>{content}</Popover.Dialog>
+      </Popover.Content>
     </Popover>
   );
 }

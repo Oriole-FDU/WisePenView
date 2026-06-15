@@ -2,7 +2,10 @@ import { LogOut, Pencil, Trash2 } from 'lucide-react';
 /**
  * 小组详情：展示/ Tab / 小组盘只读等由 getGroupDisplayConfig（如 showWalletTabs、driveReadOnlyMode）驱动。
  */
+import { Spin } from '@/components/Common/Feedback';
 import IconText from '@/components/Common/IconText';
+import type { SegmentedTabItem } from '@/components/Common/SegmentedTabs';
+import SegmentedTabs from '@/components/Common/SegmentedTabs';
 import UserCapsule from '@/components/Common/UserCapsule';
 import TableDrive from '@/components/Drive/TableDrive';
 import ComputeWallet from '@/components/Wallet/ComputeWallet';
@@ -12,8 +15,7 @@ import type { Group, GroupResConfig } from '@/domains/Group';
 import { WALLET_TARGET_TYPE } from '@/domains/Wallet';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import type { TabsProps } from 'antd';
-import { Spin, Tabs } from 'antd';
+import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getGroupDisplayConfig } from '../_components/GroupDisplayConfig';
@@ -27,6 +29,12 @@ type GroupDetailLoaded = {
   group: Group;
   currentUserRole: 'OWNER' | 'ADMIN' | 'MEMBER';
   resConfig: GroupResConfig;
+};
+
+type GroupDetailTabKey = 'files' | 'members' | 'wallet' | 'token-transfer' | 'description';
+
+type GroupDetailTabItem = SegmentedTabItem<GroupDetailTabKey> & {
+  children: ReactNode;
 };
 
 function GroupDetail() {
@@ -80,19 +88,19 @@ function GroupDetail() {
   const walletRef = useRef<ComputeWalletRef | null>(null);
 
   /** Tabs 受控，避免 items 更新时重置当前选中的 Tab */
-  const [detailTabKey, setDetailTabKey] = useState<string>('files');
+  const [detailTabKey, setDetailTabKey] = useState<GroupDetailTabKey>('files');
 
   /**
-   * Tabs 配置必须在任意 early return 之前计算，以符合 Hooks 规则。
-   * group/groupDisplayConfig 为空时返回空数组（加载中或无效态不会渲染到 Tabs）。
+   * Tab 配置必须在任意 early return 之前计算，以符合 Hooks 规则。
+   * group/groupDisplayConfig 为空时返回空数组（加载中或无效态不会渲染到 Tab）。
    */
-  const tabItems = useMemo<NonNullable<TabsProps['items']>>(() => {
+  const tabItems = useMemo<GroupDetailTabItem[]>(() => {
     if (!group || !resConfig || !groupDisplayConfig) {
       return [];
     }
 
     const gid = group.groupId || id || '';
-    const items: NonNullable<TabsProps['items']> = [
+    const items: GroupDetailTabItem[] = [
       {
         key: 'files',
         label: '文件',
@@ -182,9 +190,9 @@ function GroupDetail() {
     return items;
   }, [group, id, groupDisplayConfig, resConfig]);
 
-  const detailTabKeys = useMemo(() => tabItems.map((item) => String(item.key)), [tabItems]);
+  const detailTabKeys = useMemo(() => tabItems.map((item) => item.key), [tabItems]);
 
-  const handleDetailTabChange = (nextKey: string) => {
+  const handleDetailTabChange = (nextKey: GroupDetailTabKey) => {
     if (detailTabKeys.includes(nextKey)) {
       setDetailTabKey(nextKey);
     }
@@ -194,6 +202,7 @@ function GroupDetail() {
     detailTabKeys.length > 0 && !detailTabKeys.includes(detailTabKey)
       ? (detailTabKeys[0] ?? 'files')
       : detailTabKey;
+  const activeTabContent = tabItems.find((item) => item.key === activeDetailTabKey)?.children;
 
   // 渲染 UI
   if (loading) {
@@ -227,12 +236,14 @@ function GroupDetail() {
         </div>
       </div>
 
-      <Tabs
+      <SegmentedTabs<GroupDetailTabKey>
+        ariaLabel="小组详情"
         className={layout.detailTabs}
-        activeKey={activeDetailTabKey}
-        onChange={handleDetailTabChange}
-        items={tabItems}
+        selectedKey={activeDetailTabKey}
+        onSelectionChange={handleDetailTabChange}
+        items={tabItems.map(({ key, label, disabled }) => ({ key, label, disabled }))}
       />
+      {activeTabContent}
 
       <div className={layout.actionsBar}>
         {currentUserRole === 'OWNER' ? (
@@ -268,8 +279,8 @@ function GroupDetail() {
         onSuccess={handleEditSuccess}
       />
       <DissolveGroupModal
-        open={dissolveGroupModalOpen}
-        onCancel={() => setDissolveGroupModalOpen(false)}
+        isOpen={dissolveGroupModalOpen}
+        onOpenChange={setDissolveGroupModalOpen}
         groupName={groupName}
         groupId={groupId}
         onSuccess={handleModalCloseOnly}

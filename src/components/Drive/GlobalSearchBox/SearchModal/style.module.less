@@ -1,34 +1,61 @@
-.modal {
-  // 卡片整体上移到视口 10vh，类 Algolia DocSearch 布局
-  :global(.ant-modal) {
-    top: 10vh;
-    padding-bottom: 0;
-  }
+// 卡片整体上移到视口 10vh，类 Algolia DocSearch 布局
+.container {
+  margin-top: 10vh;
+  width: min(720px, calc(100vw - 32px));
+}
 
-  :global(.ant-modal-content) {
-    padding: 0;
-    overflow: hidden;
-    border-radius: var(--ant-border-radius-lg);
-  }
+.dialog {
+  overflow: hidden;
+}
+
+.body {
+  padding: 0;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: var(--ant-margin-sm);
-  padding: var(--ant-padding-xs) var(--ant-padding);
-  border-bottom: 1px solid var(--ant-color-split);
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-md);
+  border-bottom: 1px solid var(--separator);
 }
 
 .headerIcon {
-  font-size: var(--ant-font-size-lg);
-  color: var(--ant-color-text-secondary);
+  font-size: var(--font-size-lg);
+  color: var(--muted);
   flex-shrink: 0;
 }
 
 .input {
   flex: 1;
-  font-size: var(--ant-font-size-lg);
+  min-width: 0;
+  font-size: var(--font-size-lg);
+}
+
+.inputGroup {
+  width: 100%;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.inputControl {
+  font-size: var(--font-size-lg);
+}
+
+.clearButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--muted);
+  }
 }
 
 .kbd {
@@ -36,24 +63,24 @@
   align-items: center;
   justify-content: center;
   min-width: 32px;
-  padding: 2px var(--ant-padding-xs);
+  padding: 2px var(--space-xs);
   font-family: inherit;
-  font-size: var(--ant-font-size-sm);
-  color: var(--ant-color-text-tertiary);
-  background: var(--ant-color-fill-tertiary);
-  border: 1px solid var(--ant-color-border);
-  border-radius: var(--ant-border-radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  background: var(--surface-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    color: var(--ant-color-text-secondary);
-    background: var(--ant-color-fill-secondary);
+    color: var(--muted);
+    background: var(--surface-secondary);
   }
 }
 
 .tabs {
-  padding: var(--ant-padding-xs) var(--ant-padding);
-  border-bottom: 1px solid var(--ant-color-split);
+  padding: var(--space-xs) var(--space-md);
+  border-bottom: 1px solid var(--separator);
 }
