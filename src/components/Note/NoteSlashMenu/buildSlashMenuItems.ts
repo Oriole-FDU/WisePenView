@@ -9,7 +9,7 @@ import type { NoteEditorPlugin, PluginEditor } from '../CustomBlockNote/plugins/
  */
 type SlashMenuItemWithKey = DefaultReactSuggestionItem & { key?: string };
 
-function getSlashMenuItemKey(item: DefaultReactSuggestionItem): string | undefined {
+export function getSlashMenuItemKey(item: DefaultReactSuggestionItem): string | undefined {
   const key = (item as SlashMenuItemWithKey).key;
   return typeof key === 'string' ? key : undefined;
 }

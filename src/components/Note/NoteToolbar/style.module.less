@@ -1,7 +1,284 @@
-.askAiBtn {
+.toolbar,
+.blockTypeMenuPopover,
+.colorPopover,
+.formPopover {
+  --note-toolbar-trigger-padding-inline: var(--space-xs);
+  --note-toolbar-trigger-gap: var(--space-2xs);
+  --note-toolbar-trigger-icon-size: calc(var(--control-height-sm) - var(--space-2xs));
+  --note-toolbar-menu-padding: var(--space-xs);
+  --note-toolbar-menu-gap: var(--space-2xs);
+  --note-toolbar-menu-width: 18rem;
+  --note-toolbar-menu-max-height: min(32.5rem, calc(100vh - var(--space-2xl) - var(--space-xl) - var(--space-lg)));
+  --note-toolbar-menu-icon-column: var(--control-height);
+  --note-toolbar-menu-trailing-column: calc(var(--space-md) + var(--space-2xs));
+  --note-toolbar-swatch-size: var(--space-xl);
+  --note-toolbar-swatch-columns: 10;
+}
+
+.toolbar {
+  border: 1px solid var(--border-light);
+  background: var(--overlay);
+  color: var(--overlay-foreground);
+}
+
+.toolbar :global([data-slot='button-group-separator']),
+.toolbar :global([data-slot='toggle-button-group-separator']) {
+  position: static;
+  width: 1px;
+  height: calc(var(--control-height-sm) - var(--space-sm));
   align-self: center;
-  margin-left: var(--space-xs);
-  margin-right: var(--space-xs);
-  margin-top: var(--space-2xs);
-  margin-bottom: var(--space-2xs);
+  background: var(--separator);
+  opacity: 1;
+}
+
+.toolbarButtonActive {
+  background: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+}
+
+.blockTypeTrigger {
+  min-width: calc(var(--control-height) + var(--space-md));
+  padding-inline: var(--note-toolbar-trigger-padding-inline);
+  gap: var(--note-toolbar-trigger-gap);
+  color: var(--overlay-foreground);
+}
+
+.blockTypeTriggerIcon {
+  width: var(--note-toolbar-trigger-icon-size);
+  height: var(--note-toolbar-trigger-icon-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blockTypeMenuPopover,
+.colorPopover,
+.formPopover {
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--overlay);
+  box-shadow: var(--overlay-shadow);
+}
+
+.blockTypeMenu {
+  width: var(--note-toolbar-menu-width);
+  max-height: var(--note-toolbar-menu-max-height);
+  display: flex;
+  flex-direction: column;
+  gap: var(--note-toolbar-menu-gap);
+  overflow-y: auto;
+  padding: var(--note-toolbar-menu-padding);
+}
+
+.blockTypeMenuItem {
+  width: 100%;
+  min-height: var(--control-height);
+  display: grid;
+  grid-template-columns: var(--note-toolbar-menu-icon-column) minmax(0, 1fr) var(--note-toolbar-menu-trailing-column);
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-md);
+  color: var(--overlay-foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.blockTypeMenuItem:hover,
+.blockTypeMenuItem[data-hovered],
+.blockTypeMenuItem[data-focused],
+.blockTypeMenuItem[data-selected],
+.blockTypeMenuItemActive {
+  background: var(--surface-secondary);
+}
+
+.blockTypeMenuIcon {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.blockTypeMenuLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blockTypeMenuCheck {
+  width: var(--line-height-xs);
+  height: var(--line-height-xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+  color: var(--primary);
+}
+
+.colorTrigger {
+  min-width: calc(var(--control-height) + var(--space-sm));
+  padding-inline: var(--note-toolbar-trigger-padding-inline);
+  gap: var(--note-toolbar-trigger-gap);
+  color: var(--overlay-foreground);
+}
+
+.colorPanel {
+  width: max-content;
+  padding: var(--space-md);
+}
+
+.colorSection + .colorSection {
+  margin-top: var(--space-sm);
+}
+
+.colorSectionTitle {
+  margin-bottom: var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.colorSwatchPicker {
+  display: grid;
+  grid-template-columns: repeat(var(--note-toolbar-swatch-columns), var(--note-toolbar-swatch-size));
+  gap: var(--space-xs);
+}
+
+.colorSwatchItem {
+  width: var(--note-toolbar-swatch-size);
+  height: var(--note-toolbar-swatch-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.colorSwatchItem:hover,
+.colorSwatchItem[data-hovered],
+.colorSwatchSelected {
+  border-color: var(--primary);
+}
+
+.colorSwatchSelected {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.colorTextPreview {
+  flex-shrink: 0;
+}
+
+.colorBackgroundPreview {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: var(--radius-sm);
+}
+
+.backgroundDefault {
+  background:
+    linear-gradient(
+      135deg,
+      transparent 48%,
+      var(--primary) 49%,
+      var(--primary) 51%,
+      transparent 52%
+    ),
+    var(--surface);
+}
+
+.textDefault {
+  color: var(--overlay-foreground);
+}
+
+.textGray {
+  color: #8a8f98;
+}
+
+.textBrown {
+  color: #8b5e3c;
+}
+
+.textRed {
+  color: #ef4444;
+}
+
+.textOrange {
+  color: #f97316;
+}
+
+.textYellow {
+  color: #eab308;
+}
+
+.textGreen {
+  color: #22c55e;
+}
+
+.textBlue {
+  color: #3b82f6;
+}
+
+.textPurple {
+  color: #7c3aed;
+}
+
+.textPink {
+  color: #ec4899;
+}
+
+.backgroundGray {
+  background: #e5e7eb;
+}
+
+.backgroundBrown {
+  background: #ead7c2;
+}
+
+.backgroundRed {
+  background: #fecaca;
+}
+
+.backgroundOrange {
+  background: #fed7aa;
+}
+
+.backgroundYellow {
+  background: #fef08a;
+}
+
+.backgroundGreen {
+  background: #bbf7d0;
+}
+
+.backgroundBlue {
+  background: #bfdbfe;
+}
+
+.backgroundPurple {
+  background: #ddd6fe;
+}
+
+.backgroundPink {
+  background: #fbcfe8;
+}
+
+.resetColorButton {
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+.formPanel {
+  width: min(18.75rem, calc(100vw - var(--space-xl)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
 }
