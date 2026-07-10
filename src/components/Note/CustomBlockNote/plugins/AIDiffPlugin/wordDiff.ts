@@ -449,6 +449,115 @@ export type BuildAiEditJsonUnitsOptions = {
   readonly mergeOptions?: MergeDiffHunksOptions;
 };
 
+const DISPLAY_EDIT_MERGE_MAX_VISIBLE_LENGTH = 600;
+const DISPLAY_EDIT_MERGE_MAX_BRIDGE_CHARS = 16;
+const DISPLAY_EDIT_MERGE_MAX_BRIDGE_TOKENS = 4;
+
+const WEAK_BRIDGE_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'as',
+  'at',
+  'be',
+  'been',
+  'being',
+  'but',
+  'for',
+  'he',
+  'her',
+  'his',
+  'in',
+  'is',
+  'it',
+  'its',
+  'not',
+  'of',
+  'on',
+  'or',
+  'she',
+  'that',
+  'the',
+  'their',
+  'they',
+  'this',
+  'to',
+  'was',
+  'were',
+  'with',
+]);
+
+function unitVisibleLength(unit: AiEditJsonUnit): number {
+  if (unit.type === 'plain') return unit.text.length;
+  return Math.max(unit.origin.length, unit.replace.length);
+}
+
+function isPunctuationOrWhitespace(text: string): boolean {
+  return /^[\s.,;:!?，。；：！？、'"“”‘’()[\]{}<>《》\-—–]+$/.test(text);
+}
+
+function isWeakLexicalBridge(text: string): boolean {
+  const normalized = text.trim().toLowerCase();
+  if (!normalized) return true;
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length === 0 || words.length > DISPLAY_EDIT_MERGE_MAX_BRIDGE_TOKENS) return false;
+  return words.every((word) => WEAK_BRIDGE_WORDS.has(word) || isPunctuationOrWhitespace(word));
+}
+
+function isWeakPlainBridge(text: string): boolean {
+  if (text.includes('\n')) return false;
+  if (text.length > DISPLAY_EDIT_MERGE_MAX_BRIDGE_CHARS) return false;
+  if (tokenizeForAiEdit(text).length > DISPLAY_EDIT_MERGE_MAX_BRIDGE_TOKENS) return false;
+  return isPunctuationOrWhitespace(text) || isWeakLexicalBridge(text);
+}
+
+function mergeAdjacentDisplayEditUnits(units: readonly AiEditJsonUnit[]): AiEditJsonUnit[] {
+  const merged: AiEditJsonUnit[] = [];
+  let index = 0;
+
+  while (index < units.length) {
+    const first = units[index];
+    if (first.type !== 'edit') {
+      merged.push(first);
+      index += 1;
+      continue;
+    }
+
+    let origin = first.origin;
+    let replace = first.replace;
+    let visibleLength = unitVisibleLength(first);
+    index += 1;
+
+    while (index < units.length) {
+      const bridge = units[index];
+      const next = units[index + 1];
+      if (bridge?.type === 'edit') {
+        const nextVisibleLength = visibleLength + unitVisibleLength(bridge);
+        if (nextVisibleLength > DISPLAY_EDIT_MERGE_MAX_VISIBLE_LENGTH) break;
+        origin += bridge.origin;
+        replace += bridge.replace;
+        visibleLength = nextVisibleLength;
+        index += 1;
+        continue;
+      }
+      if (bridge?.type !== 'plain' || next?.type !== 'edit') break;
+      if (!isWeakPlainBridge(bridge.text)) break;
+      const nextVisibleLength =
+        visibleLength + unitVisibleLength(bridge) + unitVisibleLength(next);
+      if (nextVisibleLength > DISPLAY_EDIT_MERGE_MAX_VISIBLE_LENGTH) break;
+      origin += bridge.text + next.origin;
+      replace += bridge.text + next.replace;
+      visibleLength = nextVisibleLength;
+      index += 2;
+    }
+
+    merged.push({ type: 'edit', origin, replace });
+  }
+
+  return merged;
+}
+
 export function buildAiEditJsonUnits(
   origin: string,
   replace: string,
@@ -482,5 +591,5 @@ export function buildAiEditJsonUnits(
       .join('');
     units.push({ type: 'edit', origin: originText, replace: replaceText });
   }
-  return units;
+  return mergeAdjacentDisplayEditUnits(units);
 }

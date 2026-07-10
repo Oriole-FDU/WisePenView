@@ -9,6 +9,8 @@ export interface ChatWorkspaceContext {
   resourceType: string;
   viewer?: string;
   editorType?: string;
+  noteSyncStatus?: 'connecting' | 'connected' | 'disconnected';
+  getNoteClientStateVector?: () => string | undefined;
 }
 
 interface ChatSelectedResourceContext {
@@ -23,6 +25,23 @@ interface ChatUploadedAttachmentContext {
   filename: string;
   enabled: boolean;
 }
+
+export type ChatSelectedNoteScope =
+  | {
+      type: 'blocks';
+      block_ids: string[];
+      include_children?: boolean;
+    }
+  | {
+      type: 'subtree';
+      root_block_id: string;
+    }
+  | {
+      type: 'block_range';
+      start_block_id: string;
+      end_block_id: string;
+      include_partial?: boolean;
+    };
 
 export interface ChatCompletionRequest {
   session_id: string;
@@ -44,6 +63,7 @@ export interface SendSessionMessageOptions {
   providerId?: string;
   runtimeOptions?: Record<string, unknown>;
   selectedText?: string;
+  selectedNoteScope?: ChatSelectedNoteScope;
   enableSelected?: boolean;
   workspaceContext?: ChatWorkspaceContext;
   selectedResources?: ChatSelectedResourceContext[];

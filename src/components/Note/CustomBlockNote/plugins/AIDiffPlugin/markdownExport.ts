@@ -1,6 +1,7 @@
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 
 import { isInlineVisibleInMode, isRecord, shouldFoldInlineContent } from './exportVisibility';
+import { applyAiDiffActionToProps, type AiDiffActionMode } from './patch';
 
 function getInlineType(v: unknown): string {
   if (!isRecord(v)) return '';
@@ -51,6 +52,12 @@ function toExportTextInline(
   return styles ? { type: 'text', text, styles } : { type: 'text', text };
 }
 
+function modeToAiDiffAction(displayMode: AiDiffDisplayMode): AiDiffActionMode | null {
+  if (displayMode === AI_DIFF_DISPLAY_MODE.NEW_ONLY) return 'accept';
+  if (displayMode === AI_DIFF_DISPLAY_MODE.OLD_ONLY) return 'discard';
+  return null;
+}
+
 /**
  * 将单条行内映射为导出用形态：不可见则 `null`；遗留 AI-* 在 OLD_ONLY 下落成普通 `text`。
  */
@@ -60,6 +67,20 @@ function mapInlineForExport(item: unknown, displayMode: AiDiffDisplayMode): unkn
   }
 
   const type = getInlineType(item);
+
+  if (type === 'inlineMath') {
+    const mode = modeToAiDiffAction(displayMode);
+    if (!mode) return item;
+    const propsAction = applyAiDiffActionToProps(getInlineProps(item), mode);
+    if (propsAction.kind === 'remove') return null;
+    if (propsAction.kind === 'update') {
+      return {
+        ...(isRecord(item) ? item : {}),
+        props: propsAction.props,
+      };
+    }
+    return item;
+  }
 
   if (type === 'ai-diff' && displayMode === AI_DIFF_DISPLAY_MODE.OLD_ONLY) {
     const origin = getPropString(getInlineProps(item), 'origin');
@@ -94,6 +115,16 @@ function filterBlockForExport(block: unknown, displayMode: AiDiffDisplayMode): u
 
   const blockType = typeof block.type === 'string' ? block.type : '';
   if (blockType === 'math') {
+    const mode = modeToAiDiffAction(displayMode);
+    if (!mode) return block;
+    const propsAction = applyAiDiffActionToProps(block.props, mode);
+    if (propsAction.kind === 'remove') return null;
+    if (propsAction.kind === 'update') {
+      return {
+        ...block,
+        props: propsAction.props,
+      };
+    }
     return block;
   }
 

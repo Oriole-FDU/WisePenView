@@ -378,10 +378,17 @@ function mergeAiEditChains(
       const next = nodes[cursor + 1];
       if (shared.type !== 'text' || next.type !== 'AI-Edit') break;
       if (!canMergeAcrossSharedText(shared.text, mergedVisibleLen)) break;
-      oldText += shared.text + (toStringOrEmpty(next.old_text) || toStringOrEmpty(next.text_old));
-      newText += shared.text + (toStringOrEmpty(next.new_text) || toStringOrEmpty(next.text_new));
-      mergedVisibleLen = Math.max(oldText.length, newText.length);
-      if (mergedVisibleLen > mergeOptions.maxMergedLength) break;
+
+      const nextOldText =
+        oldText + shared.text + (toStringOrEmpty(next.old_text) || toStringOrEmpty(next.text_old));
+      const nextNewText =
+        newText + shared.text + (toStringOrEmpty(next.new_text) || toStringOrEmpty(next.text_new));
+      const nextVisibleLen = Math.max(nextOldText.length, nextNewText.length);
+      if (nextVisibleLen > mergeOptions.maxMergedLength) break;
+
+      oldText = nextOldText;
+      newText = nextNewText;
+      mergedVisibleLen = nextVisibleLen;
       cursor += 2;
     }
 
@@ -501,6 +508,7 @@ function aiGeneratedBlocksToBlockNoteBlocksInner(
     if (!mappedProps) return null;
 
     out.push({
+      id,
       type,
       props: mappedProps,
       ...(isContentNoneBlock ? {} : { content: mappedContent }),
@@ -702,16 +710,41 @@ export function applyAiDiffActionForKey(
   const nodes = content as unknown[];
   const changeIndex = nodes.findIndex((n) => {
     const t = getType(n);
+    const props = getProps(n);
+    if (t === 'inlineMath') {
+      return (
+        typeof props?.['aiDiffKey'] === 'string' &&
+        props['aiDiffKey'] === key &&
+        AI_DIFF_PROP_TYPES.has(getPropString(props, 'aiDiffType'))
+      );
+    }
     if (!t || !AI_DIFF_INLINE_TYPES.has(t)) {
       return false;
     }
-    const props = getProps(n);
     return typeof props?.['key'] === 'string' && props['key'] === key;
   });
   if (changeIndex < 0) return null;
 
   const changeType = getType(nodes[changeIndex]);
   const changeProps = getProps(nodes[changeIndex]) ?? {};
+  if (changeType === 'inlineMath') {
+    const propsAction = applyAiDiffActionToProps(changeProps, mode);
+    if (propsAction.kind === 'none') return null;
+    if (propsAction.kind === 'remove') {
+      const out = nodes.filter((_, index) => index !== changeIndex) as NoteInlineContentLike[];
+      return mergeAdjacentText(out);
+    }
+    const out = nodes.map((node, index) =>
+      index === changeIndex
+        ? ({
+            ...(node as Record<string, unknown>),
+            props: propsAction.props,
+          } as NoteInlineContentLike)
+        : (node as NoteInlineContentLike)
+    );
+    return mergeAdjacentText(out);
+  }
+
   const replacement = changeType ? resolveAiInlineReplacement(changeType, changeProps, mode) : [];
 
   const out: NoteInlineContentLike[] = [];

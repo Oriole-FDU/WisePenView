@@ -186,5 +186,9 @@ export function getApiServerAddr(): string {
 }
 
 export function getApiBaseURL(): string {
-  return `${window.location.protocol}//${getApiServerAddr()}/`;
+  const addr = getApiServerAddr();
+  if (addr.startsWith('/')) {
+    return `${addr.replace(/\/+$/, '')}/`;
+  }
+  return `${window.location.protocol}//${addr}/`;
 }

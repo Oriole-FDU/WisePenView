@@ -597,10 +597,8 @@ function AiDiffActionButtons({ onApply }: AiDiffActionButtonsProps) {
   }
   return (
     <span className={styles.aiActionsAnchor} contentEditable={false} aria-hidden="true">
-      {' '}
       {/* 外层锚点：用于定位/布局按钮区域 */}
       <span className={styles.aiActionsRoot} contentEditable={false} aria-hidden="true">
-        {' '}
         {/* 内层容器：放置实际按钮 */}
         <button
           type="button"
@@ -667,15 +665,14 @@ export function AiDiffView(
   // 对比模式，输出 compare UI
   return (
     <span ref={setRefs} className={styles.aiDiffRoot} contentEditable={false}>
-      {' '}
       {/* 整体用不可编辑容器包住，作为一个原子 UI */}
       {viewState.origin ? (
         <span className={styles.aiDeleteRoot}>{viewState.origin}</span>
-      ) : null}{' '}
+      ) : null}
       {/* 有 origin 则显示“删除样式”的旧文本 */}
       {viewState.replace ? (
         <span className={styles.aiAddRoot}>{viewState.replace}</span>
-      ) : null}{' '}
+      ) : null}
       {/* 有 replace 则显示“新增样式”的新文本 */}
       <AiDiffActionButtons onApply={apply} /> {/* 操作按钮：接受/丢弃 */}
     </span>

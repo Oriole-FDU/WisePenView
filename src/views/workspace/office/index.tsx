@@ -56,7 +56,7 @@ function readCurrentServerOnlyOfficeUrl(): string {
 
   try {
     const apiServerAddr = getApiServerAddr();
-    if (apiServerAddr?.trim()) {
+    if (apiServerAddr?.trim() && !apiServerAddr.trim().startsWith('/')) {
       const apiServerUrl = new URL(
         apiServerAddr.includes('://')
           ? apiServerAddr

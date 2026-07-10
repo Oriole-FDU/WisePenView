@@ -44,6 +44,9 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat, workspaceContext }
   const selectedContextText = useNoteSelectionStore((state) =>
     currentSessionId ? (state.selectedTextByResourceId[currentSessionId] ?? '') : ''
   );
+  const selectedNoteScope = useNoteSelectionStore((state) =>
+    currentSessionId ? state.selectedNoteScopeByResourceId[currentSessionId] : undefined
+  );
   const clearSelectedText = useNoteSelectionStore((state) => state.clearSelectedText);
 
   const [currentModel, setCurrentModel] = useState<Model | null>(null);
@@ -190,6 +193,14 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat, workspaceContext }
   const handleSend = async (text: string, opts?: SendOptions) => {
     const targetModel = opts?.model ?? currentModel;
     if (!targetModel) return;
+    if (
+      workspaceContext?.editorType === 'note' &&
+      workspaceContext.noteSyncStatus &&
+      workspaceContext.noteSyncStatus !== 'connected'
+    ) {
+      toast.warning('笔记仍在同步或已断开连接，请连接成功后再让 AI 读取当前笔记');
+      return;
+    }
     setCurrentModel(targetModel);
     let targetSessionId = currentSessionId;
 
@@ -207,6 +218,7 @@ function ChatPanel({ collapsed, fullWidth = false, onNewChat, workspaceContext }
       providerId: targetModel.providerId,
       enableSelected: hasSelectedContext,
       selectedText: selectedContextText,
+      selectedNoteScope,
       sessionId: targetSessionId,
       workspaceContext,
       selectedResources: opts?.activeDocRefs,

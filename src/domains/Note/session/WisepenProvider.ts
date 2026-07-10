@@ -2,9 +2,46 @@ import { getApiServerAddr, notifyAddrFailure } from '@/apis/apiServerAddr';
 import { WebsocketProvider } from 'y-websocket';
 import type * as Y from 'yjs';
 
+const devDeveloperParam = import.meta.env.DEV ? import.meta.env.VITE_X_DEVELOPER.trim() : '';
+const NOTE_COLLAB_PATH = '/note-collab';
+
+function toWsNoteCollabUrl(addr: string, fallbackProtocol: 'ws:' | 'wss:'): string {
+  const trimmed = addr.trim().replace(/\/+$/, '');
+  if (!trimmed) return '';
+
+  const hasProtocol = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(trimmed);
+  const rawUrl = hasProtocol ? trimmed : `${fallbackProtocol}//${trimmed}`;
+  const url = new URL(rawUrl);
+
+  url.protocol = url.protocol === 'https:' || url.protocol === 'wss:' ? 'wss:' : 'ws:';
+  const pathname = url.pathname.replace(/\/+$/, '');
+  url.pathname = pathname.endsWith(NOTE_COLLAB_PATH)
+    ? pathname
+    : `${pathname}${NOTE_COLLAB_PATH}`;
+  url.search = '';
+  url.hash = '';
+
+  return url.toString().replace(/\/$/, '');
+}
+
 export function getNoteUrl(): string {
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${getApiServerAddr()}/note-collab`;
+  const protocol: 'ws:' | 'wss:' = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const explicitWsAddr = import.meta.env.VITE_NOTE_COLLAB_WS_ADDR?.trim();
+  if (explicitWsAddr) {
+    return toWsNoteCollabUrl(explicitWsAddr, protocol);
+  }
+
+  const apiServerAddr = getApiServerAddr().replace(/\/+$/, '');
+  if (apiServerAddr.startsWith('/')) {
+    const devProxyTarget = import.meta.env.DEV
+      ? import.meta.env.VITE_DEV_API_PROXY_TARGET?.trim()
+      : '';
+    if (devProxyTarget) {
+      return toWsNoteCollabUrl(devProxyTarget, protocol);
+    }
+    return `${protocol}//${window.location.host}${apiServerAddr}/note-collab`;
+  }
+  return toWsNoteCollabUrl(apiServerAddr, protocol);
 }
 
 /** 笔记协同 WebSocket：固定 path、resourceId query，支持发送意图元数据帧。 */
@@ -17,6 +54,7 @@ export class WisepenProvider extends WebsocketProvider {
       disableBc: true,
       params: {
         resourceId,
+        ...(devDeveloperParam ? { developer: devDeveloperParam } : {}),
       },
     });
 

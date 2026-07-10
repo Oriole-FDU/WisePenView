@@ -12,6 +12,12 @@ const PROD_REQUIRED_KEYS = [
 export default defineConfig(({ mode }) => {
   // 无前缀：仅构建期使用，不会注入 import.meta.env 到浏览器
   const env = loadEnv(mode, process.cwd(), '');
+  const devApiProxyPrefix =
+    mode !== 'production' && env.VITE_API_SERVER_ADDR?.startsWith('/')
+      ? env.VITE_API_SERVER_ADDR.replace(/\/+$/, '') || '/api'
+      : '';
+  const devApiProxyTarget =
+    env.VITE_DEV_API_PROXY_TARGET || 'http://test.api.fudan.wisepen.oriole.cn';
 
   const servicesRegistry = env.SERVICES_REGISTRY;
   if (!servicesRegistry) {
@@ -41,12 +47,41 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       host: '0.0.0.0',
       allowedHosts: ['local.wisepen.oriole.cn'],
+      proxy: devApiProxyPrefix
+        ? {
+            [devApiProxyPrefix]: {
+              target: devApiProxyTarget,
+              changeOrigin: true,
+              // Note collaboration WebSocket is resolved by WisepenProvider directly.
+              ws: false,
+              cookieDomainRewrite: '',
+              configure: (proxy) => {
+                proxy.on('proxyRes', (proxyRes) => {
+                  const setCookie = proxyRes.headers['set-cookie'];
+                  if (!Array.isArray(setCookie)) return;
+
+                  proxyRes.headers['set-cookie'] = setCookie.map((cookie) =>
+                    cookie
+                      .replace(/;\s*Domain=[^;]*/gi, '')
+                      .replace(/;\s*Secure/gi, '')
+                      .replace(/;\s*SameSite=None/gi, '; SameSite=Lax')
+                  );
+                });
+              },
+              rewrite: (proxyPath) =>
+                proxyPath.startsWith(devApiProxyPrefix)
+                  ? proxyPath.slice(devApiProxyPrefix.length) || '/'
+                  : proxyPath,
+            },
+          }
+        : undefined,
     },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
         '@services-registry': path.resolve(__dirname, servicesRegistry),
       },
+      dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
     },
   };
 });

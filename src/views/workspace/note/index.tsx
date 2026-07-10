@@ -16,6 +16,7 @@ import {
 import { useNoteService, useResourceService } from '@/domains';
 import type { AiDiffDisplayMode, NoteInfoDisplayData } from '@/domains/Note';
 import { AI_DIFF_DISPLAY_MODE, AI_DIFF_DISPLAY_MODE_LABELS, useNoteSession } from '@/domains/Note';
+import { encodeNoteClientStateVector } from '@/domains/Note/session/stateVector';
 import { RESOURCE_TYPE } from '@/domains/Resource';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useSmoothFlag } from '@/hooks/useSmoothFlag';
@@ -102,6 +103,10 @@ function NoteViewConnected({
     hasAiDiffContent: false,
   });
   const { status, doc, provider, reconnect } = useNoteSession(resourceId);
+  const getNoteClientStateVector = useCallback(
+    () => encodeNoteClientStateVector(doc),
+    [doc]
+  );
 
   const isConnected = status === 'connected';
   const isDisconnected = useSmoothFlag(status === 'disconnected', 2000, 2000);
@@ -209,6 +214,12 @@ function NoteViewConnected({
   const workspaceFrameConfig = useMemo(
     () => ({
       className: styles.pageWrap,
+      chatContext: {
+        resourceId,
+        editorType: 'note',
+        noteSyncStatus: status,
+        getNoteClientStateVector,
+      },
       header: {
         inlineTitle: (
           <NoteToolbarTitle resourceId={resourceId} fallbackTitle={noteInfoDisplay?.noteTitle} />
@@ -268,6 +279,7 @@ function NoteViewConnected({
       aiDiffDisplayMode,
       handleMoreAction,
       headerMorePending,
+      getNoteClientStateVector,
       noteInfoDisplay?.noteTitle,
       noteInfoDisplay.ownerId,
       onRefreshNoteInfo,
@@ -275,6 +287,7 @@ function NoteViewConnected({
       setAiDiffDisplayMode,
       showAiDiffDisplayModeSwitch,
       showFullPageSpin,
+      status,
     ]
   );
   useWorkspaceLayoutConfig(workspaceFrameConfig);
