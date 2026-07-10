@@ -20,7 +20,11 @@ export function blockHasInlineContent(block: NoteBlock): boolean {
 }
 
 export function getSelectedBlocks(editor: CustomBlockNoteEditor): NoteBlock[] {
-  return editor.getSelection()?.blocks ?? [editor.getTextCursorPosition().block];
+  try {
+    return editor.getSelection()?.blocks ?? [editor.getTextCursorPosition().block];
+  } catch {
+    return [];
+  }
 }
 
 export function getSchemaStyleRecord(editor: CustomBlockNoteEditor) {

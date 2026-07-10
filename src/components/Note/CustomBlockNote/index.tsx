@@ -23,6 +23,7 @@ import { useMemoizedFn, useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import { useCallback, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
 import NoteSideMenu from '../NoteSideMenu';
 import NoteSlashMenu from '../NoteSlashMenu';
+import NoteTableHandles from '../NoteTableHandles';
 import NoteToolbar from '../NoteToolbar';
 import { hasAiDiffContentFromEditor } from './AiDiffPresence';
 import { blockNoteSchema } from './blockNoteSchema';
@@ -511,12 +512,14 @@ function CustomBlockNote({
             formattingToolbar={false}
             slashMenu={false}
             sideMenu={false}
+            tableHandles={false}
             editable={!readOnly}
             onSelectionChange={handleSelectionChange}
           >
             <NoteToolbar onAskAi={handleAskAi} />
             <NoteSlashMenu editor={editor} plugins={plugins} />
-            <NoteSideMenu />
+            <NoteSideMenu plugins={plugins} />
+            <NoteTableHandles />
           </BlockNoteView>
         </AiDiffDisplayModeProvider>
       </NoteEditorReadOnlyProvider>

@@ -2,6 +2,10 @@
   display: contents;
 }
 
+.floatingLayer {
+  z-index: var(--note-editor-menu-layer, 80);
+}
+
 .menu {
   --note-slash-menu-width: 17.5rem;
   --note-slash-menu-max-height: min(
@@ -62,6 +66,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: var(--muted);
+}
+
+.iconTheme {
+  color: var(--accent);
+}
+
+.iconAccent {
+  color: var(--accent);
+}
+
+.iconSuccess {
+  color: var(--success);
+}
+
+.iconWarning {
+  color: var(--warning);
+}
+
+.iconMuted {
+  color: var(--muted);
 }
 
 .label {
@@ -79,24 +104,4 @@
   color: var(--text-tertiary);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
-}
-
-.iconPrimary {
-  color: var(--primary);
-}
-
-.iconAccent {
-  color: var(--accent);
-}
-
-.iconSuccess {
-  color: var(--success);
-}
-
-.iconWarning {
-  color: var(--warning);
-}
-
-.iconMuted {
-  color: var(--muted);
 }

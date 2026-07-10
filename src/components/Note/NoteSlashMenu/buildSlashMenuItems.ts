@@ -9,6 +9,20 @@ import type { NoteEditorPlugin, PluginEditor } from '../CustomBlockNote/plugins/
  */
 type SlashMenuItemWithKey = DefaultReactSuggestionItem & { key?: string };
 
+/**
+ * BlockNote 在 `getDefaultReactSlashMenuItems` 里为每个默认项设置了稳定字段 `key`，
+ * 与字典 `slash_menu.*` 及图标映射一致；此处声明要从 / 菜单中移除的默认项。
+ *
+ * 当前移除：
+ * - `file` → 通用文档/附件
+ * - `audio`、`video` → 媒体块
+ */
+export const NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEYS = ['file', 'audio', 'video'] as const;
+
+export const NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET = new Set<string>(
+  NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEYS
+);
+
 export function getSlashMenuItemKey(item: DefaultReactSuggestionItem): string | undefined {
   const key = (item as SlashMenuItemWithKey).key;
   return typeof key === 'string' ? key : undefined;
@@ -39,4 +53,15 @@ export function collectPluginSlashMenuItems(
   // 因此具体 schema 的 editor 不能直接赋值给宽类型 PluginEditor，这里在边界处做一次断言。
   const pluginEditor = editor as unknown as PluginEditor;
   return plugins.flatMap((plugin) => plugin.slashMenu?.({ editor: pluginEditor }) ?? []);
+}
+
+export function getNoteSlashMenuItems(
+  editor: CustomBlockNoteEditor,
+  plugins: readonly NoteEditorPlugin[],
+  hiddenDefaultKeys: ReadonlySet<string> | readonly string[]
+): DefaultReactSuggestionItem[] {
+  return [
+    ...getFilteredDefaultReactSlashMenuItems(editor, hiddenDefaultKeys),
+    ...collectPluginSlashMenuItems(plugins, editor),
+  ];
 }

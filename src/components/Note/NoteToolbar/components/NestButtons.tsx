@@ -1,4 +1,5 @@
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/blockNoteSchema';
+import { blockHasType } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { IndentDecrease, IndentIncrease } from 'lucide-react';
@@ -10,7 +11,12 @@ export function NestButton({ type }: { type: 'nest' | 'unnest' }) {
   const state = useEditorState({
     editor,
     selector: ({ editor }) => {
-      if (!editor.isEditable || !getSelectedBlocks(editor).find(blockHasInlineContent)) {
+      const selectedBlocks = getSelectedBlocks(editor);
+      if (
+        !editor.isEditable ||
+        selectedBlocks.some((block) => blockHasType(block, editor, 'table')) ||
+        !selectedBlocks.find(blockHasInlineContent)
+      ) {
         return undefined;
       }
       return type === 'nest'
@@ -45,8 +51,14 @@ export function NestButtons() {
   const editor = useBlockNoteEditor(blockNoteSchema);
   const visible = useEditorState({
     editor,
-    selector: ({ editor }) =>
-      editor.isEditable && getSelectedBlocks(editor).some(blockHasInlineContent),
+    selector: ({ editor }) => {
+      const selectedBlocks = getSelectedBlocks(editor);
+      return (
+        editor.isEditable &&
+        selectedBlocks.some(blockHasInlineContent) &&
+        !selectedBlocks.some((block) => blockHasType(block, editor, 'table'))
+      );
+    },
   });
 
   if (!visible) {

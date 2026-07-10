@@ -1,10 +1,10 @@
 import type { CustomBlockNoteEditor } from '@/components/Note/CustomBlockNote/blockNoteSchema';
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/blockNoteSchema';
 import { useNoteEditorReadOnlyContext } from '@/components/Note/CustomBlockNote/editorReadOnly';
+import type { NoteEditorPlugin } from '@/components/Note/CustomBlockNote/plugins/types';
 import {
   applyBlockTypeToBlocks,
   blockMatchesBlockTypeItem,
-  blockTypeItemToPartialBlock,
   getAvailableBlockTypeItems,
   type BlockTypeMenuItem,
 } from '@/components/Note/NoteEditorMenus/blockTypes';
@@ -16,8 +16,25 @@ import {
   type NoteBlock,
   type NotePartialBlock,
 } from '@/components/Note/NoteEditorMenus/utils';
-import { blockHasType, defaultProps, editorHasBlockWithType } from '@blocknote/core';
+import {
+  NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET,
+  getNoteSlashMenuItems,
+} from '@/components/Note/NoteSlashMenu/buildSlashMenuItems';
+import {
+  resolveSlashMenuGroup,
+  sortSuggestionItemsForDisplay,
+} from '@/components/Note/NoteSlashMenu/slashMenuModel';
+import { SlashMenuDropdownItems } from '@/components/Note/NoteSlashMenu/slashMenuView';
+import {
+  blockHasType,
+  defaultProps,
+  editorHasBlockWithType,
+  type InlineContentSchema,
+  type StyleSchema,
+  type TableContent,
+} from '@blocknote/core';
 import { SideMenuExtension, SuggestionMenu } from '@blocknote/core/extensions';
+import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import {
   SideMenuController,
   useBlockNoteEditor,
@@ -32,16 +49,19 @@ import {
   AlignRight,
   Check,
   ChevronRight,
-  Columns3,
   Copy,
   GripVertical,
+  Image as ImageIcon,
   IndentDecrease,
   IndentIncrease,
   Paintbrush,
+  PanelLeft,
+  PanelTop,
   Plus,
   PlusSquare,
-  Rows3,
   Scissors,
+  StretchHorizontal,
+  Table2,
   Trash2,
   type LucideIcon,
 } from 'lucide-react';
@@ -49,12 +69,18 @@ import { useState, type DragEvent, type ReactNode } from 'react';
 import styles from './style.module.less';
 
 type TextAlignment = 'left' | 'center' | 'right';
+type NoteTableContent = TableContent<InlineContentSchema, StyleSchema>;
 
 const textAlignItems: Array<{ key: TextAlignment; label: string; icon: LucideIcon }> = [
   { key: 'left', label: '左对齐', icon: AlignLeft },
   { key: 'center', label: '居中对齐', icon: AlignCenter },
   { key: 'right', label: '右对齐', icon: AlignRight },
 ];
+
+const blockHandleIconMap: Partial<Record<string, LucideIcon>> = {
+  image: ImageIcon,
+  table: Table2,
+};
 
 function isBlockEmpty(block: NoteBlock) {
   const content = (block as { content?: unknown }).content;
@@ -85,6 +111,16 @@ function getBlockProp(block: NoteBlock, prop: string) {
   return isRecord(block.props) && typeof block.props[prop] === 'string'
     ? block.props[prop]
     : undefined;
+}
+
+function getTableContent(block: NoteBlock): NoteTableContent | undefined {
+  return block.type === 'table' && isRecord((block as { content?: unknown }).content)
+    ? ((block as { content?: unknown }).content as NoteTableContent)
+    : undefined;
+}
+
+function getTableColumnCount(content: NoteTableContent) {
+  return content.columnWidths.length || content.rows[0]?.cells.length || 0;
 }
 
 async function writeClipboardData(data: { html: string; text: string }) {
@@ -136,24 +172,15 @@ function MenuItemContent({
   );
 }
 
-function BlockTypeMenuItemContent({
-  item,
-  selected,
-}: {
-  item: BlockTypeMenuItem;
-  selected?: boolean;
-}) {
-  const Icon = item.icon;
+function TableMenuSwitch({ isSelected }: { isSelected: boolean }) {
   return (
-    <>
-      <span className={styles.menuIcon}>
-        <Icon size={18} aria-hidden="true" />
-      </span>
-      <span className={styles.menuLabel}>{item.label}</span>
-      <span className={styles.menuTrailing} aria-hidden="true">
-        {selected ? <Check size={16} /> : null}
-      </span>
-    </>
+    <span
+      className={styles.switchIndicator}
+      data-selected={isSelected ? 'true' : undefined}
+      aria-hidden="true"
+    >
+      <span className={styles.switchIndicatorThumb} />
+    </span>
   );
 }
 
@@ -193,7 +220,7 @@ function QuickBlockTypes({
   );
 }
 
-function CustomSideMenu() {
+function CustomSideMenu({ plugins }: { plugins: readonly NoteEditorPlugin[] }) {
   const editor = useBlockNoteEditor(blockNoteSchema);
   const sideMenu = useExtension(SideMenuExtension, { editor });
   const suggestionMenu = useExtension(SuggestionMenu, { editor });
@@ -210,10 +237,15 @@ function CustomSideMenu() {
   }
 
   const { allItems, quickItems } = getAvailableBlockTypeItems(editor);
-  const itemMap = new Map(allItems.map((item) => [item.key, item]));
+  const slashInsertItems = sortSuggestionItemsForDisplay(
+    getNoteSlashMenuItems(editor, plugins, NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET).filter(
+      (item) => resolveSlashMenuGroup(item) !== 'AI'
+    )
+  );
   const selectedBlockType = allItems.find((item) => blockMatchesBlockTypeItem(block, item));
   const blockIsEmpty = isBlockEmpty(block);
-  const SelectedBlockIcon = selectedBlockType?.icon;
+  const isTable = block.type === 'table';
+  const SelectedBlockIcon = selectedBlockType?.icon ?? blockHandleIconMap[block.type];
   const headingLevel =
     block.type === 'heading' && isRecord(block.props) ? String(block.props.level) : undefined;
   const canUseTextColor = blockSupportsTextColor(block, editor);
@@ -224,11 +256,8 @@ function CustomSideMenu() {
   const textAlignment = canUseTextAlignment
     ? String(blockProps.textAlignment ?? defaultProps.textAlignment.default)
     : undefined;
-  const isTable = block.type === 'table';
-  const tableContent = isRecord((block as { content?: unknown }).content)
-    ? ((block as { content?: unknown }).content as Record<string, unknown>)
-    : undefined;
-  const canUseTableHeaders = isTable && editor.settings.tables.headers && tableContent;
+  const tableContent = getTableContent(block);
+  const canUseTableHeaders = Boolean(isTable && tableContent);
   const isHeaderRow = Boolean(tableContent?.headerRows);
   const isHeaderColumn = Boolean(tableContent?.headerCols);
 
@@ -257,14 +286,11 @@ function CustomSideMenu() {
     closeMenu();
   };
 
-  const insertBlockBelow = (item: BlockTypeMenuItem) => {
+  const insertSlashItemBelow = (item: DefaultReactSuggestionItem) => {
     editor.focus();
-    const insertedBlock = editor.insertBlocks(
-      [blockTypeItemToPartialBlock(item)],
-      block,
-      'after'
-    )[0];
+    const insertedBlock = editor.insertBlocks([{ type: 'paragraph' }], block, 'after')[0];
     editor.setTextCursorPosition(insertedBlock);
+    item.onItemClick();
     closeMenu();
   };
 
@@ -371,6 +397,25 @@ function CustomSideMenu() {
     closeMenu();
   };
 
+  const resetTableColumnWidths = () => {
+    if (!isTable || !tableContent) {
+      return;
+    }
+    const columnCount = getTableColumnCount(tableContent);
+    editor.updateBlock(
+      block,
+      toBlockUpdate({
+        type: 'table',
+        content: {
+          ...tableContent,
+          columnWidths: Array.from({ length: columnCount }, () => undefined),
+        },
+      })
+    );
+    closeMenu();
+    window.setTimeout(() => editor.focus());
+  };
+
   const handleDragStart = (event: DragEvent<HTMLButtonElement>) => {
     setDragging(true);
     sideMenu.blockDragStart(event, block);
@@ -380,6 +425,120 @@ function CustomSideMenu() {
     sideMenu.blockDragEnd();
     window.setTimeout(() => setDragging(false));
   };
+
+  const indentAlignMenu = (
+    <Dropdown.SubmenuTrigger>
+      <Dropdown.Item id="indent-align" textValue="缩进和对齐" className={styles.menuItem}>
+        <MenuItemContent
+          icon={AlignLeft}
+          label="缩进和对齐"
+          trailing={<ChevronRight size={16} />}
+        />
+      </Dropdown.Item>
+      <Dropdown.Popover className={styles.popover} placement="right top">
+        <Dropdown.Menu
+          aria-label="缩进和对齐"
+          className={styles.menu}
+          onAction={(key) => {
+            const action = String(key);
+            if (action === 'nest') {
+              nestBlock('nest');
+            }
+            if (action === 'unnest') {
+              nestBlock('unnest');
+            }
+            if (action.startsWith('align-')) {
+              setTextAlignment(action.replace('align-', '') as TextAlignment);
+            }
+          }}
+        >
+          <Dropdown.Item id="nest" textValue="增加缩进" className={styles.menuItem}>
+            <MenuItemContent icon={IndentIncrease} label="增加缩进" />
+          </Dropdown.Item>
+          <Dropdown.Item id="unnest" textValue="减少缩进" className={styles.menuItem}>
+            <MenuItemContent icon={IndentDecrease} label="减少缩进" />
+          </Dropdown.Item>
+          {canUseTextAlignment
+            ? textAlignItems.map((item) => (
+                <Dropdown.Item
+                  key={item.key}
+                  id={`align-${item.key}`}
+                  textValue={item.label}
+                  className={styles.menuItem}
+                >
+                  <MenuItemContent
+                    icon={item.icon}
+                    label={item.label}
+                    trailing={textAlignment === item.key ? <Check size={16} /> : null}
+                  />
+                </Dropdown.Item>
+              ))
+            : null}
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown.SubmenuTrigger>
+  );
+
+  const colorMenu =
+    canUseColor && !isTable ? (
+      <Dropdown.SubmenuTrigger>
+        <Dropdown.Item id="colors" textValue="颜色" className={styles.menuItem}>
+          <MenuItemContent icon={Paintbrush} label="颜色" trailing={<ChevronRight size={16} />} />
+        </Dropdown.Item>
+        <Dropdown.Popover className={styles.popover} placement="right top">
+          <ColorPaletteContent
+            className={styles.colorPanel}
+            text={
+              canUseTextColor
+                ? {
+                    color: getBlockProp(block, 'textColor'),
+                    onChange: (color) => setBlockColor('textColor', color),
+                  }
+                : undefined
+            }
+            background={
+              canUseBackgroundColor
+                ? {
+                    color: getBlockProp(block, 'backgroundColor'),
+                    onChange: (color) => setBlockColor('backgroundColor', color),
+                  }
+                : undefined
+            }
+            onReset={resetBlockColor}
+          />
+        </Dropdown.Popover>
+      </Dropdown.SubmenuTrigger>
+    ) : null;
+
+  const tableIndentMenu = (
+    <Dropdown.SubmenuTrigger>
+      <Dropdown.Item id="indent" textValue="缩进" className={styles.menuItem}>
+        <MenuItemContent icon={IndentIncrease} label="缩进" trailing={<ChevronRight size={16} />} />
+      </Dropdown.Item>
+      <Dropdown.Popover className={styles.popover} placement="right top">
+        <Dropdown.Menu
+          aria-label="缩进"
+          className={styles.menu}
+          onAction={(key) => {
+            const action = String(key);
+            if (action === 'nest') {
+              nestBlock('nest');
+            }
+            if (action === 'unnest') {
+              nestBlock('unnest');
+            }
+          }}
+        >
+          <Dropdown.Item id="nest" textValue="增加缩进" className={styles.menuItem}>
+            <MenuItemContent icon={IndentIncrease} label="增加缩进" />
+          </Dropdown.Item>
+          <Dropdown.Item id="unnest" textValue="减少缩进" className={styles.menuItem}>
+            <MenuItemContent icon={IndentDecrease} label="减少缩进" />
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown.Popover>
+    </Dropdown.SubmenuTrigger>
+  );
 
   return (
     <div
@@ -429,12 +588,20 @@ function CustomSideMenu() {
             </Dropdown.Trigger>
             <Dropdown.Popover className={styles.popover} placement="left top" offset={8}>
               <div className={styles.menuSurface}>
-                <QuickBlockTypes block={block} items={quickItems} onSelect={applyBlockType} />
+                {!isTable ? (
+                  <QuickBlockTypes block={block} items={quickItems} onSelect={applyBlockType} />
+                ) : null}
                 <Dropdown.Menu
                   aria-label="块菜单"
                   className={styles.menu}
                   onAction={(key) => {
                     const action = String(key);
+                    if (action === 'nest') {
+                      nestBlock('nest');
+                    }
+                    if (action === 'unnest') {
+                      nestBlock('unnest');
+                    }
                     if (action === 'copy') {
                       void copyOrCutBlock('copy');
                     }
@@ -450,123 +617,13 @@ function CustomSideMenu() {
                     if (action === 'table-header-column') {
                       toggleTableHeader('column');
                     }
+                    if (action === 'table-reset-column-widths') {
+                      resetTableColumnWidths();
+                    }
                   }}
                 >
-                  <Dropdown.SubmenuTrigger>
-                    <Dropdown.Item
-                      id="indent-align"
-                      textValue="缩进和对齐"
-                      className={styles.menuItem}
-                    >
-                      <MenuItemContent
-                        icon={AlignLeft}
-                        label="缩进和对齐"
-                        trailing={<ChevronRight size={16} />}
-                      />
-                    </Dropdown.Item>
-                    <Dropdown.Popover className={styles.popover} placement="right top">
-                      <Dropdown.Menu
-                        aria-label="缩进和对齐"
-                        className={styles.menu}
-                        onAction={(key) => {
-                          const action = String(key);
-                          if (action === 'nest') {
-                            nestBlock('nest');
-                          }
-                          if (action === 'unnest') {
-                            nestBlock('unnest');
-                          }
-                          if (action.startsWith('align-')) {
-                            setTextAlignment(action.replace('align-', '') as TextAlignment);
-                          }
-                        }}
-                      >
-                        <Dropdown.Item id="nest" textValue="增加缩进" className={styles.menuItem}>
-                          <MenuItemContent icon={IndentIncrease} label="增加缩进" />
-                        </Dropdown.Item>
-                        <Dropdown.Item id="unnest" textValue="减少缩进" className={styles.menuItem}>
-                          <MenuItemContent icon={IndentDecrease} label="减少缩进" />
-                        </Dropdown.Item>
-                        {canUseTextAlignment
-                          ? textAlignItems.map((item) => (
-                              <Dropdown.Item
-                                key={item.key}
-                                id={`align-${item.key}`}
-                                textValue={item.label}
-                                className={styles.menuItem}
-                              >
-                                <MenuItemContent
-                                  icon={item.icon}
-                                  label={item.label}
-                                  trailing={textAlignment === item.key ? <Check size={16} /> : null}
-                                />
-                              </Dropdown.Item>
-                            ))
-                          : null}
-                      </Dropdown.Menu>
-                    </Dropdown.Popover>
-                  </Dropdown.SubmenuTrigger>
-
-                  {canUseColor ? (
-                    <Dropdown.SubmenuTrigger>
-                      <Dropdown.Item id="colors" textValue="颜色" className={styles.menuItem}>
-                        <MenuItemContent
-                          icon={Paintbrush}
-                          label="颜色"
-                          trailing={<ChevronRight size={16} />}
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Popover className={styles.popover} placement="right top">
-                        <ColorPaletteContent
-                          className={styles.colorPanel}
-                          text={
-                            canUseTextColor
-                              ? {
-                                  color: getBlockProp(block, 'textColor'),
-                                  onChange: (color) => setBlockColor('textColor', color),
-                                }
-                              : undefined
-                          }
-                          background={
-                            canUseBackgroundColor
-                              ? {
-                                  color: getBlockProp(block, 'backgroundColor'),
-                                  onChange: (color) => setBlockColor('backgroundColor', color),
-                                }
-                              : undefined
-                          }
-                          onReset={resetBlockColor}
-                        />
-                      </Dropdown.Popover>
-                    </Dropdown.SubmenuTrigger>
-                  ) : null}
-
-                  {canUseTableHeaders ? (
-                    <Dropdown.Section>
-                      <Dropdown.Item
-                        id="table-header-row"
-                        textValue="首行表头"
-                        className={styles.menuItem}
-                      >
-                        <MenuItemContent
-                          icon={Rows3}
-                          label="首行表头"
-                          trailing={isHeaderRow ? <Check size={16} /> : null}
-                        />
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        id="table-header-column"
-                        textValue="首列表头"
-                        className={styles.menuItem}
-                      >
-                        <MenuItemContent
-                          icon={Columns3}
-                          label="首列表头"
-                          trailing={isHeaderColumn ? <Check size={16} /> : null}
-                        />
-                      </Dropdown.Item>
-                    </Dropdown.Section>
-                  ) : null}
+                  {isTable ? tableIndentMenu : indentAlignMenu}
+                  {!isTable ? colorMenu : null}
 
                   <Dropdown.Section>
                     <Dropdown.Item id="cut" textValue="剪切" className={styles.menuItem}>
@@ -579,6 +636,44 @@ function CustomSideMenu() {
                       <MenuItemContent icon={Trash2} label="删除" />
                     </Dropdown.Item>
                   </Dropdown.Section>
+
+                  {isTable ? (
+                    <Dropdown.Section>
+                      {canUseTableHeaders ? (
+                        <>
+                          <Dropdown.Item
+                            id="table-header-row"
+                            textValue="标题行"
+                            className={styles.menuItem}
+                          >
+                            <MenuItemContent
+                              icon={PanelTop}
+                              label="标题行"
+                              trailing={<TableMenuSwitch isSelected={isHeaderRow} />}
+                            />
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            id="table-header-column"
+                            textValue="标题列"
+                            className={styles.menuItem}
+                          >
+                            <MenuItemContent
+                              icon={PanelLeft}
+                              label="标题列"
+                              trailing={<TableMenuSwitch isSelected={isHeaderColumn} />}
+                            />
+                          </Dropdown.Item>
+                        </>
+                      ) : null}
+                      <Dropdown.Item
+                        id="table-reset-column-widths"
+                        textValue="均分列宽"
+                        className={styles.menuItem}
+                      >
+                        <MenuItemContent icon={StretchHorizontal} label="均分列宽" />
+                      </Dropdown.Item>
+                    </Dropdown.Section>
+                  ) : null}
 
                   <Dropdown.Section>
                     <Dropdown.SubmenuTrigger>
@@ -598,25 +693,18 @@ function CustomSideMenu() {
                           aria-label="在下方添加"
                           className={styles.menu}
                           onAction={(key) => {
-                            const item = itemMap.get(String(key));
+                            const item = slashInsertItems.find(
+                              (_candidate, index) => `insert-slash-item-${index}` === String(key)
+                            );
                             if (item) {
-                              insertBlockBelow(item);
+                              insertSlashItemBelow(item);
                             }
                           }}
                         >
-                          {allItems.map((item) => (
-                            <Dropdown.Item
-                              key={item.key}
-                              id={item.key}
-                              textValue={item.label}
-                              className={styles.menuItem}
-                            >
-                              <BlockTypeMenuItemContent
-                                item={item}
-                                selected={selectedBlockType?.key === item.key}
-                              />
-                            </Dropdown.Item>
-                          ))}
+                          <SlashMenuDropdownItems
+                            items={slashInsertItems}
+                            getItemId={(_item, index) => `insert-slash-item-${index}`}
+                          />
                         </Dropdown.Menu>
                       </Dropdown.Popover>
                     </Dropdown.SubmenuTrigger>
@@ -631,7 +719,7 @@ function CustomSideMenu() {
   );
 }
 
-export default function NoteSideMenu() {
+export default function NoteSideMenu({ plugins }: { plugins: readonly NoteEditorPlugin[] }) {
   const readOnly = useNoteEditorReadOnlyContext();
 
   if (readOnly) {
@@ -640,7 +728,7 @@ export default function NoteSideMenu() {
 
   return (
     <SideMenuController
-      sideMenu={CustomSideMenu}
+      sideMenu={() => <CustomSideMenu plugins={plugins} />}
       floatingUIOptions={{
         useFloatingOptions: {
           placement: 'left-start',

@@ -1,0 +1,285 @@
+.host {
+  display: contents;
+}
+
+:global(.bn-editor .bn-block-content[data-content-type='table']) {
+  --note-table-insert-gutter: var(--control-height-sm);
+  --note-table-insert-size: var(--control-height-sm);
+  --note-table-insert-hit-size: var(--note-table-insert-size);
+  --note-table-insert-hit-offset: calc(
+    (var(--note-table-insert-hit-size) - var(--note-table-insert-size)) / 2
+  );
+  --note-table-insert-active-size: calc(var(--control-height-sm) - var(--space-2xs));
+  --note-table-insert-dot-size: calc(var(--space-xs) - var(--space-2xs));
+  --note-table-insert-icon-size: calc(var(--space-sm) + var(--space-2xs));
+  --note-table-insert-line-width: calc(var(--line-width) * 2);
+  --note-table-insert-outset: var(--space-sm);
+  --note-table-select-rail-size: var(--space-sm);
+  --note-table-select-hit-size: var(--control-height-sm);
+
+  position: relative;
+  overflow: visible;
+}
+
+.host :global(.bn-table-cell-handle) {
+  border: 1px solid var(--border-light);
+  background: var(--overlay);
+  color: var(--muted);
+  box-shadow: var(--surface-shadow);
+}
+
+.host :global(.bn-table-cell-handle:hover),
+.host :global(.bn-table-cell-handle[data-hovered]) {
+  background: var(--surface-secondary);
+  color: var(--surface-secondary-foreground);
+}
+
+.host :global(.bn-table-cell-handle) {
+  min-width: calc(var(--control-height-sm) + var(--space-2xs));
+  min-height: var(--control-height-sm);
+  border-radius: var(--radius-md);
+}
+
+.tableCellHandleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.tableCellHandleIcon {
+  gap: calc(var(--space-2xs) / 2);
+}
+
+.tableCellHandleIcon svg:first-child {
+  color: var(--success);
+}
+
+.selectionLayer {
+  position: absolute;
+  inset: 0;
+  z-index: var(--note-table-selection-layer, 25);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.selectionLayer[data-inserting='true'] .selectionRail {
+  pointer-events: none;
+}
+
+.selectionRail {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.selectionRail::before,
+.selectionRail::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.selectionRail::before {
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+}
+
+.selectionRail::after {
+  opacity: 0;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.selectionRail:hover::before,
+.selectionRail[data-hovered]::before,
+.selectionRail[data-selected='true']::before {
+  background: var(--primary);
+}
+
+.selectionRail:hover::after,
+.selectionRail[data-hovered]::after,
+.selectionRail[data-selected='true']::after {
+  opacity: 1;
+}
+
+.selectionRail[data-orientation='row'] {
+  width: var(--note-table-select-hit-size);
+  transform: translateX(calc(-1 * var(--note-table-select-hit-size)));
+}
+
+.selectionRail[data-orientation='row']::before {
+  right: 0;
+  top: 0;
+  width: var(--note-table-select-rail-size);
+  height: 100%;
+}
+
+.selectionRail[data-orientation='row']::after {
+  left: var(--note-table-select-hit-size);
+  top: 0;
+  width: var(--selection-highlight-width);
+  height: 100%;
+}
+
+.selectionRail[data-orientation='row'][data-selected='true']::after {
+  box-shadow: inset var(--space-2xs) 0 0 var(--primary);
+}
+
+.selectionRail[data-orientation='column'] {
+  height: var(--note-table-select-hit-size);
+  transform: translateY(calc(-1 * var(--note-table-select-hit-size)));
+}
+
+.selectionRail[data-orientation='column']::before {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: var(--note-table-select-rail-size);
+}
+
+.selectionRail[data-orientation='column']::after {
+  left: 0;
+  top: calc(var(--note-table-select-hit-size) + var(--selection-highlight-offset-y, 0px));
+  width: 100%;
+  height: var(--selection-highlight-height);
+}
+
+.selectionRail[data-orientation='column'][data-selected='true']::after {
+  box-shadow: inset 0 var(--space-2xs) 0 var(--primary);
+}
+
+.insertLayer {
+  position: absolute;
+  inset: 0;
+  z-index: var(--note-table-insert-layer, 30);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.insertHandle {
+  position: absolute;
+  height: var(--space-lg);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.insertHandle::before {
+  content: '';
+  position: absolute;
+  left: var(--table-edge, 0);
+  right: 0;
+  top: 50%;
+  height: var(--note-table-insert-line-width);
+  background: var(--primary);
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.insertButtonTrigger {
+  position: absolute;
+  left: calc(
+    var(--table-edge, 0px) - var(--note-table-insert-size) - var(--note-table-insert-outset) -
+      var(--note-table-insert-hit-offset)
+  );
+  top: 50%;
+  width: var(--note-table-insert-hit-size);
+  height: var(--note-table-insert-hit-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  pointer-events: auto;
+}
+
+.insertButton {
+  width: 100%;
+  min-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: transparent;
+  color: var(--primary-foreground);
+  cursor: pointer;
+}
+
+.insertButton::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--note-table-insert-dot-size);
+  height: var(--note-table-insert-dot-size);
+  border-radius: var(--radius-xl);
+  background: var(--muted);
+  transform: translate(-50%, -50%);
+  transition:
+    width var(--motion-duration-fast),
+    height var(--motion-duration-fast),
+    background-color var(--motion-duration-fast);
+}
+
+.insertButton svg {
+  position: relative;
+  z-index: 1;
+  width: var(--note-table-insert-icon-size);
+  height: var(--note-table-insert-icon-size);
+  color: var(--primary-foreground);
+  opacity: 0;
+  stroke: currentColor;
+}
+
+.insertHandle[data-active='true']::before {
+  opacity: 1;
+}
+
+.insertHandle[data-active='true'] .insertButton {
+  color: var(--primary-foreground);
+}
+
+.insertHandle[data-active='true'] .insertButton::before {
+  width: var(--note-table-insert-active-size);
+  height: var(--note-table-insert-active-size);
+  background: var(--primary);
+  box-shadow: var(--surface-shadow);
+}
+
+.insertHandle[data-active='true'] .insertButton svg {
+  opacity: 1;
+}
+
+.insertHandle[data-orientation='column'] {
+  width: var(--space-lg);
+  transform: translateX(-50%);
+}
+
+.insertHandle[data-orientation='column']::before {
+  left: 50%;
+  right: auto;
+  top: var(--table-edge, 0);
+  bottom: 0;
+  width: var(--note-table-insert-line-width);
+  height: auto;
+  transform: translateX(-50%);
+}
+
+.insertHandle[data-orientation='column'] .insertButton {
+  left: auto;
+  top: auto;
+  transform: none;
+}
+
+.insertHandle[data-orientation='column'] .insertButtonTrigger {
+  left: 50%;
+  top: calc(
+    var(--table-edge, 0px) - var(--note-table-insert-size) - var(--note-table-insert-outset) -
+      var(--note-table-insert-hit-offset)
+  );
+  transform: translateX(-50%);
+}

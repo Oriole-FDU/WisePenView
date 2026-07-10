@@ -1,4 +1,5 @@
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/blockNoteSchema';
+import { getSafeTableCellSelection } from '@/components/Note/tableHandlesSafe';
 import {
   blockHasType,
   defaultProps,
@@ -7,7 +8,6 @@ import {
   type StyleSchema,
   type TableContent,
 } from '@blocknote/core';
-import { TableHandlesExtension } from '@blocknote/core/extensions';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
@@ -46,7 +46,7 @@ export function TextAlignButtons() {
       }
 
       if (selectedBlocks.length === 1 && blockHasType(firstBlock, editor, 'table')) {
-        const cellSelection = editor.getExtension(TableHandlesExtension)?.getCellSelection();
+        const cellSelection = getSafeTableCellSelection(editor);
         if (!cellSelection) {
           return undefined;
         }

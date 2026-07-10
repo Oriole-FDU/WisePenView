@@ -17,6 +17,11 @@
   border: 1px solid var(--border-light);
   background: var(--overlay);
   color: var(--overlay-foreground);
+  gap: 0;
+}
+
+.floatingLayer {
+  z-index: var(--note-editor-toolbar-layer, 120);
 }
 
 .toolbar :global([data-slot='button-group-separator']),
@@ -27,6 +32,20 @@
   align-self: center;
   background: var(--separator);
   opacity: 1;
+}
+
+.toolbarSeparator {
+  width: 1px;
+  height: calc(var(--control-height-sm) - var(--space-sm));
+  align-self: center;
+  margin-inline: var(--space-2xs);
+  background: var(--separator);
+}
+
+.toolbarSeparator:first-child,
+.toolbarSeparator:last-child,
+.toolbarSeparator + .toolbarSeparator {
+  display: none;
 }
 
 .toolbarButtonActive {

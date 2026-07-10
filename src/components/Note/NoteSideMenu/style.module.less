@@ -150,6 +150,29 @@
   color: var(--primary);
 }
 
+.switchIndicator {
+  width: calc(var(--control-height-sm) + var(--space-xs));
+  height: var(--space-md);
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--space-2xs) / 2);
+  border-radius: var(--radius-xl);
+  background: var(--surface-tertiary);
+}
+
+.switchIndicatorThumb {
+  width: calc(var(--space-sm) + var(--space-2xs) / 2);
+  height: calc(var(--space-sm) + var(--space-2xs) / 2);
+  border-radius: var(--radius-xl);
+  background: var(--overlay);
+  box-shadow: var(--surface-shadow);
+}
+
+.switchIndicator[data-selected='true'] {
+  justify-content: flex-end;
+  background: var(--primary);
+}
+
 .colorPanel {
   padding: var(--space-sm);
 }

@@ -13,6 +13,53 @@
     font-family: var(--app-font-family);
   }
 
+  :global(.bn-container) {
+    --bn-colors-editor-text: var(--foreground);
+    --bn-colors-editor-background: transparent;
+    --bn-colors-menu-text: var(--overlay-foreground);
+    --bn-colors-menu-background: var(--overlay);
+    --bn-colors-tooltip-text: var(--overlay-foreground);
+    --bn-colors-tooltip-background: var(--overlay);
+    --bn-colors-hovered-text: var(--surface-secondary-foreground);
+    --bn-colors-hovered-background: var(--surface-secondary);
+    --bn-colors-selected-text: var(--accent-soft-foreground);
+    --bn-colors-selected-background: var(--accent-soft);
+    --bn-colors-disabled-text: var(--text-disabled);
+    --bn-colors-disabled-background: var(--default-soft);
+    --bn-colors-shadow: transparent;
+    --bn-colors-border: var(--border-light);
+    --bn-colors-side-menu: var(--muted);
+    --bn-shadow-medium: var(--overlay-shadow);
+    --bn-shadow-light: var(--surface-shadow);
+    --bn-border: 1px solid var(--border-light);
+    --bn-border-radius: var(--radius-md);
+    --bn-ui-base-z-index: 100;
+
+    --mantine-primary-color-filled: var(--accent);
+    --mantine-primary-color-filled-hover: var(--accent-hover);
+    --mantine-primary-color-light: var(--accent-soft);
+    --mantine-primary-color-light-hover: var(--accent-soft-hover);
+    --mantine-primary-color-light-color: var(--accent);
+  }
+
+  :global(.bn-block-content.ProseMirror-selectednode > *),
+  :global(.ProseMirror-selectednode > .bn-block-content > *) {
+    outline-color: var(--accent) !important;
+  }
+
+  :global(.ProseMirror .selectedCell::after) {
+    background: var(--accent-soft);
+  }
+
+  :global(.ProseMirror .column-resize-handle),
+  :global(.bn-table-drop-cursor) {
+    background-color: var(--accent);
+  }
+
+  :global([data-show-selection]) {
+    background-color: var(--accent-soft);
+  }
+
   /* 修改侧边栏把手居中对齐 */
   :global(.bn-container .bn-side-menu) {
     height: auto !important;
