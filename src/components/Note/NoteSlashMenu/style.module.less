@@ -1,3 +1,102 @@
 .host {
   display: contents;
 }
+
+.menu {
+  --note-slash-menu-width: 17.5rem;
+  --note-slash-menu-max-height: min(
+    34rem,
+    calc(100vh - var(--space-2xl) - var(--space-xl))
+  );
+
+  width: var(--note-slash-menu-width);
+  max-height: var(--note-slash-menu-max-height);
+  overflow-y: auto;
+  padding: var(--app-popover-content-padding, var(--space-xs));
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+  background: var(--overlay);
+  box-shadow: var(--overlay-shadow);
+}
+
+.section + .section {
+  margin-top: var(--space-2xs);
+}
+
+.sectionTitle {
+  display: block;
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.item {
+  min-height: var(--control-height);
+  display: grid;
+  grid-template-columns: var(--control-height) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-xs);
+  border-radius: var(--app-radius-popover-item, var(--radius-xl));
+  color: var(--overlay-foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.item:hover,
+.item[data-hovered],
+.item[data-focused],
+.item[data-selected] {
+  background: var(--surface-secondary);
+}
+
+.item[data-focus-visible] {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.icon {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyItem {
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.iconPrimary {
+  color: var(--primary);
+}
+
+.iconAccent {
+  color: var(--accent);
+}
+
+.iconSuccess {
+  color: var(--success);
+}
+
+.iconWarning {
+  color: var(--warning);
+}
+
+.iconMuted {
+  color: var(--muted);
+}

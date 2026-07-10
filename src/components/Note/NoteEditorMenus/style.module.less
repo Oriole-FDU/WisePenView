@@ -1,0 +1,152 @@
+.colorPanel {
+  --note-color-swatch-size: var(--control-height-sm);
+  --note-color-swatch-columns: 10;
+
+  width: max-content;
+  padding: var(--space-md);
+}
+
+.colorSection + .colorSection {
+  margin-top: var(--space-sm);
+}
+
+.colorSectionTitle {
+  margin-bottom: var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.colorSwatchPicker {
+  display: grid;
+  grid-template-columns: repeat(var(--note-color-swatch-columns), var(--note-color-swatch-size));
+  gap: var(--space-xs);
+}
+
+.colorSwatchItem {
+  width: var(--note-color-swatch-size);
+  height: var(--note-color-swatch-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.colorSwatchItem:hover,
+.colorSwatchItem[data-hovered],
+.colorSwatchSelected {
+  border-color: var(--primary);
+}
+
+.colorSwatchSelected {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.colorTextPreview {
+  flex-shrink: 0;
+}
+
+.colorBackgroundPreview {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: var(--radius-sm);
+}
+
+.backgroundDefault {
+  background:
+    linear-gradient(
+      135deg,
+      transparent 48%,
+      var(--primary) 49%,
+      var(--primary) 51%,
+      transparent 52%
+    ),
+    var(--surface);
+}
+
+.textDefault {
+  color: var(--overlay-foreground);
+}
+
+.textGray {
+  color: #9b9a97;
+}
+
+.textBrown {
+  color: #64473a;
+}
+
+.textRed {
+  color: #e03e3e;
+}
+
+.textOrange {
+  color: #d9730d;
+}
+
+.textYellow {
+  color: #dfab01;
+}
+
+.textGreen {
+  color: #4d6461;
+}
+
+.textBlue {
+  color: #0b6e99;
+}
+
+.textPurple {
+  color: #6940a5;
+}
+
+.textPink {
+  color: #ad1a72;
+}
+
+.backgroundGray {
+  background: #ebeced;
+}
+
+.backgroundBrown {
+  background: #e9e5e3;
+}
+
+.backgroundRed {
+  background: #fbe4e4;
+}
+
+.backgroundOrange {
+  background: #f6e9d9;
+}
+
+.backgroundYellow {
+  background: #fbf3db;
+}
+
+.backgroundGreen {
+  background: #ddedea;
+}
+
+.backgroundBlue {
+  background: #ddebf1;
+}
+
+.backgroundPurple {
+  background: #eae4f2;
+}
+
+.backgroundPink {
+  background: #f4dfeb;
+}
+
+.resetColorButton {
+  width: 100%;
+  margin-top: var(--space-md);
+}
+

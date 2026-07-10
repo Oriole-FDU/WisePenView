@@ -2,6 +2,8 @@ import { useNoteEditorReadOnlyContext } from '@/components/Note/CustomBlockNote/
 import { filterSuggestionItems } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem, SuggestionMenuProps } from '@blocknote/react';
 import { SuggestionMenuController } from '@blocknote/react';
+import { Header, ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
+import clsx from 'clsx';
 import {
   Braces,
   CheckSquare,
@@ -156,43 +158,28 @@ const SLASH_MENU_ICON_MAP: Record<string, typeof Type> = {
 };
 
 const SLASH_MENU_ICON_COLOR_BY_KEY: Record<string, string> = {
-  paragraph: 'text-blue-500',
-  heading: 'text-blue-500',
-  heading_2: 'text-blue-500',
-  heading_3: 'text-blue-500',
-  heading_4: 'text-blue-500',
-  heading_5: 'text-blue-500',
-  heading_6: 'text-blue-500',
-  numbered_list: 'text-indigo-500',
-  bullet_list: 'text-indigo-500',
-  check_list: 'text-violet-500',
-  code_block: 'text-emerald-500',
-  quote: 'text-blue-500',
-  divider: 'text-orange-400',
-  link: 'text-blue-500',
-  image: 'text-amber-400',
-  table: 'text-teal-500',
-  toggle_list: 'text-sky-500',
-  toggle_heading: 'text-blue-500',
-  toggle_heading_2: 'text-blue-500',
-  toggle_heading_3: 'text-blue-500',
-  emoji: 'text-pink-500',
+  paragraph: styles.iconPrimary,
+  heading: styles.iconPrimary,
+  heading_2: styles.iconPrimary,
+  heading_3: styles.iconPrimary,
+  heading_4: styles.iconPrimary,
+  heading_5: styles.iconPrimary,
+  heading_6: styles.iconPrimary,
+  numbered_list: styles.iconAccent,
+  bullet_list: styles.iconAccent,
+  check_list: styles.iconSuccess,
+  code_block: styles.iconSuccess,
+  quote: styles.iconPrimary,
+  divider: styles.iconWarning,
+  link: styles.iconPrimary,
+  image: styles.iconWarning,
+  table: styles.iconSuccess,
+  toggle_list: styles.iconPrimary,
+  toggle_heading: styles.iconPrimary,
+  toggle_heading_2: styles.iconPrimary,
+  toggle_heading_3: styles.iconPrimary,
+  emoji: styles.iconAccent,
 };
-
-const SLASH_MENU_CLASS =
-  'w-[17.5rem] max-h-[min(34rem,calc(100vh-6rem))] overflow-y-auto rounded-lg border border-[var(--border-light)] bg-[var(--overlay)] p-1.5 shadow-lg';
-const SLASH_MENU_GROUP_LABEL_CLASS = 'px-2 py-1 text-xs text-[var(--text-tertiary)]';
-const SLASH_MENU_GROUP_ITEMS_CLASS = 'flex flex-col gap-0.5';
-const SLASH_MENU_ITEM_CLASS =
-  'grid h-9 w-full grid-cols-[2.25rem_minmax(0,1fr)] items-center rounded-md px-2 text-left text-sm text-[var(--overlay-foreground)] outline-none transition-colors hover:bg-[var(--surface-secondary)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]';
-const SLASH_MENU_ITEM_SELECTED_CLASS = 'bg-[var(--surface-secondary)]';
-const SLASH_MENU_ICON_CLASS =
-  'flex h-7 w-7 items-center justify-center [&>svg]:h-[1.125rem] [&>svg]:w-[1.125rem]';
-const SLASH_MENU_EMPTY_CLASS = 'px-4 py-5 text-center text-sm text-[var(--text-tertiary)]';
-
-function cx(...classNames: Array<string | false | null | undefined>) {
-  return classNames.filter(Boolean).join(' ');
-}
 
 function resolveSlashMenuGroup(item: DefaultReactSuggestionItem): string {
   const key = getSlashMenuItemKey(item);
@@ -214,12 +201,12 @@ function resolveSlashMenuIconColor(item: DefaultReactSuggestionItem) {
     return SLASH_MENU_ICON_COLOR_BY_KEY[key];
   }
   if (item.group === 'AI') {
-    return 'text-purple-500';
+    return styles.iconAccent;
   }
   if (item.title === '公式') {
-    return 'text-slate-700';
+    return styles.iconMuted;
   }
-  return 'text-blue-500';
+  return styles.iconPrimary;
 }
 
 function resolveSlashMenuIcon(item: DefaultReactSuggestionItem) {
@@ -268,6 +255,20 @@ function groupSuggestionItems(items: DefaultReactSuggestionItem[]) {
   });
 }
 
+function getSuggestionItemId(index: number) {
+  return `slash-item-${index}`;
+}
+
+function SlashMenuState({ text }: { text: string }) {
+  return (
+    <ListBox aria-label="斜杠菜单" className={styles.menu}>
+      <ListBoxItem id="slash-menu-state" textValue={text} isDisabled className={styles.emptyItem}>
+        {text}
+      </ListBoxItem>
+    </ListBox>
+  );
+}
+
 function NoteSuggestionMenu({
   items,
   loadingState,
@@ -275,19 +276,11 @@ function NoteSuggestionMenu({
   onItemClick,
 }: SuggestionMenuProps<DefaultReactSuggestionItem>) {
   if (loadingState === 'loading-initial') {
-    return (
-      <div className={SLASH_MENU_CLASS} role="listbox" aria-label="斜杠菜单">
-        <div className={SLASH_MENU_EMPTY_CLASS}>加载中...</div>
-      </div>
-    );
+    return <SlashMenuState text="加载中..." />;
   }
 
   if (items.length === 0) {
-    return (
-      <div className={SLASH_MENU_CLASS} role="listbox" aria-label="斜杠菜单">
-        <div className={SLASH_MENU_EMPTY_CLASS}>无匹配项</div>
-      </div>
-    );
+    return <SlashMenuState text="无匹配项" />;
   }
 
   const groupedItems = groupSuggestionItems(items);
@@ -296,39 +289,43 @@ function NoteSuggestionMenu({
       .slice(0, groupIndex)
       .reduce((count, [, previousGroupItems]) => count + previousGroupItems.length, 0)
   );
+  const selectedItemIndex = selectedIndex ?? -1;
+  const selectedKey = selectedItemIndex >= 0 ? getSuggestionItemId(selectedItemIndex) : undefined;
 
   return (
-    <div className={SLASH_MENU_CLASS} role="listbox" aria-label="斜杠菜单">
+    <ListBox
+      aria-label="斜杠菜单"
+      selectionMode="single"
+      selectedKeys={selectedKey ? [selectedKey] : []}
+      className={styles.menu}
+    >
       {groupedItems.map(([group, groupItems], groupIndex) => (
-        <div className="mt-1 first:mt-0" key={group}>
-          <div className={SLASH_MENU_GROUP_LABEL_CLASS}>{group}</div>
-          <div className={SLASH_MENU_GROUP_ITEMS_CLASS}>
-            {groupItems.map((item, itemIndexInGroup) => {
-              const itemIndex = groupStartIndexes[groupIndex] + itemIndexInGroup;
-              const selected = itemIndex === selectedIndex;
-              return (
-                <button
-                  key={`${group}-${resolveSlashMenuTitle(item)}-${itemIndex}`}
-                  type="button"
-                  className={cx(SLASH_MENU_ITEM_CLASS, selected && SLASH_MENU_ITEM_SELECTED_CLASS)}
-                  role="option"
-                  aria-selected={selected}
-                  onMouseDown={(event) => {
-                    event.preventDefault();
-                  }}
-                  onClick={() => onItemClick?.(item)}
-                >
-                  <span className={cx(SLASH_MENU_ICON_CLASS, resolveSlashMenuIconColor(item))}>
-                    {resolveSlashMenuIcon(item)}
-                  </span>
-                  <span className="min-w-0 truncate">{resolveSlashMenuTitle(item)}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <ListBoxSection id={`slash-group-${group}`} className={styles.section} key={group}>
+          <Header className={styles.sectionTitle}>{group}</Header>
+          {groupItems.map((item, itemIndexInGroup) => {
+            const itemIndex = groupStartIndexes[groupIndex] + itemIndexInGroup;
+            const title = resolveSlashMenuTitle(item);
+            return (
+              <ListBoxItem
+                key={getSuggestionItemId(itemIndex)}
+                id={getSuggestionItemId(itemIndex)}
+                textValue={title}
+                className={styles.item}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                }}
+                onPress={() => onItemClick?.(item)}
+              >
+                <span className={clsx(styles.icon, resolveSlashMenuIconColor(item))}>
+                  {resolveSlashMenuIcon(item)}
+                </span>
+                <span className={styles.label}>{title}</span>
+              </ListBoxItem>
+            );
+          })}
+        </ListBoxSection>
       ))}
-    </div>
+    </ListBox>
   );
 }
 

@@ -1,17 +1,14 @@
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import type { CustomBlockNoteEditor } from '../CustomBlockNote/blockNoteSchema';
+import type { NoteBlock } from '../NoteEditorMenus/utils';
+export {
+  isRecord,
+  toBlockUpdate,
+  type NoteBlock,
+  type NoteBlockUpdate,
+} from '../NoteEditorMenus/utils';
 
-export type NoteBlock = ReturnType<CustomBlockNoteEditor['getTextCursorPosition']>['block'];
-export type NoteBlockUpdate = Parameters<CustomBlockNoteEditor['updateBlock']>[1];
 export type NoteStyleUpdate = Parameters<CustomBlockNoteEditor['addStyles']>[0];
-
-export function cx(...classNames: Array<string | false | null | undefined>) {
-  return classNames.filter(Boolean).join(' ');
-}
-
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
 
 export function stopToolbarMouseDown(event: ReactMouseEvent) {
   event.preventDefault();
@@ -45,12 +42,4 @@ export function colorStyleExists(
 
 export function toStyleUpdate(style: Record<string, string | boolean>): NoteStyleUpdate {
   return style as NoteStyleUpdate;
-}
-
-export function toBlockUpdate(update: {
-  type?: string;
-  props?: Record<string, unknown>;
-  content?: unknown;
-}): NoteBlockUpdate {
-  return update as NoteBlockUpdate;
 }

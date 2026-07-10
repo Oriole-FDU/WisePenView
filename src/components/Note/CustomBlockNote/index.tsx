@@ -21,6 +21,7 @@ import { useCreateBlockNote } from '@blocknote/react';
 import { toast } from '@heroui/react';
 import { useMemoizedFn, useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import { useCallback, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
+import NoteSideMenu from '../NoteSideMenu';
 import NoteSlashMenu from '../NoteSlashMenu';
 import NoteToolbar from '../NoteToolbar';
 import { hasAiDiffContentFromEditor } from './AiDiffPresence';
@@ -509,11 +510,13 @@ function CustomBlockNote({
             theme="light"
             formattingToolbar={false}
             slashMenu={false}
+            sideMenu={false}
             editable={!readOnly}
             onSelectionChange={handleSelectionChange}
           >
             <NoteToolbar onAskAi={handleAskAi} />
             <NoteSlashMenu editor={editor} plugins={plugins} />
+            <NoteSideMenu />
           </BlockNoteView>
         </AiDiffDisplayModeProvider>
       </NoteEditorReadOnlyProvider>
