@@ -1,4 +1,5 @@
 import { getApiBaseURL } from '@/apis/apiServerAddr';
+import { applyDeveloperHeader } from '@/apis/gray';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { useCallback } from 'react';
@@ -12,15 +13,12 @@ import type {
 // 调用时求值：apiServerAddr 会在生产环境随网络变化运行时切换，固化会失效
 const getCompletionsApi = (): string => `${getApiBaseURL()}chat/completions`;
 
-const devDeveloperHeader = import.meta.env.DEV ? import.meta.env.VITE_X_DEVELOPER.trim() : '';
 const NOTE_AI_DIFF_SKILL_ID = 'wisepen-note-ai-diff';
 const NOTE_AI_DIFF_TOOL_NAMES = ['read_note_aixml', 'apply_current_note_ai_diff_plan'] as const;
 
 const buildChatFetchInit = (init?: RequestInit): RequestInit => {
   const headers = new Headers(init?.headers);
-  if (devDeveloperHeader) {
-    headers.set('x-developer', devDeveloperHeader);
-  }
+  applyDeveloperHeader(headers);
   return {
     ...init,
     credentials: 'include',

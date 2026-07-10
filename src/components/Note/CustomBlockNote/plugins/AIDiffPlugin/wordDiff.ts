@@ -449,6 +449,93 @@ export type BuildAiEditJsonUnitsOptions = {
   readonly mergeOptions?: MergeDiffHunksOptions;
 };
 
+function comparableBoundaryText(value: string): string {
+  return value
+    .replace(/\s+([.,;:!?，。；：！？、])/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase();
+}
+
+function stripDuplicatedTrailingBoundary(candidate: string, boundary: string): string {
+  const comparableBoundary = comparableBoundaryText(boundary);
+  if (comparableBoundary.length < 16) {
+    return candidate;
+  }
+
+  if (candidate.endsWith(boundary)) {
+    const rest = candidate.slice(0, -boundary.length).replace(/[\s.,;:!?，。；：！？、]+$/, '');
+    return rest.trim() ? rest : candidate;
+  }
+
+  const minStart = Math.max(0, candidate.length - boundary.length - 32);
+  for (let start = minStart; start < candidate.length; start += 1) {
+    if (comparableBoundaryText(candidate.slice(start)) !== comparableBoundary) {
+      continue;
+    }
+    const rest = candidate.slice(0, start).replace(/[\s.,;:!?，。；：！？、]+$/, '');
+    return rest.trim() ? rest : candidate;
+  }
+
+  return candidate;
+}
+
+function buildHighChangeRatioUnits(origin: string, replace: string): AiEditJsonUnit[] {
+  const oldTokens = tokenizeForAiEdit(origin);
+  const newTokens = tokenizeForAiEdit(replace);
+  let prefixTokenCount = 0;
+  while (
+    prefixTokenCount < oldTokens.length &&
+    prefixTokenCount < newTokens.length &&
+    oldTokens[prefixTokenCount].value === newTokens[prefixTokenCount].value
+  ) {
+    prefixTokenCount += 1;
+  }
+
+  let suffixTokenCount = 0;
+  while (
+    suffixTokenCount < oldTokens.length - prefixTokenCount &&
+    suffixTokenCount < newTokens.length - prefixTokenCount
+  ) {
+    const oldToken = oldTokens[oldTokens.length - 1 - suffixTokenCount];
+    const newToken = newTokens[newTokens.length - 1 - suffixTokenCount];
+    if (oldToken.value !== newToken.value) {
+      break;
+    }
+    suffixTokenCount += 1;
+  }
+
+  const oldPrefixEnd =
+    prefixTokenCount > 0 ? oldTokens[prefixTokenCount - 1].end : 0;
+  const newPrefixEnd =
+    prefixTokenCount > 0 ? newTokens[prefixTokenCount - 1].end : 0;
+  const oldSuffixStart =
+    suffixTokenCount > 0 ? oldTokens[oldTokens.length - suffixTokenCount].start : origin.length;
+  const newSuffixStart =
+    suffixTokenCount > 0 ? newTokens[newTokens.length - suffixTokenCount].start : replace.length;
+
+  const prefix = origin.slice(0, oldPrefixEnd);
+  const suffix = origin.slice(oldSuffixStart);
+  const originMiddle = origin.slice(oldPrefixEnd, oldSuffixStart);
+  const replaceMiddle = stripDuplicatedTrailingBoundary(
+    replace.slice(newPrefixEnd, newSuffixStart),
+    suffix
+  );
+  const units: AiEditJsonUnit[] = [];
+
+  if (prefix) {
+    units.push({ type: 'plain', text: prefix });
+  }
+  if (originMiddle || replaceMiddle) {
+    units.push({ type: 'edit', origin: originMiddle, replace: replaceMiddle });
+  }
+  if (suffix) {
+    units.push({ type: 'plain', text: suffix });
+  }
+
+  return units.length > 0 ? units : [{ type: 'edit', origin, replace }];
+}
+
 const DISPLAY_EDIT_MERGE_MAX_VISIBLE_LENGTH = 600;
 const DISPLAY_EDIT_MERGE_MAX_BRIDGE_CHARS = 16;
 const DISPLAY_EDIT_MERGE_MAX_BRIDGE_TOKENS = 4;
@@ -567,7 +654,7 @@ export function buildAiEditJsonUnits(
   const { merged, highChangeRatio } = computeDiffData(origin, replace, mergeOpt);
 
   if (highChangeRatio) {
-    return [{ type: 'edit', origin, replace }];
+    return buildHighChangeRatioUnits(origin, replace);
   }
 
   const units: AiEditJsonUnit[] = [];

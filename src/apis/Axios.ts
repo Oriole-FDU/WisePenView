@@ -6,6 +6,7 @@ import {
   initApiServerAddrRuntime,
   notifyAddrFailure,
 } from '@/apis/apiServerAddr';
+import { getDeveloperHeaders } from '@/apis/gray';
 import { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
 import { clearAllZustandStores } from '@/store';
 import { emitAuthChangeEvent } from '@/utils/auth/authChange';
@@ -20,8 +21,6 @@ const Axios = axios.create({
   timeout: 5000,
   withCredentials: true,
 });
-
-const devDeveloperHeader = import.meta.env.DEV ? import.meta.env.VITE_X_DEVELOPER.trim() : '';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
@@ -104,10 +103,10 @@ const mapAxiosErrorToWisePenError = (error: AxiosError): WisePenError => {
 Axios.interceptors.request.use(async (config) => {
   await awaitAddrReady();
   config.baseURL = getApiBaseURL();
-  if (devDeveloperHeader) {
-    config.headers = AxiosHeaders.from(config.headers);
-    config.headers.set('x-developer', devDeveloperHeader);
-  }
+  config.headers = AxiosHeaders.from(config.headers);
+  Object.entries(getDeveloperHeaders()).forEach(([key, value]) => {
+    config.headers.set(key, value);
+  });
   return config;
 });
 

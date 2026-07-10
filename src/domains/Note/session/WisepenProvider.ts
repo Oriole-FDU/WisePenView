@@ -1,8 +1,8 @@
 import { getApiServerAddr, notifyAddrFailure } from '@/apis/apiServerAddr';
+import { getDeveloperQueryParams } from '@/apis/gray';
 import { WebsocketProvider } from 'y-websocket';
 import type * as Y from 'yjs';
 
-const devDeveloperParam = import.meta.env.DEV ? import.meta.env.VITE_X_DEVELOPER.trim() : '';
 const NOTE_COLLAB_PATH = '/note-collab';
 
 function toWsNoteCollabUrl(addr: string, fallbackProtocol: 'ws:' | 'wss:'): string {
@@ -33,12 +33,6 @@ export function getNoteUrl(): string {
 
   const apiServerAddr = getApiServerAddr().replace(/\/+$/, '');
   if (apiServerAddr.startsWith('/')) {
-    const devProxyTarget = import.meta.env.DEV
-      ? import.meta.env.VITE_DEV_API_PROXY_TARGET?.trim()
-      : '';
-    if (devProxyTarget) {
-      return toWsNoteCollabUrl(devProxyTarget, protocol);
-    }
     return `${protocol}//${window.location.host}${apiServerAddr}/note-collab`;
   }
   return toWsNoteCollabUrl(apiServerAddr, protocol);
@@ -46,7 +40,11 @@ export function getNoteUrl(): string {
 
 /** 笔记协同 WebSocket：固定 path、resourceId query，支持发送意图元数据帧。 */
 export class WisepenProvider extends WebsocketProvider {
-  constructor(resourceId: string, doc: Y.Doc, options?: { connect?: boolean }) {
+  constructor(
+    resourceId: string,
+    doc: Y.Doc,
+    options?: { connect?: boolean; actorUserId?: string }
+  ) {
     // 第二参数 'ws' 被 y-websocket 拼到 URL 末段，最终形如 ws://host/note-collab/ws?resourceId=...
     // connect: false 让调用方先注册 status/sync 监听再 connect()，防止极快连上时错过 connected 事件
     super(getNoteUrl(), 'ws', doc, {
@@ -54,7 +52,7 @@ export class WisepenProvider extends WebsocketProvider {
       disableBc: true,
       params: {
         resourceId,
-        ...(devDeveloperParam ? { developer: devDeveloperParam } : {}),
+        ...getDeveloperQueryParams(options?.actorUserId),
       },
     });
 

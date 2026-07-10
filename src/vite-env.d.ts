@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   // dev / mock 模式（单一 host[:port]）
   readonly VITE_API_SERVER_ADDR: string;
   readonly VITE_DEV_API_PROXY_TARGET?: string;
+  readonly VITE_DEV_NOTE_COLLAB_PROXY_TARGET?: string;
   readonly VITE_NOTE_COLLAB_WS_ADDR?: string;
   // dev 模式下可选：非空时请求头自动附带 x-developer
   readonly VITE_X_DEVELOPER: string;

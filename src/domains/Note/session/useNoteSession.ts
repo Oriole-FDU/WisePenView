@@ -12,10 +12,10 @@ export function noteYjsIdbRoomName(resourceId: string): string {
   return `wisepen-note:${resourceId}`;
 }
 
-export function useNoteSession(resourceId: string) {
+export function useNoteSession(resourceId: string, actorUserId?: string) {
   const session = useMemo(() => {
     const doc = new Y.Doc();
-    const provider = new WisepenProvider(resourceId, doc, { connect: false });
+    const provider = new WisepenProvider(resourceId, doc, { connect: false, actorUserId });
     const idb = new IndexeddbPersistence(noteYjsIdbRoomName(resourceId), doc);
     const observer = new NoteStatusObserver();
     observer.attach(provider);
@@ -33,7 +33,7 @@ export function useNoteSession(resourceId: string) {
     };
 
     return { doc, provider, observer, reconnect, destroy };
-  }, [resourceId]);
+  }, [resourceId, actorUserId]);
 
   const status = useSyncExternalStore(session.observer.subscribe, session.observer.getSnapshot);
 

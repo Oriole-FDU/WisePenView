@@ -5,6 +5,7 @@ import { ChevronsLeft, Menu } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
+import { shouldUseDeveloperWsIdentity } from '@/apis/gray';
 import EntryIcon from '@/components/Icons/EntryIcon';
 import CustomBlockNote from '@/components/Note/CustomBlockNote';
 import type { NoteBodyEditorHandle } from '@/components/Note/CustomBlockNote/index.type';
@@ -13,7 +14,7 @@ import {
   NOTE_OUTLINE_TITLE_ID,
   type NoteOutlineItem,
 } from '@/components/Note/NoteOutline/index.type';
-import { useNoteService, useResourceService } from '@/domains';
+import { useNoteService, useResourceService, useUserService } from '@/domains';
 import type { AiDiffDisplayMode, NoteInfoDisplayData } from '@/domains/Note';
 import { AI_DIFF_DISPLAY_MODE, AI_DIFF_DISPLAY_MODE_LABELS, useNoteSession } from '@/domains/Note';
 import { encodeNoteClientStateVector } from '@/domains/Note/session/stateVector';
@@ -34,6 +35,7 @@ import styles from './style.module.less';
 interface NoteViewConnectedProps {
   resourceId: string;
   noteInfoDisplay: NoteInfoDisplayData;
+  actorUserId?: string;
   onRefreshNoteInfo: () => void;
 }
 
@@ -80,6 +82,7 @@ function NoteToolbarTitle({ resourceId, fallbackTitle }: NoteToolbarTitleProps) 
 function NoteViewConnected({
   resourceId,
   noteInfoDisplay,
+  actorUserId,
   onRefreshNoteInfo,
 }: NoteViewConnectedProps) {
   const aiDiffDisplayMode = useAiDiffDisplayStore((state) => state.displayMode);
@@ -102,7 +105,7 @@ function NoteViewConnected({
     resourceId,
     hasAiDiffContent: false,
   });
-  const { status, doc, provider, reconnect } = useNoteSession(resourceId);
+  const { status, doc, provider, reconnect } = useNoteSession(resourceId, actorUserId);
   const getNoteClientStateVector = useCallback(
     () => encodeNoteClientStateVector(doc),
     [doc]
@@ -216,6 +219,7 @@ function NoteViewConnected({
       className: styles.pageWrap,
       chatContext: {
         resourceId,
+        resourceType: WORKSPACE_RESOURCE_TYPE.NOTE,
         editorType: 'note',
         noteSyncStatus: status,
         getNoteClientStateVector,
@@ -421,6 +425,8 @@ interface NoteViewProps {
 
 function NoteView({ resourceId = '' }: NoteViewProps = {}) {
   const noteService = useNoteService();
+  const userService = useUserService();
+  const needsDeveloperWsIdentity = shouldUseDeveloperWsIdentity();
   const {
     data: noteInfoDisplay,
     loading: isNoteInfoLoading,
@@ -430,6 +436,15 @@ function NoteView({ resourceId = '' }: NoteViewProps = {}) {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });
+  const {
+    data: currentUser,
+    loading: isCurrentUserLoading,
+    error: currentUserError,
+  } = useRequest(() => userService.getUserInfo(), {
+    ready: Boolean(resourceId && needsDeveloperWsIdentity),
+    refreshDeps: [resourceId, needsDeveloperWsIdentity],
+  });
+  const actorUserId = needsDeveloperWsIdentity ? currentUser?.id : undefined;
 
   if (!resourceId) {
     return (
@@ -472,13 +487,58 @@ function NoteView({ resourceId = '' }: NoteViewProps = {}) {
     );
   }
 
-  if (isNoteInfoLoading && !noteInfoDisplay) {
+  if (needsDeveloperWsIdentity && currentUserError) {
+    return (
+      <NoteLayoutConfig>
+        <div className={styles.middleOverlay}>
+          <div className={styles.middleOverlayInner}>
+            <ResultState
+              status="warning"
+              title="鏃犳硶杩炴帴绗旇鏈嶅姟"
+              subTitle={parseErrorMessage(currentUserError)}
+              extra={
+                <Link to="/app/drive">
+                  <Button variant="secondary">杩斿洖浜戠洏</Button>
+                </Link>
+              }
+            />
+          </div>
+        </div>
+      </NoteLayoutConfig>
+    );
+  }
+
+  if (
+    (isNoteInfoLoading && !noteInfoDisplay) ||
+    (needsDeveloperWsIdentity && isCurrentUserLoading && !currentUser)
+  ) {
     return (
       <NoteLayoutConfig>
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>正在加载笔记信息...</span>
+          </div>
+        </div>
+      </NoteLayoutConfig>
+    );
+  }
+
+  if (needsDeveloperWsIdentity && !actorUserId) {
+    return (
+      <NoteLayoutConfig>
+        <div className={styles.middleOverlay}>
+          <div className={styles.middleOverlayInner}>
+            <ResultState
+              status="warning"
+              title="鏃犳硶杩炴帴绗旇鏈嶅姟"
+              subTitle="鏈幏鍙栧埌褰撳墠鐢ㄦ埛韬唤锛岃閲嶆柊鐧诲綍鍚庡啀璇?"
+              extra={
+                <Link to="/login">
+                  <Button variant="secondary">閲嶆柊鐧诲綍</Button>
+                </Link>
+              }
+            />
           </div>
         </div>
       </NoteLayoutConfig>
@@ -510,6 +570,7 @@ function NoteView({ resourceId = '' }: NoteViewProps = {}) {
     <NoteViewConnected
       resourceId={resourceId}
       noteInfoDisplay={noteInfoDisplay}
+      actorUserId={actorUserId}
       onRefreshNoteInfo={refreshNoteInfo}
     />
   );

@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => {
       : '';
   const devApiProxyTarget =
     env.VITE_DEV_API_PROXY_TARGET || 'http://test.api.fudan.wisepen.oriole.cn';
+  const devNoteCollabProxyTarget = env.VITE_DEV_NOTE_COLLAB_PROXY_TARGET?.trim() || '';
+  const devDeveloperHeader = mode !== 'production' ? env.VITE_X_DEVELOPER?.trim() : '';
 
   const servicesRegistry = env.SERVICES_REGISTRY;
   if (!servicesRegistry) {
@@ -49,11 +51,26 @@ export default defineConfig(({ mode }) => {
       allowedHosts: ['local.wisepen.oriole.cn'],
       proxy: devApiProxyPrefix
         ? {
+            ...(devNoteCollabProxyTarget
+              ? {
+                  [`${devApiProxyPrefix}/note-collab`]: {
+                    target: devNoteCollabProxyTarget,
+                    changeOrigin: true,
+                    ws: true,
+                    headers: devDeveloperHeader
+                      ? { 'X-Developer': devDeveloperHeader }
+                      : undefined,
+                    rewrite: (proxyPath) =>
+                      proxyPath.startsWith(devApiProxyPrefix)
+                        ? proxyPath.slice(devApiProxyPrefix.length) || '/'
+                        : proxyPath,
+                  },
+                }
+              : {}),
             [devApiProxyPrefix]: {
               target: devApiProxyTarget,
               changeOrigin: true,
-              // Note collaboration WebSocket is resolved by WisepenProvider directly.
-              ws: false,
+              headers: devDeveloperHeader ? { 'X-Developer': devDeveloperHeader } : undefined,
               cookieDomainRewrite: '',
               configure: (proxy) => {
                 proxy.on('proxyRes', (proxyRes) => {
