@@ -1,4 +1,4 @@
-import TableDrive from '@/components/Drive/TableDrive';
+﻿import TableDrive from '@/components/Drive/TableDrive';
 import type { TableDriveHandle } from '@/components/Drive/TableDrive/index.type';
 import SegmentedTabs from '@/components/SegmentedTabs';
 import { parseDriveRouteLocation } from '@/utils/navigation/driveRoute';
@@ -8,6 +8,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useDrivePreferencesStore, type DriveViewMode } from '../_store/useDrivePreferencesStore';
 
+import FavoritesTab from '../_components/FavoritesTab';
 import GlobalSearchBox from '../_components/GlobalSearchBox';
 import type { UploadQueueTabRef } from '../_components/UploadQueueTab';
 import UploadQueueTab from '../_components/UploadQueueTab';
@@ -16,6 +17,7 @@ import styles from './style.module.less';
 const VIEW_TABS: { key: DriveViewMode; label: string }[] = [
   { key: 'tableDrive', label: '云盘' },
   { key: 'uploadQueue', label: '上传队列' },
+  { key: 'favorites', label: '我的收藏' },
 ];
 
 function Drive() {
@@ -78,6 +80,7 @@ function Drive() {
           />
         )}
         {activeViewMode === 'uploadQueue' && <UploadQueueTab ref={uploadQueueRef} />}
+        {activeViewMode === 'favorites' && <FavoritesTab />}
       </div>
     </div>
   );

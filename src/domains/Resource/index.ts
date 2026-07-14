@@ -1,3 +1,9 @@
+﻿export type {
+  FavoriteCollection,
+  FavoriteItem,
+  FavoriteResourceInfo,
+  FavoritedResourcesPage,
+} from './entity/favorite';
 export type {
   ResourceAccessRole,
   ResourceIconType,
@@ -43,8 +49,11 @@ export { groupSearchHits } from './service/groupSearchHits';
 export type { SearchHitGroup } from './service/groupSearchHits';
 export type {
   AddInlineCommentItemRequest,
+  ChangeFavoriteStatusRequest,
   ChangeInlineCommentResolveStatusRequest,
+  CreateCollectionRequest,
   CreateInlineCommentRequest,
+  DeleteCollectionRequest,
   DeleteInlineCommentItemRequest,
   GetGroupResourceRequest,
   GetResourcePermissionOverviewRequest,
@@ -52,6 +61,7 @@ export type {
   IResourceService,
   InteractRateRequest,
   InteractToggleLikeRequest,
+  ListFavoritedResourcesRequest,
   ListInlineCommentsRequest,
   MountResourcesToGroupTagRequest,
   RemoveResourcesRequest,
@@ -71,6 +81,7 @@ export type {
   SearchHitItem,
   SearchQueryRequest,
   SearchResultPage,
+  UpdateCollectionInfoRequest,
   UpdateInlineCommentItemRequest,
   UpdateResourceActionPermissionRequest,
   UpdateResourcePermissionSubjectsRequest,

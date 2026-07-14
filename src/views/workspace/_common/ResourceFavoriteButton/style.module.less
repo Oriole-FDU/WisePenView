@@ -1,0 +1,120 @@
+﻿.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height-sm, 32px);
+  height: var(--control-height-sm, 32px);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--muted, #71717a);
+  cursor: pointer;
+  line-height: 0;
+  vertical-align: middle;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-secondary, rgba(0, 0, 0, 0.06));
+    color: var(--foreground, #18181b);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.active {
+  color: var(--color-secondary, #7828c8);
+
+  &:hover:not(:disabled) {
+    color: var(--color-secondary, #7828c8);
+  }
+}
+
+.panelButton {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-secondary, rgba(0, 0, 0, 0.04));
+  color: var(--foreground);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-tertiary, rgba(0, 0, 0, 0.06));
+    border-color: color-mix(in srgb, var(--border) 65%, var(--foreground) 35%);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.panelButtonActive {
+  border-color: color-mix(in srgb, var(--color-secondary, #7828c8) 42%, var(--border) 58%);
+  background: color-mix(in srgb, var(--color-secondary, #7828c8) 8%, var(--surface));
+}
+
+.panelButtonMain {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.panelIconWrap {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.panelCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panelTitle {
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panelDescription {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-xs, 12px);
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

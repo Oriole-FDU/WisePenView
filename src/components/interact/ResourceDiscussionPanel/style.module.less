@@ -1,4 +1,4 @@
-.panel {
+﻿.panel {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -11,17 +11,32 @@
 
 .header {
   display: flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 var(--space-md);
+  align-items: flex-start;
+  min-height: 56px;
+  padding: var(--space-md) var(--space-lg) var(--space-sm);
   border-bottom: 1px solid var(--border);
+}
+
+.headerCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .title {
   margin: 0;
   color: var(--foreground);
-  font-size: var(--font-size-base);
-  font-weight: 600;
+  font-size: var(--font-size-lg, 18px);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs, 12px);
+  line-height: 1.45;
 }
 
 .content {
@@ -29,58 +44,163 @@
   flex: 1;
   min-height: 0;
   flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-md);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
   overflow: auto;
 }
 
 .stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm) var(--space-md);
-  color: var(--muted);
-  font-size: var(--font-size-sm);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
 }
 
 .statItem {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-secondary, rgba(0, 0, 0, 0.04));
+  color: var(--muted);
+}
+
+.statValue {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statLabel {
+  color: var(--muted);
+  font-size: var(--font-size-xs, 12px);
+  line-height: 1.2;
+}
+
+.actionList {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.actionButton {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-secondary, rgba(0, 0, 0, 0.04));
+  color: var(--foreground);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-tertiary, rgba(0, 0, 0, 0.06));
+    border-color: color-mix(in srgb, var(--border) 65%, var(--foreground) 35%);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.actionButtonActive {
+  border-color: color-mix(in srgb, var(--primary, #006fee) 38%, var(--border) 62%);
+  background: color-mix(in srgb, var(--primary, #006fee) 7%, var(--surface));
+}
+
+.actionButtonMain {
   display: inline-flex;
   min-width: 0;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
-.actionSection {
+.actionIconWrap {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.actionIconWrapActive {
+  color: var(--primary, #006fee);
+}
+
+.actionIconWrapWarning {
+  color: var(--color-warning, #f5a524);
+}
+
+.actionCopy {
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-md);
+  gap: 2px;
 }
 
-.sectionTitle {
-  margin: 0;
+.actionTitle {
+  overflow: hidden;
   color: var(--foreground);
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.helpfulButton {
-  max-width: 100%;
-}
-
-.helpfulCount {
+.actionDescription {
+  overflow: hidden;
   color: var(--muted);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-xs, 12px);
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.rateRow {
+.rateCard {
   display: flex;
-  width: 100%;
+  min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-secondary, rgba(0, 0, 0, 0.04));
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
-.rateLabel {
-  color: var(--muted);
-  font-size: var(--font-size-sm);
+.rateCardActive {
+  border-color: color-mix(in srgb, var(--color-warning, #f5a524) 42%, var(--border) 58%);
+  background: color-mix(in srgb, var(--color-warning, #f5a524) 8%, var(--surface));
+}
+
+.rateCardMain {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
 }

@@ -1,14 +1,21 @@
-import type {
+﻿import type {
   AddInlineCommentItemRequest,
+  ChangeFavoriteStatusRequest,
   ChangeInlineCommentResolveStatusRequest,
+  CreateCollectionRequest,
   CreateInlineCommentRequest,
+  DeleteCollectionRequest,
   DeleteInlineCommentItemRequest,
+  FavoriteCollection,
+  FavoritedResourcesPage,
+  FavoriteItem,
   GetGroupResourceRequest,
   GetResourcePermissionOverviewRequest,
   GetUserResourcesRequest,
   InteractRateRequest,
   InteractToggleLikeRequest,
   IResourceService,
+  ListFavoritedResourcesRequest,
   ListInlineCommentsRequest,
   RemoveResourcesRequest,
   RenameResourceRequest,
@@ -18,6 +25,7 @@ import type {
   ResourcePermissionOverview,
   SearchQueryRequest,
   SearchResultPage,
+  UpdateCollectionInfoRequest,
   UpdateInlineCommentItemRequest,
   UpdateResourcePermissionSubjectsRequest,
 } from '@/domains/Resource';
@@ -95,6 +103,49 @@ const fullMockPersonalResourceList: ResourceItem[] = [
   ...baseMockResourceList,
   ...personalSkillResources,
 ];
+const mockFavoriteCollections: FavoriteCollection[] = [
+  {
+    collectionId: 'mock-favorite-default',
+    collectionName: null,
+    description: null,
+    isDefault: true,
+    itemCount: 0,
+    createTime: Date.now() - 1000 * 60 * 60 * 24 * 10,
+  },
+  {
+    collectionId: 'mock-favorite-reading',
+    collectionName: '稍后阅读',
+    description: '需要继续跟进的资料',
+    isDefault: false,
+    itemCount: 0,
+    createTime: Date.now() - 1000 * 60 * 60 * 24 * 3,
+  },
+];
+
+const favoriteStatusByResourceId = new Map<string, string[]>();
+const favoriteTimeByResourceId = new Map<string, number>();
+
+const refreshMockFavoriteCounts = (): void => {
+  for (const collection of mockFavoriteCollections) {
+    collection.itemCount = 0;
+  }
+  for (const collectionIds of favoriteStatusByResourceId.values()) {
+    for (const collectionId of collectionIds) {
+      const collection = mockFavoriteCollections.find((item) => item.collectionId === collectionId);
+      if (collection) collection.itemCount += 1;
+    }
+  }
+};
+
+fullMockPersonalResourceList.slice(0, 6).forEach((item, index) => {
+  const collectionIds =
+    index % 2 === 0
+      ? ['mock-favorite-default']
+      : ['mock-favorite-default', 'mock-favorite-reading'];
+  favoriteStatusByResourceId.set(item.resourceId, collectionIds);
+  favoriteTimeByResourceId.set(item.resourceId, Date.now() - index * 1000 * 60 * 60);
+});
+refreshMockFavoriteCounts();
 
 /** 完整资源列表（含所有 Skill），供 getGroupResources 使用 */
 const personalAgentResources: ResourceItem[] = (
@@ -350,6 +401,123 @@ const changeInlineCommentResolveStatus = async (
 ): Promise<void> => {
   await delay(120);
 };
+const getFavoriteStatus = async (resourceId: string): Promise<{ collectionIds: string[] }> => {
+  await delay(80);
+  return { collectionIds: favoriteStatusByResourceId.get(resourceId) ?? [] };
+};
+
+const changeFavoriteStatus = async (params: ChangeFavoriteStatusRequest): Promise<void> => {
+  await delay(120);
+  if (!params.favorite) {
+    favoriteStatusByResourceId.delete(params.resourceId);
+    favoriteTimeByResourceId.delete(params.resourceId);
+    refreshMockFavoriteCounts();
+    return;
+  }
+  const collectionIds = params.collectionIds?.length
+    ? params.collectionIds
+    : ['mock-favorite-default'];
+  favoriteStatusByResourceId.set(params.resourceId, Array.from(new Set(collectionIds)));
+  favoriteTimeByResourceId.set(params.resourceId, Date.now());
+  refreshMockFavoriteCounts();
+};
+
+const listCollections = async (): Promise<FavoriteCollection[]> => {
+  await delay(120);
+  refreshMockFavoriteCounts();
+  return mockFavoriteCollections.map((collection) => ({ ...collection }));
+};
+
+const createCollection = async (params: CreateCollectionRequest): Promise<string> => {
+  await delay(120);
+  const collectionId = `mock-favorite-${Date.now()}`;
+  mockFavoriteCollections.push({
+    collectionId,
+    collectionName: params.collectionName,
+    description: params.description ?? null,
+    isDefault: false,
+    itemCount: 0,
+    createTime: Date.now(),
+  });
+  return collectionId;
+};
+
+const updateCollectionInfo = async (params: UpdateCollectionInfoRequest): Promise<void> => {
+  await delay(120);
+  const collection = mockFavoriteCollections.find(
+    (item) => item.collectionId === params.collectionId
+  );
+  if (!collection) return;
+  collection.collectionName = params.collectionName;
+  collection.description = params.description ?? null;
+};
+
+const deleteCollection = async (params: DeleteCollectionRequest): Promise<void> => {
+  await delay(120);
+  const index = mockFavoriteCollections.findIndex(
+    (item) => item.collectionId === params.collectionId
+  );
+  if (index < 0 || mockFavoriteCollections[index].isDefault) return;
+  mockFavoriteCollections.splice(index, 1);
+  for (const [resourceId, collectionIds] of favoriteStatusByResourceId.entries()) {
+    const nextIds = collectionIds.filter((collectionId) => collectionId !== params.collectionId);
+    if (params.keepResourcesToDefault && collectionIds.includes(params.collectionId)) {
+      nextIds.push('mock-favorite-default');
+    }
+    const uniqueIds = Array.from(new Set(nextIds));
+    if (uniqueIds.length === 0) {
+      favoriteStatusByResourceId.delete(resourceId);
+      favoriteTimeByResourceId.delete(resourceId);
+    } else {
+      favoriteStatusByResourceId.set(resourceId, uniqueIds);
+    }
+  }
+  refreshMockFavoriteCounts();
+};
+
+const mapMockFavoriteItem = (item: ResourceItem): FavoriteItem => ({
+  resourceId: item.resourceId,
+  accessible: true,
+  favoritedAt: favoriteTimeByResourceId.get(item.resourceId) ?? Date.now(),
+  collectionIds: favoriteStatusByResourceId.get(item.resourceId) ?? [],
+  resourceInfo: {
+    resourceId: item.resourceId,
+    resourceName: item.resourceName,
+    resourceType: item.resourceType ?? '',
+    ownerId: item.ownerId ?? '',
+    preview: item.preview ?? null,
+    size: item.size ?? null,
+    favoriteCount: item.favoriteCount ?? 0,
+    likeCount: item.likeCount ?? null,
+    readCount: item.readCount ?? null,
+    scoreAvg: item.scoreAvg ?? null,
+  },
+});
+
+const listFavoritedResources = async (
+  params: ListFavoritedResourcesRequest
+): Promise<FavoritedResourcesPage> => {
+  await delay(160);
+  const rows = fullMockPersonalResourceList
+    .filter((item) => {
+      const collectionIds = favoriteStatusByResourceId.get(item.resourceId) ?? [];
+      return params.collectionId
+        ? collectionIds.includes(params.collectionId)
+        : collectionIds.length > 0;
+    })
+    .map(mapMockFavoriteItem)
+    .sort((a, b) => b.favoritedAt - a.favoritedAt);
+  const total = rows.length;
+  const totalPage = Math.max(1, Math.ceil(total / params.size));
+  const start = (params.page - 1) * params.size;
+  return {
+    list: rows.slice(start, start + params.size),
+    total,
+    page: params.page,
+    size: params.size,
+    totalPage,
+  };
+};
 
 export const ResourceServicesMock: IResourceService = {
   getUserResources,
@@ -373,4 +541,11 @@ export const ResourceServicesMock: IResourceService = {
   updateInlineCommentItem,
   deleteInlineCommentItem,
   changeInlineCommentResolveStatus,
+  getFavoriteStatus,
+  changeFavoriteStatus,
+  listCollections,
+  createCollection,
+  updateCollectionInfo,
+  deleteCollection,
+  listFavoritedResources,
 };

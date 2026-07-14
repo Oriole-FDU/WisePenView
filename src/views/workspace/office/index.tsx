@@ -1,4 +1,4 @@
-import { ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL } from '@/apis/clientUrls';
+﻿import { ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL } from '@/apis/clientUrls';
 import { ResultState, Spin } from '@/components/Feedback';
 import { useDocumentService, useResourceService } from '@/domains';
 import type { ResourceAction } from '@/domains/Resource';
@@ -14,6 +14,7 @@ import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import { useRequest } from 'ahooks';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import ResourceFavoriteButton from '../_common/ResourceFavoriteButton';
 import styles from './style.module.less';
 
 interface OfficeLayoutConfigProps {
@@ -24,6 +25,7 @@ interface OfficeLayoutConfigProps {
   resourceInfoActions?: ResourceAction[] | null;
   ownerId?: string | null;
   onPermissionSuccess?: () => void;
+  actions?: ReactNode;
 }
 
 interface OfficeEditorHostProps {
@@ -46,6 +48,7 @@ function OfficeLayoutConfig({
   resourceInfoActions,
   ownerId,
   onPermissionSuccess,
+  actions,
 }: OfficeLayoutConfigProps) {
   const frameConfig = useMemo<WorkspaceLayoutConfig>(
     () => ({
@@ -60,11 +63,20 @@ function OfficeLayoutConfig({
               permissionResourceType: WORKSPACE_RESOURCE_TYPE.FILE,
               ownerId,
               onPermissionSuccess,
+              actions,
             },
           }
         : {},
     }),
-    [onPermissionSuccess, ownerId, resourceId, resourceInfoActions, resourceName, resourceType]
+    [
+      actions,
+      onPermissionSuccess,
+      ownerId,
+      resourceId,
+      resourceInfoActions,
+      resourceName,
+      resourceType,
+    ]
   );
   useWorkspaceLayoutConfig(frameConfig);
 
@@ -222,6 +234,12 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
       resourceInfoActions={data.docInfo.resourceInfo.currentActions}
       ownerId={data.docInfo.resourceInfo.ownerId}
       onPermissionSuccess={refreshOfficeData}
+      actions={
+        <ResourceFavoriteButton
+          resourceId={data.docInfo.resourceInfo.resourceId || resourceId}
+          onSuccess={refreshOfficeData}
+        />
+      }
     >
       <div className={styles.content}>
         <OfficeEditorHost

@@ -1,4 +1,4 @@
-import type { ResourceItem, ResourceTagBind } from '@/domains/Resource';
+﻿import type { ResourceItem, ResourceTagBind } from '@/domains/Resource';
 import type { UserDisplayBase } from '@/domains/User';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
@@ -215,6 +215,7 @@ const mapResourceItemFromApi = (
     specifiedUsersGrantedActions: normalizeResourceActionMap(raw.specifiedUsersGrantedActions),
     readCount: interactionInfo?.readCount,
     likeCount: interactionInfo?.likeCount,
+    favoriteCount: interactionInfo?.favoriteCount,
     scoreAvg: scoreCount > 0 ? scoreTotal / scoreCount : null,
   };
   const currentTagBind = resolveCurrentTagBind(item, context);

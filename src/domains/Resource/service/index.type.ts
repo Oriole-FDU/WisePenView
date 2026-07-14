@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Resource 相关 API 请求类型
  * 与 resource.openapi.json 对齐
  */
@@ -13,6 +13,7 @@ import type {
   SearchScope,
   TagQueryLogicMode,
 } from '@/domains/Resource';
+import type { FavoriteCollection, FavoritedResourcesPage } from '../entity/favorite';
 
 /** 资源列表分页 */
 export interface ResourceListPage {
@@ -61,6 +62,20 @@ export interface IResourceService {
   deleteInlineCommentItem(params: DeleteInlineCommentItemRequest): Promise<void>;
   /** 更新批注串解决状态 */
   changeInlineCommentResolveStatus(params: ChangeInlineCommentResolveStatusRequest): Promise<void>;
+  /** 查询资源收藏状态，collectionIds 非空表示已收藏 */
+  getFavoriteStatus(resourceId: string): Promise<{ collectionIds: string[] }>;
+  /** 更改资源收藏状态，favorite=true 时 collectionIds 为全量替换语义 */
+  changeFavoriteStatus(params: ChangeFavoriteStatusRequest): Promise<void>;
+  /** 查询当前用户收藏集合 */
+  listCollections(): Promise<FavoriteCollection[]>;
+  /** 创建收藏集合，返回 collectionId */
+  createCollection(params: CreateCollectionRequest): Promise<string>;
+  /** 更新收藏集合信息 */
+  updateCollectionInfo(params: UpdateCollectionInfoRequest): Promise<void>;
+  /** 删除收藏集合 */
+  deleteCollection(params: DeleteCollectionRequest): Promise<void>;
+  /** 分页查询已收藏资源 */
+  listFavoritedResources(params: ListFavoritedResourcesRequest): Promise<FavoritedResourcesPage>;
 }
 
 /** 全文搜索请求（对齐 GET /resource/search/globalSearchResources） */
@@ -297,4 +312,32 @@ export interface ChangeInlineCommentResolveStatusRequest {
   inlineCommentId: string;
   resolved: boolean;
   contentVersion?: number;
+}
+
+export interface ChangeFavoriteStatusRequest {
+  resourceId: string;
+  favorite: boolean;
+  collectionIds?: string[];
+}
+
+export interface CreateCollectionRequest {
+  collectionName: string;
+  description?: string | null;
+}
+
+export interface UpdateCollectionInfoRequest {
+  collectionId: string;
+  collectionName: string;
+  description?: string | null;
+}
+
+export interface DeleteCollectionRequest {
+  collectionId: string;
+  keepResourcesToDefault?: boolean;
+}
+
+export interface ListFavoritedResourcesRequest {
+  collectionId?: string;
+  page: number;
+  size: number;
 }

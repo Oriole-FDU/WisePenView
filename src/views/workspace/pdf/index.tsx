@@ -1,12 +1,14 @@
-import { ResultState, Spin } from '@/components/Feedback';
+﻿import { ResultState, Spin } from '@/components/Feedback';
+import ResourceDiscussionPanel from '@/components/interact/ResourceDiscussionPanel';
 import PdfViewer from '@/components/PdfViewer/index';
 import { useDocumentService, useResourceService } from '@/domains';
 import type { ResourceAction } from '@/domains/Resource';
 import { useWorkspaceLayoutConfig } from '@/layouts/Workspace/WorkspaceOutletContext';
 import { parseErrorMessage } from '@/utils/error';
 import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
-import { Button } from '@heroui/react';
+import { Button, ToggleButton, Tooltip } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { MessagesSquare } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './style.module.less';
@@ -19,6 +21,7 @@ interface PdfLayoutConfigProps {
   resourceInfoActions?: ResourceAction[] | null;
   ownerId?: string | null;
   onPermissionSuccess?: () => void;
+  actions?: ReactNode;
 }
 
 function PdfLayoutConfig({
@@ -29,6 +32,7 @@ function PdfLayoutConfig({
   resourceInfoActions,
   ownerId,
   onPermissionSuccess,
+  actions,
 }: PdfLayoutConfigProps) {
   const frameConfig = useMemo(
     () => ({
@@ -43,11 +47,20 @@ function PdfLayoutConfig({
               permissionResourceType: WORKSPACE_RESOURCE_TYPE.FILE,
               ownerId,
               onPermissionSuccess,
+              actions,
             },
           }
         : {},
     }),
-    [onPermissionSuccess, ownerId, resourceId, resourceInfoActions, resourceName, resourceType]
+    [
+      actions,
+      onPermissionSuccess,
+      ownerId,
+      resourceId,
+      resourceInfoActions,
+      resourceName,
+      resourceType,
+    ]
   );
   useWorkspaceLayoutConfig(frameConfig);
 
@@ -60,6 +73,7 @@ interface DocumentPreviewProps {
 
 function DocumentPreview({ resourceId }: DocumentPreviewProps = {}) {
   const [viewerErrorMap, setViewerErrorMap] = useState<Record<string, unknown>>({});
+  const [discussionOpen, setDiscussionOpen] = useState(false);
   const documentService = useDocumentService();
   const resourceService = useResourceService();
   const {
@@ -171,15 +185,40 @@ function DocumentPreview({ resourceId }: DocumentPreviewProps = {}) {
     );
   }
 
+  const resolvedResourceId = docInfo.resourceInfo.resourceId || resourceId;
+  const canShowDiscussion = docInfo.resourceInfo.resourceType === WORKSPACE_RESOURCE_TYPE.FILE;
+  const discussionToggleLabel = discussionOpen ? '收起讨论栏' : '展开讨论栏';
+  const headerActions = canShowDiscussion ? (
+    <div className={styles.headerActions}>
+      <Tooltip>
+        <Tooltip.Trigger>
+          <ToggleButton
+            variant="ghost"
+            size="sm"
+            isIconOnly
+            isSelected={discussionOpen}
+            aria-label={discussionToggleLabel}
+            aria-expanded={discussionOpen}
+            onChange={() => setDiscussionOpen((current) => !current)}
+          >
+            <MessagesSquare size={16} aria-hidden="true" />
+          </ToggleButton>
+        </Tooltip.Trigger>
+        <Tooltip.Content>{discussionToggleLabel}</Tooltip.Content>
+      </Tooltip>
+    </div>
+  ) : null;
+
   if (viewerError) {
     return (
       <PdfLayoutConfig
-        resourceId={docInfo.resourceInfo.resourceId || resourceId}
+        resourceId={resolvedResourceId}
         resourceName={docInfo.resourceInfo.resourceName}
         resourceType={docInfo.resourceInfo.resourceType}
         resourceInfoActions={docInfo.resourceInfo.currentActions}
         ownerId={docInfo.resourceInfo.ownerId}
         onPermissionSuccess={refreshDocInfo}
+        actions={headerActions}
       >
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
@@ -201,21 +240,34 @@ function DocumentPreview({ resourceId }: DocumentPreviewProps = {}) {
 
   return (
     <PdfLayoutConfig
-      resourceId={docInfo.resourceInfo.resourceId || resourceId}
+      resourceId={resolvedResourceId}
       resourceName={docInfo.resourceInfo.resourceName}
       resourceType={docInfo.resourceInfo.resourceType}
       resourceInfoActions={docInfo.resourceInfo.currentActions}
       ownerId={docInfo.resourceInfo.ownerId}
       onPermissionSuccess={refreshDocInfo}
+      actions={headerActions}
     >
       <div className={styles.content}>
-        <div className={styles.root}>
-          <PdfViewer
-            key={resourceId}
-            className={styles.viewer}
-            resourceId={resourceId}
-            onLoadError={handleViewerLoadError}
-          />
+        <div className={styles.contentRow}>
+          <div className={styles.mainPanel}>
+            <div className={styles.root}>
+              <PdfViewer
+                key={resourceId}
+                className={styles.viewer}
+                resourceId={resourceId}
+                onLoadError={handleViewerLoadError}
+              />
+            </div>
+          </div>
+          {discussionOpen ? (
+            <aside className={styles.resourceAsidePanel} aria-label="资源讨论侧栏">
+              <ResourceDiscussionPanel
+                resource={docInfo.resourceInfo}
+                onInteractionSuccess={refreshDocInfo}
+              />
+            </aside>
+          ) : null}
         </div>
       </div>
     </PdfLayoutConfig>

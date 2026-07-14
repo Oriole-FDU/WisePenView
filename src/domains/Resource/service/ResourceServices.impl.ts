@@ -1,17 +1,25 @@
-import { DocumentApi } from '@/domains/Document/apis/DocumentApi';
+﻿import { DocumentApi } from '@/domains/Document/apis/DocumentApi';
 import { NoteApi } from '@/domains/Note/apis/NoteApi';
 import { SkillApi } from '@/domains/Skill/apis/SkillApi';
+import { FavoriteApi } from '../apis/FavoriteApi';
 import { ResourceInteractApi } from '../apis/InteractApi';
 import { ResourceInlineCommentApi, ResourceItemApi } from '../apis/ResourceApi';
 import type { ListResourceItemsApiRequest } from '../apis/ResourceApi.type';
 import type { ResourceItem } from '../entity/resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '../enum';
 import { ResourceServicesMap } from '../mapper/ResourceServices.map';
+import {
+  mapFavoriteCollectionFromApi,
+  mapFavoritedResourcesPageFromApi,
+} from '../mapper/favorite.mapper';
 import { useResourceDisplayNameStore } from '../store/useResourceDisplayNameStore';
 import type {
   AddInlineCommentItemRequest,
+  ChangeFavoriteStatusRequest,
   ChangeInlineCommentResolveStatusRequest,
+  CreateCollectionRequest,
   CreateInlineCommentRequest,
+  DeleteCollectionRequest,
   DeleteInlineCommentItemRequest,
   GetGroupResourceRequest,
   GetResourcePermissionOverviewRequest,
@@ -19,6 +27,7 @@ import type {
   InteractRateRequest,
   InteractToggleLikeRequest,
   IResourceService,
+  ListFavoritedResourcesRequest,
   ListInlineCommentsRequest,
   MountResourcesToGroupTagRequest,
   RemoveResourcesRequest,
@@ -26,6 +35,7 @@ import type {
   ResourceListPage,
   SearchQueryRequest,
   SearchResultPage,
+  UpdateCollectionInfoRequest,
   UpdateInlineCommentItemRequest,
   UpdateResourceActionPermissionRequest,
   UpdateResourcePermissionSubjectsRequest,
@@ -268,6 +278,55 @@ const changeInlineCommentResolveStatus = async (
 ): Promise<void> => {
   await ResourceInlineCommentApi.changeInlineCommentResolveStatus(params);
 };
+const getFavoriteStatus = async (resourceId: string): Promise<{ collectionIds: string[] }> => {
+  const data = await FavoriteApi.getFavoriteStatus(resourceId);
+  return { collectionIds: data.collectionIds ?? [] };
+};
+
+const changeFavoriteStatus = async (params: ChangeFavoriteStatusRequest): Promise<void> => {
+  await FavoriteApi.changeFavoriteStatus({
+    resourceId: params.resourceId,
+    favorite: params.favorite,
+    ...(params.collectionIds != null ? { collectionIds: params.collectionIds } : {}),
+  });
+};
+
+const listCollections = async () => {
+  const data = await FavoriteApi.listCollections();
+  return data.map(mapFavoriteCollectionFromApi);
+};
+
+const createCollection = async (params: CreateCollectionRequest): Promise<string> => {
+  const collectionId = await FavoriteApi.createCollection({
+    collectionName: params.collectionName,
+    ...(params.description !== undefined ? { description: params.description } : {}),
+  });
+  return collectionId;
+};
+
+const updateCollectionInfo = async (params: UpdateCollectionInfoRequest): Promise<void> => {
+  await FavoriteApi.updateCollectionInfo({
+    collectionId: params.collectionId,
+    collectionName: params.collectionName,
+    ...(params.description !== undefined ? { description: params.description } : {}),
+  });
+};
+
+const deleteCollection = async (params: DeleteCollectionRequest): Promise<void> => {
+  await FavoriteApi.deleteCollection({
+    collectionId: params.collectionId,
+    keepResourcesToDefault: params.keepResourcesToDefault ?? false,
+  });
+};
+
+const listFavoritedResources = async (params: ListFavoritedResourcesRequest) => {
+  const data = await FavoriteApi.listFavoritedResources({
+    ...(params.collectionId ? { collectionId: params.collectionId } : {}),
+    page: params.page,
+    size: params.size,
+  });
+  return mapFavoritedResourcesPageFromApi(data);
+};
 
 export const createResourceServices = (): IResourceService => ({
   getUserResources,
@@ -291,4 +350,11 @@ export const createResourceServices = (): IResourceService => ({
   updateInlineCommentItem,
   deleteInlineCommentItem,
   changeInlineCommentResolveStatus,
+  getFavoriteStatus,
+  changeFavoriteStatus,
+  listCollections,
+  createCollection,
+  updateCollectionInfo,
+  deleteCollection,
+  listFavoritedResources,
 });

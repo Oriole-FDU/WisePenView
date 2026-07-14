@@ -1,0 +1,70 @@
+﻿.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.collectionItem {
+  padding: 8px;
+  border-radius: 6px;
+
+  &:hover {
+    background-color: var(--surface-secondary);
+  }
+}
+
+.collectionContent {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.collectionControl {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.collectionText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.collectionLabel {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.collectionCount {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.createRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.createInput {
+  flex: 1;
+}
+
+.newCollectionBtn {
+  align-self: flex-start;
+  margin-top: 4px;
+  color: var(--muted);
+}

@@ -1,4 +1,4 @@
-import { DRAWIO_EMBED_URL } from '@/apis/clientUrls';
+﻿import { DRAWIO_EMBED_URL } from '@/apis/clientUrls';
 import { ResultState, Spin } from '@/components/Feedback';
 import AppDisplayDialog from '@/components/Overlay/AppDisplayDialog';
 import { useNoteService, useResourceService, useUserService } from '@/domains';
@@ -20,6 +20,7 @@ import { useEventListener, useRequest, useUnmount, useUpdateEffect } from 'ahook
 import { History, Save } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import ResourceFavoriteButton from '../_common/ResourceFavoriteButton';
 import styles from './style.module.less';
 
 const EMPTY_DRAWIO_XML = `<mxfile host="WisePen"><diagram name="Page-1"><mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0"><root><mxCell id="0"/><mxCell id="1" parent="0"/></root></mxGraphModel></diagram></mxfile>`;
@@ -450,6 +451,7 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
 
   const headerActions = (
     <div className={styles.headerExtra}>
+      <ResourceFavoriteButton resourceId={resourceId} onSuccess={onRefreshDrawioInfo} />
       {currentUser?.id === noteInfoDisplay.ownerId && canViewVersions ? (
         <Button size="sm" variant="secondary" onPress={handleOpenVersions} aria-label="版本记录">
           <History size={16} />
