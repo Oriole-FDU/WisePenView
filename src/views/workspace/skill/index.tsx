@@ -14,14 +14,13 @@ import { useResourceService, useSkillService } from '@/domains';
 import type { SkillFileNode, UploadSkillAssetResult } from '@/domains/Skill';
 import { SkillServicesMap } from '@/domains/Skill';
 import { useEffectForce } from '@/hooks/useEffectForce';
-import { useOpenInWorkspace } from '@/hooks/useOpenInWorkspace';
-import { useWorkspaceNavigationStore } from '@/layouts/Workspace/_store/useWorkspaceNavigationStore';
-import {
-  useWorkspaceLayoutConfig,
-  type WorkspaceLayoutConfig,
-} from '@/layouts/Workspace/WorkspaceOutletContext';
 import { parseErrorMessage } from '@/utils/error';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
+import {
+  useResourceHostContext,
+  useResourceHostLayoutConfig,
+  type ResourceHostLayoutConfig,
+} from '@/views/workspace/ResourceHostContext';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { FolderPlus, Pencil, Plus, Save, Settings, Upload } from 'lucide-react';
@@ -31,11 +30,11 @@ import SkillSaveQueueDock from './_components/SkillSaveQueueDock';
 import type { SkillSaveQueueItem } from './_components/SkillSaveQueueDock/index.type';
 import type { UnsavedSkillChangesMode } from './_components/UnsavedSkillChangesModal';
 import UnsavedSkillChangesModal from './_components/UnsavedSkillChangesModal';
-import type { SkillWorkspaceSavePhase } from './_hooks/useSkillWorkspaceController';
+import type { SkillEditorSavePhase } from './_hooks/useSkillEditorController';
 import {
-  resolveSkillWorkspaceSavePhase,
-  useSkillWorkspaceController,
-} from './_hooks/useSkillWorkspaceController';
+  resolveSkillEditorSavePhase,
+  useSkillEditorController,
+} from './_hooks/useSkillEditorController';
 import styles from './style.module.less';
 import {
   clearSkillDraftCache,
@@ -50,7 +49,7 @@ interface SkillViewProps {
 
 interface SkillLayoutConfigProps {
   children: ReactNode;
-  config?: WorkspaceLayoutConfig;
+  config?: ResourceHostLayoutConfig;
 }
 
 interface SaveAssetOptions {
@@ -574,19 +573,19 @@ function createLocalFolderNode(name: string, parentPath = ROOT_PATH): SkillFileN
 }
 
 function SkillLayoutConfig({ children, config }: SkillLayoutConfigProps) {
-  const frameConfig = useMemo<WorkspaceLayoutConfig>(
+  const frameConfig = useMemo<ResourceHostLayoutConfig>(
     () => ({
       className: styles.pageWrap,
       ...(config ?? {}),
     }),
     [config]
   );
-  useWorkspaceLayoutConfig(frameConfig);
+  useResourceHostLayoutConfig(frameConfig);
 
   return <>{children}</>;
 }
 
-function formatSaveStatus(status?: SkillWorkspaceSavePhase): string | null {
+function formatSaveStatus(status?: SkillEditorSavePhase): string | null {
   if (status === 'dirty') return '有未保存修改';
   if (status === 'saving') return '保存中...';
   if (status === 'failed') return '保存失败';
@@ -701,7 +700,7 @@ function SkillConfigPanel({
 
 function SkillView({ resourceId = '' }: SkillViewProps = {}) {
   const navigate = useNavigate();
-  const openInWorkspace = useOpenInWorkspace();
+  const { getNavigationScope, openResource } = useResourceHostContext();
   const skillService = useSkillService();
   const resourceService = useResourceService();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -711,7 +710,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
     editorContent: string;
     savedContent: string;
   } | null>(null);
-  const { state: workspaceState, actions: workspaceActions } = useSkillWorkspaceController();
+  const { state: editorState, actions: editorActions } = useSkillEditorController();
   const {
     files: localFiles,
     selectedFileId,
@@ -726,7 +725,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
     savedConfigName,
     savedConfigDescription,
     pendingIntent,
-  } = workspaceState;
+  } = editorState;
   const {
     setFiles: setLocalFiles,
     setSelectedFileId,
@@ -741,10 +740,10 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
     setSavedConfigName,
     setSavedConfigDescription,
     setPendingIntent,
-    initialize: initializeWorkspace,
+    initialize: initializeEditor,
     restoreDraft,
     discardLocalChanges,
-  } = workspaceActions;
+  } = editorActions;
   const [pendingCreate, setPendingCreate] = useState<SkillPendingCreate | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SkillFileNode | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(!resourceId);
@@ -809,7 +808,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
 
     invalidateDraftCacheWrites();
     setDraftCacheReady(false);
-    initializeWorkspace(skill);
+    initializeEditor(skill);
     setPendingCreate(null);
 
     void loadSkillDraftCache(skill.resourceId)
@@ -837,7 +836,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
     return () => {
       disposed = true;
     };
-  }, [initializeWorkspace, invalidateDraftCacheWrites, restoreDraft, skill]);
+  }, [initializeEditor, invalidateDraftCacheWrites, restoreDraft, skill]);
 
   const activeFiles = localFiles;
   const isConfigSelected = selectedTreeNodeId === SKILL_CONFIG_NODE_ID;
@@ -1073,12 +1072,10 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
 
   const handleCreateSuccess = (newResourceId: string) => {
     setCreateModalOpen(false);
-    openInWorkspace({
+    openResource({
       resourceId: newResourceId,
-      resourceType: WORKSPACE_RESOURCE_TYPE.SKILL,
-      driveLocation: {
-        scope: useWorkspaceNavigationStore.getState().location.scope,
-      },
+      resourceType: RESOURCE_KIND.SKILL,
+      driveLocation: { scope: getNavigationScope() },
       replace: true,
     });
   };
@@ -1920,7 +1917,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
     if (pendingIntent?.type === 'switchVersion') void handleSaveAndSwitchVersion();
   };
 
-  const savePhase = resolveSkillWorkspaceSavePhase({
+  const savePhase = resolveSkillEditorSavePhase({
     isFileDirty: isDirty,
     isConfigDirty,
     hasUnsavedLocalAssets,
@@ -1937,7 +1934,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
 
   const headerSaveStatusText = formatSaveStatus(canEdit ? savePhase : undefined);
 
-  const headerConfig = useMemo<WorkspaceLayoutConfig>(
+  const headerConfig = useMemo<ResourceHostLayoutConfig>(
     () => ({
       header: {
         resource: {
@@ -1946,7 +1943,7 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
           resourceIconType: 'skill',
           currentActions: skill?.currentActions,
           copyVersion: skill?.version,
-          permissionResourceType: WORKSPACE_RESOURCE_TYPE.SKILL,
+          permissionResourceType: RESOURCE_KIND.SKILL,
           ownerId: skill?.ownerId,
           onPermissionSuccess: refreshSkill,
           titleMeta: headerSaveStatusText ? (

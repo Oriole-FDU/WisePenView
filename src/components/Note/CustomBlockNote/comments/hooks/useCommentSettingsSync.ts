@@ -1,4 +1,4 @@
-import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
+import { useMemoizedFn, useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import { useRef, useState } from 'react';
 import type { Doc } from 'yjs';
 
@@ -50,14 +50,16 @@ export function useCommentSettingsSync(doc: Doc | null | undefined) {
     detachRef.current?.();
   });
 
-  const setCollaboratorVisibility = (collaboratorVisibility: CollaboratorCommentVisibility) => {
-    if (!doc) {
-      return;
+  const setCollaboratorVisibility = useMemoizedFn(
+    (collaboratorVisibility: CollaboratorCommentVisibility) => {
+      if (!doc) {
+        return;
+      }
+      const next = { collaboratorVisibility };
+      setSettings(next);
+      setCommentSettingsOnDoc(doc, next);
     }
-    const next = { collaboratorVisibility };
-    setSettings(next);
-    setCommentSettingsOnDoc(doc, next);
-  };
+  );
 
   return { settings, setCollaboratorVisibility };
 }

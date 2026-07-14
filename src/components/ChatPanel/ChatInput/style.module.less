@@ -1,6 +1,6 @@
 ﻿.container {
   flex-shrink: 0;
-  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  padding: var(--space-sm) 0 var(--space-2xs);
   background: transparent;
 }
 
@@ -22,14 +22,51 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 12%, transparent);
   }
+
+  &.inputCardDragOver {
+    [data-slot='attachment-actions'],
+    .contextAttachmentClear {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
 }
 
-.attachmentArea {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  overflow-x: auto;
-  padding-block: 2px;
+.attachmentStripShell {
+  width: 100%;
+  min-width: 0;
+
+  .attachmentArea {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-block: var(--space-2xs) var(--space-xs);
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: block;
+      height: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: var(--scrollbar-radius, 999px);
+      background: var(--scrollbar-thumb);
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb-hover);
+    }
+  }
 }
 
 .contextAttachment {
@@ -39,6 +76,7 @@
   min-width: 0;
   padding: var(--space-xs) var(--space-sm);
   border-left: 2px solid var(--accent);
+  border-radius: var(--radius-xl);
   background: var(--surface-secondary);
 }
 
@@ -119,7 +157,8 @@
   line-height: 1;
 }
 
-.voiceButtonActive {
+.voiceButtonActive,
+.stopButtonActive {
   color: var(--danger);
   background: color-mix(in srgb, var(--danger) 10%, transparent);
 }
@@ -127,7 +166,7 @@
 .toolbarPopover {
   padding: 0;
   border: 1px solid var(--border-light);
-  border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+  border-radius: var(--radius-xl);
   background: var(--overlay);
   box-shadow: var(--card-shadow);
 }
@@ -140,11 +179,7 @@
   background: var(--surface);
 }
 
-.skillMenuPanel {
-  min-width: 220px;
-  max-width: 340px;
-  padding: 0;
-  background: var(--surface);
+.popoverPanelScrollable {
   width: 260px;
   max-height: 420px;
   overflow-y: auto;
@@ -185,7 +220,7 @@
   background: transparent;
 
   :global(.list-box-item) {
-    border-radius: var(--app-radius-popover-item, var(--radius-xl));
+    border-radius: var(--radius-xl);
   }
 }
 
@@ -213,13 +248,6 @@
   color: var(--accent);
 }
 
-.fullWidthButton {
-  width: 100%;
-  justify-content: flex-start;
-  margin: 2px 0;
-  border-radius: var(--radius-lg);
-}
-
 .switchRow {
   display: flex;
   align-items: center;
@@ -227,7 +255,7 @@
   min-height: 34px;
   padding: 6px var(--space-sm);
   border-top: 1px solid var(--border-light);
-  border-radius: var(--app-radius-popover-control, var(--radius-xl));
+  border-radius: var(--radius-xl);
   color: var(--muted);
   font-size: var(--font-size-sm);
   cursor: pointer;
@@ -252,7 +280,7 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--info);
+  background: var(--primary);
   color: #fff;
   font-size: 10px;
   line-height: 16px;
@@ -299,7 +327,7 @@
   height: 32px;
   padding: 0 var(--space-xs);
   border: 0;
-  border-radius: var(--app-radius-popover-control, var(--radius-xl));
+  border-radius: var(--radius-xl);
   background: transparent;
   color: var(--text-tertiary);
   font-size: var(--font-size-sm);
@@ -358,14 +386,14 @@
 
 .dropOverlay {
   position: absolute;
-  inset: var(--space-xs);
-  z-index: 2;
+  inset: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px dashed var(--accent);
-  border-radius: var(--radius-xl);
-  background: color-mix(in srgb, var(--surface) 86%, var(--accent));
+  border-radius: calc(var(--radius-xl) - 1px);
+  background: var(--surface);
   color: var(--accent);
   font-size: var(--font-size-sm);
   font-weight: 500;
@@ -378,10 +406,10 @@
 
 .footerTip {
   text-align: center;
-  margin-top: 4px;
-  color: var(--text-tertiary);
-  font-size: var(--font-size-sm);
-  line-height: 1;
+  margin-top: var(--space-xs);
+  color: var(--text-disabled);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
 }
 
 @keyframes chat-input-spin {

@@ -39,6 +39,9 @@ export class NoteSaveStatusObserver {
       const status = parseStatusPayload(args[0]);
       if (status === 'connected') {
         this.updateStatus('saving');
+        if (this._hasPendingLocalUpdate) {
+          this.scheduleSettle();
+        }
         return;
       }
       if (status === 'disconnected') {

@@ -2,6 +2,8 @@ import ChatPanel from '@/components/ChatPanel';
 import { useChatPanelStore } from '@/components/ChatPanel/_store/useChatPanelStore';
 import { useCurrentChatSessionStore } from '@/components/ChatPanel/_store/useCurrentChatSessionStore';
 import { clearNewChatSessionStore } from '@/components/ChatPanel/_store/useNewChatSessionStore';
+import { createResourceChatStateProvider } from '@/components/ChatPanel/ResourceChatProtocol';
+import { useOpenInWorkspace } from '@/hooks/useOpenInWorkspace';
 import { useSystemLayoutStore } from '@/layouts/_common/_store/useSystemLayoutStore';
 import DriveSidebar from '@/layouts/_common/Sidebar/DriveSidebar';
 import {
@@ -11,11 +13,14 @@ import {
 } from '@/layouts/_common/SystemResizable';
 import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
+import { useEnterZenMode } from '@/layouts/ZenMode/useEnterZenMode';
+import { normalizeResourceKind, resolveResourceViewer } from '@/utils/navigation/resourceTarget';
 import {
-  normalizeWorkspaceResourceType,
-  resolveLegacyEditorTypeForWorkspace,
-  resolveWorkspaceViewer,
-} from '@/utils/navigation/workspaceRoute';
+  DEFAULT_RESOURCE_HOST_ID,
+  ResourceHostContext,
+  type ResourceHostContextValue,
+  type ResourceHostLayoutConfig,
+} from '@/views/workspace/ResourceHostContext';
 import { useUpdateEffect } from 'ahooks';
 import clsx from 'clsx';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -29,15 +34,14 @@ import { Outlet, useLocation, useMatch } from 'react-router-dom';
 import WorkspaceFrame from './_common/WorkspaceFrame';
 import WorkspaceHeader from './_common/WorkspaceHeader';
 import { useWorkspaceChatProtocolStore } from './_store/useWorkspaceChatProtocolStore';
+import { useWorkspaceNavigationStore } from './_store/useWorkspaceNavigationStore';
 import { useWorkspaceResourceBreadcrumb } from './useWorkspaceResourceBreadcrumb';
-import { createResourceWorkspaceChatStateProvider } from './WorkspaceChatProtocol';
 import styles from './WorkspaceLayout.module.less';
-import type { WorkspaceLayoutConfig, WorkspaceOutletContextValue } from './WorkspaceOutletContext';
 
 const WORKSPACE_LEFT_SIDEBAR_MIN_WIDTH = 240;
 const WORKSPACE_LEFT_SIDEBAR_MAX_WIDTH = 420;
 const WORKSPACE_MAIN_MIN_WIDTH = 360;
-const CHAT_PANEL_MIN_WIDTH = 320;
+const CHAT_PANEL_MIN_WIDTH = 480;
 const CHAT_PANEL_MAX_WIDTH = 1020;
 const RESIZE_TARGET_MINIMUM_SIZE = { fine: 16, coarse: 32 };
 
@@ -49,8 +53,10 @@ const clampWorkspaceLeftSidebarWidth = (width: number): number =>
 
 function WorkspaceLayout() {
   const appNavigation = useAppNavigation();
+  const openResource = useOpenInWorkspace();
+  const enterZenMode = useEnterZenMode();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [layoutConfig, setLayoutConfigState] = useState<WorkspaceLayoutConfig>({});
+  const [layoutConfig, setLayoutConfigState] = useState<ResourceHostLayoutConfig>({});
   const storedLeftSidebarWidth = useSystemLayoutStore((state) => state.workspaceLeftSidebarWidth);
   const setLeftSidebarWidth = useSystemLayoutStore((state) => state.setWorkspaceLeftSidebarWidth);
   const leftSidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
@@ -86,8 +92,8 @@ function WorkspaceLayout() {
     const rawResourceType =
       resourceRouteMatch?.params.resourceType ?? resourceListRouteMatch?.params.resourceType;
     const resourceId = resourceRouteMatch?.params.resourceId;
-    const resourceType = normalizeWorkspaceResourceType(rawResourceType);
-    const viewer = resolveWorkspaceViewer({
+    const resourceType = normalizeResourceKind(rawResourceType);
+    const viewer = resolveResourceViewer({
       resourceType: rawResourceType,
       viewer: new URLSearchParams(location.search).get('viewer') ?? undefined,
     });
@@ -106,11 +112,10 @@ function WorkspaceLayout() {
   const routeChatStateProvider = useMemo(() => {
     const { resourceId, resourceType, viewer } = routeContext;
     if (!resourceId || !resourceType) return undefined;
-    return createResourceWorkspaceChatStateProvider({
+    return createResourceChatStateProvider({
       resourceId,
       resourceType,
       viewer,
-      editorType: resolveLegacyEditorTypeForWorkspace(resourceType, viewer),
     });
   }, [routeContext]);
   const resourceBreadcrumb = useWorkspaceResourceBreadcrumb(routeContext.resourceId);
@@ -233,7 +238,7 @@ function WorkspaceLayout() {
     [chatPanelOpen, setChatPanelWidth]
   );
 
-  const setLayoutConfig = useCallback((config: WorkspaceLayoutConfig) => {
+  const setLayoutConfig = useCallback((config: ResourceHostLayoutConfig) => {
     setLayoutConfigState(config);
   }, []);
 
@@ -241,13 +246,34 @@ function WorkspaceLayout() {
     setLayoutConfigState({});
   }, []);
 
-  const outletContext = useMemo<WorkspaceOutletContextValue>(
+  const handleEnterZenMode = useCallback(() => {
+    const { resourceId, resourceType, viewer } = routeContext;
+    if (!resourceId || !resourceType) return;
+    const resourceName =
+      layoutConfig.header === false ? undefined : layoutConfig.header?.resource?.resourceName;
+    enterZenMode(
+      {
+        resourceId,
+        resourceType,
+        resourceName,
+        viewer,
+      },
+      useWorkspaceNavigationStore.getState().location
+    );
+  }, [enterZenMode, layoutConfig.header, routeContext]);
+
+  const resourceHostContext = useMemo<ResourceHostContextValue>(
     () => ({
+      hostId: DEFAULT_RESOURCE_HOST_ID,
       routeContext,
+      getNavigationScope: () => useWorkspaceNavigationStore.getState().location.scope,
+      openResource,
       setLayoutConfig,
       resetLayoutConfig,
+      setChatContext: useWorkspaceChatProtocolStore.getState().setContext,
+      clearChatContext: useWorkspaceChatProtocolStore.getState().clearContext,
     }),
-    [resetLayoutConfig, routeContext, setLayoutConfig]
+    [openResource, resetLayoutConfig, routeContext, setLayoutConfig]
   );
 
   const renderHeader = () => {
@@ -274,6 +300,7 @@ function WorkspaceLayout() {
         onGoForward={appNavigation.goForward}
         onToggleLeftSidebar={handleSidebarToggle}
         onToggleRightSidebar={handleChatPanelToggle}
+        onEnterZenMode={handleEnterZenMode}
       />
     );
   };
@@ -329,13 +356,15 @@ function WorkspaceLayout() {
             className={styles.middleLayout}
           >
             <main className={`${styles.middleContent} ${styles.workspaceContent}`}>
-              <WorkspaceFrame
-                className={layoutConfig.className}
-                bodyClassName={layoutConfig.bodyClassName}
-                header={renderHeader()}
-              >
-                <Outlet context={outletContext} />
-              </WorkspaceFrame>
+              <ResourceHostContext value={resourceHostContext}>
+                <WorkspaceFrame
+                  className={layoutConfig.className}
+                  bodyClassName={layoutConfig.bodyClassName}
+                  header={renderHeader()}
+                >
+                  <Outlet />
+                </WorkspaceFrame>
+              </ResourceHostContext>
             </main>
           </SystemResizablePanel>
 
@@ -360,7 +389,7 @@ function WorkspaceLayout() {
               <ChatPanel
                 collapsed={false}
                 onNewChat={handleNewChat}
-                workspaceChat={{
+                resourceChat={{
                   provider: workspaceChatStateProvider,
                   context: workspaceChatContext,
                   clearContext: clearWorkspaceChatContext,

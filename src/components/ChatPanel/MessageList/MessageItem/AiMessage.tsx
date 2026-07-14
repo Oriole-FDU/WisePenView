@@ -3,8 +3,10 @@ import { Spin } from '@/components/Feedback';
 import ProviderLogo from '@/components/Icons/ProviderLogo';
 import { Button, toast } from '@heroui/react';
 import { useInterval } from 'ahooks';
-import { Check, Copy } from 'lucide-react';
+import clsx from 'clsx';
+import { Check, Copy, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
+import inputStyles from '../../ChatInput/style.module.less';
 import styles from './AiMessage.module.less';
 import MessageContent from './MessageContent';
 import ThinkingBlock from './ThinkingBlock';
@@ -12,6 +14,7 @@ import ToolCallBlock from './ToolCallBlock';
 
 const LOADING_HINTS = ['正在生成回复...', '请稍等片刻...', '正在组织答案...'];
 const LOADING_HINT_SWITCH_MS = 2000;
+const MESSAGE_ACTION_ICON_SIZE = 17;
 
 function AiMessage({ message }: { message: Message }) {
   const hasReasoning = message.reasoningContent !== undefined;
@@ -41,14 +44,9 @@ function AiMessage({ message }: { message: Message }) {
 
   return (
     <div className={styles.aiRow}>
-      {/* 头像 */}
-      <div className={styles.avatarCol}>
-        <ProviderLogo provider={displayProvider} size={28} />
-      </div>
-
-      {/* 内容 */}
       <div className={styles.contentCol}>
         <div className={styles.modelMeta}>
+          <ProviderLogo provider={displayProvider} size={16} className={styles.modelLogo} />
           <span className={styles.modelName}>{displayModelName}</span>
         </div>
         {/* 思考过程块 */}
@@ -75,7 +73,6 @@ function AiMessage({ message }: { message: Message }) {
           </span>
         )}
         {/* 正文内容 */}
-        {/* 只有当正文有内容，或者没有思考过程且非 loading 时（避免空白占位），才渲染正文 */}
         {(message.content || (!hasReasoning && !showLoadingIndicator)) && (
           <div className={styles.bubble}>
             <MessageContent content={message.content} renderAsMarkdown />
@@ -85,16 +82,41 @@ function AiMessage({ message }: { message: Message }) {
         {/* 底部操作栏 (非 Loading 时显示) */}
         {!message.loading && (
           <div className={styles.actions}>
-            {/* 系统当前不支持点赞、点踩、重新生成 */}
             <Button
               variant="ghost"
               isIconOnly
               size="sm"
-              className={`${styles.actionBtn} ${copied ? styles.actionBtnCopied : ''}`}
+              className={clsx(
+                inputStyles.toolbarCircleBtn,
+                styles.actionBtn,
+                copied && styles.actionBtnCopied
+              )}
               onPress={handleCopy}
               aria-label="复制"
             >
-              {copied ? <Check size={12} /> : <Copy size={12} />}
+              {copied ? (
+                <Check size={MESSAGE_ACTION_ICON_SIZE} />
+              ) : (
+                <Copy size={MESSAGE_ACTION_ICON_SIZE} />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              isIconOnly
+              size="sm"
+              className={clsx(inputStyles.toolbarCircleBtn, styles.actionBtn)}
+              aria-label="点赞"
+            >
+              <ThumbsUp size={MESSAGE_ACTION_ICON_SIZE} />
+            </Button>
+            <Button
+              variant="ghost"
+              isIconOnly
+              size="sm"
+              className={clsx(inputStyles.toolbarCircleBtn, styles.actionBtn)}
+              aria-label="点踩"
+            >
+              <ThumbsDown size={MESSAGE_ACTION_ICON_SIZE} />
             </Button>
           </div>
         )}

@@ -1,7 +1,7 @@
 import AppIconButton from '@/components/AppIconButton';
 import AppNavigationControls from '@/layouts/AppNavigation/AppNavigationControls';
 import clsx from 'clsx';
-import { PanelRightOpen } from 'lucide-react';
+import { PanelRightOpen, PanelsTopLeft } from 'lucide-react';
 
 import ResourceHeader from '../ResourceHeader';
 import type { WorkspaceHeaderProps } from './index.type';
@@ -20,6 +20,7 @@ function WorkspaceHeader({
   onGoForward,
   onToggleLeftSidebar,
   onToggleRightSidebar,
+  onEnterZenMode,
   className,
 }: WorkspaceHeaderProps) {
   return (
@@ -47,6 +48,13 @@ function WorkspaceHeader({
           )}
           <div className={styles.toolbarEnd}>
             {resource ? null : extra}
+            {onEnterZenMode ? (
+              <AppIconButton
+                icon={<PanelsTopLeft size={18} aria-hidden="true" />}
+                label="进入 Zen Mode"
+                onPress={onEnterZenMode}
+              />
+            ) : null}
             {rightSidebarCollapsed && onToggleRightSidebar ? (
               <div className={styles.sidebarControls}>
                 <AppIconButton

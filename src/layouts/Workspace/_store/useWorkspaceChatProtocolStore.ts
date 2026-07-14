@@ -1,11 +1,11 @@
+import type { ResourceChatContext } from '@/components/ChatPanel/ResourceChatProtocol';
 import { registerStore } from '@/store/lifecycle';
 import { create } from 'zustand';
-import type { WorkspaceChatContext } from '../WorkspaceChatProtocol';
 
 interface WorkspaceChatProtocolState {
-  context?: WorkspaceChatContext;
-  setContext: (context: WorkspaceChatContext) => void;
-  clearContext: (context?: WorkspaceChatContext) => void;
+  context?: ResourceChatContext;
+  setContext: (context: ResourceChatContext) => void;
+  clearContext: (context?: ResourceChatContext) => void;
 }
 
 const DEFAULT_STATE = {

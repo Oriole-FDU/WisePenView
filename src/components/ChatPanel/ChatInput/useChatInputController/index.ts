@@ -20,10 +20,11 @@ import { useVoiceInput } from '../VoiceInput/useVoiceInput';
 
 interface UseChatInputControllerOptions {
   onSend: ChatInputProps['onSend'];
+  onStop?: ChatInputProps['onStop'];
   sending: boolean;
 }
 
-export function useChatInputController({ onSend, sending }: UseChatInputControllerOptions) {
+export function useChatInputController({ onSend, onStop, sending }: UseChatInputControllerOptions) {
   const store = useChatInputStoreApi();
   const dragCounterRef = useRef(0);
   const { routeFiles, preparePendingAttachments, clearPendingFileCache } = useChatInputFiles();
@@ -42,7 +43,7 @@ export function useChatInputController({ onSend, sending }: UseChatInputControll
   const completionState = useChatInputStore(useShallow(selectChatInputCompletionState));
   const { clearAfterSend, setIsComposing, setIsDragOver, setValue } = store.getState();
 
-  const sendDisabled = !value.trim() || sending || !selectedModel || voiceInputProps.isActive;
+  const sendDisabled = !value.trim() || !selectedModel || voiceInputProps.isActive;
 
   async function handleSend(): Promise<void> {
     const text = completionState.value.trim();
@@ -143,8 +144,10 @@ export function useChatInputController({ onSend, sending }: UseChatInputControll
     },
     toolbarProps: {
       sendDisabled,
+      sending,
       voiceInputProps,
       onSend: () => void handleSend(),
+      onStop,
     },
   };
 }

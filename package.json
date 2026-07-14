@@ -1,7 +1,7 @@
 {
   "name": "wise-pen-view",
   "private": true,
-  "version": "0.5.01",
+  "version": "0.5.2",
   "type": "module",
   "scripts": {
     "dev": "vite",

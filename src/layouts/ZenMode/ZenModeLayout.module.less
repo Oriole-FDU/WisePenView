@@ -1,0 +1,153 @@
+.root {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.zenBar {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 36px;
+  height: 36px;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-xs);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.zenTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content,
+.resourceArea,
+.resourcePanel {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chatDock {
+  min-width: var(--chat-panel-min-width);
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+}
+
+.resourcePane {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px transparent;
+}
+
+.resourcePaneActive {
+  box-shadow: inset 0 0 0 1px var(--focus);
+}
+
+.paneTitleBar {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 32px;
+  height: 32px;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-2xs) 0 var(--space-sm);
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+}
+
+.paneTitle {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-xs, 12px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resourcePaneActive .paneTitle {
+  color: var(--foreground);
+}
+
+.paneActions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+}
+
+.paneBody {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.emptySlot {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  border: 0;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+.emptySlot:hover {
+  background: var(--surface-hover);
+  color: var(--foreground);
+}
+
+.emptySlot:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -3px;
+}
+
+.navigator {
+  min-height: 320px;
+  max-height: 480px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 6px);
+}
+
+.resizeHandle {
+  z-index: 30;
+}
+
+.chatDock {
+  background: var(--background);
+}

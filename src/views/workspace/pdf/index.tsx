@@ -3,14 +3,18 @@ import ResourceDiscussionPanel from '@/components/interact/ResourceDiscussionPan
 import PdfViewer from '@/components/PdfViewer/index';
 import { useDocumentService, useResourceService } from '@/domains';
 import type { ResourceAction } from '@/domains/Resource';
-import { useWorkspaceLayoutConfig } from '@/layouts/Workspace/WorkspaceOutletContext';
 import { parseErrorMessage } from '@/utils/error';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
+import {
+  useResourceHostLayoutConfig,
+  type ResourceHostLayoutConfig,
+} from '@/views/workspace/ResourceHostContext';
 import { Button, ToggleButton, Tooltip } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { MessagesSquare } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import ResourceFavoriteButton from '../_common/ResourceFavoriteButton';
 import styles from './style.module.less';
 
 interface PdfLayoutConfigProps {
@@ -34,7 +38,7 @@ function PdfLayoutConfig({
   onPermissionSuccess,
   actions,
 }: PdfLayoutConfigProps) {
-  const frameConfig = useMemo(
+  const frameConfig = useMemo<ResourceHostLayoutConfig>(
     () => ({
       className: styles.container,
       header: resourceName
@@ -44,7 +48,7 @@ function PdfLayoutConfig({
               resourceName,
               resourceType,
               currentActions: resourceInfoActions,
-              permissionResourceType: WORKSPACE_RESOURCE_TYPE.FILE,
+              permissionResourceType: RESOURCE_KIND.FILE,
               ownerId,
               onPermissionSuccess,
               actions,
@@ -62,7 +66,7 @@ function PdfLayoutConfig({
       resourceType,
     ]
   );
-  useWorkspaceLayoutConfig(frameConfig);
+  useResourceHostLayoutConfig(frameConfig);
 
   return <>{children}</>;
 }
@@ -186,28 +190,31 @@ function DocumentPreview({ resourceId }: DocumentPreviewProps = {}) {
   }
 
   const resolvedResourceId = docInfo.resourceInfo.resourceId || resourceId;
-  const canShowDiscussion = docInfo.resourceInfo.resourceType === WORKSPACE_RESOURCE_TYPE.FILE;
+  const canShowDiscussion = docInfo.resourceInfo.resourceType === RESOURCE_KIND.FILE;
   const discussionToggleLabel = discussionOpen ? '收起讨论栏' : '展开讨论栏';
-  const headerActions = canShowDiscussion ? (
+  const headerActions = (
     <div className={styles.headerActions}>
-      <Tooltip>
-        <Tooltip.Trigger>
-          <ToggleButton
-            variant="ghost"
-            size="sm"
-            isIconOnly
-            isSelected={discussionOpen}
-            aria-label={discussionToggleLabel}
-            aria-expanded={discussionOpen}
-            onChange={() => setDiscussionOpen((current) => !current)}
-          >
-            <MessagesSquare size={16} aria-hidden="true" />
-          </ToggleButton>
-        </Tooltip.Trigger>
-        <Tooltip.Content>{discussionToggleLabel}</Tooltip.Content>
-      </Tooltip>
+      <ResourceFavoriteButton resourceId={resolvedResourceId} onSuccess={refreshDocInfo} />
+      {canShowDiscussion ? (
+        <Tooltip>
+          <Tooltip.Trigger>
+            <ToggleButton
+              variant="ghost"
+              size="sm"
+              isIconOnly
+              isSelected={discussionOpen}
+              aria-label={discussionToggleLabel}
+              aria-expanded={discussionOpen}
+              onChange={() => setDiscussionOpen((current) => !current)}
+            >
+              <MessagesSquare size={16} aria-hidden="true" />
+            </ToggleButton>
+          </Tooltip.Trigger>
+          <Tooltip.Content>{discussionToggleLabel}</Tooltip.Content>
+        </Tooltip>
+      ) : null}
     </div>
-  ) : null;
+  );
 
   if (viewerError) {
     return (

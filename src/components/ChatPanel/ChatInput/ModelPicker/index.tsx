@@ -69,7 +69,7 @@ function ModelPicker() {
             <ProviderLogo provider={selectedModel?.provider ?? 'openai'} size={16} />
           )}
           <span>{loading ? '模型加载中' : (selectedModel?.name ?? '选择模型')}</span>
-          <ChevronDown size={12} />
+          <ChevronDown size={16} />
         </button>
       </Popover.Trigger>
       <Popover.Content className={styles.toolbarPopover} placement="top">

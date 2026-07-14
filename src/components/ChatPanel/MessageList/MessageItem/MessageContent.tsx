@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import MarkdownPreBlock from './MarkdownPreBlock';
 import styles from './MessageContent.module.less';
 
 interface MessageContentProps {
@@ -14,7 +15,14 @@ function MessageContent({ content, renderAsMarkdown = false }: MessageContentPro
 
   return (
     <div className={styles.markdown}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          pre: ({ children }) => <MarkdownPreBlock>{children}</MarkdownPreBlock>,
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 }

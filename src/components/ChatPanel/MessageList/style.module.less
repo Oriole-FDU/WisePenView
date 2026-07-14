@@ -10,13 +10,48 @@
 .viewport {
   display: flex;
   flex-direction: column;
-  padding: 0 var(--space-lg) var(--space-lg);
+  padding: 0;
   .appSubtleScrollbar();
 }
 
-.content {
+.scrollColumn {
   gap: 0;
-  padding-top: 0;
+  width: 100%;
+  max-width: var(--chat-message-max-width, none);
+  min-height: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.messagesBody {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md) var(--chat-message-inline-padding, var(--space-lg)) var(--space-lg);
+  box-sizing: border-box;
+}
+
+.footerSlot {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+  margin-top: calc(-1 * var(--space-lg));
+  padding-top: var(--space-lg);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--background) 0%, transparent) 0%,
+    var(--background) 20%
+  );
+}
+
+.footer {
+  flex-shrink: 0;
+  padding: 0 var(--chat-message-inline-padding, var(--space-lg)) var(--space-xs);
+  background: transparent;
 }
 
 .welcomeItem {
@@ -66,51 +101,6 @@
       color: var(--muted);
       line-height: var(--line-height-sm);
     }
-
-    .promptSection {
-      margin-top: var(--space-lg);
-    }
-
-    .promptChips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs);
-    }
-
-    .promptChip {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2xs);
-      padding: var(--space-xs) var(--space-md);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-full, 999px);
-      background: var(--surface);
-      font-size: var(--font-size-sm);
-      line-height: var(--line-height-sm);
-      color: var(--muted);
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-
-      &:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-      }
-    }
-
-    .promptIcon {
-      display: inline-flex;
-      flex-shrink: 0;
-      align-items: center;
-      justify-content: center;
-      width: var(--font-size-sm);
-      height: var(--font-size-sm);
-      color: var(--text-tertiary);
-
-      svg {
-        width: 100%;
-        height: 100%;
-      }
-    }
   }
 }
 
@@ -122,6 +112,7 @@
 }
 
 .scrollToBottomButton {
+  bottom: calc(var(--chat-footer-scroll-offset, 132px) + var(--space-md)) !important;
   z-index: 2;
   cursor: pointer;
   display: inline-flex;

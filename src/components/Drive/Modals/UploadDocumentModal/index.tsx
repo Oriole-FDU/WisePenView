@@ -350,7 +350,7 @@ function UploadDocumentModal({
       <div className={styles.statusPanel}>
         <div className={styles.statusHeader}>
           <div className={styles.statusTitle}>
-            <span>支持 PDF、Office、文本和 Markdown 文档，单文件最大 100MB。</span>
+            <span>支持 PDF 和 OFFICE 文档，单文件最大 100MB。</span>
           </div>
         </div>
       </div>

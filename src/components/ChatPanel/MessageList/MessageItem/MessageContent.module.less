@@ -10,7 +10,7 @@
   overflow-wrap: anywhere;
 
   :global(p) {
-    margin: 0 0 var(--space-sm);
+    margin: 0 0 var(--space-md);
   }
 
   :global(p:last-child) {
@@ -19,29 +19,28 @@
 
   :global(ul),
   :global(ol) {
-    margin: 0 0 var(--space-sm);
+    margin: 0 0 var(--space-md);
     padding-left: var(--space-lg);
   }
 
   :global(li + li) {
-    margin-top: 4px;
+    margin-top: var(--space-2xs);
   }
 
   :global(blockquote) {
-    margin: 0 0 var(--space-sm);
+    margin: var(--space-lg) 0 var(--space-sm);
     padding: var(--space-xs) var(--space-sm);
+    border: 0;
     border-left: 3px solid var(--border);
-    background-color: var(--surface-secondary);
-    border-radius: 6px;
+    border-radius: 0;
+    background-color: transparent;
     color: var(--muted);
   }
 
-  :global(pre) {
-    margin: 0 0 var(--space-sm);
-    padding: var(--space-sm);
-    border-radius: var(--radius);
-    background-color: var(--surface-tertiary);
-    overflow-x: auto;
+  :global(hr) {
+    margin: var(--space-md) 0 var(--chat-hr-margin-bottom, var(--space-sm));
+    border: 0;
+    border-top: 1px solid var(--border-light);
   }
 
   :global(code) {
@@ -50,8 +49,8 @@
   }
 
   :global(:not(pre) > code) {
-    padding: 1px 4px;
-    border-radius: 6px;
+    padding: calc(var(--space-2xs) / 4) var(--space-2xs);
+    border-radius: var(--radius-sm);
     background-color: var(--surface-secondary);
   }
 
@@ -63,7 +62,7 @@
 
   :global(th),
   :global(td) {
-    padding: 4px var(--space-xs);
+    padding: var(--space-2xs) var(--space-xs);
     border: 1px solid var(--border-light);
   }
 }

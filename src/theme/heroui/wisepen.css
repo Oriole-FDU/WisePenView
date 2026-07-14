@@ -222,7 +222,7 @@
     --background: #ffffff;
     --foreground: #2e2e2e;
     --muted: #6b6b6b;
-    --border: #8a727c;
+    --border: #e4e7ec;
     --separator: #eeebed;
     --surface: #ffffff;
     --surface-foreground: #2e2e2e;
@@ -241,7 +241,7 @@
     --ai-accent-hover: #ebdbe6;
     --background-alt: #f5eff4;
     --surface-hover: #fef7fb;
-    --border-light: #f7f4f7;
+    --border-light: #f0f1f3;
     --text-tertiary: #a1a1a1;
     --text-disabled: #d3d3d3;
     --text-inverse: #ffffff;
@@ -262,7 +262,7 @@
     --background: #1a141b;
     --foreground: #eee8ed;
     --muted: #a899a3;
-    --border: #42363e;
+    --border: #374151;
     --separator: #2a2026;
     --surface: #201926;
     --surface-foreground: #eee8ed;
@@ -281,7 +281,7 @@
     --ai-accent-hover: #9e8f97;
     --background-alt: #1c1520;
     --surface-hover: #261d2c;
-    --border-light: #362c34;
+    --border-light: #4b5563;
     --text-tertiary: #8e7f89;
     --text-disabled: #5a4e56;
     --text-inverse: #0d1117;
@@ -302,7 +302,7 @@
     --background: #ffffff;
     --foreground: #262626;
     --muted: #727272;
-    --border: #658a8e;
+    --border: #e4e7ec;
     --separator: #edf3f3;
     --surface: #ffffff;
     --surface-foreground: #262626;
@@ -321,7 +321,7 @@
     --ai-accent-hover: #a9dbdd;
     --background-alt: #edf7f7;
     --surface-hover: #f5fcfd;
-    --border-light: #f2f9f9;
+    --border-light: #f0f1f3;
     --text-tertiary: #9f9f9f;
     --text-disabled: #dee7e7;
     --text-inverse: #ffffff;
@@ -342,7 +342,7 @@
     --background: #0e1c1d;
     --foreground: #e1f2f2;
     --muted: #bdcfcf;
-    --border: #395b5c;
+    --border: #374151;
     --separator: #1b3131;
     --surface: #14292a;
     --surface-foreground: #e1f2f2;
@@ -361,7 +361,7 @@
     --ai-accent-hover: #5db3b6;
     --background-alt: #101f20;
     --surface-hover: #183233;
-    --border-light: #274141;
+    --border-light: #4b5563;
     --text-tertiary: #8eb9ba;
     --text-disabled: #5a7a7b;
     --text-inverse: #0d1117;
@@ -382,7 +382,7 @@
     --background: #ffffff;
     --foreground: #252121;
     --muted: #717171;
-    --border: #a5745c;
+    --border: #e4e7ec;
     --separator: #f8ede7;
     --surface: #ffffff;
     --surface-foreground: #252121;
@@ -401,7 +401,7 @@
     --ai-accent-hover: #f9d8c6;
     --background-alt: #fdf2ea;
     --surface-hover: #fdf6f2;
-    --border-light: #fdf4f1;
+    --border-light: #f0f1f3;
     --text-tertiary: #aeaeae;
     --text-disabled: #e3dfdd;
     --text-inverse: #ffffff;
@@ -422,7 +422,7 @@
     --background: #1e1512;
     --foreground: #f6eee9;
     --muted: #c4b0a7;
-    --border: #53433d;
+    --border: #374151;
     --separator: #2e221d;
     --surface: #241a16;
     --surface-foreground: #f6eee9;
@@ -441,7 +441,7 @@
     --ai-accent-hover: #a28c7f;
     --background-alt: #1a1310;
     --surface-hover: #2a1f1a;
-    --border-light: #3d2e28;
+    --border-light: #4b5563;
     --text-tertiary: #a8958b;
     --text-disabled: #6b5d56;
     --text-inverse: #0d1117;
@@ -462,7 +462,7 @@
     --background: #ffffff;
     --foreground: #1a2c25;
     --muted: #7b7b7b;
-    --border: #75857a;
+    --border: #e4e7ec;
     --separator: #eff3f0;
     --surface: #ffffff;
     --surface-foreground: #1a2c25;
@@ -481,7 +481,7 @@
     --ai-accent-hover: #d4e8dd;
     --background-alt: #ecf4ef;
     --surface-hover: #f3f9f5;
-    --border-light: #f5faf7;
+    --border-light: #f0f1f3;
     --text-tertiary: #a9a9a9;
     --text-disabled: #dee4e0;
     --text-inverse: #ffffff;
@@ -502,7 +502,7 @@
     --background: #0f1914;
     --foreground: #dff0e6;
     --muted: #b2c9bd;
-    --border: #385a47;
+    --border: #374151;
     --separator: #1a2e23;
     --surface: #132218;
     --surface-foreground: #dff0e6;
@@ -521,7 +521,7 @@
     --ai-accent-hover: #6da18a;
     --background-alt: #0d160f;
     --surface-hover: #16291d;
-    --border-light: #243d2e;
+    --border-light: #4b5563;
     --text-tertiary: #83b599;
     --text-disabled: #52705f;
     --text-inverse: #0d1117;
@@ -542,7 +542,7 @@
     --background: #ffffff;
     --foreground: #232323;
     --muted: #6c6c6c;
-    --border: #7c6c8f;
+    --border: #e4e7ec;
     --separator: #f5f3fb;
     --surface: #ffffff;
     --surface-foreground: #232323;
@@ -561,7 +561,7 @@
     --ai-accent-hover: #eae3fc;
     --background-alt: #f7f3fe;
     --surface-hover: #fbf8fe;
-    --border-light: #fbf9fe;
+    --border-light: #f0f1f3;
     --text-tertiary: #bfb9d5;
     --text-disabled: #e9e4f2;
     --text-inverse: #ffffff;
@@ -582,7 +582,7 @@
     --background: #14111e;
     --foreground: #f0ecf8;
     --muted: #c2bdda;
-    --border: #4a405b;
+    --border: #374151;
     --separator: #241e30;
     --surface: #19152b;
     --surface-foreground: #f0ecf8;
@@ -601,7 +601,7 @@
     --ai-accent-hover: #9f8cc4;
     --background-alt: #110e19;
     --surface-hover: #1e1932;
-    --border-light: #352d47;
+    --border-light: #4b5563;
     --text-tertiary: #a89ec6;
     --text-disabled: #6a6080;
     --text-inverse: #0d1117;
@@ -622,7 +622,7 @@
     --background: #ffffff;
     --foreground: #252525;
     --muted: #6e6e6e;
-    --border: #9f8b56;
+    --border: #e4e7ec;
     --separator: #f8f6ed;
     --surface: #ffffff;
     --surface-foreground: #252525;
@@ -641,7 +641,7 @@
     --ai-accent-hover: #d5cfa0;
     --background-alt: #fdf6ee;
     --surface-hover: #fefaf7;
-    --border-light: #fdfaf2;
+    --border-light: #f0f1f3;
     --text-tertiary: #a7a7a7;
     --text-disabled: #e2dfd9;
     --text-inverse: #161622;
@@ -662,7 +662,7 @@
     --background: #1a1612;
     --foreground: #f2ece2;
     --muted: #bfb7a9;
-    --border: #554c3d;
+    --border: #374151;
     --separator: #29221b;
     --surface: #211c15;
     --surface-foreground: #f2ece2;
@@ -681,7 +681,7 @@
     --ai-accent-hover: #a4998c;
     --background-alt: #17130e;
     --surface-hover: #282218;
-    --border-light: #3d3428;
+    --border-light: #4b5563;
     --text-tertiary: #a89985;
     --text-disabled: #6b6053;
     --text-inverse: #0d1117;
@@ -815,6 +815,7 @@
     --space-lg: 24px;
     --space-xl: 32px;
     --space-2xl: 40px;
+    --chat-panel-min-width: 480px;
     --radius-xs: calc(var(--radius) * 0.25);
     --radius-sm: calc(var(--radius) * 0.5);
     --radius-md: calc(var(--radius) * 0.75);

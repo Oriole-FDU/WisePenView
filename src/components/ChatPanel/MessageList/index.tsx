@@ -15,7 +15,7 @@ import {
 import markerStyles from '@/components/_shadcn/marker.module.less';
 import { useLatest, useUpdateEffect } from 'ahooks';
 import { ArrowDown } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import MessageItem from './MessageItem';
 import Welcome from './Welcome';
 import styles from './style.module.less';
@@ -27,9 +27,9 @@ interface MessageListProps {
   canLoadMoreHistory: boolean;
   loadingMoreHistory: boolean;
   onLoadMoreHistory: () => Promise<void>;
-  onPromptClick?: (text: string) => void;
   /** 哪类消息作为 scrollAnchor；默认 ai */
   scrollAnchorRole?: 'user' | 'ai';
+  footer?: ReactNode;
 }
 
 function MessageList({
@@ -37,8 +37,8 @@ function MessageList({
   canLoadMoreHistory,
   loadingMoreHistory,
   onLoadMoreHistory,
-  onPromptClick,
   scrollAnchorRole = 'ai',
+  footer,
 }: MessageListProps) {
   return (
     <MessageScrollerProvider
@@ -49,33 +49,36 @@ function MessageList({
     >
       <MessageScroller className={styles.container}>
         <MessageScrollerViewport className={styles.viewport}>
-          <MessageScrollerContent className={styles.content}>
-            {messages.length === 0 ? (
-              <MessageScrollerItem className={styles.welcomeItem}>
-                <Welcome onPromptClick={onPromptClick} />
-              </MessageScrollerItem>
-            ) : (
-              <>
-                <AutoLoadHistory
-                  canLoadMoreHistory={canLoadMoreHistory}
-                  loadingMoreHistory={loadingMoreHistory}
-                  onLoadMoreHistory={onLoadMoreHistory}
-                />
+          <MessageScrollerContent className={styles.scrollColumn}>
+            <div className={styles.messagesBody}>
+              {messages.length === 0 ? (
+                <MessageScrollerItem className={styles.welcomeItem}>
+                  <Welcome />
+                </MessageScrollerItem>
+              ) : (
+                <>
+                  <AutoLoadHistory
+                    canLoadMoreHistory={canLoadMoreHistory}
+                    loadingMoreHistory={loadingMoreHistory}
+                    onLoadMoreHistory={onLoadMoreHistory}
+                  />
 
-                <HistoryLoadingMarker visible={loadingMoreHistory} />
+                  <HistoryLoadingMarker visible={loadingMoreHistory} />
 
-                {messages.map((message) => (
-                  <MessageScrollerItem
-                    key={message.id}
-                    messageId={message.id}
-                    scrollAnchor={message.role === scrollAnchorRole}
-                    //scrollAnchor={message.role === 'ai'}
-                  >
-                    <MessageItem message={message} />
-                  </MessageScrollerItem>
-                ))}
-              </>
-            )}
+                  {messages.map((message) => (
+                    <MessageScrollerItem
+                      key={message.id}
+                      messageId={message.id}
+                      scrollAnchor={message.role === scrollAnchorRole}
+                    >
+                      <MessageItem message={message} />
+                    </MessageScrollerItem>
+                  ))}
+                </>
+              )}
+            </div>
+
+            {footer ? <div className={styles.footerSlot}>{footer}</div> : null}
           </MessageScrollerContent>
         </MessageScrollerViewport>
 

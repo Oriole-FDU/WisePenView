@@ -1,0 +1,53 @@
+@import '@/styles/scrollbar.module.less';
+
+.shell {
+  --chat-code-copy-btn-size: 32px;
+  position: relative;
+  margin: 0 0 var(--space-sm);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.copyBtn {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  z-index: 1;
+  color: var(--text-tertiary);
+
+  &:hover {
+    color: var(--accent);
+    background-color: color-mix(in srgb, var(--surface-tertiary) 70%, transparent);
+  }
+}
+
+.copyBtnCopied {
+  color: var(--success);
+}
+
+.pre {
+  margin: 0;
+  padding: var(--space-sm);
+  padding-top: calc(var(--space-xs) + var(--chat-code-copy-btn-size) + var(--space-2xs));
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  background-color: var(--surface-secondary);
+  overflow-x: auto;
+  overscroll-behavior: contain;
+  .appSubtleScrollbar();
+
+  :global(code) {
+    display: block;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    font-size: var(--font-size-xs);
+    line-height: 1.6;
+    white-space: pre;
+    word-break: normal;
+  }
+}

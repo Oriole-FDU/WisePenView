@@ -1,9 +1,13 @@
 import type { Message } from '@/components/ChatPanel/index.type';
 import { Button, toast } from '@heroui/react';
+import clsx from 'clsx';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
+import inputStyles from '../../ChatInput/style.module.less';
 import MessageContent from './MessageContent';
 import styles from './UserMessage.module.less';
+
+const MESSAGE_ACTION_ICON_SIZE = 17;
 
 interface UserMessageProps {
   message: Message;
@@ -27,23 +31,31 @@ function UserMessage({ message }: UserMessageProps) {
   return (
     <div className={styles.userRow}>
       <div className={styles.contentCol}>
-        {/* 左侧悬浮操作栏 */}
-        <div className={styles.actions}>
-          <Button
-            variant="ghost"
-            isIconOnly
-            size="sm"
-            className={`${styles.actionBtn} ${copied ? styles.actionBtnCopied : ''}`}
-            onPress={handleCopy}
-            aria-label="复制"
-          >
-            {copied ? <Check size={12} /> : <Copy size={12} />}
-          </Button>
-        </div>
+        <div className={styles.bubbleWrap}>
+          <div className={styles.bubble}>
+            <MessageContent content={message.content} />
+          </div>
 
-        {/* 气泡 */}
-        <div className={styles.bubble}>
-          <MessageContent content={message.content} />
+          <div className={styles.actions}>
+            <Button
+              variant="ghost"
+              isIconOnly
+              size="sm"
+              className={clsx(
+                inputStyles.toolbarCircleBtn,
+                styles.actionBtn,
+                copied && styles.actionBtnCopied
+              )}
+              onPress={handleCopy}
+              aria-label="复制"
+            >
+              {copied ? (
+                <Check size={MESSAGE_ACTION_ICON_SIZE} />
+              ) : (
+                <Copy size={MESSAGE_ACTION_ICON_SIZE} />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

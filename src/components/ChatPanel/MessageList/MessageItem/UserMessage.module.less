@@ -3,56 +3,54 @@
 .userRow {
   display: flex;
   width: 100%;
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-lg);
   justify-content: flex-end;
 
   .contentCol {
     display: flex;
-    align-items: flex-end;
     justify-content: flex-end;
-    gap: var(--space-xs); // 8px 间距
-
     max-width: 100%;
+
     @media (min-width: 768px) {
       max-width: 100%;
     }
+  }
 
-    .actions {
-      opacity: 0;
-      transition: opacity 0.2s ease-in-out;
-      display: flex;
-      flex-direction: row;
-      gap: 4px;
+  .bubbleWrap {
+    position: relative;
+    max-width: 100%;
+    padding-bottom: calc(32px + var(--space-xs));
+  }
 
-      flex-shrink: 0;
+  .actions {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    display: flex;
+    flex-shrink: 0;
 
-      .actionBtn {
-        min-width: 22px !important;
-        width: 22px;
-        height: 22px;
-        padding: 0 !important;
-        border-radius: var(--radius-sm);
-        color: var(--text-tertiary);
+    .actionBtn {
+      color: var(--text-tertiary);
 
-        &:hover {
-          color: var(--accent);
-        }
+      &:hover {
+        color: var(--accent);
       }
     }
+  }
 
-    // --- 气泡 ---
-    .bubble {
-      background-color: var(--surface-secondary);
-      color: var(--foreground);
-      padding: var(--space-sm) var(--space-md);
-      border-radius: 16px 6px 16px 16px;
+  .bubble {
+    background-color: var(--surface-secondary);
+    color: var(--foreground);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-2xl) var(--radius-md) var(--radius-2xl) var(--radius-2xl);
 
-      font-size: var(--font-size-base);
-      line-height: 1.6; // 这是一个倍数，不需要 px，保持不变
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-    }
+    font-size: var(--chat-message-font-size);
+    line-height: var(--chat-message-line-height);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   &:hover .actions {
@@ -63,4 +61,3 @@
 .actionBtnCopied {
   color: var(--success);
 }
-

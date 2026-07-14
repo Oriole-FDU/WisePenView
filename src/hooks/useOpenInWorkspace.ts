@@ -2,12 +2,12 @@ import { usePdfPreviewProgressStore } from '@/components/PdfViewer/_store/usePdf
 import type { DriveNodeScope } from '@/domains/Drive';
 import { useWorkspaceNavigationStore } from '@/layouts/Workspace/_store/useWorkspaceNavigationStore';
 import {
-  WORKSPACE_VIEWER,
-  buildWorkspaceResourcePath,
-  resolveWorkspaceResourceType,
-  resolveWorkspaceViewer,
-  type WorkspaceViewer,
-} from '@/utils/navigation/workspaceRoute';
+  RESOURCE_VIEWER,
+  resolveResourceKind,
+  resolveResourceViewer,
+  type ResourceViewer,
+} from '@/utils/navigation/resourceTarget';
+import { buildWorkspaceResourcePath } from '@/utils/navigation/workspaceRoute';
 import { startTransition, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ export interface OpenInWorkspaceTarget {
   resourceId: string;
   resourceType?: string;
   resourceName?: string;
-  viewer?: WorkspaceViewer | string;
+  viewer?: ResourceViewer | string;
   driveLocation:
     | { scope: DriveNodeScope }
     | {
@@ -30,8 +30,8 @@ export interface OpenInWorkspaceFn {
   (target: OpenInWorkspaceTarget): void;
 }
 
-const appendPdfPreviewProgress = (path: string, resourceId: string, viewer?: WorkspaceViewer) => {
-  if (viewer !== WORKSPACE_VIEWER.PDF_PREVIEW) return path;
+const appendPdfPreviewProgress = (path: string, resourceId: string, viewer?: ResourceViewer) => {
+  if (viewer !== RESOURCE_VIEWER.PDF_PREVIEW) return path;
 
   const progress = usePdfPreviewProgressStore.getState().progressByResourceId[resourceId];
   if (progress == null) return path;
@@ -69,11 +69,11 @@ export const useOpenInWorkspace = (): OpenInWorkspaceFn => {
         navigationStore.navigateToScope(scope);
       }
 
-      const resourceType = resolveWorkspaceResourceType({
+      const resourceType = resolveResourceKind({
         resourceType: target.resourceType,
         resourceName: target.resourceName,
       });
-      const viewer = resolveWorkspaceViewer({
+      const viewer = resolveResourceViewer({
         resourceType: target.resourceType ?? resourceType,
         resourceName: target.resourceName,
         viewer: target.viewer,

@@ -5,7 +5,7 @@
   min-height: 220px;
   overflow-y: auto;
   padding: 8px;
-  background: var(--surface-secondary);
+  background: var(--surface);
   scroll-behavior: smooth;
   .appSubtleScrollbar();
 }
@@ -39,14 +39,8 @@
 
   &:hover,
   &.rowActive {
-    background: var(--surface);
+    background: var(--surface-hover);
     border-color: var(--separator);
-  }
-
-  &.rowActive {
-    background: var(--accent-softer, color-mix(in srgb, var(--accent) 8%, transparent));
-    border-color: var(--accent-border, color-mix(in srgb, var(--accent) 32%, var(--border)));
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 14%, transparent);
   }
 
   & + & {

@@ -1,6 +1,6 @@
 import { Popover } from '@/components/Overlay';
 import { Tooltip } from '@heroui/react';
-import { CloudUpload, FolderPlus, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CloudUpload, FileInput, FolderPlus, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { KeyboardEvent, MouseEvent } from 'react';
 
 import { ROOT_DISPLAY } from '@/components/Drive/common/constants';
@@ -13,7 +13,8 @@ import type { ReactNode } from 'react';
 
 import styles from './style.module.less';
 
-export type SidebarDriveCreateAction = 'folder' | 'note' | 'drawio' | 'skill' | 'upload';
+export type SidebarDriveCreateAction =
+  'folder' | 'note' | 'importNote' | 'drawio' | 'skill' | 'upload';
 
 interface SidebarDriveNodeTitleProps {
   node: DriveNode;
@@ -122,6 +123,14 @@ function SidebarDriveNodeTitle({
                         >
                           <EntryIcon entryType="resource" resourceIconType="note" size={15} />
                           <span>新建笔记</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.createMenuItem}
+                          onClick={() => onCreateNode(node, 'importNote')}
+                        >
+                          <FileInput size={15} aria-hidden="true" />
+                          <span>导入笔记</span>
                         </button>
                         <button
                           type="button"

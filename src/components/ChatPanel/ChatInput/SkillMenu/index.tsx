@@ -94,34 +94,33 @@ function SkillMenu() {
             }
           >
             {() => (
-              <div className={styles.skillMenuPanel}>
+              <div className={`${styles.popoverPanel} ${styles.popoverPanelScrollable}`}>
+                <div className={styles.popoverTitle}>Skill</div>
+
                 {primarySection && primarySection.items.length > 0 ? (
-                  <>
-                    <div className={styles.popoverTitle}>Skill</div>
-                    <ListBox
-                      aria-label="选择 Skill"
-                      selectionMode="multiple"
-                      selectedKeys={selectedSkillIds}
-                      className={styles.listBox}
-                    >
-                      {primarySection.items.map((item) => (
-                        <ListBoxItem
-                          key={item.key}
-                          id={item.key}
-                          textValue={item.label}
-                          onPress={() => handleToggleSkill(item.key)}
-                        >
-                          <span className={styles.listItemContent}>
-                            <Sparkles size={15} />
-                            <span>{item.label}</span>
-                            {selectedSkillIds.includes(item.key) ? (
-                              <Check size={14} className={styles.checkIcon} />
-                            ) : null}
-                          </span>
-                        </ListBoxItem>
-                      ))}
-                    </ListBox>
-                  </>
+                  <ListBox
+                    aria-label="选择 Skill"
+                    selectionMode="multiple"
+                    selectedKeys={selectedSkillIds}
+                    className={styles.listBox}
+                  >
+                    {primarySection.items.map((item) => (
+                      <ListBoxItem
+                        key={item.key}
+                        id={item.key}
+                        textValue={item.label}
+                        onPress={() => handleToggleSkill(item.key)}
+                      >
+                        <span className={styles.listItemContent}>
+                          <Sparkles size={16} />
+                          <span>{item.label}</span>
+                          {selectedSkillIds.includes(item.key) ? (
+                            <Check size={14} className={styles.checkIcon} />
+                          ) : null}
+                        </span>
+                      </ListBoxItem>
+                    ))}
+                  </ListBox>
                 ) : null}
 
                 {externalItems.length > 0 ? (
@@ -141,7 +140,7 @@ function SkillMenu() {
                           onPress={() => removeSkill(item.key)}
                         >
                           <span className={styles.listItemContent}>
-                            <Sparkles size={15} />
+                            <Sparkles size={16} />
                             <span>
                               {item.label}
                               {item.sourceText ? (
@@ -158,14 +157,22 @@ function SkillMenu() {
                   </>
                 ) : null}
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={styles.fullWidthButton}
-                  onPress={handleSelectOther}
+                <ListBox
+                  aria-label="选择其他 Skill"
+                  selectionMode="none"
+                  className={styles.listBox}
                 >
-                  选择其他 Skill...
-                </Button>
+                  <ListBoxItem
+                    id="select-other-skill"
+                    textValue="选择其他 Skill..."
+                    onPress={handleSelectOther}
+                  >
+                    <span className={styles.listItemContent}>
+                      <Sparkles size={16} />
+                      <span>选择其他 Skill...</span>
+                    </span>
+                  </ListBoxItem>
+                </ListBox>
 
                 {toolSection && toolSection.items.length > 0 ? (
                   <>
@@ -184,7 +191,7 @@ function SkillMenu() {
                           onPress={() => handleToggleTool(item.key)}
                         >
                           <span className={styles.listItemContent}>
-                            <Wrench size={15} />
+                            <Wrench size={16} />
                             <span>{item.label}</span>
                             {selectedToolIds.includes(item.key) ? (
                               <Check size={14} className={styles.checkIcon} />

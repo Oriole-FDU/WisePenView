@@ -2,12 +2,14 @@
 import { ResultState, Spin } from '@/components/Feedback';
 import { useDocumentService, useResourceService } from '@/domains';
 import type { ResourceAction } from '@/domains/Resource';
-import {
-  useWorkspaceLayoutConfig,
-  type WorkspaceLayoutConfig,
-} from '@/layouts/Workspace/WorkspaceOutletContext';
 import { parseErrorMessage } from '@/utils/error';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
+import {
+  DEFAULT_RESOURCE_HOST_ID,
+  useResourceHostId,
+  useResourceHostLayoutConfig,
+  type ResourceHostLayoutConfig,
+} from '@/views/workspace/ResourceHostContext';
 import { Button } from '@heroui/react';
 import type { Config } from '@onlyoffice/doceditor-types';
 import { DocumentEditor } from '@onlyoffice/document-editor-react';
@@ -50,7 +52,7 @@ function OfficeLayoutConfig({
   onPermissionSuccess,
   actions,
 }: OfficeLayoutConfigProps) {
-  const frameConfig = useMemo<WorkspaceLayoutConfig>(
+  const frameConfig = useMemo<ResourceHostLayoutConfig>(
     () => ({
       className: styles.container,
       header: resourceName
@@ -60,7 +62,7 @@ function OfficeLayoutConfig({
               resourceName,
               resourceType,
               currentActions: resourceInfoActions,
-              permissionResourceType: WORKSPACE_RESOURCE_TYPE.FILE,
+              permissionResourceType: RESOURCE_KIND.FILE,
               ownerId,
               onPermissionSuccess,
               actions,
@@ -78,7 +80,7 @@ function OfficeLayoutConfig({
       resourceType,
     ]
   );
-  useWorkspaceLayoutConfig(frameConfig);
+  useResourceHostLayoutConfig(frameConfig);
 
   return <>{children}</>;
 }
@@ -90,10 +92,13 @@ function OfficeEditorHost({
   onReady,
   onError,
 }: OfficeEditorHostProps) {
-  const containerId = useMemo(
-    () => `onlyoffice-editor-${resourceId.replace(/[^a-z0-9_-]/gi, '-')}`,
-    [resourceId]
-  );
+  const hostId = useResourceHostId();
+  const containerId = useMemo(() => {
+    const safeResourceId = resourceId.replace(/[^a-z0-9_-]/gi, '-');
+    if (hostId === DEFAULT_RESOURCE_HOST_ID) return `onlyoffice-editor-${safeResourceId}`;
+    const safeHostId = hostId.replace(/[^a-z0-9_-]/gi, '-');
+    return `onlyoffice-editor-${safeHostId}-${safeResourceId}`;
+  }, [hostId, resourceId]);
 
   return (
     <div className={styles.editorHost}>

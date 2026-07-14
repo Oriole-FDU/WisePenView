@@ -43,16 +43,10 @@ function ThinkingBlock({ content, duration, loading }: ThinkingBlockProps) {
         aria-expanded={open}
         onClick={() => setManuallyCollapsed((collapsed) => !collapsed)}
       >
-        <span className={styles.expandIcon}>
-          <ChevronRight
-            size={14}
-            style={{
-              // 手动控制旋转，实现丝滑动画
-              transform: `rotate(${open ? 90 : 0}deg)`,
-            }}
-          />
-        </span>
         {labelContent}
+        <span className={styles.expandIcon}>
+          <ChevronRight size={14} aria-hidden="true" />
+        </span>
       </button>
       {open ? (
         <div className={styles.collapseContentBox}>

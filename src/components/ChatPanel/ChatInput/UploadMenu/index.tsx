@@ -39,6 +39,7 @@ function UploadMenu() {
       <Popover.Content className={styles.toolbarPopover} placement="top">
         <Popover.Dialog>
           <div className={styles.popoverPanel}>
+            <div className={styles.popoverTitle}>附件</div>
             <ListBox
               aria-label="附件操作"
               selectionMode="none"

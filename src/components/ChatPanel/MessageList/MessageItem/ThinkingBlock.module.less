@@ -11,10 +11,12 @@
 
 .thinkingWrapper {
   .collapseHeader {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    width: 100%;
-    padding: 0px 0px !important; // 极致紧凑
+    gap: var(--space-2xs);
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 !important;
     height: 28px !important;
     border: 0;
     border-radius: var(--radius) !important;
@@ -24,10 +26,8 @@
     font-weight: 500;
     cursor: pointer;
 
-    // 悬停反馈
     &:hover {
-      background-color: var(--surface-tertiary);
-      color: var(--foreground) !important; // 悬停变深色
+      color: var(--foreground) !important;
     }
   }
 
@@ -37,12 +37,19 @@
     justify-content: center;
     margin-top: 2px;
     opacity: 0.6;
-    transition: transform 0.2s;
+
+    svg {
+      transition: transform 0.2s;
+    }
+  }
+
+  .collapseHeader[aria-expanded='true'] .expandIcon svg {
+    transform: rotate(90deg);
   }
 
   .collapseContentBox {
     padding: 0 !important;
-    background-color: var(--surface-secondary); // 极淡的背景
+    background-color: transparent;
   }
 }
 
@@ -80,12 +87,13 @@
   max-height: min(36vh, 260px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  text-align: justify;
+  text-align: start;
+  border-radius: var(--radius-xl);
+  background-color: var(--surface-secondary);
 
   color: var(--muted);
-  font-size: var(--font-size-sm);
-
-  line-height: 1.6;
+  font-size: var(--chat-thinking-font-size);
+  line-height: var(--chat-thinking-line-height);
 
   white-space: pre-wrap;
   word-break: break-word;

@@ -24,6 +24,10 @@ export { NoteSaveStatusObserver } from './session/NoteSaveStatusObserver';
 export type { NoteSaveStatus } from './session/NoteSaveStatusObserver';
 export { NoteStatusObserver } from './session/NoteStatusObserver';
 export type { NoteSessionStatus } from './session/NoteStatusObserver';
-export { encodeNoteClientStateVector } from './session/stateVector';
+export {
+  computeNoteBodyContentHash,
+  encodeNoteClientContentSignature,
+  encodeNoteClientStateVector,
+} from './session/stateVector';
 export { noteYjsIdbRoomName, useNoteSession } from './session/useNoteSession';
 export { WisepenProvider } from './session/WisepenProvider';

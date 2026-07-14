@@ -31,6 +31,7 @@ import type {
 import {
   AI_DIFF_DISPLAY_MODE,
   AI_DIFF_DISPLAY_MODE_LABELS,
+  encodeNoteClientContentSignature,
   encodeNoteClientStateVector,
   useNoteSession,
 } from '@/domains/Note';
@@ -38,18 +39,15 @@ import { isCommentVisibilityPrivileged } from '@/domains/Resource';
 import type { User } from '@/domains/User';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useSmoothFlag } from '@/hooks/useSmoothFlag';
-import {
-  useWorkspaceLayoutConfig,
-  type WorkspaceLayoutConfig,
-} from '@/layouts/Workspace/WorkspaceOutletContext';
-import { useWorkspaceChatProtocolStore } from '@/layouts/Workspace/_store/useWorkspaceChatProtocolStore';
 import { parseErrorMessage } from '@/utils/error';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
-import { Alert, Button, Switch, ToggleButton, Tooltip, toast } from '@heroui/react';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import {
-  createNoteSelectionChatContext,
-  createNoteWorkspaceChatStateProvider,
-} from './NoteWorkspaceChatProtocol';
+  useResourceHostChatContextActions,
+  useResourceHostLayoutConfig,
+  type ResourceHostLayoutConfig,
+} from '@/views/workspace/ResourceHostContext';
+import { Alert, Button, Switch, ToggleButton, Tooltip, toast } from '@heroui/react';
+import { createNoteChatStateProvider, createNoteSelectionChatContext } from './NoteChatProtocol';
 import NoteInfoBar from './_components/NoteInfoBar';
 import NoteTitle from './_components/NoteTitle';
 import type { NoteTitleHandle, NoteTitleSaveStatus } from './_components/NoteTitle/index.type';
@@ -132,7 +130,7 @@ function formatNoteSaveStatus(status: NoteHeaderSaveStatus): string {
 
 function NoteLayoutConfig({ children }: { children: ReactNode }) {
   const frameConfig = useMemo(() => ({ className: styles.pageWrap }), []);
-  useWorkspaceLayoutConfig(frameConfig);
+  useResourceHostLayoutConfig(frameConfig);
 
   return <>{children}</>;
 }
@@ -144,7 +142,7 @@ function NoteViewConnected({
 }: NoteViewConnectedProps) {
   const aiDiffDisplayMode = useAiDiffDisplayStore((state) => state.displayMode);
   const setAiDiffDisplayMode = useAiDiffDisplayStore((state) => state.setDisplayMode);
-  const setWorkspaceChatContext = useWorkspaceChatProtocolStore((state) => state.setContext);
+  const { setChatContext } = useResourceHostChatContextActions();
   const bodyEditorRef = useRef<NoteBodyEditorHandle>(null);
   const titleEditorRef = useRef<NoteTitleHandle>(null);
   const mainScrollRef = useRef<HTMLDivElement>(null);
@@ -157,6 +155,8 @@ function NoteViewConnected({
   const [isCommentHistoryOpen, setIsCommentHistoryOpen] = useState(false);
   const [outlineItems, setOutlineItems] = useState<NoteOutlineItem[]>([]);
   const [activeHeadingId, setActiveHeadingId] = useState<string | undefined>(undefined);
+  const [aiBulkActionsPortalContainer, setAiBulkActionsPortalContainer] =
+    useState<HTMLDivElement | null>(null);
   const [commentsSidebarHostElement, setCommentsSidebarHostElement] = useState<HTMLElement | null>(
     null
   );
@@ -183,7 +183,6 @@ function NoteViewConnected({
     actorUserId: currentUser?.id,
     enabled: !shouldWaitCurrentUser,
   });
-  const getNoteClientStateVector = useCallback(() => encodeNoteClientStateVector(doc), [doc]);
   const resourceAsideMode = useNoteResourceAsideStore(
     (state) => state.modeByResourceId[resourceId] ?? DEFAULT_NOTE_RESOURCE_ASIDE_MODE
   );
@@ -203,6 +202,20 @@ function NoteViewConnected({
   const middleOverlayText =
     status === 'connecting' && !idbSynced ? '正在连接笔记服务...' : '正在加载用户信息...';
   const fallbackNoteTitle = noteInfoDisplay.noteTitle;
+  const [aiDiffBodyContentHash, setAiDiffBodyContentHash] = useState<string | undefined>(undefined);
+  const handleAiDiffBodyContentHashChange = useCallback(
+    (hash: string | undefined) => setAiDiffBodyContentHash(hash),
+    []
+  );
+  const noteClientContentSignature = useMemo(
+    () =>
+      aiDiffBodyContentHash
+        ? encodeNoteClientContentSignature({ bodyHash: aiDiffBodyContentHash })
+        : undefined,
+    [aiDiffBodyContentHash]
+  );
+  const isNoteClientContentSignaturePending = !aiDiffBodyContentHash;
+  const getNoteClientStateVector = useCallback(() => encodeNoteClientStateVector(doc), [doc]);
   const resourceName = useResourceDisplayName(resourceId, fallbackNoteTitle, '未命名笔记');
   const headerSaveStatus = resolveNoteHeaderSaveStatus(saveStatus, titleSaveStatus);
   const saveStatusText = formatNoteSaveStatus(headerSaveStatus);
@@ -315,22 +328,30 @@ function NoteViewConnected({
 
   const noteChatStateProvider = useMemo(
     () =>
-      createNoteWorkspaceChatStateProvider({
+      createNoteChatStateProvider({
         resourceId,
         syncStatus: status,
         getClientStateVector: getNoteClientStateVector,
+        isClientContentSignaturePending: isNoteClientContentSignaturePending,
+        clientContentSignature: noteClientContentSignature,
       }),
-    [getNoteClientStateVector, resourceId, status]
+    [
+      getNoteClientStateVector,
+      isNoteClientContentSignaturePending,
+      noteClientContentSignature,
+      resourceId,
+      status,
+    ]
   );
 
   const handleAskAi = useCallback(
     (selection: NoteSelectionSnapshot) => {
-      setWorkspaceChatContext(createNoteSelectionChatContext(resourceId, selection));
+      setChatContext(createNoteSelectionChatContext(resourceId, selection));
     },
-    [resourceId, setWorkspaceChatContext]
+    [resourceId, setChatContext]
   );
 
-  const workspaceFrameConfig = useMemo<WorkspaceLayoutConfig>(
+  const resourceHostConfig = useMemo<ResourceHostLayoutConfig>(
     () => ({
       className: styles.pageWrap,
       chatStateProvider: noteChatStateProvider,
@@ -341,7 +362,7 @@ function NoteViewConnected({
           resourceIconType: 'note',
           currentActions: noteInfoDisplay.resourceInfo?.currentActions,
           copyVersion: noteInfoDisplay.version,
-          permissionResourceType: WORKSPACE_RESOURCE_TYPE.NOTE,
+          permissionResourceType: RESOURCE_KIND.NOTE,
           ownerId: noteInfoDisplay.ownerId,
           onPermissionSuccess: onRefreshNoteInfo,
           isDisabled: showFullPageSpin,
@@ -475,7 +496,7 @@ function NoteViewConnected({
       toggleResourceAsideMode,
     ]
   );
-  useWorkspaceLayoutConfig(workspaceFrameConfig);
+  useResourceHostLayoutConfig(resourceHostConfig);
 
   return (
     <>
@@ -485,7 +506,7 @@ function NoteViewConnected({
             isOutlineOpen ? styles.contentRowOutlineOpen : styles.contentRowOutlineCollapsed
           }`}
         >
-          <div className={styles.mainPanel}>
+          <div className={styles.mainPanel} ref={setAiBulkActionsPortalContainer}>
             <div
               className={`${styles.mainCol} ${isMainScrolling ? styles.mainColScrolling : ''}`}
               ref={mainScrollRef}
@@ -535,6 +556,7 @@ function NoteViewConnected({
                       provider={provider}
                       collaborationUser={collaborationUser}
                       aiDiffDisplayMode={aiDiffDisplayMode}
+                      collaborationReady={isConnected}
                       readOnly={isEditorReadOnly}
                       blockLocalDocWrites={blockLocalDocWrites}
                       onOutlineChange={setOutlineItems}
@@ -557,6 +579,8 @@ function NoteViewConnected({
                       commentsSidebarPortalContainer={commentsSidebarHostElement}
                       commentHistoryOpen={isCommentHistoryOpen}
                       onCommentHistoryOpenChange={setIsCommentHistoryOpen}
+                      aiBulkActionsPortalContainer={aiBulkActionsPortalContainer}
+                      onAiDiffBodyContentHashChange={handleAiDiffBodyContentHashChange}
                     />
                   ) : null}
                 </div>

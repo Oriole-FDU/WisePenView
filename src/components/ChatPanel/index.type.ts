@@ -1,5 +1,5 @@
 import type { ChatModel, ChatModelTag } from '@/domains/Chat';
-import type { WorkspaceChatProtocolPort } from '@/layouts/Workspace/WorkspaceChatProtocol';
+import type { ResourceChatProtocolPort } from './ResourceChatProtocol';
 
 export type ModelTag = ChatModelTag;
 export type Model = ChatModel;
@@ -11,7 +11,7 @@ export interface ChatPanelProps {
   fullWidth?: boolean;
   showHeader?: boolean;
   onNewChat?: () => void;
-  workspaceChat?: WorkspaceChatProtocolPort;
+  resourceChat?: ResourceChatProtocolPort;
   showCollapseButton?: boolean;
 }
 

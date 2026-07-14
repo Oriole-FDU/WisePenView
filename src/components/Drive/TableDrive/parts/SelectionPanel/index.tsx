@@ -36,7 +36,7 @@ import {
   type TagTreeNode,
 } from '@/domains/Tag';
 import { parseErrorMessage } from '@/utils/error';
-import { resolveWorkspaceResourceType } from '@/utils/navigation/workspaceRoute';
+import { resolveResourceKind } from '@/utils/navigation/resourceTarget';
 import { Button, ListBox, toast, type Selection } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { FolderInput, Pencil, Settings, ShieldCheck } from 'lucide-react';
@@ -118,7 +118,7 @@ function TableDriveSelectionPanel({
   const resourceFallbackTagId = node?.type === 'resource' ? node.folderTagId : undefined;
   const resourcePermissionResourceType = useMemo<ResourcePermissionResourceType | undefined>(() => {
     if (node?.type !== 'resource') return undefined;
-    return resolveWorkspaceResourceType({
+    return resolveResourceKind({
       resourceType: node.resourceType,
       resourceName: selectedRow?.name,
     }) as ResourcePermissionResourceType;

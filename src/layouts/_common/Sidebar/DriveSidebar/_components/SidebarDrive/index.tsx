@@ -16,6 +16,10 @@ import {
 } from '@/components/Drive/Modals';
 import { Empty, Spin } from '@/components/Feedback';
 import { FormField, Input } from '@/components/Input';
+import {
+  MARKDOWN_NOTE_FILE_ACCEPT,
+  useMarkdownNoteImport,
+} from '@/components/Note/useMarkdownNoteImport';
 import AppFormDialog from '@/components/Overlay/AppFormDialog';
 import CreateSkillModal from '@/components/Skill/CreateSkillModal';
 import type { DataNode } from '@/components/Tree';
@@ -26,10 +30,10 @@ import { useOpenInWorkspace } from '@/hooks/useOpenInWorkspace';
 import { useSidebarDriveExpansionStore } from '@/layouts/_common/Sidebar/DriveSidebar/_store/useSidebarDriveExpansionStore';
 import { useWorkspaceNavigationStore } from '@/layouts/Workspace/_store/useWorkspaceNavigationStore';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import type { SidebarDriveCreateAction } from './SidebarDriveNodeTitle';
 import SidebarDriveNodeTitle from './SidebarDriveNodeTitle';
@@ -81,6 +85,7 @@ function SidebarDrive() {
   const [skillTarget, setSkillTarget] = useState<RootNode | FolderNode | null>(null);
   const [renameTarget, setRenameTarget] = useState<DriveActionTarget | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DriveActionTarget | null>(null);
+  const importTargetRef = useRef<RootNode | FolderNode | null>(null);
 
   const existingFolderNames = useMemo(() => {
     if (!createFolderParent) return [];
@@ -127,6 +132,35 @@ function SidebarDrive() {
     });
   };
 
+  const {
+    fileInputRef: markdownFileInputRef,
+    importing: importingMarkdownNote,
+    openFilePicker: openMarkdownFilePicker,
+    handleFileChange: handleMarkdownFileChange,
+  } = useMarkdownNoteImport({
+    mountCreatedResource: async (resourceId) => {
+      const target = importTargetRef.current;
+      if (!target) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION);
+      }
+      await mountCreatedResource(resourceId, target);
+    },
+    onSuccess: ({ resourceId, title }) => {
+      const target = importTargetRef.current;
+      importTargetRef.current = null;
+      if (!target) return;
+      openInWorkspace({
+        resourceId,
+        resourceType: RESOURCE_KIND.NOTE,
+        resourceName: title,
+        driveLocation: { scope: target.scope, parentNodeId: target.id },
+      });
+    },
+    onError: () => {
+      importTargetRef.current = null;
+    },
+  });
+
   const handleCreateNode = (
     node: RootNode | FolderNode,
     action: SidebarDriveCreateAction
@@ -137,6 +171,11 @@ function SidebarDrive() {
         break;
       case 'note':
         setNoteTarget(node);
+        break;
+      case 'importNote':
+        if (importingMarkdownNote) return;
+        importTargetRef.current = node;
+        openMarkdownFilePicker();
         break;
       case 'drawio':
         setDrawioTarget(node);
@@ -320,7 +359,7 @@ function SidebarDrive() {
         setNoteTarget(null);
         openInWorkspace({
           resourceId,
-          resourceType: WORKSPACE_RESOURCE_TYPE.NOTE,
+          resourceType: RESOURCE_KIND.NOTE,
           driveLocation: { scope: target.scope, parentNodeId: target.id },
         });
       },
@@ -353,7 +392,7 @@ function SidebarDrive() {
         setDrawioNameError('');
         openInWorkspace({
           resourceId,
-          resourceType: WORKSPACE_RESOURCE_TYPE.DRAWIO,
+          resourceType: RESOURCE_KIND.DRAWIO,
           driveLocation: { scope: target.scope, parentNodeId: target.id },
         });
       },
@@ -373,7 +412,7 @@ function SidebarDrive() {
         setSkillTarget(null);
         openInWorkspace({
           resourceId,
-          resourceType: WORKSPACE_RESOURCE_TYPE.SKILL,
+          resourceType: RESOURCE_KIND.SKILL,
           driveLocation: { scope: target.scope, parentNodeId: target.id },
         });
       } catch (err) {
@@ -436,6 +475,13 @@ function SidebarDrive() {
 
   return (
     <div className={styles.sidebar}>
+      <input
+        ref={markdownFileInputRef}
+        type="file"
+        accept={MARKDOWN_NOTE_FILE_ACCEPT}
+        onChange={handleMarkdownFileChange}
+        hidden
+      />
       <div className={styles.sectionTitle}>云盘</div>
       {showSpin ? (
         <div className={styles.stateBlock}>

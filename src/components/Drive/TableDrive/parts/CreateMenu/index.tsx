@@ -1,6 +1,6 @@
 import EntryIcon from '@/components/Icons/EntryIcon';
 import { Button } from '@heroui/react';
-import { CloudUpload, Plus } from 'lucide-react';
+import { CloudUpload, FileInput, Plus } from 'lucide-react';
 import styles from './index.module.less';
 import type { CreateMenuItem, CreateMenuProps } from './index.type';
 
@@ -12,6 +12,8 @@ function CreateMenuIcon({ id }: { id: CreateMenuItem['id'] }) {
       return <EntryIcon entryType="resource" resourceIconType="drawio" size={16} />;
     case 'note':
       return <EntryIcon entryType="resource" resourceIconType="note" size={16} />;
+    case 'importNote':
+      return <FileInput size={16} aria-hidden="true" />;
     case 'skill':
       return <EntryIcon entryType="resource" resourceIconType="skill" size={16} />;
     case 'upload':

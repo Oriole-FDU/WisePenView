@@ -1,8 +1,8 @@
 @import '@/styles/scrollbar.module.less';
 
-/* 相对 WorkspaceLayout.middleContent（position: relative）铺满中间栏，不盖住侧栏与右侧面板 */
+/* 相对资源承载区域铺满正文，不盖住宿主布局的侧栏与面板。 */
 .pageWrap {
-  --workspace-view-max-width: 1200px;
+  --resource-view-max-width: 1200px;
 }
 
 /* 会话未就绪时仍挂载子树（跑 Yjs / BlockNote），但不交互、不可见 */
@@ -132,6 +132,7 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
+  position: relative;
 }
 
 .outlinePanel {

@@ -9,13 +9,17 @@ import {
 } from '@/components/Drive/Modals';
 import { FormField, Input } from '@/components/Input';
 import { useNewNoteStore } from '@/components/Note/_store/useNewNoteStore';
+import {
+  MARKDOWN_NOTE_FILE_ACCEPT,
+  useMarkdownNoteImport,
+} from '@/components/Note/useMarkdownNoteImport';
 import AppFormDialog from '@/components/Overlay/AppFormDialog';
 import CreateSkillModal from '@/components/Skill/CreateSkillModal';
 import { useDocumentService, useDriveService, useNoteService, useResourceService } from '@/domains';
 import type { DriveNodeScope } from '@/domains/Drive';
 import { useOpenInWorkspace } from '@/hooks/useOpenInWorkspace';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useCallback, useMemo, useState, type ReactElement } from 'react';
@@ -135,6 +139,24 @@ export function useTableDriveActions({
     onUploadSuccess?.();
   }, [onUploadSuccess, refresh]);
 
+  const {
+    fileInputRef: markdownFileInputRef,
+    importing: importingMarkdownNote,
+    openFilePicker: openMarkdownFilePicker,
+    handleFileChange: handleMarkdownFileChange,
+  } = useMarkdownNoteImport({
+    mountCreatedResource,
+    onSuccess: ({ resourceId, title }) => {
+      refresh();
+      openInWorkspace({
+        resourceId,
+        resourceType: RESOURCE_KIND.NOTE,
+        resourceName: title,
+        driveLocation: { scope, parentNodeId: currentNodeId },
+      });
+    },
+  });
+
   const { loading: creatingNote, run: runCreateNote } = useRequest(
     async () => {
       const { resourceId } = await noteService.createNote({ title: '未命名笔记' });
@@ -151,7 +173,7 @@ export function useTableDriveActions({
         refresh();
         openInWorkspace({
           resourceId,
-          resourceType: WORKSPACE_RESOURCE_TYPE.NOTE,
+          resourceType: RESOURCE_KIND.NOTE,
           driveLocation: { scope, parentNodeId: currentNodeId },
         });
       },
@@ -182,7 +204,7 @@ export function useTableDriveActions({
         refresh();
         openInWorkspace({
           resourceId,
-          resourceType: WORKSPACE_RESOURCE_TYPE.DRAWIO,
+          resourceType: RESOURCE_KIND.DRAWIO,
           driveLocation: { scope, parentNodeId: currentNodeId },
         });
       },
@@ -201,7 +223,7 @@ export function useTableDriveActions({
           refresh();
           openInWorkspace({
             resourceId,
-            resourceType: WORKSPACE_RESOURCE_TYPE.SKILL,
+            resourceType: RESOURCE_KIND.SKILL,
             driveLocation: { scope, parentNodeId: currentNodeId },
           });
         } catch (err) {
@@ -215,6 +237,13 @@ export function useTableDriveActions({
   const ModalHost = useMemo(
     () => (
       <>
+        <input
+          ref={markdownFileInputRef}
+          type="file"
+          accept={MARKDOWN_NOTE_FILE_ACCEPT}
+          onChange={handleMarkdownFileChange}
+          hidden
+        />
         {newFolderOpen ? (
           <NewFolderNodeModal
             isOpen={newFolderOpen}
@@ -336,7 +365,9 @@ export function useTableDriveActions({
       existingFolderNames,
       groupId,
       handleCreateSkillSuccess,
+      handleMarkdownFileChange,
       handleUploadSuccess,
+      markdownFileInputRef,
       newFolderOpen,
       refresh,
       resourcePermissionTarget,
@@ -385,7 +416,7 @@ export function useTableDriveActions({
     if (!groupId && pendingNewNoteId) {
       openInWorkspace({
         resourceId: pendingNewNoteId,
-        resourceType: WORKSPACE_RESOURCE_TYPE.NOTE,
+        resourceType: RESOURCE_KIND.NOTE,
         driveLocation: { scope, parentNodeId: currentNodeId },
       });
       return;
@@ -413,6 +444,9 @@ export function useTableDriveActions({
         case 'note':
           handleCreateNote();
           break;
+        case 'importNote':
+          openMarkdownFilePicker();
+          break;
         case 'drawio':
           handleOpenDrawioModal();
           break;
@@ -429,6 +463,7 @@ export function useTableDriveActions({
       handleOpenDrawioModal,
       handleOpenSkillModal,
       openNewFolder,
+      openMarkdownFilePicker,
       openUploadDocument,
     ]
   );
@@ -460,6 +495,11 @@ export function useTableDriveActions({
     }
     if (canCreateInCurrentFolder && toolbarConfig.canCreateNote) {
       items.push({ id: 'note', label: '新建笔记', disabled: creatingNote });
+      items.push({
+        id: 'importNote',
+        label: '导入笔记',
+        disabled: importingMarkdownNote,
+      });
     }
     if (canCreateInCurrentFolder && toolbarConfig.canCreateSkill) {
       items.push({ id: 'skill', label: '新建 Skill' });
@@ -472,6 +512,7 @@ export function useTableDriveActions({
     canCreateInCurrentFolder,
     creatingDrawio,
     creatingNote,
+    importingMarkdownNote,
     showCreateMenu,
     showUploadDocument,
     toolbarConfig.canCreateDrawio,

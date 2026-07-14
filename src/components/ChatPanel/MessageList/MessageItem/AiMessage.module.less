@@ -2,14 +2,6 @@
   display: flex;
   width: 100%;
   margin-bottom: var(--space-lg);
-  gap: var(--space-xs); // 头像与内容间距
-
-  // 头像列
-  .avatarCol {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-  }
 
   // 内容列
   .contentCol {
@@ -22,11 +14,18 @@
     .modelMeta {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: var(--space-2xs);
       color: var(--text-tertiary);
-      font-size: var(--font-size-sm);
-      line-height: 1;
+      font-size: var(--chat-model-meta-font-size, var(--font-size-base));
+      font-weight: 500;
+      line-height: 1.2;
       width: fit-content;
+
+      .modelLogo {
+        flex-shrink: 0;
+        width: var(--chat-model-logo-size, 16px);
+        height: var(--chat-model-logo-size, 16px);
+      }
 
       .modelName {
         white-space: nowrap;
@@ -38,9 +37,9 @@
       background: transparent; // AI 无背景
       padding: 0;
       color: var(--foreground);
-      font-size: var(--font-size-base);
-      line-height: 1.6;
-      text-align: justify;
+      font-size: var(--chat-message-font-size);
+      line-height: var(--chat-message-line-height);
+      text-align: start;
     }
 
     .loadingHint {
@@ -70,21 +69,17 @@
     .actions {
       display: flex;
       flex-direction: row;
-      justify-content: flex-end;
-      gap: var(--space-sm);
+      justify-content: flex-start;
+      gap: var(--space-xs);
 
       flex-shrink: 0;
 
       .actionBtn {
-        min-width: 22px !important;
-        width: 22px;
-        height: 22px;
-        padding: 0 !important;
-        border-radius: var(--radius-sm);
         color: var(--text-tertiary);
 
-        &:hover {
+        &:hover:not(:disabled) {
           color: var(--accent);
+          background-color: var(--surface-tertiary);
         }
       }
 

@@ -13,7 +13,7 @@ import { useOpenInWorkspace } from '@/hooks/useOpenInWorkspace';
 import { useWorkspaceNavigationStore } from '@/layouts/Workspace/_store/useWorkspaceNavigationStore';
 import { parseErrorMessage } from '@/utils/error';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
-import { WORKSPACE_RESOURCE_TYPE } from '@/utils/navigation/workspaceRoute';
+import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState, type ReactNode } from 'react';
@@ -90,18 +90,15 @@ function ResourceHeaderOperations({
   const copyName = `${resourceName}_副本`;
   const normalizedType = normalizeResourceType(resourceType);
   const canCopyType =
-    normalizedType === WORKSPACE_RESOURCE_TYPE.NOTE ||
-    normalizedType === WORKSPACE_RESOURCE_TYPE.DRAWIO ||
-    normalizedType === WORKSPACE_RESOURCE_TYPE.SKILL ||
-    normalizedType === WORKSPACE_RESOURCE_TYPE.FILE ||
+    normalizedType === RESOURCE_KIND.NOTE ||
+    normalizedType === RESOURCE_KIND.DRAWIO ||
+    normalizedType === RESOURCE_KIND.SKILL ||
+    normalizedType === RESOURCE_KIND.FILE ||
     ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'].includes(normalizedType);
   const canCopy = canCopyType && resourceActionsInclude(currentActions, RESOURCE_ACTION.FORK);
 
   const forkResource = async (): Promise<string> => {
-    if (
-      normalizedType === WORKSPACE_RESOURCE_TYPE.NOTE ||
-      normalizedType === WORKSPACE_RESOURCE_TYPE.DRAWIO
-    ) {
+    if (normalizedType === RESOURCE_KIND.NOTE || normalizedType === RESOURCE_KIND.DRAWIO) {
       const result = await noteService.forkNote({
         resourceId,
         forkedResourceName: copyName,
@@ -110,7 +107,7 @@ function ResourceHeaderOperations({
       if (!result.resourceId) throw new Error('复制接口未返回资源 ID');
       return result.resourceId;
     }
-    if (normalizedType === WORKSPACE_RESOURCE_TYPE.SKILL) {
+    if (normalizedType === RESOURCE_KIND.SKILL) {
       return skillService.forkSkill({
         resourceId,
         forkedResourceName: copyName,

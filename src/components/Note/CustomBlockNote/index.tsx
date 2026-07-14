@@ -1,8 +1,9 @@
 import { useNewNoteStore } from '@/components/Note/_store/useNewNoteStore';
+import { usePendingNoteImportStore } from '@/components/Note/_store/usePendingNoteImportStore';
 import { useImageService, useResourceService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
 import type { AiDiffDisplayMode, SelectedNoteScope } from '@/domains/Note';
-import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
+import { AI_DIFF_DISPLAY_MODE, computeNoteBodyContentHash } from '@/domains/Note';
 import type { User } from '@/domains/User';
 import {
   createClientError,
@@ -26,6 +27,7 @@ import {
   type CSSProperties,
   type Ref,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { useNoteEditorSelectionStore } from '../_store/useNoteEditorSelectionStore';
 import NoteSideMenu from '../NoteSideMenu';
 import NoteSlashMenu from '../NoteSlashMenu';
@@ -128,6 +130,7 @@ function CustomBlockNoteEditor({
   provider,
   collaborationUser,
   aiDiffDisplayMode,
+  collaborationReady,
   readOnly = false,
   blockLocalDocWrites = false,
   onOutlineChange,
@@ -149,6 +152,8 @@ function CustomBlockNoteEditor({
   commentsSidebarPortalContainer,
   commentHistoryOpen = false,
   onCommentHistoryOpenChange,
+  aiBulkActionsPortalContainer,
+  onAiDiffBodyContentHashChange,
   commentUser,
   ref,
 }: CustomBlockNoteProps & { commentUser: User | null; ref?: Ref<NoteBodyEditorHandle> }) {
@@ -200,6 +205,8 @@ function CustomBlockNoteEditor({
   /** 与 reference 分离：applyPendingCommentReference 会在 createThread 时清空 reference，但 mark 仍需选区 */
   const pendingCommentSelectionRef = useRef<PendingCommentSelection | null>(null);
   const editorRef = useRef<CustomBlockNoteEditor | null>(null);
+  const aiDiffBodyContentHashRef = useRef<string | undefined>(undefined);
+  const aiDiffBodyContentHashTimerRef = useRef<number | null>(null);
   const commitPendingReferenceForThreadRef = useRef<(threadId: string) => void>(() => undefined);
   const rememberPendingCommentReferenceRef = useRef<() => void>(() => undefined);
   const noteFragment = useNoteYjsFragment(doc);
@@ -321,12 +328,32 @@ function CustomBlockNoteEditor({
   });
   const undoManager = useNoteYjsUndoManager(noteFragment, editor);
 
+  const refreshAiDiffBodyContentHash = useMemoizedFn(() => {
+    const nextHash = computeNoteBodyContentHash(editor.document);
+    aiDiffBodyContentHashRef.current = nextHash;
+    onAiDiffBodyContentHashChange?.(nextHash);
+  });
+
+  const scheduleAiDiffBodyContentHashRefresh = useMemoizedFn(() => {
+    aiDiffBodyContentHashRef.current = undefined;
+    onAiDiffBodyContentHashChange?.(undefined);
+    if (aiDiffBodyContentHashTimerRef.current !== null) {
+      window.clearTimeout(aiDiffBodyContentHashTimerRef.current);
+    }
+    aiDiffBodyContentHashTimerRef.current = window.setTimeout(() => {
+      aiDiffBodyContentHashTimerRef.current = null;
+      refreshAiDiffBodyContentHash();
+    }, 120);
+  });
+
   useMount(() => {
     editorRef.current = editor;
+    scheduleAiDiffBodyContentHashRefresh();
   });
 
   useUpdateEffect(() => {
     editorRef.current = editor;
+    scheduleAiDiffBodyContentHashRefresh();
   }, [editor]);
 
   const syncCollaborationUser = () => {
@@ -403,6 +430,7 @@ function CustomBlockNoteEditor({
 
     newNoteBodyOnChangeCleanupRef.current = editor.onChange(() => {
       activateWriteGuard();
+      scheduleAiDiffBodyContentHashRefresh();
 
       const isNoteEmpty = composeNoteBlocksToMarkdownLossy(editor, plugins).trim().length === 0;
       useNewNoteStore.getState().syncNewNoteBodyFromEditor(resourceId, isNoteEmpty);
@@ -427,6 +455,37 @@ function CustomBlockNoteEditor({
     }
   });
 
+  const applyPendingMarkdownImport = useMemoizedFn(() => {
+    if (!collaborationReady) {
+      return;
+    }
+
+    const pendingImport = usePendingNoteImportStore.getState().pendingByResourceId[resourceId];
+    if (!pendingImport) {
+      return;
+    }
+
+    try {
+      const blocks = editor.tryParseMarkdownToBlocks(pendingImport.markdown);
+      if (blocks.length > 0) {
+        editor.replaceBlocks(editor.document, blocks);
+      }
+      usePendingNoteImportStore.getState().removePendingImport(resourceId);
+      toast.success(`已导入 ${pendingImport.sourceFileName}`);
+    } catch (error) {
+      usePendingNoteImportStore.getState().removePendingImport(resourceId);
+      toast.danger(`Markdown 导入失败：${parseErrorMessage(error)}`);
+    }
+  });
+
+  useMount(() => {
+    applyPendingMarkdownImport();
+  });
+
+  useUpdateEffect(() => {
+    applyPendingMarkdownImport();
+  }, [collaborationReady, resourceId]);
+
   useUpdateEffect(() => {
     if (!blockLocalDocWrites) {
       setPmWriteGuardReady(false);
@@ -437,6 +496,10 @@ function CustomBlockNoteEditor({
     if (newNoteBodyOnChangeCleanupRef.current) {
       newNoteBodyOnChangeCleanupRef.current();
       newNoteBodyOnChangeCleanupRef.current = null;
+    }
+    if (aiDiffBodyContentHashTimerRef.current !== null) {
+      window.clearTimeout(aiDiffBodyContentHashTimerRef.current);
+      aiDiffBodyContentHashTimerRef.current = null;
     }
     clearCurrentSelection(resourceId);
   });
@@ -539,6 +602,7 @@ function CustomBlockNoteEditor({
           editor.focus();
         }
       },
+      getAiDiffBodyContentHash: () => aiDiffBodyContentHashRef.current,
       exportPdf: async (options) => {
         try {
           setExportDisplayModeOverride(AI_DIFF_DISPLAY_MODE.OLD_ONLY);
@@ -703,6 +767,42 @@ function CustomBlockNoteEditor({
   const editorShellStyle = hasInlineCommentsSidebar
     ? ({ ['--comments-sidebar-width' as string]: `${commentsSidebarWidth}px` } as CSSProperties)
     : undefined;
+  const aiBulkActionsNode = showAiBulkActions ? (
+    <div className={styles.aiBulkActions} contentEditable={false}>
+      <button
+        type="button"
+        aria-label="Keep all AI changes"
+        className={`${aiDiffStyles.aiActionBtn} ${aiDiffStyles.aiActionAccept} ${styles.aiBulkActionBtn}`}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          applyAllAiDiffActions('accept');
+        }}
+      >
+        Keep all
+      </button>
+      <button
+        type="button"
+        aria-label="Undo all AI changes"
+        className={`${aiDiffStyles.aiActionBtn} ${aiDiffStyles.aiActionDiscard} ${styles.aiBulkActionBtn}`}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          applyAllAiDiffActions('discard');
+        }}
+      >
+        Undo all
+      </button>
+    </div>
+  ) : null;
 
   return (
     <div
@@ -714,42 +814,9 @@ function CustomBlockNoteEditor({
       style={editorShellStyle}
       onKeyDownCapture={onKeyDownCapture}
     >
-      {showAiBulkActions ? (
-        <div className={styles.aiBulkActions} contentEditable={false}>
-          <button
-            type="button"
-            aria-label="Keep all AI changes"
-            className={`${aiDiffStyles.aiActionBtn} ${aiDiffStyles.aiActionAccept} ${styles.aiBulkActionBtn}`}
-            onMouseDown={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-            }}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              applyAllAiDiffActions('accept');
-            }}
-          >
-            Keep all
-          </button>
-          <button
-            type="button"
-            aria-label="Undo all AI changes"
-            className={`${aiDiffStyles.aiActionBtn} ${aiDiffStyles.aiActionDiscard} ${styles.aiBulkActionBtn}`}
-            onMouseDown={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-            }}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              applyAllAiDiffActions('discard');
-            }}
-          >
-            Undo all
-          </button>
-        </div>
-      ) : null}
+      {aiBulkActionsPortalContainer && aiBulkActionsNode
+        ? createPortal(aiBulkActionsNode, aiBulkActionsPortalContainer)
+        : aiBulkActionsNode}
       <NoteEditorReadOnlyProvider value={readOnly}>
         <AiDiffDisplayModeProvider value={effectiveAiDiffDisplayMode}>
           <LatexCommentProvider {...latexCommentProviderProps}>

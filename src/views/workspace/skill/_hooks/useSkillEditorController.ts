@@ -4,9 +4,9 @@ import { useMemo, useReducer, type SetStateAction } from 'react';
 import type { SkillSaveQueueItem } from '../_components/SkillSaveQueueDock/index.type';
 import type { SkillDraftCacheSnapshot } from '../utils/skillDraftCache';
 
-export type SkillWorkspaceSavePhase = 'clean' | 'dirty' | 'saving' | 'failed';
+export type SkillEditorSavePhase = 'clean' | 'dirty' | 'saving' | 'failed';
 
-export type SkillWorkspacePendingIntent =
+export type SkillEditorPendingIntent =
   | { type: 'publish' }
   | { type: 'leave' }
   | { type: 'switchFile'; fileId: string }
@@ -14,7 +14,7 @@ export type SkillWorkspacePendingIntent =
   | { type: 'switchVersion'; version: number }
   | null;
 
-interface SkillWorkspaceState {
+interface SkillEditorState {
   files: SkillFileNode[];
   selectedFileId: string;
   selectedTreeNodeId: string;
@@ -27,17 +27,17 @@ interface SkillWorkspaceState {
   savedConfigName: string;
   savedConfigDescription: string;
   saveQueueItems: SkillSaveQueueItem[];
-  pendingIntent: SkillWorkspacePendingIntent;
+  pendingIntent: SkillEditorPendingIntent;
 }
 
-type SkillWorkspaceAction =
-  | { type: 'update'; update: (state: SkillWorkspaceState) => SkillWorkspaceState }
-  | { type: 'setPendingIntent'; intent: SkillWorkspacePendingIntent }
+type SkillEditorAction =
+  | { type: 'update'; update: (state: SkillEditorState) => SkillEditorState }
+  | { type: 'setPendingIntent'; intent: SkillEditorPendingIntent }
   | { type: 'initialize'; skill: SkillDetail }
   | { type: 'restoreDraft'; snapshot: SkillDraftCacheSnapshot; skill: SkillDetail }
   | { type: 'discardLocalChanges'; skill: SkillDetail };
 
-const INITIAL_STATE: SkillWorkspaceState = {
+const INITIAL_STATE: SkillEditorState = {
   files: [],
   selectedFileId: '',
   selectedTreeNodeId: '',
@@ -65,10 +65,7 @@ function recoverInterruptedQueue(items: SkillSaveQueueItem[]): SkillSaveQueueIte
   );
 }
 
-function skillWorkspaceReducer(
-  state: SkillWorkspaceState,
-  action: SkillWorkspaceAction
-): SkillWorkspaceState {
+function skillEditorReducer(state: SkillEditorState, action: SkillEditorAction): SkillEditorState {
   if (action.type === 'update') return action.update(state);
 
   if (action.type === 'setPendingIntent') {
@@ -129,25 +126,25 @@ interface ResolveSavePhaseOptions {
   isSaving: boolean;
 }
 
-export function resolveSkillWorkspaceSavePhase({
+export function resolveSkillEditorSavePhase({
   isFileDirty,
   isConfigDirty,
   hasUnsavedLocalAssets,
   saveQueueItems,
   isSaving,
-}: ResolveSavePhaseOptions): SkillWorkspaceSavePhase {
+}: ResolveSavePhaseOptions): SkillEditorSavePhase {
   if (isSaving) return 'saving';
   if (saveQueueItems.some((item) => item.phase === 'failed')) return 'failed';
   if (isFileDirty || isConfigDirty || hasUnsavedLocalAssets) return 'dirty';
   return 'clean';
 }
 
-export function useSkillWorkspaceController() {
-  const [state, dispatch] = useReducer(skillWorkspaceReducer, INITIAL_STATE);
+export function useSkillEditorController() {
+  const [state, dispatch] = useReducer(skillEditorReducer, INITIAL_STATE);
   const actions = useMemo(() => {
-    const setField = <K extends Exclude<keyof SkillWorkspaceState, 'pendingIntent'>>(
+    const setField = <K extends Exclude<keyof SkillEditorState, 'pendingIntent'>>(
       field: K,
-      value: SetStateAction<SkillWorkspaceState[K]>
+      value: SetStateAction<SkillEditorState[K]>
     ) => {
       dispatch({
         type: 'update',
@@ -175,7 +172,7 @@ export function useSkillWorkspaceController() {
         setField('savedConfigDescription', value),
       setSaveQueueItems: (value: SetStateAction<SkillSaveQueueItem[]>) =>
         setField('saveQueueItems', value),
-      setPendingIntent: (intent: SkillWorkspacePendingIntent) =>
+      setPendingIntent: (intent: SkillEditorPendingIntent) =>
         dispatch({ type: 'setPendingIntent', intent }),
       initialize: (skill: SkillDetail) => dispatch({ type: 'initialize', skill }),
       restoreDraft: (snapshot: SkillDraftCacheSnapshot, skill: SkillDetail) =>

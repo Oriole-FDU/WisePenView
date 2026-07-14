@@ -13,6 +13,7 @@ import type { CollaboratorCommentVisibility } from './comments/core/commentSetti
 export interface NoteBodyEditorHandle {
   focus: () => void;
   navigateToBlock: (id: string) => void;
+  getAiDiffBodyContentHash: () => string | undefined;
   /** 通过系统打印对话框另存为 PDF（克隆 DOM + 打印前临时仅旧文本） */
   exportPdf: (options?: { title?: string; titleRoot?: HTMLElement | null }) => Promise<void>;
   /** 下载正文为 Markdown（AIDiff 按仅旧文本过滤后导出） */
@@ -30,6 +31,8 @@ export interface CustomBlockNoteProps {
   provider: WisepenProvider;
   collaborationUser: NoteCollaborationUser;
   aiDiffDisplayMode: AiDiffDisplayMode;
+  /** 协同 provider 已完成首次服务端同步，此后才允许写入待导入正文 */
+  collaborationReady: boolean;
   /** UI/editable：连接中或无 EDIT 时为 true */
   readOnly?: boolean;
   /**
@@ -66,4 +69,6 @@ export interface CustomBlockNoteProps {
   commentsSidebarPortalContainer?: HTMLElement | null;
   commentHistoryOpen?: boolean;
   onCommentHistoryOpenChange?: (open: boolean) => void;
+  aiBulkActionsPortalContainer?: HTMLElement | null;
+  onAiDiffBodyContentHashChange?: (hash: string | undefined) => void;
 }

@@ -1,4 +1,4 @@
-/* 顶栏铺满父级（中间栏）；与正文对齐宽度由父级设置 --workspace-view-max-width */
+/* 顶栏铺满父级（中间栏）；与正文对齐宽度由资源内容设置。 */
 .root {
   box-sizing: border-box;
   flex-shrink: 0;
@@ -85,7 +85,7 @@
 .titleBlockInner {
   box-sizing: border-box;
   width: 100%;
-  max-width: var(--workspace-view-max-width, 1400px);
+  max-width: var(--resource-view-max-width, 1400px);
   margin: 0 auto;
   padding-inline: var(--space-xl);
 }
