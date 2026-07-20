@@ -7,19 +7,27 @@ import type { CreateMenuItem, CreateMenuProps } from './index.type';
 function CreateMenuIcon({ id }: { id: CreateMenuItem['id'] }) {
   switch (id) {
     case 'folder':
-      return <EntryIcon entryType="folder" size={16} />;
+      return <EntryIcon entryType="folder" size={16} color="currentColor" />;
     case 'drawio':
-      return <EntryIcon entryType="resource" resourceIconType="drawio" size={16} />;
+      return (
+        <EntryIcon entryType="resource" resourceIconType="drawio" size={16} color="currentColor" />
+      );
     case 'note':
-      return <EntryIcon entryType="resource" resourceIconType="note" size={16} />;
+      return (
+        <EntryIcon entryType="resource" resourceIconType="note" size={16} color="currentColor" />
+      );
     case 'importNote':
-      return <FileInput size={16} aria-hidden="true" />;
+      return <FileInput size={16} color="var(--primary)" aria-hidden="true" />;
     case 'skill':
-      return <EntryIcon entryType="resource" resourceIconType="skill" size={16} />;
+      return (
+        <EntryIcon entryType="resource" resourceIconType="skill" size={16} color="currentColor" />
+      );
     case 'agent':
-      return <EntryIcon entryType="resource" resourceIconType="agent" size={16} />;
+      return (
+        <EntryIcon entryType="resource" resourceIconType="agent" size={16} color="currentColor" />
+      );
     case 'upload':
-      return <CloudUpload size={16} aria-hidden="true" />;
+      return <CloudUpload size={16} color="var(--primary)" aria-hidden="true" />;
   }
 }
 

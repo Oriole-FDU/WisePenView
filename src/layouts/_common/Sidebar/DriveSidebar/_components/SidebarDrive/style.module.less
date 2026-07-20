@@ -36,7 +36,7 @@
     width: 100%;
     padding: 0 2px;
     color: var(--muted);
-    border-radius: var(--app-radius-interactive, var(--radius-2xl));
+    border-radius: var(--radius-md, 6px);
     box-sizing: border-box;
     transition:
       color 0.16s ease,
@@ -65,8 +65,15 @@
   }
 
   :global(.wisepen-tree__item[aria-selected='true']) {
-    color: var(--accent);
-    background: var(--accent-soft) !important;
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+  }
+
+  :global(.wisepen-tree__item[aria-selected='true']) :global(.wisepen-tree__content) {
+    flex: 1;
+    background: transparent !important;
+    border-radius: 0;
+    padding-right: 0;
   }
 
   :global(.wisepen-tree__switcher),
@@ -102,6 +109,10 @@
   flex: 1 1 auto;
   min-width: 0;
   gap: var(--space-2xs, 4px);
+}
+
+.nodeMainRoot {
+  color: var(--foreground);
 }
 
 .nodeIcon {

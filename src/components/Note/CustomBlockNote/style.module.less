@@ -4,6 +4,17 @@
   display: flex;
   flex-direction: column;
 
+  /* 正文批注原文高亮 */
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark:not([data-orphan='true'])) {
+    background: var(--warning-soft);
+    border-radius: 2px;
+  }
+
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark.bn-thread-mark-selected:not([data-orphan='true'])),
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark .bn-thread-mark-selected) {
+    background: var(--warning-soft-hover);
+  }
+
   /* BlockNote 默认会有自己的字体变量，这里统一到应用字体栈（仅作用正文编辑区） */
   :global(.bn-container),
   :global(.bn-editor),
@@ -55,7 +66,14 @@
 
   :global(.bn-block-content.ProseMirror-selectednode > *),
   :global(.ProseMirror-selectednode > .bn-block-content > *) {
-    outline-color: var(--accent) !important;
+    outline: none !important;
+  }
+
+  /* 移除 BlockNote 缩进引导线（选中文本时左侧出现的竖线） */
+  /* BlockNote 在嵌套块的 ::before 伪元素上画了 border-left 作为缩进引导线，
+     这里直接隐藏整个伪元素，彻底消除竖线 */
+  :global(.bn-editor .bn-block-outer::before) {
+    display: none !important;
   }
 
   :global(.ProseMirror .selectedCell::after) {
@@ -144,12 +162,7 @@
   }
 
   :global(.bn-editor .bn-block-content:not([data-content-type='heading']) .bn-inline-content),
-  :global(.bn-editor .bn-block-content:not([data-content-type='heading']) .bn-inline-content *),
-  /* AI Diff 仅新/对比正文：与编辑器同一行高，不含工具条按钮 */
-  :global(.bn-editor .bn-block-content:not([data-content-type='heading']) [data-ai-diff-text]),
-  :global(
-      .bn-editor .bn-block-content:not([data-content-type='heading']) [data-ai-diff-text] *:not(button)
-    ) {
+  :global(.bn-editor .bn-block-content:not([data-content-type='heading']) .bn-inline-content *) {
     line-height: 1.8 !important;
   }
 
@@ -476,14 +489,7 @@
 }
 
 :global(.bn-drag-preview .bn-block-content:not([data-content-type='heading']) .bn-inline-content),
-:global(.bn-drag-preview .bn-block-content:not([data-content-type='heading']) .bn-inline-content *),
-:global(.bn-drag-preview .bn-block-content:not([data-content-type='heading']) [data-ai-diff-text]),
-:global(
-    .bn-drag-preview
-      .bn-block-content:not([data-content-type='heading'])
-      [data-ai-diff-text]
-      *:not(button)
-  ) {
+:global(.bn-drag-preview .bn-block-content:not([data-content-type='heading']) .bn-inline-content *) {
   line-height: 1.8 !important;
 }
 

@@ -15,6 +15,11 @@ export type { NoteOutlineItem } from './engines/outline';
 export type NoteEditorAnchor =
   { kind: 'block'; blockId: string } | { kind: 'inlineComment'; threadId: string };
 
+export interface NoteFindResult {
+  current: number;
+  total: number;
+}
+
 export interface NoteBodyEditorHandle {
   focus: () => void;
   scrollToAnchor: (anchor: NoteEditorAnchor) => void;
@@ -22,6 +27,14 @@ export interface NoteBodyEditorHandle {
   exportPdf: (options?: { title?: string; titleRoot?: HTMLElement | null }) => Promise<void>;
   /** 导出正文 Markdown artifact（AIDiff 按仅旧文本投影） */
   exportMarkdown: () => NoteMarkdownArtifact;
+  /** 在文档中搜索文本（大小写不敏感），返回匹配总数 */
+  findMatches: (query: string) => number;
+  /** 跳转到下一个匹配 */
+  findNext: () => NoteFindResult | null;
+  /** 跳转到上一个匹配 */
+  findPrev: () => NoteFindResult | null;
+  /** 清除搜索状态并恢复原始光标位置 */
+  clearFind: () => void;
 }
 
 interface NoteMarkdownArtifact {

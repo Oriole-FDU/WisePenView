@@ -1,7 +1,5 @@
 @import '../shared/styles/table.module.less';
 
-@name-header-offset: @table-header-row-height;
-
 .shell {
   .tableShellTypography();
   .tableShellBorder();
@@ -127,8 +125,8 @@
   }
 }
 
-.nameColumnHeader {
-  padding-left: @name-header-offset;
+.nameColumnHeader:global(.table__column) {
+  padding-left: calc(var(--space-sm) + 20px + var(--space-xs));
 }
 
 .actionColumnHeader:global(.table__column) {

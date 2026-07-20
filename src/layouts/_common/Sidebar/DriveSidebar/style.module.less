@@ -2,7 +2,78 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--surface-secondary);
+  background: var(--surface);
+  border-right: 1px solid var(--border-light);
+}
+
+.collapsed {
+  /* 折叠态下隐藏 SidebarDrive，由父级 Sider 控制总宽 */
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  padding: var(--space-sm) 12px;
+  min-height: 65px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.sider.collapsed .header {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.iconBtn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius, 8px);
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+  }
+}
+
+.titleBtn {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius, 8px);
+  color: var(--foreground);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-md, 14px);
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-tertiary);
+  }
+}
+
+.titleText {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .body {
@@ -11,4 +82,9 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.bodyCollapsed {
+  visibility: hidden;
+  pointer-events: none;
 }

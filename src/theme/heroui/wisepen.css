@@ -170,30 +170,30 @@
 
   /* Floral */
   html[data-color-scheme='floral'] {
-    --accent: #7c4360;
+    --accent: #8b4150;
     --accent-foreground: #ffffff;
     --foreground: #2e2e2e;
     --paper: #ffffff;
-    --canvas: #f7f2f5;
+    --canvas: #f7f0f2;
     --text-inverse: #ffffff;
-    --card-shadow: 0 2px 8px rgba(230, 166, 217, 0.08);
-    --preview-color-1: #f4e9f1;
-    --preview-color-2: #dcc2d3;
-    --preview-color-3: #7c4360;
+    --card-shadow: 0 2px 8px rgba(210, 140, 150, 0.08);
+    --preview-color-1: #f5e8ec;
+    --preview-color-2: #d8b8c0;
+    --preview-color-3: #8b4150;
   }
   html[data-color-scheme='floral'].dark,
   html[data-color-scheme='floral'][data-theme='dark'] {
     color-scheme: dark;
-    --accent: #d4a8bc;
+    --accent: #d4a0a8;
     --accent-foreground: #0d1117;
-    --foreground: #eee8ed;
+    --foreground: #eee6e7;
     --paper: #18161a;
     --canvas: #121014;
     --text-inverse: #0d1117;
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     --preview-color-1: #1c181c;
-    --preview-color-2: #d4a8bc;
-    --preview-color-3: #d4a8bc;
+    --preview-color-2: #d4a0a8;
+    --preview-color-3: #d4a0a8;
   }
 
   /* Aqua */
@@ -357,14 +357,14 @@
 
   /* Floral */
   html.light [data-scheme-preview='floral'], html[data-theme='light'] [data-scheme-preview='floral'] {
-    --preview-color-1: #fcf3f9;
-    --preview-color-2: #dab2d2;
-    --preview-color-3: #7c4360;
+    --preview-color-1: #fcf2f4;
+    --preview-color-2: #d6aab4;
+    --preview-color-3: #8b4150;
   }
   html.dark [data-scheme-preview='floral'], html[data-theme='dark'] [data-scheme-preview='floral'] {
     --preview-color-1: #312f31;
-    --preview-color-2: #d4a8bc;
-    --preview-color-3: #d4a8bc;
+    --preview-color-2: #d4a0a8;
+    --preview-color-3: #d4a0a8;
   }
 
   /* Aqua */

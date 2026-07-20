@@ -42,6 +42,10 @@ export interface FolderTableRowPressContext {
   ctrlKey: boolean;
   shiftKey: boolean;
   modifierKey: boolean;
+  /** MouseEvent.detail — 1 for single click, 2 for double-click */
+  detail?: number;
+  /** 点击是否发生在名称列的单元格内 */
+  isNameColumn?: boolean;
 }
 
 export interface FolderTableColumn<T extends FolderTableRow> extends Omit<

@@ -23,9 +23,8 @@ const COLOR_DOC = 'var(--accent)';
 const COLOR_PDF = 'var(--danger)';
 const COLOR_PPT = 'var(--warning)';
 const COLOR_XLS = 'var(--success)';
-const COLOR_NOTE = 'var(--accent)';
-const COLOR_DRAWIO = 'var(--accent)';
-const COLOR_AI = 'var(--accent-soft-foreground)';
+const COLOR_CREATIVE = 'var(--accent)';
+const COLOR_AI = 'var(--accent)';
 
 function SharedFolderIcon({ size = 18, color }: { size?: number; color?: string }) {
   const folderColor = color ?? COLOR_FOLDER;
@@ -73,9 +72,9 @@ function renderResourceIcon(
 
   switch (iconType) {
     case 'note':
-      return <NotebookPen size={size} color={color ?? COLOR_NOTE} />;
+      return <NotebookPen size={size} color={color ?? COLOR_CREATIVE} />;
     case 'drawio':
-      return <Workflow size={size} color={color ?? COLOR_DRAWIO} />;
+      return <Workflow size={size} color={color ?? COLOR_CREATIVE} />;
     case 'skill':
       return <Wrench size={size} color={color ?? COLOR_AI} />;
     case 'agent':
@@ -107,7 +106,7 @@ function EntryIcon({
 }: EntryIconProps) {
   switch (entryType) {
     case 'root':
-      return <HardDrive size={size} color={color ?? COLOR_SECONDARY} />;
+      return <HardDrive size={size} color={color ?? COLOR_CREATIVE} />;
     case 'folder':
       if (folderIconType === 'shared') {
         return <SharedFolderIcon size={size} color={color} />;

@@ -39,9 +39,15 @@
   min-width: auto;
   gap: var(--space-2xs);
   padding-inline: var(--space-2xs);
-  border: 1px solid var(--border-light);
-  background: var(--overlay);
+  border: 1px solid transparent;
+  background: transparent;
   cursor: grab;
+  transition: border-color 0.15s ease;
+}
+
+.dragHandleButton:hover {
+  border-color: var(--border-light);
+  background: var(--overlay);
 }
 
 .dragHandleButton:active {

@@ -50,11 +50,10 @@ function Drive() {
             <Button
               variant="primary"
               className={styles.pageTrashButton}
-              isDisabled={isTrashView}
               onPress={() => void tableDriveRef.current?.openTrash()}
             >
               <Trash2 size={16} aria-hidden="true" />
-              回收站
+              {isTrashView ? '返回云盘' : '回收站'}
             </Button>
           ) : null}
         </div>

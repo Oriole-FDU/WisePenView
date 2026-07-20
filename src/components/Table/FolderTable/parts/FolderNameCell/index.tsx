@@ -35,7 +35,7 @@ function FolderTableNameCell<T extends FolderTableRow>({
     : nameContent;
 
   return (
-    <div className={styles.nameCell} data-depth={depth}>
+    <div className={styles.nameCell} data-depth={depth} data-name-column="true">
       {expandable ? (
         <button
           type="button"

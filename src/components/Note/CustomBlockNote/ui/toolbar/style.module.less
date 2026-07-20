@@ -1,154 +1,20 @@
-.toolbarPopover {
-  position: fixed;
-  z-index: calc(var(--bn-ui-base-z-index, 0) + var(--note-editor-toolbar-layer, 120));
-  transform: translate(-50%, -100%);
+.askAiBtn {
+  margin-left: var(--space-xs);
+  margin-right: var(--space-xs);
 }
 
-.toolbar,
-.blockTypeMenuPopover,
-.colorPopover,
-.formPopover {
-  --note-toolbar-trigger-padding-inline: var(--space-xs);
-  --note-toolbar-trigger-gap: var(--space-2xs);
-  --note-toolbar-trigger-icon-size: calc(var(--control-height-sm) - var(--space-2xs));
-  --note-toolbar-menu-padding: var(--space-xs);
-  --note-toolbar-menu-gap: var(--space-2xs);
-  --note-toolbar-menu-width: 18rem;
-  --note-toolbar-menu-max-height: min(32.5rem, calc(100vh - var(--space-2xl) - var(--space-xl) - var(--space-lg)));
-  --note-toolbar-menu-icon-column: var(--control-height);
-  --note-toolbar-menu-trailing-column: calc(var(--space-md) + var(--space-2xs));
-}
+/* BlockNote formatting toolbar — accent background on active/hover buttons */
+:global(.bn-formatting-toolbar) {
+  /* Active/pressed button state */
+  [aria-pressed='true'],
+  [data-active='true'],
+  [data-state='on'] {
+    background: var(--primary);
+    color: var(--primary-foreground, #fff);
+  }
 
-.toolbar {
-  border: 1px solid var(--border-light);
-  background: var(--overlay);
-  color: var(--overlay-foreground);
-  gap: 0;
-}
-
-.floatingLayer {
-  z-index: var(--note-editor-toolbar-layer, 120);
-}
-
-.toolbar :global([data-slot='button-group-separator']),
-.toolbar :global([data-slot='toggle-button-group-separator']) {
-  position: static;
-  width: 1px;
-  height: calc(var(--control-height-sm) - var(--space-sm));
-  align-self: center;
-  background: var(--separator);
-  opacity: 1;
-}
-
-.toolbarSeparator {
-  width: 1px;
-  height: calc(var(--control-height-sm) - var(--space-sm));
-  align-self: center;
-  margin-inline: var(--space-2xs);
-  background: var(--separator);
-}
-
-.toolbarSeparator:first-child,
-.toolbarSeparator:last-child,
-.toolbarSeparator + .toolbarSeparator {
-  display: none;
-}
-
-.toolbarButtonActive {
-  background: var(--accent-soft);
-  color: var(--accent-soft-foreground);
-}
-
-.blockTypeTrigger {
-  min-width: calc(var(--control-height) + var(--space-md));
-  padding-inline: var(--note-toolbar-trigger-padding-inline);
-  gap: var(--note-toolbar-trigger-gap);
-  color: var(--overlay-foreground);
-}
-
-.blockTypeTriggerIcon {
-  width: var(--note-toolbar-trigger-icon-size);
-  height: var(--note-toolbar-trigger-icon-size);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.blockTypeMenuPopover,
-.colorPopover,
-.formPopover {
-  padding: 0;
-}
-
-.blockTypeMenu {
-  width: var(--note-toolbar-menu-width);
-  max-height: var(--note-toolbar-menu-max-height);
-  display: flex;
-  flex-direction: column;
-  gap: var(--note-toolbar-menu-gap);
-  overflow-y: auto;
-  padding: var(--note-toolbar-menu-padding);
-}
-
-.blockTypeMenuItem {
-  width: 100%;
-  min-height: var(--control-height);
-  display: grid;
-  grid-template-columns: var(--note-toolbar-menu-icon-column) minmax(0, 1fr) var(--note-toolbar-menu-trailing-column);
-  align-items: center;
-  gap: var(--space-xs);
-  padding: 0 var(--space-xs);
-  color: var(--overlay-foreground);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-sm);
-}
-
-.blockTypeMenuItem:hover,
-.blockTypeMenuItem[data-hovered],
-.blockTypeMenuItem[data-focused],
-.blockTypeMenuItem[data-selected],
-.blockTypeMenuItemActive {
-  background: var(--accent-soft);
-  color: var(--foreground);
-}
-
-.blockTypeMenuIcon {
-  width: var(--control-height-sm);
-  height: var(--control-height-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-}
-
-.blockTypeMenuLabel {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.blockTypeMenuCheck {
-  width: var(--line-height-xs);
-  height: var(--line-height-xs);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  justify-self: end;
-  color: var(--accent);
-}
-
-.colorTrigger {
-  min-width: calc(var(--control-height) + var(--space-sm));
-  padding-inline: var(--note-toolbar-trigger-padding-inline);
-  gap: var(--note-toolbar-trigger-gap);
-  color: var(--overlay-foreground);
-}
-
-.formPanel {
-  width: min(18.75rem, calc(100vw - var(--space-xl)));
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  /* Hover on buttons */
+  button:hover {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
 }

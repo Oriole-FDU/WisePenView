@@ -1,7 +1,6 @@
 import { buildDriveNodeScope, type DriveNodeScope } from '@/domains/Drive';
 
 const APP_DRIVE_PATH = '/app/drive';
-const APP_GROUP_PATH = '/app/my-group';
 
 export interface DriveRouteLocation {
   scope: DriveNodeScope;
@@ -19,13 +18,12 @@ export const buildDrivePath = ({
   if (nodeId && nodeId !== scope.rootId) {
     search.set('folder', nodeId);
   }
+  if (scope.type === 'group') {
+    search.set('group', scope.groupId);
+  }
 
-  const basePath =
-    scope.type === 'group'
-      ? `${APP_GROUP_PATH}/${encodeURIComponent(scope.groupId)}`
-      : APP_DRIVE_PATH;
   const query = search.toString();
-  return query ? `${basePath}?${query}` : basePath;
+  return query ? `${APP_DRIVE_PATH}?${query}` : APP_DRIVE_PATH;
 };
 
 export const parseDriveInitialNodeId = (search: string): string | undefined => {
@@ -33,10 +31,12 @@ export const parseDriveInitialNodeId = (search: string): string | undefined => {
 };
 
 export const parseDriveRouteLocation = (search: string): DriveRouteLocation => {
-  const initialNodeId = parseDriveInitialNodeId(search);
+  const params = new URLSearchParams(search);
+  const initialNodeId = params.get('folder')?.trim() || undefined;
+  const groupId = params.get('group')?.trim() || undefined;
 
   return {
-    scope: buildDriveNodeScope(),
+    scope: buildDriveNodeScope(groupId),
     ...(initialNodeId ? { initialNodeId } : {}),
   };
 };

@@ -458,7 +458,6 @@ function SidebarDrive() {
         onChange={handleMarkdownFileChange}
         hidden
       />
-      <div className={styles.sectionTitle}>云盘</div>
       {showSpin ? (
         <div className={styles.stateBlock}>
           <Spin />

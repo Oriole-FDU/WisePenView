@@ -7,6 +7,10 @@
   min-width: 0;
   min-height: 0;
   z-index: 1;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: var(--surface);
 }
 
 .panel {
@@ -27,6 +31,9 @@
   flex-direction: column;
   overflow: hidden;
   align-self: stretch;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .header {
@@ -47,9 +54,15 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  scrollbar-gutter: stable;
   .appSubtleScrollbar();
   scrollbar-color: transparent transparent;
+  border: none;
+  outline: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 
   &::-webkit-scrollbar-thumb {
     background-color: transparent;
@@ -58,6 +71,11 @@
 
   &:hover {
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+    &::-webkit-scrollbar {
+      width: var(--scrollbar-size, 8px);
+      height: var(--scrollbar-size, 8px);
+    }
 
     &::-webkit-scrollbar-thumb {
       background-color: var(--scrollbar-thumb);

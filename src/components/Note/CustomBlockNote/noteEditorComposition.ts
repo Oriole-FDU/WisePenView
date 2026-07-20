@@ -1,5 +1,6 @@
 import { aiDiffEditorExtension } from './engines/aiDiff/extension';
 import { stripEscapeEditorExtension } from './engines/editor/stripEscape';
+import { searchEditorExtension } from './engines/search/extension';
 import { noteConfig } from './noteConfig';
 import { codeBlockPlugin } from './plugins/CodeBlockPlugin';
 import { createDefaultContentPlugin } from './plugins/DefaultContentPlugin';
@@ -25,6 +26,7 @@ const notePluginTree = {
 export const notePluginRegistry = createNotePluginRegistry(notePluginTree, [
   stripEscapeEditorExtension,
   aiDiffEditorExtension,
+  searchEditorExtension,
 ]);
 
 /** 笔记正文 schema 由唯一的内容插件树生成。 */

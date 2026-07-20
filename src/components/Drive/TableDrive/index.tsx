@@ -14,6 +14,7 @@ import {
 } from '@/components/Table';
 import { useDriveService } from '@/domains';
 import type { DriveNode } from '@/domains/Drive';
+import SidebarDriveScopeSwitcher from '@/layouts/_common/Sidebar/DriveSidebar/_components/SidebarDrive/SidebarDriveScopeSwitcher';
 import { parseErrorMessage } from '@/utils/error';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 import { findTreeNodeById } from '@/utils/tree/findTreeNodeById';
@@ -29,8 +30,8 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { Button, toast, type SortDescriptor } from '@heroui/react';
-import { useMount, useRequest, useUpdateEffect } from 'ahooks';
+import { Button, toast, type Selection, type SortDescriptor } from '@heroui/react';
+import { useMount, useRequest, useUnmount, useUpdateEffect } from 'ahooks';
 import { Trash2 } from 'lucide-react';
 import {
   forwardRef,
@@ -331,9 +332,35 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
   const [draggingRowKeys, setDraggingRowKeys] = useState<Set<string>>(new Set());
   const [activeDragRowId, setActiveDragRowId] = useState<string | null>(null);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>();
+  const lastSortClickRef = useRef<{ column: string; time: number } | null>(null);
+
+  const handleSortChange = useCallback((descriptor: SortDescriptor) => {
+    const now = Date.now();
+    const last = lastSortClickRef.current;
+
+    if (last && last.column === descriptor.column && now - last.time < 300) {
+      // 双击同一列 → 回到默认未排序状态
+      lastSortClickRef.current = null;
+      setSortDescriptor(undefined);
+      return;
+    }
+
+    lastSortClickRef.current = { column: descriptor.column, time: now };
+    setSortDescriptor(descriptor);
+  }, []);
   const [renameTarget, setRenameTarget] = useState<DriveActionTarget | null>(null);
   const [moveTarget, setMoveTarget] = useState<DriveActionTarget | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DriveActionTarget | null>(null);
+  const [batchMode, setBatchMode] = useState(false);
+  const beforeTrashNodeIdRef = useRef<string | null>(null);
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const doubleClickRef = useRef(false);
+
+  useUnmount(() => {
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+    }
+  });
   const draggingRowKeysRef = useRef<Set<string>>(new Set());
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -378,6 +405,78 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
     });
     return map;
   }, [pathNodes, rowMap]);
+
+  const handleToggleBatchMode = useCallback(() => {
+    setBatchMode((prev) => {
+      if (prev) {
+        setSelectedRowKeys(new Set());
+      }
+      return !prev;
+    });
+  }, []);
+
+  const handleBatchSelectionChange = useCallback(
+    (keys: Selection) => {
+      if (keys === 'all') {
+        const allIds = rows.filter((r) => r.entryType !== 'loading').map((r) => r.id);
+        setSelectedRowKeys(new Set(allIds));
+        return;
+      }
+      setSelectedRowKeys(new Set([...keys].map(String)));
+    },
+    [rows]
+  );
+
+  const { loading: batchDeleting, run: runBatchDelete } = useRequest(
+    async () => {
+      const ids = [...selectedRowKeys];
+      await Promise.all(
+        ids.map((nodeId) => driveService.removeNode({ nodeId, groupId: finalGroupId }))
+      );
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        toast.success(`已删除 ${selectedRowKeys.size} 项`);
+        setSelectedRowKeys(new Set());
+        setBatchMode(false);
+        refreshDrive();
+      },
+      onError: (err) => {
+        toast.danger(parseErrorMessage(err));
+      },
+    }
+  );
+
+  const batchSelection = useMemo(() => {
+    if (!batchMode) return undefined;
+    return {
+      selectedKeys: selectedRowKeys as Set<string | number>,
+      onSelectionChange: handleBatchSelectionChange,
+    };
+  }, [batchMode, selectedRowKeys, handleBatchSelectionChange]);
+
+  const batchFooter = useMemo(() => {
+    if (!batchMode) return null;
+    return (
+      <div className={styles.batchFooter}>
+        <div className={styles.batchActions}>
+          <Button
+            variant="danger"
+            size="sm"
+            isDisabled={selectedRowKeys.size === 0 || batchDeleting}
+            onPress={() => runBatchDelete()}
+          >
+            删除
+          </Button>
+          <Button variant="secondary" size="sm" onPress={handleToggleBatchMode}>
+            取消
+          </Button>
+        </div>
+      </div>
+    );
+  }, [batchMode, selectedRowKeys, batchDeleting, runBatchDelete, handleToggleBatchMode]);
+
   const selectedNode = useMemo(() => {
     if (selectedRowKeys.size !== 1) {
       return undefined;
@@ -464,7 +563,14 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
   );
 
   const openTrash = useCallback(async () => {
-    if (!canOpenTrash || isTrashView) {
+    if (!canOpenTrash) {
+      return;
+    }
+
+    // 已在回收站 → 返回之前的目录
+    if (isTrashView) {
+      handleEnterFolder(beforeTrashNodeIdRef.current ?? finalRootId);
+      beforeTrashNodeIdRef.current = null;
       return;
     }
 
@@ -474,11 +580,20 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
         toast.danger('未找到回收站');
         return;
       }
+      beforeTrashNodeIdRef.current = currentNodeId;
       handleEnterFolder(resolvedTrashFolderNodeId);
     } catch (error) {
       toast.danger(parseErrorMessage(error));
     }
-  }, [canOpenTrash, handleEnterFolder, isTrashView, resolveTrashFolderNodeId, trashFolderNodeId]);
+  }, [
+    canOpenTrash,
+    currentNodeId,
+    finalRootId,
+    handleEnterFolder,
+    isTrashView,
+    resolveTrashFolderNodeId,
+    trashFolderNodeId,
+  ]);
 
   useImperativeHandle(ref, () => ({ openTrash }), [openTrash]);
 
@@ -529,22 +644,28 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
             上传到小组
           </Button>
         ) : null}
-        {showToolbarTrash && canOpenTrash ? (
+        {!isTrashView ? (
           <Button
-            variant={isTrashView ? 'ghost' : 'secondary'}
+            variant={batchMode ? 'primary' : 'secondary'}
             size="sm"
-            isDisabled={isTrashView}
-            onPress={openTrash}
+            onPress={handleToggleBatchMode}
           >
+            批量操作
+          </Button>
+        ) : null}
+        {showToolbarTrash && canOpenTrash ? (
+          <Button variant={isTrashView ? 'primary' : 'secondary'} size="sm" onPress={openTrash}>
             <Trash2 size={16} aria-hidden="true" />
-            回收站
+            {isTrashView ? '返回云盘' : '回收站'}
           </Button>
         ) : null}
       </div>
     ),
     [
+      batchMode,
       createMenuItems,
       handleCreateMenuSelect,
+      handleToggleBatchMode,
       isTrashView,
       openUploadToGroup,
       openTrash,
@@ -586,6 +707,7 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
 
   const resolveRowActions = useCallback(
     (row: DriveTableRow): FolderTableRowAction<DriveTableRow>[] => {
+      if (batchMode) return [];
       const actionTarget = toDriveActionTarget(row.node);
       if (!actionTarget) return [];
 
@@ -640,6 +762,7 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
       return actions;
     },
     [
+      batchMode,
       finalGroupId,
       handleClickNode,
       handleEnterFolder,
@@ -654,8 +777,22 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
     (row: DriveTableRow, ctx: FolderTableRowPressContext) => {
       if (row.node.type === 'loading') return;
 
+      // 清除上一次单击的待激活定时器
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+
+      // 已选中行单击：延迟激活，留给系统双击检测窗口
+      // 若在延迟内触发 dblclick 事件，handleDoubleClick 会标记 doubleClickRef 并取消激活
       if (!ctx.modifierKey && selectedRowKeys.size === 1 && selectedRowKeys.has(row.id)) {
-        handleRowActivate(row);
+        doubleClickRef.current = false;
+        clickTimerRef.current = setTimeout(() => {
+          clickTimerRef.current = null;
+          if (!doubleClickRef.current) {
+            handleRowActivate(row);
+          }
+        }, 550);
         return;
       }
 
@@ -663,6 +800,42 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
       setSelectedRowKeys(nextSelectedRowKeys);
     },
     [handleRowActivate, selectedRowKeys]
+  );
+
+  const handleDoubleClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      if (batchMode) return;
+
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const rowEl = target.closest<HTMLElement>('[data-folder-row-id]');
+      if (!rowEl) return;
+      const rowId = rowEl.getAttribute('data-folder-row-id');
+      if (!rowId) return;
+
+      const tableRow = rowMap.get(rowId);
+      if (!tableRow || tableRow.entryType === 'loading') return;
+
+      // 标记双击已发生，阻止 handleRowSelect 中的定时器激活
+      doubleClickRef.current = true;
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+
+      // 双击文件名 → 重命名；双击其他区域 → 打开/进入
+      const isNameColumn = target.closest('[data-name-column="true"]') !== null;
+      if (isNameColumn && !isDriveSystemFolderNode(tableRow.node)) {
+        const actionTarget = toDriveActionTarget(tableRow.node);
+        if (actionTarget && actionTarget.type !== 'link') {
+          handleOpenRename(actionTarget);
+          return;
+        }
+      }
+      handleRowActivate(tableRow);
+    },
+    [batchMode, rowMap, handleOpenRename, handleRowActivate]
   );
 
   const resolveDragSourceIds = useCallback(
@@ -749,11 +922,14 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
 
   const breadcrumb = useMemo(
     () => (
-      <FolderTable.Breadcrumb
-        items={breadcrumbItems}
-        onJump={handleEnterFolder}
-        renderItem={renderBreadcrumbItem}
-      />
+      <>
+        <FolderTable.Breadcrumb
+          items={breadcrumbItems}
+          onJump={handleEnterFolder}
+          renderItem={renderBreadcrumbItem}
+        />
+        <SidebarDriveScopeSwitcher />
+      </>
     ),
     [breadcrumbItems, handleEnterFolder, renderBreadcrumbItem]
   );
@@ -782,7 +958,7 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
       <main className={styles.listArea}>
         <div className={styles.driveFrame}>
           <div className={styles.driveBody}>
-            <div className={styles.tablePanel}>
+            <div className={styles.tablePanel} onDoubleClick={handleDoubleClick}>
               <FolderTable<DriveTableRow>
                 ariaLabel="云盘文件列表"
                 items={rows}
@@ -800,9 +976,11 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
                 summary={`当前目录共 ${currentDirectoryItemCount} 项`}
                 className={styles.table}
                 sortDescriptor={sortDescriptor}
-                onSortChange={setSortDescriptor}
+                onSortChange={handleSortChange}
                 isPinnedFirst={isDrivePinnedFirstRow}
                 rowActions={resolveRowActions}
+                batchSelection={batchSelection}
+                batchFooter={batchFooter}
               />
             </div>
 

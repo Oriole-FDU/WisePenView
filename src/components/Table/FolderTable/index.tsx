@@ -157,17 +157,25 @@ const EMPTY_ROW_PRESS_CONTEXT: FolderTableRowPressContext = {
   ctrlKey: false,
   shiftKey: false,
   modifierKey: false,
+  detail: 0,
+  isNameColumn: false,
 };
 
 function toRowPressContext(
   event: KeyboardEvent<HTMLElement> | MouseEvent<HTMLElement> | PointerEvent<HTMLElement>
 ): FolderTableRowPressContext {
   const modifierKey = event.metaKey || event.ctrlKey;
+  const detail = event instanceof MouseEvent ? event.detail : undefined;
+  const target = event.target;
+  const isNameColumn =
+    target instanceof Element ? target.closest('[data-name-column="true"]') !== null : false;
   return {
     metaKey: event.metaKey,
     ctrlKey: event.ctrlKey,
     shiftKey: event.shiftKey,
     modifierKey,
+    detail,
+    isNameColumn,
   };
 }
 
