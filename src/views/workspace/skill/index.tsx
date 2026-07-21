@@ -90,8 +90,6 @@ interface MoveTreeNodeResult {
 const ROOT_PATH = '/';
 const MAIN_SKILL_FILE_NAME = 'SKILL.md';
 const SKILL_CONFIG_NODE_ID = '__skill_config__';
-const SKILL_CONFIG_NAME_MAX_LENGTH = 64;
-const SKILL_CONFIG_DESCRIPTION_MAX_LENGTH = 500;
 const LOCAL_FILE_ID_PREFIX = 'local-file:';
 const LOCAL_FOLDER_ID_PREFIX = 'folder:';
 const EDITABLE_SKILL_FILE_EXTENSIONS = new Set([
@@ -629,18 +627,11 @@ function SkillConfigPanel({
               onChange={onNameChange}
               isDisabled={!canEdit || isLoading}
               isRequired
-              label={
-                <span className={styles.configFieldHeader}>
-                  <span>name</span>
-                  <span className={styles.configCounter}>
-                    {name.length} / {SKILL_CONFIG_NAME_MAX_LENGTH}
-                  </span>
-                </span>
-              }
+              label="name"
               description="用于模型识别 Skill，建议使用稳定的英文名，例如 planning_with_files。"
               errorMessage={nameMissing ? '请填写 name。' : undefined}
             >
-              <Input maxLength={SKILL_CONFIG_NAME_MAX_LENGTH} placeholder="planning_with_files" />
+              <Input placeholder="planning_with_files" />
             </FormField>
 
             <FormField
@@ -649,19 +640,12 @@ function SkillConfigPanel({
               onChange={onDescriptionChange}
               isDisabled={!canEdit || isLoading}
               isRequired
-              label={
-                <span className={styles.configFieldHeader}>
-                  <span>description</span>
-                  <span className={styles.configCounter}>
-                    {description.length} / {SKILL_CONFIG_DESCRIPTION_MAX_LENGTH}
-                  </span>
-                </span>
-              }
+              label="description"
               description="说明这个 Skill 适合处理什么任务。描述越清晰，模型越容易正确选择。"
               errorMessage={descriptionMissing ? '请填写 description。' : undefined}
             >
               <TextArea
-                maxLength={SKILL_CONFIG_DESCRIPTION_MAX_LENGTH}
+                className={styles.configDescriptionInput}
                 rows={5}
                 placeholder="说明这个 Skill 适合处理什么任务"
               />
@@ -673,8 +657,8 @@ function SkillConfigPanel({
               {hasMissingConfig
                 ? '补全 name 和 description 后，才允许发布 Skill。'
                 : isDirty
-                  ? '配置修改尚未更新。'
-                  : '配置已更新。'}
+                  ? '配置修改尚未更新'
+                  : '配置已更新'}
             </span>
             {canEdit ? (
               <span className={styles.configFooterActions}>
