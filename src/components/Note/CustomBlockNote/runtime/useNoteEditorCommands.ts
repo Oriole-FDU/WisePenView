@@ -6,7 +6,11 @@ import { useMemo, useRef, type Dispatch, type SetStateAction } from 'react';
 
 import { exportNoteMarkdown } from '../engines/markdown/markdownExport';
 import { printNotePdfViaBrowser, waitForEditorPaint } from '../engines/print/noteBrowserPrint';
-import { searchPluginKey, type SearchExtensionMeta } from '../engines/search/extension';
+import {
+  collectSearchMatches,
+  searchPluginKey,
+  type SearchExtensionMeta,
+} from '../engines/search/extension';
 import type { NoteBodyEditorHandle, NoteEditorAnchor, NoteFindResult } from '../index.type';
 import { notePluginRegistry, type CustomBlockNoteEditor } from '../noteEditorComposition';
 
@@ -15,6 +19,20 @@ function resolveCurrentBlockElement(editor: CustomBlockNoteEditor): HTMLElement 
   const domNode = view.domAtPos(view.state.selection.from).node;
   const element = domNode instanceof Element ? domNode : domNode.parentElement;
   return element?.closest<HTMLElement>('.bn-block-outer') ?? null;
+}
+
+function resolveScrollTarget(
+  editor: CustomBlockNoteEditor,
+  anchor: NoteEditorAnchor,
+  blockElement: HTMLElement | null
+): HTMLElement | null {
+  if (anchor.kind === 'block') return blockElement;
+  if (anchor.kind === 'inlineComment') {
+    return editor.prosemirrorView.dom.querySelector<HTMLElement>(
+      `[data-inline-comment-thread-id="${CSS.escape(anchor.threadId)}"]`
+    );
+  }
+  return editor.prosemirrorView.dom.querySelector<HTMLElement>('[data-search-match="active"]');
 }
 
 function useNoteScroll(editor: CustomBlockNoteEditor) {
@@ -41,12 +59,7 @@ function useNoteScroll(editor: CustomBlockNoteEditor) {
 
     queuedFrameRef.current = window.requestAnimationFrame(() => {
       queuedFrameRef.current = null;
-      const target =
-        anchor.kind === 'block'
-          ? blockElement
-          : editor.prosemirrorView.dom.querySelector<HTMLElement>(
-              `[data-inline-comment-thread-id="${CSS.escape(anchor.threadId)}"]`
-            );
+      const target = resolveScrollTarget(editor, anchor, blockElement);
       if (!target?.isConnected) return;
       const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
         ? 'auto'
@@ -63,25 +76,25 @@ export function useNoteEditorCommands(
   const scrollToAnchor = useNoteScroll(editor);
 
   const findStateRef = useRef<{
+    query: string;
     matches: { from: number; to: number }[];
     currentIndex: number;
     originalSelection: { from: number; to: number } | null;
   }>({
+    query: '',
     matches: [],
     currentIndex: -1,
     originalSelection: null,
   });
 
-  const scrollMatchIntoView = useMemoizedFn((from: number) => {
-    const view = editor.prosemirrorView;
-    const domNode = view.domAtPos(from).node;
-    const element = domNode instanceof Element ? domNode : domNode.parentElement;
-    if (element?.isConnected) {
-      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'auto'
-        : 'smooth';
-      element.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
-    }
+  /** 文档编辑后插件会重搜；导航前把命令层状态与插件对齐 */
+  const syncFindStateFromPlugin = useMemoizedFn(() => {
+    const pluginState = searchPluginKey.getState(editor.prosemirrorView.state);
+    const state = findStateRef.current;
+    if (!pluginState) return;
+    state.query = pluginState.query;
+    state.matches = pluginState.matches;
+    state.currentIndex = pluginState.activeIndex;
   });
 
   const dispatchSearchMeta = useMemoizedFn((meta: SearchExtensionMeta) => {
@@ -107,6 +120,7 @@ export function useNoteEditorCommands(
       }
     }
 
+    state.query = '';
     state.matches = [];
     state.currentIndex = -1;
     state.originalSelection = null;
@@ -119,7 +133,6 @@ export function useNoteEditorCommands(
 
     const view = editor.prosemirrorView;
     const doc = view.state.doc;
-    const lowerQuery = trimmedQuery.toLowerCase();
 
     const state = findStateRef.current;
     state.originalSelection = {
@@ -127,20 +140,8 @@ export function useNoteEditorCommands(
       to: view.state.selection.to,
     };
 
-    const matches: { from: number; to: number }[] = [];
-    doc.descendants((node, pos) => {
-      if (!node.isText) return;
-      const text = node.text ?? '';
-      const lowerText = text.toLowerCase();
-      let searchFrom = 0;
-      while (searchFrom < lowerText.length) {
-        const idx = lowerText.indexOf(lowerQuery, searchFrom);
-        if (idx === -1) break;
-        matches.push({ from: pos + idx, to: pos + idx + trimmedQuery.length });
-        searchFrom = idx + 1;
-      }
-    });
-
+    const matches = collectSearchMatches(doc, trimmedQuery);
+    state.query = trimmedQuery;
     state.matches = matches;
 
     if (matches.length > 0) {
@@ -155,7 +156,7 @@ export function useNoteEditorCommands(
       tr.setMeta('addToHistory', false);
       tr.setSelection(TextSelection.create(doc, matches[0].from, matches[0].to));
       view.dispatch(tr);
-      scrollMatchIntoView(matches[0].from);
+      scrollToAnchor({ kind: 'search' });
     } else {
       // Dispatch empty to ensure decorations are cleared
       dispatchSearchMeta({ query: trimmedQuery, matches: [], activeIndex: -1 });
@@ -165,6 +166,7 @@ export function useNoteEditorCommands(
   });
 
   const findNext = useMemoizedFn((): NoteFindResult | null => {
+    syncFindStateFromPlugin();
     const state = findStateRef.current;
     if (state.matches.length === 0) return null;
     state.currentIndex = (state.currentIndex + 1) % state.matches.length;
@@ -174,19 +176,20 @@ export function useNoteEditorCommands(
     if (match.from <= doc.content.size && match.to <= doc.content.size) {
       const tr = view.state.tr;
       tr.setMeta(searchPluginKey, {
-        query: '',
+        query: state.query,
         matches: state.matches,
         activeIndex: state.currentIndex,
       } satisfies SearchExtensionMeta);
       tr.setMeta('addToHistory', false);
       tr.setSelection(TextSelection.create(doc, match.from, match.to));
       view.dispatch(tr);
-      scrollMatchIntoView(match.from);
+      scrollToAnchor({ kind: 'search' });
     }
     return { current: state.currentIndex + 1, total: state.matches.length };
   });
 
   const findPrev = useMemoizedFn((): NoteFindResult | null => {
+    syncFindStateFromPlugin();
     const state = findStateRef.current;
     if (state.matches.length === 0) return null;
     state.currentIndex =
@@ -197,14 +200,14 @@ export function useNoteEditorCommands(
     if (match.from <= doc.content.size && match.to <= doc.content.size) {
       const tr = view.state.tr;
       tr.setMeta(searchPluginKey, {
-        query: '',
+        query: state.query,
         matches: state.matches,
         activeIndex: state.currentIndex,
       } satisfies SearchExtensionMeta);
       tr.setMeta('addToHistory', false);
       tr.setSelection(TextSelection.create(doc, match.from, match.to));
       view.dispatch(tr);
-      scrollMatchIntoView(match.from);
+      scrollToAnchor({ kind: 'search' });
     }
     return { current: state.currentIndex + 1, total: state.matches.length };
   });

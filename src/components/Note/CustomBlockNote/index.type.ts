@@ -13,7 +13,10 @@ import type { NoteOutlineItem } from './engines/outline';
 export type { NoteOutlineItem } from './engines/outline';
 
 export type NoteEditorAnchor =
-  { kind: 'block'; blockId: string } | { kind: 'inlineComment'; threadId: string };
+  | { kind: 'block'; blockId: string }
+  | { kind: 'inlineComment'; threadId: string }
+  /** 滚到当前搜索高亮（decoration `data-search-match="active"`） */
+  | { kind: 'search' };
 
 export interface NoteFindResult {
   current: number;

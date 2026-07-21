@@ -176,6 +176,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
     threadId: string;
   }>();
   const [isInlineCommentHistoryOpen, setIsInlineCommentHistoryOpen] = useState(false);
+  const [isFindBarOpen, setIsFindBarOpen] = useState(false);
   const interactService = useInteractService();
   const inlineCommentService = useInlineCommentService();
   const userService = useUserService();
@@ -488,9 +489,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
                 onAction: () => setIsInlineCommentHistoryOpen(true),
               },
             ],
-            searchPopover: (
-              <FindBar key="search-popover" editorRef={bodyEditorRef} showClose={false} />
-            ),
+            onSearch: () => setIsFindBarOpen(true),
             onPrint: handlePrintPdf,
             download: {
               label: '下载为 Markdown',
@@ -532,6 +531,11 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   return (
     <>
       <div className={styles.mainScroll}>
+        {isFindBarOpen ? (
+          <div className={styles.findBarDock}>
+            <FindBar editorRef={bodyEditorRef} onClose={() => setIsFindBarOpen(false)} />
+          </div>
+        ) : null}
         <div
           className={`${styles.contentRow} ${
             isOutlineOpen ? styles.contentRowOutlineOpen : styles.contentRowOutlineCollapsed

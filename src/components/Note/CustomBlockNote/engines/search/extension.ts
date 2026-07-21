@@ -26,6 +26,35 @@ export interface SearchExtensionMeta {
 
 export const searchPluginKey = new PluginKey<SearchExtensionState>('noteTextSearch');
 
+/** 在文档中收集大小写不敏感的全文匹配区间 */
+export function collectSearchMatches(doc: PMNode, query: string): SearchMatch[] {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return [];
+
+  const lowerQuery = trimmedQuery.toLowerCase();
+  const matches: SearchMatch[] = [];
+  doc.descendants((node, pos) => {
+    if (!node.isText) return;
+    const text = node.text ?? '';
+    const lowerText = text.toLowerCase();
+    let searchFrom = 0;
+    while (searchFrom < lowerText.length) {
+      const idx = lowerText.indexOf(lowerQuery, searchFrom);
+      if (idx === -1) break;
+      matches.push({ from: pos + idx, to: pos + idx + trimmedQuery.length });
+      searchFrom = idx + 1;
+    }
+  });
+  return matches;
+}
+
+function clampActiveIndex(activeIndex: number, matchCount: number): number {
+  if (matchCount === 0) return -1;
+  if (activeIndex < 0) return 0;
+  if (activeIndex >= matchCount) return matchCount - 1;
+  return activeIndex;
+}
+
 function buildSearchDecorations(
   doc: PMNode,
   matches: SearchMatch[],
@@ -61,13 +90,16 @@ const searchExtension = createExtension({
         apply: (tr, previous, _oldState, newState) => {
           const meta: SearchExtensionMeta | undefined = tr.getMeta(searchPluginKey);
           if (!meta) {
-            if (tr.docChanged && previous.matches.length > 0) {
-              const decorations = buildSearchDecorations(
-                newState.doc as unknown as PMNode,
-                previous.matches,
-                previous.activeIndex
-              );
-              return { ...previous, decorations };
+            if (tr.docChanged && previous.query.trim().length > 0) {
+              const doc = newState.doc as unknown as PMNode;
+              const matches = collectSearchMatches(doc, previous.query);
+              const activeIndex = clampActiveIndex(previous.activeIndex, matches.length);
+              return {
+                query: previous.query,
+                matches,
+                activeIndex,
+                decorations: buildSearchDecorations(doc, matches, activeIndex),
+              };
             }
             return previous;
           }

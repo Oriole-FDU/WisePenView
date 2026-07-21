@@ -40,7 +40,7 @@ function DriveSidebar({ collapsed, onToggle }: DriveSidebarProps) {
             className={styles.iconBtn}
             aria-label="展开侧边栏"
           >
-            <ChevronsLeft size={18} style={{ transform: 'rotate(180deg)' }} />
+            <ChevronsLeft size={18} className={styles.iconExpand} />
           </button>
         )}
       </div>

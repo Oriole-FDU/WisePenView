@@ -24,10 +24,8 @@ export interface ResourceHeaderMoreMenu {
   onPrint?: () => void;
   download?: ResourceHeaderDownloadAction;
   isPending?: boolean;
-  /** 全文搜索：在编辑器中按关键词查找 */
+  /** 全文搜索：点击后由页面自行展示搜索条（非菜单 hover 子面板） */
   onSearch?: () => void;
-  /** 全文搜索的 Popover 内容（提供后以子菜单形式弹出） */
-  searchPopover?: ReactNode;
 }
 
 export interface ResourceHeaderBreadcrumbItem {

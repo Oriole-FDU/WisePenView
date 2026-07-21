@@ -10,10 +10,8 @@ import type {
 import styles from './style.module.less';
 
 interface FindBarProps {
-  editorRef: RefObject<NoteBodyEditorHandle>;
+  editorRef: RefObject<NoteBodyEditorHandle | null>;
   onClose?: () => void;
-  /** 是否显示关闭按钮（popover 模式下由外部控制关闭，不需要） */
-  showClose?: boolean;
 }
 
 function formatResult(result: NoteFindResult | null, total: number): string {
@@ -21,7 +19,7 @@ function formatResult(result: NoteFindResult | null, total: number): string {
   return `${result.current} / ${result.total}`;
 }
 
-function FindBar({ editorRef, onClose, showClose = true }: FindBarProps) {
+function FindBar({ editorRef, onClose }: FindBarProps) {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<NoteFindResult | null>(null);
   const [total, setTotal] = useState(0);
@@ -125,11 +123,9 @@ function FindBar({ editorRef, onClose, showClose = true }: FindBarProps) {
       >
         <ChevronDown size={16} />
       </button>
-      {showClose ? (
-        <button className={styles.navBtn} type="button" aria-label="关闭搜索" onClick={handleClose}>
-          <X size={16} />
-        </button>
-      ) : null}
+      <button className={styles.navBtn} type="button" aria-label="关闭搜索" onClick={handleClose}>
+        <X size={16} />
+      </button>
     </div>
   );
 }

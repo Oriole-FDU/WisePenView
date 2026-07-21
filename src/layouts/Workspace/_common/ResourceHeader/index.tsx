@@ -103,6 +103,7 @@ function ResourceHeaderMore({
     }
     if (key === 'download') {
       menu?.download?.onAction();
+      return;
     }
     if (key === 'search') {
       menu?.onSearch?.();
@@ -182,29 +183,11 @@ function ResourceHeaderMore({
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
-          {menu?.onSearch || menu?.searchPopover ? (
+          {menu?.onSearch ? (
             <Dropdown.Section>
-              {menu.searchPopover ? (
-                <Dropdown.SubmenuTrigger>
-                  <Dropdown.Item id="search" textValue="全文搜索">
-                    <ResourceHeaderMenuItemContent
-                      icon={Search}
-                      label="全文搜索"
-                      trailing={<Dropdown.SubmenuIndicator />}
-                    />
-                  </Dropdown.Item>
-                  <Dropdown.Popover
-                    placement="right top"
-                    className={`${styles.popover} ${styles.searchPopover}`}
-                  >
-                    {menu.searchPopover}
-                  </Dropdown.Popover>
-                </Dropdown.SubmenuTrigger>
-              ) : (
-                <Dropdown.Item id="search" textValue="全文搜索">
-                  <ResourceHeaderMenuItemContent icon={Search} label="全文搜索" />
-                </Dropdown.Item>
-              )}
+              <Dropdown.Item id="search" textValue="全文搜索">
+                <ResourceHeaderMenuItemContent icon={Search} label="全文搜索" />
+              </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
           {menu?.onPrint || menu?.download ? (
