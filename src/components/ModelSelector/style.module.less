@@ -4,17 +4,23 @@
   justify-content: center;
   min-width: 0;
   height: 32px;
-  padding: 0 8px;
+  padding: 0 var(--space-xs);
   gap: 6px;
   border: 0;
-  border-radius: 6px;
-  color: var(--color-text-secondary);
+  border-radius: var(--radius-xl);
+  color: var(--text-tertiary);
   background: transparent;
   cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
 
-  &:hover:not(:disabled) {
-    color: var(--color-text-primary);
-    background: var(--color-bg-hover);
+  /* 与 ChatInput toolbarCircleBtn（HeroUI ghost）一致的 hover */
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+    outline: none;
   }
 
   &:disabled {
@@ -30,24 +36,66 @@
   }
 }
 
+.triggerIconOnly {
+  flex-shrink: 0;
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
+  border-radius: var(--radius-full, 999px);
+}
+
+/* 与 ChatInput toolbarPopover 对齐；宽度保持 320px */
 .popover {
   width: 320px;
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  background: var(--overlay);
+  box-shadow: var(--card-shadow);
 }
 
 .menu {
-  padding: 8px;
+  padding: var(--space-xs);
+  background: var(--surface);
 }
 
 .title {
-  padding: 4px 8px 8px;
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  font-weight: 600;
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
 }
 
 .list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
   max-height: 320px;
   overflow-y: auto;
+  background: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+
+  &::-webkit-scrollbar {
+    width: 1px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  :global(.list-box-item) {
+    border-radius: var(--radius-xl);
+  }
 }
 
 .item {
@@ -56,6 +104,11 @@
   align-items: center;
   width: 100%;
   gap: 10px;
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  color: var(--accent);
 }
 
 .info {
@@ -73,19 +126,19 @@
 }
 
 .name {
-  color: var(--color-text-primary);
-  font-size: 13px;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
 .meta,
 .empty {
-  color: var(--color-text-secondary);
-  font-size: 12px;
+  color: var(--muted);
+  font-size: var(--font-size-xs, 12px);
 }
 
 .empty {
-  padding: 24px 8px;
+  padding: var(--space-lg) var(--space-xs);
   text-align: center;
 }
 

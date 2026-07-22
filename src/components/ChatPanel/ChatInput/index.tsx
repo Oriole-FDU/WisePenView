@@ -21,6 +21,7 @@ function ChatInputContent({
   onClearContext,
   injectedAgents,
   preferredAgent,
+  fullWidth = false,
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { attachmentStripProps, containerProps, dropOverlayProps, textAreaProps, toolbarProps } =
@@ -73,6 +74,7 @@ function ChatInputContent({
           {...toolbarProps}
           injectedAgents={injectedAgents}
           preferredAgent={preferredAgent}
+          modelIconOnly={!fullWidth}
         />
 
         <DropOverlay {...dropOverlayProps} />

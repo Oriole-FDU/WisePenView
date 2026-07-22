@@ -45,26 +45,30 @@
     overflow-x: auto;
     overflow-y: hidden;
     padding-block: var(--space-2xs) var(--space-xs);
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) transparent;
     -webkit-overflow-scrolling: touch;
+    /* 覆盖 AttachmentGroup 默认隐藏滚动条；极细 + 主题浅色 */
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--scrollbar-thumb) transparent !important;
 
     &::-webkit-scrollbar {
-      display: block;
-      height: 3px;
+      display: block !important;
+      width: 1px !important;
+      height: 1px !important;
     }
 
     &::-webkit-scrollbar-track {
-      background: transparent;
+      background: transparent !important;
     }
 
     &::-webkit-scrollbar-thumb {
-      border-radius: var(--scrollbar-radius, 999px);
-      background: var(--scrollbar-thumb);
+      border: 0 !important;
+      border-radius: 999px;
+      background: var(--scrollbar-thumb) !important;
+      background-clip: border-box !important;
     }
 
     &:hover::-webkit-scrollbar-thumb {
-      background: var(--scrollbar-thumb-hover);
+      background: var(--scrollbar-thumb-hover) !important;
     }
   }
 }
@@ -160,10 +164,19 @@
   line-height: 1;
 }
 
-.voiceButtonActive,
-.stopButtonActive {
+.voiceButtonActive {
   color: var(--danger);
   background: var(--danger-soft);
+}
+
+.stopButtonActive {
+  color: var(--accent);
+  background: var(--accent-soft);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent-soft-hover);
+  }
 }
 
 .toolbarPopover {
@@ -186,6 +199,25 @@
   width: 260px;
   max-height: 420px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+
+  &::-webkit-scrollbar {
+    width: 1px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-hover);
+  }
 }
 
 .modelMenu {
@@ -319,6 +351,15 @@
 .modelSelectorShell {
   min-width: 0;
   max-width: 180px;
+  /* fullWidth：模型选择与录音按钮拉开一点 */
+  margin-inline-end: var(--space-sm);
+}
+
+.modelSelectorShellIcon {
+  max-width: none;
+  flex-shrink: 0;
+  /* panel 图标模式：与左侧圆形按钮间距一致，不再额外加边距 */
+  margin-inline-end: 0;
 }
 
 .modelTrigger {

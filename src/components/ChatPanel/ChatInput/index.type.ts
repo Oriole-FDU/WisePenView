@@ -14,6 +14,8 @@ export interface ChatInputProps {
   onClearContext?: () => void;
   injectedAgents?: ChatAgentOption[];
   preferredAgent?: ChatAgentOption | null;
+  /** 全宽页展示模型名；侧栏窄宽时仅图标 */
+  fullWidth?: boolean;
 }
 
 export interface LocalAttachmentPayload {

@@ -15,6 +15,7 @@ function InputToolbar({
   voiceInputProps,
   injectedAgents,
   preferredAgent,
+  modelIconOnly = false,
   onSend,
   onStop,
 }: InputToolbarProps) {
@@ -35,8 +36,13 @@ function InputToolbar({
       </div>
 
       <div className={styles.toolsRight}>
-        <div className={styles.modelSelectorShell}>
-          <ModelPicker />
+        <div
+          className={clsx(
+            styles.modelSelectorShell,
+            modelIconOnly && styles.modelSelectorShellIcon
+          )}
+        >
+          <ModelPicker iconOnly={modelIconOnly} />
         </div>
         <VoiceInput {...voiceInputProps} />
         <Button

@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 
-function ModelPicker() {
+function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {
   const chatService = useChatService();
   const store = useChatInputStoreApi();
   const { availableModels, modelOpen, selectedModelId } = useChatInputStore(
@@ -52,6 +52,7 @@ function ModelPicker() {
       }}
       loading={loading}
       placement="top"
+      triggerVariant={iconOnly ? 'icon' : 'default'}
     />
   );
 }

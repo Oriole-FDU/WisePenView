@@ -10,7 +10,15 @@
   display: flex;
   flex-direction: column;
   padding: 0;
-  .appSubtleScrollbar();
+  /* 历史横条轨已承担位置感，隐藏原生滚动条（覆盖 MessageScroller 的 scrollbar-*） */
+  scrollbar-width: none !important;
+  scrollbar-gutter: auto !important;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
 }
 
 .scrollColumn {
@@ -28,7 +36,9 @@
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  padding: var(--space-md) var(--chat-message-inline-padding, var(--space-lg)) var(--space-lg);
+  padding: var(--space-md)
+    var(--chat-message-inline-padding-end, var(--chat-message-inline-padding, var(--space-lg)))
+    var(--space-lg) var(--chat-message-inline-padding, var(--space-lg));
   box-sizing: border-box;
 }
 
@@ -110,82 +120,152 @@
   }
 }
 
+/* 历史提问：右侧垂直居中 FloatingToc 横条轨 */
 .historyNavigator {
+  --history-nav-bar-width: 12px;
+  --history-nav-bar-active-width: 22px;
+  --history-nav-bar-height: 3px;
+  --history-nav-bar-active-height: 6px;
+  --history-nav-bar-gap: var(--space-sm);
+
   position: absolute;
-  top: var(--space-sm);
-  right: var(--space-sm);
   z-index: 2;
 }
 
-.historyNavigatorTrigger {
-  && {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    padding: 0;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-full, 999px);
-    background: var(--surface);
-    color: var(--muted);
-    box-shadow: var(--card-shadow);
+.historyNavigatorRail {
+  top: 50%;
+  right: var(--space-xs);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.historyNavigatorRailTrigger {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--history-nav-bar-gap);
+  max-height: min(50vh, 320px);
+  padding: var(--space-sm) var(--space-xs);
+  margin: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  overflow-y: auto;
+  .appSubtleScrollbar();
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.historyNavigatorRailOpen .historyNavigatorRailTrigger {
+  visibility: hidden;
+  pointer-events: none;
+  width: 0;
+  padding-inline: 0;
+  overflow: hidden;
+}
+
+.historyNavigatorBar {
+  display: block;
+  flex-shrink: 0;
+  width: var(--history-nav-bar-width);
+  height: var(--history-nav-bar-height);
+  border-radius: var(--radius-full, 999px);
+  background: var(--border);
+  transition:
+    width 0.15s ease,
+    height 0.15s ease,
+    background-color 0.15s ease;
+
+  &[data-active='true'] {
+    width: var(--history-nav-bar-active-width);
+    height: var(--history-nav-bar-active-height);
+    background: var(--accent);
+  }
+}
+
+.historyNavigatorRailPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs, 2px);
+  max-width: min(240px, calc(100vw - var(--space-2xl)));
+  max-height: min(50vh, 320px);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl, var(--radius-lg));
+  background: var(--overlay, var(--surface));
+  box-shadow: var(--card-shadow);
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
-  &:hover:not(:disabled) {
-    && {
-      color: var(--foreground);
-      background: var(--surface-tertiary);
-      border-color: var(--border);
+  &[hidden] {
+    display: none;
+  }
+}
+
+.historyNavigatorRailItem {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2xs) var(--space-xs);
+  margin: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: end;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    font-weight 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--accent);
+    background: var(--surface-hover, var(--surface-secondary));
+
+    .historyNavigatorRailPreview {
+      font-weight: 600;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  &[data-active='true'] {
+    color: var(--accent);
+
+    .historyNavigatorRailPreview {
+      font-weight: 600;
     }
   }
 }
 
-.historyNavigatorPopover {
-  width: min(360px, calc(100vw - var(--space-xl)));
-  padding: 0;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  background: var(--overlay);
-  box-shadow: var(--card-shadow);
-}
-
-.historyNavigatorPanel {
-  padding: var(--space-xs);
-}
-
-.historyNavigatorTitle {
-  padding: var(--space-xs) var(--space-sm);
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-.historyNavigatorList {
-  max-height: min(420px, 60vh);
-  overflow-y: auto;
-}
-
-.historyNavigatorItem {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-sm);
-  width: 100%;
-  min-width: 0;
-}
-
-.historyNavigatorIndex {
-  flex: 0 0 20px;
-  color: var(--text-tertiary);
-  font-size: var(--font-size-xs);
-  line-height: 1.5;
-  text-align: right;
-}
-
-.historyNavigatorPreview {
+.historyNavigatorRailPreview {
   min-width: 0;
   overflow: hidden;
-  color: var(--foreground);
-  font-size: var(--font-size-sm);
-  line-height: 1.5;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.45;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
