@@ -8,10 +8,11 @@ interface MessageProps {
   message: WisePenUIMessage;
   model: Model | null;
   streaming: boolean;
+  fullWidth?: boolean;
 }
 
-function Message({ message, model, streaming }: MessageProps) {
-  if (message.role === 'user') return <UserMessage message={message} />;
+function Message({ message, model, streaming, fullWidth = false }: MessageProps) {
+  if (message.role === 'user') return <UserMessage message={message} fullWidth={fullWidth} />;
   return <AssistantMessage message={message} model={model} streaming={streaming} />;
 }
 

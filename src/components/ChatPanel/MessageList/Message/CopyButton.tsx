@@ -1,9 +1,9 @@
 import { copyText } from '@/utils/browser/copyText';
-import { Button, toast } from '@heroui/react';
+import { Button, toast, Tooltip } from '@heroui/react';
 import clsx from 'clsx';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
-import styles from './style.module.less';
+import styles from './CopyButton.module.less';
 
 const ICON_SIZE = 17;
 
@@ -28,17 +28,21 @@ function CopyButton({ text, label = '复制', className }: CopyButtonProps) {
   };
 
   return (
-    <Button
-      variant="ghost"
-      isIconOnly
-      size="sm"
-      className={clsx(styles.copyButton, copied && styles.copyButtonCopied, className)}
-      onPress={() => void handleCopy()}
-      aria-label={label}
-    >
-      {copied ? <Check size={ICON_SIZE} /> : <Copy size={ICON_SIZE} />}
-    </Button>
+    <Tooltip delay={0}>
+      <Button
+        variant="ghost"
+        isIconOnly
+        size="sm"
+        className={clsx(styles.copyButton, copied && styles.copyButtonCopied, className)}
+        onPress={() => void handleCopy()}
+        aria-label={label}
+      >
+        {copied ? <Check size={ICON_SIZE} /> : <Copy size={ICON_SIZE} />}
+      </Button>
+      <Tooltip.Content>{copied ? '已复制' : label}</Tooltip.Content>
+    </Tooltip>
   );
 }
 
 export default CopyButton;
+export { ICON_SIZE as MESSAGE_ACTION_ICON_SIZE };

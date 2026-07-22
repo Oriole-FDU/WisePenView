@@ -28,8 +28,9 @@
     --danger-foreground: #ffffff;
     --field-border: transparent;
     --scrollbar: var(--scrollbar-thumb);
-    --scrollbar-thumb: color-mix(in oklch, var(--foreground) 18%, transparent);
-    --scrollbar-thumb-hover: color-mix(in oklch, var(--foreground) 30%, transparent);
+    /* 浅主题色滚动条 */
+    --scrollbar-thumb: var(--accent-soft);
+    --scrollbar-thumb-hover: var(--accent-soft-hover);
     --scrollbar-track: transparent;
     --scrollbar-gutter: auto;
     --scrollbar-width: thin;
@@ -84,8 +85,8 @@
     --danger-foreground: #ffffff;
     --field-border: transparent;
     --scrollbar: var(--scrollbar-thumb);
-    --scrollbar-thumb: color-mix(in oklch, var(--foreground) 20%, transparent);
-    --scrollbar-thumb-hover: color-mix(in oklch, var(--foreground) 36%, transparent);
+    --scrollbar-thumb: var(--accent-soft);
+    --scrollbar-thumb-hover: var(--accent-soft-hover);
     --scrollbar-track: transparent;
     --scrollbar-gutter: auto;
     --scrollbar-width: thin;

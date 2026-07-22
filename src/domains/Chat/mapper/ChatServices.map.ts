@@ -422,6 +422,7 @@ function mapAttachmentSnapshot(value: unknown): MessageAttachmentSnapshot | null
   };
 }
 
+/** 历史 metadata / 模型字段占位：后端透出后即可回放附件与模型 icon */
 function mapMessageMetadata(data: {
   metadata?: unknown;
   createdAt?: unknown;
@@ -435,11 +436,36 @@ function mapMessageMetadata(data: {
         .map(mapAttachmentSnapshot)
         .filter((item): item is MessageAttachmentSnapshot => item !== null)
     : undefined;
+  const modelId = typeof rawMetadata?.modelId === 'string' ? rawMetadata.modelId : undefined;
+  const providerId =
+    typeof rawMetadata?.providerId === 'string' ? rawMetadata.providerId : undefined;
+  const provider = typeof rawMetadata?.provider === 'string' ? rawMetadata.provider : undefined;
+  const modelName = typeof rawMetadata?.modelName === 'string' ? rawMetadata.modelName : undefined;
+  const reasoningDurationSeconds =
+    typeof rawMetadata?.reasoningDurationSeconds === 'number' &&
+    Number.isFinite(rawMetadata.reasoningDurationSeconds)
+      ? Math.max(0, Math.round(rawMetadata.reasoningDurationSeconds))
+      : undefined;
 
-  if (!createdAt && selectedAttachments === undefined) return undefined;
+  if (
+    !createdAt &&
+    selectedAttachments === undefined &&
+    !modelId &&
+    !providerId &&
+    !provider &&
+    !modelName &&
+    reasoningDurationSeconds === undefined
+  ) {
+    return undefined;
+  }
   return {
     ...(createdAt ? { createdAt } : {}),
     ...(selectedAttachments !== undefined ? { selectedAttachments } : {}),
+    ...(modelId ? { modelId } : {}),
+    ...(providerId ? { providerId } : {}),
+    ...(provider ? { provider } : {}),
+    ...(modelName ? { modelName } : {}),
+    ...(reasoningDurationSeconds !== undefined ? { reasoningDurationSeconds } : {}),
   };
 }
 

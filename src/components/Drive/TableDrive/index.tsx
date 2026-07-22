@@ -337,15 +337,16 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
   const handleSortChange = useCallback((descriptor: SortDescriptor) => {
     const now = Date.now();
     const last = lastSortClickRef.current;
+    const column = String(descriptor.column);
 
-    if (last && last.column === descriptor.column && now - last.time < 300) {
+    if (last && last.column === column && now - last.time < 300) {
       // 双击同一列 → 回到默认未排序状态
       lastSortClickRef.current = null;
       setSortDescriptor(undefined);
       return;
     }
 
-    lastSortClickRef.current = { column: descriptor.column, time: now };
+    lastSortClickRef.current = { column, time: now };
     setSortDescriptor(descriptor);
   }, []);
   const [renameTarget, setRenameTarget] = useState<DriveActionTarget | null>(null);

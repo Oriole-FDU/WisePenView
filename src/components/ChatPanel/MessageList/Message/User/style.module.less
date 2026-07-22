@@ -1,44 +1,166 @@
-.row {
+.attachments {
   display: flex;
   justify-content: flex-end;
-  width: 100%;
-  margin-bottom: var(--space-lg);
-}
-
-.content {
-  position: relative;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: var(--space-xs);
+  width: fit-content;
   max-width: 100%;
-  padding-bottom: calc(32px + var(--space-xs));
-}
-
-.attachments {
-  justify-content: flex-end;
   margin-bottom: var(--space-xs);
+  margin-inline-start: auto;
+  /* 覆盖 AttachmentGroup 的横向滚动，避免附件被裁成「半截」 */
+  overflow: visible;
+  padding-block: 0;
+  scroll-snap-type: none;
 }
 
 .attachment {
-  max-width: min(280px, 100%);
+  /* 接近 HeroUI Pro horizontal sm：约 160 宽、更透气的高度 */
+  && {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    height: 48px;
+    overflow: hidden;
+  }
 }
 
-.bubble {
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-2xl) var(--radius-md) var(--radius-2xl) var(--radius-2xl);
-  background-color: var(--accent-soft);
-  color: var(--foreground);
-  font-size: var(--chat-message-font-size);
-  line-height: var(--chat-message-line-height);
+.moreTrigger {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--foreground);
+    background: var(--surface-secondary);
+    border-color: var(--border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
-.actions {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+.morePopover {
+  width: min(260px, calc(100vw - var(--space-2xl)));
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  background: var(--overlay, var(--surface));
+  box-shadow: var(--card-shadow);
+}
+
+.morePanel {
   display: flex;
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  max-height: min(360px, 50vh);
+  padding: var(--space-xs);
+  background: var(--surface);
 }
 
-.row:hover .actions,
-.row:focus-within .actions {
-  opacity: 1;
+.moreTitle {
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.moreList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: var(--scrollbar-radius, 999px);
+    background: var(--scrollbar-thumb);
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-hover);
+  }
+}
+
+.moreItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-xl);
+  color: var(--foreground);
+
+  &:hover {
+    background: var(--surface-tertiary, var(--surface-secondary));
+  }
+}
+
+.moreItemIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  background: var(--surface-secondary);
+  color: var(--muted);
+}
+
+.moreItemText {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.moreItemName {
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreItemMeta {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

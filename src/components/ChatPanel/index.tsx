@@ -412,6 +412,7 @@ function ChatPanel({
                       onLoadMoreHistory={loadMoreHistoryMessages}
                       status={status}
                       model={currentModel}
+                      fullWidth={fullWidth}
                       footer={
                         <div className={styles.footer}>
                           <ChatInput
@@ -423,6 +424,7 @@ function ChatPanel({
                             onClearContext={handleClearContext}
                             injectedAgents={agentDebug ? [agentDebug.agent] : undefined}
                             preferredAgent={agentDebug?.agent}
+                            fullWidth={fullWidth}
                           />
                         </div>
                       }

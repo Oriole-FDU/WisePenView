@@ -67,7 +67,7 @@
   }
 
   :global(a) {
-    color: #0969da;
+    color: var(--link, var(--accent));
     text-decoration: underline;
     text-underline-offset: 2px;
   }
@@ -300,6 +300,6 @@
   &:hover {
     border-color: var(--border);
     background-color: var(--surface-secondary);
-    color: #0969da;
+    color: var(--link, var(--accent));
   }
 }

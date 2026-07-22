@@ -12,7 +12,7 @@ import type { WisePenUIMessage } from '@/domains/Chat';
 import { useEffectForce } from '@/hooks/useEffectForce';
 import type { ChatStatus } from 'ai';
 import { ArrowDown } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import HistoryLoader from './HistoryLoader';
 import Message from './Message';
 import MessageHistoryNavigator from './MessageHistoryNavigator';
@@ -29,6 +29,7 @@ interface MessageListProps {
   onLoadMoreHistory: () => Promise<void>;
   status: ChatStatus;
   model: Model | null;
+  fullWidth?: boolean;
   footer?: ReactNode;
 }
 
@@ -40,6 +41,7 @@ function MessageList({
   onLoadMoreHistory,
   status,
   model,
+  fullWidth = false,
   footer,
 }: MessageListProps) {
   return (
@@ -57,6 +59,7 @@ function MessageList({
         onLoadMoreHistory={onLoadMoreHistory}
         status={status}
         model={model}
+        fullWidth={fullWidth}
         footer={footer}
       />
     </MessageScrollerProvider>
@@ -70,6 +73,7 @@ function MessageListContent({
   onLoadMoreHistory,
   status,
   model,
+  fullWidth = false,
   footer,
 }: MessageListProps) {
   const isGenerating = status === 'submitted' || status === 'streaming';
@@ -102,9 +106,8 @@ function MessageListContent({
                     <Message
                       message={message}
                       model={model}
-                      streaming={
-                        message.id === messages[messages.length - 1]?.id && status === 'streaming'
-                      }
+                      fullWidth={fullWidth}
+                      streaming={message.id === messages[messages.length - 1]?.id && isGenerating}
                     />
                   </MessageScrollerItem>
                 ))}
@@ -120,9 +123,7 @@ function MessageListContent({
         <ArrowDown size={14} />
         <span className={styles.srOnly}>滚动到底部</span>
       </MessageScrollerButton>
-      <div className={styles.historyNavigator}>
-        <MessageHistoryNavigator messages={messages} />
-      </div>
+      <MessageHistoryNavigator messages={messages} />
     </MessageScroller>
   );
 }
@@ -133,15 +134,28 @@ interface StreamingScrollFollowerProps {
 }
 
 function StreamingScrollFollower({ active, messages }: StreamingScrollFollowerProps) {
-  const { scrollToEndUnlessUserInterrupted } = useMessageScroller();
+  const { scrollToEnd, scrollToEndUnlessUserInterrupted } = useMessageScroller();
+  const wasActiveRef = useRef(false);
 
   /**
    * 流式 Markdown 会在子组件 effect 中再次提交，外层 ResizeObserver 可能错过该帧的高度变化。
    * 每次流消息更新后于下一帧校正到底部；仅在用户仍停留于底部时执行，避免覆盖阅读位置。
+   * 生成刚开始时强制 scrollToEnd，退出 user scrollAnchor 带来的 anchored-to-message，
+   * 否则内容增高会反复 reanchor 到用户气泡顶部，看不到最新 AI 输出。
    */
   useEffectForce(() => {
-    if (active) scrollToEndUnlessUserInterrupted();
-  }, [active, messages, scrollToEndUnlessUserInterrupted]);
+    const started = active && !wasActiveRef.current;
+    wasActiveRef.current = active;
+
+    if (!active) return;
+
+    if (started) {
+      scrollToEnd({ behavior: 'auto' });
+      return;
+    }
+
+    scrollToEndUnlessUserInterrupted();
+  }, [active, messages, scrollToEnd, scrollToEndUnlessUserInterrupted]);
 
   return null;
 }

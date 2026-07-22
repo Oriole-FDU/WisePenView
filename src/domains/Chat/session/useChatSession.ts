@@ -41,6 +41,7 @@ export const useChatSession = ({ sessionId, model }: UseChatSessionOptions) => {
         query,
         options,
       });
+      // 仅用于当次会话 UI；历史回放待后端 listHistoryMessages 透出 metadata
       const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
         .filter((attachment) => attachment.enabled)
         .map((attachment) => ({

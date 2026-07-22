@@ -1,36 +1,9 @@
-.row {
+.header {
   display: flex;
-  width: 100%;
-  margin-bottom: var(--space-lg);
-}
-
-.content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.modelMeta {
-  display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: var(--space-2xs);
-  width: fit-content;
-  color: var(--text-tertiary);
-  font-size: var(--chat-model-meta-font-size, var(--font-size-base));
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.modelLogo {
-  flex-shrink: 0;
-  width: var(--chat-model-logo-size, 16px);
-  height: var(--chat-model-logo-size, 16px);
-}
-
-.modelName {
-  white-space: nowrap;
+  gap: var(--space-sm);
+  min-width: 0;
 }
 
 .text {
@@ -39,44 +12,4 @@
   font-size: var(--chat-message-font-size);
   line-height: var(--chat-message-line-height);
   text-align: start;
-}
-
-.loadingHint {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  color: var(--text-tertiary);
-  font-size: var(--font-size-sm);
-}
-
-.loadingHintIcon {
-  display: inline-flex;
-  flex: 0 0 14px;
-  width: 14px;
-  height: 14px;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-}
-
-.loadingHintText {
-  display: inline-block;
-  animation: loadingHintFade 3s ease-in-out;
-}
-
-.actions {
-  display: flex;
-  flex-shrink: 0;
-}
-
-@keyframes loadingHintFade {
-  0%,
-  100% {
-    opacity: 0.25;
-  }
-
-  18%,
-  82% {
-    opacity: 1;
-  }
 }

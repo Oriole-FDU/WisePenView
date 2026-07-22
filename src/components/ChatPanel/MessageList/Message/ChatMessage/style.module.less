@@ -1,0 +1,108 @@
+.assistant {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-xs);
+  width: 100%;
+  min-width: 0;
+  margin-bottom: var(--space-lg);
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--chat-avatar-size, 24px);
+  height: var(--chat-avatar-size, 24px);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-secondary);
+
+  :global(svg),
+  :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.user {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: var(--space-lg);
+}
+
+.userInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* 气泡宽度随文字；整列内容靠右，避免附件更宽时短气泡贴左 */
+  width: fit-content;
+  max-width: min(100%, var(--chat-user-message-max-width, 520px));
+  min-width: 0;
+  margin-inline-start: auto;
+  padding-bottom: calc(32px + var(--space-xs));
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  color: var(--text-tertiary);
+  font-size: var(--chat-model-meta-font-size, var(--font-size-base));
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.metaName {
+  white-space: nowrap;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  /* 文档流：正文与模型名左缘对齐（avatar 列之外） */
+  margin-inline-start: calc(var(--chat-avatar-size, 24px) + var(--space-sm));
+}
+
+.bubble {
+  align-self: flex-end;
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-2xl) var(--radius-md) var(--radius-2xl) var(--radius-2xl);
+  background-color: var(--accent-soft);
+  color: var(--foreground);
+  font-size: var(--chat-message-font-size);
+  line-height: var(--chat-message-line-height);
+}
+
+.content {
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.user .actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.user:hover .actions,
+.user:focus-within .actions {
+  opacity: 1;
+}

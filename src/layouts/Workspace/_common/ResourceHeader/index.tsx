@@ -113,20 +113,16 @@ function ResourceHeaderMore({
   return (
     <Dropdown>
       <Tooltip>
-        <Tooltip.Trigger>
-          <Dropdown.Trigger>
-            <Button
-              variant="ghost"
-              size="sm"
-              isIconOnly
-              isPending={menu?.isPending || operations.isLocating}
-              isDisabled={isDisabled}
-              aria-label="更多"
-            >
-              <Ellipsis size={18} aria-hidden="true" />
-            </Button>
-          </Dropdown.Trigger>
-        </Tooltip.Trigger>
+        <Button
+          variant="ghost"
+          size="sm"
+          isIconOnly
+          isPending={menu?.isPending || operations.isLocating}
+          isDisabled={isDisabled}
+          aria-label="更多"
+        >
+          <Ellipsis size={18} aria-hidden="true" />
+        </Button>
         <Tooltip.Content>更多</Tooltip.Content>
       </Tooltip>
       <Dropdown.Popover placement="bottom end" className={styles.popover}>

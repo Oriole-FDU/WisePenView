@@ -1,4 +1,131 @@
+@import '@/styles/scrollbar.module.less';
+
 .wrapper {
   width: 100%;
   margin-bottom: var(--space-xs);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  background-color: var(--surface);
+  overflow: hidden;
+}
+
+.trigger {
+  && {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: var(--space-sm) var(--space-md);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--foreground);
+    font-weight: inherit;
+  }
+
+  &&:hover:not(:disabled) {
+    background: var(--surface-secondary);
+  }
+
+  :global([data-slot='disclosure-indicator']) {
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+}
+
+.headerMain {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.headerEnd {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+}
+
+.toolIcon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.toolName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusChip {
+  && {
+    max-width: 100%;
+    font-size: var(--font-size-xs);
+  }
+}
+
+.statusChipIcon {
+  flex-shrink: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: min(36vh, 260px);
+  margin: 0;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border-top: 1px solid var(--border-light);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: var(--surface);
+  .appSubtleScrollbar();
+}
+
+.section {
+  min-width: 0;
+}
+
+.sectionLabel {
+  margin: 0 0 var(--space-2xs);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.payload,
+.errorText {
+  margin: 0;
+  padding: var(--space-xs);
+  overflow-x: auto;
+  border-radius: var(--radius);
+  background-color: var(--surface-secondary);
+  color: var(--foreground);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.errorText {
+  color: var(--error);
+  background-color: var(--danger-soft);
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
 }

@@ -434,8 +434,9 @@ function getVisibilityState({
 }
 
 function getMessageItems(content: HTMLElement, spacer: HTMLElement | null) {
-  return Array.from(content.children).filter(
-    (item): item is HTMLElement => item instanceof HTMLElement && item !== spacer
+  // 消息项可能嵌套在 Content 子容器内（如 messagesBody），不能只用 children
+  return Array.from(content.querySelectorAll<HTMLElement>('[data-message-id]')).filter(
+    (item) => item !== spacer && Boolean(item.dataset.messageId)
   );
 }
 

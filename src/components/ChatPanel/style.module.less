@@ -15,9 +15,13 @@
   --chat-thinking-line-height: 1.6;
   --chat-hr-margin-bottom: var(--space-sm);
   --chat-message-inline-padding: var(--space-2xl);
+  /* 右侧为历史横条轨留白，避免消息贴边 */
+  --chat-message-inline-padding-end: calc(var(--space-2xl) + var(--space-xl) + var(--space-md));
   --chat-message-max-width: none;
   --chat-content-max-width: none;
-  --chat-model-logo-size: 16px;
+  /* 侧栏：用户消息收窄，避免占满整栏 */
+  --chat-user-message-max-width: 72%;
+  --chat-avatar-size: 24px;
   --chat-model-meta-font-size: var(--font-size-base);
   --chat-footer-scroll-offset: 132px;
 
@@ -29,8 +33,12 @@
     --chat-thinking-line-height: 1.75;
     --chat-hr-margin-bottom: var(--space-lg);
     --chat-message-inline-padding: var(--space-lg);
+    --chat-message-inline-padding-end: calc(var(--space-lg) + var(--space-xl) + var(--space-md));
     --chat-content-max-width: 1040px;
     --chat-message-max-width: var(--chat-content-max-width);
+    --chat-user-message-max-width: 520px;
+    --chat-avatar-size: 28px;
+    --chat-model-meta-font-size: var(--font-size-lg);
 
     .content {
       width: 100%;
@@ -254,6 +262,8 @@
 
 .footer {
   flex-shrink: 0;
-  padding: 0 var(--chat-message-inline-padding, var(--space-lg)) var(--space-xs);
+  padding: 0
+    var(--chat-message-inline-padding-end, var(--chat-message-inline-padding, var(--space-lg)))
+    var(--space-xs) var(--chat-message-inline-padding, var(--space-lg));
   background: transparent;
 }
