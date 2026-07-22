@@ -1,0 +1,98 @@
+.dialog {
+  width: min(1200px, calc(100vw - 32px));
+  max-width: min(1200px, calc(100vw - 32px));
+}
+
+.dialog {
+  width: 100%;
+  min-height: min(600px, calc(100dvh - 96px));
+}
+
+.dialogBody {
+  min-height: 400px;
+}
+
+.dialogHeading {
+  font-size: 18px;
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md, 16px) var(--space-xl, 24px);
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--space-xs, 8px);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.label {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.value {
+  min-width: 0;
+  flex: 1;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.content {
+  margin: 0;
+  width: 100%;
+  min-height: 112px;
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-secondary, var(--surface));
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.imageLink {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.image {
+  display: block;
+  max-width: min(100%, 420px);
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+@media (max-width: 640px) {
+  .dialog {
+    min-height: auto;
+  }
+
+  .dialogBody {
+    min-height: auto;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

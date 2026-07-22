@@ -19,6 +19,11 @@ export const ADMIN_PAGE_CONFIGS = {
     title: '公告管理',
     subtitle: '发布、编辑和维护面向用户的公告内容',
   },
+  feedback: {
+    path: '/admin/feedback',
+    title: '用户反馈',
+    subtitle: '查看用户提交的反馈内容与处理状态',
+  },
   statistics: {
     path: '/admin/statistics',
     title: '数据统计',

@@ -7,6 +7,7 @@ import {
   ListTodo,
   LockKeyhole,
   Megaphone,
+  MessageSquareText,
   Settings,
   Shield,
   UserCog,
@@ -16,8 +17,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styles from '../../AppSidebar/AppHeaderNav/style.module.less';
 import type { AdminHeaderNavProps } from './index.type';
 
-const { users, resources, groups, announcements, statistics, permissions, settings, logs, tasks } =
-  ADMIN_PAGE_CONFIGS;
+const {
+  users,
+  resources,
+  groups,
+  announcements,
+  feedback,
+  statistics,
+  permissions,
+  settings,
+  logs,
+  tasks,
+} = ADMIN_PAGE_CONFIGS;
 
 function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
   const navigate = useNavigate();
@@ -76,6 +87,17 @@ function AdminHeaderNav({ collapsed }: AdminHeaderNavProps) {
             <Megaphone size={18} />
           </span>
           {!collapsed && <span className={styles.menuLabel}>{announcements.title}</span>}
+        </ListBoxItem>
+        <ListBoxItem
+          id={feedback.path}
+          textValue={feedback.title}
+          className={clsx(styles.menuItem, collapsed && styles.menuItemCollapsed)}
+          onPress={() => navigate(feedback.path)}
+        >
+          <span className={styles.menuIcon}>
+            <MessageSquareText size={18} />
+          </span>
+          {!collapsed && <span className={styles.menuLabel}>{feedback.title}</span>}
         </ListBoxItem>
         <ListBoxItem
           id={statistics.path}

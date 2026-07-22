@@ -59,6 +59,7 @@ function DataTable<T extends object>({
   pagination,
   summary,
   getRowClassName,
+  onRowPress,
   sortDescriptor,
   onSortChange,
 }: DataTableProps<T>) {
@@ -223,7 +224,13 @@ function DataTable<T extends object>({
                         key={rowId}
                         id={rowId}
                         textValue={getRowTextValue(row, rowKey)}
-                        className={joinClassNames(styles.bodyRow, getRowClassName?.(row, ctx))}
+                        data-clickable={onRowPress ? 'true' : undefined}
+                        className={joinClassNames(
+                          styles.bodyRow,
+                          onRowPress ? styles.bodyRowClickable : undefined,
+                          getRowClassName?.(row, ctx)
+                        )}
+                        onAction={onRowPress ? () => onRowPress(row, ctx) : undefined}
                       >
                         {columns.map((column) => (
                           <Table.Cell

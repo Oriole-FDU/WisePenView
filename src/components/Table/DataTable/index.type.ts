@@ -51,6 +51,8 @@ export interface DataTableProps<T extends object> {
   pagination?: DataTablePagination;
   summary?: ReactNode;
   getRowClassName?: (row: T, ctx: DataTableRowContext<T>) => string | undefined;
+  /** 行激活回调（点击行或键盘激活）；传入后行可点击 */
+  onRowPress?: (row: T, ctx: DataTableRowContext<T>) => void;
   sortDescriptor?: SortDescriptor;
   onSortChange?: (descriptor: SortDescriptor) => void;
 }

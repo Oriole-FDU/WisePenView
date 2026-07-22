@@ -126,6 +126,10 @@
     cursor: default;
   }
 
+  :global(.table-root--secondary .table__row[data-clickable='true']) {
+    cursor: pointer;
+  }
+
   :global(.table-root--secondary .table__row .table__cell) {
     border-bottom-color: var(--separator);
     background: var(--surface);
@@ -163,6 +167,10 @@
 
 .bodyRow {
   cursor: default;
+}
+
+.bodyRowClickable {
+  cursor: pointer;
 }
 
 .bodyCell {

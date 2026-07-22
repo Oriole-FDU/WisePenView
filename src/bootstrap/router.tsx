@@ -16,6 +16,7 @@ const UserManagement = lazy(() => import('@/views/admin/UserManagement'));
 const ResourceManagement = lazy(() => import('@/views/admin/ResourceManagement'));
 const GroupManagement = lazy(() => import('@/views/admin/GroupManagement'));
 const AnnouncementManagement = lazy(() => import('@/views/admin/AnnouncementManagement'));
+const FeedbackManagement = lazy(() => import('@/views/admin/FeedbackManagement'));
 const DataStatistics = lazy(() => import('@/views/admin/DataStatistics'));
 const PermissionManagement = lazy(() => import('@/views/admin/PermissionManagement'));
 const SystemSettings = lazy(() => import('@/views/admin/SystemSettings'));
@@ -231,6 +232,10 @@ const router = createBrowserRouter([
               {
                 path: 'announcements',
                 element: <AnnouncementManagement />,
+              },
+              {
+                path: 'feedback',
+                element: <FeedbackManagement />,
               },
               {
                 path: 'statistics',
