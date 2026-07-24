@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
 import { ColorPaletteContent } from '@/components/Note/CustomBlockNote/ui/editorMenus/colorPalette';
 import type { ColorKey } from '@/components/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
@@ -15,7 +16,7 @@ import {
   type TableContent,
 } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { Button, ButtonGroup, ToggleButtonGroup } from '@heroui/react';
+import { ButtonGroup, ToggleButtonGroup } from '@heroui/react';
 import { Paintbrush, PanelLeft, PanelTop, TableCellsMerge, TableCellsSplit } from 'lucide-react';
 import { Fragment, useState } from 'react';
 import styles from '../style.module.less';
@@ -265,18 +266,14 @@ export function TableCellButtons() {
       ) : null}
       <ButtonGroup size="sm" variant="ghost" aria-label="表格颜色">
         <Popover isOpen={colorOpen} onOpenChange={setColorOpen} deferContent={false}>
-          <Popover.Trigger>
-            <Button
-              variant="ghost"
-              size="sm"
-              isIconOnly
-              className={colorOpen ? styles.toolbarButtonActive : undefined}
-              aria-label="单元格背景色"
-              onMouseDown={stopToolbarMouseDown}
-            >
-              <Paintbrush size={20} aria-hidden="true" />
-            </Button>
-          </Popover.Trigger>
+          <AppIconButton
+            icon={<Paintbrush size={20} aria-hidden="true" />}
+            label="单元格背景色"
+            size="sm"
+            isActive={colorOpen}
+            overlayTrigger={<Popover.Trigger />}
+            onMouseDown={stopToolbarMouseDown}
+          />
           <Popover.Content className={styles.colorPopover} placement="bottom">
             <Popover.Dialog>
               <ColorPaletteContent

@@ -1,15 +1,16 @@
-import { Button, ToggleButton } from '@heroui/react';
+import AppIconButton from '@/components/Button/AppIconButton';
+import type { Button } from '@heroui/react';
 import type { ComponentProps, ReactNode } from 'react';
 import { stopToolbarMouseDown } from '../utils';
 
 export type ButtonGroupChildProps = Pick<ComponentProps<typeof Button>, '__button_group_child'>;
 
-interface ToolbarButtonProps extends ButtonGroupChildProps {
+interface ToolbarButtonProps {
   label: string;
   icon: ReactNode;
   isDisabled?: boolean;
   className?: string;
-  onMouseDownCapture?: ComponentProps<typeof Button>['onMouseDownCapture'];
+  onMouseDownCapture?: ComponentProps<typeof AppIconButton>['onMouseDownCapture'];
   onPress?: () => void;
 }
 
@@ -20,23 +21,18 @@ export function ToolbarButton({
   className,
   onMouseDownCapture,
   onPress,
-  ...buttonGroupProps
 }: ToolbarButtonProps) {
   return (
-    <Button
-      {...buttonGroupProps}
-      variant="ghost"
+    <AppIconButton
+      icon={icon}
+      label={label}
       size="sm"
-      isIconOnly
       isDisabled={isDisabled}
-      aria-label={label}
       className={className}
       onMouseDownCapture={onMouseDownCapture}
       onMouseDown={stopToolbarMouseDown}
       onPress={onPress}
-    >
-      {icon}
-    </Button>
+    />
   );
 }
 
@@ -56,17 +52,14 @@ export function ToolbarToggleButton({
   onPress,
 }: ToolbarToggleButtonProps) {
   return (
-    <ToggleButton
-      id={id}
-      variant="ghost"
+    <AppIconButton
+      icon={icon}
+      label={label}
+      toggleId={id}
       size="sm"
-      isIconOnly
       isDisabled={isDisabled}
-      aria-label={label}
       onMouseDown={stopToolbarMouseDown}
       onPress={onPress}
-    >
-      {icon}
-    </ToggleButton>
+    />
   );
 }

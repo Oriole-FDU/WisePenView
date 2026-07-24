@@ -1,11 +1,12 @@
 import AppAvatar from '@/components/Avatar';
+import AppIconButton from '@/components/Button/AppIconButton';
 import AppAlertDialog from '@/components/Overlay/AppAlertDialog';
 import AppDisplayDialog from '@/components/Overlay/AppDisplayDialog';
 import AppModal from '@/components/Overlay/AppModal';
 import type { InlineCommentItem, InlineCommentReactionGroup } from '@/domains/InlineComment';
 import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
-import { Button, Tooltip, toast } from '@heroui/react';
+import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Check, RotateCcw, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
@@ -106,21 +107,14 @@ function CommentItem({
                 onSelect={handleEmojiSelect}
               />
               {canDelete ? (
-                <Tooltip>
-                  <Tooltip.Trigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      isIconOnly
-                      className={styles.iconButton}
-                      aria-label="删除批注"
-                      onPress={() => onDelete({ threadId, itemId: item.itemId })}
-                    >
-                      <Trash2 size={15} aria-hidden />
-                    </Button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content>删除</Tooltip.Content>
-                </Tooltip>
+                <AppIconButton
+                  icon={<Trash2 size={15} aria-hidden />}
+                  label="删除批注"
+                  size="sm"
+                  className={styles.iconButton}
+                  tooltip={{ content: '删除' }}
+                  onPress={() => onDelete({ threadId, itemId: item.itemId })}
+                />
               ) : null}
             </div>
           ) : null}
@@ -247,25 +241,18 @@ function ResolvedCommentThread({
           重新打开
         </Button>
         {canDelete ? (
-          <Tooltip>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                isIconOnly
-                className={styles.iconButton}
-                aria-label="删除批注"
-                onPress={() => {
-                  if (deletableItem) {
-                    onDelete({ threadId: thread.threadId, itemId: deletableItem.itemId });
-                  }
-                }}
-              >
-                <Trash2 size={15} aria-hidden />
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>删除</Tooltip.Content>
-          </Tooltip>
+          <AppIconButton
+            icon={<Trash2 size={15} aria-hidden />}
+            label="删除批注"
+            size="sm"
+            className={styles.iconButton}
+            tooltip={{ content: '删除' }}
+            onPress={() => {
+              if (deletableItem) {
+                onDelete({ threadId: thread.threadId, itemId: deletableItem.itemId });
+              }
+            }}
+          />
         ) : null}
       </div>
     </article>
@@ -307,23 +294,16 @@ function CommentThread({
           <span className={styles.quoteText}>{thread.quoteText}</span>
         </button>
         {active ? (
-          <Tooltip>
-            <Tooltip.Trigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                isIconOnly
-                isDisabled={resolving}
-                className={styles.resolveButton}
-                aria-label="解决批注"
-                aria-busy={resolving || undefined}
-                onPress={() => void resolve()}
-              >
-                <Check size={16} aria-hidden />
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>解决</Tooltip.Content>
-          </Tooltip>
+          <AppIconButton
+            icon={<Check size={16} aria-hidden />}
+            label="解决批注"
+            size="sm"
+            isDisabled={resolving}
+            className={styles.resolveButton}
+            tooltip={{ content: '解决' }}
+            aria-busy={resolving || undefined}
+            onPress={() => void resolve()}
+          />
         ) : null}
       </div>
       <div className={styles.commentList}>
@@ -409,21 +389,14 @@ function InlineComment({
               <blockquote className={`${styles.quoteButton} ${styles.draftQuote}`}>
                 <span className={styles.quoteText}>{draft.quoteText}</span>
               </blockquote>
-              <Tooltip>
-                <Tooltip.Trigger>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    isIconOnly
-                    className={styles.iconButton}
-                    aria-label="关闭批注编辑器"
-                    onPress={onDraftClose}
-                  >
-                    <X size={15} aria-hidden />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content>关闭</Tooltip.Content>
-              </Tooltip>
+              <AppIconButton
+                icon={<X size={15} aria-hidden />}
+                label="关闭批注编辑器"
+                size="sm"
+                className={styles.iconButton}
+                tooltip={{ content: '关闭' }}
+                onPress={onDraftClose}
+              />
             </div>
             <CommentComposer
               key={draft.key}

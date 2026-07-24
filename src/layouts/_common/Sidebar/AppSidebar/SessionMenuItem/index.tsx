@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { FormField, Input } from '@/components/Input';
 import AppAlertDialog from '@/components/Overlay/AppAlertDialog';
 import AppFormDialog from '@/components/Overlay/AppFormDialog';
@@ -5,7 +6,6 @@ import { useChatService } from '@/domains';
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import clsx from 'clsx';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { SessionMenuItemProps } from './index.type';
@@ -74,10 +74,11 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
       <span className={styles.sessionMenuLabelText}>{session.title || '未命名会话'}</span>
 
       <div className={`${styles.sessionActions} sessionActionsVisibleOnItem`}>
-        <button
-          type="button"
+        <AppIconButton
+          icon={<Pencil size={16} aria-hidden="true" />}
+          label={`重命名 ${session.title || '未命名会话'}`}
+          size="sm"
           className={styles.sessionActionBtn}
-          aria-label={`重命名 ${session.title || '未命名会话'}`}
           onPointerDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -89,13 +90,13 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
             setEditingTitleError('');
             setRenameModalOpen(true);
           }}
-        >
-          <Pencil size={16} />
-        </button>
-        <button
-          type="button"
-          className={clsx(styles.sessionActionBtn, styles.sessionDeleteBtn)}
-          aria-label={`删除 ${session.title || '未命名会话'}`}
+        />
+        <AppIconButton
+          icon={<Trash2 size={16} aria-hidden="true" />}
+          label={`删除 ${session.title || '未命名会话'}`}
+          size="sm"
+          variant="danger"
+          className={styles.sessionActionBtn}
           onPointerDown={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -105,9 +106,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
             event.stopPropagation();
             setDeleteConfirmOpen(true);
           }}
-        >
-          <Trash2 size={16} />
-        </button>
+        />
       </div>
       <AppFormDialog
         isOpen={renameModalOpen}

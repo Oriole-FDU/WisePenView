@@ -1,8 +1,9 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Popover } from '@/components/Overlay';
 import { useChatService } from '@/domains';
 import { buildSkillMenuSections } from '@/domains/Chat';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, ListBox, ListBoxItem, toast } from '@heroui/react';
+import { ListBox, ListBoxItem, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Check, Settings, Sparkles, Wrench } from 'lucide-react';
 import { useMemo } from 'react';
@@ -70,22 +71,16 @@ function SkillMenu() {
 
   return (
     <Popover isOpen={skillMenuOpen} onOpenChange={setSkillMenuOpen}>
-      <Popover.Trigger title="配置 Agent">
-        <span className={styles.toolButtonWrap}>
-          {selectedOptionCount > 0 ? (
-            <span className={styles.skillMenuBadge}>{selectedOptionCount}</span>
-          ) : null}
-          <Button
-            variant="ghost"
-            size="sm"
-            isIconOnly
-            className={styles.toolbarCircleBtn}
-            aria-label="配置 Agent"
-          >
-            <Settings size={17} />
-          </Button>
-        </span>
-      </Popover.Trigger>
+      <span className={styles.toolButtonWrap}>
+        {selectedOptionCount > 0 ? (
+          <span className={styles.skillMenuBadge}>{selectedOptionCount}</span>
+        ) : null}
+        <AppIconButton
+          icon={<Settings size={17} aria-hidden="true" />}
+          label="配置 Agent"
+          overlayTrigger={<Popover.Trigger />}
+        />
+      </span>
       <Popover.Content className={styles.toolbarPopover} placement="top">
         <Popover.Dialog>
           <Popover.DeferredContent

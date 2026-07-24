@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { useNoteEditorReadOnlyContext } from '@/components/Note/CustomBlockNote/engines/editor/readOnly';
 import {
   exportNoteFullHtml,
@@ -43,7 +44,7 @@ import {
   useExtension,
   useExtensionState,
 } from '@blocknote/react';
-import { Button, Dropdown } from '@heroui/react';
+import { Dropdown } from '@heroui/react';
 import clsx from 'clsx';
 import {
   AlignCenter,
@@ -175,17 +176,15 @@ function QuickBlockTypes({
         const Icon = item.icon;
         const selected = blockMatchesBlockTypeItem(block, item);
         return (
-          <Button
+          <AppIconButton
             key={item.key}
-            variant="ghost"
+            icon={<Icon size={18} aria-hidden="true" />}
+            label={item.label}
             size="sm"
-            isIconOnly
-            className={clsx(styles.quickTypeButton, selected && styles.quickTypeButtonActive)}
-            aria-label={item.label}
+            isActive={selected}
+            className={styles.quickTypeButton}
             onPress={() => onSelect(item)}
-          >
-            <Icon size={18} aria-hidden="true" />
-          </Button>
+          />
         );
       })}
     </div>
@@ -501,16 +500,13 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
       )}
     >
       {blockIsEmpty ? (
-        <Button
-          variant="ghost"
+        <AppIconButton
+          icon={<Plus size={18} aria-hidden="true" />}
+          label="添加块"
           size="sm"
-          isIconOnly
           className={styles.sideMenuButton}
-          aria-label="添加块"
           onPress={openSlashBelow}
-        >
-          <Plus size={18} aria-hidden="true" />
-        </Button>
+        />
       ) : null}
       {!blockIsEmpty ? (
         <div className={styles.dragHandleWrapper}>

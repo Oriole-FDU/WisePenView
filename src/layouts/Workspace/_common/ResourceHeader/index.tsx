@@ -1,8 +1,9 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import EntryIcon from '@/components/Icons/EntryIcon';
 import ResourcePermissionModal from '@/components/Resource/ResourcePermissionModal';
 import { useUserService } from '@/domains';
 import { normalizeId } from '@/utils/normalize/normalizeId';
-import { Button, Dropdown, Tooltip } from '@heroui/react';
+import { Dropdown, Spinner } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import {
   ChevronRight,
@@ -64,6 +65,7 @@ function ResourceHeaderMore({
   isDisabled?: boolean;
   onOpenPermission: () => void;
 }) {
+  const isPending = Boolean(menu?.isPending || operations.isLocating);
   const handleAction = (key: React.Key) => {
     if (key === 'permission') {
       onOpenPermission();
@@ -114,19 +116,13 @@ function ResourceHeaderMore({
 
   return (
     <Dropdown>
-      <Tooltip>
-        <Button
-          variant="ghost"
-          size="sm"
-          isIconOnly
-          isPending={menu?.isPending || operations.isLocating}
-          isDisabled={isDisabled}
-          aria-label="更多"
-        >
-          <Ellipsis size={18} aria-hidden="true" />
-        </Button>
-        <Tooltip.Content>更多</Tooltip.Content>
-      </Tooltip>
+      <AppIconButton
+        icon={isPending ? <Spinner size="sm" /> : <Ellipsis size={18} aria-hidden="true" />}
+        label="更多"
+        size="sm"
+        isDisabled={isDisabled || isPending}
+        overlayTrigger={<Dropdown.Trigger />}
+      />
       <Dropdown.Popover placement="bottom end" className={styles.popover}>
         <div className={styles.popoverHeader}>更多操作</div>
         <Dropdown.Menu aria-label="资源更多操作" onAction={handleAction}>

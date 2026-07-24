@@ -64,7 +64,7 @@ function AttachmentStrip() {
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                aria-label={`移除文档 ${resource.resourceName}`}
+                label={`移除文档 ${resource.resourceName}`}
                 onPress={() => removeDocRef(resource.resourceId)}
               >
                 <X size={12} />
@@ -84,7 +84,7 @@ function AttachmentStrip() {
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                aria-label={`移除附件 ${attachment.filename}`}
+                label={`移除附件 ${attachment.filename}`}
                 onPress={() => removeActiveAttachment(attachment.attachmentId)}
               >
                 <X size={12} />
@@ -108,7 +108,7 @@ function AttachmentStrip() {
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                aria-label={`移除图片 ${imageMeta.filename}`}
+                label={`移除图片 ${imageMeta.filename}`}
                 onPress={() => removePendingImageMeta(imageMeta.id)}
               >
                 <X size={12} />
@@ -135,7 +135,7 @@ function AttachmentStrip() {
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                aria-label={`移除上传项 ${upload.filename}`}
+                label={`移除上传项 ${upload.filename}`}
                 onPress={() => removePendingAttachmentUpload(upload.id)}
               >
                 <X size={12} />

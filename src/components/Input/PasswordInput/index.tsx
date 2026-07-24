@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import { useState } from 'react';
 
@@ -19,14 +20,13 @@ function PasswordInput({
     <div className={styles.passwordInput}>
       <Lock className={styles.prefixIcon} size={18} aria-hidden="true" />
       <Input type={visible ? 'text' : 'password'} className={className} {...props} />
-      <button
-        type="button"
+      <AppIconButton
+        icon={<VisibilityIcon size={18} aria-hidden="true" />}
+        label={visibilityLabel}
+        size="sm"
         className={styles.visibilityButton}
-        aria-label={visibilityLabel}
         onClick={() => setVisible((nextVisible) => !nextVisible)}
-      >
-        <VisibilityIcon size={18} aria-hidden="true" />
-      </button>
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { Button, Dropdown } from '@heroui/react';
+import AppIconButton from '@/components/Button/AppIconButton';
+import { Dropdown } from '@heroui/react';
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_DROPDOWN_POPOVER_CLASS } from '../styles';
@@ -15,17 +16,13 @@ function TableRowActions({ actions, ariaLabel, onAction }: TableRowActionsProps)
 
   return (
     <Dropdown>
-      <Dropdown.Trigger>
-        <Button
-          variant="ghost"
-          size="sm"
-          isIconOnly
-          aria-label={resolvedAriaLabel}
-          className={styles.trigger}
-        >
-          <EllipsisVertical size={16} />
-        </Button>
-      </Dropdown.Trigger>
+      <AppIconButton
+        icon={<EllipsisVertical size={16} aria-hidden="true" />}
+        label={resolvedAriaLabel}
+        size="sm"
+        className={styles.trigger}
+        overlayTrigger={<Dropdown.Trigger />}
+      />
       <Dropdown.Popover className={TABLE_DROPDOWN_POPOVER_CLASS} placement="bottom end">
         <Dropdown.Menu
           aria-label={resolvedAriaLabel}

@@ -8,7 +8,7 @@ import {
 } from '@/layouts/_common/Sidebar/appSidebarNavigation';
 import SidebarDrive from '@/layouts/_common/Sidebar/DriveSidebar/_components/SidebarDrive';
 import { useWorkspaceNavigationStore } from '@/layouts/Workspace/_store/useWorkspaceNavigationStore';
-import { Tabs } from '@heroui/react';
+import { Tabs, Tooltip } from '@heroui/react';
 import { useUpdateEffect } from 'ahooks';
 import clsx from 'clsx';
 import { FolderOpen, MessageSquare } from 'lucide-react';
@@ -70,21 +70,21 @@ function AppSidebarTabs({ collapsed }: AppSidebarTabsProps) {
         <Tabs.ListContainer className={styles.tabListContainer}>
           <div className={styles.tabToolbar}>
             <Tabs.List className={styles.tabList} aria-label="侧边栏内容">
-              <Tabs.Tab
-                id={SIDEBAR_TAB.SESSIONS}
-                className={styles.tab}
-                aria-label="会话历史"
-                data-tooltip="会话历史"
-              >
-                <MessageSquare size={18} aria-hidden="true" />
+              <Tabs.Tab id={SIDEBAR_TAB.SESSIONS} className={styles.tab} aria-label="会话历史">
+                <Tooltip>
+                  <Tooltip.Trigger className={styles.tabTooltipTrigger}>
+                    <MessageSquare size={18} aria-hidden="true" />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content placement="bottom">会话历史</Tooltip.Content>
+                </Tooltip>
               </Tabs.Tab>
-              <Tabs.Tab
-                id={SIDEBAR_TAB.DRIVE}
-                className={styles.tab}
-                aria-label="云盘"
-                data-tooltip="云盘"
-              >
-                <FolderOpen size={18} aria-hidden="true" />
+              <Tabs.Tab id={SIDEBAR_TAB.DRIVE} className={styles.tab} aria-label="云盘">
+                <Tooltip>
+                  <Tooltip.Trigger className={styles.tabTooltipTrigger}>
+                    <FolderOpen size={18} aria-hidden="true" />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content placement="bottom">云盘</Tooltip.Content>
+                </Tooltip>
               </Tabs.Tab>
             </Tabs.List>
             <GlobalSearch scope={driveScope} />

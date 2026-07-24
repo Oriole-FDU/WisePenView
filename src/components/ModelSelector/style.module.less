@@ -2,6 +2,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: 180px;
   min-width: 0;
   height: 32px;
   padding: 0 var(--space-xs);
@@ -15,7 +17,7 @@
     background 0.2s,
     color 0.2s;
 
-  /* 与 ChatInput toolbarCircleBtn（HeroUI ghost）一致的 hover */
+  /* 与公共 ghost 图标按钮保持一致的 hover */
   &:hover:not(:disabled),
   &:focus-visible:not(:disabled) {
     color: var(--foreground);
@@ -34,14 +36,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-}
-
-.triggerIconOnly {
-  flex-shrink: 0;
-  width: 32px;
-  min-width: 32px;
-  padding: 0;
-  border-radius: var(--radius-full, 999px);
 }
 
 /* 与 ChatInput toolbarPopover 对齐；宽度保持 320px */

@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import type { DataNode, TreeDropPosition } from '@/components/Tree';
 import Tree from '@/components/Tree';
 import type { SkillFileNode } from '@/domains/Skill';
@@ -36,17 +37,17 @@ function buildTreeData(nodes: SkillFileNode[], opts: BuildTreeOptions): DataNode
             <span className={styles.nodeLabel}>{node.name}</span>
           </span>
           {opts.isOwner ? (
-            <button
-              type="button"
+            <AppIconButton
+              icon={<X size={12} aria-hidden="true" />}
+              label={`删除 ${node.name}`}
+              size="sm"
+              variant="danger"
               className={styles.deleteBtn}
               onClick={(event) => {
                 event.stopPropagation();
                 opts.onDeleteFile(node.id);
               }}
-              aria-label={`删除 ${node.name}`}
-            >
-              <X size={12} />
-            </button>
+            />
           ) : null}
         </span>
       ),

@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import {
   joinClassNames,
   resolveColumnAlign,
@@ -25,7 +26,7 @@ import TableBatchFooter from './parts/BatchFooter';
 import TableEditErrorToast from './parts/EditErrorToast';
 import styles from './style.module.less';
 
-import { Button, Spinner, Table, type Selection } from '@heroui/react';
+import { Spinner, Table, type Selection } from '@heroui/react';
 import { Check, X } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -139,26 +140,21 @@ function ManageTable<T extends object>({
       if (ctx.state === 'editing' || ctx.state === 'error') {
         return (
           <div className={styles.inlineEditActions}>
-            <Button
-              variant="primary"
+            <AppIconButton
+              icon={<Check size={16} aria-hidden="true" />}
+              label={t('aria.save')}
               size="sm"
-              isIconOnly
-              aria-label={t('aria.save')}
+              variant="primary"
               onPress={() => {
                 void inlineEdit?.onSave(row);
               }}
-            >
-              <Check size={16} />
-            </Button>
-            <Button
-              variant="ghost"
+            />
+            <AppIconButton
+              icon={<X size={16} aria-hidden="true" />}
+              label={t('aria.cancel')}
               size="sm"
-              isIconOnly
-              aria-label={t('aria.cancel')}
               onPress={inlineEdit?.onCancel}
-            >
-              <X size={16} />
-            </Button>
+            />
           </div>
         );
       }
@@ -166,12 +162,19 @@ function ManageTable<T extends object>({
       if (ctx.state === 'saving') {
         return (
           <div className={styles.inlineEditActions}>
-            <Button variant="primary" size="sm" isIconOnly isDisabled aria-label={t('aria.saving')}>
-              <Spinner size="sm" />
-            </Button>
-            <Button variant="ghost" size="sm" isIconOnly isDisabled aria-label={t('aria.cancel')}>
-              <X size={16} />
-            </Button>
+            <AppIconButton
+              icon={<Spinner size="sm" />}
+              label={t('aria.saving')}
+              size="sm"
+              variant="primary"
+              isDisabled
+            />
+            <AppIconButton
+              icon={<X size={16} aria-hidden="true" />}
+              label={t('aria.cancel')}
+              size="sm"
+              isDisabled
+            />
           </div>
         );
       }

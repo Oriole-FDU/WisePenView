@@ -1,4 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/_shadcn';
+import AppIconButton from '@/components/Button/AppIconButton';
 import {
   DriveDelete,
   MoveNodeModal,
@@ -897,20 +898,19 @@ const TableDrive = forwardRef<TableDriveHandle, TableDriveProps>(function TableD
             {isTrashView ? '返回云盘' : '回收站'}
           </Button>
         ) : null}
-        <Button
-          variant="ghost"
+        <AppIconButton
+          icon={
+            isDetailPanelCollapsed ? (
+              <PanelRightOpen size={16} aria-hidden="true" />
+            ) : (
+              <PanelRightClose size={16} aria-hidden="true" />
+            )
+          }
+          label={isDetailPanelCollapsed ? '展开详情侧栏' : '收起详情侧栏'}
           size="sm"
-          isIconOnly
           className={styles.detailPanelToggle}
-          aria-label={isDetailPanelCollapsed ? '展开详情侧栏' : '收起详情侧栏'}
           onPress={() => setIsDetailPanelCollapsed((collapsed) => !collapsed)}
-        >
-          {isDetailPanelCollapsed ? (
-            <PanelRightOpen size={16} aria-hidden="true" />
-          ) : (
-            <PanelRightClose size={16} aria-hidden="true" />
-          )}
-        </Button>
+        />
       </div>
     ),
     [

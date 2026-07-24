@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Input, Select } from '@/components/Input';
 import { useUserService } from '@/domains';
 import type { UpdateUserInfoRequest } from '@/domains/User';
@@ -200,18 +201,17 @@ function AccountForm({
                       <Select.Trigger>
                         <Select.Value />
                         {getFieldValue(formValues, field.key) != null ? (
-                          <button
-                            type="button"
-                            aria-label={`清空${field.label}`}
+                          <AppIconButton
+                            icon={<X aria-hidden="true" />}
+                            label={`清空${field.label}`}
+                            size="sm"
                             className={styles.clearSelectButton}
                             onClick={(event) => {
                               event.preventDefault();
                               event.stopPropagation();
                               updateFormValue(field.key, undefined);
                             }}
-                          >
-                            <X />
-                          </button>
+                          />
                         ) : null}
                         <Select.Indicator />
                       </Select.Trigger>

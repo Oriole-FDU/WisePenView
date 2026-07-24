@@ -8,7 +8,11 @@ import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { buildDriveTreeData, replaceDriveTreeNodeChildren } from '../common/buildDriveTreeData';
+import {
+  buildDriveTreeData,
+  isDriveNodeSelectable,
+  replaceDriveTreeNodeChildren,
+} from '../common/buildDriveTreeData';
 import {
   getDriveScopeGroupId,
   resolveDriveScope,
@@ -153,6 +157,7 @@ function DriveNavigator({
   renderableTypes = DEFAULT_RENDERABLE_TYPES,
   selectableTypes = DEFAULT_SELECTABLE_TYPES,
   resourcePreviewLimit = DEFAULT_RESOURCE_PREVIEW_LIMIT,
+  disabled = false,
   disabledNodeIds,
   multiple = false,
   initialSelectedIds,
@@ -268,11 +273,12 @@ function DriveNavigator({
           const node = nodeMapRef.current.get(key);
           return (
             node != null &&
-            node.type !== 'loading' &&
-            !disabledNodeIdSet.has(node.id) &&
-            isNodeDisabled?.(node) !== true &&
-            selectableTypeSet.has(node.type) &&
-            (isNodeSelectable?.(node) ?? true)
+            isDriveNodeSelectable(node, {
+              selectableTypes: selectableTypeSet,
+              disabledNodeIds: disabledNodeIdSet,
+              isNodeSelectable,
+              isNodeDisabled,
+            })
           );
         });
     },
@@ -293,11 +299,12 @@ function DriveNavigator({
         .filter(
           (node): node is DriveNode =>
             node != null &&
-            node.type !== 'loading' &&
-            !disabledNodeIdSet.has(node.id) &&
-            isNodeDisabled?.(node) !== true &&
-            selectableTypeSet.has(node.type) &&
-            (isNodeSelectable?.(node) ?? true)
+            isDriveNodeSelectable(node, {
+              selectableTypes: selectableTypeSet,
+              disabledNodeIds: disabledNodeIdSet,
+              isNodeSelectable,
+              isNodeDisabled,
+            })
         );
       onNodeChange?.(selectedNodes);
       onChange?.(
@@ -391,6 +398,7 @@ function DriveNavigator({
   );
 
   const handleLoadData = async (treeNode: DataNode) => {
+    if (disabled) return;
     const key = String(treeNode.key);
     const node = nodeMapRef.current.get(key);
     if (!node || (node.type !== 'root' && node.type !== 'folder')) return;
@@ -401,6 +409,7 @@ function DriveNavigator({
 
   const handleSelect = useCallback(
     (keys: React.Key[], info: { node: DataNode; selected: boolean }) => {
+      if (disabled) return;
       const clickedKey = String(info.node.key);
       if (multiple) {
         if (normalizeSelectableKeys([clickedKey]).length === 0) return;
@@ -417,7 +426,7 @@ function DriveNavigator({
       setSelectedKeys(next);
       emitSelectionChange(next);
     },
-    [emitSelectionChange, multiple, normalizeSelectableKeys]
+    [disabled, emitSelectionChange, multiple, normalizeSelectableKeys]
   );
 
   const defaultExpandedKeys =
@@ -448,7 +457,7 @@ function DriveNavigator({
       <Tree
         treeData={treeData}
         className={styles.tree}
-        blockNode
+        disabled={disabled}
         selectable
         multiple={multiple}
         selectedKeys={selectedKeys}

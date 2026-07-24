@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { DriveCreate } from '@/components/Drive/Modals';
 import { Empty, ResultState, Spin } from '@/components/Feedback';
 import { FormField, Input, TextArea } from '@/components/Input';
@@ -2382,30 +2383,27 @@ function SkillView({ resourceId = '' }: SkillViewProps = {}) {
                     <span className={styles.middlePanelLabel}>文件</span>
                     {canEditTree ? (
                       <div className={styles.middlePanelActions}>
-                        <button
-                          type="button"
+                        <AppIconButton
+                          icon={<FolderPlus size={14} aria-hidden="true" />}
+                          label="新建文件夹"
+                          size="sm"
                           className={styles.iconBtnSm}
-                          aria-label="新建文件夹"
                           onClick={() => handleStartCreate('folder')}
-                        >
-                          <FolderPlus size={14} />
-                        </button>
-                        <button
-                          type="button"
+                        />
+                        <AppIconButton
+                          icon={<Plus size={14} aria-hidden="true" />}
+                          label="新建文件"
+                          size="sm"
                           className={styles.iconBtnSm}
-                          aria-label="新建文件"
                           onClick={() => handleStartCreate('file')}
-                        >
-                          <Plus size={14} />
-                        </button>
-                        <button
-                          type="button"
+                        />
+                        <AppIconButton
+                          icon={<Upload size={14} aria-hidden="true" />}
+                          label="上传文件"
+                          size="sm"
                           className={styles.iconBtnSm}
-                          aria-label="上传文件"
                           onClick={() => fileInputRef.current?.click()}
-                        >
-                          <Upload size={14} />
-                        </button>
+                        />
                       </div>
                     ) : null}
                   </div>

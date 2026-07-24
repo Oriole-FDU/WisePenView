@@ -1,6 +1,8 @@
 import EntryIcon from '@/components/Icons/EntryIcon';
+import { Popover } from '@/components/Overlay';
 import { Button } from '@heroui/react';
 import { CloudUpload, FileInput, Plus } from 'lucide-react';
+import { useState } from 'react';
 import styles from './index.module.less';
 import type { CreateMenuItem, CreateMenuProps } from './index.type';
 
@@ -32,19 +34,28 @@ function CreateMenuIcon({ id }: { id: CreateMenuItem['id'] }) {
 }
 
 function CreateMenu({ disabled = false, items, onSelect }: CreateMenuProps) {
+  const [open, setOpen] = useState(false);
+
   if (items.length === 0) {
     return null;
   }
 
+  const handleSelect = (id: CreateMenuItem['id']) => {
+    setOpen(false);
+    onSelect(id);
+  };
+
   return (
-    <div className={styles.wrap} data-disabled={disabled || undefined}>
-      <Button variant="secondary" size="sm" isDisabled={disabled}>
-        <Plus size={16} aria-hidden="true" />
-        新建
-      </Button>
-      {!disabled ? (
-        <div className={styles.menuDrop}>
-          <div className={styles.menuPanel} role="menu" aria-label="新建菜单">
+    <Popover isOpen={open} onOpenChange={setOpen}>
+      <Popover.Trigger>
+        <Button variant="secondary" size="sm" isDisabled={disabled}>
+          <Plus size={16} aria-hidden="true" />
+          新建
+        </Button>
+      </Popover.Trigger>
+      <Popover.Content className={styles.menuPopover} placement="bottom start">
+        <Popover.Dialog>
+          <div role="menu" aria-label="新建菜单">
             <ul className={styles.menuList}>
               {items.map((item) => (
                 <li key={item.id} role="none">
@@ -53,7 +64,7 @@ function CreateMenu({ disabled = false, items, onSelect }: CreateMenuProps) {
                     role="menuitem"
                     className={styles.menuItem}
                     disabled={item.disabled}
-                    onClick={() => onSelect(item.id)}
+                    onClick={() => handleSelect(item.id)}
                   >
                     <span className={styles.menuIcon}>
                       <CreateMenuIcon id={item.id} />
@@ -64,9 +75,9 @@ function CreateMenu({ disabled = false, items, onSelect }: CreateMenuProps) {
               ))}
             </ul>
           </div>
-        </div>
-      ) : null}
-    </div>
+        </Popover.Dialog>
+      </Popover.Content>
+    </Popover>
   );
 }
 

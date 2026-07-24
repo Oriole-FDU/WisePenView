@@ -139,6 +139,7 @@ function UploadFileToGroupModal({
                     selectableTypes={['resource', 'link']}
                     multiple
                     refreshTrigger={navRefreshKey}
+                    disabled={submitting}
                     onChange={handleFilesChange}
                   />
                 </div>
@@ -152,6 +153,7 @@ function UploadFileToGroupModal({
                     key={`group-tree-tag-${groupId}-${navRefreshKey}`}
                     scope={{ type: 'group', groupId }}
                     selectableTypes={['folder']}
+                    disabled={submitting}
                     onChange={handleTagsChange}
                   />
                 </div>

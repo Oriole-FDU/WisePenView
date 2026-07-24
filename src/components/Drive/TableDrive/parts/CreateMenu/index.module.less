@@ -1,27 +1,4 @@
-.wrap {
-  position: relative;
-  display: inline-flex;
-
-  &:not([data-disabled]):hover .menuDrop,
-  &:not([data-disabled]):focus-within .menuDrop {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-.menuDrop {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 30;
-  padding-top: var(--space-2xs);
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.menuPanel {
+.menuPopover {
   min-width: 140px;
   padding: var(--space-2xs);
   border: 1px solid var(--border-light);

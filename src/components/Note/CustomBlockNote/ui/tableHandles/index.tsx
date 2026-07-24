@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { useNoteEditorReadOnlyContext } from '@/components/Note/CustomBlockNote/engines/editor/readOnly';
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
 import {
@@ -16,7 +17,6 @@ import {
   useExtensionState,
   type TableCellButtonProps,
 } from '@blocknote/react';
-import { Button, Tooltip } from '@heroui/react';
 import { useEventListener, useMount, useUnmount, useUpdateEffect } from 'ahooks';
 import { Plus, Table2 } from 'lucide-react';
 import { useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
@@ -591,28 +591,22 @@ function MountedTableInsertHandles() {
                 } as CSSProperties
               }
             >
-              <Tooltip>
-                <Tooltip.Trigger className={styles.insertButtonTrigger}>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    isIconOnly
-                    className={styles.insertButton}
-                    aria-label="插入行"
-                    onPointerEnter={() => handleInsertPointerEnter(target)}
-                    onPointerLeave={() => handleInsertPointerLeave(target)}
-                    onPointerDown={(event) => handleInsertPointerDown(event, target)}
-                    onClick={(event) => handleInsertClick(event, target)}
-                  >
-                    <Plus size={16} strokeWidth={2.25} aria-hidden="true" />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content showArrow placement="left" offset={8}>
-                  <Tooltip.Arrow />
-                  插入行
-                </Tooltip.Content>
-              </Tooltip>
+              <AppIconButton
+                icon={<Plus size={16} strokeWidth={2.25} aria-hidden="true" />}
+                label="插入行"
+                size="sm"
+                className={styles.insertButton}
+                tooltip={{
+                  placement: 'left',
+                  offset: 8,
+                  showArrow: true,
+                  triggerClassName: styles.insertButtonTrigger,
+                }}
+                onPointerEnter={() => handleInsertPointerEnter(target)}
+                onPointerLeave={() => handleInsertPointerLeave(target)}
+                onPointerDown={(event) => handleInsertPointerDown(event, target)}
+                onClick={(event) => handleInsertClick(event, target)}
+              />
             </div>
           );
         })}
@@ -634,28 +628,22 @@ function MountedTableInsertHandles() {
                 } as CSSProperties
               }
             >
-              <Tooltip>
-                <Tooltip.Trigger className={styles.insertButtonTrigger}>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    isIconOnly
-                    className={styles.insertButton}
-                    aria-label="插入列"
-                    onPointerEnter={() => handleInsertPointerEnter(target)}
-                    onPointerLeave={() => handleInsertPointerLeave(target)}
-                    onPointerDown={(event) => handleInsertPointerDown(event, target)}
-                    onClick={(event) => handleInsertClick(event, target)}
-                  >
-                    <Plus size={16} strokeWidth={2.25} aria-hidden="true" />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content showArrow placement="top" offset={8}>
-                  <Tooltip.Arrow />
-                  插入列
-                </Tooltip.Content>
-              </Tooltip>
+              <AppIconButton
+                icon={<Plus size={16} strokeWidth={2.25} aria-hidden="true" />}
+                label="插入列"
+                size="sm"
+                className={styles.insertButton}
+                tooltip={{
+                  placement: 'top',
+                  offset: 8,
+                  showArrow: true,
+                  triggerClassName: styles.insertButtonTrigger,
+                }}
+                onPointerEnter={() => handleInsertPointerEnter(target)}
+                onPointerLeave={() => handleInsertPointerLeave(target)}
+                onPointerDown={(event) => handleInsertPointerDown(event, target)}
+                onClick={(event) => handleInsertClick(event, target)}
+              />
             </div>
           );
         })}

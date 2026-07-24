@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
 import { ColorPaletteContent } from '@/components/Note/CustomBlockNote/ui/editorMenus/colorPalette';
 import {
@@ -6,9 +7,7 @@ import {
 } from '@/components/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
 import { Popover } from '@/components/Overlay';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { Button } from '@heroui/react';
-import clsx from 'clsx';
-import { Baseline, ChevronDown } from 'lucide-react';
+import { Baseline } from 'lucide-react';
 import { useState } from 'react';
 import styles from '../style.module.less';
 import {
@@ -20,7 +19,7 @@ import {
 } from '../utils';
 import type { ButtonGroupChildProps } from './ToolbarButton';
 
-export function ColorMenu(buttonGroupProps: ButtonGroupChildProps) {
+export function ColorMenu(_buttonGroupProps: ButtonGroupChildProps) {
   const editor = useBlockNoteEditor(blockNoteSchema);
   const [open, setOpen] = useState(false);
   const state = useEditorState({
@@ -77,19 +76,14 @@ export function ColorMenu(buttonGroupProps: ButtonGroupChildProps) {
 
   return (
     <Popover isOpen={open} onOpenChange={setOpen} deferContent={false}>
-      <Popover.Trigger>
-        <Button
-          {...buttonGroupProps}
-          variant="ghost"
-          size="sm"
-          className={clsx(styles.colorTrigger, open && styles.toolbarButtonActive)}
-          onMouseDown={stopToolbarMouseDown}
-          aria-label="颜色"
-        >
-          <Baseline size={20} className={selectedTextColor.textClassName} aria-hidden="true" />
-          <ChevronDown size={16} aria-hidden="true" />
-        </Button>
-      </Popover.Trigger>
+      <AppIconButton
+        icon={<Baseline size={20} className={selectedTextColor.textClassName} aria-hidden="true" />}
+        label="颜色"
+        size="sm"
+        isActive={open}
+        overlayTrigger={<Popover.Trigger />}
+        onMouseDown={stopToolbarMouseDown}
+      />
       <Popover.Content className={styles.colorPopover} placement="bottom">
         <Popover.Dialog>
           <ColorPaletteContent

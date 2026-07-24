@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 import { Button, Table } from '@heroui/react';
@@ -114,16 +115,13 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
                       {asset.uploadStatus === 'AVAILABLE' ? '可用' : '上传中'}
                     </Table.Cell>
                     <Table.Cell>
-                      <Button
-                        isIconOnly
+                      <AppIconButton
+                        icon={<Trash2 size={14} aria-hidden="true" />}
+                        label={`删除 ${asset.name}`}
                         size="sm"
-                        variant="ghost"
                         isDisabled={disabled}
-                        aria-label={`删除 ${asset.name}`}
                         onPress={() => onDelete(asset.id)}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
+                      />
                     </Table.Cell>
                   </Table.Row>
                 )}

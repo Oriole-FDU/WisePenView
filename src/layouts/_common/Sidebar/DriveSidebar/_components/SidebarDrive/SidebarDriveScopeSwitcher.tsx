@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Popover } from '@/components/Overlay';
 import { useGroupService } from '@/domains';
 import { buildDriveNodeScope } from '@/domains/Drive';
@@ -52,11 +53,14 @@ function SidebarDriveScopeSwitcher() {
 
   return (
     <Popover isOpen={open} onOpenChange={setOpen}>
-      <Popover.Trigger>
-        <button type="button" className={styles.nodeActionBtn} aria-label="切换云盘范围">
-          <ChevronsUpDown size={14} aria-hidden="true" />
-        </button>
-      </Popover.Trigger>
+      <AppIconButton
+        icon={<ChevronsUpDown size={14} aria-hidden="true" />}
+        label="切换云盘范围"
+        size="sm"
+        className={styles.nodeActionBtn}
+        tooltip={{ content: '切换云盘' }}
+        overlayTrigger={<Popover.Trigger />}
+      />
       <Popover.Content className={styles.scopePopover} placement="right">
         <Popover.Dialog>
           <div

@@ -52,7 +52,11 @@ ComponentName/
 
 - 图标按钮优先使用已有图标库，例如 `lucide-react`。
 - 有明确图标语义时，不要用文字按钮代替图标按钮。
-- 不熟悉的图标按钮应提供 tooltip 或可访问名称。
+- 纯图标按钮统一使用 `AppIconButton`，必须同时提供 hover/focus tooltip 和可访问名称；不要用 `title` 代替 tooltip。
+- 带有清晰可见文字的按钮不重复显示同义 tooltip；截断文本、禁用原因或复杂状态按需提供 tooltip。
+- `AppIconButton` 的 hover 背景统一为圆角方形，业务样式不得覆盖其圆角；圆形控件仅用于头像、状态点等本身具有圆形语义的元素。
+- `AppIconButton` 作为 Popover、Dropdown 等浮层触发器时，通过 `overlayTrigger` 组合，不在调用点重复拼装 Tooltip 或设置 `tooltip={false}`。
+- Tooltip 方向由所在控件组统一决定，不由单个按钮随意选择：顶部工具栏向下、底部工具栏向上、左侧竖向工具栏向右、右侧竖向工具栏向左；同一控件组必须一致，仅在视口空间不足时允许浮层自动翻转。
 - 表格、菜单、tabs、开关、滑块等控件使用符合用户预期的交互形态。
 
 ## 六、检查清单

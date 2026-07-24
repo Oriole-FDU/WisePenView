@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Popover } from '@/components/Overlay';
 import { useChatService } from '@/domains';
 import type { ChatAgentOption } from '@/domains/Chat';
@@ -7,7 +8,7 @@ import {
   resolveChatInputSelectedAgent,
 } from '@/domains/Chat';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, ListBox, ListBoxItem, toast } from '@heroui/react';
+import { ListBox, ListBoxItem, toast } from '@heroui/react';
 import { useMount, useRequest, useUpdateEffect } from 'ahooks';
 import { Bot, Check } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -93,17 +94,12 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
 
   return (
     <Popover isOpen={open} onOpenChange={setOpen}>
-      <Popover.Trigger title={selectedAgent.label}>
-        <Button
-          variant="ghost"
-          size="sm"
-          isIconOnly
-          className={styles.toolbarCircleBtn}
-          aria-label="选择 Agent"
-        >
-          <Bot size={17} />
-        </Button>
-      </Popover.Trigger>
+      <AppIconButton
+        icon={<Bot size={17} aria-hidden="true" />}
+        label="选择 Agent"
+        tooltip={{ content: selectedAgent.label }}
+        overlayTrigger={<Popover.Trigger />}
+      />
       <Popover.Content className={styles.toolbarPopover} placement="top">
         <Popover.Dialog>
           <Popover.DeferredContent fallback={<div className={styles.deferredPopoverPanel} />}>

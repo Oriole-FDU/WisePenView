@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Spin } from '@/components/Feedback';
 import AppModal from '@/components/Overlay/AppModal';
 import type { FavoriteCollection } from '@/domains/Interact';
@@ -117,18 +118,15 @@ function CollectionPickerModal({
                   if (event.key === 'Escape') onShowCreateInput(false);
                 }}
               />
-              <Button
-                variant="ghost"
+              <AppIconButton
+                icon={<X size={15} aria-hidden="true" />}
+                label="取消新建收藏夹"
                 size="sm"
-                isIconOnly
-                aria-label="取消新建收藏夹"
                 isDisabled={loadingCreate}
                 className={styles.cancelCreateButton}
                 onPointerDown={(event) => event.preventDefault()}
                 onPress={() => onShowCreateInput(false)}
-              >
-                <X size={15} aria-hidden="true" />
-              </Button>
+              />
             </div>
           </TextField>
         ) : (

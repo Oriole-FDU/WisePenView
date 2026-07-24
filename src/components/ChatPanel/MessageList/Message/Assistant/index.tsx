@@ -1,8 +1,8 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import CopyButton, { MESSAGE_ACTION_ICON_SIZE } from '@/components/Button/CopyButton';
 import type { Model } from '@/components/ChatPanel/index.type';
 import ProviderLogo from '@/components/Icons/ProviderLogo';
 import type { WisePenUIMessage } from '@/domains/Chat';
-import { Button, Tooltip } from '@heroui/react';
 import { isReasoningUIPart, isTextUIPart, isToolUIPart } from 'ai';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import ChatMessage from '../ChatMessage';
@@ -82,30 +82,18 @@ function AssistantMessage({ message, model, streaming }: AssistantMessageProps) 
         {!streaming && textContent ? (
           <ChatMessage.Actions>
             <CopyButton text={textContent} />
-            <Tooltip delay={0}>
-              <Button
-                variant="ghost"
-                isIconOnly
-                size="sm"
-                className={styles.actionButton}
-                aria-label="点赞"
-              >
-                <ThumbsUp size={MESSAGE_ACTION_ICON_SIZE} />
-              </Button>
-              <Tooltip.Content>点赞</Tooltip.Content>
-            </Tooltip>
-            <Tooltip delay={0}>
-              <Button
-                variant="ghost"
-                isIconOnly
-                size="sm"
-                className={styles.actionButton}
-                aria-label="点踩"
-              >
-                <ThumbsDown size={MESSAGE_ACTION_ICON_SIZE} />
-              </Button>
-              <Tooltip.Content>点踩</Tooltip.Content>
-            </Tooltip>
+            <AppIconButton
+              icon={<ThumbsUp size={MESSAGE_ACTION_ICON_SIZE} aria-hidden="true" />}
+              label="点赞"
+              className={styles.actionButton}
+              tooltip={{ delay: 0 }}
+            />
+            <AppIconButton
+              icon={<ThumbsDown size={MESSAGE_ACTION_ICON_SIZE} aria-hidden="true" />}
+              label="点踩"
+              className={styles.actionButton}
+              tooltip={{ delay: 0 }}
+            />
           </ChatMessage.Actions>
         ) : null}
       </ChatMessage.Body>

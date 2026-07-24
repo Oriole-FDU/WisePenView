@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@heroui/react';
+import AppIconButton from '@/components/Button/AppIconButton';
 import { ArrowDownIcon } from 'lucide-react';
 import * as React from 'react';
 
@@ -90,7 +90,9 @@ function MessageScrollerButton({
   size = 'sm',
   ...props
 }: React.ComponentProps<typeof MessageScrollerPrimitive.Button> &
-  Pick<React.ComponentProps<typeof Button>, 'variant' | 'size'>) {
+  Pick<React.ComponentProps<typeof AppIconButton>, 'size'> & {
+    variant?: 'primary' | 'secondary' | 'ghost';
+  }) {
   return (
     <MessageScrollerPrimitive.Button
       data-slot="message-scroller-button"
@@ -103,7 +105,13 @@ function MessageScrollerButton({
         className
       )}
       render={
-        render ?? <Button isIconOnly className="rounded-full" variant={variant} size={size} />
+        render ?? (
+          <AppIconButton
+            icon={<ArrowDownIcon aria-hidden="true" />}
+            label={direction === 'end' ? '滚动到底部' : '滚动到顶部'}
+            size={size}
+          />
+        )
       }
       {...props}
     >

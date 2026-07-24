@@ -1,5 +1,6 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import type { FavoriteCollection } from '@/domains/Interact';
-import { Button, Dropdown, ListBox, ListBoxItem } from '@heroui/react';
+import { Dropdown, ListBox, ListBoxItem } from '@heroui/react';
 import { EllipsisVertical, Plus } from 'lucide-react';
 import styles from '../style.module.less';
 
@@ -24,16 +25,13 @@ function FavoriteCollectionList({
     <aside className={styles.collectionPanel} aria-label="收藏夹目录">
       <div className={styles.collectionPanelHeader}>
         <span className={styles.collectionPanelTitle}>收藏夹</span>
-        <Button
-          variant="ghost"
+        <AppIconButton
+          icon={<Plus size={17} aria-hidden="true" />}
+          label="新建收藏夹"
           size="sm"
-          isIconOnly
-          aria-label="新建收藏夹"
           className={styles.collectionCreateButton}
           onPress={onCreate}
-        >
-          <Plus size={17} aria-hidden="true" />
-        </Button>
+        />
       </div>
 
       <ListBox
@@ -66,17 +64,14 @@ function FavoriteCollectionList({
                 onClick={(event) => event.stopPropagation()}
               >
                 <Dropdown>
-                  <Dropdown.Trigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      isIconOnly
-                      aria-label={`${collection.collectionName ?? '我的收藏'}操作`}
-                      className={styles.collectionMoreButton}
-                    >
-                      <EllipsisVertical size={16} aria-hidden="true" />
-                    </Button>
-                  </Dropdown.Trigger>
+                  <AppIconButton
+                    icon={<EllipsisVertical size={16} aria-hidden="true" />}
+                    label={`${collection.collectionName ?? '我的收藏'}操作`}
+                    size="sm"
+                    className={styles.collectionMoreButton}
+                    tooltip={{ content: '更多操作' }}
+                    overlayTrigger={<Dropdown.Trigger />}
+                  />
                   <Dropdown.Popover placement="bottom end">
                     <Dropdown.Menu aria-label="收藏夹操作">
                       <Dropdown.Item id="edit" onAction={() => onEdit(collection)}>

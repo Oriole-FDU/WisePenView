@@ -1,8 +1,8 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import ProviderLogo from '@/components/Icons/ProviderLogo';
 import { Popover } from '@/components/Overlay';
 import type { ChatModel } from '@/domains/Chat';
 import { ListBox, ListBoxItem } from '@heroui/react';
-import clsx from 'clsx';
 import { Check, ChevronDown, LoaderCircle } from 'lucide-react';
 import styles from './style.module.less';
 
@@ -45,23 +45,37 @@ function ModelSelector({
 
   return (
     <Popover isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Popover.Trigger>
-        <button
-          type="button"
-          className={clsx(styles.trigger, iconOnly && styles.triggerIconOnly)}
-          aria-label={triggerLabel}
-          title={triggerLabel}
-          disabled={disabled}
-        >
-          {loading ? (
-            <LoaderCircle size={16} className={styles.spinIcon} />
-          ) : (
-            <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
-          )}
-          {!iconOnly ? <span>{triggerLabel}</span> : null}
-          {!iconOnly ? <ChevronDown size={16} /> : null}
-        </button>
-      </Popover.Trigger>
+      {iconOnly ? (
+        <AppIconButton
+          icon={
+            loading ? (
+              <LoaderCircle size={16} className={styles.spinIcon} aria-hidden="true" />
+            ) : (
+              <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
+            )
+          }
+          label={triggerLabel}
+          isDisabled={disabled}
+          overlayTrigger={<Popover.Trigger />}
+        />
+      ) : (
+        <Popover.Trigger>
+          <button
+            type="button"
+            className={styles.trigger}
+            aria-label={triggerLabel}
+            disabled={disabled}
+          >
+            {loading ? (
+              <LoaderCircle size={16} className={styles.spinIcon} />
+            ) : (
+              <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
+            )}
+            <span>{triggerLabel}</span>
+            <ChevronDown size={16} />
+          </button>
+        </Popover.Trigger>
+      )}
       <Popover.Content className={styles.popover} placement={placement}>
         <Popover.Dialog>
           <div className={styles.menu}>

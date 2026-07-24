@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { TextArea } from '@heroui/react';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
@@ -51,14 +52,13 @@ function ChatInputContent({
         {contextPreview ? (
           <div className={styles.contextAttachment}>
             <span className={styles.contextAttachmentPreview}>{contextPreview}</span>
-            <button
-              type="button"
+            <AppIconButton
+              icon={<X size={14} aria-hidden="true" />}
+              label="移除上下文"
+              size="sm"
               className={styles.contextAttachmentClear}
-              aria-label="移除上下文"
-              onClick={onClearContext}
-            >
-              <X size={14} />
-            </button>
+              onPress={onClearContext}
+            />
           </div>
         ) : null}
 

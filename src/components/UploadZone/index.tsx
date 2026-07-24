@@ -173,7 +173,7 @@ function UploadZone({
                 <AttachmentActions>
                   <AttachmentAction
                     isDisabled={disabled}
-                    aria-label="移除文件"
+                    label="移除文件"
                     onPress={() => removeFileAt(index)}
                   >
                     <X size={16} strokeWidth={1.8} />

@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import EntryIcon from '@/components/Icons/EntryIcon';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -37,18 +38,17 @@ function FolderTableNameCell<T extends FolderTableRow>({
   return (
     <div className={styles.nameCell} data-depth={depth} data-name-column="true">
       {expandable ? (
-        <button
-          type="button"
+        <AppIconButton
+          icon={expanded ? <ChevronDown aria-hidden /> : <ChevronRight aria-hidden />}
+          label={expanded ? t('aria.collapse') : t('aria.expand')}
+          size="sm"
           className={styles.expandBtn}
-          aria-label={expanded ? t('aria.collapse') : t('aria.expand')}
           aria-expanded={expanded}
           onClick={(event) => {
             event.stopPropagation();
             onToggleExpand?.();
           }}
-        >
-          {expanded ? <ChevronDown aria-hidden /> : <ChevronRight aria-hidden />}
-        </button>
+        />
       ) : (
         <span className={styles.expandPlaceholder} aria-hidden />
       )}

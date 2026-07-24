@@ -3,14 +3,17 @@ import type { DriveNode } from '@/domains/Drive';
 import type { ReactNode } from 'react';
 import type { DriveItemKind } from './driveComponentModel';
 
-interface BuildDriveTreeDataOptions {
-  renderableTypes: Set<DriveItemKind>;
+interface DriveNodeSelectionOptions {
   selectableTypes: Set<DriveItemKind>;
   disabledNodeIds: Set<string>;
-  getTreeKey: (node: DriveNode) => string;
-  renderTitle: (node: DriveNode) => ReactNode;
   isNodeSelectable?: (node: DriveNode) => boolean;
   isNodeDisabled?: (node: DriveNode) => boolean;
+}
+
+interface BuildDriveTreeDataOptions extends DriveNodeSelectionOptions {
+  renderableTypes: Set<DriveItemKind>;
+  getTreeKey: (node: DriveNode) => string;
+  renderTitle: (node: DriveNode) => ReactNode;
 }
 
 export function buildDriveTreeData(
@@ -45,20 +48,24 @@ export function replaceDriveTreeNodeChildren(
   });
 }
 
-function resolveNodeState(node: DriveNode, options: BuildDriveTreeDataOptions) {
-  if (node.type === 'loading') {
-    return {
-      disabled: false,
-      selectable: false,
-    };
-  }
+export function isDriveNodeSelectable(
+  node: DriveNode,
+  options: DriveNodeSelectionOptions
+): boolean {
+  return (
+    node.type !== 'loading' &&
+    !options.disabledNodeIds.has(node.id) &&
+    options.isNodeDisabled?.(node) !== true &&
+    options.selectableTypes.has(node.type) &&
+    (options.isNodeSelectable?.(node) ?? true)
+  );
+}
 
-  const disabled = options.disabledNodeIds.has(node.id) || options.isNodeDisabled?.(node) === true;
-  const selectable =
-    options.selectableTypes.has(node.type) && (options.isNodeSelectable?.(node) ?? true);
+function resolveNodeState(node: DriveNode, options: BuildDriveTreeDataOptions) {
+  const selectable = isDriveNodeSelectable(node, options);
 
   return {
-    disabled,
+    disabled: !selectable,
     selectable,
   };
 }
@@ -74,21 +81,22 @@ function toTreeDataNode(
     return {
       key,
       title,
+      disabled: true,
       selectable: false,
       checkable: false,
       isLeaf: true,
     };
   }
 
-  const { disabled, selectable } = resolveNodeState(node, options);
+  const { selectable } = resolveNodeState(node, options);
 
   if (node.type === 'root' || node.type === 'folder') {
     return {
       key,
       title,
-      selectable: selectable && !disabled,
+      selectable,
       checkable: false,
-      disabled,
+      disabled: !selectable,
       isLeaf: false,
     };
   }
@@ -96,9 +104,9 @@ function toTreeDataNode(
   return {
     key,
     title,
-    selectable: selectable && !disabled,
+    selectable,
     checkable: false,
-    disabled,
+    disabled: !selectable,
     isLeaf: true,
   };
 }

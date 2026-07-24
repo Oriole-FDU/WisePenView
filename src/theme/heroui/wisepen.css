@@ -17,6 +17,9 @@
     --ring-offset-width: 2px;
     --cursor-interactive: pointer;
     --cursor-disabled: not-allowed;
+    /* 延迟显示 Tooltip，减少鼠标经过密集工具栏时的视觉干扰。 */
+    --tooltip-delay: 800ms;
+    --tooltip-close-delay: 100ms;
     /* Brand + paper/canvas anchors (neutrals derived in shared ladder) */
     --accent: #127abb;    --accent-foreground: #ffffff;
     --foreground: #111827;

@@ -5,6 +5,7 @@ import { useRequest } from 'ahooks';
 import { Check, Copy } from 'lucide-react';
 import { useId, useState } from 'react';
 
+import AppIconButton from '@/components/Button/AppIconButton';
 import SegmentedTabs from '@/components/SegmentedTabs';
 import { copyText } from '@/utils/browser/copyText';
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
@@ -67,24 +68,26 @@ function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
             size="sm"
             className={styles.tabs}
           />
-          <button
+          <AppIconButton
+            icon={
+              copied ? (
+                <Check size={14} aria-hidden="true" />
+              ) : (
+                <Copy size={14} aria-hidden="true" />
+              )
+            }
+            label={copied ? '已复制 Mermaid 源码' : '复制 Mermaid 源码'}
+            size="sm"
+            isActive={copied}
             className={styles.copyButton}
-            type="button"
-            aria-label={copied ? '已复制 Mermaid 源码' : '复制 Mermaid 源码'}
-            title={copied ? '已复制' : '复制源码'}
             data-copied={copied}
+            tooltip={{ content: copied ? '已复制' : '复制源码' }}
             onMouseDown={(event) => {
               event.preventDefault();
               event.stopPropagation();
             }}
             onClick={handleCopy}
-          >
-            {copied ? (
-              <Check size={14} aria-hidden="true" />
-            ) : (
-              <Copy size={14} aria-hidden="true" />
-            )}
-          </button>
+          />
         </div>
       </div>
       <div className={styles.content}>

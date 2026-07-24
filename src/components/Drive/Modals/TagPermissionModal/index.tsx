@@ -768,6 +768,7 @@ const TagPolicyModalBase = ({
                 selectableTypes={['folder']}
                 multiple={false}
                 refreshTrigger={tagRefreshSeed}
+                disabled={saving}
                 onChange={handleTagChange}
               />
             </div>

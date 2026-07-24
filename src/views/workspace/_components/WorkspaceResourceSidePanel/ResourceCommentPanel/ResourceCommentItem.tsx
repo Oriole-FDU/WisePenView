@@ -1,4 +1,5 @@
 import AppAvatar from '@/components/Avatar';
+import AppIconButton from '@/components/Button/AppIconButton';
 import type { ResourceComment } from '@/domains/Interact';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { Button, Tooltip } from '@heroui/react';
@@ -78,20 +79,13 @@ function ResourceCommentItem({
           <time dateTime={dateTime}>{timeText}</time>
           {!comment.deleted ? (
             <div className={styles.commentActions}>
-              <Tooltip>
-                <Tooltip.Trigger>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    isIconOnly
-                    aria-label={`回复 ${comment.author.name}`}
-                    onPress={() => onReply(comment)}
-                  >
-                    <MessageCircle size={14} aria-hidden />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content>回复</Tooltip.Content>
-              </Tooltip>
+              <AppIconButton
+                icon={<MessageCircle size={14} aria-hidden />}
+                label={`回复 ${comment.author.name}`}
+                size="sm"
+                tooltip={{ content: '回复' }}
+                onPress={() => onReply(comment)}
+              />
               <Tooltip>
                 <Tooltip.Trigger>
                   <Button
@@ -109,20 +103,13 @@ function ResourceCommentItem({
                 <Tooltip.Content>{liked ? '取消点赞' : '点赞'}</Tooltip.Content>
               </Tooltip>
               {canDelete ? (
-                <Tooltip>
-                  <Tooltip.Trigger>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      isIconOnly
-                      aria-label="删除评论"
-                      onPress={() => onDelete(comment)}
-                    >
-                      <Trash2 size={14} aria-hidden />
-                    </Button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content>删除</Tooltip.Content>
-                </Tooltip>
+                <AppIconButton
+                  icon={<Trash2 size={14} aria-hidden />}
+                  label="删除评论"
+                  size="sm"
+                  tooltip={{ content: '删除' }}
+                  onPress={() => onDelete(comment)}
+                />
               ) : null}
             </div>
           ) : null}

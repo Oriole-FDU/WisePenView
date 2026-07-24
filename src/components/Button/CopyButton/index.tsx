@@ -1,11 +1,9 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import { copyText } from '@/utils/browser/copyText';
 import { toast } from '@heroui/react';
-import clsx from 'clsx';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import type { CopyButtonProps } from './index.type';
-import styles from './style.module.less';
 
 const ICON_SIZE = 17;
 
@@ -25,9 +23,16 @@ function CopyButton({ text, label = '复制', className }: CopyButtonProps) {
 
   return (
     <AppIconButton
-      icon={copied ? <Check size={ICON_SIZE} /> : <Copy size={ICON_SIZE} />}
+      icon={
+        copied ? (
+          <Check size={ICON_SIZE} aria-hidden="true" />
+        ) : (
+          <Copy size={ICON_SIZE} aria-hidden="true" />
+        )
+      }
       label={copied ? '已复制' : label}
-      className={clsx(styles.copyButton, copied && styles.copyButtonCopied, className)}
+      isActive={copied}
+      className={className}
       onPress={() => void handleCopy()}
     />
   );

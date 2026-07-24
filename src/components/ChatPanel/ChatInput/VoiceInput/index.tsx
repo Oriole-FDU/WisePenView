@@ -1,5 +1,4 @@
-import { Button, Tooltip } from '@heroui/react';
-import clsx from 'clsx';
+import AppIconButton from '@/components/Button/AppIconButton';
 import { LoaderCircle, Mic, Square } from 'lucide-react';
 import styles from '../style.module.less';
 import type { VoiceInputProps } from './index.type';
@@ -22,29 +21,22 @@ function VoiceInput({ state, isActive, isDisabled, onPress }: VoiceInputProps) {
     state === 'finishing';
 
   return (
-    <Tooltip>
-      <Tooltip.Trigger>
-        <Button
-          variant="ghost"
-          size="sm"
-          isIconOnly
-          isDisabled={isDisabled}
-          onPress={onPress}
-          className={clsx(styles.toolbarCircleBtn, isActive && styles.voiceButtonActive)}
-          aria-label={label}
-          aria-pressed={isActive}
-        >
-          {isLoading ? (
-            <LoaderCircle size={17} className={styles.spinIcon} />
-          ) : state === 'listening' ? (
-            <Square size={14} fill="currentColor" />
-          ) : (
-            <Mic size={18} />
-          )}
-        </Button>
-      </Tooltip.Trigger>
-      <Tooltip.Content>{label}</Tooltip.Content>
-    </Tooltip>
+    <AppIconButton
+      icon={
+        isLoading ? (
+          <LoaderCircle size={17} className={styles.spinIcon} aria-hidden="true" />
+        ) : state === 'listening' ? (
+          <Square size={14} fill="currentColor" aria-hidden="true" />
+        ) : (
+          <Mic size={18} aria-hidden="true" />
+        )
+      }
+      label={label}
+      isDisabled={isDisabled}
+      isActive={isActive}
+      variant={isActive ? 'danger' : 'ghost'}
+      onPress={onPress}
+    />
   );
 }
 

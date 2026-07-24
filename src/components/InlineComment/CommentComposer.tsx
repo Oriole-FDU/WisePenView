@@ -1,7 +1,8 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { useImageService } from '@/domains';
 import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
-import { Button, TextArea, Tooltip } from '@heroui/react';
+import { TextArea } from '@heroui/react';
 import { useRequest, useUnmount } from 'ahooks';
 import { ImagePlus, Send, X } from 'lucide-react';
 import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
@@ -30,16 +31,13 @@ function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemov
   return (
     <span className={styles.pendingImage}>
       <img src={previewUrl} alt={image.file.name} />
-      <Button
-        variant="ghost"
+      <AppIconButton
+        icon={<X size={12} aria-hidden />}
+        label={`移除图片 ${image.file.name}`}
         size="sm"
-        isIconOnly
         className={styles.removeImageButton}
-        aria-label={`移除图片 ${image.file.name}`}
         onPress={onRemove}
-      >
-        <X size={12} aria-hidden />
-      </Button>
+      />
     </span>
   );
 }
@@ -148,22 +146,14 @@ function CommentComposer({ placeholder, imageUpload, onSubmit }: CommentComposer
         />
         {imageUpload !== false ? (
           <>
-            <Tooltip>
-              <Tooltip.Trigger>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  isIconOnly
-                  isDisabled={submitting}
-                  className={styles.iconButton}
-                  aria-label="添加图片"
-                  onPress={() => imageInputRef.current?.click()}
-                >
-                  <ImagePlus size={15} aria-hidden />
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>添加图片</Tooltip.Content>
-            </Tooltip>
+            <AppIconButton
+              icon={<ImagePlus size={15} aria-hidden />}
+              label="添加图片"
+              size="sm"
+              isDisabled={submitting}
+              className={styles.iconButton}
+              onPress={() => imageInputRef.current?.click()}
+            />
             <input
               ref={imageInputRef}
               className={styles.imageInput}
@@ -178,23 +168,17 @@ function CommentComposer({ placeholder, imageUpload, onSubmit }: CommentComposer
             />
           </>
         ) : null}
-        <Tooltip>
-          <Tooltip.Trigger>
-            <Button
-              variant="primary"
-              size="sm"
-              isIconOnly
-              isDisabled={!canSubmit || submitting}
-              className={styles.sendButton}
-              aria-label="发送批注"
-              aria-busy={submitting || undefined}
-              onPress={() => void submitComment()}
-            >
-              <Send size={14} aria-hidden />
-            </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Content>发送</Tooltip.Content>
-        </Tooltip>
+        <AppIconButton
+          icon={<Send size={14} aria-hidden />}
+          label="发送批注"
+          size="sm"
+          variant="primary"
+          isDisabled={!canSubmit || submitting}
+          className={styles.sendButton}
+          tooltip={{ content: '发送' }}
+          aria-busy={submitting || undefined}
+          onPress={() => void submitComment()}
+        />
       </div>
 
       {submitError ? <p className={styles.errorText}>{submitError}</p> : null}

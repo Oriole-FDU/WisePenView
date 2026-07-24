@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import AppIconButton from '@/components/Button/AppIconButton';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { joinClassNames } from '../../../shared/TableBase/cellAlign';
@@ -12,16 +12,13 @@ function TableEditErrorToast({ message, onDismiss, className }: TableEditErrorTo
     <div className={joinClassNames(styles.toast, className)} role="alert">
       <div className={styles.message}>{message}</div>
       {onDismiss ? (
-        <Button
-          variant="ghost"
+        <AppIconButton
+          icon={<X size={16} aria-hidden="true" />}
+          label={t('aria.dismissError')}
           size="sm"
-          isIconOnly
-          aria-label={t('aria.dismissError')}
           className={styles.dismissButton}
           onPress={onDismiss}
-        >
-          <X size={16} />
-        </Button>
+        />
       ) : null}
     </div>
   );

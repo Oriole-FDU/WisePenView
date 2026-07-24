@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { copyText } from '@/utils/browser/copyText';
 import { Check, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import {
@@ -276,38 +277,41 @@ export function CodeBlockToolbar({
       </div>
 
       <div className="wise-code-block-actions">
-        <button
+        <AppIconButton
+          icon={
+            collapsed ? (
+              <ChevronDown className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
+            ) : (
+              <ChevronUp className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
+            )
+          }
+          label={collapsed ? '展开代码块' : '折叠代码块'}
+          size="sm"
           className="wise-code-block-iconButton"
-          type="button"
-          aria-label={collapsed ? '展开代码块' : '折叠代码块'}
           aria-expanded={!collapsed}
           data-collapsed={collapsed}
-          title={collapsed ? '展开' : '折叠'}
+          tooltip={{ content: collapsed ? '展开' : '折叠' }}
           onMouseDown={handleButtonMouseDown}
           onClick={handleToggleCollapsed}
-        >
-          {collapsed ? (
-            <ChevronDown className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
-          ) : (
-            <ChevronUp className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
-          )}
-        </button>
+        />
 
-        <button
+        <AppIconButton
+          icon={
+            copied ? (
+              <Check className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
+            ) : (
+              <Copy className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
+            )
+          }
+          label={copied ? '已复制代码' : '复制代码'}
+          size="sm"
+          isActive={copied}
           className="wise-code-block-iconButton"
-          type="button"
-          aria-label={copied ? '已复制代码' : '复制代码'}
           data-copied={copied}
-          title={copied ? '已复制' : '复制'}
+          tooltip={{ content: copied ? '已复制' : '复制' }}
           onMouseDown={handleButtonMouseDown}
           onClick={handleCopy}
-        >
-          {copied ? (
-            <Check className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
-          ) : (
-            <Copy className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
-          )}
-        </button>
+        />
       </div>
     </div>
   );

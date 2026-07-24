@@ -1,4 +1,4 @@
-import { Button } from '@heroui/react';
+import AppIconButton from '@/components/Button/AppIconButton';
 import clsx from 'clsx';
 import { ArrowUp, Square } from 'lucide-react';
 import AgentPicker from '../AgentPicker';
@@ -45,17 +45,20 @@ function InputToolbar({
           <ModelPicker iconOnly={modelIconOnly} />
         </div>
         <VoiceInput {...voiceInputProps} />
-        <Button
+        <AppIconButton
+          icon={
+            sending ? (
+              <Square size={14} fill="currentColor" aria-hidden="true" />
+            ) : (
+              <ArrowUp size={18} aria-hidden="true" />
+            )
+          }
+          label={sending ? '停止生成' : '发送消息'}
           variant={sending ? 'ghost' : 'primary'}
-          size="sm"
-          isIconOnly
           onPress={handlePrimaryAction}
           isDisabled={sending ? !onStop : sendDisabled}
-          className={clsx(styles.toolbarCircleBtn, sending && styles.stopButtonActive)}
-          aria-label={sending ? '停止生成' : '发送消息'}
-        >
-          {sending ? <Square size={14} fill="currentColor" /> : <ArrowUp size={18} />}
-        </Button>
+          className={sending ? styles.stopButtonActive : undefined}
+        />
       </div>
     </div>
   );

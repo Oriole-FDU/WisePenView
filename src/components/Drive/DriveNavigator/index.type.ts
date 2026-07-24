@@ -14,6 +14,8 @@ export interface DriveNavigatorProps {
   selectableTypes?: DriveItemKind[];
   /** 资源仅作辅助展示时，每个目录最多加载的 resource/link 数量。 */
   resourcePreviewLimit?: number;
+  /** 禁用树的选择、展开和懒加载交互。 */
+  disabled?: boolean;
   disabledNodeIds?: string[];
   multiple?: boolean;
   initialSelectedIds?: string[];

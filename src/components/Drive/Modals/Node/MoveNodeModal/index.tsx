@@ -16,24 +16,32 @@ const getNodeName = (node: DriveActionTarget): string => {
   return '';
 };
 
-async function collectFolderDescendantIds(
+async function collectFolderSubtreeNodeIds(
   driveService: IDriveService,
   folderId: string,
   groupId: string | undefined,
-  visited: Set<string>
+  disabledNodeIds: Set<string>,
+  visitedFolderIds: Set<string>
 ): Promise<void> {
-  if (visited.has(folderId)) return;
-  visited.add(folderId);
+  if (visitedFolderIds.has(folderId)) return;
+  visitedFolderIds.add(folderId);
+  disabledNodeIds.add(folderId);
 
   const children = await driveService.listNodeChildren({
     nodeId: folderId,
     groupId,
-    resourceLimit: 0,
   });
+  children.forEach((child) => disabledNodeIds.add(child.id));
   const folderChildren = children.filter((child): child is FolderNode => child.type === 'folder');
   await Promise.all(
     folderChildren.map((child) =>
-      collectFolderDescendantIds(driveService, child.id, groupId, visited)
+      collectFolderSubtreeNodeIds(
+        driveService,
+        child.id,
+        groupId,
+        disabledNodeIds,
+        visitedFolderIds
+      )
     )
   );
 }
@@ -53,19 +61,26 @@ function MoveNodeModal({
   const effectiveRootId = nodes[0]?.scope.rootId ?? rootId;
   const effectiveGroupId = groupId ?? (nodes[0] ? getDriveScopeGroupId(nodes[0].scope) : undefined);
 
-  const { data: blockedIds } = useRequest(
+  const { data: descendantNodeIds } = useRequest(
     async (): Promise<Set<string>> => {
-      const blocked = new Set(nodes.map((node) => node.id));
+      const descendantIds = new Set<string>();
+      const visitedFolderIds = new Set<string>();
       await Promise.all(
         nodes
           .filter(
             (node): node is Extract<DriveActionTarget, { type: 'folder' }> => node.type === 'folder'
           )
           .map((node) =>
-            collectFolderDescendantIds(driveService, node.id, effectiveGroupId, blocked)
+            collectFolderSubtreeNodeIds(
+              driveService,
+              node.id,
+              effectiveGroupId,
+              descendantIds,
+              visitedFolderIds
+            )
           )
       );
-      return blocked;
+      return descendantIds;
     },
     {
       ready: isOpen && nodes.length > 0,
@@ -79,9 +94,11 @@ function MoveNodeModal({
     }
   );
 
-  const finalBlockedIds = useMemo(() => blockedIds ?? new Set<string>(), [blockedIds]);
   const disabledTargetIds = useMemo(() => {
-    const next = new Set(finalBlockedIds);
+    const next = new Set(nodes.map((node) => node.id));
+    for (const nodeId of descendantNodeIds ?? []) {
+      next.add(nodeId);
+    }
     if (
       effectiveGroupId &&
       nodes.some((node) => node.type === 'resource' || node.type === 'link')
@@ -89,7 +106,7 @@ function MoveNodeModal({
       next.add(effectiveRootId);
     }
     return next;
-  }, [effectiveGroupId, effectiveRootId, finalBlockedIds, nodes]);
+  }, [descendantNodeIds, effectiveGroupId, effectiveRootId, nodes]);
 
   const { loading: moving, run: runMove } = useRequest(
     async () => {
@@ -165,6 +182,7 @@ function MoveNodeModal({
             groupId={effectiveGroupId}
             selectableTypes={['root', 'folder']}
             disabledNodeIds={[...disabledTargetIds]}
+            disabled={moving}
             onChange={(selected) => {
               const targetFolder = selected.find(
                 (item) => item.kind === 'root' || item.kind === 'folder'

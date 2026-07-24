@@ -1,9 +1,14 @@
+@import '@/styles/scrollbar.module.less';
+
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  min-width: 0;
   min-height: 80px;
-  padding: var(--space-xs);
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  .appSubtleScrollbar();
 }
 
 .stateBlock {
@@ -15,32 +20,23 @@
 }
 
 .tree {
+  width: max-content;
+  min-width: 100%;
   gap: 2px;
+  padding: var(--space-xs) var(--space-sm);
   color: var(--foreground);
   font-size: var(--font-size-base);
 
   :global(.wisepen-tree__item) {
-    min-height: 30px;
-    padding: 1px 4px;
-    color: var(--muted);
-    border-radius: var(--radius-md, 6px);
+    width: max-content;
+    min-width: 100%;
+    min-height: 32px;
+    padding: 2px var(--space-xs);
     box-sizing: border-box;
-    transition:
-      color 0.16s ease,
-      background-color 0.16s ease;
-
-    &[data-selectable='true'] {
-      &:hover,
-      &:focus-within {
-        color: var(--foreground);
-        background: var(--surface-tertiary);
-      }
-    }
   }
 
-  :global(.wisepen-tree__item[aria-selected='true']) {
-    color: var(--accent);
-    background: var(--accent-soft);
+  :global(.wisepen-tree__item[data-selectable='true']) {
+    color: var(--foreground);
   }
 
   :global(.wisepen-tree__item[aria-disabled='true']) {
@@ -59,29 +55,38 @@
 
   :global(.wisepen-tree__content) {
     min-height: 28px;
-    padding: 0 6px;
-    color: inherit;
-    background: transparent !important;
-    border-radius: 0;
+    padding: 0 var(--space-xs);
+  }
 
-    &:hover {
-      color: inherit;
-      background: transparent !important;
+  :global(.wisepen-tree__item[aria-selected='true'] .wisepen-tree__content) {
+    color: var(--accent);
+    background: var(--accent-softer);
+  }
+
+  :global(.wisepen-tree__item[aria-disabled='true'] .wisepen-tree__content) {
+    color: inherit;
+    background: transparent;
+  }
+
+  @media (hover: hover) {
+    :global(.wisepen-tree__item[aria-selected='true'] .wisepen-tree__content:hover) {
+      color: var(--accent);
+      background: var(--accent-soft);
     }
   }
 
   :global(.wisepen-tree__title) {
-    line-height: 22px;
-    width: 100%;
-    min-width: 0;
+    width: max-content;
+    min-width: 100%;
+    line-height: 24px;
   }
 }
 
 .nodeTitle {
   display: inline-flex;
   align-items: center;
-  max-width: 100%;
-  min-width: 0;
+  width: max-content;
+  min-width: 100%;
   gap: var(--space-2xs);
 }
 
@@ -96,8 +101,5 @@
 }
 
 .nodeLabel {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }

@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Checkbox } from '@/components/Input';
 import { useEffectForce } from '@/hooks/useEffectForce';
 import clsx from 'clsx';
@@ -44,6 +45,7 @@ type TreeDropInfo = TreeAllowDropInfo;
 export interface TreeProps {
   treeData?: DataNode[];
   className?: string;
+  disabled?: boolean;
   blockNode?: boolean;
   checkable?: boolean;
   selectable?: boolean;
@@ -136,6 +138,7 @@ function buildNextKeys(keys: string[], key: string, enabled: boolean): string[] 
 function Tree({
   treeData = [],
   className,
+  disabled = false,
   blockNode,
   checkable = false,
   selectable = true,
@@ -206,6 +209,7 @@ function Tree({
     async (node: DataNode) => {
       const key = String(node.key);
       if (
+        disabled ||
         !loadData ||
         loadingKeySet.has(key) ||
         node.isLeaf === true ||
@@ -220,22 +224,23 @@ function Tree({
         setLoadingKeys((prev) => prev.filter((item) => item !== key));
       }
     },
-    [loadData, loadingKeySet]
+    [disabled, loadData, loadingKeySet]
   );
 
   const toggleExpand = useCallback(
     (node: DataNode, expanded: boolean) => {
+      if (disabled) return;
       const key = String(node.key);
       const nextKeys = buildNextKeys(finalExpandedKeys, key, expanded);
       emitExpandedKeys(nextKeys, { node, expanded });
       if (expanded) void runLoadData(node);
     },
-    [emitExpandedKeys, finalExpandedKeys, runLoadData]
+    [disabled, emitExpandedKeys, finalExpandedKeys, runLoadData]
   );
 
   const toggleSelect = useCallback(
     (node: DataNode) => {
-      if (node.disabled || node.selectable === false || !selectable) return;
+      if (disabled || node.disabled || node.selectable === false || !selectable) return;
 
       const key = String(node.key);
       const selected = !selectedKeySet.has(key);
@@ -248,12 +253,12 @@ function Tree({
       if (!selectedKeys) setInternalSelectedKeys(nextKeys);
       onSelect?.(nextKeys, { node, selected });
     },
-    [finalSelectedKeys, multiple, onSelect, selectable, selectedKeySet, selectedKeys]
+    [disabled, finalSelectedKeys, multiple, onSelect, selectable, selectedKeySet, selectedKeys]
   );
 
   const toggleCheck = useCallback(
     (node: DataNode) => {
-      if (node.disabled || node.checkable === false) return;
+      if (disabled || node.disabled || node.checkable === false) return;
 
       const key = String(node.key);
       const checked = !checkedKeySet.has(key);
@@ -262,7 +267,7 @@ function Tree({
       if (!checkedKeys) setInternalCheckedKeys(nextKeys);
       onCheck?.(nextKeys, { node, checked });
     },
-    [checkedKeySet, checkedKeys, finalCheckedKeys, onCheck]
+    [checkedKeySet, checkedKeys, disabled, finalCheckedKeys, onCheck]
   );
 
   const renderSwitcherIcon = (loading: boolean): ReactNode => {
@@ -272,11 +277,11 @@ function Tree({
 
   const canDragNode = useCallback(
     (node: DataNode): boolean => {
-      if (node.disabled || node.draggable === false) return false;
+      if (disabled || node.disabled || node.draggable === false) return false;
       if (typeof draggable === 'function') return draggable(node);
       return Boolean(draggable);
     },
-    [draggable]
+    [disabled, draggable]
   );
 
   const resolveDropPosition = (
@@ -297,10 +302,11 @@ function Tree({
 
   const canDropNode = useCallback(
     (dragNode: DataNode, dropNode: DataNode, dropPosition: TreeDropPosition): boolean => {
+      if (disabled) return false;
       if (String(dragNode.key) === String(dropNode.key)) return false;
       return allowDrop?.({ dragNode, dropNode, dropPosition }) ?? true;
     },
-    [allowDrop]
+    [allowDrop, disabled]
   );
 
   return (
@@ -313,15 +319,17 @@ function Tree({
         className
       )}
       role="tree"
+      aria-disabled={disabled || undefined}
     >
       {flatNodes.map(({ node, level, key, expanded, expandable }) => {
         const checked = checkedKeySet.has(key);
         const selected = selectedKeySet.has(key);
         const loading = loadingKeySet.has(key);
+        const nodeDisabled = disabled || node.disabled;
         const showCheckbox = checkable && node.checkable !== false;
-        const canCheck = showCheckbox && !node.disabled;
-        const canSelect = selectable && node.selectable !== false && !node.disabled;
-        const clickExpands = expandAction === 'click' && expandable;
+        const canCheck = showCheckbox && !nodeDisabled;
+        const canSelect = selectable && node.selectable !== false && !nodeDisabled;
+        const clickExpands = !disabled && expandAction === 'click' && expandable;
 
         return (
           <div
@@ -331,7 +339,7 @@ function Tree({
               'file-tree-item',
               'wisepen-tree__item',
               selected && styles.selected,
-              node.disabled && styles.disabled,
+              nodeDisabled && styles.disabled,
               draggingKey === key && styles.dragging,
               dropTarget?.key === key && dropTarget.position === 'before' && styles.dropBefore,
               dropTarget?.key === key && dropTarget.position === 'inside' && styles.dropInside,
@@ -342,7 +350,7 @@ function Tree({
             data-selectable={canSelect}
             aria-expanded={expandable ? expanded : undefined}
             aria-selected={canSelect ? selected : undefined}
-            aria-disabled={node.disabled || undefined}
+            aria-disabled={nodeDisabled || undefined}
             style={{ '--tree-node-level': level } as CSSProperties}
             onDragStart={(event) => {
               if (!canDragNode(node)) {
@@ -382,18 +390,18 @@ function Tree({
             <div className={styles.indent} aria-hidden />
 
             {expandable ? (
-              <button
-                type="button"
+              <AppIconButton
+                icon={<span className={styles.switcherIcon}>{renderSwitcherIcon(loading)}</span>}
+                label={expanded ? '收起节点' : '展开节点'}
+                size="sm"
                 className={clsx(styles.switcher, 'wisepen-tree__switcher')}
                 data-expanded={expanded}
-                aria-label={expanded ? '收起节点' : '展开节点'}
+                isDisabled={disabled}
                 onClick={(event) => {
                   event.stopPropagation();
                   toggleExpand(node, !expanded);
                 }}
-              >
-                <span className={styles.switcherIcon}>{renderSwitcherIcon(loading)}</span>
-              </button>
+              />
             ) : (
               <span
                 className={clsx(styles.switcherPlaceholder, 'wisepen-tree__switcher-placeholder')}

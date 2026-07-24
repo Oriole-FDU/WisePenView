@@ -1,8 +1,8 @@
 import { Popover } from '@/components/Overlay';
-import { Tooltip } from '@heroui/react';
 import { CloudUpload, FileInput, FolderPlus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 
+import AppIconButton from '@/components/Button/AppIconButton';
 import { ROOT_DISPLAY } from '@/components/Drive/common/constants';
 import type { DriveActionTarget } from '@/components/Drive/common/driveComponentModel';
 import EntryIcon from '@/components/Icons/EntryIcon';
@@ -90,20 +90,14 @@ function SidebarDriveNodeTitle({
         >
           {canCreateFolder ? (
             <Popover isOpen={createMenuOpen} onOpenChange={setCreateMenuOpen}>
-              <Tooltip>
-                <Tooltip.Trigger>
-                  <Popover.Trigger>
-                    <button
-                      type="button"
-                      className={styles.nodeActionBtn}
-                      aria-label={`在${label}中新建`}
-                    >
-                      <Plus size={14} aria-hidden="true" />
-                    </button>
-                  </Popover.Trigger>
-                </Tooltip.Trigger>
-                <Tooltip.Content>新建</Tooltip.Content>
-              </Tooltip>
+              <AppIconButton
+                icon={<Plus size={14} aria-hidden="true" />}
+                label={`在${label}中新建`}
+                size="sm"
+                className={styles.nodeActionBtn}
+                tooltip={{ content: '新建' }}
+                overlayTrigger={<Popover.Trigger />}
+              />
               <Popover.Content className={styles.createPopover} placement="right">
                 <Popover.Dialog>
                   <div
@@ -194,34 +188,24 @@ function SidebarDriveNodeTitle({
             </Popover>
           ) : null}
           {canRename ? (
-            <Tooltip>
-              <Tooltip.Trigger>
-                <button
-                  type="button"
-                  className={styles.nodeActionBtn}
-                  aria-label={`重命名${label}`}
-                  onClick={() => onRenameNode(node)}
-                >
-                  <Pencil size={14} aria-hidden="true" />
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>重命名</Tooltip.Content>
-            </Tooltip>
+            <AppIconButton
+              icon={<Pencil size={14} aria-hidden="true" />}
+              label={`重命名${label}`}
+              size="sm"
+              className={styles.nodeActionBtn}
+              tooltip={{ content: '重命名' }}
+              onClick={() => onRenameNode(node)}
+            />
           ) : null}
           {canDelete ? (
-            <Tooltip>
-              <Tooltip.Trigger>
-                <button
-                  type="button"
-                  className={styles.nodeActionBtn}
-                  aria-label={`删除${label}`}
-                  onClick={() => onDeleteNode(node)}
-                >
-                  <Trash2 size={14} aria-hidden="true" />
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>删除</Tooltip.Content>
-            </Tooltip>
+            <AppIconButton
+              icon={<Trash2 size={14} aria-hidden="true" />}
+              label={`删除${label}`}
+              size="sm"
+              className={styles.nodeActionBtn}
+              tooltip={{ content: '删除' }}
+              onClick={() => onDeleteNode(node)}
+            />
           ) : null}
           {node.type === 'root' ? scopeSwitcher : null}
         </span>

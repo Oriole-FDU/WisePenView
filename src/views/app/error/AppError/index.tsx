@@ -2,12 +2,13 @@ import { Copy } from 'lucide-react';
 import { useState } from 'react';
 import { isRouteErrorResponse, useLocation, useNavigate, useRouteError } from 'react-router-dom';
 
+import AppIconButton from '@/components/Button/AppIconButton';
 import { ResultState } from '@/components/Feedback';
 import LandingNavbar from '@/layouts/Home/_components/LandingNavbar';
 import { copyText } from '@/utils/browser/copyText';
 import { getErrorReportId } from '@/utils/error';
 import ResourceNotFound from '@/views/app/error/ResourceNotFound';
-import { Button, toast, Tooltip } from '@heroui/react';
+import { Button, toast } from '@heroui/react';
 import { buildAppErrorInfo } from '../errorInfo';
 import { buildErrorDetail } from './errorDetail';
 import styles from './style.module.less';
@@ -70,21 +71,13 @@ function AppError() {
               >
                 查看错误详情
               </button>
-              <Tooltip>
-                <Tooltip.Trigger>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    isIconOnly
-                    aria-label="复制错误详情"
-                    onPress={handleCopyDetail}
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <Copy />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content>复制错误详情</Tooltip.Content>
-              </Tooltip>
+              <AppIconButton
+                icon={<Copy aria-hidden="true" />}
+                label="复制错误详情"
+                size="sm"
+                onPress={() => void handleCopyDetail()}
+                onClick={(event) => event.stopPropagation()}
+              />
             </div>
             {detailOpen ? (
               <div className={styles.errorDetailPanel}>

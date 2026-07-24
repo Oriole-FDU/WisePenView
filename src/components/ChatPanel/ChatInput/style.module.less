@@ -152,23 +152,6 @@
   margin-left: auto;
 }
 
-.toolbarCircleBtn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  padding: 0 !important;
-  line-height: 1;
-}
-
-.voiceButtonActive {
-  color: var(--danger);
-  background: var(--danger-soft);
-}
-
 .stopButtonActive {
   color: var(--accent);
   background: var(--accent-soft);
@@ -349,17 +332,14 @@
 }
 
 .modelSelectorShell {
+  flex: 0 1 180px;
   min-width: 0;
   max-width: 180px;
-  /* fullWidth：模型选择与录音按钮拉开一点 */
-  margin-inline-end: var(--space-sm);
 }
 
 .modelSelectorShellIcon {
+  flex: 0 0 auto;
   max-width: none;
-  flex-shrink: 0;
-  /* panel 图标模式：与左侧圆形按钮间距一致，不再额外加边距 */
-  margin-inline-end: 0;
 }
 
 .modelTrigger {

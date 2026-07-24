@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { InputGroup } from '@/components/Input';
 import { Modal } from '@/components/Overlay';
 import { Kbd, TextField } from '@heroui/react';
@@ -60,14 +61,13 @@ function SearchModal({ isOpen, onOpenChange, scope }: SearchModalProps) {
                     />
                     {rawKeyword ? (
                       <InputGroup.Suffix>
-                        <button
-                          type="button"
+                        <AppIconButton
+                          icon={<X size={14} aria-hidden="true" />}
+                          label="清空搜索"
+                          size="sm"
                           className={styles.clearButton}
-                          aria-label="清空搜索"
                           onClick={() => setRawKeyword('')}
-                        >
-                          <X size={14} />
-                        </button>
+                        />
                       </InputGroup.Suffix>
                     ) : null}
                   </InputGroup>

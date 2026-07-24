@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import AppModal from '@/components/Overlay/AppModal';
 import {
   Autocomplete,
@@ -92,16 +93,13 @@ export default function CapabilityPolicyPanel({
             <strong>{title}</strong>
             <span>{description}</span>
           </div>
-          <Button
-            isIconOnly
+          <AppIconButton
+            icon={<Plus size={15} aria-hidden="true" />}
+            label={addLabel}
             size="sm"
-            variant="secondary"
-            aria-label={addLabel}
             isDisabled={disabled}
             onPress={() => setIsPickerOpen(true)}
-          >
-            <Plus size={15} />
-          </Button>
+          />
         </header>
 
         <div className={styles.selectedList}>
@@ -122,16 +120,13 @@ export default function CapabilityPolicyPanel({
                     {option.description || '暂无描述'}
                   </span>
                 </span>
-                <Button
-                  isIconOnly
+                <AppIconButton
+                  icon={<Trash2 size={14} aria-hidden="true" />}
+                  label={`移除 ${option.name}`}
                   size="sm"
-                  variant="ghost"
-                  aria-label={`移除 ${option.name}`}
                   isDisabled={disabled}
                   onPress={() => remove(option.id)}
-                >
-                  <Trash2 size={14} />
-                </Button>
+                />
               </div>
             ))
           )}

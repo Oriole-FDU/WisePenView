@@ -1,3 +1,4 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
 import {
   applyBlockTypeToBlocks,
@@ -6,9 +7,9 @@ import {
   type BlockTypeMenuItem,
 } from '@/components/Note/CustomBlockNote/ui/editorMenus/blockTypes';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { Button, Dropdown } from '@heroui/react';
+import { Dropdown } from '@heroui/react';
 import clsx from 'clsx';
-import { Check, ChevronDown, Heading } from 'lucide-react';
+import { Check, Heading } from 'lucide-react';
 import styles from '../style.module.less';
 import { getSelectedBlocks, stopToolbarMouseDown } from '../utils';
 import type { ButtonGroupChildProps } from './ToolbarButton';
@@ -34,7 +35,7 @@ function BlockTypeDropdownItem({
   );
 }
 
-export function BlockTypeMenu(buttonGroupProps: ButtonGroupChildProps) {
+export function BlockTypeMenu(_buttonGroupProps: ButtonGroupChildProps) {
   const editor = useBlockNoteEditor(blockNoteSchema);
   const state = useEditorState({
     editor,
@@ -72,21 +73,13 @@ export function BlockTypeMenu(buttonGroupProps: ButtonGroupChildProps) {
 
   return (
     <Dropdown>
-      <Dropdown.Trigger>
-        <Button
-          {...buttonGroupProps}
-          variant="ghost"
-          size="sm"
-          className={styles.blockTypeTrigger}
-          onMouseDown={stopToolbarMouseDown}
-          aria-label="块类型"
-        >
-          <span className={styles.blockTypeTriggerIcon}>
-            <SelectedIcon size={20} aria-hidden="true" />
-          </span>
-          <ChevronDown size={16} aria-hidden="true" />
-        </Button>
-      </Dropdown.Trigger>
+      <AppIconButton
+        icon={<SelectedIcon size={20} aria-hidden="true" />}
+        label="块类型"
+        size="sm"
+        overlayTrigger={<Dropdown.Trigger />}
+        onMouseDown={stopToolbarMouseDown}
+      />
       <Dropdown.Popover className={styles.blockTypeMenuPopover} placement="bottom start">
         <Dropdown.Menu
           aria-label="块类型"

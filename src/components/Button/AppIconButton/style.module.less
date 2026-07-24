@@ -1,11 +1,9 @@
 .root {
-  width: 32px;
-  height: 32px;
   flex-shrink: 0;
   margin: 0;
   padding: 0;
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: transparent;
   color: var(--muted);
   cursor: pointer;
@@ -16,7 +14,7 @@
     color 0.2s ease,
     background-color 0.2s ease;
 
-  &:hover {
+  &:hover:not([aria-disabled='true']) {
     color: var(--foreground);
     background: var(--surface-tertiary);
   }
@@ -33,7 +31,62 @@
   }
 }
 
+.sm {
+  width: 28px;
+  height: 28px;
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+}
+
+.primary {
+  color: var(--primary-foreground);
+  background: var(--primary);
+
+  &:hover:not([aria-disabled='true']) {
+    color: var(--primary-foreground);
+    background: var(--primary-hover);
+  }
+}
+
+.danger {
+  color: var(--danger);
+  background: transparent;
+
+  &:hover:not([aria-disabled='true']) {
+    color: var(--danger);
+    background: var(--danger-soft);
+  }
+}
+
 .active {
   color: var(--accent);
   background: var(--accent-soft);
+
+  &:hover:not([aria-disabled='true']) {
+    color: var(--accent);
+    background: var(--accent-soft-hover);
+  }
+}
+
+.danger.active {
+  color: var(--danger);
+  background: var(--danger-soft);
+
+  &:hover:not([aria-disabled='true']) {
+    color: var(--danger);
+    background: var(--danger-soft-hover);
+  }
+}
+
+.root[data-selected] {
+  color: var(--accent);
+  background: var(--accent-soft);
+
+  &:hover:not([data-disabled]) {
+    color: var(--accent);
+    background: var(--accent-soft-hover);
+  }
 }

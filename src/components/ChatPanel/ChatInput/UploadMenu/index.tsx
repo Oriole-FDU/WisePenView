@@ -1,5 +1,6 @@
+import AppIconButton from '@/components/Button/AppIconButton';
 import { Popover } from '@/components/Overlay';
-import { Button, ListBox, ListBoxItem } from '@heroui/react';
+import { ListBox, ListBoxItem } from '@heroui/react';
 import { Cloud, Plus, Upload } from 'lucide-react';
 import type { Key } from 'react';
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
@@ -25,17 +26,11 @@ function UploadMenu() {
 
   return (
     <Popover isOpen={open} onOpenChange={setAttachmentOpen}>
-      <Popover.Trigger title="上传附件">
-        <Button
-          variant="ghost"
-          size="sm"
-          isIconOnly
-          className={styles.toolbarCircleBtn}
-          aria-label="上传附件"
-        >
-          <Plus size={18} />
-        </Button>
-      </Popover.Trigger>
+      <AppIconButton
+        icon={<Plus size={18} aria-hidden="true" />}
+        label="上传附件"
+        overlayTrigger={<Popover.Trigger />}
+      />
       <Popover.Content className={styles.toolbarPopover} placement="top">
         <Popover.Dialog>
           <div className={styles.popoverPanel}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@heroui/react';
+import AppIconButton from '@/components/Button/AppIconButton';
 import clsx from 'clsx';
 import * as React from 'react';
 import styles from './attachment.module.less';
@@ -97,18 +97,16 @@ function AttachmentActions({ className, ...props }: React.ComponentProps<'div'>)
 }
 
 function AttachmentAction({
+  children,
   className,
-  variant = 'ghost',
   size = 'sm',
-  isIconOnly = true,
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: Omit<React.ComponentProps<typeof AppIconButton>, 'icon'> & { children: React.ReactNode }) {
   return (
-    <Button
+    <AppIconButton
+      icon={children}
       data-slot="attachment-action"
-      variant={variant}
       size={size}
-      isIconOnly={isIconOnly}
       className={clsx(styles.action, className)}
       {...props}
     />

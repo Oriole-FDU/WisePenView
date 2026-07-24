@@ -1,4 +1,5 @@
 import AppAvatar from '@/components/Avatar';
+import AppIconButton from '@/components/Button/AppIconButton';
 import ResourcePermissionActionIcon from '@/components/Drive/common/resourcePermissionActionIcon';
 import {
   areResourcePermissionActionsEqualByOptions,
@@ -654,14 +655,13 @@ function ResourcePermissionPanel({
               onActionToggle={handleActionToggle}
             />
             {subject.source === 'specifiedUser' ? (
-              <Button
+              <AppIconButton
+                icon={<Trash2 size={16} aria-hidden />}
+                label="移除协作者"
                 size="sm"
                 variant="danger"
                 onPress={() => handleRemoveSpecifiedUser(subject)}
-                aria-label="移除协作者"
-              >
-                <Trash2 size={16} aria-hidden />
-              </Button>
+              />
             ) : null}
           </div>
         </div>
