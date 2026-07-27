@@ -7,6 +7,7 @@ import {
 } from '@/components/ChatPanel/ResourceChatProtocol';
 import type { ChatFrontendState } from '@/domains/Chat';
 import type { NoteSelectionSnapshot, NoteSessionStatus, SelectedNoteScope } from '@/domains/Note';
+import i18n from '@/i18n';
 import { RESOURCE_KIND, RESOURCE_VIEWER } from '@/utils/navigation/resourceTarget';
 
 const NOTE_AI_DIFF_SKILL_ID = 'builtin:wisepen-note-ai-diff';
@@ -81,10 +82,10 @@ export function createNoteChatStateProvider(params: {
     key: createResourceChatProviderKey(resource),
     getBlockedReason: () => {
       if (params.syncStatus !== 'connected') {
-        return '笔记仍在同步或已断开连接，请连接成功后再让 AI 读取当前笔记';
+        return i18n.t('ai.blockedByConnection', { ns: 'note' });
       }
       if (params.isClientContentSignaturePending) {
-        return '笔记正文同步状态正在更新，请稍后再让 AI 读取当前笔记';
+        return i18n.t('ai.blockedBySync', { ns: 'note' });
       }
       return undefined;
     },

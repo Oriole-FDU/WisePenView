@@ -8,7 +8,8 @@ import {
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
 import { buildWorkspaceResourcePath } from '@/utils/navigation/workspaceRoute';
-import { startTransition, useCallback } from 'react';
+import { useMemoizedFn } from 'ahooks';
+import { startTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export interface OpenInWorkspaceTarget {
@@ -49,39 +50,36 @@ const appendPdfPreviewProgress = (path: string, resourceId: string, viewer?: Res
 export const useOpenInWorkspace = (): OpenInWorkspaceFn => {
   const navigate = useNavigate();
 
-  return useCallback(
-    (target) => {
-      const resourceId = target.resourceId.trim();
-      if (!resourceId) return;
+  return useMemoizedFn((target) => {
+    const resourceId = target.resourceId.trim();
+    if (!resourceId) return;
 
-      const navigationStore = useWorkspaceNavigationStore.getState();
-      const driveLocation = target.driveLocation;
-      const scope = driveLocation?.scope ?? buildDriveNodeScope();
-      if (driveLocation && 'parentNodeId' in driveLocation) {
-        navigationStore.navigateToResource({
-          scope,
-          resource: {
-            resourceId,
-            parentNodeId: driveLocation.parentNodeId,
-            ...(driveLocation.nodeId ? { nodeId: driveLocation.nodeId } : {}),
-          },
-        });
-      } else {
-        navigationStore.navigateToScope(scope);
-      }
-
-      const resourceType = resolveResourceKind(target.resourceType);
-      const viewer = resolveResourceViewer({
-        resourceType: target.resourceType ?? resourceType,
-        viewer: target.viewer,
+    const navigationStore = useWorkspaceNavigationStore.getState();
+    const driveLocation = target.driveLocation;
+    const scope = driveLocation?.scope ?? buildDriveNodeScope();
+    if (driveLocation && 'parentNodeId' in driveLocation) {
+      navigationStore.navigateToResource({
+        scope,
+        resource: {
+          resourceId,
+          parentNodeId: driveLocation.parentNodeId,
+          ...(driveLocation.nodeId ? { nodeId: driveLocation.nodeId } : {}),
+        },
       });
-      const basePath = buildWorkspaceResourcePath({ resourceType, resourceId, viewer });
-      const path = appendPdfPreviewProgress(basePath, resourceId, viewer);
+    } else {
+      navigationStore.navigateToScope(scope);
+    }
 
-      startTransition(() => {
-        navigate(path, { replace: target.replace });
-      });
-    },
-    [navigate]
-  );
+    const resourceType = resolveResourceKind(target.resourceType);
+    const viewer = resolveResourceViewer({
+      resourceType: target.resourceType ?? resourceType,
+      viewer: target.viewer,
+    });
+    const basePath = buildWorkspaceResourcePath({ resourceType, resourceId, viewer });
+    const path = appendPdfPreviewProgress(basePath, resourceId, viewer);
+
+    startTransition(() => {
+      navigate(path, { replace: target.replace });
+    });
+  });
 };

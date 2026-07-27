@@ -17,7 +17,7 @@ const getSkillTreeGroupKey = (agent: ChatAgentOption | null | undefined): string
   !agent || agent.agentType === 'PERSONAL' ? 'personal' : `group-${agent.groupId ?? agent.agentId}`;
 
 const getSkillTreeGroupLabel = (agent: ChatAgentOption | null | undefined): string =>
-  !agent || agent.agentType === 'PERSONAL' ? '个人' : agent.groupName || agent.label || '小组';
+  !agent || agent.agentType === 'PERSONAL' ? '' : agent.groupName || agent.label || '';
 
 const buildCurrentAgentSkillTreeGroup = (
   agent: ChatAgentOption | null | undefined,
@@ -85,7 +85,7 @@ export const buildAdvancedSkillTreeGroups = (
   if (personalSkills.length > 0) {
     result.push({
       key: 'personal',
-      label: '个人',
+      label: '',
       skills: personalSkills,
     });
   }

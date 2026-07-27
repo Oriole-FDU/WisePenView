@@ -4,6 +4,7 @@ import type { FavoriteItem } from '@/domains/Interact';
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { useTranslation } from 'react-i18next';
 
 interface UnfavoriteResourceModalProps {
   item: FavoriteItem | undefined;
@@ -18,6 +19,7 @@ function UnfavoriteResourceModal({
   onOpenChange,
   onSuccess,
 }: UnfavoriteResourceModalProps) {
+  const { t } = useTranslation('resource');
   const interactService = useInteractService();
   const { loading, run: unfavorite } = useRequest(
     async () => {
@@ -31,7 +33,7 @@ function UnfavoriteResourceModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success('已移出收藏夹');
+        toast.success(t('favorite.resource.removeSuccess'));
         onSuccess();
         onOpenChange(false);
       },
@@ -44,9 +46,11 @@ function UnfavoriteResourceModal({
       isOpen={Boolean(item)}
       onOpenChange={onOpenChange}
       type="danger"
-      title="移出收藏夹"
-      description={`确定要将「${item?.resourceInfo?.resourceName ?? '该资源'}」移出当前收藏夹吗？`}
-      confirmText="移出"
+      title={t('favorite.resource.removeTitle')}
+      description={t('favorite.resource.removeDescription', {
+        name: item?.resourceInfo?.resourceName ?? t('favorite.resource.resourceFallback'),
+      })}
+      confirmText={t('favorite.resource.remove')}
       isConfirmLoading={loading}
       onConfirm={unfavorite}
     />

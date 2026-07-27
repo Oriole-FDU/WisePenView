@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useResourceDisplayNameStore } from '@/domains/Resource/store/useResourceDisplayNameStore';
 
 export function useResourceDisplayName(
@@ -11,8 +9,8 @@ export function useResourceDisplayName(
     resourceId != null && resourceId !== '' ? s.byResourceId[resourceId] : undefined
   );
 
-  return useMemo(() => {
+  return (() => {
     const picked = stored?.trim() || fallbackName?.trim() || '';
     return picked === '' ? emptyName : picked;
-  }, [stored, fallbackName, emptyName]);
+  })();
 }

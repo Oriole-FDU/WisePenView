@@ -64,14 +64,15 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useState, type DragEvent, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 type TextAlignment = 'left' | 'center' | 'right';
 
-const textAlignItems: Array<{ key: TextAlignment; label: string; icon: LucideIcon }> = [
-  { key: 'left', label: '左对齐', icon: AlignLeft },
-  { key: 'center', label: '居中对齐', icon: AlignCenter },
-  { key: 'right', label: '右对齐', icon: AlignRight },
+const textAlignItems: Array<{ key: TextAlignment; icon: LucideIcon }> = [
+  { key: 'left', icon: AlignLeft },
+  { key: 'center', icon: AlignCenter },
+  { key: 'right', icon: AlignRight },
 ];
 
 function isBlockEmpty(block: NoteBlock) {
@@ -166,12 +167,13 @@ function QuickBlockTypes({
   items: BlockTypeMenuItem[];
   onSelect: (item: BlockTypeMenuItem) => void;
 }) {
+  const { t } = useTranslation('note');
   if (items.length === 0) {
     return null;
   }
 
   return (
-    <div className={styles.quickTypes} role="group" aria-label="块类型">
+    <div className={styles.quickTypes} role="group" aria-label={t('editor.blockType.label')}>
       {items.map((item) => {
         const Icon = item.icon;
         const selected = blockMatchesBlockTypeItem(block, item);
@@ -192,6 +194,7 @@ function QuickBlockTypes({
 }
 
 function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
   const sideMenu = useExtension(SideMenuExtension, { editor });
   const suggestionMenu = useExtension(SuggestionMenu, { editor });
@@ -210,7 +213,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
   const { allItems, quickItems } = getAvailableBlockTypeItems(editor);
   const slashInsertItems = sortSuggestionItemsForDisplay(
     getNoteSlashMenuItems(editor, plugins, NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET).filter(
-      (item) => resolveSlashMenuGroup(item) !== 'AI'
+      (item) => resolveSlashMenuGroup(item) !== 'ai'
     )
   );
   const selectedBlockType = allItems.find((item) => blockMatchesBlockTypeItem(block, item));
@@ -376,16 +379,20 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
 
   const indentAlignMenu = (
     <Dropdown.SubmenuTrigger>
-      <Dropdown.Item id="indent-align" textValue="缩进和对齐" className={styles.menuItem}>
+      <Dropdown.Item
+        id="indent-align"
+        textValue={t('editor.indent.align')}
+        className={styles.menuItem}
+      >
         <MenuItemContent
           icon={AlignLeft}
-          label="缩进和对齐"
+          label={t('editor.indent.align')}
           trailing={<ChevronRight size={16} />}
         />
       </Dropdown.Item>
       <Dropdown.Popover className={styles.popover} placement="right top">
         <Dropdown.Menu
-          aria-label="缩进和对齐"
+          aria-label={t('editor.indent.align')}
           className={styles.menu}
           onAction={(key) => {
             const action = String(key);
@@ -400,23 +407,31 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
             }
           }}
         >
-          <Dropdown.Item id="nest" textValue="增加缩进" className={styles.menuItem}>
-            <MenuItemContent icon={IndentIncrease} label="增加缩进" />
+          <Dropdown.Item
+            id="nest"
+            textValue={t('editor.indent.increase')}
+            className={styles.menuItem}
+          >
+            <MenuItemContent icon={IndentIncrease} label={t('editor.indent.increase')} />
           </Dropdown.Item>
-          <Dropdown.Item id="unnest" textValue="减少缩进" className={styles.menuItem}>
-            <MenuItemContent icon={IndentDecrease} label="减少缩进" />
+          <Dropdown.Item
+            id="unnest"
+            textValue={t('editor.indent.decrease')}
+            className={styles.menuItem}
+          >
+            <MenuItemContent icon={IndentDecrease} label={t('editor.indent.decrease')} />
           </Dropdown.Item>
           {canUseTextAlignment
             ? textAlignItems.map((item) => (
                 <Dropdown.Item
                   key={item.key}
                   id={`align-${item.key}`}
-                  textValue={item.label}
+                  textValue={t(`editor.align.${item.key}`)}
                   className={styles.menuItem}
                 >
                   <MenuItemContent
                     icon={item.icon}
-                    label={item.label}
+                    label={t(`editor.align.${item.key}`)}
                     trailing={textAlignment === item.key ? <Check size={16} /> : null}
                   />
                 </Dropdown.Item>
@@ -430,8 +445,12 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
   const colorMenu =
     canUseColor && !isStructured ? (
       <Dropdown.SubmenuTrigger>
-        <Dropdown.Item id="colors" textValue="颜色" className={styles.menuItem}>
-          <MenuItemContent icon={Paintbrush} label="颜色" trailing={<ChevronRight size={16} />} />
+        <Dropdown.Item id="colors" textValue={t('editor.color.label')} className={styles.menuItem}>
+          <MenuItemContent
+            icon={Paintbrush}
+            label={t('editor.color.label')}
+            trailing={<ChevronRight size={16} />}
+          />
         </Dropdown.Item>
         <Dropdown.Popover className={styles.popover} placement="right top">
           <ColorPaletteContent
@@ -460,12 +479,16 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
 
   const structuredIndentMenu = (
     <Dropdown.SubmenuTrigger>
-      <Dropdown.Item id="indent" textValue="缩进" className={styles.menuItem}>
-        <MenuItemContent icon={IndentIncrease} label="缩进" trailing={<ChevronRight size={16} />} />
+      <Dropdown.Item id="indent" textValue={t('editor.indent.label')} className={styles.menuItem}>
+        <MenuItemContent
+          icon={IndentIncrease}
+          label={t('editor.indent.label')}
+          trailing={<ChevronRight size={16} />}
+        />
       </Dropdown.Item>
       <Dropdown.Popover className={styles.popover} placement="right top">
         <Dropdown.Menu
-          aria-label="缩进"
+          aria-label={t('editor.indent.label')}
           className={styles.menu}
           onAction={(key) => {
             const action = String(key);
@@ -477,11 +500,19 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
             }
           }}
         >
-          <Dropdown.Item id="nest" textValue="增加缩进" className={styles.menuItem}>
-            <MenuItemContent icon={IndentIncrease} label="增加缩进" />
+          <Dropdown.Item
+            id="nest"
+            textValue={t('editor.indent.increase')}
+            className={styles.menuItem}
+          >
+            <MenuItemContent icon={IndentIncrease} label={t('editor.indent.increase')} />
           </Dropdown.Item>
-          <Dropdown.Item id="unnest" textValue="减少缩进" className={styles.menuItem}>
-            <MenuItemContent icon={IndentDecrease} label="减少缩进" />
+          <Dropdown.Item
+            id="unnest"
+            textValue={t('editor.indent.decrease')}
+            className={styles.menuItem}
+          >
+            <MenuItemContent icon={IndentDecrease} label={t('editor.indent.decrease')} />
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown.Popover>
@@ -502,7 +533,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
       {blockIsEmpty ? (
         <AppIconButton
           icon={<Plus size={18} aria-hidden="true" />}
-          label="添加块"
+          label={t('sideMenu.addBlock')}
           size="sm"
           className={styles.sideMenuButton}
           onPress={openSlashBelow}
@@ -514,7 +545,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
             type="button"
             className={clsx(styles.sideMenuButton, styles.dragHandleButton)}
             draggable="true"
-            aria-label="块菜单"
+            aria-label={t('sideMenu.blockMenu')}
             onClick={() => {
               if (!dragging) {
                 handleOpenChange(!open);
@@ -542,7 +573,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
                   <QuickBlockTypes block={block} items={quickItems} onSelect={applyBlockType} />
                 ) : null}
                 <Dropdown.Menu
-                  aria-label="块菜单"
+                  aria-label={t('sideMenu.blockMenu')}
                   className={styles.menu}
                   onAction={(key) => {
                     const action = String(key);
@@ -570,14 +601,27 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
                   {!isStructured ? colorMenu : null}
 
                   <Dropdown.Section>
-                    <Dropdown.Item id="cut" textValue="剪切" className={styles.menuItem}>
-                      <MenuItemContent icon={Scissors} label="剪切" />
+                    <Dropdown.Item
+                      id="cut"
+                      textValue={t('sideMenu.cut')}
+                      className={styles.menuItem}
+                    >
+                      <MenuItemContent icon={Scissors} label={t('sideMenu.cut')} />
                     </Dropdown.Item>
-                    <Dropdown.Item id="copy" textValue="复制" className={styles.menuItem}>
-                      <MenuItemContent icon={Copy} label="复制" />
+                    <Dropdown.Item
+                      id="copy"
+                      textValue={t('sideMenu.copy')}
+                      className={styles.menuItem}
+                    >
+                      <MenuItemContent icon={Copy} label={t('sideMenu.copy')} />
                     </Dropdown.Item>
-                    <Dropdown.Item id="delete" textValue="删除" className={styles.menuItem}>
-                      <MenuItemContent icon={Trash2} label="删除" />
+                    <Dropdown.Item
+                      id="delete"
+                      textValue={t('sideMenu.delete')}
+                      variant="danger"
+                      className={styles.menuItem}
+                    >
+                      <MenuItemContent icon={Trash2} label={t('sideMenu.delete')} />
                     </Dropdown.Item>
                   </Dropdown.Section>
 
@@ -608,18 +652,18 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
                     <Dropdown.SubmenuTrigger>
                       <Dropdown.Item
                         id="insert-below"
-                        textValue="在下方添加"
+                        textValue={t('sideMenu.addBelow')}
                         className={styles.menuItem}
                       >
                         <MenuItemContent
                           icon={PlusSquare}
-                          label="在下方添加"
+                          label={t('sideMenu.addBelow')}
                           trailing={<ChevronRight size={16} />}
                         />
                       </Dropdown.Item>
                       <Dropdown.Popover className={styles.popover} placement="right top">
                         <Dropdown.Menu
-                          aria-label="在下方添加"
+                          aria-label={t('sideMenu.addBelow')}
                           className={styles.menu}
                           onAction={(key) => {
                             const item = slashInsertItems.find(

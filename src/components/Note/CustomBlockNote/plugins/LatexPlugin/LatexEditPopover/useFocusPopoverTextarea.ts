@@ -1,5 +1,4 @@
-import { useUpdateEffect } from 'ahooks';
-import { type RefObject } from 'react';
+import { useEffect, type RefObject } from 'react';
 
 /**
  * 浮层已算出位置后，下一帧聚焦 textarea 并将选区移到末尾（行内 / 块级公式编辑共用）。
@@ -9,7 +8,13 @@ export function useFocusPopoverTextarea(
   popoverPos: { top: number; left: number; width: number } | null,
   inputRef: RefObject<HTMLTextAreaElement | null>
 ): void {
-  useUpdateEffect(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：公式浮层完成定位且进入编辑态后，在下一帧聚焦输入框。
+   * 不可替代原因：焦点与文本选区属于浏览器 DOM 状态，只能在提交后命令式设置。
+   * cleanup：取消尚未执行的 animation frame，避免过期浮层抢占焦点。
+   */
+  useEffect(() => {
     if (!isEditing || popoverPos === null) return;
     const id = window.requestAnimationFrame(() => {
       const el = inputRef.current;

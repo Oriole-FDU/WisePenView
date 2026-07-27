@@ -1,4 +1,5 @@
 import { Button, Skeleton } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface WalletBalanceHeaderProps {
@@ -14,22 +15,24 @@ function WalletBalanceHeader({
   canRecharge,
   onRecharge,
 }: WalletBalanceHeaderProps) {
+  const { i18n, t } = useTranslation('wallet');
+  const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   return (
     <div className={styles.assetRow}>
       <div className={styles.balanceBlock}>
-        <p className={styles.balanceLabel}>计算点余额</p>
+        <p className={styles.balanceLabel}>{t('balance.label')}</p>
         {loading ? (
           <Skeleton className={styles.balanceSkeleton} />
         ) : (
           <p className={styles.balanceValue}>
-            {balance}
-            <span className={styles.unit}>计算点</span>
+            {balance.toLocaleString(locale)}
+            <span className={styles.unit}>{t('balance.unit')}</span>
           </p>
         )}
       </div>
       {canRecharge ? (
         <Button variant="primary" onPress={onRecharge}>
-          充值
+          {t('balance.recharge')}
         </Button>
       ) : null}
     </div>

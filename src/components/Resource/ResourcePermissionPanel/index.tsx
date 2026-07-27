@@ -5,8 +5,9 @@ import {
   areResourcePermissionActionsEqualByOptions,
   buildResourcePermissionActionKeySet,
   filterResourcePermissionActionsByOptions,
+  getResourcePermissionActionLabel,
 } from '@/components/Drive/common/resourcePermissionPolicy';
-import { Popover } from '@/components/Overlay';
+import { AppPopover } from '@/components/Overlay';
 import UserSearchCombobox from '@/components/UserSearchCombobox';
 import { useGroupService, useResourceService, useTagService, useUserService } from '@/domains';
 import type { GroupBaseInfo } from '@/domains/Group';
@@ -22,8 +23,10 @@ import type { UserSearchUser } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
 import { Button, Chip, ListBox, Skeleton, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import type { TFunction } from 'i18next';
 import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ResourcePermissionPanelProps } from './index.type';
 import styles from './style.module.less';
 
@@ -41,14 +44,12 @@ type SpecifiedUserCandidate = Pick<
   'userId' | 'username' | 'nickname' | 'realName' | 'avatar'
 >;
 
-const sourceLabelMap: Record<ResourcePermissionSource, string> = {
-  owner: '所有者',
-  tag: '来自标签',
-  resourceOverride: '资源覆盖',
-  specifiedUser: '指定用户',
+const sourceLabelKeyMap: Record<ResourcePermissionSource, string> = {
+  owner: 'permission.source.owner',
+  tag: 'permission.source.tag',
+  resourceOverride: 'permission.source.resourceOverride',
+  specifiedUser: 'permission.source.specifiedUser',
 };
-const TAG_INHERITED_DESCRIPTION = '继承自资源所在标签的权限';
-const RESOURCE_OVERRIDE_DESCRIPTION = '已覆盖标签策略，仅对此资源生效';
 const EMPTY_ACTION_OPTIONS: ResourcePermissionActionOption[] = [];
 const PANEL_SKELETON_ROWS = ['owner', 'tag', 'override', 'specifiedUser'] as const;
 
@@ -64,8 +65,14 @@ const getAvatarSrc = (avatar?: string): string | undefined => {
   return trimmedAvatar || undefined;
 };
 
-const getUserCandidateDisplayName = (user: SpecifiedUserCandidate): string =>
-  user.realName?.trim() || user.nickname?.trim() || user.username.trim() || `用户 ${user.userId}`;
+const getUserCandidateDisplayName = (
+  user: SpecifiedUserCandidate,
+  t: TFunction<'resource'>
+): string =>
+  user.realName?.trim() ||
+  user.nickname?.trim() ||
+  user.username.trim() ||
+  t('permission.userFallback', { userId: user.userId });
 
 const getActionLabel = (
   action: ResourcePermissionActionOption['action'],
@@ -74,16 +81,20 @@ const getActionLabel = (
 
 const formatActionSummary = (
   subject: ResourcePermissionSubject,
-  options: ResourcePermissionActionOption[]
+  options: ResourcePermissionActionOption[],
+  t: TFunction<'resource'>
 ): string => {
-  if (subject.source === 'owner') return '全部权限';
-  if (subject.source === 'tag') return '继承自标签';
+  if (subject.source === 'owner') return t('permission.summary.all');
+  if (subject.source === 'tag') return t('permission.summary.inherited');
   const actions = subject.effectiveActions;
   if (actions.length === 0) {
-    return '无权限';
+    return t('permission.summary.none');
   }
   const first = actions[0];
-  return `${getActionLabel(first, options)} 等 ${actions.length} 个权限`;
+  return t('permission.summary.multiple', {
+    first: getActionLabel(first, options),
+    count: actions.length,
+  });
 };
 
 const getSubjectActionsForDisplay = (subject: ResourcePermissionSubject) => {
@@ -124,7 +135,7 @@ const updateSubjectActions = (
         ...subject,
         id: subject.groupId ? `group:${subject.groupId}:tag` : subject.id,
         source: 'tag',
-        description: TAG_INHERITED_DESCRIPTION,
+        description: '',
         editableActions: inheritedActions,
         effectiveActions: inheritedActions,
         inheritedActions,
@@ -135,7 +146,7 @@ const updateSubjectActions = (
         ...subject,
         id: subject.groupId ? `group:${subject.groupId}:override` : `${subject.id}:override`,
         source: 'resourceOverride',
-        description: RESOURCE_OVERRIDE_DESCRIPTION,
+        description: '',
         editableActions: nextActions,
         effectiveActions: nextActions,
       };
@@ -147,12 +158,15 @@ const updateSubjectActions = (
     };
   });
 
-const createSpecifiedUserSubject = (user: SpecifiedUserCandidate): ResourcePermissionSubject => ({
+const createSpecifiedUserSubject = (
+  user: SpecifiedUserCandidate,
+  t: TFunction<'resource'>
+): ResourcePermissionSubject => ({
   id: `user:${user.userId}:specified`,
   kind: 'user',
   source: 'specifiedUser',
-  name: getUserCandidateDisplayName(user),
-  description: '由您邀请而获得的权限',
+  name: getUserCandidateDisplayName(user, t),
+  description: '',
   avatar: getAvatarSrc(user.avatar),
   userId: user.userId,
   effectiveActions: [],
@@ -161,7 +175,8 @@ const createSpecifiedUserSubject = (user: SpecifiedUserCandidate): ResourcePermi
 
 const hydrateUserDisplayInfo = (
   subjects: ResourcePermissionSubject[],
-  userInfoById: Map<string, SpecifiedUserCandidate>
+  userInfoById: Map<string, SpecifiedUserCandidate>,
+  t: TFunction<'resource'>
 ): ResourcePermissionSubject[] => {
   let changed = false;
   const nextSubjects = subjects.map((subject) => {
@@ -169,7 +184,7 @@ const hydrateUserDisplayInfo = (
     const userInfo = userInfoById.get(subject.userId);
     if (!userInfo) return subject;
 
-    const nextName = getUserCandidateDisplayName(userInfo);
+    const nextName = getUserCandidateDisplayName(userInfo, t);
     const nextAvatar = getAvatarSrc(userInfo.avatar) || getAvatarSrc(subject.avatar);
     if (subject.name === nextName && subject.avatar === nextAvatar) {
       return subject;
@@ -188,7 +203,8 @@ const hydrateUserDisplayInfo = (
 
 const hydrateGroupDisplayInfo = (
   subjects: ResourcePermissionSubject[],
-  groupInfoById: Map<string, GroupBaseInfo>
+  groupInfoById: Map<string, GroupBaseInfo>,
+  t: TFunction<'resource'>
 ): ResourcePermissionSubject[] => {
   let changed = false;
   const nextSubjects = subjects.map((subject) => {
@@ -199,7 +215,7 @@ const hydrateGroupDisplayInfo = (
     const groupName = groupInfo.groupName.trim();
     const groupDesc = groupInfo.groupDesc.trim();
     const groupCoverUrl = groupInfo.groupCoverUrl.trim();
-    const nextName = groupName ? `${groupName} 的成员` : subject.name;
+    const nextName = groupName ? t('permission.groupMembers', { groupName }) : subject.name;
     const nextDescription =
       subject.source === 'resourceOverride' && groupDesc ? groupDesc : subject.description;
     const nextAvatar = groupCoverUrl || getAvatarSrc(subject.avatar);
@@ -249,7 +265,7 @@ const hydrateInheritedTagActions = (
           ...subject,
           id: `group:${subject.groupId}:tag`,
           source: 'tag',
-          description: TAG_INHERITED_DESCRIPTION,
+          description: '',
           editableActions: normalizedInheritedActions,
           effectiveActions: normalizedInheritedActions,
           inheritedActions: normalizedInheritedActions,
@@ -260,7 +276,7 @@ const hydrateInheritedTagActions = (
     if (subject.source === 'tag') {
       return {
         ...subject,
-        description: TAG_INHERITED_DESCRIPTION,
+        description: '',
         editableActions: normalizedInheritedActions,
         effectiveActions: normalizedInheritedActions,
         inheritedActions: normalizedInheritedActions,
@@ -278,6 +294,7 @@ function SubjectPermissionPopover({
   actionOptions,
   onActionToggle,
 }: SubjectPermissionPopoverProps) {
+  const { t } = useTranslation('resource');
   const selectedActionKeys = buildResourcePermissionActionKeySet(
     getSubjectActionsForDisplay(subject),
     actionOptions
@@ -288,10 +305,10 @@ function SubjectPermissionPopover({
       size="sm"
       className={styles.permissionButton}
       isDisabled={subject.readonly || actionOptions.length === 0}
-      aria-label={`${subject.name} 的权限`}
+      aria-label={t('permission.subjectAria', { name: subject.name })}
     >
       <span className={styles.permissionTriggerText}>
-        {formatActionSummary(subject, actionOptions)}
+        {formatActionSummary(subject, actionOptions, t)}
       </span>
       {!subject.readonly && actionOptions.length > 0 ? (
         <ChevronDown size={14} aria-hidden className={styles.permissionChevron} />
@@ -304,43 +321,46 @@ function SubjectPermissionPopover({
   }
 
   return (
-    <Popover deferContent={false}>
-      <Popover.Trigger>{trigger}</Popover.Trigger>
-      <Popover.Content className={styles.permissionPopover} placement="bottom end">
-        <Popover.Dialog>
-          <ListBox
-            aria-label={`${subject.name} 的权限选项`}
-            selectionMode="multiple"
-            selectedKeys={selectedActionKeys}
-            className={styles.actionList}
-          >
-            {actionOptions.map((option) => (
-              <ListBox.Item
-                id={option.key}
-                key={option.key}
-                textValue={option.label}
-                onPress={() => onActionToggle(subject, option.action)}
-              >
-                <span className={styles.actionLabel}>
-                  <ResourcePermissionActionIcon
-                    action={option.action}
-                    className={styles.actionIcon}
-                  />
-                  <span className={styles.actionText}>{option.label}</span>
-                </span>
-                <ListBox.ItemIndicator />
-              </ListBox.Item>
-            ))}
-          </ListBox>
-        </Popover.Dialog>
-      </Popover.Content>
-    </Popover>
+    <AppPopover deferContent={false}>
+      <AppPopover.Trigger>{trigger}</AppPopover.Trigger>
+      <AppPopover.Content
+        className={styles.permissionPopover}
+        placement="bottom end"
+        bodyPadding="none"
+      >
+        <ListBox
+          aria-label={t('permission.optionsAria', { name: subject.name })}
+          selectionMode="multiple"
+          selectedKeys={selectedActionKeys}
+          className={styles.actionList}
+        >
+          {actionOptions.map((option) => (
+            <ListBox.Item
+              id={option.key}
+              key={option.key}
+              textValue={option.label}
+              onPress={() => onActionToggle(subject, option.action)}
+            >
+              <span className={styles.actionLabel}>
+                <ResourcePermissionActionIcon
+                  action={option.action}
+                  className={styles.actionIcon}
+                />
+                <span className={styles.actionText}>{option.label}</span>
+              </span>
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          ))}
+        </ListBox>
+      </AppPopover.Content>
+    </AppPopover>
   );
 }
 
 function PermissionPanelSkeleton() {
+  const { t } = useTranslation('resource');
   return (
-    <div className={styles.skeletonShell} aria-label="正在加载权限配置">
+    <div className={styles.skeletonShell} aria-label={t('permission.loadingAria')}>
       <div className={styles.skeletonList}>
         {PANEL_SKELETON_ROWS.map((row) => (
           <div key={row} className={styles.skeletonItem}>
@@ -366,6 +386,7 @@ function ResourcePermissionPanel({
   resourceType,
   onSuccess,
 }: ResourcePermissionPanelProps) {
+  const { t } = useTranslation('resource');
   const groupService = useGroupService();
   const resourceService = useResourceService();
   const tagService = useTagService();
@@ -392,7 +413,12 @@ function ResourcePermissionPanel({
     }
   );
   const subjects = subjectDrafts ?? permissionOverview?.subjects ?? [];
-  const actionOptions = permissionOverview?.actionOptions ?? EMPTY_ACTION_OPTIONS;
+  const actionOptions = (permissionOverview?.actionOptions ?? EMPTY_ACTION_OPTIONS).map(
+    (option) => ({
+      ...option,
+      label: getResourcePermissionActionLabel(option.action),
+    })
+  );
   const inheritedSubjects = subjects.filter((subject) => subject.source !== 'specifiedUser');
   const specifiedUserSubjects = subjects.filter((subject) => subject.source === 'specifiedUser');
   const existingSpecifiedUserIds = new Set(
@@ -459,14 +485,14 @@ function ResourcePermissionPanel({
 
       setSubjectDrafts((currentSubjects) => {
         const baseSubjects = currentSubjects ?? permissionOverview.subjects;
-        const nextSubjects = hydrateUserDisplayInfo(baseSubjects, userInfoById);
+        const nextSubjects = hydrateUserDisplayInfo(baseSubjects, userInfoById, t);
         latestSubjectsRef.current = nextSubjects;
         return nextSubjects;
       });
     },
     {
       ready: Boolean(permissionOverview),
-      refreshDeps: [permissionOverview, userService],
+      refreshDeps: [permissionOverview, userService, t],
     }
   );
 
@@ -494,14 +520,14 @@ function ResourcePermissionPanel({
 
       setSubjectDrafts((currentSubjects) => {
         const baseSubjects = currentSubjects ?? permissionOverview.subjects;
-        const nextSubjects = hydrateGroupDisplayInfo(baseSubjects, groupInfoById);
+        const nextSubjects = hydrateGroupDisplayInfo(baseSubjects, groupInfoById, t);
         latestSubjectsRef.current = nextSubjects;
         return nextSubjects;
       });
     },
     {
       ready: Boolean(permissionOverview),
-      refreshDeps: [permissionOverview, groupService],
+      refreshDeps: [permissionOverview, groupService, t],
     }
   );
 
@@ -592,14 +618,14 @@ function ResourcePermissionPanel({
     const currentSubjects = latestSubjectsRef.current;
     const userId = user.userId.trim();
     if (!userId) {
-      toast.warning('未找到有效用户');
+      toast.warning(t('permission.feedback.invalidUser'));
       return;
     }
     if (currentSubjects.some((subject) => subject.userId === userId)) {
-      toast.warning('该用户已在协作者列表中');
+      toast.warning(t('permission.feedback.duplicateUser'));
       return;
     }
-    const nextSubject = createSpecifiedUserSubject({ ...user, userId });
+    const nextSubject = createSpecifiedUserSubject({ ...user, userId }, t);
     const nextSubjects = [...currentSubjects, nextSubject];
     commitSubjectDrafts(nextSubjects);
     setNewUserKeyword('');
@@ -607,7 +633,9 @@ function ResourcePermissionPanel({
 
   const handleUserSearchEmpty = () => {
     const keyword = newUserKeyword.trim();
-    toast.warning(keyword ? '未找到可见用户，请输入完整用户名或邮箱' : '请输入完整用户名或邮箱');
+    toast.warning(
+      keyword ? t('permission.feedback.userNotFound') : t('permission.feedback.userRequired')
+    );
   };
 
   const handleUserSearchError = (err: unknown) => {
@@ -622,42 +650,62 @@ function ResourcePermissionPanel({
     commitSubjectDrafts(nextSubjects);
   };
 
-  const queryUserCandidates = useCallback(
-    (keyword: string) => userService.queryUserSearchCandidates({ keyword, size: 6 }),
-    [userService]
-  );
+  const queryUserCandidates = (keyword: string) =>
+    userService.queryUserSearchCandidates({ keyword, size: 6 });
 
   const renderSubjectItem = (subject: ResourcePermissionSubject) => {
     const avatarSrc = getAvatarSrc(subject.avatar);
+    const baseSubjectName =
+      subject.kind === 'owner' && !subject.name
+        ? t('permission.source.owner')
+        : subject.kind === 'user' && (!subject.name || subject.name === subject.userId)
+          ? t('permission.userFallback', { userId: subject.userId })
+          : subject.kind === 'group' && (!subject.name || subject.name === subject.groupId)
+            ? t('permission.groupFallback', { groupId: subject.groupId })
+            : subject.name;
+    const subjectName =
+      subject.kind === 'group'
+        ? t('permission.groupMembers', { groupName: baseSubjectName })
+        : baseSubjectName;
+    const displaySubject =
+      subjectName === subject.name ? subject : { ...subject, name: subjectName };
+    const description =
+      subject.source === 'owner'
+        ? t('permission.source.owner')
+        : subject.source === 'tag'
+          ? t('permission.description.inheritedFromTag')
+          : subject.source === 'specifiedUser'
+            ? t('permission.description.invitedByYou')
+            : subject.source === 'resourceOverride' && !subject.description
+              ? t('permission.description.resourceOverride')
+              : subject.description;
 
     return (
       <div key={getSubjectRenderKey(subject)} role="listitem" className={styles.subjectItem}>
         <div className={styles.subjectContent}>
-          <AppAvatar aria-label={subject.name} className={styles.avatar}>
-            {avatarSrc ? <AppAvatar.Image alt={subject.name} src={avatarSrc} /> : null}
-            <AppAvatar.Fallback>{getDisplayInitial(subject.name)}</AppAvatar.Fallback>
+          <AppAvatar aria-label={subjectName} className={styles.avatar}>
+            {avatarSrc ? <AppAvatar.Image alt={subjectName} src={avatarSrc} /> : null}
+            <AppAvatar.Fallback>{getDisplayInitial(subjectName)}</AppAvatar.Fallback>
           </AppAvatar>
           <div className={styles.subjectMeta}>
             <div className={styles.subjectNameRow}>
-              <span className={styles.subjectName}>{subject.name}</span>
+              <span className={styles.subjectName}>{subjectName}</span>
               <Chip size="sm" variant="soft" className={styles.sourceChip}>
-                <Chip.Label>{sourceLabelMap[subject.source]}</Chip.Label>
+                <Chip.Label>{t(sourceLabelKeyMap[subject.source])}</Chip.Label>
               </Chip>
             </div>
-            {subject.description ? (
-              <span className={styles.subjectDescription}>{subject.description}</span>
-            ) : null}
+            {description ? <span className={styles.subjectDescription}>{description}</span> : null}
           </div>
           <div className={styles.subjectActions}>
             <SubjectPermissionPopover
-              subject={subject}
+              subject={displaySubject}
               actionOptions={actionOptions}
               onActionToggle={handleActionToggle}
             />
             {subject.source === 'specifiedUser' ? (
               <AppIconButton
                 icon={<Trash2 size={16} aria-hidden />}
-                label="移除协作者"
+                label={t('permission.removeCollaborator')}
                 size="sm"
                 variant="danger"
                 onPress={() => handleRemoveSpecifiedUser(subject)}
@@ -678,8 +726,12 @@ function ResourcePermissionPanel({
           <div className={styles.stateText}>{parseErrorMessage(error)}</div>
         ) : permissionOverview ? (
           <div className={styles.shell}>
-            <section className={styles.subjectPane} aria-label="协作者">
-              <div className={styles.subjectList} role="list" aria-label="协作者权限来源">
+            <section className={styles.subjectPane} aria-label={t('permission.collaborator')}>
+              <div
+                className={styles.subjectList}
+                role="list"
+                aria-label={t('permission.collaboratorSources')}
+              >
                 {inheritedSubjects.map(renderSubjectItem)}
                 {shouldShowInviteDivider ? (
                   <div className={styles.inviteDivider} aria-hidden />
@@ -695,16 +747,16 @@ function ResourcePermissionPanel({
                   onError={handleUserSearchError}
                   queryUsers={queryUserCandidates}
                   excludedUserIds={existingSpecifiedUserIds}
-                  placeholder="完整用户名或邮箱"
-                  ariaLabel="协作者用户名或邮箱"
+                  placeholder={t('permission.userPlaceholder')}
+                  ariaLabel={t('permission.userInputAria')}
                   submitIcon={<UserPlus size={16} aria-hidden />}
-                  submitLabel="添加"
+                  submitLabel={t('permission.addCollaborator')}
                 />
               </div>
             </section>
           </div>
         ) : (
-          <div className={styles.stateText}>暂无权限配置</div>
+          <div className={styles.stateText}>{t('permission.empty')}</div>
         )}
       </div>
     </div>

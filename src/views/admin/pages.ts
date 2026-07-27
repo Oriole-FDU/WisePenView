@@ -1,48 +1,48 @@
 export const ADMIN_PAGE_CONFIGS = {
   users: {
     path: '/admin/users',
-    title: '用户管理',
-    subtitle: '管理用户账号、身份信息与账号状态',
+    titleKey: 'page.users.title',
+    subtitleKey: 'page.users.subtitle',
   },
   resources: {
     path: '/admin/resources',
-    title: '资源管理',
-    subtitle: '查看与维护平台内的文档、笔记和资源数据',
+    titleKey: 'page.resources.title',
+    subtitleKey: 'page.resources.subtitle',
   },
   groups: {
     path: '/admin/groups',
-    title: '小组管理',
-    subtitle: '管理小组信息、成员关系与小组运行状态',
+    titleKey: 'page.groups.title',
+    subtitleKey: 'page.groups.subtitle',
   },
   announcements: {
     path: '/admin/announcements',
-    title: '公告管理',
-    subtitle: '发布、编辑和维护面向用户的公告内容',
+    titleKey: 'page.announcements.title',
+    subtitleKey: 'page.announcements.subtitle',
   },
   statistics: {
     path: '/admin/statistics',
-    title: '数据统计',
-    subtitle: '查看业务运营数据、使用趋势与关键指标',
+    titleKey: 'page.statistics.title',
+    subtitleKey: 'page.statistics.subtitle',
   },
   permissions: {
     path: '/admin/permissions',
-    title: '权限管理',
-    subtitle: '配置后台角色、权限范围与访问控制策略',
+    titleKey: 'page.permissions.title',
+    subtitleKey: 'page.permissions.subtitle',
   },
   settings: {
     path: '/admin/settings',
-    title: '系统配置',
-    subtitle: '维护平台级配置项、开关和基础参数',
+    titleKey: 'page.settings.title',
+    subtitleKey: 'page.settings.subtitle',
   },
   logs: {
     path: '/admin/logs',
-    title: '日志审计',
-    subtitle: '查询操作日志、访问记录与审计事件',
+    titleKey: 'page.logs.title',
+    subtitleKey: 'page.logs.subtitle',
   },
   tasks: {
     path: '/admin/tasks',
-    title: '任务中心',
-    subtitle: '查看后台任务、异步作业和执行状态',
+    titleKey: 'page.tasks.title',
+    subtitleKey: 'page.tasks.subtitle',
   },
 } as const;
 

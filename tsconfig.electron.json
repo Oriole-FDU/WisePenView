@@ -15,5 +15,5 @@
     "noUncheckedSideEffectImports": true,
     "types": ["node", "electron"]
   },
-  "include": ["electron"]
+  "include": ["electron", "src/constants/layoutScale.ts"]
 }

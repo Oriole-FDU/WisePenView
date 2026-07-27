@@ -1,4 +1,5 @@
 import type { CustomBlockNoteEditor } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
+import i18n from '@/i18n';
 import { editorHasBlockWithType } from '@blocknote/core';
 import {
   Braces,
@@ -29,75 +30,90 @@ export interface BlockTypeMenuItem {
 }
 
 const primaryBlockTypeItems: BlockTypeMenuItem[] = [
-  { key: 'paragraph', label: '正文', icon: Type, type: 'paragraph' },
+  { key: 'paragraph', label: 'editor.blockType.paragraph', icon: Type, type: 'paragraph' },
   {
     key: 'heading-1',
-    label: '一级标题',
+    label: 'editor.blockType.heading1',
     icon: Heading1,
     type: 'heading',
     props: { level: 1, isToggleable: false },
   },
   {
     key: 'heading-2',
-    label: '二级标题',
+    label: 'editor.blockType.heading2',
     icon: Heading2,
     type: 'heading',
     props: { level: 2, isToggleable: false },
   },
   {
     key: 'heading-3',
-    label: '三级标题',
+    label: 'editor.blockType.heading3',
     icon: Heading3,
     type: 'heading',
     props: { level: 3, isToggleable: false },
   },
-  { key: 'numbered-list', label: '有序列表', icon: ListOrdered, type: 'numberedListItem' },
-  { key: 'bullet-list', label: '无序列表', icon: List, type: 'bulletListItem' },
-  { key: 'check-list', label: '任务', icon: CheckSquare, type: 'checkListItem' },
-  { key: 'code-block', label: '代码块', icon: Braces, type: 'codeBlock' },
-  { key: 'quote', label: '引用', icon: TextQuote, type: 'quote' },
-  { key: 'toggle-list', label: '折叠列表', icon: ListTree, type: 'toggleListItem' },
+  {
+    key: 'numbered-list',
+    label: 'editor.blockType.numberedList',
+    icon: ListOrdered,
+    type: 'numberedListItem',
+  },
+  { key: 'bullet-list', label: 'editor.blockType.bulletList', icon: List, type: 'bulletListItem' },
+  {
+    key: 'check-list',
+    label: 'editor.blockType.checkList',
+    icon: CheckSquare,
+    type: 'checkListItem',
+  },
+  { key: 'code-block', label: 'editor.blockType.codeBlock', icon: Braces, type: 'codeBlock' },
+  { key: 'quote', label: 'editor.blockType.quote', icon: TextQuote, type: 'quote' },
+  {
+    key: 'toggle-list',
+    label: 'editor.blockType.toggleList',
+    icon: ListTree,
+    type: 'toggleListItem',
+  },
 ];
 
 const moreHeadingItems: BlockTypeMenuItem[] = [
   {
     key: 'heading-4',
-    label: '四级标题',
+    label: 'editor.blockType.heading4',
     icon: Heading4,
     type: 'heading',
     props: { level: 4, isToggleable: false },
   },
   {
     key: 'heading-5',
-    label: '五级标题',
+    label: 'editor.blockType.heading5',
     icon: Heading5,
     type: 'heading',
     props: { level: 5, isToggleable: false },
   },
   {
     key: 'heading-6',
-    label: '六级标题',
+    label: 'editor.blockType.heading6',
     icon: Heading6,
     type: 'heading',
     props: { level: 6, isToggleable: false },
   },
   {
     key: 'toggle-heading-1',
-    label: '可折叠一级标题',
+    label: 'editor.blockType.toggleHeading1',
     icon: Heading1,
     type: 'heading',
     props: { level: 1, isToggleable: true },
   },
   {
     key: 'toggle-heading-2',
-    label: '可折叠二级标题',
+    label: 'editor.blockType.toggleHeading2',
     icon: Heading2,
     type: 'heading',
     props: { level: 2, isToggleable: true },
   },
   {
     key: 'toggle-heading-3',
-    label: '可折叠三级标题',
+    label: 'editor.blockType.toggleHeading3',
     icon: Heading3,
     type: 'heading',
     props: { level: 3, isToggleable: true },
@@ -145,10 +161,16 @@ export function blockMatchesBlockTypeItem(
 }
 
 export function getAvailableBlockTypeItems(editor: CustomBlockNoteEditor) {
-  const primaryItems = primaryBlockTypeItems.filter((item) =>
-    isBlockTypeItemAvailable(editor, item)
-  );
-  const headingItems = moreHeadingItems.filter((item) => isBlockTypeItemAvailable(editor, item));
+  const localizeItem = (item: BlockTypeMenuItem): BlockTypeMenuItem => ({
+    ...item,
+    label: i18n.t(item.label, { ns: 'note' }),
+  });
+  const primaryItems = primaryBlockTypeItems
+    .filter((item) => isBlockTypeItemAvailable(editor, item))
+    .map(localizeItem);
+  const headingItems = moreHeadingItems
+    .filter((item) => isBlockTypeItemAvailable(editor, item))
+    .map(localizeItem);
 
   return {
     primaryItems,

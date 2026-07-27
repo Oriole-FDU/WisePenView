@@ -4,6 +4,7 @@ import { useGroupService } from '@/domains';
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { useTranslation } from 'react-i18next';
 import type { DeleteMemberModalProps } from './index.type';
 import { useMemberEditGuard } from './useMemberEditGuard';
 
@@ -16,6 +17,7 @@ function DeleteMemberModal({
   groupId,
   groupDisplayConfig,
 }: DeleteMemberModalProps) {
+  const { t } = useTranslation('group');
   const groupService = useGroupService();
   const { loading, run: runDeleteMembers } = useRequest(
     async () =>
@@ -26,7 +28,7 @@ function DeleteMemberModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success(`已删除 ${memberIds.length} 位成员`);
+        toast.success(t('member.delete.success', { count: memberIds.length }));
         onSuccess?.();
         onOpenChange(false);
       },
@@ -42,24 +44,21 @@ function DeleteMemberModal({
     { checkOwner: true }
   );
 
-  const handleConfirm = () => {
-    runDeleteMembers();
-  };
   const description = memberContainsOwner
-    ? '选中成员中有小组创建者，不可删除！'
+    ? t('member.delete.ownerBlocked')
     : !canEdit
-      ? '您不能删除组长/管理员。'
-      : '确定要删除以下成员吗？此操作不可撤销！';
+      ? t('member.delete.unauthorized')
+      : t('member.delete.description');
 
   return (
     <AppAlertDialog
       type="danger"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="删除成员"
+      title={t('member.delete.title')}
       description={description}
-      confirmText="删除"
-      onConfirm={handleConfirm}
+      confirmText={t('member.delete.confirm')}
+      onConfirm={runDeleteMembers}
       isConfirmLoading={loading}
       isConfirmDisabled={confirmDisabled || loading}
       size="md"

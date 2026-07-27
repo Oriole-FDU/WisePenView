@@ -268,7 +268,4 @@ export const canEditSelectedMembersForQuota = (
   });
 };
 
-/** 选中有不可编辑成员时的提示文案（权限/删除） */
-export const UNAUTHORIZED_TARGET_MESSAGE = '您不能编辑组长/管理员的权限/配额。';
-
 export default GroupDisplayConfigs;

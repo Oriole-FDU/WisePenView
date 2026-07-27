@@ -6,6 +6,7 @@ import { TextArea } from '@heroui/react';
 import { useRequest, useUnmount } from 'ahooks';
 import { ImagePlus, Send, X } from 'lucide-react';
 import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import EmojiPicker from './EmojiPicker';
 import type { InlineCommentProps, InlineCommentSubmitPayload } from './index.type';
@@ -25,6 +26,7 @@ interface CommentComposerProps {
 }
 
 function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemove(): void }) {
+  const { t } = useTranslation('common');
   const [previewUrl] = useState(() => URL.createObjectURL(image.file));
   useUnmount(() => URL.revokeObjectURL(previewUrl));
 
@@ -33,7 +35,7 @@ function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemov
       <img src={previewUrl} alt={image.file.name} />
       <AppIconButton
         icon={<X size={12} aria-hidden />}
-        label={`移除图片 ${image.file.name}`}
+        label={t('inlineComment.removeImage', { name: image.file.name })}
         size="sm"
         className={styles.removeImageButton}
         onPress={onRemove}
@@ -43,6 +45,7 @@ function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemov
 }
 
 function CommentComposer({ placeholder, imageUpload, onSubmit }: CommentComposerProps) {
+  const { t } = useTranslation('common');
   const imageService = useImageService();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState('');
@@ -140,7 +143,7 @@ function CommentComposer({ placeholder, imageUpload, onSubmit }: CommentComposer
 
       <div className={styles.composerToolbar}>
         <EmojiPicker
-          label="插入表情"
+          label={t('inlineComment.insertEmoji')}
           disabled={submitting}
           onSelect={(emojiId) => setContent((currentContent) => `${currentContent}${emojiId}`)}
         />
@@ -148,7 +151,7 @@ function CommentComposer({ placeholder, imageUpload, onSubmit }: CommentComposer
           <>
             <AppIconButton
               icon={<ImagePlus size={15} aria-hidden />}
-              label="添加图片"
+              label={t('inlineComment.addImage')}
               size="sm"
               isDisabled={submitting}
               className={styles.iconButton}
@@ -170,12 +173,12 @@ function CommentComposer({ placeholder, imageUpload, onSubmit }: CommentComposer
         ) : null}
         <AppIconButton
           icon={<Send size={14} aria-hidden />}
-          label="发送批注"
+          label={t('inlineComment.sendComment')}
           size="sm"
           variant="primary"
           isDisabled={!canSubmit || submitting}
           className={styles.sendButton}
-          tooltip={{ content: '发送' }}
+          tooltip={{ content: t('inlineComment.send') }}
           aria-busy={submitting || undefined}
           onPress={() => void submitComment()}
         />

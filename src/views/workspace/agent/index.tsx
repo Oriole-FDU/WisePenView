@@ -1,4 +1,4 @@
-import { DriveCreate } from '@/components/Drive/Modals';
+import { DriveCreateModal } from '@/components/Drive/Modals';
 import { ResultState, Spin } from '@/components/Feedback';
 import { UnsavedChangesDialog } from '@/components/Overlay';
 import AppAlertDialog from '@/components/Overlay/AppAlertDialog';
@@ -17,7 +17,8 @@ import {
 import { Button, toast } from '@heroui/react';
 import { useMemoizedFn, useRequest } from 'ahooks';
 import { Save, Upload } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useBeforeUnload, useBlocker, useNavigate } from 'react-router-dom';
 import AgentSectionNav from './_components/AgentSectionNav';
 import AssetsSection from './_components/AssetsSection';
@@ -29,30 +30,23 @@ import SystemPromptSection, { type PromptMode } from './_components/SystemPrompt
 import { useAgentWorkspaceController } from './_hooks/useAgentWorkspaceController';
 import { loadAgentEditorData } from './_services/agentEditorDataService';
 import styles from './style.module.less';
-import { buildGuidedPrompt, DEFAULT_GUIDED_PROMPT_FIELDS, parseGuidedPrompt } from './systemPrompt';
+import { buildGuidedPrompt, getDefaultGuidedPromptFields, parseGuidedPrompt } from './systemPrompt';
 
 interface Props {
   resourceId?: string;
 }
-const anchors = [
-  ['agent-info', '基础信息'],
-  ['prompt', 'System Prompt'],
-  ['model', '模型配置'],
-  ['capabilities', '工具与 Skill'],
-  ['memory', '记忆策略'],
-  ['assets', '附件资源'],
+const anchorSections = [
+  ['agent-info', 'basic'],
+  ['prompt', 'prompt'],
+  ['model', 'model'],
+  ['capabilities', 'capabilities'],
+  ['memory', 'memory'],
+  ['assets', 'assets'],
 ] as const;
 const AGENT_SCROLL_CONTAINER_ID = 'agent-editor-scroll';
-const saveText = (phase: string) =>
-  phase === 'dirty'
-    ? '有未保存修改'
-    : phase === 'saving'
-      ? '保存中...'
-      : phase === 'failed'
-        ? '保存失败'
-        : '已经保存到云端';
 
 export default function AgentView({ resourceId }: Props) {
+  const { t } = useTranslation(['agent', 'common']);
   const agentService = useAgentService();
   const chatService = useChatService();
   const skillService = useSkillService();
@@ -66,6 +60,7 @@ export default function AgentView({ resourceId }: Props) {
   const [assetOverride, setAssetOverride] = useState<AgentAsset[] | null>(null);
   const [agentOverride, setAgentOverride] = useState<AgentDetail | null>(null);
   const [viewingVersion, setViewingVersion] = useState<number | null>(null);
+  const anchors = anchorSections.map(([id, key]) => [id, t(`agent:page.anchor.${key}`)] as const);
   const load = useRequest(
     async () => {
       if (!resourceId) return null;
@@ -128,7 +123,7 @@ export default function AgentView({ resourceId }: Props) {
       manual: true,
       onSuccess: () => {
         controller.markSaved();
-        toast.success('Agent 已保存');
+        toast.success(t('agent:page.saved'));
       },
       onError: (error) => {
         controller.markFailed();
@@ -145,7 +140,7 @@ export default function AgentView({ resourceId }: Props) {
     {
       manual: true,
       onSuccess: () => {
-        toast.success('Agent 已发布');
+        toast.success(t('agent:page.published'));
         load.refresh();
       },
       onError: (error) => toast.danger(parseErrorMessage(error)),
@@ -169,7 +164,7 @@ export default function AgentView({ resourceId }: Props) {
     {
       manual: true,
       onSuccess: () => {
-        toast.success('附件已上传');
+        toast.success(t('agent:page.assetUploaded'));
         void refreshAssetsOnly();
       },
       onError: (error) => toast.danger(parseErrorMessage(error)),
@@ -184,7 +179,7 @@ export default function AgentView({ resourceId }: Props) {
       manual: true,
       onSuccess: () => {
         setDeleteAssetId(null);
-        toast.success('附件已删除');
+        toast.success(t('agent:page.assetDeleted'));
         void refreshAssetsOnly();
       },
       onError: (error) => toast.danger(parseErrorMessage(error)),
@@ -225,7 +220,7 @@ export default function AgentView({ resourceId }: Props) {
   });
   const handleSave = useMemoizedFn(() => save.run());
   const handlePublish = useMemoizedFn(() => publish.run());
-  const versionItems = useMemo(() => {
+  const versionItems = (() => {
     if (!load.data) return [];
     const { draftVersion, publishedVersion } = load.data.agent;
     const items = [
@@ -244,22 +239,20 @@ export default function AgentView({ resourceId }: Props) {
       });
     }
     return items;
-  }, [load.data, viewingVersion]);
-  const disabledVersionKeys = useMemo(
-    () =>
-      load.data?.agent.isOwner ? new Set<string>() : new Set(versionItems.map((item) => item.key)),
-    [load.data?.agent.isOwner, versionItems]
-  );
+  })();
+  const disabledVersionKeys = load.data?.agent.isOwner
+    ? new Set<string>()
+    : new Set(versionItems.map((item) => item.key));
   const handleVersionSelect = useMemoizedFn((version: number) => {
     if (!load.data || version === (viewingVersion ?? load.data.agent.draftVersion)) return;
     if (controller.isDirty) {
-      toast.warning('请先保存或放弃当前修改，再切换版本');
+      toast.warning(t('agent:page.switchVersionBlocked'));
       return;
     }
     runSwitchVersion(version);
   });
   const displayAgent = agentOverride ?? load.data?.agent;
-  const currentDraftAgent = useMemo<ChatAgentOption | null>(() => {
+  const currentDraftAgent = (() => {
     if (!load.data || !controller.draft) return null;
     const skillPolicy = controller.draft.spec.toolAndSkillPolicy;
     const defaultSkillIds = Array.from(
@@ -274,103 +267,106 @@ export default function AgentView({ resourceId }: Props) {
       source: 'CURRENT_DRAFT',
       resourceId: load.data.agent.resourceId,
       agentVersion: load.data.agent.draftVersion,
-      label: load.data.agent.title || controller.draft.name || '当前 Agent',
+      label: load.data.agent.title || controller.draft.name || t('agent:page.currentAgent'),
       defaultSkillIds,
     };
-  }, [controller.draft, load.data]);
-  const headerConfig = useMemo<ResourceHostLayoutConfig>(
-    () => ({
-      className: styles.pageWrap,
-      chatAgentDebug:
-        currentDraftAgent && viewingVersion === null
-          ? {
-              agent: currentDraftAgent,
-              isDirty: controller.isDirty,
-              isSaving: save.loading,
-              onSaveDraft: handleSaveDraftForDebug,
-            }
-          : undefined,
-      header: displayAgent
+  })() satisfies ChatAgentOption | null;
+  const headerConfig = {
+    className: styles.pageWrap,
+    chatAgentDebug:
+      currentDraftAgent && viewingVersion === null
         ? {
-            resource: {
-              resourceId: displayAgent.resourceId,
-              resourceName: displayAgent.title,
-              resourceIconType: 'agent',
-              currentActions: displayAgent.currentActions,
-              copyVersion: displayAgent.version,
-              permissionResourceType: RESOURCE_KIND.AGENT,
-              ownerId: displayAgent.ownerId,
-              titleMeta: (
-                <span className={styles.saveStatus}>{saveText(controller.savePhase)}</span>
-              ),
-              actions: displayAgent.isOwner ? (
-                <div className={styles.headerActions}>
-                  <Button
-                    variant="secondary"
-                    isDisabled={
-                      viewingVersion !== null ||
-                      !controller.isDirty ||
-                      save.loading ||
-                      versionLoading
-                    }
-                    onPress={handleSave}
-                  >
-                    <Save size={15} />
-                    保存
-                  </Button>
-                  <Button
-                    variant="primary"
-                    isDisabled={
-                      viewingVersion !== null || publish.loading || save.loading || versionLoading
-                    }
-                    onPress={handlePublish}
-                  >
-                    <Upload size={15} />
-                    发布
-                  </Button>
-                  <VersionDropdown
-                    items={versionItems}
-                    disabledKeys={disabledVersionKeys}
-                    formatVersion={(version) => `v${version}.0`}
-                    onSelect={handleVersionSelect}
-                  />
-                </div>
-              ) : undefined,
-            },
+            agent: currentDraftAgent,
+            isDirty: controller.isDirty,
+            isSaving: save.loading,
+            onSaveDraft: handleSaveDraftForDebug,
           }
         : undefined,
-    }),
+    header: displayAgent
+      ? {
+          resource: {
+            resourceId: displayAgent.resourceId,
+            resourceName: displayAgent.title,
+            resourceIconType: 'agent',
+            currentActions: displayAgent.currentActions,
+            copyVersion: displayAgent.version,
+            permissionResourceType: RESOURCE_KIND.AGENT,
+            ownerId: displayAgent.ownerId,
+            titleMeta: (
+              <span className={styles.saveStatus}>
+                {t(
+                  `agent:page.saveStatus.${
+                    controller.savePhase === 'dirty' ||
+                    controller.savePhase === 'saving' ||
+                    controller.savePhase === 'failed'
+                      ? controller.savePhase
+                      : 'clean'
+                  }`
+                )}
+              </span>
+            ),
+            actions: displayAgent.isOwner ? (
+              <div className={styles.headerActions}>
+                <Button
+                  variant="secondary"
+                  isDisabled={
+                    viewingVersion !== null || !controller.isDirty || save.loading || versionLoading
+                  }
+                  onPress={handleSave}
+                >
+                  <Save size={15} />
+                  {t('common:actions.save')}
+                </Button>
+                <Button
+                  variant="primary"
+                  isDisabled={
+                    viewingVersion !== null || publish.loading || save.loading || versionLoading
+                  }
+                  onPress={handlePublish}
+                >
+                  <Upload size={15} />
+                  {t('agent:page.publishAction')}
+                </Button>
+                <VersionDropdown
+                  items={versionItems}
+                  disabledKeys={disabledVersionKeys}
+                  formatVersion={(version) => `v${version}.0`}
+                  onSelect={handleVersionSelect}
+                />
+              </div>
+            ) : undefined,
+          },
+        }
+      : undefined,
+  } satisfies ResourceHostLayoutConfig;
+  useResourceHostLayoutConfig(
+    () => headerConfig,
     [
+      agentOverride,
+      controller.draft,
       controller.isDirty,
       controller.savePhase,
-      currentDraftAgent,
-      handlePublish,
-      handleSave,
-      handleSaveDraftForDebug,
-      displayAgent,
-      disabledVersionKeys,
-      handleVersionSelect,
+      load.data,
       publish.loading,
       save.loading,
-      versionItems,
+      t,
       versionLoading,
       viewingVersion,
     ]
   );
-  useResourceHostLayoutConfig(headerConfig);
   if (!resourceId)
     return (
       <div className={styles.overlay}>
         <ResultState
           status="info"
-          title="创建 Agent"
+          title={t('agent:page.createTitle')}
           extra={
             <Button variant="primary" onPress={() => setCreateOpen(true)}>
-              创建新 Agent
+              {t('agent:page.createAction')}
             </Button>
           }
         />
-        <DriveCreate
+        <DriveCreateModal
           type="agent"
           isOpen={createOpen}
           onOpenChange={(open) => {
@@ -393,11 +389,11 @@ export default function AgentView({ resourceId }: Props) {
       <div className={styles.overlay}>
         <ResultState
           status="warning"
-          title="无法打开 Agent"
+          title={t('agent:page.openFailed')}
           subTitle={parseErrorMessage(load.error)}
           extra={
             <Link to="/app/drive/personal">
-              <Button variant="secondary">返回云盘</Button>
+              <Button variant="secondary">{t('agent:page.backToDrive')}</Button>
             </Link>
           }
         />
@@ -407,7 +403,7 @@ export default function AgentView({ resourceId }: Props) {
     return (
       <div className={styles.overlay}>
         <Spin size="large" />
-        <span>正在加载 Agent...</span>
+        <span>{t('agent:page.loading')}</span>
       </div>
     );
   const disabled =
@@ -464,14 +460,14 @@ export default function AgentView({ resourceId }: Props) {
         type="danger"
         isOpen={promptResetOpen}
         onOpenChange={setPromptResetOpen}
-        title="当前内容无法返回引导填写"
-        description="当前 System Prompt 的预设标题结构已损坏。清空并切换将删除现有内容，并从通用预设重新创建。"
-        cancelText="继续自由编辑"
-        confirmText="清空并切换"
+        title={t('agent:page.promptReset.title')}
+        description={t('agent:page.promptReset.description')}
+        cancelText={t('agent:page.promptReset.cancel')}
+        confirmText={t('agent:page.promptReset.confirm')}
         onConfirm={() => {
           setSpec({
             ...controller.draft!.spec,
-            systemPrompt: buildGuidedPrompt(DEFAULT_GUIDED_PROMPT_FIELDS, true),
+            systemPrompt: buildGuidedPrompt(getDefaultGuidedPromptFields(), true),
           });
           setPromptMode('guided');
           setPromptResetOpen(false);
@@ -481,11 +477,11 @@ export default function AgentView({ resourceId }: Props) {
         type="confirm"
         isOpen={blocker.state === 'blocked'}
         isLoading={save.loading}
-        title="保存后离开页面？"
-        description="当前 Agent 有未保存修改。保存后再离开可避免丢失本次编辑。"
-        cancelText="取消"
-        discardText="放弃更改"
-        confirmText="保存并退出"
+        title={t('agent:page.leave.title')}
+        description={t('agent:page.leave.description')}
+        cancelText={t('common:actions.cancel')}
+        discardText={t('agent:page.leave.discard')}
+        confirmText={t('agent:page.leave.confirm')}
         onCancel={() => blocker.reset?.()}
         onDiscard={() => blocker.proceed?.()}
         onConfirm={() => void handleSaveAndLeave()}
@@ -496,9 +492,9 @@ export default function AgentView({ resourceId }: Props) {
         onOpenChange={(open) => {
           if (!open) setDeleteAssetId(null);
         }}
-        title="删除附件"
-        description="确定从当前 Agent 草稿中删除这个附件吗？"
-        confirmText="删除"
+        title={t('agent:page.deleteAsset.title')}
+        description={t('agent:page.deleteAsset.description')}
+        confirmText={t('common:actions.delete')}
         isConfirmLoading={remove.loading}
         onConfirm={() => {
           if (deleteAssetId) remove.run(deleteAssetId);

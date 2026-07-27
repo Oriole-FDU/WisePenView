@@ -1,7 +1,9 @@
 import type { FormEvent, KeyboardEvent, RefObject } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
-import { useEffectForce } from '@/hooks/useEffectForce';
+import { AppPopover } from '@/components/Overlay';
+import { useEffect } from 'react';
 import popoverStyles from '../InlineMath/style.module.less';
 import { sanitizeLatexInput } from '../latexInput';
 
@@ -65,6 +67,7 @@ function handleTextareaBeforeInput(event: FormEvent<HTMLTextAreaElement>): void 
  * 行内 / 块级公式共用的 LaTeX 编辑浮层（Portal → body，样式来自 InlineMath/style.module.less）。
  */
 export function LatexEditPopover(props: LatexEditPopoverProps) {
+  const { t } = useTranslation('note');
   const {
     visible,
     position,
@@ -85,10 +88,12 @@ export function LatexEditPopover(props: LatexEditPopoverProps) {
   } = props;
 
   /**
-   * 浮层显示期间监听 document 捕获阶段的 pointerdown，补足编辑器拦截鼠标事件时 textarea
-   * 不会触发 blur 的场景；卸载时移除监听，避免关闭后继续响应外部点击。
+   * @wisepen-manual-effect
+   * 执行时机：公式编辑浮层可见且完成定位后监听页面级外部点击。
+   * 不可替代原因：编辑器会拦截鼠标事件，必须在 document 捕获阶段监听真实 DOM 事件。
+   * cleanup：浮层隐藏、依赖变化或卸载时移除 pointerdown 监听器。
    */
-  useEffectForce(() => {
+  useEffect(() => {
     if (!visible || position === null) return;
 
     const handlePointerDown = (event: PointerEvent) => {
@@ -118,21 +123,23 @@ export function LatexEditPopover(props: LatexEditPopoverProps) {
       role="dialog"
       aria-label={title}
     >
-      <div className={popoverStyles.inlineEditPopoverHeader}>{title}</div>
-      <textarea
-        ref={inputRef}
-        className={textareaClassName}
-        value={value}
-        onBeforeInput={handleTextareaBeforeInput}
-        onChange={(event) => onValueChange(sanitizeLatexInput(event.target.value))}
-        onKeyDown={(e) => handleTextareaKeyDown(e, onCancel, onCommit, commitEnterUnlessShift)}
-        onBlur={onBlur}
-        rows={rows}
-        spellCheck={false}
-        autoComplete="off"
-        aria-label="LaTeX 源码"
-      />
-      <div className={popoverStyles.inlineEditHint}>{hint}</div>
+      <AppPopover.Header>{title}</AppPopover.Header>
+      <div className={popoverStyles.inlineEditPopoverBody}>
+        <textarea
+          ref={inputRef}
+          className={textareaClassName}
+          value={value}
+          onBeforeInput={handleTextareaBeforeInput}
+          onChange={(event) => onValueChange(sanitizeLatexInput(event.target.value))}
+          onKeyDown={(e) => handleTextareaKeyDown(e, onCancel, onCommit, commitEnterUnlessShift)}
+          onBlur={onBlur}
+          rows={rows}
+          spellCheck={false}
+          autoComplete="off"
+          aria-label={t('latex.source')}
+        />
+        <div className={popoverStyles.inlineEditHint}>{hint}</div>
+      </div>
     </div>,
     document.body
   );

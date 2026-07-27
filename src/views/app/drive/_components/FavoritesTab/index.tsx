@@ -1,6 +1,7 @@
 import { Empty, Spin } from '@/components/Feedback';
 import type { FavoriteCollection } from '@/domains/Interact';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import DeleteCollectionModal from './DeleteCollectionModal';
 import EditCollectionModal from './EditCollectionModal';
 import FavoriteCollectionList from './components/FavoriteCollectionList';
@@ -15,6 +16,7 @@ function resolveDefaultCollection(
 }
 
 function FavoritesTab() {
+  const { t } = useTranslation('resource');
   const [selectedCollectionId, setSelectedCollectionId] = useState<string>();
   const [editingCollection, setEditingCollection] = useState<
     FavoriteCollection | null | undefined
@@ -41,7 +43,7 @@ function FavoritesTab() {
     return (
       <div className={styles.container}>
         <div className={styles.feedbackState}>
-          <Empty description="暂无收藏夹" />
+          <Empty description={t('favorite.collection.empty')} />
         </div>
       </div>
     );
@@ -67,10 +69,12 @@ function FavoritesTab() {
             <FavoriteResourceTable
               key={activeCollection.collectionId}
               collectionId={activeCollection.collectionId}
-              collectionName={activeCollection.collectionName ?? '我的收藏'}
+              collectionName={
+                activeCollection.collectionName ?? t('favorite.picker.defaultCollectionName')
+              }
               collectionItemCount={activeCollection.itemCount}
               onCollectionChanged={handleCollectionChanged}
-              emptyDescription="该收藏夹暂无内容"
+              emptyDescription={t('favorite.collection.emptyItems')}
             />
           </main>
         </div>

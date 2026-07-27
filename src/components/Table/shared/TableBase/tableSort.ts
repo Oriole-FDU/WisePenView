@@ -14,13 +14,14 @@ export interface SortTableRowsOptions<T extends object> {
   getEntryType?: (row: T) => string;
   isPinnedFirst?: (row: T) => boolean;
   isPinnedLast?: (row: T) => boolean;
+  locale?: string;
 }
 
 function isFolderLikeEntry(entryType: string): boolean {
   return entryType === 'folder' || entryType === 'root';
 }
 
-function compareSortValues(a: TableSortValue, b: TableSortValue): number {
+function compareSortValues(a: TableSortValue, b: TableSortValue, locale?: string): number {
   if (a == null && b == null) {
     return 0;
   }
@@ -35,20 +36,21 @@ function compareSortValues(a: TableSortValue, b: TableSortValue): number {
     return a - b;
   }
 
-  return String(a).localeCompare(String(b), 'zh-CN', { numeric: true, sensitivity: 'base' });
+  return String(a).localeCompare(String(b), locale, { numeric: true, sensitivity: 'base' });
 }
 
 function buildValueComparator<T extends object, C>(
   column: TableSortColumn<T, C>,
   direction: SortDescriptor['direction'],
-  getContext: (row: T) => C
+  getContext: (row: T) => C,
+  locale?: string
 ): (a: T, b: T) => number {
   const dir = direction === 'descending' ? -1 : 1;
 
   const compareValues = (a: T, b: T) => {
     const valueA = column.getSortValue?.(a, getContext(a));
     const valueB = column.getSortValue?.(b, getContext(b));
-    return compareSortValues(valueA, valueB) * dir;
+    return compareSortValues(valueA, valueB, locale) * dir;
   };
 
   if (!column.sortFolderGroup) {
@@ -117,7 +119,12 @@ export function sortTableRows<T extends object, C>(
     return rows;
   }
 
-  const compare = buildValueComparator(column, sortDescriptor.direction, getContext);
+  const compare = buildValueComparator(
+    column,
+    sortDescriptor.direction,
+    getContext,
+    options?.locale
+  );
 
   return [...rows].sort((a, b) => {
     const pinnedCompare = comparePinnedRows(a, b, options);
@@ -138,7 +145,12 @@ export function sortFolderTreeRows<T extends object, C>(
     return rows;
   }
 
-  const compare = buildValueComparator(column, sortDescriptor.direction, getContext);
+  const compare = buildValueComparator(
+    column,
+    sortDescriptor.direction,
+    getContext,
+    options?.locale
+  );
 
   const readChildren = (row: T): T[] | undefined => {
     const children = (row as { children?: T[] }).children;

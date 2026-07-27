@@ -1,50 +1,65 @@
 import { buildApiUrl } from '@/apis/clientUrls';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
-import { PDFViewer as EmbedPdfViewer } from '@embedpdf/react-pdf-viewer';
+import {
+  PDFViewer as EmbedPdfViewer,
+  type DocumentManagerPlugin,
+  type I18nPlugin,
+  type PDFViewerRef,
+} from '@embedpdf/react-pdf-viewer';
 import { useMount, useUnmount } from 'ahooks';
 import clsx from 'clsx';
-import React, { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { PdfViewerProps } from './index.type';
 import { DEFAULT_PDF_VIEWER_CONFIG } from './pdf.config';
 import styles from './style.module.less';
 
-interface DocumentManagerApi {
-  openDocumentUrl(options: {
-    url: string;
-    documentId: string;
-    mode?: string;
-    requestOptions?: RequestInit;
-    permissions?: Record<string, boolean>;
-  }): Promise<void>;
-  onDocumentError?(
-    handler: (payload: { documentId?: string; error?: unknown }) => void
-  ): (() => void) | void;
+function readConfigSection(value: unknown): Record<string, unknown> {
+  return value != null && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
-interface PdfViewerHandle {
-  registry: Promise<{
-    getPlugin(name: 'document-manager'): { provides(): DocumentManagerApi } | undefined;
-    getPlugin(name: string): { provides(): unknown } | undefined;
-  }>;
+function createViewerConfig(
+  config: Record<string, unknown> | undefined,
+  locale: string
+): Record<string, unknown> {
+  const baseConfig = config ?? DEFAULT_PDF_VIEWER_CONFIG;
+  const i18nConfig = readConfigSection(baseConfig.i18n);
+
+  return {
+    ...baseConfig,
+    i18n: {
+      ...i18nConfig,
+      defaultLocale: locale,
+      fallbackLocale: i18nConfig.fallbackLocale ?? 'en',
+    },
+  };
 }
 
 function PdfViewer({ resourceId, config, className, onLoadError }: PdfViewerProps) {
-  const viewerRef = useRef<PdfViewerHandle | null>(null);
+  const { i18n } = useTranslation();
+  const pdfLocale = i18n.resolvedLanguage === 'en-US' ? 'en' : 'zh-CN';
+  const viewerRef = useRef<PDFViewerRef | null>(null);
   const onDocumentErrorCleanupRef = useRef<(() => void) | null>(null);
+  // EmbedPDF 只在实例初始化时读取 config；用惰性状态保存该次初始化快照。
+  const [viewerConfig] = useState(() => createViewerConfig(config, pdfLocale));
 
   const loadDocument = async () => {
     if (!resourceId || !viewerRef.current) return;
 
     try {
       const registry = await viewerRef.current.registry;
-      const docManager = registry.getPlugin('document-manager')?.provides();
+      if (!registry) return;
+      const docManager = registry.getPlugin<DocumentManagerPlugin>('document-manager')?.provides();
       if (!docManager) {
         const err = createClientError(FRONTEND_CLIENT_ERROR.PDF_MANAGER_UNAVAILABLE);
         onLoadError?.(err);
         return;
       }
       if (onDocumentErrorCleanupRef.current === null) {
-        const cleanup = docManager.onDocumentError?.(({ error }) => {
+        const cleanup = docManager.onDocumentError(({ reason, message }) => {
+          const error = reason ?? message;
           console.error('[PdfViewer] 文档事件错误:', error);
           onLoadError?.(
             isWisePenError(error)
@@ -57,18 +72,22 @@ function PdfViewer({ resourceId, config, className, onLoadError }: PdfViewerProp
         }
       }
       const documentId = `doc-${resourceId}`;
-      await docManager?.openDocumentUrl({
-        url: buildApiUrl(`/document/getDocPreview?resourceId=${encodeURIComponent(resourceId)}`),
-        documentId,
-        mode: 'range-request',
-        requestOptions: {
-          credentials: 'include',
-        },
-        permissions: {
-          canPrint: false,
-          canCopy: false,
-        },
-      });
+      await docManager
+        .openDocumentUrl({
+          url: buildApiUrl(`/document/getDocPreview?resourceId=${encodeURIComponent(resourceId)}`),
+          documentId,
+          mode: 'range-request',
+          requestOptions: {
+            credentials: 'include',
+          },
+          permissions: {
+            overrides: {
+              print: false,
+              copyContents: false,
+            },
+          },
+        })
+        .toPromise();
     } catch (error) {
       console.error('[PdfViewer] 文档加载失败:', error);
       onLoadError?.(
@@ -83,6 +102,23 @@ function PdfViewer({ resourceId, config, className, onLoadError }: PdfViewerProp
     void loadDocument();
   });
 
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：应用语言变化后同步 PDF Viewer 的本地化配置。
+   * 不可替代原因：第三方 Viewer 仅提供命令式语言 API，不能由 JSX 属性更新。
+   * cleanup：没有订阅或延迟任务，无需清理。
+   */
+  useEffect(() => {
+    const syncViewerLocale = async () => {
+      if (!viewerRef.current) return;
+      const registryPromise = viewerRef.current.registry;
+      if (!registryPromise) return;
+      const registry = await registryPromise;
+      registry.getPlugin<I18nPlugin>('i18n')?.provides()?.setLocale(pdfLocale);
+    };
+    void syncViewerLocale();
+  }, [pdfLocale]);
+
   useUnmount(() => {
     if (onDocumentErrorCleanupRef.current) {
       onDocumentErrorCleanupRef.current();
@@ -92,8 +128,8 @@ function PdfViewer({ resourceId, config, className, onLoadError }: PdfViewerProp
 
   return (
     <EmbedPdfViewer
-      ref={viewerRef as React.RefObject<never>}
-      config={config ?? DEFAULT_PDF_VIEWER_CONFIG}
+      ref={viewerRef}
+      config={viewerConfig}
       className={clsx(styles.viewer, className)}
     />
   );

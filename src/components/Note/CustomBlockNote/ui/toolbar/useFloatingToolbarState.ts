@@ -1,7 +1,7 @@
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
-import { useLatest, useMount, useUnmount, useUpdateEffect } from 'ahooks';
-import { useRef, useState } from 'react';
+import { useLatest, useMemoizedFn, useMount, useUnmount } from 'ahooks';
+import { useEffect, useRef, useState } from 'react';
 
 import { getRootDomSelection } from '@/components/Note/CustomBlockNote/engines/editor/dom';
 import type { CustomBlockNoteEditor } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
@@ -97,7 +97,7 @@ export function useFloatingToolbarState(
     unmountTimerRef.current = null;
   };
 
-  const hideToolbar = () => {
+  const hideToolbar = useMemoizedFn(() => {
     if (frameRef.current !== null) {
       window.cancelAnimationFrame(frameRef.current);
       frameRef.current = null;
@@ -118,9 +118,9 @@ export function useFloatingToolbarState(
       toolbarStateRef.current = unmountedState;
       setToolbarState(unmountedState);
     }, TOOLBAR_FADE_DURATION_MS);
-  };
+  });
 
-  const syncToolbarState = () => {
+  const syncToolbarState = useMemoizedFn(() => {
     if (frameRef.current !== null) {
       return;
     }
@@ -150,7 +150,7 @@ export function useFloatingToolbarState(
         return resolved;
       });
     });
-  };
+  });
 
   const syncToolbarStateIfNeeded = () => {
     if (selectingPointerIdRef.current !== null) return;
@@ -163,13 +163,19 @@ export function useFloatingToolbarState(
     syncToolbarState();
   };
 
-  useUpdateEffect(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：工具栏禁用状态变化时隐藏或重新读取编辑器选区位置。
+   * 不可替代原因：位置来自 ProseMirror view 与 DOM Selection 的外部可变状态。
+   * cleanup：帧和卸载延时由 hook 统一卸载清理；本轮没有独立订阅。
+   */
+  useEffect(() => {
     if (disabled) {
       hideToolbar();
       return;
     }
     syncToolbarState();
-  }, [disabled]);
+  }, [disabled, hideToolbar, syncToolbarState]);
 
   const handlePointerDown = (event: PointerEvent) => {
     if (event.button !== 0) return;

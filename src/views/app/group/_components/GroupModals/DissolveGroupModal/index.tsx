@@ -4,6 +4,7 @@ import type { DeleteGroupRequest } from '@/domains/Group';
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { DissolveGroupModalProps } from './index.type';
 
@@ -14,6 +15,7 @@ function DissolveGroupModal({
   groupId,
   onSuccess,
 }: DissolveGroupModalProps) {
+  const { t } = useTranslation('group');
   const groupService = useGroupService();
   const navigate = useNavigate();
 
@@ -25,7 +27,7 @@ function DissolveGroupModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success('已解散小组');
+        toast.success(t('dissolve.success'));
         onSuccess?.();
         onOpenChange(false);
         navigate('/app/my-group');
@@ -38,7 +40,7 @@ function DissolveGroupModal({
 
   const handleConfirm = () => {
     if (!groupId) {
-      toast.warning('小组ID不存在');
+      toast.warning(t('dissolve.missingId'));
       return;
     }
     runDissolveGroup();
@@ -49,9 +51,9 @@ function DissolveGroupModal({
       type="danger"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="解散小组"
-      description={`确定要解散小组「${groupName}」吗？此操作不可撤销！`}
-      confirmText="解散"
+      title={t('dissolve.title')}
+      description={t('dissolve.description', { name: groupName })}
+      confirmText={t('dissolve.confirm')}
       onConfirm={handleConfirm}
       isConfirmLoading={loading}
       isDismissable={!loading}

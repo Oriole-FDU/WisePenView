@@ -1,7 +1,11 @@
 .root {
-  height: 100vh;
-  height: 100dvh;
-  width: 100vw;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
   background-color: var(--background);
@@ -10,6 +14,8 @@
 .leftSider {
   height: 100%;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
   background: var(--surface-secondary);
   overflow: hidden;
 }
@@ -21,13 +27,17 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .middleContent {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   background: var(--surface);
+  overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   padding: 0;

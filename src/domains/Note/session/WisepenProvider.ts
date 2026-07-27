@@ -26,6 +26,15 @@ export class WisepenProvider extends WebsocketProvider {
     });
   }
 
+  setActorUserId(actorUserId?: string): void {
+    const normalizedActorUserId = actorUserId?.trim();
+    if (normalizedActorUserId) {
+      this.params.actorUserId = normalizedActorUserId;
+      return;
+    }
+    delete this.params.actorUserId;
+  }
+
   sendIntent(
     operationType: 'COPY' | 'PASTE' | 'UNDO' | 'REDO' | 'KEYBOARD' | 'OTHER',
     source?: string

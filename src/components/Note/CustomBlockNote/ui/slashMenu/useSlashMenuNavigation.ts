@@ -1,6 +1,6 @@
-import { useEffectForce } from '@/hooks/useEffectForce';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
-import { useRef, useState } from 'react';
+import { useMemoizedFn } from 'ahooks';
+import { useEffect, useRef, useState } from 'react';
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 
 const EDGE_ANCHOR_ITEM_COUNT = 2;
@@ -116,20 +116,20 @@ export function useSlashMenuNavigation({
     canScrollUp: false,
   });
 
-  const updateScrollEdges = () => {
+  const updateScrollEdges = useMemoizedFn(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
     const nextScrollEdges = getScrollEdges(viewport);
     setScrollEdges((current) =>
       isSameScrollEdges(current, nextScrollEdges) ? current : nextScrollEdges
     );
-  };
+  });
 
-  const syncEditorActiveDescendant = (index: number) => {
+  const syncEditorActiveDescendant = useMemoizedFn((index: number) => {
     editor.domElement?.setAttribute('aria-activedescendant', getSlashMenuItemId(index));
-  };
+  });
 
-  const activateKeyboardItem = (index: number) => {
+  const activateKeyboardItem = useMemoizedFn((index: number) => {
     keyboardIndexRef.current = index;
     const viewport = viewportRef.current;
     if (viewport) {
@@ -139,12 +139,12 @@ export function useSlashMenuNavigation({
     }
     setIsKeyboardNavigating(true);
     syncEditorActiveDescendant(index);
-  };
+  });
 
-  const moveKeyboardSelection = (offset: number) => {
+  const moveKeyboardSelection = useMemoizedFn((offset: number) => {
     const baseIndex = keyboardIndexRef.current ?? hoveredIndexRef.current;
     activateKeyboardItem((baseIndex + offset + items.length) % items.length);
-  };
+  });
 
   const handleItemMouseMove = (index: number, event: MouseEvent) => {
     const previousPosition = mousePositionRef.current;
@@ -163,10 +163,12 @@ export function useSlashMenuNavigation({
   };
 
   /**
-   * 菜单挂载时在编辑器外层捕获导航键，原因是 BlockNote 内部索引无法同步鼠标 hover 起点。
-   * 同一生命周期还需观察可视区尺寸并维护上下边缘虚化；cleanup 负责移除监听与观察器。
+   * @wisepen-manual-effect
+   * 执行时机：斜杠菜单挂载或候选项变化时绑定键盘导航与可视区观察。
+   * 不可替代原因：BlockNote 键盘事件、滚动位置和 ResizeObserver 都属于外部 DOM 状态。
+   * cleanup：移除事件监听、断开观察器并取消待执行帧。
    */
-  useEffectForce(() => {
+  useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
@@ -223,7 +225,15 @@ export function useSlashMenuNavigation({
       document.removeEventListener('keydown', handleKeyDown, true);
       editor.domElement?.removeAttribute('aria-activedescendant');
     };
-  }, [editor, items, onItemClick]);
+  }, [
+    activateKeyboardItem,
+    editor,
+    items,
+    moveKeyboardSelection,
+    onItemClick,
+    syncEditorActiveDescendant,
+    updateScrollEdges,
+  ]);
 
   return {
     ...scrollEdges,

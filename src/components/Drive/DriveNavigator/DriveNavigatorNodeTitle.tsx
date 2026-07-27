@@ -1,7 +1,8 @@
-import { ROOT_DISPLAY } from '@/components/Drive/common/constants';
 import EntryIcon from '@/components/Icons/EntryIcon';
 import type { DriveNode } from '@/domains/Drive';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface DriveNavigatorNodeTitleProps {
@@ -12,22 +13,25 @@ interface DriveNavigatorNodeTitleProps {
 function getNodeDisplayName(
   node: DriveNavigatorNodeTitleProps['node'],
   resourceName: string,
+  t: TFunction<'drive'>,
   displayName?: string
 ): string {
   if (displayName) return displayName;
-  if (node.type === 'root') return node.name || ROOT_DISPLAY;
+  if (node.type === 'root') return node.name || t('node.drive');
   if (node.type === 'folder') {
-    if (!node.parentId) return ROOT_DISPLAY;
-    return node.name || ROOT_DISPLAY;
+    if (node.systemType === 'shared') return t('node.shared');
+    if (!node.parentId) return t('node.drive');
+    return node.name || t('node.unnamedFolder');
   }
   if (node.type === 'resource' || node.type === 'link') return resourceName;
-  return node.label || '正在加载...';
+  return node.label || t('node.loading');
 }
 
 function DriveNavigatorNodeTitle({ node, displayName }: DriveNavigatorNodeTitleProps) {
+  const { t } = useTranslation('drive');
   const resourceId = node.type === 'resource' || node.type === 'link' ? node.resourceId : undefined;
   const fallbackName = node.type === 'resource' || node.type === 'link' ? node.title : undefined;
-  const resourceName = useResourceDisplayName(resourceId, fallbackName, '未命名文件');
+  const resourceName = useResourceDisplayName(resourceId, fallbackName, t('node.unnamedFile'));
   const resourceType =
     node.type === 'resource' || node.type === 'link' ? node.resourceType : undefined;
   const resourceIconType =
@@ -47,7 +51,7 @@ function DriveNavigatorNodeTitle({ node, displayName }: DriveNavigatorNodeTitleP
         />
       </span>
       <span className={styles.nodeLabel}>
-        {getNodeDisplayName(node, resourceName, displayName)}
+        {getNodeDisplayName(node, resourceName, t, displayName)}
       </span>
     </span>
   );

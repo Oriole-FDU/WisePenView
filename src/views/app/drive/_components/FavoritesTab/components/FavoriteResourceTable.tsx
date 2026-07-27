@@ -2,6 +2,8 @@ import FavoriteCollectionPicker from '@/components/Resource/FavoriteCollectionPi
 import { FolderTable, type FolderTableColumn, type FolderTableRow } from '@/components/Table';
 import type { FavoriteItem } from '@/domains/Interact';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { useFavoriteResourceTableController } from '../hooks/useFavoriteResourceTableController';
 import styles from '../style.module.less';
 import UnfavoriteResourceModal from './UnfavoriteResourceModal';
@@ -18,43 +20,48 @@ interface FavoriteResourceTableRow extends FolderTableRow {
   item: FavoriteItem;
 }
 
-const FAVORITE_RESOURCE_COLUMNS: FolderTableColumn<FavoriteResourceTableRow>[] = [
+const buildFavoriteResourceColumns = (
+  t: TFunction<'resource'>
+): FolderTableColumn<FavoriteResourceTableRow>[] => [
   {
     id: 'resource',
-    label: '名称',
+    label: t('favorite.resource.columns.name'),
     width: 'fill',
     isNameColumn: true,
     className: styles.resourceNameColumn,
   },
   {
     id: 'type',
-    label: '类型',
+    label: t('favorite.resource.columns.type'),
     width: 'folderType',
     renderCell: (row) => row.typeLabel,
   },
   {
     id: 'favoritedAt',
-    label: '收藏时间',
+    label: t('favorite.resource.columns.favoritedAt'),
     width: 'folderType',
     renderCell: (row) => formatTimestampToDate(row.item.favoritedAt) || '—',
   },
   {
     id: 'actions',
-    label: '操作',
+    label: t('favorite.resource.columns.actions'),
     width: 'folderAction',
     isActionColumn: true,
   },
 ];
 
-function toFavoriteResourceTableRow(item: FavoriteItem): FavoriteResourceTableRow {
+function toFavoriteResourceTableRow(
+  item: FavoriteItem,
+  t: TFunction<'resource'>
+): FavoriteResourceTableRow {
   const resource = item.resourceInfo;
   return {
     id: item.resourceId,
-    name: resource?.resourceName ?? '资源已删除',
+    name: resource?.resourceName ?? t('favorite.resource.deleted'),
     entryType: 'resource',
     resourceType: resource?.resourceType,
     resourceIconType: resource?.resourceIconType,
-    typeLabel: resource?.resourceType ?? '未知类型',
+    typeLabel: resource?.resourceType ?? t('favorite.resource.unknownType'),
     item,
   };
 }
@@ -66,22 +73,25 @@ function FavoriteResourceTable({
   onCollectionChanged,
   emptyDescription,
 }: FavoriteResourceTableProps) {
+  const { t } = useTranslation('resource');
   const controller = useFavoriteResourceTableController({ collectionId, onCollectionChanged });
-  const rows = controller.list.map(toFavoriteResourceTableRow);
+  const rows = controller.list.map((item) => toFavoriteResourceTableRow(item, t));
 
   return (
     <div className={styles.resourceTablePanel}>
       <header className={styles.resourcePanelHeader}>
         <div className={styles.resourcePanelCopy}>
           <h2 className={styles.resourcePanelTitle}>{collectionName}</h2>
-          <p className={styles.resourcePanelDescription}>{collectionItemCount} 个内容</p>
+          <p className={styles.resourcePanelDescription}>
+            {t('favorite.resource.itemCount', { count: collectionItemCount })}
+          </p>
         </div>
       </header>
       <FolderTable<FavoriteResourceTableRow>
-        ariaLabel="已收藏资源"
+        ariaLabel={t('favorite.resource.tableAria')}
         items={rows}
         onRowActivate={(row) => controller.onOpenResource(row.item)}
-        columns={FAVORITE_RESOURCE_COLUMNS}
+        columns={buildFavoriteResourceColumns(t)}
         renderNameContent={(content, row) =>
           row.item.resourceInfo ? (
             content
@@ -92,25 +102,25 @@ function FavoriteResourceTable({
         rowActions={(row) => [
           {
             key: 'open',
-            label: '打开',
+            label: t('favorite.resource.open'),
             disabled: !row.item.resourceInfo,
             onPress: () => controller.onRowAction(row.item, 'open'),
           },
           {
             key: 'manage',
-            label: '管理收藏',
+            label: t('favorite.resource.manage'),
             disabled: !row.item.resourceInfo,
             onPress: () => controller.onRowAction(row.item, 'manage'),
           },
           {
             key: 'remove',
-            label: '移出收藏夹',
+            label: t('favorite.resource.remove'),
             variant: 'danger',
             onPress: () => controller.onRowAction(row.item, 'remove'),
           },
         ]}
         loading={controller.loading}
-        emptyText="暂无收藏内容"
+        emptyText={t('favorite.resource.empty')}
         emptyDescription={emptyDescription}
         totalCount={controller.total}
         loadMore={{

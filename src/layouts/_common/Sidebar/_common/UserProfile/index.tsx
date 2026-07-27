@@ -19,6 +19,7 @@ import {
   ShieldUser,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuthService } from '@/domains';
@@ -31,6 +32,7 @@ interface UserProfileProps {
 }
 
 function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
+  const { t } = useTranslation(['shell', 'common']);
   const navigate = useNavigate();
   const userService = useUserService();
   const [user, setUser] = useState<User | null>(null);
@@ -43,8 +45,11 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
   });
 
   const displayName = user?.nickname || user?.username || '-';
-  const identityLabel =
-    user?.identityType !== undefined ? IDENTITY.getLabel(user.identityType) : '-';
+  const identityKey =
+    user?.identityType !== undefined ? IDENTITY.getKey(user.identityType) : undefined;
+  const identityLabel = identityKey
+    ? t(`role.${identityKey}`)
+    : t('placeholder.dash', { ns: 'common' });
   const isAdmin = user?.identityType === IDENTITY.ADMIN;
 
   const handleMenuAction = (key: React.Key) => {
@@ -95,60 +100,98 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
   const userMenu = (
     <Dropdown.Popover placement="top left" className={styles.profilePopover}>
       <Dropdown.Menu
-        aria-label="用户菜单"
+        aria-label={t('userMenu.aria')}
         className={styles.profileMenu}
         onAction={handleMenuAction}
       >
         {menuMode === 'admin' ? (
           <>
-            <Dropdown.Item id="back-app" textValue="回到用户端" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="back-app"
+              textValue={t('userMenu.backToApp')}
+              className={styles.profileMenuItem}
+            >
               <Home size={16} />
-              <span>回到用户端</span>
+              <span>{t('userMenu.backToApp')}</span>
             </Dropdown.Item>
-            <Dropdown.Item id="about" textValue="关于" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="about"
+              textValue={t('userMenu.about')}
+              className={styles.profileMenuItem}
+            >
               <Info size={16} />
-              <span>关于</span>
+              <span>{t('userMenu.about')}</span>
             </Dropdown.Item>
-            <Dropdown.Item id="logout" textValue="退出登录" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="logout"
+              textValue={t('userMenu.logout')}
+              variant="danger"
+              className={styles.profileMenuItem}
+            >
               <LogOut size={16} />
-              <span>退出登录</span>
+              <span>{t('userMenu.logout')}</span>
             </Dropdown.Item>
           </>
         ) : (
           <>
-            <Dropdown.Item id="usage" textValue="余额与使用量" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="usage"
+              textValue={t('userMenu.usage')}
+              className={styles.profileMenuItem}
+            >
               <ChartPie size={16} />
-              <span>余额与使用量</span>
+              <span>{t('userMenu.usage')}</span>
             </Dropdown.Item>
-            <Dropdown.Item id="account" textValue="账号" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="account"
+              textValue={t('userMenu.account')}
+              className={styles.profileMenuItem}
+            >
               <ShieldUser size={16} />
-              <span>账号</span>
+              <span>{t('userMenu.account')}</span>
             </Dropdown.Item>
-            <Dropdown.Item id="appearance" textValue="外观" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="appearance"
+              textValue={t('userMenu.appearance')}
+              className={styles.profileMenuItem}
+            >
               <Palette size={16} />
-              <span>外观</span>
+              <span>{t('userMenu.appearance')}</span>
             </Dropdown.Item>
-            <Dropdown.Item id="feedback" textValue="用户反馈" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="feedback"
+              textValue={t('userMenu.feedback')}
+              className={styles.profileMenuItem}
+            >
               <MessageSquare size={16} />
-              <span>用户反馈</span>
+              <span>{t('userMenu.feedback')}</span>
             </Dropdown.Item>
             {isAdmin && (
               <Dropdown.Item
                 id="enter-admin"
-                textValue="进入管理"
+                textValue={t('userMenu.enterAdmin')}
                 className={styles.profileMenuItem}
               >
                 <Shield size={16} />
-                <span>进入管理</span>
+                <span>{t('userMenu.enterAdmin')}</span>
               </Dropdown.Item>
             )}
-            <Dropdown.Item id="about" textValue="关于" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="about"
+              textValue={t('userMenu.about')}
+              className={styles.profileMenuItem}
+            >
               <Info size={16} />
-              <span>关于</span>
+              <span>{t('userMenu.about')}</span>
             </Dropdown.Item>
-            <Dropdown.Item id="logout" textValue="退出登录" className={styles.profileMenuItem}>
+            <Dropdown.Item
+              id="logout"
+              textValue={t('userMenu.logout')}
+              variant="danger"
+              className={styles.profileMenuItem}
+            >
               <LogOut size={16} />
-              <span>退出登录</span>
+              <span>{t('userMenu.logout')}</span>
             </Dropdown.Item>
           </>
         )}
@@ -161,7 +204,7 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
       <div className={clsx(styles.profile, !collapsed && styles.expanded)}>
         {collapsed ? (
           <Dropdown>
-            <Dropdown.Trigger aria-label="打开用户菜单" className={styles.avatarTrigger}>
+            <Dropdown.Trigger aria-label={t('userMenu.openAria')} className={styles.avatarTrigger}>
               {userAvatar}
             </Dropdown.Trigger>
             {userMenu}
@@ -174,7 +217,10 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
               <span className={styles.tag}>{identityLabel}</span>
             </div>
             <Dropdown>
-              <Dropdown.Trigger aria-label="打开用户设置菜单" className={styles.menuTrigger}>
+              <Dropdown.Trigger
+                aria-label={t('userMenu.openSettingsAria')}
+                className={styles.menuTrigger}
+              >
                 <Settings className={styles.icon} />
               </Dropdown.Trigger>
               {userMenu}
@@ -186,13 +232,15 @@ function UserProfile({ collapsed, menuMode = 'app' }: UserProfileProps) {
       <AppDisplayDialog
         isOpen={aboutDialogOpen}
         onOpenChange={setAboutDialogOpen}
-        title="关于 WisePen"
-        closeText="关闭"
+        title={t('userMenu.aboutTitle')}
+        closeText={t('actions.close', { ns: 'common' })}
       >
         <div className={styles.aboutContent}>
           <img className={styles.aboutLogo} src={logoImg} alt="" />
           <div className={styles.aboutProductName}>WisePen</div>
-          <div className={styles.aboutVersion}>版本 v{__APP_VERSION__}</div>
+          <div className={styles.aboutVersion}>
+            {t('userMenu.version', { version: __APP_VERSION__ })}
+          </div>
         </div>
       </AppDisplayDialog>
 

@@ -21,7 +21,8 @@ import {
 import { ButtonGroup, Separator, Toolbar } from '@heroui/react';
 import { useEventListener } from 'ahooks';
 import { MessageSquarePlus, Search, Sparkles } from 'lucide-react';
-import { useCallback, useMemo, type ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BlockTypeMenu } from './components/BlockTypeMenu';
 import { ColorMenu } from './components/ColorMenu';
 import { FileCaptionToolbarButton } from './components/FileButtons';
@@ -55,21 +56,18 @@ function ToolbarSeparator() {
 
 function useNoteToolbarShortcuts(onOpenFind: NoteToolbarProps['onOpenFind']) {
   const editor = useBlockNoteEditor(blockNoteSchema);
-  const handleOpenFind = useCallback(() => {
+  const handleOpenFind = () => {
     const selectedText = editor.getSelectedText().trim();
     onOpenFind(selectedText || undefined);
-  }, [editor, onOpenFind]);
-  const handleEditorKeyDown = useCallback(
-    (event: Event) => {
-      if (!(event instanceof globalThis.KeyboardEvent)) return;
-      // Ctrl/Cmd + F 快捷键触发全文搜索
-      if (!event.altKey && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
-        event.preventDefault();
-        handleOpenFind();
-      }
-    },
-    [handleOpenFind]
-  );
+  };
+  const handleEditorKeyDown = (event: Event) => {
+    if (!(event instanceof globalThis.KeyboardEvent)) return;
+    // Ctrl/Cmd + F 快捷键触发全文搜索
+    if (!event.altKey && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
+      event.preventDefault();
+      handleOpenFind();
+    }
+  };
 
   useEventListener('keydown', handleEditorKeyDown, { target: editor.domElement });
 
@@ -111,12 +109,13 @@ function CustomFormattingToolbar({
   onAddComment,
   onOpenFind,
 }: CustomFormattingToolbarProps) {
+  const { t } = useTranslation('note');
   const readOnly = useNoteEditorReadOnlyContext();
   const showBlockTypeFileGroup = useBlockTypeFileGroupVisible();
 
   return (
     <Toolbar
-      aria-label="格式工具栏"
+      aria-label={t('editor.toolbar.label')}
       isAttached
       className={styles.toolbar}
       onMouseDown={stopToolbarMouseDown}
@@ -127,7 +126,7 @@ function CustomFormattingToolbar({
           {showBlockTypeFileGroup ? (
             <>
               <ToolbarSeparator />
-              <ButtonGroup size="sm" variant="ghost" aria-label="块类型和文件">
+              <ButtonGroup size="sm" variant="ghost" aria-label={t('editor.toolbar.blockAndFile')}>
                 <BlockTypeMenu />
                 <FileCaptionToolbarButton />
               </ButtonGroup>
@@ -146,14 +145,18 @@ function CustomFormattingToolbar({
           <ToolbarSeparator />
         </>
       ) : null}
-      <ButtonGroup size="sm" variant="ghost" aria-label="搜索、批注和 AI">
-        <ToolbarButton label="全文搜索" icon={<Search size={20} />} onPress={onOpenFind} />
+      <ButtonGroup size="sm" variant="ghost" aria-label={t('editor.toolbar.searchCommentAi')}>
         <ToolbarButton
-          label="添加批注"
+          label={t('editor.toolbar.search')}
+          icon={<Search size={20} />}
+          onPress={onOpenFind}
+        />
+        <ToolbarButton
+          label={t('editor.toolbar.addComment')}
           icon={<MessageSquarePlus size={20} />}
           onPress={onAddComment}
         />
-        <ToolbarButton label="问 AI" icon={<Sparkles size={20} />} onPress={onAskAi} />
+        <ToolbarButton label={t('ai.toolbar')} icon={<Sparkles size={20} />} onPress={onAskAi} />
       </ButtonGroup>
     </Toolbar>
   );
@@ -200,7 +203,7 @@ function TableRailFormattingToolbar({
   const editor = useBlockNoteEditor();
   const formattingToolbar = useExtension(FormattingToolbarExtension, { editor });
   const show = useExtensionState(FormattingToolbarExtension, { editor });
-  const reference = useMemo<GenericPopoverReference | undefined>(() => {
+  const reference = (() => {
     if (!tableRailSelection.rect) {
       return undefined;
     }
@@ -210,23 +213,20 @@ function TableRailFormattingToolbar({
     return element
       ? { element, getBoundingClientRect, cacheMountedBoundingClientRect: false }
       : { element: undefined, getBoundingClientRect };
-  }, [editor.domElement, tableRailSelection.rect]);
-  const useFloatingOptions = useMemo<ComponentProps<typeof GenericPopover>['useFloatingOptions']>(
-    () => ({
-      onOpenChange: (open, _event, reason) => {
-        formattingToolbar.store.setState(open);
-        if (reason === 'escape-key') {
-          editor.focus();
-        }
-      },
-      open: show,
-      placement:
-        tableRailSelection.orientation === null
-          ? 'top'
-          : getTableRailToolbarPlacement(tableRailSelection.orientation),
-    }),
-    [editor, formattingToolbar.store, show, tableRailSelection.orientation]
-  );
+  })() satisfies GenericPopoverReference | undefined;
+  const useFloatingOptions = {
+    onOpenChange: (open, _event, reason) => {
+      formattingToolbar.store.setState(open);
+      if (reason === 'escape-key') {
+        editor.focus();
+      }
+    },
+    open: show,
+    placement:
+      tableRailSelection.orientation === null
+        ? 'top'
+        : getTableRailToolbarPlacement(tableRailSelection.orientation),
+  } satisfies ComponentProps<typeof GenericPopover>['useFloatingOptions'];
 
   if (isFindModeActive || !tableRailSelection.orientation || !reference) {
     return null;

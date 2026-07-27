@@ -1,10 +1,10 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import { Checkbox } from '@/components/Input';
-import { useEffectForce } from '@/hooks/useEffectForce';
 import clsx from 'clsx';
 import { ChevronRight, LoaderCircle } from 'lucide-react';
 import type { CSSProperties, DragEvent, Key, ReactNode } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 export interface DataNode {
@@ -85,15 +85,6 @@ function normalizeCheckedKeys(keys: CheckedKeys | undefined): string[] {
   return Array.isArray(keys) ? normalizeKeys(keys) : normalizeKeys(keys.checked);
 }
 
-function keysSignature(keys: Key[] | undefined): string {
-  return normalizeKeys(keys).join('\u0001');
-}
-
-function parseKeysSignature(signature: string): string[] {
-  if (!signature) return [];
-  return signature.split('\u0001');
-}
-
 function collectExpandableKeys(nodes: DataNode[] | undefined): string[] {
   const keys: string[] = [];
 
@@ -157,13 +148,11 @@ function Tree({
   onExpand,
   onDrop,
 }: TreeProps) {
-  const defaultExpandedSignature = keysSignature(defaultExpandedKeys);
+  const { t } = useTranslation('common');
   const [internalSelectedKeys, setInternalSelectedKeys] = useState<string[]>([]);
   const [internalCheckedKeys, setInternalCheckedKeys] = useState<string[]>([]);
   const [internalExpandedKeys, setInternalExpandedKeys] = useState<string[]>(() =>
-    defaultExpandAll
-      ? collectExpandableKeys(treeData)
-      : parseKeysSignature(defaultExpandedSignature)
+    defaultExpandAll ? collectExpandableKeys(treeData) : normalizeKeys(defaultExpandedKeys)
   );
   const [loadingKeys, setLoadingKeys] = useState<string[]>([]);
   const [draggingKey, setDraggingKey] = useState('');
@@ -175,114 +164,81 @@ function Tree({
   const finalSelectedKeys = selectedKeys ? normalizeKeys(selectedKeys) : internalSelectedKeys;
   const finalCheckedKeys = checkedKeys ? normalizeCheckedKeys(checkedKeys) : internalCheckedKeys;
   const finalExpandedKeys = expandedKeys ? normalizeKeys(expandedKeys) : internalExpandedKeys;
-  const expandedKeySet = useMemo(() => new Set(finalExpandedKeys), [finalExpandedKeys]);
-  const checkedKeySet = useMemo(() => new Set(finalCheckedKeys), [finalCheckedKeys]);
-  const selectedKeySet = useMemo(() => new Set(finalSelectedKeys), [finalSelectedKeys]);
-  const loadingKeySet = useMemo(() => new Set(loadingKeys), [loadingKeys]);
+  const expandedKeySet = new Set(finalExpandedKeys);
+  const checkedKeySet = new Set(finalCheckedKeys);
+  const selectedKeySet = new Set(finalSelectedKeys);
+  const loadingKeySet = new Set(loadingKeys);
 
-  // 占位实现，Tree将重构
-  useEffectForce(() => {
-    if (expandedKeys) return;
-    if (defaultExpandAll) return;
-    setInternalExpandedKeys(parseKeysSignature(defaultExpandedSignature));
-  }, [defaultExpandedSignature, defaultExpandAll, expandedKeys]);
+  const flatNodes = flattenNodes(treeData, expandedKeySet);
 
-  useEffectForce(() => {
-    if (expandedKeys || !defaultExpandAll) return;
-    setInternalExpandedKeys(collectExpandableKeys(treeData));
-  }, [defaultExpandAll, expandedKeys, treeData]);
+  const emitExpandedKeys = (nextKeys: string[], info: TreeExpandInfo) => {
+    if (!expandedKeys) setInternalExpandedKeys(nextKeys);
+    onExpand?.(nextKeys, info);
+  };
 
-  const flatNodes = useMemo(
-    () => flattenNodes(treeData, expandedKeySet),
-    [expandedKeySet, treeData]
-  );
+  const runLoadData = async (node: DataNode) => {
+    const key = String(node.key);
+    if (
+      disabled ||
+      !loadData ||
+      loadingKeySet.has(key) ||
+      node.isLeaf === true ||
+      node.children !== undefined
+    )
+      return;
 
-  const emitExpandedKeys = useCallback(
-    (nextKeys: string[], info: TreeExpandInfo) => {
-      if (!expandedKeys) setInternalExpandedKeys(nextKeys);
-      onExpand?.(nextKeys, info);
-    },
-    [expandedKeys, onExpand]
-  );
+    setLoadingKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
+    try {
+      await loadData(node);
+    } finally {
+      setLoadingKeys((prev) => prev.filter((item) => item !== key));
+    }
+  };
 
-  const runLoadData = useCallback(
-    async (node: DataNode) => {
-      const key = String(node.key);
-      if (
-        disabled ||
-        !loadData ||
-        loadingKeySet.has(key) ||
-        node.isLeaf === true ||
-        node.children !== undefined
-      )
-        return;
+  const toggleExpand = (node: DataNode, expanded: boolean) => {
+    if (disabled) return;
+    const key = String(node.key);
+    const nextKeys = buildNextKeys(finalExpandedKeys, key, expanded);
+    emitExpandedKeys(nextKeys, { node, expanded });
+    if (expanded) void runLoadData(node);
+  };
 
-      setLoadingKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
-      try {
-        await loadData(node);
-      } finally {
-        setLoadingKeys((prev) => prev.filter((item) => item !== key));
-      }
-    },
-    [disabled, loadData, loadingKeySet]
-  );
+  const toggleSelect = (node: DataNode) => {
+    if (disabled || node.disabled || node.selectable === false || !selectable) return;
 
-  const toggleExpand = useCallback(
-    (node: DataNode, expanded: boolean) => {
-      if (disabled) return;
-      const key = String(node.key);
-      const nextKeys = buildNextKeys(finalExpandedKeys, key, expanded);
-      emitExpandedKeys(nextKeys, { node, expanded });
-      if (expanded) void runLoadData(node);
-    },
-    [disabled, emitExpandedKeys, finalExpandedKeys, runLoadData]
-  );
+    const key = String(node.key);
+    const selected = !selectedKeySet.has(key);
+    const nextKeys = multiple
+      ? buildNextKeys(finalSelectedKeys, key, selected)
+      : selected
+        ? [key]
+        : [];
 
-  const toggleSelect = useCallback(
-    (node: DataNode) => {
-      if (disabled || node.disabled || node.selectable === false || !selectable) return;
+    if (!selectedKeys) setInternalSelectedKeys(nextKeys);
+    onSelect?.(nextKeys, { node, selected });
+  };
 
-      const key = String(node.key);
-      const selected = !selectedKeySet.has(key);
-      const nextKeys = multiple
-        ? buildNextKeys(finalSelectedKeys, key, selected)
-        : selected
-          ? [key]
-          : [];
+  const toggleCheck = (node: DataNode) => {
+    if (disabled || node.disabled || node.checkable === false) return;
 
-      if (!selectedKeys) setInternalSelectedKeys(nextKeys);
-      onSelect?.(nextKeys, { node, selected });
-    },
-    [disabled, finalSelectedKeys, multiple, onSelect, selectable, selectedKeySet, selectedKeys]
-  );
+    const key = String(node.key);
+    const checked = !checkedKeySet.has(key);
+    const nextKeys = buildNextKeys(finalCheckedKeys, key, checked);
 
-  const toggleCheck = useCallback(
-    (node: DataNode) => {
-      if (disabled || node.disabled || node.checkable === false) return;
-
-      const key = String(node.key);
-      const checked = !checkedKeySet.has(key);
-      const nextKeys = buildNextKeys(finalCheckedKeys, key, checked);
-
-      if (!checkedKeys) setInternalCheckedKeys(nextKeys);
-      onCheck?.(nextKeys, { node, checked });
-    },
-    [checkedKeySet, checkedKeys, disabled, finalCheckedKeys, onCheck]
-  );
+    if (!checkedKeys) setInternalCheckedKeys(nextKeys);
+    onCheck?.(nextKeys, { node, checked });
+  };
 
   const renderSwitcherIcon = (loading: boolean): ReactNode => {
     if (loading) return <LoaderCircle size={14} className={styles.loadingIcon} />;
     return <ChevronRight size={14} />;
   };
 
-  const canDragNode = useCallback(
-    (node: DataNode): boolean => {
-      if (disabled || node.disabled || node.draggable === false) return false;
-      if (typeof draggable === 'function') return draggable(node);
-      return Boolean(draggable);
-    },
-    [disabled, draggable]
-  );
+  const canDragNode = (node: DataNode): boolean => {
+    if (disabled || node.disabled || node.draggable === false) return false;
+    if (typeof draggable === 'function') return draggable(node);
+    return Boolean(draggable);
+  };
 
   const resolveDropPosition = (
     event: DragEvent<HTMLElement>,
@@ -295,19 +251,17 @@ function Tree({
     return expandable ? 'inside' : 'after';
   };
 
-  const findFlatNode = useCallback(
-    (key: string) => flatNodes.find((item) => item.key === key)?.node,
-    [flatNodes]
-  );
+  const findFlatNode = (key: string) => flatNodes.find((item) => item.key === key)?.node;
 
-  const canDropNode = useCallback(
-    (dragNode: DataNode, dropNode: DataNode, dropPosition: TreeDropPosition): boolean => {
-      if (disabled) return false;
-      if (String(dragNode.key) === String(dropNode.key)) return false;
-      return allowDrop?.({ dragNode, dropNode, dropPosition }) ?? true;
-    },
-    [allowDrop, disabled]
-  );
+  const canDropNode = (
+    dragNode: DataNode,
+    dropNode: DataNode,
+    dropPosition: TreeDropPosition
+  ): boolean => {
+    if (disabled) return false;
+    if (String(dragNode.key) === String(dropNode.key)) return false;
+    return allowDrop?.({ dragNode, dropNode, dropPosition }) ?? true;
+  };
 
   return (
     <div
@@ -392,7 +346,7 @@ function Tree({
             {expandable ? (
               <AppIconButton
                 icon={<span className={styles.switcherIcon}>{renderSwitcherIcon(loading)}</span>}
-                label={expanded ? '收起节点' : '展开节点'}
+                label={expanded ? t('tree.collapse') : t('tree.expand')}
                 size="sm"
                 className={clsx(styles.switcher, 'wisepen-tree__switcher')}
                 data-expanded={expanded}
@@ -414,7 +368,7 @@ function Tree({
                 className={clsx(styles.checkbox, 'wisepen-tree__checkbox')}
                 isSelected={checked}
                 isDisabled={!canCheck}
-                aria-label="选择节点"
+                aria-label={t('tree.select')}
                 onChange={() => toggleCheck(node)}
                 onClick={(event) => event.stopPropagation()}
               />

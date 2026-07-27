@@ -1,8 +1,7 @@
-import { useMemo, useSyncExternalStore } from 'react';
+import { useUnmount } from 'ahooks';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import * as Y from 'yjs';
-
-import { useEffectForce } from '@/hooks/useEffectForce';
 
 import { NoteSaveStatusObserver } from './NoteSaveStatusObserver';
 import { NoteStatusObserver } from './NoteStatusObserver';
@@ -69,9 +68,9 @@ export interface UseNoteSessionOptions {
 
 export function useNoteSession(resourceId: string, options: UseNoteSessionOptions = {}) {
   const { actorUserId, enabled = true, localOnly = false } = options;
-  const session = useMemo(() => {
+  const [session] = useState(() => {
     const doc = new Y.Doc();
-    const provider = new WisepenProvider(resourceId, doc, { connect: false, actorUserId });
+    const provider = new WisepenProvider(resourceId, doc, { connect: false });
     const idb = localOnly ? null : new IndexeddbPersistence(noteYjsIdbRoomName(resourceId), doc);
     const observer = new NoteStatusObserver();
     const saveObserver = new NoteSaveStatusObserver();
@@ -95,7 +94,7 @@ export function useNoteSession(resourceId: string, options: UseNoteSessionOption
     };
 
     return { doc, provider, observer, saveObserver, idbObserver, reconnect, destroy };
-  }, [actorUserId, localOnly, resourceId]);
+  });
 
   const status = useSyncExternalStore(session.observer.subscribe, session.observer.getSnapshot);
   const saveStatus = useSyncExternalStore(
@@ -108,18 +107,23 @@ export function useNoteSession(resourceId: string, options: UseNoteSessionOption
   );
 
   /**
-   * 执行时机：resourceId 变化生成新的协同 session 后，连接 WebSocket/Yjs provider。
-   * 不可替代原因：provider、IndexedDB 持久化和 Y.Doc 都是外部资源，必须在挂载后建立并在卸载时释放。
-   * cleanup：断开 provider、销毁 IndexedDB persistence、observer 与 Y.Doc，避免同一笔记残留连接。
+   * @wisepen-manual-effect
+   * 执行时机：用户身份或连接开关变化时，更新协同连接参数并重连 WebSocket provider。
+   * 不可替代原因：WebSocket 是外部资源，连接状态必须与当前用户和页面可用态同步。
+   * cleanup：断开当前连接；Session 持有的 Yjs/IndexedDB 资源统一在组件卸载时销毁。
    */
-  useEffectForce(() => {
+  useEffect(() => {
+    session.provider.setActorUserId(actorUserId);
     if (enabled && !localOnly) {
+      session.observer.setConnecting();
       session.provider.connect();
+    } else {
+      session.provider.disconnect();
     }
-    return () => {
-      session.destroy();
-    };
-  }, [enabled, localOnly, session]);
+    return () => session.provider.disconnect();
+  }, [actorUserId, enabled, localOnly, session]);
+
+  useUnmount(() => session.destroy());
 
   return {
     status: localOnly ? ('connected' as const) : status,

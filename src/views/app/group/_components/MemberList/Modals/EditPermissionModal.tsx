@@ -8,6 +8,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { Alert, Button, ListBox, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { EditPermissionModalProps } from './index.type';
 import styles from './style.module.less';
 import { useMemberEditGuard } from './useMemberEditGuard';
@@ -21,6 +22,7 @@ function EditPermissionModal({
   members,
   groupDisplayConfig,
 }: EditPermissionModalProps) {
+  const { t } = useTranslation(['group', 'common']);
   const groupService = useGroupService();
   const [selectedPermission, setSelectedPermission] = useState<EnumKey<typeof ROLE>>('MEMBER');
   const { loading, run: runUpdatePermission } = useRequest(
@@ -33,7 +35,7 @@ function EditPermissionModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success(`已修改 ${memberIds.length} 位成员的权限`);
+        toast.success(t('member.editPermission.success', { count: memberIds.length }));
         onSuccess?.();
         onOpenChange(false);
       },
@@ -64,13 +66,13 @@ function EditPermissionModal({
     <AppModal
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
-      title="修改权限"
+      title={t('member.editPermission.title')}
       size="md"
       isDismissable={!loading}
       actions={
         <>
           <Button variant="secondary" isDisabled={loading} onPress={() => handleOpenChange(false)}>
-            取消
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button
             variant="primary"
@@ -78,7 +80,7 @@ function EditPermissionModal({
             aria-busy={loading || undefined}
             onPress={handleConfirm}
           >
-            确定
+            {t('actions.confirm', { ns: 'common' })}
           </Button>
         </>
       }
@@ -87,21 +89,21 @@ function EditPermissionModal({
         <Alert status="danger">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>选中成员中有小组创建者，不可修改权限！</Alert.Description>
+            <Alert.Description>{t('member.editPermission.ownerBlocked')}</Alert.Description>
           </Alert.Content>
         </Alert>
       ) : !canEdit ? (
         <Alert status="danger">
           <Alert.Indicator />
           <Alert.Content>
-            <Alert.Description>您不能编辑组长/管理员的权限。</Alert.Description>
+            <Alert.Description>{t('member.editPermission.unauthorized')}</Alert.Description>
           </Alert.Content>
         </Alert>
       ) : (
         <div className={styles.permissionRow}>
-          <label className={styles.permissionLabel}>将以下成员的权限设置为</label>
+          <label className={styles.permissionLabel}>{t('member.editPermission.prompt')}</label>
           <Select
-            aria-label="成员权限"
+            aria-label={t('member.editPermission.aria')}
             value={selectedPermission}
             onChange={(value) => {
               if (value == null || Array.isArray(value)) return;
@@ -116,13 +118,13 @@ function EditPermissionModal({
             <Select.Popover>
               <ListBox>
                 {canPromoteToAdmin ? (
-                  <ListBox.Item key="ADMIN" id="ADMIN" textValue="管理员">
-                    管理员
+                  <ListBox.Item key="ADMIN" id="ADMIN" textValue={t('member.role.admin')}>
+                    {t('member.role.admin')}
                     <ListBox.ItemIndicator />
                   </ListBox.Item>
                 ) : null}
-                <ListBox.Item key="MEMBER" id="MEMBER" textValue="成员">
-                  成员
+                <ListBox.Item key="MEMBER" id="MEMBER" textValue={t('member.role.member')}>
+                  {t('member.role.member')}
                   <ListBox.ItemIndicator />
                 </ListBox.Item>
               </ListBox>

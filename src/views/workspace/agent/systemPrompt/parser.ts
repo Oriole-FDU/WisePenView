@@ -1,6 +1,6 @@
 import {
   AGENT_PROMPT_ROOT,
-  DEFAULT_GUIDED_PROMPT_FIELDS,
+  getDefaultGuidedPromptFields,
   SOUL_FIELD_KEYS,
   SOUL_PROMPT_ROOT,
   type GuidedPromptFields,
@@ -102,7 +102,7 @@ export function parseGuidedPrompt(markdown: string): GuidedPromptParseResult {
   const agentRoots = roots(AGENT_PROMPT_ROOT);
   const soulRoots = roots(SOUL_PROMPT_ROOT);
   const soulEnabled = soulRoots.length > 0;
-  const fields = structuredClone(DEFAULT_GUIDED_PROMPT_FIELDS);
+  const fields = getDefaultGuidedPromptFields();
   let compatible = agentRoots.length === 1 && (soulRoots.length === 0 || soulRoots.length === 1);
 
   fieldSchemas.forEach(([key, level, path]) => {

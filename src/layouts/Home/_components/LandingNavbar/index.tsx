@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import logoImg from '@/assets/images/logo-icon.png';
@@ -5,11 +6,12 @@ import type { LandingNavbarProps } from './index.type';
 import styles from './style.module.less';
 
 function LandingNavbar({ activeKey }: LandingNavbarProps) {
+  const { t } = useTranslation('shell');
   const navigate = useNavigate();
   const navItems = [
-    { key: '1', label: '首页', path: '/' },
-    { key: '2', label: '注册', path: '/register' },
-    { key: '3', label: '登录', path: '/login' },
+    { key: '1', label: t('home.nav.home'), path: '/' },
+    { key: '2', label: t('home.nav.register'), path: '/register' },
+    { key: '3', label: t('home.nav.login'), path: '/login' },
   ];
 
   return (
@@ -18,7 +20,7 @@ function LandingNavbar({ activeKey }: LandingNavbarProps) {
         <img src={logoImg} alt="WisePen" className={styles.logo} />
         <span className={styles.brandText}>WisePen</span>
       </div>
-      <div className={styles.navWrap} aria-label="首页导航">
+      <div className={styles.navWrap} aria-label={t('home.navAria')}>
         {navItems.map((item) => (
           <button
             key={item.key}

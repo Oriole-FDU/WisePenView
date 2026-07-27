@@ -1,9 +1,8 @@
 import { useMemoizedFn } from 'ahooks';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type * as Y from 'yjs';
 
 import type { AiDiffDisplayMode } from '@/domains/Note';
-import { useEffectForce } from '@/hooks/useEffectForce';
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NotePluginRegistry } from '../../registry/types';
 import { applyNoteAiDiffAction, type NoteAiDiffActionRequest } from './action';
@@ -78,11 +77,12 @@ export function useAiDiffSidecar(params: {
   });
 
   /**
+   * @wisepen-manual-effect
    * 执行时机：sidecar 或正文变化时，刷新本地只读投影与 presence。
    * 不可替代原因：sidecar 是独立 Y.Map，不会触发 BlockNote 的 onChange。
    * cleanup：移除 Yjs 监听并取消待执行帧，避免旧文档继续刷新编辑器。
    */
-  useEffectForce(() => {
+  useEffect(() => {
     const scheduleSync = (syncExtension: boolean) => {
       if (!syncExtension && aiContentByBlockIdRef.current.size === 0) return;
       queuedExtensionSyncRef.current ||= syncExtension;

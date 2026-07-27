@@ -1,3 +1,4 @@
+import { APP_MAIN_MIN_WIDTH, LAYOUT_DENSITY, resolveLayoutDensity } from '@/constants/layoutScale';
 import { useSystemLayoutStore } from '@/layouts/_common/_store/useSystemLayoutStore';
 import AppSidebar from '@/layouts/_common/Sidebar/AppSidebar';
 import {
@@ -11,11 +12,13 @@ import {
   SystemResizablePanel,
   SystemResizablePanelGroup,
 } from '@/layouts/_common/SystemResizable';
+import { useCompactSidebarCollapse } from '@/layouts/_common/useCompactSidebarCollapse';
 import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
 import AppNavigationControls from '@/layouts/AppNavigation/AppNavigationControls';
 import clsx from 'clsx';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type {
   Layout,
   LayoutChangedMeta,
@@ -25,11 +28,14 @@ import type {
 import { Outlet } from 'react-router-dom';
 import styles from './AppLayout.module.less';
 
-const MAIN_MIN_WIDTH = 360;
-
 function AppLayout() {
+  const { t } = useTranslation('shell');
   const appNavigation = useAppNavigation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      resolveLayoutDensity(window.innerWidth) === LAYOUT_DENSITY.COMPACT
+  );
   const storedSidebarWidth = useSystemLayoutStore((state) => state.appSidebarWidth);
   const setSidebarWidth = useSystemLayoutStore((state) => state.setAppSidebarWidth);
   const sidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
@@ -37,46 +43,50 @@ function AppLayout() {
   const sidebarWidth = clampSidebarWidth(storedSidebarWidth);
   const sidebarPanelSize = sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : sidebarWidth;
 
+  const persistSidebarWidthFromPanel = () => {
+    const currentWidth = sidebarPanelRef.current?.getSize().inPixels;
+    if (currentWidth == null) return;
+    const nextSidebarWidth = clampSidebarWidth(currentWidth);
+    if (nextSidebarWidth > SIDEBAR_MIN_WIDTH || sidebarWidth === SIDEBAR_MIN_WIDTH) {
+      setSidebarWidth(nextSidebarWidth);
+    }
+  };
+
+  const { density, markSidebarUserOverride } = useCompactSidebarCollapse({
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    onAutoCollapse: persistSidebarWidthFromPanel,
+  });
+
   useResizablePanelSize({
     panelRef: sidebarPanelRef,
     size: sidebarPanelSize,
   });
 
-  const handleSidebarToggle = useCallback(() => {
+  const handleSidebarToggle = () => {
+    markSidebarUserOverride();
     setSidebarCollapsed((collapsed) => {
       if (!collapsed) {
-        const currentWidth = sidebarPanelRef.current?.getSize().inPixels;
-        if (currentWidth != null) {
-          const nextSidebarWidth = clampSidebarWidth(currentWidth);
-          if (nextSidebarWidth > SIDEBAR_MIN_WIDTH || sidebarWidth === SIDEBAR_MIN_WIDTH) {
-            setSidebarWidth(nextSidebarWidth);
-          }
-        }
+        persistSidebarWidthFromPanel();
       }
       return !collapsed;
     });
-  }, [setSidebarWidth, sidebarWidth]);
+  };
 
-  const handleSidebarResize = useCallback(
-    (panelSize: PanelSize) => {
-      if (sidebarCollapsed) return;
-      pendingSidebarWidthRef.current = clampSidebarWidth(panelSize.inPixels);
-    },
-    [sidebarCollapsed]
-  );
+  const handleSidebarResize = (panelSize: PanelSize) => {
+    if (sidebarCollapsed) return;
+    pendingSidebarWidthRef.current = clampSidebarWidth(panelSize.inPixels);
+  };
 
-  const handleLayoutChanged = useCallback(
-    (_layout: Layout, meta: LayoutChangedMeta) => {
-      const pendingSidebarWidth = pendingSidebarWidthRef.current;
-      pendingSidebarWidthRef.current = null;
-      if (sidebarCollapsed || !meta.isUserInteraction || pendingSidebarWidth == null) return;
-      setSidebarWidth(pendingSidebarWidth);
-    },
-    [setSidebarWidth, sidebarCollapsed]
-  );
+  const handleLayoutChanged = (_layout: Layout, meta: LayoutChangedMeta) => {
+    const pendingSidebarWidth = pendingSidebarWidthRef.current;
+    pendingSidebarWidthRef.current = null;
+    if (sidebarCollapsed || !meta.isUserInteraction || pendingSidebarWidth == null) return;
+    setSidebarWidth(pendingSidebarWidth);
+  };
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-layout-density={density}>
       {sidebarCollapsed ? (
         <div className={styles.collapsedHeaderControls}>
           <AppNavigationControls
@@ -103,7 +113,7 @@ function AppLayout() {
           maxSize={sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_MAX_WIDTH}
           groupResizeBehavior="preserve-pixel-size"
           className={styles.leftSider}
-          aria-label="应用侧边栏"
+          aria-label={t('navigation.appSidebar')}
           aria-hidden={sidebarCollapsed ? true : undefined}
           onResize={handleSidebarResize}
         >
@@ -124,7 +134,7 @@ function AppLayout() {
 
         <SystemResizablePanel
           id="app-main"
-          minSize={MAIN_MIN_WIDTH}
+          minSize={APP_MAIN_MIN_WIDTH}
           className={styles.middleLayout}
         >
           <main className={styles.middleContent}>

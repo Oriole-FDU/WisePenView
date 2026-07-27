@@ -4,9 +4,9 @@ import {
   shouldStretchTableCellContent,
 } from '../shared/TableBase/cellAlign';
 import {
-  getDataEqColumnCount,
-  isDataEqualColumnLayout,
-  resolveDataColumnWidthClass,
+  getReadonlyEqColumnCount,
+  isReadonlyEqualColumnLayout,
+  resolveReadonlyColumnWidthClass,
 } from '../shared/TableBase/columnWidth';
 import { sortTableRows } from '../shared/TableBase/tableSort';
 import TableBodyState from '../shared/TableBodyState';
@@ -20,7 +20,7 @@ import styles from './style.module.less';
 
 import { Table } from '@heroui/react';
 import { ArrowUpDown } from 'lucide-react';
-import { useCallback, useMemo, useRef, type CSSProperties, type UIEvent } from 'react';
+import { useRef, type CSSProperties, type UIEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import DataTableLoadingSkeleton from './parts/LoadingSkeleton';
 
@@ -61,7 +61,8 @@ function DataTable<T extends object>({
   sortDescriptor,
   onSortChange,
 }: DataTableProps<T>) {
-  const { t } = useTranslation('table');
+  const { t, i18n } = useTranslation('table');
+  const sortLocale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const resolvedEmptyText = emptyText ?? t('empty.noData');
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadMoreLockRef = useRef(false);
@@ -70,44 +71,40 @@ function DataTable<T extends object>({
   const showSkeletonBody = refreshing || (loading && items.length === 0);
   const showEmptyState = !loading && !refreshing && items.length === 0;
 
-  const defaultSummary = useMemo(() => {
+  const defaultSummary = (() => {
     if (summary !== undefined) {
       return summary;
     }
     const count = pagination?.total ?? totalCount ?? items.length;
     return count > 0 ? t('summary.totalRecords', { count }) : t('summary.totalRecordsZero');
-  }, [summary, pagination?.total, totalCount, items.length, t]);
+  })();
 
   const showFooter = !showSkeletonBody && (Boolean(defaultSummary) || Boolean(pagination));
 
-  const handleScroll = useCallback(
-    (event: UIEvent<HTMLElement>) => {
-      if (!loadMore) {
-        return;
-      }
+  const handleScroll = (event: UIEvent<HTMLElement>) => {
+    if (!loadMore) {
+      return;
+    }
 
-      if (!loadMore.loading) {
-        loadMoreLockRef.current = false;
-      }
+    if (!loadMore.loading) {
+      loadMoreLockRef.current = false;
+    }
 
-      if (loadMore.loading || !loadMore.hasMore || loadMoreLockRef.current) {
-        return;
-      }
+    if (loadMore.loading || !loadMore.hasMore || loadMoreLockRef.current) {
+      return;
+    }
 
-      const container = event.currentTarget;
-      const distanceToBottom =
-        container.scrollHeight - container.scrollTop - container.clientHeight;
-      if (distanceToBottom > LOAD_MORE_THRESHOLD_PX) {
-        return;
-      }
+    const container = event.currentTarget;
+    const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (distanceToBottom > LOAD_MORE_THRESHOLD_PX) {
+      return;
+    }
 
-      loadMoreLockRef.current = true;
-      loadMore.onLoadMore();
-    },
-    [loadMore]
-  );
+    loadMoreLockRef.current = true;
+    loadMore.onLoadMore();
+  };
 
-  const scrollContainerProps = useMemo(() => {
+  const scrollContainerProps = (() => {
     if (!maxBodyHeight) {
       return {};
     }
@@ -115,18 +112,20 @@ function DataTable<T extends object>({
     return {
       style: { maxHeight: resolved } as CSSProperties,
     };
-  }, [maxBodyHeight]);
+  })();
 
-  const equalColumnLayout = isDataEqualColumnLayout(columns);
-  const eqColumnCount = getDataEqColumnCount(columns);
+  const equalColumnLayout = isReadonlyEqualColumnLayout(columns);
+  const eqColumnCount = getReadonlyEqColumnCount(columns);
 
-  const sortedItems = useMemo(
-    () =>
-      sortTableRows(items, columns, sortDescriptor, (row) => ({
-        row,
-        rowId: String(row[rowKey]),
-      })),
-    [columns, items, rowKey, sortDescriptor]
+  const sortedItems = sortTableRows(
+    items,
+    columns,
+    sortDescriptor,
+    (row) => ({
+      row,
+      rowId: String(row[rowKey]),
+    }),
+    { locale: sortLocale }
   );
 
   return (
@@ -176,7 +175,7 @@ function DataTable<T extends object>({
                     allowsSorting={column.allowsSorting}
                     isRowHeader={column.isRowHeader}
                     className={joinClassNames(
-                      resolveDataColumnWidthClass(column.width, equalColumnLayout),
+                      resolveReadonlyColumnWidthClass(column.width, equalColumnLayout),
                       column.className
                     )}
                   >
@@ -229,7 +228,7 @@ function DataTable<T extends object>({
                             key={column.id}
                             className={joinClassNames(
                               styles.bodyCell,
-                              resolveDataColumnWidthClass(column.width, equalColumnLayout),
+                              resolveReadonlyColumnWidthClass(column.width, equalColumnLayout),
                               column.className
                             )}
                           >

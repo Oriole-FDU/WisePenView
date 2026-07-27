@@ -8,7 +8,8 @@ import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
 import { Button, Form, Label, ListBox, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Pencil, X } from 'lucide-react';
-import { useMemo, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { buildProfileFormValues } from './buildProfileFormValues';
 import type { AccountFormProps } from './index.type';
 import { getProfileDisplayString } from './profileDisplay';
@@ -28,11 +29,21 @@ function getFieldInputValue(values: UpdateUserInfoRequest, key: ProfileFieldKey)
   return value == null ? '' : String(value);
 }
 
-function getReadonlyInputValue(values: UpdateUserInfoRequest, key: ProfileFieldKey) {
+function getReadonlyInputValue(
+  values: UpdateUserInfoRequest,
+  key: ProfileFieldKey,
+  translateEnum: (key: string) => string
+) {
   const value = getFieldValue(values, key);
   if (value == null || value === '') return '-';
-  if (key === 'sex') return SEX.getLabel(Number(value));
-  if (key === 'degreeLevel') return DEGREE.getLabel(Number(value));
+  if (key === 'sex') {
+    const enumKey = SEX.getKey(Number(value));
+    return enumKey ? translateEnum(`enum.sex.${enumKey}`) : String(value);
+  }
+  if (key === 'degreeLevel') {
+    const enumKey = DEGREE.getKey(Number(value));
+    return enumKey ? translateEnum(`enum.degreeLevel.${enumKey}`) : String(value);
+  }
   return String(value);
 }
 
@@ -49,13 +60,11 @@ function AccountForm({
   readonlyFieldSet,
   onUserInfoReload,
 }: AccountFormProps) {
+  const { t } = useTranslation(['profile', 'common']);
   const userService = useUserService();
   const [editMode, setEditMode] = useState(false);
   const [formDraft, setFormDraft] = useState<FormDraft | null>(null);
-  const userFormValues = useMemo<UpdateUserInfoRequest>(
-    () => (user ? buildProfileFormValues(user) : {}),
-    [user]
-  );
+  const userFormValues = (user ? buildProfileFormValues(user) : {}) satisfies UpdateUserInfoRequest;
   const formValues = editMode && formDraft?.user === user ? formDraft.values : userFormValues;
 
   const { loading: saving, runAsync: runSave } = useRequest(
@@ -110,7 +119,7 @@ function AccountForm({
       onSuccess: () => {
         setFormDraft(null);
         setEditMode(false);
-        toast.success('保存成功');
+        toast.success(t('form.saveSuccess'));
       },
       onError: (err) => {
         if (err && typeof err === 'object' && 'errorFields' in err) return;
@@ -146,11 +155,11 @@ function AccountForm({
   return (
     <div className={styles.profileSection}>
       <div className={styles.sectionHeader}>
-        <h3 className={styles.sectionTitle}>基本档案</h3>
+        <h3 className={styles.sectionTitle}>{t('form.sectionTitle')}</h3>
         {!editMode ? (
           <Button variant="primary" onPress={handleStartEdit}>
             <Pencil size={16} aria-hidden="true" />
-            编辑资料
+            {t('form.edit')}
           </Button>
         ) : null}
       </div>
@@ -159,16 +168,18 @@ function AccountForm({
           <div className={styles.formFieldsGrid}>
             {visibleFields.map((field) => {
               const lockedByServer = readonlyFieldSet.has(field.key);
+              const fieldLabel = t(field.labelKey);
+              const fieldPlaceholder = t(field.placeholderKey);
               if (lockedByServer) {
                 return (
                   <TextField
                     key={field.key}
-                    aria-label={field.label}
-                    value={getReadonlyInputValue(formValues, field.key)}
+                    aria-label={fieldLabel}
+                    value={getReadonlyInputValue(formValues, field.key, t)}
                     isDisabled
                     className={styles.formField}
                   >
-                    <Label>{field.label}</Label>
+                    <Label>{fieldLabel}</Label>
                     <Input readOnly className={styles.editableInput} />
                   </TextField>
                 );
@@ -177,17 +188,17 @@ function AccountForm({
                 <div key={field.key} className={styles.formField}>
                   {field.type === 'input' ? (
                     <TextField
-                      aria-label={field.label}
+                      aria-label={fieldLabel}
                       value={getFieldInputValue(formValues, field.key)}
                       onChange={(value) => updateFormValue(field.key, value)}
                     >
-                      <Label>{field.label}</Label>
-                      <Input placeholder={field.placeholder} className={styles.editableInput} />
+                      <Label>{fieldLabel}</Label>
+                      <Input placeholder={fieldPlaceholder} className={styles.editableInput} />
                     </TextField>
                   ) : (
                     <Select
-                      aria-label={field.label}
-                      placeholder={field.placeholder}
+                      aria-label={fieldLabel}
+                      placeholder={fieldPlaceholder}
                       value={getFieldInputValue(formValues, field.key) || null}
                       onChange={(value) =>
                         updateFormValue(
@@ -197,13 +208,13 @@ function AccountForm({
                       }
                       className={styles.editableInput}
                     >
-                      <Label>{field.label}</Label>
+                      <Label>{fieldLabel}</Label>
                       <Select.Trigger>
                         <Select.Value />
                         {getFieldValue(formValues, field.key) != null ? (
                           <AppIconButton
                             icon={<X aria-hidden="true" />}
-                            label={`清空${field.label}`}
+                            label={t('form.clearField', { field: fieldLabel })}
                             size="sm"
                             className={styles.clearSelectButton}
                             onClick={(event) => {
@@ -218,13 +229,13 @@ function AccountForm({
                       <Select.Popover>
                         <ListBox>
                           {(field.optionsKey ? OPTIONS_MAP[field.optionsKey] : []).map(
-                            ({ value, label }) => (
+                            ({ value, key }) => (
                               <ListBox.Item
                                 key={String(value)}
                                 id={String(value)}
-                                textValue={label}
+                                textValue={t(`enum.${field.optionsKey}.${key}`)}
                               >
-                                {label}
+                                {t(`enum.${field.optionsKey}.${key}`)}
                                 <ListBox.ItemIndicator />
                               </ListBox.Item>
                             )
@@ -239,10 +250,10 @@ function AccountForm({
           </div>
           <div className={styles.formActions}>
             <Button type="submit" variant="primary" isDisabled={saving}>
-              保存
+              {t('actions.save', { ns: 'common' })}
             </Button>
             <Button onPress={handleCancel} className={styles.cancelBtn}>
-              取消
+              {t('actions.cancel', { ns: 'common' })}
             </Button>
           </div>
         </Form>
@@ -250,8 +261,8 @@ function AccountForm({
         <dl className={styles.descriptions}>
           {visibleFields.map((field) => (
             <div key={field.key} className={styles.descriptionItem}>
-              <dt>{field.label}</dt>
-              <dd>{getProfileDisplayString(user, field.key)}</dd>
+              <dt>{t(field.labelKey)}</dt>
+              <dd>{getProfileDisplayString(user, field.key, t)}</dd>
             </div>
           ))}
         </dl>

@@ -5,7 +5,7 @@ import type {
   StyleSchema,
 } from '@blocknote/core';
 import { useMount, useUnmount } from 'ahooks';
-import { useMemo, useRef } from 'react';
+import { useRef, useState } from 'react';
 import * as Y from 'yjs';
 
 /** 笔记正文在 Y.Doc 中的 XmlFragment 名；需与后端 observeDeep 及 BlockNote 绑定名一致 */
@@ -42,7 +42,7 @@ function resolveYjsTrackedOrigins<
 
 // 得到笔记正文在 Y.Doc 中的 XmlFragment 名
 export function useNoteYjsFragment(doc: Y.Doc): Y.XmlFragment {
-  const noteFragment = useMemo(() => doc.getXmlFragment(NOTE_YJS_DOCUMENT_FRAGMENT), [doc]);
+  const noteFragment = doc.getXmlFragment(NOTE_YJS_DOCUMENT_FRAGMENT);
   return noteFragment;
 }
 
@@ -57,7 +57,7 @@ export function useNoteYjsUndoManager<
   editor: BlockNoteEditor<BSchema, ISchema, SSchema>,
   additionalTrackedOrigins: readonly unknown[] = []
 ): Y.UndoManager {
-  const undoManager = useMemo(() => {
+  const [undoManager] = useState(() => {
     const trackedOrigins = resolveYjsTrackedOrigins(editor);
     trackedOrigins.add(null);
     additionalTrackedOrigins.forEach((origin) => trackedOrigins.add(origin));
@@ -65,7 +65,7 @@ export function useNoteYjsUndoManager<
       trackedOrigins,
       captureTimeout: 500,
     });
-  }, [additionalTrackedOrigins, aiContentStore, editor, noteFragment]);
+  });
 
   return undoManager;
 }

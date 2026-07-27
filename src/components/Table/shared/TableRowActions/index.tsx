@@ -2,7 +2,6 @@ import AppIconButton from '@/components/Button/AppIconButton';
 import { Dropdown } from '@heroui/react';
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TABLE_DROPDOWN_POPOVER_CLASS } from '../styles';
 import type { TableRowActionsProps } from './index.type';
 import styles from './style.module.less';
 
@@ -23,7 +22,7 @@ function TableRowActions({ actions, ariaLabel, onAction }: TableRowActionsProps)
         className={styles.trigger}
         overlayTrigger={<Dropdown.Trigger />}
       />
-      <Dropdown.Popover className={TABLE_DROPDOWN_POPOVER_CLASS} placement="bottom end">
+      <Dropdown.Popover placement="bottom end">
         <Dropdown.Menu
           aria-label={resolvedAriaLabel}
           onAction={(key) => {

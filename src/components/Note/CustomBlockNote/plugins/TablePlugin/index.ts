@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { defaultBlockSpecs } from '@blocknote/core';
 import { PanelLeft, PanelTop, StretchHorizontal, Table2 } from 'lucide-react';
 
@@ -11,14 +12,14 @@ function tableActions(content: TableContentLike | null): NoteSideMenuAction[] {
       ? [
           {
             id: 'header-row',
-            label: '标题行',
+            label: i18n.t('table.headerRow', { ns: 'note' }),
             icon: PanelTop,
             kind: 'toggle' as const,
             selected: Boolean(content.headerRows),
           },
           {
             id: 'header-column',
-            label: '标题列',
+            label: i18n.t('table.headerColumn', { ns: 'note' }),
             icon: PanelLeft,
             kind: 'toggle' as const,
             selected: Boolean(content.headerCols),
@@ -27,7 +28,7 @@ function tableActions(content: TableContentLike | null): NoteSideMenuAction[] {
       : []),
     {
       id: 'reset-column-widths',
-      label: '均分列宽',
+      label: i18n.t('table.distributeColumns', { ns: 'note' }),
       icon: StretchHorizontal,
       kind: 'command',
     },

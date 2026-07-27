@@ -3,20 +3,22 @@ import { copyText } from '@/utils/browser/copyText';
 import { toast } from '@heroui/react';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CopyButtonProps } from './index.type';
 
 const ICON_SIZE = 17;
 
-function CopyButton({ text, label = '复制', className }: CopyButtonProps) {
+function CopyButton({ text, label, className }: CopyButtonProps) {
+  const { t } = useTranslation('common');
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     if (!(await copyText(text))) {
-      toast.danger('复制失败');
+      toast.danger(t('copy.failed'));
       return;
     }
 
-    toast.success('复制成功');
+    toast.success(t('copy.success'));
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
@@ -30,7 +32,7 @@ function CopyButton({ text, label = '复制', className }: CopyButtonProps) {
           <Copy size={ICON_SIZE} aria-hidden="true" />
         )
       }
-      label={copied ? '已复制' : label}
+      label={copied ? t('copy.copied') : (label ?? t('copy.action'))}
       isActive={copied}
       className={className}
       onPress={() => void handleCopy()}

@@ -19,12 +19,36 @@ import type {
   UpdateMemberRoleRequest,
 } from './index.type';
 
+const ALL_GROUPS_PAGE_SIZE = 100;
+
 const fetchGroupList = async (
   params: FetchGroupListRequest
 ): Promise<{ groups: Group[]; total: number }> => {
   const query = GroupServicesMap.mapFetchGroupListRequest(params);
   const payload = await GroupApi.list(query);
   return GroupServicesMap.mapFetchGroupListFromApi(payload);
+};
+
+const fetchAllMyGroups = async (): Promise<Group[]> => {
+  const groups: Group[] = [];
+  let page = 1;
+
+  while (true) {
+    const data = await fetchGroupList({
+      groupRoleFilter: 'ALL',
+      page,
+      size: ALL_GROUPS_PAGE_SIZE,
+    });
+    groups.push(...data.groups);
+
+    if (
+      data.groups.length < ALL_GROUPS_PAGE_SIZE ||
+      (data.total > 0 && groups.length >= data.total)
+    ) {
+      return groups;
+    }
+    page += 1;
+  }
 };
 
 const fetchGroupInfo = async (groupId: string): Promise<Group> => {
@@ -129,6 +153,7 @@ const kickMembers = async (params: KickMembersRequest) => {
 
 export const createGroupServices = (): IGroupService => ({
   fetchGroupList,
+  fetchAllMyGroups,
   fetchGroupBaseInfo,
   fetchGroupInfo,
   getGroupWalletInfo,

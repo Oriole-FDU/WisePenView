@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useState, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { RatingProps } from './index.type';
 import styles from './style.module.less';
@@ -8,11 +9,12 @@ function Rating({
   value = 0,
   maxValue = 5,
   isDisabled = false,
-  ariaLabel = 'Rating',
+  ariaLabel,
   size = 'md',
   className,
   onValueChange,
 }: RatingProps) {
+  const { t } = useTranslation('common');
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const [pressedValue, setPressedValue] = useState<number | null>(null);
   const values = Array.from({ length: Math.max(maxValue, 0) }, (_, index) => index + 1);
@@ -47,7 +49,7 @@ function Rating({
     <div
       className={clsx(styles.rating, size === 'sm' && styles.ratingSmall, className)}
       role="radiogroup"
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? t('rating.aria')}
       aria-disabled={isDisabled || undefined}
       onKeyDown={handleKeyDown}
       onMouseLeave={() => setHoverValue(null)}
@@ -68,7 +70,7 @@ function Rating({
             disabled={isDisabled}
             role="radio"
             aria-checked={value === itemValue}
-            aria-label={`${itemValue} 分`}
+            aria-label={t('rating.scoreAria', { value: itemValue })}
             tabIndex={isDisabled ? -1 : value === itemValue || (!value && itemValue === 1) ? 0 : -1}
             onClick={() => updateValue(itemValue)}
             onAnimationEnd={() =>

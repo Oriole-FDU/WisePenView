@@ -2,7 +2,6 @@ import { buildApiUrl } from '@/apis/clientUrls';
 import { applyXDeveloperHeader } from '@/apis/developmentTraffic';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
-import { useCallback } from 'react';
 import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
 import { mapChatCompletionRequest } from '../mapper/chatCompletion.mapper';
 import type { SendSessionMessageOptions, UseChatSessionOptions } from './index.type';
@@ -33,40 +32,37 @@ export const useChatSession = ({ sessionId, model }: UseChatSessionOptions) => {
     }),
   });
 
-  const sendSessionMessage = useCallback(
-    async (query: string, options?: SendSessionMessageOptions) => {
-      const requestBody = mapChatCompletionRequest({
-        defaultSessionId: sessionId,
-        defaultModel: model,
-        query,
-        options,
-      });
-      // 仅用于当次会话 UI；历史回放待后端 listHistoryMessages 透出 metadata
-      const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
-        .filter((attachment) => attachment.enabled)
-        .map((attachment) => ({
-          attachmentId: attachment.attachmentId,
-          filename: attachment.filename,
-          kind: 'temporary' as const,
-          available: true,
-        }));
-      const resourceAttachmentSnapshots = (options?.selectedResources ?? [])
-        .filter((resource) => resource.enabled)
-        .map((resource) => ({
-          attachmentId: resource.resourceId,
-          filename: resource.resourceName,
-          kind: 'resource' as const,
-          available: true,
-        }));
-      const selectedAttachments = [...resourceAttachmentSnapshots, ...uploadedAttachmentSnapshots];
-      const metadata: ChatMessageMetadata = {
-        createdAt: new Date().toISOString(),
-        ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
-      };
-      await chat.sendMessage({ text: query, metadata }, { body: requestBody });
-    },
-    [chat, model, sessionId]
-  );
+  const sendSessionMessage = async (query: string, options?: SendSessionMessageOptions) => {
+    const requestBody = mapChatCompletionRequest({
+      defaultSessionId: sessionId,
+      defaultModel: model,
+      query,
+      options,
+    });
+    // 仅用于当次会话 UI；历史回放待后端 listHistoryMessages 透出 metadata
+    const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
+      .filter((attachment) => attachment.enabled)
+      .map((attachment) => ({
+        attachmentId: attachment.attachmentId,
+        filename: attachment.filename,
+        kind: 'temporary' as const,
+        available: true,
+      }));
+    const resourceAttachmentSnapshots = (options?.selectedResources ?? [])
+      .filter((resource) => resource.enabled)
+      .map((resource) => ({
+        attachmentId: resource.resourceId,
+        filename: resource.resourceName,
+        kind: 'resource' as const,
+        available: true,
+      }));
+    const selectedAttachments = [...resourceAttachmentSnapshots, ...uploadedAttachmentSnapshots];
+    const metadata: ChatMessageMetadata = {
+      createdAt: new Date().toISOString(),
+      ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
+    };
+    await chat.sendMessage({ text: query, metadata }, { body: requestBody });
+  };
 
   return {
     ...chat,

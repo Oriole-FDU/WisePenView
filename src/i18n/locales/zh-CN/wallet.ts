@@ -1,0 +1,65 @@
+const zhCNWallet = {
+  balance: {
+    label: '计算点余额',
+    unit: '计算点',
+    recharge: '充值',
+  },
+  recharge: {
+    personalTitle: '个人充值',
+    groupTitle: '为「{{name}}」充值',
+    success: '充值成功',
+    submitting: '充值中...',
+    confirm: '确认充值',
+    codeLabel: '兑换码',
+    invalidCode: '请输入 16 位兑换码',
+    hint: '请输入 16 位兑换码，将自动转为大写并分段显示。',
+  },
+  transaction: {
+    title: '交易明细',
+    aria: '交易明细',
+    typeAria: '交易明细类型',
+    empty: '暂无交易明细',
+    tabs: {
+      all: '全部',
+      recharge: '充值',
+      spend: '消费',
+    },
+    columns: {
+      time: '时间',
+      type: '类型',
+      summary: '摘要 / 备注',
+      amount: '变动金额',
+      operator: '操作人',
+    },
+    kind: {
+      recharge: '充值',
+      spend: '消费',
+      transferIn: '划入',
+      transferOut: '划出',
+    },
+  },
+  transfer: {
+    missingGroup: '缺少小组信息',
+    intro:
+      '点卡兑换仅计入组长个人账户。您可将个人账户中的计算点划入小组池，或将小组池余额转回个人账户，便于统一给组员分配使用。',
+    currentBalance: '当前余额',
+    refresh: '刷新',
+    ownerBalance: '组长个人计算点',
+    groupBalance: '小组池计算点',
+    unit: '点',
+    toGroupTitle: '划入小组池',
+    toGroupAria: '转入小组池数量',
+    toGroupConfirm: '确认转入小组',
+    toOwnerTitle: '从小组池转回组长',
+    toOwnerAria: '转回组长数量',
+    toOwnerConfirm: '确认转回组长',
+    amountPlaceholder: '数量',
+    invalidAmount: '请输入大于 0 的整数',
+    ownerInsufficient: '组长个人计算点不足',
+    groupInsufficient: '小组池计算点不足',
+    toGroupSuccess: '已转入小组池',
+    toOwnerSuccess: '已转回组长账户',
+  },
+};
+
+export default zhCNWallet;

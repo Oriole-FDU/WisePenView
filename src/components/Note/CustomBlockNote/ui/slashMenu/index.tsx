@@ -3,6 +3,7 @@ import { filterSuggestionItems } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem, SuggestionMenuProps } from '@blocknote/react';
 import { SuggestionMenuController, useBlockNoteEditor } from '@blocknote/react';
 import { ListBox, ListBoxItem } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { blockNoteSchema, type CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteContentPlugin } from '../../registry/types';
 import {
@@ -23,14 +24,16 @@ interface NoteSlashMenuProps {
 function getSuggestionMenuContentKey(items: DefaultReactSuggestionItem[]) {
   return items
     .map(
-      (item, index) => getSlashMenuItemKey(item) ?? `${item.group ?? '其他'}:${item.title}:${index}`
+      (item, index) =>
+        getSlashMenuItemKey(item) ?? `${item.group ?? 'other'}:${item.title}:${index}`
     )
     .join('|');
 }
 
 function SlashMenuState({ text }: { text: string }) {
+  const { t } = useTranslation('note');
   return (
-    <ListBox id="bn-suggestion-menu" aria-label="斜杠菜单" className={styles.menuState}>
+    <ListBox id="bn-suggestion-menu" aria-label={t('slashMenu.label')} className={styles.menuState}>
       <ListBoxItem id="slash-menu-state" textValue={text} isDisabled className={styles.emptyItem}>
         {text}
       </ListBoxItem>
@@ -47,6 +50,7 @@ function NoteSuggestionMenuList({
   items: DefaultReactSuggestionItem[];
   onItemClick?: (item: DefaultReactSuggestionItem) => void;
 }) {
+  const { t } = useTranslation('note');
   const {
     canScrollDown,
     canScrollUp,
@@ -67,7 +71,7 @@ function NoteSuggestionMenuList({
     >
       <span aria-hidden className={styles.keyboardFrame} />
       <div ref={viewportRef} className={styles.menuViewport} onScroll={handleScroll}>
-        <ListBox id="bn-suggestion-menu" aria-label="斜杠菜单" className={styles.menu}>
+        <ListBox id="bn-suggestion-menu" aria-label={t('slashMenu.label')} className={styles.menu}>
           <SlashMenuListBoxItems
             items={items}
             getItemId={(_item, index) => getSlashMenuItemId(index)}
@@ -86,14 +90,15 @@ function NoteSuggestionMenu({
   loadingState,
   onItemClick,
 }: SuggestionMenuProps<DefaultReactSuggestionItem>) {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
 
   if (loadingState === 'loading-initial') {
-    return <SlashMenuState text="加载中..." />;
+    return <SlashMenuState text={t('slashMenu.loading')} />;
   }
 
   if (displayItems.length === 0) {
-    return <SlashMenuState text="无匹配项" />;
+    return <SlashMenuState text={t('slashMenu.empty')} />;
   }
 
   return (

@@ -3,7 +3,7 @@ import type { DataNode, TreeDropPosition } from '@/components/Tree';
 import Tree from '@/components/Tree';
 import type { SkillFileNode } from '@/domains/Skill';
 import { FileCode2, FileText, Folder, X } from 'lucide-react';
-import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { SkillFileTreeProps, SkillPendingCreate } from './index.type';
 import styles from './style.module.less';
@@ -13,6 +13,7 @@ const PENDING_KEY = '__pending_create__';
 interface BuildTreeOptions {
   isOwner: boolean;
   onDeleteFile: (id: string) => void;
+  getDeleteLabel: (name: string) => string;
 }
 
 function buildTreeData(nodes: SkillFileNode[], opts: BuildTreeOptions): DataNode[] {
@@ -39,7 +40,7 @@ function buildTreeData(nodes: SkillFileNode[], opts: BuildTreeOptions): DataNode
           {opts.isOwner ? (
             <AppIconButton
               icon={<X size={12} aria-hidden="true" />}
-              label={`删除 ${node.name}`}
+              label={opts.getDeleteLabel(node.name)}
               size="sm"
               variant="danger"
               className={styles.deleteBtn}
@@ -154,12 +155,14 @@ function SkillFileTree({
   onDeleteFile,
   onMoveFile,
 }: SkillFileTreeProps) {
-  const opts = useMemo<BuildTreeOptions>(
-    () => ({ isOwner, onDeleteFile }),
-    [isOwner, onDeleteFile]
-  );
+  const { t } = useTranslation('skill');
+  const opts = {
+    isOwner,
+    onDeleteFile,
+    getDeleteLabel: (name) => t('fileTree.deleteItem', { name }),
+  } satisfies BuildTreeOptions;
 
-  const treeData = useMemo(() => {
+  const treeData = (() => {
     const base = buildTreeData(files, opts);
     const fileNodes = pendingCreate
       ? insertPendingNode(
@@ -170,7 +173,7 @@ function SkillFileTree({
       : base;
 
     return prependNodes.length > 0 ? [...prependNodes, ...fileNodes] : fileNodes;
-  }, [files, onCancelCreate, onCommitCreate, opts, pendingCreate, prependNodes]);
+  })();
 
   const handleSelect = (keys: React.Key[]) => {
     const key = String(keys[0] ?? '');

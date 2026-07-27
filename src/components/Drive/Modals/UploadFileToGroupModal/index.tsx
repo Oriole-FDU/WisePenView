@@ -2,14 +2,14 @@ import DriveNavigator from '@/components/Drive/DriveNavigator';
 import AppModal from '@/components/Overlay/AppModal';
 import StepDots from '@/components/StepDots';
 import { useResourceService } from '@/domains';
-import { useEffectForce } from '@/hooks/useEffectForce';
 import { parseErrorMessage } from '@/utils/error';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { DriveSelectionItem } from '../../common/driveComponentModel';
-import styles from './index.module.less';
 import type { UploadFileToGroupModalProps } from './index.type';
+import styles from './style.module.less';
 
 function UploadFileToGroupModal({
   isOpen,
@@ -17,6 +17,7 @@ function UploadFileToGroupModal({
   groupId,
   onSuccess,
 }: UploadFileToGroupModalProps) {
+  const { t } = useTranslation(['drive', 'common']);
   const resourceService = useResourceService();
   const [step, setStep] = useState(0);
   const [navRefreshKey, setNavRefreshKey] = useState(0);
@@ -27,6 +28,12 @@ function UploadFileToGroupModal({
     setStep(0);
     setSelectedFileIds([]);
     setSelectedTargetTagId(undefined);
+  };
+
+  const closeModal = () => {
+    resetState();
+    setNavRefreshKey((key) => key + 1);
+    onOpenChange(false);
   };
 
   const handleFilesChange = (nodes: DriveSelectionItem[]) => {
@@ -54,9 +61,9 @@ function UploadFileToGroupModal({
     {
       manual: true,
       onSuccess: (count) => {
-        toast.success(`已添加 ${count} 个文件到小组`);
+        toast.success(t('upload.group.success', { count }));
         onSuccess?.();
-        onOpenChange(false);
+        closeModal();
       },
       onError: (err) => {
         toast.danger(parseErrorMessage(err));
@@ -72,22 +79,10 @@ function UploadFileToGroupModal({
   const canNext = selectedFileIds.length > 0;
   const canSubmit = canNext && Boolean(selectedTargetTagId);
 
-  /**
-   * 弹窗每次打开都需要清空上次选择并刷新两棵选择树；
-   * 这里依赖打开态变化触发，不能放到提交或关闭事件中，否则重新打开会短暂显示旧选择。
-   * 本 effect 不注册外部订阅，因此不需要 cleanup。
-   */
-  useEffectForce(() => {
-    if (!isOpen) return;
-    resetState();
-    setNavRefreshKey((k) => k + 1);
-  }, [isOpen]);
-
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
       if (submitting) return;
-      resetState();
-      onOpenChange(false);
+      closeModal();
     }
   };
 
@@ -95,26 +90,26 @@ function UploadFileToGroupModal({
     <AppModal
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
-      title="从个人云盘添加文件"
+      title={t('upload.group.title')}
       size="md"
       isDismissable={!submitting}
       actions={
         <>
-          <Button variant="secondary" onPress={() => onOpenChange(false)} isDisabled={submitting}>
-            取消
+          <Button variant="secondary" onPress={closeModal} isDisabled={submitting}>
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           {step === 1 && (
             <Button variant="secondary" onPress={() => setStep(0)} isDisabled={submitting}>
-              上一步
+              {t('upload.group.previous')}
             </Button>
           )}
           {step === 0 ? (
             <Button variant="primary" onPress={() => setStep(1)} isDisabled={!canNext}>
-              下一步
+              {t('upload.group.next')}
             </Button>
           ) : (
             <Button variant="primary" onPress={handleSubmit} isDisabled={submitting || !canSubmit}>
-              确定
+              {t('actions.confirm', { ns: 'common' })}
             </Button>
           )}
         </>
@@ -124,7 +119,10 @@ function UploadFileToGroupModal({
         <div className={styles.stepsRow}>
           <StepDots
             current={step}
-            items={[{ title: '选择个人文件' }, { title: '选择目标文件夹' }]}
+            items={[
+              { title: t('upload.group.selectFilesStep') },
+              { title: t('upload.group.selectFolderStep') },
+            ]}
           />
         </div>
 
@@ -132,7 +130,7 @@ function UploadFileToGroupModal({
           <div className={`${styles.slideTrack} ${step === 1 ? styles.slideTrackShift : ''}`}>
             <div className={styles.slidePane}>
               <div className={styles.treeSection}>
-                <div className={styles.hint}>选择要添加的文件（可多选）</div>
+                <div className={styles.hint}>{t('upload.group.selectFilesHint')}</div>
                 <div className={styles.navTree}>
                   <DriveNavigator
                     key={`personal-${navRefreshKey}`}
@@ -147,7 +145,7 @@ function UploadFileToGroupModal({
             </div>
             <div className={styles.slidePane}>
               <div className={styles.treeSection}>
-                <div className={styles.hint}>选择文件要添加到的小组文件夹（只能选择一个）</div>
+                <div className={styles.hint}>{t('upload.group.selectFolderHint')}</div>
                 <div className={styles.navTree}>
                   <DriveNavigator
                     key={`group-tree-tag-${groupId}-${navRefreshKey}`}

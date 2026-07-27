@@ -25,15 +25,18 @@
     background: transparent;
     color: var(--foreground);
     font-weight: inherit;
+    /* 关闭 HeroUI Button 默认按下 scale(0.97) */
+    transform: none;
+    transition: background-color 100ms var(--ease-out, ease);
   }
 
   &&:hover:not(:disabled) {
     background: var(--surface-secondary);
   }
 
-  :global([data-slot='disclosure-indicator']) {
-    flex-shrink: 0;
-    color: var(--muted);
+  &&:active,
+  &&[data-pressed='true'] {
+    transform: none;
   }
 }
 
@@ -76,6 +79,15 @@
 
 .statusChipIcon {
   flex-shrink: 0;
+}
+
+.indicator {
+  flex-shrink: 0;
+  color: var(--muted);
+
+  &[data-expanded='true'] {
+    transform: rotate(180deg);
+  }
 }
 
 .panel {

@@ -13,9 +13,11 @@ import {
   ToggleButtonGroup,
 } from '@heroui/react';
 import { ChevronDown } from 'lucide-react';
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from '@/components/Input';
+import { changeAppLanguage } from '@/i18n';
+import type { SupportedLanguage } from '@/i18n/resources';
 import {
   COLOR_SCHEME_OPTIONS,
   THEME_FORM_RADIUS_OPTIONS,
@@ -42,10 +44,12 @@ type ThemeModeSectionProps = {
 };
 
 function ThemeModeSection({ value, onChange }: ThemeModeSectionProps) {
+  const { t } = useTranslation('profile');
+
   return (
     <section className={styles.section}>
       <Heading level={3} className={layout.sectionTitle}>
-        明暗模式
+        {t('appearance.mode')}
       </Heading>
       <Tabs
         className={styles.modeTabs}
@@ -53,10 +57,10 @@ function ThemeModeSection({ value, onChange }: ThemeModeSectionProps) {
         onSelectionChange={(next) => onChange(String(next) as ThemeMode)}
       >
         <Tabs.ListContainer className={styles.modeTabsListContainer}>
-          <Tabs.List className={styles.modeTabsList} aria-label="明暗模式">
+          <Tabs.List className={styles.modeTabsList} aria-label={t('appearance.mode')}>
             {THEME_MODE_OPTIONS.map((option) => (
               <Tabs.Tab key={option.id} id={option.id} className={styles.modeTab}>
-                {option.label}
+                {t(option.labelKey)}
                 <Tabs.Indicator />
               </Tabs.Tab>
             ))}
@@ -73,14 +77,16 @@ type ColorSchemeSectionProps = {
 };
 
 function ColorSchemeSection({ value, onChange }: ColorSchemeSectionProps) {
+  const { t } = useTranslation('profile');
+
   return (
     <section className={styles.section}>
       <Heading level={3} className={layout.sectionTitle}>
-        主题配色（Base / Accent）
+        {t('appearance.colorScheme')}
       </Heading>
       <div className={styles.schemeGrid}>
         <ToggleButtonGroup
-          aria-label="主题配色"
+          aria-label={t('appearance.colorScheme')}
           selectionMode="single"
           selectedKeys={new Set([value])}
           onSelectionChange={(keys) => {
@@ -113,10 +119,12 @@ function ThemeShapeSection({
   onRadiusChange,
   onFormRadiusChange,
 }: ThemeShapeSectionProps) {
+  const { t } = useTranslation('profile');
+
   return (
     <section className={styles.section}>
       <Heading level={3} className={layout.sectionTitle}>
-        圆角
+        {t('appearance.radius')}
       </Heading>
       <div className={styles.shapeControls}>
         <ShapeOptionGroup
@@ -187,61 +195,58 @@ type SchemeOptionProps = {
 };
 
 function SchemeOption({ option }: SchemeOptionProps) {
-  const ref = React.useRef<HTMLButtonElement | null>(null);
+  const { t } = useTranslation('profile');
 
   return (
-    <ToggleButton
-      ref={ref}
-      id={option.id}
-      data-scheme-preview={option.id}
-      className={styles.schemeOption}
-    >
+    <ToggleButton id={option.id} data-scheme-preview={option.id} className={styles.schemeOption}>
       <span className={styles.schemePreview}>
         <span className={styles.schemeSwatch} />
         <span className={styles.schemeSwatch} />
         <span className={styles.schemeSwatch} />
       </span>
-      <span className={styles.schemeLabel}>{option.label}</span>
-      <span className={styles.schemeDescription}>{option.description}</span>
+      <span className={styles.schemeLabel}>{t(option.labelKey)}</span>
+      <span className={styles.schemeDescription}>{t(option.descriptionKey)}</span>
     </ToggleButton>
   );
 }
 
 function ThemeVariantPreview() {
+  const { t } = useTranslation('profile');
+
   return (
     <div className={styles.variantPreview}>
-      <span className={styles.variantPreviewTitle}>Button Variants</span>
+      <span className={styles.variantPreviewTitle}>{t('appearance.preview.buttonVariants')}</span>
       <div className={styles.variantRow}>
-        <span className={styles.variantRowLabel}>Accent</span>
+        <span className={styles.variantRowLabel}>{t('appearance.preview.accent')}</span>
         <div className={styles.variantRowActions}>
           <Button size="sm" variant="primary">
-            Solid
+            {t('appearance.preview.solid')}
           </Button>
           <Button size="sm" variant="secondary" className={styles.variantSoftAccent}>
-            Soft
+            {t('appearance.preview.soft')}
           </Button>
           <Button size="sm" variant="outline">
-            Outline
+            {t('appearance.preview.outline')}
           </Button>
           <Button size="sm" variant="ghost">
-            Ghost
+            {t('appearance.preview.ghost')}
           </Button>
         </div>
       </div>
       <div className={styles.variantRow}>
-        <span className={styles.variantRowLabel}>Gray</span>
+        <span className={styles.variantRowLabel}>{t('appearance.preview.gray')}</span>
         <div className={styles.variantRowActions}>
           <Button size="sm" variant="secondary">
-            Solid
+            {t('appearance.preview.solid')}
           </Button>
           <Button size="sm" variant="tertiary">
-            Soft
+            {t('appearance.preview.soft')}
           </Button>
           <Button size="sm" variant="outline" className={styles.variantOutlineGray}>
-            Outline
+            {t('appearance.preview.outline')}
           </Button>
           <Button size="sm" variant="ghost" className={styles.variantGhostGray}>
-            Ghost
+            {t('appearance.preview.ghost')}
           </Button>
         </div>
       </div>
@@ -250,39 +255,44 @@ function ThemeVariantPreview() {
 }
 
 function ThemePreviewSection() {
+  const { t } = useTranslation(['profile', 'common']);
+
   return (
     <section className={styles.section}>
       <Heading level={3} className={layout.sectionTitle}>
-        主题验证
+        {t('appearance.preview.title')}
       </Heading>
       <div className={styles.previewGrid}>
         <Card className={styles.previewCard}>
           <Card.Content className={styles.previewBody}>
             <ThemeVariantPreview />
             <div className={styles.previewActions}>
-              <Button variant="primary">Primary</Button>
-              <Button variant="secondary">Secondary</Button>
+              <Button variant="primary">{t('appearance.preview.primary')}</Button>
+              <Button variant="secondary">{t('appearance.preview.secondary')}</Button>
               <Dropdown>
                 <Dropdown.Trigger>
                   <Button variant="tertiary">
-                    菜单
+                    {t('appearance.preview.menu')}
                     <ChevronDown size={14} />
                   </Button>
                 </Dropdown.Trigger>
                 <Dropdown.Popover>
-                  <Dropdown.Menu aria-label="主题验证菜单">
-                    <Dropdown.Item key="edit">编辑</Dropdown.Item>
-                    <Dropdown.Item key="copy">复制</Dropdown.Item>
+                  <Dropdown.Menu aria-label={t('appearance.preview.menuAria')}>
+                    <Dropdown.Item key="edit">{t('actions.edit', { ns: 'common' })}</Dropdown.Item>
+                    <Dropdown.Item key="copy">{t('actions.copy', { ns: 'common' })}</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown.Popover>
               </Dropdown>
             </div>
-            <TextField aria-label="主题验证输入框" className={styles.previewField}>
-              <Label>输入框</Label>
-              <Input placeholder="Radius Form 控制这里" />
+            <TextField
+              aria-label={t('appearance.preview.inputAria')}
+              className={styles.previewField}
+            >
+              <Label>{t('appearance.preview.inputLabel')}</Label>
+              <Input placeholder={t('appearance.preview.inputPlaceholder')} />
             </TextField>
             <ProgressBar
-              aria-label="主题验证进度"
+              aria-label={t('appearance.preview.progressAria')}
               value={64}
               valueLabel="64%"
               className={styles.previewProgress}
@@ -297,19 +307,19 @@ function ThemePreviewSection() {
 
         <div className={styles.previewDialog}>
           <div className={styles.previewDialogHeader}>
-            <span>Modal / Table 外壳</span>
+            <span>{t('appearance.preview.shell')}</span>
           </div>
           <div className={styles.previewTable}>
             <div className={styles.previewTableRow}>
-              <span>Button</span>
+              <span>{t('appearance.preview.button')}</span>
               <span>--radius-3xl</span>
             </div>
             <div className={styles.previewTableRow}>
-              <span>Input</span>
+              <span>{t('appearance.preview.input')}</span>
               <span>--radius-field</span>
             </div>
             <div className={styles.previewTableRow}>
-              <span>Table</span>
+              <span>{t('appearance.preview.table')}</span>
               <span>--table-shell-radius</span>
             </div>
           </div>
@@ -320,15 +330,48 @@ function ThemePreviewSection() {
 }
 
 function AppearanceHeader() {
+  const { t } = useTranslation('profile');
+
   return (
     <header className={layout.pageHeader}>
       <Heading level={1} className={layout.pageTitle}>
-        外观
+        {t('appearance.title')}
       </Heading>
       <Paragraph size="sm" color="muted" className={layout.pageSubtitle}>
-        设置明暗与主题
+        {t('appearance.subtitle')}
       </Paragraph>
     </header>
+  );
+}
+
+function LanguageSection() {
+  const { i18n, t } = useTranslation(['profile', 'common']);
+  const selectedLanguage: SupportedLanguage = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
+
+  return (
+    <section className={styles.section}>
+      <Heading level={3} className={layout.sectionTitle}>
+        {t('appearance.language')}
+      </Heading>
+      <Tabs
+        className={styles.modeTabs}
+        selectedKey={selectedLanguage}
+        onSelectionChange={(next) => void changeAppLanguage(String(next) as SupportedLanguage)}
+      >
+        <Tabs.ListContainer className={styles.modeTabsListContainer}>
+          <Tabs.List className={styles.modeTabsList} aria-label={t('appearance.languageAria')}>
+            <Tabs.Tab id="zh-CN" className={styles.modeTab}>
+              {t('language.zhCN', { ns: 'common' })}
+              <Tabs.Indicator />
+            </Tabs.Tab>
+            <Tabs.Tab id="en-US" className={styles.modeTab}>
+              {t('language.enUS', { ns: 'common' })}
+              <Tabs.Indicator />
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
+    </section>
   );
 }
 
@@ -342,6 +385,8 @@ function Appearance() {
       <AppearanceHeader />
       <Card className={styles.panel}>
         <Card.Content className={styles.body}>
+          <LanguageSection />
+          <Separator className={styles.divider} />
           <ThemeModeSection value={theme} onChange={setTheme} />
           <Separator className={styles.divider} />
           <ColorSchemeSection value={colorScheme} onChange={setColorScheme} />

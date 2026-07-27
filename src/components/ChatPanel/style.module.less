@@ -2,7 +2,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-width: var(--chat-panel-min-width);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
   position: relative;
   /* 与 Note / Workspace 主区同纸面；fullWidth 亦同 */
   --chat-shell-bg: var(--surface);
@@ -15,17 +17,35 @@
   --chat-thinking-line-height: 1.6;
   --chat-hr-margin-bottom: var(--space-sm);
   --chat-message-inline-padding: var(--space-2xl);
-  /* 右侧为历史横条轨留白，避免消息贴边 */
-  --chat-message-inline-padding-end: calc(var(--space-2xl) + var(--space-xl) + var(--space-md));
+  /* 侧栏：右侧历史横条轨留白收紧，消息更靠近右侧条 */
+  --chat-message-inline-padding-end: calc(var(--space-xl) + var(--space-xl));
   --chat-message-max-width: none;
   --chat-content-max-width: none;
   /* 侧栏：用户消息收窄，避免占满整栏 */
   --chat-user-message-max-width: 72%;
   --chat-avatar-size: 24px;
   --chat-model-meta-font-size: var(--font-size-base);
-  --chat-footer-scroll-offset: 132px;
+  /* 历史导航：侧栏紧凑 */
+  --history-nav-preview-font-size: var(--font-size-xs);
+  --history-nav-item-padding-block: var(--space-2xs);
+  --history-nav-item-padding-inline: var(--space-xs);
+  --history-nav-item-gap: var(--space-md);
+  --history-nav-panel-padding-block: var(--space-md);
+  --history-nav-panel-padding-inline: var(--space-lg);
+  --history-nav-panel-min-width: 148px;
+  --history-nav-panel-max-width: 260px;
+  --history-nav-bar-width: 12px;
+  --history-nav-bar-hover-width: 18px;
+  --history-nav-bar-active-width: 22px;
+  --history-nav-bar-height: 3px;
+  --history-nav-bar-hover-height: 5px;
+  --history-nav-bar-active-height: 6px;
+  --history-nav-bar-gap: var(--space-sm);
 
   &.fullWidth {
+    min-width: 0;
+    width: 100%;
+    height: 100%;
     --chat-shell-bg: var(--surface);
     --chat-message-font-size: var(--font-size-heading-5);
     --chat-message-line-height: 1.625;
@@ -39,8 +59,24 @@
     --chat-user-message-max-width: 520px;
     --chat-avatar-size: 28px;
     --chat-model-meta-font-size: var(--font-size-lg);
+    /* 历史导航：全宽放大字号与点击区 */
+    --history-nav-preview-font-size: var(--font-size-sm);
+    --history-nav-item-padding-block: var(--space-xs);
+    --history-nav-item-padding-inline: var(--space-sm);
+    --history-nav-item-gap: var(--space-lg);
+    --history-nav-panel-padding-block: var(--space-lg);
+    --history-nav-panel-padding-inline: var(--space-xl);
+    --history-nav-panel-min-width: 200px;
+    --history-nav-panel-max-width: 320px;
+    --history-nav-bar-width: 16px;
+    --history-nav-bar-hover-width: 24px;
+    --history-nav-bar-active-width: 28px;
+    --history-nav-bar-height: 4px;
+    --history-nav-bar-hover-height: 6px;
+    --history-nav-bar-active-height: 7px;
+    --history-nav-bar-gap: var(--space-md);
 
-    .content {
+    .conversationPanel {
       width: 100%;
       max-width: none;
       margin-inline: 0;
@@ -65,9 +101,16 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+}
 
-  &.collapsedHeader {
-    padding: var(--space-sm);
+:global(html[data-layout-height='short']) {
+  .header {
+    padding-block: var(--space-xs);
+  }
+
+  .headerLeft,
+  .headerRight {
+    min-height: 32px;
   }
 }
 
@@ -120,13 +163,6 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-}
-
-.content {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
   position: relative;
   padding: 0;
 }
@@ -147,6 +183,25 @@
   display: flex;
   flex-direction: column;
   padding-top: 0;
+  /* 输入框已移到滚动容器外，滚动按钮不再需要为 footer 预留偏移 */
+  --chat-footer-scroll-offset: 0px;
+}
+
+.footerSlot {
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+  margin-top: calc(-1 * var(--space-lg));
+  padding: var(--space-lg)
+    var(--chat-message-inline-padding-end, var(--chat-message-inline-padding, var(--space-lg)))
+    var(--space-xs) var(--chat-message-inline-padding, var(--space-lg));
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--chat-shell-bg, var(--surface)) 0%, transparent) 0%,
+    var(--chat-shell-bg, var(--surface)) 20%
+  );
 }
 
 .sessionList {
@@ -258,12 +313,4 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-}
-
-.footer {
-  flex-shrink: 0;
-  padding: 0
-    var(--chat-message-inline-padding-end, var(--chat-message-inline-padding, var(--space-lg)))
-    var(--space-xs) var(--chat-message-inline-padding, var(--space-lg));
-  background: transparent;
 }

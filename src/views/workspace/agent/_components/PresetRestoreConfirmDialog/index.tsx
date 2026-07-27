@@ -1,4 +1,5 @@
 import AppAlertDialog from '@/components/Overlay/AppAlertDialog';
+import { useTranslation } from 'react-i18next';
 
 interface PresetRestoreConfirmDialogProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ export default function PresetRestoreConfirmDialog({
   onOpenChange,
   onConfirm,
 }: PresetRestoreConfirmDialogProps) {
+  const { t } = useTranslation(['agent', 'common']);
+
   return (
     <AppAlertDialog
       type="warning"
@@ -22,8 +25,8 @@ export default function PresetRestoreConfirmDialog({
       onOpenChange={onOpenChange}
       title={title}
       description={description}
-      cancelText="取消"
-      confirmText="恢复预设"
+      cancelText={t('common:actions.cancel')}
+      confirmText={t('agent:common.restorePreset')}
       onConfirm={onConfirm}
       isDismissable
     />

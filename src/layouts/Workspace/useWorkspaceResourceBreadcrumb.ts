@@ -5,11 +5,12 @@ import {
 import { useDriveService, useGroupService } from '@/domains';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
 import { useRequest } from 'ahooks';
-import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useWorkspaceNavigationStore } from './_store/useWorkspaceNavigationStore';
 
 export function useWorkspaceResourceBreadcrumb(resourceId?: string) {
+  const { t } = useTranslation('workspace');
   const driveService = useDriveService();
   const groupService = useGroupService();
   const navigate = useNavigate();
@@ -37,7 +38,8 @@ export function useWorkspaceResourceBreadcrumb(resourceId?: string) {
           nodeId: node.id,
           label:
             index === 0
-              ? group?.groupName || (groupId ? '未命名小组' : '个人云盘')
+              ? group?.groupName ||
+                (groupId ? t('breadcrumb.unnamedGroup') : t('breadcrumb.personalDrive'))
               : getDriveNodeLabel(node),
         })),
       };
@@ -50,6 +52,7 @@ export function useWorkspaceResourceBreadcrumb(resourceId?: string) {
         resourceLocation?.parentNodeId,
         location.scope.rootId,
         groupId,
+        t,
       ],
     }
   );
@@ -62,12 +65,9 @@ export function useWorkspaceResourceBreadcrumb(resourceId?: string) {
       ? data.items
       : [];
 
-  const navigateToNode = useCallback(
-    (nodeId: string) => {
-      navigate(buildDrivePath({ scope: location.scope, nodeId }));
-    },
-    [location.scope, navigate]
-  );
+  const navigateToNode = (nodeId: string) => {
+    navigate(buildDrivePath({ scope: location.scope, nodeId }));
+  };
 
   return { items, navigateToNode };
 }

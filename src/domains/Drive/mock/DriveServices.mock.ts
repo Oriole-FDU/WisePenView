@@ -4,7 +4,6 @@ import type { DriveNode, FolderNode, RootNode } from '../entity/drive';
 import {
   buildDriveNodeScope,
   decodeRootNodeScope,
-  DRIVE_SHARED_FOLDER_DISPLAY_NAME,
   orderDriveFolderNodes,
 } from '../mapper/DriveServices.map';
 import type {
@@ -437,7 +436,7 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
       parentId: ROOT_ID,
       scope: buildDriveNodeScope(),
       tagId: SHARED_FOLDER_TAG_ID,
-      name: DRIVE_SHARED_FOLDER_DISPLAY_NAME,
+      name: '',
       systemType: 'shared',
       childrenIds: [],
     };

@@ -1,0 +1,165 @@
+.permissionCard {
+  display: flex;
+  min-width: 0;
+  min-height: 420px;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.presetBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.presetLabel {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.presetButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.currentPreset {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.permissionTableShell {
+  min-width: 0;
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.permissionTable {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.permissionTable th,
+.permissionTable td {
+  height: 48px;
+  padding: 0 var(--space-xs);
+  border-bottom: 1px solid var(--border-light);
+  border-left: 1px solid var(--border-light);
+  color: var(--foreground);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.permissionTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.permissionTable tbody tr:last-child th,
+.permissionTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.actionHeader,
+.actionCell {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: 160px;
+  border-left: 0 !important;
+  background: var(--surface);
+  text-align: left !important;
+}
+
+.actionCell {
+  color: var(--foreground) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: 600;
+}
+
+.actionName {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.actionIcon {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.actionText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toggleHeader {
+  width: 88px;
+}
+
+.resourceApplicabilityHeader {
+  width: 118px;
+}
+
+.permissionTable td.supportedCell {
+  color: var(--success);
+}
+
+.permissionTable td.deniedCell {
+  color: var(--danger);
+}
+
+.permissionStateIcon {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.unsupportedCell {
+  color: var(--muted) !important;
+  background: var(--surface-secondary);
+}
+
+.permissionToggleCell {
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.permissionToggleCell:hover {
+  background: var(--surface-hover);
+}
+
+.permissionCheckbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+}
+
+@media (max-width: 560px) {
+  .presetBar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

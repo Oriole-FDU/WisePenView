@@ -1,6 +1,6 @@
 /* WisePen Table 共享 token
  * 链路：wisepen.css (--table-*) → 本文件 @table-* → 各 variant / cell less
- * 圆角：--table-shell/control/overlay-radius 统一外框与行内控件；--table-inner-radius 用于 Chip / 小按钮 / 骨架屏
+ * 圆角：--table-shell/control-radius 统一外框与行内控件；--table-inner-radius 用于 Chip / 小按钮 / 骨架屏
  */
 @import '@/styles/scrollbar.module.less';
 
@@ -32,10 +32,9 @@
 @table-shell-padding-inline: var(--table-shell-padding-inline, 14px);
 @table-toolbar-padding-block: var(--table-toolbar-padding-block, 10px);
 
-/* 圆角：wisepen.css --table-*-radius → 本文件 @table-*-radius → shell / 控件 / 浮层 */
+/* 圆角：wisepen.css --table-*-radius → 本文件 @table-*-radius → shell / 控件 */
 @table-shell-radius: var(--table-shell-radius, var(--radius-xl));
 @table-control-radius: var(--table-control-radius, @table-shell-radius);
-@table-overlay-radius: var(--table-overlay-radius, @table-shell-radius);
 @table-inner-radius: var(--table-inner-radius, var(--radius-lg));
 
 /* 排版 token */
@@ -123,10 +122,14 @@
     outline: none;
   }
 
-  :global(.table__row:is(:focus-visible, [data-focus-visible='true']) :is(.table__cell, .table__column)),
   :global(
-      .table__row:is(:focus-visible, [data-focus-visible='true']) > * :is(.table__cell, .table__column)
-    ) {
+    .table__row:is(:focus-visible, [data-focus-visible='true']) :is(.table__cell, .table__column)
+  ),
+  :global(
+    .table__row:is(:focus-visible, [data-focus-visible='true'])
+      > *
+      :is(.table__cell, .table__column)
+  ) {
     box-shadow: none;
     outline: none;
   }
@@ -448,16 +451,6 @@
   composes: toolbarSelect;
   min-width: var(--table-page-size-select-width, 110px);
   width: var(--table-page-size-select-width, 110px);
-}
-
-.selectPopover:global(.select__popover) {
-  border-radius: @table-overlay-radius !important;
-  overflow: clip;
-}
-
-.dropdownPopover:global(.dropdown__popover) {
-  border-radius: @table-overlay-radius !important;
-  overflow: clip;
 }
 
 .tableSkeletonRowMixin() {

@@ -79,8 +79,6 @@ const mapTransactionRowFromApi = (row: Record<string, unknown>): WalletTransacti
   const time = String(row.createTime ?? row.time ?? row.createdAt ?? '');
   const titleFromApi =
     row.title != null && String(row.title).trim().length > 0 ? String(row.title) : '';
-  // fallback：缺失标题时使用交易类型展示文案
-  const title = titleFromApi || WALLET_TRANSACTION_KIND.getLabel(type);
   const subTitleFromMeta = row.meta != null && String(row.meta).length > 0 ? String(row.meta) : '';
   const subTitleFromLegacy =
     row.subTitle != null && String(row.subTitle).length > 0
@@ -93,7 +91,7 @@ const mapTransactionRowFromApi = (row: Record<string, unknown>): WalletTransacti
     time,
     type,
     amount,
-    title,
+    title: titleFromApi,
     subTitle: subTitleFromMeta || subTitleFromLegacy,
     operatorName: mapOperatorNameFromApi(row),
   };

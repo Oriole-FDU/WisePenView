@@ -10,7 +10,7 @@ type GroupResourceActionApiValue = TagResourceActionKey | NumericEnumApiValue;
 type GroupResourceActionApiList = GroupResourceActionApiValue[];
 
 export interface ListGroupApiRequest extends PageApiRequest {
-  groupRoleFilter: 'JOINED' | 'MANAGED';
+  groupRoleFilter: 'ALL' | 'JOINED' | 'MANAGED';
 }
 
 export interface GroupApiResponse {

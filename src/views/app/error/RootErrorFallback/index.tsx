@@ -1,32 +1,34 @@
 import type { FallbackProps } from 'react-error-boundary';
+import { useTranslation } from 'react-i18next';
 
 import { getErrorReportId } from '@/utils/error';
 import styles from './style.module.less';
 
 function RootErrorFallback({ error }: FallbackProps) {
+  const { t } = useTranslation('errors');
   const errorId = getErrorReportId(error);
 
   return (
     <main className={styles.root}>
       <div className={styles.content}>
         <div className={styles.brand}>WisePen</div>
-        <h1 className={styles.title}>应用暂时无法继续运行</h1>
-        <p className={styles.description}>请重新加载页面。若问题持续，请将错误编号提供给开发者。</p>
-        <p className={styles.errorId}>错误编号：{errorId}</p>
+        <h1 className={styles.title}>{t('page.appUnavailable')}</h1>
+        <p className={styles.description}>{t('page.reloadDescription')}</p>
+        <p className={styles.errorId}>{t('page.errorId', { errorId })}</p>
         <div className={styles.actions}>
           <button
             className={styles.primaryButton}
             type="button"
             onClick={() => window.location.reload()}
           >
-            重新加载
+            {t('page.reload')}
           </button>
           <button
             className={styles.secondaryButton}
             type="button"
             onClick={() => window.location.assign('/')}
           >
-            返回首页
+            {t('page.backHome')}
           </button>
         </div>
       </div>

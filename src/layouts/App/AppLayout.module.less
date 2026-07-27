@@ -1,8 +1,11 @@
 .root {
   position: relative;
-  height: 100vh;
-  height: 100dvh;
-  width: 100vw;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
   background-color: var(--background);
@@ -13,11 +16,14 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 .leftSider {
   height: 100%;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
   /* 侧栏 = 抬升层，相对外壳 --background，主区仍用 --surface 纸面 */
   background: var(--surface-secondary);
   overflow: hidden;
@@ -25,18 +31,23 @@
 
 .middleLayout {
   width: 100%;
+  /* 下限由 Panel minSize 约束；勿在 flex 子项上写 CSS min-width，否则会撑破视口出现整页滚动 */
   min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .middleContent {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   background: var(--surface);
+  overflow-x: auto;
   overflow-y: auto;
   position: relative;
   padding: 0;

@@ -6,7 +6,8 @@ import { parseErrorMessage } from '@/utils/error';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { Button, toast, type Selection, type SortDescriptor } from '@heroui/react';
 import { usePagination } from 'ahooks';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MemberListProps } from './index.type';
 import MemberListTable from './MemberListTable';
 import type { MemberListInlineDraft, MemberListInlineEditKind } from './MemberListTable/index.type';
@@ -22,6 +23,8 @@ const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;
 const EMPTY_MEMBERS: GroupMember[] = [];
 
 function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: MemberListProps) {
+  const { i18n, t } = useTranslation(['group', 'common']);
+  const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const groupService = useGroupService();
   const quotaService = useQuotaService();
   const selectedMembersMapRef = useRef<Map<string, GroupMember>>(new Map());
@@ -60,7 +63,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       defaultPageSize,
       refreshDeps: [groupId],
       onError: () => {
-        toast.danger('获取成员列表失败');
+        toast.danger(t('member.loadFailed'));
       },
     }
   );
@@ -105,10 +108,6 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
     clearInlineEdit();
     setBatchEditMode(false);
     void refresh();
-  };
-
-  const handleEdit = (action: 'editPermission' | 'assignQuota' | 'deleteMember') => {
-    setActiveModal(action);
   };
 
   const handleSelectionChange = (keys: Selection, currentPageMembers: GroupMember[]) => {
@@ -161,15 +160,19 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
     const min = Math.max(1, member.used ?? 0);
 
     if (!rawValue || !Number.isFinite(value) || !Number.isInteger(value) || value <= 0) {
-      toast.warning('请输入有效的整数配额');
+      toast.warning(t('member.feedback.invalidIntegerQuota'));
       return null;
     }
     if (value > GROUP_MEMBER_TOKEN_LIMIT_MAX) {
-      toast.warning(`配额限额不能超过 ${GROUP_MEMBER_TOKEN_LIMIT_MAX.toLocaleString()}`);
+      toast.warning(
+        t('member.feedback.quotaOverLimit', {
+          limit: GROUP_MEMBER_TOKEN_LIMIT_MAX.toLocaleString(locale),
+        })
+      );
       return null;
     }
     if (value < min) {
-      toast.warning(`配额限额不能小于成员当前用量（${min.toLocaleString()}）`);
+      toast.warning(t('member.feedback.quotaBelowUsage', { used: min.toLocaleString(locale) }));
       return null;
     }
     return value;
@@ -193,7 +196,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
           targetUserIds: [member.userId],
           role: ROLE[nextRole] ?? ROLE.MEMBER,
         });
-        toast.success('已修改成员权限');
+        toast.success(t('member.feedback.permissionUpdated'));
       } else {
         const quota = validateQuotaDraft(member);
         if (quota == null) {
@@ -205,7 +208,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
           targetUserIds: [member.userId],
           newTokenLimit: quota,
         });
-        toast.success('已分配成员配额');
+        toast.success(t('member.feedback.quotaAssigned'));
       }
 
       clearInlineEdit();
@@ -223,19 +226,16 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
     setActiveModal('deleteMember');
   };
 
-  const selectedMemberIds = useMemo(
-    () => selectedRowKeys.map((k) => normalizeId(k)),
-    [selectedRowKeys]
-  );
+  const selectedMemberIds = selectedRowKeys.map((k) => normalizeId(k));
 
   const activeDeleteMembers = singleDeleteMember ? [singleDeleteMember] : selectedMembersList;
   const activeDeleteMemberIds = singleDeleteMember
     ? [singleDeleteMember.userId]
     : selectedMemberIds;
-  const currentPageSelectedKeys = useMemo(() => {
+  const currentPageSelectedKeys = (() => {
     const currentPageKeys = new Set(members.map((member) => String(member.userId)));
     return new Set(selectedRowKeys.filter((key) => currentPageKeys.has(String(key))).map(String));
-  }, [members, selectedRowKeys]);
+  })();
 
   const showBatchActions = groupDisplayConfig.canEnterEditMode;
   const hasBatchActions =
@@ -249,40 +249,40 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       <div className={styles.toolbarActions}>
         {batchEditMode && showBatchActions && groupDisplayConfig.canModifyPermission ? (
           <Button
-            onPress={() => handleEdit('editPermission')}
+            onPress={() => setActiveModal('editPermission')}
             isDisabled={selectedRowKeys.length === 0}
           >
-            修改权限
+            {t('member.actions.editPermission')}
           </Button>
         ) : null}
         {batchEditMode && showBatchActions && groupDisplayConfig.canAssignQuota ? (
           <Button
-            onPress={() => handleEdit('assignQuota')}
+            onPress={() => setActiveModal('assignQuota')}
             isDisabled={selectedRowKeys.length === 0}
           >
-            分配配额
+            {t('member.actions.assignQuota')}
           </Button>
         ) : null}
         {batchEditMode && showBatchActions && groupDisplayConfig.canRemoveMember ? (
           <Button
             variant="danger"
-            onPress={() => handleEdit('deleteMember')}
+            onPress={() => setActiveModal('deleteMember')}
             isDisabled={selectedRowKeys.length === 0}
           >
-            删除成员
+            {t('member.actions.delete')}
           </Button>
         ) : null}
         {batchEditMode && hasBatchActions ? (
           <Button variant="ghost" onPress={exitBatchEditMode}>
-            取消
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
         ) : null}
         {!batchEditMode && hasBatchActions ? (
-          <Button onPress={enterBatchEditMode}>批量编辑</Button>
+          <Button onPress={enterBatchEditMode}>{t('member.actions.batchEdit')}</Button>
         ) : null}
         {groupDisplayConfig.canInviteMember ? (
           <Button variant="primary" onPress={() => setActiveModal('invite')}>
-            邀请用户
+            {t('member.actions.invite')}
           </Button>
         ) : null}
       </div>

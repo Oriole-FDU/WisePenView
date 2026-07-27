@@ -1,5 +1,6 @@
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { isRouteErrorResponse, useLocation, useNavigate, useRouteError } from 'react-router-dom';
 
 import AppIconButton from '@/components/Button/AppIconButton';
@@ -14,6 +15,7 @@ import { buildErrorDetail } from './errorDetail';
 import styles from './style.module.less';
 
 function AppError() {
+  const { t } = useTranslation('errors');
   const navigate = useNavigate();
   const location = useLocation();
   const error = useRouteError();
@@ -30,11 +32,11 @@ function AppError() {
   const handleCopyDetail = async () => {
     const copied = await copyText(errorDetail);
     if (copied) {
-      toast.success('错误详情已复制');
+      toast.success(t('page.copySuccess'));
       return;
     }
 
-    toast.danger('复制失败，请手动复制');
+    toast.danger(t('page.copyFailed'));
   };
 
   return (
@@ -52,15 +54,15 @@ function AppError() {
           extra={
             <div className={styles.actionGroup}>
               <Button variant="primary" size="lg" onPress={() => window.location.reload()}>
-                刷新页面
+                {t('page.refresh')}
               </Button>
               <Button size="lg" onPress={() => navigate(-1)}>
-                返回上一页
+                {t('page.backPrevious')}
               </Button>
             </div>
           }
         >
-          <p className={styles.errorId}>错误编号：{errorId}</p>
+          <p className={styles.errorId}>{t('page.errorId', { errorId })}</p>
           <div className={styles.errorCollapse}>
             <div className={styles.errorCollapseHeader}>
               <button
@@ -69,11 +71,11 @@ function AppError() {
                 aria-expanded={detailOpen}
                 onClick={() => setDetailOpen((open) => !open)}
               >
-                查看错误详情
+                {t('page.detail')}
               </button>
               <AppIconButton
                 icon={<Copy aria-hidden="true" />}
-                label="复制错误详情"
+                label={t('page.copyDetail')}
                 size="sm"
                 onPress={() => void handleCopyDetail()}
                 onClick={(event) => event.stopPropagation()}
@@ -82,14 +84,14 @@ function AppError() {
             {detailOpen ? (
               <div className={styles.errorDetailPanel}>
                 <pre className={styles.errorDetail}>{errorDetail}</pre>
-                <span className={styles.contactTip}>如问题持续，请复制错误详情并联系开发者</span>
+                <span className={styles.contactTip}>{t('page.contactTip')}</span>
               </div>
             ) : null}
           </div>
         </ResultState>
       </main>
 
-      <footer className={styles.footerMini}>WisePen · 学术英语写作平台</footer>
+      <footer className={styles.footerMini}>{t('page.footer')}</footer>
     </div>
   );
 }

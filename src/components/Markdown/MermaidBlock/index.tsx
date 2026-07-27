@@ -1,6 +1,7 @@
 import SegmentedTabs from '@/components/SegmentedTabs';
 import { useRequest } from 'ahooks';
 import { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CodeBlockFrame, HighlightedCode } from '../CodeBlock';
 import { renderMermaidDiagram } from './mermaidRuntime';
 import styles from './style.module.less';
@@ -13,12 +14,13 @@ interface MermaidBlockProps {
   streaming: boolean;
 }
 
-function readRenderError(error: unknown): string {
+function readRenderError(error: unknown, fallbackMessage: string): string {
   if (error instanceof Error && error.message) return error.message;
-  return '图形渲染失败，请检查 Mermaid 语法。';
+  return fallbackMessage;
 }
 
 function MermaidBlock({ code, language, streaming }: MermaidBlockProps) {
+  const { t, i18n } = useTranslation('common');
   const [view, setView] = useState<MermaidView>('graph');
   const diagramId = `mermaid-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const shouldRender = view === 'graph' && !streaming;
@@ -27,10 +29,13 @@ function MermaidBlock({ code, language, streaming }: MermaidBlockProps) {
       try {
         return { source: code, svg: await renderMermaidDiagram(diagramId, code) };
       } catch (error) {
-        return { source: code, error: readRenderError(error) };
+        return { source: code, error: readRenderError(error, t('markdown.mermaidFailed')) };
       }
     },
-    { ready: shouldRender, refreshDeps: [code, diagramId, shouldRender] }
+    {
+      ready: shouldRender,
+      refreshDeps: [code, diagramId, shouldRender, i18n.resolvedLanguage],
+    }
   );
   const result = rendered?.source === code ? rendered : undefined;
 
@@ -40,10 +45,10 @@ function MermaidBlock({ code, language, streaming }: MermaidBlockProps) {
       language={language}
       actions={
         <SegmentedTabs
-          ariaLabel="Mermaid 展示模式"
+          ariaLabel={t('markdown.mermaidMode')}
           items={[
-            { key: 'code', label: '代码' },
-            { key: 'graph', label: '图形' },
+            { key: 'code', label: t('markdown.code') },
+            { key: 'graph', label: t('markdown.graph') },
           ]}
           selectedKey={view}
           onSelectionChange={(key) => setView(key as MermaidView)}
@@ -53,7 +58,9 @@ function MermaidBlock({ code, language, streaming }: MermaidBlockProps) {
       }
     >
       {view === 'code' || streaming ? <HighlightedCode code={code} language={language} /> : null}
-      {shouldRender && loading ? <div className={styles.status}>正在渲染图形...</div> : null}
+      {shouldRender && loading ? (
+        <div className={styles.status}>{t('markdown.mermaidRendering')}</div>
+      ) : null}
       {shouldRender && result?.error ? <div className={styles.error}>{result.error}</div> : null}
       {shouldRender && result?.svg ? (
         <div className={styles.graph}>

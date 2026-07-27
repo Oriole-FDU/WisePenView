@@ -1,6 +1,7 @@
 import { Spinner } from '@heroui/react';
 import { CircleAlert, CircleCheck, CircleHelp, Info, SearchX, ShieldAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 type FeedbackStatus = 'success' | 'info' | 'warning' | 'error' | '404' | '403' | '500';
@@ -109,11 +110,13 @@ function Spin({ size = 'default', spinning = true, tip, children, className }: S
   );
 }
 
-function EmptyState({ title = '暂无数据', description, className }: EmptyStateProps) {
+function EmptyState({ title, description, className }: EmptyStateProps) {
+  const { t } = useTranslation('common');
+
   return (
     <div className={cx(styles.emptyState, className)}>
       <CircleHelp className={styles.emptyIcon} size={28} aria-hidden />
-      <div className={styles.emptyTitle}>{title}</div>
+      <div className={styles.emptyTitle}>{title ?? t('feedback.empty')}</div>
       {description ? <div className={styles.emptyDescription}>{description}</div> : null}
     </div>
   );

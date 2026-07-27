@@ -3,17 +3,19 @@ import AppModal from '@/components/Overlay/AppModal';
 import UploadZone from '@/components/UploadZone';
 import { useImageService, useUserService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
-import { getVerificationModeLabel, IDENTITY, USER_STATUS } from '@/domains/User';
+import { IDENTITY, USER_STATUS } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
 import { IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/image/uploadLimit';
 import { Button, toast, Tooltip } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Check, TriangleAlert, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AccountHeaderProps } from './index.type';
 import styles from './style.module.less';
 
 function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
+  const { t } = useTranslation(['profile', 'shell', 'common']);
   const userService = useUserService();
   const imageService = useImageService();
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
@@ -36,7 +38,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
     {
       manual: true,
       onSuccess: () => {
-        toast.success('头像已更新');
+        toast.success(t('header.avatarUpdated'));
         setAvatarFile(null);
         setAvatarModalOpen(false);
       },
@@ -81,23 +83,34 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
 
   const handleAvatarModalOk = () => {
     if (!avatarFile) {
-      toast.warning('请选择头像图片');
+      toast.warning(t('header.selectAvatar'));
       return;
     }
     if (!user) {
-      toast.danger('用户信息未加载，请稍后重试');
+      toast.danger(t('header.userNotLoaded'));
       return;
     }
     runUpdateAvatar(avatarFile, user);
   };
 
-  const nickname = user?.userInfo?.nickname ?? user?.userInfo?.username ?? '未设置昵称';
+  const nickname =
+    user?.userInfo?.nickname ?? user?.userInfo?.username ?? t('header.nicknameUnset');
   const avatarLetter = (user?.userInfo?.nickname ?? user?.userInfo?.username ?? '?')
     .charAt(0)
     .toUpperCase();
-  const identityLabel =
-    user?.userInfo?.identityType != null ? IDENTITY.getLabel(user.userInfo.identityType) : '';
-  const verifiedText = getVerificationModeLabel(user?.userInfo?.verificationMode ?? null);
+  const identityKey =
+    user?.userInfo?.identityType != null ? IDENTITY.getKey(user.userInfo.identityType) : undefined;
+  const identityLabel = identityKey ? t(`role.${identityKey}`, { ns: 'shell' }) : '';
+  const verificationMode = user?.userInfo?.verificationMode ?? null;
+  const verifiedText = verificationMode
+    ? t(`header.verification.${verificationMode}`)
+    : t('header.verification.verified');
+  const statusText =
+    user?.userInfo?.status === USER_STATUS.UNVERIFIED
+      ? t('header.status.unverified')
+      : user?.userInfo?.status === USER_STATUS.BANNED
+        ? t('header.status.banned')
+        : verifiedText;
 
   return (
     <>
@@ -127,7 +140,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
                 </AppAvatar>
               </span>
             </Tooltip.Trigger>
-            <Tooltip.Content>修改头像</Tooltip.Content>
+            <Tooltip.Content>{t('header.changeAvatar')}</Tooltip.Content>
           </Tooltip>
           <div className={styles.accountInfo}>
             <div className={styles.nameRow}>
@@ -141,23 +154,8 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
         </div>
         {user?.userInfo?.status != null && (
           <span className={styles.statusGroup}>
-            <span className={styles.statusText}>
-              {user.userInfo.status === USER_STATUS.UNVERIFIED
-                ? '未认证'
-                : user.userInfo.status === USER_STATUS.BANNED
-                  ? '封禁'
-                  : verifiedText}
-            </span>
-            <span
-              className={styles.statusIcon}
-              title={
-                user.userInfo.status === USER_STATUS.UNVERIFIED
-                  ? '未认证'
-                  : user.userInfo.status === USER_STATUS.BANNED
-                    ? '封禁'
-                    : verifiedText
-              }
-            >
+            <span className={styles.statusText}>{statusText}</span>
+            <span className={styles.statusIcon} title={statusText}>
               {user.userInfo.status === USER_STATUS.BANNED ? (
                 <X size={24} className={styles.statusIconBanned} />
               ) : user.userInfo.status === USER_STATUS.UNVERIFIED ? (
@@ -173,7 +171,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
       <AppModal
         isOpen={avatarModalOpen}
         onOpenChange={handleAvatarModalOpenChange}
-        title="更换头像"
+        title={t('header.changeAvatarTitle')}
         isDismissable={!avatarSubmitting}
         actions={
           <>
@@ -182,7 +180,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
               isDisabled={avatarSubmitting}
               onPress={handleAvatarModalClose}
             >
-              取消
+              {t('actions.cancel', { ns: 'common' })}
             </Button>
             <Button
               variant="primary"
@@ -190,20 +188,20 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
               aria-busy={avatarSubmitting || undefined}
               onPress={handleAvatarModalOk}
             >
-              上传并保存
+              {t('header.uploadAndSave')}
             </Button>
           </>
         }
       >
         <p className={styles.avatarModalHint}>
-          支持 JPG、PNG、GIF、WebP，单张不超过 {IMAGE_UPLOAD_MAX_SIZE_LABEL}。
+          {t('header.avatarHint', { maxSize: IMAGE_UPLOAD_MAX_SIZE_LABEL })}
         </p>
         <UploadZone
           file={avatarFile}
           disabled={avatarSubmitting}
           accept="image/*"
-          label="点击或拖拽头像图片到此区域"
-          description={`支持 JPG、PNG、GIF、WebP，单张不超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`}
+          label={t('header.avatarUpload')}
+          description={t('header.avatarHint', { maxSize: IMAGE_UPLOAD_MAX_SIZE_LABEL })}
           onFileChange={handleAvatarFileChange}
         />
       </AppModal>

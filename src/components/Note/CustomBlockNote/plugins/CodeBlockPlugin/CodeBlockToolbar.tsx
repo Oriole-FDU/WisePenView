@@ -10,6 +10,7 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const COPY_FEEDBACK_DURATION = 1200;
 
@@ -49,6 +50,7 @@ export function CodeBlockToolbar({
   onCollapsedChange,
   onLanguageChange,
 }: CodeBlockToolbarProps) {
+  const { t } = useTranslation('note');
   const languageListId = useId();
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
@@ -237,10 +239,10 @@ export function CodeBlockToolbar({
           <div className="wise-code-block-languagePopover">
             <input
               className="wise-code-block-languageInput"
-              aria-label="搜索代码语言"
+              aria-label={t('code.searchLanguage')}
               value={query}
               onChange={handleLanguageSearchChange}
-              placeholder="搜索语言"
+              placeholder={t('code.searchLanguagePlaceholder')}
               autoComplete="off"
               aria-controls={languageListId}
               aria-activedescendant={activeLanguageOptionId}
@@ -250,7 +252,7 @@ export function CodeBlockToolbar({
               id={languageListId}
               className="wise-code-block-languageList"
               role="listbox"
-              aria-label="代码语言"
+              aria-label={t('code.language')}
             >
               {filteredLanguageOptions.map((option, index) => (
                 <button
@@ -285,12 +287,12 @@ export function CodeBlockToolbar({
               <ChevronUp className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
             )
           }
-          label={collapsed ? '展开代码块' : '折叠代码块'}
+          label={t(collapsed ? 'code.expandBlock' : 'code.collapseBlock')}
           size="sm"
           className="wise-code-block-iconButton"
           aria-expanded={!collapsed}
           data-collapsed={collapsed}
-          tooltip={{ content: collapsed ? '展开' : '折叠' }}
+          tooltip={{ content: t(collapsed ? 'code.expand' : 'code.collapse') }}
           onMouseDown={handleButtonMouseDown}
           onClick={handleToggleCollapsed}
         />
@@ -303,12 +305,12 @@ export function CodeBlockToolbar({
               <Copy className="wise-code-block-actionIcon" size={13} aria-hidden="true" />
             )
           }
-          label={copied ? '已复制代码' : '复制代码'}
+          label={t(copied ? 'code.copiedCode' : 'code.copyCode')}
           size="sm"
           isActive={copied}
           className="wise-code-block-iconButton"
           data-copied={copied}
-          tooltip={{ content: copied ? '已复制' : '复制' }}
+          tooltip={{ content: t(copied ? 'code.copied' : 'code.copy') }}
           onMouseDown={handleButtonMouseDown}
           onClick={handleCopy}
         />

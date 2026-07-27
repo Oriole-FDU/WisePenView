@@ -6,6 +6,7 @@ import {
 } from '@/utils/codeHighlight';
 import { useRequest } from 'ahooks';
 import { type CSSProperties, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CodeBlockFrameProps, CodeBlockProps, HighlightedCodeProps } from './index.type';
 import styles from './style.module.less';
 
@@ -37,6 +38,7 @@ function renderHighlightedCode(code: string, tokens: readonly CodeHighlightToken
 }
 
 export function CodeBlockFrame({ code, language, actions, children }: CodeBlockFrameProps) {
+  const { t } = useTranslation('common');
   const codeLanguage = normalizeCodeLanguage(language);
 
   return (
@@ -45,7 +47,7 @@ export function CodeBlockFrame({ code, language, actions, children }: CodeBlockF
         <span className={styles.language}>{codeLanguage}</span>
         <div className={styles.actions}>
           {actions}
-          <CopyButton text={code} label="复制代码块" className={styles.copyButton} />
+          <CopyButton text={code} label={t('copy.codeBlock')} className={styles.copyButton} />
         </div>
       </div>
       <div className={styles.content}>{children}</div>

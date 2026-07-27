@@ -47,11 +47,6 @@
     color: var(--foreground);
     background: transparent;
   }
-
-  :global([data-slot='disclosure-indicator']) {
-    flex-shrink: 0;
-    color: currentColor;
-  }
 }
 
 .brainIcon,
@@ -80,6 +75,24 @@
   animation: reasoning-shimmer 1.35s ease-in-out infinite;
 }
 
+.indicator {
+  flex-shrink: 0;
+  color: currentColor;
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+
+  &[data-expanded='true'] {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+  }
+}
+
+.collapse {
+  overflow: hidden;
+}
+
 .content {
   max-height: min(36vh, 260px);
   margin: var(--space-xs) 0 0;
@@ -94,5 +107,7 @@
   text-align: start;
   white-space: pre-wrap;
   word-break: break-word;
+  content-visibility: auto;
+  contain: layout paint;
   .appSubtleScrollbar();
 }

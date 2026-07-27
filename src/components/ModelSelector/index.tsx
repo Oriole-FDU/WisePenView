@@ -1,9 +1,10 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import ProviderLogo from '@/components/Icons/ProviderLogo';
-import { Popover } from '@/components/Overlay';
+import { AppPopover } from '@/components/Overlay';
 import type { ChatModel } from '@/domains/Chat';
 import { ListBox, ListBoxItem } from '@heroui/react';
 import { Check, ChevronDown, LoaderCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 export type ModelSelectorTriggerVariant = 'default' | 'icon';
@@ -39,12 +40,15 @@ function ModelSelector({
   placement = 'bottom',
   triggerVariant = 'default',
 }: ModelSelectorProps) {
+  const { t } = useTranslation('chat');
   const selected = models.find((model) => model.id === selectedId) ?? null;
   const iconOnly = triggerVariant === 'icon';
-  const triggerLabel = loading ? '模型加载中' : (selected?.name ?? '选择模型');
+  const triggerLabel = loading
+    ? t('modelSelector.loading')
+    : (selected?.name ?? t('modelSelector.select'));
 
   return (
-    <Popover isOpen={isOpen} onOpenChange={onOpenChange}>
+    <AppPopover isOpen={isOpen} onOpenChange={onOpenChange}>
       {iconOnly ? (
         <AppIconButton
           icon={
@@ -56,10 +60,10 @@ function ModelSelector({
           }
           label={triggerLabel}
           isDisabled={disabled}
-          overlayTrigger={<Popover.Trigger />}
+          overlayTrigger={<AppPopover.Trigger />}
         />
       ) : (
-        <Popover.Trigger>
+        <AppPopover.Trigger>
           <button
             type="button"
             className={styles.trigger}
@@ -74,46 +78,45 @@ function ModelSelector({
             <span>{triggerLabel}</span>
             <ChevronDown size={16} />
           </button>
-        </Popover.Trigger>
+        </AppPopover.Trigger>
       )}
-      <Popover.Content className={styles.popover} placement={placement}>
-        <Popover.Dialog>
-          <div className={styles.menu}>
-            <div className={styles.title}>模型</div>
-            {models.length === 0 ? (
-              <div className={styles.empty}>暂无可用模型</div>
-            ) : (
-              <ListBox
-                aria-label="选择模型"
-                selectionMode="single"
-                selectedKeys={selected ? [selected.id] : []}
-                className={styles.list}
+      <AppPopover.Content
+        className={styles.popover}
+        placement={placement}
+        title={t('modelSelector.title')}
+      >
+        {models.length === 0 ? (
+          <div className={styles.empty}>{t('modelSelector.empty')}</div>
+        ) : (
+          <ListBox
+            aria-label={t('modelSelector.select')}
+            selectionMode="single"
+            selectedKeys={selected ? [selected.id] : []}
+            className={styles.list}
+          >
+            {models.map((model) => (
+              <ListBoxItem
+                key={model.id}
+                id={model.id}
+                textValue={model.name}
+                onPress={() => onChange(model)}
               >
-                {models.map((model) => (
-                  <ListBoxItem
-                    key={model.id}
-                    id={model.id}
-                    textValue={model.name}
-                    onPress={() => onChange(model)}
-                  >
-                    <span className={styles.item}>
-                      <ProviderLogo provider={model.provider} size={18} />
-                      <span className={styles.info}>
-                        <span className={styles.name}>{model.name}</span>
-                        <span className={styles.meta}>{renderProviderText(model)}</span>
-                      </span>
-                      {selected?.id === model.id ? (
-                        <Check size={14} className={styles.checkIcon} />
-                      ) : null}
-                    </span>
-                  </ListBoxItem>
-                ))}
-              </ListBox>
-            )}
-          </div>
-        </Popover.Dialog>
-      </Popover.Content>
-    </Popover>
+                <span className={styles.item}>
+                  <ProviderLogo provider={model.provider} size={18} />
+                  <span className={styles.info}>
+                    <span className={styles.name}>{model.name}</span>
+                    <span className={styles.meta}>{renderProviderText(model)}</span>
+                  </span>
+                  {selected?.id === model.id ? (
+                    <Check size={14} className={styles.checkIcon} />
+                  ) : null}
+                </span>
+              </ListBoxItem>
+            ))}
+          </ListBox>
+        )}
+      </AppPopover.Content>
+    </AppPopover>
   );
 }
 

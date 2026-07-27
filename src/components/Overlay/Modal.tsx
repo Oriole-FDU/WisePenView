@@ -1,6 +1,6 @@
 import { Modal as HeroModal } from '@heroui/react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ComponentProps } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from './DeferredContent';
 
@@ -56,22 +56,16 @@ function ModalRoot({
     onOpenChange,
     state,
   });
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      onOpenChange?.(nextOpen);
-    },
-    [onOpenChange]
-  );
-  const rootControl = useMemo<ModalRootControlContextValue>(
-    () => ({
-      contentDelay,
-      defaultOpen,
-      deferContent,
-      isOpen: controlledOpen,
-      onOpenChange: state?.setOpen ?? handleOpenChange,
-    }),
-    [contentDelay, controlledOpen, defaultOpen, deferContent, handleOpenChange, state]
-  );
+  const handleOpenChange = (nextOpen: boolean) => {
+    onOpenChange?.(nextOpen);
+  };
+  const rootControl = {
+    contentDelay,
+    defaultOpen,
+    deferContent,
+    isOpen: controlledOpen,
+    onOpenChange: state?.setOpen ?? handleOpenChange,
+  } satisfies ModalRootControlContextValue;
 
   if (shouldUseBackdropControl) {
     return (
@@ -111,15 +105,12 @@ function ModalBackdrop({
     onOpenChange != null;
   const [innerOpen, setInnerOpen] = useState(Boolean(resolvedDefaultOpen));
   const trackedOpen = resolvedIsOpen ?? innerOpen;
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      if (resolvedIsOpen == null) {
-        setInnerOpen(nextOpen);
-      }
-      resolvedOnOpenChange?.(nextOpen);
-    },
-    [resolvedIsOpen, resolvedOnOpenChange]
-  );
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (resolvedIsOpen == null) {
+      setInnerOpen(nextOpen);
+    }
+    resolvedOnOpenChange?.(nextOpen);
+  };
   const overlayControlProps = hasBackdropControl
     ? {
         defaultOpen: resolvedDefaultOpen,

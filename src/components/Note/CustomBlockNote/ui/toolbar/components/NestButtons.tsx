@@ -3,10 +3,12 @@ import { blockHasType } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { IndentDecrease, IndentIncrease } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { blockHasInlineContent, getSelectedBlocks } from '../utils';
 import { ToolbarToggleButton } from './ToolbarButton';
 
 function NestButton({ type }: { type: 'nest' | 'unnest' }) {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
   const state = useEditorState({
     editor,
@@ -32,7 +34,7 @@ function NestButton({ type }: { type: 'nest' | 'unnest' }) {
   return (
     <ToolbarToggleButton
       id={type}
-      label={type === 'nest' ? '增加缩进' : '减少缩进'}
+      label={t(type === 'nest' ? 'editor.indent.increase' : 'editor.indent.decrease')}
       icon={type === 'nest' ? <IndentIncrease size={20} /> : <IndentDecrease size={20} />}
       isDisabled={!state.enabled}
       onPress={() => {
@@ -48,6 +50,7 @@ function NestButton({ type }: { type: 'nest' | 'unnest' }) {
 }
 
 export function NestButtons() {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
   const visible = useEditorState({
     editor,
@@ -67,7 +70,7 @@ export function NestButtons() {
 
   return (
     <ToggleButtonGroup
-      aria-label="缩进"
+      aria-label={t('editor.indent.label')}
       selectionMode="multiple"
       selectedKeys={new Set()}
       orientation="horizontal"

@@ -37,8 +37,6 @@ import { Table } from '@heroui/react';
 import { Folder } from 'lucide-react';
 import {
   memo,
-  useCallback,
-  useMemo,
   useRef,
   type CSSProperties,
   type KeyboardEvent,
@@ -314,61 +312,51 @@ function FolderTable<T extends FolderTableRow>({
   checkboxSelection,
   selectionFooter,
 }: FolderTableProps<T>) {
-  const { t } = useTranslation('table');
+  const { t, i18n } = useTranslation('table');
+  const sortLocale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const resolvedEmptyText = emptyText ?? t('empty.folderEmpty');
   const resolvedEmptyDescription = emptyDescription ?? t('empty.folderDescription');
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadMoreLockRef = useRef(false);
   const selectionAnchorRef = useRef<string | undefined>(undefined);
 
-  const columns = useMemo(
-    () => columnsProp ?? (createDefaultFolderColumns<T>(t) as FolderTableColumn<T>[]),
-    [columnsProp, t]
-  );
+  const columns = columnsProp ?? (createDefaultFolderColumns<T>(t) as FolderTableColumn<T>[]);
   const eqLayout = isFolderEqLayout(columns);
   const eqColumnCount = countFolderEqColumns(columns);
 
-  const expandedKeySet = useMemo(() => new Set(expandedRowKeys), [expandedRowKeys]);
-  const selectedEditRowKeySet = useMemo(
-    () => new Set(checkboxSelection ? [...checkboxSelection.selectedKeys].map(String) : []),
-    [checkboxSelection]
+  const expandedKeySet = new Set(expandedRowKeys);
+  const selectedEditRowKeySet = new Set(
+    checkboxSelection ? [...checkboxSelection.selectedKeys].map(String) : []
   );
-  const selectedRowKeySet = useMemo(
-    () => (isEditMode ? selectedEditRowKeySet : new Set(selectedRowKey ? [selectedRowKey] : [])),
-    [isEditMode, selectedEditRowKeySet, selectedRowKey]
+  const selectedRowKeySet = isEditMode
+    ? selectedEditRowKeySet
+    : new Set(selectedRowKey ? [selectedRowKey] : []);
+
+  const sortedItems = sortFolderTreeRows(
+    items,
+    columns,
+    sortDescriptor,
+    (row) => ({ row, rowId: row.id, depth: 0 }),
+    {
+      isPinnedFirst,
+      isPinnedLast: (row) => row.entryType === 'loading',
+      locale: sortLocale,
+    }
   );
 
-  const sortedItems = useMemo(
-    () =>
-      sortFolderTreeRows(
-        items,
-        columns,
-        sortDescriptor,
-        (row) => ({ row, rowId: row.id, depth: 0 }),
-        {
-          isPinnedFirst,
-          isPinnedLast: (row) => row.entryType === 'loading',
-        }
-      ),
-    [columns, isPinnedFirst, items, sortDescriptor]
-  );
-
-  const visibleRows = useMemo(
-    () => flattenFolderRows(sortedItems, expandedKeySet),
-    [sortedItems, expandedKeySet]
-  );
-  const visibleRowMap = useMemo(() => {
+  const visibleRows = flattenFolderRows(sortedItems, expandedKeySet);
+  const visibleRowMap = (() => {
     const map = new Map<string, FolderTableVisibleRow & T>();
     for (const row of visibleRows) {
       map.set(row.id, row as FolderTableVisibleRow & T);
     }
     return map;
-  }, [visibleRows]);
+  })();
 
   const showSkeletonBody = loading && items.length === 0;
   const showEmptyState = !loading && visibleRows.length === 0;
   const showCheckboxSelection = Boolean(checkboxSelection);
-  const disabledKeys = useMemo(() => {
+  const disabledKeys = (() => {
     const keys = new Set<string>();
     if (checkboxSelection?.disabledKeys) {
       for (const key of checkboxSelection.disabledKeys) {
@@ -376,8 +364,8 @@ function FolderTable<T extends FolderTableRow>({
       }
     }
     return keys;
-  }, [checkboxSelection]);
-  const hiddenKeys = useMemo(() => {
+  })();
+  const hiddenKeys = (() => {
     const keys = new Set<string>();
     if (checkboxSelection?.hiddenKeys) {
       for (const key of checkboxSelection.hiddenKeys) {
@@ -385,17 +373,12 @@ function FolderTable<T extends FolderTableRow>({
       }
     }
     return keys;
-  }, [checkboxSelection]);
-  const selectableVisibleRowIds = useMemo(
-    () =>
-      visibleRows
-        .filter(
-          (row) =>
-            row.entryType !== 'loading' && !disabledKeys.has(row.id) && !hiddenKeys.has(row.id)
-        )
-        .map((row) => row.id),
-    [disabledKeys, hiddenKeys, visibleRows]
-  );
+  })();
+  const selectableVisibleRowIds = visibleRows
+    .filter(
+      (row) => row.entryType !== 'loading' && !disabledKeys.has(row.id) && !hiddenKeys.has(row.id)
+    )
+    .map((row) => row.id);
   const selectedVisibleCount = selectableVisibleRowIds.filter((id) =>
     selectedRowKeySet.has(id)
   ).length;
@@ -404,55 +387,52 @@ function FolderTable<T extends FolderTableRow>({
   const someVisibleSelected = selectedVisibleCount > 0 && !allVisibleSelected;
   const showSelectionFooter = Boolean(checkboxSelection && selectionFooter);
 
-  const defaultSummary = useMemo(() => {
+  const defaultSummary = (() => {
     if (summary !== undefined) {
       return summary;
     }
     const count = totalCount ?? items.length;
     return count > 0 ? t('summary.totalItems', { count }) : t('summary.totalItemsZero');
-  }, [summary, totalCount, items.length, t]);
+  })();
 
   const showFooter = !showSkeletonBody && Boolean(defaultSummary) && !showSelectionFooter;
 
-  const handleCheckboxChange = useCallback(
-    (rowId: string, selected: boolean, shiftKey: boolean) => {
-      if (
-        !checkboxSelection ||
-        disabledKeys.has(rowId) ||
-        hiddenKeys.has(rowId) ||
-        !selectableVisibleRowIds.includes(rowId)
-      ) {
-        return;
-      }
+  const handleCheckboxChange = (rowId: string, selected: boolean, shiftKey: boolean) => {
+    if (
+      !checkboxSelection ||
+      disabledKeys.has(rowId) ||
+      hiddenKeys.has(rowId) ||
+      !selectableVisibleRowIds.includes(rowId)
+    ) {
+      return;
+    }
 
-      const nextKeys = new Set(selectedEditRowKeySet);
-      const anchorId = selectionAnchorRef.current;
-      const anchorIndex = anchorId ? selectableVisibleRowIds.indexOf(anchorId) : -1;
-      const rowIndex = selectableVisibleRowIds.indexOf(rowId);
+    const nextKeys = new Set(selectedEditRowKeySet);
+    const anchorId = selectionAnchorRef.current;
+    const anchorIndex = anchorId ? selectableVisibleRowIds.indexOf(anchorId) : -1;
+    const rowIndex = selectableVisibleRowIds.indexOf(rowId);
 
-      if (shiftKey && anchorIndex >= 0 && rowIndex >= 0) {
-        const start = Math.min(anchorIndex, rowIndex);
-        const end = Math.max(anchorIndex, rowIndex);
-        selectableVisibleRowIds.slice(start, end + 1).forEach((id) => {
-          if (selected) {
-            nextKeys.add(id);
-          } else {
-            nextKeys.delete(id);
-          }
-        });
-      } else if (selected) {
-        nextKeys.add(rowId);
-      } else {
-        nextKeys.delete(rowId);
-      }
+    if (shiftKey && anchorIndex >= 0 && rowIndex >= 0) {
+      const start = Math.min(anchorIndex, rowIndex);
+      const end = Math.max(anchorIndex, rowIndex);
+      selectableVisibleRowIds.slice(start, end + 1).forEach((id) => {
+        if (selected) {
+          nextKeys.add(id);
+        } else {
+          nextKeys.delete(id);
+        }
+      });
+    } else if (selected) {
+      nextKeys.add(rowId);
+    } else {
+      nextKeys.delete(rowId);
+    }
 
-      selectionAnchorRef.current = rowId;
-      checkboxSelection.onSelectionChange(nextKeys);
-    },
-    [checkboxSelection, disabledKeys, hiddenKeys, selectableVisibleRowIds, selectedEditRowKeySet]
-  );
+    selectionAnchorRef.current = rowId;
+    checkboxSelection.onSelectionChange(nextKeys);
+  };
 
-  const handleToggleAll = useCallback(() => {
+  const handleToggleAll = () => {
     if (!checkboxSelection) {
       return;
     }
@@ -466,36 +446,32 @@ function FolderTable<T extends FolderTableRow>({
     });
     selectionAnchorRef.current = undefined;
     checkboxSelection.onSelectionChange(nextKeys);
-  }, [allVisibleSelected, checkboxSelection, selectableVisibleRowIds, selectedEditRowKeySet]);
+  };
 
-  const handleScroll = useCallback(
-    (event: UIEvent<HTMLElement>) => {
-      if (!loadMore) {
-        return;
-      }
+  const handleScroll = (event: UIEvent<HTMLElement>) => {
+    if (!loadMore) {
+      return;
+    }
 
-      if (!loadMore.loading) {
-        loadMoreLockRef.current = false;
-      }
+    if (!loadMore.loading) {
+      loadMoreLockRef.current = false;
+    }
 
-      if (loadMore.loading || !loadMore.hasMore || loadMoreLockRef.current) {
-        return;
-      }
+    if (loadMore.loading || !loadMore.hasMore || loadMoreLockRef.current) {
+      return;
+    }
 
-      const container = event.currentTarget;
-      const distanceToBottom =
-        container.scrollHeight - container.scrollTop - container.clientHeight;
-      if (distanceToBottom > LOAD_MORE_THRESHOLD_PX) {
-        return;
-      }
+    const container = event.currentTarget;
+    const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (distanceToBottom > LOAD_MORE_THRESHOLD_PX) {
+      return;
+    }
 
-      loadMoreLockRef.current = true;
-      loadMore.onLoadMore();
-    },
-    [loadMore]
-  );
+    loadMoreLockRef.current = true;
+    loadMore.onLoadMore();
+  };
 
-  const scrollContainerProps = useMemo(() => {
+  const scrollContainerProps = (() => {
     if (!maxBodyHeight) {
       return {};
     }
@@ -503,214 +479,171 @@ function FolderTable<T extends FolderTableRow>({
     return {
       style: { maxHeight: resolved } as CSSProperties,
     };
-  }, [maxBodyHeight]);
+  })();
 
-  const handleToggleExpand = useCallback(
-    (rowId: string) => {
-      if (!onExpandedChange) {
-        return;
-      }
-      const isCollapsing = expandedRowKeys.includes(rowId);
-      if (isCollapsing && checkboxSelection) {
-        const rowIndex = visibleRows.findIndex((row) => row.id === rowId);
-        const rowDepth = visibleRows[rowIndex]?.depth;
-        if (rowIndex >= 0 && rowDepth !== undefined) {
-          const descendantIds = new Set<string>();
-          for (let index = rowIndex + 1; index < visibleRows.length; index += 1) {
-            const row = visibleRows[index];
-            if (row.depth <= rowDepth) break;
-            descendantIds.add(row.id);
+  const handleToggleExpand = (rowId: string) => {
+    if (!onExpandedChange) {
+      return;
+    }
+    const isCollapsing = expandedRowKeys.includes(rowId);
+    if (isCollapsing && checkboxSelection) {
+      const rowIndex = visibleRows.findIndex((row) => row.id === rowId);
+      const rowDepth = visibleRows[rowIndex]?.depth;
+      if (rowIndex >= 0 && rowDepth !== undefined) {
+        const descendantIds = new Set<string>();
+        for (let index = rowIndex + 1; index < visibleRows.length; index += 1) {
+          const row = visibleRows[index];
+          if (row.depth <= rowDepth) break;
+          descendantIds.add(row.id);
+        }
+        if (descendantIds.size > 0) {
+          const nextSelectedKeys = new Set(selectedEditRowKeySet);
+          let selectionChanged = false;
+          descendantIds.forEach((id) => {
+            selectionChanged = nextSelectedKeys.delete(id) || selectionChanged;
+          });
+          if (selectionAnchorRef.current && descendantIds.has(selectionAnchorRef.current)) {
+            selectionAnchorRef.current = undefined;
           }
-          if (descendantIds.size > 0) {
-            const nextSelectedKeys = new Set(selectedEditRowKeySet);
-            let selectionChanged = false;
-            descendantIds.forEach((id) => {
-              selectionChanged = nextSelectedKeys.delete(id) || selectionChanged;
-            });
-            if (selectionAnchorRef.current && descendantIds.has(selectionAnchorRef.current)) {
-              selectionAnchorRef.current = undefined;
-            }
-            if (selectionChanged) {
-              checkboxSelection.onSelectionChange(nextSelectedKeys);
-            }
+          if (selectionChanged) {
+            checkboxSelection.onSelectionChange(nextSelectedKeys);
           }
         }
       }
-      const next = isCollapsing
-        ? expandedRowKeys.filter((key) => key !== rowId)
-        : [...expandedRowKeys, rowId];
-      onExpandedChange(next);
-    },
-    [checkboxSelection, expandedRowKeys, onExpandedChange, selectedEditRowKeySet, visibleRows]
-  );
+    }
+    const next = isCollapsing
+      ? expandedRowKeys.filter((key) => key !== rowId)
+      : [...expandedRowKeys, rowId];
+    onExpandedChange(next);
+  };
 
-  const handleRowAction = useCallback(
-    (row: T, actionKey: string) => {
-      const matched = resolveRowActions(row, rowActions).find((action) => action.key === actionKey);
-      matched?.onPress(row);
-    },
-    [rowActions]
-  );
+  const handleRowAction = (row: T, actionKey: string) => {
+    const matched = resolveRowActions(row, rowActions).find((action) => action.key === actionKey);
+    matched?.onPress(row);
+  };
 
-  const handleRowPress = useCallback(
-    (row: T) => {
-      if (onRowSelect) {
-        onRowSelect(row);
-        return;
-      }
-      onRowActivate?.(row);
-    },
-    [onRowActivate, onRowSelect]
-  );
+  const handleRowPress = (row: T) => {
+    if (onRowSelect) {
+      onRowSelect(row);
+      return;
+    }
+    onRowActivate?.(row);
+  };
 
-  const handleDelegatedRowPress = useCallback(
-    (rowId: string, shiftKey: boolean) => {
-      const row = visibleRowMap.get(rowId);
-      if (!row) {
-        return;
-      }
-      if (isEditMode) {
-        handleCheckboxChange(rowId, !selectedEditRowKeySet.has(rowId), shiftKey);
-        return;
-      }
-      handleRowPress(row as T);
-    },
-    [handleCheckboxChange, handleRowPress, isEditMode, selectedEditRowKeySet, visibleRowMap]
-  );
+  const handleDelegatedRowPress = (rowId: string, shiftKey: boolean) => {
+    const row = visibleRowMap.get(rowId);
+    if (!row) {
+      return;
+    }
+    if (isEditMode) {
+      handleCheckboxChange(rowId, !selectedEditRowKeySet.has(rowId), shiftKey);
+      return;
+    }
+    handleRowPress(row as T);
+  };
 
-  const handleBodyClick = useCallback(
-    (event: MouseEvent<HTMLElement>) => {
-      if (event.defaultPrevented) {
-        return;
-      }
-      const target = getDelegatedRowTarget(event);
-      if (!target) {
-        return;
-      }
-      handleDelegatedRowPress(target.rowId, event.shiftKey);
-    },
-    [handleDelegatedRowPress]
-  );
+  const handleBodyClick = (event: MouseEvent<HTMLElement>) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+    const target = getDelegatedRowTarget(event);
+    if (!target) {
+      return;
+    }
+    handleDelegatedRowPress(target.rowId, event.shiftKey);
+  };
 
-  const handleBodyDoubleClick = useCallback(
-    (event: MouseEvent<HTMLElement>) => {
-      if (event.defaultPrevented || isEditMode || !onRowSelect) {
-        return;
-      }
-      const target = getDelegatedRowTarget(event);
-      if (!target) {
-        return;
-      }
-      const row = visibleRowMap.get(target.rowId);
-      if (row) {
-        onRowActivate?.(row as T);
-      }
-    },
-    [isEditMode, onRowActivate, onRowSelect, visibleRowMap]
-  );
+  const handleBodyDoubleClick = (event: MouseEvent<HTMLElement>) => {
+    if (event.defaultPrevented || isEditMode || !onRowSelect) {
+      return;
+    }
+    const target = getDelegatedRowTarget(event);
+    if (!target) {
+      return;
+    }
+    const row = visibleRowMap.get(target.rowId);
+    if (row) {
+      onRowActivate?.(row as T);
+    }
+  };
 
-  const handleBodyKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLElement>) => {
-      if (event.defaultPrevented) {
-        return;
-      }
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return;
-      }
-      const target = getDelegatedRowTarget(event);
-      if (!target) {
-        return;
-      }
-      event.preventDefault();
-      handleDelegatedRowPress(target.rowId, event.shiftKey);
-    },
-    [handleDelegatedRowPress]
-  );
+  const handleBodyKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+    const target = getDelegatedRowTarget(event);
+    if (!target) {
+      return;
+    }
+    event.preventDefault();
+    handleDelegatedRowPress(target.rowId, event.shiftKey);
+  };
 
-  const renderCellContent = useCallback(
-    (
-      column: FolderTableColumn<T>,
-      row: FolderTableVisibleRow & T,
-      ctx: FolderTableRowContext<T>
-    ) => {
-      if (column.isNameColumn) {
-        if (row.entryType === 'loading') {
-          return <span className={styles.inlineLoadMoreButton}>{row.name || '正在加载...'}</span>;
-        }
-
-        const expandable = folderRowHasChildren(row);
-        const expanded = expandedKeySet.has(row.id);
-        return (
-          <FolderTableNameCell<T>
-            row={row}
-            depth={row.depth}
-            expanded={expanded}
-            expandable={expandable}
-            renderNameContent={renderNameContent}
-            onToggleExpand={
-              expandable && onExpandedChange ? () => handleToggleExpand(row.id) : undefined
-            }
-          />
-        );
+  const renderCellContent = (
+    column: FolderTableColumn<T>,
+    row: FolderTableVisibleRow & T,
+    ctx: FolderTableRowContext<T>
+  ) => {
+    if (column.isNameColumn) {
+      if (row.entryType === 'loading') {
+        return <span className={styles.inlineLoadMoreButton}>{row.name || t('loadMore')}</span>;
       }
 
-      if (column.isActionColumn) {
-        const menuActions = toMenuActions(resolveRowActions(ctx.row, rowActions), ctx.row);
-        if (row.entryType === 'loading' || menuActions.length === 0) {
-          return null;
-        }
-        return (
-          <TableRowActions
-            actions={menuActions}
-            onAction={(key) => handleRowAction(ctx.row, key)}
-          />
-        );
+      const expandable = folderRowHasChildren(row);
+      const expanded = expandedKeySet.has(row.id);
+      return (
+        <FolderTableNameCell<T>
+          row={row}
+          depth={row.depth}
+          expanded={expanded}
+          expandable={expandable}
+          renderNameContent={renderNameContent}
+          onToggleExpand={
+            expandable && onExpandedChange ? () => handleToggleExpand(row.id) : undefined
+          }
+        />
+      );
+    }
+
+    if (column.isActionColumn) {
+      const menuActions = toMenuActions(resolveRowActions(ctx.row, rowActions), ctx.row);
+      if (row.entryType === 'loading' || menuActions.length === 0) {
+        return null;
       }
+      return (
+        <TableRowActions actions={menuActions} onAction={(key) => handleRowAction(ctx.row, key)} />
+      );
+    }
 
-      if (column.renderCell) {
-        return column.renderCell(ctx.row, ctx);
-      }
+    if (column.renderCell) {
+      return column.renderCell(ctx.row, ctx);
+    }
 
-      return null;
-    },
-    [
-      expandedKeySet,
-      handleRowAction,
-      handleToggleExpand,
-      onExpandedChange,
-      renderNameContent,
-      rowActions,
-    ]
-  );
+    return null;
+  };
 
-  const resolveColumnHeaderClass = useCallback(
-    (column: FolderTableColumn<T>) =>
-      joinClassNames(
-        resolveFolderColumnWidthClassForColumn(column, eqLayout),
-        column.isNameColumn ? styles.nameColumnHeader : undefined,
-        column.isActionColumn ? styles.actionColumnHeader : undefined,
-        column.className
-      ),
-    [eqLayout]
-  );
+  const resolveColumnHeaderClass = (column: FolderTableColumn<T>) =>
+    joinClassNames(
+      resolveFolderColumnWidthClassForColumn(column, eqLayout),
+      column.isNameColumn ? styles.nameColumnHeader : undefined,
+      column.isActionColumn ? styles.actionColumnHeader : undefined,
+      column.className
+    );
 
-  const resolveHeaderAlign = useCallback(
-    (column: FolderTableColumn<T>) =>
-      column.isActionColumn ? 'center' : resolveColumnAlign(column.align),
-    []
-  );
+  const resolveHeaderAlign = (column: FolderTableColumn<T>) =>
+    column.isActionColumn ? 'center' : resolveColumnAlign(column.align);
 
-  const resolveBodyCellClass = useCallback(
-    (column: FolderTableColumn<T>) =>
-      joinClassNames(
-        resolveFolderColumnWidthClassForColumn(column, eqLayout),
-        column.isActionColumn ? styles.actionCell : styles.bodyCell,
-        column.isNameColumn ? styles.nameCell : undefined,
-        !column.isNameColumn && !column.isActionColumn ? styles.mutedCell : undefined,
-        column.className
-      ),
-    [eqLayout]
-  );
+  const resolveBodyCellClass = (column: FolderTableColumn<T>) =>
+    joinClassNames(
+      resolveFolderColumnWidthClassForColumn(column, eqLayout),
+      column.isActionColumn ? styles.actionCell : styles.bodyCell,
+      column.isNameColumn ? styles.nameCell : undefined,
+      !column.isNameColumn && !column.isActionColumn ? styles.mutedCell : undefined,
+      column.className
+    );
 
   return (
     <div

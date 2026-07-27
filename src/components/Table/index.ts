@@ -5,20 +5,13 @@ import FolderBreadcrumb from './FolderTable/parts/FolderBreadcrumb';
 import ManageTableComponent from './ManageTable';
 import TableMemberCell from './shared/cells/MemberCell';
 import TableTextCell from './shared/cells/TextCell';
-import {
-  TABLE_DROPDOWN_POPOVER_CLASS,
-  TABLE_SELECT_POPOVER_CLASS,
-  tableCellStyles,
-  tableStyles,
-} from './shared/styles';
+import { tableCellStyles, tableStyles } from './shared/styles';
 
 export const ManageTable = Object.assign(ManageTableComponent, {
   MemberCell: TableMemberCell,
   TextCell: TableTextCell,
   styles: tableStyles,
   cellStyles: tableCellStyles,
-  selectPopover: TABLE_SELECT_POPOVER_CLASS,
-  dropdownPopover: TABLE_DROPDOWN_POPOVER_CLASS,
 });
 
 export const DataTable = Object.assign(DataTableComponent, {

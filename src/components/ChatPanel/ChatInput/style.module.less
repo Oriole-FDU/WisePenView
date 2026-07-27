@@ -1,6 +1,6 @@
 .container {
   flex-shrink: 0;
-  padding: var(--space-sm) 0 var(--space-2xs);
+  padding: var(--chat-input-container-padding-block, var(--space-sm)) 0 var(--space-2xs);
   background: transparent;
 }
 
@@ -9,11 +9,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--chat-input-card-padding-block, var(--space-sm)) var(--space-md);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--card-shadow);
+  container-type: inline-size;
+  container-name: chat-input;
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
@@ -46,7 +48,7 @@
     overflow-y: hidden;
     padding-block: var(--space-2xs) var(--space-xs);
     -webkit-overflow-scrolling: touch;
-    /* 覆盖 AttachmentGroup 默认隐藏滚动条；极细 + 主题浅色 */
+    /* ?? AttachmentGroup ?????????? + ???? */
     scrollbar-width: thin !important;
     scrollbar-color: var(--scrollbar-thumb) transparent !important;
 
@@ -114,8 +116,9 @@
 
 .textarea {
   flex: 0 0 auto;
+  width: 100%;
   min-height: calc(1.6em + 16px);
-  max-height: calc(16em + 16px);
+  max-height: var(--chat-input-textarea-max-height, calc(16em + 16px));
   overflow-y: hidden;
   resize: none !important;
   border: none !important;
@@ -126,16 +129,27 @@
   line-height: 1.6;
   color: var(--foreground);
 
+  /* HeroUI TextArea：样式可能落在包裹层，实际 textarea 需同步约束 */
+  :global(textarea) {
+    min-height: inherit !important;
+    max-height: inherit !important;
+    height: inherit;
+    overflow-y: inherit;
+    resize: none !important;
+    field-sizing: fixed;
+  }
+
   &::placeholder {
     color: var(--field-placeholder);
   }
 }
 
 .actionToolbar {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--space-sm);
+  column-gap: var(--space-sm);
+  width: 100%;
   min-height: 36px;
   min-width: 0;
 }
@@ -143,13 +157,54 @@
 .toolbarLeft,
 .toolsRight {
   display: flex;
+  flex-flow: row nowrap;
   align-items: center;
   gap: var(--space-xs);
   min-width: 0;
 }
 
+.toolbarLeft {
+  grid-column: 1;
+  justify-self: start;
+
+  > :global(*) {
+    flex: 0 0 auto;
+  }
+}
+
 .toolsRight {
-  margin-left: auto;
+  grid-column: 3;
+  justify-self: end;
+  /* 模型选择与录音/发送之间需稳定间距，避免文案溢出叠上去 */
+  gap: var(--space-xs);
+
+  > :global(*) {
+    flex: 0 0 auto;
+  }
+}
+
+.toolbarCircleBtn {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 0 !important;
+  line-height: 1;
+
+  :global(svg) {
+    flex-shrink: 0;
+  }
+}
+
+.voiceButtonActive {
+  color: var(--danger);
+  background: var(--danger-soft);
 }
 
 .stopButtonActive {
@@ -243,8 +298,7 @@
 }
 
 .listItemContent,
-.agentItem,
-.modelItem {
+.agentItem {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -252,8 +306,15 @@
   min-width: 0;
 }
 
+/* ???????????????? flex ?? */
+.listItemContent > :global(svg),
+.agentMain > :global(svg) {
+  flex-shrink: 0;
+}
+
 .listItemContent > span,
 .agentMain > span {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -320,92 +381,54 @@
 .agentMain {
   display: inline-flex;
   align-items: center;
+  flex: 1;
   gap: var(--space-xs);
   min-width: 0;
+  overflow: hidden;
 }
 
 .agentMeta {
+  flex-shrink: 0;
+  max-width: 72px;
   margin-left: auto;
+  overflow: hidden;
   color: var(--muted);
   font-size: var(--font-size-sm);
-  white-space: nowrap;
-}
-
-.modelSelectorShell {
-  flex: 0 1 180px;
-  min-width: 0;
-  max-width: 180px;
-}
-
-.modelSelectorShellIcon {
-  flex: 0 0 auto;
-  max-width: none;
-}
-
-.modelTrigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  max-width: 180px;
-  min-width: 0;
-  height: 32px;
-  padding: 0 var(--space-xs);
-  border: 0;
-  border-radius: var(--radius-xl);
-  background: transparent;
-  color: var(--text-tertiary);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
-
-  span {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &:hover,
-  &:focus-visible {
-    color: var(--foreground);
-    background: var(--surface-tertiary);
-    outline: none;
-  }
-}
-
-.modelInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.modelName,
-.modelMeta {
-  min-width: 0;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.modelName {
-  font-size: var(--font-size-base);
-  color: var(--foreground);
+.modelSelectorShell {
+  flex: 0 1 auto;
+  width: max-content;
+  min-width: 32px;
+  max-width: var(--layout-model-selector-max-width, 240px);
+  overflow: hidden;
+  margin-inline-end: 0;
 }
 
-.modelMeta {
-  font-size: var(--font-size-sm);
-  color: var(--muted);
+.modelSelectorShellIcon {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  min-width: 32px;
+  overflow: visible;
+  margin-inline-end: 0;
 }
 
-.emptyText {
-  padding: var(--space-lg) var(--space-sm);
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-  text-align: center;
+@container chat-input (max-width: 420px) {
+  .actionToolbar {
+    column-gap: var(--space-2xs);
+  }
+
+  .toolbarLeft {
+    gap: 2px;
+  }
+
+  /* 右侧控件保持可读间距，防止模型文案与麦克风重叠 */
+  .toolsRight {
+    gap: var(--space-xs);
+  }
 }
 
 .dropOverlay {
@@ -417,11 +440,45 @@
   justify-content: center;
   border: 1px dashed var(--accent);
   border-radius: calc(var(--radius-xl) - 1px);
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent-soft));
   color: var(--accent);
   font-size: var(--font-size-sm);
   font-weight: 500;
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.98);
+  transition:
+    opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.22s,
+    background-color 0.22s ease;
+
+  &[data-visible='true'] {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition:
+      opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 0s,
+      background-color 0.22s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+    transform: none;
+
+    &[data-visible='true'] {
+      transform: none;
+    }
+  }
+}
+
+.dropOverlayLabel {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
 }
 
 .spinIcon {
@@ -449,19 +506,5 @@
 @media (max-width: 640px) {
   .container {
     padding-inline: var(--space-sm);
-  }
-
-  .actionToolbar {
-    align-items: flex-end;
-    flex-wrap: wrap;
-  }
-
-  .toolsRight {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .modelSelectorShell {
-    max-width: calc(100% - 40px);
   }
 }

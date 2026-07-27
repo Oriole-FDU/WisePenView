@@ -4,7 +4,7 @@ import {
   resolveColumnAlign,
   shouldStretchTableCellContent,
 } from '../shared/TableBase/cellAlign';
-import { resolveManageColumnWidthClass } from '../shared/TableBase/columnWidth';
+import { resolveEditableColumnWidthClass } from '../shared/TableBase/columnWidth';
 import { resolveSelectedCount } from '../shared/TableBase/tableSelection';
 import { sortTableRows } from '../shared/TableBase/tableSort';
 import TableBodyState from '../shared/TableBodyState';
@@ -28,7 +28,6 @@ import styles from './style.module.less';
 
 import { Spinner, Table, type Selection } from '@heroui/react';
 import { Check, X } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function evaluateRowPredicate<T>(
@@ -110,16 +109,16 @@ function ManageTable<T extends object>({
   onSortChange,
   getRowClassName,
 }: ManageTableProps<T>) {
-  const { t } = useTranslation('table');
+  const { t, i18n } = useTranslation('table');
+  const sortLocale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const resolvedEmptyText = emptyText ?? t('empty.noData');
   const resolvedLoadingText = loadingText ?? t('loading');
 
-  const disabledKeys = useMemo(
-    () => (batchSelection?.disabledKeys ? new Set(batchSelection.disabledKeys) : undefined),
-    [batchSelection]
-  );
+  const disabledKeys = batchSelection?.disabledKeys
+    ? new Set(batchSelection.disabledKeys)
+    : undefined;
 
-  const defaultSummary = useMemo(() => {
+  const defaultSummary = (() => {
     if (!pagination) {
       return undefined;
     }
@@ -129,94 +128,83 @@ function ManageTable<T extends object>({
     return pagination.total > 0
       ? t('summary.totalItems', { count: pagination.total })
       : t('summary.totalItemsZero');
-  }, [pagination, t]);
+  })();
 
-  const renderActionCell = useCallback(
-    (row: T, ctx: ManageTableRowContext<T>) => {
-      if (renderRowActions) {
-        return renderRowActions(row, ctx);
-      }
+  const renderActionCell = (row: T, ctx: ManageTableRowContext<T>) => {
+    if (renderRowActions) {
+      return renderRowActions(row, ctx);
+    }
 
-      if (ctx.state === 'editing' || ctx.state === 'error') {
-        return (
-          <div className={styles.inlineEditActions}>
-            <AppIconButton
-              icon={<Check size={16} aria-hidden="true" />}
-              label={t('aria.save')}
-              size="sm"
-              variant="primary"
-              onPress={() => {
-                void inlineEdit?.onSave(row);
-              }}
-            />
-            <AppIconButton
-              icon={<X size={16} aria-hidden="true" />}
-              label={t('aria.cancel')}
-              size="sm"
-              onPress={inlineEdit?.onCancel}
-            />
-          </div>
-        );
-      }
-
-      if (ctx.state === 'saving') {
-        return (
-          <div className={styles.inlineEditActions}>
-            <AppIconButton
-              icon={<Spinner size="sm" />}
-              label={t('aria.saving')}
-              size="sm"
-              variant="primary"
-              isDisabled
-            />
-            <AppIconButton
-              icon={<X size={16} aria-hidden="true" />}
-              label={t('aria.cancel')}
-              size="sm"
-              isDisabled
-            />
-          </div>
-        );
-      }
-
-      const actions = resolveRowActions(row, rowActions);
-      const menuItems = toMenuActions(actions, row);
-      if (menuItems.length === 0) {
-        return null;
-      }
-
+    if (ctx.state === 'editing' || ctx.state === 'error') {
       return (
-        <TableRowActions
-          actions={menuItems}
-          onAction={(key) => {
-            const matched = actions.find((action) => action.key === key);
-            matched?.onPress(row);
-          }}
-        />
+        <div className={styles.inlineEditActions}>
+          <AppIconButton
+            icon={<Check size={16} aria-hidden="true" />}
+            label={t('aria.save')}
+            size="sm"
+            variant="primary"
+            onPress={() => {
+              void inlineEdit?.onSave(row);
+            }}
+          />
+          <AppIconButton
+            icon={<X size={16} aria-hidden="true" />}
+            label={t('aria.cancel')}
+            size="sm"
+            onPress={inlineEdit?.onCancel}
+          />
+        </div>
       );
-    },
-    [inlineEdit, renderRowActions, rowActions, t]
-  );
+    }
+
+    if (ctx.state === 'saving') {
+      return (
+        <div className={styles.inlineEditActions}>
+          <AppIconButton
+            icon={<Spinner size="sm" />}
+            label={t('aria.saving')}
+            size="sm"
+            variant="primary"
+            isDisabled
+          />
+          <AppIconButton
+            icon={<X size={16} aria-hidden="true" />}
+            label={t('aria.cancel')}
+            size="sm"
+            isDisabled
+          />
+        </div>
+      );
+    }
+
+    const actions = resolveRowActions(row, rowActions);
+    const menuItems = toMenuActions(actions, row);
+    if (menuItems.length === 0) {
+      return null;
+    }
+
+    return (
+      <TableRowActions
+        actions={menuItems}
+        onAction={(key) => {
+          const matched = actions.find((action) => action.key === key);
+          matched?.onPress(row);
+        }}
+      />
+    );
+  };
 
   const showHeaderBar = Boolean(title || toolbar);
   const showEditErrorToast = Boolean(inlineEdit?.errorMessage);
   const showBatchFooter = Boolean(batchSelection && batchFooter);
   const selectedCount = resolveSelectedCount(batchSelection?.selectedKeys, items.length);
-  const selectableRowIds = useMemo(
-    () =>
-      batchSelection
-        ? items.map((row) => String(row[rowKey])).filter((rowId) => !disabledKeys?.has(rowId))
-        : [],
-    [batchSelection, disabledKeys, items, rowKey]
-  );
-  const selectedRowIdSet = useMemo(
-    () =>
-      new Set(
-        batchSelection?.selectedKeys === 'all'
-          ? selectableRowIds
-          : Array.from(batchSelection?.selectedKeys ?? [], String)
-      ),
-    [batchSelection, selectableRowIds]
+  const selectableRowIds = batchSelection
+    ? items.map((row) => String(row[rowKey])).filter((rowId) => !disabledKeys?.has(rowId))
+    : [];
+  const selectedRowIdSet = new Set(
+    batchSelection?.selectedKeys === 'all'
+      ? selectableRowIds
+      : Array.from(batchSelection?.selectedKeys ?? [], String)
   );
   const selectedSelectableRowCount = selectableRowIds.filter((rowId) =>
     selectedRowIdSet.has(rowId)
@@ -225,62 +213,55 @@ function ManageTable<T extends object>({
     selectableRowIds.length > 0 && selectedSelectableRowCount === selectableRowIds.length;
   const someRowsSelected = selectedSelectableRowCount > 0 && !allRowsSelected;
 
-  const sortedItems = useMemo(
-    () =>
-      sortTableRows(items, columns, sortDescriptor, (row) => {
-        const rowId = String(row[rowKey]);
-        return { row, rowId, state: resolveRowState(rowId, inlineEdit) };
-      }),
-    [columns, inlineEdit, items, rowKey, sortDescriptor]
-  );
-
-  const handleBatchSelectionChange = useCallback(
-    (keys: Selection) => {
-      if (!batchSelection) {
-        return;
-      }
-      if (keys === 'all') {
-        batchSelection.onSelectionChange('all');
-        return;
-      }
-      batchSelection.onSelectionChange(keys);
+  const sortedItems = sortTableRows(
+    items,
+    columns,
+    sortDescriptor,
+    (row) => {
+      const rowId = String(row[rowKey]);
+      return { row, rowId, state: resolveRowState(rowId, inlineEdit) };
     },
-    [batchSelection]
+    { locale: sortLocale }
   );
 
-  const handleRowCheckboxChange = useCallback(
-    (rowId: string, selected: boolean) => {
-      if (!batchSelection || disabledKeys?.has(rowId)) {
-        return;
-      }
-      const nextKeys = new Set(selectedRowIdSet);
+  const handleBatchSelectionChange = (keys: Selection) => {
+    if (!batchSelection) {
+      return;
+    }
+    if (keys === 'all') {
+      batchSelection.onSelectionChange('all');
+      return;
+    }
+    batchSelection.onSelectionChange(keys);
+  };
+
+  const handleRowCheckboxChange = (rowId: string, selected: boolean) => {
+    if (!batchSelection || disabledKeys?.has(rowId)) {
+      return;
+    }
+    const nextKeys = new Set(selectedRowIdSet);
+    if (selected) {
+      nextKeys.add(rowId);
+    } else {
+      nextKeys.delete(rowId);
+    }
+    batchSelection.onSelectionChange(nextKeys);
+  };
+
+  const handleSelectAllCheckboxChange = (selected: boolean) => {
+    if (!batchSelection) {
+      return;
+    }
+    const nextKeys = new Set(selectedRowIdSet);
+    selectableRowIds.forEach((rowId) => {
       if (selected) {
         nextKeys.add(rowId);
       } else {
         nextKeys.delete(rowId);
       }
-      batchSelection.onSelectionChange(nextKeys);
-    },
-    [batchSelection, disabledKeys, selectedRowIdSet]
-  );
-
-  const handleSelectAllCheckboxChange = useCallback(
-    (selected: boolean) => {
-      if (!batchSelection) {
-        return;
-      }
-      const nextKeys = new Set(selectedRowIdSet);
-      selectableRowIds.forEach((rowId) => {
-        if (selected) {
-          nextKeys.add(rowId);
-        } else {
-          nextKeys.delete(rowId);
-        }
-      });
-      batchSelection.onSelectionChange(nextKeys);
-    },
-    [batchSelection, selectableRowIds, selectedRowIdSet]
-  );
+    });
+    batchSelection.onSelectionChange(nextKeys);
+  };
 
   return (
     <div className={joinClassNames(styles.shell, className)}>
@@ -357,7 +338,7 @@ function ManageTable<T extends object>({
                     allowsSorting={column.allowsSorting}
                     isRowHeader={column.isRowHeader}
                     className={joinClassNames(
-                      resolveManageColumnWidthClass(column.width),
+                      resolveEditableColumnWidthClass(column.width),
                       column.isRowHeader ? styles.stickyRowHeaderColumn : undefined,
                       column.className
                     )}
@@ -453,7 +434,7 @@ function ManageTable<T extends object>({
                           data-row-accent={isEditingRow && column.isRowHeader ? 'true' : undefined}
                           className={joinClassNames(
                             styles.bodyCell,
-                            resolveManageColumnWidthClass(column.width),
+                            resolveEditableColumnWidthClass(column.width),
                             column.isRowHeader ? styles.stickyRowHeaderCell : undefined,
                             isSavingRow ? styles.editFieldDisabled : undefined,
                             column.className

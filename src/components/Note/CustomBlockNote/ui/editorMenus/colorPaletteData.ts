@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import styles from './style.module.less';
 
 export type ColorKey =
@@ -14,70 +15,70 @@ interface ColorItem {
 export const colorItems: ColorItem[] = [
   {
     key: 'default',
-    label: '默认',
+    label: 'editor.color.default',
     value: '#111827',
     textClassName: styles.textDefault,
     backgroundClassName: styles.backgroundDefault,
   },
   {
     key: 'gray',
-    label: '灰色',
+    label: 'editor.color.gray',
     value: '#9b9a97',
     textClassName: styles.textGray,
     backgroundClassName: styles.backgroundGray,
   },
   {
     key: 'brown',
-    label: '棕色',
+    label: 'editor.color.brown',
     value: '#64473a',
     textClassName: styles.textBrown,
     backgroundClassName: styles.backgroundBrown,
   },
   {
     key: 'red',
-    label: '红色',
+    label: 'editor.color.red',
     value: '#e03e3e',
     textClassName: styles.textRed,
     backgroundClassName: styles.backgroundRed,
   },
   {
     key: 'orange',
-    label: '橙色',
+    label: 'editor.color.orange',
     value: '#d9730d',
     textClassName: styles.textOrange,
     backgroundClassName: styles.backgroundOrange,
   },
   {
     key: 'yellow',
-    label: '黄色',
+    label: 'editor.color.yellow',
     value: '#dfab01',
     textClassName: styles.textYellow,
     backgroundClassName: styles.backgroundYellow,
   },
   {
     key: 'green',
-    label: '绿色',
+    label: 'editor.color.green',
     value: '#4d6461',
     textClassName: styles.textGreen,
     backgroundClassName: styles.backgroundGreen,
   },
   {
     key: 'blue',
-    label: '蓝色',
+    label: 'editor.color.blue',
     value: '#0b6e99',
     textClassName: styles.textBlue,
     backgroundClassName: styles.backgroundBlue,
   },
   {
     key: 'purple',
-    label: '紫色',
+    label: 'editor.color.purple',
     value: '#6940a5',
     textClassName: styles.textPurple,
     backgroundClassName: styles.backgroundPurple,
   },
   {
     key: 'pink',
-    label: '粉色',
+    label: 'editor.color.pink',
     value: '#ad1a72',
     textClassName: styles.textPink,
     backgroundClassName: styles.backgroundPink,
@@ -92,6 +93,10 @@ function normalizeColor(color: string | undefined): ColorKey {
 export function getColorItem(color: string | undefined) {
   const safeColor = normalizeColor(color);
   return colorItems.find((item) => item.key === safeColor) ?? colorItems[0];
+}
+
+export function getColorItemLabel(item: ColorItem): string {
+  return i18n.t(item.label, { ns: 'note' });
 }
 
 export function findColorItemByPickerValue(value: string) {

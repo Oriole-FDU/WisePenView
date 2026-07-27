@@ -5,7 +5,8 @@ import { Button, TextField } from '@heroui/react';
 import { useRequest, useUnmount } from 'ahooks';
 import clsx from 'clsx';
 import type { KeyboardEvent } from 'react';
-import { useId, useMemo, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { UserSearchComboboxProps } from './index.type';
 import styles from './style.module.less';
 
@@ -13,8 +14,8 @@ const DEFAULT_MIN_KEYWORD_LENGTH = 2;
 
 const getDisplayInitial = (name: string): string => name.trim().charAt(0).toUpperCase() || '?';
 
-const getUserDisplayName = (user: UserSearchUser): string =>
-  user.realName?.trim() || user.nickname?.trim() || user.username.trim() || `用户 ${user.userId}`;
+const getUserDisplayName = (user: UserSearchUser, fallbackName: string): string =>
+  user.realName?.trim() || user.nickname?.trim() || user.username.trim() || fallbackName;
 
 const getUserDescription = (user: UserSearchUser): string =>
   user.username ? `@${user.username}` : user.userId;
@@ -32,13 +33,14 @@ function UserSearchCombobox({
   onEmptySubmit,
   onError,
   excludedUserIds,
-  placeholder = '完整用户名或邮箱',
-  ariaLabel = '搜索用户',
+  placeholder,
+  ariaLabel,
   submitLabel,
   submitIcon,
   minKeywordLength = DEFAULT_MIN_KEYWORD_LENGTH,
   disabled = false,
 }: UserSearchComboboxProps) {
+  const { t } = useTranslation('common');
   const inputId = useId();
   const listboxId = `${inputId}-listbox`;
   const keyword = value.trim();
@@ -63,13 +65,10 @@ function UserSearchCombobox({
   );
 
   const isFreshResult = queryResult?.keyword === keyword;
-  const users = useMemo(
-    () =>
-      keyword.length >= minKeywordLength && isFreshResult
-        ? queryResult.users.filter((user) => !excludedUserIds?.has(user.userId))
-        : [],
-    [excludedUserIds, isFreshResult, keyword.length, minKeywordLength, queryResult]
-  );
+  const users =
+    keyword.length >= minKeywordLength && isFreshResult
+      ? queryResult.users.filter((user) => !excludedUserIds?.has(user.userId))
+      : [];
   const shouldShowList = isFocused && keyword.length >= minKeywordLength;
   const shouldShowLoading = loading || (shouldShowList && !isFreshResult);
   const activeIndex =
@@ -165,7 +164,7 @@ function UserSearchCombobox({
   };
 
   const renderUser = (user: UserSearchUser, index: number) => {
-    const displayName = getUserDisplayName(user);
+    const displayName = getUserDisplayName(user, t('userSearch.fallbackName', { id: user.userId }));
     const selected = index === activeIndex;
     return (
       <button
@@ -199,9 +198,13 @@ function UserSearchCombobox({
   return (
     <div className={styles.root} onFocusCapture={handleFocus} onBlurCapture={handleBlur}>
       <div className={styles.controlRow}>
-        <TextField aria-label={ariaLabel} value={value} onChange={handleValueChange}>
+        <TextField
+          aria-label={ariaLabel ?? t('userSearch.aria')}
+          value={value}
+          onChange={handleValueChange}
+        >
           <Input
-            placeholder={placeholder}
+            placeholder={placeholder ?? t('userSearch.placeholder')}
             disabled={disabled}
             role="combobox"
             aria-autocomplete="list"
@@ -219,13 +222,18 @@ function UserSearchCombobox({
         ) : null}
       </div>
       {shouldShowList ? (
-        <div id={listboxId} className={styles.listbox} role="listbox" aria-label="用户搜索建议">
+        <div
+          id={listboxId}
+          className={styles.listbox}
+          role="listbox"
+          aria-label={t('userSearch.suggestionsAria')}
+        >
           {shouldShowLoading ? (
-            <div className={styles.state}>搜索中...</div>
+            <div className={styles.state}>{t('userSearch.searching')}</div>
           ) : users.length > 0 ? (
             users.map(renderUser)
           ) : (
-            <div className={styles.state}>无匹配用户</div>
+            <div className={styles.state}>{t('userSearch.noMatch')}</div>
           )}
         </div>
       ) : null}

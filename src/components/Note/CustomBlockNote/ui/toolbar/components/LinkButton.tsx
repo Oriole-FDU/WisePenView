@@ -1,5 +1,5 @@
 import { blockNoteSchema } from '@/components/Note/CustomBlockNote/registry/noteEditorComposition';
-import { Popover } from '@/components/Overlay';
+import { AppPopover } from '@/components/Overlay';
 import { isTableCellSelection } from '@blocknote/core';
 import {
   DEFAULT_LINK_PROTOCOL,
@@ -12,7 +12,8 @@ import { useBlockNoteEditor, useEditorState, useExtension } from '@blocknote/rea
 import { Button, Input } from '@heroui/react';
 import { useEventListener, useUnmount } from 'ahooks';
 import { Link } from 'lucide-react';
-import { useCallback, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from '../style.module.less';
 import { blockHasInlineContent, getSelectedBlocks } from '../utils';
 import { ToolbarButton, type ButtonGroupChildProps } from './ToolbarButton';
@@ -28,6 +29,7 @@ function normalizeUrl(url: string) {
 }
 
 export function CreateLinkToolbarButton(buttonGroupProps: ButtonGroupChildProps) {
+  const { t } = useTranslation(['note', 'common']);
   const editor = useBlockNoteEditor(blockNoteSchema);
   const formattingToolbar = useExtension(FormattingToolbarExtension);
   const { editLink } = useExtension(LinkToolbarExtension);
@@ -57,43 +59,37 @@ export function CreateLinkToolbarButton(buttonGroupProps: ButtonGroupChildProps)
     },
   });
 
-  const openLinkPopover = useCallback(() => {
+  const openLinkPopover = () => {
     if (!state) {
       return;
     }
     setUrl(state.url);
     showSelection(true, 'createLinkButton');
     setOpen(true);
-  }, [showSelection, state]);
+  };
 
-  const closeLinkPopover = useCallback(() => {
+  const closeLinkPopover = () => {
     showSelection(false, 'createLinkButton');
     setOpen(false);
-  }, [showSelection]);
+  };
 
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      if (nextOpen) {
-        openLinkPopover();
-      } else {
-        closeLinkPopover();
-      }
-    },
-    [closeLinkPopover, openLinkPopover]
-  );
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      openLinkPopover();
+    } else {
+      closeLinkPopover();
+    }
+  };
 
-  const handleEditorKeyDown = useCallback(
-    (event: Event) => {
-      if (!(event instanceof globalThis.KeyboardEvent)) {
-        return;
-      }
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        openLinkPopover();
-      }
-    },
-    [openLinkPopover]
-  );
+  const handleEditorKeyDown = (event: Event) => {
+    if (!(event instanceof globalThis.KeyboardEvent)) {
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      openLinkPopover();
+    }
+  };
 
   useEventListener('keydown', handleEditorKeyDown, {
     target: editor.domElement,
@@ -126,27 +122,29 @@ export function CreateLinkToolbarButton(buttonGroupProps: ButtonGroupChildProps)
   };
 
   return (
-    <Popover isOpen={open} onOpenChange={handleOpenChange} deferContent={false}>
-      <Popover.Trigger>
-        <ToolbarButton {...buttonGroupProps} label="添加链接" icon={<Link size={20} />} />
-      </Popover.Trigger>
-      <Popover.Content className={styles.formPopover} placement="bottom">
-        <Popover.Dialog>
-          <div className={styles.formPanel} onMouseDown={(event) => event.stopPropagation()}>
-            <Input
-              autoFocus
-              aria-label="链接地址"
-              placeholder="输入链接地址"
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <Button size="sm" variant="primary" onPress={saveLink}>
-              确定
-            </Button>
-          </div>
-        </Popover.Dialog>
-      </Popover.Content>
-    </Popover>
+    <AppPopover isOpen={open} onOpenChange={handleOpenChange} deferContent={false}>
+      <AppPopover.Trigger>
+        <ToolbarButton
+          {...buttonGroupProps}
+          label={t('editor.link.add')}
+          icon={<Link size={20} />}
+        />
+      </AppPopover.Trigger>
+      <AppPopover.Content className={styles.formPopover} placement="bottom">
+        <div className={styles.formPanel} onMouseDown={(event) => event.stopPropagation()}>
+          <Input
+            autoFocus
+            aria-label={t('editor.link.address')}
+            placeholder={t('editor.link.placeholder')}
+            value={url}
+            onChange={(event) => setUrl(event.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <Button size="sm" variant="primary" onPress={saveLink}>
+            {t('actions.confirm', { ns: 'common' })}
+          </Button>
+        </div>
+      </AppPopover.Content>
+    </AppPopover>
   );
 }

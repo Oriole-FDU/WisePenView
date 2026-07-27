@@ -27,25 +27,71 @@ export type ProfileFieldKey = keyof Omit<ProfileFieldConfig, 'showProfileSection
 /** 基本档案字段列表，顺序决定 grid 布局（每行 2 个） */
 export const PROFILE_FIELDS: Array<{
   key: ProfileFieldKey;
-  label: string;
+  labelKey: string;
   type: 'input' | 'select';
-  placeholder: string;
+  placeholderKey: string;
   optionsKey?: 'sex' | 'degreeLevel';
 }> = [
-  { key: 'nickname', label: '昵称', type: 'input', placeholder: '请输入昵称' },
-  { key: 'realName', label: '真实姓名', type: 'input', placeholder: '请输入真实姓名' },
-  { key: 'sex', label: '性别', type: 'select', placeholder: '请选择性别', optionsKey: 'sex' },
-  { key: 'college', label: '学院', type: 'input', placeholder: '请输入学院' },
-  { key: 'major', label: '专业', type: 'input', placeholder: '请输入专业' },
-  { key: 'className', label: '班级', type: 'input', placeholder: '请输入班级' },
-  { key: 'academicTitle', label: '职称', type: 'input', placeholder: '请输入职称' },
-  { key: 'university', label: '高校', type: 'input', placeholder: '请输入高校' },
-  { key: 'enrollmentYear', label: '入学年份', type: 'input', placeholder: '如：2024' },
+  {
+    key: 'nickname',
+    labelKey: 'form.field.nickname.label',
+    type: 'input',
+    placeholderKey: 'form.field.nickname.placeholder',
+  },
+  {
+    key: 'realName',
+    labelKey: 'form.field.realName.label',
+    type: 'input',
+    placeholderKey: 'form.field.realName.placeholder',
+  },
+  {
+    key: 'sex',
+    labelKey: 'form.field.sex.label',
+    type: 'select',
+    placeholderKey: 'form.field.sex.placeholder',
+    optionsKey: 'sex',
+  },
+  {
+    key: 'college',
+    labelKey: 'form.field.college.label',
+    type: 'input',
+    placeholderKey: 'form.field.college.placeholder',
+  },
+  {
+    key: 'major',
+    labelKey: 'form.field.major.label',
+    type: 'input',
+    placeholderKey: 'form.field.major.placeholder',
+  },
+  {
+    key: 'className',
+    labelKey: 'form.field.className.label',
+    type: 'input',
+    placeholderKey: 'form.field.className.placeholder',
+  },
+  {
+    key: 'academicTitle',
+    labelKey: 'form.field.academicTitle.label',
+    type: 'input',
+    placeholderKey: 'form.field.academicTitle.placeholder',
+  },
+  {
+    key: 'university',
+    labelKey: 'form.field.university.label',
+    type: 'input',
+    placeholderKey: 'form.field.university.placeholder',
+  },
+  {
+    key: 'enrollmentYear',
+    labelKey: 'form.field.enrollmentYear.label',
+    type: 'input',
+    placeholderKey: 'form.field.enrollmentYear.placeholder',
+  },
   {
     key: 'degreeLevel',
-    label: '学历层次',
+    labelKey: 'form.field.degreeLevel.label',
     type: 'select',
-    placeholder: '请选择学历层次',
+    placeholderKey: 'form.field.degreeLevel.placeholder',
     optionsKey: 'degreeLevel',
   },
 ];

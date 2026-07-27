@@ -7,8 +7,9 @@
 }
 
 .skeletonLine {
-  height: var(--font-size-base);
+  height: calc(var(--font-size-base) + 2px);
   border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--muted) 26%, var(--surface)) !important;
 
   &:nth-child(1) {
     width: 92%;
@@ -20,5 +21,23 @@
 
   &:nth-child(3) {
     width: 64%;
+  }
+
+  &:global(.skeleton--shimmer)::after {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--surface) 70%, transparent) 42%,
+      color-mix(in srgb, var(--foreground) 14%, var(--surface)) 50%,
+      color-mix(in srgb, var(--surface) 70%, transparent) 58%,
+      transparent 100%
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:global(.skeleton--shimmer)::after {
+      animation: none;
+      opacity: 0;
+    }
   }
 }

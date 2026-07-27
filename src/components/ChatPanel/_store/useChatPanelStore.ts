@@ -11,7 +11,6 @@ interface ChatPanelState {
   setChatPanelCollapsed: (collapsed: boolean) => void;
   setChatPanelDraftOpen: (open: boolean) => void;
   setChatPanelWidth: (width: number) => void;
-  toggleChatPanelCollapsed: () => void;
 }
 
 const DEFAULT_CHAT_PANEL_STATE: Pick<
@@ -19,7 +18,7 @@ const DEFAULT_CHAT_PANEL_STATE: Pick<
   'chatPanelCollapsed' | 'chatPanelWidth' | 'chatPanelDraftOpen'
 > = {
   chatPanelCollapsed: true,
-  chatPanelWidth: 500,
+  chatPanelWidth: 600,
   chatPanelDraftOpen: false,
 };
 
@@ -48,8 +47,6 @@ export const useChatPanelStore = create<ChatPanelState>()(
           }
           return { chatPanelDraftOpen: open };
         }),
-      toggleChatPanelCollapsed: () =>
-        set((state) => ({ chatPanelCollapsed: !state.chatPanelCollapsed })),
     }),
     { name: 'chat-panel', storage: createStoreJSONStorage('tab') }
   )

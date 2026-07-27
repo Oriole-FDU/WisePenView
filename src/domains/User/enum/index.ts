@@ -34,10 +34,6 @@ export const USER_VERIFICATION = createEnum([
   { value: 'FDU_UIS_SYS', key: 'FDU_UIS_SYS', label: 'UIS认证' },
 ] as const);
 export type UserVerificationMode = EnumValue<typeof USER_VERIFICATION>;
-export const getVerificationModeLabel = (mode: UserVerificationMode | null | undefined): string => {
-  if (!mode) return '已认证';
-  return USER_VERIFICATION.labels[mode] ?? '已认证';
-};
 
 /** 用户反馈类型选项 */
 export const FEEDBACK_TYPE = createEnum([

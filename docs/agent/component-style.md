@@ -39,7 +39,15 @@ ComponentName/
 - 异步提交使用 `useRequest(fn, { manual: true })`。
 - 错误提示使用 HeroUI `toast` 和 `parseErrorMessage(err)`。
 
-## 四、布局与可读性
+## 四、Popover 约定
+
+- 业务 Popover 使用 `src/components/Overlay/AppPopover`，不要直接组合底层 `Popover.Content` / `Popover.Dialog`。
+- 标准标题通过 `AppPopover.Content` 的 `title` 传入；无标题轻浮层省略 `title`，两者共用同一内容间距。
+- 危险提示型 Popover 使用 `variant="danger"`；Dropdown 中的删除、退出等危险操作使用 `Dropdown.Item variant="danger"`。
+- 宽度、最大高度等业务布局通过 `className` 保留在调用方，不重复设置边框、圆角、背景或阴影。
+- 内容已有完整内边距或为第三方面板时使用 `bodyPadding="none"`，避免双层间距。
+
+## 五、布局与可读性
 
 - 页面和工具界面优先清晰、紧凑、可扫描。
 - 不要为了装饰创建过多卡片嵌套。
@@ -48,7 +56,7 @@ ComponentName/
 - 不要使用纯装饰性渐变球、光斑、无意义背景图。
 - 不要用 viewport 宽度直接缩放字体。
 
-## 五、组件库使用
+## 六、组件库使用
 
 - 图标按钮优先使用已有图标库，例如 `lucide-react`。
 - 有明确图标语义时，不要用文字按钮代替图标按钮。
@@ -59,7 +67,7 @@ ComponentName/
 - Tooltip 方向由所在控件组统一决定，不由单个按钮随意选择：顶部工具栏向下、底部工具栏向上、左侧竖向工具栏向右、右侧竖向工具栏向左；同一控件组必须一致，仅在视口空间不足时允许浮层自动翻转。
 - 表格、菜单、tabs、开关、滑块等控件使用符合用户预期的交互形态。
 
-## 六、检查清单
+## 七、检查清单
 
 - [ ] 样式使用 Less + CSS Modules。
 - [ ] 没有非必要内联样式。

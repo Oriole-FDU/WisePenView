@@ -3,10 +3,12 @@ import { GROUP_TYPE } from '@/domains/Group';
 import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 import { Card } from '@heroui/react';
 import type { KeyboardEvent, SyntheticEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { GroupCardProps } from './index.type';
 import styles from './style.module.less';
 
 function GroupCard({ group, onClick }: GroupCardProps) {
+  const { t } = useTranslation('group');
   const {
     groupName,
     ownerInfo,
@@ -33,7 +35,12 @@ function GroupCard({ group, onClick }: GroupCardProps) {
   };
 
   const ownerName = ownerInfo?.nickname ?? '';
-  const groupTypeLabel = GROUP_TYPE.getLabel(groupType);
+  const groupTypeLabel =
+    groupType === GROUP_TYPE.ADVANCED
+      ? t('type.advanced')
+      : groupType === GROUP_TYPE.PUBLIC
+        ? t('type.public')
+        : t('type.normal');
   const isSpecialGroup = groupType === GROUP_TYPE.ADVANCED || groupType === GROUP_TYPE.PUBLIC;
   const badgeClassName =
     groupType === GROUP_TYPE.PUBLIC ? `${styles.badge} ${styles.publicBadge}` : styles.badge;
@@ -62,7 +69,9 @@ function GroupCard({ group, onClick }: GroupCardProps) {
         </Card.Header>
         <Card.Footer className={styles.footer}>
           {ownerInfo && <UserCapsule name={ownerName} avatar={ownerInfo.avatar} />}
-          <span className={styles.memberCount}>{memberCount} 成员</span>
+          <span className={styles.memberCount}>
+            {t('card.memberCount', { count: memberCount })}
+          </span>
         </Card.Footer>
       </div>
     </Card>

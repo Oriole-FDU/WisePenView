@@ -13,7 +13,6 @@ import type {
 
 export const DRIVE_ROOT_ID = 'drive-root';
 export const DRIVE_SHARED_TAG_NAME = '/.shared';
-export const DRIVE_SHARED_FOLDER_DISPLAY_NAME = '共享';
 const DRIVE_GROUP_ROOT_PREFIX = 'drive-root:group:';
 
 export type EncodedNodeKind = 'folder' | 'resource' | 'link' | 'loading';
@@ -27,8 +26,7 @@ type DecodedNodeId =
   | { kind: 'unknown'; raw: string };
 
 const getFolderName = (tagName: string): string => {
-  if (tagName === '/') return '根目录';
-  if (tagName === DRIVE_SHARED_TAG_NAME) return DRIVE_SHARED_FOLDER_DISPLAY_NAME;
+  if (tagName === '/' || tagName === DRIVE_SHARED_TAG_NAME) return '';
   if (tagName.startsWith('/')) return tagName.slice(1);
   return tagName;
 };
@@ -185,7 +183,7 @@ export const buildDriveRootNode = (params: {
     tagId: params.personalRootTag?.tagId,
     isVirtual: isGroupRoot,
     canMountResources: !isGroupRoot && Boolean(params.personalRootTag?.tagId),
-    name: isGroupRoot ? '小组云盘' : '个人云盘',
+    name: '',
     childrenIds: [],
   };
 };

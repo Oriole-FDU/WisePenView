@@ -7,6 +7,7 @@ import {
   type DragEvent,
   type KeyboardEvent,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 import {
   selectChatInputCompletionState,
@@ -25,6 +26,7 @@ interface UseChatInputControllerOptions {
 }
 
 export function useChatInputController({ onSend, onStop, sending }: UseChatInputControllerOptions) {
+  const { t } = useTranslation('chat');
   const store = useChatInputStoreApi();
   const dragCounterRef = useRef(0);
   const { routeFiles, preparePendingAttachments, clearPendingFileCache } = useChatInputFiles();
@@ -49,7 +51,7 @@ export function useChatInputController({ onSend, onStop, sending }: UseChatInput
     const text = completionState.value.trim();
     if (!text || sending || !selectedModel) return;
     if (pendingAttachmentUploads.some((upload) => upload.status === 'uploading')) {
-      toast.warning('附件仍在上传中，请稍后再发送');
+      toast.warning(t('input.attachmentUploading'));
       return;
     }
 
@@ -68,7 +70,7 @@ export function useChatInputController({ onSend, onStop, sending }: UseChatInput
       clearAfterSend();
       clearPendingFileCache();
     } catch (err) {
-      toast.danger(`发送失败: ${parseErrorMessage(err)}`);
+      toast.danger(t('input.sendFailed', { error: parseErrorMessage(err) }));
     }
   }
 
@@ -132,10 +134,7 @@ export function useChatInputController({ onSend, onStop, sending }: UseChatInput
       onDragLeave: handleDragLeave,
       onDrop: handleDrop,
     },
-    dropOverlayProps: {
-      visible: isDragOver,
-    },
-    attachmentStripProps: {},
+    isDragOver,
     textAreaProps: {
       value,
       readOnly: voiceInputProps.isActive,

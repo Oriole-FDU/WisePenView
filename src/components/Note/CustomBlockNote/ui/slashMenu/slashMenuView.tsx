@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { Dropdown, Header, ListBoxItem, ListBoxSection } from '@heroui/react';
 import clsx from 'clsx';
@@ -23,7 +24,11 @@ import {
 } from 'lucide-react';
 import { createElement } from 'react';
 import { getSlashMenuItemKey } from './buildSlashMenuItems';
-import { groupSortedSuggestionItems, resolveSlashMenuTitle } from './slashMenuModel';
+import {
+  groupSortedSuggestionItems,
+  resolveSlashMenuGroupLabel,
+  resolveSlashMenuTitle,
+} from './slashMenuModel';
 import styles from './style.module.less';
 
 const SLASH_MENU_ICON_MAP: Record<string, typeof Type> = {
@@ -67,7 +72,7 @@ function resolveSlashMenuIconColor(item: DefaultReactSuggestionItem) {
   if (item.group === 'AI') {
     return styles.iconAccent;
   }
-  if (item.title === '公式') {
+  if (item.title === i18n.t('slashMenu.item.math', { ns: 'note' })) {
     return styles.iconMuted;
   }
   return styles.iconTheme;
@@ -107,7 +112,7 @@ export function SlashMenuDropdownItems({
       {groupedItems.map(([group, groupItems, currentOffset]) => {
         return (
           <Dropdown.Section id={`slash-group-${group}`} className={styles.section} key={group}>
-            <Header className={styles.sectionTitle}>{group}</Header>
+            <Header className={styles.sectionTitle}>{resolveSlashMenuGroupLabel(group)}</Header>
             {groupItems.map((item, itemIndexInGroup) => {
               const itemIndex = currentOffset + itemIndexInGroup;
               const title = resolveSlashMenuTitle(item);

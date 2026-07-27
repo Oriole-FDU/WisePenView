@@ -10,6 +10,7 @@ import {
 } from '@/domains/Resource';
 import type { TagTreeNode } from '@/domains/Tag';
 import { getTagPermissionPresetValues, type TagPermissionPresetKey } from '@/domains/Tag';
+import i18n from '@/i18n';
 import { TAG_PERMISSION_PRESETS } from './tagPermissionPreset';
 
 export type ResourcePermissionPresetKey = 'inherit' | TagPermissionPresetKey;
@@ -41,41 +42,31 @@ export interface ResolveResourcePermissionPolicyParams {
   resourceType?: string;
 }
 
-const RESOURCE_PERMISSION_INHERIT_OPTION: ResourcePermissionPresetOption = {
-  key: 'inherit',
-  label: '继承标签',
-  description: '使用所在标签的权限策略',
-  detail: '资源权限随标签策略变更自动同步。',
-};
+const createResourcePermissionPresetOption = (
+  key: ResourcePermissionPresetKey
+): ResourcePermissionPresetOption => ({
+  key,
+  get label() {
+    return i18n.t(`permission.preset.${key}.label`, { ns: 'resource' });
+  },
+  get description() {
+    return i18n.t(`permission.preset.${key}.description`, { ns: 'resource' });
+  },
+  get detail() {
+    return i18n.t(`permission.preset.${key}.detail`, { ns: 'resource' });
+  },
+});
+
+const RESOURCE_PERMISSION_INHERIT_OPTION = createResourcePermissionPresetOption('inherit');
 
 const RESOURCE_PERMISSION_PRESET_OVERRIDES: Record<
   TagPermissionPresetKey,
   ResourcePermissionPresetOption
 > = {
-  private: {
-    key: 'private',
-    label: '私密',
-    description: '当前小组成员不可访问',
-    detail: '仅保留资源所有者等固有权限。',
-  },
-  readonly: {
-    key: 'readonly',
-    label: '只读',
-    description: '当前小组成员可以查看',
-    detail: '适合发布版材料或只读资料。',
-  },
-  shared: {
-    key: 'shared',
-    label: '共享',
-    description: '当前小组成员可阅读和协作',
-    detail: '适合团队共同维护的资源。',
-  },
-  custom: {
-    key: 'custom',
-    label: '自定义',
-    description: '选择此资源可用的权限动作',
-    detail: '仅调整当前资源，不影响标签策略。',
-  },
+  private: createResourcePermissionPresetOption('private'),
+  readonly: createResourcePermissionPresetOption('readonly'),
+  shared: createResourcePermissionPresetOption('shared'),
+  custom: createResourcePermissionPresetOption('custom'),
 };
 
 export const RESOURCE_PERMISSION_PRESETS: ResourcePermissionPresetOption[] = [
@@ -126,9 +117,14 @@ export const buildResourcePermissionActionOptions = (
   supportedActions.map((action) => ({
     action,
     key: RESOURCE_ACTION.getKey(action) ?? String(action),
-    label: RESOURCE_ACTION.labels[action] ?? String(action),
+    label: getResourcePermissionActionLabel(action),
     supported: true,
   }));
+
+export const getResourcePermissionActionLabel = (action: ResourceAction): string => {
+  const key = RESOURCE_ACTION.getKey(action);
+  return key ? i18n.t(`permission.actions.${key}`, { ns: 'resource' }) : String(action);
+};
 
 export const buildResourcePermissionActionKeySet = (
   actions: ResourceAction[] | null | undefined,

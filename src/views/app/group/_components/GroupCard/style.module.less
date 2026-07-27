@@ -6,11 +6,12 @@
   padding: 0;
   overflow: hidden;
   cursor: pointer;
-  border: 1px solid var(--accent);
-  transition: border-color 0.2s ease;
+  border: 1px solid var(--border-secondary, var(--border));
+  box-shadow: none;
+  transition: border-color 150ms ease;
 
   &:hover {
-    border-color: var(--accent-secondary);
+    border-color: var(--accent);
   }
 
   &:focus-visible {

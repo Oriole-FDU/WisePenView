@@ -4,6 +4,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { CornerUpLeft } from 'lucide-react';
 import { createContext, Fragment, memo, useContext, type MouseEvent, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import CodeBlock from './CodeBlock';
 import MermaidBlock from './MermaidBlock';
 import { isMermaidLanguage } from './MermaidBlock/language';
@@ -610,6 +611,8 @@ function MarkdownFootnotes({
   renderContext: MarkdownRenderContext;
   linkMode: MarkdownLinkMode;
 }) {
+  const { t } = useTranslation('common');
+
   if (renderContext.footnoteReferenceOrder.length === 0) return null;
 
   return (
@@ -633,7 +636,7 @@ function MarkdownFootnotes({
               )}
               <a
                 href={`#fnref-${fragmentId}`}
-                aria-label="返回脚注引用"
+                aria-label={t('markdown.footnoteBack')}
                 onClick={handleFootnoteNavigation}
                 className={styles.footnoteBackLink}
               >

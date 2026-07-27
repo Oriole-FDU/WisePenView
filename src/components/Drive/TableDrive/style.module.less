@@ -10,8 +10,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  /* 列表+详情并排下限；GroupDetail 等复用处也靠此触发横向滚动 */
+  min-width: var(--layout-drive-layout-min-width, 860px);
   flex: 0 0 auto;
-  min-width: 0;
   min-height: var(--table-drive-layout-max-height, calc(100dvh - 240px));
   height: var(--table-drive-layout-max-height, calc(100dvh - 240px));
   max-height: var(--table-drive-layout-max-height, calc(100dvh - 240px));
@@ -23,14 +24,15 @@
 
 .driveBody {
   display: flex;
+  flex-flow: row nowrap;
   flex: 1;
   min-width: 0;
   min-height: 0;
 }
 
 .tablePanel {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: var(--layout-drive-table-min-width, 560px);
   min-height: 0;
 }
 
@@ -51,12 +53,15 @@
   display: flex;
   flex: 0 0 var(--table-drive-detail-panel-width, 300px);
   flex-direction: column;
-  min-width: 0;
+  min-width: var(--table-drive-detail-panel-width, 300px);
+  max-width: var(--table-drive-detail-panel-width, 300px);
   border-left: 1px solid var(--border-light);
   background: var(--surface);
 
   &[data-collapsed='true'] {
     flex-basis: 0;
+    min-width: 0;
+    max-width: 0;
     overflow: hidden;
     border-left: 0;
   }
@@ -64,153 +69,6 @@
 
 .detailPanelToggle {
   flex: 0 0 auto;
-}
-
-.detailContent {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.detailHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  min-height: 53px;
-  padding: 0 var(--space-sm);
-  border-bottom: 1px solid var(--border-light);
-}
-
-.detailIcon {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-}
-
-.detailTitleBlock {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.detailTitle {
-  overflow: hidden;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-md);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.detailType,
-.detailMeta dt {
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-}
-
-.detailBody {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-}
-
-.detailAccordion {
-  width: 100%;
-}
-
-.detailSection {
-  border-bottom: 1px solid var(--border-light);
-}
-
-.detailSectionTrigger {
-  min-height: 36px;
-  padding: 0 var(--space-sm);
-  border-radius: 0;
-  color: var(--foreground);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-md);
-}
-
-.detailSectionContent > div {
-  padding: var(--space-2xs) var(--space-sm) var(--space-sm);
-}
-
-.detailMeta {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  margin: 0;
-
-  div {
-    min-width: 0;
-  }
-
-  dd {
-    margin: 2px 0 0;
-    overflow-wrap: anywhere;
-    font-size: var(--font-size-sm);
-    line-height: var(--line-height-md);
-  }
-}
-
-.detailSectionActions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.detailSectionActions,
-.detailSectionButton {
-  :global([data-slot='button']) {
-    justify-content: flex-start;
-  }
-}
-
-.detailSectionButton {
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.openWithOptions {
-  width: 100%;
-
-  :global(.toggle-button) {
-    flex: 1 1 0;
-  }
-}
-
-.detailHint,
-.detailEmpty {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-md);
-}
-
-.detailEmpty {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-lg);
-  text-align: center;
-}
-
-.detailActions {
-  display: flex;
-  gap: var(--space-xs);
-  padding: var(--space-sm);
-  border-top: 1px solid var(--border-light);
-
-  :global([data-slot='button']) {
-    flex: 1 1 0;
-  }
 }
 
 .toolbarActions {
@@ -298,35 +156,4 @@
   color: var(--muted);
   font-size: var(--font-size-xs);
   white-space: nowrap;
-}
-
-@media (max-width: 960px) {
-  .driveFrame {
-    min-height: auto;
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .table {
-    height: auto;
-  }
-
-  .driveBody {
-    flex-direction: column;
-  }
-
-  .detailPanel {
-    flex-basis: auto;
-    width: 100%;
-    border-top: 1px solid var(--border-light);
-    border-left: 0;
-
-    &[data-collapsed='true'] {
-      flex-basis: 0;
-      width: 0;
-      overflow: hidden;
-      border-top: 0;
-    }
-  }
 }

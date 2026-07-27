@@ -2,7 +2,7 @@ import {
   isDriveTrashFolderNode,
   type DriveSelectionItem,
 } from '@/components/Drive/common/driveComponentModel';
-import { DriveDelete, MoveNodeModal, TrashDelete } from '@/components/Drive/Modals';
+import { DriveDeleteModal, MoveNodeModal, TrashDeleteModal } from '@/components/Drive/Modals';
 import {
   useDocumentService,
   useDriveService,
@@ -20,6 +20,7 @@ import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ResourceTargetModal from './ResourceTargetModal';
 
@@ -56,6 +57,7 @@ function ResourceHeaderOperations({
   copyVersion,
   onResolve,
 }: ResourceHeaderOperationsProps) {
+  const { t } = useTranslation(['resource', 'drive']);
   const driveService = useDriveService();
   const noteService = useNoteService();
   const documentService = useDocumentService();
@@ -102,7 +104,7 @@ function ResourceHeaderOperations({
   );
   const isTrashView = Boolean(!groupId && parentPath?.some(isDriveTrashFolderNode));
 
-  const copyName = `${resourceName}_副本`;
+  const copyName = t('resource:header.copyName', { name: resourceName });
   const normalizedType = normalizeResourceType(resourceType);
   const canCopyType =
     normalizedType === RESOURCE_KIND.NOTE ||
@@ -174,7 +176,7 @@ function ResourceHeaderOperations({
       manual: true,
       onSuccess: ({ newResourceId, target }) => {
         setTargetModal(null);
-        toast.success('副本已创建');
+        toast.success(t('resource:header.copyCreated'));
         openInWorkspace({
           resourceId: newResourceId,
           resourceType,
@@ -199,7 +201,7 @@ function ResourceHeaderOperations({
       manual: true,
       onSuccess: () => {
         setTargetModal(null);
-        toast.success('链接已创建');
+        toast.success(t('resource:header.linkCreated'));
         refreshNode();
       },
       onError: (error) => toast.danger(parseErrorMessage(error)),
@@ -219,7 +221,7 @@ function ResourceHeaderOperations({
       manual: true,
       onSuccess: () => {
         setTargetModal(null);
-        toast.success('已分享到小组');
+        toast.success(t('resource:header.sharedToGroup'));
       },
       onError: (error) => toast.danger(parseErrorMessage(error)),
     }
@@ -264,12 +266,12 @@ function ResourceHeaderOperations({
   const handlers: ResourceHeaderOperationHandlers = {
     deleteLabel:
       node?.type === 'link'
-        ? '删除链接'
+        ? t('drive:delete.deleteLink')
         : groupId
-          ? '从小组移除'
+          ? t('drive:delete.removeFromGroup')
           : isTrashView
-            ? '永久删除'
-            : '移入回收站',
+            ? t('drive:delete.permanent')
+            : t('drive:delete.moveToTrash'),
     isLocating: locating || locatingParentPath,
     onCopy: canCopy ? () => setTargetModal('copy') : undefined,
     onCreateLink: groupId && node?.type === 'resource' ? () => setTargetModal('link') : undefined,
@@ -285,34 +287,34 @@ function ResourceHeaderOperations({
       {onResolve(handlers)}
       <ResourceTargetModal
         isOpen={targetModal === 'copy'}
-        title="创建副本"
-        hint={`副本名称为「${copyName}」，请选择保存位置。`}
+        title={t('resource:header.copyDialog.title')}
+        hint={t('resource:header.copyDialog.hint', { name: copyName })}
         scope={scope}
         submitting={copying}
-        confirmText="创建副本"
+        confirmText={t('resource:header.copyDialog.confirm')}
         onOpenChange={(open) => setTargetModal(open ? 'copy' : null)}
         onConfirm={runCopy}
       />
       <ResourceTargetModal
         isOpen={targetModal === 'link'}
-        title="添加链接到"
-        hint="链接只会挂载到当前空间，不会复制文件内容。"
+        title={t('resource:header.linkDialog.title')}
+        hint={t('resource:header.linkDialog.hint')}
         scope={scope}
         submitting={linking}
-        confirmText="创建链接"
+        confirmText={t('resource:header.linkDialog.confirm')}
         isTargetSelectable={(target) => target.nodeId !== node?.parentId}
         onOpenChange={(open) => setTargetModal(open ? 'link' : null)}
         onConfirm={runCreateLink}
       />
       <ResourceTargetModal
         isOpen={targetModal === 'share'}
-        title="分享到小组"
-        hint="选择其他小组中的文件夹，文件会作为主挂载添加到该小组。"
+        title={t('resource:header.shareDialog.title')}
+        hint={t('resource:header.shareDialog.hint')}
         scopeMode="groups"
         scope={scope}
         excludedGroupIds={groupId ? [groupId] : undefined}
         submitting={sharing}
-        confirmText="分享"
+        confirmText={t('resource:header.shareDialog.confirm')}
         onOpenChange={(open) => setTargetModal(open ? 'share' : null)}
         onConfirm={runShare}
       />
@@ -325,14 +327,14 @@ function ResourceHeaderOperations({
         onSuccess={handleMoveSuccess}
       />
       {isTrashView ? (
-        <TrashDelete
+        <TrashDeleteModal
           isOpen={deleteOpen}
           node={node ?? null}
           onOpenChange={setDeleteOpen}
           onSuccess={handleDeleteSuccess}
         />
       ) : (
-        <DriveDelete
+        <DriveDeleteModal
           isOpen={deleteOpen}
           node={node ?? null}
           groupId={groupId}

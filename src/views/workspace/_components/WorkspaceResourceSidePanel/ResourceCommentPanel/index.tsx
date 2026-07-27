@@ -8,6 +8,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { Button, Separator, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ResourceFavoriteAction from '../../ResourceFavoriteAction';
 import CommentComposer from './CommentComposer';
 import ResourceCommentThread from './ResourceCommentThread';
@@ -17,11 +18,6 @@ import { updateCommentLikeCount } from './utils';
 
 const COMMENT_PAGE_SIZE = 10;
 const EMPTY_LIKED_COMMENT_IDS = new Set<string>();
-const COMMENT_SORT_OPTIONS: Array<{ key: CommentSortBy; label: string }> = [
-  { key: 'CREATE_TIME', label: '最新' },
-  { key: 'LIKE_COUNT', label: '最热' },
-];
-
 interface ResourceCommentPanelProps {
   resource: ResourceItem;
   onResourceChanged?: () => unknown | Promise<unknown>;
@@ -46,6 +42,7 @@ interface PendingDeletion {
 }
 
 function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPanelProps) {
+  const { t } = useTranslation(['resource', 'common']);
   const interactService = useInteractService();
   const userService = useUserService();
   const resourceId = resource.resourceId;
@@ -194,6 +191,10 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
       : undefined;
   const commentCount = commentPageData?.total ?? resource.commentCount ?? 0;
   const hasMoreComments = Boolean(commentPageData && commentPage < commentPageData.totalPage);
+  const commentSortOptions: Array<{ key: CommentSortBy; label: string }> = [
+    { key: 'CREATE_TIME', label: t('resource:comment.sort.latest') },
+    { key: 'LIKE_COUNT', label: t('resource:comment.sort.hottest') },
+  ];
 
   const handleResourceLikeChange = (liked: boolean) => {
     const currentCount = activeOptimisticLike?.count ?? resourceLikeCount;
@@ -240,11 +241,11 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
         <section className={styles.commentsSection} aria-labelledby="resource-comments-title">
           <div className={styles.commentsHeader}>
             <h3 id="resource-comments-title" className={styles.sectionTitle}>
-              评论 {commentCount}
+              {t('resource:comment.count', { count: commentCount })}
             </h3>
             <SegmentedTabs<CommentSortBy>
-              ariaLabel="评论排序"
-              items={COMMENT_SORT_OPTIONS}
+              ariaLabel={t('resource:comment.sortAria')}
+              items={commentSortOptions}
               selectedKey={sortBy}
               size="sm"
               onSelectionChange={handleSortChange}
@@ -255,10 +256,10 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
             <p className={styles.errorText}>{parseErrorMessage(commentsError)}</p>
           ) : null}
           {commentsLoading && comments.length === 0 ? (
-            <p className={styles.mutedText}>正在加载评论...</p>
+            <p className={styles.mutedText}>{t('resource:comment.loading')}</p>
           ) : null}
           {!commentsLoading && comments.length === 0 ? (
-            <p className={styles.emptyText}>还没有评论</p>
+            <p className={styles.emptyText}>{t('resource:comment.empty')}</p>
           ) : null}
 
           <div className={styles.commentList}>
@@ -287,7 +288,9 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
               isDisabled={commentsLoading}
               onPress={() => void loadComments(commentPage + 1, true, sortBy)}
             >
-              {commentsLoading ? '加载中...' : '加载更多'}
+              {commentsLoading
+                ? t('resource:comment.loadingShort')
+                : t('resource:comment.loadMore')}
             </Button>
           ) : null}
         </section>
@@ -295,7 +298,7 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
 
       <div className={styles.composerDock}>
         <CommentComposer
-          placeholder="写下你的评论"
+          placeholder={t('resource:comment.placeholder')}
           onSubmit={async (content, imageUrls) => {
             await interactService.createComment({ resourceId, content, imageUrls });
             await refreshComments();
@@ -309,9 +312,9 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
         onOpenChange={(open) => {
           if (!open && !deleting) setPendingDeletion(undefined);
         }}
-        title="删除评论"
-        description="删除后无法恢复，确定继续吗？"
-        confirmText="删除"
+        title={t('resource:comment.deleteDialog.title')}
+        description={t('resource:comment.deleteDialog.description')}
+        confirmText={t('common:actions.delete')}
         isConfirmLoading={deleting}
         isConfirmDisabled={!pendingDeletion}
         onConfirm={confirmDelete}
@@ -322,11 +325,15 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
         onOpenChange={(open) => {
           if (!open) setPreviewImageUrl(undefined);
         }}
-        title="评论图片"
+        title={t('resource:comment.imageDialog.title')}
         size="lg"
       >
         {previewImageUrl ? (
-          <img className={styles.previewImage} src={previewImageUrl} alt="评论图片预览" />
+          <img
+            className={styles.previewImage}
+            src={previewImageUrl}
+            alt={t('resource:comment.imageDialog.previewAlt')}
+          />
         ) : null}
       </AppDisplayDialog>
     </div>

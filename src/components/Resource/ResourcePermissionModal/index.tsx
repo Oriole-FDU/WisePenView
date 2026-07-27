@@ -1,5 +1,6 @@
 import AppModal from '@/components/Overlay/AppModal';
 import { Button } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import ResourcePermissionPanel from '../ResourcePermissionPanel';
 import type { ResourcePermissionModalProps } from './index.type';
 import styles from './style.module.less';
@@ -11,17 +12,18 @@ function ResourcePermissionModal({
   onOpenChange,
   onSuccess,
 }: ResourcePermissionModalProps) {
+  const { t } = useTranslation(['resource', 'common']);
   return (
     <AppModal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="管理协作者"
-      description="所有可访问此资源的用户"
+      title={t('permission.modal.title')}
+      description={t('permission.modal.description')}
       size="lg"
       bodyClassName={styles.modalBody}
       actions={
         <Button variant="secondary" onPress={() => onOpenChange(false)}>
-          关闭
+          {t('actions.close', { ns: 'common' })}
         </Button>
       }
     >

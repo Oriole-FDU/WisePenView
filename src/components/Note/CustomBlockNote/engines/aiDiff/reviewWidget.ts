@@ -1,4 +1,5 @@
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
+import i18n from '@/i18n';
 
 import type {
   NoteAiDiffActionTarget,
@@ -84,7 +85,9 @@ function createActionButton(params: {
   const { action, request, onAction } = params;
   const accept = action === 'accept';
   const shortcut = accept ? 'Enter' : 'Esc';
-  const label = `${accept ? '接受' : '拒绝'}此修改（${accept ? shortcut : 'Esc / Backspace'}）`;
+  const label = accept
+    ? i18n.t('aiDiff.acceptChange', { ns: 'note', shortcut })
+    : i18n.t('aiDiff.rejectChange', { ns: 'note' });
   const button = createToolbarButton({
     className: `${styles.blockAction} ${accept ? styles.blockAccept : styles.blockDiscard}`,
     label,
@@ -106,7 +109,9 @@ function createNavigationButton(params: {
   const { direction, changeKey, onSelectChange } = params;
   const button = createToolbarButton({
     className: styles.navButton,
-    label: direction === 'previous' ? '上一个修改' : '下一个修改',
+    label: i18n.t(direction === 'previous' ? 'aiDiff.previousChange' : 'aiDiff.nextChange', {
+      ns: 'note',
+    }),
     onClick: changeKey ? () => onSelectChange(changeKey) : undefined,
   });
   button.appendChild(createReviewIcon(direction));

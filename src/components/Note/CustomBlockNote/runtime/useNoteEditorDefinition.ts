@@ -1,11 +1,12 @@
 import { useImageService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
-import { zh } from '@blocknote/core/locales';
+import { en, zh } from '@blocknote/core/locales';
 import type { useCreateBlockNote } from '@blocknote/react';
 import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getAiContentStore } from '../engines/aiDiff/store';
 import { useNoteYjsFragment } from '../engines/collaboration/useNoteYjsUndoStack';
@@ -30,6 +31,7 @@ export function useNoteEditorDefinition({
   state: { readOnly, blockLocalDocWrites },
   inlineComments,
 }: CustomBlockNoteProps) {
+  const { i18n } = useTranslation('note');
   const imageService = useImageService();
   const [pmWriteGuardReady, setPmWriteGuardReady] = useState(false);
   const shouldBlockLocalDocWrites = useMemoizedFn(() => blockLocalDocWrites && pmWriteGuardReady);
@@ -60,27 +62,24 @@ export function useNoteEditorDefinition({
     return publicUrl;
   });
 
-  const editorExtensions = useMemo(
-    () => [
-      ...collectNoteEditorExtensions(notePluginRegistry),
-      ...(inlineComments
-        ? [
-            createInlineCommentExtension({
-              fragment: noteFragment,
-              session: inlineComments.session,
-              onThreadSelect: inlineComments.onThreadSelect ?? (() => undefined),
-            }),
-          ]
-        : []),
-      createNoteReadOnlyFilterExtension(shouldBlockLocalDocWrites),
-    ],
-    [inlineComments, noteFragment, shouldBlockLocalDocWrites]
-  );
+  const editorExtensions = [
+    ...collectNoteEditorExtensions(notePluginRegistry),
+    ...(inlineComments
+      ? [
+          createInlineCommentExtension({
+            fragment: noteFragment,
+            session: inlineComments.session,
+            onThreadSelect: inlineComments.onThreadSelect ?? (() => undefined),
+          }),
+        ]
+      : []),
+    createNoteReadOnlyFilterExtension(shouldBlockLocalDocWrites),
+  ];
 
   return {
     editorOptions: {
       schema: blockNoteSchema,
-      dictionary: zh,
+      dictionary: i18n.resolvedLanguage === 'en-US' ? en : zh,
       trailingBlock: true,
       disableExtensions: ['history', 'yUndo'],
       uploadFile,

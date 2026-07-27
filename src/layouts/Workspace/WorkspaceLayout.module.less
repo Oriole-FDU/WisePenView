@@ -1,7 +1,13 @@
+@import '@/styles/scrollbar.module.less';
+
 .root {
-  height: 100vh;
-  height: 100dvh;
-  width: 100vw;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
   background-color: var(--background);
@@ -10,7 +16,8 @@
 .leftSider {
   height: 100%;
   width: 100%;
-  /* 侧栏 = 抬升层；主区 / 右侧 Chat 保持纸面 --surface */
+  min-width: 0;
+  min-height: 0;
   background: var(--surface-secondary);
   overflow: hidden;
 }
@@ -22,7 +29,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .workspaceArea {
@@ -30,31 +39,40 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  .appSubtleScrollbar();
 }
 
 .workspaceInnerGroup {
   width: 100%;
   height: 100%;
-  min-width: 0;
+  min-width: 100%;
   min-height: 0;
   overflow: hidden;
 }
 
+.workspaceInnerGroupChatOpen {
+  min-width: max(100%, var(--layout-workspace-inner-chat-min-width, 1064px));
+  width: max(100%, var(--layout-workspace-inner-chat-min-width, 1064px));
+}
+
 .middleContent {
   flex: 1;
+  min-width: 0;
   min-height: 0;
   background: var(--surface);
-  overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
   position: relative;
   padding: 0;
+  .appSubtleScrollbar();
 }
 
 .rightSider {
   height: 100%;
   width: 100%;
-  min-width: var(--chat-panel-min-width);
-  /* 与主区 Note 同纸面 */
+  min-width: 0;
   background: var(--surface);
   position: relative;
   overflow: hidden;
@@ -75,4 +93,6 @@
 
 .workspaceContent {
   overflow: hidden;
+  min-width: 0;
+  min-height: 0;
 }

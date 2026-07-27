@@ -1,11 +1,13 @@
 import AppIconButton from '@/components/Button/AppIconButton';
-import { Popover } from '@/components/Overlay';
+import { AppPopover } from '@/components/Overlay';
 import data from '@emoji-mart/data';
+import en from '@emoji-mart/data/i18n/en.json';
 import zh from '@emoji-mart/data/i18n/zh.json';
 import { useMemoizedFn } from 'ahooks';
 import { Picker } from 'emoji-mart';
 import { SmilePlus } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './style.module.less';
 
@@ -20,7 +22,10 @@ interface EmojiMartSelection {
 }
 
 function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
+  const { t, i18n } = useTranslation('common');
   const [open, setOpen] = useState(false);
+  const emojiLocale = i18n.resolvedLanguage === 'en-US' ? 'en' : 'zh';
+  const emojiTranslations = emojiLocale === 'en' ? en : zh;
 
   const handleSelect = useMemoizedFn((emoji: EmojiMartSelection) => {
     const emojiId = emoji.native?.trim();
@@ -33,8 +38,8 @@ function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
     if (!container) return;
     const picker = new Picker({
       data,
-      i18n: zh,
-      locale: 'zh',
+      i18n: emojiTranslations,
+      locale: emojiLocale,
       set: 'native',
       theme: 'auto',
       perLine: 8,
@@ -51,21 +56,24 @@ function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
   });
 
   return (
-    <Popover isOpen={open} onOpenChange={setOpen} deferContent={false}>
+    <AppPopover isOpen={open} onOpenChange={setOpen} deferContent={false}>
       <AppIconButton
         icon={<SmilePlus size={15} aria-hidden />}
         label={label}
         size="sm"
         isDisabled={disabled}
         className={styles.iconButton}
-        overlayTrigger={<Popover.Trigger />}
+        overlayTrigger={<AppPopover.Trigger />}
       />
-      <Popover.Content className={styles.emojiPopover} placement="bottom end">
-        <Popover.Dialog>
-          <div ref={mountPicker} className={styles.emojiMartHost} aria-label="选择表情" />
-        </Popover.Dialog>
-      </Popover.Content>
-    </Popover>
+      <AppPopover.Content placement="bottom end" bodyPadding="none">
+        <div
+          key={emojiLocale}
+          ref={mountPicker}
+          className={styles.emojiMartHost}
+          aria-label={t('emoji.pickerAria')}
+        />
+      </AppPopover.Content>
+    </AppPopover>
   );
 }
 

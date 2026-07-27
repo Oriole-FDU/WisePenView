@@ -5,6 +5,7 @@ import { createUuid } from '@/utils/random/createUuid';
 import { toast } from '@heroui/react';
 import { useMount, useUnmount } from 'ahooks';
 import { useRef, type ChangeEvent, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChatInputFileContext, type ChatInputFileContextValue } from './ChatInputFileContextValue';
 import { selectChatInputSelectedModel, useChatInputStoreApi } from './_store/ChatInputStore';
 import type { LocalAttachmentPayload } from './index.type';
@@ -21,6 +22,7 @@ export function ChatInputFileProvider({
   children: ReactNode;
   getUploadSessionId: () => Promise<string>;
 }) {
+  const { t } = useTranslation('chat');
   const chatService = useChatService();
   const store = useChatInputStoreApi();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -106,7 +108,7 @@ export function ChatInputFileProvider({
       return attachment;
     } catch (err) {
       setPendingAttachmentUploadFailed(id);
-      toast.danger(`附件上传失败: ${parseErrorMessage(err)}`);
+      toast.danger(t('input.attachments.uploadFailed', { error: parseErrorMessage(err) }));
       return null;
     }
   }
@@ -114,7 +116,7 @@ export function ChatInputFileProvider({
   async function addPendingVisionImage(file: File): Promise<void> {
     try {
       if (file.size > MAX_IMAGE_RAW_BYTES_APPROX) {
-        toast.warning(`${file.name} 过大，图片大小约限制原图 3.75MB`);
+        toast.warning(t('input.attachments.imageTooLarge', { name: file.name }));
         return;
       }
       const { mimeType, base64 } = await fileToBase64(file);
@@ -123,7 +125,7 @@ export function ChatInputFileProvider({
       base64MapRef.current.set(id, base64);
       addPendingImageMeta({ id, filename: file.name, mimeType, thumbnailUrl });
     } catch (err) {
-      toast.danger(`图片添加失败: ${parseErrorMessage(err)}`);
+      toast.danger(t('input.attachments.imageAddFailed', { error: parseErrorMessage(err) }));
     }
   }
 
@@ -155,7 +157,7 @@ export function ChatInputFileProvider({
     for (const meta of metas) {
       const base64 = base64MapRef.current.get(meta.id);
       if (!base64) {
-        toast.danger(`${meta.filename} 图片数据已失效，请重新添加`);
+        toast.danger(t('input.attachments.imageDataExpired', { name: meta.filename }));
         return null;
       }
       const file = base64ToFile(base64, meta.mimeType, meta.filename);
@@ -192,16 +194,16 @@ export function ChatInputFileProvider({
         continue;
       }
       if (!currentModelVision) {
-        toast.warning('当前模型不支持图片，已按普通附件待发送');
+        toast.warning(t('input.attachments.visionUnsupported'));
         queueLocalAttachment(file);
         continue;
       }
       if (acceptedImageCount >= MAX_IMAGE_COUNT) {
-        toast.warning(`最多 ${MAX_IMAGE_COUNT} 张图片`);
+        toast.warning(t('input.attachments.imageCountLimit', { count: MAX_IMAGE_COUNT }));
         continue;
       }
       if (file.size > MAX_IMAGE_RAW_BYTES_APPROX) {
-        toast.warning(`${file.name} 过大，图片大小约限制原图 3.75MB`);
+        toast.warning(t('input.attachments.imageTooLarge', { name: file.name }));
         continue;
       }
       acceptedImageCount += 1;

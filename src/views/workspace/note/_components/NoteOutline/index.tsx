@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { ChevronsLeft, Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/Button/AppIconButton';
 import type { NoteOutlineItem } from '@/components/Note/CustomBlockNote/index.type';
@@ -26,15 +27,16 @@ function normalizeText(text: string): string {
 }
 
 function NoteOutline({ items, activeId, onNavigate, title, open, onOpenChange }: NoteOutlineProps) {
+  const { t } = useTranslation('note');
   const displayItems = [{ id: NOTE_OUTLINE_TITLE_ID, level: 0, text: title }, ...items];
 
   if (!open) {
     return (
       <div className={styles.collapsedPanel}>
-        <div className={styles.collapsedContent} aria-label="展开目录">
+        <div className={styles.collapsedContent} aria-label={t('outline.expand')}>
           <AppIconButton
             icon={<Menu size={20} aria-hidden="true" />}
-            label="展开目录"
+            label={t('outline.expand')}
             className={styles.toggleButton}
             onClick={() => onOpenChange(true)}
           />
@@ -45,24 +47,24 @@ function NoteOutline({ items, activeId, onNavigate, title, open, onOpenChange }:
 
   return (
     <div className={styles.panel}>
-      <aside className={styles.aside} aria-label="文档目录侧栏">
+      <aside className={styles.aside} aria-label={t('outline.sidebar')}>
         <div className={styles.header}>
-          <span className={styles.title}>目录</span>
+          <span className={styles.title}>{t('outline.title')}</span>
           <AppIconButton
             icon={<ChevronsLeft size={20} aria-hidden="true" />}
-            label="收起目录"
+            label={t('outline.collapse')}
             className={styles.toggleButton}
             onClick={() => onOpenChange(false)}
           />
         </div>
         <div className={styles.scrollArea}>
-          <div className={styles.root} aria-label="文档目录">
+          <div className={styles.root} aria-label={t('outline.document')}>
             <div className={styles.list} role="list">
               {displayItems.length === 0 ? (
-                <div className={styles.empty}>暂无标题</div>
+                <div className={styles.empty}>{t('outline.empty')}</div>
               ) : (
                 displayItems.map((it) => {
-                  const text = normalizeText(it.text) || '（无标题）';
+                  const text = normalizeText(it.text) || t('outline.untitled');
                   const isActive = activeId === it.id;
                   return (
                     <button

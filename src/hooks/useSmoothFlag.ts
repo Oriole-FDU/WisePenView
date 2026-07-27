@@ -1,5 +1,4 @@
-import { useUnmount, useUpdateEffect } from 'ahooks';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * 对布尔标志做平滑处理：
@@ -13,7 +12,13 @@ export function useSmoothFlag(flag: boolean, showDelay: number, minShowDuration:
   const shownAtRef = useRef(0);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  useUpdateEffect(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：flag 或展示时序参数变化时重新安排显隐计时。
+   * 不可替代原因：setTimeout 是 React 外部计时器，需要随最新输入启动或取消。
+   * cleanup：清除本轮尚未执行的显示、隐藏计时器，避免过期回调修改状态。
+   */
+  useEffect(() => {
     clearTimeout(showTimerRef.current);
     clearTimeout(hideTimerRef.current);
 
@@ -28,22 +33,17 @@ export function useSmoothFlag(flag: boolean, showDelay: number, minShowDuration:
     } else if (visibleRef.current) {
       const elapsed = Date.now() - shownAtRef.current;
       const remaining = Math.max(0, minShowDuration - elapsed);
-      if (remaining <= 0) {
+      hideTimerRef.current = setTimeout(() => {
         visibleRef.current = false;
         setVisible(false);
-      } else {
-        hideTimerRef.current = setTimeout(() => {
-          visibleRef.current = false;
-          setVisible(false);
-        }, remaining);
-      }
+      }, remaining);
     }
-  }, [flag]);
 
-  useUnmount(() => {
-    clearTimeout(showTimerRef.current);
-    clearTimeout(hideTimerRef.current);
-  });
+    return () => {
+      clearTimeout(showTimerRef.current);
+      clearTimeout(hideTimerRef.current);
+    };
+  }, [flag, minShowDuration, showDelay]);
 
   return visible;
 }

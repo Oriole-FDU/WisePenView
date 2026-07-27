@@ -2,7 +2,6 @@ import type { IDocumentService } from '@/domains/Document';
 import {
   decodeRootNodeScope,
   DRIVE_ROOT_ID,
-  DRIVE_SHARED_FOLDER_DISPLAY_NAME,
   type DriveNode,
   type DriveNodeScope,
   type FolderNode,
@@ -10,9 +9,9 @@ import {
 } from '@/domains/Drive';
 import { decodeNodeId } from '@/domains/Drive/mapper/DriveServices.map';
 import type { IResourceService, ResourceItem } from '@/domains/Resource';
+import i18n from '@/i18n';
 
 export const DEFAULT_DRIVE_ROOT_ID = DRIVE_ROOT_ID;
-export const TRASH_FOLDER_DISPLAY_NAME = '回收站';
 
 export type DriveScope = { type: 'personal' } | { type: 'group'; groupId: string };
 
@@ -56,18 +55,18 @@ export const resolveDriveScope = (
 export const getDriveNodeLabel = (node: DriveNode): string => {
   switch (node.type) {
     case 'root':
-      return node.name || '云盘';
+      return node.name || i18n.t('node.drive', { ns: 'drive' });
     case 'folder':
       if (node.name === '.Trash') {
-        return TRASH_FOLDER_DISPLAY_NAME;
+        return i18n.t('node.trash', { ns: 'drive' });
       }
       if (node.systemType === 'shared') {
-        return DRIVE_SHARED_FOLDER_DISPLAY_NAME;
+        return i18n.t('node.shared', { ns: 'drive' });
       }
-      return node.name || '未命名文件夹';
+      return node.name || i18n.t('node.unnamedFolder', { ns: 'drive' });
     case 'resource':
     case 'link':
-      return node.title || '未命名文件';
+      return node.title || i18n.t('node.unnamedFile', { ns: 'drive' });
     case 'loading':
       return '';
   }

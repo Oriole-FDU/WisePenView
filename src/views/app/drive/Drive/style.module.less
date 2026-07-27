@@ -1,16 +1,19 @@
 .pageContainer {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  /* 页面下限；窄于此时由 AppLayout.middleContent 横向滚动 */
+  min-width: var(--layout-drive-page-min-width, 956px);
+  margin: 0;
   padding: var(--space-lg) var(--space-xl);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
-.pageHeaderWithActions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.pageHeader {
   margin-bottom: var(--space-lg);
 }
 
@@ -23,16 +26,6 @@
   color: var(--muted);
 }
 
-.actionsRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.pageTrashButton {
-  flex-shrink: 0;
-}
-
 .detailTabs {
   margin-top: var(--space-md);
   margin-bottom: var(--space-lg);
@@ -43,5 +36,6 @@
   flex-direction: row;
   gap: var(--space-lg);
   flex: 1;
+  min-width: 0;
   min-height: 0;
 }

@@ -2,6 +2,15 @@
   display: flex;
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.panelGroup > :global([data-slot='system-resizable-panel']) {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .panelGroup[aria-orientation='vertical'] {

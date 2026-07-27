@@ -2,6 +2,12 @@ import { app, BrowserWindow, ipcMain, net, protocol, shell, type WebContents } f
 import { existsSync, statSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {
+  WINDOW_DEFAULT_HEIGHT,
+  WINDOW_DEFAULT_WIDTH,
+  WINDOW_MIN_HEIGHT,
+  WINDOW_MIN_WIDTH,
+} from '../../src/constants/layoutScale';
 import { DESKTOP_CHANNEL } from '../shared/channels';
 
 const APP_SCHEME = 'app';
@@ -83,10 +89,11 @@ function protectWindowNavigation(contents: WebContents): void {
 
 function createMainWindow(): BrowserWindow {
   const window = new BrowserWindow({
-    minWidth: 1024,
-    minHeight: 720,
-    width: 1440,
-    height: 960,
+    minWidth: WINDOW_MIN_WIDTH,
+    minHeight: WINDOW_MIN_HEIGHT,
+    width: WINDOW_DEFAULT_WIDTH,
+    height: WINDOW_DEFAULT_HEIGHT,
+    backgroundColor: '#F8FAFB',
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,

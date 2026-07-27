@@ -5,10 +5,10 @@ import { createReactInlineContentSpec } from '@blocknote/react';
 import type { Transaction } from '@tiptap/pm/state';
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
-import { useCallback, useRef, useState } from 'react';
-
-import { useEffectForce } from '@/hooks/useEffectForce';
+import { useLatest } from 'ahooks';
 import 'katex/dist/katex.min.css';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import { renderKatexInto } from '../katexRender';
 import { LatexEditPopover } from '../LatexEditPopover';
@@ -52,7 +52,13 @@ function InlineMathFormulaPreview({
 }) {
   const mathRef = useRef<HTMLSpanElement>(null);
 
-  useEffectForce(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：行内公式表达式变化后重新渲染 KaTeX DOM。
+   * 不可替代原因：KaTeX 通过命令式 API 写入真实 DOM，不能由 React JSX 直接表达。
+   * cleanup：下一次渲染会覆盖旧内容，没有订阅或异步任务需要清理。
+   */
+  useEffect(() => {
     const el = mathRef.current;
     if (!el) return;
     renderKatexInto(el, expression, popoverStyles.mathPlaceholder, false);
@@ -103,10 +109,13 @@ function placeCaretAfterInlineMathNode(editor: EditorForPmCaret, shell: HTMLElem
 function InlineMathView(
   props: ReactCustomInlineContentRenderProps<typeof inlineMathConfig, DefaultStyleSchema>
 ) {
+  const { t } = useTranslation('note');
   const { contentRef, updateInlineContent, inlineContent, editor } = props;
   const readOnly = useNoteEditorReadOnlyContext();
   const expression = inlineContent.props.expression as string;
   const autoOpenEdit = inlineContent.props.autoOpenEdit as boolean;
+  const inlineContentPropsLatest = useLatest(inlineContent.props);
+  const updateInlineContentLatest = useLatest(updateInlineContent);
 
   const [isEditing, setIsEditing] = useState(false);
   const isEditingRef = useRef(false);
@@ -120,11 +129,11 @@ function InlineMathView(
     left: number;
     width: number;
   } | null>(null);
-  const clearPopoverPos = useCallback(() => {
+  const clearPopoverPos = () => {
     setPopoverPos(null);
-  }, []);
+  };
 
-  const measurePopoverPosition = useCallback(() => {
+  const measurePopoverPosition = () => {
     const el = shellRef.current;
     if (!el) {
       return false;
@@ -138,37 +147,40 @@ function InlineMathView(
       computeLatexPopoverPlacement(r, { minWidth: 260, maxWidth: 360, estHeight: 200 })
     );
     return true;
-  }, []);
+  };
 
   useLatexPopoverAnchorSync(isEditing, shellRef, measurePopoverPosition, clearPopoverPos);
 
   const canEnterEdit = !readOnly && !isEditing;
 
-  // TODO: 重构，不使用useEffect，使用更合适的语义以增加可读性，但是latexSupport有完全重构的可能，因此暂时保留
-  useEffectForce(() => {
-    if (isEditing) return;
-    setValue(sanitizeLatexInput(expression));
-  }, [expression, isEditing]);
-
   const displayLatex = isEditing ? value : expression;
 
-  useEffectForce(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：BlockNote 插件把 autoOpenEdit 置为 true 后拉起一次公式编辑。
+   * 不可替代原因：该标记来自编辑器外部文档状态，还需用命令式事务消费并复位。
+   * cleanup：取消尚未消费 autoOpenEdit 的 animation frame。
+   */
+  useEffect(() => {
     if (readOnly) return;
     if (!autoOpenEdit) return;
-    const openExpr = sanitizeLatexInput(inlineContent.props.expression as string);
-    updateInlineContent({
-      type: 'inlineMath',
-      props: {
-        ...inlineContent.props,
-        expression: openExpr,
-        autoOpenEdit: false,
-      },
+    const inlineContentProps = inlineContentPropsLatest.current;
+    const openExpr = sanitizeLatexInput(inlineContentProps.expression as string);
+    const frame = window.requestAnimationFrame(() => {
+      updateInlineContentLatest.current({
+        type: 'inlineMath',
+        props: {
+          ...inlineContentProps,
+          expression: openExpr,
+          autoOpenEdit: false,
+        },
+      });
+      setValue(openExpr);
+      isEditingRef.current = true;
+      setIsEditing(true);
     });
-    setValue(openExpr);
-    isEditingRef.current = true;
-    setIsEditing(true);
-    // 仅在插件将 autoOpenEdit 置为 true 时拉起编辑
-  }, [autoOpenEdit]);
+    return () => window.cancelAnimationFrame(frame);
+  }, [autoOpenEdit, inlineContentPropsLatest, readOnly, updateInlineContentLatest]);
 
   useFocusPopoverTextarea(isEditing, popoverPos, inputRef);
 
@@ -222,20 +234,17 @@ function InlineMathView(
     setIsEditing(true);
   };
 
-  const setShellRef = useCallback(
-    (el: HTMLSpanElement | null) => {
-      shellRef.current = el;
-      contentRef(el);
-    },
-    [contentRef]
-  );
+  const setShellRef = (el: HTMLSpanElement | null) => {
+    shellRef.current = el;
+    contentRef(el);
+  };
 
   const editPopover = (
     <LatexEditPopover
       visible={Boolean(isEditing && popoverPos)}
       position={popoverPos}
-      title="编辑 LaTeX（行内）"
-      hint="Enter / Shift+Enter 确定 · Esc 取消 · 不可换行"
+      title={t('latex.inlineTitle')}
+      hint={t('latex.inlineHint')}
       textareaClassName={popoverStyles.inlineEditTextarea}
       value={value}
       onValueChange={(nextValue) => setValue(nextValue.replace(/\n/g, ''))}
@@ -266,7 +275,7 @@ function InlineMathView(
         role={canEnterEdit ? 'button' : undefined}
         tabIndex={canEnterEdit ? 0 : -1}
         aria-readonly={readOnly || undefined}
-        aria-label={canEnterEdit ? '编辑行内公式' : undefined}
+        aria-label={canEnterEdit ? t('latex.inlineEdit') : undefined}
         onClick={() => {
           if (canEnterEdit) enterEdit();
         }}

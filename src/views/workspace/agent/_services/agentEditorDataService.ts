@@ -2,7 +2,7 @@ import type { AgentDetail, IAgentService } from '@/domains/Agent';
 import type { ChatModel, IChatService, ToolOption } from '@/domains/Chat';
 import type { ISkillService, SkillSummary } from '@/domains/Skill';
 import type { AgentDraft } from '../_hooks/useAgentWorkspaceController';
-import { buildGuidedPrompt, DEFAULT_GUIDED_PROMPT_FIELDS } from '../systemPrompt';
+import { buildGuidedPrompt, getDefaultGuidedPromptFields } from '../systemPrompt';
 
 export interface AgentEditorData {
   agent: AgentDetail;
@@ -39,7 +39,7 @@ export async function loadAgentEditorData({
   };
   const usesDefaultPrompt = !agent.spec.systemPrompt;
   if (usesDefaultPrompt) {
-    agent.spec.systemPrompt = buildGuidedPrompt(DEFAULT_GUIDED_PROMPT_FIELDS, true);
+    agent.spec.systemPrompt = buildGuidedPrompt(getDefaultGuidedPromptFields(), true);
   }
 
   return {

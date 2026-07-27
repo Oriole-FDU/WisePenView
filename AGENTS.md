@@ -40,9 +40,13 @@
 ## React 与样式
 
 - 只写函数组件和 Hooks，不使用 `React.FC` / `FC`，不新增 `any`。
-- 默认不直接使用 `useEffect`；请求用 `useRequest`，交互逻辑放事件处理函数，生命周期语义优先用已有 hook。
-- 必须使用 effect 时，走 `useEffectForce`，并用中文 JSDoc 说明执行时机、不可替代原因和 cleanup。
-- 不滥用 `useMemo`、`useCallback`、`React.memo`；只有计算昂贵或引用稳定有实际收益时再使用。
+- 默认不使用 `useEffect`；请求用 `useRequest`，交互逻辑放事件处理函数，生命周期语义优先用已有 hook。
+- 必须使用 effect 时，直接使用 React `useEffect`，并在调用点用带 `@wisepen-manual-effect` 标记的中文 JSDoc 说明执行时机、不可替代原因和 cleanup。React Hooks lint 规则不做豁免。
+- 业务代码默认禁止 `useMemo`、`useCallback`、`useUpdateEffect`；确有必要时直接使用 React `useMemo` / `useCallback`，并在调用点用带 `@wisepen-manual-memo` 标记的中文 JSDoc 说明为什么、收益和失效条件。React Hooks lint 规则不做豁免。
+- `useRef` 优先用于 DOM 节点、第三方实例、定时器、异步竞态标记等不参与渲染的数据；父子组件的业务状态同步优先使用 props、状态或版本号。
+- 只有确实需要操控子组件实例命令（例如聚焦编辑器、滚动到选区、打开查找框）时，才通过 `useImperativeHandle` 暴露 interface；不要用 ref 传递普通刷新、重新请求等业务事件。
+- 第三方组件的 ref 和实例类型必须优先使用官方类型；禁止用 `RefObject<never>` 或宽泛类型断言掩盖类型不匹配。发现本地类型与第三方 API 不一致时，应先按真实契约收敛调用。
+- 新增或修改 ref 后必须确认 `ref.current` 被实际读取；未读取的 ref、仅为预留而存在的 ref 和已迁移 API 的旧 ref 类型应及时删除。
 - 样式使用 Less CSS Modules，类名用 camelCase，避免非必要内联样式。
 - 业务弹窗优先使用 `AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`、`AppModal`；普通业务代码不直接使用底层 `Modal` / `AlertDialog`。
 

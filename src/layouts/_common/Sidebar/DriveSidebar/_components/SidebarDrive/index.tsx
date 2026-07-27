@@ -10,10 +10,10 @@ import {
   type DriveActionTarget,
 } from '@/components/Drive/common/driveComponentModel';
 import {
-  DriveCreate,
-  DriveDelete,
+  DriveCreateModal,
+  DriveDeleteModal,
   RenameNodeModal,
-  TrashDelete,
+  TrashDeleteModal,
   UploadDocumentModal,
   type DriveCreateType,
 } from '@/components/Drive/Modals';
@@ -37,7 +37,8 @@ import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/u
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 import type { SidebarDriveCreateAction } from './SidebarDriveNodeTitle';
@@ -82,6 +83,7 @@ const isResourceNode = (
   node?.type === 'resource' || node?.type === 'link';
 
 function SidebarDrive() {
+  const { t } = useTranslation('drive');
   const location = useLocation();
   const driveService = useDriveService();
   const documentService = useDocumentService();
@@ -105,17 +107,14 @@ function SidebarDrive() {
   const importTargetRef = useRef<RootNode | FolderNode | null>(null);
   const activeNavKey = resolveAppHeaderNavKey(location.pathname);
 
-  const existingFolderNames = useMemo(() => {
+  const existingFolderNames = (() => {
     if (driveCreateTarget?.type !== 'folder') return [];
     return [...nodeMap.values()]
       .filter((node): node is FolderNode => node.type === 'folder')
       .filter((node) => node.parentId === driveCreateTarget.target.id)
       .map((node) => node.name);
-  }, [driveCreateTarget, nodeMap]);
-  const isDeleteTargetInTrash = useMemo(
-    () => isNodeInTrash(deleteTarget, nodeMap),
-    [deleteTarget, nodeMap]
-  );
+  })();
+  const isDeleteTargetInTrash = isNodeInTrash(deleteTarget, nodeMap);
 
   const resolveContainerMountTagId = (node: RootNode | FolderNode): string | undefined => {
     if (node.type === 'folder') return node.tagId;
@@ -369,7 +368,9 @@ function SidebarDrive() {
           reason: '笔记创建目标不存在',
         });
       }
-      const { resourceId } = await noteService.createNote({ title: '未命名笔记' });
+      const { resourceId } = await noteService.createNote({
+        title: t('create.defaultNoteTitle'),
+      });
       if (!resourceId) {
         throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
       }
@@ -464,7 +465,7 @@ function SidebarDrive() {
         </div>
       ) : showEmpty ? (
         <div className={styles.stateBlock}>
-          <Empty description="暂无内容" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <Empty description={t('navigator.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </div>
       ) : (
         <Tree
@@ -484,7 +485,7 @@ function SidebarDrive() {
         <UploadDocumentModal isOpen onOpenChange={setUploadDocumentOpen} onSuccess={refreshTree} />
       ) : null}
       {driveCreateTarget ? (
-        <DriveCreate
+        <DriveCreateModal
           type={driveCreateTarget.type}
           isOpen
           parentId={driveCreateTarget.target.id}
@@ -521,7 +522,7 @@ function SidebarDrive() {
         onSuccess={refreshTree}
       />
       {isDeleteTargetInTrash ? (
-        <TrashDelete
+        <TrashDeleteModal
           isOpen={Boolean(deleteTarget)}
           node={deleteTarget}
           onOpenChange={(open) => {
@@ -530,7 +531,7 @@ function SidebarDrive() {
           onSuccess={refreshTree}
         />
       ) : (
-        <DriveDelete
+        <DriveDeleteModal
           isOpen={Boolean(deleteTarget)}
           node={deleteTarget}
           groupId={groupId}

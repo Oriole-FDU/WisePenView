@@ -1,10 +1,11 @@
 import { FormField, TextArea } from '@/components/Input';
 import { Button, Switch, Tabs } from '@heroui/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { GuidedPromptFields, SoulFieldKey } from '../../systemPrompt';
 import {
   buildGuidedPrompt,
-  DEFAULT_GUIDED_PROMPT_FIELDS,
+  getDefaultGuidedPromptFields,
   parseGuidedPrompt,
   setSoulEnabled,
   syncGuidedPrompt,
@@ -22,37 +23,22 @@ interface Props {
 }
 const textFields: Array<{
   key: keyof GuidedPromptFields;
-  label: string;
-  description: string;
   rows?: number;
 }> = [
-  {
-    key: 'overview',
-    label: 'Overview',
-    description: '这个 Agent 是做什么的？适合用在哪些场景？不适合做什么？',
-  },
-  { key: 'context', label: 'Context', description: '它需要知道哪些背景？' },
-  { key: 'workflow', label: 'Workflow', description: '它应该如何处理任务？' },
-  { key: 'outputFormat', label: 'Output Format', description: '它应该如何组织回答？' },
-  {
-    key: 'exampleOutput',
-    label: 'Example Output 示例输出',
-    description: '提供一份可以按任务替换的回答骨架。',
-    rows: 7,
-  },
-  { key: 'qualityChecks', label: 'Quality Checks', description: '它如何确保结果可靠？' },
-  { key: 'whenToAsk', label: 'When To Ask First', description: '什么情况下必须先问用户？' },
+  { key: 'overview' },
+  { key: 'context' },
+  { key: 'workflow' },
+  { key: 'outputFormat' },
+  { key: 'exampleOutput', rows: 7 },
+  { key: 'qualityChecks' },
+  { key: 'whenToAsk' },
 ];
-const soulFields: Array<{ key: SoulFieldKey; label: string; description: string }> = [
-  { key: 'soulStyle', label: '说话方式 Communication Style', description: '它应该怎么表达？' },
-  { key: 'soulInitiative', label: '主动程度 Initiative Level', description: '它应该多主动？' },
-  { key: 'soulTaste', label: '结果偏好 Quality Taste', description: '它认为什么是好的结果？' },
-  {
-    key: 'soulTruth',
-    label: '事实与不确定性 Truth & Uncertainty',
-    description: '它如何处理事实、证据、推测和不确定？',
-  },
-  { key: 'soulBoundaries', label: '底线 Boundaries', description: '它绝对不应该做什么？' },
+const soulFields: SoulFieldKey[] = [
+  'soulStyle',
+  'soulInitiative',
+  'soulTaste',
+  'soulTruth',
+  'soulBoundaries',
 ];
 
 export default function SystemPromptSection({
@@ -62,16 +48,17 @@ export default function SystemPromptSection({
   onMarkdownChange,
   onModeRequest,
 }: Props) {
+  const { t } = useTranslation('agent');
   const [restoreOpen, setRestoreOpen] = useState(false);
   const parsed = parseGuidedPrompt(markdown);
-  const fields = parsed.compatible ? parsed.fields : DEFAULT_GUIDED_PROMPT_FIELDS;
+  const fields = parsed.compatible ? parsed.fields : getDefaultGuidedPromptFields();
   const update = (next: GuidedPromptFields) => onMarkdownChange(syncGuidedPrompt(markdown, next));
   return (
     <>
       <SectionShell
         id="prompt"
-        title="System Prompt"
-        description="通过表单维护预设内容，也可以切换到自由编辑处理完整 Markdown。"
+        title={t('prompt.title')}
+        description={t('prompt.description')}
         actions={
           <Tabs
             className={styles.tabs}
@@ -82,13 +69,13 @@ export default function SystemPromptSection({
             }}
           >
             <Tabs.ListContainer>
-              <Tabs.List className={styles.tabList} aria-label="System Prompt 编辑模式">
+              <Tabs.List className={styles.tabList} aria-label={t('prompt.modeAria')}>
                 <Tabs.Tab id="guided" className={styles.tab}>
-                  引导填写
+                  {t('prompt.guided')}
                   <Tabs.Indicator />
                 </Tabs.Tab>
                 <Tabs.Tab id="free" className={styles.tab}>
-                  自由编辑
+                  {t('prompt.free')}
                   <Tabs.Indicator />
                 </Tabs.Tab>
               </Tabs.List>
@@ -101,7 +88,7 @@ export default function SystemPromptSection({
             <div className={styles.editorHead}>
               <strong>System Prompt Markdown</strong>
               <span data-compatible={parsed.compatible}>
-                {parsed.compatible ? '当前内容可返回引导填写' : '当前内容已不可返回引导填写'}
+                {parsed.compatible ? t('prompt.compatible') : t('prompt.incompatible')}
               </span>
             </div>
             <FormField
@@ -118,7 +105,7 @@ export default function SystemPromptSection({
             <div className={styles.groupHead}>
               <div>
                 <strong>Agent</strong>
-                <p>定义用途、工作方法、输出组织和必要确认边界。</p>
+                <p>{t('prompt.agentDescription')}</p>
               </div>
               <Button
                 className={styles.presetButton}
@@ -127,14 +114,14 @@ export default function SystemPromptSection({
                 isDisabled={disabled}
                 onPress={() => setRestoreOpen(true)}
               >
-                恢复通用预设
+                {t('prompt.restore')}
               </Button>
             </div>
             {textFields.map((field) => (
               <div key={field.key} className={styles.promptField}>
                 <FormField
-                  label={field.label}
-                  description={field.description}
+                  label={t(`prompt.field.${field.key}.label`)}
+                  description={t(`prompt.field.${field.key}.description`)}
                   value={String(fields[field.key])}
                   isDisabled={disabled}
                   onChange={(value) => update({ ...fields, [field.key]: value })}
@@ -145,12 +132,12 @@ export default function SystemPromptSection({
             ))}
             <div className={styles.soulHead}>
               <div>
-                <strong>SOUL（可选）</strong>
-                <p>补充协作关系、表达偏好、主动程度和行为底线。</p>
+                <strong>{t('prompt.soulTitle')}</strong>
+                <p>{t('prompt.soulDescription')}</p>
               </div>
               <Switch
                 size="md"
-                aria-label="启用 SOUL"
+                aria-label={t('prompt.soulAria')}
                 isSelected={parsed.soulEnabled}
                 isDisabled={disabled}
                 onChange={(selected) =>
@@ -168,8 +155,8 @@ export default function SystemPromptSection({
               <>
                 <div className={styles.promptField}>
                   <FormField
-                    label="角色关系 Role & Relationship"
-                    description="它应该以什么身份和用户协作？"
+                    label={t('prompt.field.soulRole.label')}
+                    description={t('prompt.field.soulRole.description')}
                     value={fields.soulRole}
                     isDisabled={disabled}
                     onChange={(value) => update({ ...fields, soulRole: value })}
@@ -178,13 +165,13 @@ export default function SystemPromptSection({
                   </FormField>
                 </div>
                 {soulFields.map((field) => (
-                  <div key={field.key} className={styles.presetField}>
+                  <div key={field} className={styles.presetField}>
                     <FormField
-                      label={field.label}
-                      description={field.description}
-                      value={fields[field.key]}
+                      label={t(`prompt.field.${field}.label`)}
+                      description={t(`prompt.field.${field}.description`)}
+                      value={fields[field]}
                       isDisabled={disabled}
-                      onChange={(value) => update({ ...fields, [field.key]: value })}
+                      onChange={(value) => update({ ...fields, [field]: value })}
                     >
                       <TextArea rows={3} />
                     </FormField>
@@ -198,10 +185,10 @@ export default function SystemPromptSection({
       <PresetRestoreConfirmDialog
         isOpen={restoreOpen}
         onOpenChange={setRestoreOpen}
-        title="恢复通用预设？"
-        description="这会用通用模板重建 System Prompt，当前填写内容和 SOUL 内容都会被覆盖。"
+        title={t('prompt.restoreTitle')}
+        description={t('prompt.restoreDescription')}
         onConfirm={() => {
-          onMarkdownChange(buildGuidedPrompt(DEFAULT_GUIDED_PROMPT_FIELDS, true));
+          onMarkdownChange(buildGuidedPrompt(getDefaultGuidedPromptFields(), true));
           setRestoreOpen(false);
         }}
       />

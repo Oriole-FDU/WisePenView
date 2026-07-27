@@ -9,6 +9,7 @@ import { SkillApi } from '../apis/SkillApi';
 import { SkillServicesMap } from '../mapper/SkillServices.map';
 import type {
   ISkillService,
+  MoveSkillAssetResult,
   UploadSkillAssetRequest,
   UploadSkillAssetResult,
   UploadSkillAssetsOptions,
@@ -314,22 +315,72 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     return results;
   };
 
-  const uploadAsset = async (
+  const moveAssets: ISkillService['moveAssets'] = async (
     resourceId: string,
     draftVersion: number,
-    params: UploadSkillAssetRequest
+    assets
   ) => {
-    const [result] = await uploadAssets(resourceId, draftVersion, [params]);
-    if (result?.error) throw result.error;
-    return result?.assetId;
-  };
+    if (assets.length === 0) return [];
 
-  const saveAsset = async (
-    resourceId: string,
-    draftVersion: number,
-    params: { name: string; path: string; content: string }
-  ) => {
-    return uploadAsset(resourceId, draftVersion, params);
+    const uploadRequests = await Promise.all(
+      assets.map(async ({ assetId, objectKey, name, path, content }) => {
+        let nextContent = content;
+        if (nextContent === undefined) {
+          if (!objectKey) {
+            throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
+          }
+          nextContent = await readAssetBlob(resourceId, objectKey, draftVersion);
+        }
+        return {
+          clientId: assetId,
+          name,
+          path,
+          content: nextContent,
+        };
+      })
+    );
+    const results = await uploadAssets(resourceId, draftVersion, uploadRequests);
+    const createdAssetIds = results.flatMap((result) =>
+      result.assetId && !result.error ? [result.assetId] : []
+    );
+    const failedResult = results.find((result) => result.error);
+    if (failedResult?.error) {
+      await deleteAssets(resourceId, draftVersion, createdAssetIds).catch(() => undefined);
+      throw failedResult.error;
+    }
+
+    const missingAssetIdResult = results.find((result) => !result.assetId);
+    if (missingAssetIdResult || results.length !== assets.length) {
+      await deleteAssets(resourceId, draftVersion, createdAssetIds).catch(() => undefined);
+      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
+        fileName: missingAssetIdResult?.name,
+      });
+    }
+    const missingObjectKeyResult = results.find((result) => !result.objectKey);
+    if (missingObjectKeyResult) {
+      await deleteAssets(resourceId, draftVersion, createdAssetIds).catch(() => undefined);
+      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING, {
+        fileName: missingObjectKeyResult.name,
+      });
+    }
+    const movedAssets: MoveSkillAssetResult[] = results.flatMap((result) =>
+      result.assetId && result.objectKey
+        ? [
+            {
+              previousAssetId: result.clientId,
+              assetId: result.assetId,
+              objectKey: result.objectKey,
+            },
+          ]
+        : []
+    );
+
+    await deleteAssets(
+      resourceId,
+      draftVersion,
+      assets.map((asset) => asset.assetId)
+    );
+    return movedAssets;
   };
 
   return {
@@ -343,8 +394,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     loadAssetContent,
     loadAssetBlob,
     deleteAssets,
-    uploadAsset,
     uploadAssets,
-    saveAsset,
+    moveAssets,
   };
 };

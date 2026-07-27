@@ -1,12 +1,13 @@
-import { Empty, Spin } from '@/components/Feedback';
+import { Empty } from '@/components/Feedback';
 import SegmentedTabs from '@/components/SegmentedTabs';
 import { useGroupService } from '@/domains';
 import type { FetchGroupListRequest, Group } from '@/domains/Group';
 import { GROUP_ROLE_FILTER_MAP } from '@/domains/Group';
-import { Button, Pagination, toast } from '@heroui/react';
+import { Button, Card, Pagination, Skeleton, toast } from '@heroui/react';
 import { usePagination } from 'ahooks';
 import { Plus, UserPlus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import GroupCard from '../_components/GroupCard';
 import { CreateGroupModal, JoinGroupModal } from '../_components/GroupModals';
@@ -15,6 +16,10 @@ import page from './style.module.less';
 
 const PAGE_SIZE = 8;
 const PAGINATION_SIBLING_COUNT = 1;
+const GROUP_CARD_SKELETON_KEYS = Array.from(
+  { length: PAGE_SIZE },
+  (_, index) => `group-card-skeleton-${index + 1}`
+);
 
 type PaginationPageItem = number | 'ellipsis';
 
@@ -42,14 +47,31 @@ function buildPaginationItems(currentPage: number, totalPages: number): Paginati
   });
 }
 
+function GroupCardSkeleton() {
+  return (
+    <Card className={page.skeletonCard} aria-hidden="true">
+      <Skeleton animationType="shimmer" className={page.skeletonCover} />
+      <div className={page.skeletonBody}>
+        <Skeleton animationType="shimmer" className={page.skeletonTitle} />
+        <div className={page.skeletonFooter}>
+          <Skeleton animationType="shimmer" className={page.skeletonAvatar} />
+          <Skeleton animationType="shimmer" className={page.skeletonOwner} />
+          <Skeleton animationType="shimmer" className={page.skeletonMemberCount} />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function MyGroup() {
+  const { t } = useTranslation('group');
   const groupService = useGroupService();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>('joined');
+  const [activeTab, setActiveTab] = useState<string>('all');
   const [joinGroupModalOpen, setJoinGroupModalOpen] = useState(false);
   const [createGroupModalOpen, setCreateGroupModalOpen] = useState(false);
 
-  const groupRoleFilter = GROUP_ROLE_FILTER_MAP[activeTab] ?? GROUP_ROLE_FILTER_MAP.joined;
+  const groupRoleFilter = GROUP_ROLE_FILTER_MAP[activeTab] ?? GROUP_ROLE_FILTER_MAP.all;
 
   const {
     data: groupsData,
@@ -71,22 +93,18 @@ function MyGroup() {
       defaultPageSize: PAGE_SIZE,
       refreshDeps: [groupRoleFilter],
       onError: () => {
-        toast.danger('获取小组列表失败');
+        toast.danger(t('list.loadFailed'));
       },
     }
   );
   const groups: Group[] = groupsData?.list ?? [];
   const total = groupsData?.total ?? 0;
   const totalPages = Math.max(Math.ceil(total / size), 1);
-  const pages = useMemo(() => buildPaginationItems(pageNum, totalPages), [pageNum, totalPages]);
+  const pages = buildPaginationItems(pageNum, totalPages);
   const start = total === 0 ? 0 : (pageNum - 1) * size + 1;
   const end = Math.min(pageNum * size, total);
-
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    if (pageNum !== 1) {
-      onPageChange(1, size);
-    }
   };
 
   const handleModalSuccess = () => {
@@ -105,94 +123,108 @@ function MyGroup() {
     <div className={layout.pageContainer}>
       <div className={layout.pageHeaderWithActions}>
         <div>
-          <h1 className={layout.pageTitle}>我的小组</h1>
-          <span className={layout.pageSubtitle}>管理您的小组和协作</span>
+          <h1 className={layout.pageTitle}>{t('list.title')}</h1>
+          <span className={layout.pageSubtitle}>{t('list.subtitle')}</span>
         </div>
         <div className={layout.actionsRow}>
           <Button onPress={() => setJoinGroupModalOpen(true)}>
             <UserPlus size={16} aria-hidden="true" />
-            加入小组
+            {t('list.join')}
           </Button>
           <Button variant="primary" onPress={() => setCreateGroupModalOpen(true)}>
             <Plus size={16} aria-hidden="true" />
-            新建小组
+            {t('list.create')}
           </Button>
         </div>
       </div>
 
       <SegmentedTabs
-        ariaLabel="小组筛选"
+        ariaLabel={t('list.filterAria')}
         selectedKey={activeTab}
         onSelectionChange={handleTabChange}
         items={[
-          { key: 'joined', label: '我加入的' },
-          { key: 'managed', label: '我管理的' },
+          { key: 'all', label: t('list.all') },
+          { key: 'joined', label: t('list.joined') },
+          { key: 'managed', label: t('list.managed') },
         ]}
         className={layout.detailTabs}
         size="sm"
       />
 
-      <Spin spinning={loading}>
-        {groups.length === 0 ? (
-          <div className={page.emptyState}>
-            <Empty description="暂无小组" />
-          </div>
-        ) : (
-          <div className={page.groupGrid}>
-            {groups.map((group) => (
-              <div key={group.groupId} className={page.groupGridItem}>
-                <GroupCard group={group} onClick={handleGroupClick} />
-              </div>
-            ))}
-          </div>
-        )}
+      {loading ? (
+        <div
+          className={page.groupGrid}
+          role="status"
+          aria-live="polite"
+          aria-label={t('list.loading')}
+        >
+          {GROUP_CARD_SKELETON_KEYS.map((key) => (
+            <div key={key} className={page.groupGridItem}>
+              <GroupCardSkeleton />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {groups.length === 0 ? (
+            <div className={page.emptyState}>
+              <Empty description={t('list.empty')} />
+            </div>
+          ) : (
+            <div className={page.groupGrid}>
+              {groups.map((group) => (
+                <div key={group.groupId} className={page.groupGridItem}>
+                  <GroupCard group={group} onClick={handleGroupClick} />
+                </div>
+              ))}
+            </div>
+          )}
 
-        {total > 0 && (
-          <div className={page.paginationWrap}>
-            <Pagination size="sm">
-              <Pagination.Summary>
-                {start} - {end} / 共 {total} 条
-              </Pagination.Summary>
-              <Pagination.Content>
-                <Pagination.Item>
-                  <Pagination.Previous
-                    isDisabled={pageNum <= 1}
-                    onPress={() => onPageChange(Math.max(1, pageNum - 1), size)}
-                  >
-                    <Pagination.PreviousIcon />
-                    上一页
-                  </Pagination.Previous>
-                </Pagination.Item>
-                {pages.map((targetPage, index) =>
-                  targetPage === 'ellipsis' ? (
-                    <Pagination.Item key={`ellipsis-${index}`}>
-                      <Pagination.Ellipsis />
-                    </Pagination.Item>
-                  ) : (
-                    <Pagination.Item key={targetPage}>
-                      <Pagination.Link
-                        isActive={targetPage === pageNum}
-                        onPress={() => onPageChange(targetPage, size)}
-                      >
-                        {targetPage}
-                      </Pagination.Link>
-                    </Pagination.Item>
-                  )
-                )}
-                <Pagination.Item>
-                  <Pagination.Next
-                    isDisabled={pageNum >= totalPages}
-                    onPress={() => onPageChange(Math.min(totalPages, pageNum + 1), size)}
-                  >
-                    下一页
-                    <Pagination.NextIcon />
-                  </Pagination.Next>
-                </Pagination.Item>
-              </Pagination.Content>
-            </Pagination>
-          </div>
-        )}
-      </Spin>
+          {total > 0 && (
+            <div className={page.paginationWrap}>
+              <Pagination size="sm">
+                <Pagination.Summary>{t('list.summary', { start, end, total })}</Pagination.Summary>
+                <Pagination.Content>
+                  <Pagination.Item>
+                    <Pagination.Previous
+                      isDisabled={pageNum <= 1}
+                      onPress={() => onPageChange(Math.max(1, pageNum - 1), size)}
+                    >
+                      <Pagination.PreviousIcon />
+                      {t('list.previous')}
+                    </Pagination.Previous>
+                  </Pagination.Item>
+                  {pages.map((targetPage, index) =>
+                    targetPage === 'ellipsis' ? (
+                      <Pagination.Item key={`ellipsis-${index}`}>
+                        <Pagination.Ellipsis />
+                      </Pagination.Item>
+                    ) : (
+                      <Pagination.Item key={targetPage}>
+                        <Pagination.Link
+                          isActive={targetPage === pageNum}
+                          onPress={() => onPageChange(targetPage, size)}
+                        >
+                          {targetPage}
+                        </Pagination.Link>
+                      </Pagination.Item>
+                    )
+                  )}
+                  <Pagination.Item>
+                    <Pagination.Next
+                      isDisabled={pageNum >= totalPages}
+                      onPress={() => onPageChange(Math.min(totalPages, pageNum + 1), size)}
+                    >
+                      {t('list.next')}
+                      <Pagination.NextIcon />
+                    </Pagination.Next>
+                  </Pagination.Item>
+                </Pagination.Content>
+              </Pagination>
+            </div>
+          )}
+        </>
+      )}
 
       <JoinGroupModal
         isOpen={joinGroupModalOpen}

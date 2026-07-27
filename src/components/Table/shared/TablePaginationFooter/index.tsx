@@ -1,6 +1,5 @@
 import { Pagination, Table } from '@heroui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useMemo } from 'react';
 import type { TablePaginationFooterProps } from './index.type';
 import styles from './style.module.less';
 
@@ -86,14 +85,10 @@ function TablePaginationFooter({
   className,
 }: TablePaginationFooterProps) {
   const totalPages = Math.max(Math.ceil(total / pageSize), 1);
-  const pages = useMemo(
-    () =>
-      buildPaginationItems(current, totalPages, {
-        siblingCount,
-        boundaryCount,
-      }),
-    [boundaryCount, current, siblingCount, totalPages]
-  );
+  const pages = buildPaginationItems(current, totalPages, {
+    siblingCount,
+    boundaryCount,
+  });
 
   return (
     <Table.Footer className={className ?? styles.footer}>

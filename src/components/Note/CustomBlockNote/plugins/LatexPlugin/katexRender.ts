@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import katex from 'katex';
 
 /**
@@ -14,7 +15,7 @@ export function renderKatexInto(
   if (!trimmed) {
     const span = document.createElement('span');
     span.className = placeholderClass;
-    span.textContent = '点击输入公式...';
+    span.textContent = i18n.t('latex.placeholder', { ns: 'note' });
     el.appendChild(span);
     return;
   }

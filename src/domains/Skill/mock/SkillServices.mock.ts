@@ -36,7 +36,6 @@ export const SkillServicesMock: ISkillService = {
   loadAssetContent: async () => '# Mock Skill\n',
   loadAssetBlob: async () => new Blob(),
   deleteAssets: async () => undefined,
-  uploadAsset: async () => undefined,
   uploadAssets: async (_resourceId, _draftVersion, assets, options) => {
     assets.forEach((asset, index) => {
       options?.onProgress?.({ clientId: asset.clientId ?? String(index), progress: 100 });
@@ -49,5 +48,10 @@ export const SkillServicesMock: ISkillService = {
       objectKey: `mock-skill/${asset.path}/${asset.name}`,
     }));
   },
-  saveAsset: async () => undefined,
+  moveAssets: async (_resourceId, _draftVersion, assets) =>
+    assets.map((asset, index) => ({
+      previousAssetId: asset.assetId,
+      assetId: `mock-moved-asset-${index}-${asset.name}`,
+      objectKey: `mock-skill/${asset.path}/${asset.name}`,
+    })),
 };

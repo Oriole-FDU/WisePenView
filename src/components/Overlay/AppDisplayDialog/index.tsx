@@ -2,6 +2,7 @@ import { Button } from '@heroui/react';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal } from '../Modal';
 import type {
@@ -39,7 +40,7 @@ function AppDisplayDialogRoot({
   title,
   description,
   children,
-  closeText = '关闭',
+  closeText,
   primaryAction,
   secondaryAction,
   actions,
@@ -59,6 +60,9 @@ function AppDisplayDialogRoot({
   footerClassName,
   classNames,
 }: AppDisplayDialogProps) {
+  const { t } = useTranslation('common');
+  const resolvedCloseText = closeText === undefined ? t('actions.close') : closeText;
+
   const handleClose = () => {
     onOpenChange(false);
   };
@@ -77,10 +81,10 @@ function AppDisplayDialogRoot({
       );
     }
 
-    if (closeText !== false && closeText != null) {
+    if (resolvedCloseText !== false && resolvedCloseText != null) {
       return (
         <Button variant="primary" onPress={handleClose}>
-          {closeText}
+          {resolvedCloseText}
         </Button>
       );
     }
@@ -109,7 +113,7 @@ function AppDisplayDialogRoot({
           >
             {hasCloseTrigger ? (
               <Modal.CloseTrigger
-                aria-label="关闭"
+                aria-label={t('overlay.closeAria')}
                 className={clsx(
                   styles.closeTrigger,
                   closeTriggerClassName,

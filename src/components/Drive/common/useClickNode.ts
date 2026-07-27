@@ -1,7 +1,6 @@
 import type { DriveNode } from '@/domains/Drive';
 import { useOpenInWorkspace } from '@/hooks/useOpenInWorkspace';
 import type { ResourceViewer } from '@/utils/navigation/resourceTarget';
-import { useCallback } from 'react';
 
 export interface UseClickNodeParams {
   /** 进入 root / folder 等容器型节点（通常由 useTableDrive.enterFolder 提供） */
@@ -16,28 +15,25 @@ export interface UseClickNodeParams {
 export const useClickNode = ({ enterFolder }: UseClickNodeParams) => {
   const openInWorkspace = useOpenInWorkspace();
 
-  return useCallback(
-    (node: DriveNode, viewer?: ResourceViewer) => {
-      if (node.type === 'root' || node.type === 'folder') {
-        enterFolder(node.id);
-        return;
-      }
-      if (node.type === 'loading') {
-        return;
-      }
-      if (!node.resourceId) return;
-      openInWorkspace({
-        resourceId: node.resourceId,
-        resourceType: node.resourceType,
-        resourceName: node.title,
-        viewer,
-        driveLocation: {
-          scope: node.scope,
-          nodeId: node.id,
-          parentNodeId: node.parentId,
-        },
-      });
-    },
-    [enterFolder, openInWorkspace]
-  );
+  return (node: DriveNode, viewer?: ResourceViewer) => {
+    if (node.type === 'root' || node.type === 'folder') {
+      enterFolder(node.id);
+      return;
+    }
+    if (node.type === 'loading') {
+      return;
+    }
+    if (!node.resourceId) return;
+    openInWorkspace({
+      resourceId: node.resourceId,
+      resourceType: node.resourceType,
+      resourceName: node.title,
+      viewer,
+      driveLocation: {
+        scope: node.scope,
+        nodeId: node.id,
+        parentNodeId: node.parentId,
+      },
+    });
+  };
 };

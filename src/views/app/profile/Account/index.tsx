@@ -6,13 +6,15 @@ import { IDENTITY } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
 import { Separator, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AccountForm, AccountHeader, AccountVerification } from '../_components/Account';
 import type { ProfileFieldKey } from '../profile.config';
 import { getProfileFieldConfig, PROFILE_FIELDS } from '../profile.config';
 import layout from '../style.module.less';
 
 function Account() {
+  const { t } = useTranslation(['profile', 'common']);
   const userService = useUserService();
   const [user, setUser] = useState<UserAccountProfile | null>(null);
 
@@ -29,34 +31,38 @@ function Account() {
   const fieldConfig = getProfileFieldConfig(identityType);
   const visibleFields = PROFILE_FIELDS.filter((f) => fieldConfig[f.key]);
 
-  const readonlyFieldSet = useMemo(
-    () => new Set((user?.readonlyFields ?? []) as ProfileFieldKey[]),
-    [user?.readonlyFields]
-  );
-  const accountItems = useMemo(
-    () => [
-      { key: 'username', label: '用户名', value: user?.userInfo?.username ?? '-' },
-      {
-        key: 'campusNo',
-        label: '学工号',
-        value: user?.userInfo?.campusNo === 'PENDING' ? '-' : (user?.userInfo?.campusNo ?? '-'),
-      },
-      { key: 'email', label: '邮箱', value: user?.userInfo?.email ?? '-' },
-      { key: 'mobile', label: '手机号', value: user?.userInfo?.mobile ?? '-' },
-    ],
-    [
-      user?.userInfo?.campusNo,
-      user?.userInfo?.email,
-      user?.userInfo?.mobile,
-      user?.userInfo?.username,
-    ]
-  );
+  const readonlyFieldSet = new Set((user?.readonlyFields ?? []) as ProfileFieldKey[]);
+  const accountItems = [
+    {
+      key: 'username',
+      label: t('account.username'),
+      value: user?.userInfo?.username ?? t('placeholder.dash', { ns: 'common' }),
+    },
+    {
+      key: 'campusNo',
+      label: t('account.campusNo'),
+      value:
+        user?.userInfo?.campusNo === 'PENDING'
+          ? t('placeholder.dash', { ns: 'common' })
+          : (user?.userInfo?.campusNo ?? t('placeholder.dash', { ns: 'common' })),
+    },
+    {
+      key: 'email',
+      label: t('account.email'),
+      value: user?.userInfo?.email ?? t('placeholder.dash', { ns: 'common' }),
+    },
+    {
+      key: 'mobile',
+      label: t('account.mobile'),
+      value: user?.userInfo?.mobile ?? t('placeholder.dash', { ns: 'common' }),
+    },
+  ];
 
   return (
     <div className={layout.pageContainer}>
       <div className={layout.pageHeader}>
-        <h1 className={layout.pageTitle}>账号管理</h1>
-        <span className={layout.pageSubtitle}>管理您的账号信息</span>
+        <h1 className={layout.pageTitle}>{t('account.title')}</h1>
+        <span className={layout.pageSubtitle}>{t('account.subtitle')}</span>
       </div>
       <AccountVerification user={user} onUserInfoReload={reloadUserInfo} />
       <Spin spinning={loading}>
@@ -65,7 +71,7 @@ function Account() {
 
           <Separator className={layout.sectionDivider} />
 
-          <h3 className={layout.sectionTitle}>账号</h3>
+          <h3 className={layout.sectionTitle}>{t('account.sectionTitle')}</h3>
           <DescriptionGrid items={accountItems} columns={2} className={layout.descriptions} />
 
           <Separator className={layout.sectionDivider} />

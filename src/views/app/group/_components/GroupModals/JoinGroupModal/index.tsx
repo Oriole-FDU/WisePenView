@@ -6,6 +6,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { JoinGroupModalProps } from './index.type';
 
 import styles from './index.module.less';
@@ -24,6 +25,7 @@ const normalizeInviteCode = (raw = ''): string =>
     .toUpperCase();
 
 function JoinGroupModal({ isOpen, onOpenChange, onSuccess }: JoinGroupModalProps) {
+  const { t } = useTranslation('group');
   const groupService = useGroupService();
   const [inviteCode, setInviteCode] = useState('');
   const [inviteCodeError, setInviteCodeError] = useState('');
@@ -43,7 +45,7 @@ function JoinGroupModal({ isOpen, onOpenChange, onSuccess }: JoinGroupModalProps
     {
       manual: true,
       onSuccess: () => {
-        toast.success('加入小组成功');
+        toast.success(t('join.success'));
         resetForm();
         onSuccess?.();
         onOpenChange(false);
@@ -57,7 +59,7 @@ function JoinGroupModal({ isOpen, onOpenChange, onSuccess }: JoinGroupModalProps
   const handleConfirm = () => {
     const normalizedInviteCode = normalizeInviteCode(inviteCode);
     if (normalizedInviteCode.length !== INVITE_CODE_LENGTH) {
-      setInviteCodeError('请输入 8 位邀请码');
+      setInviteCodeError(t('join.invalidCode'));
       return;
     }
     runJoinGroup({
@@ -74,7 +76,7 @@ function JoinGroupModal({ isOpen, onOpenChange, onSuccess }: JoinGroupModalProps
         }
         onOpenChange(nextOpen);
       }}
-      title="加入小组"
+      title={t('join.title')}
       onCancel={handleCancel}
       onSubmit={handleConfirm}
       isSubmitting={loading}
@@ -87,7 +89,7 @@ function JoinGroupModal({ isOpen, onOpenChange, onSuccess }: JoinGroupModalProps
           id="join-group-invite-code-label"
           htmlFor="join-group-invite-code"
         >
-          邀请码
+          {t('join.inviteCode')}
         </label>
         <InputOTP
           id="join-group-invite-code"
@@ -123,7 +125,7 @@ function JoinGroupModal({ isOpen, onOpenChange, onSuccess }: JoinGroupModalProps
           ))}
         </InputOTP>
         <p id="join-group-invite-code-hint" className={styles.hint}>
-          请输入 8 位邀请码，将自动转为大写并分段显示。
+          {t('join.hint')}
         </p>
         {inviteCodeError ? (
           <p id="join-group-invite-code-error" className={styles.fieldError}>

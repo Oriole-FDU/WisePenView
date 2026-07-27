@@ -14,6 +14,7 @@ import {
 import { Button } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useResourceHostLayoutConfig, type ResourceHostLayoutConfig } from './ResourceHostContext';
 import styles from './ResourceRenderer.module.less';
 
@@ -44,10 +45,13 @@ function UnsupportedResource({
   message,
   onClose,
 }: UnsupportedResourceProps) {
-  useResourceHostLayoutConfig(HEADERLESS_LAYOUT_CONFIG);
+  const { t } = useTranslation('workspace');
+  useResourceHostLayoutConfig(() => HEADERLESS_LAYOUT_CONFIG, []);
 
-  const readableType = resourceType ? `资源类型：${resourceType}` : undefined;
-  const readableViewer = viewer ? `打开方式：${viewer}` : undefined;
+  const readableType = resourceType
+    ? t('renderer.resourceType', { type: resourceType })
+    : undefined;
+  const readableViewer = viewer ? t('renderer.viewer', { viewer }) : undefined;
   const subTitle = message ?? [readableType, readableViewer].filter(Boolean).join('，');
 
   return (
@@ -55,11 +59,11 @@ function UnsupportedResource({
       <div className={styles.middleOverlayInner}>
         <ResultState
           status="warning"
-          title={resourceId ? '暂不支持打开该资源' : '无法打开资源'}
+          title={resourceId ? t('renderer.unsupported') : t('renderer.cannotOpen')}
           subTitle={subTitle || undefined}
           extra={
             <Button variant="secondary" onPress={onClose}>
-              关闭资源
+              {t('renderer.close')}
             </Button>
           }
         />
@@ -69,8 +73,9 @@ function UnsupportedResource({
 }
 
 function FileViewerResolver({ target, onTargetChange, onClose }: ResourceRendererProps) {
+  const { t } = useTranslation('workspace');
   const documentService = useDocumentService();
-  useResourceHostLayoutConfig(HEADERLESS_LAYOUT_CONFIG);
+  useResourceHostLayoutConfig(() => HEADERLESS_LAYOUT_CONFIG, []);
 
   const { resourceId = '' } = target;
   const {
@@ -109,7 +114,7 @@ function FileViewerResolver({ target, onTargetChange, onClose }: ResourceRendere
       <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
         <div className={styles.middleOverlayLoading}>
           <Spin size="large" />
-          <span className={styles.middleOverlayText}>正在解析文件打开方式...</span>
+          <span className={styles.middleOverlayText}>{t('renderer.resolving')}</span>
         </div>
       </div>
     );
@@ -119,7 +124,7 @@ function FileViewerResolver({ target, onTargetChange, onClose }: ResourceRendere
     <UnsupportedResource
       {...target}
       resourceType={RESOURCE_KIND.FILE}
-      message="无法从文件信息判断打开方式"
+      message={t('renderer.unresolved')}
       onClose={onClose}
     />
   );

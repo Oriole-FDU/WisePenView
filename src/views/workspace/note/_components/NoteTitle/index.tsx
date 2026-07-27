@@ -1,10 +1,11 @@
 import type { Block as BlockNoteBlock } from '@blocknote/core';
-import { zh } from '@blocknote/core/locales';
+import { en, zh } from '@blocknote/core/locales';
 import { BlockNoteView } from '@blocknote/mantine';
 import '@blocknote/mantine/style.css';
 import { useCreateBlockNote } from '@blocknote/react';
-import { useMemoizedFn, useMount, useUnmount, useUpdateEffect } from 'ahooks';
-import { useImperativeHandle, useRef, type KeyboardEvent, type Ref } from 'react';
+import { useLatest, useMemoizedFn, useMount, useUnmount } from 'ahooks';
+import { useEffect, useImperativeHandle, useRef, type KeyboardEvent, type Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useNewNoteStore } from '@/components/Note/_store/useNewNoteStore';
 import { getProseMirrorRoot } from '@/components/Note/CustomBlockNote/engines/editor/dom';
@@ -66,9 +67,12 @@ const DEFAULT_HEADING_BLOCK = [
   },
 ] as unknown as BlockNoteBlock[];
 
-function toHeadingBlockFromTitle(title?: string): BlockNoteBlock[] {
+function toHeadingBlockFromTitle(
+  title: string | undefined,
+  untitledTitle: string
+): BlockNoteBlock[] {
   const trimmedTitle = title?.trim();
-  if (trimmedTitle === '未命名笔记' || !trimmedTitle) {
+  if (trimmedTitle === untitledTitle || !trimmedTitle) {
     return DEFAULT_HEADING_BLOCK;
   }
   return [
@@ -88,29 +92,24 @@ function NoteTitle({
   onSaveStatusChange,
   ref,
 }: NoteTitleProps & { ref?: Ref<NoteTitleHandle> }) {
+  const { i18n, t } = useTranslation('note');
   const { resolvedTheme } = useAppTheme();
   const noteService = useNoteService();
-  const latestIdRef = useRef(id);
+  const latestIdRef = useLatest(id);
   const titleDebounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onChangeCleanupRef = useRef<(() => void) | null>(null);
-  const beforeChangeCleanupRef = useRef<(() => void) | null>(null);
-  const readOnlyRef = useRef(readOnly);
   const saveVersionRef = useRef(0);
   const emitSaveStatus = useMemoizedFn(onSaveStatusChange);
-
-  useUpdateEffect(() => {
-    latestIdRef.current = id;
-    readOnlyRef.current = readOnly;
-  }, [id, readOnly]);
+  const untitledTitle = t('title.untitled');
+  const editorDictionary = i18n.resolvedLanguage === 'en-US' ? en : zh;
 
   const editor = useCreateBlockNote({
-    initialContent: toHeadingBlockFromTitle(initialContent),
+    initialContent: toHeadingBlockFromTitle(initialContent, untitledTitle),
     dictionary: {
-      ...zh,
+      ...editorDictionary,
       placeholders: {
-        ...zh.placeholders,
-        heading: '请输入标题',
+        ...editorDictionary.placeholders,
+        heading: t('title.placeholder'),
       },
     },
     trailingBlock: false,
@@ -123,11 +122,11 @@ function NoteTitle({
         const firstBlock = editor.document[0];
         const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
         const trimmed = raw.trim();
-        return trimmed || '未命名笔记';
+        return trimmed || untitledTitle;
       },
       getProseMirrorRoot: () => getProseMirrorRoot(editor),
     }),
-    [editor]
+    [editor, untitledTitle]
   );
 
   useMount(() => {
@@ -138,55 +137,46 @@ function NoteTitle({
     }, 0);
   });
 
-  const detachTitleHandlers = () => {
-    if (onChangeCleanupRef.current) {
-      onChangeCleanupRef.current();
-      onChangeCleanupRef.current = null;
-    }
-    if (beforeChangeCleanupRef.current) {
-      beforeChangeCleanupRef.current();
-      beforeChangeCleanupRef.current = null;
-    }
-  };
-
-  const attachTitleHandlers = () => {
-    detachTitleHandlers();
-
-    onChangeCleanupRef.current = editor.onChange(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：标题编辑器实例或只读状态变化时重新注册编辑器事件。
+   * 不可替代原因：BlockNote 的 onChange/onBeforeChange 是命令式外部订阅，无法由 JSX 表达。
+   * cleanup：注销本轮两个编辑器监听器，防止旧实例或旧只读状态继续响应。
+   */
+  useEffect(() => {
+    if (readOnly) return;
+    const detachOnChange = editor.onChange(() => {
       const firstBlock = editor.document[0];
       if (!firstBlock) return;
 
-      if (!readOnlyRef.current) {
-        const currentId = latestIdRef.current;
-        saveVersionRef.current += 1;
-        const saveVersion = saveVersionRef.current;
-        emitSaveStatus('saving');
-        if (titleDebounceTimerRef.current) {
-          clearTimeout(titleDebounceTimerRef.current);
-          titleDebounceTimerRef.current = null;
-        }
-        titleDebounceTimerRef.current = setTimeout(() => {
-          titleDebounceTimerRef.current = null;
-          const block = editor.document[0];
-          const raw = getBlockPlainText(block as { content?: unknown[] } | undefined);
-          const nextTitle = raw.trim() || '未命名笔记';
-          void noteService.syncTitle({ resourceId: currentId, newName: nextTitle }).then(
-            () => {
-              if (saveVersion === saveVersionRef.current) {
-                emitSaveStatus('saved');
-              }
-            },
-            (error: unknown) => {
-              if (saveVersion === saveVersionRef.current) {
-                emitSaveStatus('failed');
-              }
-              toast.danger(parseErrorMessage(error));
-            }
-          );
-        }, TITLE_DEBOUNCE_MS);
-      }
-
       const currentId = latestIdRef.current;
+      saveVersionRef.current += 1;
+      const saveVersion = saveVersionRef.current;
+      emitSaveStatus('saving');
+      if (titleDebounceTimerRef.current) {
+        clearTimeout(titleDebounceTimerRef.current);
+        titleDebounceTimerRef.current = null;
+      }
+      titleDebounceTimerRef.current = setTimeout(() => {
+        titleDebounceTimerRef.current = null;
+        const block = editor.document[0];
+        const raw = getBlockPlainText(block as { content?: unknown[] } | undefined);
+        const nextTitle = raw.trim() || untitledTitle;
+        void noteService.syncTitle({ resourceId: currentId, newName: nextTitle }).then(
+          () => {
+            if (saveVersion === saveVersionRef.current) {
+              emitSaveStatus('saved');
+            }
+          },
+          (error: unknown) => {
+            if (saveVersion === saveVersionRef.current) {
+              emitSaveStatus('failed');
+            }
+            toast.danger(parseErrorMessage(error));
+          }
+        );
+      }, TITLE_DEBOUNCE_MS);
+
       const newNoteState = useNewNoteStore.getState();
       if (newNoteState.newNoteResourceId === currentId) {
         const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
@@ -196,7 +186,7 @@ function NoteTitle({
       }
     });
 
-    beforeChangeCleanupRef.current = editor.onBeforeChange(({ getChanges }) => {
+    const detachBeforeChange = editor.onBeforeChange(({ getChanges }) => {
       const firstBlock = editor.document[0];
       if (!firstBlock) return true;
       for (const change of getChanges()) {
@@ -217,25 +207,13 @@ function NoteTitle({
       }
       return true;
     });
-  };
-
-  useMount(() => {
-    if (!readOnly) {
-      attachTitleHandlers();
-    }
-    return detachTitleHandlers;
-  });
-
-  useUpdateEffect(() => {
-    detachTitleHandlers();
-    if (!readOnly) {
-      attachTitleHandlers();
-    }
-    return detachTitleHandlers;
-  }, [readOnly, editor]);
+    return () => {
+      detachOnChange();
+      detachBeforeChange();
+    };
+  }, [editor, emitSaveStatus, latestIdRef, noteService, readOnly, untitledTitle]);
 
   useUnmount(() => {
-    detachTitleHandlers();
     if (focusTimerRef.current) {
       clearTimeout(focusTimerRef.current);
       focusTimerRef.current = null;

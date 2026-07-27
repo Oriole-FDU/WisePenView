@@ -2,6 +2,7 @@ import AppIconButton from '@/components/Button/AppIconButton';
 import type { FavoriteCollection } from '@/domains/Interact';
 import { Dropdown, ListBox, ListBoxItem } from '@heroui/react';
 import { EllipsisVertical, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from '../style.module.less';
 
 interface FavoriteCollectionListProps {
@@ -21,13 +22,14 @@ function FavoriteCollectionList({
   onEdit,
   onDelete,
 }: FavoriteCollectionListProps) {
+  const { t } = useTranslation(['resource', 'common']);
   return (
-    <aside className={styles.collectionPanel} aria-label="收藏夹目录">
+    <aside className={styles.collectionPanel} aria-label={t('favorite.collection.panelAria')}>
       <div className={styles.collectionPanelHeader}>
-        <span className={styles.collectionPanelTitle}>收藏夹</span>
+        <span className={styles.collectionPanelTitle}>{t('favorite.collection.title')}</span>
         <AppIconButton
           icon={<Plus size={17} aria-hidden="true" />}
-          label="新建收藏夹"
+          label={t('favorite.collection.createTitle')}
           size="sm"
           className={styles.collectionCreateButton}
           onPress={onCreate}
@@ -35,7 +37,7 @@ function FavoriteCollectionList({
       </div>
 
       <ListBox
-        aria-label="收藏夹"
+        aria-label={t('favorite.picker.collectionList')}
         selectionMode="single"
         selectedKeys={selectedCollectionId ? [selectedCollectionId] : []}
         onSelectionChange={(keys) => {
@@ -48,47 +50,52 @@ function FavoriteCollectionList({
           <ListBoxItem
             key={collection.collectionId}
             id={collection.collectionId}
-            textValue={collection.collectionName ?? '我的收藏'}
+            textValue={collection.collectionName ?? t('favorite.picker.defaultCollectionName')}
             className={styles.collectionListItem}
           >
             <span className={styles.collectionListItemContent}>
               <span className={styles.collectionListItemName}>
-                {collection.collectionName ?? '我的收藏'}
+                {collection.collectionName ?? t('favorite.picker.defaultCollectionName')}
               </span>
               <span className={styles.collectionListItemMeta}>{collection.itemCount}</span>
-            </span>
-            {!collection.isDefault ? (
               <span
                 className={styles.collectionListItemActions}
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={(event) => event.stopPropagation()}
+                onPointerDown={
+                  collection.isDefault ? undefined : (event) => event.stopPropagation()
+                }
+                onClick={collection.isDefault ? undefined : (event) => event.stopPropagation()}
               >
-                <Dropdown>
-                  <AppIconButton
-                    icon={<EllipsisVertical size={16} aria-hidden="true" />}
-                    label={`${collection.collectionName ?? '我的收藏'}操作`}
-                    size="sm"
-                    className={styles.collectionMoreButton}
-                    tooltip={{ content: '更多操作' }}
-                    overlayTrigger={<Dropdown.Trigger />}
-                  />
-                  <Dropdown.Popover placement="bottom end">
-                    <Dropdown.Menu aria-label="收藏夹操作">
-                      <Dropdown.Item id="edit" onAction={() => onEdit(collection)}>
-                        编辑
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        id="delete"
-                        variant="danger"
-                        onAction={() => onDelete(collection)}
-                      >
-                        删除
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown.Popover>
-                </Dropdown>
+                {!collection.isDefault ? (
+                  <Dropdown>
+                    <AppIconButton
+                      icon={<EllipsisVertical size={16} aria-hidden="true" />}
+                      label={t('favorite.collection.actionsAria', {
+                        name:
+                          collection.collectionName ?? t('favorite.picker.defaultCollectionName'),
+                      })}
+                      size="sm"
+                      className={styles.collectionMoreButton}
+                      tooltip={{ content: t('favorite.collection.moreActions') }}
+                      overlayTrigger={<Dropdown.Trigger />}
+                    />
+                    <Dropdown.Popover placement="bottom end">
+                      <Dropdown.Menu aria-label={t('favorite.collection.menuAria')}>
+                        <Dropdown.Item id="edit" onAction={() => onEdit(collection)}>
+                          {t('actions.edit', { ns: 'common' })}
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          id="delete"
+                          variant="danger"
+                          onAction={() => onDelete(collection)}
+                        >
+                          {t('actions.delete', { ns: 'common' })}
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown.Popover>
+                  </Dropdown>
+                ) : null}
               </span>
-            ) : null}
+            </span>
           </ListBoxItem>
         ))}
       </ListBox>

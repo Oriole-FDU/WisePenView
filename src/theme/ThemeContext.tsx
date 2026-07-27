@@ -1,6 +1,5 @@
 import { useTheme as useHeroUITheme } from '@heroui/react';
-import { useMount, useUpdateEffect } from 'ahooks';
-import { useCallback, type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { ThemeContext, type ResolvedTheme, type ThemeMode } from './ThemeContextValue';
 
 export { ThemeContext } from './ThemeContextValue';
@@ -37,37 +36,24 @@ export function ThemeContextProvider({
 
   const resolved = resolveTheme((heroTheme as ThemeMode) || 'light');
 
-  // Apply on mount
-  useMount(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：主题模式或解析后的明暗主题变化时同步页面根节点。
+   * 不可替代原因：document class、data-theme 和系统媒体查询都属于 React 外部状态。
+   * cleanup：移除本轮注册的系统主题媒体查询监听器；非 system 模式没有监听器。
+   */
+  useEffect(() => {
     applyThemeToDOM(resolved);
-  });
-
-  // Re-apply when resolved changes
-  useUpdateEffect(() => {
-    applyThemeToDOM(resolved);
-  }, [resolved]);
-
-  // Listen for system preference changes when in system mode
-  useMount(() => {
+    if (heroTheme !== 'system') return;
     const media = window.matchMedia(PREFERS_DARK_MEDIA);
-    const handler = () => {
-      if (heroTheme !== 'system') return;
-      applyThemeToDOM(getSystemPreference());
-    };
+    const handler = () => applyThemeToDOM(getSystemPreference());
     media.addEventListener('change', handler);
     return () => media.removeEventListener('change', handler);
-  });
-
-  const setTheme = useCallback(
-    (newTheme: ThemeMode) => {
-      heroSetTheme(newTheme);
-    },
-    [heroSetTheme]
-  );
+  }, [heroTheme, resolved]);
 
   return (
     <ThemeContext.Provider
-      value={{ theme: heroTheme as ThemeMode, resolvedTheme: resolved, setTheme }}
+      value={{ theme: heroTheme as ThemeMode, resolvedTheme: resolved, setTheme: heroSetTheme }}
     >
       {children}
     </ThemeContext.Provider>

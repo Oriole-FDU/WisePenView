@@ -1,4 +1,5 @@
 import { Button, Card, Chip } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import nodeSvg from '@/assets/images/backgrounds/node.svg';
@@ -8,6 +9,7 @@ import searchSvg from '@/assets/images/backgrounds/search.svg';
 import styles from './style.module.less';
 
 function Home() {
+  const { t } = useTranslation('shell');
   const navigate = useNavigate();
 
   return (
@@ -16,25 +18,22 @@ function Home() {
         <div className={styles.container}>
           <div className={styles.heroGrid}>
             <div className={styles.heroCopy}>
-              <span className={styles.heroEyebrow}>学术英语 · AI 赋能</span>
+              <span className={styles.heroEyebrow}>{t('home.eyebrow')}</span>
               <h1 id="landing-hero-title" className={styles.heroTitle}>
                 WisePen
               </h1>
-              <p className={styles.heroSubtitle}>学术英语写作 AI + 教学平台</p>
-              <p className={styles.heroLead}>
-                专为高校教学与科研团队打造。集成智能写作辅助，AI
-                Agent工作流与深度文稿评估，赋能师生智慧教学与应用。
-              </p>
+              <p className={styles.heroSubtitle}>{t('home.subtitle')}</p>
+              <p className={styles.heroLead}>{t('home.lead')}</p>
               <div className={styles.heroActions}>
                 <Button
                   variant="primary"
                   className={styles.heroCta}
                   onPress={() => navigate('/register')}
                 >
-                  注册
+                  {t('home.nav.register')}
                 </Button>
                 <Button className={styles.heroCta} onPress={() => navigate('/login')}>
-                  登录
+                  {t('home.nav.login')}
                 </Button>
               </div>
             </div>
@@ -51,14 +50,12 @@ function Home() {
         <div className={styles.container}>
           <header className={styles.sectionHead}>
             <Chip size="sm" variant="soft" className={styles.sectionTag}>
-              <Chip.Label>产品能力</Chip.Label>
+              <Chip.Label>{t('home.capabilities')}</Chip.Label>
             </Chip>
             <h2 id="landing-features-title" className={styles.sectionTitle}>
-              三大核心模块
+              {t('home.modulesTitle')}
             </h2>
-            <p className={styles.sectionLead}>
-              从构思到成稿、从互动到反馈，覆盖学术写作关键链路；可按教学与课题组场景灵活组合使用。
-            </p>
+            <p className={styles.sectionLead}>{t('home.modulesLead')}</p>
           </header>
 
           <div className={styles.cardsGrid}>
@@ -67,10 +64,8 @@ function Home() {
                 <img alt="" src={nodeSvg} className={styles.cardCover} />
               </div>
               <Card.Content className={styles.cardBody}>
-                <h3 className={styles.cardTitle}>论文写作</h3>
-                <p className={styles.cardDescription}>
-                  结构化辅助与素材组织，贴合学术论文写作流程。
-                </p>
+                <h3 className={styles.cardTitle}>{t('home.writing.title')}</h3>
+                <p className={styles.cardDescription}>{t('home.writing.description')}</p>
               </Card.Content>
             </Card>
             <Card className={styles.featureCard}>
@@ -78,10 +73,8 @@ function Home() {
                 <img alt="" src={relationSvg} className={styles.cardCover} />
               </div>
               <Card.Content className={styles.cardBody}>
-                <h3 className={styles.cardTitle}>AI 对话</h3>
-                <p className={styles.cardDescription}>
-                  针对术语、句式与逻辑的多轮对话，即时澄清写作疑点。
-                </p>
+                <h3 className={styles.cardTitle}>{t('home.chat.title')}</h3>
+                <p className={styles.cardDescription}>{t('home.chat.description')}</p>
               </Card.Content>
             </Card>
             <Card className={styles.featureCard}>
@@ -89,10 +82,8 @@ function Home() {
                 <img alt="" src={polylineSvg} className={styles.cardCover} />
               </div>
               <Card.Content className={styles.cardBody}>
-                <h3 className={styles.cardTitle}>写作质量评估</h3>
-                <p className={styles.cardDescription}>
-                  从清晰度、一致性与学术规范等维度给出可操作的改进建议。
-                </p>
+                <h3 className={styles.cardTitle}>{t('home.evaluation.title')}</h3>
+                <p className={styles.cardDescription}>{t('home.evaluation.description')}</p>
               </Card.Content>
             </Card>
           </div>

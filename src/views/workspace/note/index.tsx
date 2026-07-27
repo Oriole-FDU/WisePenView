@@ -8,6 +8,7 @@ import {
 import { Button } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import NoteWorkspace from './_components/NoteWorkspace';
 import styles from './style.module.less';
@@ -15,22 +16,23 @@ import styles from './style.module.less';
 const NOTE_FRAME_CONFIG: ResourceHostLayoutConfig = { className: styles.pageWrap };
 
 function NoteFrame({ children }: { children: ReactNode }) {
-  useResourceHostLayoutConfig(NOTE_FRAME_CONFIG);
+  useResourceHostLayoutConfig(() => NOTE_FRAME_CONFIG, []);
   return <>{children}</>;
 }
 
 function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
+  const { t } = useTranslation('note');
   return (
     <NoteFrame>
       <div className={styles.middleOverlay}>
         <div className={styles.middleOverlayInner}>
           <ResultState
             status="warning"
-            title="无法打开笔记"
+            title={t('workspace.openFailed')}
             subTitle={subTitle}
             extra={
               <Link to="/app/drive/personal">
-                <Button variant="secondary">返回云盘</Button>
+                <Button variant="secondary">{t('workspace.backToDrive')}</Button>
               </Link>
             }
           />
@@ -41,12 +43,13 @@ function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
 }
 
 function NoteInfoLoading() {
+  const { t } = useTranslation('note');
   return (
     <NoteFrame>
       <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
         <div className={styles.middleOverlayLoading}>
           <Spin size="large" />
-          <span className={styles.middleOverlayText}>正在加载笔记信息...</span>
+          <span className={styles.middleOverlayText}>{t('workspace.loadingInfo')}</span>
         </div>
       </div>
     </NoteFrame>
@@ -54,6 +57,7 @@ function NoteInfoLoading() {
 }
 
 function NoteView({ resourceId }: { resourceId: string }) {
+  const { t } = useTranslation('note');
   const noteService = useNoteService();
   const {
     data: noteInfoDisplay,
@@ -75,12 +79,12 @@ function NoteView({ resourceId }: { resourceId: string }) {
     return <NoteInfoLoading />;
   }
   if (!noteInfoDisplay) {
-    return <NoteOpenFailure subTitle="笔记信息为空，请稍后重试" />;
+    return <NoteOpenFailure subTitle={t('workspace.emptyInfo')} />;
   }
 
   return (
     <NoteWorkspace
-      key={resourceId}
+      key={`${resourceId}:${Boolean(noteInfoDisplay.aiDiffPreview)}`}
       resourceId={resourceId}
       noteInfoDisplay={noteInfoDisplay}
       onRefreshNoteInfo={refresh}

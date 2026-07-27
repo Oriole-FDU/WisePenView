@@ -39,8 +39,6 @@ export type {
   SearchScope,
   TagQueryLogicMode,
 } from './enum';
-export { groupSearchHits } from './service/groupSearchHits';
-export type { SearchHitGroup } from './service/groupSearchHits';
 export type {
   GetGroupResourceRequest,
   GetResourcePermissionOverviewRequest,

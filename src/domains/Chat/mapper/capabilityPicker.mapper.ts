@@ -6,14 +6,13 @@ export interface CapabilityToolOption {
   label: string;
 }
 
-type CapabilityPickerItemKind = 'primary-skill' | 'external-skill' | 'tool' | 'select-other';
+type CapabilityPickerItemKind = 'primary-skill' | 'external-skill' | 'tool';
 
 interface CapabilityPickerItem {
   key: string;
   kind: CapabilityPickerItemKind;
   label: string;
   checked?: boolean;
-  sourceText?: string;
   skill?: ResourceSkillSummary;
   tool?: CapabilityToolOption;
 }
@@ -43,8 +42,6 @@ interface BuildCapabilityPickerSectionsInput {
   advancedMode: boolean;
   otherSkillGroups: SkillScopeTreeGroup[];
 }
-
-const SELECT_OTHER_KEY = '__select-other__';
 
 export function buildCapabilityPickerSections(
   input: BuildCapabilityPickerSectionsInput
@@ -95,17 +92,7 @@ export function buildCapabilityPickerSections(
         kind: 'external-skill' as const,
         label: item.displayName,
         checked: true,
-        sourceText:
-          item.groupName || item.sourceAgentLabel
-            ? ` · ${(item.groupName || item.sourceAgentLabel) ?? ''}提供`
-            : undefined,
       }));
-
-    externalItems.push({
-      key: SELECT_OTHER_KEY,
-      kind: 'select-other',
-      label: '选择其他 Skill...',
-    });
 
     sections.push({
       key: 'external-skills',

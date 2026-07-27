@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import { collectNotePrintStyles } from '../../registry';
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
@@ -224,7 +225,7 @@ function buildPrintDocument(
   const titleRoot = options?.titleRoot ?? null;
 
   const titleEl = doc.createElement('title');
-  titleEl.textContent = titleText || '笔记';
+  titleEl.textContent = titleText || i18n.t('export.printDocumentTitle', { ns: 'note' });
   doc.head.appendChild(titleEl);
 
   const styleEl = doc.createElement('style');
@@ -271,7 +272,7 @@ export async function printNotePdfViaBrowser(
   }
 
   const iframe = document.createElement('iframe');
-  iframe.title = '笔记打印';
+  iframe.title = i18n.t('export.printFrameTitle', { ns: 'note' });
   iframe.setAttribute('aria-hidden', 'true');
   iframe.style.cssText = PRINT_IFRAME_STYLE;
   document.body.appendChild(iframe);

@@ -1,10 +1,12 @@
 import { Button, ColorSwatchPicker } from '@heroui/react';
 import clsx from 'clsx';
 import { Baseline } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   colorItems,
   findColorItemByPickerValue,
   getColorItem,
+  getColorItemLabel,
   type ColorKey,
 } from './colorPaletteData';
 import styles from './style.module.less';
@@ -53,7 +55,7 @@ function ColorSection({
           <ColorSwatchPicker.Item
             key={`${mode}-${item.key}`}
             color={item.value}
-            aria-label={`${title}${item.label}`}
+            aria-label={`${title}${getColorItemLabel(item)}`}
             className={({ isSelected }) =>
               clsx(styles.colorSwatchItem, isSelected && styles.colorSwatchSelected)
             }
@@ -81,11 +83,12 @@ export function ColorPaletteContent({
   onReset,
   className,
 }: ColorPaletteContentProps) {
+  const { t } = useTranslation('note');
   return (
     <div className={clsx(styles.colorPanel, className)}>
       {text ? (
         <ColorSection
-          title="字体颜色"
+          title={t('editor.color.text')}
           selectedColor={text.color}
           mode="text"
           onSelect={text.onChange}
@@ -93,7 +96,7 @@ export function ColorPaletteContent({
       ) : null}
       {background ? (
         <ColorSection
-          title="背景颜色"
+          title={t('editor.color.background')}
           selectedColor={background.color}
           mode="background"
           onSelect={background.onChange}
@@ -101,7 +104,7 @@ export function ColorPaletteContent({
       ) : null}
       {onReset ? (
         <Button variant="outline" size="sm" className={styles.resetColorButton} onPress={onReset}>
-          恢复默认
+          {t('editor.color.reset')}
         </Button>
       ) : null}
     </div>

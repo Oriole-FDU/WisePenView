@@ -1,5 +1,6 @@
 import { Button, ButtonGroup } from '@heroui/react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import type * as Y from 'yjs';
 
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
@@ -24,6 +25,7 @@ export function AiDiffBulkActions({
   visible,
   portalContainer,
 }: AiDiffBulkActionsProps) {
+  const { t } = useTranslation('note');
   if (!visible || !portalContainer) return null;
 
   const apply = (action: NoteAiDiffAction) => {
@@ -38,22 +40,22 @@ export function AiDiffBulkActions({
 
   return createPortal(
     <div className={styles.bulkActions} contentEditable={false}>
-      <ButtonGroup size="sm" aria-label="全部 AI Diff 操作">
+      <ButtonGroup size="sm" aria-label={t('aiDiff.actions')}>
         <Button
           variant="secondary"
-          aria-label="撤销全部 AI 修改"
+          aria-label={t('aiDiff.rejectAllLabel')}
           onMouseDown={preventEditorInteraction}
           onPress={() => apply('discard')}
         >
-          全部撤销
+          {t('aiDiff.rejectAll')}
         </Button>
         <Button
           variant="primary"
-          aria-label="保留全部 AI 修改"
+          aria-label={t('aiDiff.acceptAllLabel')}
           onMouseDown={preventEditorInteraction}
           onPress={() => apply('accept')}
         >
-          全部保留
+          {t('aiDiff.acceptAll')}
         </Button>
       </ButtonGroup>
     </div>,

@@ -42,21 +42,6 @@
   box-sizing: border-box;
 }
 
-.footerSlot {
-  flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
-  width: 100%;
-  margin-top: calc(-1 * var(--space-lg));
-  padding-top: var(--space-lg);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--chat-shell-bg, var(--surface)) 0%, transparent) 0%,
-    var(--chat-shell-bg, var(--surface)) 20%
-  );
-}
-
 .welcomeItem {
   flex: 1 1 auto;
   min-height: 100%;
@@ -120,13 +105,12 @@
   }
 }
 
-/* 历史提问：右侧垂直居中 FloatingToc 横条轨 */
+  /* 历史提问：右侧垂直居中 FloatingToc 横条轨（尺寸由 ChatPanel CSS 变量控制） */
 .historyNavigator {
-  --history-nav-bar-width: 12px;
-  --history-nav-bar-active-width: 22px;
-  --history-nav-bar-height: 3px;
-  --history-nav-bar-active-height: 6px;
-  --history-nav-bar-gap: var(--space-sm);
+  --history-nav-panel-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --history-nav-panel-duration: 0.14s;
+  --history-nav-item-duration: 0.12s;
+  --history-nav-item-stagger: 0.016s;
 
   position: absolute;
   z-index: 2;
@@ -136,126 +120,261 @@
   top: 50%;
   right: var(--space-xs);
   transform: translateY(-50%);
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.historyNavigatorRailTriggerWrap {
+  position: relative;
+  z-index: 2;
+  max-height: min(50vh, 320px);
+  border-radius: var(--radius-md);
+  opacity: 1;
+  transform: translateX(0);
+  visibility: visible;
+  transition:
+    opacity 0.12s ease,
+    transform 0.14s var(--history-nav-panel-ease),
+    visibility 0s linear 0s;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+  }
 }
 
 .historyNavigatorRailTrigger {
-  position: absolute;
-  z-index: 1;
-  inset: calc(-1 * var(--space-sm));
-  inset-inline-start: calc(-1 * var(--space-lg));
-  padding: 0;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: var(--history-nav-bar-gap);
+  max-height: min(50vh, 320px);
+  padding: var(--space-sm) var(--space-xs);
   margin: 0;
   border: none;
   border-radius: var(--radius-md);
   background: transparent;
   cursor: pointer;
-  overflow-y: auto;
-  transition:
-    opacity 0.18s ease,
-    visibility 0s linear 0s;
-  .appSubtleScrollbar();
-
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-}
-
-.historyNavigatorRailOpen .historyNavigatorRailTrigger {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition-delay: 0s, 0.18s;
-}
-
-.historyNavigatorBar {
-  display: block;
-  flex-shrink: 0;
-  width: var(--history-nav-bar-width);
-  height: var(--history-nav-bar-height);
-  border-radius: var(--radius-full, 999px);
-  background: var(--border);
-  transition:
-    width 0.15s ease,
-    height 0.15s ease,
-    background-color 0.15s ease;
-
-  &[data-active='true'] {
-    width: var(--history-nav-bar-active-width);
-    height: var(--history-nav-bar-active-height);
-    background: var(--accent);
-  }
-}
-
-.historyNavigatorRailPanel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--history-nav-bar-gap);
-  box-sizing: border-box;
-  width: calc(var(--history-nav-bar-active-width) + var(--space-sm) + 2px);
-  max-width: min(240px, calc(100vw - var(--space-2xl)));
-  max-height: min(50vh, 320px);
-  padding: var(--space-sm) var(--space-xs);
-  border: 1px solid transparent;
-  border-radius: var(--radius-xl, var(--radius-lg));
-  background: transparent;
-  box-shadow: none;
   overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 1;
+  transform: translateX(0);
   scrollbar-width: none;
+  -ms-overflow-style: none;
   transition:
-    width 0.24s ease,
-    padding 0.24s ease,
-    gap 0.24s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
+    opacity 0.28s var(--history-nav-panel-ease),
+    transform 0.32s var(--history-nav-panel-ease),
+    visibility 0s linear 0s;
 
   &::-webkit-scrollbar {
     display: none;
     width: 0;
     height: 0;
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+  }
 }
 
-.historyNavigatorRailOpen .historyNavigatorRailPanel {
-  width: min(240px, calc(100vw - var(--space-2xl)));
-  padding: var(--space-md) var(--space-xs) var(--space-md) var(--space-lg);
+.historyNavigatorRailOpen .historyNavigatorRailTriggerWrap {
+  opacity: 0;
+  transform: translateX(8px);
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity 0.1s ease,
+    transform 0.12s var(--history-nav-panel-ease),
+    visibility 0s linear 0.1s;
+}
+
+.historyNavigatorRailOpen .historyNavigatorRailTrigger {
+  /* 收起动画改由 wrap 控制，避免双重淡出 */
+  opacity: 1;
+  transform: none;
+  pointer-events: none;
+  visibility: visible;
+  transition: none;
+}
+
+.historyNavigatorBar {
+  --history-nav-bar-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  display: block;
+  flex-shrink: 0;
+  width: var(--history-nav-bar-width);
+  height: var(--history-nav-bar-height);
+  border-radius: var(--radius-full, 999px);
+  background: var(--border);
+  transform-origin: right center;
+  transition:
+    width 0.32s var(--history-nav-bar-ease),
+    height 0.32s var(--history-nav-bar-ease),
+    background-color 0.32s var(--history-nav-bar-ease),
+    transform 0.32s var(--history-nav-bar-ease),
+    opacity 0.24s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+  }
+
+  &:hover {
+    width: var(--history-nav-bar-hover-width, 18px);
+    height: var(--history-nav-bar-hover-height, 5px);
+    background: color-mix(in srgb, var(--accent) 55%, var(--border));
+  }
+
+  &[data-active='true'] {
+    width: var(--history-nav-bar-active-width);
+    height: var(--history-nav-bar-active-height);
+    background: var(--accent);
+  }
+
+  &[data-active='true']:hover {
+    width: var(--history-nav-bar-active-width);
+    height: var(--history-nav-bar-active-height);
+    background: var(--accent);
+    transform: scaleX(1.06);
+  }
+}
+
+.historyNavigatorRailPanel {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-2xs, 2px);
-  border-color: var(--border-light);
-  background: var(--overlay, var(--surface));
-  box-shadow: var(--card-shadow);
+  width: max-content;
+  min-width: var(--history-nav-panel-min-width, 148px);
+  max-width: min(var(--history-nav-panel-max-width, 260px), calc(100vw - var(--space-2xl)));
+  max-height: min(50vh, 360px);
+  padding: var(--history-nav-panel-padding-block, var(--space-md))
+    var(--history-nav-panel-padding-inline, var(--space-lg));
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: var(--radius-xl, var(--radius-lg));
+  background: color-mix(in srgb, var(--overlay, var(--surface)) 88%, transparent);
+  box-shadow:
+    var(--card-shadow),
+    0 12px 40px color-mix(in srgb, var(--foreground) 8%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  transform-origin: right center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(10px);
+  transition:
+    opacity var(--history-nav-panel-duration) var(--history-nav-panel-ease),
+    transform var(--history-nav-panel-duration) var(--history-nav-panel-ease),
+    visibility 0s linear var(--history-nav-panel-duration),
+    box-shadow var(--history-nav-panel-duration) ease;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  &[data-open='true'] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0);
+    transition:
+      opacity var(--history-nav-panel-duration) var(--history-nav-panel-ease),
+      transform var(--history-nav-panel-duration) var(--history-nav-panel-ease),
+      visibility 0s linear 0s,
+      box-shadow var(--history-nav-panel-duration) ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+    transform: translateY(-50%);
+
+    &[data-open='true'] {
+      transform: translateY(-50%);
+    }
+  }
 }
 
 .historyNavigatorRailItem {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0;
+  gap: var(--history-nav-item-gap, var(--space-md));
   width: 100%;
   min-width: 0;
-  padding: 0;
+  padding: var(--history-nav-item-padding-block, var(--space-2xs))
+    var(--history-nav-item-padding-inline, var(--space-xs));
+  border-radius: var(--radius-md);
   margin: 0;
   border: none;
-  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   text-align: end;
+  opacity: 0;
+  /* 收起态藏在右侧；展开时由右向左滑入 */
+  transform: translateX(14px);
+  /* 关闭时快速收起，不拖慢 */
   transition:
-    color 0.15s ease,
-    background-color 0.15s ease,
-    font-weight 0.15s ease,
-    gap 0.24s ease,
-    padding 0.24s ease;
+    opacity 0.08s ease,
+    transform 0.08s ease;
+
+  .historyNavigatorBar {
+    transition: none;
+  }
+
+  .historyNavigatorRailPanel[data-open='true'] & {
+    opacity: 1;
+    transform: translateX(0);
+    transition:
+      opacity var(--history-nav-item-duration) ease-out,
+      transform var(--history-nav-item-duration) var(--history-nav-panel-ease);
+  }
+
+  /* 从上到下 stagger，避免内联 --history-nav-stagger-index */
+  .history-nav-stagger(@i) when (@i > 0) {
+    .historyNavigatorRailPanel[data-open='true'] &:nth-child(@{i}) {
+      transition-delay: calc((@i - 1) * var(--history-nav-item-stagger));
+    }
+    .history-nav-stagger((@i - 1));
+  }
+  .history-nav-stagger(48);
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    transform: none;
+    transition-duration: 0.01ms;
+    transition-delay: 0s !important;
+  }
 
   &:hover,
   &:focus-visible {
     color: var(--accent);
     background: var(--surface-hover, var(--surface-secondary));
 
-    .historyNavigatorRailPreview {
-      font-weight: 600;
+    .historyNavigatorBar:not([data-active='true']) {
+      width: var(--history-nav-bar-hover-width, 18px);
+      height: var(--history-nav-bar-hover-height, 5px);
+      background: color-mix(in srgb, var(--accent) 55%, var(--border));
     }
   }
 
@@ -274,33 +393,13 @@
 }
 
 .historyNavigatorRailPreview {
-  flex: 1;
   min-width: 0;
-  min-height: 0;
-  max-width: 0;
-  max-height: 0;
   overflow: hidden;
-  font-size: var(--font-size-xs);
+  font-size: var(--history-nav-preview-font-size, var(--font-size-xs));
   font-weight: 500;
-  line-height: 1.45;
-  opacity: 0;
+  line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition:
-    max-width 0.24s ease,
-    max-height 0.24s ease,
-    opacity 0.18s ease;
-}
-
-.historyNavigatorRailOpen .historyNavigatorRailItem {
-  gap: var(--space-md);
-  padding: var(--space-2xs) var(--space-xs);
-}
-
-.historyNavigatorRailOpen .historyNavigatorRailPreview {
-  max-width: 100%;
-  max-height: 2em;
-  opacity: 1;
 }
 
 .srOnly {

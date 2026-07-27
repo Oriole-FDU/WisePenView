@@ -10,6 +10,7 @@ import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { Dropdown } from '@heroui/react';
 import clsx from 'clsx';
 import { Check, Heading } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from '../style.module.less';
 import { getSelectedBlocks, stopToolbarMouseDown } from '../utils';
 import type { ButtonGroupChildProps } from './ToolbarButton';
@@ -36,6 +37,7 @@ function BlockTypeDropdownItem({
 }
 
 export function BlockTypeMenu(_buttonGroupProps: ButtonGroupChildProps) {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
   const state = useEditorState({
     editor,
@@ -75,14 +77,14 @@ export function BlockTypeMenu(_buttonGroupProps: ButtonGroupChildProps) {
     <Dropdown>
       <AppIconButton
         icon={<SelectedIcon size={20} aria-hidden="true" />}
-        label="块类型"
+        label={t('editor.blockType.label')}
         size="sm"
         overlayTrigger={<Dropdown.Trigger />}
         onMouseDown={stopToolbarMouseDown}
       />
       <Dropdown.Popover className={styles.blockTypeMenuPopover} placement="bottom start">
         <Dropdown.Menu
-          aria-label="块类型"
+          aria-label={t('editor.blockType.label')}
           className={styles.blockTypeMenu}
           selectionMode="single"
           selectedKeys={selectedInMoreHeading ? [] : [selectedItem.key]}
@@ -100,7 +102,7 @@ export function BlockTypeMenu(_buttonGroupProps: ButtonGroupChildProps) {
             <Dropdown.SubmenuTrigger>
               <Dropdown.Item
                 id="more-headings"
-                textValue="其他标题"
+                textValue={t('editor.blockType.moreHeadings')}
                 className={clsx(
                   styles.blockTypeMenuItem,
                   selectedInMoreHeading && styles.blockTypeMenuItemActive
@@ -109,12 +111,14 @@ export function BlockTypeMenu(_buttonGroupProps: ButtonGroupChildProps) {
                 <span className={styles.blockTypeMenuIcon}>
                   <Heading size={20} aria-hidden="true" />
                 </span>
-                <span className={styles.blockTypeMenuLabel}>其他标题</span>
+                <span className={styles.blockTypeMenuLabel}>
+                  {t('editor.blockType.moreHeadings')}
+                </span>
                 <Dropdown.SubmenuIndicator className={styles.blockTypeMenuCheck} />
               </Dropdown.Item>
               <Dropdown.Popover className={styles.blockTypeMenuPopover} placement="right top">
                 <Dropdown.Menu
-                  aria-label="其他标题"
+                  aria-label={t('editor.blockType.moreHeadings')}
                   className={styles.blockTypeMenu}
                   selectionMode="single"
                   selectedKeys={selectedInMoreHeading ? [selectedItem.key] : []}

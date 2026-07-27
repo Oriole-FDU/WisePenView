@@ -1,5 +1,5 @@
-import { useEffectForce } from '@/hooks/useEffectForce';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface AgentSectionNavProps {
@@ -30,11 +30,17 @@ const getActiveSectionId = (root: HTMLElement, sections: HTMLElement[]) => {
 };
 
 function AgentSectionNav({ items, scrollContainerId }: AgentSectionNavProps) {
+  const { t } = useTranslation('agent');
   const [activeId, setActiveId] = useState(items[0]?.[0] ?? '');
   const pendingNavigationRef = useRef<{ id: string; top: number } | null>(null);
 
-  /** 点击导航后的平滑滚动完成前锁定选中项，手动滚动时仍按当前位置同步。 */
-  useEffectForce(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：导航条挂载或段落集合变化时订阅滚动容器并同步当前段落。
+   * 不可替代原因：段落位置、平滑滚动进度和 scroll 事件都属于浏览器 DOM 状态。
+   * cleanup：移除滚动监听，并取消尚未执行的 animation frame 与稳定计时器。
+   */
+  useEffect(() => {
     const root = document.getElementById(scrollContainerId);
     if (!root) return;
     const sections = items
@@ -71,7 +77,6 @@ function AgentSectionNav({ items, scrollContainerId }: AgentSectionNavProps) {
       scheduleSync();
       scheduleNavigationSettle();
     };
-    const handleScrollEnd = () => settleNavigation();
     const cancelPendingNavigation = () => {
       if (!pendingNavigationRef.current) return;
       pendingNavigationRef.current = null;
@@ -84,7 +89,7 @@ function AgentSectionNav({ items, scrollContainerId }: AgentSectionNavProps) {
     resizeObserver.observe(root);
     sections.forEach((section) => resizeObserver.observe(section));
     root.addEventListener('scroll', handleScroll, { passive: true });
-    root.addEventListener('scrollend', handleScrollEnd);
+    root.addEventListener('scrollend', settleNavigation);
     root.addEventListener('wheel', cancelPendingNavigation, { passive: true });
     root.addEventListener('touchstart', cancelPendingNavigation, { passive: true });
     root.addEventListener('pointerdown', cancelPendingNavigation, { passive: true });
@@ -92,7 +97,7 @@ function AgentSectionNav({ items, scrollContainerId }: AgentSectionNavProps) {
 
     return () => {
       root.removeEventListener('scroll', handleScroll);
-      root.removeEventListener('scrollend', handleScrollEnd);
+      root.removeEventListener('scrollend', settleNavigation);
       root.removeEventListener('wheel', cancelPendingNavigation);
       root.removeEventListener('touchstart', cancelPendingNavigation);
       root.removeEventListener('pointerdown', cancelPendingNavigation);
@@ -103,8 +108,8 @@ function AgentSectionNav({ items, scrollContainerId }: AgentSectionNavProps) {
   }, [items, scrollContainerId]);
 
   return (
-    <nav className={styles.nav} aria-label="Agent 配置导航">
-      <h2>Agent配置导航</h2>
+    <nav className={styles.nav} aria-label={t('navigation.aria')}>
+      <h2>{t('navigation.title')}</h2>
       {items.map(([id, label]) => (
         <button
           key={id}

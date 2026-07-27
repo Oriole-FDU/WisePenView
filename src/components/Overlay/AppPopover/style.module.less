@@ -1,0 +1,67 @@
+.content {
+  min-width: 0;
+  max-width: calc(100vw - var(--space-xl, 32px));
+  padding: 0;
+  border: 1px solid var(--border-light, var(--border));
+  border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+  overflow: clip;
+  color: var(--overlay-foreground, var(--foreground));
+  background: var(--overlay, var(--surface));
+  box-shadow: var(--overlay-shadow, var(--card-shadow));
+}
+
+.dialog {
+  min-width: 0;
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-xs, 8px);
+  padding: var(--space-sm, 12px) var(--space-md, 16px);
+  border-bottom: 1px solid var(--separator);
+  color: var(--overlay-foreground, var(--foreground));
+  font-size: var(--font-size-sm, 14px);
+  font-weight: 600;
+  line-height: var(--line-height-sm, 20px);
+}
+
+.headerIcon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.heading {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body {
+  min-width: 0;
+  padding: var(--app-popover-content-padding, var(--space-xs, 8px));
+  background: var(--surface);
+}
+
+.bodyWithoutPadding {
+  padding: 0;
+}
+
+.dangerContent {
+  border-color: color-mix(in srgb, var(--danger) 28%, var(--border-light, var(--border)));
+}
+
+.dangerHeader {
+  border-bottom-color: color-mix(in srgb, var(--danger) 24%, var(--separator));
+  color: var(--danger-soft-foreground, var(--danger));
+  background: var(--danger-soft);
+}

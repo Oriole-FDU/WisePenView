@@ -154,7 +154,6 @@ const mapModelOption = (
   supportThinking: model.support_thinking,
   supportTools: model.support_tools,
   tags: buildModelTags(model, providerOption, index),
-  multiplier: model.billing_ratio >= 1 ? `${model.billing_ratio}x 消耗` : null,
   isDefault: model.is_active && index === 0,
   vision: model.support_vision,
   usageRank: index + 1,

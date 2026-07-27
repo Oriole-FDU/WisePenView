@@ -9,8 +9,9 @@ export const GROUP_TYPE = createEnum([
   { value: 3, key: 'PUBLIC', label: '集市组' },
 ] as const);
 
-/** 关系类型（我加入的 / 我管理的） */
-export const GROUP_ROLE_FILTER_MAP: Record<string, 'JOINED' | 'MANAGED'> = {
+/** 当前用户与小组的关系筛选 */
+export const GROUP_ROLE_FILTER_MAP: Record<string, 'ALL' | 'JOINED' | 'MANAGED'> = {
+  all: 'ALL',
   joined: 'JOINED',
   managed: 'MANAGED',
 };

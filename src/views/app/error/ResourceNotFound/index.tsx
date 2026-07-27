@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { ResultState } from '@/components/Feedback';
@@ -6,6 +7,7 @@ import LandingNavbar from '@/layouts/Home/_components/LandingNavbar';
 import styles from './style.module.less';
 
 function ResourceNotFound() {
+  const { t } = useTranslation('errors');
   const navigate = useNavigate();
 
   return (
@@ -18,22 +20,22 @@ function ResourceNotFound() {
         <ResultState
           className={styles.result}
           status="404"
-          title="页面不存在"
-          subTitle="抱歉，您访问的链接可能已失效，或页面已被移动。请返回首页或上一页继续浏览。"
+          title={t('page.notFoundTitle')}
+          subTitle={t('page.notFoundDescription')}
           extra={
             <div className={styles.actionGroup}>
               <Button variant="primary" size="lg" onPress={() => navigate('/')}>
-                返回首页
+                {t('page.backHome')}
               </Button>
               <Button size="lg" onPress={() => navigate(-1)}>
-                返回上一页
+                {t('page.backPrevious')}
               </Button>
             </div>
           }
         />
       </main>
 
-      <footer className={styles.footerMini}>WisePen · 学术英语写作平台</footer>
+      <footer className={styles.footerMini}>{t('page.footer')}</footer>
     </div>
   );
 }

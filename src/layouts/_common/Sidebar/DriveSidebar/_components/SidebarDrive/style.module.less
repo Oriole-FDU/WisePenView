@@ -176,22 +176,11 @@
     background-color 0.14s ease;
 }
 
-.createPopover {
-  padding: 0;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md, 6px);
-  background: var(--overlay);
-  box-shadow: var(--card-shadow);
-  overflow: hidden;
-}
-
 .createMenuPanel {
   display: flex;
   flex-direction: column;
   width: 176px;
-  padding: var(--space-xs, 8px);
   gap: 2px;
-  background: var(--surface);
 }
 
 .createMenuItem {
@@ -206,7 +195,7 @@
   text-align: left;
   background: transparent;
   border: 0;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--app-radius-popover-item, var(--radius-xl));
   cursor: pointer;
   transition:
     color 0.14s ease,
@@ -219,27 +208,9 @@
   }
 }
 
-.scopePopover {
-  padding: 0;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md, 6px);
-  background: var(--overlay);
-  box-shadow: var(--card-shadow);
-  overflow: hidden;
-}
-
 .scopeMenuPanel {
   width: 240px;
   max-height: 340px;
-  padding: var(--space-xs, 8px);
-  background: var(--surface);
-}
-
-.scopeMenuTitle {
-  padding: 4px 8px 6px;
-  color: var(--muted);
-  font-size: var(--font-size-sm, 12px);
-  font-weight: 500;
 }
 
 .scopeList {
@@ -263,7 +234,7 @@
   text-align: left;
   background: transparent;
   border: 0;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--app-radius-popover-item, var(--radius-xl));
   cursor: pointer;
   transition:
     color 0.14s ease,

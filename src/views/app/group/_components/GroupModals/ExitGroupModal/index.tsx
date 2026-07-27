@@ -4,6 +4,7 @@ import type { QuitGroupRequest } from '@/domains/Group';
 import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { ExitGroupModalProps } from './index.type';
 
@@ -16,6 +17,7 @@ function ExitGroupModal({
   groupId,
   onSuccess,
 }: ExitGroupModalProps) {
+  const { t } = useTranslation('group');
   const groupService = useGroupService();
   const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ function ExitGroupModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success('已退出小组');
+        toast.success(t('exit.success'));
         onSuccess?.();
         onOpenChange(false);
         navigate('/app/my-group');
@@ -40,7 +42,7 @@ function ExitGroupModal({
 
   const handleConfirm = () => {
     if (!groupId) {
-      toast.danger('小组ID不存在');
+      toast.danger(t('exit.missingId'));
       return;
     }
     runExitGroup();
@@ -51,14 +53,14 @@ function ExitGroupModal({
       type="danger"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="退出小组"
-      description="退出小组后，您将无法访问该小组的资源和历史数据，且需要重新邀请才能再次加入。"
-      confirmText="确认退出"
+      title={t('exit.title')}
+      description={t('exit.description')}
+      confirmText={t('exit.confirm')}
       onConfirm={handleConfirm}
       isConfirmLoading={loading}
       isDismissable={!loading}
     >
-      <div className={styles.exitGroupName}>将要退出：{groupName}</div>
+      <div className={styles.exitGroupName}>{t('exit.target', { name: groupName })}</div>
     </AppAlertDialog>
   );
 }

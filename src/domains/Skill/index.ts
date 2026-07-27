@@ -5,6 +5,8 @@ export { SkillServicesMap } from './mapper/SkillServices.map';
 export type {
   ForkSkillRequest,
   ISkillService,
+  MoveSkillAssetRequest,
+  MoveSkillAssetResult,
   UploadSkillAssetRequest,
   UploadSkillAssetResult,
 } from './service/index.type';

@@ -10,6 +10,7 @@ import { useRequest, useUnmount } from 'ahooks';
 import { CircleCheck, Info, Mail, ShieldUser, TriangleAlert } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import VerifyBanner from '../VerifyBanner';
 import type { AccountVerificationProps, UisOutcomeState, VerifyModalMode } from './index.type';
 import { resolveUisQrImageDataUrl } from './resolveUisQrImageDataUrl';
@@ -20,6 +21,7 @@ type VerifyFormErrors = Partial<Record<'email' | 'uisAccount' | 'uisPassword', s
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function AccountVerification({ user, onUserInfoReload }: AccountVerificationProps) {
+  const { t } = useTranslation(['profile', 'common']);
   const userService = useUserService();
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const [verifyMode, setVerifyMode] = useState<VerifyModalMode>('uis');
@@ -51,9 +53,9 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
     const trimmedEmail = email.trim();
 
     if (trimmedEmail === '') {
-      nextErrors.email = '请输入邮箱';
+      nextErrors.email = t('profile:verification.emailRequired');
     } else if (!EMAIL_PATTERN.test(trimmedEmail)) {
-      nextErrors.email = '请输入有效邮箱地址';
+      nextErrors.email = t('profile:verification.emailInvalid');
     }
 
     setVerifyFormErrors(nextErrors);
@@ -64,11 +66,11 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
     const nextErrors: VerifyFormErrors = {};
 
     if (uisAccount.trim() === '') {
-      nextErrors.uisAccount = '请输入 UIS 账号';
+      nextErrors.uisAccount = t('profile:verification.uisAccountRequired');
     }
 
     if (uisPassword === '') {
-      nextErrors.uisPassword = '请输入 UIS 密码';
+      nextErrors.uisPassword = t('profile:verification.uisPasswordRequired');
     }
 
     setVerifyFormErrors(nextErrors);
@@ -120,7 +122,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
     {
       manual: true,
       onSuccess: () => {
-        toast.success('验证邮件已发送，请查收');
+        toast.success(t('profile:verification.emailSent'));
         resetVerifyForm();
         setVerifyMode('uis');
         setVerifyModalOpen(false);
@@ -147,7 +149,10 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
         setVerifyModalOpen(false);
         endUisPolling();
         uisPollingActiveRef.current = true;
-        const toastId = toast('正在确认 UIS 认证状态…', { isLoading: true, timeout: 0 });
+        const toastId = toast(t('profile:verification.checkingUis'), {
+          isLoading: true,
+          timeout: 0,
+        });
         uisPollLoadingRef.current = () => toast.close(toastId);
         runUisPolling();
       },
@@ -227,7 +232,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
       <AppModal
         isOpen={verifyModalOpen}
         onOpenChange={handleVerifyModalOpenChange}
-        title="账号验证"
+        title={t('profile:verification.title')}
         size="md"
         isDismissable={!verifySubmitting}
         actions={
@@ -237,7 +242,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
               isDisabled={verifySubmitting}
               onPress={handleVerifyModalClose}
             >
-              取消
+              {t('common:actions.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -245,7 +250,9 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
               aria-busy={verifySubmitting || undefined}
               onPress={handleVerifySubmit}
             >
-              {verifyMode === 'email' ? '发送验证邮件' : '发起 UIS 认证'}
+              {verifyMode === 'email'
+                ? t('profile:verification.sendEmail')
+                : t('profile:verification.startUis')}
             </Button>
           </>
         }
@@ -259,13 +266,16 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
           }}
         >
           <Tabs.ListContainer className={styles.verifyModeTabsListContainer}>
-            <Tabs.List className={styles.verifyModeTabsList} aria-label="验证方式">
+            <Tabs.List
+              className={styles.verifyModeTabsList}
+              aria-label={t('profile:verification.methodAria')}
+            >
               <Tabs.Tab className={styles.verifyModeTab} id="uis">
-                复旦 UIS 验证
+                {t('profile:verification.uisTab')}
                 <Tabs.Indicator />
               </Tabs.Tab>
               <Tabs.Tab className={styles.verifyModeTab} id="email">
-                邮箱验证
+                {t('profile:verification.emailTab')}
                 <Tabs.Indicator />
               </Tabs.Tab>
             </Tabs.List>
@@ -284,7 +294,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                 </Alert.Indicator>
                 <Alert.Content>
                   <Alert.Description>
-                    请输入完整邮箱地址，系统将发送包含验证链接的邮件。
+                    {t('profile:verification.emailDescription')}
                   </Alert.Description>
                 </Alert.Content>
               </Alert>
@@ -297,12 +307,15 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                 isInvalid={verifyFormErrors.email != null}
                 name="email"
               >
-                <Label>邮箱</Label>
+                <Label>{t('profile:verification.emailLabel')}</Label>
                 <InputGroup>
                   <InputGroup.Prefix>
                     <Mail size={18} className={styles.verifyInputIcon} />
                   </InputGroup.Prefix>
-                  <InputGroup.Input type="email" placeholder="请输入完整邮箱地址" />
+                  <InputGroup.Input
+                    type="email"
+                    placeholder={t('profile:verification.emailPlaceholder')}
+                  />
                 </InputGroup>
                 <ErrorMessage>{verifyFormErrors.email}</ErrorMessage>
               </TextField>
@@ -314,9 +327,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                   <Info size={18} />
                 </Alert.Indicator>
                 <Alert.Content>
-                  <Alert.Description>
-                    使用复旦大学统一身份认证（UIS）账号与密码发起认证，请按后续提示完成验证。
-                  </Alert.Description>
+                  <Alert.Description>{t('profile:verification.uisDescription')}</Alert.Description>
                 </Alert.Content>
               </Alert>
               <TextField
@@ -328,12 +339,15 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                 isInvalid={verifyFormErrors.uisAccount != null}
                 name="uisAccount"
               >
-                <Label>UIS 账号</Label>
+                <Label>{t('profile:verification.uisAccountLabel')}</Label>
                 <InputGroup>
                   <InputGroup.Prefix>
                     <ShieldUser size={18} className={styles.verifyInputIcon} />
                   </InputGroup.Prefix>
-                  <InputGroup.Input placeholder="学工号或 UIS 账号" autoComplete="username" />
+                  <InputGroup.Input
+                    placeholder={t('profile:verification.uisAccountPlaceholder')}
+                    autoComplete="username"
+                  />
                 </InputGroup>
                 <ErrorMessage>{verifyFormErrors.uisAccount}</ErrorMessage>
               </TextField>
@@ -349,8 +363,12 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                 isInvalid={verifyFormErrors.uisPassword != null}
                 name="uisPassword"
               >
-                <Label>UIS 密码</Label>
-                <Input type="password" placeholder="UIS 密码" autoComplete="current-password" />
+                <Label>{t('profile:verification.uisPasswordLabel')}</Label>
+                <Input
+                  type="password"
+                  placeholder={t('profile:verification.uisPasswordLabel')}
+                  autoComplete="current-password"
+                />
                 <ErrorMessage>{verifyFormErrors.uisPassword}</ErrorMessage>
               </TextField>
             </>
@@ -363,10 +381,12 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
         onOpenChange={(nextOpen) => {
           if (!nextOpen) handleUisOutcomeModalClose();
         }}
-        title={uisAwaitingScan ? '请扫码完成 UIS 验证' : 'UIS 认证'}
+        title={
+          uisAwaitingScan ? t('profile:verification.scanTitle') : t('profile:verification.uisTitle')
+        }
         isDismissable={!uisAwaitingScan}
         footer={uisAwaitingScan ? null : undefined}
-        closeText="知道了"
+        closeText={t('profile:verification.acknowledge')}
       >
         {uisOutcome != null && (
           <div className={styles.uisOutcomeBody}>
@@ -378,7 +398,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                       <TriangleAlert size={18} />
                     </Alert.Indicator>
                     <Alert.Content>
-                      <Alert.Title>未返回二维码数据，请稍后重试或联系管理员</Alert.Title>
+                      <Alert.Title>{t('profile:verification.qrMissing')}</Alert.Title>
                     </Alert.Content>
                   </Alert>
                 ) : uisQrImageSrc != null ? (
@@ -388,11 +408,15 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                         <Info size={18} />
                       </Alert.Indicator>
                       <Alert.Content>
-                        <Alert.Title>请使用复旦大学 UIS 相关应用或微信等扫码完成验证。</Alert.Title>
+                        <Alert.Title>{t('profile:verification.scanHint')}</Alert.Title>
                       </Alert.Content>
                     </Alert>
                     <div className={styles.uisQrWrap}>
-                      <img src={uisQrImageSrc} alt="UIS 验证二维码" className={styles.uisQrImg} />
+                      <img
+                        src={uisQrImageSrc}
+                        alt={t('profile:verification.qrAlt')}
+                        className={styles.uisQrImg}
+                      />
                     </div>
                   </>
                 ) : (
@@ -401,10 +425,9 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                       <TriangleAlert size={18} />
                     </Alert.Indicator>
                     <Alert.Content>
-                      <Alert.Title>二维码图片数据无效</Alert.Title>
+                      <Alert.Title>{t('profile:verification.qrInvalid')}</Alert.Title>
                       <Alert.Description>
-                        服务端应返回 PNG 或 JPEG 的 base64 编码字符串；也可使用
-                        data:image/png;base64, 前缀格式。
+                        {t('profile:verification.qrInvalidDescription')}
                       </Alert.Description>
                     </Alert.Content>
                   </Alert>
@@ -416,7 +439,7 @@ function AccountVerification({ user, onUserInfoReload }: AccountVerificationProp
                   <CircleCheck size={18} />
                 </Alert.Indicator>
                 <Alert.Content>
-                  <Alert.Title>认证成功</Alert.Title>
+                  <Alert.Title>{t('profile:verification.success')}</Alert.Title>
                   {uisOutcome.message.trim() !== '' ? (
                     <Alert.Description>{uisOutcome.message}</Alert.Description>
                   ) : null}

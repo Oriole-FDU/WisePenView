@@ -10,7 +10,7 @@ export type AppHeaderNavKey = (typeof APP_HEADER_NAV_KEY)[keyof typeof APP_HEADE
 
 interface AppHeaderNavItem {
   key: AppHeaderNavKey;
-  label: string;
+  labelKey: string;
   icon: LucideIcon;
   routePrefixes: readonly string[];
 }
@@ -18,19 +18,19 @@ interface AppHeaderNavItem {
 export const APP_HEADER_NAV_ITEMS: readonly AppHeaderNavItem[] = [
   {
     key: APP_HEADER_NAV_KEY.CHAT,
-    label: '新建对话',
+    labelKey: 'navigation.newChat',
     icon: MessageSquarePlus,
     routePrefixes: ['/app/chat'],
   },
   {
     key: APP_HEADER_NAV_KEY.DRIVE,
-    label: '文档与云盘',
+    labelKey: 'navigation.drive',
     icon: FileText,
     routePrefixes: ['/app/drive', '/app/workspace'],
   },
   {
     key: APP_HEADER_NAV_KEY.GROUP,
-    label: '我的小组',
+    labelKey: 'navigation.groups',
     icon: Users,
     routePrefixes: ['/app/my-group'],
   },

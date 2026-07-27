@@ -4,6 +4,7 @@ import type { TagResourceAction } from '@/domains/Tag';
 /** GroupService 接口：供依赖注入使用 */
 export interface IGroupService {
   fetchGroupList(params: FetchGroupListRequest): Promise<{ groups: Group[]; total: number }>;
+  fetchAllMyGroups(): Promise<Group[]>;
   fetchGroupBaseInfo(groupId: string): Promise<GroupBaseInfo>;
   fetchGroupInfo(groupId: string): Promise<Group>;
   getGroupWalletInfo(params: GetGroupWalletInfoRequest): Promise<number>;
@@ -35,7 +36,7 @@ export interface GetGroupWalletInfoRequest {
 
 /** 获取小组列表请求参数 */
 export interface FetchGroupListRequest {
-  groupRoleFilter: 'JOINED' | 'MANAGED';
+  groupRoleFilter: 'ALL' | 'JOINED' | 'MANAGED';
   page: number;
   size: number;
 }

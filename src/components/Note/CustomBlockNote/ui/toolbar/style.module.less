@@ -71,6 +71,17 @@
   margin-right: var(--space-xs);
 }
 
+.formPopover {
+  width: min(320px, calc(100vw - var(--space-xl)));
+}
+
+.formPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 /* BlockNote formatting toolbar — accent background on active/hover buttons */
 :global(.bn-formatting-toolbar) {
   /* Active/pressed button state */

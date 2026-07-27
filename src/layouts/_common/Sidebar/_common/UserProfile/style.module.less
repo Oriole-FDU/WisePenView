@@ -58,6 +58,18 @@
   background: var(--surface-tertiary) !important;
 }
 
+.profileMenuItem:global(.menu-item--danger) {
+  color: var(--danger-soft-foreground, var(--danger));
+}
+
+.profileMenuItem:global(.menu-item--danger)[data-hovered],
+.profileMenuItem:global(.menu-item--danger)[data-focused],
+.profileMenu :global(.menu-item--danger[data-hovered]),
+.profileMenu :global(.menu-item--danger[data-focused]) {
+  color: var(--danger-soft-foreground, var(--danger));
+  background: var(--danger-soft) !important;
+}
+
 .aboutContent {
   display: flex;
   flex-direction: column;

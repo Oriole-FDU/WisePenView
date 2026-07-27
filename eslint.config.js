@@ -5,11 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
-const reactUseEffectImportRule = {
-  name: 'react',
-  importNames: ['useEffect'],
+const ahooksUpdateEffectImportRule = {
+  name: 'ahooks',
+  importNames: ['useUpdateEffect'],
   message:
-    '项目约定禁止使用 useEffect，请改为事件驱动、显式回调或拆解为 ahooks 的 useMount、useUnmount、useUpdateEffect。',
+    'useUpdateEffect 只是跳过首次执行，不能替代副作用设计；请改为事件驱动、渲染期派生、useRequest 或有带 @wisepen-manual-effect 标记完整说明的 useEffect。',
 };
 
 const reactFcImportRule = {
@@ -98,12 +98,11 @@ const buildRestrictedImportsRule = ({
   allowDirectAxios = false,
   allowDomainApiFunction = false,
   allowOverlayPrimitive = false,
-  allowReactUseEffect = false,
   allowServiceFactory = false,
   allowServiceMock = false,
 } = {}) => {
   const paths = [
-    ...(allowReactUseEffect ? [] : [reactUseEffectImportRule]),
+    ahooksUpdateEffectImportRule,
     reactFcImportRule,
     ...(allowOverlayPrimitive
       ? []
@@ -120,6 +119,113 @@ const buildRestrictedImportsRule = ({
   ];
 
   return ['error', { paths, patterns }];
+};
+
+const requireManualEffectJSDocRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: '要求 useEffect 说明执行时机、不可替代原因和 cleanup',
+    },
+    schema: [],
+    messages: {
+      missing:
+        'useEffect 上方必须紧邻中文 JSDoc，并包含 @wisepen-manual-effect、“执行时机：”“不可替代原因：”“cleanup：”。',
+    },
+  },
+  create(context) {
+    const sourceCode = context.sourceCode;
+    return {
+      CallExpression(node) {
+        if (node.callee.type !== 'Identifier' || node.callee.name !== 'useEffect') return;
+        const statement = node.parent?.type === 'ExpressionStatement' ? node.parent : node;
+        const comment = sourceCode.getCommentsBefore(statement).at(-1);
+        const isAdjacent =
+          comment?.loc?.end.line != null &&
+          statement.loc?.start.line != null &&
+          statement.loc.start.line - comment.loc.end.line <= 1;
+        const commentText = comment?.value ?? '';
+        const isValid =
+          comment?.type === 'Block' &&
+          commentText.startsWith('*') &&
+          isAdjacent &&
+          ['@wisepen-manual-effect', '执行时机：', '不可替代原因：', 'cleanup：'].every((field) =>
+            commentText.includes(field)
+          );
+        if (!isValid) {
+          context.report({ node, messageId: 'missing' });
+        }
+      },
+    };
+  },
+};
+
+const requireManualMemoJSDocRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: '要求 useMemo/useCallback 说明必要性、收益和失效条件',
+    },
+    schema: [],
+    messages: {
+      missing:
+        'useMemo/useCallback 上方必须紧邻中文 JSDoc，并包含 @wisepen-manual-memo、“为什么：”“收益：”“失效条件：”。',
+    },
+  },
+  create(context) {
+    const sourceCode = context.sourceCode;
+    const statementTypes = new Set([
+      'ExpressionStatement',
+      'VariableDeclaration',
+      'ReturnStatement',
+      'AssignmentExpression',
+    ]);
+
+    const getStatement = (node) => {
+      let current = node;
+      while (current.parent && !statementTypes.has(current.parent.type)) {
+        current = current.parent;
+      }
+      return current.parent ?? node;
+    };
+
+    return {
+      CallExpression(node) {
+        if (
+          node.callee.type !== 'Identifier' ||
+          !['useMemo', 'useCallback'].includes(node.callee.name)
+        ) {
+          return;
+        }
+
+        const statement = getStatement(node);
+        const comment = sourceCode.getCommentsBefore(statement).at(-1);
+        const isAdjacent =
+          comment?.loc?.end.line != null &&
+          statement.loc?.start.line != null &&
+          statement.loc.start.line - comment.loc.end.line <= 1;
+        const commentText = comment?.value ?? '';
+        const isValid =
+          comment?.type === 'Block' &&
+          commentText.startsWith('*') &&
+          isAdjacent &&
+          ['@wisepen-manual-memo', '为什么：', '收益：', '失效条件：'].every((field) =>
+            commentText.includes(field)
+          );
+
+        if (!isValid) {
+          context.report({ node, messageId: 'missing' });
+        }
+      },
+    };
+  },
+};
+
+const wisePenPlugin = {
+  rules: {
+    'require-manual-effect-jsdoc': requireManualEffectJSDocRule,
+    'require-manual-memo-jsdoc': requireManualMemoJSDocRule,
+  },
 };
 
 const projectRestrictedSyntaxRules = [
@@ -167,6 +273,9 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    plugins: {
+      wisepen: wisePenPlugin,
+    },
     rules: {
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
@@ -182,10 +291,28 @@ export default defineConfig([
           object: 'React',
           property: 'useEffect',
           message:
-            '项目约定禁止使用 useEffect，请改为事件驱动、显式回调或拆解为 ahooks 的 useMount、useUnmount、useUpdateEffect。',
+            '请命名导入 useEffect，并在调用点写带 @wisepen-manual-effect 标记的完整中文 JSDoc。',
+        },
+        {
+          object: 'React',
+          property: 'useCallback',
+          message: '请命名导入 useCallback，并在调用点写带 @wisepen-manual-memo 标记的中文 JSDoc。',
+        },
+        {
+          object: 'React',
+          property: 'useMemo',
+          message: '请命名导入 useMemo，并在调用点写带 @wisepen-manual-memo 标记的中文 JSDoc。',
+        },
+        {
+          object: 'ahooks',
+          property: 'useUpdateEffect',
+          message:
+            '项目禁止 ahooks.useUpdateEffect；请改为事件驱动、渲染期派生、useRequest 或有带 @wisepen-manual-effect 标记完整说明的 useEffect。',
         },
       ],
       'no-restricted-syntax': ['error', ...projectRestrictedSyntaxRules],
+      'wisepen/require-manual-effect-jsdoc': 'error',
+      'wisepen/require-manual-memo-jsdoc': 'error',
     },
   },
   {
@@ -215,18 +342,11 @@ export default defineConfig([
   },
   {
     // 全局搜索是 command palette 形态，允许直接使用底层 Modal。
-    files: ['src/components/Drive/GlobalSearch/SearchModal/**/*.{ts,tsx}'],
+    files: [
+      'src/layouts/_common/Sidebar/AppSidebar/_components/GlobalSearch/SearchModal/**/*.{ts,tsx}',
+    ],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({ allowOverlayPrimitive: true }),
-    },
-  },
-  {
-    // 全局禁止 useEffect，只有统一封装入口允许直接调用原生 useEffect。
-    // 请勿删除此白名单，否则 useEffectForce 无法工作。
-    files: ['src/hooks/useEffectForce.ts'],
-    rules: {
-      'no-restricted-imports': buildRestrictedImportsRule({ allowReactUseEffect: true }),
-      'no-restricted-properties': 'off',
     },
   },
   {

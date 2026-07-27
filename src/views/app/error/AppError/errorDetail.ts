@@ -1,6 +1,9 @@
 import { isRouteErrorResponse } from 'react-router-dom';
 
+import i18n from '@/i18n';
 import { isWisePenError } from '@/utils/error';
+
+const detailLabel = (key: string): string => i18n.t(`detail.${key}`, { ns: 'errors' });
 
 const getStackLocation = (stack: string | undefined): string | undefined => {
   if (!stack) {
@@ -72,51 +75,57 @@ const appendError = (
   }
   seenErrors.add(error);
 
-  lines.push(`错误类型: ${error.name || 'Error'}`, `错误消息: ${error.message}`);
+  lines.push(
+    `${detailLabel('type')}: ${error.name || 'Error'}`,
+    `${detailLabel('message')}: ${error.message}`
+  );
 
   const stackLocation = getStackLocation(error.stack);
   if (stackLocation) {
-    lines.push(`报错位置: ${stackLocation}`);
+    lines.push(`${detailLabel('location')}: ${stackLocation}`);
   }
 
   if (isWisePenError(error)) {
-    lines.push(`错误代码: ${error.code}`, `错误来源: ${error.source}`);
+    lines.push(
+      `${detailLabel('code')}: ${error.code}`,
+      `${detailLabel('source')}: ${error.source}`
+    );
 
     if (error.serverMsg && error.serverMsg !== error.message) {
-      lines.push(`服务端信息: ${error.serverMsg}`);
+      lines.push(`${detailLabel('serverMessage')}: ${error.serverMsg}`);
     }
 
     if (error.meta) {
-      lines.push(`附加信息: ${serializeValue(error.meta)}`);
+      lines.push(`${detailLabel('metadata')}: ${serializeValue(error.meta)}`);
     }
   }
 
   if (error.stack) {
-    lines.push('', '调用栈:', error.stack);
+    lines.push('', `${detailLabel('stack')}:`, error.stack);
   }
 
   if (error.cause instanceof Error) {
-    appendError(lines, error.cause, '原始异常', seenErrors);
+    appendError(lines, error.cause, detailLabel('cause'), seenErrors);
   } else if (error.cause !== undefined) {
-    lines.push('', '原始异常:', serializeValue(error.cause));
+    lines.push('', `${detailLabel('cause')}:`, serializeValue(error.cause));
   }
 };
 
 export const buildErrorDetail = (error: unknown, pathname: string, errorId: string): string => {
-  const lines = [`错误编号: ${errorId}`, `页面模块: ${pathname}`];
+  const lines = [`${detailLabel('errorId')}: ${errorId}`, `${detailLabel('page')}: ${pathname}`];
 
   if (isRouteErrorResponse(error)) {
     lines.push(
-      '错误类型: RouteErrorResponse',
-      `HTTP 状态: ${error.status}${error.statusText ? ` ${error.statusText}` : ''}`
+      `${detailLabel('type')}: RouteErrorResponse`,
+      `${detailLabel('httpStatus')}: ${error.status}${error.statusText ? ` ${error.statusText}` : ''}`
     );
 
     if (!import.meta.env.DEV) return lines.join('\n');
 
     if (error.data instanceof Error) {
-      appendError(lines, error.data, '响应异常');
+      appendError(lines, error.data, detailLabel('responseError'));
     } else if (error.data !== undefined) {
-      lines.push(`响应数据: ${serializeValue(error.data)}`);
+      lines.push(`${detailLabel('responseData')}: ${serializeValue(error.data)}`);
     }
 
     return lines.join('\n');
@@ -124,9 +133,12 @@ export const buildErrorDetail = (error: unknown, pathname: string, errorId: stri
 
   if (error instanceof Error) {
     if (!import.meta.env.DEV) {
-      lines.push(`错误类型: ${error.name || 'Error'}`);
+      lines.push(`${detailLabel('type')}: ${error.name || 'Error'}`);
       if (isWisePenError(error)) {
-        lines.push(`错误代码: ${error.code}`, `错误来源: ${error.source}`);
+        lines.push(
+          `${detailLabel('code')}: ${error.code}`,
+          `${detailLabel('source')}: ${error.source}`
+        );
       }
       return lines.join('\n');
     }
@@ -134,9 +146,9 @@ export const buildErrorDetail = (error: unknown, pathname: string, errorId: stri
     return lines.join('\n');
   }
 
-  lines.push('错误类型: Unknown');
+  lines.push(`${detailLabel('type')}: Unknown`);
   if (import.meta.env.DEV) {
-    lines.push(`错误内容: ${serializeValue(error)}`);
+    lines.push(`${detailLabel('content')}: ${serializeValue(error)}`);
   }
   return lines.join('\n');
 };

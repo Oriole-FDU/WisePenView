@@ -8,10 +8,10 @@ export const PAGE_SIZE = 20;
 
 export type TxTabKey = 'all' | 'recharge' | 'spend';
 
-export const TX_TABS: { key: TxTabKey; label: string }[] = [
-  { key: 'all', label: '全部' },
-  { key: 'recharge', label: '充值' },
-  { key: 'spend', label: '消费' },
+export const TX_TABS: { key: TxTabKey; labelKey: string }[] = [
+  { key: 'all', labelKey: 'transaction.tabs.all' },
+  { key: 'recharge', labelKey: 'transaction.tabs.recharge' },
+  { key: 'spend', labelKey: 'transaction.tabs.spend' },
 ];
 
 export const tabToListType = (key: TxTabKey): number | undefined => {

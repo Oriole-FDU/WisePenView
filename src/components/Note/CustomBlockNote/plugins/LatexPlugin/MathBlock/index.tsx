@@ -7,11 +7,10 @@ import type {
   StyleSchema,
 } from '@blocknote/core';
 import { createReactBlockSpec } from '@blocknote/react';
-import type { ComponentType } from 'react';
-import { useCallback, useRef, useState } from 'react';
-
-import { useEffectForce } from '@/hooks/useEffectForce';
 import 'katex/dist/katex.min.css';
+import type { ComponentType } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import popoverStyles from '../InlineMath/style.module.less';
 import { renderKatexInto } from '../katexRender';
@@ -57,7 +56,13 @@ type MathBlockRenderProps = {
 function MathFormulaPreview({ expression, className }: { expression: string; className: string }) {
   const mathRef = useRef<HTMLDivElement>(null);
 
-  useEffectForce(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：块级公式表达式变化后重新渲染 KaTeX DOM。
+   * 不可替代原因：KaTeX 通过命令式 API 写入真实 DOM，不能由 React JSX 直接表达。
+   * cleanup：下一次渲染会覆盖旧内容，没有订阅或异步任务需要清理。
+   */
+  useEffect(() => {
     const el = mathRef.current;
     if (!el) return;
     renderKatexInto(el, expression, styles.mathPlaceholder, true);
@@ -67,6 +72,7 @@ function MathFormulaPreview({ expression, className }: { expression: string; cla
 }
 
 function MathBlockView(props: MathBlockRenderProps) {
+  const { t } = useTranslation('note');
   const readOnly = useNoteEditorReadOnlyContext();
   const [isEditing, setIsEditing] = useState(false);
   const isEditingRef = useRef(false);
@@ -82,11 +88,11 @@ function MathBlockView(props: MathBlockRenderProps) {
     width: number;
   } | null>(null);
 
-  const clearPopoverPos = useCallback(() => {
+  const clearPopoverPos = () => {
     setPopoverPos(null);
-  }, []);
+  };
 
-  const measurePopoverPosition = useCallback(() => {
+  const measurePopoverPosition = () => {
     const el = shellRef.current;
     if (!el) {
       return false;
@@ -100,29 +106,32 @@ function MathBlockView(props: MathBlockRenderProps) {
     const estHeight = 220;
     setPopoverPos(computeLatexPopoverPlacement(r, { minWidth: minW, maxWidth: maxW, estHeight }));
     return true;
-  }, []);
+  };
 
   useLatexPopoverAnchorSync(isEditing, shellRef, measurePopoverPosition, clearPopoverPos);
 
-  // TODO: 重构，不使用useEffect，使用更合适的语义以增加可读性，但是latexSupport有完全重构的可能，因此暂时保留
-  useEffectForce(() => {
-    if (isEditing) return;
-    setValue(sanitizeLatexInput(props.block.props.expression));
-  }, [props.block.props.expression, isEditing]);
-
   useFocusPopoverTextarea(isEditing, popoverPos, inputRef);
 
-  useEffectForce(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：BlockNote 块属性把 autoEdit 置为 true 后拉起一次公式编辑。
+   * 不可替代原因：该标记来自编辑器外部文档状态，还需用命令式事务消费并复位。
+   * cleanup：取消尚未消费 autoEdit 的 animation frame。
+   */
+  useEffect(() => {
     if (readOnly) return;
     if (!props.block.props.autoEdit) return;
-    openValueRef.current = sanitizeLatexInput(props.block.props.expression);
-    setValue(openValueRef.current);
-    isEditingRef.current = true;
-    setIsEditing(true);
-    props.editor.updateBlock(props.block, {
-      props: { ...props.block.props, autoEdit: false },
+    const frame = window.requestAnimationFrame(() => {
+      openValueRef.current = sanitizeLatexInput(props.block.props.expression);
+      setValue(openValueRef.current);
+      isEditingRef.current = true;
+      setIsEditing(true);
+      props.editor.updateBlock(props.block, {
+        props: { ...props.block.props, autoEdit: false },
+      });
     });
-  }, [props.block, props.block.props, props.editor]);
+    return () => window.cancelAnimationFrame(frame);
+  }, [props.block, props.block.props, props.editor, readOnly]);
 
   const focusStartOfBlockAfterMath = () => {
     const { editor, block } = props;
@@ -214,7 +223,7 @@ function MathBlockView(props: MathBlockRenderProps) {
 
   const shellClass = `${styles.mathShell} ${styles.mathShellBlock}`;
   const previewClass = styles.mathPreview;
-  const editTitle = '编辑 LaTeX（独立）';
+  const editTitle = t('latex.blockTitle');
   const canEnterEdit = !readOnly && !isEditing;
   const rootClass = canEnterEdit
     ? styles.mathRoot
@@ -225,7 +234,7 @@ function MathBlockView(props: MathBlockRenderProps) {
       visible={Boolean(isEditing && popoverPos)}
       position={popoverPos}
       title={editTitle}
-      hint="Enter 确定 · Shift+Enter 换行 · Esc 取消"
+      hint={t('latex.blockHint')}
       textareaClassName={`${popoverStyles.inlineEditTextarea} ${styles.blockPopoverTextarea}`}
       value={value}
       onValueChange={setValue}
@@ -247,7 +256,7 @@ function MathBlockView(props: MathBlockRenderProps) {
         className={rootClass}
         role={canEnterEdit ? 'button' : undefined}
         tabIndex={canEnterEdit ? 0 : -1}
-        aria-label={canEnterEdit ? '编辑独立公式' : undefined}
+        aria-label={canEnterEdit ? t('latex.blockEdit') : undefined}
         onClick={() => {
           if (canEnterEdit) enterEdit();
         }}

@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DataTableTabsProps } from './index.type';
 import styles from './style.module.less';
@@ -18,38 +18,32 @@ function DataTableTabs<T extends string>({
     width: 0,
   });
 
-  const updateIndicator = useCallback(() => {
-    const activeEl = tabRefs.current.get(activeTab);
+  useLayoutEffect(() => {
     const listEl = listRef.current;
-    if (!activeEl || !listEl) return;
-    const listRect = listEl.getBoundingClientRect();
-    const tabRect = activeEl.getBoundingClientRect();
-    setIndicatorStyle({
-      left: tabRect.left - listRect.left - listEl.clientLeft,
-      width: tabRect.width,
-    });
-  }, [activeTab]);
+    const updateIndicator = () => {
+      const activeEl = tabRefs.current.get(activeTab);
+      if (!activeEl || !listEl) return;
+      const listRect = listEl.getBoundingClientRect();
+      const tabRect = activeEl.getBoundingClientRect();
+      setIndicatorStyle({
+        left: tabRect.left - listRect.left - listEl.clientLeft,
+        width: tabRect.width,
+      });
+    };
 
-  useLayoutEffect(() => {
     updateIndicator();
-  }, [updateIndicator, tabs]);
+    const observer = new ResizeObserver(updateIndicator);
+    if (listEl) observer.observe(listEl);
+    return () => observer.disconnect();
+  }, [activeTab, tabs.length]);
 
-  useLayoutEffect(() => {
-    const handleResize = () => updateIndicator();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [updateIndicator]);
-
-  const setTabRef = useCallback(
-    (key: string) => (el: HTMLButtonElement | null) => {
-      if (el) {
-        tabRefs.current.set(key, el);
-      } else {
-        tabRefs.current.delete(key);
-      }
-    },
-    []
-  );
+  const setTabRef = (key: string) => (el: HTMLButtonElement | null) => {
+    if (el) {
+      tabRefs.current.set(key, el);
+    } else {
+      tabRefs.current.delete(key);
+    }
+  };
 
   return (
     <div className={styles.tabList} role="tablist" aria-label={resolvedAriaLabel} ref={listRef}>

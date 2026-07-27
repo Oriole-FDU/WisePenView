@@ -1,6 +1,7 @@
 import type { UserAccountProfile } from '@/domains/User';
 import { DEGREE, SEX } from '@/domains/User';
 import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
+import type { TFunction } from 'i18next';
 
 /** 从完整用户信息中取出档案字段原始值；昵称/姓名在 userInfo，其余在 userProfile。 */
 function getProfileFieldValue(
@@ -17,11 +18,18 @@ function getProfileFieldValue(
  */
 export function getProfileDisplayString(
   user: UserAccountProfile | null,
-  key: ProfileFieldKey
+  key: ProfileFieldKey,
+  t: TFunction<'profile'>
 ): string {
   const raw = getProfileFieldValue(user, key);
   if (raw === null || raw === undefined || raw === '') return '-';
-  if (key === 'sex') return SEX.getLabel(raw as number);
-  if (key === 'degreeLevel') return DEGREE.getLabel(raw as number);
+  if (key === 'sex') {
+    const enumKey = SEX.getKey(raw as number);
+    return enumKey ? t(`enum.sex.${enumKey}`) : String(raw);
+  }
+  if (key === 'degreeLevel') {
+    const enumKey = DEGREE.getKey(raw as number);
+    return enumKey ? t(`enum.degreeLevel.${enumKey}`) : String(raw);
+  }
   return String(raw);
 }

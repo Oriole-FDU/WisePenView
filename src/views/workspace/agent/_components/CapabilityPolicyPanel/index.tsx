@@ -10,7 +10,8 @@ import {
   type Key,
 } from '@heroui/react';
 import { Plus, Sparkles, Trash2, Wrench } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 export type CapabilityPolicyKind = 'tool' | 'skill';
@@ -51,12 +52,12 @@ export default function CapabilityPolicyPanel({
   disabled,
   onChange,
 }: Props) {
+  const { t } = useTranslation('agent');
   const { contains } = useFilter({ sensitivity: 'base' });
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const optionMap = useMemo(() => new Map(options.map((option) => [option.id, option])), [options]);
-  const disabledIds = useMemo(
-    () => new Set(options.filter((option) => option.disabled).map((option) => option.id)),
-    [options]
+  const optionMap = new Map(options.map((option) => [option.id, option]));
+  const disabledIds = new Set(
+    options.filter((option) => option.disabled).map((option) => option.id)
   );
   const selectedOptions = selectedIds.map(
     (id) =>
@@ -64,7 +65,7 @@ export default function CapabilityPolicyPanel({
         id,
         name: id,
         internalName: id,
-        description: '该项目暂未在可选列表中返回。',
+        description: t('capabilities.missingOption'),
       }
   );
   const Icon = kind === 'skill' ? Sparkles : Wrench;
@@ -117,12 +118,12 @@ export default function CapabilityPolicyPanel({
                     {option.internalName ? <small>{option.internalName}</small> : null}
                   </span>
                   <span className={styles.selectedDescription} title={option.description}>
-                    {option.description || '暂无描述'}
+                    {option.description || t('common.noDescription')}
                   </span>
                 </span>
                 <AppIconButton
                   icon={<Trash2 size={14} aria-hidden="true" />}
-                  label={`移除 ${option.name}`}
+                  label={t('capabilities.remove', { name: option.name })}
                   size="sm"
                   isDisabled={disabled}
                   onPress={() => remove(option.id)}
@@ -140,7 +141,7 @@ export default function CapabilityPolicyPanel({
         size="lg"
         actions={
           <Button variant="primary" onPress={() => setIsPickerOpen(false)}>
-            完成
+            {t('common.done')}
           </Button>
         }
       >
@@ -162,7 +163,8 @@ export default function CapabilityPolicyPanel({
               renderEmptyState={() => <EmptyState>{emptyText}</EmptyState>}
             >
               {options.map((option) => {
-                const helper = option.disabledReason || option.description || '暂无描述';
+                const helper =
+                  option.disabledReason || option.description || t('common.noDescription');
                 return (
                   <ListBox.Item
                     key={option.id}
@@ -178,7 +180,7 @@ export default function CapabilityPolicyPanel({
                         <strong>{option.name}</strong>
                         <small title={helper}>{helper}</small>
                       </span>
-                      {option.disabled ? <em>不可用</em> : null}
+                      {option.disabled ? <em>{t('common.unavailable')}</em> : null}
                     </span>
                     <ListBox.ItemIndicator />
                   </ListBox.Item>

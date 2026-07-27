@@ -6,6 +6,7 @@ import { Button, TextArea } from '@heroui/react';
 import { useRequest, useUnmount } from 'ahooks';
 import { ImagePlus, Send, X } from 'lucide-react';
 import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 const IMAGE_ONLY_CONTENT = '\u200B';
@@ -23,6 +24,7 @@ interface PendingImage {
 }
 
 function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemove(): void }) {
+  const { t } = useTranslation('resource');
   const [previewUrl] = useState(() => URL.createObjectURL(image.file));
   useUnmount(() => URL.revokeObjectURL(previewUrl));
 
@@ -31,7 +33,7 @@ function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemov
       <img src={previewUrl} alt={image.file.name} />
       <AppIconButton
         icon={<X size={12} aria-hidden />}
-        label={`移除图片 ${image.file.name}`}
+        label={t('comment.removeImage', { name: image.file.name })}
         size="sm"
         className={styles.removeImageButton}
         onPress={onRemove}
@@ -41,6 +43,7 @@ function PendingImagePreview({ image, onRemove }: { image: PendingImage; onRemov
 }
 
 function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: CommentComposerProps) {
+  const { t } = useTranslation(['resource', 'common']);
   const imageService = useImageService();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState('');
@@ -129,7 +132,7 @@ function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: Comment
       <div className={styles.composerActions}>
         <AppIconButton
           icon={<ImagePlus size={16} aria-hidden />}
-          label="添加图片"
+          label={t('resource:comment.addImage')}
           size="sm"
           isDisabled={submitting}
           onPress={() => imageInputRef.current?.click()}
@@ -149,12 +152,12 @@ function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: Comment
         <div className={styles.composerPrimaryActions}>
           {onCancel ? (
             <Button variant="ghost" size="sm" isDisabled={submitting} onPress={onCancel}>
-              取消
+              {t('common:actions.cancel')}
             </Button>
           ) : null}
           <AppIconButton
             icon={<Send size={15} aria-hidden />}
-            label="发布评论"
+            label={t('resource:comment.publish')}
             size="sm"
             variant="primary"
             isDisabled={!canSubmit || submitting}

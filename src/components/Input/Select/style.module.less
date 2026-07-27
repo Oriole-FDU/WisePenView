@@ -24,11 +24,7 @@
     var(--border, #e4e7ec) 90%,
     var(--surface, #ffffff) 10%
   );
-  --app-select-trigger-border-focus: color-mix(
-    in srgb,
-    var(--accent, #1e6f9f) 100%,
-    transparent
-  );
+  --app-select-trigger-border-focus: color-mix(in srgb, var(--accent, #1e6f9f) 100%, transparent);
   --app-select-trigger-border-width: 1px;
   --app-select-trigger-focus-ring-width: 1px;
   --app-select-trigger-focus-ring-color: color-mix(
@@ -118,9 +114,4 @@
 
 .select:global(.select) :global(.select__indicator) {
   color: var(--field-placeholder, var(--muted));
-}
-
-.selectPopover:global(.select__popover) {
-  border: 1px solid color-mix(in oklab, var(--border, #e4e7ec) 88%, transparent);
-  border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
 }

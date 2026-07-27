@@ -56,10 +56,6 @@ const getDisabledCategories = (): string[] =>
     .map(([category]) => category);
 
 export const DEFAULT_PDF_VIEWER_CONFIG: Record<string, unknown> = {
-  i18n: {
-    defaultLocale: 'zh-CN',
-    fallbackLocale: 'en',
-  },
   tabBar: 'never',
   documentManager: { maxDocuments: 5 },
   disabledCategories: getDisabledCategories(),

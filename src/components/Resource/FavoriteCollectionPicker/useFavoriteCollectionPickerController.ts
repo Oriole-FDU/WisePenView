@@ -3,6 +3,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface UseFavoriteCollectionPickerControllerOptions {
   resourceId: string;
@@ -15,6 +16,7 @@ export function useFavoriteCollectionPickerController({
   onConfirmed,
   onOpenChange,
 }: UseFavoriteCollectionPickerControllerOptions) {
+  const { t } = useTranslation('resource');
   const interactService = useInteractService();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showCreateInput, setShowCreateInput] = useState(false);
@@ -80,7 +82,7 @@ export function useFavoriteCollectionPickerController({
     if (loadingCreate) return;
     const collectionName = newCollectionName.trim();
     if (!collectionName) {
-      toast.warning('请输入收藏夹名称');
+      toast.warning(t('favorite.picker.nameRequired'));
       return;
     }
     createCollection(collectionName);

@@ -1,5 +1,6 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import { ArrowLeft, ArrowRight, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './AppNavigationControls.module.less';
 
 interface AppNavigationControlsProps {
@@ -19,7 +20,10 @@ function AppNavigationControls({
   onGoForward,
   onToggleSidebar,
 }: AppNavigationControlsProps) {
-  const sidebarLabel = sidebarCollapsed ? '展开侧边栏' : '收起侧边栏';
+  const { t } = useTranslation('shell');
+  const sidebarLabel = sidebarCollapsed
+    ? t('navigation.expandSidebar')
+    : t('navigation.collapseSidebar');
 
   return (
     <div className={styles.root}>
@@ -36,13 +40,13 @@ function AppNavigationControls({
       />
       <AppIconButton
         icon={<ArrowLeft size={18} aria-hidden="true" />}
-        label="后退"
+        label={t('navigation.back')}
         isDisabled={!canGoBack}
         onPress={onGoBack}
       />
       <AppIconButton
         icon={<ArrowRight size={18} aria-hidden="true" />}
-        label="前进"
+        label={t('navigation.forward')}
         isDisabled={!canGoForward}
         onPress={onGoForward}
       />

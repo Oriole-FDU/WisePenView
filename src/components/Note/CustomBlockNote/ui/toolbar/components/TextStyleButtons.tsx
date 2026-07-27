@@ -3,6 +3,7 @@ import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
 import { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   basicStyleExists,
   blockHasInlineContent,
@@ -12,16 +13,17 @@ import {
 import { ToolbarToggleButton } from './ToolbarButton';
 
 const textStyleButtons = [
-  { key: 'bold', label: '加粗', icon: Bold, strokeWidth: 2.5 },
-  { key: 'strike', label: '删除线', icon: Strikethrough },
-  { key: 'italic', label: '斜体', icon: Italic },
-  { key: 'underline', label: '下划线', icon: Underline },
-  { key: 'code', label: '行内代码', icon: Code },
+  { key: 'bold', icon: Bold, strokeWidth: 2.5 },
+  { key: 'strike', icon: Strikethrough },
+  { key: 'italic', icon: Italic },
+  { key: 'underline', icon: Underline },
+  { key: 'code', icon: Code },
 ] as const;
 
 type BasicTextStyle = (typeof textStyleButtons)[number]['key'];
 
 export function TextStyleButtons() {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
   const state = useEditorState({
     editor,
@@ -54,7 +56,7 @@ export function TextStyleButtons() {
 
   return (
     <ToggleButtonGroup
-      aria-label="文字样式"
+      aria-label={t('editor.textStyle.label')}
       selectionMode="multiple"
       selectedKeys={state.selectedKeys}
       onSelectionChange={(keys) => {
@@ -76,7 +78,7 @@ export function TextStyleButtons() {
             {index > 0 ? <ToggleButtonGroup.Separator /> : null}
             <ToolbarToggleButton
               id={item.key}
-              label={item.label}
+              label={t(`editor.textStyle.${item.key}`)}
               icon={
                 <Icon
                   size={20}

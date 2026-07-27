@@ -1,5 +1,4 @@
-import { useMount, useUnmount, useUpdateEffect } from 'ahooks';
-import { useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useContext, useEffect, useState, type ReactNode } from 'react';
 import {
   DeferredOverlayContext,
   type DeferredContentProps,
@@ -25,51 +24,51 @@ function renderDeferredContent(
   return content ?? null;
 }
 
-function useDeferredReady(isOpen: boolean, enabled: boolean, delay: number): boolean {
+function useDeferredReady(delay: number): boolean {
   const [ready, setReady] = useState(false);
-  const frameRef = useRef<number | null>(null);
-  const timerRef = useRef<number | null>(null);
 
-  const clearDeferredReady = useCallback(() => {
-    if (timerRef.current !== null) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    if (frameRef.current !== null) {
-      window.cancelAnimationFrame(frameRef.current);
-      frameRef.current = null;
-    }
-  }, []);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：已打开的浮层挂载或延迟时长变化时，安排内容挂载。
+   * 不可替代原因：计时器和动画帧是浏览器外部资源，需要跟随已打开浮层的生命周期同步。
+   * cleanup：取消未执行的计时器与动画帧，避免过期浮层写入状态。
+   */
+  useEffect(() => {
+    let frame: number | null = null;
+    const timer = window.setTimeout(
+      () => {
+        frame = window.requestAnimationFrame(() => {
+          frame = null;
+          setReady(true);
+        });
+      },
+      Math.max(0, delay)
+    );
 
-  const scheduleDeferredReady = useCallback(() => {
-    clearDeferredReady();
-    if (!enabled || !isOpen) {
-      setReady(false);
-      return;
-    }
+    return () => {
+      window.clearTimeout(timer);
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
+  }, [delay]);
 
-    timerRef.current = window.setTimeout(() => {
-      timerRef.current = null;
-      frameRef.current = window.requestAnimationFrame(() => {
-        frameRef.current = null;
-        setReady(true);
-      });
-    }, Math.max(0, delay));
-  }, [clearDeferredReady, delay, enabled, isOpen, setReady]);
+  return ready;
+}
 
-  useMount(() => {
-    scheduleDeferredReady();
-  });
+function OpenDeferredOverlayProvider({
+  children,
+  delay,
+}: Pick<DeferredOverlayProviderProps, 'children' | 'delay'>) {
+  const ready = useDeferredReady(delay);
+  const value = {
+    delay,
+    enabled: true,
+    isOpen: true,
+    ready,
+  } satisfies DeferredOverlayContextValue;
 
-  useUnmount(() => {
-    clearDeferredReady();
-  });
-
-  useUpdateEffect(() => {
-    scheduleDeferredReady();
-  }, [scheduleDeferredReady]);
-
-  return enabled ? ready : isOpen;
+  return (
+    <DeferredOverlayContext.Provider value={value}>{children}</DeferredOverlayContext.Provider>
+  );
 }
 
 export function DeferredOverlayProvider({
@@ -78,18 +77,20 @@ export function DeferredOverlayProvider({
   enabled = true,
   isOpen,
 }: DeferredOverlayProviderProps) {
-  const ready = useDeferredReady(isOpen, enabled, delay);
-  const value = useMemo<DeferredOverlayContextValue>(
-    () => ({
-      delay,
-      enabled,
-      isOpen,
-      ready,
-    }),
-    [delay, enabled, isOpen, ready]
-  );
+  if (enabled && isOpen) {
+    return <OpenDeferredOverlayProvider delay={delay}>{children}</OpenDeferredOverlayProvider>;
+  }
 
-  return <DeferredOverlayContext.Provider value={value}>{children}</DeferredOverlayContext.Provider>;
+  const value = {
+    delay,
+    enabled,
+    isOpen,
+    ready: !enabled,
+  } satisfies DeferredOverlayContextValue;
+
+  return (
+    <DeferredOverlayContext.Provider value={value}>{children}</DeferredOverlayContext.Provider>
+  );
 }
 
 export function DeferredContent({

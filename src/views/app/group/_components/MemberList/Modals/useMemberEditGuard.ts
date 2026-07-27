@@ -1,6 +1,5 @@
 import type { ROLE } from '@/domains/Group';
 import type { EnumKey } from '@/utils/enum';
-import { useMemo } from 'react';
 import {
   canEditSelectedMembers,
   canEditSelectedMembersForQuota,
@@ -26,12 +25,12 @@ export function useMemberEditGuard(
 ): { memberContainsOwner: boolean; canEdit: boolean; confirmDisabled: boolean } {
   const { checkOwner = true, forQuota = false } = options;
 
-  return useMemo(() => {
+  return (() => {
     const memberContainsOwner = members.some((m) => m.role === 'OWNER');
     const canEdit = forQuota
       ? canEditSelectedMembersForQuota(members, editableRoles as readonly EditableRoleForQuota[])
       : canEditSelectedMembers(members, editableRoles as readonly EditableRole[]);
     const confirmDisabled = checkOwner ? memberContainsOwner || !canEdit : !canEdit;
     return { memberContainsOwner, canEdit, confirmDisabled };
-  }, [members, editableRoles, checkOwner, forQuota]);
+  })();
 }

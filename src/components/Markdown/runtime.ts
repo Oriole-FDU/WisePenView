@@ -33,6 +33,9 @@ interface MarkdownRuntime {
   content: string;
   streaming: boolean;
   snapshot: MarkdownSnapshot;
+  getSnapshot: () => MarkdownSnapshot;
+  notify: () => void;
+  subscribe: (listener: () => void) => () => void;
 }
 
 function recordsEqual<T>(left: Record<string, T>, right: Record<string, T>): boolean {
@@ -88,7 +91,20 @@ export function createMarkdownRuntime(content: string, streaming: boolean): Mark
   if (!streaming) update = parser.finalize();
 
   const snapshot = createSnapshot(parser, update);
-  return { parser, content: normalizedContent, streaming, snapshot };
+  const listeners = new Set<() => void>();
+  const runtime: MarkdownRuntime = {
+    parser,
+    content: normalizedContent,
+    streaming,
+    snapshot,
+    getSnapshot: () => runtime.snapshot,
+    notify: () => listeners.forEach((listener) => listener()),
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+  return runtime;
 }
 
 /** 流式文本保持旧内容前缀时只追加差量；历史替换或重新生成时重建解析状态。 */
@@ -122,5 +138,6 @@ export function updateMarkdownRuntime(
   if (!update) return null;
 
   runtime.snapshot = createSnapshot(runtime.parser, update, runtime.snapshot);
+  runtime.notify();
   return runtime.snapshot;
 }

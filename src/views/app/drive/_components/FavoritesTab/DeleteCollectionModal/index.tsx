@@ -5,6 +5,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DeleteCollectionModalProps {
   onOpenChange: (open: boolean) => void;
@@ -19,6 +20,7 @@ function DeleteCollectionModal({
   collectionName,
   onSuccess,
 }: DeleteCollectionModalProps) {
+  const { t } = useTranslation(['resource', 'common']);
   const interactService = useInteractService();
   const [keepResources, setKeepResources] = useState(false);
   const { loading, run: remove } = useRequest(
@@ -30,7 +32,7 @@ function DeleteCollectionModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success('收藏夹已删除');
+        toast.success(t('favorite.collection.deleteSuccess'));
         onSuccess();
         onOpenChange(false);
       },
@@ -42,14 +44,16 @@ function DeleteCollectionModal({
       isOpen
       onOpenChange={onOpenChange}
       type="danger"
-      title="删除收藏夹"
-      description={`确定要删除收藏夹「${collectionName ?? '我的收藏'}」吗？此操作不可撤销。`}
-      confirmText="删除"
+      title={t('favorite.collection.deleteTitle')}
+      description={t('favorite.collection.deleteDescription', {
+        name: collectionName ?? t('favorite.picker.defaultCollectionName'),
+      })}
+      confirmText={t('actions.delete', { ns: 'common' })}
       isConfirmLoading={loading}
       onConfirm={remove}
     >
       <Checkbox isSelected={keepResources} onChange={setKeepResources}>
-        <span data-slot="label">将该收藏夹内的资源保留到我的收藏</span>
+        <span data-slot="label">{t('favorite.collection.keepResources')}</span>
       </Checkbox>
     </AppAlertDialog>
   );

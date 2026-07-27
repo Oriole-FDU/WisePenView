@@ -5,6 +5,7 @@ import { Button } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import CommentComposer from './CommentComposer';
 import ResourceCommentItem from './ResourceCommentItem';
 import styles from './style.module.less';
@@ -37,6 +38,7 @@ function ResourceCommentThread({
   onCommentsChanged,
   onPreviewImage,
 }: ResourceCommentThreadProps) {
+  const { t } = useTranslation('resource');
   const interactService = useInteractService();
   const [expanded, setExpanded] = useState(false);
   const [replies, setReplies] = useState<ResourceComment[]>([]);
@@ -116,14 +118,16 @@ function ResourceCommentThread({
           onPress={handleToggleReplies}
         >
           {expanded ? <ChevronUp size={14} aria-hidden /> : <ChevronDown size={14} aria-hidden />}
-          {expanded ? '收起回复' : `${rootComment.replyCount} 条回复`}
+          {expanded
+            ? t('comment.collapseReplies')
+            : t('comment.replyCount', { count: rootComment.replyCount })}
         </Button>
       ) : null}
 
       {expanded ? (
         <div className={styles.replyList}>
           {repliesLoading && replies.length === 0 ? (
-            <p className={styles.mutedText}>正在加载回复...</p>
+            <p className={styles.mutedText}>{t('comment.loadingReplies')}</p>
           ) : null}
           {replies.map((reply) => (
             <ResourceCommentItem
@@ -154,7 +158,7 @@ function ResourceCommentThread({
               isDisabled={repliesLoading}
               onPress={() => void loadReplies(replyPage + 1, true)}
             >
-              {repliesLoading ? '加载中...' : '更多回复'}
+              {repliesLoading ? t('comment.loadingShort') : t('comment.moreReplies')}
             </Button>
           ) : null}
         </div>
@@ -164,7 +168,7 @@ function ResourceCommentThread({
         <div className={styles.replyComposer}>
           <CommentComposer
             autoFocus
-            placeholder={`回复 ${replyTarget.author.name}`}
+            placeholder={t('comment.replyPlaceholder', { name: replyTarget.author.name })}
             onCancel={() => setReplyTarget(undefined)}
             onSubmit={handleReplySubmit}
           />

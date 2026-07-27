@@ -3,6 +3,7 @@ import { formatReadCount } from '@/utils/format/formatNumber';
 import { ToggleButton } from '@heroui/react';
 import { Bookmark, Eye, Star, ThumbsUp } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface ResourceFeedbackSummaryProps {
@@ -32,19 +33,24 @@ function ResourceFeedbackSummary({
   onRateChange,
   favoriteAction,
 }: ResourceFeedbackSummaryProps) {
+  const { t } = useTranslation('resource');
   const scoreAvgText =
-    scoreAvg != null && Number.isFinite(scoreAvg) ? `平均 ${scoreAvg.toFixed(1)} 分` : '暂无评分';
+    scoreAvg != null && Number.isFinite(scoreAvg)
+      ? t('comment.feedback.averageScore', { score: scoreAvg.toFixed(1) })
+      : t('comment.feedback.noScore');
 
   return (
     <>
-      <div className={styles.stats} aria-label="资源互动统计">
+      <div className={styles.stats} aria-label={t('comment.feedback.statsAria')}>
         <span className={styles.statItem}>
           <Eye size={14} aria-hidden />
-          <span>{formatReadCount(readCount)} 次浏览</span>
+          <span>{t('comment.feedback.viewCount', { count: formatReadCount(readCount) })}</span>
         </span>
         <span className={styles.statItem}>
           <Bookmark size={14} aria-hidden />
-          <span>{formatReadCount(favoriteCount)} 次收藏</span>
+          <span>
+            {t('comment.feedback.favoriteCount', { count: formatReadCount(favoriteCount) })}
+          </span>
         </span>
         <span className={styles.statItem}>
           <Star size={14} aria-hidden />
@@ -54,7 +60,7 @@ function ResourceFeedbackSummary({
 
       <section className={styles.feedback} aria-labelledby="resource-feedback-title">
         <h3 id="resource-feedback-title" className={styles.sectionTitle}>
-          资源反馈
+          {t('comment.feedback.title')}
         </h3>
         <div className={styles.feedbackActions}>
           {favoriteAction}
@@ -73,7 +79,7 @@ function ResourceFeedbackSummary({
             value={score}
             size="sm"
             isDisabled={ratePending}
-            ariaLabel="资源评分"
+            ariaLabel={t('comment.feedback.ratingAria')}
             onValueChange={onRateChange}
           />
         </div>

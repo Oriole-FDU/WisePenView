@@ -129,6 +129,17 @@
   background: var(--accent-soft);
 }
 
+.menuItem:global(.menu-item--danger) {
+  color: var(--danger-soft-foreground, var(--danger));
+}
+
+.menuItem:global(.menu-item--danger):hover,
+.menuItem:global(.menu-item--danger)[data-hovered],
+.menuItem:global(.menu-item--danger)[data-focused] {
+  color: var(--danger-soft-foreground, var(--danger));
+  background: var(--danger-soft);
+}
+
 .menuIcon,
 .menuTrailing {
   width: var(--control-height-sm);

@@ -1,0 +1,65 @@
+const enUSWallet = {
+  balance: {
+    label: 'Compute credit balance',
+    unit: 'credits',
+    recharge: 'Recharge',
+  },
+  recharge: {
+    personalTitle: 'Personal recharge',
+    groupTitle: 'Recharge "{{name}}"',
+    success: 'Recharge successful',
+    submitting: 'Recharging...',
+    confirm: 'Confirm recharge',
+    codeLabel: 'Voucher code',
+    invalidCode: 'Enter a 16-character voucher code',
+    hint: 'Enter the 16-character voucher code. It will be capitalized and grouped automatically.',
+  },
+  transaction: {
+    title: 'Transaction history',
+    aria: 'Transaction history',
+    typeAria: 'Transaction type',
+    empty: 'No transactions',
+    tabs: {
+      all: 'All',
+      recharge: 'Credits added',
+      spend: 'Spent',
+    },
+    columns: {
+      time: 'Time',
+      type: 'Type',
+      summary: 'Summary / note',
+      amount: 'Amount',
+      operator: 'Operator',
+    },
+    kind: {
+      recharge: 'Recharge',
+      spend: 'Spend',
+      transferIn: 'Transfer in',
+      transferOut: 'Transfer out',
+    },
+  },
+  transfer: {
+    missingGroup: 'Group information is missing',
+    intro:
+      "Voucher credits are added to the owner's personal account. Transfer credits to the group pool for member allocation, or transfer unused credits back to the owner.",
+    currentBalance: 'Current balance',
+    refresh: 'Refresh',
+    ownerBalance: "Owner's personal credits",
+    groupBalance: 'Group pool credits',
+    unit: 'credits',
+    toGroupTitle: 'Transfer to group pool',
+    toGroupAria: 'Amount to transfer to group pool',
+    toGroupConfirm: 'Transfer to group',
+    toOwnerTitle: 'Transfer back to owner',
+    toOwnerAria: 'Amount to transfer back to owner',
+    toOwnerConfirm: 'Transfer to owner',
+    amountPlaceholder: 'Amount',
+    invalidAmount: 'Enter an integer greater than 0',
+    ownerInsufficient: "The owner's personal balance is insufficient",
+    groupInsufficient: 'The group pool balance is insufficient',
+    toGroupSuccess: 'Transferred to the group pool',
+    toOwnerSuccess: "Transferred back to the owner's account",
+  },
+};
+
+export default enUSWallet;

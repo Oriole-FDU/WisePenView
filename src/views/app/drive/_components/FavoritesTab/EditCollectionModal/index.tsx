@@ -6,6 +6,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface EditCollectionModalProps {
@@ -15,6 +16,7 @@ interface EditCollectionModalProps {
 }
 
 function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollectionModalProps) {
+  const { t } = useTranslation(['resource', 'common']);
   const interactService = useInteractService();
   const isCreate = collection == null;
   const [name, setName] = useState(collection?.collectionName ?? '');
@@ -39,7 +41,9 @@ function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollec
     {
       manual: true,
       onSuccess: () => {
-        toast.success(isCreate ? '收藏夹创建成功' : '收藏夹修改成功');
+        toast.success(
+          isCreate ? t('favorite.collection.createSuccess') : t('favorite.collection.updateSuccess')
+        );
         onSuccess();
         onOpenChange(false);
       },
@@ -49,7 +53,7 @@ function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollec
 
   const handleSubmit = () => {
     if (!name.trim()) {
-      toast.warning('请输入收藏夹名称');
+      toast.warning(t('favorite.picker.nameRequired'));
       return;
     }
     submit();
@@ -59,23 +63,30 @@ function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollec
     <AppFormDialog
       isOpen
       onOpenChange={onOpenChange}
-      title={isCreate ? '新建收藏夹' : '编辑收藏夹'}
-      confirmText={isCreate ? '创建' : '保存'}
+      title={isCreate ? t('favorite.collection.createTitle') : t('favorite.collection.editTitle')}
+      confirmText={
+        isCreate ? t('actions.create', { ns: 'common' }) : t('actions.save', { ns: 'common' })
+      }
       isSubmitting={loading}
       onSubmit={handleSubmit}
     >
       <div className={styles.body}>
         <FormField
-          aria-label="收藏夹名称"
-          label="收藏夹名称"
+          aria-label={t('favorite.collection.nameLabel')}
+          label={t('favorite.collection.nameLabel')}
           value={name}
           onChange={setName}
           isRequired
         >
-          <Input placeholder="收藏夹名称（必填）" autoFocus />
+          <Input placeholder={t('favorite.collection.nameRequiredPlaceholder')} autoFocus />
         </FormField>
-        <FormField aria-label="描述" label="描述" value={description} onChange={setDescription}>
-          <TextArea placeholder="描述（可选）" rows={4} />
+        <FormField
+          aria-label={t('favorite.collection.descriptionLabel')}
+          label={t('favorite.collection.descriptionLabel')}
+          value={description}
+          onChange={setDescription}
+        >
+          <TextArea placeholder={t('favorite.collection.descriptionPlaceholder')} rows={4} />
         </FormField>
       </div>
     </AppFormDialog>

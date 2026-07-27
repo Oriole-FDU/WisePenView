@@ -1,6 +1,7 @@
 import { Button, Form, Modal } from '@heroui/react';
 import clsx from 'clsx';
 import type { FormEvent, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { AppFormDialogProps } from './index.type';
 import styles from './style.module.less';
@@ -11,8 +12,8 @@ function AppFormDialog({
   title,
   description,
   children,
-  confirmText = '确定',
-  cancelText = '取消',
+  confirmText,
+  cancelText,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -33,6 +34,7 @@ function AppFormDialog({
   footerClassName,
   classNames,
 }: AppFormDialogProps) {
+  const { t } = useTranslation('common');
   const canDismiss = isDismissable && !isSubmitting;
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -68,7 +70,7 @@ function AppFormDialog({
     return (
       <>
         <Button type="button" variant="secondary" isDisabled={isSubmitting} onPress={handleCancel}>
-          {cancelText}
+          {cancelText ?? t('actions.cancel')}
         </Button>
         <Button
           type="submit"
@@ -76,7 +78,7 @@ function AppFormDialog({
           isDisabled={isSubmitDisabled || isSubmitting}
           aria-busy={isSubmitting || undefined}
         >
-          {confirmText}
+          {confirmText ?? t('actions.confirm')}
         </Button>
       </>
     );

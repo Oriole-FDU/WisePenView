@@ -3,10 +3,12 @@ import { copyText } from '@/utils/browser/copyText';
 import { toast } from '@heroui/react';
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { InviteUserModalProps } from './index.type';
 import styles from './style.module.less';
 
 function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalProps) {
+  const { t } = useTranslation(['group', 'common']);
   const [copied, setCopied] = useState(false);
 
   const handleClose = () => {
@@ -26,24 +28,24 @@ function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalPr
     const copied = await copyText(inviteCode ?? '');
     if (copied) {
       setCopied(true);
-      toast.success('邀请码已复制到剪贴板');
+      toast.success(t('member.invite.copied'));
       return;
     }
 
-    toast.danger('复制失败，请手动复制');
+    toast.danger(t('member.invite.copyFailed'));
   };
 
   return (
     <AppDisplayDialog
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
-      title="邀请用户"
+      title={t('member.invite.title')}
       secondaryAction={{
-        label: '关闭',
+        label: t('actions.close', { ns: 'common' }),
         onPress: handleClose,
       }}
       primaryAction={{
-        label: copied ? '已复制' : '复制',
+        label: copied ? t('member.invite.copiedAction') : t('actions.copy', { ns: 'common' }),
         icon: <Copy size={16} aria-hidden="true" />,
         onPress: handleCopy,
         isDisabled: !inviteCode,
@@ -51,9 +53,9 @@ function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalPr
     >
       <div className={styles.inviteContainer}>
         <div className={styles.inviteCodeWrap}>
-          <div className={styles.inviteCode}>{inviteCode ?? '暂无邀请码'}</div>
+          <div className={styles.inviteCode}>{inviteCode ?? t('member.invite.noCode')}</div>
         </div>
-        <div className={styles.inviteHint}>分享此邀请码给其他用户，他们可以使用此码加入小组</div>
+        <div className={styles.inviteHint}>{t('member.invite.hint')}</div>
       </div>
     </AppDisplayDialog>
   );

@@ -42,7 +42,7 @@ function SelectIndicator({ className, ...props }: SelectIndicatorProps) {
 }
 
 function SelectPopover({ className, ...props }: SelectPopoverProps) {
-  return <HeroSelect.Popover className={clsx(styles.selectPopover, className)} {...props} />;
+  return <HeroSelect.Popover className={className} {...props} />;
 }
 
 const Select = Object.assign(SelectRoot, {

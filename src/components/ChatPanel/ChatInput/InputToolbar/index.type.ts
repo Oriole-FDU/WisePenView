@@ -8,7 +8,7 @@ export interface InputToolbarProps {
   injectedAgents?: ChatAgentOption[];
   preferredAgent?: ChatAgentOption | null;
   /** 侧栏窄宽时模型选择仅显示图标 */
-  modelIconOnly?: boolean;
+  modelIconOnly: boolean;
   onSend: () => void;
   onStop?: () => void;
 }

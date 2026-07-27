@@ -14,6 +14,7 @@ import {
   type TagResourceAction,
   type TagTreeNode,
 } from '@/domains/Tag';
+import i18n from '@/i18n';
 
 export type TagPermissionResourceStrategyKey = 'note' | 'file' | 'drawio' | 'aiAsset';
 
@@ -59,7 +60,9 @@ const ALL_RESOURCE_ACTIONS = TAG_RESOURCE_ACTION.options.map(
 export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[] = [
   {
     key: 'note',
-    label: '笔记',
+    get label() {
+      return i18n.t('permission.tag.strategies.note', { ns: 'resource' });
+    },
     supportedActions: [
       TAG_RESOURCE_ACTION.DISCOVER,
       TAG_RESOURCE_ACTION.VIEW,
@@ -71,12 +74,16 @@ export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[]
   },
   {
     key: 'file',
-    label: '文件',
+    get label() {
+      return i18n.t('permission.tag.strategies.file', { ns: 'resource' });
+    },
     supportedActions: ALL_RESOURCE_ACTIONS.filter((action) => action !== TAG_RESOURCE_ACTION.LOAD),
   },
   {
     key: 'drawio',
-    label: '画板',
+    get label() {
+      return i18n.t('permission.tag.strategies.drawio', { ns: 'resource' });
+    },
     supportedActions: [
       TAG_RESOURCE_ACTION.DISCOVER,
       TAG_RESOURCE_ACTION.VIEW,
@@ -86,7 +93,9 @@ export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[]
   },
   {
     key: 'aiAsset',
-    label: 'AI 资产',
+    get label() {
+      return i18n.t('permission.tag.strategies.aiAsset', { ns: 'resource' });
+    },
     supportedActions: ALL_RESOURCE_ACTIONS,
   },
 ];
@@ -95,64 +104,58 @@ export const TAG_PERMISSION_ACTION_ROWS: TagPermissionActionRow[] = TAG_PERMISSI
   (action) => ({
     action,
     key: action.key,
-    label: action.label,
+    get label() {
+      return i18n.t(`permission.actions.${action.key}`, { ns: 'resource' });
+    },
     supportedStrategyKeys: TAG_PERMISSION_RESOURCE_STRATEGIES.filter((strategy) =>
       strategy.supportedActions.includes(action.action)
     ).map((strategy) => strategy.key),
   })
 );
 
+const createTagPermissionPresetOption = (
+  key: TagPermissionPresetKey
+): TagPermissionPresetOption => ({
+  key,
+  get label() {
+    return i18n.t(`permission.tag.preset.${key}.label`, { ns: 'resource' });
+  },
+  get description() {
+    return i18n.t(`permission.tag.preset.${key}.description`, { ns: 'resource' });
+  },
+  get detail() {
+    return i18n.t(`permission.tag.preset.${key}.detail`, { ns: 'resource' });
+  },
+  values: getTagPermissionPresetValues(key),
+});
+
 export const TAG_PERMISSION_PRESETS: TagPermissionPresetOption[] = [
-  {
-    key: 'private',
-    label: '私密',
-    description: '仅所有者和管理员可访问',
-    detail: '适合草稿、归档或尚未准备公开的资料。',
-    values: getTagPermissionPresetValues('private'),
-  },
-  {
-    key: 'readonly',
-    label: '只读',
-    description: '成员可以查看，不能协作修改',
-    detail: '适合制度、手册、发布版材料。',
-    values: getTagPermissionPresetValues('readonly'),
-  },
-  {
-    key: 'shared',
-    label: '共享',
-    description: '成员可以阅读、评论和常用协作',
-    detail: '适合团队共建资料，默认不开放源文件下载。',
-    values: getTagPermissionPresetValues('shared'),
-  },
-  {
-    key: 'custom',
-    label: '自定义',
-    description: '进入高级权限表格',
-    detail: '细调标签级资源权限动作。',
-  },
+  createTagPermissionPresetOption('private'),
+  createTagPermissionPresetOption('readonly'),
+  createTagPermissionPresetOption('shared'),
+  createTagPermissionPresetOption('custom'),
 ];
 
+const createTagMountPermissionPresetOption = (
+  key: TagMountPermissionPresetKey
+): TagMountPermissionPresetOption => ({
+  key,
+  get label() {
+    return i18n.t(`permission.tag.mountPreset.${key}.label`, { ns: 'resource' });
+  },
+  get description() {
+    return i18n.t(`permission.tag.mountPreset.${key}.description`, { ns: 'resource' });
+  },
+  get detail() {
+    return i18n.t(`permission.tag.mountPreset.${key}.detail`, { ns: 'resource' });
+  },
+  values: getTagMountPermissionPresetValues(key),
+});
+
 export const TAG_MOUNT_PERMISSION_PRESETS: TagMountPermissionPresetOption[] = [
-  {
-    key: 'all',
-    label: '全部',
-    description: '所有成员可向此文件夹挂载资源',
-    detail: '适合开放协作的资料目录。',
-    values: getTagMountPermissionPresetValues('all'),
-  },
-  {
-    key: 'onlyAdmin',
-    label: '仅管理员',
-    description: '只有管理员可挂载资源',
-    detail: '适合结构固定或需要集中维护的目录。',
-    values: getTagMountPermissionPresetValues('onlyAdmin'),
-  },
-  {
-    key: 'advanced',
-    label: '高级',
-    description: '按黑名单或白名单指定成员',
-    detail: '细调谁能向该文件夹挂载资源。',
-  },
+  createTagMountPermissionPresetOption('all'),
+  createTagMountPermissionPresetOption('onlyAdmin'),
+  createTagMountPermissionPresetOption('advanced'),
 ];
 
 export const TAG_PERMISSION_ACTION_PRESET_OPTIONS: TagPermissionActionPresetOption[] =
@@ -165,7 +168,9 @@ export const TAG_PERMISSION_ACTION_PRESET_OPTIONS: TagPermissionActionPresetOpti
     } => Boolean(preset.values)
   ).map((preset) => ({
     key: preset.key,
-    label: preset.label,
+    get label() {
+      return preset.label;
+    },
     values: preset.values,
   }));
 

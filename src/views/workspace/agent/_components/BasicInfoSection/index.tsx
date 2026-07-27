@@ -1,5 +1,6 @@
 import { FormField, Input, TextArea } from '@/components/Input';
 import type { AgentSpec } from '@/domains/Agent';
+import { useTranslation } from 'react-i18next';
 import SectionShell from '../SectionShell';
 import SettingRow from '../SettingRow';
 import styles from './style.module.less';
@@ -23,16 +24,14 @@ export default function BasicInfoSection({
   onDescriptionChange,
   onSpecChange,
 }: Props) {
+  const { t } = useTranslation('agent');
+
   return (
-    <SectionShell
-      id="agent-info"
-      title="Agent Info"
-      description="填写 Agent 的内部名称和用途说明。资源标题仍由云盘管理。"
-    >
+    <SectionShell id="agent-info" title={t('basic.title')} description={t('basic.description')}>
       <div className={styles.form}>
         <FormField
           label="name"
-          description="建议使用稳定的英文名称。"
+          description={t('basic.nameHint')}
           value={name}
           isDisabled={disabled}
           onChange={onNameChange}
@@ -41,16 +40,16 @@ export default function BasicInfoSection({
         </FormField>
         <FormField
           label="description"
-          description="清晰描述有助于用户理解 Agent 的用途。"
+          description={t('basic.descriptionHint')}
           value={description}
           isDisabled={disabled}
           onChange={onDescriptionChange}
         >
-          <TextArea maxLength={500} rows={4} placeholder="概括这个 Agent 适合处理的任务" />
+          <TextArea maxLength={500} rows={4} placeholder={t('basic.descriptionPlaceholder')} />
         </FormField>
         <SettingRow
-          title="自动生成会话标题"
-          description="首次对话后，根据用户问题生成简短标题。"
+          title={t('basic.autoTitle')}
+          description={t('basic.autoTitleDescription')}
           selected={spec.autoGenerateTitle}
           disabled={disabled}
           onChange={(value) => onSpecChange({ ...spec, autoGenerateTitle: value })}

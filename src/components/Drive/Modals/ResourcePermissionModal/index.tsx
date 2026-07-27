@@ -4,6 +4,7 @@ import {
   buildResourcePermissionActionKeySet,
   buildResourcePermissionActionOptions,
   filterResourcePermissionActionsByOptions,
+  getResourcePermissionActionLabel,
   resolveResourcePermissionPolicy,
   resolveTagInheritedResourceActions,
 } from '@/components/Drive/common/resourcePermissionPolicy';
@@ -21,6 +22,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/u
 import { Button, ListBox, toast, type Selection } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ResourcePermissionModalProps } from './index.type';
 import styles from './style.module.less';
 
@@ -55,6 +57,7 @@ function ResourcePermissionModal({
   onOpenChange,
   onSuccess,
 }: ResourcePermissionModalProps) {
+  const { t } = useTranslation(['resource', 'common']);
   const resourceService = useResourceService();
   const tagService = useTagService();
   const [selectedActions, setSelectedActions] = useState<ResourceAction[]>([]);
@@ -118,9 +121,13 @@ function ResourcePermissionModal({
   );
 
   const policy = data?.policy;
-  const actionOptions = data?.overview.actionOptions.length
+  const rawActionOptions = data?.overview.actionOptions.length
     ? data.overview.actionOptions
     : buildResourcePermissionActionOptions(policy?.supportedActions ?? []);
+  const actionOptions = rawActionOptions.map((option) => ({
+    ...option,
+    label: getResourcePermissionActionLabel(option.action),
+  }));
   const selectedActionKeys = buildResourcePermissionActionKeySet(selectedActions, actionOptions);
   const draftInconsistent = Boolean(
     policy &&
@@ -202,14 +209,14 @@ function ResourcePermissionModal({
     <AppModal
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
-      title="资源权限"
+      title={t('permission.editor.title')}
       description={target?.resourceName}
       size="md"
       isDismissable={!saving}
       actions={
         <>
           <Button variant="secondary" isDisabled={saving} onPress={() => handleOpenChange(false)}>
-            取消
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button
             variant="primary"
@@ -217,14 +224,14 @@ function ResourcePermissionModal({
             aria-busy={saving || undefined}
             onPress={() => runSave()}
           >
-            保存
+            {t('actions.save', { ns: 'common' })}
           </Button>
         </>
       }
     >
       {loading ? (
         <div className={styles.state} aria-busy="true">
-          <Spin size="large" tip="加载资源权限中" />
+          <Spin size="large" tip={t('permission.editor.loading')} />
         </div>
       ) : error ? (
         <div className={styles.state}>{parseErrorMessage(error)}</div>
@@ -232,11 +239,11 @@ function ResourcePermissionModal({
         <div className={styles.content}>
           <div className={draftInconsistent ? styles.warning : styles.inheritHint}>
             {draftInconsistent
-              ? '与标签权限不一致，保存后仅对此资源生效。'
-              : '当前选择与标签权限一致，将继续继承标签策略。'}
+              ? t('permission.editor.inconsistent')
+              : t('permission.editor.inherited')}
           </div>
           <ListBox
-            aria-label="资源权限动作"
+            aria-label={t('permission.editor.actionsAria')}
             selectionMode="multiple"
             selectedKeys={selectedActionKeys}
             onSelectionChange={handleSelectionChange}
@@ -257,7 +264,7 @@ function ResourcePermissionModal({
           </ListBox>
         </div>
       ) : (
-        <div className={styles.state}>暂无资源权限配置</div>
+        <div className={styles.state}>{t('permission.editor.empty')}</div>
       )}
     </AppModal>
   );

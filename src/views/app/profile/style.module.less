@@ -1,10 +1,12 @@
 .pageContainer {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 0;
+  height: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px 32px;
+  padding: var(--space-lg) var(--space-xl);
+  box-sizing: border-box;
 }
 
 .pageHeader {
@@ -33,6 +35,14 @@
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg, 8px);
+}
+
+.usageContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 24px;
 }
 
 .sectionTitle {

@@ -43,20 +43,6 @@ const getModels = async (): Promise<ChatModel[]> => {
   return ChatServicesMap.mapGetModelsFromApi(data);
 };
 
-const fetchAllGroups = async (deps: ChatServiceDeps): Promise<Group[]> => {
-  const [joinedData, managedData] = await Promise.all([
-    deps.groupService.fetchGroupList({ groupRoleFilter: 'JOINED', page: 1, size: 100 }),
-    deps.groupService.fetchGroupList({ groupRoleFilter: 'MANAGED', page: 1, size: 100 }),
-  ]);
-
-  const seenGroupIds = new Set<string>();
-  return [...(joinedData?.groups ?? []), ...(managedData?.groups ?? [])].filter((group) => {
-    if (seenGroupIds.has(group.groupId)) return false;
-    seenGroupIds.add(group.groupId);
-    return true;
-  });
-};
-
 const fetchAllSkills = async (
   deps: ChatServiceDeps,
   groups: Group[]
@@ -145,7 +131,7 @@ const fetchAllAgents = async (
 };
 
 const getWorkspace = async (deps: ChatServiceDeps): Promise<ChatWorkspace> => {
-  const groups = await fetchAllGroups(deps);
+  const groups = await deps.groupService.fetchAllMyGroups();
   const [skills, agentData] = await Promise.all([
     fetchAllSkills(deps, groups),
     fetchAllAgents(deps, groups),

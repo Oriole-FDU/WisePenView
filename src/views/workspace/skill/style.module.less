@@ -1,5 +1,6 @@
 .pageWrap {
   min-height: 0;
+  min-width: 0;
 }
 
 .toolbarSaveStatus {
@@ -320,7 +321,7 @@
 
 .configDescriptionInput {
   min-height: 160px;
-  max-height: max(160px, min(560px, calc(100dvh - 440px)));
+  max-height: max(160px, min(560px, calc(100dvh - var(--layout-drive-chrome-height, 240px) - 200px)));
   field-sizing: content;
   overflow-y: auto;
   resize: vertical;

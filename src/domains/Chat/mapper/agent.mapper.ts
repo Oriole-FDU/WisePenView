@@ -2,12 +2,11 @@ import type { ResourceItem } from '@/domains/Resource';
 import type { ChatAgentOption } from '../entity/agent';
 
 const DEFAULT_PERSONAL_AGENT_ID = 'agent-personal-default';
-const DEFAULT_PERSONAL_AGENT_LABEL = '默认Agent';
 
 export const buildDefaultPersonalAgent = (): ChatAgentOption => ({
   agentId: DEFAULT_PERSONAL_AGENT_ID,
   agentType: 'PERSONAL',
-  label: DEFAULT_PERSONAL_AGENT_LABEL,
+  label: '',
   source: 'DEFAULT',
   isDefault: true,
 });

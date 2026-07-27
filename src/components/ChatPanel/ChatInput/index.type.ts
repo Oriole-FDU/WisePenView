@@ -1,8 +1,8 @@
-import type { Model } from '@/components/ChatPanel/index.type';
 import type {
   CapabilitySkillSelection,
   CapabilityToolOption,
   ChatAgentOption,
+  ChatModel,
 } from '@/domains/Chat';
 
 export interface ChatInputProps {
@@ -14,8 +14,8 @@ export interface ChatInputProps {
   onClearContext?: () => void;
   injectedAgents?: ChatAgentOption[];
   preferredAgent?: ChatAgentOption | null;
-  /** 全宽页展示模型名；侧栏窄宽时仅图标 */
-  fullWidth?: boolean;
+  /** 全宽页默认可展示模型名；窄宽时自动仅图标（与侧栏一致） */
+  fullWidth: boolean;
 }
 
 export interface LocalAttachmentPayload {
@@ -45,7 +45,7 @@ export interface LocalAttachmentUpload {
 }
 
 export interface SendOptions {
-  model?: Model;
+  model?: ChatModel;
   selectedAgent?: ChatAgentOption;
   activeDocRefs?: LocalResourcePayload[];
   activeAttachments?: LocalAttachmentPayload[];

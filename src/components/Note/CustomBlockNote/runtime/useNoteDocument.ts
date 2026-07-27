@@ -4,8 +4,9 @@ import { computeNoteBodyContentHash } from '@/domains/Note';
 import { getNearestBlockPos } from '@blocknote/core';
 import { toast } from '@heroui/react';
 import type { Node as PMNode } from '@tiptap/pm/model';
-import { useMemoizedFn, useMount, useUnmount, useUpdateEffect } from 'ahooks';
-import { useRef } from 'react';
+import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
@@ -62,6 +63,7 @@ export function useNoteDocument({
   onAskAi: CustomBlockNoteProps['onAskAi'];
   onAiDiffBodyContentHashChange: CustomBlockNoteProps['onAiDiffBodyContentHashChange'];
 }) {
+  const { t } = useTranslation('note');
   const bodyOnChangeCleanupRef = useRef<(() => void) | null>(null);
   const selectionRangeSnapshotRef = useRef<NoteSelectionRangeSnapshot | null>(null);
   const bodyContentHashTimerRef = useRef<number | null>(null);
@@ -108,9 +110,13 @@ export function useNoteDocument({
     }, 120);
   });
 
-  useMount(scheduleBodyContentHashRefresh);
-
-  useUpdateEffect(scheduleBodyContentHashRefresh, [editor]);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：编辑器实例就绪或替换后安排一次正文内容哈希计算。
+   * 不可替代原因：计算由浏览器 timer/idle callback 调度，并读取命令式编辑器文档。
+   * cleanup：统一由 hook 卸载清理取消尚未执行的 timer/idle callback。
+   */
+  useEffect(scheduleBodyContentHashRefresh, [editor, scheduleBodyContentHashRefresh]);
 
   useMount(() => {
     let writeGuardActivated = false;
@@ -147,11 +153,17 @@ export function useNoteDocument({
     }
   });
 
-  useUpdateEffect(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：本地文档写入限制解除时复位 ProseMirror 写保护状态。
+   * 不可替代原因：写保护状态存储在编辑器 definition 的外部可变运行时中。
+   * cleanup：没有订阅或异步任务，无需清理。
+   */
+  useEffect(() => {
     if (!blockLocalDocWrites) {
       definition.setPmWriteGuardReady(false);
     }
-  }, [blockLocalDocWrites]);
+  }, [blockLocalDocWrites, definition]);
 
   useUnmount(() => {
     bodyOnChangeCleanupRef.current?.();
@@ -169,7 +181,7 @@ export function useNoteDocument({
     const snapshot = selection ? buildSelectionSnapshot(selection) : null;
     const selectedText = snapshot?.text.trim() ?? '';
     if (!selectedText) {
-      toast.info('请先选中一段文字再问 AI');
+      toast.info(t('ai.selectTextFirst'));
       return;
     }
 

@@ -18,6 +18,16 @@
   border-bottom: 1px solid var(--border-light);
 }
 
+:global(html[data-layout-height='short']) {
+  .bar {
+    padding-block: var(--space-xs);
+  }
+
+  .toolbar {
+    min-height: 32px;
+  }
+}
+
 .toolbar {
   display: flex;
   align-items: center;

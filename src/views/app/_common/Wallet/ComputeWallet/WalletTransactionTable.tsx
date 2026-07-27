@@ -4,11 +4,24 @@ import { formatCompactNumber } from '@/utils/format/formatNumber';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { Chip } from '@heroui/react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 import { isInflowKind, normalizeMaskDisplayText, TX_TABS, type TxTabKey } from './walletHelpers';
 
 type WalletTransactionRow = WalletTransactionRecord & { key: string };
+
+function getTransactionKindKey(kind: WalletTransactionRecord['type']): string {
+  switch (kind) {
+    case WALLET_TRANSACTION_KIND.RECHARGE:
+      return 'transaction.kind.recharge';
+    case WALLET_TRANSACTION_KIND.SPEND:
+      return 'transaction.kind.spend';
+    case WALLET_TRANSACTION_KIND.TRANSFER_IN:
+      return 'transaction.kind.transferIn';
+    case WALLET_TRANSACTION_KIND.TRANSFER_OUT:
+      return 'transaction.kind.transferOut';
+  }
+}
 
 interface WalletTransactionTableProps {
   activeTab: TxTabKey;
@@ -35,20 +48,17 @@ function WalletTransactionTable({
   onPageChange,
   onTabChange,
 }: WalletTransactionTableProps) {
-  const dataSource = useMemo(
-    () =>
-      records.map((r) => ({
-        ...r,
-        key: String(r.traceId || r.time),
-      })),
-    [records]
-  );
+  const { t } = useTranslation('wallet');
+  const dataSource = records.map((r) => ({
+    ...r,
+    key: String(r.traceId || r.time),
+  }));
 
-  const columns = useMemo<Array<DataTableColumn<WalletTransactionRow>>>(() => {
+  const columns = (() => {
     const baseColumns: Array<DataTableColumn<WalletTransactionRow>> = [
       {
         id: 'time',
-        label: '时间',
+        label: t('transaction.columns.time'),
         width: 'lg',
         align: 'start',
         renderCell: (row) => (
@@ -59,7 +69,7 @@ function WalletTransactionTable({
       },
       {
         id: 'type',
-        label: '类型',
+        label: t('transaction.columns.type'),
         width: 'sm',
         align: 'start',
         renderCell: (row) => {
@@ -72,19 +82,21 @@ function WalletTransactionTable({
               variant="soft"
             >
               {inflow ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-              <Chip.Label>{WALLET_TRANSACTION_KIND.getLabel(row.type)}</Chip.Label>
+              <Chip.Label>{t(getTransactionKindKey(row.type))}</Chip.Label>
             </Chip>
           );
         },
       },
       {
         id: 'summary',
-        label: '摘要 / 备注',
+        label: t('transaction.columns.summary'),
         width: 'fill',
         align: 'start',
         renderCell: (row) => (
           <div className={styles.summaryBlock}>
-            <div className={styles.summaryMain}>{row.title || '—'}</div>
+            <div className={styles.summaryMain}>
+              {row.title || t(getTransactionKindKey(row.type))}
+            </div>
             <div className={styles.summarySub}>
               {row.subTitle ? normalizeMaskDisplayText(row.subTitle) : '—'}
             </div>
@@ -93,7 +105,7 @@ function WalletTransactionTable({
       },
       {
         id: 'amount',
-        label: '变动金额',
+        label: t('transaction.columns.amount'),
         width: 'md',
         align: 'end',
         renderCell: (row) => {
@@ -113,7 +125,7 @@ function WalletTransactionTable({
     if (showOperatorColumn) {
       baseColumns.push({
         id: 'operatorName',
-        label: '操作人',
+        label: t('transaction.columns.operator'),
         width: 'md',
         align: 'start',
         renderCell: (row) => (
@@ -125,24 +137,26 @@ function WalletTransactionTable({
     }
 
     return baseColumns;
-  }, [showOperatorColumn]);
+  })() satisfies Array<DataTableColumn<WalletTransactionRow>>;
+
+  const tabs = TX_TABS.map((tab) => ({ key: tab.key, label: t(tab.labelKey) }));
 
   return (
     <DataTable
-      ariaLabel="交易明细"
+      ariaLabel={t('transaction.aria')}
       className={styles.transactionTable}
       items={dataSource}
       rowKey="key"
       columns={columns}
       loading={loading}
-      emptyText="暂无交易明细"
-      title="交易明细"
+      emptyText={t('transaction.empty')}
+      title={t('transaction.title')}
       tabs={
         <DataTable.Tabs
-          tabs={TX_TABS}
+          tabs={tabs}
           activeTab={activeTab}
           onChange={onTabChange}
-          ariaLabel="交易明细类型"
+          ariaLabel={t('transaction.typeAria')}
         />
       }
       pagination={{

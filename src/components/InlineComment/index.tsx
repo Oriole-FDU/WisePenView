@@ -5,11 +5,11 @@ import AppDisplayDialog from '@/components/Overlay/AppDisplayDialog';
 import AppModal from '@/components/Overlay/AppModal';
 import type { InlineCommentItem, InlineCommentReactionGroup } from '@/domains/InlineComment';
 import { parseErrorMessage } from '@/utils/error';
-import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Check, RotateCcw, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CommentComposer from './CommentComposer';
 import EmojiPicker from './EmojiPicker';
@@ -29,22 +29,38 @@ function hasVisibleContent(content: string): boolean {
   return Boolean(content.replace(/\u200B/g, '').trim());
 }
 
-function formatRelativeTime(timestamp: number): string {
-  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1_000));
-  if (elapsedSeconds < 60) return '刚刚';
-  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
-  if (elapsedMinutes < 60) return `${elapsedMinutes} 分钟前`;
-  const elapsedHours = Math.floor(elapsedMinutes / 60);
-  if (elapsedHours < 24) return `${elapsedHours} 小时前`;
-  const elapsedDays = Math.floor(elapsedHours / 24);
-  if (elapsedDays < 7) return `${elapsedDays} 天前`;
-  return formatTimestampToDateTime(timestamp) || '时间未知';
+function formatDateTime(timestamp: number, locale: string): string | undefined {
+  const date = new Date(timestamp);
+  if (!Number.isFinite(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
 }
 
-function getReactionLabel(group: InlineCommentReactionGroup): string {
+function formatRelativeTime(timestamp: number, locale: string): string | undefined {
+  if (!Number.isFinite(new Date(timestamp).getTime())) return undefined;
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1_000));
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  if (elapsedSeconds < 60) return formatter.format(0, 'second');
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) return formatter.format(-elapsedMinutes, 'minute');
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return formatter.format(-elapsedHours, 'hour');
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  if (elapsedDays < 7) return formatter.format(-elapsedDays, 'day');
+  return formatDateTime(timestamp, locale);
+}
+
+function formatReactionUsers(
+  group: InlineCommentReactionGroup,
+  locale: string,
+  fallbackText: string
+): string {
   const users = group.users.map((user) => user.name).filter(Boolean);
-  const usersText = users.length > 0 ? users.join('、') : `${group.count} 人`;
-  return `${usersText}${group.reactedByCurrentUser ? '，点击取消' : '，点击添加'} ${group.emojiId}`;
+  return users.length > 0
+    ? new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' }).format(users)
+    : fallbackText;
 }
 
 interface CommentItemProps {
@@ -66,6 +82,8 @@ function CommentItem({
   onDelete,
   onPreviewImage,
 }: CommentItemProps) {
+  const { t, i18n } = useTranslation('common');
+  const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const { loading: changingReaction, runAsync: changeReaction } = useRequest(
     async (emojiId?: string) => onReactionChange({ threadId, itemId: item.itemId, emojiId }),
     {
@@ -79,7 +97,7 @@ function CommentItem({
     void changeReaction(selectedGroup?.reactedByCurrentUser ? undefined : emojiId);
   };
 
-  const formattedTime = formatTimestampToDateTime(item.createdAt) || '时间未知';
+  const formattedTime = formatDateTime(item.createdAt, locale) ?? t('inlineComment.timeUnknown');
   const date = new Date(item.createdAt);
   const dateTime = Number.isFinite(date.getTime()) ? date.toISOString() : undefined;
 
@@ -96,23 +114,23 @@ function CommentItem({
           <div className={styles.authorMeta}>
             <strong>{item.author.name}</strong>
             <time dateTime={dateTime} title={formattedTime}>
-              {formatRelativeTime(item.createdAt)}
+              {formatRelativeTime(item.createdAt, locale) ?? t('inlineComment.timeUnknown')}
             </time>
           </div>
           {active ? (
             <div className={styles.commentActions}>
               <EmojiPicker
-                label={`回应 ${item.author.name}`}
+                label={t('inlineComment.respond', { name: item.author.name })}
                 disabled={changingReaction}
                 onSelect={handleEmojiSelect}
               />
               {canDelete ? (
                 <AppIconButton
                   icon={<Trash2 size={15} aria-hidden />}
-                  label="删除批注"
+                  label={t('inlineComment.deleteComment')}
                   size="sm"
                   className={styles.iconButton}
-                  tooltip={{ content: '删除' }}
+                  tooltip={{ content: t('actions.delete') }}
                   onPress={() => onDelete({ threadId, itemId: item.itemId })}
                 />
               ) : null}
@@ -129,10 +147,10 @@ function CommentItem({
                 key={`${url}-${index}`}
                 type="button"
                 className={styles.commentImageButton}
-                aria-label="预览批注图片"
+                aria-label={t('inlineComment.previewImageAria')}
                 onClick={() => onPreviewImage(url)}
               >
-                <img src={url} alt="批注图片" loading="lazy" />
+                <img src={url} alt={t('inlineComment.imageAlt')} loading="lazy" />
               </button>
             ))}
           </div>
@@ -147,7 +165,19 @@ function CommentItem({
                 className={`${styles.reaction} ${
                   group.reactedByCurrentUser ? styles.reactionSelected : ''
                 }`}
-                aria-label={getReactionLabel(group)}
+                aria-label={t(
+                  group.reactedByCurrentUser
+                    ? 'inlineComment.reactionRemove'
+                    : 'inlineComment.reactionAdd',
+                  {
+                    users: formatReactionUsers(
+                      group,
+                      locale,
+                      t('inlineComment.reactionCount', { count: group.count })
+                    ),
+                    emoji: group.emojiId,
+                  }
+                )}
                 onClick={() => handleEmojiSelect(group.emojiId)}
               >
                 <span aria-hidden>{group.emojiId}</span>
@@ -194,11 +224,12 @@ function ResolvedCommentThread({
   onDelete,
   onPreviewImage,
 }: ResolvedCommentThreadProps) {
+  const { t } = useTranslation('common');
   const { loading: reopening, runAsync: reopen } = useRequest(
     async () => onReopen(thread.threadId),
     {
       manual: true,
-      onSuccess: () => toast.success('批注已重新打开'),
+      onSuccess: () => toast.success(t('inlineComment.reopened')),
       onError: (error) => toast.danger(parseErrorMessage(error)),
     }
   );
@@ -238,15 +269,15 @@ function ResolvedCommentThread({
           onPress={() => void reopen()}
         >
           <RotateCcw size={14} aria-hidden />
-          重新打开
+          {t('inlineComment.reopen')}
         </Button>
         {canDelete ? (
           <AppIconButton
             icon={<Trash2 size={15} aria-hidden />}
-            label="删除批注"
+            label={t('inlineComment.deleteComment')}
             size="sm"
             className={styles.iconButton}
-            tooltip={{ content: '删除' }}
+            tooltip={{ content: t('actions.delete') }}
             onPress={() => {
               if (deletableItem) {
                 onDelete({ threadId: thread.threadId, itemId: deletableItem.itemId });
@@ -272,12 +303,13 @@ function CommentThread({
   onDelete,
   onPreviewImage,
 }: CommentThreadProps) {
+  const { t } = useTranslation('common');
   const active = thread.threadId === activeThreadId;
   const { loading: resolving, runAsync: resolve } = useRequest(
     async () => onResolve(thread.threadId),
     {
       manual: true,
-      onSuccess: () => toast.success('批注已解决'),
+      onSuccess: () => toast.success(t('inlineComment.resolved')),
       onError: (error) => toast.danger(parseErrorMessage(error)),
     }
   );
@@ -296,11 +328,11 @@ function CommentThread({
         {active ? (
           <AppIconButton
             icon={<Check size={16} aria-hidden />}
-            label="解决批注"
+            label={t('inlineComment.resolveComment')}
             size="sm"
             isDisabled={resolving}
             className={styles.resolveButton}
-            tooltip={{ content: '解决' }}
+            tooltip={{ content: t('inlineComment.resolve') }}
             aria-busy={resolving || undefined}
             onPress={() => void resolve()}
           />
@@ -325,7 +357,7 @@ function CommentThread({
       </div>
       {active ? (
         <CommentComposer
-          placeholder="回复"
+          placeholder={t('inlineComment.reply')}
           imageUpload={imageUpload}
           onSubmit={(payload) => onReply(thread.threadId, payload)}
         />
@@ -355,6 +387,7 @@ function InlineComment({
   onReopen,
   onDelete,
 }: InlineCommentProps) {
+  const { t } = useTranslation('common');
   const [pendingDeletion, setPendingDeletion] = useState<InlineCommentDeletePayload>();
   const [previewImageUrl, setPreviewImageUrl] = useState<string>();
   const { loading: deleting, runAsync: deleteComment } = useRequest(
@@ -366,7 +399,7 @@ function InlineComment({
       manual: true,
       onSuccess: () => {
         setPendingDeletion(undefined);
-        toast.success('批注已删除');
+        toast.success(t('inlineComment.deleted'));
       },
       onError: (deleteError) => toast.danger(parseErrorMessage(deleteError)),
     }
@@ -376,11 +409,11 @@ function InlineComment({
     <div className={styles.panel}>
       <div className={styles.threadList}>
         {loading && threads.length === 0 ? (
-          <p className={styles.stateText}>正在加载批注...</p>
+          <p className={styles.stateText}>{t('inlineComment.loading')}</p>
         ) : null}
         {error ? <p className={styles.errorText}>{parseErrorMessage(error)}</p> : null}
         {!loading && !error && threads.length === 0 && !draft ? (
-          <p className={styles.stateText}>还没有行内批注</p>
+          <p className={styles.stateText}>{t('inlineComment.empty')}</p>
         ) : null}
 
         {draft ? (
@@ -391,16 +424,16 @@ function InlineComment({
               </blockquote>
               <AppIconButton
                 icon={<X size={15} aria-hidden />}
-                label="关闭批注编辑器"
+                label={t('inlineComment.closeEditor')}
                 size="sm"
                 className={styles.iconButton}
-                tooltip={{ content: '关闭' }}
+                tooltip={{ content: t('actions.close') }}
                 onPress={onDraftClose}
               />
             </div>
             <CommentComposer
               key={draft.key}
-              placeholder="添加批注"
+              placeholder={t('inlineComment.addComment')}
               imageUpload={imageUpload}
               onSubmit={onCreate}
             />
@@ -431,9 +464,9 @@ function InlineComment({
         onOpenChange={(open) => {
           if (!open && !deleting) setPendingDeletion(undefined);
         }}
-        title="删除批注"
-        description="删除后无法恢复，确定继续吗？"
-        confirmText="删除"
+        title={t('inlineComment.deleteComment')}
+        description={t('inlineComment.deleteDescription')}
+        confirmText={t('actions.delete')}
         isConfirmLoading={deleting}
         isConfirmDisabled={!pendingDeletion}
         onConfirm={() => void deleteComment()}
@@ -442,17 +475,17 @@ function InlineComment({
       <AppModal
         isOpen={isHistoryOpen}
         onOpenChange={onHistoryOpenChange}
-        title="历史评论"
+        title={t('inlineComment.historyTitle')}
         size="md"
         bodyClassName={styles.historyBody}
         footer={false}
       >
         {loading && resolvedThreads.length === 0 ? (
-          <p className={styles.stateText}>正在加载历史评论...</p>
+          <p className={styles.stateText}>{t('inlineComment.historyLoading')}</p>
         ) : null}
         {error ? <p className={styles.errorText}>{parseErrorMessage(error)}</p> : null}
         {!loading && !error && resolvedThreads.length === 0 ? (
-          <p className={styles.stateText}>还没有已解决的评论</p>
+          <p className={styles.stateText}>{t('inlineComment.historyEmpty')}</p>
         ) : null}
         {resolvedThreads.length > 0 ? (
           <div className={styles.resolvedList}>
@@ -479,11 +512,15 @@ function InlineComment({
         onOpenChange={(open) => {
           if (!open) setPreviewImageUrl(undefined);
         }}
-        title="批注图片"
+        title={t('inlineComment.imageTitle')}
         size="lg"
       >
         {previewImageUrl ? (
-          <img className={styles.previewImage} src={previewImageUrl} alt="批注图片预览" />
+          <img
+            className={styles.previewImage}
+            src={previewImageUrl}
+            alt={t('inlineComment.imagePreviewAlt')}
+          />
         ) : null}
       </AppDisplayDialog>
     </div>

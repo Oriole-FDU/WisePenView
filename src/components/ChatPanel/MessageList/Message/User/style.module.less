@@ -61,11 +61,6 @@
 
 .morePopover {
   width: min(260px, calc(100vw - var(--space-2xl)));
-  padding: 0;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-xl);
-  background: var(--overlay, var(--surface));
-  box-shadow: var(--card-shadow);
 }
 
 .morePanel {
@@ -73,15 +68,6 @@
   flex-direction: column;
   gap: var(--space-2xs);
   max-height: min(360px, 50vh);
-  padding: var(--space-xs);
-  background: var(--surface);
-}
-
-.moreTitle {
-  padding: var(--space-2xs) var(--space-xs);
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
 }
 
 .moreList {
@@ -120,7 +106,7 @@
   width: 100%;
   min-width: 0;
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-popover-item, var(--radius-xl));
   color: var(--foreground);
 
   &:hover {

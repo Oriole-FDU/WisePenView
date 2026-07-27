@@ -1,4 +1,3 @@
-import { useUpdateEffect } from 'ahooks';
 import { useState } from 'react';
 import { NavigationType, Outlet, useNavigate, useNavigationType } from 'react-router-dom';
 import { AppNavigationContext, type AppNavigationContextValue } from './AppNavigationContext';
@@ -13,20 +12,35 @@ function AppNavigationLayout() {
   const navigationType = useNavigationType();
   const currentIndex = readHistoryIndex();
   const [firstIndex] = useState(currentIndex);
-  const [furthestIndex, setFurthestIndex] = useState(currentIndex);
+  const [historyState, setHistoryState] = useState(() => ({
+    observedIndex: currentIndex,
+    observedNavigationType: navigationType,
+    furthestIndex: currentIndex,
+  }));
 
-  // 新跳转会截断浏览器的前进分支；POP 则保留已到达过的最远位置。
-  useUpdateEffect(() => {
-    if (currentIndex == null) return;
-    if (navigationType === NavigationType.Push) {
-      setFurthestIndex(currentIndex);
-      return;
+  let furthestIndex = historyState.furthestIndex;
+  if (
+    historyState.observedIndex !== currentIndex ||
+    historyState.observedNavigationType !== navigationType
+  ) {
+    if (currentIndex != null) {
+      furthestIndex =
+        navigationType === NavigationType.Push ||
+        furthestIndex == null ||
+        currentIndex > furthestIndex
+          ? currentIndex
+          : furthestIndex;
     }
-    setFurthestIndex((index) => (index == null || currentIndex > index ? currentIndex : index));
-  }, [currentIndex, navigationType]);
+    // 新跳转会截断浏览器的前进分支；POP 则保留已到达过的最远位置。
+    setHistoryState({
+      observedIndex: currentIndex,
+      observedNavigationType: navigationType,
+      furthestIndex,
+    });
+  }
 
   const effectiveFurthestIndex =
-    navigationType === NavigationType.Push ? currentIndex : furthestIndex;
+    navigationType === NavigationType.Push ? currentIndex : historyState.furthestIndex;
   const value: AppNavigationContextValue = {
     canGoBack: currentIndex != null && firstIndex != null && currentIndex > firstIndex,
     canGoForward:

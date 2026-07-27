@@ -323,23 +323,14 @@
   display: none;
 }
 
-.emojiPopover {
-  padding: 0;
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  background: var(--overlay);
-  box-shadow: var(--card-shadow);
-}
-
 .emojiMartHost {
   width: min(300px, calc(100vw - 32px));
   min-height: 435px;
-  border-radius: 7px;
 }
 
 .emojiMartPicker {
   display: block;
-  --border-radius: 7px;
+  --border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
   --category-icon-size: 18px;
   --font-family: inherit;
 }

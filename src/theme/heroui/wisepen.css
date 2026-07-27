@@ -17,9 +17,6 @@
     --ring-offset-width: 2px;
     --cursor-interactive: pointer;
     --cursor-disabled: not-allowed;
-    /* 延迟显示 Tooltip，减少鼠标经过密集工具栏时的视觉干扰。 */
-    --tooltip-delay: 800ms;
-    --tooltip-close-delay: 100ms;
     /* Brand + paper/canvas anchors (neutrals derived in shared ladder) */
     --accent: #127abb;    --accent-foreground: #ffffff;
     --foreground: #111827;
@@ -172,30 +169,28 @@
 
   /* Floral */
   html[data-color-scheme='floral'] {
-    --accent: #8b4150;
-    --accent-foreground: #ffffff;
+    --accent: #bb455c;    --accent-foreground: #ffffff;
     --foreground: #2e2e2e;
     --paper: #ffffff;
-    --canvas: #f7f0f2;
+    --canvas: #f6f1f2;
     --text-inverse: #ffffff;
     --card-shadow: 0 2px 8px rgba(210, 140, 150, 0.08);
-    --preview-color-1: #f5e8ec;
-    --preview-color-2: #d8b8c0;
-    --preview-color-3: #8b4150;
+    --preview-color-1: #ffffff;
+    --preview-color-2: #edd6dc;
+    --preview-color-3: #bb455c;
   }
   html[data-color-scheme='floral'].dark,
   html[data-color-scheme='floral'][data-theme='dark'] {
     color-scheme: dark;
-    --accent: #d4a0a8;
-    --accent-foreground: #0d1117;
+    --accent: #e8bfc5;    --accent-foreground: #0d1117;
     --foreground: #eee6e7;
-    --paper: #18161a;
-    --canvas: #121014;
+    --paper: #181818;
+    --canvas: #121212;
     --text-inverse: #0d1117;
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --preview-color-1: #1c181c;
-    --preview-color-2: #d4a0a8;
-    --preview-color-3: #d4a0a8;
+    --preview-color-1: #3d2a3d;
+    --preview-color-2: #e8bfc5;
+    --preview-color-3: #e8bfc5;
   }
 
   /* Aqua */
@@ -349,14 +344,14 @@
 
   /* Floral */
   html.light [data-scheme-preview='floral'], html[data-theme='light'] [data-scheme-preview='floral'] {
-    --preview-color-1: #fcf2f4;
-    --preview-color-2: #d6aab4;
-    --preview-color-3: #8b4150;
+    --preview-color-1: #ffffff;
+    --preview-color-2: #eac9d0;
+    --preview-color-3: #bb455c;
   }
   html.dark [data-scheme-preview='floral'], html[data-theme='dark'] [data-scheme-preview='floral'] {
-    --preview-color-1: #312f31;
-    --preview-color-2: #d4a0a8;
-    --preview-color-3: #d4a0a8;
+    --preview-color-1: #524152;
+    --preview-color-2: #e8bfc5;
+    --preview-color-3: #e8bfc5;
   }
 
   /* Aqua */
@@ -451,7 +446,39 @@
     --space-lg: 24px;
     --space-xl: 32px;
     --space-2xl: 40px;
+    /* 运行时由 syncViewportLayoutScale 覆盖，此处为同源兜底 */
     --chat-panel-min-width: 480px;
+    --chat-full-width-min-width: 720px;
+    --layout-sidebar-min-width: 240px;
+    --layout-sidebar-max-width: 420px;
+    --layout-sidebar-min-height: 424px;
+    --layout-sidebar-session-list-min-height: 120px;
+    --layout-window-min-height: 720px;
+    --layout-main-min-width: 560px;
+    --layout-app-main-min-width: 720px;
+    --layout-main-scroll-min-width: 400px;
+    --layout-note-editor-min-width: 560px;
+    --layout-resource-side-panel-min-width: 280px;
+    --layout-note-with-side-panel-min-width: 864px;
+    --layout-workspace-inner-chat-min-width: 1064px;
+    --layout-resize-handle-reserve: 24px;
+    --layout-note-outline-open-width: 260px;
+    --layout-note-outline-collapsed-width: 40px;
+    --layout-chat-panel-max-width: 1020px;
+    --layout-model-selector-max-width: 240px;
+    --layout-compact-max-width: 1280px;
+    --layout-short-max-height: 720px;
+    --layout-drive-chrome-height: 240px;
+    --table-drive-detail-panel-width: 300px;
+    --layout-drive-table-min-width: 560px;
+    --layout-drive-layout-min-width: 860px;
+    --layout-drive-page-min-width: 956px;
+    --layout-chat-footer-scroll-offset: 132px;
+    --chat-input-textarea-max-height: calc(16em + 16px);
+    --chat-input-card-padding-block: 12px;
+    --chat-input-container-padding-block: 8px;
+    --layout-welcome-icon-size: 40px;
+    --layout-welcome-title-size: 18px;
     --radius-xs: calc(var(--radius) * 0.25);
     --radius-sm: calc(var(--radius) * 0.5);
     --radius-md: calc(var(--radius) * 0.75);
@@ -516,12 +543,15 @@
     --table-chip-min-height: 28px;
     --table-chip-padding-block: 4px;
     --table-chip-padding-inline: 14px;
+    /* 延迟显示 Tooltip，减少鼠标经密集图标区时的视觉干扰。 */
+    --tooltip-delay: 800ms;
+    --tooltip-close-delay: 100ms;
     /* Table 鍦嗚锛歴hell / 琛屽唴鎸夐挳 / 涓嬫媺灞傜粺涓€锛涘皬鎺т欢锛堝睍寮€閽€丆hip锛夌敤 inner */
     --table-shell-radius: var(--radius-xl);
     --table-control-radius: var(--table-shell-radius);
     --table-overlay-radius: var(--table-shell-radius);
     --table-inner-radius: var(--radius-lg);
-    --table-drive-layout-max-height: calc(100dvh - 240px);
+    --table-drive-layout-max-height: calc(100dvh - var(--layout-drive-chrome-height, 240px));
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
     --shadow-md: var(--card-shadow);
     --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);

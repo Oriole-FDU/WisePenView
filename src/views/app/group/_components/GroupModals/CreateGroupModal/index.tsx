@@ -13,6 +13,7 @@ import {
 import { Button, Label, ListBox, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CreateGroupModalProps } from './index.type';
 
 import styles from './index.module.less';
@@ -23,6 +24,12 @@ type CreateGroupFormValues = Omit<CreateGroupRequest, 'groupCoverUrl'> & {
 
 const groupTypeOptionsBase = GROUP_TYPE.options;
 
+const GROUP_TYPE_LABEL_KEYS = {
+  NORMAL: 'type.normal',
+  ADVANCED: 'type.advanced',
+  PUBLIC: 'type.public',
+} as const;
+
 const DEFAULT_FORM_VALUES: CreateGroupFormValues = {
   groupName: '',
   groupDesc: '',
@@ -31,6 +38,7 @@ const DEFAULT_FORM_VALUES: CreateGroupFormValues = {
 };
 
 function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalProps) {
+  const { t } = useTranslation(['group', 'common']);
   const groupService = useGroupService();
   const imageService = useImageService();
   const userService = useUserService();
@@ -95,7 +103,7 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
         groupDesc: values.groupDesc,
         groupCoverUrl,
       });
-      if (groupId) toast.success('创建成功');
+      if (groupId) toast.success(t('create.success'));
     },
     {
       manual: true,
@@ -112,15 +120,15 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
 
   const validateForm = (): boolean => {
     if (!formValues.groupName.trim()) {
-      toast.warning('请输入小组名称');
+      toast.warning(t('create.nameRequired'));
       return false;
     }
     if (!formValues.groupDesc.trim()) {
-      toast.warning('请输入小组描述');
+      toast.warning(t('create.descriptionRequired'));
       return false;
     }
     if (!isStudent && !formValues.groupType) {
-      toast.warning('请选择小组类型');
+      toast.warning(t('create.typeRequired'));
       return false;
     }
     return true;
@@ -130,7 +138,7 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
     if (!validateForm()) return;
     const groupType = isStudent ? GROUP_TYPE.NORMAL : formValues.groupType;
     if (groupType == null) {
-      toast.warning('请选择小组类型');
+      toast.warning(t('create.typeRequired'));
       return;
     }
     runCreateGroup({
@@ -145,14 +153,14 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
     <AppModal
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="新建小组"
+      title={t('create.title')}
       size="md"
       bodyClassName={styles.modalBody}
       isDismissable={!submitting}
       actions={
         <>
           <Button variant="secondary" isDisabled={submitting} onPress={handleCancel}>
-            取消
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button
             variant="primary"
@@ -160,44 +168,44 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
             aria-busy={submitting || undefined}
             onPress={handleConfirm}
           >
-            确定
+            {t('actions.confirm', { ns: 'common' })}
           </Button>
         </>
       }
     >
       <TextField
-        aria-label="小组名称"
+        aria-label={t('fields.name')}
         value={formValues.groupName}
         onChange={(value) => updateFormValue('groupName', value)}
         isRequired
       >
-        <Label>小组名称</Label>
-        <Input placeholder="请输入小组名称" />
+        <Label>{t('fields.name')}</Label>
+        <Input placeholder={t('fields.namePlaceholder')} />
       </TextField>
       <TextField
-        aria-label="小组描述"
+        aria-label={t('fields.description')}
         value={formValues.groupDesc}
         onChange={(value) => updateFormValue('groupDesc', value)}
         isRequired
       >
-        <Label>小组描述</Label>
-        <TextArea rows={4} placeholder="请输入小组描述" />
+        <Label>{t('fields.description')}</Label>
+        <TextArea rows={4} placeholder={t('fields.descriptionPlaceholder')} />
       </TextField>
       {!isStudent && (
         <Select
-          aria-label="小组类型"
+          aria-label={t('fields.type')}
           name="groupType"
           value={String(formValues.groupType)}
           onChange={(value) => updateFormValue('groupType', Number(value))}
           isRequired
         >
-          <Label>小组类型</Label>
+          <Label>{t('fields.type')}</Label>
           <Select.Trigger />
           <Select.Popover>
             <ListBox>
               {groupTypeOptions.map((opt) => (
                 <ListBox.Item key={String(opt.value)} id={String(opt.value)}>
-                  {opt.label}
+                  {t(GROUP_TYPE_LABEL_KEYS[opt.key])}
                 </ListBox.Item>
               ))}
             </ListBox>
@@ -205,13 +213,13 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
         </Select>
       )}
       <div className={styles.coverField}>
-        <span className={styles.fieldLabel}>封面图片</span>
+        <span className={styles.fieldLabel}>{t('fields.cover')}</span>
         <UploadZone
           file={formValues.cover ?? null}
           disabled={submitting}
           accept="image/*"
-          label="点击或拖拽封面图片到此区域"
-          description={`仅可选择单张图片，大小不超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`}
+          label={t('fields.coverUpload')}
+          description={t('fields.coverUploadLimit', { size: IMAGE_UPLOAD_MAX_SIZE_LABEL })}
           onFileChange={handleCoverChange}
         />
       </div>

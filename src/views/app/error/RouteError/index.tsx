@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useRouteError } from 'react-router-dom';
 
 import { ResultState } from '@/components/Feedback';
@@ -7,6 +8,7 @@ import { buildAppErrorInfo } from '../errorInfo';
 import styles from './style.module.less';
 
 function RouteError() {
+  const { t } = useTranslation('errors');
   const navigate = useNavigate();
   const location = useLocation();
   const error = useRouteError();
@@ -23,14 +25,14 @@ function RouteError() {
         extra={
           <div className={styles.actions}>
             <Button variant="primary" onPress={() => window.location.reload()}>
-              重新加载
+              {t('page.reload')}
             </Button>
-            <Button onPress={() => navigate(-1)}>返回上一页</Button>
+            <Button onPress={() => navigate(-1)}>{t('page.backPrevious')}</Button>
           </div>
         }
       >
         <p className={styles.errorId}>
-          错误编号：{errorId} · 页面：{location.pathname}
+          {t('page.errorIdWithPage', { errorId, pathname: location.pathname })}
         </p>
       </ResultState>
     </main>

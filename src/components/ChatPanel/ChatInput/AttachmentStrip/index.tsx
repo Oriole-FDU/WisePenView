@@ -10,6 +10,7 @@ import {
   AttachmentTitle,
 } from '@/components/_shadcn';
 import { Image, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 import styles from '../style.module.less';
@@ -20,13 +21,14 @@ function getUploadAttachmentState(status: 'pending' | 'uploading' | 'failed') {
   return 'idle';
 }
 
-function getUploadAttachmentDescription(status: 'pending' | 'uploading' | 'failed') {
-  if (status === 'pending') return '附件待发送';
-  if (status === 'uploading') return '上传中';
-  return '上传失败';
+function getUploadAttachmentDescriptionKey(status: 'pending' | 'uploading' | 'failed') {
+  if (status === 'pending') return 'input.attachments.pending' as const;
+  if (status === 'uploading') return 'input.attachments.uploading' as const;
+  return 'input.attachments.failed' as const;
 }
 
 function AttachmentStrip() {
+  const { t } = useTranslation('chat');
   const store = useChatInputStoreApi();
   const { resources, attachments, images, uploads } = useChatInputStore(
     useShallow((state) => ({
@@ -50,7 +52,10 @@ function AttachmentStrip() {
 
   return (
     <div className={styles.attachmentStripShell}>
-      <AttachmentGroup className={styles.attachmentArea} aria-label="输入上下文">
+      <AttachmentGroup
+        className={styles.attachmentArea}
+        aria-label={t('input.attachments.contextAria')}
+      >
         {resources.map((resource) => (
           <Attachment key={resource.resourceId} size="xs" className={styles.chatAttachment}>
             <AttachmentMedia>
@@ -60,11 +65,13 @@ function AttachmentStrip() {
               <AttachmentTitle title={resource.resourceName}>
                 {resource.resourceName}
               </AttachmentTitle>
-              <AttachmentDescription>文档引用</AttachmentDescription>
+              <AttachmentDescription>
+                {t('input.attachments.documentReference')}
+              </AttachmentDescription>
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                label={`移除文档 ${resource.resourceName}`}
+                label={t('input.attachments.removeDocument', { name: resource.resourceName })}
                 onPress={() => removeDocRef(resource.resourceId)}
               >
                 <X size={12} />
@@ -80,11 +87,11 @@ function AttachmentStrip() {
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle title={attachment.filename}>{attachment.filename}</AttachmentTitle>
-              <AttachmentDescription>附件</AttachmentDescription>
+              <AttachmentDescription>{t('input.attachments.attachment')}</AttachmentDescription>
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                label={`移除附件 ${attachment.filename}`}
+                label={t('input.attachments.removeAttachment', { name: attachment.filename })}
                 onPress={() => removeActiveAttachment(attachment.attachmentId)}
               >
                 <X size={12} />
@@ -104,11 +111,11 @@ function AttachmentStrip() {
             </AttachmentMedia>
             <AttachmentContent>
               <AttachmentTitle title={imageMeta.filename}>{imageMeta.filename}</AttachmentTitle>
-              <AttachmentDescription>图片待发送</AttachmentDescription>
+              <AttachmentDescription>{t('input.attachments.imagePending')}</AttachmentDescription>
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                label={`移除图片 ${imageMeta.filename}`}
+                label={t('input.attachments.removeImage', { name: imageMeta.filename })}
                 onPress={() => removePendingImageMeta(imageMeta.id)}
               >
                 <X size={12} />
@@ -130,12 +137,12 @@ function AttachmentStrip() {
             <AttachmentContent>
               <AttachmentTitle title={upload.filename}>{upload.filename}</AttachmentTitle>
               <AttachmentDescription>
-                {getUploadAttachmentDescription(upload.status)}
+                {t(getUploadAttachmentDescriptionKey(upload.status))}
               </AttachmentDescription>
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                label={`移除上传项 ${upload.filename}`}
+                label={t('input.attachments.removeUpload', { name: upload.filename })}
                 onPress={() => removePendingAttachmentUpload(upload.id)}
               >
                 <X size={12} />

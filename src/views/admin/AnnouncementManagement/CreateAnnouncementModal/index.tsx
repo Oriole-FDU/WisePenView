@@ -5,6 +5,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { Input, Label, ListBox, Select, TextArea, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface CreateAnnouncementModalProps {
@@ -22,14 +23,17 @@ interface AnnouncementFormValues {
   receiverUserIds: string;
 }
 
-const MESSAGE_TYPE_OPTIONS: Array<{ value: PublishMessageType; label: string }> = [
-  { value: 'SYSTEM', label: '系统消息' },
-  { value: 'NORMAL', label: '普通消息' },
+const MESSAGE_TYPE_OPTIONS: Array<{ value: PublishMessageType; labelKey: string }> = [
+  { value: 'SYSTEM', labelKey: 'announcement.type.SYSTEM' },
+  { value: 'NORMAL', labelKey: 'announcement.type.NORMAL' },
 ];
 
-const DELIVERY_SCOPE_OPTIONS: Array<{ value: PublishMessageDeliveryScope; label: string }> = [
-  { value: 'ALL_USERS', label: '全员消息' },
-  { value: 'DIRECT', label: '定向投递' },
+const DELIVERY_SCOPE_OPTIONS: Array<{
+  value: PublishMessageDeliveryScope;
+  labelKey: string;
+}> = [
+  { value: 'ALL_USERS', labelKey: 'announcement.scope.ALL_USERS' },
+  { value: 'DIRECT', labelKey: 'announcement.scope.DIRECT' },
 ];
 
 const INITIAL_FORM_VALUES: AnnouncementFormValues = {
@@ -53,6 +57,7 @@ function CreateAnnouncementModal({
   onOpenChange,
   onSuccess,
 }: CreateAnnouncementModalProps) {
+  const { t } = useTranslation(['admin', 'common']);
   const userService = useUserService();
   const [formValues, setFormValues] = useState<AnnouncementFormValues>(INITIAL_FORM_VALUES);
 
@@ -94,7 +99,7 @@ function CreateAnnouncementModal({
     {
       manual: true,
       onSuccess: () => {
-        toast.success('公告发布成功');
+        toast.success(t('announcement.publish.success'));
         reset();
         onOpenChange(false);
         onSuccess?.();
@@ -107,12 +112,12 @@ function CreateAnnouncementModal({
 
   const handleSubmit = () => {
     if (!formValues.title.trim()) {
-      toast.warning('请输入公告标题');
+      toast.warning(t('announcement.publish.titleRequired'));
       return;
     }
 
     if (!formValues.content.trim()) {
-      toast.warning('请输入公告内容');
+      toast.warning(t('announcement.publish.contentRequired'));
       return;
     }
 
@@ -120,7 +125,7 @@ function CreateAnnouncementModal({
       formValues.deliveryScope === 'DIRECT' &&
       parseReceiverUserIds(formValues.receiverUserIds).length === 0
     ) {
-      toast.warning('请输入接收用户 ID');
+      toast.warning(t('announcement.publish.receiverRequired'));
       return;
     }
 
@@ -137,9 +142,9 @@ function CreateAnnouncementModal({
     <AppFormDialog
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
-      title="发布公告"
-      confirmText="发布"
-      cancelText="取消"
+      title={t('announcement.publish.title')}
+      confirmText={t('announcement.publish.action')}
+      cancelText={t('actions.cancel', { ns: 'common' })}
       onCancel={handleCancel}
       onSubmit={handleSubmit}
       isSubmitting={submitting}
@@ -150,19 +155,19 @@ function CreateAnnouncementModal({
     >
       <div className={styles.form}>
         <TextField
-          aria-label="公告标题"
+          aria-label={t('announcement.publish.titleLabel')}
           value={formValues.title}
           onChange={(value) => updateFormValue('title', value)}
           isDisabled={submitting}
           isRequired
         >
-          <Label>公告标题</Label>
-          <Input placeholder="请输入公告标题" autoFocus />
+          <Label>{t('announcement.publish.titleLabel')}</Label>
+          <Input placeholder={t('announcement.publish.titlePlaceholder')} autoFocus />
         </TextField>
 
         <div className={styles.twoColumnFields}>
           <Select
-            aria-label="公告类型"
+            aria-label={t('announcement.publish.typeLabel')}
             value={formValues.messageType}
             onChange={(value) => {
               if (value == null || Array.isArray(value)) return;
@@ -171,7 +176,7 @@ function CreateAnnouncementModal({
             isDisabled={formValues.deliveryScope === 'ALL_USERS' || submitting}
             isRequired
           >
-            <Label>公告类型</Label>
+            <Label>{t('announcement.publish.typeLabel')}</Label>
             <Select.Trigger>
               <Select.Value />
               <Select.Indicator />
@@ -179,8 +184,8 @@ function CreateAnnouncementModal({
             <Select.Popover>
               <ListBox>
                 {MESSAGE_TYPE_OPTIONS.map((option) => (
-                  <ListBox.Item key={option.value} id={option.value} textValue={option.label}>
-                    {option.label}
+                  <ListBox.Item key={option.value} id={option.value} textValue={t(option.labelKey)}>
+                    {t(option.labelKey)}
                     <ListBox.ItemIndicator />
                   </ListBox.Item>
                 ))}
@@ -189,7 +194,7 @@ function CreateAnnouncementModal({
           </Select>
 
           <Select
-            aria-label="发布范围"
+            aria-label={t('announcement.publish.scopeLabel')}
             value={formValues.deliveryScope}
             onChange={(value) => {
               if (value == null || Array.isArray(value)) return;
@@ -202,7 +207,7 @@ function CreateAnnouncementModal({
             isDisabled={submitting}
             isRequired
           >
-            <Label>发布范围</Label>
+            <Label>{t('announcement.publish.scopeLabel')}</Label>
             <Select.Trigger>
               <Select.Value />
               <Select.Indicator />
@@ -210,8 +215,8 @@ function CreateAnnouncementModal({
             <Select.Popover>
               <ListBox>
                 {DELIVERY_SCOPE_OPTIONS.map((option) => (
-                  <ListBox.Item key={option.value} id={option.value} textValue={option.label}>
-                    {option.label}
+                  <ListBox.Item key={option.value} id={option.value} textValue={t(option.labelKey)}>
+                    {t(option.labelKey)}
                     <ListBox.ItemIndicator />
                   </ListBox.Item>
                 ))}
@@ -221,36 +226,36 @@ function CreateAnnouncementModal({
         </div>
 
         <TextField
-          aria-label="公告内容"
+          aria-label={t('announcement.publish.contentLabel')}
           value={formValues.content}
           onChange={(value) => updateFormValue('content', value)}
           isDisabled={submitting}
           isRequired
         >
-          <Label>公告内容</Label>
-          <TextArea rows={5} placeholder="请输入公告内容" />
+          <Label>{t('announcement.publish.contentLabel')}</Label>
+          <TextArea rows={5} placeholder={t('announcement.publish.contentPlaceholder')} />
         </TextField>
 
         <TextField
-          aria-label="跳转地址"
+          aria-label={t('announcement.publish.jumpUrlLabel')}
           value={formValues.jumpUrl}
           onChange={(value) => updateFormValue('jumpUrl', value)}
           isDisabled={submitting}
         >
-          <Label>跳转地址</Label>
-          <Input placeholder="可选，例如 /app/group" />
+          <Label>{t('announcement.publish.jumpUrlLabel')}</Label>
+          <Input placeholder={t('announcement.publish.jumpUrlPlaceholder')} />
         </TextField>
 
         {formValues.deliveryScope === 'DIRECT' ? (
           <TextField
-            aria-label="接收用户 ID"
+            aria-label={t('announcement.publish.receiverLabel')}
             value={formValues.receiverUserIds}
             onChange={(value) => updateFormValue('receiverUserIds', value)}
             isDisabled={submitting}
             isRequired
           >
-            <Label>接收用户 ID</Label>
-            <Input placeholder="多个 ID 用逗号、分号或空格分隔" />
+            <Label>{t('announcement.publish.receiverLabel')}</Label>
+            <Input placeholder={t('announcement.publish.receiverPlaceholder')} />
           </TextField>
         ) : null}
       </div>

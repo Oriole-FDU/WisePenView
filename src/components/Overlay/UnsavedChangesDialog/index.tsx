@@ -1,4 +1,5 @@
 import { Button } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '../AppAlertDialog';
 import type { UnsavedChangesDialogProps } from './index.type';
@@ -9,20 +10,23 @@ function UnsavedChangesDialog({
   isLoading = false,
   title,
   description,
-  cancelText = '取消',
-  discardText = '放弃更改',
+  cancelText,
+  discardText,
   confirmText,
   onCancel,
   onDiscard,
   onConfirm,
 }: UnsavedChangesDialogProps) {
+  const { t } = useTranslation('common');
+  const resolvedCancelText = cancelText ?? t('actions.cancel');
+  const resolvedDiscardText = discardText ?? t('overlay.discard');
   const actions = onDiscard ? (
     <>
       <Button variant="secondary" isDisabled={isLoading} onPress={onCancel}>
-        {cancelText}
+        {resolvedCancelText}
       </Button>
       <Button variant="secondary" isDisabled={isLoading} onPress={onDiscard}>
-        {discardText}
+        {resolvedDiscardText}
       </Button>
       <Button variant="primary" isDisabled={isLoading} aria-busy={isLoading} onPress={onConfirm}>
         {confirmText}
@@ -39,7 +43,7 @@ function UnsavedChangesDialog({
       }}
       title={title}
       description={description}
-      cancelText={cancelText}
+      cancelText={resolvedCancelText}
       confirmText={confirmText}
       actions={actions}
       onCancel={onCancel}

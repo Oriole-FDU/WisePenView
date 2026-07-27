@@ -4,6 +4,7 @@ import type { ResourceComment } from '@/domains/Interact';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { Button, Tooltip } from '@heroui/react';
 import { Heart, MessageCircle, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 import { getAuthorInitial, hasVisibleCommentContent } from './utils';
 
@@ -30,8 +31,10 @@ function ResourceCommentItem({
   onDelete,
   onPreviewImage,
 }: ResourceCommentItemProps) {
+  const { t } = useTranslation(['resource', 'common']);
   const canDelete = currentUserId === comment.authorId || currentUserId === resourceOwnerId;
-  const timeText = formatTimestampToDateTime(comment.createTime) || '时间未知';
+  const timeText =
+    formatTimestampToDateTime(comment.createTime) || t('resource:comment.unknownTime');
   const commentDate = new Date(comment.createTime);
   const dateTime = Number.isFinite(commentDate.getTime()) ? commentDate.toISOString() : undefined;
 
@@ -47,11 +50,13 @@ function ResourceCommentItem({
       <div className={styles.commentBody}>
         <div className={styles.authorLine}>
           <strong>{comment.author.name}</strong>
-          {comment.replyToUser ? <span>回复 {comment.replyToUser.name}</span> : null}
+          {comment.replyToUser ? (
+            <span>{t('resource:comment.replyTo', { name: comment.replyToUser.name })}</span>
+          ) : null}
         </div>
 
         {comment.deleted ? (
-          <p className={styles.deletedText}>该评论已删除</p>
+          <p className={styles.deletedText}>{t('resource:comment.deleted')}</p>
         ) : (
           <>
             {hasVisibleCommentContent(comment.content) ? (
@@ -64,10 +69,10 @@ function ResourceCommentItem({
                     key={`${url}-${index}`}
                     type="button"
                     className={styles.commentImageButton}
-                    aria-label="预览评论图片"
+                    aria-label={t('resource:comment.previewImage')}
                     onClick={() => onPreviewImage(url)}
                   >
-                    <img src={url} alt="评论图片" loading="lazy" />
+                    <img src={url} alt={t('resource:comment.imageAlt')} loading="lazy" />
                   </button>
                 ))}
               </div>
@@ -81,9 +86,9 @@ function ResourceCommentItem({
             <div className={styles.commentActions}>
               <AppIconButton
                 icon={<MessageCircle size={14} aria-hidden />}
-                label={`回复 ${comment.author.name}`}
+                label={t('resource:comment.replyAction', { name: comment.author.name })}
                 size="sm"
-                tooltip={{ content: '回复' }}
+                tooltip={{ content: t('resource:comment.reply') }}
                 onPress={() => onReply(comment)}
               />
               <Tooltip>
@@ -93,21 +98,23 @@ function ResourceCommentItem({
                     size="sm"
                     className={liked ? styles.likedButton : undefined}
                     isDisabled={likePending}
-                    aria-label={liked ? '取消点赞' : '点赞'}
+                    aria-label={liked ? t('resource:comment.unlike') : t('resource:comment.like')}
                     onPress={() => void onLike(comment)}
                   >
                     <Heart size={14} aria-hidden fill={liked ? 'currentColor' : 'none'} />
                     {comment.likeCount > 0 ? comment.likeCount : null}
                   </Button>
                 </Tooltip.Trigger>
-                <Tooltip.Content>{liked ? '取消点赞' : '点赞'}</Tooltip.Content>
+                <Tooltip.Content>
+                  {liked ? t('resource:comment.unlike') : t('resource:comment.like')}
+                </Tooltip.Content>
               </Tooltip>
               {canDelete ? (
                 <AppIconButton
                   icon={<Trash2 size={14} aria-hidden />}
-                  label="删除评论"
+                  label={t('resource:comment.delete')}
                   size="sm"
-                  tooltip={{ content: '删除' }}
+                  tooltip={{ content: t('common:actions.delete') }}
                   onPress={() => onDelete(comment)}
                 />
               ) : null}

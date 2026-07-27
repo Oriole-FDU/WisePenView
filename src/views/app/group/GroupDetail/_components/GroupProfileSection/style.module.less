@@ -1,0 +1,127 @@
+.profileLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  align-items: start;
+  gap: clamp(32px, 6vw, 80px);
+}
+
+.fields {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.readonlyFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin: 0;
+
+  div {
+    min-width: 0;
+  }
+
+  dt {
+    margin-bottom: var(--space-2xs);
+    color: var(--muted);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-md);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--foreground);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+}
+
+.coverField {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.coverLabel {
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md);
+}
+
+.coverButton,
+.coverReadonly {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--surface-secondary);
+  aspect-ratio: 16 / 9;
+}
+
+.coverButton {
+  cursor: pointer;
+  outline: none;
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent-border, var(--accent));
+
+    .coverEditAffordance {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    border-color: var(--focus, var(--accent));
+    box-shadow: 0 0 0 2px var(--accent-softer);
+
+    .coverEditAffordance {
+      opacity: 1;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.coverImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverEditAffordance {
+  position: absolute;
+  right: var(--space-sm);
+  bottom: var(--space-sm);
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--surface) 68%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) ease;
+}
+
+@media (max-width: 720px) {
+  .profileLayout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .coverField {
+    width: min(100%, 420px);
+  }
+}

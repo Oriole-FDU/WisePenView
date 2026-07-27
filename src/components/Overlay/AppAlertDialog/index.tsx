@@ -1,6 +1,7 @@
 import { AlertDialog, Button } from '@heroui/react';
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   AppAlertDialogBodyProps,
@@ -35,7 +36,7 @@ function AppAlertDialogRoot({
   description,
   children,
   confirmText,
-  cancelText = '取消',
+  cancelText,
   onConfirm,
   onCancel,
   isConfirmLoading = false,
@@ -54,6 +55,7 @@ function AppAlertDialogRoot({
   footerClassName,
   classNames,
 }: AppAlertDialogProps) {
+  const { t } = useTranslation('common');
   const status = STATUS_MAP[type];
   const isDanger = type === 'danger';
   const canDismiss = isDismissable && !isConfirmLoading;
@@ -85,7 +87,7 @@ function AppAlertDialogRoot({
     return (
       <>
         <Button variant="secondary" isDisabled={isConfirmLoading} onPress={handleCancel}>
-          {cancelText}
+          {cancelText ?? t('actions.cancel')}
         </Button>
         <Button
           variant={isDanger ? 'danger' : 'primary'}
@@ -93,7 +95,7 @@ function AppAlertDialogRoot({
           aria-busy={isConfirmLoading || undefined}
           onPress={handleConfirm}
         >
-          {confirmText ?? '确定'}
+          {confirmText ?? t('actions.confirm')}
         </Button>
       </>
     );

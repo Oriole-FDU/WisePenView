@@ -2,7 +2,7 @@
 
 .menuContainer {
   flex: 1;
-  min-height: 0;
+  min-height: var(--layout-sidebar-session-list-min-height, 120px);
   overflow: hidden;
 }
 
@@ -100,6 +100,7 @@
 .sessionPanel {
   overflow-y: auto;
   overflow-x: hidden;
+  min-height: var(--layout-sidebar-session-list-min-height, 120px);
   padding: 8px;
   .appSubtleScrollbar();
 }

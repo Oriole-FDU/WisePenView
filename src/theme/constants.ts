@@ -50,8 +50,8 @@ export const DEFAULT_THEME_FORM_RADIUS = THEME_FORM_RADIUS.LARGE;
 
 export interface ColorSchemeOption {
   id: ColorScheme;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
 }
 
 export interface ThemeRadiusOption {
@@ -69,19 +69,63 @@ export interface ThemeFormRadiusOption {
 }
 
 export const COLOR_SCHEME_OPTIONS: ColorSchemeOption[] = [
-  { id: COLOR_SCHEME.DEFAULT, label: '烟蓝', description: '蓝灰色系' },
-  { id: COLOR_SCHEME.FLORAL, label: '樱粉', description: '柔粉色系' },
-  { id: COLOR_SCHEME.AQUA, label: '青碧', description: '青蓝色系' },
-  { id: COLOR_SCHEME.SUNSET, label: '暮橘', description: '暖橘色系' },
-  { id: COLOR_SCHEME.EMERALD, label: '翠微', description: '翠绿色系' },
-  { id: COLOR_SCHEME.LAVENDER, label: '紫烟', description: '薰衣草紫' },
-  { id: COLOR_SCHEME.SPROUT, label: '春芽', description: '春芽色系' },
+  {
+    id: COLOR_SCHEME.DEFAULT,
+    labelKey: 'appearance.scheme.default.label',
+    descriptionKey: 'appearance.scheme.default.description',
+  },
+  {
+    id: COLOR_SCHEME.FLORAL,
+    labelKey: 'appearance.scheme.floral.label',
+    descriptionKey: 'appearance.scheme.floral.description',
+  },
+  {
+    id: COLOR_SCHEME.AQUA,
+    labelKey: 'appearance.scheme.aqua.label',
+    descriptionKey: 'appearance.scheme.aqua.description',
+  },
+  {
+    id: COLOR_SCHEME.SUNSET,
+    labelKey: 'appearance.scheme.sunset.label',
+    descriptionKey: 'appearance.scheme.sunset.description',
+  },
+  {
+    id: COLOR_SCHEME.EMERALD,
+    labelKey: 'appearance.scheme.emerald.label',
+    descriptionKey: 'appearance.scheme.emerald.description',
+  },
+  {
+    id: COLOR_SCHEME.LAVENDER,
+    labelKey: 'appearance.scheme.lavender.label',
+    descriptionKey: 'appearance.scheme.lavender.description',
+  },
+  {
+    id: COLOR_SCHEME.SPROUT,
+    labelKey: 'appearance.scheme.sprout.label',
+    descriptionKey: 'appearance.scheme.sprout.description',
+  },
 ];
 
-export const THEME_MODE_OPTIONS: Array<{ id: ThemeMode; label: string; description: string }> = [
-  { id: THEME_MODE.LIGHT, label: '浅色', description: '始终使用浅色界面' },
-  { id: THEME_MODE.DARK, label: '深色', description: '始终使用深色界面' },
-  { id: THEME_MODE.SYSTEM, label: '跟随系统', description: '随操作系统明暗设置切换' },
+export const THEME_MODE_OPTIONS: Array<{
+  id: ThemeMode;
+  labelKey: string;
+  descriptionKey: string;
+}> = [
+  {
+    id: THEME_MODE.LIGHT,
+    labelKey: 'appearance.modeOption.light.label',
+    descriptionKey: 'appearance.modeOption.light.description',
+  },
+  {
+    id: THEME_MODE.DARK,
+    labelKey: 'appearance.modeOption.dark.label',
+    descriptionKey: 'appearance.modeOption.dark.description',
+  },
+  {
+    id: THEME_MODE.SYSTEM,
+    labelKey: 'appearance.modeOption.system.label',
+    descriptionKey: 'appearance.modeOption.system.description',
+  },
 ];
 
 export const THEME_RADIUS_OPTIONS: ThemeRadiusOption[] = [

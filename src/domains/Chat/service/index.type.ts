@@ -47,7 +47,6 @@ export interface ChatModel {
   supportThinking: boolean;
   supportTools: boolean;
   tags: ChatModelTag[];
-  multiplier: string | null;
   isDefault: boolean;
   vision: boolean;
   usageRank: number;

@@ -1,9 +1,9 @@
-import { Popover } from '@/components/Overlay';
+import { AppPopover } from '@/components/Overlay';
 import { CloudUpload, FileInput, FolderPlus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/Button/AppIconButton';
-import { ROOT_DISPLAY } from '@/components/Drive/common/constants';
 import type { DriveActionTarget } from '@/components/Drive/common/driveComponentModel';
 import EntryIcon from '@/components/Icons/EntryIcon';
 import type { DriveNode, FolderNode, RootNode } from '@/domains/Drive';
@@ -28,11 +28,21 @@ function stopTreeAction(event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLEleme
   event.stopPropagation();
 }
 
-function getNodeDisplayName(node: DriveNode, resourceName: string): string {
-  if (node.type === 'root') return node.name || ROOT_DISPLAY;
-  if (node.type === 'folder') return node.name || ROOT_DISPLAY;
+function getNodeDisplayName(
+  node: DriveNode,
+  resourceName: string,
+  driveName: string,
+  sharedFolder: string,
+  unnamedFolder: string,
+  loadingLabel: string
+): string {
+  if (node.type === 'root') return node.name || driveName;
+  if (node.type === 'folder') {
+    if (node.systemType === 'shared') return sharedFolder;
+    return node.name || unnamedFolder;
+  }
   if (node.type === 'resource' || node.type === 'link') return resourceName;
-  return node.label || '正在加载...';
+  return node.label || loadingLabel;
 }
 
 function SidebarDriveNodeTitle({
@@ -42,9 +52,14 @@ function SidebarDriveNodeTitle({
   onRenameNode,
   onDeleteNode,
 }: SidebarDriveNodeTitleProps) {
+  const { t } = useTranslation(['drive', 'common']);
   const resourceId = node.type === 'resource' || node.type === 'link' ? node.resourceId : undefined;
   const fallbackName = node.type === 'resource' || node.type === 'link' ? node.title : undefined;
-  const resourceName = useResourceDisplayName(resourceId, fallbackName, '未命名文件');
+  const resourceName = useResourceDisplayName(
+    resourceId,
+    fallbackName,
+    t('drive:node.unnamedFile')
+  );
   const resourceType =
     node.type === 'resource' || node.type === 'link' ? node.resourceType : undefined;
   const resourceIconType =
@@ -59,7 +74,14 @@ function SidebarDriveNodeTitle({
   const canRename = !isSystemFolder && (node.type === 'folder' || node.type === 'resource');
   const canDelete =
     !isSystemFolder && (node.type === 'folder' || node.type === 'resource' || node.type === 'link');
-  const label = getNodeDisplayName(node, resourceName);
+  const label = getNodeDisplayName(
+    node,
+    resourceName,
+    t('drive:node.drive'),
+    t('drive:node.shared'),
+    t('drive:node.unnamedFolder'),
+    t('drive:node.loading')
+  );
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const handleCreate = (action: SidebarDriveCreateAction) => {
     setCreateMenuOpen(false);
@@ -89,121 +111,119 @@ function SidebarDriveNodeTitle({
           onKeyDown={stopTreeAction}
         >
           {canCreateFolder ? (
-            <Popover isOpen={createMenuOpen} onOpenChange={setCreateMenuOpen}>
+            <AppPopover isOpen={createMenuOpen} onOpenChange={setCreateMenuOpen}>
               <AppIconButton
                 icon={<Plus size={14} aria-hidden="true" />}
-                label={`在${label}中新建`}
+                label={t('drive:sidebar.createIn', { name: label })}
                 size="sm"
                 className={styles.nodeActionBtn}
-                tooltip={{ content: '新建' }}
-                overlayTrigger={<Popover.Trigger />}
+                tooltip={{ content: t('drive:create.menu') }}
+                overlayTrigger={<AppPopover.Trigger />}
               />
-              <Popover.Content className={styles.createPopover} placement="right">
-                <Popover.Dialog>
-                  <div
-                    className={styles.createMenuPanel}
-                    onClick={stopTreeAction}
-                    onKeyDown={stopTreeAction}
+              <AppPopover.Content placement="right">
+                <div
+                  className={styles.createMenuPanel}
+                  onClick={stopTreeAction}
+                  onKeyDown={stopTreeAction}
+                >
+                  <button
+                    type="button"
+                    className={styles.createMenuItem}
+                    onClick={() => handleCreate('folder')}
                   >
-                    <button
-                      type="button"
-                      className={styles.createMenuItem}
-                      onClick={() => handleCreate('folder')}
-                    >
-                      <FolderPlus size={15} color="var(--primary)" aria-hidden="true" />
-                      <span>新建文件夹</span>
-                    </button>
-                    {canCreateResource ? (
-                      <>
+                    <FolderPlus size={15} color="var(--primary)" aria-hidden="true" />
+                    <span>{t('drive:create.folder')}</span>
+                  </button>
+                  {canCreateResource ? (
+                    <>
+                      <button
+                        type="button"
+                        className={styles.createMenuItem}
+                        onClick={() => handleCreate('note')}
+                      >
+                        <EntryIcon
+                          entryType="resource"
+                          resourceIconType="note"
+                          size={15}
+                          color="var(--primary)"
+                        />
+                        <span>{t('drive:create.note')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.createMenuItem}
+                        onClick={() => handleCreate('importNote')}
+                      >
+                        <FileInput size={15} color="var(--primary)" aria-hidden="true" />
+                        <span>{t('drive:create.importNote')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.createMenuItem}
+                        onClick={() => handleCreate('drawio')}
+                      >
+                        <EntryIcon
+                          entryType="resource"
+                          resourceIconType="drawio"
+                          size={15}
+                          color="var(--primary)"
+                        />
+                        <span>{t('drive:create.drawio')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.createMenuItem}
+                        onClick={() => handleCreate('skill')}
+                      >
+                        <EntryIcon
+                          entryType="resource"
+                          resourceIconType="skill"
+                          size={15}
+                          color="var(--primary)"
+                        />
+                        <span>{t('drive:create.skill')}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.createMenuItem}
+                        onClick={() => handleCreate('agent')}
+                      >
+                        <EntryIcon entryType="resource" resourceIconType="agent" size={15} />
+                        <span>{t('drive:create.agent')}</span>
+                      </button>
+                      {canUploadDocument ? (
                         <button
                           type="button"
                           className={styles.createMenuItem}
-                          onClick={() => handleCreate('note')}
+                          onClick={() => handleCreate('upload')}
                         >
-                          <EntryIcon
-                            entryType="resource"
-                            resourceIconType="note"
-                            size={15}
-                            color="var(--primary)"
-                          />
-                          <span>新建笔记</span>
+                          <CloudUpload size={15} color="var(--primary)" aria-hidden="true" />
+                          <span>{t('drive:create.upload')}</span>
                         </button>
-                        <button
-                          type="button"
-                          className={styles.createMenuItem}
-                          onClick={() => handleCreate('importNote')}
-                        >
-                          <FileInput size={15} color="var(--primary)" aria-hidden="true" />
-                          <span>导入笔记</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.createMenuItem}
-                          onClick={() => handleCreate('drawio')}
-                        >
-                          <EntryIcon
-                            entryType="resource"
-                            resourceIconType="drawio"
-                            size={15}
-                            color="var(--primary)"
-                          />
-                          <span>新建图表</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.createMenuItem}
-                          onClick={() => handleCreate('skill')}
-                        >
-                          <EntryIcon
-                            entryType="resource"
-                            resourceIconType="skill"
-                            size={15}
-                            color="var(--primary)"
-                          />
-                          <span>新建 Skill</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.createMenuItem}
-                          onClick={() => handleCreate('agent')}
-                        >
-                          <EntryIcon entryType="resource" resourceIconType="agent" size={15} />
-                          <span>新建 Agent</span>
-                        </button>
-                        {canUploadDocument ? (
-                          <button
-                            type="button"
-                            className={styles.createMenuItem}
-                            onClick={() => handleCreate('upload')}
-                          >
-                            <CloudUpload size={15} color="var(--primary)" aria-hidden="true" />
-                            <span>上传文件</span>
-                          </button>
-                        ) : null}
-                      </>
-                    ) : null}
-                  </div>
-                </Popover.Dialog>
-              </Popover.Content>
-            </Popover>
+                      ) : null}
+                    </>
+                  ) : null}
+                </div>
+              </AppPopover.Content>
+            </AppPopover>
           ) : null}
           {canRename ? (
             <AppIconButton
               icon={<Pencil size={14} aria-hidden="true" />}
-              label={`重命名${label}`}
+              label={t('drive:sidebar.renameNode', { name: label })}
               size="sm"
               className={styles.nodeActionBtn}
-              tooltip={{ content: '重命名' }}
+              tooltip={{ content: t('common:actions.rename') }}
               onClick={() => onRenameNode(node)}
             />
           ) : null}
           {canDelete ? (
             <AppIconButton
               icon={<Trash2 size={14} aria-hidden="true" />}
-              label={`删除${label}`}
+              label={t('drive:sidebar.deleteNode', { name: label })}
               size="sm"
               className={styles.nodeActionBtn}
-              tooltip={{ content: '删除' }}
+              tooltip={{ content: t('common:actions.delete') }}
               onClick={() => onDeleteNode(node)}
             />
           ) : null}

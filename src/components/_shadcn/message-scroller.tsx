@@ -3,6 +3,7 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import { ArrowDownIcon } from 'lucide-react';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   MessageScroller as MessageScrollerPrimitive,
@@ -93,6 +94,8 @@ function MessageScrollerButton({
   Pick<React.ComponentProps<typeof AppIconButton>, 'size'> & {
     variant?: 'primary' | 'secondary' | 'ghost';
   }) {
+  const { t } = useTranslation('chat');
+
   return (
     <MessageScrollerPrimitive.Button
       data-slot="message-scroller-button"
@@ -108,7 +111,7 @@ function MessageScrollerButton({
         render ?? (
           <AppIconButton
             icon={<ArrowDownIcon aria-hidden="true" />}
-            label={direction === 'end' ? '滚动到底部' : '滚动到顶部'}
+            label={direction === 'end' ? t('message.scrollToBottom') : t('message.scrollToTop')}
             size={size}
           />
         )
@@ -119,7 +122,7 @@ function MessageScrollerButton({
         <>
           <ArrowDownIcon />
           <span className="sr-only">
-            {direction === 'end' ? 'Scroll to end' : 'Scroll to start'}
+            {direction === 'end' ? t('message.scrollToBottom') : t('message.scrollToTop')}
           </span>
         </>
       )}

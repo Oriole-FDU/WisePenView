@@ -2,8 +2,8 @@ import { Table } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { joinClassNames, resolveColumnAlign } from '../../../shared/TableBase/cellAlign';
 import {
-  resolveDataColumnWidthClass,
-  resolveDataSkeletonBarWidth,
+  resolveReadonlyColumnWidthClass,
+  resolveReadonlySkeletonBarWidth,
 } from '../../../shared/TableBase/columnWidth';
 import type { TableColumnWidth } from '../../../shared/TableBase/index.type';
 import TableCellAlign from '../../../shared/cells/CellAlign';
@@ -44,14 +44,14 @@ function DataTableLoadingSkeleton({
               key={column.id}
               className={joinClassNames(
                 styles.skeletonCell,
-                resolveDataColumnWidthClass(column.width, equalLayout),
+                resolveReadonlyColumnWidthClass(column.width, equalLayout),
                 column.className
               )}
             >
               <TableCellAlign align={resolveColumnAlign(column.align)}>
                 <div
                   className={styles.skeletonBar}
-                  data-width={resolveDataSkeletonBarWidth(
+                  data-width={resolveReadonlySkeletonBarWidth(
                     column.width,
                     equalLayout,
                     column.isRowHeader

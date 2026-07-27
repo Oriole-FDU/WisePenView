@@ -1,6 +1,6 @@
 import type { Selection, SortDescriptor } from '@heroui/react';
 import type { ReactNode } from 'react';
-import type { ManageColumnWidth } from '../shared/TableBase/columnWidth';
+import type { EditableColumnWidth } from '../shared/TableBase/columnWidth';
 import type { TableColumnBase } from '../shared/TableBase/index.type';
 import type { TableRowAction } from '../shared/TableRowActions/index.type';
 
@@ -16,7 +16,7 @@ export interface ManageTableColumn<T extends object> extends Omit<
   TableColumnBase<T, ManageTableRowContext<T>>,
   'renderCell' | 'width'
 > {
-  width?: ManageColumnWidth;
+  width?: EditableColumnWidth;
   renderCell: (row: T, ctx: ManageTableRowContext<T>) => ReactNode;
   renderEditCell?: (row: T, ctx: ManageTableRowContext<T>) => ReactNode;
 }

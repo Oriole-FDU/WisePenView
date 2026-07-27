@@ -6,9 +6,9 @@ export type ProfileFormValues = UpdateUserInfoRequest;
 /** 与 `PROFILE_FIELDS` 单项结构一致 */
 export type ProfileFieldItem = {
   key: ProfileFieldKey;
-  label: string;
+  labelKey: string;
   type: 'input' | 'select';
-  placeholder: string;
+  placeholderKey: string;
   optionsKey?: 'sex' | 'degreeLevel';
 };
 

@@ -112,20 +112,17 @@ const mapResourceTagBindsFromApi = (
 const resolveUserDisplayName = (
   userInfo: UserDisplayBase | undefined,
   fallbackId: string
-): string =>
-  userInfo?.realName?.trim() ||
-  userInfo?.nickname?.trim() ||
-  (fallbackId ? `用户 ${fallbackId}` : '用户');
+): string => userInfo?.realName?.trim() || userInfo?.nickname?.trim() || fallbackId;
 
 const resolveGroupDisplayName = (
   groupInfo: ResourceGroupDisplayBaseApiResponse | undefined,
   fallbackId: string
-): string => groupInfo?.groupName?.trim() || (fallbackId ? `小组 ${fallbackId}` : '小组');
+): string => groupInfo?.groupName?.trim() || fallbackId;
 
 const resolveGroupMemberSubjectName = (
   groupId: string,
   groupInfo?: ResourceGroupDisplayBaseApiResponse
-): string => `${resolveGroupDisplayName(groupInfo, groupId)} 的成员`;
+): string => resolveGroupDisplayName(groupInfo, groupId);
 
 const isGrantedActionListItem = (
   value: unknown
@@ -317,13 +314,13 @@ const mapPermissionActionOptions = (
   return supportedActions.map((action) => ({
     action,
     key: RESOURCE_ACTION.getKey(action) ?? String(action),
-    label: RESOURCE_ACTION.labels[action] ?? String(action),
+    label: RESOURCE_ACTION.getKey(action) ?? String(action),
     supported: true,
   }));
 };
 
 const resolveOwnerName = (ownerInfo: UserDisplayBase | undefined, ownerId?: string): string =>
-  ownerInfo?.realName?.trim() || ownerInfo?.nickname?.trim() || ownerId || '所有者';
+  ownerInfo?.realName?.trim() || ownerInfo?.nickname?.trim() || ownerId || '';
 
 const mapResourcePermissionOverviewFromApi = (
   raw: ResourceItemApiResponse,
@@ -346,7 +343,7 @@ const mapResourcePermissionOverviewFromApi = (
     kind: 'owner',
     source: 'owner',
     name: resolveOwnerName(ownerInfo, resourceInfo.ownerId),
-    description: '所有者',
+    description: '',
     avatar: ownerInfo?.avatar,
     userId: resourceInfo.ownerId,
     effectiveActions: ownerActions,
@@ -377,7 +374,7 @@ const mapResourcePermissionOverviewFromApi = (
       kind: 'group',
       source: 'tag',
       name: resolveGroupMemberSubjectName(groupId),
-      description: '继承自资源所在标签的权限',
+      description: '',
       groupId,
       primaryTagId: bind.primaryTagId,
       effectiveActions: [],
@@ -394,7 +391,7 @@ const mapResourcePermissionOverviewFromApi = (
       kind: 'group',
       source: 'resourceOverride',
       name: resolveGroupMemberSubjectName(groupId, groupInfo),
-      description: groupInfo?.groupDesc ?? '已覆盖标签策略，仅对此资源生效',
+      description: groupInfo?.groupDesc ?? '',
       avatar: groupInfo?.groupCoverUrl ?? undefined,
       groupId,
       primaryTagId: primaryTag?.tagId,
@@ -411,7 +408,7 @@ const mapResourcePermissionOverviewFromApi = (
       kind: 'user',
       source: 'specifiedUser',
       name: resolveUserDisplayName(userInfo, userId),
-      description: '由您邀请而获得的权限',
+      description: '',
       avatar: userInfo?.avatar,
       userId,
       effectiveActions: filteredActions,

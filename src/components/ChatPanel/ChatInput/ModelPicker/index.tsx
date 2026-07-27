@@ -1,7 +1,6 @@
 import ModelSelector from '@/components/ModelSelector';
 import { useChatService } from '@/domains';
 import { useRequest } from 'ahooks';
-import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 
@@ -32,13 +31,13 @@ function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {
       }
     },
   });
-  const selectedModel = useMemo(() => {
+  const selectedModel = (() => {
     if (availableModels.length === 0) return null;
     const explicitModel = selectedModelId
       ? availableModels.find((model) => model.id === selectedModelId)
       : undefined;
     return explicitModel ?? availableModels.find((model) => model.isDefault) ?? availableModels[0];
-  }, [availableModels, selectedModelId]);
+  })();
 
   return (
     <ModelSelector

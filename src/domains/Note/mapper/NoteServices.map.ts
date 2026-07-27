@@ -48,8 +48,7 @@ const mapAuthorDisplay = (
   }
 ): NoteInfoDisplayAuthor => ({
   id: normalizeId(authorId),
-  // fallback：作者展示名缺失时显示未知用户
-  name: author?.nickname || author?.realName || '未知用户',
+  name: author?.nickname || author?.realName || normalizeId(authorId),
   avatar: author?.avatar ?? undefined,
 });
 
@@ -69,8 +68,8 @@ const mapNoteInfoDisplayFromApi = (data: GetNoteInfoApiResponse): NoteInfoDispla
     authorIds.map((authorId) => [authorId, mapAuthorDisplay(authorId, authorsDisplay[authorId])])
   );
   const lastEditedAtText = data.noteInfo?.lastUpdatedAt
-    ? formatTimestampToDateTime(data.noteInfo.lastUpdatedAt) || '暂无'
-    : '暂无';
+    ? formatTimestampToDateTime(data.noteInfo.lastUpdatedAt)
+    : '';
 
   return {
     noteTitle: resourceInfo.resourceName,

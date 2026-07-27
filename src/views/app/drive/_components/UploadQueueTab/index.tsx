@@ -15,8 +15,10 @@ import { parseErrorMessage } from '@/utils/error';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 import { Button, ProgressBar, toast } from '@heroui/react';
 import { useInterval, useMount, useRequest, useUnmount } from 'ahooks';
+import type { TFunction } from 'i18next';
 import { CircleAlert, CircleCheck } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 const REFRESH_INTERVAL_MS = 5000;
@@ -39,7 +41,19 @@ type UploadQueueRow = {
   cancelable: boolean;
 };
 
+const documentStatusKeyMap: Record<string, string> = {
+  [DOCUMENT_PROCESS.UPLOADING]: 'uploadQueue.status.document.UPLOADING',
+  [DOCUMENT_PROCESS.UPLOADED]: 'uploadQueue.status.document.UPLOADED',
+  [DOCUMENT_PROCESS.CONVERTING_AND_PARSING]: 'uploadQueue.status.document.CONVERTING_AND_PARSING',
+  [DOCUMENT_PROCESS.REGISTERING_RES]: 'uploadQueue.status.document.REGISTERING_RES',
+  [DOCUMENT_PROCESS.READY]: 'uploadQueue.status.document.READY',
+  [DOCUMENT_PROCESS.TRANSFER_TIMEOUT]: 'uploadQueue.status.document.TRANSFER_TIMEOUT',
+  [DOCUMENT_PROCESS.REGISTERING_RES_TIMEOUT]: 'uploadQueue.status.document.REGISTERING_RES_TIMEOUT',
+  [DOCUMENT_PROCESS.FAILED]: 'uploadQueue.status.document.FAILED',
+};
+
 function UploadQueueTab() {
+  const { t } = useTranslation(['drive', 'common']);
   const documentService = useDocumentService();
   const localUploads = useDriveUploadQueueStore((state) => state.uploads);
   const completedRowKeysRef = useRef<Set<string>>(new Set());
@@ -74,7 +88,7 @@ function UploadQueueTab() {
     onSuccess: (nextItems) => {
       const readyRows = nextItems.flatMap((item, index) =>
         item.documentStatus.status === DOCUMENT_PROCESS.READY
-          ? [mapCompletedPendingItemToRow(item, index)]
+          ? [mapCompletedPendingItemToRow(item, index, t)]
           : []
       );
       const nextPendingItems = nextItems.filter(
@@ -106,7 +120,7 @@ function UploadQueueTab() {
         setRetryingId(documentId ?? null);
       },
       onSuccess: () => {
-        toast.success('已提交重试');
+        toast.success(t('uploadQueue.feedback.retrySubmitted'));
         runFetchPendingList();
       },
       onError: (err) => {
@@ -128,7 +142,7 @@ function UploadQueueTab() {
         setCancelingId(documentId ?? null);
       },
       onSuccess: () => {
-        toast.success('已取消处理');
+        toast.success(t('uploadQueue.feedback.canceled'));
         runFetchPendingList();
       },
       onError: (err) => {
@@ -157,91 +171,85 @@ function UploadQueueTab() {
     cancelPolling();
   });
 
-  const items = useMemo(
-    () => buildUploadQueueRows(localUploads, pendingItems, completedRows),
-    [completedRows, localUploads, pendingItems]
-  );
+  const items = buildUploadQueueRows(localUploads, pendingItems, completedRows, t);
 
-  const columns = useMemo<DataTableColumn<UploadQueueRow>[]>(
-    () => [
-      {
-        id: 'filename',
-        label: '文件名',
-        width: 'fill',
-        isRowHeader: true,
-        renderCell: (row) => (
-          <span className={styles.nameText}>{row.documentName || '未命名文档'}</span>
-        ),
+  const columns = [
+    {
+      id: 'filename',
+      label: t('uploadQueue.columns.filename'),
+      width: 'fill',
+      isRowHeader: true,
+      renderCell: (row) => (
+        <span className={styles.nameText}>{row.documentName || t('node.unnamedDocument')}</span>
+      ),
+    },
+    {
+      id: 'fileType',
+      label: t('uploadQueue.columns.type'),
+      width: 'sm',
+      renderCell: (row) => formatFileType(row.fileType),
+    },
+    {
+      id: 'size',
+      label: t('uploadQueue.columns.size'),
+      width: 'sm',
+      renderCell: (row) => formatFileSize(row.size),
+    },
+    {
+      id: 'progress',
+      label: t('uploadQueue.columns.progress'),
+      width: 'lg',
+      renderCell: (row) => <UploadProgressCell row={row} />,
+    },
+    {
+      id: 'action',
+      label: '',
+      width: 'md',
+      align: 'end',
+      renderCell: (row) => {
+        if (!row.retryable && !row.cancelable) return null;
+        return (
+          <div className={styles.actionGroup}>
+            {row.retryable ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                isDisabled={retryingId === row.documentId}
+                onPress={() => {
+                  if (row.documentId) runRetryPendingDoc(row.documentId);
+                }}
+              >
+                {t('actions.retry', { ns: 'common' })}
+              </Button>
+            ) : null}
+            {row.cancelable ? (
+              <Button
+                variant="danger"
+                size="sm"
+                isDisabled={cancelingId === row.documentId}
+                onPress={() => {
+                  if (row.documentId) runCancelPendingDoc(row.documentId);
+                }}
+              >
+                {t('actions.cancel', { ns: 'common' })}
+              </Button>
+            ) : null}
+          </div>
+        );
       },
-      {
-        id: 'fileType',
-        label: '类型',
-        width: 'sm',
-        renderCell: (row) => formatFileType(row.fileType),
-      },
-      {
-        id: 'size',
-        label: '大小',
-        width: 'sm',
-        renderCell: (row) => formatFileSize(row.size),
-      },
-      {
-        id: 'progress',
-        label: '进度',
-        width: 'lg',
-        renderCell: (row) => <UploadProgressCell row={row} />,
-      },
-      {
-        id: 'action',
-        label: '',
-        width: 'md',
-        align: 'end',
-        renderCell: (row) => {
-          if (!row.retryable && !row.cancelable) return null;
-          return (
-            <div className={styles.actionGroup}>
-              {row.retryable ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  isDisabled={retryingId === row.documentId}
-                  onPress={() => {
-                    if (row.documentId) runRetryPendingDoc(row.documentId);
-                  }}
-                >
-                  重试
-                </Button>
-              ) : null}
-              {row.cancelable ? (
-                <Button
-                  variant="danger"
-                  size="sm"
-                  isDisabled={cancelingId === row.documentId}
-                  onPress={() => {
-                    if (row.documentId) runCancelPendingDoc(row.documentId);
-                  }}
-                >
-                  取消
-                </Button>
-              ) : null}
-            </div>
-          );
-        },
-      },
-    ],
-    [cancelingId, retryingId, runCancelPendingDoc, runRetryPendingDoc]
-  );
+    },
+  ] satisfies DataTableColumn<UploadQueueRow>[];
 
   return (
     <div className={styles.wrapper}>
       <main className={styles.listArea}>
         <DataTable<UploadQueueRow>
-          ariaLabel="上传队列"
+          ariaLabel={t('uploadQueue.aria')}
           rowKey="queueRowKey"
           items={items}
           columns={columns}
           loading={listLoading}
-          emptyText="暂无上传队列"
+          emptyText={t('uploadQueue.empty')}
           summary={false}
         />
       </main>
@@ -250,6 +258,7 @@ function UploadQueueTab() {
 }
 
 function UploadProgressCell({ row }: { row: UploadQueueRow }) {
+  const { t } = useTranslation('drive');
   const { presentation } = row;
 
   if (presentation.kind === 'done') {
@@ -285,7 +294,10 @@ function UploadProgressCell({ row }: { row: UploadQueueRow }) {
         ) : null}
       </div>
       <ProgressBar
-        aria-label={`${row.documentName || '未命名文档'} ${presentation.label}`}
+        aria-label={t('uploadQueue.status.progressAria', {
+          name: row.documentName || t('node.unnamedDocument'),
+          status: presentation.label,
+        })}
         color="accent"
         isIndeterminate={isLoading}
         size="sm"
@@ -302,7 +314,8 @@ function UploadProgressCell({ row }: { row: UploadQueueRow }) {
 function buildUploadQueueRows(
   localUploads: DriveUploadQueueItem[],
   pendingItems: PendingDocItem[],
-  completedRows: UploadQueueRow[]
+  completedRows: UploadQueueRow[],
+  t: TFunction<'drive'>
 ): UploadQueueRow[] {
   const localUploadByDocumentId = new Map<string, DriveUploadQueueItem>();
   localUploads.forEach((upload) => {
@@ -318,12 +331,13 @@ function buildUploadQueueRows(
   );
   const localRows = localUploads
     .filter((upload) => !upload.documentId || !backendDocumentIds.has(upload.documentId))
-    .map(mapLocalUploadToRow);
+    .map((upload) => mapLocalUploadToRow(upload, t));
   const pendingRows = pendingItems.map((item, index) =>
     mapPendingItemToRow(
       item,
       index,
-      item.documentId ? localUploadByDocumentId.get(item.documentId) : undefined
+      item.documentId ? localUploadByDocumentId.get(item.documentId) : undefined,
+      t
     )
   );
   const activeRowKeys = new Set([...localRows, ...pendingRows].map((row) => row.queueRowKey));
@@ -335,14 +349,14 @@ function buildUploadQueueRows(
   ];
 }
 
-function mapLocalUploadToRow(upload: DriveUploadQueueItem): UploadQueueRow {
+function mapLocalUploadToRow(upload: DriveUploadQueueItem, t: TFunction<'drive'>): UploadQueueRow {
   return {
     queueRowKey: `local:${upload.id}`,
     documentId: upload.documentId,
     documentName: upload.filename,
     fileType: upload.fileType,
     size: upload.size,
-    presentation: resolveLocalUploadPresentation(upload),
+    presentation: resolveLocalUploadPresentation(upload, t),
     retryable: false,
     cancelable: false,
   };
@@ -351,7 +365,8 @@ function mapLocalUploadToRow(upload: DriveUploadQueueItem): UploadQueueRow {
 function mapPendingItemToRow(
   item: PendingDocItem,
   index: number,
-  localUpload?: DriveUploadQueueItem
+  localUpload: DriveUploadQueueItem | undefined,
+  t: TFunction<'drive'>
 ): UploadQueueRow {
   const status = item.documentStatus.status;
   const hasDocumentId = Boolean(item.documentId);
@@ -361,64 +376,82 @@ function mapPendingItemToRow(
     documentName: item.uploadMeta.documentName,
     fileType: item.uploadMeta.fileType,
     size: item.uploadMeta.size,
-    presentation: resolvePendingUploadPresentation(item.documentStatus, localUpload),
+    presentation: resolvePendingUploadPresentation(item.documentStatus, localUpload, t),
     retryable: hasDocumentId && isDocumentRetryableStatus(status),
     cancelable: hasDocumentId && isDocumentCancelableStatus(status),
   };
 }
 
-function mapCompletedPendingItemToRow(item: PendingDocItem, index: number): UploadQueueRow {
+function mapCompletedPendingItemToRow(
+  item: PendingDocItem,
+  index: number,
+  t: TFunction<'drive'>
+): UploadQueueRow {
   return {
     queueRowKey: getPendingQueueRowKey(item, index),
     documentId: item.documentId,
     documentName: item.uploadMeta.documentName,
     fileType: item.uploadMeta.fileType,
     size: item.uploadMeta.size,
-    presentation: { kind: 'done', label: '处理完成' },
+    presentation: { kind: 'done', label: t('uploadQueue.status.done') },
     retryable: false,
     cancelable: false,
   };
 }
 
-function resolveLocalUploadPresentation(upload: DriveUploadQueueItem): UploadProgressPresentation {
+function resolveLocalUploadPresentation(
+  upload: DriveUploadQueueItem,
+  t: TFunction<'drive'>
+): UploadProgressPresentation {
   if (upload.phase === 'hashing') {
-    return { kind: 'loading', label: '本地计算中' };
+    return { kind: 'loading', label: t('uploadQueue.status.hashing') };
   }
   if (upload.phase === 'uploading') {
-    return { kind: 'progress', label: '上传中', progress: upload.progress };
+    return {
+      kind: 'progress',
+      label: t('uploadQueue.status.uploading'),
+      progress: upload.progress,
+    };
   }
   if (upload.phase === 'confirming') {
-    return { kind: 'loading', label: '处理中' };
+    return { kind: 'loading', label: t('uploadQueue.status.processing') };
   }
   if (upload.phase === 'done') {
-    return { kind: 'done', label: '处理完成' };
+    return { kind: 'done', label: t('uploadQueue.status.done') };
   }
-  return { kind: 'error', label: upload.errorMessage ?? '上传失败' };
+  return { kind: 'error', label: upload.errorMessage ?? t('uploadQueue.status.failed') };
 }
 
 function resolvePendingUploadPresentation(
   documentStatus: DocumentProcessStatus,
-  localUpload?: DriveUploadQueueItem
+  localUpload: DriveUploadQueueItem | undefined,
+  t: TFunction<'drive'>
 ): UploadProgressPresentation {
   if (localUpload?.phase === 'failed') {
-    return { kind: 'error', label: localUpload.errorMessage ?? '上传失败' };
+    return { kind: 'error', label: localUpload.errorMessage ?? t('uploadQueue.status.failed') };
   }
   if (isFailedDocumentStatus(documentStatus.status)) {
     return {
       kind: 'error',
-      label: documentStatus.errorMessage ?? DOCUMENT_PROCESS.getLabel(documentStatus.status),
+      label:
+        documentStatus.errorMessage ??
+        t(documentStatusKeyMap[documentStatus.status] ?? 'uploadQueue.status.document.FAILED'),
     };
   }
   if (documentStatus.status === DOCUMENT_PROCESS.READY || localUpload?.phase === 'done') {
-    return { kind: 'done', label: '处理完成' };
+    return { kind: 'done', label: t('uploadQueue.status.done') };
   }
   if (documentStatus.status === DOCUMENT_PROCESS.UPLOADING && localUpload?.phase === 'uploading') {
-    return { kind: 'progress', label: '上传中', progress: localUpload.progress };
+    return {
+      kind: 'progress',
+      label: t('uploadQueue.status.uploading'),
+      progress: localUpload.progress,
+    };
   }
   if (documentStatus.status === DOCUMENT_PROCESS.UPLOADING) {
-    return { kind: 'loading', label: '上传中' };
+    return { kind: 'loading', label: t('uploadQueue.status.uploading') };
   }
-  return { kind: 'loading', label: '处理中' };
+  return { kind: 'loading', label: t('uploadQueue.status.processing') };
 }
 
 function isActiveLocalUpload(upload: DriveUploadQueueItem): boolean {

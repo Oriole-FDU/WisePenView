@@ -1,9 +1,9 @@
-import type { Model } from '@/components/ChatPanel/index.type';
 import {
   buildDefaultPersonalAgent,
   type CapabilitySkillSelection,
   type CapabilityToolOption,
   type ChatAgentOption,
+  type ChatModel,
 } from '@/domains/Chat';
 import type { ResourceSkillSummary } from '@/domains/Resource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
@@ -17,7 +17,7 @@ import type {
   LocalResourcePayload,
 } from '../index.type';
 
-export const DEFAULT_PERSONAL_AGENT = buildDefaultPersonalAgent();
+const DEFAULT_PERSONAL_AGENT = buildDefaultPersonalAgent();
 
 function buildSkillSelection(
   skill: ResourceSkillSummary,
@@ -44,7 +44,7 @@ function buildSkillSelection(
   };
 }
 
-export interface ChatInputCompletionState {
+interface ChatInputCompletionState {
   value: string;
   selectedModelId: string | null;
   selectedAgent: ChatAgentOption;
@@ -59,7 +59,7 @@ interface ChatInputState {
   activeDocRefs: LocalResourcePayload[];
   activeAttachments: LocalAttachmentPayload[];
   attachmentOpen: boolean;
-  availableModels: Model[];
+  availableModels: ChatModel[];
   documentPickerOpen: boolean;
   isComposing: boolean;
   isDragOver: boolean;
@@ -93,7 +93,7 @@ interface ChatInputActions {
     selected: Array<{ skill: ResourceSkillSummary; sourceAgent: ChatAgentOption | null }>
   ) => void;
   setAttachmentOpen: (open: boolean) => void;
-  setAvailableModels: (models: Model[]) => void;
+  setAvailableModels: (models: ChatModel[]) => void;
   setDocumentPickerOpen: (open: boolean) => void;
   setIsComposing: (isComposing: boolean) => void;
   setIsDragOver: (isDragOver: boolean) => void;
@@ -109,8 +109,8 @@ interface ChatInputActions {
   toggleTool: (tool: CapabilityToolOption) => void;
 }
 
-export type ChatInputStoreState = ChatInputState & ChatInputActions;
-export type ChatInputStoreApi = StoreApi<ChatInputStoreState>;
+type ChatInputStoreState = ChatInputState & ChatInputActions;
+type ChatInputStoreApi = StoreApi<ChatInputStoreState>;
 
 export const ChatInputStoreContext = createContext<ChatInputStoreApi | null>(null);
 
@@ -306,7 +306,7 @@ export function selectChatInputCompletionState(
   };
 }
 
-export function selectChatInputSelectedModel(state: ChatInputStoreState): Model | null {
+export function selectChatInputSelectedModel(state: ChatInputStoreState): ChatModel | null {
   if (state.availableModels.length === 0) return null;
   const explicitModel = state.selectedModelId
     ? state.availableModels.find((model) => model.id === state.selectedModelId)

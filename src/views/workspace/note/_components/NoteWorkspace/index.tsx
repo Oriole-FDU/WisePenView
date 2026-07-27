@@ -2,7 +2,8 @@
 import InlineComment from '@/components/InlineComment';
 import SegmentedTabs from '@/components/SegmentedTabs';
 import { useMemoizedFn, useRequest, useUnmount } from 'ahooks';
-import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CustomBlockNote from '@/components/Note/CustomBlockNote';
 import type {
@@ -20,13 +21,11 @@ import type {
 } from '@/domains/Note';
 import {
   AI_DIFF_DISPLAY_MODE,
-  AI_DIFF_DISPLAY_MODE_LABELS,
   encodeNoteClientContentSignature,
   NoteInlineCommentSession,
   useNoteSession,
 } from '@/domains/Note';
 import type { User } from '@/domains/User';
-import { useEffectForce } from '@/hooks/useEffectForce';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useSmoothFlag } from '@/hooks/useSmoothFlag';
 import { parseErrorMessage } from '@/utils/error';
@@ -59,21 +58,6 @@ interface NoteWorkspaceProps {
 
 const INLINE_COMMENT_POLLING_INTERVAL = 8_000;
 
-const AI_DIFF_DISPLAY_OPTIONS: Array<{ value: AiDiffDisplayMode; label: string }> = [
-  {
-    value: AI_DIFF_DISPLAY_MODE.OLD_ONLY,
-    label: AI_DIFF_DISPLAY_MODE_LABELS[AI_DIFF_DISPLAY_MODE.OLD_ONLY],
-  },
-  {
-    value: AI_DIFF_DISPLAY_MODE.NEW_ONLY,
-    label: AI_DIFF_DISPLAY_MODE_LABELS[AI_DIFF_DISPLAY_MODE.NEW_ONLY],
-  },
-  {
-    value: AI_DIFF_DISPLAY_MODE.COMPARE,
-    label: AI_DIFF_DISPLAY_MODE_LABELS[AI_DIFF_DISPLAY_MODE.COMPARE],
-  },
-];
-
 const NOTE_COLLABORATION_COLORS = [
   '#2563eb',
   '#16a34a',
@@ -87,8 +71,8 @@ const NOTE_COLLABORATION_COLORS = [
   '#ea580c',
 ] as const;
 
-function getNoteCollaborationUserName(user?: User): string {
-  return user?.nickname?.trim() || user?.realName?.trim() || user?.username?.trim() || '当前用户';
+function getNoteCollaborationUserName(user: User | undefined, fallbackName: string): string {
+  return user?.nickname?.trim() || user?.realName?.trim() || user?.username?.trim() || fallbackName;
 }
 
 function pickNoteCollaborationColor(seed: string): string {
@@ -99,10 +83,10 @@ function pickNoteCollaborationColor(seed: string): string {
   return NOTE_COLLABORATION_COLORS[hash % NOTE_COLLABORATION_COLORS.length];
 }
 
-function sanitizeDownloadFileName(fileName: string): string {
+function sanitizeDownloadFileName(fileName: string, fallbackName: string): string {
   const normalizedName = fileName.trim().replace(/[\\/:*?"<>|]+/g, '_');
   const safeName = normalizedName.replace(/[.\s]+$/g, '');
-  return safeName || '未命名笔记';
+  return safeName || fallbackName;
 }
 
 function downloadTextArtifact(params: {
@@ -125,8 +109,11 @@ function downloadTextArtifact(params: {
   }
 }
 
-function buildNoteCollaborationUser(user?: User): NoteCollaborationUser {
-  const name = getNoteCollaborationUserName(user);
+function buildNoteCollaborationUser(
+  user: User | undefined,
+  fallbackName: string
+): NoteCollaborationUser {
+  const name = getNoteCollaborationUserName(user, fallbackName);
   const colorSeed = user?.id?.trim() || user?.username?.trim() || name;
   return {
     name,
@@ -146,14 +133,8 @@ function resolveNoteHeaderSaveStatus(
   return 'saved';
 }
 
-function formatNoteSaveStatus(status: NoteHeaderSaveStatus): string {
-  if (status === 'saving') return '保存中...';
-  if (status === 'waiting') return '等待网络同步';
-  if (status === 'failed') return '保存失败';
-  return '已自动保存';
-}
-
 function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteWorkspaceProps) {
+  const { t } = useTranslation('note');
   const aiDiffDisplayMode = useAiDiffDisplayStore((state) => state.displayMode);
   const setAiDiffDisplayMode = useAiDiffDisplayStore((state) => state.setDisplayMode);
   const { setChatContext } = useResourceHostChatContextActions();
@@ -182,13 +163,8 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const inlineCommentService = useInlineCommentService();
   const userService = useUserService();
   const setResourceSidePanelMode = useWorkspaceResourceSidePanelStore((state) => state.setMode);
-  const inlineCommentSession = useMemo(
-    () =>
-      new NoteInlineCommentSession({
-        resourceId,
-        inlineCommentService,
-      }),
-    [inlineCommentService, resourceId]
+  const [inlineCommentSession] = useState(
+    () => new NoteInlineCommentSession({ resourceId, inlineCommentService })
   );
   const inlineCommentSnapshot = useSyncExternalStore(
     inlineCommentSession.subscribe,
@@ -210,21 +186,18 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const blockLocalDocWrites = isConnected && !noteInfoDisplay.canCollaborativeEdit;
   const showFullPageSpin = (status === 'connecting' && !idbSynced) || shouldWaitCurrentUser;
   const middleOverlayText =
-    status === 'connecting' && !idbSynced ? '正在连接笔记服务...' : '正在加载用户信息...';
+    status === 'connecting' && !idbSynced ? t('workspace.connecting') : t('workspace.loadingUser');
   const fallbackNoteTitle = noteInfoDisplay.noteTitle;
   const [aiDiffBodyContentHash, setAiDiffBodyContentHash] = useState<string | undefined>(undefined);
-  const noteClientContentSignature = useMemo(
-    () =>
-      aiDiffBodyContentHash
-        ? encodeNoteClientContentSignature({ bodyHash: aiDiffBodyContentHash })
-        : undefined,
-    [aiDiffBodyContentHash]
-  );
+  const noteClientContentSignature = aiDiffBodyContentHash
+    ? encodeNoteClientContentSignature({ bodyHash: aiDiffBodyContentHash })
+    : undefined;
   const isNoteClientContentSignaturePending = !aiDiffBodyContentHash;
-  const resourceName = useResourceDisplayName(resourceId, fallbackNoteTitle, '未命名笔记');
+  const untitledTitle = t('title.untitled');
+  const resourceName = useResourceDisplayName(resourceId, fallbackNoteTitle, untitledTitle);
   const headerSaveStatus = resolveNoteHeaderSaveStatus(saveStatus, titleSaveStatus);
-  const saveStatusText = formatNoteSaveStatus(headerSaveStatus);
-  const collaborationUser = useMemo(() => buildNoteCollaborationUser(currentUser), [currentUser]);
+  const saveStatusText = t(`save.${headerSaveStatus}`);
+  const collaborationUser = buildNoteCollaborationUser(currentUser, t('workspace.currentUser'));
   const canRenderBodyEditor = !shouldWaitCurrentUser;
   const findMode = useNoteFindMode({
     editorRef: bodyEditorRef,
@@ -285,11 +258,11 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const handlePrintPdf = useMemoizedFn(async () => {
     const bodyApi = bodyEditorRef.current;
     if (!bodyApi) {
-      toast.info('编辑器未就绪');
+      toast.info(t('export.editorNotReady'));
       return;
     }
     const titleApi = titleEditorRef.current;
-    const title = titleApi?.getPlainTitle() ?? fallbackNoteTitle ?? '未命名笔记';
+    const title = titleApi?.getPlainTitle() ?? fallbackNoteTitle ?? untitledTitle;
     const titleRoot = titleApi?.getProseMirrorRoot() ?? null;
     try {
       setExportPending(true);
@@ -304,19 +277,19 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const handleDownloadMarkdown = useMemoizedFn(async () => {
     const bodyApi = bodyEditorRef.current;
     if (!bodyApi) {
-      toast.info('编辑器未就绪');
+      toast.info(t('export.editorNotReady'));
       return;
     }
     try {
       setExportPending(true);
-      const title = titleEditorRef.current?.getPlainTitle() ?? fallbackNoteTitle ?? '未命名笔记';
+      const title = titleEditorRef.current?.getPlainTitle() ?? fallbackNoteTitle ?? untitledTitle;
       const artifact = bodyApi.exportMarkdown();
       downloadTextArtifact({
         content: artifact.content,
         mimeType: artifact.mimeType,
-        fileName: `${sanitizeDownloadFileName(title)}.${artifact.extension}`,
+        fileName: `${sanitizeDownloadFileName(title, untitledTitle)}.${artifact.extension}`,
       });
-      toast.success('Markdown 下载已开始');
+      toast.success(t('export.markdownStarted'));
     } catch (err) {
       toast.danger(parseErrorMessage(err));
     } finally {
@@ -324,46 +297,35 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
     }
   });
 
-  const noteChatStateProvider = useMemo(
-    () =>
-      createNoteChatStateProvider({
-        resourceId,
-        syncStatus: status,
-        isClientContentSignaturePending: isNoteClientContentSignaturePending,
-        clientContentSignature: noteClientContentSignature,
-      }),
-    [isNoteClientContentSignaturePending, noteClientContentSignature, resourceId, status]
-  );
+  const noteChatStateProvider = createNoteChatStateProvider({
+    resourceId,
+    syncStatus: status,
+    isClientContentSignaturePending: isNoteClientContentSignaturePending,
+    clientContentSignature: noteClientContentSignature,
+  });
 
-  const handleAskAi = useCallback(
-    (selection: NoteSelectionSnapshot) => {
-      setChatContext(createNoteSelectionChatContext(resourceId, selection));
-    },
-    [resourceId, setChatContext]
-  );
+  const handleAskAi = useMemoizedFn((selection: NoteSelectionSnapshot) => {
+    setChatContext(createNoteSelectionChatContext(resourceId, selection));
+  });
 
-  const handleInlineCommentCreateRequest = useCallback(
-    (draft: NoteInlineCommentDraft) => {
-      setInlineCommentDraft(draft);
-      setResourceSidePanelMode(resourceId, 'inlineComment');
-    },
-    [resourceId, setResourceSidePanelMode]
-  );
+  const handleInlineCommentCreateRequest = useMemoizedFn((draft: NoteInlineCommentDraft) => {
+    setInlineCommentDraft(draft);
+    setResourceSidePanelMode(resourceId, 'inlineComment');
+  });
 
-  const handleInlineCommentThreadSelect = useCallback(
-    (threadId: string) => {
-      setActiveInlineCommentThreadId(threadId);
-      setInlineCommentScrollTarget({ threadId });
-      setResourceSidePanelMode(resourceId, 'inlineComment');
-    },
-    [resourceId, setResourceSidePanelMode]
-  );
+  const handleInlineCommentThreadSelect = useMemoizedFn((threadId: string) => {
+    setActiveInlineCommentThreadId(threadId);
+    setInlineCommentScrollTarget({ threadId });
+    setResourceSidePanelMode(resourceId, 'inlineComment');
+  });
 
   /**
+   * @wisepen-manual-effect
    * 执行时机：选中批注并完成侧栏布局更新后，将正文锚点平滑滚动到视口中央。
-   * 不可替代原因：回调会传给子组件，React 不允许它闭包读取 ref；cleanup 无资源需要释放。
+   * 不可替代原因：目标正文位置存在于 BlockNote 编辑器的命令式滚动运行时中。
+   * cleanup：没有订阅或延迟任务，无需清理。
    */
-  useEffectForce(() => {
+  useEffect(() => {
     if (!inlineCommentScrollTarget) return;
     bodyEditorRef.current?.scrollToAnchor({
       kind: 'inlineComment',
@@ -371,169 +333,163 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
     });
   }, [inlineCommentScrollTarget]);
 
-  const inlineCommentsBinding = useMemo(
-    () => ({
-      session: inlineCommentSession,
-      onCreateRequest: handleInlineCommentCreateRequest,
-      onThreadSelect: handleInlineCommentThreadSelect,
-    }),
-    [handleInlineCommentCreateRequest, handleInlineCommentThreadSelect, inlineCommentSession]
-  );
+  const inlineCommentsBinding = {
+    session: inlineCommentSession,
+    onCreateRequest: handleInlineCommentCreateRequest,
+    onThreadSelect: handleInlineCommentThreadSelect,
+  };
 
-  const resourceHostConfig = useMemo<ResourceHostLayoutConfig>(
-    () => ({
-      className: styles.pageWrap,
-      chatStateProvider: noteChatStateProvider,
-      sidePanel: noteInfoDisplay.resourceInfo
-        ? {
-            resource: noteInfoDisplay.resourceInfo,
-            onResourceChanged: onRefreshNoteInfo,
-            inlineComment: (
-              <InlineComment
-                threads={inlineCommentSnapshot.threads}
-                resolvedThreads={inlineCommentSnapshot.resolvedThreads}
-                loading={inlineCommentSnapshot.loading}
-                error={inlineCommentSnapshot.error}
-                isHistoryOpen={isInlineCommentHistoryOpen}
-                draft={
-                  inlineCommentDraft
-                    ? {
-                        key: `${inlineCommentDraft.anchor.start}:${inlineCommentDraft.anchor.end}`,
-                        quoteText: inlineCommentDraft.quoteText,
-                      }
-                    : undefined
-                }
-                activeThreadId={activeInlineCommentThreadId}
-                currentUserId={currentUser?.id}
-                resourceOwnerId={noteInfoDisplay.ownerId}
-                imageUpload={{
-                  scene: 'PRIVATE_IMAGE_FOR_NOTE',
-                  bizTag: `notes/${resourceId}/inline-comments`,
-                }}
-                onHistoryOpenChange={setIsInlineCommentHistoryOpen}
-                onDraftClose={() => setInlineCommentDraft(undefined)}
-                onThreadSelect={handleInlineCommentThreadSelect}
-                onCreate={async ({ content, imageUrls, idempotencyKey }) => {
-                  if (!inlineCommentDraft) return;
-                  const thread = await inlineCommentSession.createThread({
-                    ...inlineCommentDraft,
-                    content,
-                    imageUrls,
-                    idempotencyKey,
-                  });
-                  handleInlineCommentThreadSelect(thread.threadId);
-                  setInlineCommentDraft(undefined);
-                }}
-                onReply={async (threadId, { content, imageUrls, idempotencyKey }) => {
-                  await inlineCommentSession.addComment(
-                    threadId,
-                    content,
-                    imageUrls,
-                    idempotencyKey
-                  );
-                }}
-                onReactionChange={({ threadId, itemId, emojiId }) =>
-                  inlineCommentSession.changeReaction(threadId, itemId, emojiId)
-                }
-                onResolve={async (threadId) => {
-                  await inlineCommentSession.resolveThread(threadId);
-                  setActiveInlineCommentThreadId((currentThreadId) =>
-                    currentThreadId === threadId ? undefined : currentThreadId
-                  );
-                }}
-                onReopen={(threadId) => inlineCommentSession.reopenThread(threadId)}
-                onDelete={({ threadId, itemId }) =>
-                  inlineCommentSession.deleteComment(threadId, itemId)
-                }
-              />
-            ),
-          }
-        : undefined,
-      header: {
-        resource: {
-          resourceId,
-          resourceName,
-          resourceIconType: 'note',
-          currentActions: noteInfoDisplay.resourceInfo?.currentActions,
-          copyVersion: noteInfoDisplay.version,
-          permissionResourceType: RESOURCE_KIND.NOTE,
-          ownerId: noteInfoDisplay.ownerId,
-          onPermissionSuccess: onRefreshNoteInfo,
-          isDisabled: showFullPageSpin,
-          titleMeta: (
-            <span
-              className={`${styles.headerSaveStatus} ${
-                headerSaveStatus === 'waiting' ? styles.headerSaveStatusWaiting : ''
-              } ${headerSaveStatus === 'failed' ? styles.headerSaveStatusFailed : ''}`}
-            >
-              {saveStatusText}
-            </span>
-          ),
-          leadingActions: showAiDiffDisplayModeSwitch ? (
-            <SegmentedTabs<AiDiffDisplayMode>
-              ariaLabel="AI 差异展示模式"
-              selectedKey={aiDiffDisplayMode}
-              className={styles.aiDiffDisplayModeSwitch}
-              items={AI_DIFF_DISPLAY_OPTIONS.map((option) => ({
-                key: option.value,
-                label: option.label,
-                disabled: showFullPageSpin,
-              }))}
-              onSelectionChange={setAiDiffDisplayMode}
+  const resourceHostConfig = {
+    className: styles.pageWrap,
+    chatStateProvider: noteChatStateProvider,
+    sidePanel: noteInfoDisplay.resourceInfo
+      ? {
+          resource: noteInfoDisplay.resourceInfo,
+          onResourceChanged: onRefreshNoteInfo,
+          inlineComment: (
+            <InlineComment
+              threads={inlineCommentSnapshot.threads}
+              resolvedThreads={inlineCommentSnapshot.resolvedThreads}
+              loading={inlineCommentSnapshot.loading}
+              error={inlineCommentSnapshot.error}
+              isHistoryOpen={isInlineCommentHistoryOpen}
+              draft={
+                inlineCommentDraft
+                  ? {
+                      key: `${inlineCommentDraft.anchor.start}:${inlineCommentDraft.anchor.end}`,
+                      quoteText: inlineCommentDraft.quoteText,
+                    }
+                  : undefined
+              }
+              activeThreadId={activeInlineCommentThreadId}
+              currentUserId={currentUser?.id}
+              resourceOwnerId={noteInfoDisplay.ownerId}
+              imageUpload={{
+                scene: 'PRIVATE_IMAGE_FOR_NOTE',
+                bizTag: `notes/${resourceId}/inline-comments`,
+              }}
+              onHistoryOpenChange={setIsInlineCommentHistoryOpen}
+              onDraftClose={() => setInlineCommentDraft(undefined)}
+              onThreadSelect={handleInlineCommentThreadSelect}
+              onCreate={async ({ content, imageUrls, idempotencyKey }) => {
+                if (!inlineCommentDraft) return;
+                const thread = await inlineCommentSession.createThread({
+                  ...inlineCommentDraft,
+                  content,
+                  imageUrls,
+                  idempotencyKey,
+                });
+                handleInlineCommentThreadSelect(thread.threadId);
+                setInlineCommentDraft(undefined);
+              }}
+              onReply={async (threadId, { content, imageUrls, idempotencyKey }) => {
+                await inlineCommentSession.addComment(threadId, content, imageUrls, idempotencyKey);
+              }}
+              onReactionChange={({ threadId, itemId, emojiId }) =>
+                inlineCommentSession.changeReaction(threadId, itemId, emojiId)
+              }
+              onResolve={async (threadId) => {
+                await inlineCommentSession.resolveThread(threadId);
+                setActiveInlineCommentThreadId((currentThreadId) =>
+                  currentThreadId === threadId ? undefined : currentThreadId
+                );
+              }}
+              onReopen={(threadId) => inlineCommentSession.reopenThread(threadId)}
+              onDelete={({ threadId, itemId }) =>
+                inlineCommentSession.deleteComment(threadId, itemId)
+              }
             />
-          ) : null,
-          moreMenu: {
-            actions: [
-              {
-                id: 'inline-comment-history',
-                label: `历史评论${
+          ),
+        }
+      : undefined,
+    header: {
+      resource: {
+        resourceId,
+        resourceName,
+        resourceIconType: 'note',
+        currentActions: noteInfoDisplay.resourceInfo?.currentActions,
+        copyVersion: noteInfoDisplay.version,
+        permissionResourceType: RESOURCE_KIND.NOTE,
+        ownerId: noteInfoDisplay.ownerId,
+        onPermissionSuccess: onRefreshNoteInfo,
+        isDisabled: showFullPageSpin,
+        titleMeta: (
+          <span
+            className={`${styles.headerSaveStatus} ${
+              headerSaveStatus === 'waiting' ? styles.headerSaveStatusWaiting : ''
+            } ${headerSaveStatus === 'failed' ? styles.headerSaveStatusFailed : ''}`}
+          >
+            {saveStatusText}
+          </span>
+        ),
+        leadingActions: showAiDiffDisplayModeSwitch ? (
+          <SegmentedTabs<AiDiffDisplayMode>
+            ariaLabel={t('aiDiff.displayMode')}
+            selectedKey={aiDiffDisplayMode}
+            className={styles.aiDiffDisplayModeSwitch}
+            items={[
+              { value: AI_DIFF_DISPLAY_MODE.OLD_ONLY, label: t('aiDiff.mode.oldOnly') },
+              { value: AI_DIFF_DISPLAY_MODE.NEW_ONLY, label: t('aiDiff.mode.newOnly') },
+              { value: AI_DIFF_DISPLAY_MODE.COMPARE, label: t('aiDiff.mode.compare') },
+            ].map((option) => ({
+              key: option.value,
+              label: option.label,
+              disabled: showFullPageSpin,
+            }))}
+            onSelectionChange={setAiDiffDisplayMode}
+          />
+        ) : null,
+        moreMenu: {
+          actions: [
+            {
+              id: 'inline-comment-history',
+              label: t('comments.history', {
+                count:
                   inlineCommentSnapshot.resolvedThreads.length > 0
                     ? ` (${inlineCommentSnapshot.resolvedThreads.length})`
-                    : ''
-                }`,
-                icon: History,
-                onAction: () => setIsInlineCommentHistoryOpen(true),
-              },
-            ],
-            onSearch: findMode.openFind,
-            onPrint: handlePrintPdf,
-            download: {
-              label: '下载为 Markdown',
-              onAction: handleDownloadMarkdown,
+                    : '',
+              }),
+              icon: History,
+              onAction: () => setIsInlineCommentHistoryOpen(true),
             },
-            isPending: exportPending,
+          ],
+          onSearch: findMode.openFind,
+          onPrint: handlePrintPdf,
+          download: {
+            label: t('export.downloadMarkdown'),
+            onAction: handleDownloadMarkdown,
           },
+          isPending: exportPending,
         },
       },
-    }),
+    },
+  } satisfies ResourceHostLayoutConfig;
+  useResourceHostLayoutConfig(
+    () => resourceHostConfig,
     [
+      activeInlineCommentThreadId,
       aiDiffDisplayMode,
-      handleDownloadMarkdown,
-      handlePrintPdf,
+      currentUser?.id,
       exportPending,
-      noteChatStateProvider,
+      headerSaveStatus,
+      inlineCommentDraft,
+      inlineCommentSession,
+      inlineCommentSnapshot,
+      isInlineCommentHistoryOpen,
+      noteClientContentSignature,
       noteInfoDisplay.ownerId,
       noteInfoDisplay.resourceInfo,
       noteInfoDisplay.version,
-      activeInlineCommentThreadId,
-      handleInlineCommentThreadSelect,
-      inlineCommentDraft,
-      isInlineCommentHistoryOpen,
-      inlineCommentSnapshot,
-      inlineCommentSession,
-      currentUser?.id,
       onRefreshNoteInfo,
       resourceId,
       resourceName,
-      headerSaveStatus,
-      findMode.openFind,
       saveStatusText,
-      setAiDiffDisplayMode,
       showAiDiffDisplayModeSwitch,
       showFullPageSpin,
+      status,
+      t,
     ]
   );
-  useResourceHostLayoutConfig(resourceHostConfig);
 
   return (
     <>
@@ -572,9 +528,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
                   <Alert className={styles.wsAlert} status="warning">
                     <Alert.Indicator />
                     <Alert.Content>
-                      <Alert.Description>
-                        网络连接已断开，当前可继续本地编辑；网络恢复后会自动同步到云端。
-                      </Alert.Description>
+                      <Alert.Description>{t('workspace.disconnected')}</Alert.Description>
                     </Alert.Content>
                     <div className={styles.wsAlertAction}>
                       <Button
@@ -583,7 +537,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
                         isDisabled={status !== 'disconnected'}
                         onPress={reconnect}
                       >
-                        重试
+                        {t('workspace.retry')}
                       </Button>
                     </div>
                   </Alert>

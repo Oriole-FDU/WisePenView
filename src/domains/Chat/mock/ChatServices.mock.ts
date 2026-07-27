@@ -122,7 +122,6 @@ const getModels: IChatService['getModels'] = async () => {
               ? ([{ text: 'Thinking', type: 'purple' }] as Array<{ text: string; type: string }>)
               : []),
           ],
-          multiplier: item.billing_ratio >= 1 ? `${item.billing_ratio}x 消耗` : null,
           isDefault: item.is_active && index === 0,
           vision: item.support_vision,
           usageRank: index + 1,

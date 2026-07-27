@@ -1,5 +1,6 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import { MessageSquareText, MessagesSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useWorkspaceResourceSidePanelStore } from '../../_store/useWorkspaceResourceSidePanelStore';
 import styles from './style.module.less';
 
@@ -14,6 +15,7 @@ function WorkspaceResourceSidePanelActions({
   inlineCommentAvailable,
   disabled,
 }: WorkspaceResourceSidePanelActionsProps) {
+  const { t } = useTranslation('resource');
   const mode = useWorkspaceResourceSidePanelStore(
     (state) => state.modeByResourceId[resourceId] ?? 'closed'
   );
@@ -24,21 +26,33 @@ function WorkspaceResourceSidePanelActions({
       {inlineCommentAvailable ? (
         <AppIconButton
           icon={<MessageSquareText size={18} aria-hidden="true" />}
-          label={mode === 'inlineComment' ? '收起批注栏' : '展开批注栏'}
+          label={
+            mode === 'inlineComment'
+              ? t('sidePanel.collapseAnnotation')
+              : t('sidePanel.expandAnnotation')
+          }
           isActive={mode === 'inlineComment'}
           isDisabled={disabled}
           aria-expanded={mode === 'inlineComment'}
-          tooltip={{ content: mode === 'inlineComment' ? '收起批注栏' : '打开批注栏' }}
+          tooltip={{
+            content:
+              mode === 'inlineComment'
+                ? t('sidePanel.collapseAnnotation')
+                : t('sidePanel.openAnnotation'),
+          }}
           onPress={() => toggleMode(resourceId, 'inlineComment')}
         />
       ) : null}
       <AppIconButton
         icon={<MessagesSquare size={18} aria-hidden="true" />}
-        label={mode === 'comment' ? '收起评论区' : '展开评论区'}
+        label={mode === 'comment' ? t('sidePanel.collapseComments') : t('sidePanel.expandComments')}
         isActive={mode === 'comment'}
         isDisabled={disabled}
         aria-expanded={mode === 'comment'}
-        tooltip={{ content: mode === 'comment' ? '收起评论区' : '打开评论区' }}
+        tooltip={{
+          content:
+            mode === 'comment' ? t('sidePanel.collapseComments') : t('sidePanel.openComments'),
+        }}
         onPress={() => toggleMode(resourceId, 'comment')}
       />
     </div>

@@ -1,5 +1,6 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import EntryIcon from '@/components/Icons/EntryIcon';
+import { AppPopover } from '@/components/Overlay';
 import ResourcePermissionModal from '@/components/Resource/ResourcePermissionModal';
 import { useUserService } from '@/domains';
 import { normalizeId } from '@/utils/normalize/normalizeId';
@@ -24,6 +25,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import ResourceHeaderOperations, {
   type ResourceHeaderOperationHandlers,
 } from './ResourceHeaderOperations';
@@ -65,6 +67,7 @@ function ResourceHeaderMore({
   isDisabled?: boolean;
   onOpenPermission: () => void;
 }) {
+  const { t } = useTranslation('resource');
   const isPending = Boolean(menu?.isPending || operations.isLocating);
   const handleAction = (key: React.Key) => {
     if (key === 'permission') {
@@ -118,51 +121,54 @@ function ResourceHeaderMore({
     <Dropdown>
       <AppIconButton
         icon={isPending ? <Spinner size="sm" /> : <Ellipsis size={18} aria-hidden="true" />}
-        label="更多"
+        label={t('header.more')}
         size="sm"
         isDisabled={isDisabled || isPending}
         overlayTrigger={<Dropdown.Trigger />}
       />
       <Dropdown.Popover placement="bottom end" className={styles.popover}>
-        <div className={styles.popoverHeader}>更多操作</div>
-        <Dropdown.Menu aria-label="资源更多操作" onAction={handleAction}>
+        <AppPopover.Header>{t('header.moreActions')}</AppPopover.Header>
+        <Dropdown.Menu aria-label={t('header.menuAria')} onAction={handleAction}>
           {operations.onOpenOriginal ? (
             <Dropdown.Section>
-              <Dropdown.Item id="open-original" textValue="打开文件本体">
-                <ResourceHeaderMenuItemContent icon={ExternalLink} label="打开文件本体" />
+              <Dropdown.Item id="open-original" textValue={t('header.openOriginal')}>
+                <ResourceHeaderMenuItemContent
+                  icon={ExternalLink}
+                  label={t('header.openOriginal')}
+                />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
           {operations.onCopy ? (
             <Dropdown.Section>
-              <Dropdown.Item id="create-copy" textValue="创建副本">
-                <ResourceHeaderMenuItemContent icon={Copy} label="创建副本" />
+              <Dropdown.Item id="create-copy" textValue={t('header.createCopy')}>
+                <ResourceHeaderMenuItemContent icon={Copy} label={t('header.createCopy')} />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
           {operations.onCreateLink || operations.onMove || operations.onShare ? (
             <Dropdown.Section>
               {operations.onCreateLink ? (
-                <Dropdown.Item id="add-link" textValue="添加链接到">
-                  <ResourceHeaderMenuItemContent icon={Link2} label="添加链接到" />
+                <Dropdown.Item id="add-link" textValue={t('header.addLink')}>
+                  <ResourceHeaderMenuItemContent icon={Link2} label={t('header.addLink')} />
                 </Dropdown.Item>
               ) : null}
               {operations.onMove ? (
-                <Dropdown.Item id="move-to" textValue="移动到">
-                  <ResourceHeaderMenuItemContent icon={FolderInput} label="移动到" />
+                <Dropdown.Item id="move-to" textValue={t('header.moveTo')}>
+                  <ResourceHeaderMenuItemContent icon={FolderInput} label={t('header.moveTo')} />
                 </Dropdown.Item>
               ) : null}
               {operations.onShare ? (
-                <Dropdown.Item id="share-to" textValue="分享到小组">
-                  <ResourceHeaderMenuItemContent icon={Share2} label="分享到小组" />
+                <Dropdown.Item id="share-to" textValue={t('header.shareToGroup')}>
+                  <ResourceHeaderMenuItemContent icon={Share2} label={t('header.shareToGroup')} />
                 </Dropdown.Item>
               ) : null}
             </Dropdown.Section>
           ) : null}
           {canManagePermission ? (
             <Dropdown.Section>
-              <Dropdown.Item id="permission" textValue="权限">
-                <ResourceHeaderMenuItemContent icon={ShieldCheck} label="权限" />
+              <Dropdown.Item id="permission" textValue={t('header.permission')}>
+                <ResourceHeaderMenuItemContent icon={ShieldCheck} label={t('header.permission')} />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
@@ -170,17 +176,20 @@ function ResourceHeaderMore({
             <Dropdown.Section>
               <Dropdown.Item
                 id="comment-history"
-                textValue="历史批注"
+                textValue={t('header.inlineCommentHistory')}
                 isDisabled={!menu.onInlineCommentHistory}
               >
-                <ResourceHeaderMenuItemContent icon={MessageSquare} label="历史批注" />
+                <ResourceHeaderMenuItemContent
+                  icon={MessageSquare}
+                  label={t('header.inlineCommentHistory')}
+                />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
           {menu?.onSearch ? (
             <Dropdown.Section>
-              <Dropdown.Item id="search" textValue="全文搜索">
-                <ResourceHeaderMenuItemContent icon={Search} label="全文搜索" />
+              <Dropdown.Item id="search" textValue={t('header.fullTextSearch')}>
+                <ResourceHeaderMenuItemContent icon={Search} label={t('header.fullTextSearch')} />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
@@ -223,8 +232,8 @@ function ResourceHeaderMore({
           {menu?.onPrint || menu?.download ? (
             <Dropdown.Section>
               {menu.onPrint ? (
-                <Dropdown.Item id="print" textValue="打印">
-                  <ResourceHeaderMenuItemContent icon={Printer} label="打印" />
+                <Dropdown.Item id="print" textValue={t('header.print')}>
+                  <ResourceHeaderMenuItemContent icon={Printer} label={t('header.print')} />
                 </Dropdown.Item>
               ) : null}
               {menu.download ? (
@@ -237,10 +246,10 @@ function ResourceHeaderMore({
           {menu?.advanced ? (
             <Dropdown.Section>
               <Dropdown.SubmenuTrigger>
-                <Dropdown.Item id="advanced" textValue="高级">
+                <Dropdown.Item id="advanced" textValue={t('header.advanced')}>
                   <ResourceHeaderMenuItemContent
                     icon={Settings2}
-                    label="高级"
+                    label={t('header.advanced')}
                     trailing={<Dropdown.SubmenuIndicator />}
                   />
                 </Dropdown.Item>
@@ -249,7 +258,7 @@ function ResourceHeaderMore({
                   className={`${styles.popover} ${styles.advancedPopover}`}
                 >
                   <div className={styles.advancedPanel}>
-                    <div className={styles.popoverHeader}>高级设置</div>
+                    <AppPopover.Header>{t('header.advancedSettings')}</AppPopover.Header>
                     {menu.advanced}
                   </div>
                 </Dropdown.Popover>
@@ -260,12 +269,12 @@ function ResourceHeaderMore({
             <Dropdown.Section>
               <Dropdown.Item
                 id="delete"
-                textValue={operations.deleteLabel ?? '删除文件'}
+                textValue={operations.deleteLabel ?? t('header.deleteFile')}
                 variant="danger"
               >
                 <ResourceHeaderMenuItemContent
                   icon={Trash2}
-                  label={operations.deleteLabel ?? '删除文件'}
+                  label={operations.deleteLabel ?? t('header.deleteFile')}
                 />
               </Dropdown.Item>
             </Dropdown.Section>
@@ -295,6 +304,7 @@ function ResourceHeader({
   moreMenu,
   hideBreadcrumb,
 }: ResourceHeaderProps) {
+  const { t } = useTranslation('resource');
   const userService = useUserService();
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
   const normalizedOwnerId = normalizeId(ownerId);
@@ -310,7 +320,7 @@ function ResourceHeader({
       <div className={styles.root}>
         <div className={styles.title}>
           {!hideBreadcrumb ? (
-            <nav className={styles.breadcrumb} aria-label="资源路径">
+            <nav className={styles.breadcrumb} aria-label={t('header.breadcrumbAria')}>
               {breadcrumbItems.map((item, index) => (
                 <span key={item.nodeId} className={styles.breadcrumbSegment}>
                   <button

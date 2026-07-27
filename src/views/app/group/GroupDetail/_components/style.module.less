@@ -1,0 +1,117 @@
+.modalFormPadding {
+  padding: var(--space-lg) 0;
+}
+
+.modalContainer {
+  width: min(1280px, calc(100vw - 24px));
+  max-width: min(1280px, calc(100vw - 24px));
+}
+
+.modalDialog {
+  width: 100%;
+  max-width: min(1280px, calc(100vw - 24px));
+}
+
+.mountModalContainer {
+  width: min(560px, calc(100vw - 24px));
+  max-width: min(560px, calc(100vw - 24px));
+}
+
+.mountModalDialog {
+  width: 100%;
+  max-width: min(560px, calc(100vw - 24px));
+}
+
+.advancedAccessGrid {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: var(--space-md);
+}
+
+.advancedMountGrid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+.personnelCard {
+  display: flex;
+  min-width: 0;
+  min-height: 420px;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.personnelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.personnelTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scopeTabs,
+.scopeTabsListContainer,
+.scopeTabsList {
+  width: 100%;
+}
+
+.scopeTabsList {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.scopeTab {
+  min-width: 0;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberState {
+  display: flex;
+  flex: 1;
+  min-height: 180px;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+@media (max-width: 860px) {
+  .advancedAccessGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .advancedMountGrid {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .scopeTabsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

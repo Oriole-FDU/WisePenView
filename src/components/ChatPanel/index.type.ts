@@ -1,11 +1,7 @@
-import type { ChatAgentOption, ChatModel, ChatModelTag } from '@/domains/Chat';
+import type { ChatAgentOption } from '@/domains/Chat';
 import type { ResourceChatProtocolPort } from './ResourceChatProtocol';
 
-export type ModelTag = ChatModelTag;
-export type Model = ChatModel;
-
 export interface ChatPanelProps {
-  collapsed: boolean;
   fullWidth?: boolean;
   showHeader?: boolean;
   onNewChat?: () => void;

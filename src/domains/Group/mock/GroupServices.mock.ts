@@ -30,6 +30,11 @@ const fetchGroupList = async (): Promise<{ groups: Group[]; total: number }> => 
   return { groups, total: groups.length };
 };
 
+const fetchAllMyGroups = async (): Promise<Group[]> => {
+  await delay(200);
+  return groups;
+};
+
 const fetchGroupBaseInfo = async (groupId: string): Promise<GroupBaseInfo> => {
   await delay(100);
   const group = groups.find((item) => item.groupId === groupId) ?? groupDetail;
@@ -108,6 +113,7 @@ const kickMembers = async (): Promise<void> => {
 
 export const GroupServicesMock: IGroupService = {
   fetchGroupList,
+  fetchAllMyGroups,
   fetchGroupBaseInfo,
   fetchGroupInfo,
   getGroupWalletInfo,

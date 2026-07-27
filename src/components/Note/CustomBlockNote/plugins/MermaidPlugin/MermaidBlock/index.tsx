@@ -4,9 +4,11 @@ import { createReactBlockSpec, type ReactCustomBlockRenderProps } from '@blockno
 import { useRequest } from 'ahooks';
 import { Check, Copy } from 'lucide-react';
 import { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/Button/AppIconButton';
 import SegmentedTabs from '@/components/SegmentedTabs';
+import i18n from '@/i18n';
 import { copyText } from '@/utils/browser/copyText';
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import { renderNoteMermaidDiagram } from '../mermaidRuntime';
@@ -24,10 +26,11 @@ type MermaidView = 'code' | 'graph';
 
 function readRenderError(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
-  return '图表渲染失败，请检查 Mermaid 语法。';
+  return i18n.t('mermaid.renderFailed', { ns: 'note' });
 }
 
 function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
+  const { t } = useTranslation('note');
   const readOnly = useNoteEditorReadOnlyContext();
   const [view, setView] = useState<MermaidView>('graph');
   const [copied, setCopied] = useState(false);
@@ -58,10 +61,10 @@ function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
         <span className={styles.title}>mermaid</span>
         <div className={styles.toolbarActions} data-mermaid-toolbar-actions="">
           <SegmentedTabs
-            ariaLabel="Mermaid 展示模式"
+            ariaLabel={t('mermaid.displayMode')}
             items={[
-              { key: 'code', label: '源码' },
-              { key: 'graph', label: '图形' },
+              { key: 'code', label: t('mermaid.source') },
+              { key: 'graph', label: t('mermaid.graph') },
             ]}
             selectedKey={view}
             onSelectionChange={(key) => setView(key as MermaidView)}
@@ -76,12 +79,12 @@ function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
                 <Copy size={14} aria-hidden="true" />
               )
             }
-            label={copied ? '已复制 Mermaid 源码' : '复制 Mermaid 源码'}
+            label={t(copied ? 'mermaid.copiedSource' : 'mermaid.copySource')}
             size="sm"
             isActive={copied}
             className={styles.copyButton}
             data-copied={copied}
-            tooltip={{ content: copied ? '已复制' : '复制源码' }}
+            tooltip={{ content: t(copied ? 'mermaid.copied' : 'mermaid.copy') }}
             onMouseDown={(event) => {
               event.preventDefault();
               event.stopPropagation();
@@ -95,8 +98,10 @@ function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
           className={view === 'graph' ? styles.preview : `${styles.preview} ${styles.panelHidden}`}
           contentEditable={false}
         >
-          {!shouldRender ? <div className={styles.status}>请输入 Mermaid 图表源码。</div> : null}
-          {shouldRender && loading ? <div className={styles.status}>正在渲染图表...</div> : null}
+          {!shouldRender ? <div className={styles.status}>{t('mermaid.empty')}</div> : null}
+          {shouldRender && loading ? (
+            <div className={styles.status}>{t('mermaid.rendering')}</div>
+          ) : null}
           {shouldRender && result?.error ? (
             <div className={styles.error}>{result.error}</div>
           ) : null}

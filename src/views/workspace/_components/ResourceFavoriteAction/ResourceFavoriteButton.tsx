@@ -1,5 +1,6 @@
 import { Button } from '@heroui/react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 interface ResourceFavoriteButtonProps {
@@ -9,6 +10,7 @@ interface ResourceFavoriteButtonProps {
 }
 
 function ResourceFavoriteButton({ isFavorited, isDisabled, onPress }: ResourceFavoriteButtonProps) {
+  const { t } = useTranslation('resource');
   const Icon = isFavorited ? BookmarkCheck : Bookmark;
   return (
     <Button
@@ -20,8 +22,14 @@ function ResourceFavoriteButton({ isFavorited, isDisabled, onPress }: ResourceFa
     >
       <Icon size={16} aria-hidden="true" />
       <span className={styles.panelCopy}>
-        <strong>{isFavorited ? '已收藏' : '收藏'}</strong>
-        <span>{isFavorited ? '管理收藏夹' : '加入收藏夹'}</span>
+        <strong>
+          {isFavorited ? t('favorite.action.favorited') : t('favorite.action.favorite')}
+        </strong>
+        <span>
+          {isFavorited
+            ? t('favorite.action.manageCollections')
+            : t('favorite.action.addToCollection')}
+        </span>
       </span>
     </Button>
   );

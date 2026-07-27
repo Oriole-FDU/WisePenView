@@ -1,6 +1,7 @@
 import { useMount } from 'ahooks';
 import { ChevronDown, ChevronUp, Replace, ReplaceAll, X } from 'lucide-react';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/Button/AppIconButton';
 import type { NoteFindResult } from '@/components/Note/CustomBlockNote/index.type';
@@ -22,11 +23,6 @@ interface FindBarProps {
   onClose: () => void;
 }
 
-function formatResult(result: NoteFindResult | null): string {
-  if (!result) return '无匹配';
-  return `${result.current} / ${result.total}`;
-}
-
 function FindBar({
   query,
   replacement,
@@ -41,6 +37,7 @@ function FindBar({
   onReplaceAll,
   onClose,
 }: FindBarProps) {
+  const { t } = useTranslation('note');
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 挂载时聚焦输入框。
@@ -51,7 +48,7 @@ function FindBar({
   const isNavigationDisabled = result === null;
 
   return (
-    <div className={styles.root} role="search" aria-label="笔记内搜索">
+    <div className={styles.root} role="search" aria-label={t('find.region')}>
       <div className={styles.fields}>
         <div className={styles.fieldRow}>
           <input
@@ -59,12 +56,14 @@ function FindBar({
             className={styles.input}
             type="text"
             value={query}
-            placeholder="查找"
-            aria-label="查找"
+            placeholder={t('find.query')}
+            aria-label={t('find.query')}
             onChange={(e) => onQueryChange(e.target.value)}
           />
           <span className={styles.count} aria-live="polite">
-            {formatResult(result)}
+            {result
+              ? t('find.result', { current: result.current, total: result.total })
+              : t('find.noMatches')}
           </span>
         </div>
         <div className={styles.fieldRow}>
@@ -72,27 +71,27 @@ function FindBar({
             className={styles.input}
             type="text"
             value={replacement}
-            placeholder="替换"
-            aria-label="替换为"
+            placeholder={t('find.replacement')}
+            aria-label={t('find.replaceWith')}
             disabled={!canReplace}
             onChange={(e) => onReplacementChange(e.target.value)}
           />
           <span className={styles.replaceCount} aria-live="polite">
-            {replaced > 0 ? `已替换 ${replaced} 处` : ''}
+            {replaced > 0 ? t('find.replaced', { count: replaced }) : ''}
           </span>
         </div>
       </div>
       <div className={styles.navigationControls}>
         <AppIconButton
           icon={<ChevronUp size={16} />}
-          label="上一个匹配"
+          label={t('find.previous')}
           isDisabled={isNavigationDisabled}
           onPress={onPrevious}
           tooltip={{ placement: 'left' }}
         />
         <AppIconButton
           icon={<ChevronDown size={16} />}
-          label="下一个匹配"
+          label={t('find.next')}
           isDisabled={isNavigationDisabled}
           onPress={onNext}
           tooltip={{ placement: 'left' }}
@@ -101,14 +100,14 @@ function FindBar({
       <div className={styles.replaceControls}>
         <AppIconButton
           icon={<Replace size={16} />}
-          label="替换当前"
+          label={t('find.replaceCurrent')}
           isDisabled={isNavigationDisabled || !canReplace}
           onPress={onReplaceCurrent}
           tooltip={{ placement: 'left' }}
         />
         <AppIconButton
           icon={<ReplaceAll size={16} />}
-          label="全部替换"
+          label={t('find.replaceAll')}
           isDisabled={isNavigationDisabled || !canReplace}
           onPress={onReplaceAll}
           tooltip={{ placement: 'left' }}
@@ -116,7 +115,7 @@ function FindBar({
       </div>
       <AppIconButton
         icon={<X size={16} />}
-        label="关闭搜索"
+        label={t('find.close')}
         onPress={onClose}
         tooltip={{ placement: 'left' }}
       />

@@ -4,7 +4,6 @@ import {
   type ResourceTarget,
 } from '@/utils/navigation/resourceTarget';
 import { buildWorkspaceResourcePathWithSearch } from '@/utils/navigation/workspaceRoute';
-import { useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useResourceHostContext } from './ResourceHostContext';
 import ResourceRenderer from './ResourceRenderer';
@@ -26,28 +25,25 @@ function WorkspaceResourceView() {
     viewer: viewerParam,
   };
 
-  const handleTargetChange = useCallback(
-    (nextTarget: ResourceTarget) => {
-      const resourceType = normalizeResourceKind(nextTarget.resourceType);
-      if (!resourceType) return;
-      navigate(
-        buildWorkspaceResourcePathWithSearch(
-          {
-            resourceType,
-            resourceId: nextTarget.resourceId,
-            viewer: normalizeResourceViewer(nextTarget.viewer),
-          },
-          location.search
-        ),
-        { replace: true }
-      );
-    },
-    [location.search, navigate]
-  );
+  const handleTargetChange = (nextTarget: ResourceTarget) => {
+    const resourceType = normalizeResourceKind(nextTarget.resourceType);
+    if (!resourceType) return;
+    navigate(
+      buildWorkspaceResourcePathWithSearch(
+        {
+          resourceType,
+          resourceId: nextTarget.resourceId,
+          viewer: normalizeResourceViewer(nextTarget.viewer),
+        },
+        location.search
+      ),
+      { replace: true }
+    );
+  };
 
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     navigate('/app/drive/personal');
-  }, [navigate]);
+  };
 
   const sidePanelConfig =
     layoutConfig.sidePanel?.resource.resourceId === resourceId ? layoutConfig.sidePanel : undefined;

@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import {
   AlertCircle,
   CheckCircle2,
@@ -7,6 +8,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   SkillSaveQueueDockProps,
@@ -41,24 +43,28 @@ function resolveQueueMode(items: SkillSaveQueueItem[]): QueueMode {
   return 'pending';
 }
 
-function resolveQueueTitle(mode: QueueMode, items: SkillSaveQueueItem[]): string {
-  if (mode === 'idle') return '保存队列';
+function resolveQueueTitle(
+  mode: QueueMode,
+  items: SkillSaveQueueItem[],
+  t: TFunction<'skill'>
+): string {
+  if (mode === 'idle') return t('queue.title');
   if (mode === 'failed') {
     const failedCount = items.filter((item) => item.phase === 'failed').length;
-    return `${failedCount} 项保存失败`;
+    return t('queue.failedTitle', { count: failedCount });
   }
   if (mode === 'saving') {
     const doneCount = items.filter((item) => item.phase === 'done').length;
-    return `保存中 ${doneCount}/${items.length}`;
+    return t('queue.savingTitle', { done: doneCount, total: items.length });
   }
-  return `待保存 ${items.length} 项`;
+  return t('queue.pendingTitle', { count: items.length });
 }
 
-function resolveQueueHint(mode: QueueMode): string {
-  if (mode === 'idle') return '无待处理事项';
-  if (mode === 'failed') return '可重试或放弃更改';
-  if (mode === 'saving') return '请勿关闭页面';
-  return '点击保存后上传';
+function resolveQueueHint(mode: QueueMode, t: TFunction<'skill'>): string {
+  if (mode === 'idle') return t('queue.idleHint');
+  if (mode === 'failed') return t('queue.failedHint');
+  if (mode === 'saving') return t('queue.savingHint');
+  return t('queue.pendingHint');
 }
 
 function resolveQueueProgress(items: SkillSaveQueueItem[]): number {
@@ -67,12 +73,12 @@ function resolveQueueProgress(items: SkillSaveQueueItem[]): number {
   return clampProgress(total / items.length);
 }
 
-function resolvePhaseText(item: SkillSaveQueueItem): string {
-  if (item.phase === 'pending') return '待保存';
-  if (item.phase === 'preparing') return '准备中';
+function resolvePhaseText(item: SkillSaveQueueItem, t: TFunction<'skill'>): string {
+  if (item.phase === 'pending') return t('queue.phase.pending');
+  if (item.phase === 'preparing') return t('queue.phase.preparing');
   if (item.phase === 'uploading') return `${clampProgress(item.progress)}%`;
-  if (item.phase === 'done') return '完成';
-  return item.errorMessage ?? '失败';
+  if (item.phase === 'done') return t('queue.phase.done');
+  return item.errorMessage ?? t('queue.phase.failed');
 }
 
 function QueuePhaseIcon({ item }: { item: SkillSaveQueueItem }) {
@@ -83,6 +89,7 @@ function QueuePhaseIcon({ item }: { item: SkillSaveQueueItem }) {
 }
 
 function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
+  const { t } = useTranslation('skill');
   const [expanded, setExpanded] = useState(false);
   const [bodyHeight, setBodyHeight] = useState(DEFAULT_QUEUE_BODY_HEIGHT);
   const resizeStateRef = useRef<{
@@ -153,7 +160,7 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
         className={styles.resizeHandle}
         role="separator"
         aria-orientation="horizontal"
-        aria-label="调整保存队列高度"
+        aria-label={t('queue.resize')}
         aria-valuemin={MIN_QUEUE_BODY_HEIGHT}
         aria-valuemax={MAX_QUEUE_BODY_HEIGHT}
         aria-valuenow={bodyHeight}
@@ -180,8 +187,8 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
             aria-hidden="true"
           />
           <span className={styles.queueTitle}>
-            <strong>{resolveQueueTitle(mode, items)}</strong>
-            <span>{resolveQueueHint(mode)}</span>
+            <strong>{resolveQueueTitle(mode, items, t)}</strong>
+            <span>{resolveQueueHint(mode, t)}</span>
           </span>
         </button>
         <span className={styles.queueMeta}>
@@ -189,7 +196,7 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
           {canRetry ? (
             <button type="button" className={styles.retryButton} onClick={() => onRetry?.()}>
               <RefreshCw size={12} />
-              <span>重试</span>
+              <span>{t('queue.retry')}</span>
             </button>
           ) : null}
         </span>
@@ -204,7 +211,7 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
       {expanded ? (
         <div className={styles.queueBody} style={{ height: bodyHeight }}>
           {items.length === 0 ? (
-            <div className={styles.emptyItem}>当前没有等待保存或上传的文件</div>
+            <div className={styles.emptyItem}>{t('queue.empty')}</div>
           ) : (
             items.map((item) => (
               <div key={item.id} className={styles.queueItem}>
@@ -224,9 +231,9 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
                   className={`${styles.itemPhase} ${
                     item.phase === 'failed' ? styles.itemPhaseFailed : ''
                   }`}
-                  title={resolvePhaseText(item)}
+                  title={resolvePhaseText(item, t)}
                 >
-                  {resolvePhaseText(item)}
+                  {resolvePhaseText(item, t)}
                 </span>
               </div>
             ))

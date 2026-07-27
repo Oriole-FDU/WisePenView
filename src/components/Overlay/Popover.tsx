@@ -1,6 +1,6 @@
 import { Popover as HeroPopover } from '@heroui/react';
-import { useCallback, useState } from 'react';
 import type { ComponentProps } from 'react';
+import { useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from './DeferredContent';
 
@@ -24,15 +24,12 @@ function PopoverRoot({
 }: PopoverRootProps) {
   const [innerOpen, setInnerOpen] = useState(Boolean(defaultOpen));
   const trackedOpen = isOpen ?? innerOpen;
-  const handleOpenChange = useCallback(
-    (nextOpen: boolean) => {
-      if (isOpen == null) {
-        setInnerOpen(nextOpen);
-      }
-      onOpenChange?.(nextOpen);
-    },
-    [isOpen, onOpenChange]
-  );
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (isOpen == null) {
+      setInnerOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  };
 
   return (
     <DeferredOverlayProvider delay={contentDelay} enabled={deferContent} isOpen={trackedOpen}>

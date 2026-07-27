@@ -1,5 +1,6 @@
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
-import { useMemo, useReducer, type SetStateAction } from 'react';
+import i18n from '@/i18n';
+import { useReducer, useState, type SetStateAction } from 'react';
 
 import type { SkillSaveQueueItem } from '../_components/SkillSaveQueueDock/index.type';
 import type { SkillDraftCacheSnapshot } from '../utils/skillDraftCache';
@@ -14,7 +15,7 @@ export type SkillEditorPendingIntent =
   | { type: 'switchVersion'; version: number }
   | null;
 
-interface SkillEditorState {
+export interface SkillEditorState {
   files: SkillFileNode[];
   selectedFileId: string;
   selectedTreeNodeId: string;
@@ -28,6 +29,25 @@ interface SkillEditorState {
   savedConfigDescription: string;
   saveQueueItems: SkillSaveQueueItem[];
   pendingIntent: SkillEditorPendingIntent;
+}
+
+export interface SkillEditorActions {
+  setFiles: (value: SetStateAction<SkillFileNode[]>) => void;
+  setSelectedFileId: (value: SetStateAction<string>) => void;
+  setSelectedTreeNodeId: (value: SetStateAction<string>) => void;
+  setViewingVersion: (value: SetStateAction<number | null>) => void;
+  setEditing: (value: SetStateAction<boolean>) => void;
+  setEditorContent: (value: SetStateAction<string>) => void;
+  setSavedContent: (value: SetStateAction<string>) => void;
+  setConfigName: (value: SetStateAction<string>) => void;
+  setConfigDescription: (value: SetStateAction<string>) => void;
+  setSavedConfigName: (value: SetStateAction<string>) => void;
+  setSavedConfigDescription: (value: SetStateAction<string>) => void;
+  setSaveQueueItems: (value: SetStateAction<SkillSaveQueueItem[]>) => void;
+  setPendingIntent: (intent: SkillEditorPendingIntent) => void;
+  initialize: (skill: SkillDetail) => void;
+  restoreDraft: (snapshot: SkillDraftCacheSnapshot, skill: SkillDetail) => void;
+  discardLocalChanges: (skill: SkillDetail) => void;
 }
 
 type SkillEditorAction =
@@ -60,7 +80,11 @@ function resolveValue<T>(current: T, value: SetStateAction<T>): T {
 function recoverInterruptedQueue(items: SkillSaveQueueItem[]): SkillSaveQueueItem[] {
   return items.map((item) =>
     item.phase === 'preparing' || item.phase === 'uploading'
-      ? { ...item, phase: 'failed', errorMessage: '上次保存被中断，请重新保存' }
+      ? {
+          ...item,
+          phase: 'failed',
+          errorMessage: i18n.t('queue.interrupted', { ns: 'skill' }),
+        }
       : item
   );
 }
@@ -141,7 +165,7 @@ export function resolveSkillEditorSavePhase({
 
 export function useSkillEditorController() {
   const [state, dispatch] = useReducer(skillEditorReducer, INITIAL_STATE);
-  const actions = useMemo(() => {
+  const [actions] = useState<SkillEditorActions>(() => {
     const setField = <K extends Exclude<keyof SkillEditorState, 'pendingIntent'>>(
       field: K,
       value: SetStateAction<SkillEditorState[K]>
@@ -179,7 +203,7 @@ export function useSkillEditorController() {
         dispatch({ type: 'restoreDraft', snapshot, skill }),
       discardLocalChanges: (skill: SkillDetail) => dispatch({ type: 'discardLocalChanges', skill }),
     };
-  }, []);
+  });
 
   return { state, actions };
 }

@@ -9,8 +9,9 @@
  */
 import { InputOTP, REGEXP_ONLY_DIGITS_AND_CHARS } from '@/components/Input';
 import AppFormDialog from '@/components/Overlay/AppFormDialog';
-import { useRequest, useUpdateEffect } from 'ahooks';
-import React, { useRef, useState } from 'react';
+import { useRequest } from 'ahooks';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RechargeModalProps } from './index.type';
 import styles from './style.module.less';
 
@@ -29,6 +30,7 @@ const OTP_GROUPS = [
 ];
 
 function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeModalProps) {
+  const { t } = useTranslation('wallet');
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState('');
   const [codeError, setCodeError] = useState('');
@@ -41,8 +43,8 @@ function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeM
 
   const title =
     groupDisplayName != null && groupDisplayName.length > 0
-      ? `为「${groupDisplayName}」充值`
-      : '个人充值';
+      ? t('recharge.groupTitle', { name: groupDisplayName })
+      : t('recharge.personalTitle');
 
   const { loading: submitting, run: runRecharge } = useRequest(
     async (code: string) => onSubmit(code),
@@ -57,7 +59,7 @@ function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeM
   const handleOk = () => {
     const code = normalizeVoucherCode(value);
     if (code.length !== 16) {
-      setCodeError('请输入 16 位兑换码');
+      setCodeError(t('recharge.invalidCode'));
       return;
     }
     runRecharge(code);
@@ -65,7 +67,13 @@ function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeM
 
   const canSubmit = value.length === 16 && !submitting;
 
-  useUpdateEffect(() => {
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：弹窗打开或验证码长度变化后，在下一帧恢复输入焦点与末尾选区。
+   * 不可替代原因：焦点和 selection range 是浏览器 DOM 状态，无法通过 JSX 派生。
+   * cleanup：取消尚未执行的 animation frame，避免关闭后的弹窗重新抢焦点。
+   */
+  useEffect(() => {
     if (!open) {
       return;
     }
@@ -84,7 +92,7 @@ function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeM
       onOpenChange={(isOpen) => !isOpen && handleCancel()}
       title={title}
       size="lg"
-      confirmText={submitting ? '充值中...' : '确认充值'}
+      confirmText={submitting ? t('recharge.submitting') : t('recharge.confirm')}
       onCancel={handleCancel}
       onSubmit={handleOk}
       isSubmitting={submitting}
@@ -93,7 +101,7 @@ function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeM
     >
       <div className={styles.field}>
         <label className={styles.fieldLabel} id="recharge-code-label" htmlFor="recharge-code">
-          兑换码
+          {t('recharge.codeLabel')}
         </label>
         <InputOTP
           ref={inputRef}
@@ -131,7 +139,7 @@ function RechargeModal({ open, onCancel, groupDisplayName, onSubmit }: RechargeM
           ))}
         </InputOTP>
         <p id="recharge-code-hint" className={styles.hint}>
-          请输入 16 位兑换码，将自动转为大写并分段显示。
+          {t('recharge.hint')}
         </p>
         {codeError ? (
           <p id="recharge-code-error" className={styles.fieldError}>

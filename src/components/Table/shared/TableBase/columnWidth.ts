@@ -175,44 +175,6 @@ export function resolveReadonlySkeletonBarWidth(
   }
 }
 
-export type ManageColumnWidth = EditableColumnWidth;
-
-export function resolveManageColumnWidthClass(width?: ManageColumnWidth): string | undefined {
-  return resolveEditableColumnWidthClass(width);
-}
-
-export function isDataEqualColumnLayout(columns: Array<{ width?: TableColumnWidth }>): boolean {
-  return isReadonlyEqualColumnLayout(columns);
-}
-
-export function getDataEqColumnCount(
-  columns: Array<{ width?: TableColumnWidth }>
-): number | undefined {
-  return getReadonlyEqColumnCount(columns);
-}
-
-export function resolveDataColumnWidth(
-  width: TableColumnWidth | undefined,
-  equalLayout: boolean
-): TableColumnWidth | undefined {
-  return resolveReadonlyColumnWidth(width, equalLayout);
-}
-
-export function resolveDataColumnWidthClass(
-  width: TableColumnWidth | undefined,
-  equalLayout: boolean
-): string | undefined {
-  return resolveReadonlyColumnWidthClass(width, equalLayout);
-}
-
-export function resolveDataSkeletonBarWidth(
-  width: TableColumnWidth | undefined,
-  equalLayout: boolean,
-  isRowHeader?: boolean
-): ReadonlySkeletonBarWidth {
-  return resolveReadonlySkeletonBarWidth(width, equalLayout, isRowHeader);
-}
-
 export function resolveFolderSkeletonBarWidth(
   column: {
     width?: FolderColumnWidth;

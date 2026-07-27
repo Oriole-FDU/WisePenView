@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState, type Key } from 'react';
+import { useLayoutEffect, useRef, useState, type Key } from 'react';
 import type { SegmentedTabsProps } from './index.type';
 import styles from './style.module.less';
 
@@ -25,39 +25,32 @@ function SegmentedTabs<T extends Key = string>({
     width: 0,
   });
 
-  const updateIndicator = useCallback(() => {
-    const selectedEl = tabRefs.current.get(String(selectedKey));
+  useLayoutEffect(() => {
     const listEl = listRef.current;
-    if (!selectedEl || !listEl) return;
-    const listRect = listEl.getBoundingClientRect();
-    const tabRect = selectedEl.getBoundingClientRect();
-    setIndicatorStyle({
-      left: tabRect.left - listRect.left - listEl.clientLeft,
-      width: tabRect.width,
-    });
-  }, [selectedKey]);
+    const updateIndicator = () => {
+      const selectedEl = tabRefs.current.get(String(selectedKey));
+      if (!selectedEl || !listEl) return;
+      const listRect = listEl.getBoundingClientRect();
+      const tabRect = selectedEl.getBoundingClientRect();
+      setIndicatorStyle({
+        left: tabRect.left - listRect.left - listEl.clientLeft,
+        width: tabRect.width,
+      });
+    };
 
-  useLayoutEffect(() => {
     updateIndicator();
-  }, [updateIndicator, items]);
+    const observer = new ResizeObserver(updateIndicator);
+    if (listEl) observer.observe(listEl);
+    return () => observer.disconnect();
+  }, [items.length, selectedKey]);
 
-  // Also update on resize
-  useLayoutEffect(() => {
-    const handleResize = () => updateIndicator();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [updateIndicator]);
-
-  const setTabRef = useCallback(
-    (key: string) => (el: HTMLButtonElement | null) => {
-      if (el) {
-        tabRefs.current.set(key, el);
-      } else {
-        tabRefs.current.delete(key);
-      }
-    },
-    []
-  );
+  const setTabRef = (key: string) => (el: HTMLButtonElement | null) => {
+    if (el) {
+      tabRefs.current.set(key, el);
+    } else {
+      tabRefs.current.delete(key);
+    }
+  };
 
   return (
     <div

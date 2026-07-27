@@ -1,5 +1,6 @@
 import AppAvatar from '@/components/Avatar';
 import { Separator } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 
 import type { NoteInfoDisplayData } from '@/domains/Note';
 import styles from './style.module.less';
@@ -14,8 +15,9 @@ const getAvatarText = (name: string): string => {
 };
 
 function NoteInfoBar({ noteInfoDisplay }: NoteInfoBarProps) {
+  const { t } = useTranslation('note');
   const authors = noteInfoDisplay.authors;
-  const lastEditedAtText = noteInfoDisplay.lastEditedAtText;
+  const lastEditedAtText = noteInfoDisplay.lastEditedAtText || t('info.empty');
   const hasAuthors = authors.length > 0;
   const authorNamesText = authors.map((author) => author.name).join(', ');
 
@@ -25,7 +27,9 @@ function NoteInfoBar({ noteInfoDisplay }: NoteInfoBarProps) {
         <div className={`${styles.noteInfoItem} ${styles.authorsInfoItem}`}>
           <div
             className={styles.authorsInfo}
-            aria-label={hasAuthors ? `作者：${authorNamesText}` : '作者：暂无'}
+            aria-label={
+              hasAuthors ? t('info.authors', { names: authorNamesText }) : t('info.noAuthors')
+            }
           >
             {hasAuthors ? (
               <>
@@ -51,13 +55,13 @@ function NoteInfoBar({ noteInfoDisplay }: NoteInfoBarProps) {
                 </span>
               </>
             ) : (
-              <span className={styles.noteInfoValue}>暂无</span>
+              <span className={styles.noteInfoValue}>{t('info.empty')}</span>
             )}
           </div>
         </div>
         <Separator orientation="vertical" className={styles.infoDivider} />
         <div className={styles.noteInfoItem}>
-          <span className={styles.noteInfoLabel}>上次编辑</span>
+          <span className={styles.noteInfoLabel}>{t('info.lastEdited')}</span>
           <span className={styles.noteInfoValue}>{lastEditedAtText}</span>
         </div>
       </div>

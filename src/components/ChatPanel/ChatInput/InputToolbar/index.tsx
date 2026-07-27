@@ -1,6 +1,7 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import clsx from 'clsx';
 import { ArrowUp, Square } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import AgentPicker from '../AgentPicker';
 import ModelPicker from '../ModelPicker';
 import SkillMenu from '../SkillMenu';
@@ -15,10 +16,11 @@ function InputToolbar({
   voiceInputProps,
   injectedAgents,
   preferredAgent,
-  modelIconOnly = false,
+  modelIconOnly,
   onSend,
   onStop,
 }: InputToolbarProps) {
+  const { t } = useTranslation('chat');
   function handlePrimaryAction(): void {
     if (sending) {
       onStop?.();
@@ -53,7 +55,7 @@ function InputToolbar({
               <ArrowUp size={18} aria-hidden="true" />
             )
           }
-          label={sending ? '停止生成' : '发送消息'}
+          label={sending ? t('input.stop') : t('input.send')}
           variant={sending ? 'ghost' : 'primary'}
           onPress={handlePrimaryAction}
           isDisabled={sending ? !onStop : sendDisabled}

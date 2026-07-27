@@ -1,5 +1,6 @@
 import { isRouteErrorResponse } from 'react-router-dom';
 
+import i18n from '@/i18n';
 import { FRONTEND_CLIENT_ERROR, isWisePenError, parseErrorMessage } from '@/utils/error';
 
 export interface AppErrorInfo {
@@ -20,8 +21,11 @@ export const buildAppErrorInfo = (error: unknown): AppErrorInfo => {
             : 'warning';
     return {
       status,
-      title: error.status >= 500 ? '出错啦' : `请求异常 (${error.status})`,
-      subTitle: error.statusText || '页面加载失败，请稍后重试。',
+      title:
+        error.status >= 500
+          ? i18n.t('page.genericTitle', { ns: 'errors' })
+          : i18n.t('page.requestError', { ns: 'errors', status: error.status }),
+      subTitle: error.statusText || i18n.t('page.loadFailed', { ns: 'errors' }),
     };
   }
 
@@ -31,7 +35,9 @@ export const buildAppErrorInfo = (error: unknown): AppErrorInfo => {
       error.code === FRONTEND_CLIENT_ERROR.UNKNOWN;
     return {
       status: isInternal ? '500' : 'warning',
-      title: isInternal ? '页面发生错误' : '操作未完成',
+      title: isInternal
+        ? i18n.t('page.pageError', { ns: 'errors' })
+        : i18n.t('page.operationIncomplete', { ns: 'errors' }),
       subTitle: parseErrorMessage(error),
     };
   }
@@ -39,14 +45,14 @@ export const buildAppErrorInfo = (error: unknown): AppErrorInfo => {
   if (error instanceof Error) {
     return {
       status: '500',
-      title: '出错啦',
-      subTitle: '页面发生了意外错误，请刷新后重试。',
+      title: i18n.t('page.genericTitle', { ns: 'errors' }),
+      subTitle: i18n.t('page.unexpected', { ns: 'errors' }),
     };
   }
 
   return {
     status: '500',
-    title: '出错啦',
-    subTitle: '发生了未知错误，请稍后再试。',
+    title: i18n.t('page.genericTitle', { ns: 'errors' }),
+    subTitle: i18n.t('page.unknown', { ns: 'errors' }),
   };
 };

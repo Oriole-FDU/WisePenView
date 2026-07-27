@@ -1,4 +1,5 @@
 import { Input, TextArea } from '@/components/Input';
+import { AppPopover } from '@/components/Overlay';
 import AppModal from '@/components/Overlay/AppModal';
 import UploadZone from '@/components/UploadZone';
 import { FEEDBACK_TYPE, useImageService, useUserService, type FeedbackType } from '@/domains';
@@ -7,10 +8,11 @@ import {
   assertImageProxyUploadLimit,
   IMAGE_UPLOAD_MAX_SIZE_LABEL,
 } from '@/utils/image/uploadLimit';
-import { Button, Label, ListBox, Popover, TextField, toast, type Selection } from '@heroui/react';
+import { Button, Label, ListBox, TextField, toast, type Selection } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { ChevronDown } from 'lucide-react';
 import { useState, type Key } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { UserFeedbackModalProps } from './index.type';
 import styles from './style.module.less';
 
@@ -28,15 +30,14 @@ const DEFAULT_FORM_VALUES: FeedbackFormValues = {
   image: null,
 };
 
-const FEEDBACK_TYPE_VALUES = new Set<string>(
-  FEEDBACK_TYPE.options.map((option) => option.value)
-);
+const FEEDBACK_TYPE_VALUES = new Set<string>(FEEDBACK_TYPE.options.map((option) => option.value));
 
 function isFeedbackType(value: string): value is FeedbackType {
   return FEEDBACK_TYPE_VALUES.has(value);
 }
 
 function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
+  const { i18n, t } = useTranslation(['shell', 'common']);
   const userService = useUserService();
   const imageService = useImageService();
   const [formValues, setFormValues] = useState<FeedbackFormValues>(DEFAULT_FORM_VALUES);
@@ -115,7 +116,7 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
     {
       manual: true,
       onSuccess: () => {
-        toast.success('反馈提交成功');
+        toast.success(t('feedback.success'));
         resetForm();
         onOpenChange(false);
       },
@@ -127,15 +128,15 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
 
   const validateForm = (): boolean => {
     if (formValues.types.length === 0) {
-      toast.warning('请选择问题类型');
+      toast.warning(t('feedback.typeRequired'));
       return false;
     }
     if (!formValues.content.trim()) {
-      toast.warning('请输入问题描述');
+      toast.warning(t('feedback.contentRequired'));
       return false;
     }
     if (!formValues.contact.trim()) {
-      toast.warning('请输入您的联系方式');
+      toast.warning(t('feedback.contactRequired'));
       return false;
     }
     return true;
@@ -150,23 +151,29 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
     });
   };
 
+  const selectedTypeLabels = formValues.types.map((type) => {
+    const typeKey = FEEDBACK_TYPE.getKey(type);
+    return typeKey ? t(`feedback.type.${typeKey}`) : String(type);
+  });
   const selectedTypeLabel =
-    formValues.types.length > 0
-      ? formValues.types.map((type) => FEEDBACK_TYPE.getLabel(type)).join('、')
-      : '请选择问题类型';
+    selectedTypeLabels.length > 0
+      ? new Intl.ListFormat(i18n.resolvedLanguage, { style: 'short', type: 'conjunction' }).format(
+          selectedTypeLabels
+        )
+      : t('feedback.typeRequired');
 
   return (
     <AppModal
       isOpen={isOpen}
       onOpenChange={handleOpenChange}
-      title="用户反馈"
+      title={t('feedback.title')}
       size="md"
       bodyClassName={styles.modalBody}
       isDismissable={!submitting}
       actions={
         <>
           <Button variant="secondary" isDisabled={submitting} onPress={handleCancel}>
-            取消
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button
             variant="primary"
@@ -174,25 +181,25 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
             aria-busy={submitting || undefined}
             onPress={handleConfirm}
           >
-            提交
+            {t('actions.submit', { ns: 'common' })}
           </Button>
         </>
       }
     >
       <div className={styles.typeField}>
         <span className={styles.fieldLabel}>
-          问题类型
+          {t('feedback.typeLabel')}
           <span className={styles.requiredMark} aria-hidden="true">
             *
           </span>
         </span>
-        <Popover>
-          <Popover.Trigger>
+        <AppPopover>
+          <AppPopover.Trigger>
             <Button
               variant="outline"
               className={styles.typeTrigger}
               isDisabled={submitting}
-              aria-label="问题类型"
+              aria-label={t('feedback.typeLabel')}
             >
               <span
                 className={formValues.types.length > 0 ? styles.typeText : styles.typePlaceholder}
@@ -201,60 +208,62 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
               </span>
               <ChevronDown size={16} aria-hidden className={styles.typeChevron} />
             </Button>
-          </Popover.Trigger>
-          <Popover.Content className={styles.typePopover} placement="bottom start">
-            <Popover.Dialog>
-              <ListBox
-                aria-label="问题类型选项"
-                selectionMode="multiple"
-                selectedKeys={new Set(formValues.types)}
-                onSelectionChange={handleTypeSelectionChange}
-                className={styles.typeList}
-              >
-                {FEEDBACK_TYPE.options.map((option) => (
-                  <ListBox.Item key={option.value} id={option.value} textValue={option.label}>
-                    {option.label}
-                    <ListBox.ItemIndicator />
-                  </ListBox.Item>
-                ))}
-              </ListBox>
-            </Popover.Dialog>
-          </Popover.Content>
-        </Popover>
+          </AppPopover.Trigger>
+          <AppPopover.Content className={styles.typePopover} placement="bottom start">
+            <ListBox
+              aria-label={t('feedback.typeOptionsAria')}
+              selectionMode="multiple"
+              selectedKeys={new Set(formValues.types)}
+              onSelectionChange={handleTypeSelectionChange}
+              className={styles.typeList}
+            >
+              {FEEDBACK_TYPE.options.map((option) => (
+                <ListBox.Item
+                  key={option.value}
+                  id={option.value}
+                  textValue={t(`feedback.type.${option.key}`)}
+                >
+                  {t(`feedback.type.${option.key}`)}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </AppPopover.Content>
+        </AppPopover>
       </div>
 
       <TextField
-        aria-label="问题描述"
+        aria-label={t('feedback.contentLabel')}
         value={formValues.content}
         onChange={(value) => updateFormValue('content', value)}
         isDisabled={submitting}
         isRequired
       >
-        <Label>问题描述</Label>
-        <TextArea rows={5} placeholder="请输入问题描述..." />
+        <Label>{t('feedback.contentLabel')}</Label>
+        <TextArea rows={5} placeholder={t('feedback.contentPlaceholder')} />
       </TextField>
 
       <div className={styles.imageField}>
-        <span className={styles.fieldLabel}>图片上传</span>
+        <span className={styles.fieldLabel}>{t('feedback.imageLabel')}</span>
         <UploadZone
           file={formValues.image}
           disabled={submitting}
           accept="image/*"
-          label="点击或拖拽图片到此区域"
-          description={`选填，仅可上传一张图片，大小不超过 ${IMAGE_UPLOAD_MAX_SIZE_LABEL}`}
+          label={t('feedback.uploadLabel')}
+          description={t('feedback.uploadDescription', { maxSize: IMAGE_UPLOAD_MAX_SIZE_LABEL })}
           onFileChange={handleImageChange}
         />
       </div>
 
       <TextField
-        aria-label="您的联系方式"
+        aria-label={t('feedback.contactLabel')}
         value={formValues.contact}
         onChange={(value) => updateFormValue('contact', value)}
         isDisabled={submitting}
         isRequired
       >
-        <Label>您的联系方式</Label>
-        <Input placeholder="请输入您的联系方式" />
+        <Label>{t('feedback.contactLabel')}</Label>
+        <Input placeholder={t('feedback.contactPlaceholder')} />
       </TextField>
     </AppModal>
   );

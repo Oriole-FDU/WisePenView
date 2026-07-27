@@ -788,10 +788,6 @@ export const createDriveServices = (
     }
   };
 
-  const moveToFolder: IDriveService['moveToFolder'] = async (params) => {
-    await moveNodeToFolder(params);
-  };
-
   const resolveBatchMoveSourceIds = (params: {
     nodeIds: string[];
     targetFolderNodeId: string;
@@ -951,7 +947,7 @@ export const createDriveServices = (
     listNodeChildren,
     getNodePath,
     getResourceNode,
-    moveToFolder,
+    moveToFolder: moveNodeToFolder,
     createLink,
     moveNodesToFolder,
     removeNode,

@@ -1,5 +1,5 @@
 import { useLatest } from 'ahooks';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { WisePenUIMessage } from '../entity/message';
 import type { PageResult } from '../service/index.type';
 
@@ -41,50 +41,47 @@ export function useChatHistory({
   const [totalPage, setTotalPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const clearConversation = useCallback(() => {
+  const clearConversation = () => {
     requestVersionRef.current += 1;
     loadingMoreRef.current = false;
     setLoadingMore(false);
     setPage(1);
     setTotalPage(1);
     setMessages([]);
-  }, [setMessages]);
+  };
 
-  const replaceHistory = useCallback(
-    async (targetSessionId: string): Promise<void> => {
-      const requestVersion = requestVersionRef.current + 1;
-      requestVersionRef.current = requestVersion;
-      loadingMoreRef.current = false;
-      setLoadingMore(false);
-      setPage(1);
-      setTotalPage(1);
-      setMessages([]);
+  const replaceHistory = async (targetSessionId: string): Promise<void> => {
+    const requestVersion = requestVersionRef.current + 1;
+    requestVersionRef.current = requestVersion;
+    loadingMoreRef.current = false;
+    setLoadingMore(false);
+    setPage(1);
+    setTotalPage(1);
+    setMessages([]);
 
-      try {
-        const payload = await loadPage(targetSessionId, 1, pageSize);
-        if (
-          requestVersion !== requestVersionRef.current ||
-          targetSessionId !== sessionIdRef.current
-        ) {
-          return;
-        }
-        setMessages((currentMessages) => mergeMessages(payload.list, currentMessages));
-        setPage(payload.page ?? 1);
-        setTotalPage(payload.totalPage ?? 1);
-      } catch (error) {
-        if (
-          requestVersion !== requestVersionRef.current ||
-          targetSessionId !== sessionIdRef.current
-        ) {
-          return;
-        }
-        throw error;
+    try {
+      const payload = await loadPage(targetSessionId, 1, pageSize);
+      if (
+        requestVersion !== requestVersionRef.current ||
+        targetSessionId !== sessionIdRef.current
+      ) {
+        return;
       }
-    },
-    [loadPage, pageSize, sessionIdRef, setMessages]
-  );
+      setMessages((currentMessages) => mergeMessages(payload.list, currentMessages));
+      setPage(payload.page ?? 1);
+      setTotalPage(payload.totalPage ?? 1);
+    } catch (error) {
+      if (
+        requestVersion !== requestVersionRef.current ||
+        targetSessionId !== sessionIdRef.current
+      ) {
+        return;
+      }
+      throw error;
+    }
+  };
 
-  const prependHistory = useCallback(async (): Promise<void> => {
+  const prependHistory = async (): Promise<void> => {
     const targetSessionId = sessionIdRef.current;
     if (!targetSessionId || loadingMoreRef.current || page >= totalPage) return;
 
@@ -113,7 +110,7 @@ export function useChatHistory({
         setLoadingMore(false);
       }
     }
-  }, [loadPage, page, pageSize, sessionIdRef, setMessages, totalPage]);
+  };
 
   return {
     canLoadMore: Boolean(sessionId) && page < totalPage,

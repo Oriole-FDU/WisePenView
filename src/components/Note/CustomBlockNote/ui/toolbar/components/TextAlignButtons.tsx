@@ -12,18 +12,20 @@ import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
 import { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getSelectedBlocks, toBlockUpdate } from '../utils';
 import { ToolbarToggleButton } from './ToolbarButton';
 
 const textAlignButtons = [
-  { key: 'left', label: '左对齐', icon: AlignLeft },
-  { key: 'center', label: '居中对齐', icon: AlignCenter },
-  { key: 'right', label: '右对齐', icon: AlignRight },
+  { key: 'left', icon: AlignLeft },
+  { key: 'center', icon: AlignCenter },
+  { key: 'right', icon: AlignRight },
 ] as const;
 
 type TextAlignment = (typeof textAlignButtons)[number]['key'];
 
 export function TextAlignButtons() {
+  const { t } = useTranslation('note');
   const editor = useBlockNoteEditor(blockNoteSchema);
   const state = useEditorState({
     editor,
@@ -109,7 +111,7 @@ export function TextAlignButtons() {
 
   return (
     <ToggleButtonGroup
-      aria-label="文本对齐"
+      aria-label={t('editor.align.label')}
       selectionMode="single"
       selectedKeys={new Set([state.textAlignment])}
       onSelectionChange={(keys) => {
@@ -127,7 +129,11 @@ export function TextAlignButtons() {
         return (
           <Fragment key={item.key}>
             {index > 0 ? <ToggleButtonGroup.Separator /> : null}
-            <ToolbarToggleButton id={item.key} label={item.label} icon={<Icon size={20} />} />
+            <ToolbarToggleButton
+              id={item.key}
+              label={t(`editor.align.${item.key}`)}
+              icon={<Icon size={20} />}
+            />
           </Fragment>
         );
       })}

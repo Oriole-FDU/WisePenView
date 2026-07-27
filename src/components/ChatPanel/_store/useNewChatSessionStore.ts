@@ -4,27 +4,18 @@ import { registerStore } from '@/store/lifecycle';
 
 interface NewChatSessionState {
   newChatSessionId: string | null;
-  newChatSessionTitle: string;
-  setNewChatSession: (payload: { id: string; title: string }) => void;
+  setNewChatSessionId: (sessionId: string) => void;
   clearNewChatSessionById: (sessionId: string) => void;
 }
 
-const DEFAULT_NEW_CHAT_SESSION_STATE: Pick<
-  NewChatSessionState,
-  'newChatSessionId' | 'newChatSessionTitle'
-> = {
+const DEFAULT_NEW_CHAT_SESSION_STATE: Pick<NewChatSessionState, 'newChatSessionId'> = {
   newChatSessionId: null,
-  newChatSessionTitle: '',
 };
 
 export const useNewChatSessionStore = create<NewChatSessionState>()((set) => ({
   ...DEFAULT_NEW_CHAT_SESSION_STATE,
 
-  setNewChatSession: ({ id, title }) =>
-    set({
-      newChatSessionId: id,
-      newChatSessionTitle: title,
-    }),
+  setNewChatSessionId: (sessionId) => set({ newChatSessionId: sessionId }),
   clearNewChatSessionById: (sessionId) =>
     set((state) => {
       if (state.newChatSessionId !== sessionId) {

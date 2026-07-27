@@ -90,12 +90,13 @@
 }
 
 .collectionListItemContent {
-  display: flex;
+  display: grid;
+  width: 100%;
   min-width: 0;
   flex: 1;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
+  grid-template-columns: minmax(0, 1fr) auto 28px;
+  gap: var(--space-2xs);
 }
 
 .collectionListItemName {
@@ -109,10 +110,15 @@
   flex: 0 0 auto;
   color: var(--muted);
   font-size: var(--font-size-xs);
+  text-align: right;
 }
 
 .collectionListItemActions {
-  flex: 0 0 auto;
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.14s ease;
@@ -123,6 +129,13 @@
 .collectionListItem[data-selected='true'] .collectionListItemActions {
   opacity: 1;
   pointer-events: auto;
+}
+
+.resourcePanel {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .resourcePanelHeader {

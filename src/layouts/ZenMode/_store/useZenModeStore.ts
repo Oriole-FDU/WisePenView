@@ -1,3 +1,4 @@
+import { CHAT_PANEL_MIN_WIDTH, clampZenChatPanelWidth } from '@/constants/layoutScale';
 import { buildDriveNodeScope, type DriveNodeScope } from '@/domains/Drive';
 import { registerStore } from '@/store/lifecycle';
 import { createStoreJSONStorage } from '@/store/persistence';
@@ -59,7 +60,7 @@ const DEFAULT_ZEN_MODE_STATE: Pick<
   panes: DEFAULT_PANES,
   activePaneId: ZEN_PRIMARY_PANE_ID,
   primaryPanePercentage: 50,
-  chatWidth: 420,
+  chatWidth: CHAT_PANEL_MIN_WIDTH,
 };
 
 const clamp = (value: number, min: number, max: number): number =>
@@ -110,7 +111,7 @@ export const useZenModeStore = create<ZenModeState>()(
       setActivePane: (paneId) => set({ activePaneId: paneId }),
       setPrimaryPanePercentage: (percentage) =>
         set({ primaryPanePercentage: clamp(percentage, 25, 75) }),
-      setChatWidth: (width) => set({ chatWidth: clamp(width, 320, 720) }),
+      setChatWidth: (width) => set({ chatWidth: clampZenChatPanelWidth(width) }),
     }),
     {
       name: 'zen-mode',

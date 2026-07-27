@@ -8,10 +8,12 @@ import { toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SessionMenuItemProps } from './index.type';
 import styles from './style.module.less';
 
 function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps) {
+  const { t } = useTranslation(['chat', 'common']);
   const chatService = useChatService();
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [editingTitle, setEditingTitle] = useState(session.title || '');
@@ -27,7 +29,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
     {
       manual: true,
       onSuccess: async () => {
-        toast.success('重命名成功');
+        toast.success(t('chat:session.renameSuccess'));
         setRenameModalOpen(false);
         await onUpdated();
       },
@@ -45,7 +47,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
     {
       manual: true,
       onSuccess: async () => {
-        toast.success('删除成功');
+        toast.success(t('chat:session.deleteSuccess'));
         onDeleted(session.id);
         await onUpdated();
       },
@@ -58,7 +60,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
   const submitRename = async () => {
     const trimmedTitle = editingTitle.trim();
     if (!trimmedTitle) {
-      setEditingTitleError('请输入对话标题');
+      setEditingTitleError(t('chat:session.titleRequired'));
       return;
     }
     await runRenameSession(trimmedTitle);
@@ -71,12 +73,16 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
 
   return (
     <div className={styles.sessionMenuLabel}>
-      <span className={styles.sessionMenuLabelText}>{session.title || '未命名会话'}</span>
+      <span className={styles.sessionMenuLabelText}>
+        {session.title || t('chat:session.untitled')}
+      </span>
 
       <div className={`${styles.sessionActions} sessionActionsVisibleOnItem`}>
         <AppIconButton
           icon={<Pencil size={16} aria-hidden="true" />}
-          label={`重命名 ${session.title || '未命名会话'}`}
+          label={t('chat:session.renameAction', {
+            name: session.title || t('chat:session.untitled'),
+          })}
           size="sm"
           className={styles.sessionActionBtn}
           onPointerDown={(event) => {
@@ -93,7 +99,9 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
         />
         <AppIconButton
           icon={<Trash2 size={16} aria-hidden="true" />}
-          label={`删除 ${session.title || '未命名会话'}`}
+          label={t('chat:session.deleteAction', {
+            name: session.title || t('chat:session.untitled'),
+          })}
           size="sm"
           variant="danger"
           className={styles.sessionActionBtn}
@@ -116,8 +124,8 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
           }
           setRenameModalOpen(nextOpen);
         }}
-        title="修改对话标题"
-        confirmText="保存"
+        title={t('chat:session.renameTitle')}
+        confirmText={t('common:actions.save')}
         onCancel={() => {
           setRenameModalOpen(false);
           setEditingTitle(session.title || '');
@@ -126,8 +134,8 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
         onSubmit={() => void submitRename()}
       >
         <FormField
-          aria-label="对话标题"
-          label="对话标题"
+          aria-label={t('chat:session.titleLabel')}
+          label={t('chat:session.titleLabel')}
           value={editingTitle}
           autoFocus
           onChange={(value) => {
@@ -137,16 +145,16 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
           errorMessage={editingTitleError}
           isRequired
         >
-          <Input placeholder="请输入对话标题" />
+          <Input placeholder={t('chat:session.titlePlaceholder')} />
         </FormField>
       </AppFormDialog>
       <AppAlertDialog
         type="danger"
         isOpen={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="删除会话"
-        description="删除后不可恢复，是否继续？"
-        confirmText="删除"
+        title={t('chat:session.deleteTitle')}
+        description={t('chat:session.deleteDescription')}
+        confirmText={t('common:actions.delete')}
         onConfirm={() => void confirmDeleteSession()}
         isConfirmLoading={deleting}
         isDismissable={!deleting}

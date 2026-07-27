@@ -10,7 +10,8 @@ import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Folder } from 'lucide-react';
 import type { Key } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 import styles from './style.module.less';
@@ -22,6 +23,7 @@ function OtherSkillModal() {
 }
 
 function OtherSkillModalContent() {
+  const { t } = useTranslation(['chat', 'common']);
   const chatService = useChatService();
   const { currentAgent, selectedSkills } = useChatInputStore(
     useShallow((state) => ({
@@ -42,19 +44,25 @@ function OtherSkillModalContent() {
   );
   const rawGroups = data?.otherSkillGroups;
 
-  const { skillMap, treeData } = useMemo(() => {
+  const { skillMap, treeData } = (() => {
     const mapping = new Map<
       string,
       { skill: ResourceSkillSummary; sourceAgent: ChatAgentOption | null }
     >();
     const groups = buildOtherSkillTreeGroups(rawGroups ?? [], currentAgent);
     const data: TreeDataNode[] = groups.map((group) => {
+      const groupLabel =
+        group.key === 'personal'
+          ? t('input.otherSkillPicker.personal')
+          : !group.label
+            ? t('input.otherSkillPicker.group')
+            : group.label;
       return {
         key: group.key,
         title: (
           <span className={styles.nodeTitle}>
             <Folder size={14} color="var(--warning)" />
-            <span>{group.label}</span>
+            <span>{groupLabel}</span>
           </span>
         ),
         selectable: false,
@@ -69,7 +77,7 @@ function OtherSkillModalContent() {
     });
 
     return { skillMap: mapping, treeData: data };
-  }, [currentAgent, rawGroups]);
+  })();
 
   function handleClose(): void {
     setOtherSkillModalOpen(false);
@@ -92,7 +100,7 @@ function OtherSkillModalContent() {
     <AppModal
       isOpen
       onOpenChange={handleOpenChange}
-      title="选择其他 Skill"
+      title={t('input.otherSkillPicker.title')}
       size="md"
       contentMode="dialog"
     >
@@ -100,7 +108,7 @@ function OtherSkillModalContent() {
         fallback={
           <AppModal.Body>
             <div className={styles.wrapper}>
-              <div className={styles.hint}>选择要添加的 Skill（可多选）</div>
+              <div className={styles.hint}>{t('input.otherSkillPicker.hint')}</div>
               <div className={styles.treeNav} />
             </div>
           </AppModal.Body>
@@ -109,10 +117,10 @@ function OtherSkillModalContent() {
         {() => (
           <AppModal.Body>
             <div className={styles.wrapper}>
-              <div className={styles.hint}>选择要添加的 Skill（可多选）</div>
+              <div className={styles.hint}>{t('input.otherSkillPicker.hint')}</div>
               <div className={styles.treeNav}>
                 {loading ? (
-                  <div className={styles.hint}>正在加载 Skill</div>
+                  <div className={styles.hint}>{t('input.otherSkillPicker.loading')}</div>
                 ) : (
                   <Tree
                     treeData={treeData}
@@ -131,10 +139,10 @@ function OtherSkillModalContent() {
       </AppModal.DeferredContent>
       <AppModal.Footer>
         <Button variant="secondary" onPress={handleClose}>
-          取消
+          {t('actions.cancel', { ns: 'common' })}
         </Button>
         <Button variant="primary" onPress={handleConfirm}>
-          确认
+          {t('actions.confirm', { ns: 'common' })}
         </Button>
       </AppModal.Footer>
     </AppModal>

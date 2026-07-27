@@ -13,6 +13,7 @@ import { formatFileSize } from '@/utils/format/formatFileSize';
 import { Button, ProgressBar } from '@heroui/react';
 import { UploadCloud, X } from 'lucide-react';
 import { useRef, useState, type ChangeEvent, type DragEvent, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { UploadZoneProps } from './index.type';
 import styles from './style.module.less';
 
@@ -22,12 +23,13 @@ function UploadZone({
   multiple = false,
   disabled = false,
   accept,
-  label = '点击或拖拽文件到此区域',
-  description = '仅可选择单个文件',
+  label,
+  description,
   onFileChange,
   onFilesChange,
   getFileProgress,
 }: UploadZoneProps) {
+  const { t } = useTranslation('common');
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const selectedFiles = files ?? (file ? [file] : []);
@@ -123,15 +125,21 @@ function UploadZone({
         <span className={styles.uploadIcon} aria-hidden="true">
           <UploadCloud size={32} strokeWidth={1.8} />
         </span>
-        <span className={styles.uploadText}>{label}</span>
-        <span className={styles.uploadHint}>{description}</span>
+        <span className={styles.uploadText}>{label ?? t('uploadZone.label')}</span>
+        <span className={styles.uploadHint}>{description ?? t('uploadZone.single')}</span>
         <Button variant="outline" size="sm" isDisabled={disabled} onPress={openFilePicker}>
-          {multiple ? '选择文件' : selectedFiles.length > 0 ? '重新选择' : '选择文件'}
+          {multiple || selectedFiles.length === 0
+            ? t('uploadZone.select')
+            : t('uploadZone.reselect')}
         </Button>
       </div>
 
       {selectedFiles.length > 0 && (
-        <AttachmentGroup className={styles.fileList} role="group" aria-label="已选择文件">
+        <AttachmentGroup
+          className={styles.fileList}
+          role="group"
+          aria-label={t('uploadZone.selectedAria')}
+        >
           {selectedFiles.map((selectedFile, index) => {
             const fileProgress = getFileProgress?.(selectedFile, index);
             const attachmentState =
@@ -159,7 +167,7 @@ function UploadZone({
                   {typeof fileProgress === 'number' && (
                     <div className={styles.fileProgress}>
                       <ProgressBar
-                        aria-label={`${selectedFile.name} 上传进度`}
+                        aria-label={t('uploadZone.progressAria', { name: selectedFile.name })}
                         value={fileProgress}
                         size="sm"
                       >
@@ -173,7 +181,7 @@ function UploadZone({
                 <AttachmentActions>
                   <AttachmentAction
                     isDisabled={disabled}
-                    label="移除文件"
+                    label={t('uploadZone.remove')}
                     onPress={() => removeFileAt(index)}
                   >
                     <X size={16} strokeWidth={1.8} />
@@ -185,7 +193,7 @@ function UploadZone({
           {multiple && selectedFiles.length > 1 && (
             <div className={styles.fileListActions}>
               <Button variant="ghost" size="sm" isDisabled={disabled} onPress={removeFile}>
-                清空全部
+                {t('uploadZone.clear')}
               </Button>
             </div>
           )}

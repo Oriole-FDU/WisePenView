@@ -52,20 +52,20 @@
 .inlineEditPopover {
   position: fixed;
   z-index: 10050;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-lg);
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+  overflow: clip;
   background: var(--overlay);
   color: var(--overlay-foreground);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--overlay-shadow);
+  box-shadow: var(--overlay-shadow, var(--card-shadow));
   box-sizing: border-box;
   min-width: 240px;
 }
 
-.inlineEditPopoverHeader {
-  font-size: var(--font-size-xs);
-  color: var(--muted);
-  margin-bottom: var(--space-xs);
+.inlineEditPopoverBody {
+  padding: var(--app-popover-content-padding, var(--space-xs));
+  background: var(--surface);
 }
 
 .inlineEditTextarea {
@@ -81,7 +81,7 @@
   color: var(--foreground);
   background: var(--field-background);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-popover-control, var(--radius-md));
   resize: none;
   outline: none;
 
