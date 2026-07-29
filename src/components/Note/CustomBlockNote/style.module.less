@@ -105,23 +105,23 @@
   }
 
   :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='1']) {
-    min-height: calc(26px * 1.8 + 6px);
+    min-height: calc(18px * 1.8 + 6px);
   }
   :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='2']) {
-    min-height: calc(22px * 1.4 + 6px);
+    min-height: calc(16px * 1.4 + 6px);
   }
   :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='3']) {
-    min-height: calc(20px * 1.4 + 6px);
+    min-height: calc(14px * 1.4 + 6px);
   }
   :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='4']) {
-    min-height: calc(18px * 1.4 + 6px);
+    min-height: calc(14px * 1.4 + 6px);
   }
   :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='5']),
   :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='6']) {
-    min-height: calc(16px * 1.4 + 6px);
+    min-height: calc(13px * 1.4 + 6px);
   }
   :global(.bn-container .bn-side-menu[data-block-type='paragraph']) {
-    min-height: calc(16px * 1.8 + 6px);
+    min-height: calc(14px * 1.8 + 6px);
   }
   :global(.bn-container .bn-side-menu[data-block-type='math']) {
     min-height: 48px;
@@ -145,7 +145,7 @@
 
   /* 贴近飞书文档的正文与标题字阶（仅作用正文编辑区） */
   :global(.bodyBlockNoteView .bn-editor) {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.8;
     /* 保留少量可点击留白以便在文末继续输入；过大（如 60vh）会在短笔记下方出现大块空区 */
     padding-bottom: min(12vh, 8rem);
@@ -157,7 +157,7 @@
 
   :global(.bn-editor .bn-block-content) {
     /* 块类型切换时 BlockNote 会短暂挂载上一类型属性，必须持续压住其原生排版与字号动画。 */
-    font-size: 16px !important;
+    font-size: 14px !important;
     font-weight: 400 !important;
     line-height: 1.8;
     margin-top: 0;
@@ -170,7 +170,7 @@
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='heading']) {
-    font-size: 26px !important;
+    font-size: 18px !important;
     font-weight: 500 !important;
     line-height: 1.8;
     margin-left: -2px;
@@ -186,23 +186,23 @@
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='2']) {
-    font-size: 22px !important;
+    font-size: 16px !important;
     line-height: 1.4;
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='3']) {
-    font-size: 20px !important;
+    font-size: 14px !important;
     line-height: 1.4;
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='4']) {
-    font-size: 18px !important;
+    font-size: 14px !important;
     line-height: 1.4;
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='5']),
   :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='6']) {
-    font-size: 16px !important;
+    font-size: 13px !important;
     line-height: 1.4;
   }
 
@@ -581,7 +581,7 @@
 :global(.bn-drag-preview) {
   --bn-font-family: var(--app-font-family);
   font-family: var(--app-font-family);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.8;
 }
 
@@ -590,7 +590,7 @@
 }
 
 :global(.bn-drag-preview .bn-block-content) {
-  font-size: 16px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
   line-height: 1.8;
   margin-top: 0;
@@ -605,7 +605,7 @@
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='heading']) {
-  font-size: 26px !important;
+  font-size: 18px !important;
   font-weight: 500 !important;
   line-height: 1.8;
   margin-left: -2px;
@@ -621,23 +621,23 @@
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='2']) {
-  font-size: 22px !important;
+  font-size: 16px !important;
   line-height: 1.4;
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='3']) {
-  font-size: 20px !important;
+  font-size: 14px !important;
   line-height: 1.4;
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='4']) {
-  font-size: 18px !important;
+  font-size: 14px !important;
   line-height: 1.4;
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='5']),
 :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='6']) {
-  font-size: 16px !important;
+  font-size: 13px !important;
   line-height: 1.4;
 }
 

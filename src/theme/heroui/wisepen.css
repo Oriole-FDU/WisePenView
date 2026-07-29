@@ -425,10 +425,10 @@
     --font-size-base: 14px;
     --font-size-sm: 14px;
     --font-size-xs: 12px;
-    --font-size-2xs: 11px;
+    --font-size-2xs: 12px;
     --font-size-md: var(--font-size-base);
     --font-size-lg: 18px;
-    --font-size-heading-3: 24px;
+    --font-size-heading-3: 18px;
     --font-size-heading-5: 16px;
     --font-weight-regular: 400;
     --font-weight-medium: 500;
@@ -812,5 +812,11 @@
     --diff-modified: inherit;
     --diff-modified-border: inherit;
     --diff-row-selected: inherit;
+  }
+
+  /* 按钮文字统⼀ @wisepen-typography-button */
+  :where([data-slot='button']) {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
   }
 }

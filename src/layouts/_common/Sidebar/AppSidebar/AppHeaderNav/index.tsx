@@ -101,7 +101,7 @@ function AppHeaderNav({ collapsed }: AppHeaderNavProps) {
               onPress={() => handleNavItemPress(item.key)}
             >
               <span className={styles.menuIcon}>
-                <Icon size={18} />
+                <Icon size={16} />
               </span>
               {!collapsed && <span className={styles.menuLabel}>{label}</span>}
             </ListBoxItem>
