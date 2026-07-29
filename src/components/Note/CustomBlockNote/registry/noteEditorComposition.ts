@@ -2,6 +2,7 @@ import { createAiDiffEditorExtension } from '../engines/aiDiff/extension';
 import { searchEditorExtension } from '../engines/search/extension';
 import { codeBlockPlugin } from '../plugins/CodeBlockPlugin';
 import { createDefaultContentPlugin } from '../plugins/DefaultContentPlugin';
+import { createHighlightBlockPlugin } from '../plugins/HighlightBlockPlugin';
 import { latexPlugin } from '../plugins/LatexPlugin';
 import { mermaidPlugin } from '../plugins/MermaidPlugin';
 import { tablePlugin } from '../plugins/TablePlugin';
@@ -18,12 +19,20 @@ import type { NoteEditorServices, NotePluginBundle } from './types';
 
 const richTextAiDiffConfig = noteConfig.aiDiff.richText;
 const defaultContentPlugin = createDefaultContentPlugin(richTextAiDiffConfig);
+const highlightBlockPlugin = createHighlightBlockPlugin(richTextAiDiffConfig);
 const aiDiffEditorExtension = createAiDiffEditorExtension(richTextAiDiffConfig);
 
 const notePluginTree = {
   kind: 'bundle',
   id: 'note',
-  children: [defaultContentPlugin, codeBlockPlugin, tablePlugin, latexPlugin, mermaidPlugin],
+  children: [
+    defaultContentPlugin,
+    highlightBlockPlugin,
+    codeBlockPlugin,
+    tablePlugin,
+    latexPlugin,
+    mermaidPlugin,
+  ],
 } satisfies NotePluginBundle;
 
 const noteEditorServices = {

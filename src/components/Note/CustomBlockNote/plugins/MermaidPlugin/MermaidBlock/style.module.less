@@ -21,6 +21,7 @@
 }
 
 .content {
+  position: relative;
   overflow: hidden;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-xl);
@@ -87,7 +88,10 @@
 }
 
 .panelHidden {
-  display: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .diagram {

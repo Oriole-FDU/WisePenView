@@ -3,7 +3,7 @@ import type { BlockConfig } from '@blocknote/core';
 import { createReactBlockSpec, type ReactCustomBlockRenderProps } from '@blocknote/react';
 import { useRequest } from 'ahooks';
 import { Check, Copy } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/Button/AppIconButton';
@@ -29,7 +29,7 @@ function readRenderError(error: unknown): string {
   return i18n.t('mermaid.renderFailed', { ns: 'note' });
 }
 
-function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
+function MermaidBlockView({ block, contentRef, editor }: MermaidBlockRenderProps) {
   const { t } = useTranslation('note');
   const readOnly = useNoteEditorReadOnlyContext();
   const [view, setView] = useState<MermaidView>('graph');
@@ -48,6 +48,37 @@ function MermaidBlockView({ block, contentRef }: MermaidBlockRenderProps) {
     { ready: shouldRender, refreshDeps: [diagramId, source, shouldRender] }
   );
   const result = rendered?.source === source ? rendered : undefined;
+
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：编辑器选区进入当前 Mermaid 块时。
+   * 不可替代原因：源码编辑区在图形态被隐藏，必须订阅编辑器选区变化后切换到可承载原生光标的面板。
+   * cleanup：卸载时取消 BlockNote 选区订阅，避免已销毁的块视图继续更新状态。
+   */
+  useEffect(() => {
+    if (readOnly) return;
+    return editor.onSelectionChange((currentEditor) => {
+      if (currentEditor.getTextCursorPosition().block.id === block.id) {
+        setView('code');
+      }
+    });
+  }, [block.id, editor, readOnly]);
+
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：源码面板由图形态切换为可见后。
+   * 不可替代原因：ProseMirror 在源码 DOM 被隐藏时已完成选区同步，需等待 React 提交可见布局后重新聚焦，才能重新绘制原生光标。
+   * cleanup：卸载或再次切换视图时取消尚未执行的 animation frame。
+   */
+  useEffect(() => {
+    if (readOnly || view !== 'code') return;
+    const frame = window.requestAnimationFrame(() => {
+      if (editor.getTextCursorPosition().block.id === block.id) {
+        editor.focus();
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [block.id, editor, readOnly, view]);
 
   const handleCopy = async () => {
     if (!(await copyText(source))) return;

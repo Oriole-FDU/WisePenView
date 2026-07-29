@@ -27,8 +27,6 @@ const enUSAgent = {
     assetDeleted: 'Asset deleted',
     switchVersionBlocked: 'Save or discard your changes before switching versions',
     currentAgent: 'Current Agent',
-    createTitle: 'Create Agent',
-    createAction: 'Create new Agent',
     openFailed: 'Unable to open Agent',
     backToDrive: 'Back to drive',
     loading: 'Loading Agent...',

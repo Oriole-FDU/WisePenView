@@ -62,6 +62,7 @@ function fileExtToLanguage(name: string): string {
 function SkillEditor({
   content,
   fileName,
+  modelPath,
   readOnly,
   onSave,
   onChange,
@@ -79,6 +80,8 @@ function SkillEditor({
   return (
     <Editor
       height="100%"
+      path={modelPath}
+      saveViewState
       language={fileExtToLanguage(fileName)}
       value={content}
       onChange={(value) => onChange?.(value ?? '')}

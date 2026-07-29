@@ -12,7 +12,7 @@ import type {
 } from '../entity/drive';
 
 export const DRIVE_ROOT_ID = 'drive-root';
-export const DRIVE_SHARED_TAG_NAME = '/.shared';
+export const DRIVE_SHARED_TAG_NAME = '.Shared';
 const DRIVE_GROUP_ROOT_PREFIX = 'drive-root:group:';
 
 export type EncodedNodeKind = 'folder' | 'resource' | 'link' | 'loading';

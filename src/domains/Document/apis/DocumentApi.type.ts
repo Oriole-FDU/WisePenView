@@ -8,6 +8,7 @@ export interface UploadDocApiRequest {
   extension: string;
   md5: string;
   expectedSize: number;
+  pathTagId: string;
 }
 
 export interface UploadDocApiResponse {

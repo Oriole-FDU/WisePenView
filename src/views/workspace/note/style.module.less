@@ -34,8 +34,8 @@
   flex: 1;
   min-height: 0;
   width: 100%;
-  max-width: 980px;
-  margin: 0;
+  max-width: var(--note-editor-max-width, 900px);
+  margin: 0 auto;
   padding: 0;
 }
 
@@ -78,14 +78,29 @@
   box-sizing: border-box;
   overflow: hidden;
   min-width: 0;
+  container-type: inline-size;
+  container-name: note-content;
+  --note-editor-max-width: 900px;
+  --note-outline-open-width: clamp(
+    180px,
+    18cqw,
+    var(--layout-note-outline-open-width, 200px)
+  );
 }
 
-.contentRowOutlineOpen {
-  padding-left: var(--layout-note-outline-open-width, 260px);
-}
-
-.contentRowOutlineCollapsed {
-  padding-left: var(--layout-note-outline-collapsed-width, 40px);
+.contentRowOutlineOpen .mainPanel {
+  /* 宽度不足时只让出避免目录遮挡所需的空间，并优先保住正文最小宽度。 */
+  margin-left: clamp(
+    0px,
+    calc(
+      var(--note-editor-max-width) + var(--note-outline-open-width) +
+        var(--note-outline-open-width) - 100cqw
+    ),
+    min(
+      var(--note-outline-open-width),
+      max(0px, calc(100cqw - var(--layout-note-editor-min-width, 560px)))
+    )
+  );
 }
 
 .mainPanel {

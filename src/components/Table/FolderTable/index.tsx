@@ -295,6 +295,8 @@ function FolderTable<T extends FolderTableRow>({
   onRowSelect,
   onRowActivate,
   renderNameContent,
+  bodyDragHandlers,
+  bodyOverlay,
   rowActions,
   loadMore,
   totalCount,
@@ -668,8 +670,13 @@ function FolderTable<T extends FolderTableRow>({
           onClick={handleBodyClick}
           onDoubleClick={handleBodyDoubleClick}
           onKeyDown={handleBodyKeyDown}
+          onDragEnter={bodyDragHandlers?.onDragEnter}
+          onDragOver={bodyDragHandlers?.onDragOver}
+          onDragLeave={bodyDragHandlers?.onDragLeave}
+          onDrop={bodyDragHandlers?.onDrop}
           {...scrollContainerProps}
         >
+          {bodyOverlay ? <div className={styles.bodyOverlay}>{bodyOverlay}</div> : null}
           {showEmptyState ? (
             <div className={styles.emptyStateOverlay}>
               <TableBodyState

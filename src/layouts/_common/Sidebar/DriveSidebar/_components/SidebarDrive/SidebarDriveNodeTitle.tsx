@@ -66,11 +66,11 @@ function SidebarDriveNodeTitle({
     node.type === 'resource' || node.type === 'link' ? node.resourceIconType : undefined;
   const folderIconType =
     node.type === 'folder' && node.systemType === 'shared' ? 'shared' : undefined;
-  const canCreateFolder = node.type === 'root' || node.type === 'folder';
-  const canCreateResource =
-    node.type === 'folder' || (node.type === 'root' && node.canMountResources);
-  const canUploadDocument = node.type === 'root' && node.scope.type === 'personal';
   const isSystemFolder = node.type === 'folder' && Boolean(node.systemType);
+  const canCreateFolder = !isSystemFolder && (node.type === 'root' || node.type === 'folder');
+  const canCreateResource =
+    !isSystemFolder && (node.type === 'folder' || (node.type === 'root' && node.canMountResources));
+  const canUploadDocument = canCreateResource;
   const canRename = !isSystemFolder && (node.type === 'folder' || node.type === 'resource');
   const canDelete =
     !isSystemFolder && (node.type === 'folder' || node.type === 'resource' || node.type === 'link');

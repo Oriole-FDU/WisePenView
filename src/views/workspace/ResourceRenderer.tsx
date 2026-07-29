@@ -22,7 +22,7 @@ const AgentView = lazy(() => import('./agent'));
 const DrawioView = lazy(() => import('./drawio'));
 const NoteView = lazy(() => import('./note'));
 const OfficeView = lazy(() => import('./office'));
-const DocumentPreview = lazy(() => import('./pdf'));
+const PdfView = lazy(() => import('./pdf'));
 const SkillView = lazy(() => import('./skill'));
 
 interface ResourceRendererProps {
@@ -148,7 +148,7 @@ function renderResource(
     return <AgentView resourceId={resourceId} />;
   }
   if (resourceType === RESOURCE_KIND.FILE && viewer === RESOURCE_VIEWER.PDF_PREVIEW) {
-    return <DocumentPreview resourceId={resourceId} />;
+    return <PdfView resourceId={resourceId} />;
   }
   if (resourceType === RESOURCE_KIND.FILE && viewer === RESOURCE_VIEWER.OFFICE) {
     return <OfficeView resourceId={resourceId} />;
@@ -167,12 +167,6 @@ function ResourceRenderer({ target, onTargetChange, onClose }: ResourceRendererP
   }
   if (!resourceType) {
     return <UnsupportedResource {...target} onClose={onClose} />;
-  }
-  if (resourceType === RESOURCE_KIND.SKILL && !resourceId) {
-    return <SkillView />;
-  }
-  if (resourceType === RESOURCE_KIND.AGENT && !resourceId) {
-    return <AgentView />;
   }
   if (!resourceId) {
     return <UnsupportedResource {...target} onClose={onClose} />;

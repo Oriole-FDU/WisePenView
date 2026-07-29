@@ -1,7 +1,5 @@
 const zhCNSkill = {
   page: {
-    createTitle: '创建 Skill',
-    createAction: '创建新 Skill',
     openFailed: '无法打开 Skill',
     backToDrive: '返回云盘',
     loading: '正在加载 Skill...',
@@ -44,6 +42,7 @@ const zhCNSkill = {
       unsaved: '未保存',
       complete: '完成',
     },
+    queuePath: 'Skill 配置',
   },
   fileTree: {
     title: '文件',
@@ -67,7 +66,7 @@ const zhCNSkill = {
     failedTitle: '{{count}} 项保存失败',
     failedTitle_one: '{{count}} 项保存失败',
     failedTitle_other: '{{count}} 项保存失败',
-    savingTitle: '保存中 {{done}}/{{total}}',
+    savingTitle: '正在保存 {{total}} 项',
     pendingTitle: '待保存 {{count}} 项',
     pendingTitle_one: '待保存 {{count}} 项',
     pendingTitle_other: '待保存 {{count}} 项',
@@ -98,20 +97,17 @@ const zhCNSkill = {
       description: '当前 Skill 有未保存修改。保存后再离开可避免丢失本次编辑。',
       confirm: '保存并退出',
     },
-    switchFile: {
-      title: '保存后切换文件？',
-      description: '当前文件有未保存修改。保存后再切换可避免丢失本次编辑。',
-      confirm: '保存并切换',
-    },
-    switchConfig: {
-      title: '保存后打开配置？',
-      description: '当前文件有未保存修改。保存后再打开配置可避免丢失本次编辑。',
-      confirm: '保存并打开',
-    },
     switchVersion: {
       title: '保存后切换版本？',
       description: '当前 Skill 有未保存内容。保存后再切换版本可避免丢失本次编辑。',
       confirm: '保存并切换',
+    },
+    cancelEditing: {
+      title: '退出编辑？',
+      description: '当前存在未保存的改动。直接退出将丢失这些改动。',
+      confirm: '保存并退出',
+      cancel: '继续编辑',
+      discard: '丢弃并退出',
     },
   },
   delete: {
@@ -119,13 +115,18 @@ const zhCNSkill = {
     fileTitle: '删除文件',
     folderDescription: '确定删除该文件夹「{{name}}」及其所有内容吗？此操作不可撤销。',
     fileDescription: '确定删除该文件「{{name}}」吗？此操作不可撤销。',
+    dirtyFolderDescription:
+      '该文件夹「{{name}}」中存在 {{count}} 个未保存文件。删除后这些改动将无法恢复。',
+    dirtyFileDescription: '该文件「{{name}}」存在未保存改动。删除后这些改动将无法恢复。',
     confirm: '删除',
+  },
+  move: {
+    dirtyTitle: '移动未保存的文件？',
+    dirtyDescription: '受影响的文件尚未保存。确认移动后将自动保存这些文件。',
+    confirm: '确认移动',
   },
   toast: {
     draftRestored: '已恢复上次未保存的 Skill 草稿',
-    savingSwitchConfig: '正在保存 Skill，请稍后再切换配置',
-    savingSwitchFile: '正在保存 Skill，请稍后再切换文件',
-    updateConfigBeforeDirectory: '请先更新或重置配置后再切换目录',
     saveSuccess: '保存成功',
     configUpdated: '配置已更新',
     publishSuccess: '发布成功',
@@ -135,12 +136,9 @@ const zhCNSkill = {
     missingConfig: '发布前需要填写 Config 中的 name 和 description',
     savingSwitchVersion: '正在保存 Skill，请稍后再切换版本',
     moveSuccess: '移动成功',
-    saveBeforeUpload: '请先保存或放弃当前修改后再上传文件',
+    moveInProgress: '文件正在移动，请稍后保存',
     uploadSingleZip: '导入 zip 压缩包时请单独上传一个文件',
     zipImported: 'zip 压缩包已导入，保存后生效',
-    savingClearSelection: '正在保存 Skill，请稍后再取消选择',
-    saveBeforeClearSelection: '请先保存或放弃当前修改后再取消选择',
-    updateConfigBeforeClearSelection: '请先更新或重置配置后再取消选择',
   },
 };
 

@@ -1,7 +1,5 @@
 const enUSSkill = {
   page: {
-    createTitle: 'Create Skill',
-    createAction: 'Create a new Skill',
     openFailed: 'Unable to open Skill',
     backToDrive: 'Back to Drive',
     loading: 'Loading Skill...',
@@ -38,6 +36,7 @@ const enUSSkill = {
     reset: 'Reset',
     update: 'Update configuration',
     badge: { required: 'Required', unsaved: 'Unsaved', complete: 'Complete' },
+    queuePath: 'Skill configuration',
   },
   fileTree: {
     title: 'Files',
@@ -62,7 +61,7 @@ const enUSSkill = {
     failedTitle: '{{count}} item failed to save',
     failedTitle_one: '{{count}} item failed to save',
     failedTitle_other: '{{count}} items failed to save',
-    savingTitle: 'Saving {{done}}/{{total}}',
+    savingTitle: 'Saving {{total}} item(s)',
     pendingTitle: '{{count}} item waiting to save',
     pendingTitle_one: '{{count}} item waiting to save',
     pendingTitle_other: '{{count}} items waiting to save',
@@ -90,23 +89,18 @@ const enUSSkill = {
         'This Skill has unsaved changes. Save before leaving to avoid losing your edits.',
       confirm: 'Save and leave',
     },
-    switchFile: {
-      title: 'Save before switching files?',
-      description:
-        'This file has unsaved changes. Save before switching to avoid losing your edits.',
-      confirm: 'Save and switch',
-    },
-    switchConfig: {
-      title: 'Save before opening configuration?',
-      description:
-        'This file has unsaved changes. Save before opening configuration to avoid losing your edits.',
-      confirm: 'Save and open',
-    },
     switchVersion: {
       title: 'Save before switching versions?',
       description:
         'This Skill has unsaved content. Save before switching to avoid losing your edits.',
       confirm: 'Save and switch',
+    },
+    cancelEditing: {
+      title: 'Exit editing?',
+      description: 'There are unsaved changes. Exiting directly will discard them.',
+      confirm: 'Save and exit',
+      cancel: 'Continue editing',
+      discard: 'Discard and exit',
     },
   },
   delete: {
@@ -115,13 +109,20 @@ const enUSSkill = {
     folderDescription:
       'Delete the folder “{{name}}” and all its contents? This action cannot be undone.',
     fileDescription: 'Delete the file “{{name}}”? This action cannot be undone.',
+    dirtyFolderDescription:
+      'The folder “{{name}}” contains {{count}} unsaved file(s). Deleting it will permanently discard those changes.',
+    dirtyFileDescription:
+      'The file “{{name}}” has unsaved changes. Deleting it will permanently discard them.',
     confirm: 'Delete',
+  },
+  move: {
+    dirtyTitle: 'Move unsaved files?',
+    dirtyDescription:
+      'Affected files are unsaved. Confirming the move will save them automatically.',
+    confirm: 'Move',
   },
   toast: {
     draftRestored: 'Restored your unsaved Skill draft',
-    savingSwitchConfig: 'The Skill is being saved. Wait before switching to configuration.',
-    savingSwitchFile: 'The Skill is being saved. Wait before switching files.',
-    updateConfigBeforeDirectory: 'Apply or reset the configuration before switching directories.',
     saveSuccess: 'Saved successfully',
     configUpdated: 'Configuration updated',
     publishSuccess: 'Published successfully',
@@ -132,13 +133,9 @@ const enUSSkill = {
     missingConfig: 'Enter a name and description in Config before publishing.',
     savingSwitchVersion: 'The Skill is being saved. Wait before switching versions.',
     moveSuccess: 'Moved successfully',
-    saveBeforeUpload: 'Save or discard the current changes before uploading files.',
+    moveInProgress: 'Files are being moved. Save after the move finishes.',
     uploadSingleZip: 'Upload a zip archive by itself.',
     zipImported: 'The zip archive was imported. Save to apply the changes.',
-    savingClearSelection: 'The Skill is being saved. Wait before clearing the selection.',
-    saveBeforeClearSelection: 'Save or discard the current changes before clearing the selection.',
-    updateConfigBeforeClearSelection:
-      'Apply or reset the configuration before clearing the selection.',
   },
 };
 

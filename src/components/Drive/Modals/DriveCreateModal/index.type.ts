@@ -5,6 +5,7 @@ export interface DriveCreateModalProps {
   isOpen: boolean;
   parentId?: string;
   groupId?: string;
+  pathTagId?: string;
   parentLabel?: string;
   existingFolderNames?: string[];
   onOpenChange: (open: boolean) => void;

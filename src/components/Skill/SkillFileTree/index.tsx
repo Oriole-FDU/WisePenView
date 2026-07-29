@@ -11,6 +11,7 @@ import styles from './style.module.less';
 const PENDING_KEY = '__pending_create__';
 
 interface BuildTreeOptions {
+  dirtyNodeIds: Set<string>;
   isOwner: boolean;
   onDeleteFile: (id: string) => void;
   getDeleteLabel: (name: string) => string;
@@ -35,7 +36,13 @@ function buildTreeData(nodes: SkillFileNode[], opts: BuildTreeOptions): DataNode
                 <FileText size={14} color="var(--muted)" />
               )}
             </span>
-            <span className={styles.nodeLabel}>{node.name}</span>
+            <span
+              className={`${styles.nodeLabel} ${
+                opts.dirtyNodeIds.has(node.id) ? styles.nodeLabelDirty : ''
+              }`}
+            >
+              {node.name}
+            </span>
           </span>
           {opts.isOwner ? (
             <AppIconButton
@@ -148,6 +155,7 @@ function SkillFileTree({
   selectedNodeId,
   expandedKeys,
   pendingCreate,
+  dirtyNodeIds = new Set<string>(),
   onSelect,
   onCommitCreate,
   onCancelCreate,
@@ -157,6 +165,7 @@ function SkillFileTree({
 }: SkillFileTreeProps) {
   const { t } = useTranslation('skill');
   const opts = {
+    dirtyNodeIds,
     isOwner,
     onDeleteFile,
     getDeleteLabel: (name) => t('fileTree.deleteItem', { name }),

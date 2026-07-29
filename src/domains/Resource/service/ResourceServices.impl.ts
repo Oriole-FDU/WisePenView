@@ -1,7 +1,3 @@
-import { DocumentApi } from '@/domains/Document/apis/DocumentApi';
-import { NoteApi } from '@/domains/Note/apis/NoteApi';
-import { SkillApi } from '@/domains/Skill/apis/SkillApi';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { ResourceItemApi } from '../apis/ResourceApi';
 import type { ListResourceItemsApiRequest } from '../apis/ResourceApi.type';
 import type { ResourceItem } from '../entity/resource';
@@ -10,7 +6,6 @@ import { ResourceServicesMap } from '../mapper/ResourceServices.map';
 import { useResourceDisplayNameStore } from '../store/useResourceDisplayNameStore';
 import type {
   GetGroupResourceRequest,
-  GetResourcePermissionOverviewRequest,
   GetUserResourcesRequest,
   IResourceService,
   MountResourcesToGroupTagRequest,
@@ -23,6 +18,12 @@ import type {
   UpdateResourcePermissionSubjectsRequest,
   UpdateResourceTagsRequest,
 } from './index.type';
+import {
+  getResourcePermissionOverview,
+  type ResourcePermissionOverviewDeps,
+} from './resourcePermissionOverview';
+
+type ResourceServicesDeps = ResourcePermissionOverviewDeps;
 
 const GROUP_RESOURCE_SCAN_PAGE_SIZE = 200;
 
@@ -146,39 +147,12 @@ const updateResourcePermissionSubjects = async (
   await ResourceItemApi.changeResourceActionPermission(request);
 };
 
-const getPermissionResourceInfo = async (params: GetResourcePermissionOverviewRequest) => {
-  switch (params.resourceType) {
-    case 'note':
-    case 'drawio': {
-      const data = await NoteApi.getNoteInfo({ resourceId: params.resourceId });
-      return data.resourceInfo;
-    }
-    case 'file': {
-      const data = await DocumentApi.getDocInfo({ resourceId: params.resourceId });
-      return data.resourceInfo;
-    }
-    case 'skill': {
-      const data = await SkillApi.getSkillInfo({ resourceId: params.resourceId });
-      return (
-        data?.resourceInfo ?? { resourceId: params.resourceId, resourceName: '', ownerInfo: {} }
-      );
-    }
-    case 'agent':
-      throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_AGENT_PERMISSION_UNSUPPORTED);
-  }
-};
-
-const getResourcePermissionOverview = async (params: GetResourcePermissionOverviewRequest) => {
-  const resourceInfo = await getPermissionResourceInfo(params);
-  return ResourceServicesMap.mapResourcePermissionOverviewFromApi(resourceInfo, params.resourceId);
-};
-
 const globalSearch = async (params: SearchQueryRequest): Promise<SearchResultPage> => {
   const data = await ResourceItemApi.globalSearch(params);
   return ResourceServicesMap.mapSearchResultPageFromApi(data);
 };
 
-export const createResourceServices = (): IResourceService => ({
+export const createResourceServices = (deps: ResourceServicesDeps): IResourceService => ({
   getUserResources,
   getGroupResources,
   renameResource,
@@ -187,6 +161,6 @@ export const createResourceServices = (): IResourceService => ({
   mountResourcesToGroupTag,
   updateResourceActionPermission,
   updateResourcePermissionSubjects,
-  getResourcePermissionOverview,
+  getResourcePermissionOverview: (params) => getResourcePermissionOverview(params, deps),
   globalSearch,
 });

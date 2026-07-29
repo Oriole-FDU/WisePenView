@@ -147,7 +147,11 @@ export function createDefaultNoteBlock(registry: NotePluginRegistry): Record<str
   if (!registry.defaultBlock) {
     throw createRegistryError('Note registry 缺少默认插入 block owner');
   }
-  return registry.defaultBlock.createEmpty();
+  const block = registry.defaultBlock.createEmpty();
+  if (block.type !== 'paragraph') {
+    throw createRegistryError('Note 默认插入 block 必须是 paragraph');
+  }
+  return block;
 }
 
 export function createNoteBlockNoteSchema(registry: NotePluginRegistry) {

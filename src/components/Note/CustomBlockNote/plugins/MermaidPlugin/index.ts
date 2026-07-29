@@ -1,3 +1,4 @@
+import { createBlockKeyboardNavigationExtension } from '../../engines/editor/keyboardNavigation';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
 import type { NoteBlockPlugin, NotePluginBundle } from '../../registry/types';
 import { createMermaidBlockSpec } from './MermaidBlock';
@@ -36,7 +37,7 @@ const mermaidBlockPlugin = {
     }),
   },
   slashMenu: ({ editor }) => [createMermaidSlashMenuItem(editor)],
-  extensions: () => [mermaidCodeEditorExtension],
+  extensions: () => [mermaidCodeEditorExtension, createBlockKeyboardNavigationExtension('mermaid')],
   print: {
     styles: [
       `

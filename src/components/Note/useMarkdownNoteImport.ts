@@ -14,7 +14,7 @@ interface ImportedMarkdownNote {
 }
 
 interface UseMarkdownNoteImportOptions {
-  mountCreatedResource: (resourceId: string) => Promise<void>;
+  getPathTagId?: () => string | undefined;
   onSuccess: (note: ImportedMarkdownNote) => void;
   onError?: () => void;
 }
@@ -37,7 +37,7 @@ function resolveNoteTitle(fileName: string, untitledTitle: string): string {
 }
 
 export function useMarkdownNoteImport({
-  mountCreatedResource,
+  getPathTagId,
   onSuccess,
   onError,
 }: UseMarkdownNoteImportOptions): UseMarkdownNoteImportResult {
@@ -53,12 +53,14 @@ export function useMarkdownNoteImport({
 
       const title = resolveNoteTitle(file.name, t('title.untitled'));
       const markdown = (await file.text()).replace(/^\uFEFF/, '');
-      const { resourceId } = await noteService.createNote({ title });
+      const { resourceId } = await noteService.createNote({
+        title,
+        pathTagId: getPathTagId?.(),
+      });
       if (!resourceId) {
         throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
       }
 
-      await mountCreatedResource(resourceId);
       usePendingNoteImportStore.getState().setPendingImport(resourceId, {
         markdown,
         sourceFileName: file.name,

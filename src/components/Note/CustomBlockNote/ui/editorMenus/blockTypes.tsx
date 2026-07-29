@@ -10,6 +10,7 @@ import {
   Heading4,
   Heading5,
   Heading6,
+  Highlighter,
   List,
   ListOrdered,
   ListTree,
@@ -67,6 +68,12 @@ const primaryBlockTypeItems: BlockTypeMenuItem[] = [
   },
   { key: 'code-block', label: 'editor.blockType.codeBlock', icon: Braces, type: 'codeBlock' },
   { key: 'quote', label: 'editor.blockType.quote', icon: TextQuote, type: 'quote' },
+  {
+    key: 'highlight-block',
+    label: 'editor.blockType.highlightBlock',
+    icon: Highlighter,
+    type: 'highlightBlock',
+  },
   {
     key: 'toggle-list',
     label: 'editor.blockType.toggleList',

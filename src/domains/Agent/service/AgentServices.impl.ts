@@ -10,19 +10,9 @@ interface AgentServicesDeps {
   userService: IUserService;
 }
 
-const resolveAssetType = (name: string): string => {
-  const extension = name.split('.').pop()?.toLowerCase();
-  if (extension === 'md') return 'MD';
-  if (extension === 'py') return 'PYTHON_SCRIPT';
-  if (extension === 'json') return 'JSON';
-  if (extension === 'yaml' || extension === 'yml') return 'YAML';
-  if (extension === 'toml') return 'TOML';
-  return 'TEXT';
-};
-
 export const createAgentServices = ({ userService }: AgentServicesDeps): IAgentService => ({
-  async createAgent(title, name, description) {
-    const resourceId = await AgentApi.createAgent({ title, name, description });
+  async createAgent(title, name, description, pathTagId) {
+    const resourceId = await AgentApi.createAgent({ title, name, description, pathTagId });
     if (!resourceId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.AGENT_CREATE_RESOURCE_ID_MISSING);
     }
@@ -43,11 +33,12 @@ export const createAgentServices = ({ userService }: AgentServicesDeps): IAgentS
         : undefined;
     return AgentServicesMap.mapAgentDetail({ resourceId, info, bundle, currentUserId: user.id });
   },
-  async updateAgentInfo(resourceId, name, description) {
-    await AgentApi.changeAgentInfo({ resourceId, name, description });
-  },
-  async updateAgentSpec(resourceId, draftVersion, spec) {
-    await AgentApi.updateAgentSpec({ resourceId, draftVersion, spec });
+  async saveAgentDraft(request) {
+    const requests = AgentServicesMap.mapSaveAgentDraftRequests(request);
+    await Promise.all([
+      AgentApi.changeAgentInfo(requests.info),
+      AgentApi.updateAgentSpec(requests.spec),
+    ]);
   },
   async publishVersion(resourceId) {
     await AgentApi.publishAgentVersion(resourceId);
@@ -60,7 +51,7 @@ export const createAgentServices = ({ userService }: AgentServicesDeps): IAgentS
         {
           name: file.name,
           path,
-          assetResourceType: resolveAssetType(file.name),
+          assetResourceType: AgentServicesMap.resolveAssetResourceType(file.name),
           md5: await computeFileMd5(file),
           expectedSize: file.size,
         },

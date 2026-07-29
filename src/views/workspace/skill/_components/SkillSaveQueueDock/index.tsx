@@ -6,6 +6,7 @@ import {
   Clock3,
   LoaderCircle,
   RefreshCw,
+  Settings,
 } from 'lucide-react';
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,8 +55,7 @@ function resolveQueueTitle(
     return t('queue.failedTitle', { count: failedCount });
   }
   if (mode === 'saving') {
-    const doneCount = items.filter((item) => item.phase === 'done').length;
-    return t('queue.savingTitle', { done: doneCount, total: items.length });
+    return t('queue.savingTitle', { total: items.length });
   }
   return t('queue.pendingTitle', { count: items.length });
 }
@@ -85,6 +85,7 @@ function QueuePhaseIcon({ item }: { item: SkillSaveQueueItem }) {
   if (item.phase === 'done') return <CheckCircle2 size={13} />;
   if (item.phase === 'failed') return <AlertCircle size={13} />;
   if (isActivePhase(item.phase)) return <LoaderCircle className={styles.spinningIcon} size={13} />;
+  if (item.kind === 'config') return <Settings size={13} />;
   return <Clock3 size={13} />;
 }
 

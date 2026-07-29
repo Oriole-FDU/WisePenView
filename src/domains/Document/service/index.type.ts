@@ -81,6 +81,8 @@ export interface ForkDocumentRequest {
 
 export interface UploadDocumentParams {
   file: File;
+  /** 上传完成后资源挂载的目标路径标签。 */
+  pathTagId: string;
   /** 初始化上传成功后触发，供上传队列提前关联后端任务 */
   onUploadInitialized?: (payload: UploadDocumentInitializedPayload) => void;
   /** 直传 OSS 进度 0–100（秒传时不触发） */

@@ -1,3 +1,4 @@
+import { createBlockKeyboardNavigationExtension } from '../../engines/editor/keyboardNavigation';
 import { collectNodeAttributeTextMatches } from '../../engines/search/findReplace';
 import type { NoteBlockPlugin, NoteInlinePlugin, NotePluginBundle } from '../../registry/types';
 import { inlineMathAiDiff, mathBlockAiDiff } from './aiDiff';
@@ -36,6 +37,7 @@ const mathBlockPlugin = {
       };
     },
   },
+  extensions: () => [createBlockKeyboardNavigationExtension('math')],
   print: {
     styles: [
       `.note-print-body .bn-block-content[data-content-type='math'] {

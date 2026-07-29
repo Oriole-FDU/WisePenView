@@ -17,6 +17,7 @@ function DriveCreateModal({
   isOpen,
   parentId,
   groupId,
+  pathTagId,
   parentLabel,
   existingFolderNames = [],
   onOpenChange,
@@ -47,13 +48,15 @@ function DriveCreateModal({
           createdId = await agentService.createAgent(
             title.trim(),
             name.trim() || undefined,
-            description.trim() || undefined
+            description.trim() || undefined,
+            pathTagId
           );
           break;
         case 'drawio': {
           const result = await noteService.createNote({
             title: title.trim() || t('create.defaultDrawioTitle'),
             resourceType: 'DRAWIO',
+            pathTagId,
           });
           if (!result.resourceId) {
             throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
@@ -77,7 +80,8 @@ function DriveCreateModal({
           createdId = await skillService.createSkill(
             title.trim(),
             name.trim() || undefined,
-            description.trim() || undefined
+            description.trim() || undefined,
+            pathTagId
           );
           break;
       }

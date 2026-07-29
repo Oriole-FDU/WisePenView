@@ -1,8 +1,7 @@
 import { UnsavedChangesDialog } from '@/components/Overlay';
 import { useTranslation } from 'react-i18next';
 
-export type UnsavedSkillChangesMode =
-  'publish' | 'leave' | 'switchFile' | 'switchConfig' | 'switchVersion';
+export type UnsavedSkillChangesMode = 'publish' | 'leave' | 'switchVersion' | 'cancelEditing';
 
 interface UnsavedSkillChangesModalProps {
   isOpen: boolean;
@@ -26,6 +25,8 @@ function UnsavedSkillChangesModal({
     title: t(`unsaved.${mode}.title`),
     description: t(`unsaved.${mode}.description`),
     confirmText: t(`unsaved.${mode}.confirm`),
+    cancelText: mode === 'cancelEditing' ? t('unsaved.cancelEditing.cancel') : undefined,
+    discardText: mode === 'cancelEditing' ? t('unsaved.cancelEditing.discard') : undefined,
   };
 
   return (
@@ -36,6 +37,8 @@ function UnsavedSkillChangesModal({
       title={copy.title}
       description={copy.description}
       confirmText={copy.confirmText}
+      cancelText={copy.cancelText}
+      discardText={copy.discardText}
       onCancel={onCancel}
       onDiscard={onDiscard}
       onConfirm={onConfirm}

@@ -31,6 +31,7 @@ export interface CreateSkillApiRequest {
   title: string;
   name?: string;
   description?: string;
+  pathTagId?: string;
   sourceType?: string;
 }
 

@@ -36,6 +36,35 @@
   cursor: pointer;
 }
 
+/* AI Diff widget 位于原生 block-content 外，需显式恢复标题块的排版阶梯。 */
+.review[data-ai-diff-content-type='heading'] {
+  margin-bottom: 10px;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.review[data-ai-diff-content-type='heading'][data-ai-diff-heading-level='2'] {
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+.review[data-ai-diff-content-type='heading'][data-ai-diff-heading-level='3'] {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.review[data-ai-diff-content-type='heading'][data-ai-diff-heading-level='4'] {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.review[data-ai-diff-content-type='heading'][data-ai-diff-heading-level='5'],
+.review[data-ai-diff-content-type='heading'][data-ai-diff-heading-level='6'] {
+  font-size: 16px;
+  line-height: 1.4;
+}
+
 /* 对比模式：需要段尾工具条叠层时再 flex */
 .review[data-ai-diff-display-mode='compare'] {
   display: flex;

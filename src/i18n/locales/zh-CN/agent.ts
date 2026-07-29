@@ -27,8 +27,6 @@ const zhCNAgent = {
     assetDeleted: '附件已删除',
     switchVersionBlocked: '请先保存或放弃当前修改，再切换版本',
     currentAgent: '当前 Agent',
-    createTitle: '创建 Agent',
-    createAction: '创建新 Agent',
     openFailed: '无法打开 Agent',
     backToDrive: '返回云盘',
     loading: '正在加载 Agent...',

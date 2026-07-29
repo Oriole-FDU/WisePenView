@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 
 import { getCodeBlockHighlighter, normalizeCodeLanguage } from '@/utils/codeHighlight';
 
+import { createBlockKeyboardNavigationExtension } from '../../engines/editor/keyboardNavigation';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
 import type { NoteBlockPlugin } from '../../registry/types';
 import { CodeBlockAiContentView, CodeBlockAiDiffComparisonView } from './AiDiffView';
@@ -134,6 +135,7 @@ export const codeBlockPlugin = {
   selection: {
     inspect: (_block, context) => ({ selected: context.selected, text: context.selectedText }),
   },
+  extensions: () => [createBlockKeyboardNavigationExtension('codeBlock')],
   findReplace: {
     collectMatches: ({ node, pos, query }) =>
       collectInlineTextMatches(node, pos, query, 'codeBlock'),

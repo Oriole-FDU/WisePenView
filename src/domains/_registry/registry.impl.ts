@@ -40,27 +40,32 @@ const imageService = createImageServices();
 const inlineCommentService = createInlineCommentServices();
 const interactService = createInteractServices();
 const quotaService = createQuotaServices();
-const resourceService = createResourceServices();
 const speechService = createSpeechServices();
 const userService = createUserServices();
 const walletService = createWalletServices();
 
 // Level 1：依赖 Level 0
+const resourceService = createResourceServices({
+  groupService: groupService,
+  userService: userService,
+});
+const agentService = createAgentServices({ userService: userService });
+
+// Level 2：依赖已装配的领域服务
 const noteService = createNoteServices({ resourceService: resourceService });
 const skillService = createSkillServices({
   resourceService: resourceService,
   userService: userService,
 });
-const agentService = createAgentServices({ userService: userService });
 const tagService = createTagServices({ resourceService: resourceService });
-const driveService = createDriveServices({
-  tagService: tagService,
+const chatService = createChatServices({
+  groupService: groupService,
   resourceService: resourceService,
 });
 
-// Level 2：依赖已装配的领域服务
-const chatService = createChatServices({
-  groupService: groupService,
+// Level 3：依赖 Level 2 标签服务
+const driveService = createDriveServices({
+  tagService: tagService,
   resourceService: resourceService,
 });
 

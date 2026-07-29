@@ -149,6 +149,30 @@ export interface ResourcePermissionOverview {
   actionOptions: ResourcePermissionActionOption[];
 }
 
+/** 权限概览补全所需的用户展示字段，已脱离用户服务的请求协议。 */
+export interface ResourcePermissionUserInfo {
+  userId: string;
+  username: string;
+  nickname?: string;
+  realName?: string;
+  avatar?: string;
+}
+
+/** 权限概览补全所需的小组展示字段，已脱离小组服务的请求协议。 */
+export interface ResourcePermissionGroupInfo {
+  groupId: string;
+  groupName: string;
+  groupDesc: string;
+  groupCoverUrl: string;
+}
+
+/** 二次查询结果交给 Resource mapper 做确定性归并。 */
+export interface ResourcePermissionHydration {
+  userInfoById: ReadonlyMap<string, ResourcePermissionUserInfo>;
+  groupInfoById: ReadonlyMap<string, ResourcePermissionGroupInfo>;
+  inheritedActionsBySubjectId: ReadonlyMap<string, ResourceAction[]>;
+}
+
 /**
  * 获取用户资源列表请求参数（个人所有资源，group 不暴露、强制留空）
  * 对齐 GET /resource/item/list 的 query 参数

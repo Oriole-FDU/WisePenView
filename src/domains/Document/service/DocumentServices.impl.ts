@@ -40,7 +40,7 @@ const initUpload = async (body: UploadDocApiRequest): Promise<UploadDocApiRespon
 };
 
 const uploadDocument = async (params: UploadDocumentParams): Promise<string> => {
-  const { file, onUploadInitialized, onUploadProgress } = params;
+  const { file, pathTagId, onUploadInitialized, onUploadProgress } = params;
   assertDocumentUploadAllowed(file);
 
   const md5 = await computeFileMd5(file);
@@ -51,6 +51,7 @@ const uploadDocument = async (params: UploadDocumentParams): Promise<string> => 
     extension,
     md5,
     expectedSize: file.size,
+    pathTagId,
   });
 
   onUploadInitialized?.({

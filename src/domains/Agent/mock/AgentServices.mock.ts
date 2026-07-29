@@ -1,5 +1,5 @@
 import type { AgentDetail } from '../entity/agent';
-import { DEFAULT_AGENT_SPEC } from '../mapper/AgentServices.map';
+import { AgentServicesMap } from '../mapper/AgentServices.map';
 import type { IAgentService } from '../service/index.type';
 
 const mockAgent: AgentDetail = {
@@ -11,7 +11,7 @@ const mockAgent: AgentDetail = {
   draftVersion: 1,
   version: 1,
   status: 'DRAFT',
-  spec: structuredClone(DEFAULT_AGENT_SPEC),
+  spec: AgentServicesMap.mapSpec(),
   assets: [],
   isOwner: true,
 };
@@ -23,11 +23,9 @@ export const AgentServicesMock: IAgentService = {
   async getAgentDetail(resourceId) {
     return { ...structuredClone(mockAgent), resourceId };
   },
-  async updateAgentInfo(_resourceId, name, description) {
+  async saveAgentDraft({ name, description, spec }) {
     mockAgent.name = name ?? '';
     mockAgent.description = description ?? '';
-  },
-  async updateAgentSpec(_resourceId, _draftVersion, spec) {
     mockAgent.spec = structuredClone(spec);
   },
   async publishVersion() {

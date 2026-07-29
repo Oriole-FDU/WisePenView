@@ -1,7 +1,6 @@
-import type { SkillFileNode } from '@/domains/Skill';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { SkillSaveQueueItem } from '../_components/SkillSaveQueueDock/index.type';
+import type { SkillWorkspaceDraftState } from '../_models/workspaceDraft';
 
 const DB_NAME = 'wisepen-skill-draft-cache';
 const DB_VERSION = 1;
@@ -9,20 +8,11 @@ const STORE_NAME = 'skillDrafts';
 const DRAFT_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export interface SkillDraftCacheSnapshot {
+  schemaVersion?: 2;
   resourceId: string;
   draftVersion: number;
   cacheToken?: string;
-  files: SkillFileNode[];
-  selectedFileId: string;
-  selectedTreeNodeId: string;
-  editorContent: string;
-  savedContent: string;
-  viewingVersion: number | null;
-  saveQueueItems: SkillSaveQueueItem[];
-  configName?: string;
-  configDescription?: string;
-  savedConfigName?: string;
-  savedConfigDescription?: string;
+  workspace: SkillWorkspaceDraftState;
   updatedAt: number;
 }
 

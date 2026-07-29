@@ -100,6 +100,7 @@ const enUSNote = {
       checkList: 'Task',
       codeBlock: 'Code block',
       quote: 'Quote',
+      highlightBlock: 'Highlight block',
       toggleList: 'Toggle list',
       toggleHeading1: 'Toggle heading 1',
       toggleHeading2: 'Toggle heading 2',
@@ -187,7 +188,14 @@ const enUSNote = {
       mathDescription: 'Insert a standalone KaTeX equation block',
       mermaid: 'Mermaid diagram',
       mermaidDescription: 'Insert a collaboratively editable Mermaid diagram',
+      highlightBlock: 'Highlight block',
+      highlightBlockDescription: 'Emphasize content with an icon and configurable colors',
     },
+  },
+  highlight: {
+    changeIcon: 'Change highlight block icon',
+    emojiPicker: 'Choose a highlight block icon',
+    placeholder: 'Enter highlighted content',
   },
   sideMenu: {
     addBlock: 'Add block',

@@ -105,6 +105,7 @@ const zhCNNote = {
       checkList: '任务',
       codeBlock: '代码块',
       quote: '引用',
+      highlightBlock: '高亮块',
       toggleList: '折叠列表',
       toggleHeading1: '可折叠一级标题',
       toggleHeading2: '可折叠二级标题',
@@ -202,7 +203,14 @@ const zhCNNote = {
       mathDescription: '插入独占一行的块级 KaTeX 公式',
       mermaid: 'Mermaid 图表',
       mermaidDescription: '插入可协同编辑的 Mermaid 图表',
+      highlightBlock: '高亮块',
+      highlightBlockDescription: '插入带图标和可调颜色的强调内容',
     },
+  },
+  highlight: {
+    changeIcon: '更换高亮块图标',
+    emojiPicker: '选择高亮块图标',
+    placeholder: '输入高亮内容',
   },
   sideMenu: {
     addBlock: '添加块',

@@ -44,7 +44,12 @@ export interface MoveSkillAssetResult {
 
 export interface ISkillService {
   getSkillSummaries(groupId?: string): Promise<SkillSummary[]>;
-  createSkill(title: string, name?: string, description?: string): Promise<string>;
+  createSkill(
+    title: string,
+    name?: string,
+    description?: string,
+    pathTagId?: string
+  ): Promise<string>;
   /** 复制已发布 Skill，后端统一校验 FORK 权限。 */
   forkSkill(params: ForkSkillRequest): Promise<string>;
   getSkillDetail(resourceId: string): Promise<SkillDetail>;

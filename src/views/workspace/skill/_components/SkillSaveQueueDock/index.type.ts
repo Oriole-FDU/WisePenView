@@ -2,10 +2,12 @@ export type SkillSaveQueuePhase = 'pending' | 'preparing' | 'uploading' | 'done'
 
 export interface SkillSaveQueueItem {
   id: string;
+  kind: 'file' | 'config';
   name: string;
   path: string;
   phase: SkillSaveQueuePhase;
   progress: number;
+  revision: number;
   size?: number;
   errorMessage?: string;
 }

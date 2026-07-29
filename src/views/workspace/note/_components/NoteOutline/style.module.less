@@ -14,11 +14,11 @@
 }
 
 .panel {
-  width: 260px;
+  width: var(--note-outline-open-width, var(--layout-note-outline-open-width, 200px));
 }
 
 .collapsedPanel {
-  width: 40px;
+  width: var(--layout-note-outline-collapsed-width, 40px);
 }
 
 .aside {
@@ -193,4 +193,12 @@
 }
 .level6 {
   padding-left: calc(var(--space-xs) + var(--space-sm) * 5);
+}
+
+/* 极窄画布无法同时容纳目录和正文下限时，目录退化为临时覆盖层。 */
+@container note-content (max-width: 740px) {
+  .panel {
+    border-right: 1px solid var(--border-light);
+    box-shadow: var(--surface-shadow);
+  }
 }

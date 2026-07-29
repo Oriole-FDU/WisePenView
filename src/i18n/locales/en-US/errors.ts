@@ -83,8 +83,6 @@ const enUSErrors = {
     '170': 'The comment does not exist or has been deleted.',
     '174': '{{failedCount}} files failed to save.',
     '175': 'Enter the name and description in Config.',
-    '176': 'Skill is being saved. Wait before moving files.',
-    '177': 'Save or discard the current changes before moving files.',
     '178': 'The item cannot be moved there. A file or folder with the same name may exist.',
     '179': 'The file content is not loaded. Save the file again before moving it.',
     '180': 'Failed to export the note. Refresh and try again.',

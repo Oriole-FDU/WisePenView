@@ -15,6 +15,7 @@ export interface SkillFileTreeProps {
   selectedNodeId?: string;
   expandedKeys?: string[];
   pendingCreate?: SkillPendingCreate | null;
+  dirtyNodeIds?: Set<string>;
   isOwner?: boolean;
   onSelect: (fileId: string) => void;
   onCommitCreate: (name: string, kind: 'file' | 'folder') => void;

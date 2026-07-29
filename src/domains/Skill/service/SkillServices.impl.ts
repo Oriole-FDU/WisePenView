@@ -128,8 +128,13 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     return page.list.map(SkillServicesMap.mapSkillSummary).filter((item) => item.resourceId);
   };
 
-  const createSkill = async (title: string, name?: string, description?: string) => {
-    const resourceId = await SkillApi.createSkill({ title, name, description });
+  const createSkill = async (
+    title: string,
+    name?: string,
+    description?: string,
+    pathTagId?: string
+  ) => {
+    const resourceId = await SkillApi.createSkill({ title, name, description, pathTagId });
     if (!resourceId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_CREATE_RESOURCE_ID_MISSING);
     }

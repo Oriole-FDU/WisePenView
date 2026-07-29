@@ -72,7 +72,7 @@ const zhCNDrive = {
   },
   upload: {
     title: '上传文档',
-    description: '文件将上传到个人云盘根目录，并同步显示在上传队列',
+    description: '文件将上传到当前目录，并同步显示在上传队列',
     addToQueue: '添加到上传队列',
     zoneLabel: '点击或拖拽文档到此区域',
     zoneDescription: '支持一次选择多个文档，也可以逐个添加',
@@ -205,6 +205,7 @@ const zhCNDrive = {
     batchDeleted: '已删除 {{count}} 项',
     movedSingle: '已移动',
     trashNotFound: '未找到回收站',
+    dropToUpload: '松开以上传文档',
     addFromPersonal: '从个人云盘添加',
     expandDetails: '展开详情侧栏',
     collapseDetails: '收起详情侧栏',

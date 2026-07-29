@@ -25,7 +25,6 @@ const NETWORK_DELAY_MS = 150;
 const ROOT_ID = 'drive-root';
 const GROUP_ROOT_PREFIX = 'drive-root:group:';
 const SHARED_FOLDER_NODE_ID = 'folder-shared';
-const SHARED_FOLDER_TAG_ID = 'tag-shared';
 const TRASH_FOLDER_NODE_ID = 'trash-root';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -420,31 +419,13 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
     return node.tagId;
   };
 
-  const ensureSharedFolder = async (): Promise<string> => {
+  const getSharedFolderTagId = async (): Promise<string | undefined> => {
     await delay(NETWORK_DELAY_MS);
     const existing = nodes.get(SHARED_FOLDER_NODE_ID);
     if (existing?.type === 'folder') {
       return existing.tagId;
     }
-    const root = getContainer(ROOT_ID);
-    if (!root) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, { nodeId: ROOT_ID });
-    }
-    const node: FolderNode = {
-      id: SHARED_FOLDER_NODE_ID,
-      type: 'folder',
-      parentId: ROOT_ID,
-      scope: buildDriveNodeScope(),
-      tagId: SHARED_FOLDER_TAG_ID,
-      name: '',
-      systemType: 'shared',
-      childrenIds: [],
-    };
-    nodes.set(SHARED_FOLDER_NODE_ID, node);
-    if (!root.childrenIds.includes(SHARED_FOLDER_NODE_ID)) {
-      root.childrenIds.push(SHARED_FOLDER_NODE_ID);
-    }
-    return node.tagId;
+    return undefined;
   };
 
   const getTrashFolderNodeId = async (): Promise<string | undefined> => {
@@ -464,7 +445,7 @@ function createDriveServiceMock(opts?: CreateDriveServiceOptions): IDriveService
     removeNode,
     renameNode,
     createFolder,
-    ensureSharedFolder,
+    getSharedFolderTagId,
   };
 }
 

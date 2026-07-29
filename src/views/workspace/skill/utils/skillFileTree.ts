@@ -224,7 +224,7 @@ export function updateSavedTreeFile(
         ...node,
         id: nextId ?? node.id,
         content: typeof content === 'string' ? content : node.content,
-        contentBlob: node.contentBlob,
+        contentBlob: undefined,
         objectKey: objectKey ?? node.objectKey,
       };
     }

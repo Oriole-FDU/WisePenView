@@ -74,11 +74,11 @@ function PdfLayoutConfig({
   return <>{children}</>;
 }
 
-interface DocumentPreviewProps {
+interface PdfViewProps {
   resourceId?: string;
 }
 
-function DocumentPreview({ resourceId }: DocumentPreviewProps = {}) {
+function PdfView({ resourceId }: PdfViewProps = {}) {
   const { t } = useTranslation('workspace');
   const [viewerErrorMap, setViewerErrorMap] = useState<Record<string, unknown>>({});
   const documentService = useDocumentService();
@@ -238,4 +238,4 @@ function DocumentPreview({ resourceId }: DocumentPreviewProps = {}) {
   );
 }
 
-export default DocumentPreview;
+export default PdfView;

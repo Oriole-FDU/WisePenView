@@ -24,8 +24,8 @@ export const MAIN_SCROLL_MIN_WIDTH = 400;
  */
 export const NOTE_EDITOR_MIN_WIDTH = 560;
 
-/** 笔记大纲展开/收起占位 */
-export const NOTE_OUTLINE_OPEN_WIDTH = 260;
+/** 笔记大纲展开宽度上限与收起宽度 */
+export const NOTE_OUTLINE_OPEN_WIDTH = 200;
 export const NOTE_OUTLINE_COLLAPSED_WIDTH = 40;
 
 /** Chat 侧栏/分栏面板下限 */

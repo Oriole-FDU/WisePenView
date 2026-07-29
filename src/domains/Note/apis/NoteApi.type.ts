@@ -5,6 +5,7 @@ import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.typ
 export interface AddNoteApiRequest {
   title: string;
   resourceType?: string;
+  pathTagId?: string;
 }
 
 export type AddNoteApiResponse = string;

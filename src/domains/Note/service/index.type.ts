@@ -52,6 +52,7 @@ export interface CreateNoteRequest {
   initial_content?: Block[];
   title: string;
   resourceType?: 'NOTE' | 'DRAWIO';
+  pathTagId?: string;
   /** 从已有文档创建副本时传入源文档 ID */
   source?: string;
 }

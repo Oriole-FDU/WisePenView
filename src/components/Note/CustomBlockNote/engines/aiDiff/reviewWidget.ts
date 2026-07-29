@@ -190,6 +190,15 @@ function isSameTarget(left: NoteAiDiffActionTarget | undefined, right: NoteAiDif
   );
 }
 
+function readHeadingLevel(block: Record<string, unknown>): number | undefined {
+  const props = block.props;
+  if (typeof props !== 'object' || props === null) return undefined;
+  const level = (props as Record<string, unknown>).level;
+  return typeof level === 'number' && Number.isInteger(level) && level >= 1 && level <= 6
+    ? level
+    : undefined;
+}
+
 export function createAiDiffReviewWidget(params: {
   blockId: string;
   contentType: string;
@@ -235,6 +244,10 @@ export function createAiDiffReviewWidget(params: {
   root.dataset.aiDiffContentType = contentType;
   root.dataset.aiDiffChangeKind = projection.changeKind;
   root.dataset.aiDiffDisplayMode = displayMode;
+  if (contentType === 'heading') {
+    const headingLevel = readHeadingLevel(projection.aiBlock);
+    if (headingLevel !== undefined) root.dataset.aiDiffHeadingLevel = String(headingLevel);
+  }
   if (blockUnit) root.dataset.aiDiffChangeKey = blockUnit.key;
   if (selected) root.dataset.aiDiffSelected = 'true';
 

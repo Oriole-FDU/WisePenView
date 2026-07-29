@@ -1,34 +1,27 @@
 import AppAvatar from '@/components/Avatar';
 import AppIconButton from '@/components/Button/AppIconButton';
 import ResourcePermissionActionIcon from '@/components/Drive/common/resourcePermissionActionIcon';
-import {
-  areResourcePermissionActionsEqualByOptions,
-  buildResourcePermissionActionKeySet,
-  filterResourcePermissionActionsByOptions,
-  getResourcePermissionActionLabel,
-} from '@/components/Drive/common/resourcePermissionPolicy';
+import { buildResourcePermissionActionKeySet } from '@/components/Drive/common/resourcePermissionPolicy';
 import { AppPopover } from '@/components/Overlay';
 import UserSearchCombobox from '@/components/UserSearchCombobox';
-import { useGroupService, useResourceService, useTagService, useUserService } from '@/domains';
-import type { GroupBaseInfo } from '@/domains/Group';
 import {
-  type ResourceAction,
   type ResourcePermissionActionOption,
-  type ResourcePermissionOverview,
   type ResourcePermissionSource,
   type ResourcePermissionSubject,
-  updateResourceActionSelection,
 } from '@/domains/Resource';
-import type { UserSearchUser } from '@/domains/User';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, Chip, ListBox, Skeleton, toast } from '@heroui/react';
-import { useRequest } from 'ahooks';
+import { Button, Chip, ListBox, Skeleton } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
-import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ResourcePermissionPanelProps } from './index.type';
+import {
+  getAvatarSrc,
+  getSubjectActionsForDisplay,
+  getSubjectRenderKey,
+} from './resourcePermissionPanelModel';
 import styles from './style.module.less';
+import { useResourcePermissionPanelController } from './useResourcePermissionPanelController';
 
 interface SubjectPermissionPopoverProps {
   subject: ResourcePermissionSubject;
@@ -39,40 +32,15 @@ interface SubjectPermissionPopoverProps {
   ) => void;
 }
 
-type SpecifiedUserCandidate = Pick<
-  UserSearchUser,
-  'userId' | 'username' | 'nickname' | 'realName' | 'avatar'
->;
-
 const sourceLabelKeyMap: Record<ResourcePermissionSource, string> = {
   owner: 'permission.source.owner',
   tag: 'permission.source.tag',
   resourceOverride: 'permission.source.resourceOverride',
   specifiedUser: 'permission.source.specifiedUser',
 };
-const EMPTY_ACTION_OPTIONS: ResourcePermissionActionOption[] = [];
 const PANEL_SKELETON_ROWS = ['owner', 'tag', 'override', 'specifiedUser'] as const;
 
-const getSupportedActionsFromOptions = (
-  actionOptions: ResourcePermissionActionOption[]
-): ResourceAction[] =>
-  actionOptions.filter((option) => option.supported).map((option) => option.action);
-
 const getDisplayInitial = (name: string): string => name.trim().charAt(0).toUpperCase() || '?';
-
-const getAvatarSrc = (avatar?: string): string | undefined => {
-  const trimmedAvatar = avatar?.trim();
-  return trimmedAvatar || undefined;
-};
-
-const getUserCandidateDisplayName = (
-  user: SpecifiedUserCandidate,
-  t: TFunction<'resource'>
-): string =>
-  user.realName?.trim() ||
-  user.nickname?.trim() ||
-  user.username.trim() ||
-  t('permission.userFallback', { userId: user.userId });
 
 const getActionLabel = (
   action: ResourcePermissionActionOption['action'],
@@ -96,198 +64,6 @@ const formatActionSummary = (
     count: actions.length,
   });
 };
-
-const getSubjectActionsForDisplay = (subject: ResourcePermissionSubject) => {
-  if (subject.source === 'tag') {
-    return subject.inheritedActions ?? subject.effectiveActions;
-  }
-  return subject.readonly ? subject.effectiveActions : subject.editableActions;
-};
-
-const canCompareWithInheritedActions = (subject: ResourcePermissionSubject): boolean =>
-  Array.isArray(subject.inheritedActions);
-
-const getSubjectRenderKey = (subject: ResourcePermissionSubject): string => {
-  if (subject.groupId) return `group:${subject.groupId}`;
-  if (subject.userId) return `user:${subject.userId}:${subject.source}`;
-  return subject.id;
-};
-
-const updateSubjectActions = (
-  subjects: ResourcePermissionSubject[],
-  subjectId: string,
-  actions: ResourcePermissionActionOption['action'][],
-  options: ResourcePermissionActionOption[]
-): ResourcePermissionSubject[] =>
-  subjects.map((subject) => {
-    if (subject.id !== subjectId || subject.readonly) return subject;
-    const nextActions = filterResourcePermissionActionsByOptions(actions, options);
-    if (
-      subject.source === 'resourceOverride' &&
-      canCompareWithInheritedActions(subject) &&
-      areResourcePermissionActionsEqualByOptions(nextActions, subject.inheritedActions, options)
-    ) {
-      const inheritedActions = filterResourcePermissionActionsByOptions(
-        subject.inheritedActions,
-        options
-      );
-      return {
-        ...subject,
-        id: subject.groupId ? `group:${subject.groupId}:tag` : subject.id,
-        source: 'tag',
-        description: '',
-        editableActions: inheritedActions,
-        effectiveActions: inheritedActions,
-        inheritedActions,
-      };
-    }
-    if (subject.source === 'tag') {
-      return {
-        ...subject,
-        id: subject.groupId ? `group:${subject.groupId}:override` : `${subject.id}:override`,
-        source: 'resourceOverride',
-        description: '',
-        editableActions: nextActions,
-        effectiveActions: nextActions,
-      };
-    }
-    return {
-      ...subject,
-      editableActions: nextActions,
-      effectiveActions: nextActions,
-    };
-  });
-
-const createSpecifiedUserSubject = (
-  user: SpecifiedUserCandidate,
-  t: TFunction<'resource'>
-): ResourcePermissionSubject => ({
-  id: `user:${user.userId}:specified`,
-  kind: 'user',
-  source: 'specifiedUser',
-  name: getUserCandidateDisplayName(user, t),
-  description: '',
-  avatar: getAvatarSrc(user.avatar),
-  userId: user.userId,
-  effectiveActions: [],
-  editableActions: [],
-});
-
-const hydrateUserDisplayInfo = (
-  subjects: ResourcePermissionSubject[],
-  userInfoById: Map<string, SpecifiedUserCandidate>,
-  t: TFunction<'resource'>
-): ResourcePermissionSubject[] => {
-  let changed = false;
-  const nextSubjects = subjects.map((subject) => {
-    if (!subject.userId) return subject;
-    const userInfo = userInfoById.get(subject.userId);
-    if (!userInfo) return subject;
-
-    const nextName = getUserCandidateDisplayName(userInfo, t);
-    const nextAvatar = getAvatarSrc(userInfo.avatar) || getAvatarSrc(subject.avatar);
-    if (subject.name === nextName && subject.avatar === nextAvatar) {
-      return subject;
-    }
-
-    changed = true;
-    return {
-      ...subject,
-      name: nextName,
-      avatar: nextAvatar,
-    };
-  });
-
-  return changed ? nextSubjects : subjects;
-};
-
-const hydrateGroupDisplayInfo = (
-  subjects: ResourcePermissionSubject[],
-  groupInfoById: Map<string, GroupBaseInfo>,
-  t: TFunction<'resource'>
-): ResourcePermissionSubject[] => {
-  let changed = false;
-  const nextSubjects = subjects.map((subject) => {
-    if (!subject.groupId) return subject;
-    const groupInfo = groupInfoById.get(subject.groupId);
-    if (!groupInfo) return subject;
-
-    const groupName = groupInfo.groupName.trim();
-    const groupDesc = groupInfo.groupDesc.trim();
-    const groupCoverUrl = groupInfo.groupCoverUrl.trim();
-    const nextName = groupName ? t('permission.groupMembers', { groupName }) : subject.name;
-    const nextDescription =
-      subject.source === 'resourceOverride' && groupDesc ? groupDesc : subject.description;
-    const nextAvatar = groupCoverUrl || getAvatarSrc(subject.avatar);
-
-    if (
-      subject.name === nextName &&
-      subject.description === nextDescription &&
-      subject.avatar === nextAvatar
-    ) {
-      return subject;
-    }
-
-    changed = true;
-    return {
-      ...subject,
-      name: nextName,
-      description: nextDescription,
-      avatar: nextAvatar,
-    };
-  });
-
-  return changed ? nextSubjects : subjects;
-};
-
-const hydrateInheritedTagActions = (
-  subjects: ResourcePermissionSubject[],
-  options: ResourcePermissionActionOption[],
-  getInheritedActions: (subject: ResourcePermissionSubject) => ResourceAction[] | undefined
-): ResourcePermissionSubject[] =>
-  subjects.map((subject) => {
-    if (!subject.groupId || !subject.primaryTagId) return subject;
-    const inheritedActions = getInheritedActions(subject);
-    if (!inheritedActions) return subject;
-    const normalizedInheritedActions = filterResourcePermissionActionsByOptions(
-      inheritedActions,
-      options
-    );
-
-    if (subject.source === 'resourceOverride') {
-      const matchesTag = areResourcePermissionActionsEqualByOptions(
-        subject.editableActions,
-        normalizedInheritedActions,
-        options
-      );
-      if (matchesTag) {
-        return {
-          ...subject,
-          id: `group:${subject.groupId}:tag`,
-          source: 'tag',
-          description: '',
-          editableActions: normalizedInheritedActions,
-          effectiveActions: normalizedInheritedActions,
-          inheritedActions: normalizedInheritedActions,
-        };
-      }
-    }
-
-    if (subject.source === 'tag') {
-      return {
-        ...subject,
-        description: '',
-        editableActions: normalizedInheritedActions,
-        effectiveActions: normalizedInheritedActions,
-        inheritedActions: normalizedInheritedActions,
-      };
-    }
-
-    return {
-      ...subject,
-      inheritedActions: normalizedInheritedActions,
-    };
-  });
 
 function SubjectPermissionPopover({
   subject,
@@ -387,271 +163,25 @@ function ResourcePermissionPanel({
   onSuccess,
 }: ResourcePermissionPanelProps) {
   const { t } = useTranslation('resource');
-  const groupService = useGroupService();
-  const resourceService = useResourceService();
-  const tagService = useTagService();
-  const userService = useUserService();
-  const updateQueueRef = useRef<Promise<void>>(Promise.resolve());
-  const latestSubjectsRef = useRef<ResourcePermissionSubject[]>([]);
-  const [subjectDrafts, setSubjectDrafts] = useState<ResourcePermissionSubject[] | null>(null);
-  const [newUserKeyword, setNewUserKeyword] = useState('');
-  const [pendingUpdateCount, setPendingUpdateCount] = useState(0);
   const {
-    data: permissionOverview,
-    loading,
+    actionOptions,
+    addSpecifiedUserCandidate,
     error,
-    refresh: refreshPermissionOverview,
-  } = useRequest(
-    () => resourceService.getResourcePermissionOverview({ resourceId, resourceType }),
-    {
-      ready: Boolean(resourceId && resourceType),
-      refreshDeps: [resourceId, resourceType],
-      onSuccess: (overview: ResourcePermissionOverview) => {
-        latestSubjectsRef.current = overview.subjects;
-        setSubjectDrafts(overview.subjects);
-      },
-    }
-  );
-  const subjects = subjectDrafts ?? permissionOverview?.subjects ?? [];
-  const actionOptions = (permissionOverview?.actionOptions ?? EMPTY_ACTION_OPTIONS).map(
-    (option) => ({
-      ...option,
-      label: getResourcePermissionActionLabel(option.action),
-    })
-  );
-  const inheritedSubjects = subjects.filter((subject) => subject.source !== 'specifiedUser');
-  const specifiedUserSubjects = subjects.filter((subject) => subject.source === 'specifiedUser');
-  const existingSpecifiedUserIds = new Set(
-    specifiedUserSubjects
-      .map((subject) => subject.userId)
-      .filter((userId): userId is string => Boolean(userId))
-  );
-  const shouldShowInviteDivider = inheritedSubjects.length > 0 && specifiedUserSubjects.length > 0;
-
-  const isUpdating = pendingUpdateCount > 0;
-
-  useRequest(
-    async () => {
-      if (!permissionOverview) return;
-      const userSubjects = permissionOverview.subjects.filter(
-        (subject) => subject.userId && subject.kind !== 'group'
-      );
-      if (userSubjects.length === 0) return;
-
-      const userInfoById = new Map<string, SpecifiedUserCandidate>();
-      const ownerIds = new Set(
-        userSubjects
-          .filter((subject) => subject.source === 'owner')
-          .map((subject) => subject.userId)
-          .filter((userId): userId is string => Boolean(userId))
-      );
-
-      if (ownerIds.size > 0) {
-        const currentUser = await userService.getUserInfo().catch(() => undefined);
-        if (currentUser && ownerIds.has(currentUser.id)) {
-          userInfoById.set(currentUser.id, {
-            userId: currentUser.id,
-            username: currentUser.username,
-            nickname: currentUser.nickname,
-            realName: currentUser.realName,
-            avatar: currentUser.avatar,
-          });
-        }
-      }
-
-      await Promise.all(
-        userSubjects
-          .filter((subject) => subject.source !== 'owner' && subject.userId)
-          .map(async (subject) => {
-            const userId = subject.userId;
-            if (!userId || userInfoById.has(userId)) return;
-            const keywords = Array.from(
-              new Set([userId, subject.name].map((keyword) => keyword.trim()).filter(Boolean))
-            );
-            for (const keyword of keywords) {
-              const candidates = await userService
-                .queryUserSearchCandidates({ keyword, size: 6 })
-                .catch(() => []);
-              const matchedUser = candidates.find((user) => user.userId === userId);
-              if (matchedUser) {
-                userInfoById.set(userId, matchedUser);
-                return;
-              }
-            }
-          })
-      );
-
-      if (userInfoById.size === 0) return;
-
-      setSubjectDrafts((currentSubjects) => {
-        const baseSubjects = currentSubjects ?? permissionOverview.subjects;
-        const nextSubjects = hydrateUserDisplayInfo(baseSubjects, userInfoById, t);
-        latestSubjectsRef.current = nextSubjects;
-        return nextSubjects;
-      });
-    },
-    {
-      ready: Boolean(permissionOverview),
-      refreshDeps: [permissionOverview, userService, t],
-    }
-  );
-
-  useRequest(
-    async () => {
-      if (!permissionOverview) return;
-      const groupIds = Array.from(
-        new Set(
-          permissionOverview.subjects
-            .map((subject) => subject.groupId)
-            .filter((groupId): groupId is string => Boolean(groupId))
-        )
-      );
-      if (groupIds.length === 0) return;
-
-      const groupInfos = await Promise.all(
-        groupIds.map((groupId) => groupService.fetchGroupBaseInfo(groupId).catch(() => undefined))
-      );
-      const groupInfoById = new Map(
-        groupInfos
-          .filter((groupInfo): groupInfo is GroupBaseInfo => Boolean(groupInfo?.groupId))
-          .map((groupInfo) => [groupInfo.groupId, groupInfo])
-      );
-      if (groupInfoById.size === 0) return;
-
-      setSubjectDrafts((currentSubjects) => {
-        const baseSubjects = currentSubjects ?? permissionOverview.subjects;
-        const nextSubjects = hydrateGroupDisplayInfo(baseSubjects, groupInfoById, t);
-        latestSubjectsRef.current = nextSubjects;
-        return nextSubjects;
-      });
-    },
-    {
-      ready: Boolean(permissionOverview),
-      refreshDeps: [permissionOverview, groupService, t],
-    }
-  );
-
-  useRequest(
-    async () => {
-      if (!permissionOverview || actionOptions.length === 0) return;
-      const groupIds = Array.from(
-        new Set(
-          permissionOverview.subjects
-            .map((subject) => subject.groupId)
-            .filter((groupId): groupId is string => Boolean(groupId))
-        )
-      );
-      if (groupIds.length === 0) return;
-
-      await Promise.all(
-        groupIds.map((groupId) => tagService.getRawTagTree(groupId).catch(() => []))
-      );
-      setSubjectDrafts((currentSubjects) => {
-        const baseSubjects = currentSubjects ?? permissionOverview.subjects;
-        const nextSubjects = hydrateInheritedTagActions(baseSubjects, actionOptions, (subject) =>
-          subject.primaryTagId
-            ? tagService.getRawTagById(subject.primaryTagId, subject.groupId)?.grantedActions
-            : undefined
-        );
-        latestSubjectsRef.current = nextSubjects;
-        return nextSubjects;
-      });
-    },
-    {
-      ready: Boolean(permissionOverview && actionOptions.length > 0),
-      refreshDeps: [permissionOverview, actionOptions, tagService],
-    }
-  );
-
-  const persistPermissionSubjects = (nextSubjects: ResourcePermissionSubject[]) => {
-    setPendingUpdateCount((count) => count + 1);
-    updateQueueRef.current = updateQueueRef.current
-      .catch(() => undefined)
-      .then(async () => {
-        await resourceService.updateResourcePermissionSubjects({
-          resourceId,
-          subjects: nextSubjects,
-        });
-        onSuccess?.();
-      })
-      .catch((err) => {
-        toast.danger(parseErrorMessage(err));
-        refreshPermissionOverview();
-      })
-      .finally(() => {
-        setPendingUpdateCount((count) => Math.max(0, count - 1));
-      });
-  };
-
-  const commitSubjectDrafts = (nextSubjects: ResourcePermissionSubject[]) => {
-    latestSubjectsRef.current = nextSubjects;
-    setSubjectDrafts(nextSubjects);
-    persistPermissionSubjects(nextSubjects);
-  };
-
-  const handleActionToggle = (
-    changedSubject: ResourcePermissionSubject,
-    action: ResourcePermissionActionOption['action']
-  ) => {
-    const currentSubjects = latestSubjectsRef.current;
-    const currentSelectedSubject = currentSubjects.find(
-      (subject) => subject.id === changedSubject.id
-    );
-    if (!currentSelectedSubject || currentSelectedSubject.readonly) return;
-    const currentActions = getSubjectActionsForDisplay(currentSelectedSubject);
-    const nextActions = updateResourceActionSelection(
-      currentActions,
-      action,
-      !currentActions.includes(action),
-      getSupportedActionsFromOptions(actionOptions)
-    );
-    const nextSubjects = updateSubjectActions(
-      currentSubjects,
-      currentSelectedSubject.id,
-      nextActions,
-      actionOptions
-    );
-    commitSubjectDrafts(nextSubjects);
-  };
-
-  const addSpecifiedUserCandidate = (user: SpecifiedUserCandidate) => {
-    const currentSubjects = latestSubjectsRef.current;
-    const userId = user.userId.trim();
-    if (!userId) {
-      toast.warning(t('permission.feedback.invalidUser'));
-      return;
-    }
-    if (currentSubjects.some((subject) => subject.userId === userId)) {
-      toast.warning(t('permission.feedback.duplicateUser'));
-      return;
-    }
-    const nextSubject = createSpecifiedUserSubject({ ...user, userId }, t);
-    const nextSubjects = [...currentSubjects, nextSubject];
-    commitSubjectDrafts(nextSubjects);
-    setNewUserKeyword('');
-  };
-
-  const handleUserSearchEmpty = () => {
-    const keyword = newUserKeyword.trim();
-    toast.warning(
-      keyword ? t('permission.feedback.userNotFound') : t('permission.feedback.userRequired')
-    );
-  };
-
-  const handleUserSearchError = (err: unknown) => {
-    toast.danger(parseErrorMessage(err));
-  };
-
-  const handleRemoveSpecifiedUser = (subject: ResourcePermissionSubject) => {
-    if (subject.source !== 'specifiedUser') return;
-    const nextSubjects = latestSubjectsRef.current.filter(
-      (currentSubject) => currentSubject.id !== subject.id
-    );
-    commitSubjectDrafts(nextSubjects);
-  };
-
-  const queryUserCandidates = (keyword: string) =>
-    userService.queryUserSearchCandidates({ keyword, size: 6 });
+    existingSpecifiedUserIds,
+    handleActionToggle,
+    handleRemoveSpecifiedUser,
+    handleUserSearchEmpty,
+    handleUserSearchError,
+    inheritedSubjects,
+    isUpdating,
+    loading,
+    newUserKeyword,
+    permissionOverview,
+    queryUserCandidates,
+    setNewUserKeyword,
+    shouldShowInviteDivider,
+    specifiedUserSubjects,
+  } = useResourcePermissionPanelController({ resourceId, resourceType, onSuccess });
 
   const renderSubjectItem = (subject: ResourcePermissionSubject) => {
     const avatarSrc = getAvatarSrc(subject.avatar);

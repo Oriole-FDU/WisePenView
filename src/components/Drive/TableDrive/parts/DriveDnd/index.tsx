@@ -1,6 +1,6 @@
 import EntryIcon from '@/components/Icons/EntryIcon';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { type ReactNode } from 'react';
+import { type DragEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DriveTableRow } from '../../index.type';
 import styles from '../../style.module.less';
@@ -58,6 +58,13 @@ interface DriveDroppableBreadcrumbProps {
   children: ReactNode;
 }
 
+interface ExternalFileDropHandlers {
+  onDragEnter: (event: DragEvent<HTMLElement>) => void;
+  onDragOver: (event: DragEvent<HTMLElement>) => void;
+  onDragLeave: (event: DragEvent<HTMLElement>) => void;
+  onDrop: (event: DragEvent<HTMLElement>) => void;
+}
+
 export function DriveDroppableBreadcrumb({
   targetNodeId,
   disabled,
@@ -74,6 +81,42 @@ export function DriveDroppableBreadcrumb({
       ref={setNodeRef}
       className={styles.breadcrumbDropTarget}
       data-drop-target={isOver ? 'true' : undefined}
+    >
+      {children}
+    </span>
+  );
+}
+
+interface ExternalFileDroppableBreadcrumbProps {
+  nodeId: string;
+  isActive: boolean;
+  handlers: ExternalFileDropHandlers;
+  children: ReactNode;
+}
+
+interface ExternalFileDropHandlers {
+  onDragEnter: (event: DragEvent<HTMLElement>) => void;
+  onDragOver: (event: DragEvent<HTMLElement>) => void;
+  onDragLeave: (event: DragEvent<HTMLElement>) => void;
+  onDrop: (event: DragEvent<HTMLElement>) => void;
+}
+
+/** 原生文件拖入的面包屑容器，不参与 dnd-kit 的内部节点移动。 */
+export function ExternalFileDroppableBreadcrumb({
+  nodeId,
+  isActive,
+  handlers,
+  children,
+}: ExternalFileDroppableBreadcrumbProps) {
+  return (
+    <span
+      className={styles.externalFileBreadcrumbTarget}
+      data-drive-breadcrumb-node-id={nodeId}
+      data-drop-target={isActive ? 'true' : undefined}
+      onDragEnter={handlers.onDragEnter}
+      onDragOver={handlers.onDragOver}
+      onDragLeave={handlers.onDragLeave}
+      onDrop={handlers.onDrop}
     >
       {children}
     </span>

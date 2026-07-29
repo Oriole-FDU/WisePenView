@@ -33,6 +33,7 @@ const mapCreateNoteFromApi = (resourceId: string): CreateNoteResponse => ({
 const mapCreateNoteRequest = (params: CreateNoteRequest): AddNoteApiRequest => ({
   title: params.title,
   ...(params.resourceType ? { resourceType: params.resourceType } : {}),
+  ...(params.pathTagId ? { pathTagId: params.pathTagId } : {}),
 });
 
 const mapForkNoteFromApi = (resourceId: string): ForkNoteResponse => ({

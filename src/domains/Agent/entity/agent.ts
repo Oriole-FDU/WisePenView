@@ -1,5 +1,9 @@
 import type { ResourceAction } from '@/domains/Resource';
 
+export type AgentAssetResourceType = 'MD' | 'PYTHON_SCRIPT' | 'TEXT' | 'JSON' | 'YAML' | 'TOML';
+
+export type AgentAssetUploadStatus = 'UPLOADING' | 'AVAILABLE';
+
 export interface AgentModelPolicy {
   defaultModelId: string;
   defaultProviderId: string;
@@ -40,8 +44,8 @@ export interface AgentAsset {
   name: string;
   path: string;
   objectKey?: string;
-  assetResourceType: string;
-  uploadStatus: string;
+  assetResourceType: AgentAssetResourceType;
+  uploadStatus: AgentAssetUploadStatus;
   size: number;
 }
 

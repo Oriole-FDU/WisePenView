@@ -7,6 +7,7 @@
 }
 
 .driveFrame {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -20,6 +21,21 @@
   border: 1px solid var(--border-light);
   border-radius: var(--table-shell-radius, var(--radius-xl));
   background: var(--surface);
+}
+
+.fileDropOverlay {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--accent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--accent-soft) 86%, transparent);
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  pointer-events: none;
 }
 
 .driveBody {
@@ -105,10 +121,29 @@
   }
 }
 
+:global(.table__row):has(.externalFileDropTarget[data-drop-target='true']) {
+  :global(.table__cell) {
+    background: var(--accent-soft);
+  }
+
+  :global(.table__cell:first-child) {
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+}
+
 .breadcrumbDropTarget {
   display: inline-flex;
 
   &[data-drop-target='true'] > * {
+    background: var(--accent-soft);
+    color: var(--foreground);
+  }
+}
+
+.externalFileBreadcrumbTarget {
+  display: inline-flex;
+
+  &[data-drop-target='true'] :global(*) {
     background: var(--accent-soft);
     color: var(--foreground);
   }

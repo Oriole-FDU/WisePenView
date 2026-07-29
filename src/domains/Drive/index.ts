@@ -11,7 +11,6 @@ export type {
 } from './entity/drive';
 export {
   DRIVE_ROOT_ID,
-  DRIVE_SHARED_TAG_NAME,
   buildDriveNodeScope,
   decodeRootNodeScope,
   encodeNodeId,

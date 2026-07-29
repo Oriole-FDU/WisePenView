@@ -72,7 +72,7 @@ const enUSDrive = {
   },
   upload: {
     title: 'Upload documents',
-    description: 'Files are uploaded to the root of Personal Drive and shown in the upload queue',
+    description: 'Files are uploaded to the current folder and shown in the upload queue',
     addToQueue: 'Add to upload queue',
     zoneLabel: 'Click or drag documents here',
     zoneDescription: 'Select multiple documents at once or add them individually',
@@ -208,6 +208,7 @@ const enUSDrive = {
     batchDeleted: 'Deleted {{count}} items',
     movedSingle: 'Moved',
     trashNotFound: 'Trash not found',
+    dropToUpload: 'Drop to upload documents',
     addFromPersonal: 'Add from Personal Drive',
     expandDetails: 'Expand details sidebar',
     collapseDetails: 'Collapse details sidebar',

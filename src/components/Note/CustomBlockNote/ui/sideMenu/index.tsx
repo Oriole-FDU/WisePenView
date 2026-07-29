@@ -68,6 +68,9 @@ import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 type TextAlignment = 'left' | 'center' | 'right';
+type BlockColorTarget = 'textColor' | 'backgroundColor';
+
+const HIGHLIGHT_BLOCK_TYPE = 'highlightBlock';
 
 const textAlignItems: Array<{ key: TextAlignment; icon: LucideIcon }> = [
   { key: 'left', icon: AlignLeft },
@@ -80,7 +83,12 @@ function isBlockEmpty(block: NoteBlock) {
   return Array.isArray(content) && content.length === 0;
 }
 
+function isHighlightBlock(block: NoteBlock) {
+  return block.type === HIGHLIGHT_BLOCK_TYPE;
+}
+
 function blockSupportsTextColor(block: NoteBlock, editor: CustomBlockNoteEditor) {
+  if (isHighlightBlock(block)) return true;
   return (
     blockHasType(block, editor, block.type, { textColor: 'string' }) &&
     editorHasBlockWithType(editor, block.type, { textColor: 'string' })
@@ -88,6 +96,7 @@ function blockSupportsTextColor(block: NoteBlock, editor: CustomBlockNoteEditor)
 }
 
 function blockSupportsBackgroundColor(block: NoteBlock, editor: CustomBlockNoteEditor) {
+  if (isHighlightBlock(block)) return true;
   return (
     blockHasType(block, editor, block.type, { backgroundColor: 'string' }) &&
     editorHasBlockWithType(editor, block.type, { backgroundColor: 'string' })
@@ -104,6 +113,23 @@ function getBlockProp(block: NoteBlock, prop: string) {
   return isRecord(block.props) && typeof block.props[prop] === 'string'
     ? block.props[prop]
     : undefined;
+}
+
+function getBlockColorProp(block: NoteBlock, target: BlockColorTarget) {
+  if (isHighlightBlock(block)) {
+    return getBlockProp(
+      block,
+      target === 'textColor' ? 'highlightTextColor' : 'highlightBackgroundColor'
+    );
+  }
+  return getBlockProp(block, target);
+}
+
+function getBlockColorPropName(block: NoteBlock, target: BlockColorTarget) {
+  if (isHighlightBlock(block)) {
+    return target === 'textColor' ? 'highlightTextColor' : 'highlightBackgroundColor';
+  }
+  return target;
 }
 
 async function writeClipboardData(data: { html: string; text: string }) {
@@ -218,6 +244,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
   );
   const selectedBlockType = allItems.find((item) => blockMatchesBlockTypeItem(block, item));
   const blockIsEmpty = isBlockEmpty(block);
+  const showBlockMenu = !blockIsEmpty || isHighlightBlock(block);
   const owner = notePluginRegistry.blockPlugins.get(block.type);
   const ownerSideMenuState = owner?.sideMenu?.inspect?.(
     block as unknown as Record<string, unknown>
@@ -308,11 +335,12 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
     closeMenu();
   };
 
-  const setBlockColor = (target: 'textColor' | 'backgroundColor', color: ColorKey) => {
+  const setBlockColor = (target: BlockColorTarget, color: ColorKey) => {
+    const prop = getBlockColorPropName(block, target);
     editor.updateBlock(
       block,
       toBlockUpdate({
-        props: { [target]: color },
+        props: { [prop]: color },
       })
     );
     closeMenu();
@@ -320,12 +348,14 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
   };
 
   const resetBlockColor = () => {
+    const textColorProp = getBlockColorPropName(block, 'textColor');
+    const backgroundColorProp = getBlockColorPropName(block, 'backgroundColor');
     editor.updateBlock(
       block,
       toBlockUpdate({
         props: {
-          ...(canUseTextColor ? { textColor: 'default' } : {}),
-          ...(canUseBackgroundColor ? { backgroundColor: 'default' } : {}),
+          ...(canUseTextColor ? { [textColorProp]: 'default' } : {}),
+          ...(canUseBackgroundColor ? { [backgroundColorProp]: 'default' } : {}),
         },
       })
     );
@@ -458,7 +488,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
             text={
               canUseTextColor
                 ? {
-                    color: getBlockProp(block, 'textColor'),
+                    color: getBlockColorProp(block, 'textColor'),
                     onChange: (color) => setBlockColor('textColor', color),
                   }
                 : undefined
@@ -466,7 +496,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
             background={
               canUseBackgroundColor
                 ? {
-                    color: getBlockProp(block, 'backgroundColor'),
+                    color: getBlockColorProp(block, 'backgroundColor'),
                     onChange: (color) => setBlockColor('backgroundColor', color),
                   }
                 : undefined
@@ -530,7 +560,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
         ])
       )}
     >
-      {blockIsEmpty ? (
+      {blockIsEmpty && !isHighlightBlock(block) ? (
         <AppIconButton
           icon={<Plus size={18} aria-hidden="true" />}
           label={t('sideMenu.addBlock')}
@@ -539,7 +569,7 @@ function CustomSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) 
           onPress={openSlashBelow}
         />
       ) : null}
-      {!blockIsEmpty ? (
+      {showBlockMenu ? (
         <div className={styles.dragHandleWrapper}>
           <button
             type="button"
