@@ -115,7 +115,7 @@ const zhCNChat = {
   },
   message: {
     welcome: {
-      title: '你好，我是 AI 助理小 W',
+      title: '你好，我是 WisePen Agent',
       subtitle: '今天想做点什么？',
     },
     scrollToBottom: '滚动到底部',
