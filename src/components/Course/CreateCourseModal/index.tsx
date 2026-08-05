@@ -6,14 +6,12 @@ import { Button, Label, TextField, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  EMPTY_COURSE_CREATE_FORM,
+  mapCourseCreateFormToRequest,
+  type CourseCreateForm,
+} from './createCourseForm.mapper';
 import styles from './style.module.less';
-
-interface CourseCreateForm {
-  name: string;
-  description: string;
-  term: string;
-  category: string;
-}
 
 interface CreateCourseModalProps {
   isOpen: boolean;
@@ -21,31 +19,20 @@ interface CreateCourseModalProps {
   onCreated: (courseId: string) => void;
 }
 
-const EMPTY_COURSE: CourseCreateForm = { name: '', description: '', term: '', category: '' };
-
 function CreateCourseModal({ isOpen, onOpenChange, onCreated }: CreateCourseModalProps) {
   const { t } = useTranslation(['course', 'common']);
   const courseService = useCourseService();
-  const [form, setForm] = useState<CourseCreateForm>(EMPTY_COURSE);
-  const request = useRequest(
-    () =>
-      courseService.createCourse({
-        name: form.name.trim(),
-        description: form.description.trim(),
-        term: form.term.trim(),
-        category: form.category.trim() || undefined,
-      }),
-    {
-      manual: true,
-      onSuccess: (courseId) => {
-        toast.success(t('create.success'));
-        setForm(EMPTY_COURSE);
-        onOpenChange(false);
-        onCreated(courseId);
-      },
-      onError: (error: unknown) => toast.danger(parseErrorMessage(error)),
-    }
-  );
+  const [form, setForm] = useState<CourseCreateForm>(EMPTY_COURSE_CREATE_FORM);
+  const request = useRequest(() => courseService.createCourse(mapCourseCreateFormToRequest(form)), {
+    manual: true,
+    onSuccess: (courseId) => {
+      toast.success(t('create.success'));
+      setForm(EMPTY_COURSE_CREATE_FORM);
+      onOpenChange(false);
+      onCreated(courseId);
+    },
+    onError: (error: unknown) => toast.danger(parseErrorMessage(error)),
+  });
 
   const handleCreate = () => {
     if (!form.name.trim() || !form.description.trim() || !form.term.trim()) {

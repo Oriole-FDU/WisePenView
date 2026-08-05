@@ -1,6 +1,5 @@
 import { useCourseContext } from '@/layouts/Course/CourseContext';
 import { Tabs } from '@heroui/react';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CourseHomeTab from './_components/CourseHomeTab';
@@ -18,10 +17,8 @@ const resolveInitialTab = (value: string | null): CourseContextTabKey =>
 function CourseContextPage() {
   const { t } = useTranslation('course');
   const { course } = useCourseContext();
-  const [searchParams] = useSearchParams();
-  const [activeTabKey, setActiveTabKey] = useState<CourseContextTabKey>(() =>
-    resolveInitialTab(searchParams.get('tab'))
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTabKey = resolveInitialTab(searchParams.get('tab'));
   const tabItems = [
     { key: 'home', label: t('nav.home') },
     { key: 'info', label: t('nav.info') },
@@ -61,7 +58,13 @@ function CourseContextPage() {
           onSelectionChange={(key) => {
             const nextKey = String(key);
             if (COURSE_CONTEXT_TAB_KEYS.includes(nextKey as CourseContextTabKey)) {
-              setActiveTabKey(nextKey as CourseContextTabKey);
+              const nextSearchParams = new URLSearchParams(searchParams);
+              if (nextKey === 'home') {
+                nextSearchParams.delete('tab');
+              } else {
+                nextSearchParams.set('tab', nextKey);
+              }
+              setSearchParams(nextSearchParams, { replace: true });
             }
           }}
           className={styles.contextTabs}

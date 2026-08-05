@@ -11,6 +11,7 @@ import type {
   CourseFinalAssessment,
   CourseMeeting,
   CourseMember,
+  CourseOutlineEditorNode,
   CourseOutlineNode,
   CourseProgress,
   CourseSummary,
@@ -140,6 +141,29 @@ const mapCourseOutlineNodes = (
 
   return mapTags(tags, 0);
 };
+
+const mapCourseOutlineEditorNodes = (
+  nodes: CourseOutlineNode[],
+  parentId?: string
+): CourseOutlineEditorNode[] =>
+  nodes.map((node) =>
+    node.nodeType === 'RESOURCE'
+      ? {
+          nodeId: node.nodeId,
+          name: node.title,
+          entryType: 'resource',
+          resourceId: node.resourceId,
+          resourceType: node.resourceType,
+          parentId,
+        }
+      : {
+          nodeId: node.nodeId,
+          name: node.title,
+          entryType: 'folder',
+          parentId,
+          children: mapCourseOutlineEditorNodes(node.children, node.nodeId),
+        }
+  );
 
 const calculateCourseOutlineProgress = (nodes: CourseOutlineNode[]): CourseProgress => {
   const readByResourceId = new Map<string, boolean>();
@@ -325,6 +349,7 @@ export const CourseServicesMap = {
   sortCourseOutlineResources,
   collectCourseOutlineTagIds,
   mapCourseOutlineNodes,
+  mapCourseOutlineEditorNodes,
   calculateCourseOutlineProgress,
   mapGroupToCourseSummary,
   mapGroupToCourseDetail,

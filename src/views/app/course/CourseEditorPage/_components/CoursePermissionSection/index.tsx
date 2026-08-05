@@ -58,7 +58,7 @@ function CoursePermissionSection({
         </Button>
       </div>
 
-      {groupResConfig ? (
+      {accessPermissionOpen && groupResConfig ? (
         <GroupDefaultAccessPermissionModal
           isOpen={accessPermissionOpen}
           groupId={courseId}
@@ -67,7 +67,7 @@ function CoursePermissionSection({
           onSuccess={handlePermissionSuccess}
         />
       ) : null}
-      {outlineRootTagId ? (
+      {mountPermissionOpen && outlineRootTagId ? (
         <TagMountPermissionModal
           isOpen={mountPermissionOpen}
           groupId={courseId}

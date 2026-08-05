@@ -1,4 +1,3 @@
-import type { CourseOutlineEditorNode } from '@/domains/Course/entity/course';
 import { GROUP_TYPE, type IGroupService } from '@/domains/Group';
 import type { IInteractService } from '@/domains/Interact';
 import type { IResourceService, ResourceItem } from '@/domains/Resource';
@@ -28,35 +27,6 @@ const findTag = (nodes: TagTreeNode[], tagId: string): TagTreeNode | undefined =
   }
   return undefined;
 };
-
-const mapOutlineEditorNodes = async (
-  tagService: ITagService,
-  tags: Awaited<ReturnType<ITagService['getTagTree']>>
-): Promise<CourseOutlineEditorNode[]> =>
-  Promise.all(
-    tags.map(async (tag) => {
-      const data = await tagService.getResByTag({ tag, filePage: 1, filePageSize: 100 });
-      return {
-        nodeId: tag.tagId,
-        name: tag.tagName,
-        entryType: 'folder' as const,
-        parentId: tag.parentId,
-        children: [
-          ...(await mapOutlineEditorNodes(tagService, data.tags)),
-          ...CourseServicesMap.sortCourseOutlineResources(data.files, tag.tagMetaInfo).map(
-            (resource) => ({
-              nodeId: `${tag.tagId}:${resource.resourceId}`,
-              name: resource.resourceName,
-              entryType: 'resource' as const,
-              resourceId: resource.resourceId,
-              resourceType: resource.resourceType,
-              parentId: tag.tagId,
-            })
-          ),
-        ],
-      };
-    })
-  );
 
 interface CourseServicesDeps {
   groupService: IGroupService;
@@ -243,10 +213,9 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     };
   };
 
-  const getCourseOutlineEditor = async (courseId: string): Promise<CourseOutlineEditorNode[]> => {
-    const outlineRoot = await getCourseOutlineRoot(courseId);
-    const nodes = await mapOutlineEditorNodes(tagService, outlineRoot.children ?? []);
-    return nodes.map((node) => ({ ...node, parentId: undefined }));
+  const getCourseOutlineEditor: ICourseService['getCourseOutlineEditor'] = async (courseId) => {
+    const outline = await getCourseOutline(courseId);
+    return CourseServicesMap.mapCourseOutlineEditorNodes(outline.nodes);
   };
 
   const createCourseOutlineSection: ICourseService['createCourseOutlineSection'] = async ({
