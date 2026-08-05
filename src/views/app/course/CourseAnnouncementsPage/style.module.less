@@ -1,5 +1,25 @@
 .page {
-  width: min(100%, 1000px);
+  --course-workflow-gutter: clamp(var(--space-xl), 5vw, 64px);
+  box-sizing: border-box;
+  width: min(100%, 1280px);
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--course-workflow-gutter);
+}
+
+.header {
+  margin-bottom: var(--space-xl);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: var(--font-size-heading-3);
+  font-weight: 600;
+}
+
+.header p {
+  margin: var(--space-xs) 0 0;
+  color: var(--muted);
 }
 
 .announcementFeed {
@@ -75,5 +95,12 @@
   .announcementTitleRow {
     flex-direction: column;
     gap: var(--space-xs);
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    --course-workflow-gutter: var(--space-lg);
+    padding-block: var(--space-lg);
   }
 }

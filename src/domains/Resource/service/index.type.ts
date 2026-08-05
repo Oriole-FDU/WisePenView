@@ -187,6 +187,8 @@ export interface GetUserResourcesRequest {
   tagIds?: string[];
   /** 标签查询逻辑：OR=包含任意，AND=包含全部 */
   tagQueryLogicMode?: TagQueryLogicMode;
+  /** 是否随列表批量返回当前用户的资源交互状态。 */
+  includeMyInteraction?: boolean;
 }
 
 /** 获取小组资源列表请求参数（groupId 必填） */

@@ -25,7 +25,7 @@ import {
 
 type ResourceServicesDeps = ResourcePermissionOverviewDeps;
 
-const GROUP_RESOURCE_SCAN_PAGE_SIZE = 200;
+const GROUP_RESOURCE_SCAN_PAGE_SIZE = 100;
 
 const requestResourceItemList = async (
   params: GetUserResourcesRequest,

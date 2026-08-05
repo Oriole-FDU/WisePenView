@@ -1,6 +1,6 @@
+import { TagMountPermissionModal } from '@/components/Drive/Modals';
+import GroupDefaultAccessPermissionModal from '@/components/Group/DefaultAccessPermissionModal';
 import { useGroupService } from '@/domains';
-import GroupDefaultAccessPermissionModal from '@/views/app/group/_components/GroupPermissions/GroupDefaultAccessPermissionModal';
-import GroupMountPermissionModal from '@/views/app/group/_components/GroupPermissions/GroupMountPermissionModal';
 import { Button, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { FolderInput, ShieldCheck } from 'lucide-react';
@@ -10,10 +10,15 @@ import styles from '../../style.module.less';
 
 interface CoursePermissionSectionProps {
   courseId: string;
+  outlineRootTagId?: string;
   onSuccess: () => void;
 }
 
-function CoursePermissionSection({ courseId, onSuccess }: CoursePermissionSectionProps) {
+function CoursePermissionSection({
+  courseId,
+  outlineRootTagId,
+  onSuccess,
+}: CoursePermissionSectionProps) {
   const { t } = useTranslation(['course', 'group']);
   const groupService = useGroupService();
   const [accessPermissionOpen, setAccessPermissionOpen] = useState(false);
@@ -43,7 +48,11 @@ function CoursePermissionSection({ courseId, onSuccess }: CoursePermissionSectio
           <ShieldCheck size={16} aria-hidden="true" />
           {t('editor.permissions.access')}
         </Button>
-        <Button variant="secondary" onPress={() => setMountPermissionOpen(true)}>
+        <Button
+          variant="secondary"
+          isDisabled={!outlineRootTagId}
+          onPress={() => setMountPermissionOpen(true)}
+        >
           <FolderInput size={16} aria-hidden="true" />
           {t('editor.permissions.mount')}
         </Button>
@@ -58,10 +67,15 @@ function CoursePermissionSection({ courseId, onSuccess }: CoursePermissionSectio
           onSuccess={handlePermissionSuccess}
         />
       ) : null}
-      <GroupMountPermissionModal
-        isOpen={mountPermissionOpen}
-        onOpenChange={setMountPermissionOpen}
-      />
+      {outlineRootTagId ? (
+        <TagMountPermissionModal
+          isOpen={mountPermissionOpen}
+          groupId={courseId}
+          initialTagId={outlineRootTagId}
+          onOpenChange={setMountPermissionOpen}
+          onSuccess={handlePermissionSuccess}
+        />
+      ) : null}
     </>
   );
 }

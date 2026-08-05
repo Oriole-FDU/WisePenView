@@ -1,7 +1,16 @@
-import { replaceMockAdvancedGroups, upsertMockGroup } from '@/domains/Group/mock/groupStore.mock';
+import {
+  removeMockGroup,
+  replaceMockAdvancedGroups,
+  upsertMockGroup,
+} from '@/domains/Group/mock/groupStore.mock';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { createDefaultCourseAssessmentItems } from '../constants/defaults';
-import { formatCoursePeriodRange, getCoursePeriodTimeRange } from '../constants/schedule';
+import {
+  calculateCourseTeachingWeek,
+  calculateCourseTotalTeachingWeeks,
+  formatCoursePeriodRange,
+  getCoursePeriodTimeRange,
+} from '../constants/schedule';
 import type {
   CourseAssignmentPreview,
   CourseDetail,
@@ -50,6 +59,8 @@ export function createCourseServicesMock(): ICourseService {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_NOT_FOUND, { courseId });
     }
     syncCourseMockBaseInfoFromGroup(detail);
+    detail.teachingWeek = calculateCourseTeachingWeek(detail.startAt, Date.now(), detail.endAt);
+    detail.totalTeachingWeeks = calculateCourseTotalTeachingWeeks(detail.startAt, detail.endAt);
     return detail;
   };
 
@@ -155,7 +166,7 @@ export function createCourseServicesMock(): ICourseService {
         name: params.name,
         description: params.description,
         term: params.term,
-        category: '未设置',
+        category: params.category,
         myRole: COURSE_ROLE.TEACHER,
         readResourceCount: 0,
         totalResourceCount: 0,
@@ -201,6 +212,18 @@ export function createCourseServicesMock(): ICourseService {
         ? cloneCourseMockValue(params.finalAssessment)
         : undefined;
       upsertMockGroup(mapCourseDetailToMockGroup(detail));
+    },
+
+    async deleteCourse(courseId) {
+      await delay();
+      const index = details.findIndex((item) => item.courseId === courseId);
+      if (index < 0) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_NOT_FOUND, { courseId });
+      }
+      details.splice(index, 1);
+      delete outlines[courseId];
+      delete assignmentMap[courseId];
+      removeMockGroup(courseId);
     },
 
     async getCourseOutlineEditor(courseId) {

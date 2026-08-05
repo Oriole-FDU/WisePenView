@@ -43,7 +43,6 @@ const ChatPage = lazy(() => import('@/views/app/chat'));
 const NotificationsPage = lazy(() => import('@/views/app/notifications'));
 const ResourceNotFound = lazy(() => import('@/views/app/error/ResourceNotFound'));
 const AppError = lazy(() => import('@/views/app/error/AppError'));
-const CourseListPage = lazy(() => import('@/views/app/course/CourseListPage'));
 const CourseRoute = lazy(() => import('@/views/app/course/CourseRoute'));
 const CourseContextPage = lazy(() => import('@/views/app/course/CourseContextPage'));
 const CourseAssignmentsPage = lazy(() => import('@/views/app/course/CourseAssignmentsPage'));
@@ -214,10 +213,6 @@ const router = createBrowserRouter([
               {
                 path: 'my-group/:id',
                 element: <GroupDetail />,
-              },
-              {
-                path: 'course',
-                element: <CourseListPage />,
               },
               {
                 path: 'course/:courseId',

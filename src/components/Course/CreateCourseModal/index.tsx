@@ -12,6 +12,7 @@ interface CourseCreateForm {
   name: string;
   description: string;
   term: string;
+  category: string;
 }
 
 interface CreateCourseModalProps {
@@ -20,7 +21,7 @@ interface CreateCourseModalProps {
   onCreated: (courseId: string) => void;
 }
 
-const EMPTY_COURSE: CourseCreateForm = { name: '', description: '', term: '' };
+const EMPTY_COURSE: CourseCreateForm = { name: '', description: '', term: '', category: '' };
 
 function CreateCourseModal({ isOpen, onOpenChange, onCreated }: CreateCourseModalProps) {
   const { t } = useTranslation(['course', 'common']);
@@ -32,6 +33,7 @@ function CreateCourseModal({ isOpen, onOpenChange, onCreated }: CreateCourseModa
         name: form.name.trim(),
         description: form.description.trim(),
         term: form.term.trim(),
+        category: form.category.trim() || undefined,
       }),
     {
       manual: true,
@@ -87,15 +89,6 @@ function CreateCourseModal({ isOpen, onOpenChange, onCreated }: CreateCourseModa
           <Input placeholder={t('create.namePlaceholder')} />
         </TextField>
         <TextField
-          value={form.description}
-          onChange={(description) => setForm((current) => ({ ...current, description }))}
-          aria-label={t('create.intro')}
-          isRequired
-        >
-          <Label>{t('create.intro')}</Label>
-          <TextArea rows={4} placeholder={t('create.introPlaceholder')} />
-        </TextField>
-        <TextField
           value={form.term}
           onChange={(term) => setForm((current) => ({ ...current, term }))}
           aria-label={t('create.term')}
@@ -103,6 +96,23 @@ function CreateCourseModal({ isOpen, onOpenChange, onCreated }: CreateCourseModa
         >
           <Label>{t('create.term')}</Label>
           <Input placeholder={t('create.termPlaceholder')} />
+        </TextField>
+        <TextField
+          value={form.category}
+          onChange={(category) => setForm((current) => ({ ...current, category }))}
+          aria-label={t('create.category')}
+        >
+          <Label>{t('create.category')}</Label>
+          <Input placeholder={t('create.categoryPlaceholder')} />
+        </TextField>
+        <TextField
+          value={form.description}
+          onChange={(description) => setForm((current) => ({ ...current, description }))}
+          aria-label={t('create.intro')}
+          isRequired
+        >
+          <Label>{t('create.intro')}</Label>
+          <TextArea rows={4} placeholder={t('create.introPlaceholder')} />
         </TextField>
       </div>
     </AppModal>

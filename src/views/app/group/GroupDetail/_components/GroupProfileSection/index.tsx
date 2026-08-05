@@ -241,7 +241,11 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
                   onChange={(value) => updateDraft('groupDesc', value)}
                 >
                   <Label>{descriptionLabel}</Label>
-                  <TextArea rows={5} placeholder={descriptionPlaceholder} />
+                  <TextArea
+                    rows={5}
+                    className={styles.descriptionTextArea}
+                    placeholder={descriptionPlaceholder}
+                  />
                 </TextField>
               </>
             ) : (

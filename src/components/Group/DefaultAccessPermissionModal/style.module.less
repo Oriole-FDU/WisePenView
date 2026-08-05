@@ -1,0 +1,90 @@
+.modalFormPadding {
+  padding: var(--space-lg) 0;
+}
+
+.modalContainer {
+  width: min(1280px, calc(100vw - 24px));
+  max-width: min(1280px, calc(100vw - 24px));
+}
+
+.modalDialog {
+  width: 100%;
+  max-width: min(1280px, calc(100vw - 24px));
+}
+
+.advancedAccessGrid {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+  gap: var(--space-md);
+}
+
+.personnelCard {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow: hidden;
+}
+
+.personnelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.personnelTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scopeTabs,
+.scopeTabsListContainer,
+.scopeTabsList {
+  width: 100%;
+}
+
+.scopeTabsList {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.scopeTab {
+  min-width: 0;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberState {
+  display: flex;
+  flex: 1;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+@media (max-width: 860px) {
+  .advancedAccessGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .scopeTabsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

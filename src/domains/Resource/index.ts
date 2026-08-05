@@ -4,6 +4,7 @@ export type {
   ResourceItem,
   ResourceTagBind,
   ResourceTagInfo,
+  ResourceUserInteraction,
 } from './entity/resource';
 export type { ResourceSkillSummary, SkillScopeType } from './entity/skill';
 export {

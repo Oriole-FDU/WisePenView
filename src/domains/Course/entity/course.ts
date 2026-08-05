@@ -67,6 +67,7 @@ export interface CourseDetail extends CourseSummary {
   finalAssessment?: CourseFinalAssessment;
   outlineRootTagId?: string;
   teachingWeek?: number;
+  totalTeachingWeeks?: number;
   memberCount: number;
 }
 

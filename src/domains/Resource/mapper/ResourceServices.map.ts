@@ -78,6 +78,9 @@ const mapListResourceItemsRequest = (
     ...(hasResourceType ? { resourceType } : {}),
     // 不传 tagIds：空数组仍会触发按标签过滤
     ...(hasTagIds ? { tagIds } : {}),
+    ...(params.includeMyInteraction !== undefined
+      ? { includeMyInteraction: params.includeMyInteraction }
+      : {}),
     // 小组列表等场景由 Service 注入 groupId 等覆盖项
     ...overrides,
   };
@@ -112,6 +115,22 @@ const mapResourceTagBindsFromApi = (
     primaryTagId: bind.primaryTagId,
     tags: bind.tags,
   }));
+
+const mapMyInteractionFromApi = (
+  interaction: ResourceItemApiResponse['myInteractionRecord']
+): ResourceItem['myInteraction'] => {
+  if (!interaction) return undefined;
+  return {
+    read: interaction.read === true,
+    liked: interaction.liked === true,
+    score: normalizeNonNegativeNumber(interaction.score),
+    likedCommentIds: Array.isArray(interaction.likedCommentIds)
+      ? interaction.likedCommentIds.filter((commentId): commentId is string =>
+          Boolean(commentId?.trim())
+        )
+      : [],
+  };
+};
 
 const resolveUserDisplayName = (
   userInfo: UserDisplayBase | undefined,
@@ -195,6 +214,7 @@ const mapResourceItemFromApi = (
     favoriteCount: normalizeNonNegativeNumber(interactionInfo?.favoriteCount),
     commentCount: normalizeNonNegativeNumber(interactionInfo?.commentCount),
     scoreAvg: scoreCount > 0 ? scoreTotal / scoreCount : null,
+    myInteraction: mapMyInteractionFromApi(raw.myInteractionRecord),
   };
   const currentTagBind = resolveCurrentTagBind(item, context);
   const currentTags = mapTagsToCurrentTags(currentTagBind?.tags);

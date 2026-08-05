@@ -9,16 +9,16 @@ import { useCourseContext } from '@/layouts/Course/CourseContext';
 import { Chip } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useTranslation } from 'react-i18next';
-import sharedStyles from '../_styles/contextPage.module.less';
 import styles from './style.module.less';
 
 interface CourseMembersViewProps {
   courseId: string;
+  memberCount: number;
 }
 
 const TEACHER_MEMBER_MANAGEMENT_CONFIG = getGroupDisplayConfig(GROUP_TYPE.ADVANCED, 'OWNER');
 
-function TeacherCourseMembersView({ courseId }: CourseMembersViewProps) {
+function TeacherCourseMembersView({ courseId, memberCount }: CourseMembersViewProps) {
   const { t } = useTranslation('course');
   const groupService = useGroupService();
   const { data: group } = useRequest(() => groupService.fetchGroupInfo(courseId), {
@@ -26,11 +26,12 @@ function TeacherCourseMembersView({ courseId }: CourseMembersViewProps) {
   });
 
   return (
-    <div className={`${sharedStyles.page} ${styles.page}`}>
-      <header className={sharedStyles.pageHeader}>
-        <h2>{t('members.title')}</h2>
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <h1>{t('members.title')}</h1>
+        <p>{t('members.count', { count: memberCount })}</p>
       </header>
-      <div className={styles.memberManagement}>
+      <div className={styles.contentArea}>
         <MemberList
           groupDisplayConfig={TEACHER_MEMBER_MANAGEMENT_CONFIG}
           groupId={courseId}
@@ -46,7 +47,7 @@ function TeacherCourseMembersView({ courseId }: CourseMembersViewProps) {
   );
 }
 
-function StudentCourseMembersView({ courseId }: CourseMembersViewProps) {
+function StudentCourseMembersView({ courseId, memberCount }: CourseMembersViewProps) {
   const { t } = useTranslation('course');
   const courseService = useCourseService();
   const { data, loading } = useRequest(() =>
@@ -96,21 +97,22 @@ function StudentCourseMembersView({ courseId }: CourseMembersViewProps) {
   ];
 
   return (
-    <div className={`${sharedStyles.page} ${styles.page}`}>
-      <header className={sharedStyles.pageHeader}>
-        <h2>{t('members.title')}</h2>
-        <span>{t('members.count', { count: data?.total ?? 0 })}</span>
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <h1>{t('members.title')}</h1>
+        <p>{t('members.count', { count: data?.total ?? memberCount })}</p>
       </header>
-      <DataTable<CourseMember>
-        ariaLabel={t('members.tableAria')}
-        items={data?.members ?? []}
-        rowKey="userId"
-        columns={columns}
-        loading={loading}
-        emptyText={t('members.empty')}
-        summary={null}
-        className={styles.memberTable}
-      />
+      <div className={styles.contentArea}>
+        <DataTable<CourseMember>
+          ariaLabel={t('members.tableAria')}
+          items={data?.members ?? []}
+          rowKey="userId"
+          columns={columns}
+          loading={loading}
+          emptyText={t('members.empty')}
+          summary={null}
+        />
+      </div>
     </div>
   );
 }
@@ -118,9 +120,9 @@ function StudentCourseMembersView({ courseId }: CourseMembersViewProps) {
 function CourseMembersPage() {
   const { course } = useCourseContext();
   return course.myRole === COURSE_ROLE.TEACHER ? (
-    <TeacherCourseMembersView courseId={course.courseId} />
+    <TeacherCourseMembersView courseId={course.courseId} memberCount={course.memberCount} />
   ) : (
-    <StudentCourseMembersView courseId={course.courseId} />
+    <StudentCourseMembersView courseId={course.courseId} memberCount={course.memberCount} />
   );
 }
 

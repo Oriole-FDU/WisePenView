@@ -40,6 +40,25 @@ export const findOutlineResourceByResourceId = (
   return undefined;
 };
 
+export const markCourseOutlineResourceRead = (
+  nodes: CourseOutlineNode[],
+  resourceId: string
+): CourseOutlineNode[] => {
+  let changed = false;
+  const nextNodes = nodes.map((node): CourseOutlineNode => {
+    if (node.nodeType === 'RESOURCE') {
+      if (node.resourceId !== resourceId || node.read) return node;
+      changed = true;
+      return { ...node, read: true };
+    }
+    const children = markCourseOutlineResourceRead(node.children, resourceId);
+    if (children === node.children) return node;
+    changed = true;
+    return { ...node, children };
+  });
+  return changed ? nextNodes : nodes;
+};
+
 export const filterCourseOutline = (
   nodes: CourseOutlineNode[],
   normalizedQuery: string

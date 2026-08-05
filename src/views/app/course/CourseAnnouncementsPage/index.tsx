@@ -26,34 +26,26 @@ function CourseAnnouncementsPage() {
       minute: '2-digit',
     });
 
-  if (loading) {
-    return (
-      <div className={sharedStyles.state}>
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={sharedStyles.state}>
-        <span>{parseErrorMessage(error)}</span>
-        <Button variant="secondary" onPress={refresh}>
-          {t('common.retry')}
-        </Button>
-      </div>
-    );
-  }
-
   const announcements = data ?? [];
 
   return (
-    <div className={`${sharedStyles.page} ${styles.page}`}>
-      <header className={sharedStyles.pageHeader}>
-        <h2>{t('announcements.title')}</h2>
-        <span>{t('announcements.count', { count: announcements.length })}</span>
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <h1>{t('announcements.title')}</h1>
+        <p>{t('announcements.count', { count: announcements.length })}</p>
       </header>
-      {announcements.length > 0 ? (
+      {loading ? (
+        <div className={sharedStyles.state}>
+          <Spin size="large" />
+        </div>
+      ) : error ? (
+        <div className={sharedStyles.state}>
+          <span>{parseErrorMessage(error)}</span>
+          <Button variant="secondary" onPress={refresh}>
+            {t('common.retry')}
+          </Button>
+        </div>
+      ) : announcements.length > 0 ? (
         <div className={styles.announcementFeed}>
           {announcements.map((announcement) => (
             <article key={announcement.announcementId} className={styles.announcementItem}>

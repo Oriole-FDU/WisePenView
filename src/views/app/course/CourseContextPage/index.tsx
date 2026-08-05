@@ -26,6 +26,7 @@ function CourseContextPage() {
     { key: 'home', label: t('nav.home') },
     { key: 'info', label: t('nav.info') },
   ] satisfies { key: CourseContextTabKey; label: string }[];
+  const courseKicker = [course.term, course.category].filter(Boolean).join(' · ');
 
   const activeTabContent = (() => {
     switch (activeTabKey) {
@@ -39,9 +40,7 @@ function CourseContextPage() {
   return (
     <div className={styles.root}>
       <header className={styles.courseHeader}>
-        <div className={styles.courseKicker}>
-          {course.term} · {course.category}
-        </div>
+        <div className={styles.courseKicker}>{courseKicker}</div>
         <div className={styles.courseTitleRow}>
           <h1>{course.name}</h1>
         </div>

@@ -7,6 +7,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import CourseAssessmentSection from './_components/CourseAssessmentSection';
 import CourseBasicSection from './_components/CourseBasicSection';
 import CourseCoverModal from './_components/CourseCoverModal';
+import CourseDangerSection from './_components/CourseDangerSection';
 import CourseEditorNav from './_components/CourseEditorNav';
 import CourseGoalsSection from './_components/CourseGoalsSection';
 import CoursePermissionSection from './_components/CoursePermissionSection';
@@ -87,8 +88,14 @@ function CourseEditorPage() {
                   <p>{t('editor.permissions.description')}</p>
                 </div>
               </div>
-              <CoursePermissionSection courseId={course.courseId} onSuccess={refreshCourse} />
+              <CoursePermissionSection
+                courseId={course.courseId}
+                outlineRootTagId={course.outlineRootTagId}
+                onSuccess={refreshCourse}
+              />
             </section>
+
+            <CourseDangerSection courseId={course.courseId} courseName={course.name} />
           </div>
         </main>
       </div>

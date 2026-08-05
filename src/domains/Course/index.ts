@@ -2,6 +2,7 @@ export { createDefaultCourseAssessmentItems } from './constants/defaults';
 export {
   FUDAN_COURSE_PERIODS,
   calculateCourseTeachingWeek,
+  calculateCourseTotalTeachingWeeks,
   formatCoursePeriodRange,
   getCoursePeriodTimeRange,
   isCoursePeriod,

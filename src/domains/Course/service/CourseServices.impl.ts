@@ -1,8 +1,8 @@
 import type { CourseOutlineEditorNode } from '@/domains/Course/entity/course';
 import { GROUP_TYPE, type IGroupService } from '@/domains/Group';
 import type { IInteractService } from '@/domains/Interact';
-import type { IResourceService } from '@/domains/Resource';
-import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
+import type { IResourceService, ResourceItem } from '@/domains/Resource';
+import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
 import type { ITagService, TagTreeNode } from '@/domains/Tag';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { CourseServicesMap } from '../mapper/CourseServices.map';
@@ -16,6 +16,17 @@ import type {
 
 const unavailable = async (..._args: unknown[]): Promise<never> => {
   throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_SERVICE_UNAVAILABLE);
+};
+
+const COURSE_RESOURCE_PAGE_SIZE = 100;
+
+const findTag = (nodes: TagTreeNode[], tagId: string): TagTreeNode | undefined => {
+  for (const node of nodes) {
+    if (node.tagId === tagId) return node;
+    const child = findTag(node.children ?? [], tagId);
+    if (child) return child;
+  }
+  return undefined;
 };
 
 const mapOutlineEditorNodes = async (
@@ -126,20 +137,114 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     });
   };
 
-  const getCourseOutlineEditor = async (courseId: string): Promise<CourseOutlineEditorNode[]> => {
-    const group = await groupService.fetchGroupInfo(courseId);
-    const courseMeta = CourseServicesMap.parseCourseMeta(group.groupMetaInfo);
-    if (!courseMeta.outlineRootTagId) {
+  const deleteCourse = async (courseId: string): Promise<void> => {
+    await groupService.deleteGroup({ groupId: courseId });
+  };
+
+  const getCourseOutlineRoot = async (courseId: string): Promise<TagTreeNode> => {
+    const [group, tags] = await Promise.all([
+      groupService.fetchGroupInfo(courseId),
+      tagService.getTagTree(courseId),
+    ]);
+    if (group.groupType !== GROUP_TYPE.ADVANCED) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_NOT_FOUND, { courseId });
+    }
+    const outlineRootTagId = CourseServicesMap.parseCourseMeta(
+      group.groupMetaInfo
+    ).outlineRootTagId;
+    if (!outlineRootTagId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, { courseId });
     }
-    const tags = await tagService.getTagTree(courseId);
-    const outlineRoot = tags.find((tag) => tag.tagId === courseMeta.outlineRootTagId);
+    const outlineRoot = findTag(tags, outlineRootTagId);
     if (!outlineRoot) {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, {
         courseId,
-        outlineRootTagId: courseMeta.outlineRootTagId,
+        outlineRootTagId,
       });
     }
+    return outlineRoot;
+  };
+
+  const listCourseOutlineResources = async (courseId: string, tagIds: string[]) => {
+    if (tagIds.length === 0) return [];
+    const resources: ResourceItem[] = [];
+    let page = 1;
+
+    while (true) {
+      const result = await resourceService.getGroupResources({
+        groupId: courseId,
+        page,
+        size: COURSE_RESOURCE_PAGE_SIZE,
+        sortBy: RESOURCE_SORT_BY.UPDATE_TIME,
+        sortDir: RESOURCE_SORT_DIR.DESC,
+        tagIds,
+        tagQueryLogicMode: TAG_QUERY_LOGIC_MODE.OR,
+        includeMyInteraction: true,
+      });
+      resources.push(...result.list);
+
+      const reachedKnownTotal = result.total > 0 && resources.length >= result.total;
+      const reachedKnownLastPage = result.totalPage > 0 && page >= result.totalPage;
+      const reachedShortPage = result.list.length < COURSE_RESOURCE_PAGE_SIZE;
+      if (reachedKnownTotal || reachedKnownLastPage || reachedShortPage) break;
+      page += 1;
+    }
+
+    return resources;
+  };
+
+  const findCourseOutlineResourceInTag = async (
+    courseId: string,
+    tagId: string,
+    resourceId: string
+  ): Promise<ResourceItem | undefined> => {
+    let page = 1;
+
+    while (true) {
+      const result = await resourceService.getGroupResources({
+        groupId: courseId,
+        page,
+        size: COURSE_RESOURCE_PAGE_SIZE,
+        sortBy: RESOURCE_SORT_BY.UPDATE_TIME,
+        sortDir: RESOURCE_SORT_DIR.DESC,
+        tagIds: [tagId],
+        tagQueryLogicMode: TAG_QUERY_LOGIC_MODE.AND,
+      });
+      const resource = result.list.find((item) => item.resourceId === resourceId);
+      if (resource) return resource;
+
+      const reachedKnownTotal =
+        result.total > 0 && page * COURSE_RESOURCE_PAGE_SIZE >= result.total;
+      const reachedKnownLastPage = result.totalPage > 0 && page >= result.totalPage;
+      const reachedShortPage = result.list.length < COURSE_RESOURCE_PAGE_SIZE;
+      if (reachedKnownTotal || reachedKnownLastPage || reachedShortPage) return undefined;
+
+      page += 1;
+    }
+  };
+
+  const getCourseOutline: ICourseService['getCourseOutline'] = async (courseId) => {
+    const outlineRoot = await getCourseOutlineRoot(courseId);
+    const outlineTags = outlineRoot.children ?? [];
+    const tagIds = CourseServicesMap.collectCourseOutlineTagIds(outlineTags);
+    const resources = await listCourseOutlineResources(courseId, tagIds);
+    return {
+      courseId,
+      nodes: CourseServicesMap.mapCourseOutlineNodes(outlineTags, resources),
+    };
+  };
+
+  const getCourseHome: ICourseService['getCourseHome'] = async (courseId) => {
+    const outline = await getCourseOutline(courseId);
+    return {
+      progress: CourseServicesMap.calculateCourseOutlineProgress(outline.nodes),
+      pendingAssignments: [],
+      announcements: [],
+    };
+  };
+
+  const getCourseOutlineEditor = async (courseId: string): Promise<CourseOutlineEditorNode[]> => {
+    const outlineRoot = await getCourseOutlineRoot(courseId);
     const nodes = await mapOutlineEditorNodes(tagService, outlineRoot.children ?? []);
     return nodes.map((node) => ({ ...node, parentId: undefined }));
   };
@@ -166,16 +271,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     sourceNodeId: string,
     targetNodeId?: string
   ) => {
-    const page = await resourceService.getGroupResources({
-      groupId: courseId,
-      page: 1,
-      size: 100,
-      sortBy: RESOURCE_SORT_BY.UPDATE_TIME,
-      sortDir: RESOURCE_SORT_DIR.DESC,
-      tagIds: [sourceNodeId],
-      tagQueryLogicMode: 'AND',
-    });
-    const resource = page.list.find((item) => item.resourceId === resourceId);
+    const resource = await findCourseOutlineResourceInTag(courseId, sourceNodeId, resourceId);
     if (!resource) {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, { resourceId });
     }
@@ -193,15 +289,6 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
           : {}),
       });
     }
-  };
-
-  const findTag = (nodes: TagTreeNode[], tagId: string): TagTreeNode | undefined => {
-    for (const node of nodes) {
-      if (node.tagId === tagId) return node;
-      const child = findTag(node.children ?? [], tagId);
-      if (child) return child;
-    }
-    return undefined;
   };
 
   const updateCourseOutlineResourceOrder = async (
@@ -251,13 +338,14 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
   return {
     listMyCourses,
     getCourseDetail,
-    getCourseHome: unavailable,
+    getCourseHome,
     listCourseAnnouncements: unavailable,
-    getCourseOutline: unavailable,
+    getCourseOutline,
     setResourceRead: ({ resourceId }) => interactService.recordResourceRead(resourceId),
     listCourseMembers,
     createCourse,
     updateCourse,
+    deleteCourse,
     getCourseOutlineEditor,
     createCourseOutlineSection,
     renameCourseOutlineSection: ({ courseId, nodeId, name }) =>

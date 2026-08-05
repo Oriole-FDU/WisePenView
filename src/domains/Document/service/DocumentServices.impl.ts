@@ -46,13 +46,15 @@ const uploadDocument = async (params: UploadDocumentParams): Promise<string> => 
   const md5 = await computeFileMd5(file);
   const extension = parseExtension(file.name);
 
-  const init = await initUpload({
-    filename: file.name,
-    extension,
-    md5,
-    expectedSize: file.size,
-    pathTagId,
-  });
+  const init = await initUpload(
+    DocumentServicesMap.mapUploadDocToApi({
+      filename: file.name,
+      extension,
+      md5,
+      expectedSize: file.size,
+      pathTagId,
+    })
+  );
 
   onUploadInitialized?.({
     documentId: init.documentId,

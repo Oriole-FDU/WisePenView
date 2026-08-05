@@ -9,6 +9,7 @@ import type {
   ListPendingDocsApiResponse,
   PendingDocItemApiResponse,
   PendingDocumentStatusApiResponse,
+  UploadDocApiRequest,
 } from '../apis/DocumentApi.type';
 import type {
   DocDisplayInfoResponse,
@@ -16,6 +17,24 @@ import type {
   DocumentProcessStatus,
   PendingDocItem,
 } from '../service/index.type';
+
+interface UploadDocRequestParams extends Omit<UploadDocApiRequest, 'mountTargetTagId'> {
+  pathTagId: string;
+}
+
+const mapUploadDocToApi = ({
+  filename,
+  extension,
+  md5,
+  expectedSize,
+  pathTagId,
+}: UploadDocRequestParams): UploadDocApiRequest => ({
+  filename,
+  extension,
+  md5,
+  expectedSize,
+  mountTargetTagId: pathTagId,
+});
 
 const normalizeOptionalId = (value: string | number | null | undefined): string | null => {
   const normalized = normalizeId(value);
@@ -72,6 +91,7 @@ const mapGetDocInfoFromApi = (data: GetDocInfoApiResponse): DocDisplayInfoRespon
 });
 
 export const DocumentServicesMap = {
+  mapUploadDocToApi,
   mapDocumentProcessStatusFromApi,
   mapListPendingDocsFromApi,
   mapGetDocInfoFromApi,

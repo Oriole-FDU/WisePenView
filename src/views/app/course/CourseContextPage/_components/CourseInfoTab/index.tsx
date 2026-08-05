@@ -25,6 +25,10 @@ function CourseInfoTab() {
     course.startAt && course.endAt
       ? `${formatDate(course.startAt)} - ${formatDate(course.endAt)}`
       : t('info.notSet');
+  const totalTeachingWeeks =
+    course.totalTeachingWeeks === undefined
+      ? undefined
+      : t('info.totalWeeks', { count: course.totalTeachingWeeks });
   const finalAssessment = course.finalAssessment;
   const finalAssessmentTitle = finalAssessment
     ? finalAssessment.type === 'OTHER'
@@ -114,7 +118,7 @@ function CourseInfoTab() {
             <span>
               <small>{t('info.period')}</small>
               <strong>{coursePeriod}</strong>
-              <small>{t('info.totalWeeks')}</small>
+              {totalTeachingWeeks ? <small>{totalTeachingWeeks}</small> : null}
             </span>
           </div>
           <div className={styles.teachingItem}>

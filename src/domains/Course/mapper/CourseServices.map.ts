@@ -1,5 +1,6 @@
 import {
   calculateCourseTeachingWeek,
+  calculateCourseTotalTeachingWeeks,
   formatCoursePeriodRange,
   getCoursePeriodTimeRange,
   isCoursePeriod,
@@ -10,6 +11,8 @@ import type {
   CourseFinalAssessment,
   CourseMeeting,
   CourseMember,
+  CourseOutlineNode,
+  CourseProgress,
   CourseSummary,
 } from '@/domains/Course/entity/course';
 import {
@@ -19,7 +22,8 @@ import {
   type CourseRole,
 } from '@/domains/Course/enum';
 import type { Group, GroupMember } from '@/domains/Group';
-import { TAG_META_SCHEMA, type TagMetaInfo } from '@/domains/Tag';
+import type { ResourceItem } from '@/domains/Resource';
+import { TAG_META_SCHEMA, type TagMetaInfo, type TagTreeNode } from '@/domains/Tag';
 
 const COURSE_META_SCHEMA = 'wisepen.course.v1';
 const COURSE_META_KEYS = new Set([
@@ -94,6 +98,75 @@ const sortCourseOutlineResources = <T extends { resourceId: string }>(
   });
 };
 
+const collectCourseOutlineTagIds = (tags: TagTreeNode[]): string[] =>
+  tags.flatMap((tag) => [tag.tagId, ...collectCourseOutlineTagIds(tag.children ?? [])]);
+
+const mapCourseOutlineNodes = (
+  tags: TagTreeNode[],
+  resources: ResourceItem[]
+): CourseOutlineNode[] => {
+  const outlineTagIds = new Set(collectCourseOutlineTagIds(tags));
+  const resourcesByTagId = new Map<string, ResourceItem[]>();
+
+  for (const resource of resources) {
+    for (const tagId of Object.keys(resource.currentTags ?? {})) {
+      if (!outlineTagIds.has(tagId)) continue;
+      const tagResources = resourcesByTagId.get(tagId) ?? [];
+      tagResources.push(resource);
+      resourcesByTagId.set(tagId, tagResources);
+    }
+  }
+
+  const mapTags = (items: TagTreeNode[], depth: number): CourseOutlineNode[] =>
+    items.map((tag) => ({
+      nodeId: tag.tagId,
+      title: tag.tagName,
+      nodeType: depth === 0 ? ('CHAPTER' as const) : ('SECTION' as const),
+      description: tag.tagDesc,
+      children: [
+        ...mapTags(tag.children ?? [], depth + 1),
+        ...sortCourseOutlineResources(resourcesByTagId.get(tag.tagId) ?? [], tag.tagMetaInfo).map(
+          (resource) => ({
+            nodeId: `${tag.tagId}:${resource.resourceId}`,
+            title: resource.resourceName,
+            nodeType: 'RESOURCE' as const,
+            resourceId: resource.resourceId,
+            resourceType: resource.resourceType ?? 'file',
+            read: resource.myInteraction?.read ?? false,
+          })
+        ),
+      ],
+    }));
+
+  return mapTags(tags, 0);
+};
+
+const calculateCourseOutlineProgress = (nodes: CourseOutlineNode[]): CourseProgress => {
+  const readByResourceId = new Map<string, boolean>();
+  const collect = (items: CourseOutlineNode[]) => {
+    for (const node of items) {
+      if (node.nodeType === 'RESOURCE') {
+        readByResourceId.set(
+          node.resourceId,
+          Boolean(readByResourceId.get(node.resourceId)) || node.read
+        );
+      } else {
+        collect(node.children);
+      }
+    }
+  };
+  collect(nodes);
+
+  const totalResourceCount = readByResourceId.size;
+  const readResourceCount = Array.from(readByResourceId.values()).filter(Boolean).length;
+  return {
+    readResourceCount,
+    totalResourceCount,
+    percent:
+      totalResourceCount === 0 ? 0 : Math.round((readResourceCount / totalResourceCount) * 100),
+  };
+};
+
 const parseOptionalString = (value: unknown): string | undefined =>
   typeof value === 'string' ? value : undefined;
 
@@ -164,7 +237,7 @@ const serializeCourseMeta = (
       ...unknownCourseMeta,
       schema: COURSE_META_SCHEMA,
       term: params.term,
-      ...(params.category ? { category: params.category } : {}),
+      ...(params.category !== undefined ? { category: params.category } : {}),
       ...(params.startAt ? { startAt: params.startAt } : {}),
       ...(params.endAt ? { endAt: params.endAt } : {}),
       ...(params.outlineRootTagId ? { outlineRootTagId: params.outlineRootTagId } : {}),
@@ -238,7 +311,8 @@ const mapGroupToCourseDetail = (group: Group, role: 'OWNER' | 'ADMIN' | 'MEMBER'
     meetings: metadata.meetings ?? [],
     finalAssessment: metadata.finalAssessment,
     outlineRootTagId: metadata.outlineRootTagId,
-    teachingWeek: calculateCourseTeachingWeek(metadata.startAt),
+    teachingWeek: calculateCourseTeachingWeek(metadata.startAt, Date.now(), metadata.endAt),
+    totalTeachingWeeks: calculateCourseTotalTeachingWeeks(metadata.startAt, metadata.endAt),
     memberCount: group.memberCount,
   };
 };
@@ -249,6 +323,9 @@ export const CourseServicesMap = {
   getCourseOutlineResourceOrder,
   mapCourseOutlineResourceOrderMeta,
   sortCourseOutlineResources,
+  collectCourseOutlineTagIds,
+  mapCourseOutlineNodes,
+  calculateCourseOutlineProgress,
   mapGroupToCourseSummary,
   mapGroupToCourseDetail,
   mapGroupMemberToCourseMember,

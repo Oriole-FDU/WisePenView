@@ -21,6 +21,11 @@ export const upsertMockGroup = (nextGroup: Group): void => {
   groups.unshift(structuredClone(nextGroup));
 };
 
+export const removeMockGroup = (groupId: string): void => {
+  const index = groups.findIndex((group) => group.groupId === groupId);
+  if (index >= 0) groups.splice(index, 1);
+};
+
 export const replaceMockAdvancedGroups = (advancedGroups: Group[]): void => {
   const otherGroups = groups.filter((group) => group.groupType !== GROUP_TYPE.ADVANCED);
   groups.splice(

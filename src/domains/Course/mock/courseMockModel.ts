@@ -51,9 +51,18 @@ export const mapCourseDetailToMockGroup = (detail: CourseDetail): Group => {
 export const syncCourseMockBaseInfoFromGroup = (detail: CourseDetail): void => {
   const group = findMockGroup(detail.courseId);
   if (!group) return;
+  const metadata = CourseServicesMap.parseCourseMeta(group.groupMetaInfo);
   detail.name = group.groupName;
   detail.description = group.groupDesc;
   detail.coverUrl = group.groupCoverUrl || undefined;
+  detail.term = metadata.term || detail.term;
+  detail.category = metadata.category;
+  detail.startAt = metadata.startAt;
+  detail.endAt = metadata.endAt;
+  detail.learningObjectives = metadata.learningObjectives ?? detail.learningObjectives;
+  detail.meetings = metadata.meetings ?? detail.meetings;
+  detail.assessmentItems = metadata.assessmentItems ?? detail.assessmentItems;
+  detail.finalAssessment = metadata.finalAssessment;
 };
 
 export const mapCourseMockDetailToSummary = (detail: CourseDetail): CourseSummary => {
@@ -68,6 +77,7 @@ export const mapCourseMockDetailToSummary = (detail: CourseDetail): CourseSummar
     startAt: _startAt,
     teacher: _teacher,
     teachingWeek: _teachingWeek,
+    totalTeachingWeeks: _totalTeachingWeeks,
     memberCount: _memberCount,
     outlineRootTagId: _outlineRootTagId,
     ...summary

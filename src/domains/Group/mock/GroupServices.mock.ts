@@ -10,7 +10,7 @@ import type {
   IGroupService,
 } from '@/domains/Group';
 import { DEFAULT_MEMBER_ACTIONS, GROUP_FILE_ORG_LOGIC } from '@/domains/Group';
-import { findMockGroup, getMockGroups, upsertMockGroup } from './groupStore.mock';
+import { findMockGroup, getMockGroups, removeMockGroup, upsertMockGroup } from './groupStore.mock';
 import mockdata from './mockdata.json';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -123,8 +123,7 @@ const editGroup = async (params: EditGroupRequest): Promise<void> => {
 
 const deleteGroup: IGroupService['deleteGroup'] = async ({ groupId }): Promise<void> => {
   await delay(200);
-  const index = groups.findIndex((group) => group.groupId === groupId);
-  if (index >= 0) groups.splice(index, 1);
+  removeMockGroup(groupId);
 };
 
 const fetchGroupMembers = async (

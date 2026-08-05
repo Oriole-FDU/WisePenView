@@ -7,6 +7,7 @@ import {
   filterCourseOutline,
   findOutlineNode,
   findOutlineResourceByResourceId,
+  markCourseOutlineResourceRead,
 } from '../model';
 
 export const useCourseLearningNavigationController = (courseId: string) => {
@@ -32,6 +33,23 @@ export const useCourseLearningNavigationController = (courseId: string) => {
       ? [selectedNode]
       : collectOutlineResources(selectedNode.children)
     : [];
+  const selectedUnreadResourceId =
+    selectedNode?.nodeType === 'RESOURCE' && !selectedNode.read ? selectedNode.resourceId : '';
+
+  useRequest(() => courseService.setResourceRead({ resourceId: selectedUnreadResourceId }), {
+    ready: Boolean(selectedUnreadResourceId),
+    refreshDeps: [courseId, selectedUnreadResourceId],
+    onSuccess: () => {
+      request.mutate((outline) =>
+        outline
+          ? {
+              ...outline,
+              nodes: markCourseOutlineResourceRead(outline.nodes, selectedUnreadResourceId),
+            }
+          : outline
+      );
+    },
+  });
 
   return {
     basePath,

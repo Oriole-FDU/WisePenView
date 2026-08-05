@@ -22,6 +22,14 @@ export interface ResourceInteractionInfoApiResponse {
   commentCount?: JavaLongApiValue | null;
 }
 
+export interface ResourceUserInteractionRecordApiResponse {
+  read?: boolean | null;
+  liked?: boolean | null;
+  score?: number | null;
+  likedCommentIds?: string[] | null;
+  resourceId?: string | null;
+}
+
 interface ResourceTagInfoApiResponse {
   tagName?: string;
   tagDesc?: string;
@@ -68,6 +76,7 @@ export interface ResourceItemApiResponse {
   preview?: string;
   path?: string;
   resourceInteractionInfo?: ResourceInteractionInfoApiResponse;
+  myInteractionRecord?: ResourceUserInteractionRecordApiResponse | null;
   tagBinds?: ResourceTagBindApiResponse[];
   currentActions?: ResourceActionApiList | null;
   resourceAccessRole?: 'OWNER' | 'OWNER_SPECIFIED' | 'GROUP_ADMIN' | 'GROUP_MEMBER' | 'NONE';
@@ -84,6 +93,7 @@ export interface ListResourceItemsApiRequest extends PageApiRequest {
   tagIds?: string[];
   tagQueryLogicMode?: string;
   groupId?: string;
+  includeMyInteraction?: boolean;
 }
 
 export interface RenameResourceApiRequest {

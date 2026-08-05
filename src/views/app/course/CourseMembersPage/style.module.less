@@ -1,11 +1,35 @@
 .page {
-  width: min(100%, 1200px);
+  --course-workflow-gutter: clamp(var(--space-xl), 5vw, 64px);
+  box-sizing: border-box;
+  width: min(100%, 1280px);
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--course-workflow-gutter);
 }
 
-.memberTable {
-  margin-top: var(--space-lg);
+.header {
+  margin-bottom: var(--space-xl);
 }
 
-.memberManagement {
-  margin-top: var(--space-lg);
+.header h1 {
+  margin: 0;
+  font-size: var(--font-size-heading-3);
+  font-weight: 600;
+}
+
+.header p {
+  margin: var(--space-xs) 0 0;
+  color: var(--muted);
+}
+
+.contentArea {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+@media (max-width: 760px) {
+  .page {
+    --course-workflow-gutter: var(--space-lg);
+    padding-block: var(--space-lg);
+  }
 }

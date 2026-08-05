@@ -39,6 +39,7 @@ export interface CreateCourseRequest {
   name: string;
   description: string;
   term: string;
+  category?: string;
 }
 
 export interface UpdateCourseRequest {
@@ -132,6 +133,7 @@ export interface ICourseService {
   listCourseMembers(params: ListCourseMembersRequest): Promise<CourseMemberPage>;
   createCourse(params: CreateCourseRequest): Promise<string>;
   updateCourse(params: UpdateCourseRequest): Promise<void>;
+  deleteCourse(courseId: string): Promise<void>;
   getCourseOutlineEditor(courseId: string): Promise<CourseOutlineEditorNode[]>;
   createCourseOutlineSection(params: CreateCourseOutlineSectionRequest): Promise<string>;
   renameCourseOutlineSection(params: RenameCourseOutlineSectionRequest): Promise<void>;

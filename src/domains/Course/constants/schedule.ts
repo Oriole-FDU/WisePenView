@@ -44,14 +44,33 @@ export const getCoursePeriodTimeRange = (
   return `${start.startTime}–${end.endTime}`;
 };
 
+const parseCourseDateStart = (value?: string): number | undefined => {
+  if (!value) return undefined;
+  const time = new Date(`${value.slice(0, 10)}T00:00:00`).getTime();
+  return Number.isNaN(time) ? undefined : time;
+};
+
+export const calculateCourseTotalTeachingWeeks = (
+  startAt?: string,
+  endAt?: string
+): number | undefined => {
+  const startTime = parseCourseDateStart(startAt);
+  const endTime = parseCourseDateStart(endAt);
+  if (startTime === undefined || endTime === undefined || endTime < startTime) return undefined;
+  const inclusiveDays = Math.floor((endTime - startTime) / 86_400_000) + 1;
+  return Math.max(1, Math.ceil(inclusiveDays / 7));
+};
+
 export const calculateCourseTeachingWeek = (
   startAt?: string,
-  currentTime = Date.now()
+  currentTime = Date.now(),
+  endAt?: string
 ): number | undefined => {
-  if (!startAt) return undefined;
-  const startDate = new Date(`${startAt.slice(0, 10)}T00:00:00`);
-  if (Number.isNaN(startDate.getTime())) return undefined;
-  const elapsedDays = Math.floor((currentTime - startDate.getTime()) / 86_400_000);
+  const startTime = parseCourseDateStart(startAt);
+  if (startTime === undefined) return undefined;
+  const elapsedDays = Math.floor((currentTime - startTime) / 86_400_000);
   if (elapsedDays < 0) return undefined;
-  return Math.min(18, Math.floor(elapsedDays / 7) + 1);
+  const currentWeek = Math.floor(elapsedDays / 7) + 1;
+  const totalWeeks = calculateCourseTotalTeachingWeeks(startAt, endAt);
+  return totalWeeks === undefined ? currentWeek : Math.min(totalWeeks, currentWeek);
 };

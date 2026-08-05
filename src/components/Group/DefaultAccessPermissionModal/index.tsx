@@ -2,14 +2,17 @@ import TagPermissionActionEditor from '@/components/Drive/PermissionActionEditor
 import AppModal from '@/components/Overlay/AppModal';
 import { useGroupService } from '@/domains';
 import type { GroupResConfig } from '@/domains/Group';
-import { normalizeResourceActions, type TagResourceAction } from '@/domains/Tag';
+import {
+  ACCESS_CONTROL_SCOPE,
+  normalizeResourceActions,
+  type TagResourceAction,
+} from '@/domains/Tag';
 import { parseErrorMessage } from '@/utils/error';
-import { Button, toast } from '@heroui/react';
+import { Button, Tabs, toast } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import GroupPolicyShellCard from '../GroupPolicyShellCard';
-import styles from '../style.module.less';
+import styles from './style.module.less';
 
 const PRESET_LABEL_KEYS = {
   private: 'permission.preset.private',
@@ -36,12 +39,56 @@ const ACTION_LABEL_KEYS = {
   COMMENT: 'permission.action.COMMENT',
 } as const;
 
+const POLICY_SCOPE_OPTIONS = [
+  { scope: ACCESS_CONTROL_SCOPE.ALL, labelKey: 'permission.scope.all' },
+  { scope: ACCESS_CONTROL_SCOPE.ONLY_ADMIN, labelKey: 'permission.scope.adminOnly' },
+  { scope: ACCESS_CONTROL_SCOPE.BLACKLIST, labelKey: 'permission.scope.blacklist' },
+  { scope: ACCESS_CONTROL_SCOPE.WHITELIST, labelKey: 'permission.scope.whitelist' },
+] as const;
+
 interface GroupDefaultAccessPermissionModalProps {
   isOpen: boolean;
   groupId: string;
   groupResConfig: GroupResConfig;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+}
+
+interface DefaultMemberScopePreviewProps {
+  title: string;
+}
+
+function DefaultMemberScopePreview({ title }: DefaultMemberScopePreviewProps) {
+  const { t } = useTranslation('group');
+
+  return (
+    <section className={styles.personnelCard} aria-label={title}>
+      <div className={styles.personnelHeader}>
+        <div className={styles.personnelTitle}>{title}</div>
+      </div>
+      <Tabs className={styles.scopeTabs} selectedKey={String(ACCESS_CONTROL_SCOPE.ALL)}>
+        <Tabs.ListContainer className={styles.scopeTabsListContainer}>
+          <Tabs.List
+            className={styles.scopeTabsList}
+            aria-label={t('permission.scopeAria', { title })}
+          >
+            {POLICY_SCOPE_OPTIONS.map((option) => (
+              <Tabs.Tab
+                key={option.scope}
+                id={String(option.scope)}
+                className={styles.scopeTab}
+                isDisabled
+              >
+                {t(option.labelKey)}
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
+      <div className={styles.memberState}>{t('permission.allMembers')}</div>
+    </section>
+  );
 }
 
 function GroupDefaultAccessPermissionModal({
@@ -104,7 +151,7 @@ function GroupDefaultAccessPermissionModal({
     >
       <div className={styles.modalFormPadding}>
         <div className={styles.advancedAccessGrid}>
-          <GroupPolicyShellCard title={t('permission.accessList')} />
+          <DefaultMemberScopePreview title={t('permission.accessList')} />
           <TagPermissionActionEditor
             ariaLabel={t('permission.resourceActionsAria')}
             actions={selectedActions}

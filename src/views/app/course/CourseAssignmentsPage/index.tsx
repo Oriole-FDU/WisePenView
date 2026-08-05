@@ -30,10 +30,8 @@ function CourseAssignmentsPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <div>
-          <h1>{t('assignments.title')}</h1>
-          <p>{t('assignments.description')}</p>
-        </div>
+        <h1>{t('assignments.title')}</h1>
+        <p>{t('assignments.description')}</p>
       </header>
 
       {loading ? (

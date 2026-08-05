@@ -1,18 +1,20 @@
 .page {
+  --course-workflow-gutter: clamp(var(--space-xl), 5vw, 64px);
   display: flex;
   box-sizing: border-box;
-  width: 100%;
-  min-width: var(--layout-drive-page-min-width, 956px);
+  width: min(100%, 1280px);
+  min-width: 0;
   min-height: 0;
   height: 100%;
   flex-direction: column;
-  padding: var(--space-lg) var(--space-xl);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--course-workflow-gutter);
   overflow: hidden;
 }
 
 .header {
   flex: 0 0 auto;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .header h1 {
@@ -30,5 +32,12 @@
   min-width: 0;
   min-height: 0;
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
+}
+
+@media (max-width: 760px) {
+  .page {
+    --course-workflow-gutter: var(--space-lg);
+    padding-block: var(--space-lg);
+  }
 }

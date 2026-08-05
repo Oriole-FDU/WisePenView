@@ -25,6 +25,13 @@ export interface ResourceTagBind {
   tags?: Record<string, ResourceTagInfo | null | undefined>;
 }
 
+export interface ResourceUserInteraction {
+  read: boolean;
+  liked: boolean;
+  score?: number;
+  likedCommentIds: string[];
+}
+
 /** 供前端展示与业务编排使用的稳定资源实体 */
 export interface ResourceItem {
   resourceId: string;
@@ -66,4 +73,6 @@ export interface ResourceItem {
   commentCount?: number | null;
   /** 平均评分，暂无评分时为 null，不得展示 0.0 */
   scoreAvg?: number | null;
+  /** 当前用户对该资源的交互状态，仅在列表请求显式要求时返回。 */
+  myInteraction?: ResourceUserInteraction;
 }

@@ -25,6 +25,8 @@ const enUSCourse = {
     introPlaceholder: 'Describe the course content and learning goals',
     term: 'Term',
     termPlaceholder: 'For example: Fall 2026',
+    category: 'Category',
+    categoryPlaceholder: 'For example: Required or elective',
     confirm: 'Create course',
     success: 'Course created',
     required: 'Complete the name, description, and term',
@@ -34,7 +36,7 @@ const enUSCourse = {
     description: 'Enter the invitation code provided by the teacher.',
     inviteCode: 'Invitation code',
     placeholder: 'Enter invitation code',
-    success: 'Join request submitted',
+    success: 'Joined the course',
     required: 'Enter an invitation code',
   },
   nav: {
@@ -114,7 +116,7 @@ const enUSCourse = {
     fileRequired: 'Choose a file first',
   },
   materials: {
-    title: 'Course materials',
+    title: 'Materials',
     description: 'Course group shared drive',
     tableAria: 'Course materials file list',
     outlineFolder: 'Outline content',
@@ -138,7 +140,7 @@ const enUSCourse = {
     location: 'Location',
     teacher: 'Teacher',
     finalAssessment: 'Final assessment',
-    totalWeeks: '18 teaching weeks',
+    totalWeeks: '{{count}} teaching weeks',
     notSet: 'Not set',
   },
   editor: {
@@ -169,6 +171,17 @@ const enUSCourse = {
       access: 'Access permissions',
       mount: 'Mount permissions',
       loadFailed: 'Failed to load course permission settings',
+    },
+    danger: {
+      title: 'Course actions',
+      description:
+        'Deleting a course dissolves its course group and removes outline/material links.',
+      delete: 'Delete course',
+      confirmTitle: 'Delete course',
+      confirmDescription: 'Delete “{{name}}”? This action cannot be undone.',
+      confirm: 'Delete',
+      success: 'Course deleted',
+      missingId: 'Missing course ID',
     },
     basic: { title: 'Basic information', description: 'Shown in the course list and course home.' },
     goals: {
@@ -286,14 +299,14 @@ const enUSCourse = {
     },
   },
   members: {
-    title: 'Course people',
+    title: 'People',
     count: '{{count}} course members',
     tableAria: 'Course member list',
     empty: 'No course members',
     columns: { member: 'Member', studentNumber: 'Student ID', email: 'Email', role: 'Role' },
   },
   announcements: {
-    title: 'Course announcements',
+    title: 'Announcements',
     count: '{{count}} announcements',
     pinned: 'Pinned',
     publishedBy: 'Published by {{name}}',
