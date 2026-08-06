@@ -12,7 +12,31 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background-color: var(--background);
+  background-color: var(--portal-canvas);
+
+  // ── 外部门户专属品牌色：跟随 WisePen_website 门户（墨绿 + 薄荷绿 + 米白底）──
+  // 固定浅色，不随全局主题 accent 漂移、不随深色模式切换。
+  --portal-accent: #2e8c67;
+  --portal-accent-deep: #236f52;
+  --portal-slate: #6e7773;
+  --portal-lime: #79e6b2;
+  --portal-lime-deep: #5bc491;
+  --portal-canvas: #fbfcfa;
+  --portal-ink: #17201d;
+
+  --accent: var(--portal-accent);
+  --accent-hover: #26785a;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--portal-accent) 12%, #ffffff);
+  --accent-soft-hover: color-mix(in srgb, var(--portal-accent) 20%, #ffffff);
+  --accent-softer: color-mix(in srgb, var(--portal-accent) 8%, #ffffff);
+  --accent-border: color-mix(in srgb, var(--portal-accent) 32%, var(--portal-slate));
+  --canvas: var(--portal-canvas);
+  --foreground: var(--portal-ink);
+  --surface: #ffffff;
+  --muted: #6e7773;
+  --border-light: rgba(23, 32, 29, 0.11);
+  --border: rgba(23, 32, 29, 0.16);
 }
 
 /* 登录页无导航时仍保留可拖顶栏带（含上方拖拽留白） */
@@ -40,9 +64,10 @@
   height: 680px;
   width: 1200px;
   overflow: hidden;
-  border-radius: var(--radius-lg, var(--radius, 8px));
-  border: 1px solid var(--border);
-  background-color: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  background-color: #ffffff;
+  box-shadow: 0 30px 70px rgba(47, 68, 53, 0.13);
   display: flex;
 }
 
@@ -55,5 +80,5 @@
 }
 
 .loginImage {
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--border-light);
 }

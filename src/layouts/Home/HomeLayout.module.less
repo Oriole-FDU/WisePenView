@@ -1,9 +1,9 @@
 @import '@/layouts/_common/desktopTitleBar.less';
 
 @landing-inline: clamp(16px, 4vw, 40px);
-@content-max: 1160px;
 
 .root {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -13,7 +13,36 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: var(--background);
+  background-color: var(--canvas);
+
+  // ── 门户页基准令牌（跟随当前主题）──
+  --paper: var(--canvas);
+  --ink: var(--foreground);
+  --line: var(--border-light);
+
+  // ── 门户专属品牌色：跟随 WisePen_website 门户（墨绿 + 薄荷绿 + 米白底）──
+  // 页面级覆盖，门户整体固定浅色，不随全局主题 accent 漂移、不随深色模式切换。
+  --portal-accent: #17a06e;
+  --portal-accent-deep: #177a5b;
+  --portal-slate: #64726b;
+  --portal-lime: #6fe3ab;
+  --portal-lime-deep: #50c98b;
+  --portal-canvas: #f6fbf8;
+  --portal-ink: #14211c;
+
+  --accent: var(--portal-accent);
+  --accent-hover: #148f5f;
+  --accent-foreground: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--portal-accent) 12%, #ffffff);
+  --accent-soft-hover: color-mix(in srgb, var(--portal-accent) 20%, #ffffff);
+  --accent-softer: color-mix(in srgb, var(--portal-accent) 8%, #ffffff);
+  --accent-border: color-mix(in srgb, var(--portal-accent) 32%, var(--portal-slate));
+  --canvas: var(--portal-canvas);
+  --foreground: var(--portal-ink);
+  --surface: #ffffff;
+  --muted: #64726b;
+  --border-light: rgba(20, 33, 28, 0.12);
+  --border: rgba(20, 33, 28, 0.16);
 }
 
 .navShell {
@@ -22,7 +51,7 @@
   z-index: 100;
   width: 100%;
   flex-shrink: 0;
-  background-color: color-mix(in srgb, var(--surface) 88%, transparent);
+  background-color: color-mix(in srgb, var(--canvas) 82%, transparent);
   border-bottom: 1px solid var(--border-light);
   backdrop-filter: saturate(180%) blur(10px);
 }
@@ -46,6 +75,8 @@
 }
 
 .outlet {
+  position: relative;
+  z-index: 1;
   flex: 1;
   width: 100%;
   display: flex;
@@ -55,91 +86,158 @@
 
 .footer {
   position: relative;
+  z-index: 1;
   width: 100%;
   flex-shrink: 0;
-  /* 落地页深色页脚：跟 accent 色温，仍保持夜间底 */
-  background-color: color-mix(in oklab, var(--accent) 32%, #0c0a18);
-  padding: clamp(28px, 4vh, 48px) @landing-inline clamp(20px, 3vh, 32px);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
   box-sizing: border-box;
+  padding: 54px 0 22px;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
 .footerInner {
-  max-width: @content-max;
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: min(1240px, calc(100% - 64px));
   margin: 0 auto;
-  width: 100%;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0;
-}
-
-.waveWrap {
-  position: absolute;
-  top: -2px;
-  right: 0;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  transform: rotate(180deg);
-  line-height: 0;
-  pointer-events: none;
-}
-
-.waveSvg {
-  display: block;
-  width: 100%;
-  height: clamp(36px, 5vh, 56px);
-}
-
-.waveSvg polygon {
-  fill: var(--background);
-}
-
-.footerBrandText {
-  color: color-mix(in oklab, var(--paper) 62%, transparent);
-  font-size: clamp(13px, 1.8vh, 15px);
-  font-weight: var(--font-weight-medium);
+  padding: 0 clamp(16px, 3vw, 28px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
 .footerBrand {
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 17px;
+}
+
+.footerBrandRow {
+  display: inline-flex;
+  align-items: center;
   gap: 10px;
 }
 
-.divider {
-  width: 100%;
-  max-width: @content-max;
-  height: 1px;
-  margin: clamp(12px, 1.5vh, 16px) 0;
-  background-color: color-mix(in oklab, var(--paper) 12%, transparent);
+.brandMark {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
+  transform: rotate(-8deg);
+
+  span {
+    display: block;
+    background: var(--portal-ink);
+    border-radius: 3px 7px 3px 7px;
+
+    &:first-child {
+      grid-row: span 2;
+      background: var(--portal-lime);
+    }
+
+    &:nth-child(3) {
+      background: #afeecf;
+    }
+  }
 }
 
-.copyright {
-  width: 100%;
-  max-width: @content-max;
+.footerBrandText {
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  color: var(--foreground);
+}
+
+.footerTagline {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.footerLinks {
+  justify-self: end;
   display: flex;
-  justify-content: flex-end;
-  text-align: right;
-  color: color-mix(in oklab, var(--paper) 62%, transparent);
-  font-size: clamp(11px, 1.4vh, 13px);
-  line-height: 1.5;
+  align-items: flex-start;
+  gap: 20px;
 }
 
-.copyright a {
-  color: color-mix(in oklab, var(--paper) 78%, transparent);
+.footerLink {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  color: #616b66;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--portal-accent);
+  }
+}
+
+.footerBottom {
+  grid-column: 1 / -1;
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #939b97;
+
+  > div {
+    display: flex;
+    gap: 20px;
+  }
+}
+
+.footerMetaLink {
+  color: inherit;
   text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklab, var(--paper) 35%, transparent);
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--portal-accent);
+  }
 }
 
-.copyright a:hover {
-  color: var(--paper);
-  border-bottom-color: color-mix(in oklab, var(--paper) 60%, transparent);
+@media (max-width: 960px) {
+  .footerInner {
+    grid-template-columns: 1fr;
+    max-width: calc(100% - 36px);
+  }
+
+  .footerLinks {
+    justify-self: start;
+    margin-top: 30px;
+  }
+
+  .footerBottom {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 620px) {
+  .footer {
+    padding: 44px 0 18px;
+  }
+
+  .footerLinks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 25px;
+  }
+
+  .footerBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 40px;
+  }
 }
