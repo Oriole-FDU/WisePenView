@@ -1,8 +1,10 @@
 ﻿import { Spin } from '@/components/Feedback';
 import InlineComment from '@/components/InlineComment';
+import { AppAlertDialog } from '@/components/Overlay';
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useBeforeUnload, useBlocker } from 'react-router-dom';
 
 import CustomBlockNote from '@/components/Note/CustomBlockNote';
 import type {
@@ -50,6 +52,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const [aiDiffControlsPortalContainer, setAiDiffControlsPortalContainer] =
     useState<HTMLDivElement | null>(null);
   const [titleSaveStatus, setTitleSaveStatus] = useState<NoteTitleSaveStatus>('saved');
+  const [pendingImageUploadCount, setPendingImageUploadCount] = useState(0);
   const fallbackNoteTitle = noteInfoDisplay.noteTitle;
   const [aiDiffBodyContentHash, setAiDiffBodyContentHash] = useState<string | undefined>(undefined);
   const noteClientContentSignature = aiDiffBodyContentHash
@@ -104,6 +107,16 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   } = workspace;
   const headerSaveStatus = resolveNoteHeaderSaveStatus(saveStatus, titleSaveStatus);
   const saveStatusText = t(`save.${headerSaveStatus}`);
+  const imageUploadNavigationBlocker = useBlocker(pendingImageUploadCount > 0);
+
+  useBeforeUnload(
+    (event) => {
+      if (pendingImageUploadCount === 0) return;
+      event.preventDefault();
+      event.returnValue = '';
+    },
+    { capture: true }
+  );
   const focusBody = () => {
     bodyEditorRef.current?.focus();
   };
@@ -363,6 +376,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
                         findBar: findBarPortalContainer,
                       }}
                       onAiDiffBodyContentHashChange={setAiDiffBodyContentHash}
+                      onImageUploadCountChange={setPendingImageUploadCount}
                       inlineComments={inlineCommentsBinding}
                     />
                   ) : null}
@@ -390,6 +404,18 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
           </div>
         </div>
       ) : null}
+      <AppAlertDialog
+        type="warning"
+        isOpen={imageUploadNavigationBlocker.state === 'blocked'}
+        onOpenChange={() => imageUploadNavigationBlocker.reset?.()}
+        title={t('workspace.imageUploadLeaveTitle')}
+        description={t('workspace.imageUploadLeaveDescription', { count: pendingImageUploadCount })}
+        footer={
+          <Button variant="primary" onPress={() => imageUploadNavigationBlocker.reset?.()}>
+            {t('workspace.imageUploadContinue')}
+          </Button>
+        }
+      />
     </>
   );
 }

@@ -10,6 +10,10 @@ const enUSNote = {
       'The network connection was lost. You can keep editing locally, and changes will sync automatically when the connection returns.',
     retry: 'Retry',
     currentUser: 'Current user',
+    imageUploadLeaveTitle: 'Images are still uploading',
+    imageUploadLeaveDescription:
+      'Wait for {{count}} image upload to finish before leaving this note.',
+    imageUploadContinue: 'Continue uploading',
   },
   title: { untitled: 'Untitled note', placeholder: 'Enter a title' },
   info: {

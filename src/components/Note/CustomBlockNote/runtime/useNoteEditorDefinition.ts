@@ -25,6 +25,13 @@ type CreateBlockNoteOptions = NonNullable<Parameters<typeof useCreateBlockNote>[
 type BlockNoteCollaborationConfig = NonNullable<CreateBlockNoteOptions['collaboration']>;
 type NotePasteHandler = NonNullable<CreateBlockNoteOptions['pasteHandler']>;
 
+interface NoteImageUploadTracker {
+  start: (blockId: string | undefined) => void;
+  markFailed: (blockId: string | undefined) => void;
+  finish: (blockId: string | undefined) => boolean;
+  dispose: () => void;
+}
+
 const NOTE_EDITOR_PROPS = collectNoteEditorProps(notePluginRegistry);
 const STRUCTURED_CLIPBOARD_TYPES = new Set([
   'blocknote/html',
@@ -114,36 +121,65 @@ export function useNoteEditorDefinition({
   collaboration: { doc, provider, user: collaborationUser },
   state: { readOnly, blockLocalDocWrites },
   inlineComments,
+  onImageUploadCountChange,
 }: CustomBlockNoteProps) {
   const { i18n } = useTranslation('note');
   const imageService = useImageService();
   const [pmWriteGuardReady, setPmWriteGuardReady] = useState(false);
+  const [imageUploadTracker] = useState<NoteImageUploadTracker>(() => {
+    const tasks = new Map<string, { failed: boolean }>();
+    return {
+      start: (blockId) => {
+        if (!blockId) return;
+        tasks.set(blockId, { failed: false });
+        onImageUploadCountChange?.(tasks.size);
+      },
+      markFailed: (blockId) => {
+        if (!blockId) return;
+        const task = tasks.get(blockId);
+        if (task) task.failed = true;
+      },
+      finish: (blockId) => {
+        if (!blockId) return false;
+        const task = tasks.get(blockId);
+        if (!task) return false;
+        tasks.delete(blockId);
+        onImageUploadCountChange?.(tasks.size);
+        return task.failed;
+      },
+      dispose: () => {
+        tasks.clear();
+        onImageUploadCountChange?.(0);
+      },
+    };
+  });
   const shouldBlockLocalDocWrites = useMemoizedFn(() => blockLocalDocWrites && pmWriteGuardReady);
   const hasBlockLocalDocWritesProp = useMemoizedFn(() => blockLocalDocWrites);
   const noteFragment = useNoteYjsFragment(doc);
   const aiContentStore = getAiContentStore(doc);
 
-  const uploadFile = useMemoizedFn(async (file: File) => {
-    if (readOnly) {
-      const err = createClientError(FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD);
-      toast.danger(parseErrorMessage(err));
-      throw err;
-    }
-    if (!file.type.startsWith('image/')) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
-    }
+  const uploadFile = useMemoizedFn(async (file: File, blockId?: string) => {
+    imageUploadTracker.start(blockId);
     try {
+      if (readOnly) {
+        const err = createClientError(FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD);
+        throw err;
+      }
+      if (!file.type.startsWith('image/')) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
+      }
       assertImageProxyUploadLimit(file);
+      const { publicUrl } = await imageService.uploadImage({
+        file,
+        scene: 'PRIVATE_IMAGE_FOR_NOTE',
+        bizTag: `notes/${resourceId}`,
+      });
+      return publicUrl;
     } catch (error) {
+      imageUploadTracker.markFailed(blockId);
       toast.danger(parseErrorMessage(error));
       throw error;
     }
-    const { publicUrl } = await imageService.uploadImage({
-      file,
-      scene: 'PRIVATE_IMAGE_FOR_NOTE',
-      bizTag: `notes/${resourceId}`,
-    });
-    return publicUrl;
   });
 
   const editorExtensions = [
@@ -186,6 +222,7 @@ export function useNoteEditorDefinition({
     } satisfies CreateBlockNoteOptions,
     noteFragment,
     aiContentStore,
+    imageUploadTracker,
     hasBlockLocalDocWritesProp,
     setPmWriteGuardReady,
   };

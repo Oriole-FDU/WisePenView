@@ -9,6 +9,9 @@ const zhCNNote = {
     disconnected: '网络连接已断开，当前可继续本地编辑；网络恢复后会自动同步到云端。',
     retry: '重试',
     currentUser: '当前用户',
+    imageUploadLeaveTitle: '图片仍在上传',
+    imageUploadLeaveDescription: '请等待 {{count}} 张图片上传完成后再离开此笔记。',
+    imageUploadContinue: '继续上传',
   },
   title: {
     untitled: '未命名笔记',

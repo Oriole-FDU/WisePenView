@@ -69,6 +69,7 @@ export function useNoteDocument({
   const bodyContentHashTimerRef = useRef<number | null>(null);
   const bodyContentHashIdleRef = useRef<number | null>(null);
   const bodyContentHashInvalidatedRef = useRef(false);
+  const imageUploadCleanupTimersRef = useRef<number[]>([]);
 
   const refreshBodyContentHash = useMemoizedFn(() => {
     bodyContentHashIdleRef.current = null;
@@ -165,10 +166,39 @@ export function useNoteDocument({
     }
   }, [blockLocalDocWrites, definition]);
 
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：BlockNote 文件上传结束后，延迟处理对应图片块。
+   * 不可替代原因：BlockNote 先插入空图片块再异步上传，失败时须在其内部处理结束后清除该块。
+   * cleanup：取消尚未执行的清理任务，并在编辑器卸载时释放上传追踪状态。
+   */
+  useEffect(() => {
+    const unsubscribe = editor.onUploadEnd((blockId) => {
+      const timer = window.setTimeout(() => {
+        imageUploadCleanupTimersRef.current = imageUploadCleanupTimersRef.current.filter(
+          (item) => item !== timer
+        );
+        if (!blockId) return;
+        if (!definition.imageUploadTracker.finish(blockId)) return;
+
+        const block = editor.getBlock(blockId);
+        if (block && 'url' in block.props && !block.props.url) {
+          editor.removeBlocks([blockId]);
+        }
+      }, 0);
+      imageUploadCleanupTimersRef.current.push(timer);
+    });
+
+    return unsubscribe;
+  }, [definition.imageUploadTracker, editor]);
+
   useUnmount(() => {
     bodyOnChangeCleanupRef.current?.();
     bodyOnChangeCleanupRef.current = null;
     cancelPendingBodyContentHashRefresh();
+    imageUploadCleanupTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    imageUploadCleanupTimersRef.current = [];
+    definition.imageUploadTracker.dispose();
   });
 
   const captureSelection = () => {

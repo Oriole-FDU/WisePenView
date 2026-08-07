@@ -88,6 +88,7 @@ export interface CustomBlockNoteProps {
   onOutlineChange?: (items: NoteOutlineItem[]) => void;
   onActiveHeadingChange?: (activeId: string | undefined) => void;
   onAiDiffPresenceChange?: (hasAiDiffContent: boolean) => void;
+  onImageUploadCountChange?: (count: number) => void;
   onAskAi: (context: NoteSelectionSnapshot) => void;
   onAiDiffBodyContentHashChange?: (hash: string | undefined) => void;
   inlineComments?: NoteInlineCommentsBinding;
