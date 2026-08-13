@@ -4,6 +4,47 @@ export interface ChatFrontendState<Key extends string = string, Value = unknown>
   disabled?: boolean;
 }
 
+export interface ChatClientToolCapability {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export interface ChatClientToolCapabilityRequest {
+  name: string;
+  description: string;
+  input_schema: Record<string, unknown>;
+}
+
+export interface ClientToolCallEvent {
+  sessionId: string;
+  toolCallId: string;
+  toolName: string;
+  input: unknown;
+}
+
+export type ClientToolExecutionResult =
+  | {
+      toolCallId: string;
+      output: unknown;
+      errorText?: never;
+    }
+  | {
+      toolCallId: string;
+      output?: never;
+      errorText: string;
+    };
+
+export type ClientToolCallHandler = (
+  event: ClientToolCallEvent
+) => ClientToolExecutionResult | Promise<ClientToolExecutionResult>;
+
+export interface ClientToolResultSubmission {
+  tool_call_id: string;
+  output?: unknown;
+  error_text?: string;
+}
+
 interface ChatSelectedResourceContext {
   resourceId: string;
   resourceName: string;
@@ -29,6 +70,7 @@ export interface ChatCompletionRequest {
   user_defined_deny_tool_names?: string[];
   user_defined_on_demand_skill_ids?: string[];
   user_defined_force_enabled_skill_ids?: string[];
+  client_tool_capabilities?: ChatClientToolCapabilityRequest[];
 }
 
 export interface SendSessionMessageOptions {
@@ -43,9 +85,11 @@ export interface SendSessionMessageOptions {
   denyToolNames?: string[];
   onDemandSkillIds?: string[];
   forceEnabledSkillIds?: string[];
+  clientToolCapabilities?: ChatClientToolCapability[];
 }
 
 export interface UseChatSessionOptions {
   sessionId: string;
   model?: string;
+  onClientToolCall?: ClientToolCallHandler;
 }

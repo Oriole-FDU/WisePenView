@@ -25,6 +25,7 @@ import { History, Save } from 'lucide-react';
 import { useState, type DependencyList, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { createDrawioChatStateProvider } from './DrawioChatProtocol';
 import { useDrawioEditorSession } from './_hooks/useDrawioEditorSession';
 import {
   buildDrawioUrl,
@@ -103,6 +104,7 @@ function DrawioLayoutConfig({
   onResourceChanged,
   titleMeta,
   actions,
+  chatStateProvider,
   layoutDeps,
 }: {
   children: ReactNode;
@@ -116,12 +118,14 @@ function DrawioLayoutConfig({
   onResourceChanged?: () => unknown | Promise<unknown>;
   titleMeta?: ReactNode;
   actions?: ReactNode;
+  chatStateProvider?: ResourceHostLayoutConfig['chatStateProvider'];
   layoutDeps?: DependencyList;
 }) {
   const { t } = useTranslation('workspace');
   const displayResourceName = resourceName ?? t('drawio.defaultName');
   const frameConfig = {
     className: styles.container,
+    chatStateProvider,
     sidePanel: resourceInfo ? { resource: resourceInfo, onResourceChanged } : undefined,
     header: {
       resource: {
@@ -231,15 +235,30 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
     colorScheme: readWisePenColorScheme(),
   });
   const drawioOrigin = readDrawioEmbedOrigin(DRAWIO_EMBED_URL);
-  const { iframeRef, currentVersion, saveState, editorReady, editorLoaded, requestSave } =
-    useDrawioEditorSession({
-      canEdit,
-      drawioOrigin,
-      initialVersion,
-      initialXml,
-      noteService,
-      resourceId,
-    });
+  const {
+    iframeRef,
+    currentVersion,
+    saveState,
+    editorReady,
+    editorLoaded,
+    requestSave,
+    readXml,
+    replaceXml,
+  } = useDrawioEditorSession({
+    canEdit,
+    drawioOrigin,
+    initialVersion,
+    initialXml,
+    noteService,
+    resourceId,
+  });
+  const chatStateProvider = createDrawioChatStateProvider({
+    resourceId,
+    canEdit,
+    editorLoaded,
+    readXml,
+    replaceXml,
+  });
 
   const { data: currentUser } = useApi(() => userService.getUserInfo(), {
     ready: Boolean(noteInfoDisplay.ownerId),
@@ -305,6 +324,7 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
     currentVersion,
     editorLoaded,
     i18n.resolvedLanguage,
+    readXml,
     saveState,
   ];
 
@@ -320,6 +340,7 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
       onResourceChanged={onRefreshDrawioInfo}
       titleMeta={titleMeta}
       actions={headerActions}
+      chatStateProvider={chatStateProvider}
       layoutDeps={layoutDeps}
     >
       <div className={styles.content}>

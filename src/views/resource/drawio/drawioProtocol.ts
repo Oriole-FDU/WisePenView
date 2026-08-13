@@ -3,6 +3,13 @@ export const EMPTY_DRAWIO_XML = `<mxfile host="WisePen"><diagram name="Page-1"><
 export type DrawioSaveState = 'saved' | 'dirty' | 'saving' | 'failed';
 export type WisePenTheme = 'light' | 'dark';
 
+export type DrawioXmlValidationResult =
+  | { ok: true }
+  | {
+      ok: false;
+      message: string;
+    };
+
 export type DrawioEditorCommand =
   | {
       action: 'load';
@@ -60,6 +67,40 @@ export function extractDrawioPlainText(xml: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+export function validateDrawioXml(xml: string): DrawioXmlValidationResult {
+  const normalizedXml = xml.trim();
+  if (!normalizedXml) {
+    return { ok: false, message: 'XML must not be empty.' };
+  }
+
+  const doc = new DOMParser().parseFromString(normalizedXml, 'text/xml');
+  const parserError = doc.querySelector('parsererror');
+  if (parserError) {
+    return {
+      ok: false,
+      message: parserError.textContent?.trim() || 'XML is not well-formed.',
+    };
+  }
+
+  const rootName = doc.documentElement?.localName;
+  if (rootName === 'mxfile') {
+    return doc.querySelector('diagram')
+      ? { ok: true }
+      : { ok: false, message: 'Draw.io mxfile XML must contain at least one diagram.' };
+  }
+
+  if (rootName === 'mxGraphModel') {
+    return doc.querySelector('root')
+      ? { ok: true }
+      : { ok: false, message: 'Draw.io mxGraphModel XML must contain a root element.' };
+  }
+
+  return {
+    ok: false,
+    message: 'XML root must be mxfile or mxGraphModel.',
+  };
 }
 
 export function readDrawioEmbedOrigin(embedUrl: string): string {

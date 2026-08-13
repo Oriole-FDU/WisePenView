@@ -1,4 +1,6 @@
 import type {
+  ChatClientToolCapability,
+  ChatClientToolCapabilityRequest,
   ChatCompletionRequest,
   ChatFrontendState,
   SendSessionMessageOptions,
@@ -25,6 +27,24 @@ function unique(values?: readonly string[]): string[] {
   return Array.from(new Set(values ?? []));
 }
 
+function uniqueClientToolCapabilities(
+  values?: readonly ChatClientToolCapability[]
+): ChatClientToolCapability[] {
+  return Array.from(
+    new Map((values ?? []).map((capability) => [capability.name, capability])).values()
+  );
+}
+
+function mapClientToolCapability(
+  capability: ChatClientToolCapability
+): ChatClientToolCapabilityRequest {
+  return {
+    name: capability.name,
+    description: capability.description,
+    input_schema: capability.inputSchema,
+  };
+}
+
 export function mapChatCompletionRequest(params: {
   defaultSessionId: string;
   defaultModel?: string;
@@ -39,6 +59,7 @@ export function mapChatCompletionRequest(params: {
     .map((attachment) => attachment.attachmentId);
   const allowToolNames = unique(options.allowToolNames);
   const forceEnabledSkillIds = unique(options.forceEnabledSkillIds);
+  const clientToolCapabilities = uniqueClientToolCapabilities(options.clientToolCapabilities);
 
   return {
     session_id: options.sessionId ?? defaultSessionId,
@@ -57,6 +78,9 @@ export function mapChatCompletionRequest(params: {
       : {}),
     ...(forceEnabledSkillIds.length > 0
       ? { user_defined_force_enabled_skill_ids: forceEnabledSkillIds }
+      : {}),
+    ...(clientToolCapabilities.length > 0
+      ? { client_tool_capabilities: clientToolCapabilities.map(mapClientToolCapability) }
       : {}),
   };
 }

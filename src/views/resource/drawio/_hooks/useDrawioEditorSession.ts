@@ -1,5 +1,5 @@
 import type { INoteService } from '@/domains/Note';
-import { parseErrorMessage } from '@/utils/error';
+import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useEventListener, useMemoizedFn, useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
@@ -21,6 +21,22 @@ interface UseDrawioEditorSessionOptions {
   resourceId: string;
 }
 
+interface PendingDrawioLoad {
+  resolve: () => void;
+  reject: (error: Error) => void;
+  timer: number;
+}
+
+interface PendingDrawioXmlRead {
+  resolve: (xml: string) => void;
+  reject: (error: Error) => void;
+  timer: number;
+}
+
+function createDrawioSessionError(reason: string): Error {
+  return createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { reason });
+}
+
 export function useDrawioEditorSession({
   canEdit,
   drawioOrigin,
@@ -35,6 +51,8 @@ export function useDrawioEditorSession({
   const lastSavedXmlRef = useRef(initialXml);
   const exportTimerRef = useRef<number | null>(null);
   const pendingExportForSaveRef = useRef(false);
+  const pendingLoadRef = useRef<PendingDrawioLoad | null>(null);
+  const pendingXmlReadRef = useRef<PendingDrawioXmlRead | null>(null);
   const [currentVersion, setCurrentVersion] = useState(initialVersion);
   const [saveState, setSaveState] = useState<DrawioSaveState>('saved');
   const [editorReady, setEditorReady] = useState(false);
@@ -48,6 +66,28 @@ export function useDrawioEditorSession({
     if (exportTimerRef.current !== null) {
       window.clearTimeout(exportTimerRef.current);
       exportTimerRef.current = null;
+    }
+  };
+
+  const clearPendingXmlRead = (error?: Error) => {
+    const pendingRead = pendingXmlReadRef.current;
+    if (!pendingRead) return;
+
+    window.clearTimeout(pendingRead.timer);
+    pendingXmlReadRef.current = null;
+    if (error) {
+      pendingRead.reject(error);
+    }
+  };
+
+  const clearPendingLoad = (error?: Error) => {
+    const pendingLoad = pendingLoadRef.current;
+    if (!pendingLoad) return;
+
+    window.clearTimeout(pendingLoad.timer);
+    pendingLoadRef.current = null;
+    if (error) {
+      pendingLoad.reject(error);
     }
   };
 
@@ -104,6 +144,62 @@ export function useDrawioEditorSession({
     }, 10000);
   });
 
+  const replaceXml = useMemoizedFn((xml: string): Promise<void> => {
+    if (!canEdit) {
+      return Promise.reject(createDrawioSessionError(t('drawio.noEditPermission')));
+    }
+    if (!editorLoaded) {
+      return Promise.reject(createDrawioSessionError(t('drawio.editorNotReady')));
+    }
+    if (pendingLoadRef.current) {
+      return Promise.reject(
+        createDrawioSessionError('Draw.io editor is refreshing. Please try again later.')
+      );
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const timer = window.setTimeout(() => {
+        pendingLoadRef.current = null;
+        reject(createDrawioSessionError('Draw.io editor refresh timed out.'));
+      }, 10000);
+
+      pendingLoadRef.current = { resolve, reject, timer };
+      postToEditor({
+        action: 'load',
+        autosave: canEdit ? 1 : 0,
+        modified: true,
+        noExitBtn: 1,
+        noSaveBtn: canEdit ? 0 : 1,
+        saveAndExit: 0,
+        xml,
+      });
+    });
+  });
+
+  const readXml = useMemoizedFn((): Promise<string> => {
+    if (!editorLoaded) {
+      return Promise.reject(createDrawioSessionError(t('drawio.editorNotReady')));
+    }
+    if (pendingLoadRef.current) {
+      return Promise.reject(
+        createDrawioSessionError('Draw.io editor is refreshing. Please try again later.')
+      );
+    }
+    if (pendingExportForSaveRef.current || pendingXmlReadRef.current) {
+      return Promise.reject(createDrawioSessionError('Draw.io XML export is already in progress.'));
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      const timer = window.setTimeout(() => {
+        pendingXmlReadRef.current = null;
+        reject(createDrawioSessionError('Draw.io XML export timed out.'));
+      }, 10000);
+
+      pendingXmlReadRef.current = { resolve, reject, timer };
+      postToEditor({ action: 'export', format: 'xml' });
+    });
+  });
+
   const handleMessage = (event: MessageEvent) => {
     if (event.origin !== drawioOrigin) return;
     if (event.source !== iframeRef.current?.contentWindow) return;
@@ -127,6 +223,14 @@ export function useDrawioEditorSession({
 
     if (message.event === 'load') {
       setEditorLoaded(true);
+      const pendingLoad = pendingLoadRef.current;
+      if (pendingLoad) {
+        clearPendingLoad();
+        setSaveState('dirty');
+        postToEditor({ action: 'status', message: t('drawio.status.dirty'), modified: true });
+        pendingLoad.resolve();
+        return;
+      }
       setSaveState('saved');
       return;
     }
@@ -155,13 +259,30 @@ export function useDrawioEditorSession({
       return;
     }
 
+    if (message.event === 'export' && pendingXmlReadRef.current) {
+      const pendingRead = pendingXmlReadRef.current;
+      clearPendingXmlRead();
+      if (typeof message.xml === 'string') {
+        pendingRead.resolve(message.xml);
+      } else {
+        pendingRead.reject(createDrawioSessionError('Draw.io XML export failed.'));
+      }
+      return;
+    }
+
     if (message.event === 'error') {
+      clearPendingLoad(createDrawioSessionError(message.message || t('drawio.loadFailed')));
+      clearPendingXmlRead(createDrawioSessionError(message.message || t('drawio.loadFailed')));
       toast.danger(message.message || t('drawio.loadFailed'));
     }
   };
 
   useEventListener('message', handleMessage);
-  useUnmount(clearExportTimer);
+  useUnmount(() => {
+    clearExportTimer();
+    clearPendingLoad(createDrawioSessionError(t('drawio.loadFailed')));
+    clearPendingXmlRead(createDrawioSessionError(t('drawio.loadFailed')));
+  });
 
   return {
     iframeRef,
@@ -170,5 +291,7 @@ export function useDrawioEditorSession({
     editorReady,
     editorLoaded,
     requestSave,
+    readXml,
+    replaceXml,
   };
 }

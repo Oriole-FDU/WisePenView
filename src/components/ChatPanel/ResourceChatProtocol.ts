@@ -1,4 +1,4 @@
-import type { ChatFrontendState } from '@/domains/Chat';
+import type { ChatClientToolCapability, ChatFrontendState } from '@/domains/Chat';
 import {
   RESOURCE_KIND,
   RESOURCE_VIEWER,
@@ -31,6 +31,8 @@ export interface ResourceChatStateProvider<State extends ChatFrontendState = Cha
   getStates: () => State[];
   allowToolNames?: readonly string[];
   forceEnabledSkillIds?: readonly string[];
+  clientToolCapabilities?: readonly ChatClientToolCapability[];
+  clientToolHandlers?: Partial<Record<string, ResourceClientToolHandler>>;
 }
 
 export interface ResourceChatContext<State extends ChatFrontendState = ChatFrontendState> {
@@ -44,6 +46,19 @@ export interface ResourceChatProtocolPort {
   context?: ResourceChatContext;
   clearContext: (context?: ResourceChatContext) => void;
 }
+
+export interface ResourceClientToolCall {
+  sessionId: string;
+  toolCallId: string;
+  toolName: string;
+  input: unknown;
+}
+
+export type ResourceClientToolOutput = Record<string, unknown>;
+
+export type ResourceClientToolHandler = (
+  call: ResourceClientToolCall
+) => ResourceClientToolOutput | Promise<ResourceClientToolOutput>;
 
 function resolveResourceEditorType(resource: ResourceChatResource): string | undefined {
   if (resource.editorType) return resource.editorType;

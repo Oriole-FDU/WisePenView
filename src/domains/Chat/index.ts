@@ -37,8 +37,14 @@ export type {
   UploadAttachmentResult,
 } from './service/index.type';
 export type {
+  ChatClientToolCapability,
+  ChatClientToolCapabilityRequest,
   ChatCompletionRequest,
   ChatFrontendState,
+  ClientToolCallEvent,
+  ClientToolCallHandler,
+  ClientToolExecutionResult,
+  ClientToolResultSubmission,
   SendSessionMessageOptions,
   UseChatSessionOptions,
 } from './session/index.type';

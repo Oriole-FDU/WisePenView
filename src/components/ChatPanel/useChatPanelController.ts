@@ -12,6 +12,8 @@ import {
   useChatSession,
   type ChatModel,
   type ChatSession,
+  type ClientToolCallEvent,
+  type ClientToolExecutionResult,
   type CreateSessionRequest,
 } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
@@ -69,9 +71,42 @@ export function useChatPanelController({
   const [pendingDebugSend, setPendingDebugSend] = useState<PendingDebugSend | null>(null);
   const [savingDebugDraft, setSavingDebugDraft] = useState(false);
 
+  const handleClientToolCall = async (
+    event: ClientToolCallEvent
+  ): Promise<ClientToolExecutionResult> => {
+    const handler = resourceStateProvider?.clientToolHandlers?.[event.toolName];
+    if (!handler) {
+      return {
+        toolCallId: event.toolCallId,
+        errorText: `当前页面并未提供工具 '${event.toolName}'`,
+      };
+    }
+
+    try {
+      const output = await handler({
+        sessionId: event.sessionId,
+        toolCallId: event.toolCallId,
+        toolName: event.toolName,
+        input: event.input,
+      });
+      return {
+        toolCallId: event.toolCallId,
+        output,
+      };
+    } catch (error) {
+      const message = parseErrorMessage(error);
+      toast.danger(message);
+      return {
+        toolCallId: event.toolCallId,
+        errorText: message,
+      };
+    }
+  };
+
   const { messages, status, setMessages, sendSessionMessage, stop } = useChatSession({
     sessionId: currentSessionId ?? '',
     model: currentModel?.modelId,
+    onClientToolCall: handleClientToolCall,
   });
 
   const { runAsync: runLoadSessionHistory } = useApi(
@@ -238,6 +273,7 @@ export function useChatPanelController({
         ...(opts?.selectedTools?.map((tool) => tool.toolId) ?? []),
       ],
       forceEnabledSkillIds: [...(resourceStateProvider?.forceEnabledSkillIds ?? [])],
+      clientToolCapabilities: [...(resourceStateProvider?.clientToolCapabilities ?? [])],
     }).catch((error) => {
       toast.danger(parseErrorMessage(error));
     });
