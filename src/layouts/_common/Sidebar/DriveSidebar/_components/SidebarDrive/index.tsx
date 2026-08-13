@@ -75,7 +75,7 @@ function SidebarDrive() {
     ? groupBaseInfo && groupBaseInfo.groupId === groupId
       ? groupBaseInfo.groupName || undefined
       : undefined
-    : t('navigator.personalDrive');
+    : t('sidebar.personalDrive');
 
   const resolveContainerMountTagId = (node: RootNode | FolderNode): string | undefined => {
     if (node.type === 'folder') return node.tagId;

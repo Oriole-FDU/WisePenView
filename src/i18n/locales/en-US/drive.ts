@@ -32,6 +32,7 @@ const enUSDrive = {
     empty: 'No content',
   },
   sidebar: {
+    personalDrive: 'My Drive',
     createIn: 'Create in "{{name}}"',
     collapseAll: 'Collapse all',
     renameNode: 'Rename {{name}}',

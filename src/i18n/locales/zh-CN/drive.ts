@@ -32,6 +32,7 @@ const zhCNDrive = {
     empty: '暂无内容',
   },
   sidebar: {
+    personalDrive: '我的云盘',
     createIn: '在「{{name}}」中新建',
     collapseAll: '折叠全部',
     renameNode: '重命名 {{name}}',

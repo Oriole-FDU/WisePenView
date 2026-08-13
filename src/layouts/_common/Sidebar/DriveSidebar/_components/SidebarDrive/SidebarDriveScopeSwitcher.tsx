@@ -73,9 +73,9 @@ function SidebarDriveScopeSwitcher() {
         >
           <Dropdown.Section>
             <Header>{t('sidebar.switchDrive')}</Header>
-            <Dropdown.Item id={PERSONAL_SCOPE_KEY} textValue={t('navigator.personalDrive')}>
+            <Dropdown.Item id={PERSONAL_SCOPE_KEY} textValue={t('sidebar.personalDrive')}>
               <HardDrive size={15} aria-hidden="true" />
-              <Label>{t('navigator.personalDrive')}</Label>
+              <Label>{t('sidebar.personalDrive')}</Label>
               <Dropdown.ItemIndicator type="dot" />
             </Dropdown.Item>
             {groups.map((group) => (
