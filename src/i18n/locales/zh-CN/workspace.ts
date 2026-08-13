@@ -5,7 +5,7 @@ const zhCNWorkspace = {
     resizeSidebar: '调整侧边栏宽度',
     resizeChatPanel: '调整聊天面板宽度',
   },
-  breadcrumb: { unnamedGroup: '未命名小组', personalDrive: '个人云盘' },
+  breadcrumb: { unnamedGroup: '未命名小组', personalDrive: '我的云盘' },
   renderer: {
     resourceType: '资源类型：{{type}}',
     viewer: '打开方式：{{viewer}}',

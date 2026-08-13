@@ -26,7 +26,7 @@ const zhCNDrive = {
     unnamedDocument: '未命名文档',
   },
   navigator: {
-    personalDrive: '个人云盘',
+    personalDrive: '我的云盘',
     groupDrive: '小组云盘',
     unnamedGroup: '未命名小组',
     empty: '暂无内容',
@@ -90,7 +90,7 @@ const zhCNDrive = {
       queued: '已添加 {{count}} 个文件到上传队列',
     },
     group: {
-      title: '从个人云盘添加文件',
+      title: '从我的云盘添加文件',
       selectFilesStep: '选择个人文件',
       selectFolderStep: '选择目标文件夹',
       selectFilesHint: '选择要添加的文件（可多选）',
@@ -226,7 +226,7 @@ const zhCNDrive = {
     trashEmpty: '回收站为空',
     trashDescription: '移入回收站的文件会显示在这里',
     dropToUpload: '松开以上传文档',
-    addFromPersonal: '从个人云盘添加',
+    addFromPersonal: '从我的云盘添加',
     expandDetails: '展开详情侧栏',
     collapseDetails: '收起详情侧栏',
     detailsAsideAria: '节点详情侧栏',

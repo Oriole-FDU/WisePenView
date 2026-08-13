@@ -276,10 +276,10 @@ const enUSCourse = {
       uploadDrive: 'Upload from Drive',
       uploadLocal: 'Upload locally',
       localUploadDescription:
-        'Documents will be uploaded to the current folder and synced to your personal Drive.',
+        'Documents will be uploaded to the current folder and synced to My Drive.',
       mountTarget: 'Mount target',
       selectTarget: 'Select a chapter or section first',
-      cloudPickerTitle: 'Choose from personal Drive',
+      cloudPickerTitle: 'Choose from My Drive',
       cloudPickerDescription: 'Choose resources to mount under “{{name}}”.',
       mountSelected: 'Mount {{count}} items',
       mountSuccess: '{{count}} resources mounted',

@@ -5,7 +5,7 @@ const enUSWorkspace = {
     resizeSidebar: 'Resize sidebar',
     resizeChatPanel: 'Resize chat panel',
   },
-  breadcrumb: { unnamedGroup: 'Unnamed group', personalDrive: 'Personal Drive' },
+  breadcrumb: { unnamedGroup: 'Unnamed group', personalDrive: 'My Drive' },
   renderer: {
     resourceType: 'Resource type: {{type}}',
     viewer: 'Viewer: {{viewer}}',

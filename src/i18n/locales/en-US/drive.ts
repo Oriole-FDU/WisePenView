@@ -12,7 +12,7 @@ const enUSDrive = {
     },
   },
   node: {
-    drive: 'Personal Drive',
+    drive: 'Drive',
     trash: 'Trash',
     shared: 'Shared',
     folder: 'Folder',
@@ -26,7 +26,7 @@ const enUSDrive = {
     unnamedDocument: 'Untitled document',
   },
   navigator: {
-    personalDrive: 'Personal Drive',
+    personalDrive: 'My Drive',
     groupDrive: 'Group Drive',
     unnamedGroup: 'Untitled group',
     empty: 'No content',
@@ -92,7 +92,7 @@ const enUSDrive = {
       queued: '{{count}} files added to the upload queue',
     },
     group: {
-      title: 'Add files from Personal Drive',
+      title: 'Add files from My Drive',
       selectFilesStep: 'Select personal files',
       selectFolderStep: 'Select destination folder',
       selectFilesHint: 'Select files to add (multiple allowed)',
@@ -229,7 +229,7 @@ const enUSDrive = {
     trashEmpty: 'Trash is empty',
     trashDescription: 'Files moved to Trash will appear here',
     dropToUpload: 'Drop to upload documents',
-    addFromPersonal: 'Add from Personal Drive',
+    addFromPersonal: 'Add from My Drive',
     expandDetails: 'Expand details sidebar',
     collapseDetails: 'Collapse details sidebar',
     detailsAsideAria: 'Node details sidebar',

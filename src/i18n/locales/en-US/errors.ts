@@ -22,7 +22,7 @@ const enUSErrors = {
     '109': 'Failed to rename chat session.',
     '110': 'Upload initialization returned no data.',
     '111': 'Upload initialization did not return a valid direct upload URL.',
-    '112': 'Personal drive root was not found.',
+    '112': 'My Drive root was not found.',
     '113': 'Drive node was not found: {{nodeId}}.',
     '114': 'Trash tag was not found.',
     '115': 'Resource tag information was not found. Reload the list before moving.',
