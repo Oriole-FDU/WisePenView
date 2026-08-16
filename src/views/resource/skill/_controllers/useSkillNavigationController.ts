@@ -75,7 +75,7 @@ export function useSkillNavigationController({
    */
   useEffect(() => {
     if (unsavedChangesGuard.isBlocked) {
-      setPendingIntent({ type: 'leave' });
+      if (pendingIntent?.type !== 'leave') setPendingIntent({ type: 'leave' });
     } else if (pendingIntent?.type === 'leave') {
       setPendingIntent(null);
     }
