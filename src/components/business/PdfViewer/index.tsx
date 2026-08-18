@@ -1,4 +1,4 @@
-import { buildApiUrl } from '@/apis/clientUrls';
+import { buildApiUrl } from '@/apis/apiServerAddr';
 import { cn } from '@/utils/cn';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import {
