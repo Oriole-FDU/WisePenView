@@ -1,4 +1,4 @@
-import { getNoteCollaborationWsUrl, notifyAddrFailure } from '@/apis/apiServerAddr';
+import { getApiBaseUrl, notifyAddrFailure } from '@/apis/apiServerAddr';
 import { getXDeveloper } from '@/apis/developmentTraffic';
 import { WebsocketProvider } from 'y-websocket';
 import type * as Y from 'yjs';
@@ -6,6 +6,12 @@ import type * as Y from 'yjs';
 export interface WisepenProviderOptions {
   connect?: boolean;
   actorUserId?: string;
+}
+
+function getNoteCollaborationWsUrl(): string {
+  const url = new URL('/note-collab', getApiBaseUrl());
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  return url.toString().replace(/\/$/, '');
 }
 
 /** 笔记协同 WebSocket：固定 path、resourceId query，支持发送意图元数据帧。 */

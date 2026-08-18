@@ -1,15 +1,18 @@
 import Axios from '@/apis/Axios';
 import type { ApiResponse } from '@/apis/api.type';
+import i18n from '@/i18n';
+import { I18N_NAMESPACES } from '@/i18n/resources';
 import { WisePenError } from '@/utils/error';
 import type { AxiosRequestConfig } from 'axios';
 
 function checkResponse(res: ApiResponse<unknown>): void {
   if (res.code !== 200) {
+    const message = res.msg ?? i18n.t('code.1001', { ns: I18N_NAMESPACES.ERRORS });
     throw new WisePenError({
       code: res.code,
       source: 'api',
-      serverMsg: res.msg,
-      message: res.msg,
+      serverMsg: res.msg ?? undefined,
+      message,
     });
   }
 }

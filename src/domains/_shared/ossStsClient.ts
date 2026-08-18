@@ -1,4 +1,4 @@
-import type { OssStsTokenApiResponse } from '@/apis/api.type';
+import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import { isRecord } from '@/utils/typeGuards';

@@ -66,6 +66,12 @@ export default defineConfig(({ mode }) => {
       if (key === 'VITE_API_BASE_URL_INTRANET') {
         assertClientUrl(key, value, mode);
       }
+      if (key === 'VITE_NETWORK_PROBE_TIMEOUT') {
+        const timeout = Number(value);
+        if (!Number.isFinite(timeout) || timeout <= 0) {
+          throw new Error(`[vite] ${key} 必须是正数。请检查 .env.${mode}`);
+        }
+      }
     }
   }
 
