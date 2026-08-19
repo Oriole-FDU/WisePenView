@@ -15,12 +15,12 @@ export interface InlineCommentAnchor {
 
 export interface InlineCommentReaction {
   userId: string;
-  emojiId: string;
+  emoji: string;
   createdAt?: number;
 }
 
 export interface InlineCommentReactionGroup {
-  emojiId: string;
+  emoji: string;
   count: number;
   reactedByCurrentUser: boolean;
   users: InlineCommentUserDisplay[];

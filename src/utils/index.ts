@@ -2,6 +2,7 @@ export * from './auth';
 export * from './browser';
 export * from './cn';
 export * from './codeHighlight';
+export * from './colors';
 export * from './enum';
 export * from './error';
 export * from './file';

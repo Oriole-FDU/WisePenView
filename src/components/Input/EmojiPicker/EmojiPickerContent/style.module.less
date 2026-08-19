@@ -1,0 +1,41 @@
+.host {
+  width: min(300px, calc(100vw - 32px));
+  height: 435px;
+  min-height: 0;
+  display: grid;
+  overflow: hidden;
+}
+
+.pickerMount,
+.state {
+  grid-area: 1 / 1;
+}
+
+.pickerMount {
+  min-width: 0;
+  min-height: 0;
+}
+
+.pickerMountHidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.state {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.picker {
+  display: flex;
+  height: 100%;
+  --border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+  --category-icon-size: 18px;
+  --font-family: inherit;
+}
