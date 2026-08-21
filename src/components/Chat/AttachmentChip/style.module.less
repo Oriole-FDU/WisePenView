@@ -1,0 +1,64 @@
+.root {
+  min-width: 0;
+}
+
+.root[data-size='default'] {
+  min-width: 200px;
+}
+
+.root[data-size='sm'] {
+  min-width: 176px;
+}
+
+.root[data-size='xs'] {
+  min-width: 160px;
+}
+
+.content {
+  display: grid;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.title {
+  min-width: 0;
+}
+
+.root[data-state='uploading'] .title {
+  background: none;
+  color: var(--foreground);
+  -webkit-text-fill-color: initial;
+  animation: none;
+}
+
+.progressRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.progressBar {
+  flex: 1;
+  min-width: 0;
+}
+
+.progressTrack {
+  height: 4px;
+}
+
+.progressFill {
+  background: var(--accent);
+}
+
+.progressValue {
+  flex: none;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  white-space: nowrap;
+}
+
+.actions {
+  margin-left: auto;
+}
