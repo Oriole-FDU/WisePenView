@@ -1,4 +1,3 @@
-import { DRAWIO_EMBED_URL } from '@/apis/clientUrls';
 import { AppButton } from '@/components/Button';
 import { ResultState, Spin } from '@/components/Feedback';
 import AppDisplayDialog from '@/components/Overlay/AppDisplayDialog';
@@ -43,6 +42,7 @@ const WISEPEN_COLOR_SCHEMES = new Set([
   'forest',
   'minimal',
 ]);
+const DRAWIO_EMBED_URL = import.meta.env.VITE_DRAWIO_EMBED_URL || 'https://embed.diagrams.net/';
 
 interface DrawioViewProps {
   resourceId?: string;

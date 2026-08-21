@@ -1,5 +1,3 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-
 /**
  * 运行时 API 地址单例。
  *
@@ -9,9 +7,9 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 const POLL_INTERVAL_MS = 60_000;
 const ADDR_READY_AWAIT_MS = 1_500;
+const EXTRANET_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-let serverBaseUrl: string;
-let extranetBaseUrl: string;
+let serverBaseUrl = EXTRANET_BASE_URL;
 let switchingEnabled = false;
 let intranetBaseUrl = '';
 let pingPath = '';
@@ -20,15 +18,26 @@ let addrSuspectedDead = false;
 let probeInflight: Promise<void> | null = null;
 let pollTimerId: number | null = null;
 
-function readRequiredEnv(key: keyof ImportMetaEnv): string {
-  const value = import.meta.env[key];
-  if (!value) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: '运行时 API 地址配置缺失',
-      key,
-    });
-  }
-  return value;
+// 生产环境下，启用内外网切换逻辑
+if (import.meta.env.MODE === 'production') {
+  switchingEnabled = true;
+  intranetBaseUrl = import.meta.env.VITE_API_BASE_URL_INTRANET;
+  pingPath = import.meta.env.VITE_INTRANET_PING_PATH;
+  probeTimeoutMs = Number(import.meta.env.VITE_NETWORK_PROBE_TIMEOUT);
+
+  void runProbe();
+
+  window.addEventListener('online', () => {
+    triggerImmediateProbe();
+  });
+  window.addEventListener('offline', () => {
+    addrSuspectedDead = true;
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      triggerImmediateProbe();
+    }
+  });
 }
 
 async function probeIntranet(): Promise<boolean> {
@@ -56,19 +65,9 @@ async function probeAndSwitch(): Promise<void> {
   if (intranetOk) {
     serverBaseUrl = intranetBaseUrl;
   } else {
-    serverBaseUrl = extranetBaseUrl;
+    serverBaseUrl = EXTRANET_BASE_URL;
   }
   addrSuspectedDead = false;
-}
-
-function scheduleNextProbe(): void {
-  if (pollTimerId !== null) {
-    window.clearTimeout(pollTimerId);
-  }
-  pollTimerId = window.setTimeout(() => {
-    pollTimerId = null;
-    void runProbe();
-  }, POLL_INTERVAL_MS);
 }
 
 function runProbe(): Promise<void> {
@@ -78,7 +77,13 @@ function runProbe(): Promise<void> {
       await probeAndSwitch();
     } finally {
       probeInflight = null;
-      scheduleNextProbe();
+      if (pollTimerId !== null) {
+        window.clearTimeout(pollTimerId);
+      }
+      pollTimerId = window.setTimeout(() => {
+        pollTimerId = null;
+        void runProbe();
+      }, POLL_INTERVAL_MS);
     }
   })();
   return probeInflight;
@@ -110,38 +115,10 @@ export async function awaitAddrReady(maxWaitMs: number = ADDR_READY_AWAIT_MS): P
   ]);
 }
 
-if (import.meta.env.MODE !== 'production') {
-  serverBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  extranetBaseUrl = serverBaseUrl;
-} else {
-  switchingEnabled = true;
-  serverBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  extranetBaseUrl = serverBaseUrl;
-  intranetBaseUrl = readRequiredEnv('VITE_API_BASE_URL_INTRANET');
-  pingPath = readRequiredEnv('VITE_INTRANET_PING_PATH');
-  probeTimeoutMs = Number(readRequiredEnv('VITE_NETWORK_PROBE_TIMEOUT'));
-
-  void runProbe();
-
-  window.addEventListener('online', () => {
-    triggerImmediateProbe();
-  });
-  window.addEventListener('offline', () => {
-    addrSuspectedDead = true;
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      triggerImmediateProbe();
-    }
-  });
-}
-
 export function getApiBaseUrl(): string {
   return serverBaseUrl;
 }
 
-export function getNoteCollaborationWsUrl(): string {
-  const url = new URL('/note-collab', getApiBaseUrl());
-  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-  return url.toString().replace(/\/$/, '');
+export function buildApiUrl(path: `/${string}`): string {
+  return new URL(path, getApiBaseUrl()).toString();
 }
