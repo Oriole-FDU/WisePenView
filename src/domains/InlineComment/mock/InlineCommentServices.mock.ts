@@ -55,9 +55,9 @@ function updateItemReactions(
 ): InlineCommentItem {
   const groupsByEmoji = new Map<string, InlineCommentItem['reactionGroups'][number]>();
   reactions.forEach((reaction) => {
-    const group = groupsByEmoji.get(reaction.emojiId);
-    groupsByEmoji.set(reaction.emojiId, {
-      emojiId: reaction.emojiId,
+    const group = groupsByEmoji.get(reaction.emoji);
+    groupsByEmoji.set(reaction.emoji, {
+      emoji: reaction.emoji,
       count: (group?.count ?? 0) + 1,
       reactedByCurrentUser: group?.reactedByCurrentUser || reaction.userId === currentUser.id,
       users: reaction.userId === currentUser.id ? [currentUser] : (group?.users ?? []),
@@ -152,10 +152,9 @@ const setInlineCommentItemReaction = async (
       item.itemId === params.itemId
         ? updateItemReactions(item, [
             ...item.reactions.filter(
-              (reaction) =>
-                reaction.userId !== currentUser.id || reaction.emojiId !== params.emojiId
+              (reaction) => reaction.userId !== currentUser.id || reaction.emoji !== params.emoji
             ),
-            { userId: currentUser.id, emojiId: params.emojiId, createdAt: now },
+            { userId: currentUser.id, emoji: params.emoji, createdAt: now },
           ])
         : item
     ),
@@ -173,8 +172,7 @@ const deleteInlineCommentItemReaction = async (
         ? updateItemReactions(
             item,
             item.reactions.filter(
-              (reaction) =>
-                reaction.userId !== currentUser.id || reaction.emojiId !== params.emojiId
+              (reaction) => reaction.userId !== currentUser.id || reaction.emoji !== params.emoji
             )
           )
         : item

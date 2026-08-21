@@ -75,7 +75,7 @@ const zhCNCommon = {
     mermaidFailed: '图形渲染失败，请检查 Mermaid 语法。',
     mermaidRendering: '正在渲染图形...',
   },
-  emoji: { pickerAria: '选择表情' },
+  emoji: { pickerAria: '选择表情', loading: '正在加载表情...', loadFailed: '表情加载失败' },
   inlineComment: {
     removeImage: '移除图片 {{name}}',
     insertEmoji: '插入表情',

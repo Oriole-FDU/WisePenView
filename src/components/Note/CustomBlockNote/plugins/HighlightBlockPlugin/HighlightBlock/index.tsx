@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- BlockNote block spec 与展示组件同文件 */
 import AppIconButton from '@/components/Button/AppIconButton';
-import { EmojiPickerContent } from '@/components/EmojiPicker';
+import { EmojiPickerContent } from '@/components/Input';
 import { AppPopover } from '@/components/Overlay';
 import { createReactBlockSpec, type ReactCustomBlockRenderProps } from '@blocknote/react';
 import { useMemoizedFn } from 'ahooks';
@@ -22,8 +22,8 @@ function HighlightIconPicker({ block, editor }: HighlightBlockRenderProps) {
   const [open, setOpen] = useState(false);
   const props = readHighlightBlockProps(block as unknown as Record<string, unknown>);
 
-  const handleSelect = useMemoizedFn((emojiId: string) => {
-    const icon = emojiId.trim();
+  const handleSelect = useMemoizedFn((emoji: string) => {
+    const icon = emoji.trim();
     if (!icon) return;
     editor.updateBlock(block, { props: { icon } });
     setOpen(false);

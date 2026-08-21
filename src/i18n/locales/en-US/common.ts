@@ -75,7 +75,11 @@ const enUSCommon = {
     mermaidFailed: 'Unable to render the diagram. Check the Mermaid syntax.',
     mermaidRendering: 'Rendering diagram...',
   },
-  emoji: { pickerAria: 'Choose emoji' },
+  emoji: {
+    pickerAria: 'Choose emoji',
+    loading: 'Loading emoji...',
+    loadFailed: 'Unable to load emoji',
+  },
   inlineComment: {
     removeImage: 'Remove image {{name}}',
     insertEmoji: 'Insert emoji',

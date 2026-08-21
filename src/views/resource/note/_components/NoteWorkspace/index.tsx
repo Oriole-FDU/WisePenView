@@ -220,8 +220,8 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
               onReply={async (threadId, { content, imageUrls, idempotencyKey }) => {
                 await inlineCommentSession.addComment(threadId, content, imageUrls, idempotencyKey);
               }}
-              onReactionChange={({ threadId, itemId, emojiId, selected }) =>
-                inlineCommentSession.changeReaction(threadId, itemId, emojiId, selected)
+              onReactionChange={({ threadId, itemId, emoji, selected }) =>
+                inlineCommentSession.changeReaction(threadId, itemId, emoji, selected)
               }
               onResolve={async (threadId) => {
                 await inlineCommentSession.resolveThread(threadId);

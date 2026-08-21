@@ -4,6 +4,9 @@ export type { InputProps } from './Input';
 export { default as Checkbox } from './Checkbox';
 export type { CheckboxProps } from './Checkbox';
 
+export { default as EmojiPicker, EmojiPickerContent } from './EmojiPicker';
+export type { EmojiPickerContentProps, EmojiPickerProps } from './EmojiPicker';
+
 export { default as Fieldset } from './Fieldset';
 export type {
   FieldGroupProps,

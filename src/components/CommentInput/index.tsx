@@ -1,7 +1,6 @@
 import { AppButton } from '@/components/Button';
 import AppIconButton from '@/components/Button/AppIconButton';
-import EmojiPicker from '@/components/EmojiPicker';
-import { TextArea } from '@/components/Input';
+import { EmojiPicker, TextArea } from '@/components/Input';
 
 import { useUnmount } from 'ahooks';
 import { ImagePlus, X } from 'lucide-react';
@@ -80,6 +79,7 @@ function CommentInput({
   onCancel,
   onSubmit,
 }: CommentInputProps) {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const appendImages = (files: File[]) => {
@@ -112,6 +112,21 @@ function CommentInput({
     handleSubmit();
   };
 
+  const handleEmojiSelect = (emoji: string) => {
+    const textArea = textAreaRef.current;
+    const selectionStart = textArea?.selectionStart ?? value.length;
+    const selectionEnd = textArea?.selectionEnd ?? selectionStart;
+    const caretPosition = selectionStart + emoji.length;
+    onChange(`${value.slice(0, selectionStart)}${emoji}${value.slice(selectionEnd)}`);
+
+    window.requestAnimationFrame(() => {
+      const currentTextArea = textAreaRef.current;
+      if (!currentTextArea || currentTextArea !== textArea) return;
+      currentTextArea.focus();
+      currentTextArea.setSelectionRange(caretPosition, caretPosition);
+    });
+  };
+
   return (
     <div className={styles.composer}>
       {pendingImages.length > 0 ? (
@@ -129,6 +144,7 @@ function CommentInput({
 
       <div className={styles.inputWrap}>
         <TextArea
+          ref={textAreaRef}
           value={value}
           rows={1}
           autoFocus={autoFocus}
@@ -144,7 +160,7 @@ function CommentInput({
           <EmojiPicker
             label={labels.insertEmoji}
             disabled={disabled}
-            onSelect={(emojiId) => onChange(`${value}${emojiId}`)}
+            onSelect={handleEmojiSelect}
           />
           {imageUploadEnabled ? (
             <AppIconButton

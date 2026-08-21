@@ -1,6 +1,7 @@
 import AppAvatar from '@/components/Avatar';
 import { AppButton } from '@/components/Button';
 import AppIconButton from '@/components/Button/AppIconButton';
+import { EmojiPicker } from '@/components/Input';
 import AppAlertDialog from '@/components/Overlay/AppAlertDialog';
 import AppDisplayDialog from '@/components/Overlay/AppDisplayDialog';
 import AppModal from '@/components/Overlay/AppModal';
@@ -15,7 +16,6 @@ import { Check, RotateCcw, Trash2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import EmojiPicker from '@/components/EmojiPicker';
 import CommentComposer from './CommentComposer';
 import type {
   InlineCommentDeletePayload,
@@ -75,12 +75,12 @@ function CommentItem({
   const { t, i18n } = useTranslation('common');
   const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const { loading: changingReaction, runAsync: changeReaction } = useApi(
-    async (emojiId: string) => {
-      const selectedGroup = item.reactionGroups.find((group) => group.emojiId === emojiId);
+    async (emoji: string) => {
+      const selectedGroup = item.reactionGroups.find((group) => group.emoji === emoji);
       await onReactionChange({
         threadId,
         itemId: item.itemId,
-        emojiId,
+        emoji,
         selected: selectedGroup?.reactedByCurrentUser ?? false,
       });
     },
@@ -89,8 +89,8 @@ function CommentItem({
     }
   );
 
-  const handleEmojiSelect = (emojiId: string) => {
-    void changeReaction(emojiId);
+  const handleEmojiSelect = (emoji: string) => {
+    void changeReaction(emoji);
   };
 
   const formattedTime = formatTimestampToDateTime(item.createdAt) || t('inlineComment.timeUnknown');
@@ -162,10 +162,10 @@ function CommentItem({
               const reactionItems =
                 group.users.length > 0
                   ? group.users.map((user, index) => ({
-                      key: `${group.emojiId}-${user.name}-${index}`,
+                      key: `${group.emoji}-${user.name}-${index}`,
                       label: user.name,
                     }))
-                  : [{ key: group.emojiId, label: String(group.count) }];
+                  : [{ key: group.emoji, label: String(group.count) }];
 
               return reactionItems.map((reactionItem) => (
                 <button
@@ -181,10 +181,10 @@ function CommentItem({
                       : 'inlineComment.reactionAdd',
                     {
                       users: reactionUsers,
-                      emoji: group.emojiId,
+                      emoji: group.emoji,
                     }
                   )}
-                  onClick={() => handleEmojiSelect(group.emojiId)}
+                  onClick={() => handleEmojiSelect(group.emoji)}
                 >
                   <Chip
                     variant="soft"
@@ -192,7 +192,7 @@ function CommentItem({
                       group.reactedByCurrentUser ? styles.reactionChipSelected : ''
                     }`}
                   >
-                    <span aria-hidden>{group.emojiId}</span>
+                    <span aria-hidden>{group.emoji}</span>
                     <Chip.Label className={styles.reactionUser}>{reactionItem.label}</Chip.Label>
                   </Chip>
                 </button>

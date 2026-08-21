@@ -133,7 +133,7 @@ export class NoteInlineCommentSession {
   async changeReaction(
     threadId: string,
     itemId: string,
-    emojiId: string,
+    emoji: string,
     selected: boolean
   ): Promise<void> {
     if (!selected) {
@@ -141,14 +141,14 @@ export class NoteInlineCommentSession {
         resourceId: this.resourceId,
         inlineCommentId: threadId,
         itemId,
-        emojiId,
+        emoji,
       });
     } else {
       await this.inlineCommentService.deleteInlineCommentItemReaction({
         resourceId: this.resourceId,
         inlineCommentId: threadId,
         itemId,
-        emojiId,
+        emoji,
       });
     }
     await this.refreshAfterMutation();

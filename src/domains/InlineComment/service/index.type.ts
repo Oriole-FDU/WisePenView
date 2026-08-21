@@ -48,7 +48,7 @@ export interface SetInlineCommentItemReactionRequest {
   inlineCommentId: string;
   itemId: string;
   contentVersion?: number;
-  emojiId: string;
+  emoji: string;
 }
 
 export interface DeleteInlineCommentItemReactionRequest {
@@ -56,7 +56,7 @@ export interface DeleteInlineCommentItemReactionRequest {
   inlineCommentId: string;
   itemId: string;
   contentVersion?: number;
-  emojiId?: string;
+  emoji?: string;
 }
 
 export interface DeleteInlineCommentItemRequest {

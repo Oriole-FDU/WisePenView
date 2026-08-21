@@ -88,11 +88,11 @@ function mapReactionGroups(
   groups: InlineCommentReactionGroupApiResponse[] | null | undefined
 ): InlineCommentReactionGroup[] {
   return (groups ?? []).flatMap((group) => {
-    const emojiId = group.emojiId?.trim();
-    if (!emojiId) return [];
+    const emoji = group.emojiId?.trim();
+    if (!emoji) return [];
     return [
       {
-        emojiId,
+        emoji,
         count: group.count ?? 0,
         reactedByCurrentUser: group.reactedByCurrentUser ?? false,
         users: (group.users ?? []).flatMap((user) => {
@@ -109,9 +109,9 @@ function mapUserReactions(
   reactions: InlineCommentUserReactionApiValue | null | undefined
 ): InlineCommentItem['reactions'] {
   return (Array.isArray(reactions) ? reactions : [reactions]).flatMap((reaction) => {
-    const emojiId = reaction?.emojiId?.trim();
-    if (!userId || !emojiId) return [];
-    return [{ userId, emojiId, createdAt: optionalTimestamp(reaction?.createTime) }];
+    const emoji = reaction?.emojiId?.trim();
+    if (!userId || !emoji) return [];
+    return [{ userId, emoji, createdAt: optionalTimestamp(reaction?.createTime) }];
   });
 }
 
@@ -204,11 +204,23 @@ const mapUpdateItemRequest = (
 
 const mapSetReactionRequest = (
   params: SetInlineCommentItemReactionRequest
-): SetInlineCommentItemReactionApiRequest => ({ ...params });
+): SetInlineCommentItemReactionApiRequest => ({
+  resourceId: params.resourceId,
+  inlineCommentId: params.inlineCommentId,
+  itemId: params.itemId,
+  emojiId: params.emoji,
+  ...(params.contentVersion != null ? { contentVersion: params.contentVersion } : {}),
+});
 
 const mapDeleteReactionRequest = (
   params: DeleteInlineCommentItemReactionRequest
-): DeleteInlineCommentItemReactionApiRequest => ({ ...params });
+): DeleteInlineCommentItemReactionApiRequest => ({
+  resourceId: params.resourceId,
+  inlineCommentId: params.inlineCommentId,
+  itemId: params.itemId,
+  ...(params.contentVersion != null ? { contentVersion: params.contentVersion } : {}),
+  ...(params.emoji ? { emojiId: params.emoji } : {}),
+});
 
 const mapDeleteItemRequest = (
   params: DeleteInlineCommentItemRequest

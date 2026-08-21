@@ -1,4 +1,4 @@
-import { EmojiPickerContent } from '@/components/EmojiPicker';
+import { EmojiPickerContent } from '@/components/Input';
 import {
   GenericPopover,
   useBlockNoteEditor,
