@@ -1,3 +1,4 @@
+import AdminSidebar from '@/components/Sidebar/AdminSidebar';
 import {
   ADMIN_SIDEBAR_COLLAPSED_WIDTH,
   clampSidebarWidth,
@@ -9,7 +10,6 @@ import { useSystemLayoutStore } from '@/layouts/_common/_store/useSystemLayoutSt
 import { focusVisibleSidebarToggle } from '@/layouts/_common/a11y/sidebarToggle';
 import SkipToMainLink, { MAIN_CONTENT_ID } from '@/layouts/_common/a11y/SkipToMainLink';
 import RouteOutletBoundary from '@/layouts/_common/RouteOutletBoundary';
-import AdminSidebar from '@/layouts/_common/Sidebar/AdminSidebar';
 import {
   RESIZE_TARGET_MINIMUM_SIZE,
   SystemResizableHandle,

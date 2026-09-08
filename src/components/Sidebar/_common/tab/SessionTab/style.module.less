@@ -1,0 +1,102 @@
+@import '@/layouts/_common/a11y/focusRing.less';
+
+.sessionMenu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: 0;
+  font-size: var(--font-size-base, 14px);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base, 22px);
+  background: transparent;
+  outline: none;
+}
+
+.sessionSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.sessionItem {
+  width: 100%;
+  min-height: var(--sidebar-tab-size, 32px);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-xs) 0 calc(var(--sidebar-content-inset, var(--space-lg)) - var(--space-xs));
+  color: var(--muted);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background var(--motion-duration-mid) var(--motion-ease-standard),
+    color var(--motion-duration-mid) var(--motion-ease-standard);
+
+  &:focus-visible,
+  &:focus-visible:not(:focus),
+  &[data-focus-visible] {
+    .clearHeroFocusRing();
+  }
+
+  &:hover,
+  &[data-hovered],
+  &[data-focus-visible] {
+    color: var(--foreground);
+    background: var(--item-hover);
+  }
+
+  &[data-selected] {
+    color: var(--accent-text-strong);
+    background: var(--item-selected);
+    font-weight: var(--font-weight-semibold);
+
+    &:hover,
+    &[data-hovered],
+    &[data-focus-visible] {
+      color: var(--accent-text-strong);
+      background: var(--item-selected-hover);
+    }
+  }
+
+  &[data-disabled] {
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    background: transparent;
+  }
+}
+
+.sessionEmptyState {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.sessionItemWithActions {
+  &:hover,
+  &[data-hovered],
+  &[data-focus-visible],
+  &:focus-within {
+    :global(.sessionActionsVisibleOnItem) {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+  }
+}
+
+.sessionLoadMoreBtn {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+
+  &:hover,
+  &[data-hovered] {
+    color: var(--foreground);
+    background: transparent;
+  }
+}

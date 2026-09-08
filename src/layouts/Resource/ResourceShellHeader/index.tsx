@@ -1,5 +1,5 @@
+import NavigationControls from '@/components/Sidebar/_common/header/NavigationControls';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
-import AppNavigationControls from '@/layouts/AppNavigation/AppNavigationControls';
 import { cn } from '@/utils/cn';
 
 import ResourceHeader from '../ResourceHeader';
@@ -49,7 +49,7 @@ function ResourceShellHeader({
         <div className={styles.toolbar}>
           {leftSidebarCollapsed && onToggleLeftSidebar && onGoBack && onGoForward ? (
             <div className={styles.leftSidebarControls}>
-              <AppNavigationControls
+              <NavigationControls
                 sidebarCollapsed
                 canGoBack={canGoBack}
                 canGoForward={canGoForward}

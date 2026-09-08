@@ -1,9 +1,14 @@
 import type { AppRouteContentContainer } from '@/bootstrap/routeMeta';
+import NavigationControls from '@/components/Sidebar/_common/header/NavigationControls';
+import AppSidebar from '@/components/Sidebar/AppSidebar';
 import {
   APP_MAIN_MIN_WIDTH,
   APP_WEB_SIDEBAR_COLLAPSED_WIDTH,
+  clampSidebarWidth,
   LAYOUT_DENSITY,
   resolveLayoutDensity,
+  SIDEBAR_COLLAPSED_WIDTH,
+  SIDEBAR_MIN_WIDTH,
 } from '@/constants/layoutScale';
 import { useAppRouteMeta } from '@/hooks/useAppRouteMeta';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
@@ -11,12 +16,6 @@ import { useSystemLayoutStore } from '@/layouts/_common/_store/useSystemLayoutSt
 import { focusVisibleSidebarToggle } from '@/layouts/_common/a11y/sidebarToggle';
 import SkipToMainLink, { MAIN_CONTENT_ID } from '@/layouts/_common/a11y/SkipToMainLink';
 import RouteOutletBoundary from '@/layouts/_common/RouteOutletBoundary';
-import AppSidebar from '@/layouts/_common/Sidebar/AppSidebar';
-import {
-  clampSidebarWidth,
-  SIDEBAR_COLLAPSED_WIDTH,
-  SIDEBAR_MIN_WIDTH,
-} from '@/layouts/_common/Sidebar/sidebarLayoutConfig';
 import {
   RESIZE_TARGET_MINIMUM_SIZE,
   SystemResizableHandle,
@@ -30,7 +29,6 @@ import {
   useSidebarCollapseMotion,
 } from '@/layouts/_common/useSidebarCollapseMotion';
 import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
-import AppNavigationControls from '@/layouts/AppNavigation/AppNavigationControls';
 import { cn } from '@/utils/cn';
 import { memo, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -111,7 +109,7 @@ const AppMainColumn = memo(function AppMainColumn({
         >
           {showDesktopCollapsedChrome ? (
             <div className={styles.collapsedHeaderControls}>
-              <AppNavigationControls
+              <NavigationControls
                 sidebarCollapsed
                 canGoBack={canGoBack}
                 canGoForward={canGoForward}
@@ -295,7 +293,7 @@ function AppLayout() {
         >
           {showWebCollapsedChrome ? (
             <header className={styles.webCollapsedSidebar}>
-              <AppNavigationControls
+              <NavigationControls
                 sidebarCollapsed
                 showHistory={false}
                 canGoBack={appNavigation.canGoBack}
