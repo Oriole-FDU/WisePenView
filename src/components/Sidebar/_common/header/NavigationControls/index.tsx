@@ -4,15 +4,7 @@ import { ArrowLeft, ArrowRight, PanelLeftClose, PanelLeftOpen } from 'lucide-rea
 import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
-interface NavigationControlsProps {
-  sidebarCollapsed: boolean;
-  showHistory?: boolean;
-  canGoBack?: boolean;
-  canGoForward?: boolean;
-  onGoBack?: () => void;
-  onGoForward?: () => void;
-  onToggleSidebar: () => void;
-}
+import type { NavigationControlsProps } from './index.type';
 
 function NavigationControls({
   sidebarCollapsed,
