@@ -66,10 +66,5 @@ export function useColorScheme(defaultScheme: ColorScheme = DEFAULT_COLOR_SCHEME
     () => readStoredColorScheme(defaultScheme)
   );
 
-  const setColorScheme = (scheme: ColorScheme) => {
-    if (typeof window === 'undefined') return;
-    setSharedColorScheme(scheme);
-  };
-
-  return { colorScheme, setColorScheme };
+  return { colorScheme, setColorScheme: setSharedColorScheme };
 }
