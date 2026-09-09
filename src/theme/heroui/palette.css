@@ -1,8 +1,7 @@
 :root,
 .light,
-.default,
-[data-theme='light'],
-[data-theme='default'] {
+[data-theme='light']
+{
   color-scheme: light;
 }
 
@@ -531,10 +530,8 @@ html[data-color-scheme='lavender'] {
 
 :root,
 .light,
-.default,
 .dark,
 [data-theme='light'],
-[data-theme='default'],
 [data-theme='dark'] {
   --white: oklch(100% 0 0);
   --black: oklch(0% 0 0);
@@ -811,7 +808,7 @@ html[data-color-scheme='lavender'] {
   --preview-color-3: var(--wisepen-lavender-9);
 }
 
-html[data-color-scheme] :is(.light, .dark, .default):not(html):not(:root) {
+html[data-color-scheme] :is(.light, .dark):not(html):not(:root) {
   --accent: inherit;
   --accent-foreground: inherit;
   --accent-hover: inherit;

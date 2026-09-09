@@ -6,9 +6,7 @@
  */
 :root,
 .light,
-.default,
-[data-theme='light'],
-[data-theme='default'] {
+[data-theme='light']{
   --wisepen-default-1: #fafdff;
   --wisepen-default-2: #f2f9ff;
   --wisepen-default-3: #e2f4ff;
