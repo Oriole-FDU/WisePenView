@@ -417,7 +417,28 @@ html {
   -webkit-user-select: none;
 }
 
-#root :is(input, textarea, [contenteditable='true'], [contenteditable=''], [role='textbox']) {
+#root 
+  :is(
+    input, 
+    textarea, 
+    [contenteditable='true'], 
+    [contenteditable=''], 
+    [role='textbox'],
+    .markdown,
+    .bn-editor,
+    .ProseMirror,
+    .cm-editor,
+    .cm-content,
+    .monaco-editor,
+    .pdfViewer,
+    .textLayer,
+    .docx-wrapper,
+    pre,
+    code,
+    kbd,
+    samp,
+    iframe
+) {
   user-select: text;
   -webkit-user-select: text;
 }
@@ -441,27 +462,6 @@ html {
     iframe
   )
   :is(*) {
-  user-select: text;
-  -webkit-user-select: text;
-}
-
-#root
-  :is(
-    .markdown,
-    .bn-editor,
-    .ProseMirror,
-    .cm-editor,
-    .cm-content,
-    .monaco-editor,
-    .pdfViewer,
-    .textLayer,
-    .docx-wrapper,
-    pre,
-    code,
-    kbd,
-    samp,
-    iframe
-  ) {
   user-select: text;
   -webkit-user-select: text;
 }
