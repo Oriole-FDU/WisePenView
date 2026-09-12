@@ -1,0 +1,73 @@
+.root {
+  --loading-text-duration: 2s;
+
+  display: inline;
+  max-width: 100%;
+  font-size: inherit;
+  line-height: inherit;
+  word-break: break-word;
+}
+
+.root[data-size='xs'] {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.root[data-size='sm'] {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.root[data-tone='muted'] {
+  --loading-text-color: var(--muted);
+  --loading-text-base: var(--muted);
+  --loading-text-highlight: var(--foreground);
+}
+
+.root[data-tone='default'] {
+  --loading-text-color: var(--foreground);
+  --loading-text-base: var(--text-tertiary, var(--muted));
+  --loading-text-highlight: var(--foreground);
+}
+
+.root[data-tone='accent'] {
+  --loading-text-color: var(--accent-text, var(--accent));
+  --loading-text-base: var(--accent-text, var(--accent));
+  --loading-text-highlight: var(--accent-text-strong, var(--foreground));
+}
+
+.root[data-animated='true'] {
+  background-image: linear-gradient(
+    90deg,
+    var(--loading-text-base) 0%,
+    var(--loading-text-base) 38%,
+    var(--loading-text-highlight) 50%,
+    var(--loading-text-base) 62%,
+    var(--loading-text-base) 100%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: loadingTextShimmer var(--loading-text-duration) linear infinite;
+}
+
+.root[data-animated='false'] {
+  color: var(--loading-text-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-animated='true'] {
+    animation: none;
+  }
+}
+
+@keyframes loadingTextShimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
