@@ -1,15 +1,29 @@
-/** 与后端 OpenAPI 一致的标准 API 响应体 */
-export interface ApiResponse<T = unknown> {
+/** API 协议中的可空值。仅用于表达后端明确返回 null 的字段。 */
+export type Nullable<T> = T | null;
+
+/** 与 Java Cloud、Node Sidecar 的 R<T> 一致，响应体固定包含 key。 */
+export interface KeyedApiResponse<T = unknown> {
+  code: number;
+  key: Nullable<string>;
+  msg: Nullable<string>;
+  data: T;
+}
+
+/** 与 Python Cloud-AI 的 R<T> 一致，不包含 key。 */
+export interface PythonApiResponse<T = unknown> {
   code: number;
   msg: string;
   data: T;
 }
 
-/** 数字枚举经 JSON 序列化后可能返回数值或对应字符串。 */
+/** WisePen 各后端服务可能返回的统一响应体。 */
+export type ApiResponse<T = unknown> = KeyedApiResponse<T> | PythonApiResponse<T>;
+
+/** 数字枚举的 API 值。兼容尚未统一的数字字符串返回。 */
 export type NumericEnumApiValue<Value extends number = number> = Value | `${Value}`;
 
-/** Java Long 经 JSON 序列化后可能返回数字或十进制字符串。 */
-export type JavaLongApiValue = NumericEnumApiValue;
+/** Java Long 的 API 值。 */
+export type JavaLongApiValue = string;
 
 /** Java 分页接口的公共请求参数。 */
 export interface PageApiRequest {
@@ -19,7 +33,7 @@ export interface PageApiRequest {
 
 export type OptionalPageApiRequest = Partial<PageApiRequest>;
 
-/** 与 Java 后端 PageR<T> 一致的标准分页响应体 */
+/** Java 分页接口的公共响应体。 */
 export interface PageR<T> {
   list: T[];
   total: number;
@@ -28,21 +42,16 @@ export interface PageR<T> {
   totalPage: number;
 }
 
-/** OSS STS 接口返回的临时凭证。 */
-export interface OssStsTokenApiResponse {
-  accessKeyId?: string;
-  accessKeySecret?: string;
-  securityToken?: string;
-  bucket?: string;
-  region?: string;
-  endpoint?: string;
-  expiration?: string;
+/** APISIX、FastAPI 等基础设施直接返回的 HTTP 错误体。 */
+export interface InfrastructureApiErrorBody {
+  /** APISIX 网关错误字段。 */
+  error_msg?: string;
+  /** 通用 Node/HTTP 框架错误字段。 */
+  message?: string;
+  /** FastAPI 默认 HTTP 错误字段。 */
+  detail?: string;
 }
 
-/** HTTP 4xx/5xx 时响应体可能携带的业务错误字段 */
-export interface ApiErrorBody {
-  code?: number;
-  msg?: string;
-  /** 部分网关/框架使用 message 而非 msg */
-  message?: string;
-}
+/** HTTP 4xx/5xx 可能返回的已知错误体；string 对应 Python 中间件的纯文本响应。 */
+export type ApiErrorBody =
+  KeyedApiResponse<unknown> | PythonApiResponse<unknown> | InfrastructureApiErrorBody | string;

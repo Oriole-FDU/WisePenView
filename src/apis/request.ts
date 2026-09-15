@@ -3,13 +3,16 @@ import type { ApiResponse } from '@/apis/api.type';
 import { WisePenError } from '@/utils/error';
 import type { AxiosRequestConfig } from 'axios';
 
+/**
+ * 业务码非 200 时抛出统一错误。
+ * 传输层只归一化 code 与后端文案，用户可见提示统一由 parseErrorMessage 按 code 解析。
+ */
 function checkResponse(res: ApiResponse<unknown>): void {
   if (res.code !== 200) {
     throw new WisePenError({
       code: res.code,
       source: 'api',
-      serverMsg: res.msg,
-      message: res.msg,
+      serverMsg: res.msg ?? undefined,
     });
   }
 }

@@ -1,30 +1,18 @@
-import type { ApiErrorBody } from '@/apis/api.type';
+import { parseApiErrorBody, type ParsedApiErrorBody } from '@/apis/apiError';
 import i18n from '@/i18n';
 import { I18N_NAMESPACES } from '@/i18n/resources';
 import { isWisePenError } from '@/utils/error/WisePenError';
-import { isRecord } from '@/utils/typeGuards';
 import type { AxiosError } from 'axios';
 
-const readCodeFromAxiosData = (data: unknown): number | undefined => {
-  if (!isRecord(data)) return undefined;
-  return typeof data.code === 'number' ? data.code : undefined;
-};
-
-const readServerMsgFromAxiosData = (data: unknown): string | undefined => {
-  if (!isRecord(data)) return undefined;
-  const body = data as ApiErrorBody;
-  if (typeof body.msg === 'string') return body.msg;
-  if (typeof body.message === 'string') return body.message;
-  return undefined;
+const readAxiosErrorBody = (err: unknown): ParsedApiErrorBody | undefined => {
+  const axiosErr = err as AxiosError<unknown>;
+  if (!axiosErr?.response) return undefined;
+  return parseApiErrorBody(axiosErr.response.data);
 };
 
 const extractErrorCode = (err: unknown): number | undefined => {
   if (isWisePenError(err)) return err.code;
-  const axiosErr = err as AxiosError<ApiErrorBody>;
-  if (axiosErr?.response?.data) {
-    return readCodeFromAxiosData(axiosErr.response.data);
-  }
-  return undefined;
+  return readAxiosErrorBody(err)?.code;
 };
 
 const extractErrorMeta = (err: unknown): Record<string, unknown> | undefined => {
@@ -32,12 +20,14 @@ const extractErrorMeta = (err: unknown): Record<string, unknown> | undefined => 
   return undefined;
 };
 
+/**
+ * WisePenError 的 message 仅作诊断兜底，无后端文案时会形如 `Error 1001`，
+ * 因此用户可见文案只取 serverMsg，避免把内部错误码直接展示给用户。
+ */
 const extractServerMsg = (err: unknown): string | undefined => {
-  if (isWisePenError(err)) return err.serverMsg ?? err.message;
-  const axiosErr = err as AxiosError<ApiErrorBody>;
-  if (axiosErr?.response?.data) {
-    return readServerMsgFromAxiosData(axiosErr.response.data);
-  }
+  if (isWisePenError(err)) return err.serverMsg;
+  const serverMsg = readAxiosErrorBody(err)?.message;
+  if (serverMsg) return serverMsg;
   if (err instanceof Error && err.message) return err.message;
   return undefined;
 };

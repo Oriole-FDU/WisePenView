@@ -14,9 +14,9 @@ interface ImportMetaEnv {
   // ONLYOFFICE Document Server 前端访问地址
   readonly VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL: string;
   // 校内地址探测路径
-  readonly VITE_INTRANET_PING_PATH?: string;
+  readonly VITE_INTRANET_PING_PATH: string;
   // 校内地址探测超时（毫秒）
-  readonly VITE_NETWORK_PROBE_TIMEOUT?: string;
+  readonly VITE_NETWORK_PROBE_TIMEOUT: string;
 }
 
 interface ImportMeta {
