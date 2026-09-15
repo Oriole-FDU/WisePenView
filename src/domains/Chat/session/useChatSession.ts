@@ -1,4 +1,5 @@
-import { awaitAddrReady, buildApiUrl, notifyAddrFailure } from '@/apis/apiServerAddr';
+import { awaitAddrReady, notifyAddrFailure } from '@/apis/apiServerAddr';
+import { buildApiUrl } from '@/apis/buildApiUrl';
 import { applyXDeveloperHeader } from '@/apis/developmentTraffic';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { useChat } from '@ai-sdk/react';

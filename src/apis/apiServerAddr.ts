@@ -118,7 +118,3 @@ export async function awaitAddrReady(maxWaitMs: number = ADDR_READY_AWAIT_MS): P
 export function getApiBaseUrl(): string {
   return serverBaseUrl;
 }
-
-export function buildApiUrl(path: `/${string}`): string {
-  return new URL(path, getApiBaseUrl()).toString();
-}
