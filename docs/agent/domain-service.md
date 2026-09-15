@@ -54,6 +54,7 @@ export const createXxxServices = (deps?: XxxServiceDeps): IXxxService => ({
 - 捕获已有错误仅为补充上下文时，应通过 `cause` 保留原异常；无需补充时直接向上抛出。
 - UI 层 catch 后使用 HeroUI `toast` 和 `parseErrorMessage(err)`。
 - `parseErrorMessage` 只接收一个 `unknown` 参数，不传 fallback 文案。
+- 网络、HTTP、API 边界只归一化 `code`、`serverMsg` 和 `cause`，不在传输层查 i18n 或拼接用户文案；文案解析只发生在 `parseErrorMessage`。
 
 ## 四、请求触发
 

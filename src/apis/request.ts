@@ -1,18 +1,18 @@
 import Axios from '@/apis/Axios';
 import type { ApiResponse } from '@/apis/api.type';
-import i18n from '@/i18n';
-import { I18N_NAMESPACES } from '@/i18n/resources';
 import { WisePenError } from '@/utils/error';
 import type { AxiosRequestConfig } from 'axios';
 
+/**
+ * 业务码非 200 时抛出统一错误。
+ * 传输层只归一化 code 与后端文案，用户可见提示统一由 parseErrorMessage 按 code 解析。
+ */
 function checkResponse(res: ApiResponse<unknown>): void {
   if (res.code !== 200) {
-    const message = res.msg ?? i18n.t('code.1001', { ns: I18N_NAMESPACES.ERRORS });
     throw new WisePenError({
       code: res.code,
       source: 'api',
       serverMsg: res.msg ?? undefined,
-      message,
     });
   }
 }

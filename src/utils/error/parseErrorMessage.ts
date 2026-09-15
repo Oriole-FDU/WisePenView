@@ -20,8 +20,12 @@ const extractErrorMeta = (err: unknown): Record<string, unknown> | undefined => 
   return undefined;
 };
 
+/**
+ * WisePenError 的 message 仅作诊断兜底，无后端文案时会形如 `Error 1001`，
+ * 因此用户可见文案只取 serverMsg，避免把内部错误码直接展示给用户。
+ */
 const extractServerMsg = (err: unknown): string | undefined => {
-  if (isWisePenError(err)) return err.serverMsg ?? err.message;
+  if (isWisePenError(err)) return err.serverMsg;
   const serverMsg = readAxiosErrorBody(err)?.message;
   if (serverMsg) return serverMsg;
   if (err instanceof Error && err.message) return err.message;

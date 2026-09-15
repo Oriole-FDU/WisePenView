@@ -26,18 +26,10 @@ const mapHttpCode = (status: number): number => {
   return FRONTEND_NETWORK_ERROR.HTTP;
 };
 
-const buildFallbackMessage = (
-  status: number,
-  serverMsg: string | undefined,
-  fallback: string
-): string =>
-  serverMsg ?? (status === 400 ? '请求参数错误' : status === 500 ? '服务器错误' : fallback);
-
 const createNetworkWisePenError = (error: AxiosError): WisePenError =>
   new WisePenError({
     code: mapNetworkCode(error),
     source: 'network',
-    message: error.message,
     cause: error,
   });
 
@@ -45,17 +37,13 @@ const createHttpWisePenError = (
   error: AxiosError,
   status: number,
   serverMsg: string | undefined
-): WisePenError => {
-  const fallbackMsg = buildFallbackMessage(status, serverMsg, error.message);
-
-  return new WisePenError({
+): WisePenError =>
+  new WisePenError({
     code: mapHttpCode(status),
     source: 'http',
-    serverMsg: fallbackMsg,
-    message: fallbackMsg,
+    serverMsg,
     cause: error,
   });
-};
 
 const createApiWisePenError = (
   error: AxiosError,
@@ -67,7 +55,6 @@ const createApiWisePenError = (
     code: businessCode,
     source: status === 400 || status === 500 ? 'api' : 'http',
     serverMsg,
-    message: serverMsg ?? error.message,
     cause: error,
   });
 
