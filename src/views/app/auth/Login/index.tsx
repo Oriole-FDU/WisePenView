@@ -1,6 +1,6 @@
 import { appendRedirectParam, readRedirectParam } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/Button';
-import { FormField, Input, PasswordInput } from '@/components/Input';
+import { FormField, PasswordInput } from '@/components/Input';
 import { useAuthService } from '@/domains';
 import type { LoginRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
@@ -9,11 +9,11 @@ import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/inde
 import { Form } from '@heroui/react';
 
 import { hasFieldErrors, runFieldValidation, type FieldErrors } from '@/utils/formValidation';
-import { User } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import auth from '../Auth.module.less';
+import AuthIconField from '../_common/AuthIconField';
+import auth from '../_common/style.module.less';
 
 type LoginField = keyof LoginRequest;
 
@@ -82,10 +82,7 @@ function Login() {
           errorMessage={formErrors.account}
           isRequired
         >
-          <div className={auth.inputWithIcon}>
-            <User className={auth.inputIcon} size={18} aria-hidden="true" />
-            <Input placeholder={t('login.accountPlaceholder')} autoComplete="username" />
-          </div>
+          <AuthIconField placeholder={t('login.accountPlaceholder')} autoComplete="username" />
         </FormField>
 
         <FormField

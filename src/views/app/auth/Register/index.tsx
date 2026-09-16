@@ -4,7 +4,7 @@ import {
   readRedirectParam,
 } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/Button';
-import { Checkbox, FormField, Input, PasswordInput } from '@/components/Input';
+import { Checkbox, FormField, PasswordInput } from '@/components/Input';
 import { useAuthService } from '@/domains';
 import type { RegisterRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
@@ -13,11 +13,11 @@ import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/inde
 import { Form, toast } from '@heroui/react';
 
 import { hasFieldErrors, runFieldValidation, type FieldErrors } from '@/utils/formValidation';
-import { User } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import auth from '../Auth.module.less';
+import AuthIconField from '../_common/AuthIconField';
+import auth from '../_common/style.module.less';
 
 const USERNAME_MAX_LENGTH = 20;
 const USERNAME_PATTERN = /^[a-zA-Z0-9_]{4,20}$/;
@@ -139,14 +139,11 @@ function Register() {
           errorMessage={formErrors.username}
           isRequired
         >
-          <div className={auth.inputWithIcon}>
-            <User className={auth.inputIcon} size={18} aria-hidden="true" />
-            <Input
-              placeholder={t('register.usernamePlaceholder')}
-              maxLength={USERNAME_MAX_LENGTH}
-              autoComplete="username"
-            />
-          </div>
+          <AuthIconField
+            placeholder={t('register.usernamePlaceholder')}
+            maxLength={USERNAME_MAX_LENGTH}
+            autoComplete="username"
+          />
         </FormField>
 
         <FormField

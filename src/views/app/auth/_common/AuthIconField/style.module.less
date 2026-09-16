@@ -1,0 +1,31 @@
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+
+  :global(input) {
+    width: 100%;
+    min-width: 0;
+    padding-left: var(--space-2xl);
+  }
+
+  :global([data-slot='input-wrapper']),
+  :global([data-slot='input']) {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.icon {
+  position: absolute;
+  left: calc(var(--space-sm) + var(--space-3xs));
+  top: 50%;
+  z-index: var(--app-z-index-raised);
+  width: var(--font-size-lg);
+  height: var(--font-size-lg);
+  color: var(--muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}

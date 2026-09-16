@@ -14,7 +14,7 @@ import { CircleCheck, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import auth from '../Auth.module.less';
+import auth from '../_common/style.module.less';
 
 function AuthBindingOnboarding() {
   const { t } = useTranslation(['auth', 'common']);

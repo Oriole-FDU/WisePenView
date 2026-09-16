@@ -9,12 +9,12 @@ import { useUserService } from '@/domains';
 import type { ConfirmEmailVerifyRequest } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { toast } from '@heroui/react';
+import { Alert, toast } from '@heroui/react';
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import auth from '../Auth.module.less';
+import auth from '../_common/style.module.less';
 
 function VerifyEmail() {
   const userService = useUserService();
@@ -60,13 +60,17 @@ function VerifyEmail() {
 
   return (
     <div className={auth.authContainer}>
-      <h1>{t('verifyEmail.title')}</h1>
-      <div className="mt-3 rounded-medium bg-accent-soft px-4 py-3 text-sm text-accent-soft-foreground">
-        {t('verifyEmail.alertDescription')}
-      </div>
-      <div className="mt-6">
+      <h1 className={auth.title}>{t('verifyEmail.title')}</h1>
+      <Alert status="accent" className={auth.authAlert}>
+        <Alert.Indicator />
+        <Alert.Content>
+          <Alert.Description>{t('verifyEmail.alertDescription')}</Alert.Description>
+        </Alert.Content>
+      </Alert>
+      <div className={auth.formActions}>
         <AppButton
           variant="primary"
+          size="lg"
           className={auth.submitButton}
           isDisabled={loading || !token}
           onPress={onVerify}

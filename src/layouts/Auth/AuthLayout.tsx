@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import AuthBackground from './AuthBackground';
-import styles from './AuthLayout.module.less';
+import styles from './style.module.less';
 
 function AuthLayout() {
   const { t } = useTranslation('auth');

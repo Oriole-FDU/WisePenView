@@ -1,4 +1,6 @@
 @import '@/layouts/_common/desktopTitleBar.less';
+@import '@/styles/scrollbar.module.less';
+@import (reference) '@/styles/breakpoints.less';
 
 .root {
   position: relative;
@@ -37,11 +39,12 @@
 .authSheet {
   position: relative;
   z-index: var(--app-z-index-raised);
-  height: 680px;
-  width: 1200px;
+  height: var(--layout-auth-sheet-height);
+  width: var(--layout-auth-sheet-width);
+  min-width: 0;
   overflow: hidden;
   border-radius: var(--radius-lg, var(--radius, var(--radius-lg)));
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   background-color: var(--surface);
   display: flex;
 }
@@ -52,8 +55,47 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-width: 0;
 }
 
 .loginImage {
-  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  border-right: var(--border-width) solid var(--border);
+}
+
+@media (max-width: @breakpoint-lg) {
+  .root {
+    padding: var(--space-lg);
+    overflow-x: hidden;
+    overflow-y: auto;
+    .appSubtleScrollbar();
+  }
+
+  .authSheet {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .loginImage {
+    display: none;
+  }
+
+  .formSection {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    padding: var(--space-lg);
+  }
+}
+
+@media (max-width: @breakpoint-sm) {
+  .root {
+    padding: var(--space-xl);
+  }
+
+  .formSection {
+    padding: var(--space-xl);
+  }
 }

@@ -1,4 +1,5 @@
 @import '@/styles/scrollbar.module.less';
+@import (reference) '@/styles/breakpoints.less';
 
 .panel {
   display: flex;
@@ -325,6 +326,35 @@
   .footerSlot,
   .composerBottomSpacer {
     transition: none;
+  }
+}
+
+/* 与 LAYOUT_DENSITY.COMPACT / data-layout-density 同源，不用单独 960 断点 */
+:global(html[data-layout-density='compact']) {
+  .panel:not(.fullWidth) {
+    --chat-message-inline-padding: var(--space-md);
+    --chat-message-inline-padding-end: var(--space-md);
+    --chat-user-message-max-width: 88%;
+    --chat-welcome-offset-y: var(--space-md);
+  }
+
+  .panel:not(.fullWidth) .header {
+    padding-inline: var(--space-sm) var(--space-md);
+  }
+
+  .panel:not(.fullWidth) .footerSlot {
+    padding-inline: var(--space-md);
+  }
+}
+
+@media (max-width: @breakpoint-sm) {
+  .panel:not(.fullWidth) {
+    --chat-message-inline-padding: var(--space-sm);
+    --chat-message-inline-padding-end: var(--space-sm);
+  }
+
+  .panel:not(.fullWidth) .footerSlot {
+    padding-inline: var(--space-sm);
   }
 }
 

@@ -77,6 +77,9 @@
   --layout-chat-panel-max-width: 1020px;
   --layout-model-selector-max-width: 240px;
   --layout-compact-max-width: 1280px;
+  --layout-auth-sheet-width: 1200px;
+  --layout-auth-sheet-height: 680px;
+  --layout-auth-form-width: 70%;
   --layout-short-max-height: 720px;
   --layout-drive-chrome-height: 240px;
   --table-drive-detail-panel-width: 300px;

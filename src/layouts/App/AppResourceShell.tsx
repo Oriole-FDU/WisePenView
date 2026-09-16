@@ -4,6 +4,7 @@ import { createResourceChatStateProvider } from '@/components/ChatPanel/Resource
 import {
   CHAT_PANEL_MAX_WIDTH,
   CHAT_PANEL_MIN_WIDTH,
+  LAYOUT_DENSITY,
   RESOURCE_MAIN_MIN_WIDTH,
   clampChatPanelWidth,
 } from '@/constants/layoutScale';
@@ -15,11 +16,13 @@ import {
   SystemResizablePanelGroup,
 } from '@/layouts/_common/SystemResizable';
 import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
+import { useViewportLayoutScale } from '@/layouts/_common/useViewportLayoutScale';
 import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
 import ResourceFrame from '@/layouts/Resource/ResourceFrame';
 import ResourceShellHeader from '@/layouts/Resource/ResourceShellHeader';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 import { useResourceHeaderEndReserve } from '@/layouts/Resource/useResourceHeaderEndReserve';
+import { cn } from '@/utils/cn';
 import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 import { normalizeResourceKind, resolveResourceViewer } from '@/utils/navigation/resourceTarget';
 import ResourceSidePanelActions from '@/views/resource/_components/ResourceSidePanel/Actions';
@@ -72,6 +75,9 @@ function AppResourceShell({
   const openResource = useOpenResource();
   const location = useLocation();
   const resourceRouteParams = useParams<{ resourceType?: string; resourceId?: string }>();
+  // 与侧栏 compact 同源：窄屏改为全屏 overlay，避免并排抢 Chat min-width。
+  const { widthDensity } = useViewportLayoutScale();
+  const isCompactChat = widthDensity === LAYOUT_DENSITY.COMPACT;
   const { headerRef } = useResourceHeaderEndReserve({
     idleDockWidthPx: 0,
     isAnimating: false,
@@ -97,7 +103,9 @@ function AppResourceShell({
     routeContext.driveLocation
   );
   const chatPanelOpen = !chatPanelCollapsed;
-  const chatPanelSize = chatPanelOpen ? clampChatPanelWidth(chatPanelWidth) : 0;
+  const dockChatOpen = chatPanelOpen && !isCompactChat;
+  const overlayChatOpen = chatPanelOpen && isCompactChat;
+  const chatPanelSize = dockChatOpen ? clampChatPanelWidth(chatPanelWidth) : 0;
 
   useResizablePanelSize({ panelRef: chatPanelRef, size: chatPanelSize });
 
@@ -180,8 +188,21 @@ function AppResourceShell({
         })
       : undefined);
 
+  const chatPanel = (
+    <ChatPanel
+      // overlay 需要收起按钮关闭；桌面 dock 仍由资源顶栏开关
+      showCollapseButton={isCompactChat}
+      resourceChat={{
+        provider: chatStateProvider,
+        context: resourceChatContext,
+        clearContext: clearResourceChatContext,
+      }}
+      agentDebug={layoutConfig.chatAgentDebug}
+    />
+  );
+
   const handleChatResize = (size: PanelSize) => {
-    if (chatPanelOpen) {
+    if (dockChatOpen) {
       pendingChatWidthRef.current = clampChatPanelWidth(size.inPixels);
     }
   };
@@ -189,59 +210,69 @@ function AppResourceShell({
   const handleLayoutChanged = (_layout: Layout, meta: LayoutChangedMeta) => {
     const pendingChatWidth = pendingChatWidthRef.current;
     pendingChatWidthRef.current = null;
-    if (meta.isUserInteraction && chatPanelOpen && pendingChatWidth != null) {
+    if (meta.isUserInteraction && dockChatOpen && pendingChatWidth != null) {
       setChatPanelWidth(pendingChatWidth);
     }
   };
 
   return (
     <ResourceHostContext value={resourceHostContext}>
-      <SystemResizablePanelGroup
-        orientation="horizontal"
-        className={styles.root}
-        resizeTargetMinimumSize={RESIZE_TARGET_MINIMUM_SIZE}
-        onLayoutChanged={handleLayoutChanged}
-      >
-        <SystemResizablePanel minSize={RESOURCE_MAIN_MIN_WIDTH} className={styles.resourcePanel}>
-          <ResourceFrame
-            className={layoutConfig.className}
-            bodyClassName={layoutConfig.bodyClassName}
-            header={renderHeader()}
-          >
-            {children}
-          </ResourceFrame>
-        </SystemResizablePanel>
-
-        <SystemResizableHandle
-          collapsed={!chatPanelOpen}
-          disabled={!chatPanelOpen}
-          aria-label={t('shell.resizeChatPanel')}
-        />
-        <SystemResizablePanel
-          id="app-resource-chat"
-          panelRef={chatPanelRef}
-          defaultSize={chatPanelSize}
-          minSize={chatPanelOpen ? CHAT_PANEL_MIN_WIDTH : 0}
-          maxSize={chatPanelOpen ? CHAT_PANEL_MAX_WIDTH : 0}
-          groupResizeBehavior="preserve-pixel-size"
-          className={styles.chatDock}
-          aria-label={t('shell.chatPanel')}
-          aria-hidden={!chatPanelOpen ? true : undefined}
-          onResize={handleChatResize}
+      <div className={cn(styles.shell, overlayChatOpen && styles.shellWithOverlay)}>
+        <SystemResizablePanelGroup
+          orientation="horizontal"
+          className={styles.root}
+          resizeTargetMinimumSize={RESIZE_TARGET_MINIMUM_SIZE}
+          onLayoutChanged={handleLayoutChanged}
         >
-          {chatPanelOpen ? (
-            <ChatPanel
-              showCollapseButton={false}
-              resourceChat={{
-                provider: chatStateProvider,
-                context: resourceChatContext,
-                clearContext: clearResourceChatContext,
-              }}
-              agentDebug={layoutConfig.chatAgentDebug}
-            />
+          <SystemResizablePanel
+            minSize={isCompactChat ? 0 : RESOURCE_MAIN_MIN_WIDTH}
+            className={styles.resourcePanel}
+          >
+            <ResourceFrame
+              className={layoutConfig.className}
+              bodyClassName={layoutConfig.bodyClassName}
+              header={renderHeader()}
+            >
+              {children}
+            </ResourceFrame>
+          </SystemResizablePanel>
+
+          {!isCompactChat ? (
+            <>
+              <SystemResizableHandle
+                collapsed={!dockChatOpen}
+                disabled={!dockChatOpen}
+                aria-label={t('shell.resizeChatPanel')}
+              />
+              <SystemResizablePanel
+                id="app-resource-chat"
+                panelRef={chatPanelRef}
+                defaultSize={chatPanelSize}
+                minSize={dockChatOpen ? CHAT_PANEL_MIN_WIDTH : 0}
+                maxSize={dockChatOpen ? CHAT_PANEL_MAX_WIDTH : 0}
+                groupResizeBehavior="preserve-pixel-size"
+                className={styles.chatDock}
+                aria-label={t('shell.chatPanel')}
+                aria-hidden={!dockChatOpen ? true : undefined}
+                onResize={handleChatResize}
+              >
+                {dockChatOpen ? chatPanel : null}
+              </SystemResizablePanel>
+            </>
           ) : null}
-        </SystemResizablePanel>
-      </SystemResizablePanelGroup>
+        </SystemResizablePanelGroup>
+
+        {overlayChatOpen ? (
+          <div
+            className={styles.chatOverlay}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('shell.chatPanel')}
+          >
+            {chatPanel}
+          </div>
+        ) : null}
+      </div>
     </ResourceHostContext>
   );
 }

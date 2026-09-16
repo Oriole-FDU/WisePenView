@@ -1,4 +1,4 @@
-import styles from './AuthBackground.module.less';
+import styles from './style.module.less';
 
 /** 认证页全屏装饰背景（光斑、圆点、线条），随 HeroUI CSS 变量切换明暗 */
 function AuthBackground() {

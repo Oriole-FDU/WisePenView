@@ -13,7 +13,7 @@ import { useMount } from 'ahooks';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import auth from '../Auth.module.less';
+import auth from '../_common/style.module.less';
 
 type NewPasswordFormValues = Pick<NewPasswordRequest, 'newPassword'> & {
   confirmPassword: string;

@@ -1,7 +1,20 @@
+@import (reference) '@/styles/breakpoints.less';
+
+.authTextLink() {
+  color: var(--link);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--accent-text-strong);
+    text-decoration: underline;
+  }
+}
+
 .authContainer {
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: var(--layout-auth-form-width);
 
   :global(button) {
     font-weight: var(--font-weight-bold);
@@ -9,9 +22,9 @@
 }
 
 .title {
-  margin: 0 0 24px;
+  margin: 0 0 var(--space-lg);
   color: var(--foreground);
-  font-size: clamp(28px, 4vw, 36px);
+  font-size: var(--layout-welcome-title-size);
   font-weight: var(--font-weight-semibold);
   line-height: 1.2;
 }
@@ -19,7 +32,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--space-md-plus);
   width: 100%;
   min-width: 0;
 
@@ -27,45 +40,6 @@
     width: 100%;
     min-width: 0;
   }
-}
-
-.inputWithIcon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-
-  :global(input) {
-    width: 100%;
-    min-width: 0;
-    padding-left: var(--space-2xl);
-  }
-
-  :global([data-slot='input-wrapper']),
-  :global([data-slot='input']) {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
-.inputIcon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  z-index: var(--app-z-index-raised);
-  width: 18px;
-  height: 18px;
-  color: var(--muted);
-  pointer-events: none;
-  transform: translateY(-50%);
-}
-
-.fieldError {
-  margin: var(--space-2xs-plus) 0 0;
-  color: var(--danger-text);
-  font-size: var(--font-size-sm, 14px);
-  line-height: 1.4;
 }
 
 .formActions {
@@ -83,12 +57,20 @@
   display: flex;
   justify-content: center;
   gap: var(--space-sm);
+
+  :global(a) {
+    .authTextLink();
+  }
 }
 
 .rightLinks {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-sm);
+
+  :global(a) {
+    .authTextLink();
+  }
 }
 
 // 底部左侧链接，用户协议展示
@@ -110,17 +92,18 @@
 
   :global(a) {
     width: auto;
+    .authTextLink();
   }
 }
 
 .authAlert {
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
 }
 
 .onboardingBody {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--space-md-plus);
   width: 100%;
   min-width: 0;
 }
@@ -132,5 +115,15 @@
 
   > :global(button) {
     width: 100%;
+  }
+}
+
+@media (max-width: @breakpoint-lg) {
+  .authContainer {
+    width: 100%;
+  }
+
+  .title {
+    margin-bottom: var(--space-md);
   }
 }
