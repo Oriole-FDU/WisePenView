@@ -122,6 +122,7 @@ export interface ChatModelProviderOption {
   providerId: string;
   providerName?: string | null;
   providerModelName: string;
+  billingRatio: number;
   provider: string;
   supportRuntimeOptions: Record<string, unknown>;
   isPreferred: boolean;

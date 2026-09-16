@@ -1,7 +1,7 @@
 import AppIconButton from '@/components/Button/AppIconButton';
 import ProviderLogo from '@/components/Icons/ProviderLogo';
 import type { ChatModel } from '@/domains/Chat';
-import { Description, Dropdown, Header, Label } from '@heroui/react';
+import { Chip, Description, Dropdown, Header, Label } from '@heroui/react';
 import { ChevronDown, LoaderCircle } from 'lucide-react';
 import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +29,18 @@ const renderProviderText = (model: ChatModel): string => {
   return model.providerModelName || model.providerName || model.provider;
 };
 
+const isFreeModel = (model: ChatModel): boolean =>
+  model.scope.toUpperCase() === 'SYSTEM' && model.ratio === 0;
+
+const prioritizeFreeModels = (models: ChatModel[]): ChatModel[] =>
+  models
+    .map((model, index) => ({ model, index }))
+    .sort((left, right) => {
+      const freePriority = Number(isFreeModel(right.model)) - Number(isFreeModel(left.model));
+      return freePriority || left.index - right.index;
+    })
+    .map(({ model }) => model);
+
 function ModelSelector({
   models,
   selectedId,
@@ -42,6 +54,7 @@ function ModelSelector({
 }: ModelSelectorProps) {
   const { t } = useTranslation('chat');
   const selected = models.find((model) => model.id === selectedId) ?? null;
+  const orderedModels = prioritizeFreeModels(models);
   const iconOnly = triggerVariant === 'icon';
   const triggerLabel = loading
     ? t('modelSelector.loading')
@@ -99,11 +112,18 @@ function ModelSelector({
           >
             <Dropdown.Section>
               <Header>{t('modelSelector.title')}</Header>
-              {models.map((model) => (
+              {orderedModels.map((model) => (
                 <Dropdown.Item key={model.id} id={model.id} textValue={model.name}>
                   <ProviderLogo provider={model.provider} size={18} />
                   <span className={styles.info}>
-                    <Label>{model.name}</Label>
+                    <span className={styles.nameRow}>
+                      <Label>{model.name}</Label>
+                      {isFreeModel(model) ? (
+                        <Chip size="sm" variant="soft" color="success" className={styles.freeChip}>
+                          <Chip.Label>{t('modelSelector.free')}</Chip.Label>
+                        </Chip>
+                      ) : null}
+                    </span>
                     <Description>{renderProviderText(model)}</Description>
                   </span>
                   <Dropdown.ItemIndicator />

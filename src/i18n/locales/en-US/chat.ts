@@ -4,6 +4,7 @@ const enUSChat = {
     select: 'Select a model',
     title: 'Models',
     empty: 'No models available',
+    free: 'Free',
   },
   panel: {
     newChat: 'New chat',
