@@ -20,7 +20,7 @@ const config: StorybookConfig = {
       alias: {
         ...(config.resolve?.alias ?? {}),
         '@': resolve(currentDir, '../src'),
-        '@services-registry': resolve(currentDir, '../src/domains/_registry/registry.mock.ts'),
+        '@domain-apis': resolve(currentDir, '../src/domains/_registry/apis.mock.ts'),
       },
     },
   }),

@@ -1,4 +1,4 @@
-import { MessageApi } from '../apis/MessageApi';
+import { MessageApi } from '@domain-apis';
 import { MessageServicesMap } from '../mapper/MessageServices.map';
 import type {
   IMessageService,

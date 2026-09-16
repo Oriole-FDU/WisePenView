@@ -45,7 +45,7 @@ src/domains/<Domain>/apis/
 允许：
 
 ```text
-service -> domain api -> src/apis/request -> src/apis/Axios
+service -> @domain-apis -> domain api -> src/apis/request -> src/apis/Axios
 ```
 
 禁止：
@@ -59,6 +59,13 @@ api -> views/components
 ```
 
 同一 URL 只在一个 API 文件中定义一次。其它业务需要复用时，优先在 service 层编排已有 API。
+
+## Mock API
+
+- `mock/*Api.mock.ts` 使用對應真實 API 的 `typeof` 型別約束方法、參數與回應。
+- fixture 採用 API DTO；前端映射、校驗、快取與跨 service 編排共用正式實作。
+- mock 記憶體資料僅模擬後端讀寫，重新整理頁面後重置。不同 API 操作同一份資源資料，避免各自維護副本。
+- 編輯器內容、PDF 預覽等展示 fixture 放在 view 的 mock 目錄，不塞入後端 DTO。
 
 ## 四、错误边界
 

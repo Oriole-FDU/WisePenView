@@ -1,151 +1,905 @@
-{
-  "resourceListPage": {
-    "list": [
+[
+  {
+    "resourceId": "mock-note-1",
+    "resourceName": "课程导学",
+    "resourceType": "NOTE",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
       {
-        "resourceId": "mock-note-1",
-        "resourceName": "第一份 Mock 笔记",
-        "resourceType": "NOTE",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": []
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
       },
       {
-        "resourceId": "mock-note-2",
-        "resourceName": "第二份 Mock 笔记",
-        "resourceType": "NOTE",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": []
+        "groupId": "course-computer-networks",
+        "primaryTagId": "network-chapter-1",
+        "tags": {
+          "network-chapter-1": {
+            "tagName": "network-chapter-1"
+          }
+        }
       },
       {
-        "resourceId": "res-001",
-        "resourceName": "示例文档.pdf",
-        "resourceType": "pdf",
-        "ownerId": "1",
-        "preview": "",
-        "size": 102400,
-        "path": "/",
-        "currentTags": ["笔记"]
-      },
-      {
-        "resourceId": "res-002",
-        "resourceName": "报告.docx",
-        "resourceType": "docx",
-        "ownerId": "1",
-        "size": 51200,
-        "path": "/documents",
-        "currentTags": []
+        "groupId": "course-data-structures",
+        "primaryTagId": "chapter-1",
+        "tags": {
+          "chapter-1": {
+            "tagName": "chapter-1"
+          }
+        }
       }
     ],
-    "total": 4,
-    "page": 1,
-    "size": 20,
-    "totalPage": 1
-  },
-  "skillResources": {
-    "personal": [
-      {
-        "resourceId": "skill-personal-translation",
-        "resourceName": "翻译助手",
-        "resourceType": "SKILL",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": []
-      },
-      {
-        "resourceId": "skill-personal-codereview",
-        "resourceName": "代码审查",
-        "resourceType": "SKILL",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": []
-      },
-      {
-        "resourceId": "skill-personal-summary",
-        "resourceName": "文档总结",
-        "resourceType": "SKILL",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": []
-      },
-      {
-        "resourceId": "skill-personal-math",
-        "resourceName": "数学计算",
-        "resourceType": "SKILL",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": []
-      }
-    ],
-    "groups": {
-      "1": [
-        {
-          "resourceId": "skill-group-1-weekly",
-          "resourceName": "团队周报生成",
-          "resourceType": "SKILL",
-          "ownerId": "1",
-          "path": "/",
-          "currentTags": []
-        },
-        {
-          "resourceId": "skill-group-1-tracker",
-          "resourceName": "项目进度追踪",
-          "resourceType": "SKILL",
-          "ownerId": "1",
-          "path": "/",
-          "currentTags": []
-        }
-      ],
-      "2": [
-        {
-          "resourceId": "skill-group-2-component",
-          "resourceName": "组件生成器",
-          "resourceType": "SKILL",
-          "ownerId": "1",
-          "path": "/",
-          "currentTags": []
-        },
-        {
-          "resourceId": "skill-group-2-lint",
-          "resourceName": "样式检查",
-          "resourceType": "SKILL",
-          "ownerId": "1",
-          "path": "/",
-          "currentTags": []
-        }
-      ]
+    "myInteractionRecord": {
+      "read": true
     }
   },
-  "agentResources": {
-    "personal": [
+  {
+    "resourceId": "mock-note-2",
+    "resourceName": "顺序表与链表笔记",
+    "resourceType": "NOTE",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
       {
-        "resourceId": "agent-custom-translation",
-        "resourceName": "翻译助手Agent",
-        "resourceType": "AGENT",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": {}
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
       },
       {
-        "resourceId": "agent-custom-writing",
-        "resourceName": "内容助手Agent",
-        "resourceType": "AGENT",
-        "ownerId": "1",
-        "path": "/",
-        "currentTags": {}
+        "groupId": "course-data-structures",
+        "primaryTagId": "section-21",
+        "tags": {
+          "section-21": {
+            "tagName": "section-21"
+          }
+        }
       }
     ],
-    "groups": {
-      "1": [
-        {
-          "resourceId": "agent-group-1-design",
-          "resourceName": "设计评审Agent",
-          "resourceType": "AGENT",
-          "ownerId": "1",
-          "path": "/",
-          "currentTags": {}
+    "myInteractionRecord": {
+      "read": true
+    }
+  },
+  {
+    "resourceId": "res-001",
+    "resourceName": "示例文档.pdf",
+    "resourceType": "pdf",
+    "ownerId": "1",
+    "preview": "",
+    "size": 102400,
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
         }
-      ]
+      },
+      {
+        "groupId": "1",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      },
+      {
+        "groupId": "2",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      }
+    ],
+    "overrideGrantedActions": [
+      {
+        "groupId": "2",
+        "grantedActions": ["DISCOVER", "VIEW"]
+      }
+    ],
+    "specifiedUsersGrantedActions": [
+      {
+        "userId": "10086",
+        "userInfo": {
+          "nickname": "小明"
+        },
+        "grantedActions": ["DISCOVER", "VIEW", "EDIT"]
+      }
+    ]
+  },
+  {
+    "resourceId": "res-002",
+    "resourceName": "报告.docx",
+    "resourceType": "docx",
+    "ownerId": "1",
+    "size": 51200,
+    "path": "/documents",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-personal-translation",
+    "resourceName": "翻译助手",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-personal-codereview",
+    "resourceName": "代码审查",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-personal-summary",
+    "resourceName": "文档总结",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-personal-math",
+    "resourceName": "数学计算",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-group-1-weekly",
+    "resourceName": "团队周报生成",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "groupId": "1",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-group-1-tracker",
+    "resourceName": "项目进度追踪",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "groupId": "1",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-group-2-component",
+    "resourceName": "组件生成器",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "groupId": "2",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "skill-group-2-lint",
+    "resourceName": "样式检查",
+    "resourceType": "SKILL",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "groupId": "2",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "agent-custom-translation",
+    "resourceName": "翻译助手Agent",
+    "resourceType": "AGENT",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "agent-custom-writing",
+    "resourceName": "内容助手Agent",
+    "resourceType": "AGENT",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "agent-group-1-design",
+    "resourceName": "设计评审Agent",
+    "resourceType": "AGENT",
+    "ownerId": "1",
+    "path": "/",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "groupId": "1",
+        "primaryTagId": "tag-work",
+        "tags": {
+          "tag-work": {
+            "tagName": "工作"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "resourceId": "mock-course-syllabus",
+    "resourceName": "课程安排与评分说明",
+    "resourceType": "pdf",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-computer-networks",
+        "primaryTagId": "network-http",
+        "tags": {
+          "network-http": {
+            "tagName": "network-http"
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "chapter-1",
+        "tags": {
+          "chapter-1": {
+            "tagName": "chapter-1"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": true
+    }
+  },
+  {
+    "resourceId": "mock-video-list",
+    "resourceName": "线性表的基本概念",
+    "resourceType": "mp4",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "section-21",
+        "tags": {
+          "section-21": {
+            "tagName": "section-21"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": true
+    }
+  },
+  {
+    "resourceId": "mock-video-stack",
+    "resourceName": "栈的实现与应用",
+    "resourceType": "mp4",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "section-22",
+        "tags": {
+          "section-22": {
+            "tagName": "section-22"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": false
+    }
+  },
+  {
+    "resourceId": "mock-pdf-queue",
+    "resourceName": "队列补充阅读",
+    "resourceType": "pdf",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "section-22",
+        "tags": {
+          "section-22": {
+            "tagName": "section-22"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": false
+    }
+  },
+  {
+    "resourceId": "mock-video-tree",
+    "resourceName": "二叉树遍历",
+    "resourceType": "mp4",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "chapter-3",
+        "tags": {
+          "chapter-3": {
+            "tagName": "chapter-3"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": false
+    }
+  },
+  {
+    "resourceId": "mock-note-graph",
+    "resourceName": "图的存储结构",
+    "resourceType": "NOTE",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "chapter-3",
+        "tags": {
+          "chapter-3": {
+            "tagName": "chapter-3"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": false
+    }
+  },
+  {
+    "resourceId": "mock-pdf-sort",
+    "resourceName": "排序算法对照表",
+    "resourceType": "pdf",
+    "ownerId": "1",
+    "ownerInfo": {
+      "nickname": "示例用户",
+      "identityType": 1
+    },
+    "currentActions": [
+      "DISCOVER",
+      "VIEW",
+      "LOAD",
+      "EDIT",
+      "INLINE_COMMENT",
+      "DOWNLOAD_WATERMARK",
+      "DOWNLOAD_ORIGINAL",
+      "FORK",
+      "COMMENT"
+    ],
+    "resourceAccessRole": "OWNER",
+    "tagBinds": [
+      {
+        "primaryTagId": "tag-root",
+        "tags": {
+          "tag-root": {
+            "tagName": "/",
+            "isPath": true
+          }
+        }
+      },
+      {
+        "groupId": "course-data-structures",
+        "primaryTagId": "chapter-4",
+        "tags": {
+          "chapter-4": {
+            "tagName": "chapter-4"
+          }
+        }
+      }
+    ],
+    "myInteractionRecord": {
+      "read": false
     }
   }
-}
+]

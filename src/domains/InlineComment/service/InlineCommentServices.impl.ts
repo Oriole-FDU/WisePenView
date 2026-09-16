@@ -1,4 +1,4 @@
-import { InlineCommentApi } from '../apis/InlineCommentApi';
+import { InlineCommentApi } from '@domain-apis';
 import { InlineCommentServicesMap } from '../mapper/InlineCommentServices.map';
 import type {
   AddInlineCommentItemRequest,

@@ -94,7 +94,12 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
     refresh: refreshDocInfo,
   } = useApi(
     async () => {
-      return await documentService.getDocInfo(resourceId as string);
+      const info = await documentService.getDocInfo(resourceId as string);
+      if (import.meta.env.MODE === 'mock') {
+        const { MOCK_PDF_PREVIEW_URL } = await import('./mock/pdfPreview');
+        return { ...info, previewUrl: MOCK_PDF_PREVIEW_URL };
+      }
+      return info;
     },
     {
       ready: Boolean(resourceId),

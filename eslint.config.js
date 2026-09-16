@@ -88,18 +88,19 @@ const serviceFactoryImportPattern = {
   ],
   importNamePattern: '^create[A-Z]\\w*Services$',
   message:
-    '项目保留命名约定：createXxxServices 是 Service 工厂的专属符号，仅允许在装配入口 src/domains/_registry/registry.impl.ts 中 import；其它位置禁止直接导入或调用，业务代码请通过 useXxxService() 获取实例。',
+    '项目保留命名约定：createXxxServices 是 Service 工厂的专属符号，仅允许在装配入口 src/domains/_registry/registry.ts 中 import；其它位置禁止直接导入或调用，业务代码请通过 useXxxService() 获取实例。',
 };
 
-const serviceMockImportPattern = {
-  group: [
-    '@/domains/*/mock/*Services.mock',
-    '@/domains/*/mock/*Services.mock.*',
-    '**/domains/*/mock/*Services.mock',
-    '**/domains/*/mock/*Services.mock.*',
-  ],
+const domainApiPortImportRule = {
+  name: '@domain-apis',
   message:
-    'Mock Service 只能在 src/domains/_registry/registry.mock.ts 装配；业务代码请通过 useXxxService() 获取实例。',
+    'API 实现入口只允许 service 与 OSS 会话管理器使用；组件请通过 useXxxService() 获取能力。',
+};
+
+const domainMockImportPattern = {
+  group: ['@/domains/*/mock/**', '**/domains/*/mock/**'],
+  message:
+    'Mock API 只允许在 apis.mock.ts 装配或 mock 内部引用；业务代码通过 @domain-apis 使用统一 API 契约。',
 };
 
 const apiRequestImportPattern = {
@@ -110,8 +111,9 @@ const apiRequestImportPattern = {
 
 const domainApiFunctionImportPattern = {
   group: ['@/domains/*/apis/*Api', '**/domains/*/apis/*Api', '**/apis/*Api'],
+  allowTypeImports: true,
   message:
-    '领域 API 函数只能由 src/domains/<Domain>/service 调用；mapper、组件和页面只允许依赖领域类型或 API type。',
+    '真实领域 API 只允许在 apis.impl.ts 导出；service 通过 @domain-apis 调用，其他层只能引用 API 类型。',
 };
 
 const buildRestrictedImportsRule = ({
@@ -123,7 +125,8 @@ const buildRestrictedImportsRule = ({
   allowFeedbackPrimitive = false,
   allowOverlayPrimitive = false,
   allowServiceFactory = false,
-  allowServiceMock = false,
+  allowDomainApiPort = false,
+  allowDomainMock = false,
 } = {}) => {
   const paths = [
     ahooksUpdateEffectImportRule,
@@ -135,12 +138,13 @@ const buildRestrictedImportsRule = ({
       ? []
       : [heroUiOverlayPrimitiveImportRule, projectOverlayModalImportRule]),
     ...(allowDirectAxios ? [] : [directAxiosImportRule]),
+    ...(allowDomainApiPort ? [] : [domainApiPortImportRule]),
   ];
   const patterns = [
     ...(allowOverlayPrimitive ? [] : [projectOverlayModalImportPattern]),
     ...(allowDirectAxios ? [] : [directAxiosImportPattern]),
     ...(allowServiceFactory ? [] : [serviceFactoryImportPattern]),
-    ...(allowServiceMock ? [] : [serviceMockImportPattern]),
+    ...(allowDomainMock ? [] : [domainMockImportPattern]),
     ...(allowApiRequest ? [] : [apiRequestImportPattern]),
     ...(allowDomainApiFunction ? [] : [domainApiFunctionImportPattern]),
   ];
@@ -297,12 +301,12 @@ const projectRestrictedSyntaxRules = [
   {
     selector: 'ExportAllDeclaration[source.value=/Services\\.impl(\\.[jt]sx?)?$/]',
     message:
-      '禁止 re-export *Services.impl —— createXxxServices 工厂只能在 src/domains/_registry/registry.impl.ts 装配，index.ts 不得二次导出。',
+      '禁止 re-export *Services.impl —— createXxxServices 工厂只能在 src/domains/_registry/registry.ts 装配，index.ts 不得二次导出。',
   },
   {
     selector: 'ExportNamedDeclaration[source.value=/Services\\.impl(\\.[jt]sx?)?$/]',
     message:
-      '禁止 re-export *Services.impl —— createXxxServices 工厂只能在 src/domains/_registry/registry.impl.ts 装配，index.ts 不得二次导出。',
+      '禁止 re-export *Services.impl —— createXxxServices 工厂只能在 src/domains/_registry/registry.ts 装配，index.ts 不得二次导出。',
   },
 ];
 
@@ -459,10 +463,16 @@ export default defineConfig([
     },
   },
   {
-    // Mock Service 的唯一合法装配入口。
-    files: ['src/domains/_registry/registry.mock.ts'],
+    // 构建时分别选择真实 API 与 mock API，service 装配不分叉。
+    files: ['src/domains/_registry/apis.impl.ts'],
     rules: {
-      'no-restricted-imports': buildRestrictedImportsRule({ allowServiceMock: true }),
+      'no-restricted-imports': buildRestrictedImportsRule({ allowDomainApiFunction: true }),
+    },
+  },
+  {
+    files: ['src/domains/_registry/apis.mock.ts', 'src/domains/*/mock/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': buildRestrictedImportsRule({ allowDomainMock: true }),
     },
   },
   {
@@ -475,18 +485,18 @@ export default defineConfig([
     },
   },
   {
-    // Service 层是唯一允许调用领域 API 函数的业务层。
-    files: ['src/domains/*/service/**/*.{ts,tsx}'],
+    // 业务与 OSS 会话管理统一经构建出口选择 I/O。
+    files: ['src/domains/*/service/**/*.{ts,tsx}', 'src/domains/_shared/ossStsClient.ts'],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({
-        allowDomainApiFunction: true,
+        allowDomainApiPort: true,
       }),
     },
   },
   {
-    // Service 工厂的唯一合法装配入口：只有 registry.impl.ts 可以 import createXxxServices。
+    // Service 工厂的唯一合法装配入口：只有 registry.ts 可以 import createXxxServices。
     // 请勿扩大此白名单，否则"分层 + 显式注入"约束将被破坏。
-    files: ['src/domains/_registry/registry.impl.ts'],
+    files: ['src/domains/_registry/registry.ts'],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({ allowServiceFactory: true }),
     },
@@ -496,13 +506,6 @@ export default defineConfig([
     files: ['src/apis/request.ts'],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({ allowDirectAxios: true }),
-    },
-  },
-  {
-    // Mock 实现允许 console.log 作为调试路径
-    files: ['src/domains/*/mock/**/*.{ts,tsx}'],
-    rules: {
-      'no-console': 'off',
     },
   },
 ]);

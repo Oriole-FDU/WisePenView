@@ -2,7 +2,8 @@ import type { OssStsTokenApiResponse } from '@/apis/api.type';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import { isRecord } from '@/utils/typeGuards';
-import OSS from 'ali-oss';
+import { createOssClient } from '@domain-apis';
+import type { OssReadClient } from './apis/ossClient';
 
 export interface OssStsClientManagerOptions<Key> {
   loadToken: (key: Key) => Promise<OssStsTokenApiResponse | null | undefined>;
@@ -12,13 +13,16 @@ export interface OssStsClientManagerOptions<Key> {
 }
 
 export interface OssStsClientManager<Key> {
-  getClient: (key: Key, options?: { forceRefresh?: boolean }) => Promise<OSS>;
-  runWithClient: <Result>(key: Key, operation: (client: OSS) => Promise<Result>) => Promise<Result>;
+  getClient: (key: Key, options?: { forceRefresh?: boolean }) => Promise<OssReadClient>;
+  runWithClient: <Result>(
+    key: Key,
+    operation: (client: OssReadClient) => Promise<Result>
+  ) => Promise<Result>;
   clear: () => void;
 }
 
 interface CachedOssClient {
-  client: OSS;
+  client: OssReadClient;
   expiresAt: number;
 }
 
@@ -29,28 +33,6 @@ const resolveExpiresAt = (expiration: string | undefined, defaultExpiresInMs: nu
   if (!expiration) return Date.now() + defaultExpiresInMs;
   const expiresAt = Date.parse(expiration);
   return Number.isFinite(expiresAt) ? expiresAt : Date.now() + defaultExpiresInMs;
-};
-
-const createOssClient = (token: OssStsTokenApiResponse): OSS => {
-  if (
-    !token.accessKeyId ||
-    !token.accessKeySecret ||
-    !token.securityToken ||
-    !token.bucket ||
-    (!token.region && !token.endpoint)
-  ) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
-  }
-
-  return new OSS({
-    region: token.region,
-    endpoint: token.endpoint,
-    bucket: token.bucket,
-    accessKeyId: token.accessKeyId,
-    accessKeySecret: token.accessKeySecret,
-    stsToken: token.securityToken,
-    secure: true,
-  });
 };
 
 const isOssAuthExpiredError = (error: unknown): boolean => {
@@ -71,7 +53,7 @@ export const createOssStsClientManager = <Key>(
   const refreshBufferMs = options.refreshBufferMs ?? DEFAULT_REFRESH_BUFFER_MS;
   const defaultExpiresInMs = options.defaultExpiresInMs ?? DEFAULT_EXPIRES_IN_MS;
   const clientCache = new Map<string, CachedOssClient>();
-  const pendingClientCache = new Map<string, Promise<OSS>>();
+  const pendingClientCache = new Map<string, Promise<OssReadClient>>();
   let cacheGeneration = 0;
 
   const clear = (): void => {
@@ -82,7 +64,10 @@ export const createOssStsClientManager = <Key>(
 
   registerServiceCacheCleaner(clear);
 
-  const getClient = async (key: Key, getOptions?: { forceRefresh?: boolean }): Promise<OSS> => {
+  const getClient = async (
+    key: Key,
+    getOptions?: { forceRefresh?: boolean }
+  ): Promise<OssReadClient> => {
     const cacheKey = options.resolveCacheKey(key);
     if (getOptions?.forceRefresh) {
       clientCache.delete(cacheKey);
@@ -97,7 +82,7 @@ export const createOssStsClientManager = <Key>(
     if (pending) return pending;
 
     const requestGeneration = cacheGeneration;
-    const request: Promise<OSS> = options
+    const request: Promise<OssReadClient> = options
       .loadToken(key)
       .then((token) => {
         if (!token) {
@@ -125,7 +110,7 @@ export const createOssStsClientManager = <Key>(
 
   const runWithClient = async <Result>(
     key: Key,
-    operation: (client: OSS) => Promise<Result>
+    operation: (client: OssReadClient) => Promise<Result>
   ): Promise<Result> => {
     try {
       return await operation(await getClient(key));

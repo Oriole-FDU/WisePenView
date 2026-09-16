@@ -1,6 +1,4 @@
-import { CommentApi } from '../apis/CommentApi';
-import { FavoriteApi } from '../apis/FavoriteApi';
-import { InteractApi } from '../apis/InteractApi';
+import { CommentApi, FavoriteApi, InteractApi } from '@domain-apis';
 import { InteractServicesMap } from '../mapper/InteractServices.map';
 import type {
   CommentItemActionRequest,

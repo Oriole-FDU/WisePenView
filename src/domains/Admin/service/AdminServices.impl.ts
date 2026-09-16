@@ -1,4 +1,4 @@
-import { AdminUserApi } from '../apis/AdminUserApi';
+import { AdminUserApi } from '@domain-apis';
 import { AdminUserServicesMap } from '../mapper/AdminUserServices.map';
 import type {
   ChangeAdminUserInfoRequest,

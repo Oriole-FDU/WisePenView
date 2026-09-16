@@ -1,5 +1,46 @@
 {
-  "tagTree": [
+  "": [
+    {
+      "tagId": "tag-root",
+      "tagName": "/",
+      "parentId": "0",
+      "isPath": true,
+      "children": [
+        {
+          "tagId": "path-work",
+          "tagName": "/工作",
+          "parentId": "tag-root",
+          "isPath": true,
+          "children": []
+        },
+        {
+          "tagId": "path-study",
+          "tagName": "/学习",
+          "parentId": "tag-root",
+          "isPath": true,
+          "children": []
+        },
+        {
+          "tagId": "path-life",
+          "tagName": "/生活",
+          "parentId": "tag-root",
+          "isPath": true,
+          "children": []
+        }
+      ]
+    },
+    {
+      "tagId": "tag-trash",
+      "tagName": ".Trash",
+      "parentId": "0",
+      "isPath": true
+    },
+    {
+      "tagId": "tag-shared",
+      "tagName": ".Shared",
+      "parentId": "0",
+      "isPath": true
+    },
     {
       "tagId": "tag-work",
       "parentId": "",
@@ -125,66 +166,388 @@
       ]
     }
   ],
-  "flatTagTree": [
+  "1": [
     {
       "tagId": "tag-work",
       "parentId": "",
       "tagName": "工作",
-      "tagDesc": "工作相关"
-    },
-    {
-      "tagId": "tag-work-project-a",
-      "parentId": "tag-work",
-      "tagName": "项目A",
-      "tagDesc": "项目 A"
-    },
-    {
-      "tagId": "tag-work-project-b",
-      "parentId": "tag-work",
-      "tagName": "项目B",
-      "tagDesc": "项目 B"
-    },
-    {
-      "tagId": "tag-work-meeting",
-      "parentId": "tag-work",
-      "tagName": "会议记录",
-      "tagDesc": "会议纪要"
+      "tagDesc": "工作相关",
+      "tagCreator": "10086",
+      "creatorInfo": {
+        "nickname": "小明",
+        "realName": "王明"
+      },
+      "grantedActions": ["DISCOVER", "VIEW", "EDIT"],
+      "children": [
+        {
+          "tagId": "tag-work-project-a",
+          "parentId": "tag-work",
+          "tagName": "项目A",
+          "tagDesc": "项目 A",
+          "tagCreator": "10087",
+          "creatorInfo": {
+            "nickname": "小张",
+            "realName": "张三"
+          },
+          "children": [],
+          "groupId": "1"
+        },
+        {
+          "tagId": "tag-work-project-b",
+          "parentId": "tag-work",
+          "tagName": "项目B",
+          "tagDesc": "项目 B",
+          "tagCreator": "10088",
+          "creatorInfo": {
+            "nickname": "SIG 助手",
+            "realName": "陈思齐"
+          },
+          "children": [],
+          "groupId": "1"
+        },
+        {
+          "tagId": "tag-work-meeting",
+          "parentId": "tag-work",
+          "tagName": "会议记录",
+          "tagDesc": "会议纪要",
+          "tagCreator": "10086",
+          "creatorInfo": {
+            "nickname": "小明",
+            "realName": "王明"
+          },
+          "children": [],
+          "groupId": "1"
+        }
+      ],
+      "groupId": "1"
     },
     {
       "tagId": "tag-study",
       "parentId": "",
       "tagName": "学习",
-      "tagDesc": "学习与笔记"
-    },
-    {
-      "tagId": "tag-study-tech",
-      "parentId": "tag-study",
-      "tagName": "技术",
-      "tagDesc": "技术笔记"
-    },
-    {
-      "tagId": "tag-study-lang",
-      "parentId": "tag-study",
-      "tagName": "语言",
-      "tagDesc": "语言学习"
+      "tagDesc": "学习与笔记",
+      "tagCreator": "10087",
+      "creatorInfo": {
+        "nickname": "小张",
+        "realName": "张三"
+      },
+      "children": [
+        {
+          "tagId": "tag-study-tech",
+          "parentId": "tag-study",
+          "tagName": "技术",
+          "tagDesc": "技术笔记",
+          "tagCreator": "10088",
+          "creatorInfo": {
+            "nickname": "SIG 助手",
+            "realName": "陈思齐"
+          },
+          "children": [],
+          "groupId": "1"
+        },
+        {
+          "tagId": "tag-study-lang",
+          "parentId": "tag-study",
+          "tagName": "语言",
+          "tagDesc": "语言学习",
+          "tagCreator": "10086",
+          "creatorInfo": {
+            "nickname": "小明",
+            "realName": "王明"
+          },
+          "children": [],
+          "groupId": "1"
+        }
+      ],
+      "groupId": "1"
     },
     {
       "tagId": "tag-life",
       "parentId": "",
       "tagName": "生活",
-      "tagDesc": "生活与兴趣"
+      "tagDesc": "生活与兴趣",
+      "tagCreator": "10088",
+      "creatorInfo": {
+        "nickname": "SIG 助手",
+        "realName": "陈思齐"
+      },
+      "children": [
+        {
+          "tagId": "tag-life-travel",
+          "parentId": "tag-life",
+          "tagName": "旅行",
+          "tagDesc": "旅行记录",
+          "tagCreator": "10087",
+          "creatorInfo": {
+            "nickname": "小张",
+            "realName": "张三"
+          },
+          "children": [],
+          "groupId": "1"
+        },
+        {
+          "tagId": "tag-life-reading",
+          "parentId": "tag-life",
+          "tagName": "阅读",
+          "tagDesc": "读书笔记",
+          "tagCreator": "10086",
+          "creatorInfo": {
+            "nickname": "小明",
+            "realName": "王明"
+          },
+          "children": [],
+          "groupId": "1"
+        }
+      ],
+      "groupId": "1"
+    }
+  ],
+  "2": [
+    {
+      "tagId": "tag-work",
+      "parentId": "",
+      "tagName": "工作",
+      "tagDesc": "工作相关",
+      "tagCreator": "10086",
+      "creatorInfo": {
+        "nickname": "小明",
+        "realName": "王明"
+      },
+      "grantedActions": ["DISCOVER", "VIEW", "EDIT"],
+      "children": [
+        {
+          "tagId": "tag-work-project-a",
+          "parentId": "tag-work",
+          "tagName": "项目A",
+          "tagDesc": "项目 A",
+          "tagCreator": "10087",
+          "creatorInfo": {
+            "nickname": "小张",
+            "realName": "张三"
+          },
+          "children": [],
+          "groupId": "2"
+        },
+        {
+          "tagId": "tag-work-project-b",
+          "parentId": "tag-work",
+          "tagName": "项目B",
+          "tagDesc": "项目 B",
+          "tagCreator": "10088",
+          "creatorInfo": {
+            "nickname": "SIG 助手",
+            "realName": "陈思齐"
+          },
+          "children": [],
+          "groupId": "2"
+        },
+        {
+          "tagId": "tag-work-meeting",
+          "parentId": "tag-work",
+          "tagName": "会议记录",
+          "tagDesc": "会议纪要",
+          "tagCreator": "10086",
+          "creatorInfo": {
+            "nickname": "小明",
+            "realName": "王明"
+          },
+          "children": [],
+          "groupId": "2"
+        }
+      ],
+      "groupId": "2"
     },
     {
-      "tagId": "tag-life-travel",
-      "parentId": "tag-life",
-      "tagName": "旅行",
-      "tagDesc": "旅行记录"
+      "tagId": "tag-study",
+      "parentId": "",
+      "tagName": "学习",
+      "tagDesc": "学习与笔记",
+      "tagCreator": "10087",
+      "creatorInfo": {
+        "nickname": "小张",
+        "realName": "张三"
+      },
+      "children": [
+        {
+          "tagId": "tag-study-tech",
+          "parentId": "tag-study",
+          "tagName": "技术",
+          "tagDesc": "技术笔记",
+          "tagCreator": "10088",
+          "creatorInfo": {
+            "nickname": "SIG 助手",
+            "realName": "陈思齐"
+          },
+          "children": [],
+          "groupId": "2"
+        },
+        {
+          "tagId": "tag-study-lang",
+          "parentId": "tag-study",
+          "tagName": "语言",
+          "tagDesc": "语言学习",
+          "tagCreator": "10086",
+          "creatorInfo": {
+            "nickname": "小明",
+            "realName": "王明"
+          },
+          "children": [],
+          "groupId": "2"
+        }
+      ],
+      "groupId": "2"
     },
     {
-      "tagId": "tag-life-reading",
-      "parentId": "tag-life",
-      "tagName": "阅读",
-      "tagDesc": "读书笔记"
+      "tagId": "tag-life",
+      "parentId": "",
+      "tagName": "生活",
+      "tagDesc": "生活与兴趣",
+      "tagCreator": "10088",
+      "creatorInfo": {
+        "nickname": "SIG 助手",
+        "realName": "陈思齐"
+      },
+      "children": [
+        {
+          "tagId": "tag-life-travel",
+          "parentId": "tag-life",
+          "tagName": "旅行",
+          "tagDesc": "旅行记录",
+          "tagCreator": "10087",
+          "creatorInfo": {
+            "nickname": "小张",
+            "realName": "张三"
+          },
+          "children": [],
+          "groupId": "2"
+        },
+        {
+          "tagId": "tag-life-reading",
+          "parentId": "tag-life",
+          "tagName": "阅读",
+          "tagDesc": "读书笔记",
+          "tagCreator": "10086",
+          "creatorInfo": {
+            "nickname": "小明",
+            "realName": "王明"
+          },
+          "children": [],
+          "groupId": "2"
+        }
+      ],
+      "groupId": "2"
+    }
+  ],
+  "course-computer-networks": [
+    {
+      "tagId": "outline-root-course-computer-networks",
+      "tagName": "大纲内容",
+      "groupId": "course-computer-networks",
+      "parentId": "0",
+      "children": [
+        {
+          "tagId": "network-chapter-1",
+          "parentId": "outline-root-course-computer-networks",
+          "groupId": "course-computer-networks",
+          "tagName": "第一章 计算机网络概述",
+          "tagDesc": "了解计算机网络的基本组成、分层思想以及本课程的学习要求。",
+          "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-note-1\"]}",
+          "children": []
+        },
+        {
+          "tagId": "network-chapter-2",
+          "parentId": "outline-root-course-computer-networks",
+          "groupId": "course-computer-networks",
+          "tagName": "第二章 应用层",
+          "tagDesc": "",
+          "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[]}",
+          "children": [
+            {
+              "tagId": "network-http",
+              "parentId": "network-chapter-2",
+              "groupId": "course-computer-networks",
+              "tagName": "2.1 HTTP 与 Web",
+              "tagDesc": "",
+              "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-course-syllabus\"]}",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "course-data-structures": [
+    {
+      "tagId": "outline-root-course-data-structures",
+      "tagName": "大纲内容",
+      "groupId": "course-data-structures",
+      "parentId": "0",
+      "children": [
+        {
+          "tagId": "chapter-1",
+          "parentId": "outline-root-course-data-structures",
+          "groupId": "course-data-structures",
+          "tagName": "第一章 课程概览",
+          "tagDesc": "从课程导学开始，了解本学期的学习安排、考核方式与资源使用方法。",
+          "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-note-1\",\"mock-course-syllabus\"]}",
+          "children": []
+        },
+        {
+          "tagId": "chapter-2",
+          "parentId": "outline-root-course-data-structures",
+          "groupId": "course-data-structures",
+          "tagName": "第二章 线性结构",
+          "tagDesc": "",
+          "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[]}",
+          "children": [
+            {
+              "tagId": "section-21",
+              "parentId": "chapter-2",
+              "groupId": "course-data-structures",
+              "tagName": "2.1 线性表",
+              "tagDesc": "学习线性表的逻辑结构，并比较顺序存储与链式存储的实现特点。",
+              "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-video-list\",\"mock-note-2\"]}",
+              "children": []
+            },
+            {
+              "tagId": "section-22",
+              "parentId": "chapter-2",
+              "groupId": "course-data-structures",
+              "tagName": "2.2 栈与队列",
+              "tagDesc": "",
+              "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-video-stack\",\"mock-pdf-queue\"]}",
+              "children": []
+            }
+          ]
+        },
+        {
+          "tagId": "chapter-3",
+          "parentId": "outline-root-course-data-structures",
+          "groupId": "course-data-structures",
+          "tagName": "第三章 树与图",
+          "tagDesc": "",
+          "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-video-tree\",\"mock-note-graph\"]}",
+          "children": []
+        },
+        {
+          "tagId": "chapter-4",
+          "parentId": "outline-root-course-data-structures",
+          "groupId": "course-data-structures",
+          "tagName": "第四章 查找与排序",
+          "tagDesc": "",
+          "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-pdf-sort\"]}",
+          "children": []
+        }
+      ]
+    }
+  ],
+  "course-database-systems": [
+    {
+      "tagId": "outline-root-course-database-systems",
+      "tagName": "大纲内容",
+      "groupId": "course-database-systems",
+      "parentId": "0",
+      "children": []
     }
   ]
 }

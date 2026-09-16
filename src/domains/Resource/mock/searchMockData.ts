@@ -1,24 +1,23 @@
 /** 全文搜索 mock 语料 + 查询模拟，对齐后端 SearchQueryServiceImpl */
 import type {
-  SearchHitItem,
-  SearchQueryRequest,
-  SearchResourceType,
-  SearchResultPage,
-} from '@/domains/Resource';
-import { SEARCH_SCOPE, resolveResourceIconType } from '@/domains/Resource';
+  GlobalSearchApiRequest,
+  GlobalSearchApiResponse,
+  GlobalSearchItemApiResponse,
+  ResourceItemApiResponse,
+} from '../apis/ResourceApi.type';
 
 /** 一篇可被搜索的 mock 资源；content 仅 mock 内部用，后端不返回 */
 interface SearchCorpusItem {
   resourceId: string;
   /** 小写资源类型，与后端 ResourceType 序列化值一致。 */
-  resourceType: SearchResourceType;
+  resourceType: string;
   resourceName: string;
   content: string;
   updateTime: string;
 }
 
 /** 15 篇文档 + 8 篇笔记，覆盖 pdf/doc/docx/ppt/pptx/xls/xlsx/note */
-const SEARCH_CORPUS: SearchCorpusItem[] = [
+export const SEARCH_CORPUS: SearchCorpusItem[] = [
   {
     resourceId: 'doc-ds-analysis',
     resourceType: 'pdf',
@@ -237,20 +236,26 @@ function buildContentSnippet(content: string, keyword: string): string | null {
   return fragments.join(' ');
 }
 
-function emptyPage(page: number, size: number): SearchResultPage {
+function emptyPage(page: number, size: number): GlobalSearchApiResponse {
   return { list: [], total: 0, page, size, totalPage: 0 };
 }
 
 /** 对齐后端流程：scope 过滤 → 标题/正文匹配 → 相关性排序（resourceName^3 加权）→ 分页 */
-export function simulateGlobalSearch(params: SearchQueryRequest): SearchResultPage {
+export function simulateGlobalSearch(
+  params: GlobalSearchApiRequest,
+  resources: ReadonlyMap<string, ResourceItemApiResponse>
+): GlobalSearchApiResponse {
   const { page, size, scope } = params;
   const keyword = params.keyword.trim();
   if (keyword === '') return emptyPage(page, size);
   const lowerKeyword = keyword.toLowerCase();
 
-  const scoped = SEARCH_CORPUS.filter((item) => {
-    if (scope === SEARCH_SCOPE.DOCUMENT) return item.resourceType !== 'note';
-    if (scope === SEARCH_SCOPE.NOTE) return item.resourceType === 'note';
+  const scoped = SEARCH_CORPUS.flatMap((item) => {
+    const resource = resources.get(item.resourceId);
+    return resource ? [{ ...item, resourceName: resource.resourceName }] : [];
+  }).filter((item) => {
+    if (scope === 'DOCUMENT') return item.resourceType !== 'note';
+    if (scope === 'NOTE') return item.resourceType === 'note';
     return true;
   });
 
@@ -259,10 +264,9 @@ export function simulateGlobalSearch(params: SearchQueryRequest): SearchResultPa
       const nameHit = item.resourceName.toLowerCase().includes(lowerKeyword);
       const contentSnippet = buildContentSnippet(item.content, keyword);
       if (!nameHit && contentSnippet === null) return null;
-      const hit: SearchHitItem = {
+      const hit: GlobalSearchItemApiResponse = {
         resourceId: item.resourceId,
         resourceType: item.resourceType,
-        resourceIconType: resolveResourceIconType(item.resourceType),
         resourceName: highlight(item.resourceName, keyword),
         highlightContent: contentSnippet,
         updateTime: item.updateTime,
@@ -270,7 +274,7 @@ export function simulateGlobalSearch(params: SearchQueryRequest): SearchResultPa
       const score = (nameHit ? 3 : 0) + (contentSnippet !== null ? 1 : 0);
       return { hit, score };
     })
-    .filter((entry): entry is { hit: SearchHitItem; score: number } => entry !== null)
+    .filter((entry): entry is { hit: GlobalSearchItemApiResponse; score: number } => entry !== null)
     .sort((a, b) => b.score - a.score);
 
   const total = ranked.length;

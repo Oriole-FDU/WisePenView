@@ -37,6 +37,10 @@ Mock 模式：
 pnpm mock
 ```
 
+Mock 與正式環境共用 service、mapper、快取和 registry，只在 `@domain-apis` 替換 API 與 OSS I/O。模擬資料存於記憶體，重新整理後重置；API 契約變更時需同步更新 mock API。
+
+Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 service 尚未提供的能力，在 mock 中也維持未開放狀態。Chat 串流、外部協作、Office 編輯與語音辨識不在此模擬範圍。
+
 ## 常用命令
 
 - `pnpm dev`：启动开发服务器
@@ -44,3 +48,4 @@ pnpm mock
 - `pnpm build`：构建产物
 - `pnpm lint`：执行 ESLint
 - `pnpm typecheck`：执行 TypeScript 类型检查
+- `pnpm check:mock`：離線檢查 mock API 與正式 service 的跨領域讀寫，不啟動伺服器

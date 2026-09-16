@@ -1,0 +1,22 @@
+/** 构建期选择 API 实现；service 与 mapper 始终共用。 */
+export { createOssClient } from '@/domains/_shared/apis/ossClient';
+export { AdminUserApi } from '@/domains/Admin/apis/AdminUserApi';
+export { AgentApi } from '@/domains/Agent/apis/AgentApi';
+export { AuthApi } from '@/domains/Auth/apis/AuthApi';
+export { ChatApi, ChatCompletionApi, ChatSessionApi } from '@/domains/Chat/apis/ChatApi';
+export { DocumentApi } from '@/domains/Document/apis/DocumentApi';
+export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/apis/GroupApi';
+export { ImageApi } from '@/domains/Image/apis/ImageApi';
+export { InlineCommentApi } from '@/domains/InlineComment/apis/InlineCommentApi';
+export { CommentApi } from '@/domains/Interact/apis/CommentApi';
+export { FavoriteApi } from '@/domains/Interact/apis/FavoriteApi';
+export { InteractApi } from '@/domains/Interact/apis/InteractApi';
+export { MessageApi } from '@/domains/Message/apis/MessageApi';
+export { NoteApi } from '@/domains/Note/apis/NoteApi';
+export { ResourceItemApi } from '@/domains/Resource/apis/ResourceApi';
+export { ResourcePlacementApi } from '@/domains/Resource/apis/ResourcePlacementApi';
+export { SkillApi } from '@/domains/Skill/apis/SkillApi';
+export { SpeechApi } from '@/domains/Speech/apis/SpeechApi';
+export { TagApi } from '@/domains/Tag/apis/TagApi';
+export { UserApi, UserWalletApi } from '@/domains/User/apis/UserApi';
+export { putOssPresignedUrl } from '@/utils/oss/ossPresignedPut';

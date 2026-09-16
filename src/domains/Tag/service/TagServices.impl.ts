@@ -3,7 +3,7 @@ import { createTtlCache } from '@/domains/_shared/ttlCache';
 import { TAG_META_SCHEMA, type TagTreeNode } from '@/domains/Tag';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
-import { TagApi } from '../apis/TagApi';
+import { TagApi } from '@domain-apis';
 import { TagServicesMap } from '../mapper/TagServices.map';
 import type {
   ITagService,

@@ -3,9 +3,8 @@ import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
 import type { AssetUploadTicketApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
 import { createOssStsClientManager } from '@/domains/_shared/ossStsClient';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { putOssPresignedUrl } from '@/utils/oss/ossPresignedPut';
 import { isRecord } from '@/utils/typeGuards';
-import { SkillApi } from '../apis/SkillApi';
+import { putOssPresignedUrl, SkillApi } from '@domain-apis';
 import { SkillServicesMap } from '../mapper/SkillServices.map';
 import type {
   ISkillService,

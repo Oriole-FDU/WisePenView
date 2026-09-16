@@ -17,7 +17,8 @@
       "createTime": "2024-01-01T00:00:00.000Z",
       "inviteCode": "ABC12345",
       "tokenUsed": 100,
-      "tokenBalance": 900
+      "tokenBalance": 900,
+      "groupMetaInfo": "{}"
     },
     {
       "groupId": "2",
@@ -36,209 +37,791 @@
       "createTime": "2024-02-15T00:00:00.000Z",
       "inviteCode": "DEF45678",
       "tokenUsed": 500,
-      "tokenBalance": 1500
+      "tokenBalance": 1500,
+      "groupMetaInfo": "{}"
+    },
+    {
+      "groupId": "course-data-structures",
+      "groupName": "数据结构与算法",
+      "groupDesc": "从抽象数据类型到经典算法，理解数据组织、问题建模与程序效率之间的关系。",
+      "groupType": 2,
+      "groupCoverUrl": "",
+      "groupMetaInfo": "{\"course\":{\"term\":\"2026 春季\",\"category\":\"必修课\",\"startAt\":\"2026-03-02T00:00:00+08:00\",\"endAt\":\"2026-07-03T23:59:59+08:00\",\"learningObjectives\":[\"理解线性结构、树、图、查找和排序等常用数据结构与经典算法。\",\"能够根据问题约束选择合适的数据结构，并分析时间与空间复杂度。\",\"能够完成核心数据结构的实现、测试与工程化应用。\"],\"meetings\":[{\"meetingId\":\"meeting-tuesday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周二\",\"startPeriod\":3,\"endPeriod\":4,\"location\":\"示例楼 A203\"}],\"assessmentItems\":[{\"label\":\"平时分\",\"weight\":10},{\"label\":\"作业\",\"weight\":20},{\"label\":\"期末考试\",\"weight\":70}],\"finalAssessment\":{\"type\":\"EXAM\",\"examForm\":\"闭卷\",\"date\":\"2026-06-29\",\"startTime\":\"13:30\",\"endTime\":\"15:30\",\"location\":\"示例楼 201\"},\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-course-data-structures\"}}",
+      "ownerId": "mock-teacher-primary",
+      "ownerInfo": {
+        "nickname": "示例教师",
+        "identityType": 2
+      },
+      "memberCount": 86,
+      "inviteCode": "COURSE-course-data-structures",
+      "tokenUsed": 0,
+      "tokenBalance": 1000
+    },
+    {
+      "groupId": "course-computer-networks",
+      "groupName": "计算机网络",
+      "groupDesc": "理解分层网络体系、核心协议与现代互联网基础设施。",
+      "groupType": 2,
+      "groupCoverUrl": "",
+      "groupMetaInfo": "{\"course\":{\"term\":\"2026 春季\",\"category\":\"必修课\",\"startAt\":\"2026-03-02T00:00:00+08:00\",\"endAt\":\"2026-07-03T23:59:59+08:00\",\"learningObjectives\":[\"理解分层网络体系与端到端通信的基本原理。\",\"能够分析常见网络协议及其工程取舍。\"],\"meetings\":[{\"meetingId\":\"meeting-monday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周一\",\"startPeriod\":6,\"endPeriod\":7,\"location\":\"示例楼 B305\"}],\"assessmentItems\":[{\"label\":\"实验\",\"weight\":30},{\"label\":\"期中考试\",\"weight\":20},{\"label\":\"期末考试\",\"weight\":50}],\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-course-computer-networks\"}}",
+      "ownerId": "mock-teacher-network",
+      "ownerInfo": {
+        "nickname": "示例教师甲",
+        "identityType": 2
+      },
+      "memberCount": 72,
+      "inviteCode": "COURSE-course-computer-networks",
+      "tokenUsed": 0,
+      "tokenBalance": 1000
+    },
+    {
+      "groupId": "course-database-systems",
+      "groupName": "数据库系统",
+      "groupDesc": "数据库系统原理、关系模型、查询处理与事务管理。",
+      "groupType": 2,
+      "groupCoverUrl": "",
+      "groupMetaInfo": "{\"course\":{\"term\":\"2025 秋季\",\"category\":\"专业选修\",\"startAt\":\"2025-09-01T00:00:00+08:00\",\"endAt\":\"2026-01-09T23:59:59+08:00\",\"learningObjectives\":[\"掌握关系模型、查询处理和事务管理的基本原理。\"],\"meetings\":[{\"meetingId\":\"meeting-friday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周五\",\"startPeriod\":6,\"endPeriod\":8,\"location\":\"示例楼 C401\"}],\"assessmentItems\":[{\"label\":\"课程项目\",\"weight\":40},{\"label\":\"期末考试\",\"weight\":60}],\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-course-database-systems\"}}",
+      "ownerId": "mock-current-user",
+      "ownerInfo": {
+        "nickname": "当前教师",
+        "identityType": 2
+      },
+      "memberCount": 64,
+      "inviteCode": "COURSE-course-database-systems",
+      "tokenUsed": 0,
+      "tokenBalance": 1000
     }
   ],
-  "groupDetail": {
-    "groupId": "1",
-    "groupName": "示例小组",
-    "groupDesc": "这是一个 mock 小组",
-    "groupCoverUrl": "",
-    "groupType": 1,
-    "ownerId": "1",
-    "ownerInfo": {
-      "nickname": "Mock User",
-      "realName": "张三",
-      "avatar": "",
-      "identityType": 1
-    },
-    "memberCount": 18,
-    "createTime": "2024-01-01T00:00:00.000Z",
-    "inviteCode": "ABC12345",
-    "tokenUsed": 100,
-    "tokenBalance": 900
+  "members": {
+    "1": [
+      {
+        "memberId": "1",
+        "groupId": "1",
+        "role": "0",
+        "joinTime": "2024-01-01T00:00:00.000Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 100,
+        "memberInfo": {
+          "nickname": "Mock User",
+          "realName": "张三",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-1@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "2",
+        "groupId": "1",
+        "role": "1",
+        "joinTime": "2024-01-03T09:12:00.000Z",
+        "tokenLimit": 5000,
+        "tokenUsed": 3200,
+        "memberInfo": {
+          "nickname": "若水",
+          "realName": "李若水",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-2@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "3",
+        "groupId": "1",
+        "role": "1",
+        "joinTime": "2024-01-05T14:30:00.000Z",
+        "tokenLimit": 3000,
+        "tokenUsed": 280,
+        "memberInfo": {
+          "nickname": "Ming",
+          "realName": "王明轩",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-3@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "4",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-08T08:00:00.000Z",
+        "tokenLimit": 1200,
+        "tokenUsed": 450,
+        "memberInfo": {
+          "nickname": "清遥",
+          "realName": "赵清遥",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-4@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "5",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-10T16:45:00.000Z",
+        "tokenLimit": 800,
+        "tokenUsed": 790,
+        "memberInfo": {
+          "nickname": "Nora",
+          "realName": "陈一诺",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-5@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "6",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-13T11:20:00.000Z",
+        "tokenLimit": 1600,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "启航",
+          "realName": "周启航",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-6@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "7",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-17T10:05:00.000Z",
+        "tokenLimit": 2500,
+        "tokenUsed": 1250,
+        "memberInfo": {
+          "nickname": "知微",
+          "realName": "孙知微",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-7@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "8",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-19T18:12:00.000Z",
+        "tokenLimit": 100000000,
+        "tokenUsed": 56000,
+        "memberInfo": {
+          "nickname": "Star",
+          "realName": "吴星野",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-8@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "9",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-22T07:48:00.000Z",
+        "tokenLimit": 900,
+        "tokenUsed": 901,
+        "memberInfo": {
+          "nickname": "云起",
+          "realName": "郑云起",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-9@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "10",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-24T13:35:00.000Z",
+        "tokenLimit": 2200,
+        "tokenUsed": 1800,
+        "memberInfo": {
+          "nickname": "千里",
+          "realName": "冯千里",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-10@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "11",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-01-28T15:00:00.000Z",
+        "tokenLimit": 1500,
+        "tokenUsed": 300,
+        "memberInfo": {
+          "nickname": "秋白",
+          "realName": "蒋秋白",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-11@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "12",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-01T09:40:00.000Z",
+        "tokenLimit": 1800,
+        "tokenUsed": 720,
+        "memberInfo": {
+          "nickname": "南枝",
+          "realName": "沈南枝",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-12@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "13",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-04T12:18:00.000Z",
+        "tokenLimit": 2000,
+        "tokenUsed": 1999,
+        "memberInfo": {
+          "nickname": "书言",
+          "realName": "韩书言",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-13@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "14",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-08T17:26:00.000Z",
+        "tokenLimit": 600,
+        "tokenUsed": 60,
+        "memberInfo": {
+          "nickname": "予安",
+          "realName": "唐予安",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-14@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "15",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-11T20:10:00.000Z",
+        "tokenLimit": 3600,
+        "tokenUsed": 2400,
+        "memberInfo": {
+          "nickname": "照临",
+          "realName": "何照临",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-15@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "16",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-15T10:50:00.000Z",
+        "tokenLimit": 1100,
+        "tokenUsed": 1080,
+        "memberInfo": {
+          "nickname": "初夏",
+          "realName": "梁初夏",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-16@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "17",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-18T08:33:00.000Z",
+        "tokenLimit": 2700,
+        "tokenUsed": 135,
+        "memberInfo": {
+          "nickname": "见山",
+          "realName": "林见山",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-17@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "18",
+        "groupId": "1",
+        "role": "2",
+        "joinTime": "2024-02-21T14:14:00.000Z",
+        "tokenLimit": 4200,
+        "tokenUsed": 3100,
+        "memberInfo": {
+          "nickname": "微澜",
+          "realName": "许微澜",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-18@example.invalid",
+          "mobile": null
+        }
+      }
+    ],
+    "2": [
+      {
+        "memberId": "1",
+        "groupId": "2",
+        "role": "0",
+        "joinTime": "2024-01-01T00:00:00.000Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 100,
+        "memberInfo": {
+          "nickname": "Mock User",
+          "realName": "张三",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-1@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "2",
+        "groupId": "2",
+        "role": "1",
+        "joinTime": "2024-01-03T09:12:00.000Z",
+        "tokenLimit": 5000,
+        "tokenUsed": 3200,
+        "memberInfo": {
+          "nickname": "若水",
+          "realName": "李若水",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-2@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "3",
+        "groupId": "2",
+        "role": "1",
+        "joinTime": "2024-01-05T14:30:00.000Z",
+        "tokenLimit": 3000,
+        "tokenUsed": 280,
+        "memberInfo": {
+          "nickname": "Ming",
+          "realName": "王明轩",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-3@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "4",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-08T08:00:00.000Z",
+        "tokenLimit": 1200,
+        "tokenUsed": 450,
+        "memberInfo": {
+          "nickname": "清遥",
+          "realName": "赵清遥",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-4@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "5",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-10T16:45:00.000Z",
+        "tokenLimit": 800,
+        "tokenUsed": 790,
+        "memberInfo": {
+          "nickname": "Nora",
+          "realName": "陈一诺",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-5@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "6",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-13T11:20:00.000Z",
+        "tokenLimit": 1600,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "启航",
+          "realName": "周启航",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-6@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "7",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-17T10:05:00.000Z",
+        "tokenLimit": 2500,
+        "tokenUsed": 1250,
+        "memberInfo": {
+          "nickname": "知微",
+          "realName": "孙知微",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-7@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "8",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-19T18:12:00.000Z",
+        "tokenLimit": 100000000,
+        "tokenUsed": 56000,
+        "memberInfo": {
+          "nickname": "Star",
+          "realName": "吴星野",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-8@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "9",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-22T07:48:00.000Z",
+        "tokenLimit": 900,
+        "tokenUsed": 901,
+        "memberInfo": {
+          "nickname": "云起",
+          "realName": "郑云起",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-9@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "10",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-24T13:35:00.000Z",
+        "tokenLimit": 2200,
+        "tokenUsed": 1800,
+        "memberInfo": {
+          "nickname": "千里",
+          "realName": "冯千里",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-10@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "11",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-01-28T15:00:00.000Z",
+        "tokenLimit": 1500,
+        "tokenUsed": 300,
+        "memberInfo": {
+          "nickname": "秋白",
+          "realName": "蒋秋白",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-11@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "12",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-01T09:40:00.000Z",
+        "tokenLimit": 1800,
+        "tokenUsed": 720,
+        "memberInfo": {
+          "nickname": "南枝",
+          "realName": "沈南枝",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-12@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "13",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-04T12:18:00.000Z",
+        "tokenLimit": 2000,
+        "tokenUsed": 1999,
+        "memberInfo": {
+          "nickname": "书言",
+          "realName": "韩书言",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-13@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "14",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-08T17:26:00.000Z",
+        "tokenLimit": 600,
+        "tokenUsed": 60,
+        "memberInfo": {
+          "nickname": "予安",
+          "realName": "唐予安",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-14@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "15",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-11T20:10:00.000Z",
+        "tokenLimit": 3600,
+        "tokenUsed": 2400,
+        "memberInfo": {
+          "nickname": "照临",
+          "realName": "何照临",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-15@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "16",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-15T10:50:00.000Z",
+        "tokenLimit": 1100,
+        "tokenUsed": 1080,
+        "memberInfo": {
+          "nickname": "初夏",
+          "realName": "梁初夏",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-16@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "17",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-18T08:33:00.000Z",
+        "tokenLimit": 2700,
+        "tokenUsed": 135,
+        "memberInfo": {
+          "nickname": "见山",
+          "realName": "林见山",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-17@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "18",
+        "groupId": "2",
+        "role": "2",
+        "joinTime": "2024-02-21T14:14:00.000Z",
+        "tokenLimit": 4200,
+        "tokenUsed": 3100,
+        "memberInfo": {
+          "nickname": "微澜",
+          "realName": "许微澜",
+          "avatar": "",
+          "identityType": 1,
+          "campusNo": null,
+          "email": "member-18@example.invalid",
+          "mobile": null
+        }
+      }
+    ],
+    "course-data-structures": [
+      {
+        "memberId": "mock-teacher-primary",
+        "groupId": "course-data-structures",
+        "role": "0",
+        "joinTime": "2026-03-01T00:00:00Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "示例教师",
+          "realName": "示例教师",
+          "avatar": null,
+          "identityType": 1,
+          "campusNo": null,
+          "email": "teacher@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "mock-assistant",
+        "groupId": "course-data-structures",
+        "role": "1",
+        "joinTime": "2026-03-01T00:00:00Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "示例助教",
+          "realName": "示例助教",
+          "avatar": null,
+          "identityType": 1,
+          "campusNo": "2026000001",
+          "email": "assistant@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "mock-student-current",
+        "groupId": "course-data-structures",
+        "role": "2",
+        "joinTime": "2026-03-01T00:00:00Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "当前学生",
+          "realName": "当前学生",
+          "avatar": null,
+          "identityType": 1,
+          "campusNo": "2026000002",
+          "email": "student@example.invalid",
+          "mobile": null
+        }
+      }
+    ],
+    "course-computer-networks": [
+      {
+        "memberId": "mock-teacher-network",
+        "groupId": "course-computer-networks",
+        "role": "0",
+        "joinTime": "2026-03-01T00:00:00Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "示例教师甲",
+          "realName": "示例教师甲",
+          "avatar": null,
+          "identityType": 1,
+          "campusNo": null,
+          "email": "network-teacher@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "mock-student-network-current",
+        "groupId": "course-computer-networks",
+        "role": "2",
+        "joinTime": "2026-03-01T00:00:00Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "当前学生",
+          "realName": "当前学生",
+          "avatar": null,
+          "identityType": 1,
+          "campusNo": "2026000011",
+          "email": "network-student@example.invalid",
+          "mobile": null
+        }
+      },
+      {
+        "memberId": "mock-student-network-peer",
+        "groupId": "course-computer-networks",
+        "role": "2",
+        "joinTime": "2026-03-01T00:00:00Z",
+        "tokenLimit": 1000,
+        "tokenUsed": 0,
+        "memberInfo": {
+          "nickname": "示例同学",
+          "realName": "示例同学",
+          "avatar": null,
+          "identityType": 1,
+          "campusNo": "2026000012",
+          "email": "network-peer@example.invalid",
+          "mobile": null
+        }
+      }
+    ],
+    "course-database-systems": []
   },
-  "members": [
-    {
-      "userId": "1",
-      "realname": "张三",
-      "nickname": "Mock User",
-      "role": "OWNER",
-      "joinTime": "2024-01-01T00:00:00.000Z",
-      "avatar": "",
-      "limit": 1000,
-      "used": 100
-    },
-    {
-      "userId": "2",
-      "realname": "李若水",
-      "nickname": "若水",
-      "role": "ADMIN",
-      "joinTime": "2024-01-03T09:12:00.000Z",
-      "avatar": "",
-      "limit": 5000,
-      "used": 3200
-    },
-    {
-      "userId": "3",
-      "realname": "王明轩",
-      "nickname": "Ming",
-      "role": "ADMIN",
-      "joinTime": "2024-01-05T14:30:00.000Z",
-      "avatar": "",
-      "limit": 3000,
-      "used": 280
-    },
-    {
-      "userId": "4",
-      "realname": "赵清遥",
-      "nickname": "清遥",
-      "role": "MEMBER",
-      "joinTime": "2024-01-08T08:00:00.000Z",
-      "avatar": "",
-      "limit": 1200,
-      "used": 450
-    },
-    {
-      "userId": "5",
-      "realname": "陈一诺",
-      "nickname": "Nora",
-      "role": "MEMBER",
-      "joinTime": "2024-01-10T16:45:00.000Z",
-      "avatar": "",
-      "limit": 800,
-      "used": 790
-    },
-    {
-      "userId": "6",
-      "realname": "周启航",
-      "nickname": "启航",
-      "role": "MEMBER",
-      "joinTime": "2024-01-13T11:20:00.000Z",
-      "avatar": "",
-      "limit": 1600,
-      "used": 0
-    },
-    {
-      "userId": "7",
-      "realname": "孙知微",
-      "nickname": "知微",
-      "role": "MEMBER",
-      "joinTime": "2024-01-17T10:05:00.000Z",
-      "avatar": "",
-      "limit": 2500,
-      "used": 1250
-    },
-    {
-      "userId": "8",
-      "realname": "吴星野",
-      "nickname": "Star",
-      "role": "MEMBER",
-      "joinTime": "2024-01-19T18:12:00.000Z",
-      "avatar": "",
-      "limit": 100000000,
-      "used": 56000
-    },
-    {
-      "userId": "9",
-      "realname": "郑云起",
-      "nickname": "云起",
-      "role": "MEMBER",
-      "joinTime": "2024-01-22T07:48:00.000Z",
-      "avatar": "",
-      "limit": 900,
-      "used": 901
-    },
-    {
-      "userId": "10",
-      "realname": "冯千里",
-      "nickname": "千里",
-      "role": "MEMBER",
-      "joinTime": "2024-01-24T13:35:00.000Z",
-      "avatar": "",
-      "limit": 2200,
-      "used": 1800
-    },
-    {
-      "userId": "11",
-      "realname": "蒋秋白",
-      "nickname": "秋白",
-      "role": "MEMBER",
-      "joinTime": "2024-01-28T15:00:00.000Z",
-      "avatar": "",
-      "limit": 1500,
-      "used": 300
-    },
-    {
-      "userId": "12",
-      "realname": "沈南枝",
-      "nickname": "南枝",
-      "role": "MEMBER",
-      "joinTime": "2024-02-01T09:40:00.000Z",
-      "avatar": "",
-      "limit": 1800,
-      "used": 720
-    },
-    {
-      "userId": "13",
-      "realname": "韩书言",
-      "nickname": "书言",
-      "role": "MEMBER",
-      "joinTime": "2024-02-04T12:18:00.000Z",
-      "avatar": "",
-      "limit": 2000,
-      "used": 1999
-    },
-    {
-      "userId": "14",
-      "realname": "唐予安",
-      "nickname": "予安",
-      "role": "MEMBER",
-      "joinTime": "2024-02-08T17:26:00.000Z",
-      "avatar": "",
-      "limit": 600,
-      "used": 60
-    },
-    {
-      "userId": "15",
-      "realname": "何照临",
-      "nickname": "照临",
-      "role": "MEMBER",
-      "joinTime": "2024-02-11T20:10:00.000Z",
-      "avatar": "",
-      "limit": 3600,
-      "used": 2400
-    },
-    {
-      "userId": "16",
-      "realname": "梁初夏",
-      "nickname": "初夏",
-      "role": "MEMBER",
-      "joinTime": "2024-02-15T10:50:00.000Z",
-      "avatar": "",
-      "limit": 1100,
-      "used": 1080
-    },
-    {
-      "userId": "17",
-      "realname": "林见山",
-      "nickname": "见山",
-      "role": "MEMBER",
-      "joinTime": "2024-02-18T08:33:00.000Z",
-      "avatar": "",
-      "limit": 2700,
-      "used": 135
-    },
-    {
-      "userId": "18",
-      "realname": "许微澜",
-      "nickname": "微澜",
-      "role": "MEMBER",
-      "joinTime": "2024-02-21T14:14:00.000Z",
-      "avatar": "",
-      "limit": 4200,
-      "used": 3100
-    }
-  ],
-  "myRole": "OWNER"
+  "myRoles": {
+    "1": "0",
+    "2": "0",
+    "course-data-structures": "0",
+    "course-computer-networks": "2",
+    "course-database-systems": "0"
+  }
 }

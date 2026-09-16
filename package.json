@@ -22,6 +22,7 @@
     "package:desktop:unsigned:dev": "pnpm build:dev && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "lint": "eslint .",
     "typecheck": "tsc -b",
+    "check:mock": "node scripts/check-mock.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

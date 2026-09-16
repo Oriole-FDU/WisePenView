@@ -23,7 +23,7 @@ import type { IWalletService } from '@/domains/Wallet';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { ServicesContext } from './context';
-import type { ServicesContextValue } from './registry';
+import type { ServicesContextValue } from './registry.types';
 
 /** 内部 hook，供 useXxxService 复用；必须在 ServicesProvider 内使用 */
 function useServicesContext(): ServicesContextValue {

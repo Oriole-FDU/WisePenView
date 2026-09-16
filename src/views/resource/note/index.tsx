@@ -66,10 +66,20 @@ function NoteView({ resourceId }: { resourceId: string }) {
     loading,
     error,
     refresh,
-  } = useApi(() => noteService.getNoteInfoDisplay({ resourceId }), {
-    ready: Boolean(resourceId),
-    refreshDeps: [resourceId],
-  });
+  } = useApi(
+    async () => {
+      const info = await noteService.getNoteInfoDisplay({ resourceId });
+      if (import.meta.env.MODE === 'mock') {
+        const { getNotePreview } = await import('./mock/notePreview');
+        return { ...info, aiDiffPreview: getNotePreview(resourceId) };
+      }
+      return info;
+    },
+    {
+      ready: Boolean(resourceId),
+      refreshDeps: [resourceId],
+    }
+  );
 
   if (!resourceId) {
     return <NoteOpenFailure />;

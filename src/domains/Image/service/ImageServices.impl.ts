@@ -1,4 +1,4 @@
-import { ImageApi } from '../apis/ImageApi';
+import { ImageApi } from '@domain-apis';
 import { ImageServicesMap } from '../mapper/ImageServices.map';
 import type { IImageService, ImageUploadRequest, ImageUploadResult } from './index.type';
 import { assertImageProxyUploadLimit } from './index.type';
