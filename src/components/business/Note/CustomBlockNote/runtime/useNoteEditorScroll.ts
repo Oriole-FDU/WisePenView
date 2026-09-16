@@ -5,8 +5,8 @@ import { findInlineCommentAnchorElement } from '../engines/inlineComments/extens
 import type { NoteEditorAnchor } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
 import {
-  scrollNoteEditorTargetIntoView,
   type NoteScrollTargetResolver,
+  scrollNoteEditorTargetIntoView,
 } from './noteEditorScrollTarget';
 export type { NoteScrollTargetResolver } from './noteEditorScrollTarget';
 

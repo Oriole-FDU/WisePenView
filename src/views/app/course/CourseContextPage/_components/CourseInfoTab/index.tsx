@@ -1,7 +1,3 @@
-import { PieChart } from '@/components/base/Chart';
-import { formatCoursePeriodRange, getCoursePeriodTimeRange } from '@/domains/Course';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
-import { formatTimestampToDate } from '@/utils/format/formatTime';
 import {
   CalendarRange,
   ChartNoAxesColumnIncreasing,
@@ -11,6 +7,12 @@ import {
   UserRound,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { PieChart } from '@/components/base/Chart';
+import { formatCoursePeriodRange, getCoursePeriodTimeRange } from '@/domains/Course';
+import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { formatTimestampToDate } from '@/utils/format/formatTime';
+
 import styles from './style.module.less';
 
 function CourseInfoTab() {

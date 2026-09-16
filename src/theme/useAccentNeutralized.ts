@@ -1,5 +1,6 @@
-import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { useSyncExternalStore } from 'react';
+
+import { STORAGE_KEYS } from '@/constants/storageKeys';
 
 const READING_MODE_ACCENT_SURFACE_NEUTRAL_MIX_PERCENT = 40;
 const READING_MODE_ACCENT_FOREGROUND_NEUTRAL_MIX_PERCENT = 10;

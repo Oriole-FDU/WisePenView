@@ -1,7 +1,9 @@
+import type { TFunction } from 'i18next';
+
 import type { FolderTableColumn } from '@/components/base/Table';
 import type { UserDisplayBase } from '@/domains/User';
 import { formatFileSize } from '@/utils/format/formatFileSize';
-import type { TFunction } from 'i18next';
+
 import { getDriveNodeLabel, isDriveSharedFolderNode } from '../common/driveComponentModel';
 import type { DriveRow, DriveTableRow } from './index.type';
 

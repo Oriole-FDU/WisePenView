@@ -8,7 +8,8 @@ import {
   SquareMinus,
   Trash2,
 } from 'lucide-react';
-import { useState, type KeyboardEvent, type MouseEvent } from 'react';
+import type { ReactNode } from 'react';
+import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -20,7 +21,6 @@ import type {
 import type { FolderNode, RootNode } from '@/domains/Drive';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { cn } from '@/utils/cn';
-import type { ReactNode } from 'react';
 
 import styles from './style.module.less';
 

@@ -1,5 +1,6 @@
+import { type RefObject, useEffect, useRef } from 'react';
+
 import { SIDEBAR_MAX_WIDTH, SIDEBAR_MIN_WIDTH } from '@/constants/layoutScale';
-import { useEffect, useRef, type RefObject } from 'react';
 
 export const SIDEBAR_COLLAPSE_DURATION_MS = 220;
 

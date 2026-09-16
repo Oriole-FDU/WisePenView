@@ -1,5 +1,6 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import type * as Y from 'yjs';
+
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 const AI_CONTENT_STORE_MAP = 'ai-content-store';
 export const AI_DIFF_ACTION_ORIGIN = Symbol('ai-diff-action');

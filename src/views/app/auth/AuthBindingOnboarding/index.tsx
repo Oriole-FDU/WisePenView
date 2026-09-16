@@ -1,3 +1,9 @@
+import { Alert } from '@heroui/react';
+import { CircleCheck, Info } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { readRedirectParam } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
@@ -8,12 +14,7 @@ import { useApi } from '@/hooks/useApi';
 import AccountVerificationForm from '@/views/app/profile/_components/Account/AccountVerification/AccountVerificationForm';
 import AccountVerificationOutcomeDialog from '@/views/app/profile/_components/Account/AccountVerification/AccountVerificationOutcomeDialog';
 import { useAccountVerificationController } from '@/views/app/profile/_components/Account/AccountVerification/useAccountVerificationController';
-import { Alert } from '@heroui/react';
 
-import { CircleCheck, Info } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
 function AuthBindingOnboarding() {

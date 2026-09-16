@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState, type ReactNode } from 'react';
+import { type ReactNode, useContext, useEffect, useState } from 'react';
+
 import {
-  DeferredOverlayContext,
   type DeferredContentProps,
+  DeferredOverlayContext,
   type DeferredOverlayContextValue,
   type DeferredOverlayProviderProps,
   type DeferredOverlayState,

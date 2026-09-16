@@ -1,4 +1,5 @@
-import { isRecord } from '@/utils/typeGuards';
+import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
+
 // axios request 封装
 import type { ApiErrorBody } from '@/apis/api.type';
 import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/apiServerAddr';
@@ -6,7 +7,7 @@ import { applyXDeveloperHeader } from '@/apis/developmentTraffic';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 import { WisePenError } from '@/utils/error';
 import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
-import axios, { AxiosHeaders, type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { isRecord } from '@/utils/typeGuards';
 
 declare module 'axios' {
   interface AxiosRequestConfig {

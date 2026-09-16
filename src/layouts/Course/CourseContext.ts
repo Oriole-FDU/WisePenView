@@ -1,6 +1,7 @@
+import { createContext, useContext } from 'react';
+
 import type { CourseDetail } from '@/domains/Course';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { createContext, useContext } from 'react';
 
 export interface CourseContextValue {
   course: CourseDetail;

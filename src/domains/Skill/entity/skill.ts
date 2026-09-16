@@ -1,4 +1,5 @@
 import type { ResourceAction, ResourceItem } from '@/domains/Resource';
+
 import type { SkillVersionStatus } from '../enum';
 
 export type SkillScopeType = 'PERSONAL' | 'GROUP';

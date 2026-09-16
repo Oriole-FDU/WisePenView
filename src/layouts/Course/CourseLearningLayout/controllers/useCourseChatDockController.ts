@@ -1,10 +1,3 @@
-import { useChatPanelStore } from '@/components/business/ChatPanel/_store/useChatPanelStore';
-import {
-  CHAT_PANEL_MAX_WIDTH,
-  CHAT_PANEL_MIN_WIDTH,
-  clampChatPanelWidth,
-} from '@/constants/layoutScale';
-import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
 import { useMount } from 'ahooks';
 import { useRef } from 'react';
 import type {
@@ -13,6 +6,14 @@ import type {
   PanelImperativeHandle,
   PanelSize,
 } from 'react-resizable-panels';
+
+import { useChatPanelStore } from '@/components/business/ChatPanel/_store/useChatPanelStore';
+import {
+  CHAT_PANEL_MAX_WIDTH,
+  CHAT_PANEL_MIN_WIDTH,
+  clampChatPanelWidth,
+} from '@/constants/layoutScale';
+import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
 
 export const useCourseChatDockController = () => {
   const panelRef = useRef<PanelImperativeHandle | null>(null);

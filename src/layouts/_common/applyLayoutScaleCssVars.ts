@@ -1,10 +1,10 @@
 import {
   getLayoutScaleCssVars,
-  resolveLayoutDensity,
-  resolveLayoutHeightDensity,
   type LayoutDensity,
   type LayoutHeightDensity,
   type LayoutScaleCssVarOptions,
+  resolveLayoutDensity,
+  resolveLayoutHeightDensity,
 } from '@/constants/layoutScale';
 
 /** 将 Layout Scale 同步到 CSS 变量，保证 Less 与 TS 同源。 */

@@ -1,11 +1,13 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import type { UserAccountProfile } from '@/domains/User';
 import { IDENTITY } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import PageHeader from '@/layouts/_common/PageHeader';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import {
   AccountForm,
   AccountHeader,

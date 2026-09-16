@@ -1,12 +1,13 @@
-import { useNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
-import type { NoteSelectionSnapshot, SelectedNoteScope } from '@/domains/Note';
-import { computeNoteBodyContentHash } from '@/domains/Note';
 import { getNearestBlockPos } from '@blocknote/core';
 import { toast } from '@heroui/react';
 import type { Node as PMNode } from '@tiptap/pm/model';
 import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
+import type { NoteSelectionSnapshot, SelectedNoteScope } from '@/domains/Note';
+import { computeNoteBodyContentHash } from '@/domains/Note';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';

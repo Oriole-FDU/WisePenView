@@ -1,4 +1,5 @@
 import { isRecord } from '@/utils/typeGuards';
+
 import type {
   NoteAiDiffProjection,
   NoteBlockAiDiff,

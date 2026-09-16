@@ -1,12 +1,14 @@
+import type { ReactNode } from 'react';
+import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { ResultState } from '@/components/base/Feedback';
 import { getErrorReportId, reportError } from '@/utils/error';
 import shellStyles from '@/views/app/error/_components/ErrorPageShell/style.module.less';
 import { buildAppErrorInfo } from '@/views/app/error/errorInfo';
-import type { ReactNode } from 'react';
-import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+
 import styles from './style.module.less';
 
 interface RouteOutletBoundaryProps {

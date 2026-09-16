@@ -1,11 +1,12 @@
+import { FolderInput, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import GroupDefaultAccessPermissionModal from '@/components/business/Group/DefaultAccessPermissionModal';
 import type { GroupResConfig } from '@/domains/Group';
 import GroupMountPermissionModal from '@/views/app/group/_components/GroupPermissions/GroupMountPermissionModal';
 
-import { FolderInput, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import GroupSettingsSection from '../GroupSettingsSection';
 import styles from './style.module.less';
 

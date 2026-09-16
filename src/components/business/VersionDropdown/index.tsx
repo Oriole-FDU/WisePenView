@@ -1,7 +1,9 @@
-import { AppButton } from '@/components/base/Button';
 import { Dropdown, Label } from '@heroui/react';
 import { ChevronDown, GitBranch } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { AppButton } from '@/components/base/Button';
+
 import type { VersionDropdownProps } from './index.type';
 
 function VersionDropdown({ items, disabledKeys, formatVersion, onSelect }: VersionDropdownProps) {

@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 import JoinByInviteCodeModal from '@/components/business/Group/JoinByInviteCodeModal';
 import { useCourseService } from '@/domains';
-import { useTranslation } from 'react-i18next';
 
 interface JoinCourseModalProps {
   isOpen: boolean;

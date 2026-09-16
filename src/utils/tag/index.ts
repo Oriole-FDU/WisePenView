@@ -1,5 +1,5 @@
 export {
   RESERVED_NAME_HINT,
-  validateReservedName,
   type ReservedNameValidationResult,
+  validateReservedName,
 } from './validateReservedName';

@@ -1,11 +1,12 @@
 /* eslint-disable react-refresh/only-export-components -- BlockNote block spec 与展示组件同文件 */
-import AppPopover from '@/components/base/AppPopover';
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
 import { createReactBlockSpec, type ReactCustomBlockRenderProps } from '@blocknote/react';
 import { useMemoizedFn } from 'ahooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppPopover from '@/components/base/AppPopover';
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
 
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import {

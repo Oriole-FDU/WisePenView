@@ -1,21 +1,23 @@
+import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppPopover from '@/components/base/AppPopover';
 import ColorTextIcon from '@/components/base/Icons/Custom/ColorTextIcon';
 import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import { ColorPaletteContent } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPalette';
 import {
-  getColorItem,
   type ColorKey,
+  getColorItem,
 } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
-import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import {
   blockHasInlineContent,
   colorStyleExists,
   getSelectedBlocks,
   toStyleUpdate,
 } from '../utils';
-import { ToolbarButton, type ButtonGroupChildProps } from './ToolbarButton';
+import { type ButtonGroupChildProps, ToolbarButton } from './ToolbarButton';
 
 export function ColorMenu(buttonGroupProps: ButtonGroupChildProps) {
   const { t } = useTranslation('note');

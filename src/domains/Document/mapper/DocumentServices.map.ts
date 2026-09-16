@@ -4,6 +4,7 @@ import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
+
 import type {
   DocMetaInfoApiResponse,
   GetDocInfoApiResponse,

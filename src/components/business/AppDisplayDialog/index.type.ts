@@ -1,7 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import type { AppButtonProps } from '@/components/base/Button';
-
 import type { Modal } from '@/components/base/Modal';
 
 export type AppDisplayDialogSize = ComponentProps<typeof Modal.Container>['size'];

@@ -1,8 +1,9 @@
-import { STORAGE_PREFIXES } from '@/constants/storageKeys';
 import { useUnmount } from 'ahooks';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import * as Y from 'yjs';
+
+import { STORAGE_PREFIXES } from '@/constants/storageKeys';
 
 import { NoteSaveStatusObserver } from './NoteSaveStatusObserver';
 import { NoteStatusObserver } from './NoteStatusObserver';

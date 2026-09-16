@@ -1,5 +1,7 @@
-import RouteOutletBoundary from '@/layouts/_common/RouteOutletBoundary';
 import { Outlet } from 'react-router-dom';
+
+import RouteOutletBoundary from '@/layouts/_common/RouteOutletBoundary';
+
 import CourseNavigationSidebar from './CourseNavigationSidebar';
 import styles from './style.module.less';
 

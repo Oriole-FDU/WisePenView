@@ -1,12 +1,13 @@
+import { FolderInput, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import { TagMountPermissionModal } from '@/components/business/Drive/Modals';
 import GroupDefaultAccessPermissionModal from '@/components/business/Group/DefaultAccessPermissionModal';
 import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import { FolderInput, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styles from '../../style.module.less';
 
 interface CoursePermissionSectionProps {

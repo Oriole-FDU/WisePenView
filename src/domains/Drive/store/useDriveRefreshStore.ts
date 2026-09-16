@@ -1,5 +1,6 @@
-import { registerStore } from '@/store/lifecycle';
 import { create } from 'zustand';
+
+import { registerStore } from '@/store/lifecycle';
 
 interface DriveRefreshState {
   refreshVersion: number;

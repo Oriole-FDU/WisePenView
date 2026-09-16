@@ -1,6 +1,7 @@
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { useMemoizedFn } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
+
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 
 const EDGE_ANCHOR_ITEM_COUNT = 2;

@@ -1,6 +1,7 @@
 /**
  * domains - 业务 Domain Service 统一对外入口（barrel）
  */
+export type { ServicesContextValue } from './_registry';
 export {
   ServicesProvider,
   useAdminService,
@@ -25,7 +26,6 @@ export {
   useUserService,
   useWalletService,
 } from './_registry';
-export type { ServicesContextValue } from './_registry';
 export type { IMessageService, UserMessage } from './Message';
-export { FEEDBACK_TYPE } from './User';
 export type { FeedbackType, SubmitFeedbackRequest } from './User';
+export { FEEDBACK_TYPE } from './User';

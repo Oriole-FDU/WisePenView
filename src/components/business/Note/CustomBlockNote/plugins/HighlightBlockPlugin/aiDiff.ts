@@ -1,4 +1,5 @@
 import { isRecord } from '@/utils/typeGuards';
+
 import { isAiDiffContentEmpty, isAiDiffContentEqual } from '../../engines/aiDiff/contentState';
 import type {
   NoteAiDiffAcceptedBlockUpdate,

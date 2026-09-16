@@ -1,4 +1,5 @@
 import type { ResourcePermissionOverview } from '@/domains/Resource';
+
 import type { SkillDetail, SkillSummary } from '../entity/skill';
 
 export interface UploadSkillAssetRequest {

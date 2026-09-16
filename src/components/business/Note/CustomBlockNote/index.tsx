@@ -1,5 +1,6 @@
 import '@blocknote/mantine/style.css';
-import { useImperativeHandle, type Ref } from 'react';
+
+import { type Ref, useImperativeHandle } from 'react';
 
 import type { CustomBlockNoteProps, NoteBodyEditorHandle } from './index.type';
 import { useNoteEditorRuntimeCoordinator } from './registry/useNoteEditorRuntimeCoordinator';

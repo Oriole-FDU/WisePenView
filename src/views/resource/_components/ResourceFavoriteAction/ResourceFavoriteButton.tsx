@@ -1,7 +1,8 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import { ToggleButton } from '@heroui/react';
 import { Bookmark } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
 
 interface ResourceFavoriteButtonProps {
   isFavorited: boolean;

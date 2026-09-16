@@ -1,4 +1,5 @@
 import { apiPost } from '@/apis/request';
+
 import type { ImageUploadApiRequest, ImageUploadApiResponse } from './ImageApi.type';
 
 function imageUpload(

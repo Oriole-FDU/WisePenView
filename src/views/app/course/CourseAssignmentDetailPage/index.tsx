@@ -1,3 +1,9 @@
+import { toast } from '@heroui/react';
+import { ArrowLeft, CalendarClock, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import UploadZone from '@/components/base/Input/UploadZone';
@@ -8,12 +14,7 @@ import { useCourseContext } from '@/layouts/Course/CourseContext';
 import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { buildCourseAssignmentPath } from '@/utils/navigation/appRoute';
-import { toast } from '@heroui/react';
 
-import { ArrowLeft, CalendarClock, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
 import styles from './style.module.less';
 
 function CourseAssignmentDetailPage() {

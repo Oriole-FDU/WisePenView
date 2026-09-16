@@ -1,9 +1,9 @@
 export { createDefaultCourseAssessmentItems } from './constants/defaults';
 export {
-  FUDAN_COURSE_PERIODS,
   calculateCourseTeachingWeek,
   calculateCourseTotalTeachingWeeks,
   formatCoursePeriodRange,
+  FUDAN_COURSE_PERIODS,
   getCoursePeriodTimeRange,
   isCoursePeriod,
 } from './constants/schedule';
@@ -13,11 +13,11 @@ export {
   COURSE_FINAL_ASSESSMENT_TYPE,
   COURSE_ROLE,
   COURSE_WEEK_PATTERN,
-  isCourseFinalAssessmentType,
-  isCourseWeekPattern,
   type CourseAssignmentStatus,
   type CourseFinalAssessmentType,
   type CourseRole,
   type CourseWeekPattern,
+  isCourseFinalAssessmentType,
+  isCourseWeekPattern,
 } from './enum';
 export type * from './service/index.type';

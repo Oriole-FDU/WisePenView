@@ -1,4 +1,5 @@
 import type { ChatAgentOption, ChatInputCapabilityOptions } from '@/domains/Chat';
+
 import type { VoiceInputProps } from '../VoiceInput';
 
 export interface InputToolbarProps {

@@ -19,9 +19,9 @@ import type {
 } from '@/domains/Course/entity/course';
 import {
   COURSE_ROLE,
+  type CourseRole,
   isCourseFinalAssessmentType,
   isCourseWeekPattern,
-  type CourseRole,
 } from '@/domains/Course/enum';
 import type { Group, GroupMember } from '@/domains/Group';
 import type { ResourceItem } from '@/domains/Resource';

@@ -1,5 +1,6 @@
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { createContext, useContext } from 'react';
+
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 export type AppAuthMode = 'authenticated' | 'anonymous';
 

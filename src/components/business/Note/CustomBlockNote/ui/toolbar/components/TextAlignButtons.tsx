@@ -1,10 +1,8 @@
-import { getSafeTableCellSelection } from '@/components/business/Note/CustomBlockNote/plugins/TablePlugin/ui/tableHandles/safe';
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import {
   blockHasType,
   defaultProps,
-  mapTableCell,
   type InlineContentSchema,
+  mapTableCell,
   type StyleSchema,
   type TableContent,
 } from '@blocknote/core';
@@ -12,6 +10,10 @@ import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { getSafeTableCellSelection } from '@/components/business/Note/CustomBlockNote/plugins/TablePlugin/ui/tableHandles/safe';
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+
 import { getSelectedBlocks, toBlockUpdate } from '../utils';
 import { ToolbarToggleButton } from './ToolbarButton';
 

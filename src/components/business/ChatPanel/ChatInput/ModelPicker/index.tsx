@@ -1,7 +1,9 @@
+import { useShallow } from 'zustand/react/shallow';
+
 import ModelSelector from '@/components/business/ModelSelector';
 import { useChatService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { useShallow } from 'zustand/react/shallow';
+
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 
 function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {

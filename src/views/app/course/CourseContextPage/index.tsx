@@ -1,9 +1,11 @@
-import { useCourseContext } from '@/layouts/Course/CourseContext';
-import { APP_ROUTE_PATH, buildCoursePath } from '@/utils/navigation/appRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
 import { Tabs } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useMatch, useNavigate } from 'react-router-dom';
+
+import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { APP_ROUTE_PATH, buildCoursePath } from '@/utils/navigation/appRoute';
+import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
+
 import styles from './style.module.less';
 
 const COURSE_CONTEXT_TAB_KEYS = ['home', 'info'] as const;

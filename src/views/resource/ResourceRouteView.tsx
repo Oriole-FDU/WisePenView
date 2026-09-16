@@ -1,3 +1,5 @@
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { buildResourcePathWithSearch } from '@/utils/navigation/resourceRoute';
 import {
@@ -5,10 +7,10 @@ import {
   normalizeResourceViewer,
   type ResourceTarget,
 } from '@/utils/navigation/resourceTarget';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import ResourceSidePanel from './_components/ResourceSidePanel';
 import { useResourceHostContext } from './ResourceHostContext';
 import ResourceRenderer from './ResourceRenderer';
-import ResourceSidePanel from './_components/ResourceSidePanel';
 
 function ResourceRouteView() {
   const { resourceType: rawResourceType, resourceId } = useParams<{

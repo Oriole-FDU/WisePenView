@@ -1,3 +1,4 @@
+// eslint-disable-next-line simple-import-sort/imports -- i18n 必须先初始化；全局样式保持在 App 样式之后、错误页样式之前。
 import '@/i18n';
 import '@fontsource-variable/noto-sans-sc/wght.css';
 import { createRoot } from 'react-dom/client';

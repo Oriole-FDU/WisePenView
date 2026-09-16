@@ -1,8 +1,10 @@
-import { SVG_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/sanitizeHtml';
 import { Tabs } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/sanitizeHtml';
+
 import { CodeBlockFrame, HighlightedCode } from '../CodeBlock';
 import { renderMermaidDiagram } from './mermaidRuntime';
 import styles from './style.module.less';

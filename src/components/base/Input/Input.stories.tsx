@@ -1,7 +1,9 @@
-import { AppButton } from '@/components/base/Button';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
+
+import { AppButton } from '@/components/base/Button';
+
 import Checkbox from './Checkbox';
 import Fieldset from './Fieldset';
 import FormField from './FormField';

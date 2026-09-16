@@ -8,7 +8,7 @@ import {
   RefreshCw,
   Settings,
 } from 'lucide-react';
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type {

@@ -1,3 +1,7 @@
+import { isTextUIPart } from 'ai';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   Attachment,
   AttachmentContent,
@@ -10,9 +14,7 @@ import AppPopover from '@/components/base/AppPopover';
 import CopyButton from '@/components/base/Button/CopyButton';
 import EntryIcon from '@/components/base/Icons/EntryIcon';
 import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/Chat';
-import { isTextUIPart } from 'ai';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
 import styles from './style.module.less';

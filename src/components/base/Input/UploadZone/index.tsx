@@ -1,3 +1,8 @@
+import { ProgressBar } from '@heroui/react';
+import { UploadCloud, X } from 'lucide-react';
+import { type ChangeEvent, type DragEvent, type KeyboardEvent, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   Attachment,
   AttachmentAction,
@@ -11,11 +16,7 @@ import {
 import { AppButton } from '@/components/base/Button';
 import EntryIcon from '@/components/base/Icons/EntryIcon';
 import { formatFileSize } from '@/utils/format/formatFileSize';
-import { ProgressBar } from '@heroui/react';
 
-import { UploadCloud, X } from 'lucide-react';
-import { useRef, useState, type ChangeEvent, type DragEvent, type KeyboardEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { UploadZoneProps } from './index.type';
 import styles from './style.module.less';
 

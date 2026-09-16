@@ -1,4 +1,5 @@
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
 import type {
   IssueRecognitionCredentialApiRequest,
   IssueRecognitionCredentialApiResponse,

@@ -1,3 +1,8 @@
+import { Plus, UserPlus } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { Empty, Spin } from '@/components/base/Feedback';
 import CourseCard from '@/components/business/CourseCard';
@@ -11,10 +16,6 @@ import {
   parseCourseListRouteQuery,
 } from '@/utils/navigation/appRoute';
 
-import { Plus, UserPlus } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import PublicListPagination from '../_components/PublicListPagination';
 import { CreateCourseModal, JoinCourseModal } from '../_components/PublicModals';
 import PublicSectionTabs from '../_components/PublicSectionTabs';

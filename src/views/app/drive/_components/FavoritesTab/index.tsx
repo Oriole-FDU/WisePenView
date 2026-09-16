@@ -1,11 +1,13 @@
-import { Empty, Spin } from '@/components/base/Feedback';
-import type { FavoriteCollection } from '@/domains/Interact';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import DeleteCollectionModal from './DeleteCollectionModal';
-import EditCollectionModal from './EditCollectionModal';
+
+import { Empty, Spin } from '@/components/base/Feedback';
+import type { FavoriteCollection } from '@/domains/Interact';
+
 import FavoriteCollectionList from './components/FavoriteCollectionList';
 import FavoriteResourceTable from './components/FavoriteResourceTable';
+import DeleteCollectionModal from './DeleteCollectionModal';
+import EditCollectionModal from './EditCollectionModal';
 import { useFavoriteCollections } from './hooks/useFavoriteCollections';
 import styles from './style.module.less';
 

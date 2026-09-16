@@ -4,10 +4,10 @@ import { useEffect, useRef } from 'react';
 
 import {
   buildNoteOutlineProjection,
-  projectNoteOutlineBlock,
-  resolveActiveOutlineItemId,
   type NoteOutlineBlockSnapshot,
   type NoteOutlineItem,
+  projectNoteOutlineBlock,
+  resolveActiveOutlineItemId,
 } from '../engines/outline';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
 import type { NotePluginRegistry, NoteTransactionAnalysis } from '../registry/types';

@@ -1,5 +1,3 @@
-import type { CustomBlockNoteEditor } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
-import i18n from '@/i18n';
 import { editorHasBlockWithType } from '@blocknote/core';
 import {
   Braces,
@@ -14,11 +12,15 @@ import {
   List,
   ListOrdered,
   ListTree,
+  type LucideIcon,
   TextQuote,
   Type,
-  type LucideIcon,
 } from 'lucide-react';
-import { isRecord, toBlockUpdate, type NoteBlock } from './utils';
+
+import type { CustomBlockNoteEditor } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+import i18n from '@/i18n';
+
+import { isRecord, type NoteBlock, toBlockUpdate } from './utils';
 
 type BlockTypeProps = Record<string, boolean | number | string>;
 

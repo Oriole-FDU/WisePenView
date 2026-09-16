@@ -1,4 +1,3 @@
-import { ADMIN_PAGE_CONFIGS } from '@/views/admin/pages';
 import {
   Layers,
   List,
@@ -12,6 +11,9 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { ADMIN_PAGE_CONFIGS } from '@/views/admin/pages';
+
 import HeaderNav from '../../_common/header/HeaderNav';
 import type { HeaderNavSection } from '../../_common/header/HeaderNav/index.type';
 import type { AdminHeaderNavProps } from './index.type';

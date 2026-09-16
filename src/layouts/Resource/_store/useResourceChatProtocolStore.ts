@@ -1,6 +1,7 @@
+import { create } from 'zustand';
+
 import type { ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import { registerStore } from '@/store/lifecycle';
-import { create } from 'zustand';
 
 interface ResourceChatProtocolState {
   context?: ResourceChatContext;

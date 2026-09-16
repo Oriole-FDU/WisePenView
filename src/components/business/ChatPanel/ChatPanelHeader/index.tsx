@@ -1,8 +1,10 @@
+import { History, PanelRightClose, Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { cn } from '@/utils/cn';
-import { History, PanelRightClose, Plus } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+
 import styles from '../style.module.less';
 import type { ChatPanelHeaderProps } from './index.type';
 

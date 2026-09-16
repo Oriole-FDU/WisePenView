@@ -1,8 +1,9 @@
-import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { useSyncExternalStore } from 'react';
 
+import { STORAGE_KEYS } from '@/constants/storageKeys';
+
 import { COLOR_SCHEME_ICON_SRC } from './colorSchemeIcons';
-import { COLOR_SCHEME, DEFAULT_COLOR_SCHEME, type ColorScheme } from './constants';
+import { COLOR_SCHEME, type ColorScheme, DEFAULT_COLOR_SCHEME } from './constants';
 
 const COLOR_SCHEME_VALUES = new Set<string>(Object.values(COLOR_SCHEME));
 const colorSchemeListeners = new Set<() => void>();

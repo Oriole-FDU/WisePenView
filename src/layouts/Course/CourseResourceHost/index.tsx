@@ -1,14 +1,15 @@
 import type { ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import { cn } from '@/utils/cn';
 import type { ResourceTarget } from '@/utils/navigation/resourceTarget';
+import ResourceSidePanel from '@/views/resource/_components/ResourceSidePanel';
 import {
-  ResourceHostContext,
   type OpenResourceFn,
+  ResourceHostContext,
   type ResourceHostContextValue,
   type ResourceHostLayoutConfig,
 } from '@/views/resource/ResourceHostContext';
 import ResourceRenderer from '@/views/resource/ResourceRenderer';
-import ResourceSidePanel from '@/views/resource/_components/ResourceSidePanel';
+
 import styles from './style.module.less';
 
 interface CourseResourceHostProps {

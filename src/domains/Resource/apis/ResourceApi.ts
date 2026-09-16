@@ -1,5 +1,6 @@
 import { apiGet, apiPost } from '@/apis/request';
 import { serializeRepeatKeyQuery } from '@/apis/serializeRepeatKeyQuery';
+
 import type {
   ChangeResourceActionPermissionApiRequest,
   GlobalSearchApiRequest,

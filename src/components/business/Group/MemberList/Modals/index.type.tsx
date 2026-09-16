@@ -1,4 +1,5 @@
 import type { GroupMember } from '@/domains/Group';
+
 import type { GroupDisplayConfig } from '../../GroupDisplayConfig';
 
 export interface InviteUserModalProps {

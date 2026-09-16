@@ -1,6 +1,8 @@
-import { cn } from '@/utils/cn';
 import { Heading, Paragraph } from '@heroui/react';
 import type { ReactNode } from 'react';
+
+import { cn } from '@/utils/cn';
+
 import styles from './style.module.less';
 
 interface PageHeaderProps {

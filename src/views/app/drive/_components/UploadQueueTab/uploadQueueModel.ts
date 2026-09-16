@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import type { DriveUploadQueueItem } from '@/components/business/Drive/_store/useDriveUploadQueueStore';
 import type { DocumentProcessStatus, PendingDocItem } from '@/domains/Document';
 import {
@@ -5,7 +7,6 @@ import {
   isDocumentCancelableStatus,
   isDocumentRetryableStatus,
 } from '@/domains/Document';
-import type { TFunction } from 'i18next';
 
 export type UploadProgressPresentation =
   | { kind: 'loading'; label: string }

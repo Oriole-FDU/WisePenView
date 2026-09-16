@@ -1,5 +1,6 @@
 import type { Selection, SortDescriptor } from '@heroui/react';
 import type { ReactNode } from 'react';
+
 import type { EditableColumnWidth } from '../shared/TableBase/columnWidth';
 import type { TableColumnBase } from '../shared/TableBase/index.type';
 import type { TableRowAction } from '../shared/TableRowActions/index.type';

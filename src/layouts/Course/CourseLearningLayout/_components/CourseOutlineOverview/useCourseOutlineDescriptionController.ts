@@ -1,8 +1,9 @@
-import { useCourseService } from '@/domains';
-import { useApi } from '@/hooks/useApi';
 import { toast } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useCourseService } from '@/domains';
+import { useApi } from '@/hooks/useApi';
 
 interface UseCourseOutlineDescriptionControllerOptions {
   courseId: string;

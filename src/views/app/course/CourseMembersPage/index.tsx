@@ -1,3 +1,6 @@
+import { Chip } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import MemberList from '@/components/business/Group/MemberList';
@@ -7,8 +10,7 @@ import { COURSE_ROLE } from '@/domains/Course';
 import { GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/CourseContext';
-import { Chip } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 interface CourseMembersViewProps {

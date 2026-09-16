@@ -1,12 +1,13 @@
-import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
 import {
   GenericPopover,
+  type GenericPopoverReference,
   useBlockNoteEditor,
   useEditorState,
-  type GenericPopoverReference,
 } from '@blocknote/react';
 import { useEventListener } from 'ahooks';
 import { useEffect } from 'react';
+
+import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
 
 import { useNoteEditorReadOnlyContext } from '../../engines/editor/readOnly';
 import { blockNoteSchema } from '../../registry/noteEditorComposition';

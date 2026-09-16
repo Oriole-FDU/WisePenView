@@ -1,8 +1,10 @@
-import { useGroupContext } from '@/layouts/Group/GroupContext';
 import { useOutletContext } from 'react-router-dom';
-import type { GroupDetailOutletContextValue } from '..';
+
+import { useGroupContext } from '@/layouts/Group/GroupContext';
+
 import OwnerGroupTokenTransfer from '../../_components/OwnerGroupTokenTransfer';
 import layout from '../../style.module.less';
+import type { GroupDetailOutletContextValue } from '..';
 
 function GroupTokenTransferPage() {
   const { group } = useGroupContext();

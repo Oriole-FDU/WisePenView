@@ -1,9 +1,9 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 import {
-  NoteInteractionStoreContext,
   createNoteInteractionStore,
   type NoteInteractionState,
+  NoteInteractionStoreContext,
 } from './noteInteractionStore';
 
 export function NoteInteractionStoreProvider({

@@ -10,14 +10,15 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import i18n from '@/i18n';
 import { copyText } from '@/utils/browser/copyText';
-import { SVG_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/sanitizeHtml';
+import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/sanitizeHtml';
+
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import { renderNoteMermaidDiagram } from '../mermaidRuntime';
 import {
   DEFAULT_MERMAID_SOURCE,
   MERMAID_TEMPLATE_SOURCES,
-  readMermaidSource,
   type MermaidTemplateKey,
+  readMermaidSource,
 } from '../source';
 import styles from './style.module.less';
 

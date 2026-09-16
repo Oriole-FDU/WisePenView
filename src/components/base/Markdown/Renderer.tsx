@@ -1,12 +1,15 @@
-import { Checkbox } from '@/components/base/Input';
-import { MATH_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/sanitizeHtml';
+import 'katex/dist/katex.min.css';
+
 import type { ParsedBlock, RootContent } from '@incremark/core';
 import katex from 'katex';
-import 'katex/dist/katex.min.css';
 import { CornerUpLeft } from 'lucide-react';
-import { createContext, Fragment, memo, useContext, type MouseEvent, type ReactNode } from 'react';
+import { createContext, Fragment, memo, type MouseEvent, type ReactNode, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { Checkbox } from '@/components/base/Input';
+import { MATH_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/sanitizeHtml';
+
 import CodeBlock from './CodeBlock';
 import MermaidBlock from './MermaidBlock';
 import { isMermaidLanguage } from './MermaidBlock/language';

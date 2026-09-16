@@ -1,4 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- BlockNote block spec 与展示组件同文件 */
+import 'katex/dist/katex.min.css';
+
 import type {
   BlockConfig,
   BlockNoteEditor,
@@ -7,10 +9,10 @@ import type {
   StyleSchema,
 } from '@blocknote/core';
 import { createReactBlockSpec } from '@blocknote/react';
-import 'katex/dist/katex.min.css';
 import type { ComponentType, MouseEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import popoverStyles from '../InlineMath/style.module.less';
 import { renderKatexInto } from '../katexRender';

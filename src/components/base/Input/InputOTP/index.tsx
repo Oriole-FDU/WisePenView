@@ -1,10 +1,11 @@
-import { cn } from '@/utils/cn';
 import {
   InputOTP as HeroInputOTP,
   REGEXP_ONLY_CHARS,
   REGEXP_ONLY_DIGITS,
   REGEXP_ONLY_DIGITS_AND_CHARS,
 } from '@heroui/react';
+
+import { cn } from '@/utils/cn';
 
 import type { InputOTPProps } from './index.type';
 import styles from './style.module.less';

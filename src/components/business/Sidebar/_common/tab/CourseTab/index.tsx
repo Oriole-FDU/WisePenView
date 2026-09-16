@@ -1,12 +1,14 @@
+import { BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { Spin } from '@/components/base/Feedback';
 import Tree, { type TreeDataNode } from '@/components/base/Tree';
 import { useCourseService } from '@/domains';
 import type { CourseSummary } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { buildCourseLearningPath } from '@/utils/navigation/appRoute';
-import { BookOpen } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+
 import styles from './style.module.less';
 
 function toCourseTreeData(courses: CourseSummary[]): TreeDataNode[] {

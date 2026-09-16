@@ -1,7 +1,8 @@
-import { cn } from '@/utils/cn';
 import type { ReactNode } from 'react';
 
 import { Modal } from '@/components/base/Modal';
+import { cn } from '@/utils/cn';
+
 import type { AppModalBodyProps, AppModalFooterProps, AppModalProps } from './index.type';
 import styles from './style.module.less';
 

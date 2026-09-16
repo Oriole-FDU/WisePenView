@@ -1,9 +1,10 @@
-import type { AiDiffDisplayMode } from '@/domains/Note';
-import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { createContext, useContext } from 'react';
 import { useStore } from 'zustand';
 import { createStore, type StoreApi } from 'zustand/vanilla';
+
+import type { AiDiffDisplayMode } from '@/domains/Note';
+import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { NoteFindResult } from '../index.type';
 

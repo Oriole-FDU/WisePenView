@@ -1,10 +1,13 @@
+import { Tabs } from '@heroui/react';
+import { Check, X } from 'lucide-react';
+
 import { Checkbox } from '@/components/base/Input';
 import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
 import {
+  resolveTagPermissionActionPresetKey,
   TAG_PERMISSION_ACTION_PRESET_OPTIONS,
   TAG_PERMISSION_ACTION_ROWS,
   TAG_PERMISSION_RESOURCE_STRATEGIES,
-  resolveTagPermissionActionPresetKey,
   type TagPermissionResourceStrategy,
 } from '@/components/business/Drive/common/tagPermissionPreset';
 import {
@@ -15,8 +18,7 @@ import {
   type TagPermissionPresetKey,
   type TagResourceAction,
 } from '@/domains/Tag';
-import { Tabs } from '@heroui/react';
-import { Check, X } from 'lucide-react';
+
 import styles from './style.module.less';
 
 type ActionPresetKey = Exclude<TagPermissionPresetKey, 'custom'>;

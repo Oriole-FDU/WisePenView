@@ -1,10 +1,11 @@
-import { AppButton } from '@/components/base/Button';
-import { isAdmin, isOwner, type GroupRole } from '@/components/business/Group/GroupDisplayConfig';
-import type { Group, GroupResConfig } from '@/domains/Group';
-
 import { LogOut, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { AppButton } from '@/components/base/Button';
+import { type GroupRole, isAdmin, isOwner } from '@/components/business/Group/GroupDisplayConfig';
+import type { Group, GroupResConfig } from '@/domains/Group';
+
 import { DissolveGroupModal, ExitGroupModal } from '../../../_components/GroupModals';
 import GroupPermissionSection from '../GroupPermissionSection';
 import GroupProfileSection from '../GroupProfileSection';

@@ -1,6 +1,8 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+
 import { joinClassNames } from '../../../shared/TableBase/cellAlign';
 import type { TableEditErrorToastProps } from './index.type';
 import styles from './style.module.less';

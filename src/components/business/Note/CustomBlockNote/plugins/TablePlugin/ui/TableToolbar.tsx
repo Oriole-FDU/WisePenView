@@ -1,22 +1,8 @@
-import AppPopover from '@/components/base/AppPopover';
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
-import { ColorPaletteContent } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPalette';
-import type { ColorKey } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
-import {
-  ToolbarButton,
-  ToolbarToggleButton,
-  type ButtonGroupChildProps,
-} from '@/components/business/Note/CustomBlockNote/ui/toolbar/components/ToolbarButton';
-import {
-  getSelectedBlocks,
-  toBlockUpdate,
-} from '@/components/business/Note/CustomBlockNote/ui/toolbar/utils';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import {
   blockHasType,
+  type InlineContentSchema,
   isTableCellSelection,
   mapTableCell,
-  type InlineContentSchema,
   type StyleSchema,
   type TableContent,
 } from '@blocknote/core';
@@ -31,13 +17,28 @@ import {
   TableCellsSplit,
   Trash2,
 } from 'lucide-react';
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, type ReactNode, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import AppPopover from '@/components/base/AppPopover';
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+import { ColorPaletteContent } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPalette';
+import type { ColorKey } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
 import {
+  type ButtonGroupChildProps,
+  ToolbarButton,
+  ToolbarToggleButton,
+} from '@/components/business/Note/CustomBlockNote/ui/toolbar/components/ToolbarButton';
+import {
+  getSelectedBlocks,
+  toBlockUpdate,
+} from '@/components/business/Note/CustomBlockNote/ui/toolbar/utils';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
+import {
+  type TableRailSelectionOrientation,
   tableRailSelectionState,
   useTableRailSelectionState,
-  type TableRailSelectionOrientation,
 } from './tableHandles/railSelectionState';
 import { getSafeTableCellSelection, getTableHandles } from './tableHandles/safe';
 import styles from './TableToolbar.module.less';

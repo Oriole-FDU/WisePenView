@@ -1,8 +1,9 @@
-import { useInteractService } from '@/domains';
-import { useApi } from '@/hooks/useApi';
 import { toast } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useInteractService } from '@/domains';
+import { useApi } from '@/hooks/useApi';
 
 interface UseFavoriteCollectionPickerControllerOptions {
   resourceId: string;

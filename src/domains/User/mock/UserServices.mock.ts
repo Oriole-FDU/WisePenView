@@ -8,9 +8,10 @@ import type {
   UserAccountProfile,
   UserSearchUser,
 } from '@/domains/User';
+
 import type { GetUserInfoApiResponse } from '../apis/UserApi.type';
-import { UserServicesMap } from '../mapper/UserServices.map';
 import { normalizeIdentityTypeFromApi } from '../mapper/userEnum.mapper';
+import { UserServicesMap } from '../mapper/UserServices.map';
 import mockdata from './mockdata.json';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

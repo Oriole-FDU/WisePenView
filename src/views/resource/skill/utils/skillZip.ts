@@ -1,5 +1,6 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import JSZip from 'jszip';
+
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 export interface ParsedSkillZipFile {
   name: string;

@@ -1,9 +1,11 @@
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
+
 import { FolderTable, type FolderTableColumn, type FolderTableRow } from '@/components/base/Table';
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
 import type { FavoriteItem } from '@/domains/Interact';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
-import type { TFunction } from 'i18next';
-import { useTranslation } from 'react-i18next';
+
 import { useFavoriteResourceTableController } from '../hooks/useFavoriteResourceTableController';
 import styles from '../style.module.less';
 import UnfavoriteResourceModal from './UnfavoriteResourceModal';

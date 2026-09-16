@@ -1,16 +1,18 @@
+import { useTranslation } from 'react-i18next';
+
 import type { FolderTableRowAction } from '@/components/base/Table';
 import type { ResourcePermissionModalTarget } from '@/components/business/Drive/Modals';
 import {
+  resolveResourceKind,
   RESOURCE_KIND,
   RESOURCE_VIEWER,
-  resolveResourceKind,
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
-import { useTranslation } from 'react-i18next';
+
 import {
+  type DriveActionTarget,
   isDriveActionTarget,
   isDriveSystemFolderNode,
-  type DriveActionTarget,
 } from '../../common/driveComponentModel';
 import type { DriveTableRow } from '../index.type';
 

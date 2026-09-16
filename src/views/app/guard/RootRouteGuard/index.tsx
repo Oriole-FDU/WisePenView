@@ -1,8 +1,10 @@
+import { Navigate } from 'react-router-dom';
+
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { Navigate } from 'react-router-dom';
+
 import styles from '../AuthenticatedRouteGuard/style.module.less';
 
 function RootRouteGuard() {

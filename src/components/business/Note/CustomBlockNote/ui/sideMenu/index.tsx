@@ -1,41 +1,3 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
-import {
-  exportNoteFullHtml,
-  exportNoteMarkdown,
-} from '@/components/business/Note/CustomBlockNote/engines/markdown/markdownExport';
-import type { CustomBlockNoteEditor } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
-import {
-  blockNoteSchema,
-  createDefaultNoteBlock,
-  notePluginRegistry,
-} from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
-import type { NoteContentPlugin } from '@/components/business/Note/CustomBlockNote/registry/types';
-import {
-  applyBlockTypeToBlocks,
-  blockMatchesBlockTypeItem,
-  getAvailableBlockTypeItems,
-  type BlockTypeMenuItem,
-} from '@/components/business/Note/CustomBlockNote/ui/editorMenus/blockTypes';
-import { ColorPaletteContent } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPalette';
-import type { ColorKey } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
-import {
-  isRecord,
-  toBlockUpdate,
-  type NoteBlock,
-  type NotePartialBlock,
-} from '@/components/business/Note/CustomBlockNote/ui/editorMenus/utils';
-import {
-  NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET,
-  getNoteSlashMenuItems,
-} from '@/components/business/Note/CustomBlockNote/ui/slashMenu/buildSlashMenuItems';
-import {
-  resolveSlashMenuGroup,
-  sortSuggestionItemsForDisplay,
-} from '@/components/business/Note/CustomBlockNote/ui/slashMenu/slashMenuModel';
-import { SlashMenuDropdownItems } from '@/components/business/Note/CustomBlockNote/ui/slashMenu/slashMenuView';
-import { copyText } from '@/utils/browser/copyText';
-import { cn } from '@/utils/cn';
 import { blockHasType, defaultProps, editorHasBlockWithType } from '@blocknote/core';
 import { SideMenuExtension, SuggestionMenu } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
@@ -57,15 +19,55 @@ import {
   GripVertical,
   IndentDecrease,
   IndentIncrease,
+  type LucideIcon,
   Paintbrush,
   Plus,
   PlusSquare,
   Scissors,
   Trash2,
-  type LucideIcon,
 } from 'lucide-react';
-import { useEffect, useRef, useState, type DragEvent, type ReactNode } from 'react';
+import { type DragEvent, type ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+import {
+  exportNoteFullHtml,
+  exportNoteMarkdown,
+} from '@/components/business/Note/CustomBlockNote/engines/markdown/markdownExport';
+import type { CustomBlockNoteEditor } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+import {
+  blockNoteSchema,
+  createDefaultNoteBlock,
+  notePluginRegistry,
+} from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+import type { NoteContentPlugin } from '@/components/business/Note/CustomBlockNote/registry/types';
+import {
+  applyBlockTypeToBlocks,
+  blockMatchesBlockTypeItem,
+  type BlockTypeMenuItem,
+  getAvailableBlockTypeItems,
+} from '@/components/business/Note/CustomBlockNote/ui/editorMenus/blockTypes';
+import { ColorPaletteContent } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPalette';
+import type { ColorKey } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/colorPaletteData';
+import {
+  isRecord,
+  type NoteBlock,
+  type NotePartialBlock,
+  toBlockUpdate,
+} from '@/components/business/Note/CustomBlockNote/ui/editorMenus/utils';
+import {
+  getNoteSlashMenuItems,
+  NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET,
+} from '@/components/business/Note/CustomBlockNote/ui/slashMenu/buildSlashMenuItems';
+import {
+  resolveSlashMenuGroup,
+  sortSuggestionItemsForDisplay,
+} from '@/components/business/Note/CustomBlockNote/ui/slashMenu/slashMenuModel';
+import { SlashMenuDropdownItems } from '@/components/business/Note/CustomBlockNote/ui/slashMenu/slashMenuView';
+import { copyText } from '@/utils/browser/copyText';
+import { cn } from '@/utils/cn';
+
 import styles from './style.module.less';
 
 type TextAlignment = 'left' | 'center' | 'right';

@@ -1,8 +1,9 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
 import { clampResourceSidePanelWidth } from '@/constants/layoutScale';
 import { registerStore } from '@/store/lifecycle';
 import { createStoreJSONStorage } from '@/store/persistence';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export const RESOURCE_SIDE_PANEL_DEFAULT_WIDTH = 360;
 

@@ -1,6 +1,7 @@
-import { cn } from '@/utils/cn';
-import { useState, type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/utils/cn';
 
 import type { RatingProps } from './index.type';
 import styles from './style.module.less';

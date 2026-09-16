@@ -1,4 +1,3 @@
-import { resolveResourceIconType } from '@/domains/Resource';
 import {
   Bot,
   File,
@@ -18,6 +17,9 @@ import {
   Workflow,
   Wrench,
 } from 'lucide-react';
+
+import { resolveResourceIconType } from '@/domains/Resource';
+
 import type { EntryIconProps } from './index.type';
 
 const COLOR_ROOT = 'var(--resource-icon-root)';

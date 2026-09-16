@@ -1,5 +1,6 @@
+import { type RefObject, useCallback, useEffect, useRef } from 'react';
+
 import { DESKTOP_WINDOW_CONTROLS_WIDTH } from '@/constants/layoutScale';
-import { useCallback, useEffect, useRef, type RefObject } from 'react';
 
 interface UseResourceHeaderEndReserveOptions {
   /** 静止态对应的右 dock 宽度（展开=面板宽，收起=0） */

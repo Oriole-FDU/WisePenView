@@ -1,11 +1,12 @@
 import type { ROLE } from '@/domains/Group';
 import type { EnumKey } from '@/utils/enum';
+
 import {
   canEditSelectedMembers,
   canEditSelectedMembersForQuota,
-  isOwner,
   type EditableRole,
   type EditableRoleForQuota,
+  isOwner,
 } from '../../GroupDisplayConfig';
 
 interface UseMemberEditGuardOptions {

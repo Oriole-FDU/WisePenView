@@ -1,13 +1,14 @@
 import {
+  type BlockSpecs,
   defaultBlockSpecs,
   defaultInlineContentSpecs,
-  type BlockSpecs,
   type InlineContentConfig,
   type InlineContentSpec,
 } from '@blocknote/core';
 import { Image as ImageIcon } from 'lucide-react';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
 import { projectInlinePlainText } from '../../engines/plainText';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
 import type {
@@ -21,8 +22,8 @@ import type {
 import {
   createRichTextBlockAiDiff,
   linkInlineAiDiff,
-  textInlineAiDiff,
   type NoteRichTextAiDiffConfig,
+  textInlineAiDiff,
 } from './aiDiff';
 
 const DEFAULT_CAPABILITY: NoteCapabilityDeclaration = { support: 'default' };

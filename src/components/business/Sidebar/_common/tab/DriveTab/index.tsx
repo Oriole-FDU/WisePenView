@@ -1,20 +1,23 @@
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { Empty, Spin } from '@/components/base/Feedback';
 import type { DataNode } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
 import { buildDriveTreeData } from '@/components/business/Drive/common/buildDriveTreeData';
 import {
-  getDriveNodeLabel,
-  getDriveScopeGroupId,
   type DriveActionTarget,
   type DriveViewNode,
+  getDriveNodeLabel,
+  getDriveScopeGroupId,
 } from '@/components/business/Drive/common/driveComponentModel';
 import {
   DriveCreateModal,
+  type DriveCreateType,
   DriveDeleteModal,
   RenameNodeModal,
   TrashDeleteModal,
   UploadDocumentModal,
-  type DriveCreateType,
 } from '@/components/business/Drive/Modals';
 import {
   MARKDOWN_NOTE_FILE_ACCEPT,
@@ -26,8 +29,6 @@ import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
 import {
@@ -244,7 +245,7 @@ function DriveTab() {
           driveLocation: resolveContainerResourceLocation(target),
         });
       },
-      onErrorEffect: (err) => {
+      onErrorEffect: () => {
         setNoteTarget(null);
       },
     }

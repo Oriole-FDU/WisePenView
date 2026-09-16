@@ -1,6 +1,8 @@
-import type { ResourceIconType } from '@/domains/Resource';
 import type { SortDescriptor } from '@heroui/react';
 import type { DragEvent, ReactElement, ReactNode } from 'react';
+
+import type { ResourceIconType } from '@/domains/Resource';
+
 import type { FolderColumnWidth } from '../shared/TableBase/columnWidth';
 import type { TableColumnBase, TableLoadMore } from '../shared/TableBase/index.type';
 import type { TableRowAction } from '../shared/TableRowActions/index.type';

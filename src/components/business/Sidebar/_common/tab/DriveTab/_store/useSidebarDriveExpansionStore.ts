@@ -1,7 +1,8 @@
-import { registerStore } from '@/store/lifecycle';
-import { createStoreJSONStorage } from '@/store/persistence';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { registerStore } from '@/store/lifecycle';
+import { createStoreJSONStorage } from '@/store/persistence';
 
 interface SidebarDriveExpansionState {
   expandedNodeIdsByScope: Record<string, string[]>;

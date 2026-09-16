@@ -1,9 +1,11 @@
+import { toast } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import type { ResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
-import { toast } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
+
 import ResourceLayoutConfig from '../../../_components/ResourceLayoutConfig';
 import type { AgentVersionItem, AgentWorkspaceData } from '../../model';
 import styles from '../../style.module.less';

@@ -1,3 +1,7 @@
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { type CSSProperties, type RefObject, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { CommandGroup, CommandItem } from '@/components/_shadcn';
 import { Empty, Spin } from '@/components/base/Feedback';
 import EntryIcon from '@/components/base/Icons/EntryIcon';
@@ -6,10 +10,8 @@ import type { SearchHitItem, SearchResultPage } from '@/domains/Resource';
 import { SEARCH_SCOPE } from '@/domains/Resource';
 import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { SEARCH_HIGHLIGHT_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/sanitizeHtml';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { useEffect, useState, type CSSProperties, type RefObject } from 'react';
-import { useTranslation } from 'react-i18next';
+import { sanitizeHtml, SEARCH_HIGHLIGHT_SANITIZE_CONFIG } from '@/utils/sanitizeHtml';
+
 import styles from './style.module.less';
 
 const PAGE_SIZE = 20;

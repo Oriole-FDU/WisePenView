@@ -1,19 +1,20 @@
+import '@blocknote/mantine/style.css';
+
 import type { Block as BlockNoteBlock } from '@blocknote/core';
 import { en, zh } from '@blocknote/core/locales';
 import { BlockNoteView } from '@blocknote/mantine';
-import '@blocknote/mantine/style.css';
 import { useCreateBlockNote } from '@blocknote/react';
+import { toast } from '@heroui/react';
 import { useDebounceFn, useLatest, useMemoizedFn, useMount, useUnmount } from 'ahooks';
-import { useEffect, useImperativeHandle, useRef, type KeyboardEvent, type Ref } from 'react';
+import { type KeyboardEvent, type Ref, useEffect, useImperativeHandle, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
 import { getProseMirrorRoot } from '@/components/business/Note/CustomBlockNote/engines/editor/dom';
 import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
-
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
+
 import styles from './style.module.less';
 
 export interface NoteTitleHandle {

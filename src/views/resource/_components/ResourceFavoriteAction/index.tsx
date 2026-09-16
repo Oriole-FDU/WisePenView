@@ -1,9 +1,11 @@
+import { toast } from '@heroui/react';
+import { useState } from 'react';
+
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
 import { useInteractService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
-import { useState } from 'react';
+
 import ResourceFavoriteButton from './ResourceFavoriteButton';
 
 interface ResourceFavoriteActionProps {

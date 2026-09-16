@@ -1,10 +1,11 @@
 import {
   COURSE_FINAL_ASSESSMENT_TYPE,
-  createDefaultCourseAssessmentItems,
   type CourseDetail,
+  createDefaultCourseAssessmentItems,
   type UpdateCourseRequest,
 } from '@/domains/Course';
-import { createAssessmentEditorItem, createCourseMeeting, type CourseEditorForm } from './model';
+
+import { type CourseEditorForm, createAssessmentEditorItem, createCourseMeeting } from './model';
 
 interface MapCourseEditorFormToUpdateRequestParams {
   courseId: string;

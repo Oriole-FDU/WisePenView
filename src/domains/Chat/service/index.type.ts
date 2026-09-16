@@ -1,5 +1,6 @@
 import type { Group, IGroupService } from '@/domains/Group';
 import type { IResourceService, ResourceSkillSummary } from '@/domains/Resource';
+
 import type { ChatAgentOption } from '../entity/agent';
 import type { WisePenUIMessage } from '../entity/message';
 import type { CapabilityToolOption } from '../mapper/capabilityPicker.mapper';

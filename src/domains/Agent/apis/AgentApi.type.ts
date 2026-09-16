@@ -1,9 +1,9 @@
-import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type {
   InitUploadAssetApiItem,
   VersionBundleApiResponse,
   VersionResourceInfoApiResponse,
 } from '@/domains/_shared/apis/versionAssetApi.type';
+import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 
 export const AGENT_ASSET_RESOURCE_TYPE_API = {
   MD: 'MD',

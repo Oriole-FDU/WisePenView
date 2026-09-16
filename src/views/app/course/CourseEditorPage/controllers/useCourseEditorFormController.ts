@@ -1,17 +1,19 @@
+import { toast } from '@heroui/react';
+import { type SyntheticEvent, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useCourseService, useImageService } from '@/domains';
 import type { CourseAssessmentItem, CourseDetail, CourseMeeting } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
-import { toast } from '@heroui/react';
-import { useRef, useState, type SyntheticEvent } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import {
   mapCourseDetailToEditorForm,
   mapCourseEditorFormToUpdateRequest,
 } from '../courseEditorForm.mapper';
-import { getCourseAssessmentTotal, type CourseEditorForm } from '../model';
+import { type CourseEditorForm, getCourseAssessmentTotal } from '../model';
 
 interface UseCourseEditorFormControllerParams {
   course: CourseDetail;

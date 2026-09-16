@@ -1,5 +1,5 @@
 export type { CommentAuthor, CommentPage, CommentSortBy, ResourceComment } from './entity/comment';
-export type { FavoriteCollection, FavoriteItem, FavoritedResourcesPage } from './entity/favorite';
+export type { FavoriteCollection, FavoritedResourcesPage, FavoriteItem } from './entity/favorite';
 export type { ResourceInteractionRecord } from './entity/interaction';
 export type {
   CommentItemActionRequest,

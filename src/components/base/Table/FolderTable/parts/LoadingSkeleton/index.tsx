@@ -1,12 +1,13 @@
 import { Table } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
+import TableCellAlign from '../../../shared/cells/CellAlign';
+import { tableStyles } from '../../../shared/styles';
 import { joinClassNames, resolveColumnAlign } from '../../../shared/TableBase/cellAlign';
 import {
   resolveFolderColumnWidthClassForColumn,
   resolveFolderSkeletonBarWidth,
 } from '../../../shared/TableBase/columnWidth';
-import TableCellAlign from '../../../shared/cells/CellAlign';
-import { tableStyles } from '../../../shared/styles';
 import folderStyles from '../../style.module.less';
 import type { FolderTableLoadingSkeletonProps } from './index.type';
 import styles from './style.module.less';

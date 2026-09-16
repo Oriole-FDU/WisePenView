@@ -1,7 +1,24 @@
+import { blockHasType } from '@blocknote/core';
+import { FormattingToolbarExtension } from '@blocknote/core/extensions';
+import {
+  GenericPopover,
+  type GenericPopoverReference,
+  useBlockNoteEditor,
+  useEditorState,
+  useExtension,
+  useExtensionState,
+} from '@blocknote/react';
+import { ButtonGroup, Separator, Toolbar } from '@heroui/react';
+import { useEventListener } from 'ahooks';
+import { MessageSquarePlus, Search, Sparkles } from 'lucide-react';
+import { type ComponentProps, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+
 import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
 import {
-  useTableRailSelectionState,
   type TableRailSelectionOrientation,
+  useTableRailSelectionState,
 } from '@/components/business/Note/CustomBlockNote/plugins/TablePlugin/ui/tableHandles/railSelectionState';
 import {
   TableCellBackgroundAction,
@@ -14,22 +31,7 @@ import {
   blockMatchesBlockTypeItem,
   getAvailableBlockTypeItems,
 } from '@/components/business/Note/CustomBlockNote/ui/editorMenus/blockTypes';
-import { blockHasType } from '@blocknote/core';
-import { FormattingToolbarExtension } from '@blocknote/core/extensions';
-import {
-  GenericPopover,
-  useBlockNoteEditor,
-  useEditorState,
-  useExtension,
-  useExtensionState,
-  type GenericPopoverReference,
-} from '@blocknote/react';
-import { ButtonGroup, Separator, Toolbar } from '@heroui/react';
-import { useEventListener } from 'ahooks';
-import { MessageSquarePlus, Search, Sparkles } from 'lucide-react';
-import { useState, type ComponentProps } from 'react';
-import { createPortal } from 'react-dom';
-import { useTranslation } from 'react-i18next';
+
 import { BlockTypeMenu } from './components/BlockTypeMenu';
 import { ColorMenu } from './components/ColorMenu';
 import { FileCaptionToolbarButton } from './components/FileButtons';

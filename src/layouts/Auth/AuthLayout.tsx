@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
+
 import loginImage from '@/assets/images/login.png';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { cn } from '@/utils/cn';
-import { useTranslation } from 'react-i18next';
-import { Outlet } from 'react-router-dom';
+
 import AuthBackground from './AuthBackground';
 import styles from './AuthLayout.module.less';
 

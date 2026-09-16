@@ -1,16 +1,18 @@
+import { useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { buildCourseLearningPath, buildCoursePath } from '@/utils/navigation/appRoute';
-import { useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+
 import {
   appendCourseOutlineResources,
   collectOutlineResources,
+  type CourseOutlineResourcePageState,
   filterCourseOutline,
   findOutlineNode,
   findOutlineResourceByResourceId,
   markCourseOutlineResourceRead,
-  type CourseOutlineResourcePageState,
 } from '../model';
 
 export const useCourseLearningNavigationController = (courseId: string) => {

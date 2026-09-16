@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { DataTableTabsProps } from './index.type';
 import styles from './style.module.less';
 

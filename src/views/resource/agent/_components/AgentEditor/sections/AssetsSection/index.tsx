@@ -1,12 +1,13 @@
+import { Table } from '@heroui/react';
+import { Trash2, Upload } from 'lucide-react';
+import { type DragEvent, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
-import { Table } from '@heroui/react';
 
-import { Trash2, Upload } from 'lucide-react';
-import { useRef, useState, type DragEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 import SectionShell from '../../shared/SectionShell';
 import styles from './style.module.less';
 interface Props {

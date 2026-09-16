@@ -1,4 +1,5 @@
 import Markdown from '@/components/base/Markdown';
+
 import styles from './style.module.less';
 
 interface MessageContentProps {

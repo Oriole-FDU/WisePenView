@@ -1,15 +1,16 @@
+import { useMemoizedFn } from 'ahooks';
+import { startTransition } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { usePdfPreviewProgressStore } from '@/components/business/PdfViewer/_store/usePdfPreviewProgressStore';
 import type { DriveResourceLocation } from '@/domains/Drive';
 import { buildResourcePath } from '@/utils/navigation/resourceRoute';
 import {
-  RESOURCE_VIEWER,
   resolveResourceKind,
   resolveResourceViewer,
+  RESOURCE_VIEWER,
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
-import { useMemoizedFn } from 'ahooks';
-import { startTransition } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 export interface OpenResourceNavigationTarget {
   resourceId: string;

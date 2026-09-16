@@ -1,5 +1,7 @@
-import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useTranslation } from 'react-i18next';
+
+import AppDisplayDialog from '@/components/business/AppDisplayDialog';
+
 import type { ContractModalProps } from './index.type';
 import styles from './style.module.less';
 

@@ -1,10 +1,11 @@
 import { useTheme as useHeroUITheme } from '@heroui/react';
-import { useEffect, type ReactNode } from 'react';
-import { DEFAULT_HEROUI_THEME } from './constants';
-import { ThemeContext, type ResolvedTheme, type ThemeMode } from './ThemeContextValue';
+import { type ReactNode, useEffect } from 'react';
 
-export { ThemeContext } from './ThemeContextValue';
+import { DEFAULT_HEROUI_THEME } from './constants';
+import { type ResolvedTheme, ThemeContext, type ThemeMode } from './ThemeContextValue';
+
 export type { ResolvedTheme, ThemeContextValue, ThemeMode } from './ThemeContextValue';
+export { ThemeContext } from './ThemeContextValue';
 
 const PREFERS_DARK_MEDIA = '(prefers-color-scheme: dark)';
 

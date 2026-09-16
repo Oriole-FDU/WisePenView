@@ -1,9 +1,16 @@
+import { Link, Tabs } from '@heroui/react';
+import { linkVariants } from '@heroui/styles';
+import { ArrowLeft, BookOpen, UserPlus } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link as RouterLink, Outlet, useMatch, useNavigate } from 'react-router-dom';
+
 import { AppButton, AppIconButton } from '@/components/base/Button';
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import InviteUserModal from '@/components/business/Group/MemberList/Modals/InviteUserModal';
 import { GROUP_TYPE } from '@/domains/Group';
-import { useGroupContext } from '@/layouts/Group/GroupContext';
 import PageHeader from '@/layouts/_common/PageHeader';
+import { useGroupContext } from '@/layouts/Group/GroupContext';
 import {
   APP_ROUTE_PATH,
   buildCoursePath,
@@ -11,13 +18,7 @@ import {
   type GroupRoutePage,
 } from '@/utils/navigation/appRoute';
 import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
-import { Link, Tabs } from '@heroui/react';
 
-import { linkVariants } from '@heroui/styles';
-import { ArrowLeft, BookOpen, UserPlus } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Outlet, Link as RouterLink, useMatch, useNavigate } from 'react-router-dom';
 import page from './style.module.less';
 
 export interface GroupDetailOutletContextValue {

@@ -1,4 +1,5 @@
 import { apiGet, apiPost } from '@/apis/request';
+
 import type {
   GetUserInteractionRecordApiResponse,
   RateApiRequest,

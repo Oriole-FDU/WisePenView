@@ -1,14 +1,15 @@
-import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
 import { TextSelection } from '@tiptap/pm/state';
 import { useMemoizedFn } from 'ahooks';
+
+import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
 
 import { exportNoteMarkdown } from '../engines/markdown/markdownExport';
 import { printNotePdfViaBrowser, waitForEditorPaint } from '../engines/print/noteBrowserPrint';
 import {
   findActiveSearchMatchElement,
   getSearchMatchIndexAtPosition,
-  searchPluginKey,
   type SearchExtensionMeta,
+  searchPluginKey,
 } from '../engines/search/extension';
 import {
   applyNoteReplaceOperations,
@@ -16,7 +17,7 @@ import {
   selectNoteReplaceOperations,
 } from '../engines/search/findReplace';
 import type { NoteBodyEditorHandle, NoteFindResult, NoteReplaceResult } from '../index.type';
-import { notePluginRegistry, type CustomBlockNoteEditor } from '../registry/noteEditorComposition';
+import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
 import { useNoteInteractionStore } from './noteInteractionStore';
 import type { NoteScrollTargetResolver } from './useNoteEditorScroll';
 

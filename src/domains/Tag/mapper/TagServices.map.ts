@@ -1,16 +1,17 @@
 import {
   ACCESS_CONTROL_SCOPE,
+  type AccessControlScope,
   coerceResourceActions,
   normalizeResourceActions,
   permissionCodeToActions,
   resourceActionsToApiKeys,
   TAG_VISIBILITY_MODE,
-  type AccessControlScope,
   type TagResourceAction,
   type TagVisibilityModeString,
 } from '@/domains/Tag';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
+
 import type {
   AddTagApiRequest,
   ChangeTagApiRequest,

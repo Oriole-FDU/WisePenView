@@ -1,8 +1,10 @@
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+
 import {
   basicStyleExists,
   blockHasInlineContent,

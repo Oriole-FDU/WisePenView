@@ -1,6 +1,7 @@
-import { cn } from '@/utils/cn';
 import { Avatar as HeroAvatar } from '@heroui/react';
 import type { ComponentProps } from 'react';
+
+import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 

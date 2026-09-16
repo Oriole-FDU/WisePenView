@@ -1,8 +1,9 @@
-import i18n from '@/i18n';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { Workflow } from 'lucide-react';
 import { createElement } from 'react';
+
+import i18n from '@/i18n';
 
 import type { PluginEditor } from '../../registry/types';
 import { DEFAULT_MERMAID_SOURCE } from './source';

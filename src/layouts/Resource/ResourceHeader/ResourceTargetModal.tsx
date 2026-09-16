@@ -1,13 +1,14 @@
-import AppModal from '@/components/base/AppModal';
-import { AppButton } from '@/components/base/Button';
-import DriveNavigator from '@/components/business/Drive/DriveNavigator';
-import type { DriveNavigatorScopeMode } from '@/components/business/Drive/DriveNavigator/index.type';
-import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
-import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
-
 import { useMemoizedFn } from 'ahooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppModal from '@/components/base/AppModal';
+import { AppButton } from '@/components/base/Button';
+import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
+import DriveNavigator from '@/components/business/Drive/DriveNavigator';
+import type { DriveNavigatorScopeMode } from '@/components/business/Drive/DriveNavigator/index.type';
+import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
+
 import styles from './ResourceTargetModal.module.less';
 
 interface ResourceTargetModalProps {

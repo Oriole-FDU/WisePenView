@@ -7,11 +7,13 @@
  * - 提交：剔除横杠与空格，仅传 16 位纯字符。
  * - 防重复提交：进行中按钮文案为「充值中...」并禁用。
  */
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { InputOTP, REGEXP_ONLY_DIGITS_AND_CHARS } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useApi } from '@/hooks/useApi';
-import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { RechargeModalProps } from './index.type';
 import styles from './style.module.less';
 

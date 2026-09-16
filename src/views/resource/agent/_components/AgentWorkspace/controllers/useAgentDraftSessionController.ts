@@ -1,16 +1,18 @@
+import { toast } from '@heroui/react';
+import type { TFunction } from 'i18next';
+import { useState } from 'react';
+
 import { useAgentService } from '@/domains';
 import type { AgentDetail, AgentSpec } from '@/domains/Agent';
 import { useApi } from '@/hooks/useApi';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
-import { toast } from '@heroui/react';
-import type { TFunction } from 'i18next';
-import { useState } from 'react';
+
 import { buildGuidedPrompt, getDefaultGuidedPromptFields } from '../../../guidedPrompt';
 import {
+  type AgentDraft,
   buildAgentDraft,
   buildCurrentDraftAgent,
   snapshotAgentDraft,
-  type AgentDraft,
 } from '../../../model';
 
 type AgentSavePhase = 'clean' | 'dirty' | 'saving' | 'failed';
@@ -81,7 +83,7 @@ export function useAgentDraftSessionController({
         setSavePhase('clean');
         toast.success(t('agent:page.saved'));
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         setSavePhase('failed');
       },
     }

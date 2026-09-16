@@ -1,11 +1,13 @@
+import { toast } from '@heroui/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useInteractService } from '@/domains';
 import type { FavoriteCollection } from '@/domains/Interact';
 import { useApi } from '@/hooks/useApi';
-import { toast } from '@heroui/react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 interface EditCollectionModalProps {

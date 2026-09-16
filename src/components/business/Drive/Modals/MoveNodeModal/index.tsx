@@ -1,9 +1,11 @@
+import { toast } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+
 import { useDriveService } from '@/domains';
 import type { DriveContainerNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
-import { toast } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
-import { getDriveScopeGroupId, type DriveActionTarget } from '../../common/driveComponentModel';
+
+import { type DriveActionTarget, getDriveScopeGroupId } from '../../common/driveComponentModel';
 import DriveFolderPickerModal from '../DriveFolderPickerModal';
 import type { MoveNodeModalProps } from './index.type';
 
@@ -61,7 +63,7 @@ function MoveNodeModal({
         onSuccess?.(target);
         onOpenChange(false);
       },
-      onErrorEffect: (err) => {
+      onErrorEffect: () => {
         onError?.();
       },
     }

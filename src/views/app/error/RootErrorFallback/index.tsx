@@ -2,6 +2,7 @@ import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
 import { getErrorReportId } from '@/utils/error';
+
 import styles from './style.module.less';
 
 function RootErrorFallback({ error }: FallbackProps) {

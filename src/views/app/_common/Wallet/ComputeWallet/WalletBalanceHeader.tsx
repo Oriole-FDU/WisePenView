@@ -1,7 +1,8 @@
-import { AppButton } from '@/components/base/Button';
 import { Skeleton } from '@heroui/react';
-
 import { useTranslation } from 'react-i18next';
+
+import { AppButton } from '@/components/base/Button';
+
 import styles from './style.module.less';
 
 interface WalletBalanceHeaderProps {

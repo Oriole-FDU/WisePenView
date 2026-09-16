@@ -3,6 +3,7 @@
  */
 
 import type { UserDisplayBase } from '@/domains/User';
+
 import type { AccessControlScope, TagResourceAction, TagVisibilityModeString } from '../enum';
 
 /** 后端以 JSON 字符串透传；前端保留未知字段，避免不同功能相互覆盖。 */

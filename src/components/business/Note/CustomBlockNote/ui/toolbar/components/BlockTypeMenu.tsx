@@ -1,17 +1,19 @@
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
-import {
-  applyBlockTypeToBlocks,
-  blockMatchesBlockTypeItem,
-  getAvailableBlockTypeItems,
-  type BlockTypeMenuItem,
-} from '@/components/business/Note/CustomBlockNote/ui/editorMenus/blockTypes';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { Dropdown, Label } from '@heroui/react';
 import { Heading } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+import {
+  applyBlockTypeToBlocks,
+  blockMatchesBlockTypeItem,
+  type BlockTypeMenuItem,
+  getAvailableBlockTypeItems,
+} from '@/components/business/Note/CustomBlockNote/ui/editorMenus/blockTypes';
+
 import styles from '../style.module.less';
 import { getSelectedBlocks } from '../utils';
-import { ToolbarButton, type ButtonGroupChildProps } from './ToolbarButton';
+import { type ButtonGroupChildProps, ToolbarButton } from './ToolbarButton';
 
 function BlockTypeDropdownItem({ item }: { item: BlockTypeMenuItem }) {
   const Icon = item.icon;

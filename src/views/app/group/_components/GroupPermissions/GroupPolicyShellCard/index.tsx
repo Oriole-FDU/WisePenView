@@ -1,6 +1,8 @@
-import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
 import { Tabs } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
+import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
+
 import styles from '../style.module.less';
 
 interface GroupPolicyShellCardProps {

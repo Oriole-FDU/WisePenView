@@ -1,16 +1,18 @@
+import { isReasoningUIPart, isTextUIPart, isToolUIPart } from 'ai';
+import { ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import CopyButton, { MESSAGE_ACTION_ICON_SIZE } from '@/components/base/Button/CopyButton';
 import ProviderLogo from '@/components/base/Icons/ProviderLogo';
 import type { ChatModel, WisePenUIMessage } from '@/domains/Chat';
-import { isReasoningUIPart, isTextUIPart, isToolUIPart } from 'ai';
-import { ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
 import MessageLoaderSkeleton from '../Loader';
 import ReasoningBlock from './ReasoningBlock';
-import ToolCallBlock from './ToolCallBlock';
 import styles from './style.module.less';
+import ToolCallBlock from './ToolCallBlock';
 
 interface AssistantMessageProps {
   message: WisePenUIMessage;

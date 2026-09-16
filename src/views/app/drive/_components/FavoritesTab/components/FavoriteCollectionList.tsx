@@ -1,8 +1,10 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import type { FavoriteCollection } from '@/domains/Interact';
 import { Dropdown, Label, ListBox, ListBoxItem } from '@heroui/react';
 import { EllipsisVertical, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import type { FavoriteCollection } from '@/domains/Interact';
+
 import styles from '../style.module.less';
 
 interface FavoriteCollectionListProps {

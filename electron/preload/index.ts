@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+
 import { DESKTOP_CHANNEL, type DesktopNavigationState } from '../shared/channels';
 
 const nodePlatform = process.platform;

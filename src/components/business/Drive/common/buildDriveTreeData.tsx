@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react';
+
 import type { DataNode } from '@/components/base/Tree';
 import type { DriveNode } from '@/domains/Drive';
-import type { ReactNode } from 'react';
+
 import type { DriveItemKind, DriveViewNode } from './driveComponentModel';
 
 interface DriveNodeSelectionOptions {

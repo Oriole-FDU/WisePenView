@@ -1,13 +1,14 @@
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useInfiniteScroll } from 'ahooks';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { type RefObject, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import { useInteractService } from '@/domains';
 import type { ResourceComment } from '@/domains/Interact';
 import { parseErrorMessage } from '@/utils/error';
 
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { useInfiniteScroll } from 'ahooks';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useEffect, useState, type RefObject } from 'react';
-import { useTranslation } from 'react-i18next';
 import CommentComposer from './CommentComposer';
 import ResourceCommentItem from './ResourceCommentItem';
 import styles from './style.module.less';

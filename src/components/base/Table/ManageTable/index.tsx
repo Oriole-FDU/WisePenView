@@ -1,5 +1,12 @@
+import { type Selection, Table } from '@heroui/react';
+import { Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
+
+import TableCellAlign from '../shared/cells/CellAlign';
+import { tableCellStyles, tableStyles } from '../shared/styles';
 import {
   joinClassNames,
   resolveColumnAlign,
@@ -14,8 +21,6 @@ import TableRowActions from '../shared/TableRowActions';
 import type { TableRowActionItem } from '../shared/TableRowActions/index.type';
 import TableSelectionCheckbox from '../shared/TableSelectionCheckbox';
 import { renderSortableColumnLabel } from '../shared/TableSortHeader/renderSortableColumnLabel';
-import TableCellAlign from '../shared/cells/CellAlign';
-import { tableCellStyles, tableStyles } from '../shared/styles';
 import type {
   ManageTableInlineEdit,
   ManageTableProps,
@@ -26,10 +31,6 @@ import type {
 import TableBatchFooter from './parts/BatchFooter';
 import TableEditErrorToast from './parts/EditErrorToast';
 import styles from './style.module.less';
-
-import { Table, type Selection } from '@heroui/react';
-import { Check, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 function evaluateRowPredicate<T>(
   predicate: boolean | ((row: T) => boolean) | undefined,

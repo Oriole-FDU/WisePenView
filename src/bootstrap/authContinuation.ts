@@ -42,8 +42,6 @@ const parseStoredContinuation = (raw: string | null): AuthContinuation | null =>
 
 const createContinuationId = (): string => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-const normalizeRoutePath = (path: string): string => (path.startsWith('/') ? path : `/${path}`);
-
 const toCurrentPathWithSearchAndHash = (location: Location): string =>
   `${location.pathname}${location.search}${location.hash}`;
 

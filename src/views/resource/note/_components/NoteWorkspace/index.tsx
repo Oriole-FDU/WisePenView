@@ -1,16 +1,18 @@
-﻿import { AppButton } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
-import InlineComment from '@/components/business/InlineComment';
-import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
+﻿import { Alert } from '@heroui/react';
 import { useMemoizedFn, useUnmount } from 'ahooks';
+import { Download, History } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppButton } from '@/components/base/Button';
+import { Spin } from '@/components/base/Feedback';
+import InlineComment from '@/components/business/InlineComment';
 import CustomBlockNote from '@/components/business/Note/CustomBlockNote';
 import type {
   NoteBodyEditorHandle,
   NoteOutlineItem,
 } from '@/components/business/Note/CustomBlockNote/index.type';
+import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import type { NoteInfoDisplayData } from '@/domains/Note';
 import { encodeNoteClientContentSignature } from '@/domains/Note';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
@@ -18,12 +20,10 @@ import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { isDesktop } from '@/utils/platform';
 import {
-  useResourceHostLayoutConfig,
   type ResourceHostLayoutConfig,
+  useResourceHostLayoutConfig,
 } from '@/views/resource/ResourceHostContext';
-import { Alert } from '@heroui/react';
 
-import { Download, History } from 'lucide-react';
 import styles from '../../style.module.less';
 import NoteInfoBar from '../NoteInfoBar';
 import NoteOutline, { NOTE_OUTLINE_TITLE_ID } from '../NoteOutline';

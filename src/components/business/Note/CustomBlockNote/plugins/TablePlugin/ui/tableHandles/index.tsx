@@ -1,34 +1,36 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import {
+  type InlineContentSchema,
   isTableCellSelection,
   mapTableCell,
-  type InlineContentSchema,
   type StyleSchema,
   type TableContent,
 } from '@blocknote/core';
 import { TableHandlesExtension } from '@blocknote/core/extensions';
 import {
   TableCellButton,
+  type TableCellButtonProps,
   TableHandlesController,
   useBlockNoteEditor,
   useEditorState,
   useExtensionState,
-  type TableCellButtonProps,
 } from '@blocknote/react';
 import { useEventListener, useMount, useUnmount } from 'ahooks';
 import { Plus, Table2 } from 'lucide-react';
 import {
-  useEffect,
-  useRef,
-  useState,
   type CSSProperties,
   type MouseEvent,
   type PointerEvent,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+
 import { tableRailSelectionState, useTableRailSelectionState } from './railSelectionState';
 import { getTableHandles, hasMountedEditorView } from './safe';
 import styles from './style.module.less';

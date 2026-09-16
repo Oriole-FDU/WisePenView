@@ -1,4 +1,5 @@
 import { Table } from '@heroui/react';
+
 import type { TableSortColumnLabelProps } from './index.type';
 
 function TableSortColumnLabel({ label, sortDirection, align }: TableSortColumnLabelProps) {

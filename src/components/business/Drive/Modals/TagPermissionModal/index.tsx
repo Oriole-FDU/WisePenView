@@ -1,3 +1,17 @@
+import {
+  Autocomplete,
+  EmptyState,
+  ListBox,
+  SearchField,
+  Tabs,
+  Tag,
+  TagGroup,
+  useFilter,
+} from '@heroui/react';
+import { X } from 'lucide-react';
+import type { Key, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppBanner from '@/components/base/AppBanner';
 import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
@@ -12,19 +26,7 @@ import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import TagPermissionActionEditor from '@/components/business/Drive/PermissionActionEditor';
 import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
 import { parseErrorMessage } from '@/utils/error';
-import {
-  Autocomplete,
-  EmptyState,
-  ListBox,
-  SearchField,
-  Tabs,
-  Tag,
-  TagGroup,
-  useFilter,
-} from '@heroui/react';
-import { X } from 'lucide-react';
-import type { Key, ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { TagMountPermissionModalProps, TagPermissionModalProps } from './index.type';
 import styles from './style.module.less';
 import {

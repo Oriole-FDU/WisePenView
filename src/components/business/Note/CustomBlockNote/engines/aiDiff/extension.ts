@@ -6,6 +6,7 @@ import type { EditorView } from '@tiptap/pm/view';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
+
 import {
   listRichTextChangeTargets,
   type NoteRichTextAiDiffConfig,
@@ -23,9 +24,9 @@ import type { NoteAiDiffActionRequest } from './action';
 import { resolveNoteAiDiffBlock, stableStringify } from './contentState';
 import { cleanupAiDiffDomTree } from './domCleanup';
 import {
-  createAiDiffReviewWidget,
   type AiDiffReviewNavigation,
   type AiDiffReviewUnit,
+  createAiDiffReviewWidget,
 } from './reviewWidget';
 import styles from './style.module.less';
 

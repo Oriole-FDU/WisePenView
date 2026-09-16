@@ -1,9 +1,10 @@
-import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
 import type * as Y from 'yjs';
+
+import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
 
 import { useAiDiffSidecar } from '../engines/aiDiff/useAiDiffSidecar';
 import type { CustomBlockNoteProps } from '../index.type';
-import { notePluginRegistry, type CustomBlockNoteEditor } from '../registry/noteEditorComposition';
+import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
 import { useNoteInteractionStore } from './noteInteractionStore';
 import type { NoteEditorDefinition } from './useNoteEditorDefinition';
 

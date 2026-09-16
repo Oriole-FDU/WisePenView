@@ -1,12 +1,14 @@
-import CopyButton from '@/components/base/Button/CopyButton';
-import {
-  normalizeCodeLanguage,
-  tokenizeCodeLines,
-  type CodeHighlightToken,
-} from '@/utils/codeHighlight';
 import { useRequest } from 'ahooks';
 import { type CSSProperties, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import CopyButton from '@/components/base/Button/CopyButton';
+import {
+  type CodeHighlightToken,
+  normalizeCodeLanguage,
+  tokenizeCodeLines,
+} from '@/utils/codeHighlight';
+
 import type { CodeBlockFrameProps, CodeBlockProps, HighlightedCodeProps } from './index.type';
 import styles from './style.module.less';
 

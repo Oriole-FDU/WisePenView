@@ -1,14 +1,15 @@
 import type { Node as PMNode } from '@tiptap/pm/model';
 import {
   absolutePositionToRelativePosition,
+  type ProsemirrorBinding,
   relativePositionToAbsolutePosition,
   ySyncPluginKey,
-  type ProsemirrorBinding,
 } from 'y-prosemirror';
 import type { XmlFragment } from 'yjs';
 import * as Y from 'yjs';
 
 import type { NoteInlineCommentAnchor, NoteInlineCommentDraft } from '@/domains/Note';
+
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NotePluginRegistry } from '../../registry/types';
 import { getRootDomSelection } from '../editor/dom';

@@ -1,3 +1,13 @@
+import { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type {
+  Layout,
+  LayoutChangedMeta,
+  PanelImperativeHandle,
+  PanelSize,
+} from 'react-resizable-panels';
+import { Outlet, useMatch } from 'react-router-dom';
+
 import NavigationControls from '@/components/business/Sidebar/_common/header/NavigationControls';
 import AppSidebar from '@/components/business/Sidebar/AppSidebar';
 import {
@@ -29,15 +39,7 @@ import {
 import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
 import { cn } from '@/utils/cn';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { memo, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { useTranslation } from 'react-i18next';
-import type {
-  Layout,
-  LayoutChangedMeta,
-  PanelImperativeHandle,
-  PanelSize,
-} from 'react-resizable-panels';
-import { Outlet, useMatch } from 'react-router-dom';
+
 import styles from './AppLayout.module.less';
 import AppResourceShell from './AppResourceShell';
 

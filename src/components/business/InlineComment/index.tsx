@@ -1,21 +1,21 @@
+import { Chip, toast } from '@heroui/react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Check, RotateCcw, Trash2, X } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import EmojiPicker from '@/components/base/Input/EmojiPicker';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import type { InlineCommentItem, InlineCommentReactionGroup } from '@/domains/InlineComment';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
-import { Chip, toast } from '@heroui/react';
 
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { Check, RotateCcw, Trash2, X } from 'lucide-react';
-import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import EmojiPicker from '@/components/base/Input/EmojiPicker';
 import CommentComposer from './CommentComposer';
 import type {
   InlineCommentDeletePayload,

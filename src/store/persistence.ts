@@ -1,5 +1,6 @@
-import { STORAGE_PREFIXES } from '@/constants/storageKeys';
 import { createJSONStorage, type StateStorage } from 'zustand/middleware';
+
+import { STORAGE_PREFIXES } from '@/constants/storageKeys';
 
 export type StoreScope = 'session' | 'tab';
 

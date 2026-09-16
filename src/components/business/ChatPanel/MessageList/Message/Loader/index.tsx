@@ -1,6 +1,8 @@
-import { cn } from '@/utils/cn';
 import { Skeleton } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/utils/cn';
+
 import type { MessageLoaderSkeletonProps } from './index.type';
 import styles from './style.module.less';
 

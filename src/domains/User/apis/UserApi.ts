@@ -1,5 +1,7 @@
-import { apiGet, apiPost, apiPut } from '@/apis/request';
 import type { AxiosRequestConfig } from 'axios';
+
+import { apiGet, apiPost, apiPut } from '@/apis/request';
+
 import type {
   AddFeedbackApiRequest,
   ChangeUserInfoApiRequest,

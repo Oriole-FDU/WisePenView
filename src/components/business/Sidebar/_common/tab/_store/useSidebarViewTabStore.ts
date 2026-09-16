@@ -1,7 +1,8 @@
-import { registerStore } from '@/store/lifecycle';
-import { createStoreJSONStorage } from '@/store/persistence';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { registerStore } from '@/store/lifecycle';
+import { createStoreJSONStorage } from '@/store/persistence';
 
 export const SIDEBAR_VIEW_TAB = {
   SESSIONS: 'session-history',

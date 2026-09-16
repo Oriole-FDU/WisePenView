@@ -1,4 +1,5 @@
 import type { ResourcePermissionOverview } from '@/domains/Resource';
+
 import type { AgentDetail, AgentSpec } from '../entity/agent';
 
 export interface SaveAgentDraftRequest {

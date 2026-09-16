@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from '@/constants/storageKeys';
+
 import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, type SupportedLanguage } from './resources';
 
 function normalizeLanguage(language: string | null | undefined): SupportedLanguage | undefined {

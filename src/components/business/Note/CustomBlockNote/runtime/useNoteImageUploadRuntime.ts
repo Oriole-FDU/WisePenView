@@ -1,10 +1,11 @@
-import { useImageService } from '@/domains';
-import { assertImageProxyUploadLimit } from '@/domains/Image';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import type { useCreateBlockNote } from '@blocknote/react';
 import { toast } from '@heroui/react';
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
+
+import { useImageService } from '@/domains';
+import { assertImageProxyUploadLimit } from '@/domains/Image';
+import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';

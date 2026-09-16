@@ -1,5 +1,6 @@
 import type { SortDescriptor } from '@heroui/react';
 import type { ReactNode } from 'react';
+
 import type {
   TableColumnBase,
   TableColumnWidth,

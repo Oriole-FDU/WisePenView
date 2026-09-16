@@ -1,4 +1,5 @@
 import type { ReactNode, Ref } from 'react';
+
 import type { ResourceHeaderProps } from '../ResourceHeader/index.type';
 
 export interface ResourceShellHeaderProps {

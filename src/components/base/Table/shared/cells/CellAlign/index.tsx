@@ -1,10 +1,10 @@
+import { tableCellStyles } from '../../styles';
 import {
   joinClassNames,
   resolveCellContentHostClass,
   resolveColumnAlign,
   TableColumnAlignContext,
 } from '../../TableBase/cellAlign';
-import { tableCellStyles } from '../../styles';
 import type { TableCellAlignProps } from './index.type';
 
 function TableCellAlign({ align, stretch = false, children, className }: TableCellAlignProps) {

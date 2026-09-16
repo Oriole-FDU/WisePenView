@@ -1,9 +1,11 @@
-import PageHeader from '@/layouts/_common/PageHeader';
 import { useTranslation } from 'react-i18next';
+
+import PageHeader from '@/layouts/_common/PageHeader';
+
 import ModelSettingsSection from './ModelSettingsSection';
 import ProviderSettingsSection from './ProviderSettingsSection';
-import WebSearchSettingsSection from './WebSearchSettingsSection';
 import styles from './style.module.less';
+import WebSearchSettingsSection from './WebSearchSettingsSection';
 
 function AISettings() {
   const { t } = useTranslation('profile');

@@ -1,13 +1,15 @@
-import { useCourseService } from '@/domains';
-import type { CourseOutlineNode } from '@/domains/Course';
-import { useApi } from '@/hooks/useApi';
 import { toast } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useCourseService } from '@/domains';
+import type { CourseOutlineNode } from '@/domains/Course';
+import { useApi } from '@/hooks/useApi';
+
 import {
-  findCourseOutlineContainerSiblings,
   type CourseOutlineContainerNode,
   type CourseOutlineResourceTarget,
+  findCourseOutlineContainerSiblings,
 } from './model';
 
 type SectionDialog =
@@ -147,7 +149,7 @@ export const useCourseOutlineEditingController = ({
         onMutated();
         toast.success(t('editor.outline.saved'));
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         onMutated();
       },
     }

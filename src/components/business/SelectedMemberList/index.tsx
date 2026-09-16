@@ -1,7 +1,9 @@
-import AppAvatar from '@/components/base/Avatar';
-import type { GroupMember } from '@/domains/Group';
 import { ListBox, ListBoxItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
+import AppAvatar from '@/components/base/Avatar';
+import type { GroupMember } from '@/domains/Group';
+
 import type { SelectedMemberListProps } from './index.type';
 import styles from './style.module.less';
 

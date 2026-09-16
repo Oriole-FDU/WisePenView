@@ -1,5 +1,6 @@
-import type { CustomBlockNoteEditor } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import { TableHandlesExtension } from '@blocknote/core/extensions';
+
+import type { CustomBlockNoteEditor } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 
 type TableHandles = ReturnType<ReturnType<typeof TableHandlesExtension>>;
 

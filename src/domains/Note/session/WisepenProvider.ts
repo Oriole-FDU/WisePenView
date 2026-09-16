@@ -1,7 +1,8 @@
-import { getNoteCollaborationWsUrl, notifyAddrFailure } from '@/apis/apiServerAddr';
-import { getXDeveloper } from '@/apis/developmentTraffic';
 import { WebsocketProvider } from 'y-websocket';
 import type * as Y from 'yjs';
+
+import { getNoteCollaborationWsUrl, notifyAddrFailure } from '@/apis/apiServerAddr';
+import { getXDeveloper } from '@/apis/developmentTraffic';
 
 export interface WisepenProviderOptions {
   connect?: boolean;

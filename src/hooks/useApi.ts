@@ -1,16 +1,15 @@
-import { isWisePenError, parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import useInfiniteScroll from 'ahooks/es/useInfiniteScroll';
 import type {
-  InfiniteScrollOptions,
   Data as UseInfiniteScrollData,
+  InfiniteScrollOptions,
   Service as UseInfiniteScrollService,
 } from 'ahooks/es/useInfiniteScroll/types';
 import usePagination from 'ahooks/es/usePagination';
 import type {
+  Data as UsePaginationData,
   PaginationOptions,
   PaginationResult,
-  Data as UsePaginationData,
   Params as UsePaginationParams,
   Service as UsePaginationService,
 } from 'ahooks/es/usePagination/types';
@@ -20,6 +19,8 @@ import type {
   Result as UseRequestResult,
   Service as UseRequestService,
 } from 'ahooks/es/useRequest/src/types';
+
+import { isWisePenError, parseErrorMessage } from '@/utils/error';
 
 interface UseApiErrorOptions<TParams extends unknown[]> {
   getErrorMessage?: (error: Error, params: TParams) => string;

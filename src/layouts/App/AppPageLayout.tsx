@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+
 import styles from './AppPageLayout.module.less';
 
 export function AppScrollablePageLayout() {

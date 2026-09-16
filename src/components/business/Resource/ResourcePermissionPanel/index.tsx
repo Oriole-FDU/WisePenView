@@ -1,3 +1,8 @@
+import { Chip, Dropdown, Label, Skeleton } from '@heroui/react';
+import type { TFunction } from 'i18next';
+import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -10,11 +15,7 @@ import {
   type ResourcePermissionSubject,
 } from '@/domains/Resource';
 import { parseErrorMessage } from '@/utils/error';
-import { Chip, Dropdown, Label, Skeleton } from '@heroui/react';
 
-import type { TFunction } from 'i18next';
-import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { ResourcePermissionPanelProps } from './index.type';
 import {
   getAvatarSrc,

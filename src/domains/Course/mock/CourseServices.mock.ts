@@ -6,6 +6,7 @@ import {
 import type { IResourceService, ResourceItem } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
 import { createDefaultCourseAssessmentItems } from '../constants/defaults';
 import {
   calculateCourseTeachingWeek,

@@ -1,3 +1,8 @@
+import { toast } from '@heroui/react';
+import type { TFunction } from 'i18next';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { Empty, Spin } from '@/components/base/Feedback';
 import type { DataNode } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
@@ -6,10 +11,7 @@ import { buildDriveNodeScope, type DriveNode, type DriveNodeScope } from '@/doma
 import type { IGroupService } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
-import type { TFunction } from 'i18next';
-import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import {
   buildDriveTreeData,
   isDriveNodeSelectable,
@@ -17,12 +19,12 @@ import {
 } from '../common/buildDriveTreeData';
 import {
   buildDriveLoadingNode,
-  resolveDriveScope,
-  toDriveSelectionItem,
   type DriveItemKind,
   type DriveScope,
   type DriveSelectionItem,
   type DriveViewNode,
+  resolveDriveScope,
+  toDriveSelectionItem,
 } from '../common/driveComponentModel';
 import { useDrivePagedTreeChildren } from '../common/useDrivePagedTreeChildren';
 import DriveNavigatorNodeTitle from './DriveNavigatorNodeTitle';
@@ -448,7 +450,7 @@ function DriveNavigator({
         setSelectedKeys(nextSelected);
         emitSelectionChange(nextSelected);
       },
-      onErrorEffect: (err) => {
+      onErrorEffect: () => {
         setTreeData([]);
         setSelectedKeys([]);
         emitSelectionChange([]);

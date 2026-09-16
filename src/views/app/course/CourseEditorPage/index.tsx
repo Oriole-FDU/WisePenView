@@ -1,9 +1,11 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
-import { buildCoursePath } from '@/utils/navigation/appRoute';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { buildCoursePath } from '@/utils/navigation/appRoute';
+
 import CourseAssessmentSection from './_components/CourseAssessmentSection';
 import CourseBasicSection from './_components/CourseBasicSection';
 import CourseCoverModal from './_components/CourseCoverModal';

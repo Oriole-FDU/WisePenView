@@ -1,17 +1,19 @@
-import { useChatService } from '@/domains';
-import { mapChatInputToolSelectionOverrides } from '@/domains/Chat';
-import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import {
-  useRef,
   type ChangeEvent,
   type ClipboardEvent,
   type DragEvent,
   type KeyboardEvent,
+  useRef,
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
+
+import { useChatService } from '@/domains';
+import { mapChatInputToolSelectionOverrides } from '@/domains/Chat';
+import { useApi } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
+
 import {
   selectChatInputCompletionState,
   selectChatInputSelectedModel,

@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+
 import { persistLanguage, resolveInitialLanguage, syncDocumentLanguage } from './language';
 import { DEFAULT_LANGUAGE, I18N_NAMESPACES, resources, type SupportedLanguage } from './resources';
 

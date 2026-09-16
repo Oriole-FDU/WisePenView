@@ -1,18 +1,19 @@
+import { Form } from '@heroui/react';
+import { User } from 'lucide-react';
+import { type FormEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import { appendRedirectParam, readRedirectParam } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, PasswordInput } from '@/components/base/Input';
 import { useAuthService } from '@/domains';
 import type { LoginRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
+import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
-import { Form } from '@heroui/react';
 
-import { hasFieldErrors, runFieldValidation, type FieldErrors } from '@/utils/formValidation';
-import { User } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
 type LoginField = keyof LoginRequest;

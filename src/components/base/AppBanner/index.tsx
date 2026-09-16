@@ -1,5 +1,6 @@
-import { cn } from '@/utils/cn';
 import { Alert } from '@heroui/react';
+
+import { cn } from '@/utils/cn';
 
 import type { AppBannerProps } from './index.type';
 import styles from './style.module.less';

@@ -1,5 +1,6 @@
 import { useUnmount } from 'ahooks';
-import { useRef, useState, type UIEvent } from 'react';
+import { type UIEvent, useRef, useState } from 'react';
+
 import { COURSE_EDITOR_SECTION_IDS, type CourseEditorSectionId } from '../model';
 
 export function useCourseEditorNavigationController() {

@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+
 import type { FolderTableColumn, FolderTableRow } from './index.type';
 
 export function createDefaultFolderColumns<T extends FolderTableRow = FolderTableRow>(

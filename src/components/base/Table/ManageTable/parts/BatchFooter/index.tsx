@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+
 import { joinClassNames } from '../../../shared/TableBase/cellAlign';
 import type { TableBatchFooterProps } from './index.type';
 import styles from './style.module.less';

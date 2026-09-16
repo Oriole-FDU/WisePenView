@@ -1,4 +1,5 @@
 import { isRecord } from '@/utils/typeGuards';
+
 import type { NotePluginRegistry } from '../../registry/types';
 
 export function projectInlinePlainText(content: unknown, registry: NotePluginRegistry): string {

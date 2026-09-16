@@ -1,6 +1,7 @@
+import type { Config } from '@onlyoffice/doceditor-types';
+
 import type { ResourceItem, ResourcePermissionOverview } from '@/domains/Resource';
 import type { UserDisplayBase } from '@/domains/User';
-import type { Config } from '@onlyoffice/doceditor-types';
 
 /** 小写扩展名，不含点 */
 export const DOCUMENT_ALLOWED_EXTENSIONS = [

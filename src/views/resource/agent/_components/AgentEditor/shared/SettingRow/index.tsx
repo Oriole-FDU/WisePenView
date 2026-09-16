@@ -1,5 +1,6 @@
 import { Switch } from '@heroui/react';
 import type { ReactNode } from 'react';
+
 import styles from './style.module.less';
 interface Props {
   title: string;

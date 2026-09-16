@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 interface AgentSectionNavProps {

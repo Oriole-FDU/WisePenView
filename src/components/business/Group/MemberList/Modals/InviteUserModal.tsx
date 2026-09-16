@@ -1,12 +1,13 @@
+import { toast } from '@heroui/react';
+import { Copy, Link as LinkIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { copyText } from '@/utils/browser/copyText';
 import { buildInvitePath } from '@/utils/navigation/appRoute';
-import { toast } from '@heroui/react';
 
-import { Copy, Link as LinkIcon } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { InviteUserModalProps } from './index.type';
 import styles from './style.module.less';
 
