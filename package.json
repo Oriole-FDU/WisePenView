@@ -20,7 +20,8 @@
     "package:desktop": "pnpm build && pnpm build:electron && electron-builder",
     "package:desktop:unsigned": "pnpm build && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "package:desktop:unsigned:dev": "pnpm build:dev && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
     "typecheck": "tsc -b",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
@@ -102,6 +103,8 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^16.5.0",
     "husky": "^8.0.0",
     "less": "^4.4.2",
@@ -145,11 +148,10 @@
     }
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "node scripts/organize-imports.mjs",
-      "eslint --max-warnings 0 --no-warn-ignored",
+    "*.{js,mjs,cjs,ts,tsx}": [
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
-    "*.{js,jsx,json,md}": "prettier --write"
+    "*.{jsx,json,md}": "prettier --write"
   }
 }

@@ -42,5 +42,13 @@ pnpm mock
 - `pnpm dev`：启动开发服务器
 - `pnpm mock`：以 mock 模式启动
 - `pnpm build`：构建产物
-- `pnpm lint`：执行 ESLint
+- `pnpm lint`：执行全量 ESLint 检查，error 或 warning 均会失败
+- `pnpm lint:fix`：自动整理导入、移除未使用的导入并修复可自动处理的问题
 - `pnpm typecheck`：执行 TypeScript 类型检查
+
+提交前由 lint-staged 对暂存的 JS、MJS、CJS、TS、TSX 文件执行 ESLint 自动修复，再交给
+Prettier 格式化。全量 lint、提交钩子与 CI 共用同一份 ESLint 规则。
+
+导入按副作用导入、Node 内置模块、第三方包、项目别名、相对路径分组。副作用导入保留组内顺序；
+依赖初始化或样式覆盖顺序的入口必须保留语义顺序。重复导入由 ESLint 报错，类型导入可以单独声明。
+未使用的局部变量应删除；确需保留位置的回调参数使用 `_` 前缀，对象 rest 排除字段不计为未使用。

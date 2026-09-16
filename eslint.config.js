@@ -1,9 +1,11 @@
 import js from '@eslint/js';
-import globals from 'globals';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import unusedImports from 'eslint-plugin-unused-imports';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import { defineConfig, globalIgnores } from 'eslint/config';
 
 const ahooksUpdateEffectImportRule = {
   name: 'ahooks',
@@ -320,24 +322,67 @@ const nativeErrorRestrictedSyntaxRules = [
 ];
 
 export default defineConfig([
-  globalIgnores(['dist', 'storybook-static', 'src/components/_shadcn/**']),
+  globalIgnores(['dist', 'storybook-static', '.electron', 'release', 'src/components/_shadcn/**']),
+  {
+    files: ['**/*.{js,mjs,cjs,ts,tsx}'],
+    extends: [js.configs.recommended],
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
+      reportUnusedInlineConfigs: 'error',
+    },
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+      'unused-imports': unusedImports,
+    },
+    rules: {
+      'no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'error',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+          reportUsedIgnorePattern: true,
+        },
+      ],
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      'no-duplicate-imports': ['error', { allowSeparateTypeImports: true }],
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx,js}', '.storybook/preview.tsx'],
+    languageOptions: {
+      globals: globals.browser,
+    },
+  },
+  {
+    files: [
+      '*.{js,mjs,cjs,ts}',
+      'scripts/**/*.{js,mjs,cjs}',
+      'electron/**/*.{ts,tsx}',
+      '.storybook/main.ts',
+    ],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
-      js.configs.recommended,
       tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      // Vite 使用自动 JSX runtime，不再隐式引用 React 默认导入。
+      parserOptions: { jsxPragma: null },
     },
     plugins: {
       wisepen: wisePenPlugin,
     },
     rules: {
-      'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'no-alert': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
@@ -397,13 +442,6 @@ export default defineConfig([
         ...projectRestrictedSyntaxRules,
         ...nativeErrorRestrictedSyntaxRules,
       ],
-    },
-  },
-  {
-    // Electron 主进程与预加载脚本运行在 Node 环境，不能沿用浏览器全局变量配置。
-    files: ['electron/**/*.{ts,tsx}'],
-    languageOptions: {
-      globals: globals.node,
     },
   },
   {
