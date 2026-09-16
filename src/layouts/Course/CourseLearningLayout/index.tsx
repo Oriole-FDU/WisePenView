@@ -1,3 +1,7 @@
+import { PanelRightClose, PanelRightOpen, Video } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import ChatPanel from '@/components/business/ChatPanel';
 import {
@@ -14,9 +18,7 @@ import {
 import ResourceShellHeader from '@/layouts/Resource/ResourceShellHeader';
 import { cn } from '@/utils/cn';
 import type { ResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
-import { PanelRightClose, PanelRightOpen, Video } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { useCourseContext } from '../CourseContext';
 import CourseResourceHost from '../CourseResourceHost';
 import CourseOutlineOverview from './_components/CourseOutlineOverview';

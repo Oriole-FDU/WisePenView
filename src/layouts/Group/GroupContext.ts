@@ -1,6 +1,7 @@
+import { createContext, useContext } from 'react';
+
 import type { Group, GroupResConfig } from '@/domains/Group';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { createContext, useContext } from 'react';
 
 export type GroupCurrentUserRole = 'OWNER' | 'ADMIN' | 'MEMBER';
 

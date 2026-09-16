@@ -1,4 +1,5 @@
 import { createMockResourcePermissionOverview } from '@/domains/Resource/mock/resourcePermissionOverview.mockdata';
+
 import type { AgentDetail } from '../entity/agent';
 import { AgentServicesMap } from '../mapper/AgentServices.map';
 import type { IAgentService } from '../service/index.type';

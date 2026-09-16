@@ -1,3 +1,7 @@
+import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { useNoteService } from '@/domains';
@@ -5,13 +9,10 @@ import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import {
-  useResourceHostLayoutConfig,
   type ResourceHostLayoutConfig,
+  useResourceHostLayoutConfig,
 } from '@/views/resource/ResourceHostContext';
 
-import type { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import NoteWorkspace from './_components/NoteWorkspace';
 import styles from './style.module.less';
 

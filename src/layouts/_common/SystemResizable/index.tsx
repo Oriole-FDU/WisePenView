@@ -2,6 +2,7 @@ import type { ComponentProps } from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
 
 import { cn } from '@/utils/cn';
+
 import styles from './style.module.less';
 
 const RESIZE_TARGET_MINIMUM_SIZE = { fine: 16, coarse: 32 } as const;

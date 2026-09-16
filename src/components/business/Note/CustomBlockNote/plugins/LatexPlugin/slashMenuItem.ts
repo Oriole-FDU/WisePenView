@@ -1,8 +1,9 @@
-import i18n from '@/i18n';
 import { insertOrUpdateBlockForSlashMenu } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { Sigma } from 'lucide-react';
 import { createElement } from 'react';
+
+import i18n from '@/i18n';
 
 import type { PluginEditor } from '../../registry/types';
 

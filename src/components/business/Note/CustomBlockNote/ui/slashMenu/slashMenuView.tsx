@@ -1,5 +1,3 @@
-import i18n from '@/i18n';
-import { cn } from '@/utils/cn';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { Dropdown, Header, Label, ListBoxItem, ListBoxSection } from '@heroui/react';
 import {
@@ -23,6 +21,10 @@ import {
   Type,
 } from 'lucide-react';
 import { createElement } from 'react';
+
+import i18n from '@/i18n';
+import { cn } from '@/utils/cn';
+
 import { getSlashMenuItemKey } from './buildSlashMenuItems';
 import {
   groupSortedSuggestionItems,

@@ -1,4 +1,5 @@
 import type { ResourceItem } from '@/domains/Resource';
+
 import type {
   DriveContainerNode,
   DriveMutableNode,

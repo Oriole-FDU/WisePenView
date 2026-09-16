@@ -1,7 +1,7 @@
-import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
-
 import { Popover as HeroPopover } from '@heroui/react';
 import { useState } from 'react';
+
+import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
 import type { PopoverRootProps } from './index.type';
 

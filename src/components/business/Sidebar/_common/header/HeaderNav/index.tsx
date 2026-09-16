@@ -1,6 +1,8 @@
-import { cn } from '@/utils/cn';
 import { ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
 import { useLayoutEffect, useRef } from 'react';
+
+import { cn } from '@/utils/cn';
+
 import type { HeaderNavItem, HeaderNavProps, HeaderNavSection } from './index.type';
 import styles from './style.module.less';
 

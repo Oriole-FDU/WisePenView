@@ -1,5 +1,7 @@
-import { LoadingState } from '@/components/base/Feedback';
 import { useTranslation } from 'react-i18next';
+
+import { LoadingState } from '@/components/base/Feedback';
+
 import styles from './style.module.less';
 
 function ConversationLoading() {

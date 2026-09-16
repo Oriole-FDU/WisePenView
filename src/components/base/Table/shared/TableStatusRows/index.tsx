@@ -1,5 +1,6 @@
 import { Loader } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 export function TableRefreshIndicator() {

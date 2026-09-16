@@ -1,5 +1,7 @@
-import { Spin } from '@/components/base/Feedback';
 import { EllipsisVertical } from 'lucide-react';
+
+import { Spin } from '@/components/base/Feedback';
+
 import { joinClassNames } from '../TableBase/cellAlign';
 import type { TableBodyStateProps } from './index.type';
 import styles from './style.module.less';

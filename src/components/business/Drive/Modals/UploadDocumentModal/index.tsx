@@ -1,3 +1,8 @@
+import { toast } from '@heroui/react';
+import { CloudUpload, X } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { UploadZone } from '@/components/base/Input';
@@ -6,11 +11,7 @@ import {
   getSupportedDriveDocumentFiles,
   useDriveDocumentUpload,
 } from '@/components/business/Drive/common/useDriveDocumentUpload';
-import { toast } from '@heroui/react';
 
-import { CloudUpload, X } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { UploadDocumentModalProps } from './index.type';
 import styles from './style.module.less';
 

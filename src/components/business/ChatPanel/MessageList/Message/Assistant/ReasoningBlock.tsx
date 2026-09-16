@@ -1,9 +1,10 @@
-import { useMessageScroller } from '@/components/_shadcn';
-import { AppButton } from '@/components/base/Button';
-
 import { Brain, ChevronDown } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useMessageScroller } from '@/components/_shadcn';
+import { AppButton } from '@/components/base/Button';
+
 import styles from './ReasoningBlock.module.less';
 import { useCollapseHeight } from './useCollapseHeight';
 

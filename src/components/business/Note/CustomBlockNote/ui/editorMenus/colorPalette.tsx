@@ -1,15 +1,16 @@
-import { AppButton } from '@/components/base/Button';
 import { ColorSwatchPicker } from '@heroui/react';
-
-import { cn } from '@/utils/cn';
 import { Baseline } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { AppButton } from '@/components/base/Button';
+import { cn } from '@/utils/cn';
+
 import {
   colorItems,
+  type ColorKey,
   findColorItemByPickerValue,
   getColorItem,
   getColorItemLabel,
-  type ColorKey,
 } from './colorPaletteData';
 import styles from './style.module.less';
 

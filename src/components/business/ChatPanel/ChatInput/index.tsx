@@ -1,9 +1,11 @@
-import { FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH } from '@/constants/layoutScale';
-import { cn } from '@/utils/cn';
 import { TextArea } from '@heroui/react';
 import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH } from '@/constants/layoutScale';
+import { cn } from '@/utils/cn';
+
 import { ChatInputStoreProvider } from './_store/ChatInputStoreProvider';
 import AttachmentStrip from './AttachmentStrip';
 import { ChatInputFileProvider } from './ChatInputFileContext';

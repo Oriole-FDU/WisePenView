@@ -1,3 +1,8 @@
+import { toast } from '@heroui/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import {
   consumeActiveAuthContinuation,
   getCurrentRouteSearch,
@@ -9,11 +14,7 @@ import { useUserService } from '@/domains';
 import type { ConfirmEmailVerifyRequest } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { toast } from '@heroui/react';
 
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
 function VerifyEmail() {

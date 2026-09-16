@@ -1,6 +1,8 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import { LoaderCircle, Mic, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+
 import styles from '../style.module.less';
 import type { VoiceInputProps } from './index.type';
 

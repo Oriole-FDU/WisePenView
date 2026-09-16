@@ -1,5 +1,6 @@
-import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 import type { TFunction } from 'i18next';
+
+import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 
 import { canPreviewSkillFile, findFile, getFirstFile } from './utils/skillFileTree';
 

@@ -1,15 +1,17 @@
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
 import { filterSuggestionItems } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem, SuggestionMenuProps } from '@blocknote/react';
 import { SuggestionMenuController, useBlockNoteEditor } from '@blocknote/react';
 import { ListBox, ListBoxItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+
 import { blockNoteSchema, type CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteContentPlugin } from '../../registry/types';
 import {
-  NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET,
   getNoteSlashMenuItems,
   getSlashMenuItemKey,
+  NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET,
 } from './buildSlashMenuItems';
 import { sortSuggestionItemsForDisplay } from './slashMenuModel';
 import { SlashMenuListBoxItems } from './slashMenuView';

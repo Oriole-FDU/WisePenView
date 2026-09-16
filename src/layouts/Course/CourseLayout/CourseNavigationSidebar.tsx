@@ -1,3 +1,7 @@
+import { ArrowLeft, BookOpen, FolderOpen, Home, Settings, UsersRound } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { NavLink, useNavigate } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { COURSE_ROLE } from '@/domains/Course';
 import {
@@ -6,9 +10,6 @@ import {
   buildCoursePath,
 } from '@/utils/navigation/appRoute';
 
-import { ArrowLeft, BookOpen, FolderOpen, Home, Settings, UsersRound } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { NavLink, useNavigate } from 'react-router-dom';
 import { useCourseContext } from '../CourseContext';
 import styles from './style.module.less';
 

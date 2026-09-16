@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import type * as Y from 'yjs';
 
 import type { AiDiffDisplayMode } from '@/domains/Note';
+
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NotePluginRegistry } from '../../registry/types';
 import { applyNoteAiDiffAction, type NoteAiDiffActionRequest } from './action';

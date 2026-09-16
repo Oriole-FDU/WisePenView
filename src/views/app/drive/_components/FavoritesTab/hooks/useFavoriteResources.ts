@@ -1,7 +1,8 @@
-import { useInteractService } from '@/domains';
-import type { FavoriteItem } from '@/domains/Interact';
 import { useInfiniteScroll } from 'ahooks';
 import { useEffect } from 'react';
+
+import { useInteractService } from '@/domains';
+import type { FavoriteItem } from '@/domains/Interact';
 
 const PAGE_SIZE = 20;
 

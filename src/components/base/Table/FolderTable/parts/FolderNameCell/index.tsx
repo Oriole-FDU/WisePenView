@@ -1,8 +1,10 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import EntryIcon from '@/components/base/Icons/EntryIcon';
+
 import TableTextCell from '../../../shared/cells/TextCell';
 import type { FolderTableRow } from '../../index.type';
 import type { FolderTableNameCellProps } from './index.type';

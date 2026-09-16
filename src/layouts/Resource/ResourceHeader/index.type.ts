@@ -1,3 +1,6 @@
+import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
+
 import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import type {
   ResourceAction,
@@ -5,8 +8,6 @@ import type {
   ResourceItem,
   ResourcePermissionResourceType,
 } from '@/domains/Resource';
-import type { LucideIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
 
 export interface ResourceHeaderDownloadAction {
   label: string;

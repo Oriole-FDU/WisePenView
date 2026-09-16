@@ -1,11 +1,13 @@
+import { Card } from '@heroui/react';
+import { Cell, Pie, PieChart as RechartsPieChart } from 'recharts';
+
 import {
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  type ChartConfig,
 } from '@/components/_shadcn';
-import { Card } from '@heroui/react';
-import { Cell, Pie, PieChart as RechartsPieChart } from 'recharts';
+
 import type { PieChartItem, PieChartProps } from './index.type';
 import styles from './style.module.less';
 

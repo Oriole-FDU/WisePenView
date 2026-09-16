@@ -1,6 +1,7 @@
 import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
+
 import type {
   AgentAssetResourceTypeApiValue,
   AgentInfoApiResponse,

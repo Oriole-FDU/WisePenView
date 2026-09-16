@@ -1,16 +1,17 @@
-import { RESOURCE_ACTION, type ResourceAction } from '@/domains/Resource';
 import {
   Bot,
   Download,
   Eye,
   GitFork,
   ListTree,
+  type LucideIcon,
   MessageCircle,
   MessageSquareText,
   PencilLine,
   ShieldCheck,
-  type LucideIcon,
 } from 'lucide-react';
+
+import { RESOURCE_ACTION, type ResourceAction } from '@/domains/Resource';
 
 interface ResourcePermissionActionIconProps {
   action: ResourceAction;

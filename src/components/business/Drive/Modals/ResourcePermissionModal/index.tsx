@@ -1,3 +1,7 @@
+import { ListBox, type Selection, Tabs } from '@heroui/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
@@ -18,17 +22,14 @@ import {
 import { useResourcePermissionService, useResourceService, useTagService } from '@/domains';
 import {
   areResourcePermissionActionsEqual,
-  updateResourceActionSelection,
   type ResourceAction,
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
+  updateResourceActionSelection,
 } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
-import { ListBox, Tabs, type Selection } from '@heroui/react';
 
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { ResourcePermissionModalProps } from './index.type';
 import styles from './style.module.less';
 

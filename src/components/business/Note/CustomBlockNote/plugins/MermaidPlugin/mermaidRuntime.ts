@@ -1,6 +1,7 @@
+import type { Mermaid } from 'mermaid';
+
 import i18n from '@/i18n';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import type { Mermaid } from 'mermaid';
 
 /** Mermaid 源码最大长度，避免超大图表触发高耗时解析和布局计算。 */
 export const NOTE_MERMAID_SOURCE_MAX_LENGTH = 50_000;

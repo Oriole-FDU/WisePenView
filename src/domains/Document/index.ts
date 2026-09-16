@@ -4,7 +4,6 @@ export {
   isDocumentRetryableStatus,
   isDocumentTerminalStatus,
 } from './enum';
-export { DOCUMENT_ALLOWED_EXTENSIONS } from './service/index.type';
 export type {
   DocDisplayInfoResponse,
   DocumentProcessStatus,
@@ -14,3 +13,4 @@ export type {
   OnlyOfficeEditorConfigResponse,
   PendingDocItem,
 } from './service/index.type';
+export { DOCUMENT_ALLOWED_EXTENSIONS } from './service/index.type';

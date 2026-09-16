@@ -1,3 +1,7 @@
+import { toast } from '@heroui/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea, UploadZone } from '@/components/base/Input';
@@ -10,13 +14,9 @@ import {
   assertImageProxyUploadLimit,
   IMAGE_UPLOAD_MAX_SIZE_LABEL,
 } from '@/utils/image/uploadLimit';
-import { toast } from '@heroui/react';
-
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import type { CreateGroupModalProps } from './index.type';
 
 import styles from './index.module.less';
+import type { CreateGroupModalProps } from './index.type';
 
 type CreateGroupFormValues = Omit<CreateGroupRequest, 'groupCoverUrl'> & {
   cover?: File | null;

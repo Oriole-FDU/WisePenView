@@ -1,5 +1,6 @@
-import i18n from '@/i18n';
 import katex from 'katex';
+
+import i18n from '@/i18n';
 
 /**
  * 与 MathBlock / InlineMath 共用的 KaTeX 渲染；失败时回退为纯文本。

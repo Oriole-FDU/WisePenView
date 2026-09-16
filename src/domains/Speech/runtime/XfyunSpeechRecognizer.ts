@@ -5,6 +5,7 @@ import {
   type WisePenError,
 } from '@/utils/error';
 import { isRecord } from '@/utils/typeGuards';
+
 import type { SpeechRecognitionCredential } from '../service/index.type';
 import { XfyunResultAssembler } from './XfyunResultAssembler';
 

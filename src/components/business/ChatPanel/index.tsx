@@ -1,7 +1,9 @@
-import AppAlertDialog from '@/components/business/AppAlertDialog';
-import type { ChatPanelProps } from '@/components/business/ChatPanel/index.type';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppAlertDialog from '@/components/business/AppAlertDialog';
+import type { ChatPanelProps } from '@/components/business/ChatPanel/index.type';
+
 import ChatPanelBody from './ChatPanelBody';
 import ChatPanelHeader from './ChatPanelHeader';
 import styles from './style.module.less';

@@ -1,4 +1,5 @@
 import { createMockResourcePermissionOverview } from '@/domains/Resource/mock/resourcePermissionOverview.mockdata';
+
 import type { ISkillService } from '../service/index.type';
 
 const mockDetail = {

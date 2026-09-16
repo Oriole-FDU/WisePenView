@@ -1,6 +1,7 @@
 import wisePenLogo from '@/assets/sidebar_logo/WisePen_Logo.svg';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { cn } from '@/utils/cn';
+
 import NavigationControls from '../NavigationControls';
 import type { SidebarHeaderProps } from './index.type';
 import styles from './style.module.less';

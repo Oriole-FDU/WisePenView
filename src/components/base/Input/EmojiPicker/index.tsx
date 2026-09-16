@@ -1,5 +1,3 @@
-import AppPopover from '@/components/base/AppPopover';
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import data, { type EmojiMartData } from '@emoji-mart/data';
 import en from '@emoji-mart/data/i18n/en.json';
 import zh from '@emoji-mart/data/i18n/zh.json';
@@ -9,6 +7,9 @@ import zhEmojiData from 'emojibase-data/zh/data.json';
 import { SmilePlus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppPopover from '@/components/base/AppPopover';
+import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import styles from './style.module.less';
 

@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import {
   areResourcePermissionActionsEqualByOptions,
   filterResourcePermissionActionsByOptions,
@@ -9,7 +11,6 @@ import type {
   ResourcePermissionSubject,
 } from '@/domains/Resource';
 import type { UserSearchUser } from '@/domains/User';
-import type { TFunction } from 'i18next';
 
 export type SpecifiedUserCandidate = Pick<
   UserSearchUser,

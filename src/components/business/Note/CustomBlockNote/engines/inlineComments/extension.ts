@@ -1,11 +1,12 @@
 import { createExtension, type ExtensionFactoryInstance } from '@blocknote/core';
 import type { Node as PMNode } from '@tiptap/pm/model';
-import { Plugin, PluginKey, type EditorState, type Transaction } from '@tiptap/pm/state';
+import { type EditorState, Plugin, PluginKey, type Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { ySyncPluginKey, type ProsemirrorBinding } from 'y-prosemirror';
+import { type ProsemirrorBinding, ySyncPluginKey } from 'y-prosemirror';
 import type { XmlFragment } from 'yjs';
 
 import type { NoteInlineCommentAnchorReference, NoteInlineCommentSession } from '@/domains/Note';
+
 import type { NotePluginRegistry } from '../../registry/types';
 import { projectInlineCommentRangeText, resolveInlineCommentAnchor } from './relativePosition';
 import styles from './style.module.less';

@@ -1,19 +1,20 @@
+import { toast, Tooltip } from '@heroui/react';
+import { Pencil } from 'lucide-react';
+import { type SyntheticEvent, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea, UploadZone } from '@/components/base/Input';
 import { useGroupService, useImageService } from '@/domains';
-import { GROUP_TYPE, type EditGroupRequest, type Group } from '@/domains/Group';
+import { type EditGroupRequest, type Group, GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/layouts/_common/a11y/tooltipFocusPassthrough';
 import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
-import { toast, Tooltip } from '@heroui/react';
 
-import { Pencil } from 'lucide-react';
-import { useRef, useState, type SyntheticEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 import GroupSettingsSection from '../GroupSettingsSection';
 import styles from './style.module.less';
 

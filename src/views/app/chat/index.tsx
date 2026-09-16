@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+
 import ChatPanel from '@/components/business/ChatPanel';
 import { useCurrentChatSessionStore } from '@/components/business/ChatPanel/_store/useCurrentChatSessionStore';
 import { clearNewChatSessionStore } from '@/components/business/ChatPanel/_store/useNewChatSessionStore';
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+
 import styles from './style.module.less';
 
 function ChatPage() {

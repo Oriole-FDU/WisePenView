@@ -1,6 +1,7 @@
 import { GROUP_TYPE } from '@/domains/Group';
 import type { IQuotaService } from '@/domains/Quota';
 import type { GroupQuotaInfo, UserGroupQuota } from '@/domains/Wallet';
+
 import mockdata from './mockdata.json';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

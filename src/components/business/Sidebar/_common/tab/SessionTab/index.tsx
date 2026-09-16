@@ -1,17 +1,18 @@
+import { ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
+import { useInfiniteScroll, useMemoizedFn } from 'ahooks';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { useChatSessionHistoryRefreshStore } from '@/components/business/ChatPanel/_store/useChatSessionHistoryRefreshStore';
 import { useCurrentChatSessionStore } from '@/components/business/ChatPanel/_store/useCurrentChatSessionStore';
 import { useNewChatSessionStore } from '@/components/business/ChatPanel/_store/useNewChatSessionStore';
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
-import { buildChatPath } from '@/utils/navigation/appRoute';
-import { ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
-
 import { cn } from '@/utils/cn';
-import { useInfiniteScroll, useMemoizedFn } from 'ahooks';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { buildChatPath } from '@/utils/navigation/appRoute';
+
 import { useSidebarSessionHistoryStore } from './_store/useSidebarSessionHistoryStore';
 import SessionMenuItem from './SessionMenuItem';
 import styles from './style.module.less';

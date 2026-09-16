@@ -1,9 +1,11 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { copyText } from '@/utils/browser/copyText';
 import { toast } from '@heroui/react';
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { copyText } from '@/utils/browser/copyText';
+
 import type { CopyButtonProps } from './index.type';
 
 const ICON_SIZE = 17;

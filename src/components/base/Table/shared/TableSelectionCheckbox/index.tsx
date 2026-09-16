@@ -1,5 +1,6 @@
-import { Checkbox } from '@/components/base/Input';
 import { useRef } from 'react';
+
+import { Checkbox } from '@/components/base/Input';
 
 export interface TableSelectionCheckboxProps {
   ariaLabel: string;

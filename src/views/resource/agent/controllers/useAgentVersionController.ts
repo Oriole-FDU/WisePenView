@@ -1,8 +1,10 @@
+import { useState } from 'react';
+
 import { useAgentService, useChatService, useSkillService, useUserService } from '@/domains';
 import type { AgentDetail } from '@/domains/Agent';
 import { useApi } from '@/hooks/useApi';
-import { useState } from 'react';
-import { getAgentVersionItems, type AgentWorkspaceData } from '../model';
+
+import { type AgentWorkspaceData, getAgentVersionItems } from '../model';
 
 interface UseAgentVersionControllerOptions {
   resourceId: string;

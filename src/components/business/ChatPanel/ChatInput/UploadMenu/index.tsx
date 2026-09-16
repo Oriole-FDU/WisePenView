@@ -1,8 +1,10 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Dropdown, Header, Label } from '@heroui/react';
 import { Cloud, Plus, Upload } from 'lucide-react';
 import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 import { useChatInputFiles } from '../useChatInputFiles';
 

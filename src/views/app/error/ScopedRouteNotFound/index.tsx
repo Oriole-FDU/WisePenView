@@ -1,9 +1,10 @@
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { ResultState } from '@/components/base/Feedback';
 import ErrorPageShell from '@/views/app/error/_components/ErrorPageShell';
 
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import shellStyles from '../_components/ErrorPageShell/style.module.less';
 
 export interface ScopedRouteNotFoundProps {

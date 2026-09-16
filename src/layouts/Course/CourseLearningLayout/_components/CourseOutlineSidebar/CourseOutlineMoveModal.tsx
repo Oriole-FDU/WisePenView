@@ -1,10 +1,11 @@
+import { BookOpen, BookOpenText, BookText, NotebookText } from 'lucide-react';
+import { type Key, useState } from 'react';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import Tree, { type DataNode } from '@/components/base/Tree';
 import type { CourseOutlineNode } from '@/domains/Course';
 
-import { BookOpen, BookOpenText, BookText, NotebookText } from 'lucide-react';
-import { useState, type Key } from 'react';
 import styles from '../../style.module.less';
 
 interface CourseOutlineMoveModalProps {

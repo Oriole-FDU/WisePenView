@@ -1,11 +1,12 @@
 import type { MouseEvent as ReactMouseEvent } from 'react';
+
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteBlock } from '../editorMenus/utils';
 export {
   isRecord,
-  toBlockUpdate,
   type NoteBlock,
   type NoteBlockUpdate,
+  toBlockUpdate,
 } from '../editorMenus/utils';
 
 type NoteStyleUpdate = Parameters<CustomBlockNoteEditor['addStyles']>[0];

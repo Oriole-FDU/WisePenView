@@ -1,12 +1,14 @@
+import { toast } from '@heroui/react';
+import { type ChangeEvent, type ReactNode, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useChatService } from '@/domains';
 import { parseErrorMessage } from '@/utils/error';
 import { generateThumbnail } from '@/utils/file/upload';
 import { createUuid } from '@/utils/random/createUuid';
-import { toast } from '@heroui/react';
-import { useRef, type ChangeEvent, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ChatInputFileContext, type ChatInputFileContextValue } from './ChatInputFileContextValue';
+
 import { selectChatInputSelectedModel, useChatInputStoreApi } from './_store/ChatInputStore';
+import { ChatInputFileContext, type ChatInputFileContextValue } from './ChatInputFileContextValue';
 import type { LocalAttachmentPayload } from './index.type';
 
 const MAX_IMAGE_RAW_BYTES = Math.floor(5 * 1024 * 1024 * 0.75);

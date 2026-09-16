@@ -1,3 +1,7 @@
+import { CalendarClock, CheckCircle2, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
@@ -8,9 +12,6 @@ import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { buildCourseAssignmentPath } from '@/utils/navigation/appRoute';
 
-import { CalendarClock, CheckCircle2, ChevronRight, ClipboardCheck } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styles from './style.module.less';
 
 function CourseAssignmentsPage() {

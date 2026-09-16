@@ -1,7 +1,9 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { cn } from '@/utils/cn';
 import { ArrowUp, Bot, Mic, Plus, Settings, SlidersHorizontal, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { cn } from '@/utils/cn';
+
 import AgentPicker from '../AgentPicker';
 import ModelPicker from '../ModelPicker';
 import SkillMenu from '../SkillMenu';

@@ -1,9 +1,11 @@
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import { blockHasType } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
 import { ToggleButtonGroup } from '@heroui/react';
 import { IndentDecrease, IndentIncrease } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+
 import { blockHasInlineContent, getSelectedBlocks } from '../utils';
 import { ToolbarToggleButton } from './ToolbarButton';
 

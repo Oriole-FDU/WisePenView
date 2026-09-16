@@ -1,3 +1,14 @@
+import {
+  DndContext,
+  DragOverlay,
+  type Modifier,
+  type Modifiers,
+  pointerWithin,
+} from '@dnd-kit/core';
+import { HardDrive, PanelRightClose, PanelRightOpen, Trash2 } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -5,17 +16,7 @@ import { FolderTable } from '@/components/base/Table';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
 import type { ResourceViewer } from '@/utils/navigation/resourceTarget';
-import {
-  DndContext,
-  DragOverlay,
-  pointerWithin,
-  type Modifier,
-  type Modifiers,
-} from '@dnd-kit/core';
 
-import { HardDrive, PanelRightClose, PanelRightOpen, Trash2 } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   getDriveNodeLabel,
   resolveCurrentFolderTagId,

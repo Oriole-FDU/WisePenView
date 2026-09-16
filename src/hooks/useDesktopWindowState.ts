@@ -1,5 +1,6 @@
-import { isDesktop, isMac } from '@/utils/platform';
 import { useSyncExternalStore } from 'react';
+
+import { isDesktop, isMac } from '@/utils/platform';
 
 const subscribe = (listener: () => void): (() => void) =>
   window.desktop?.onFullScreenChange(listener) ?? (() => undefined);

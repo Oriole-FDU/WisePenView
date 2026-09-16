@@ -1,4 +1,5 @@
 import { useMatches } from 'react-router-dom';
+
 import type { AppRouteHandle } from './routeHandle';
 
 export function useCurrentRouteHandle(): AppRouteHandle | undefined {

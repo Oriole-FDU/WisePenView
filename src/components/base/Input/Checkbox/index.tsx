@@ -1,5 +1,6 @@
-import { cn } from '@/utils/cn';
 import { Checkbox as HeroCheckbox } from '@heroui/react';
+
+import { cn } from '@/utils/cn';
 
 import type { CheckboxProps } from './index.type';
 import styles from './style.module.less';

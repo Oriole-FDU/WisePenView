@@ -1,8 +1,10 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/Chat';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import SectionShell from '../../shared/SectionShell';
 import SettingRow from '../../shared/SettingRow';
 import styles from './style.module.less';

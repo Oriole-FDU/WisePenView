@@ -1,11 +1,13 @@
-import { Empty } from '@/components/base/Feedback';
-import Markdown, { type MarkdownResourceResolver } from '@/components/base/Markdown';
-import SkillEditor from '@/components/business/Skill/SkillEditor';
-import type { SkillFileNode } from '@/domains/Skill';
 import { Tabs } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import type { editor as MonacoEditor } from 'monaco-editor';
 import type { RefObject } from 'react';
+
+import { Empty } from '@/components/base/Feedback';
+import Markdown, { type MarkdownResourceResolver } from '@/components/base/Markdown';
+import SkillEditor from '@/components/business/Skill/SkillEditor';
+import type { SkillFileNode } from '@/domains/Skill';
+
 import styles from '../style.module.less';
 import { canPreviewSkillFile } from '../utils/skillFileTree';
 import { isMarkdownSkillFile } from '../utils/skillMarkdown';

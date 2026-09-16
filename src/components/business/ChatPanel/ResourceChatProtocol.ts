@@ -1,9 +1,9 @@
 import type { ChatFrontendState } from '@/domains/Chat';
 import {
-  RESOURCE_KIND,
-  RESOURCE_VIEWER,
   normalizeResourceKind,
   normalizeResourceViewer,
+  RESOURCE_KIND,
+  RESOURCE_VIEWER,
 } from '@/utils/navigation/resourceTarget';
 
 export interface ResourceChatResource {

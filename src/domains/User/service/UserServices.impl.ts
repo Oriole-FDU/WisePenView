@@ -1,6 +1,7 @@
-import type { User, UserAccountProfile } from '@/domains/User';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createTtlCache } from '@/domains/_shared/ttlCache';
+import type { User, UserAccountProfile } from '@/domains/User';
+
 import { UserApi } from '../apis/UserApi';
 import { UserServicesMap } from '../mapper/UserServices.map';
 import type {

@@ -1,3 +1,23 @@
+import { useDebounceFn } from 'ahooks';
+import {
+  Bot,
+  FolderHeart,
+  Gauge,
+  HardDrive,
+  KeyRound,
+  type LucideIcon,
+  MessageSquarePlus,
+  Palette,
+  PenLine,
+  UserRound,
+  Users,
+  Workflow,
+  Wrench,
+} from 'lucide-react';
+import { type KeyboardEvent, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import {
   CommandDialog,
   CommandGroup,
@@ -17,25 +37,7 @@ import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import { useDebounceFn } from 'ahooks';
-import {
-  Bot,
-  FolderHeart,
-  Gauge,
-  HardDrive,
-  KeyRound,
-  MessageSquarePlus,
-  Palette,
-  PenLine,
-  UserRound,
-  Users,
-  Workflow,
-  Wrench,
-  type LucideIcon,
-} from 'lucide-react';
-import { useRef, useState, type KeyboardEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+
 import ResourceSearchResults from './ResourceSearchResults';
 import styles from './style.module.less';
 

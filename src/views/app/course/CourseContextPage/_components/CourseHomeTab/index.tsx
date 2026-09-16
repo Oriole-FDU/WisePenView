@@ -1,3 +1,8 @@
+import { Meter, ProgressBar } from '@heroui/react';
+import { ArrowRight, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
@@ -6,11 +11,7 @@ import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/CourseContext';
 import { parseErrorMessage } from '@/utils/error';
 import { buildCourseLearningPath } from '@/utils/navigation/appRoute';
-import { Meter, ProgressBar } from '@heroui/react';
 
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styles from './style.module.less';
 
 function CourseHomeTab() {

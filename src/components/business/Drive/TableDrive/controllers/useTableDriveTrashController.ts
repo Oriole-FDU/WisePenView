@@ -1,7 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 import { useDriveService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
-import { useTranslation } from 'react-i18next';
 
 interface UseTableDriveTrashControllerParams {
   currentNodeId: string;

@@ -1,4 +1,5 @@
 import type { IResourcePermissionService } from '@/domains/Resource';
+
 import { createMockResourcePermissionOverview } from './resourcePermissionOverview.mockdata';
 
 export const ResourcePermissionServicesMock: IResourcePermissionService = {

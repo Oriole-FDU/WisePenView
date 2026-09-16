@@ -1,10 +1,11 @@
+import { ChevronRight, Pencil } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FormField, TextArea } from '@/components/base/Input';
 import type { CourseOutlineContainerNode, CourseOutlineResourceNode } from '@/domains/Course';
 
-import { ChevronRight, Pencil } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import CourseResourceIcon from '../CourseResourceIcon';
 import styles from './style.module.less';
 import { useCourseOutlineDescriptionController } from './useCourseOutlineDescriptionController';

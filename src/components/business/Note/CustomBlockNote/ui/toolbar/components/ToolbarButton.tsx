@@ -1,9 +1,10 @@
+import { ToggleButton, Tooltip } from '@heroui/react';
+import { cloneElement, type ReactElement, type ReactNode } from 'react';
+
 import { AppButton, type AppButtonProps } from '@/components/base/Button';
 import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/layouts/_common/a11y/tooltipFocusPassthrough';
-import { ToggleButton, Tooltip } from '@heroui/react';
-
 import { cn } from '@/utils/cn';
-import { cloneElement, type ReactElement, type ReactNode } from 'react';
+
 import styles from '../style.module.less';
 import { stopToolbarMouseDown } from '../utils';
 

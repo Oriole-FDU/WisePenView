@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react';
+
 import { ChatInputStoreContext, createChatInputStore } from './ChatInputStore';
 
 interface ChatInputStoreProviderProps {

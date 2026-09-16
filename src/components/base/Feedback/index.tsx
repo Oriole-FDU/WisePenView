@@ -2,6 +2,7 @@ import { Spinner } from '@heroui/react';
 import { CircleAlert, CircleCheck, CircleHelp, Info, SearchX, ShieldAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 type FeedbackStatus = 'success' | 'info' | 'warning' | 'error' | '404' | '403' | '500';

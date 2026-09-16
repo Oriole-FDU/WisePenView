@@ -3,6 +3,7 @@ import { BlockNoteSchema } from '@blocknote/core';
 import type { EditorProps } from '@tiptap/pm/view';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
 import type {
   NoteBlockPlugin,
   NoteContentPlugin,

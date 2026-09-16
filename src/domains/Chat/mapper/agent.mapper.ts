@@ -1,4 +1,5 @@
 import type { ResourceItem } from '@/domains/Resource';
+
 import type { ChatAgentOption } from '../entity/agent';
 
 const DEFAULT_PERSONAL_AGENT_ID = 'agent-personal-default';

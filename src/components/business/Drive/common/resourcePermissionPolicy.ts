@@ -11,6 +11,7 @@ import {
 import type { TagTreeNode } from '@/domains/Tag';
 import { getTagPermissionPresetValues, type TagPermissionPresetKey } from '@/domains/Tag';
 import i18n from '@/i18n';
+
 import { TAG_PERMISSION_PRESETS } from './tagPermissionPreset';
 
 export type ResourcePermissionPresetKey = 'inherit' | TagPermissionPresetKey;

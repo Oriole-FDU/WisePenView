@@ -1,6 +1,7 @@
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
+
 import type {
   CommentPageApiResponse,
   ResourceCommentItemApiResponse,
@@ -18,7 +19,7 @@ import type {
 } from '../apis/FavoriteApi.type';
 import type { GetUserInteractionRecordApiResponse } from '../apis/InteractApi.type';
 import type { CommentAuthor, CommentPage, ResourceComment } from '../entity/comment';
-import type { FavoriteCollection, FavoriteItem, FavoritedResourcesPage } from '../entity/favorite';
+import type { FavoriteCollection, FavoritedResourcesPage, FavoriteItem } from '../entity/favorite';
 import type { ResourceInteractionRecord } from '../entity/interaction';
 import type {
   CreateFavoriteCollectionRequest,

@@ -1,8 +1,9 @@
-import {
-  useResourceHostLayoutConfig,
-  type ResourceHostLayoutConfig,
-} from '@/views/resource/ResourceHostContext';
 import type { DependencyList, ReactNode } from 'react';
+
+import {
+  type ResourceHostLayoutConfig,
+  useResourceHostLayoutConfig,
+} from '@/views/resource/ResourceHostContext';
 
 interface ResourceLayoutConfigProps {
   children: ReactNode;

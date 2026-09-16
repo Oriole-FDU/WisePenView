@@ -1,10 +1,3 @@
-import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
-import ResourcePermissionModal from '@/components/business/Resource/ResourcePermissionModal';
-import { useUserService } from '@/domains';
-import { useApi } from '@/hooks/useApi';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 import { Dropdown, Label } from '@heroui/react';
 import {
   ChevronRight,
@@ -15,6 +8,7 @@ import {
   FolderInput,
   HardDrive,
   Link2,
+  type LucideIcon,
   MessageSquare,
   PanelRightClose,
   PanelRightOpen,
@@ -24,14 +18,22 @@ import {
   Share2,
   ShieldCheck,
   Trash2,
-  type LucideIcon,
 } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import EntryIcon from '@/components/base/Icons/EntryIcon';
+import ResourcePermissionModal from '@/components/business/Resource/ResourcePermissionModal';
+import { useUserService } from '@/domains';
+import { useApi } from '@/hooks/useApi';
+import { normalizeId } from '@/utils/normalize/normalizeId';
+
+import type { ResourceHeaderMoreMenu, ResourceHeaderProps } from './index.type';
 import ResourceHeaderOperations, {
   type ResourceHeaderOperationHandlers,
 } from './ResourceHeaderOperations';
-import type { ResourceHeaderMoreMenu, ResourceHeaderProps } from './index.type';
 import styles from './style.module.less';
 
 interface ResourceHeaderMenuItemContentProps {

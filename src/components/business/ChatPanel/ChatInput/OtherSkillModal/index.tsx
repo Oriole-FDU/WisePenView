@@ -1,12 +1,14 @@
-import AppModal from '@/components/base/AppModal';
-import { AppButton } from '@/components/base/Button';
-import DriveNavigator from '@/components/business/Drive/DriveNavigator';
-import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
-import { type ChatAgentOption } from '@/domains/Chat';
-import type { ResourceSkillSummary } from '@/domains/Resource';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
+
+import AppModal from '@/components/base/AppModal';
+import { AppButton } from '@/components/base/Button';
+import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
+import DriveNavigator from '@/components/business/Drive/DriveNavigator';
+import { type ChatAgentOption } from '@/domains/Chat';
+import type { ResourceSkillSummary } from '@/domains/Resource';
+
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 import styles from './style.module.less';
 

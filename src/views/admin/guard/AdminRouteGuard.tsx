@@ -1,9 +1,11 @@
+import { Navigate, Outlet } from 'react-router-dom';
+
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { IDENTITY } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { Navigate, Outlet } from 'react-router-dom';
+
 import styles from './AdminRouteGuard.module.less';
 
 function AdminRouteGuard() {

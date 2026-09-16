@@ -1,10 +1,12 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import CommentInput, { type CommentInputImage } from '@/components/business/CommentInput';
 import { useImageService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 const IMAGE_ONLY_CONTENT = '\u200B';

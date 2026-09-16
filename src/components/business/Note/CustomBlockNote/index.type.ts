@@ -7,6 +7,7 @@ import type {
   NoteSelectionSnapshot,
   WisepenProvider,
 } from '@/domains/Note';
+
 import type { NoteOutlineItem } from './engines/outline';
 
 export type { NoteOutlineItem } from './engines/outline';

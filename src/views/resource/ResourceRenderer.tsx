@@ -1,22 +1,23 @@
+import { lazy } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { useDocumentService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import {
-  RESOURCE_KIND,
-  RESOURCE_VIEWER,
   isResourceViewerCompatible,
   normalizeResourceKind,
   normalizeResourceViewer,
   resolveResourceViewer,
+  RESOURCE_KIND,
+  RESOURCE_VIEWER,
   type ResourceTarget,
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
 
-import { lazy } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useResourceHostLayoutConfig, type ResourceHostLayoutConfig } from './ResourceHostContext';
+import { type ResourceHostLayoutConfig, useResourceHostLayoutConfig } from './ResourceHostContext';
 import styles from './ResourceRenderer.module.less';
 
 const AgentView = lazy(() => import('./agent'));

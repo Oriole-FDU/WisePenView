@@ -1,3 +1,7 @@
+import { existsSync, promises as fs, statSync } from 'node:fs';
+import { dirname, join, resolve, sep } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import {
   app,
   BrowserWindow,
@@ -10,9 +14,7 @@ import {
   shell,
   type WebContents,
 } from 'electron';
-import { existsSync, promises as fs, statSync } from 'node:fs';
-import { dirname, join, resolve, sep } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import {
   DESKTOP_MAC_TRAFFIC_LIGHT_POSITION,
   WINDOW_DEFAULT_HEIGHT,
@@ -20,7 +22,7 @@ import {
   WINDOW_MIN_HEIGHT,
   WINDOW_MIN_WIDTH,
 } from '../../src/constants/layoutScale';
-import { COLOR_SCHEME, DEFAULT_COLOR_SCHEME, type ColorScheme } from '../../src/theme/constants';
+import { COLOR_SCHEME, type ColorScheme, DEFAULT_COLOR_SCHEME } from '../../src/theme/constants';
 import { APP_ROUTE_PATH, isAuthenticatedAppRoutePath } from '../../src/utils/navigation/appRoute';
 import { DESKTOP_CHANNEL, type DesktopNavigationState } from '../shared/channels';
 

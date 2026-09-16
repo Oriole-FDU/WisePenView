@@ -1,5 +1,6 @@
-import { build, context } from 'esbuild';
 import { rmSync } from 'node:fs';
+
+import { build, context } from 'esbuild';
 
 const watch = process.argv.includes('--watch');
 

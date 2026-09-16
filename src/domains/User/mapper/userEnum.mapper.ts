@@ -6,7 +6,7 @@ import type {
   UserStatusApiValue,
 } from '../apis/UserApi.type';
 import type { UserDisplayBase } from '../entity/user';
-import { DEGREE, SEX, USER_STATUS, type DegreeLevel } from '../enum';
+import { DEGREE, type DegreeLevel, SEX, USER_STATUS } from '../enum';
 
 export const normalizeIdentityTypeFromApi = (value: UserIdentityTypeApiValue): number =>
   Number(value);

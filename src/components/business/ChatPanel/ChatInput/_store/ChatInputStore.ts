@@ -1,3 +1,8 @@
+import { createContext, useContext } from 'react';
+import { useStore } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { createStore, type StoreApi } from 'zustand/vanilla';
+
 import {
   buildDefaultPersonalAgent,
   type CapabilitySkillSelection,
@@ -8,10 +13,7 @@ import {
 import type { ResourceSkillSummary } from '@/domains/Resource';
 import { createStoreJSONStorage } from '@/store/persistence';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { createContext, useContext } from 'react';
-import { useStore } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { createStore, type StoreApi } from 'zustand/vanilla';
+
 import type {
   LocalAttachmentPayload,
   LocalAttachmentUpload,

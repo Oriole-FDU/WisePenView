@@ -1,9 +1,11 @@
+import { useInfiniteScroll, useKeyPress } from 'ahooks';
+import { useTranslation } from 'react-i18next';
+
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
 import { cn } from '@/utils/cn';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
-import { useInfiniteScroll, useKeyPress } from 'ahooks';
-import { useTranslation } from 'react-i18next';
+
 import styles from '../style.module.less';
 
 interface ChatSessionBarProps {

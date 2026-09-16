@@ -1,5 +1,6 @@
 import { apiPost } from '@/apis/request';
 import type { InitUploadAssetsApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
+
 import type {
   AgentInfoApiResponse,
   AgentVersionBundleApiResponse,

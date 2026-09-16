@@ -1,7 +1,8 @@
-import { LAYOUT_DENSITY, resolveLayoutDensity, type LayoutDensity } from '@/constants/layoutScale';
 import { useMemoizedFn } from 'ahooks';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useRef, useState } from 'react';
+
+import { LAYOUT_DENSITY, type LayoutDensity, resolveLayoutDensity } from '@/constants/layoutScale';
 
 interface UseCompactSidebarCollapseOptions {
   sidebarCollapsed: boolean;

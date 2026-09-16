@@ -12,9 +12,9 @@ export type {
   RootNode,
 } from './entity/drive';
 export {
-  DRIVE_ROOT_ID,
   buildDriveNodeScope,
   decodeRootNodeScope,
+  DRIVE_ROOT_ID,
 } from './mapper/DriveServices.map';
 export type {
   AddResourcesToGroupParams,

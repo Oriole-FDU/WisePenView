@@ -1,7 +1,7 @@
-import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
-
 import { Modal as HeroModal } from '@heroui/react';
 import { createContext, useContext, useState } from 'react';
+
+import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
 import type {
   ModalBackdropProps,

@@ -1,11 +1,12 @@
 import { type SortDescriptor } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import { useRef, useState } from 'react';
+
 import {
+  type DriveActionTarget,
   isDriveActionTarget,
   isDriveSharedFolderNode,
   isDriveSystemFolderNode,
-  type DriveActionTarget,
 } from '../../common/driveComponentModel';
 import type { DriveRow } from '../index.type';
 import { buildDriveTableRowMap, toDriveTableRow } from '../tableConfig';

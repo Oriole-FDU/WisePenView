@@ -1,7 +1,8 @@
+import type { TFunction } from 'i18next';
+
 import type { UserAccountProfile } from '@/domains/User';
 import { DEGREE, SEX } from '@/domains/User';
 import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
-import type { TFunction } from 'i18next';
 
 /** 从完整用户信息中取出档案字段原始值；昵称/姓名在 userInfo，其余在 userProfile。 */
 function getProfileFieldValue(

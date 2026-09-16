@@ -1,3 +1,8 @@
+import { FilePenLine } from 'lucide-react';
+import { type ReactNode, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import PdfViewer from '@/components/business/PdfViewer/index';
@@ -14,10 +19,6 @@ import {
 } from '@/utils/navigation/resourceTarget';
 import { useResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
 
-import { FilePenLine } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';
 import styles from './style.module.less';
 

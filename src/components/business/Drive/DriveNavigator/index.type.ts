@@ -1,5 +1,7 @@
-import type { DriveNode } from '@/domains/Drive';
 import type { ReactNode } from 'react';
+
+import type { DriveNode } from '@/domains/Drive';
+
 import type { DriveItemKind, DriveScope, DriveSelectionItem } from '../common/driveComponentModel';
 
 export type DriveNavigatorScopeMode = 'single' | 'all' | 'public';

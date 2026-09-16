@@ -1,3 +1,7 @@
+import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import { useCurrentRouteHandle } from '@/bootstrap/router';
 import { useCurrentChatSessionStore } from '@/components/business/ChatPanel/_store/useCurrentChatSessionStore';
 import { clearNewChatSessionStore } from '@/components/business/ChatPanel/_store/useNewChatSessionStore';
@@ -8,9 +12,7 @@ import { useOpenResource } from '@/hooks/useOpenResource';
 import { useAppAuth } from '@/layouts/App/AppAuthContext';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+
 import UserProfile from '../_common/footer/UserProfile';
 import HeaderNav from '../_common/header/HeaderNav';
 import type { HeaderNavItem } from '../_common/header/HeaderNav/index.type';

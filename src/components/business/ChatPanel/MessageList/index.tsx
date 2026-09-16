@@ -1,3 +1,8 @@
+import type { ChatStatus } from 'ai';
+import { ArrowDown } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -8,10 +13,7 @@ import {
   useMessageScroller,
 } from '@/components/_shadcn';
 import type { ChatModel, WisePenUIMessage } from '@/domains/Chat';
-import type { ChatStatus } from 'ai';
-import { ArrowDown } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import ConversationLoading from './ConversationLoading';
 import HistoryLoader from './HistoryLoader';
 import Message from './Message';

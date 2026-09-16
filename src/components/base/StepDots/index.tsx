@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+
 import type { StepDotsProps } from './index.type';
 import styles from './style.module.less';
 

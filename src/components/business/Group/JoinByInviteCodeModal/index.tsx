@@ -1,8 +1,10 @@
+import { toast } from '@heroui/react';
+import { Fragment, useId, useState } from 'react';
+
 import { InputOTP, REGEXP_ONLY_DIGITS_AND_CHARS } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useApi } from '@/hooks/useApi';
-import { toast } from '@heroui/react';
-import { Fragment, useId, useState } from 'react';
+
 import type { JoinByInviteCodeModalProps } from './index.type';
 import styles from './style.module.less';
 

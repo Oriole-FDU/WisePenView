@@ -1,4 +1,5 @@
 import i18n from '@/i18n';
+
 import type { GuidedPromptFields } from './codec';
 
 export const getDefaultGuidedPromptFields = (): GuidedPromptFields => ({

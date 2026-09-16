@@ -1,6 +1,7 @@
-import i18n from '@/i18n';
 import { defaultBlockSpecs } from '@blocknote/core';
 import { PanelLeft, PanelTop, StretchHorizontal, Table2 } from 'lucide-react';
+
+import i18n from '@/i18n';
 
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
 import type { NoteBlockPlugin, NoteSideMenuAction } from '../../registry/types';

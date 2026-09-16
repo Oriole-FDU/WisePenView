@@ -1,10 +1,10 @@
-import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type {
   InitUploadAssetApiItem,
   VersionAssetApiInfo,
   VersionBundleApiResponse,
   VersionResourceInfoApiResponse,
 } from '@/domains/_shared/apis/versionAssetApi.type';
+import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 
 export const AssetResourceTypeEnum = {
   MD: 'MD',

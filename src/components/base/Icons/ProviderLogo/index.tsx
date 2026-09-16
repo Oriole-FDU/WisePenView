@@ -1,4 +1,3 @@
-import { cn } from '@/utils/cn';
 import claudeIcon from '@lobehub/icons-static-svg/icons/claude.svg?raw';
 import deepSeekIcon from '@lobehub/icons-static-svg/icons/deepseek.svg?raw';
 import doubaoIcon from '@lobehub/icons-static-svg/icons/doubao.svg?raw';
@@ -9,6 +8,9 @@ import mistralIcon from '@lobehub/icons-static-svg/icons/mistral.svg?raw';
 import openAiIcon from '@lobehub/icons-static-svg/icons/openai.svg?raw';
 import qwenIcon from '@lobehub/icons-static-svg/icons/qwen.svg?raw';
 import type { CSSProperties } from 'react';
+
+import { cn } from '@/utils/cn';
+
 import type { ProviderLogoProps } from './index.type';
 import styles from './style.module.less';
 

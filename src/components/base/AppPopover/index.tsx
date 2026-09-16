@@ -1,7 +1,8 @@
-import { cn } from '@/utils/cn';
 import { CircleAlert } from 'lucide-react';
 
 import { Popover } from '@/components/base/Popover';
+import { cn } from '@/utils/cn';
+
 import type { AppPopoverContentProps, AppPopoverHeaderProps, AppPopoverProps } from './index.type';
 import styles from './style.module.less';
 

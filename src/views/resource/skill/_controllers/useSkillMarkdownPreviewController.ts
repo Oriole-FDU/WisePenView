@@ -1,9 +1,11 @@
-import type { MarkdownResourceResolver } from '@/components/base/Markdown';
-import { useSkillService } from '@/domains';
-import type { SkillFileNode } from '@/domains/Skill';
 import { useLatest, useUnmount } from 'ahooks';
 import type { editor as MonacoEditor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
+
+import type { MarkdownResourceResolver } from '@/components/base/Markdown';
+import { useSkillService } from '@/domains';
+import type { SkillFileNode } from '@/domains/Skill';
+
 import {
   collectMarkdownResourceUrls,
   inferImageMimeType,

@@ -1,6 +1,8 @@
-import type { GroupMember } from '@/domains/Group';
 import type { Selection, SortDescriptor } from '@heroui/react';
 import type { ReactNode } from 'react';
+
+import type { GroupMember } from '@/domains/Group';
+
 import type { GroupDisplayConfig } from '../../GroupDisplayConfig';
 
 export type MemberListInlineEditKind = 'role' | 'quota';

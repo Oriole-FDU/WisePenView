@@ -1,6 +1,7 @@
+import { Bell, Folder, type LucideIcon, MessageSquarePlus, NotebookPen, Users } from 'lucide-react';
+
 import { APP_SIDEBAR_HEADER_NAV_KEY, type AppSidebarHeaderNavKey } from '@/config/appSidebar';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { Bell, Folder, MessageSquarePlus, NotebookPen, Users, type LucideIcon } from 'lucide-react';
 
 export interface AppSidebarNavigateItem {
   type: 'navigate';

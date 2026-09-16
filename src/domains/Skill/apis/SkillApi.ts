@@ -1,6 +1,7 @@
 import type { OssStsTokenApiResponse } from '@/apis/api.type';
 import { apiGet, apiPost } from '@/apis/request';
 import type { InitUploadAssetsApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
+
 import type {
   CreateSkillApiRequest,
   DeleteSkillAssetsApiRequest,

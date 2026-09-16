@@ -1,3 +1,18 @@
+import { Table } from '@heroui/react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Folder } from 'lucide-react';
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  memo,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type UIEvent,
+  useRef,
+} from 'react';
+import { useTranslation } from 'react-i18next';
+
 import TableBatchFooter from '../ManageTable/parts/BatchFooter';
 import TableCellAlign from '../shared/cells/CellAlign';
 import TableTextCell from '../shared/cells/TextCell';
@@ -32,21 +47,6 @@ import type {
 import FolderTableNameCell from './parts/FolderNameCell';
 import FolderTableLoadingSkeleton from './parts/LoadingSkeleton';
 import styles from './style.module.less';
-
-import { Table } from '@heroui/react';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { Folder } from 'lucide-react';
-import {
-  memo,
-  useRef,
-  type CSSProperties,
-  type KeyboardEvent,
-  type MouseEvent,
-  type ReactElement,
-  type ReactNode,
-  type UIEvent,
-} from 'react';
-import { useTranslation } from 'react-i18next';
 
 const LOAD_MORE_THRESHOLD_PX = 48;
 const VIRTUAL_ROW_ESTIMATE_SIZE = 60;

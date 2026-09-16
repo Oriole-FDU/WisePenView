@@ -1,4 +1,5 @@
 import AppAvatar from '@/components/base/Avatar';
+
 import type { TableMemberCellProps } from './index.type';
 import styles from './style.module.less';
 

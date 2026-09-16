@@ -4,6 +4,7 @@ import type { GroupBaseInfo, IGroupService } from '@/domains/Group';
 import type { INoteService } from '@/domains/Note';
 import type { ISkillService } from '@/domains/Skill';
 import type { ITagService } from '@/domains/Tag';
+
 import { type ResourceAction } from '../enum';
 import { ResourceServicesMap } from '../mapper/ResourceServices.map';
 import type {

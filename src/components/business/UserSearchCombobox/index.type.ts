@@ -1,5 +1,6 @@
-import type { UserSearchUser } from '@/domains/User';
 import type { ReactNode } from 'react';
+
+import type { UserSearchUser } from '@/domains/User';
 
 export interface UserSearchComboboxProps {
   value: string;

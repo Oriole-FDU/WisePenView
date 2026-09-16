@@ -1,11 +1,12 @@
 import { isRecord } from '@/utils/typeGuards';
+
 import { stableStringify } from '../../engines/aiDiff/contentState';
 import {
-  diffAiTextTokens,
-  tokenizeAiDiffText,
   type AiDiffTextConfig,
   type AiDiffTextHunk,
   type AiDiffTextToken,
+  diffAiTextTokens,
+  tokenizeAiDiffText,
 } from '../../engines/aiDiff/wordDiff';
 
 function withoutField(

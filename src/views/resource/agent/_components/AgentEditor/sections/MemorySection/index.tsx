@@ -1,10 +1,11 @@
+import { Label, NumberField, Slider } from '@heroui/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import { FormField, TextArea } from '@/components/base/Input';
 import type { AgentSpec } from '@/domains/Agent';
-import { Label, NumberField, Slider } from '@heroui/react';
 
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';
 import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
 import SectionShell from '../../shared/SectionShell';

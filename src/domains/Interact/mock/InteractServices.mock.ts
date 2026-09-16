@@ -3,6 +3,7 @@ import type {
   RateResourceRequest,
   ResourceInteractionRecord,
 } from '@/domains/Interact';
+
 import {
   createMockComment,
   createMockReply,

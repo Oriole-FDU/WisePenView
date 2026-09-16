@@ -1,6 +1,8 @@
+import { useState } from 'react';
+
 import type { FavoriteItem } from '@/domains/Interact';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { useState } from 'react';
+
 import { useFavoriteResources } from './useFavoriteResources';
 
 interface UseFavoriteResourceTableControllerOptions {

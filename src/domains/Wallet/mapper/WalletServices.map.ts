@@ -6,6 +6,7 @@ import {
   type WalletTransactionRecord,
 } from '@/domains/Wallet';
 import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
+
 import type {
   GetWalletInfoResponse,
   ListWalletTransactionsRequest,

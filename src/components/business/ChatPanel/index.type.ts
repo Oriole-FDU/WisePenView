@@ -1,4 +1,5 @@
 import type { ChatAgentOption } from '@/domains/Chat';
+
 import type { ResourceChatProtocolPort } from './ResourceChatProtocol';
 
 export interface ChatPanelProps {

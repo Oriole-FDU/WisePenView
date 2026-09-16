@@ -1,5 +1,7 @@
-import i18n from '@/i18n';
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
+
+import i18n from '@/i18n';
+
 import { getSlashMenuItemKey } from './buildSlashMenuItems';
 
 const SLASH_MENU_GROUP_ORDER = ['basic', 'common', 'advanced', 'ai', 'other'] as const;

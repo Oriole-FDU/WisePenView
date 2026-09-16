@@ -1,8 +1,8 @@
 import type { FormEvent, KeyboardEvent, RefObject } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
-import { useEffect } from 'react';
 import popoverStyles from '../InlineMath/style.module.less';
 import { sanitizeLatexInput } from '../latexInput';
 

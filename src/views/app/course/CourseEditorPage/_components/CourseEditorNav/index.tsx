@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+
 import type { CourseEditorSectionId } from '../../model';
 import styles from '../../style.module.less';
 

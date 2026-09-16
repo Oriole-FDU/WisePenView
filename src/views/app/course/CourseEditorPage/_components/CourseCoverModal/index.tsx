@@ -1,8 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { UploadZone } from '@/components/base/Input';
-
-import { useTranslation } from 'react-i18next';
 
 interface CourseCoverModalProps {
   isOpen: boolean;

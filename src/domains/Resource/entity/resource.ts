@@ -1,4 +1,5 @@
 import type { UserDisplayBase } from '@/domains/User';
+
 import type { ResourceAction } from '../enum';
 /** Resource 领域模型 */
 

@@ -1,10 +1,12 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import ProviderLogo from '@/components/base/Icons/ProviderLogo';
-import type { ChatModel } from '@/domains/Chat';
 import { Description, Dropdown, Header, Label } from '@heroui/react';
 import { ChevronDown, LoaderCircle } from 'lucide-react';
 import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import ProviderLogo from '@/components/base/Icons/ProviderLogo';
+import type { ChatModel } from '@/domains/Chat';
+
 import styles from './style.module.less';
 
 export type ModelSelectorTriggerVariant = 'default' | 'icon';

@@ -1,12 +1,13 @@
 import { Table } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
+import TableCellAlign from '../../../shared/cells/CellAlign';
 import { joinClassNames, resolveColumnAlign } from '../../../shared/TableBase/cellAlign';
 import {
   resolveReadonlyColumnWidthClass,
   resolveReadonlySkeletonBarWidth,
 } from '../../../shared/TableBase/columnWidth';
 import type { TableColumnWidth } from '../../../shared/TableBase/index.type';
-import TableCellAlign from '../../../shared/cells/CellAlign';
 import styles from './style.module.less';
 
 interface DataTableSkeletonColumn {

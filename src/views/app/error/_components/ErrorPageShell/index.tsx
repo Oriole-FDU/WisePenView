@@ -1,6 +1,7 @@
-import { cn } from '@/utils/cn';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 

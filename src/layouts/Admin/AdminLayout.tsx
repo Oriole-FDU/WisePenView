@@ -1,3 +1,13 @@
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type {
+  Layout,
+  LayoutChangedMeta,
+  PanelImperativeHandle,
+  PanelSize,
+} from 'react-resizable-panels';
+import { Outlet } from 'react-router-dom';
+
 import AdminSidebar from '@/components/business/Sidebar/AdminSidebar';
 import {
   ADMIN_SIDEBAR_COLLAPSED_WIDTH,
@@ -17,15 +27,7 @@ import {
   SystemResizablePanelGroup,
 } from '@/layouts/_common/SystemResizable';
 import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import type {
-  Layout,
-  LayoutChangedMeta,
-  PanelImperativeHandle,
-  PanelSize,
-} from 'react-resizable-panels';
-import { Outlet } from 'react-router-dom';
+
 import styles from './AdminLayout.module.less';
 
 function AdminLayout() {

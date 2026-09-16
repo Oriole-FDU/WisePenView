@@ -1,11 +1,12 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/Chat';
 import { Description, Dropdown, Header, Label, Separator, Skeleton } from '@heroui/react';
-
 import { Settings, Sparkles, Wrench } from 'lucide-react';
 import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/Chat';
+
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 import styles from '../style.module.less';
 

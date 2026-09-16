@@ -1,3 +1,9 @@
+import { Form, toast } from '@heroui/react';
+import { User } from 'lucide-react';
+import { type FormEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import {
   appendRedirectParam,
   buildRegisterOnboardingPath,
@@ -8,15 +14,10 @@ import { Checkbox, FormField, Input, PasswordInput } from '@/components/base/Inp
 import { useAuthService } from '@/domains';
 import type { RegisterRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
+import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
-import { Form, toast } from '@heroui/react';
 
-import { hasFieldErrors, runFieldValidation, type FieldErrors } from '@/utils/formValidation';
-import { User } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import auth from '../Auth.module.less';
 
 const USERNAME_MAX_LENGTH = 20;

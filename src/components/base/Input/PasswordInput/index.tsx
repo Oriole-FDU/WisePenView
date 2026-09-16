@@ -1,6 +1,7 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Eye, EyeOff, Lock } from 'lucide-react';
 import { useState } from 'react';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import Input from '../Input';
 import type { PasswordInputProps } from './index.type';

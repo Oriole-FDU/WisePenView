@@ -1,4 +1,3 @@
-import { isRecord } from '@/utils/typeGuards';
 import type {
   BlockNoteEditor,
   BlockSchema,
@@ -7,6 +6,8 @@ import type {
 } from '@blocknote/core';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { isRecord } from '@/utils/typeGuards';
+
 import type {
   NoteMarkdownImportContext,
   NoteMarkdownImportSegment,

@@ -1,6 +1,3 @@
-import AppPopover from '@/components/base/AppPopover';
-import { AppButton } from '@/components/base/Button';
-import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import { isTableCellSelection } from '@blocknote/core';
 import {
   DEFAULT_LINK_PROTOCOL,
@@ -11,14 +8,18 @@ import {
 } from '@blocknote/core/extensions';
 import { useBlockNoteEditor, useEditorState, useExtension } from '@blocknote/react';
 import { Input } from '@heroui/react';
-
 import { useEventListener, useUnmount } from 'ahooks';
 import { Link } from 'lucide-react';
-import { useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { type KeyboardEvent as ReactKeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppPopover from '@/components/base/AppPopover';
+import { AppButton } from '@/components/base/Button';
+import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
+
 import styles from '../style.module.less';
 import { blockHasInlineContent, getSelectedBlocks } from '../utils';
-import { ToolbarButton, type ButtonGroupChildProps } from './ToolbarButton';
+import { type ButtonGroupChildProps, ToolbarButton } from './ToolbarButton';
 
 function normalizeUrl(url: string) {
   const trimmedUrl = url.trim();

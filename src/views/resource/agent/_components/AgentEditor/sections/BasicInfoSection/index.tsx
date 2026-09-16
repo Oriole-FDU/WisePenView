@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import type { AgentSpec } from '@/domains/Agent';
-import { useTranslation } from 'react-i18next';
+
 import SectionShell from '../../shared/SectionShell';
 import SettingRow from '../../shared/SettingRow';
 import styles from './style.module.less';

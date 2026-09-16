@@ -1,11 +1,12 @@
+import { useUnmount } from 'ahooks';
+import { ImagePlus, X } from 'lucide-react';
+import { type ClipboardEvent, type KeyboardEvent, useRef, useState } from 'react';
+
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { TextArea } from '@/components/base/Input';
 import EmojiPicker from '@/components/base/Input/EmojiPicker';
 
-import { useUnmount } from 'ahooks';
-import { ImagePlus, X } from 'lucide-react';
-import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
 import styles from './style.module.less';
 
 export interface CommentInputImage {

@@ -1,5 +1,6 @@
-import { cn } from '@/utils/cn';
 import { Fieldset as HeroFieldset } from '@heroui/react';
+
+import { cn } from '@/utils/cn';
 
 import type {
   FieldGroupProps,

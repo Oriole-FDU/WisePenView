@@ -1,4 +1,5 @@
 import { buildDriveNodeScope, type DriveResourceLocation } from '@/domains/Drive';
+
 import { APP_ROUTE_PATH } from './appRoute';
 
 const RESOURCE_SCOPE_QUERY_KEY = 'scope';

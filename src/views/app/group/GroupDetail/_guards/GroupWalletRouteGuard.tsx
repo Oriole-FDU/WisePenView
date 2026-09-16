@@ -1,7 +1,9 @@
+import { Outlet, useOutletContext } from 'react-router-dom';
+
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import { useGroupContext } from '@/layouts/Group/GroupContext';
 import ForbiddenRoute from '@/views/app/error/ForbiddenRoute';
-import { Outlet, useOutletContext } from 'react-router-dom';
+
 import type { GroupDetailOutletContextValue } from '..';
 
 function GroupWalletRouteGuard() {

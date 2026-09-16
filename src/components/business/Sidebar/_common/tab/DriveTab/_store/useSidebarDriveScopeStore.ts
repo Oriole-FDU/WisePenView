@@ -1,8 +1,9 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
 import { buildDriveNodeScope, type DriveNodeScope } from '@/domains/Drive';
 import { registerStore } from '@/store/lifecycle';
 import { createStoreJSONStorage } from '@/store/persistence';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface SidebarDriveScopeState {
   scope: DriveNodeScope;

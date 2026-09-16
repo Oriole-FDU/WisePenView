@@ -6,6 +6,7 @@ import type {
 import { createExtension, getBlockInfo, inlineContentToNodes, nodeToBlock } from '@blocknote/core';
 import type { Node as PMNode } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+
 import type { NotePluginRegistry, NoteTransactionService } from '../../../registry/types';
 import { sanitizeLatexInput } from '../latexInput';
 

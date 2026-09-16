@@ -1,5 +1,6 @@
 import type { Group } from '@/domains/Group';
 import { GROUP_TYPE } from '@/domains/Group';
+
 import mockdata from './mockdata.json';
 
 const groups = (mockdata.groups as Group[]).map((group) => ({

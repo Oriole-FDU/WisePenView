@@ -1,6 +1,7 @@
 import type { Group } from '@/domains/Group';
 import { GROUP_TYPE } from '@/domains/Group';
 import { findMockGroup } from '@/domains/Group/mock/groupStore.mock';
+
 import type {
   CourseDetail,
   CourseOutlineEditorNode,

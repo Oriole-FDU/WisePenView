@@ -3,6 +3,7 @@ import type { UserDisplayBase } from '@/domains/User';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
+
 import type {
   ChangeResourceActionPermissionApiRequest,
   GlobalSearchApiResponse,
@@ -31,10 +32,10 @@ import {
   normalizeSearchResourceType,
   RESOURCE_ACTION,
   RESOURCE_PERMISSION_ACTION_ORDER,
-  resourceActionsToApiKeys,
-  TAG_QUERY_LOGIC_MODE,
   type ResourceAction,
   type ResourceActionKey,
+  resourceActionsToApiKeys,
+  TAG_QUERY_LOGIC_MODE,
 } from '../enum';
 import type {
   GetUserResourcesRequest,

@@ -1,12 +1,13 @@
+import { Input, ListBox, ListBoxItem, TextField } from '@heroui/react';
+import { Plus, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/Interact';
-import { Input, ListBox, ListBoxItem, TextField } from '@heroui/react';
 
-import { Plus, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import styles from './style.module.less';
 
 export interface CollectionPickerModalProps {

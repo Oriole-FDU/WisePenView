@@ -1,9 +1,10 @@
+import { useTranslation } from 'react-i18next';
+
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import type { DriveContainerNode } from '@/domains/Drive';
 import { usePickerSelection } from '@/hooks/usePickerSelection';
 
-import { useTranslation } from 'react-i18next';
 import DriveNavigator from '../../DriveNavigator';
 import type { DriveFolderPickerModalProps } from './index.type';
 import styles from './style.module.less';

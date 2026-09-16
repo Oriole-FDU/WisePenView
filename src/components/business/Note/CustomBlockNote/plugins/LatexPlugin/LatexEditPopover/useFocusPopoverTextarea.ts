@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react';
+import { type RefObject, useEffect } from 'react';
 
 /**
  * 浮层已算出位置后，下一帧聚焦 textarea 并将选区移到末尾（行内 / 块级公式编辑共用）。

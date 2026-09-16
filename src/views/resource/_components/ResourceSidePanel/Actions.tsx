@@ -1,6 +1,8 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import { MessageSquareText, MessagesSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+
 import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
 
 interface ResourceSidePanelActionsProps {

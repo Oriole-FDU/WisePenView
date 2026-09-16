@@ -1,5 +1,6 @@
 import i18n from '@/i18n';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
+
 import { collectNotePrintStyles } from '../../registry';
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NotePluginRegistry } from '../../registry/types';

@@ -1,5 +1,3 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import type { CourseOutlineNode } from '@/domains/Course';
 import { Dropdown, Label } from '@heroui/react';
 import {
   ArrowDown,
@@ -17,8 +15,12 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
-import { useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { type KeyboardEvent, type MouseEvent, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import type { CourseOutlineNode } from '@/domains/Course';
+
 import styles from '../../style.module.less';
 import CourseResourceIcon from '../CourseResourceIcon';
 import type { CourseOutlineContainerNode, CourseOutlineResourceTarget } from './model';

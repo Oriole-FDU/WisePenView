@@ -1,20 +1,21 @@
-import { useMessageScroller } from '@/components/_shadcn';
-import { AppButton } from '@/components/base/Button';
 import { Chip } from '@heroui/react';
-
-import { getToolName, type DynamicToolUIPart, type ToolUIPart } from 'ai';
+import { type DynamicToolUIPart, getToolName, type ToolUIPart } from 'ai';
 import {
   CheckCircle2,
   ChevronDown,
   Circle,
   CircleX,
   Clock,
+  type LucideIcon,
   ShieldAlert,
   Wrench,
-  type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useMessageScroller } from '@/components/_shadcn';
+import { AppButton } from '@/components/base/Button';
+
 import styles from './ToolCallBlock.module.less';
 
 type RenderableToolPart = ToolUIPart | DynamicToolUIPart;

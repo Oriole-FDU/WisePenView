@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import { tableCellStyles } from '../styles';
 import type { TableColumnBase, TableColumnWidth } from './index.type';
 

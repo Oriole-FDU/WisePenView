@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
+
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { COLOR_SCHEME_ICON_SRC, useColorScheme } from '@/theme';
-import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 function Welcome() {

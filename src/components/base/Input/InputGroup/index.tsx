@@ -1,5 +1,6 @@
-import { cn } from '@/utils/cn';
 import { InputGroup as HeroInputGroup } from '@heroui/react';
+
+import { cn } from '@/utils/cn';
 
 import type { InputGroupProps } from './index.type';
 import styles from './style.module.less';

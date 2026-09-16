@@ -1,3 +1,8 @@
+import { Toast, toast } from '@heroui/react';
+import { useMount, useUnmount } from 'ahooks';
+import { Suspense, useRef } from 'react';
+import { type ClientOnErrorFunction, RouterProvider } from 'react-router-dom';
+
 import { Spin } from '@/components/base/Feedback';
 import { ServicesProvider } from '@/domains';
 import { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
@@ -8,10 +13,7 @@ import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';
 import { reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { Toast, toast } from '@heroui/react';
-import { useMount, useUnmount } from 'ahooks';
-import { Suspense, useRef } from 'react';
-import { RouterProvider, type ClientOnErrorFunction } from 'react-router-dom';
+
 import styles from './App.module.less';
 import { buildLoginPathForCurrentLocation } from './authContinuation';
 import router from './router';

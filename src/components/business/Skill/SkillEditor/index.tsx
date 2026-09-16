@@ -1,6 +1,7 @@
-import { Spin } from '@/components/base/Feedback';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import { useLatest } from 'ahooks';
+
+import { Spin } from '@/components/base/Feedback';
 
 import type { SkillEditorProps } from './index.type';
 import styles from './style.module.less';

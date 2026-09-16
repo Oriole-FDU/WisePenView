@@ -1,5 +1,6 @@
-import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import { useTranslation } from 'react-i18next';
+
+import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 
 export type UnsavedSkillChangesMode = 'publish' | 'leave' | 'switchVersion' | 'cancelEditing';
 

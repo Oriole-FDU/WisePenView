@@ -1,4 +1,5 @@
 import i18n from '@/i18n';
+
 import styles from './style.module.less';
 
 export type ColorKey =

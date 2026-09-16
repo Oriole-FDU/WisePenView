@@ -11,6 +11,7 @@ import type {
   UpdateResourcePermissionSubjectsRequest,
 } from '@/domains/Resource';
 import { resolveResourceIconType } from '@/domains/Resource';
+
 import { useResourceDisplayNameStore } from '../store/useResourceDisplayNameStore';
 import mockdata from './mockdata.json';
 import { simulateGlobalSearch } from './searchMockData';

@@ -1,8 +1,10 @@
+import { Navigate, Outlet } from 'react-router-dom';
+
 import { buildLoginPathForCurrentLocation } from '@/bootstrap/authContinuation';
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { Navigate, Outlet } from 'react-router-dom';
+
 import styles from './style.module.less';
 
 function AuthenticatedRouteGuard() {

@@ -1,3 +1,8 @@
+import { Chip, ListBox, Switch } from '@heroui/react';
+import { Link, Link2, Plus, Settings2, Trash2, Unlink } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton, AppIconButton } from '@/components/base/Button';
 import { FormField, Input, PasswordInput, Select } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
@@ -5,10 +10,7 @@ import AppFormDialog from '@/components/business/AppFormDialog';
 import { useChatService } from '@/domains';
 import type { ChatModelConfig, ChatProvider, ChatProviderType } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
-import { Chip, ListBox, Switch } from '@heroui/react';
-import { Link, Link2, Plus, Settings2, Trash2, Unlink } from 'lucide-react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import styles from './style.module.less';
 
 const PROVIDER_TYPES: ChatProviderType[] = [

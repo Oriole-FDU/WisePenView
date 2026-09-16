@@ -1,10 +1,11 @@
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { SIDEBAR_TOGGLE_BUTTON_PROPS } from '@/layouts/_common/a11y/sidebarToggle';
 import { ArrowLeft, ArrowRight, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import styles from './style.module.less';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { SIDEBAR_TOGGLE_BUTTON_PROPS } from '@/layouts/_common/a11y/sidebarToggle';
 
 import type { NavigationControlsProps } from './index.type';
+import styles from './style.module.less';
 
 function NavigationControls({
   sidebarCollapsed,

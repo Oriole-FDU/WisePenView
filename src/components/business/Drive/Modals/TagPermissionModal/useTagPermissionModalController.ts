@@ -1,10 +1,12 @@
+import type { TFunction } from 'i18next';
+import { type Key, useState } from 'react';
+
 import { useGroupService, useTagService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
 import type { TagTreeNode } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import type { TFunction } from 'i18next';
-import { useState, type Key } from 'react';
+
 import type { TagPermissionModalProps } from './index.type';
 import {
   buildFormFromTag,
@@ -16,8 +18,8 @@ import {
   normalizeFormForMode,
   normalizeSpecifiedUsersByScope,
   normalizeSupportedScope,
-  selectionToUserIds,
   type PersonnelPolicyTarget,
+  selectionToUserIds,
   type TagPermissionFormValues,
   type TagPolicyModalMode,
 } from './tagPermissionModalModel';

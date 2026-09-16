@@ -1,7 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 
-import { useTranslation } from 'react-i18next';
 import styles from '../../style.module.less';
 
 interface SkillConfigPanelProps {

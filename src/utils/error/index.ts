@@ -8,16 +8,16 @@ export { createClientError } from './createClientError';
 export { parseErrorMessage } from './parseErrorMessage';
 export {
   configureErrorReporter,
-  getErrorReportId,
-  installGlobalErrorReporting,
-  reportError,
   type ErrorReport,
   type ErrorReportContext,
   type ErrorReporter,
+  getErrorReportId,
+  installGlobalErrorReporting,
+  reportError,
 } from './reportError';
 export {
-  WisePenError,
   isWisePenError,
+  WisePenError,
   type WisePenErrorOptions,
   type WisePenErrorSource,
 } from './WisePenError';

@@ -7,6 +7,7 @@ export type {
   UserProfileInfo,
   UserSearchUser,
 } from './entity/user';
+export type { DegreeLevel, FeedbackType, UserVerificationMode } from './enum';
 export {
   DEGREE,
   EMAIL_SUFFIX,
@@ -16,12 +17,11 @@ export {
   USER_STATUS,
   USER_VERIFICATION,
 } from './enum';
-export type { DegreeLevel, FeedbackType, UserVerificationMode } from './enum';
 export type {
   ConfirmEmailVerifyRequest,
   FudanUISVerifyStatusData,
-  IUserService,
   InitiateUISVerifyRequest,
+  IUserService,
   ListAdminMessagesRequest,
   ListAdminMessagesResponse,
   ListUserSearchSuggestionsRequest,

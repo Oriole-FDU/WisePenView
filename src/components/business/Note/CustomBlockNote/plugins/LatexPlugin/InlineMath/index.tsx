@@ -1,4 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- BlockNote inline spec 与展示组件同文件 */
+import 'katex/dist/katex.min.css';
+
 import type { DefaultStyleSchema } from '@blocknote/core';
 import type { ReactCustomInlineContentRenderProps } from '@blocknote/react';
 import { createReactInlineContentSpec } from '@blocknote/react';
@@ -6,9 +8,9 @@ import type { Transaction } from '@tiptap/pm/state';
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import { useLatest } from 'ahooks';
-import 'katex/dist/katex.min.css';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import { renderKatexInto } from '../katexRender';
 import { LatexEditPopover } from '../LatexEditPopover';

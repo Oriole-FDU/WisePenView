@@ -1,6 +1,7 @@
-import { cn } from '@/utils/cn';
-import { Select as HeroSelect, Label } from '@heroui/react';
+import { Label, Select as HeroSelect } from '@heroui/react';
 import type { ReactNode } from 'react';
+
+import { cn } from '@/utils/cn';
 
 import type {
   SelectIndicatorProps,

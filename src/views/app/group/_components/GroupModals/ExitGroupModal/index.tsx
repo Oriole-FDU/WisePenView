@@ -1,14 +1,15 @@
+import { toast } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { useGroupService } from '@/domains';
 import type { QuitGroupRequest } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { toast } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import type { ExitGroupModalProps } from './index.type';
 
 import styles from './index.module.less';
+import type { ExitGroupModalProps } from './index.type';
 
 function ExitGroupModal({
   isOpen,

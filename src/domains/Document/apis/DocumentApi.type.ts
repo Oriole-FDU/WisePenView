@@ -1,7 +1,8 @@
+import type { Config } from '@onlyoffice/doceditor-types';
+
 import type { JavaLongApiValue } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
-import type { Config } from '@onlyoffice/doceditor-types';
 
 export interface UploadDocApiRequest {
   filename: string;

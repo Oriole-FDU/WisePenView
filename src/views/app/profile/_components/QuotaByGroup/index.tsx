@@ -1,10 +1,12 @@
+import { type SortDescriptor } from '@heroui/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import QuotaBar from '@/components/base/QuotaBar';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { useQuotaService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { type SortDescriptor } from '@heroui/react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { QuotaByGroupProps, UserGroupQuota } from './index.type';
 import styles from './style.module.less';
 

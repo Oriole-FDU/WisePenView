@@ -1,8 +1,9 @@
-import AppAvatar from '@/components/base/Avatar';
 import { Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import AppAvatar from '@/components/base/Avatar';
 import type { NoteInfoDisplayData } from '@/domains/Note';
+
 import styles from './style.module.less';
 
 interface NoteInfoBarProps {

@@ -1,8 +1,9 @@
+import OSS from 'ali-oss';
+
 import type { OssStsTokenApiResponse } from '@/apis/api.type';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import { isRecord } from '@/utils/typeGuards';
-import OSS from 'ali-oss';
 
 export interface OssStsClientManagerOptions<Key> {
   loadToken: (key: Key) => Promise<OssStsTokenApiResponse | null | undefined>;

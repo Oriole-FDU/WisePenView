@@ -1,18 +1,20 @@
+import type { TFunction } from 'i18next';
+import type { Key } from 'react';
+
 import { mapTagToFolderNode } from '@/domains/Drive/mapper/DriveServices.map';
 import type { GroupMember } from '@/domains/Group';
 import {
   ACCESS_CONTROL_SCOPE,
-  normalizeResourceActions,
   type AccessControlScope,
+  normalizeResourceActions,
   type TagResourceAction,
   type TagTreeNode,
 } from '@/domains/Tag';
-import type { TFunction } from 'i18next';
-import type { Key } from 'react';
+
 import {
+  type DriveSelectionItem,
   resolveDriveScope,
   toDriveSelectionItem,
-  type DriveSelectionItem,
 } from '../../common/driveComponentModel';
 
 export type TagPolicyModalMode = 'access' | 'mount';

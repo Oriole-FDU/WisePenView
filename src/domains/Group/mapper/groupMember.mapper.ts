@@ -5,6 +5,7 @@ import {
   normalizeFiniteNumber,
   normalizeNonNegativeNumber,
 } from '@/utils/normalize/normalizeNumber';
+
 import type { GroupMemberApiResponse } from '../apis/GroupApi.type';
 
 const normalizeRoleFromApi = (value: unknown): GroupMember['role'] => {

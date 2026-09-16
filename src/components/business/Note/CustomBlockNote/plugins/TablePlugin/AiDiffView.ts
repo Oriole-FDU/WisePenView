@@ -1,5 +1,6 @@
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/typeGuards';
+
 import { addAiDiffDomListener } from '../../engines/aiDiff/domCleanup';
 import type { NotePluginRegistry } from '../../registry/types';
 import styles from './style.module.less';

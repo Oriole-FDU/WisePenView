@@ -1,3 +1,7 @@
+import { Image, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useShallow } from 'zustand/react/shallow';
+
 import {
   Attachment,
   AttachmentAction,
@@ -9,9 +13,7 @@ import {
   AttachmentTitle,
 } from '@/components/_shadcn';
 import EntryIcon from '@/components/base/Icons/EntryIcon';
-import { Image, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useShallow } from 'zustand/react/shallow';
+
 import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
 import styles from '../style.module.less';
 

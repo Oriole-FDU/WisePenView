@@ -1,13 +1,14 @@
+import { useEffect, useState } from 'react';
+
 import {
   LAYOUT_DENSITY,
   LAYOUT_HEIGHT_DENSITY,
-  resolveLayoutDensity,
-  resolveLayoutHeightDensity,
   type LayoutDensity,
   type LayoutHeightDensity,
+  resolveLayoutDensity,
+  resolveLayoutHeightDensity,
 } from '@/constants/layoutScale';
 import { syncViewportLayoutScale } from '@/layouts/_common/applyLayoutScaleCssVars';
-import { useEffect, useState } from 'react';
 
 interface ViewportLayoutScale {
   widthDensity: LayoutDensity;

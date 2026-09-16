@@ -1,9 +1,9 @@
-import { AppButton } from '@/components/base/Button';
 import { ButtonGroup } from '@heroui/react';
-
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type * as Y from 'yjs';
+
+import { AppButton } from '@/components/base/Button';
 
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteAiDiffAction, NotePluginRegistry } from '../../registry/types';

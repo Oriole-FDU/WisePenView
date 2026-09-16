@@ -1,3 +1,5 @@
+import './style.module.less';
+
 import { createExtension } from '@blocknote/core';
 import type { Node as PMNode } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
@@ -9,7 +11,6 @@ import type {
   NotePluginRegistry,
 } from '../../registry/types';
 import { collectFindReplaceMatches } from './findReplace';
-import './style.module.less';
 
 interface SearchState {
   query: string;

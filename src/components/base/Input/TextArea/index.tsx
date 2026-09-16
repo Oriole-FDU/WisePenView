@@ -1,5 +1,6 @@
-import { cn } from '@/utils/cn';
 import { TextArea as HeroTextArea } from '@heroui/react';
+
+import { cn } from '@/utils/cn';
 
 import type { TextAreaProps } from './index.type';
 import styles from './style.module.less';

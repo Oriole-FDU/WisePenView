@@ -1,5 +1,6 @@
 import { ProgressBar } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+
 import type { QuotaBarProps } from './index.type';
 import styles from './style.module.less';
 

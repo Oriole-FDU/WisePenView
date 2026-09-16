@@ -1,7 +1,9 @@
-import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { Minus, Square, SquareStack, X } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
+
 import styles from './style.module.less';
 
 const subscribeMaximized = (listener: () => void): (() => void) =>

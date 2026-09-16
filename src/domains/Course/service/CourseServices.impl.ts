@@ -4,6 +4,7 @@ import type { IResourceService } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
 import type { ITagService, TagTreeNode } from '@/domains/Tag';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
 import { CourseServicesMap } from '../mapper/CourseServices.map';
 import type {
   CreateCourseRequest,

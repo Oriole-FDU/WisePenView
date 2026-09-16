@@ -1,9 +1,10 @@
+import { FileCode2, FileText, Folder, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { DataNode, TreeDropPosition } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
 import type { SkillFileNode } from '@/domains/Skill';
-import { FileCode2, FileText, Folder, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 import type { SkillFileTreeProps, SkillPendingCreate } from './index.type';
 import styles from './style.module.less';

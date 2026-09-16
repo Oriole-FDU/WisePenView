@@ -1,4 +1,4 @@
-import { EventSourceParserStream, type EventSourceMessage } from 'eventsource-parser/stream';
+import { type EventSourceMessage, EventSourceParserStream } from 'eventsource-parser/stream';
 
 const CHAT_SSE_MAX_EVENT_SIZE = 8 * 1024 * 1024;
 

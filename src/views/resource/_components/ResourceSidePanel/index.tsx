@@ -1,3 +1,12 @@
+import { type ReactNode, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import type {
+  Layout,
+  LayoutChangedMeta,
+  PanelImperativeHandle,
+  PanelSize,
+} from 'react-resizable-panels';
+
 import {
   NOTE_EDITOR_MIN_WIDTH,
   RESOURCE_SIDE_PANEL_MAX_WIDTH,
@@ -11,16 +20,9 @@ import {
 } from '@/layouts/_common/SystemResizable';
 import { useResizablePanelSize } from '@/layouts/_common/useResizablePanelSize';
 import { cn } from '@/utils/cn';
-import { useRef, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import type {
-  Layout,
-  LayoutChangedMeta,
-  PanelImperativeHandle,
-  PanelSize,
-} from 'react-resizable-panels';
-import type { ResourceHostSidePanelConfig } from '../../ResourceHostContext';
+
 import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
+import type { ResourceHostSidePanelConfig } from '../../ResourceHostContext';
 import ResourceCommentPanel from './ResourceCommentPanel';
 import styles from './style.module.less';
 

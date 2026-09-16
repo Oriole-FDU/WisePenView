@@ -3,6 +3,7 @@
  */
 import { UserWalletApi } from '@/domains/User/apis/UserApi';
 import { WALLET_TX_TAB_MERGE_FETCH_CAP, type WalletTransactionRecord } from '@/domains/Wallet';
+
 import { WalletServicesMap } from '../mapper/WalletServices.map';
 import type {
   GetWalletInfoResponse,

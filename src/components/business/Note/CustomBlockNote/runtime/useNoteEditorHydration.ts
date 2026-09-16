@@ -1,19 +1,20 @@
-import { usePendingNoteImportStore } from '@/components/business/Note/_store/usePendingNoteImportStore';
-import type { NoteAiDiffPreviewData } from '@/domains/Note';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type * as Y from 'yjs';
 
+import { usePendingNoteImportStore } from '@/components/business/Note/_store/usePendingNoteImportStore';
+import type { NoteAiDiffPreviewData } from '@/domains/Note';
+import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+
 import { getAiContentStore } from '../engines/aiDiff/store';
 import { importNoteMarkdown } from '../engines/markdown/markdownImport';
 import type { CustomBlockNoteProps } from '../index.type';
 import {
   createDefaultNoteBlock,
-  notePluginRegistry,
   type CustomBlockNoteEditor,
+  notePluginRegistry,
 } from '../registry/noteEditorComposition';
 
 const initializedAiDiffPreviews = new WeakMap<Y.Doc, NoteAiDiffPreviewData>();

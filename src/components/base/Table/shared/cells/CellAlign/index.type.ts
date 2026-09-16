@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+
 import type { TableCellAlignValue } from '../../TableBase/cellAlign';
 
 export type { TableCellAlignValue };
