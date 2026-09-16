@@ -1,8 +1,10 @@
+import { type ChangeEvent, type RefObject, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useNoteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { useRef, type ChangeEvent, type RefObject } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { usePendingNoteImportStore } from './_store/usePendingNoteImportStore';
 
 export const MARKDOWN_NOTE_FILE_ACCEPT = '.md,.markdown,text/markdown,text/x-markdown';
@@ -73,7 +75,7 @@ export function useMarkdownNoteImport({
     {
       manual: true,
       onSuccess,
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         onError?.();
       },
     }

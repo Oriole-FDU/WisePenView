@@ -13,7 +13,7 @@ import { NoteEditorReadOnlyProvider } from '../engines/editor/readOnly';
 import type { CustomBlockNoteProps } from '../index.type';
 import { NoteEmojiPickerPopover } from '../plugins/EmojiPlugin/EmojiPickerPopover';
 import NoteTableHandles from '../plugins/TablePlugin/ui/tableHandles';
-import { notePluginRegistry, type CustomBlockNoteEditor } from '../registry/noteEditorComposition';
+import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
 import type { NoteEditorRuntimeCoordinator } from '../registry/useNoteEditorRuntimeCoordinator';
 import { useNoteInteractionStore } from '../runtime/noteInteractionStore';
 import styles from '../style.module.less';
@@ -28,7 +28,6 @@ function NoteFindBar({
   runtimeCoordinator: NoteEditorRuntimeCoordinator;
   portalContainer: HTMLElement | null;
 }) {
-  const { t } = useTranslation('note');
   const access = useNoteInteractionStore((state) => state.access);
   const find = useNoteInteractionStore((state) => state.find);
   const dispatch = useNoteInteractionStore((state) => state.dispatch);

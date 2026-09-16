@@ -1,21 +1,25 @@
-import {
-  DriveCreateModal,
-  DriveDeleteModal,
-  MoveNodeModal,
-  RenameNodeModal,
-  ResourcePermissionModal,
-  TagMountPermissionModal,
-  TagPermissionModal,
-  TrashDeleteModal,
-  UploadFileToGroupModal,
-  type DriveCreateType,
-  type ResourcePermissionModalTarget,
-} from '@/components/business/Drive/Modals';
+import { toast } from '@heroui/react';
+import { type ChangeEvent, type ReactElement, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   DRIVE_DOCUMENT_FILE_ACCEPT,
   getSupportedDriveDocumentFiles,
   useDriveDocumentUpload,
 } from '@/components/business/Drive/common/useDriveDocumentUpload';
+import {
+  DriveCreateModal,
+  type DriveCreateType,
+  DriveDeleteModal,
+  MoveNodeModal,
+  RenameNodeModal,
+  ResourcePermissionModal,
+  type ResourcePermissionModalTarget,
+  TagMountPermissionModal,
+  TagPermissionModal,
+  TrashDeleteModal,
+  UploadFileToGroupModal,
+} from '@/components/business/Drive/Modals';
 import { useNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
 import {
   MARKDOWN_NOTE_FILE_ACCEPT,
@@ -27,9 +31,7 @@ import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import { toast } from '@heroui/react';
-import { useRef, useState, type ChangeEvent, type ReactElement } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
 import type { DriveTableRow, TableDriveActionConfig } from '../index.type';
@@ -116,7 +118,7 @@ export function useTableDriveActionsController({
         toast.success(t('table.batchDeleted', { count: selectedNodes.length }));
         onNodeActionSuccess();
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         refresh();
       },
     }

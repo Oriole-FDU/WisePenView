@@ -1,13 +1,3 @@
-import AppAvatar from '@/components/base/Avatar';
-import { AppButton } from '@/components/base/Button';
-import AppDisplayDialog from '@/components/business/AppDisplayDialog';
-import { useUserService } from '@/domains';
-import type { User } from '@/domains/User';
-import { IDENTITY } from '@/domains/User';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-
-import { cn } from '@/utils/cn';
 import { Dropdown, Label } from '@heroui/react';
 import { useMount } from 'ahooks';
 import {
@@ -27,8 +17,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuthService } from '@/domains';
+import AppAvatar from '@/components/base/Avatar';
+import { AppButton } from '@/components/base/Button';
+import AppDisplayDialog from '@/components/business/AppDisplayDialog';
+import { useAuthService, useUserService } from '@/domains';
+import type { User } from '@/domains/User';
+import { IDENTITY } from '@/domains/User';
+import { useAppAuth } from '@/layouts/App/AppAuthContext';
 import { COLOR_SCHEME_ICON_SRC, useColorScheme } from '@/theme';
+import { cn } from '@/utils/cn';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+
 import UserFeedbackModal from '../UserFeedbackModal';
 import styles from './style.module.less';
 

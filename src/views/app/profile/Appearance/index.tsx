@@ -9,18 +9,16 @@ import {
 } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
-import { changeAppLanguage } from '@/i18n';
-import type { SupportedLanguage } from '@/i18n/resources';
 import PageHeader from '@/layouts/_common/PageHeader';
 import {
   COLOR_SCHEME_OPTIONS,
+  type ColorScheme,
+  type ColorSchemeOption,
   THEME_MODE_OPTIONS,
+  type ThemeMode,
   useAccentNeutralized,
   useAppTheme,
   useColorScheme,
-  type ColorScheme,
-  type ColorSchemeOption,
-  type ThemeMode,
 } from '@/theme';
 
 import layout from '../style.module.less';
@@ -152,37 +150,6 @@ function AppearanceHeader() {
   return <PageHeader title={t('appearance.title')} subtitle={t('appearance.subtitle')} />;
 }
 
-function LanguageSection() {
-  const { i18n, t } = useTranslation(['profile', 'common']);
-  const selectedLanguage: SupportedLanguage = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
-
-  return (
-    <section className={styles.section}>
-      <Heading level={3} className={layout.sectionTitle}>
-        {t('appearance.language')}
-      </Heading>
-      <Tabs
-        className={styles.modeTabs}
-        selectedKey={selectedLanguage}
-        onSelectionChange={(next) => void changeAppLanguage(String(next) as SupportedLanguage)}
-      >
-        <Tabs.ListContainer className={styles.modeTabsListContainer}>
-          <Tabs.List className={styles.modeTabsList} aria-label={t('appearance.languageAria')}>
-            <Tabs.Tab id="zh-CN" className={styles.modeTab}>
-              {t('language.zhCN', { ns: 'common' })}
-              <Tabs.Indicator />
-            </Tabs.Tab>
-            <Tabs.Tab id="en-US" className={styles.modeTab}>
-              {t('language.enUS', { ns: 'common' })}
-              <Tabs.Indicator />
-            </Tabs.Tab>
-          </Tabs.List>
-        </Tabs.ListContainer>
-      </Tabs>
-    </section>
-  );
-}
-
 function Appearance() {
   const { theme, setTheme } = useAppTheme();
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -191,8 +158,6 @@ function Appearance() {
     <>
       <AppearanceHeader />
       <div className={styles.body}>
-        {/* <LanguageSection />
-        <Separator className={styles.divider} /> */}
         <ThemeModeSection value={theme} onChange={setTheme} />
         <Separator className={styles.divider} />
         <ColorSchemeSection value={colorScheme} onChange={setColorScheme} />

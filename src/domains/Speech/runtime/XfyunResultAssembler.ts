@@ -1,8 +1,6 @@
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/typeGuards';
 
-type UnknownRecord = Record<string, unknown>;
-
 function readSegmentText(words: unknown): string {
   if (!Array.isArray(words)) return '';
 

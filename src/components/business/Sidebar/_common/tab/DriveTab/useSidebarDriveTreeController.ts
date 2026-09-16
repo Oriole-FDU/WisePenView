@@ -1,9 +1,12 @@
+import { toast } from '@heroui/react';
+import { type Key, useState } from 'react';
+
 import type { DataNode } from '@/components/base/Tree';
 import { replaceDriveTreeNodeChildren } from '@/components/business/Drive/common/buildDriveTreeData';
 import {
   buildDriveLoadingNode,
-  getDriveScopeGroupId,
   type DriveViewNode,
+  getDriveScopeGroupId,
 } from '@/components/business/Drive/common/driveComponentModel';
 import { useDrivePagedTreeChildren } from '@/components/business/Drive/common/useDrivePagedTreeChildren';
 import { useDriveService } from '@/domains';
@@ -11,8 +14,7 @@ import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useDriveRefreshStore } from '@/domains/Drive/store/useDriveRefreshStore';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { toast } from '@heroui/react';
-import { useState, type Key } from 'react';
+
 import { useSidebarDriveExpansionStore } from './_store/useSidebarDriveExpansionStore';
 import { isSidebarResourceNode } from './sidebarDriveModel';
 
@@ -151,7 +153,7 @@ export function useSidebarDriveTreeController({
           .getState()
           .setExpandedNodeIds(expansionScopeKey, result.expandedKeys.map(String));
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         setNodeMap(new Map());
         setTreeData([]);
         reset();

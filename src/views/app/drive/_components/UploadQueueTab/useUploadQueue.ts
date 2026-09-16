@@ -1,12 +1,14 @@
+import { toast } from '@heroui/react';
+import { useInterval, useMount, useUnmount } from 'ahooks';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { useDriveUploadQueueStore } from '@/components/business/Drive/_store/useDriveUploadQueueStore';
 import { useDocumentService } from '@/domains';
 import type { PendingDocItem } from '@/domains/Document';
 import { DOCUMENT_PROCESS, isDocumentTerminalStatus } from '@/domains/Document';
 import { useApi } from '@/hooks/useApi';
-import { toast } from '@heroui/react';
-import { useInterval, useMount, useUnmount } from 'ahooks';
-import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import {
   buildUploadQueueRows,
   isActiveLocalUpload,
@@ -74,7 +76,7 @@ export function useUploadQueue() {
         nextPendingItems.some((item) => !isDocumentTerminalStatus(item.documentStatus.status))
       );
     },
-    onErrorEffect: (error) => {
+    onErrorEffect: () => {
       setPollingActive(false);
     },
   });

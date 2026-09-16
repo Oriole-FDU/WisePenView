@@ -1,3 +1,8 @@
+import { Tabs, toast } from '@heroui/react';
+import type { Key } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import TableDrive from '@/components/business/Drive/TableDrive';
 import { useDriveService } from '@/domains';
 import { buildDriveNodeScope } from '@/domains/Drive';
@@ -12,10 +17,6 @@ import {
   DRIVE_UPLOAD_QUEUE_PATH,
 } from '@/utils/navigation/driveRoute';
 import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
-import { Tabs, toast } from '@heroui/react';
-import type { Key } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
 
 import FavoritesTab from '../_components/FavoritesTab';
 import UploadQueueTab from '../_components/UploadQueueTab';
@@ -87,7 +88,7 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
       navigate(buildDrivePath({ scope: driveScope }));
       return;
     }
-    navigate(buildDriveSystemFolderPath({ view: viewMode, nodeId }));
+    navigate(buildDriveSystemFolderPath({ nodeId }));
   };
 
   return (

@@ -1,8 +1,9 @@
+import { toast } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { toast } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { DriveDeleteModalProps } from './index.type';
@@ -47,7 +48,7 @@ function DriveDeleteModal({
         onSuccess?.();
         onOpenChange(false);
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         onError?.();
       },
     }

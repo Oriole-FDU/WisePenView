@@ -1,4 +1,5 @@
 import type { DriveNodeScope } from '@/domains/Drive';
+
 import { APP_ROUTE_PATH, buildGroupFilesPath } from './appRoute';
 
 export const DRIVE_UPLOAD_QUEUE_PATH = APP_ROUTE_PATH.DRIVE_UPLOAD_QUEUE;
@@ -23,12 +24,6 @@ export const buildDrivePath = ({
     : APP_ROUTE_PATH.DRIVE_PERSONAL;
 };
 
-export const buildDriveSystemFolderPath = ({
-  view,
-  nodeId,
-}: {
-  view: 'trash';
-  nodeId?: string;
-}): string => {
+export const buildDriveSystemFolderPath = ({ nodeId }: { nodeId?: string }): string => {
   return nodeId ? `${DRIVE_TRASH_PATH}/folder/${encodeURIComponent(nodeId)}` : DRIVE_TRASH_PATH;
 };

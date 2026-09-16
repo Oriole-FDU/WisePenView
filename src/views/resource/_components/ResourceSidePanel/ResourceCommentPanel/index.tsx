@@ -1,3 +1,9 @@
+import { Tabs, toast } from '@heroui/react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useInfiniteScroll } from 'ahooks';
+import { type Key, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { AppButton } from '@/components/base/Button';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
@@ -6,12 +12,7 @@ import type { CommentSortBy, ResourceComment } from '@/domains/Interact';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { Tabs, toast } from '@heroui/react';
 
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { useInfiniteScroll } from 'ahooks';
-import { useEffect, useRef, useState, type Key } from 'react';
-import { useTranslation } from 'react-i18next';
 import ResourceFavoriteAction from '../../ResourceFavoriteAction';
 import CommentComposer from './CommentComposer';
 import ResourceCommentThread from './ResourceCommentThread';
@@ -85,7 +86,7 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
     {
       manual: true,
       onSuccess: notifyResourceChanged,
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         setOptimisticLike(undefined);
       },
     }

@@ -5,22 +5,21 @@
  * 个人「充值」仅 REFILL；小组「充值」与「消费」通过 walletService.listMergedTransactions 合并两类流水；其余走 listTransactions。
  * 数据请求使用 ahooks（不使用 useEffect）。
  */
-import { useGroupService, useWalletService } from '@/domains';
-import { WALLET_TARGET_TYPE, WALLET_TOKEN_TX_TYPE } from '@/domains/Wallet';
-import { useApi } from '@/hooks/useApi';
-import type { EnumValue } from '@/utils/enum';
 import { toast } from '@heroui/react';
 import { usePagination, useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useGroupService, useWalletService } from '@/domains';
+import { WALLET_TARGET_TYPE, WALLET_TOKEN_TX_TYPE } from '@/domains/Wallet';
+import { useApi } from '@/hooks/useApi';
+
 import RechargeModal from '../RechargeModal';
 import type { ComputeWalletProps } from './index.type';
 import styles from './style.module.less';
 import WalletBalanceHeader from './WalletBalanceHeader';
 import { PAGE_SIZE, tabToListType, type TxTabKey } from './walletHelpers';
 import WalletTransactionTable from './WalletTransactionTable';
-
-type WalletTxTypeQueryCode = EnumValue<typeof WALLET_TOKEN_TX_TYPE>;
 
 function ComputeWallet({
   targetType,
@@ -118,7 +117,6 @@ function ComputeWallet({
   const {
     data: txData,
     loading: loadingTx,
-    refresh: refreshTransactions,
     pagination: { current: page = 1, total = 0, onChange: onTxPageChange },
   } = usePagination(
     async ({ current, pageSize }) => {

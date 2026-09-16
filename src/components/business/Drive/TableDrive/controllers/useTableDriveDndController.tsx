@@ -1,21 +1,23 @@
+import {
+  type DragEndEvent,
+  type DragStartEvent,
+  MouseSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { toast } from '@heroui/react';
+import { type ReactElement, type ReactNode, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import { useDriveService } from '@/domains';
 import type { DriveNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+
 import {
-  MouseSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type DragStartEvent,
-} from '@dnd-kit/core';
-import { toast } from '@heroui/react';
-import { useRef, useState, type ReactElement, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
+  type DriveViewNode,
   isDriveActionTarget,
   isDriveSharedFolderNode,
-  type DriveViewNode,
 } from '../../common/driveComponentModel';
 import type { DriveTableRow } from '../index.type';
 import { DriveDndRow, DriveDroppableBreadcrumb } from '../parts/DriveDnd';
@@ -115,7 +117,7 @@ export function useTableDriveDndController({
           toast.success(t('table.movedSingle'));
         }
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: () => {
         onMoveError?.();
       },
     }

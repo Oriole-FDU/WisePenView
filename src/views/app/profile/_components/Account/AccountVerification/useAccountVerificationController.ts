@@ -1,3 +1,9 @@
+import { toast } from '@heroui/react';
+import { useUnmount } from 'ahooks';
+import type { FormEvent } from 'react';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import {
   DEFAULT_AUTH_REDIRECT_PATH,
   getCurrentRedirectPath,
@@ -8,11 +14,7 @@ import {
 import { useUserService } from '@/domains';
 import type { InitiateUISVerifyRequest, SendEmailVerifyRequest } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
-import { toast } from '@heroui/react';
-import { useUnmount } from 'ahooks';
-import type { FormEvent } from 'react';
-import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import type { UisOutcomeState, VerifyFormErrors, VerifyModalMode } from './index.type';
 import { resolveUisQrImageDataUrl } from './resolveUisQrImageDataUrl';
 
@@ -115,7 +117,7 @@ export const useAccountVerificationController = ({
           setUisOutcomeOpen(true);
         }
       },
-      onErrorEffect: (pollErr) => {
+      onErrorEffect: () => {
         if (!uisPollingActiveRef.current) return;
         dismissUisOutcome();
       },
