@@ -18,10 +18,8 @@
 /* 字重只通过 Regular、Medium、Semibold、Bold 四档表达层级，避免同层级出现多套数值。 */
 :root,
 .light,
-.default,
 .dark,
 [data-theme='light'],
-[data-theme='default'],
 [data-theme='dark'] {
   --font-size-base: 14px;
   --font-size-sm: 14px;

@@ -12,6 +12,7 @@ import type {
 import type { ResourceAction, ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
+import { DEFAULT_COLOR_SCHEME } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
@@ -35,14 +36,7 @@ import {
 } from './drawioProtocol';
 import styles from './style.module.less';
 
-const WISEPEN_COLOR_SCHEMES = new Set([
-  'default',
-  'warm',
-  'academic',
-  'violet',
-  'forest',
-  'minimal',
-]);
+const WISEPEN_COLOR_SCHEMES = new Set(['mist', 'warm', 'academic', 'violet', 'forest', 'minimal']);
 
 interface DrawioViewProps {
   resourceId?: string;
@@ -88,7 +82,7 @@ function readWisePenColorScheme(): string {
     // localStorage 不可用时使用默认主题。
   }
 
-  return 'default';
+  return DEFAULT_COLOR_SCHEME;
 }
 
 function DrawioLayoutConfig({

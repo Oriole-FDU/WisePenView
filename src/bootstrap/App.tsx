@@ -12,6 +12,8 @@ import { RouterProvider, type ClientOnErrorFunction } from 'react-router-dom';
 import styles from './App.module.less';
 import router from './router';
 
+const MAX_VISIBLE_TOASTS = 3;
+
 const handleRouterError: ClientOnErrorFunction = (error, { errorInfo, location }) => {
   reportError(error, {
     origin: 'route',
@@ -44,7 +46,7 @@ function App() {
   return (
     <ThemeApplier defaultTheme={DEFAULT_HEROUI_THEME}>
       <ServicesProvider>
-        <Toast.Provider maxVisibleToasts={3} placement="top" />
+        <Toast.Provider maxVisibleToasts={MAX_VISIBLE_TOASTS} placement="top" />
         {/* 与 Chat 侧栏动画解耦：固定右上，避免随 Header 迁移产生卡顿 */}
         <DesktopWindowControls />
         <Suspense fallback={<PageLoadingFallback />}>

@@ -7,8 +7,11 @@ export {
   HEROUI_SYSTEM_THEME,
   THEME_MODE,
   THEME_MODE_OPTIONS,
+  ThemeContext,
   type ColorScheme,
   type ColorSchemeOption,
+  type ResolvedTheme,
+  type ThemeContextValue,
   type ThemeMode,
 } from './constants';
 export { ThemeApplier } from './ThemeApplier';

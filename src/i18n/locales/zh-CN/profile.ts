@@ -130,7 +130,7 @@ const zhCNProfile = {
       system: { label: '跟随系统', description: '随操作系统明暗设置切换' },
     },
     scheme: {
-      default: { label: '烟蓝', description: '蓝灰色系' },
+      mist: { label: '烟蓝', description: '蓝灰色系' },
       floral: { label: '樱粉', description: '柔粉色系' },
       aqua: { label: '青碧', description: '青蓝色系' },
       sunset: { label: '暮橘', description: '暖橘色系' },

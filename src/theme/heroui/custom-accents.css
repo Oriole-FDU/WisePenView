@@ -6,23 +6,21 @@
  */
 :root,
 .light,
-.default,
-[data-theme='light'],
-[data-theme='default'] {
-  --wisepen-default-1: #fafdff;
-  --wisepen-default-2: #f2f9ff;
-  --wisepen-default-3: #e2f4ff;
-  --wisepen-default-4: #d2edff;
-  --wisepen-default-5: #c0e4ff;
-  --wisepen-default-a5: #0092ff3f;
-  --wisepen-default-6: #abd7fc;
-  --wisepen-default-7: #8fc6f3;
-  --wisepen-default-8: #63afeb;
-  --wisepen-default-9: #127abb;
-  --wisepen-default-10: #006cac;
-  --wisepen-default-11: #0071b2;
-  --wisepen-default-12: #183c58;
-  --wisepen-default-contrast: #fff;
+[data-theme='light']{
+  --wisepen-mist-1: #fafdff;
+  --wisepen-mist-2: #f2f9ff;
+  --wisepen-mist-3: #e2f4ff;
+  --wisepen-mist-4: #d2edff;
+  --wisepen-mist-5: #c0e4ff;
+  --wisepen-mist-a5: #0092ff3f;
+  --wisepen-mist-6: #abd7fc;
+  --wisepen-mist-7: #8fc6f3;
+  --wisepen-mist-8: #63afeb;
+  --wisepen-mist-9: #127abb;
+  --wisepen-mist-10: #006cac;
+  --wisepen-mist-11: #0071b2;
+  --wisepen-mist-12: #183c58;
+  --wisepen-mist-contrast: #fff;
 
   --wisepen-floral-1: #fffcfc;
   --wisepen-floral-2: #fef8f8;
@@ -102,20 +100,20 @@
 
 .dark,
 [data-theme='dark'] {
-  --wisepen-default-1: #05101a;
-  --wisepen-default-2: #0b1a26;
-  --wisepen-default-3: #032943;
-  --wisepen-default-4: #00365b;
-  --wisepen-default-5: #00436e;
-  --wisepen-default-a5: #0095ff63;
-  --wisepen-default-6: #005282;
-  --wisepen-default-7: #0c639a;
-  --wisepen-default-8: #0d78b9;
-  --wisepen-default-9: #127abb;
-  --wisepen-default-10: #1b6ca3;
-  --wisepen-default-11: #71c0ff;
-  --wisepen-default-12: #c8ebff;
-  --wisepen-default-contrast: #fff;
+  --wisepen-mist-1: #05101a;
+  --wisepen-mist-2: #0b1a26;
+  --wisepen-mist-3: #032943;
+  --wisepen-mist-4: #00365b;
+  --wisepen-mist-5: #00436e;
+  --wisepen-mist-a5: #0095ff63;
+  --wisepen-mist-6: #005282;
+  --wisepen-mist-7: #0c639a;
+  --wisepen-mist-8: #0d78b9;
+  --wisepen-mist-9: #127abb;
+  --wisepen-mist-10: #1b6ca3;
+  --wisepen-mist-11: #71c0ff;
+  --wisepen-mist-12: #c8ebff;
+  --wisepen-mist-contrast: #fff;
 
   --wisepen-floral-1: #170e0f;
   --wisepen-floral-2: #1f1415;
