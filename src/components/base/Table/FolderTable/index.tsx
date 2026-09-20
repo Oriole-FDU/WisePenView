@@ -13,7 +13,6 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import TableBatchFooter from '../ManageTable/parts/BatchFooter';
 import TableCellAlign from '../shared/cells/CellAlign';
 import TableTextCell from '../shared/cells/TextCell';
 import { tableCellStyles, tableStyles } from '../shared/styles';
@@ -36,6 +35,15 @@ import { renderSortableColumnLabel } from '../shared/TableSortHeader/renderSorta
 import { TableLoadMoreRow } from '../shared/TableStatusRows';
 import TableSummaryFooter from '../shared/TableSummaryFooter';
 import { createDefaultFolderColumns } from './defaultColumns';
+import {
+  buildVisualSelectedRowKeySet,
+  collectDescendantSelectableRowIds,
+  flattenFolderRows,
+  folderRowHasChildren,
+  getSelectionRange,
+  isFolderContainerRow,
+  normalizeTreeSelection,
+} from './folderTableModel';
 import type {
   FolderTableColumn,
   FolderTableProps,
@@ -44,6 +52,7 @@ import type {
   FolderTableRowContext,
   FolderTableVisibleRow,
 } from './index.type';
+import TableBatchFooter from './parts/BatchFooter';
 import FolderTableNameCell from './parts/FolderNameCell';
 import FolderTableLoadingSkeleton from './parts/LoadingSkeleton';
 import styles from './style.module.less';
@@ -68,126 +77,6 @@ const INTERACTIVE_ROW_TARGET_SELECTOR = [
   '[slot="selection"]',
   '.checkbox',
 ].join(',');
-
-function flattenFolderRows<T extends FolderTableRow>(
-  rows: T[],
-  expandedKeys: Set<string>,
-  depth = 0
-): Array<FolderTableVisibleRow & T> {
-  const result: Array<FolderTableVisibleRow & T> = [];
-
-  for (const row of rows) {
-    result.push({ ...row, depth });
-    const hasChildren = Boolean(row.children?.length);
-    if (
-      (row.entryType === 'root' || row.entryType === 'folder') &&
-      hasChildren &&
-      expandedKeys.has(row.id)
-    ) {
-      result.push(...flattenFolderRows(row.children as T[], expandedKeys, depth + 1));
-    }
-  }
-
-  return result;
-}
-
-function folderRowHasChildren(row: FolderTableRow): boolean {
-  return (
-    (row.entryType === 'root' || row.entryType === 'folder') &&
-    (row.isExpandable === true || Boolean(row.children?.length))
-  );
-}
-
-function isFolderContainerRow(row: FolderTableRow): boolean {
-  return row.entryType === 'root' || row.entryType === 'folder';
-}
-
-function collectDescendantSelectableRowIds<T extends FolderTableRow>(
-  row: T,
-  disabledKeys: Set<string>,
-  hiddenKeys: Set<string>
-): string[] {
-  const result: string[] = [];
-  const visit = (children: T[] | undefined) => {
-    children?.forEach((child) => {
-      if (
-        child.entryType !== 'loading' &&
-        !disabledKeys.has(child.id) &&
-        !hiddenKeys.has(child.id)
-      ) {
-        result.push(child.id);
-      }
-      visit(child.children as T[] | undefined);
-    });
-  };
-  visit(row.children as T[] | undefined);
-  return result;
-}
-
-function normalizeTreeSelection<T extends FolderTableRow>(
-  rows: T[],
-  selectedKeys: Set<string>,
-  disabledKeys: Set<string>,
-  hiddenKeys: Set<string>,
-  ancestorSelected = false
-): Set<string> {
-  const nextKeys = new Set(selectedKeys);
-  rows.forEach((row) => {
-    const selectable =
-      row.entryType !== 'loading' && !disabledKeys.has(row.id) && !hiddenKeys.has(row.id);
-    const currentSelected = selectable && selectedKeys.has(row.id);
-    if (selectable && ancestorSelected) {
-      nextKeys.delete(row.id);
-    }
-    const childAncestorSelected =
-      ancestorSelected || (currentSelected && isFolderContainerRow(row));
-    if (row.children?.length) {
-      const normalizedChildren = normalizeTreeSelection(
-        row.children as T[],
-        nextKeys,
-        disabledKeys,
-        hiddenKeys,
-        childAncestorSelected
-      );
-      nextKeys.clear();
-      normalizedChildren.forEach((key) => nextKeys.add(key));
-    }
-  });
-  return nextKeys;
-}
-
-function buildVisualSelectedRowKeySet<T extends FolderTableRow>(
-  visibleRows: Array<FolderTableVisibleRow & T>,
-  selectedKeys: Set<string>,
-  disabledKeys: Set<string>,
-  hiddenKeys: Set<string>
-): Set<string> {
-  const result = new Set<string>();
-  const selectedAncestorDepths: number[] = [];
-
-  visibleRows.forEach((row) => {
-    while (
-      selectedAncestorDepths.length > 0 &&
-      (selectedAncestorDepths[selectedAncestorDepths.length - 1] ?? 0) >= row.depth
-    ) {
-      selectedAncestorDepths.pop();
-    }
-
-    const selectable =
-      row.entryType !== 'loading' && !disabledKeys.has(row.id) && !hiddenKeys.has(row.id);
-    const inheritedSelected = selectedAncestorDepths.length > 0;
-    const explicitlySelected = selectedKeys.has(row.id);
-
-    if (selectable && (explicitlySelected || inheritedSelected)) {
-      result.add(row.id);
-    }
-    if (selectable && explicitlySelected && isFolderContainerRow(row)) {
-      selectedAncestorDepths.push(row.depth);
-    }
-  });
-
-  return result;
-}
 
 function resolveMaxBodyHeight(value: number | string | undefined): string | undefined {
   if (value === undefined) {
@@ -543,8 +432,6 @@ function FolderTable<T extends FolderTableRow>({
 
     let nextKeys = new Set(selectedEditRowKeySet);
     const anchorId = selectionAnchorRef.current;
-    const anchorIndex = anchorId ? selectableVisibleRowIds.indexOf(anchorId) : -1;
-    const rowIndex = selectableVisibleRowIds.indexOf(rowId);
     const applyRowSelection = (id: string) => {
       const row = visibleRowMap.get(id);
       if (selected) {
@@ -564,13 +451,9 @@ function FolderTable<T extends FolderTableRow>({
       }
     };
 
-    if (shiftKey && anchorIndex >= 0 && rowIndex >= 0) {
-      const start = Math.min(anchorIndex, rowIndex);
-      const end = Math.max(anchorIndex, rowIndex);
-      selectableVisibleRowIds.slice(start, end + 1).forEach(applyRowSelection);
-    } else {
-      applyRowSelection(rowId);
-    }
+    getSelectionRange(selectableVisibleRowIds, rowId, anchorId, shiftKey).forEach(
+      applyRowSelection
+    );
 
     nextKeys = normalizeTreeSelection(sortedItems, nextKeys, disabledKeys, hiddenKeys);
     selectionAnchorRef.current = rowId;

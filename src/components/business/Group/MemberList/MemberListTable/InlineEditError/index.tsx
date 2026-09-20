@@ -2,12 +2,12 @@ import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { joinClassNames } from '@/components/base/Table/shared/TableBase/cellAlign';
 
-import { joinClassNames } from '../../../shared/TableBase/cellAlign';
-import type { TableEditErrorToastProps } from './index.type';
+import type { InlineEditErrorProps } from './index.type';
 import styles from './style.module.less';
 
-function TableEditErrorToast({ message, onDismiss, className }: TableEditErrorToastProps) {
+function InlineEditError({ message, onDismiss, className }: InlineEditErrorProps) {
   const { t } = useTranslation('table');
 
   return (
@@ -26,4 +26,4 @@ function TableEditErrorToast({ message, onDismiss, className }: TableEditErrorTo
   );
 }
 
-export default TableEditErrorToast;
+export default InlineEditError;
