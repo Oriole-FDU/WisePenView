@@ -13,9 +13,11 @@ export type {
 } from './entity/drive';
 export {
   buildDriveNodeScope,
+  decodeNodeId,
   decodeRootNodeScope,
   DRIVE_ROOT_ID,
-} from './mapper/DriveServices.map';
+  mapTagToFolderNode,
+} from './model/driveNode';
 export type {
   AddResourcesToGroupParams,
   CreateDriveServiceOptions,

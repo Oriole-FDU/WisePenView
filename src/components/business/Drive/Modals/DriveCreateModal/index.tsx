@@ -6,6 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
+import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useAgentService, useDriveService, useNoteService, useSkillService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
@@ -72,6 +73,7 @@ function DriveCreateModal({
             });
           }
           createdId = (await driveService.createFolder({ parent, name: title.trim() })).tagId;
+          requestDriveRefresh();
           break;
         case 'skill':
           createdId = await skillService.createSkill(

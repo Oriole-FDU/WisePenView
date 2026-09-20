@@ -1,11 +1,11 @@
 import {
+  decodeNodeId,
   decodeRootNodeScope,
   DRIVE_ROOT_ID,
   type DriveNode,
   type DriveNodeScope,
   type FolderNode,
 } from '@/domains/Drive';
-import { decodeNodeId } from '@/domains/Drive/mapper/DriveServices.map';
 import i18n from '@/i18n';
 
 export const DEFAULT_DRIVE_ROOT_ID = DRIVE_ROOT_ID;

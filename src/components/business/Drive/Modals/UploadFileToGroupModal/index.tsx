@@ -6,6 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import StepDots from '@/components/base/StepDots';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
+import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useDriveService } from '@/domains';
 import type { DriveNode, FolderNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
@@ -55,6 +56,7 @@ function UploadFileToGroupModal({
   const { loading: submitting, run: runUploadToGroup } = useApi(
     async ({ resourceIds, target }: { resourceIds: string[]; target: FolderNode }) => {
       await driveService.addResourcesToGroup({ resourceIds, target });
+      requestDriveRefresh();
       return resourceIds.length;
     },
     {

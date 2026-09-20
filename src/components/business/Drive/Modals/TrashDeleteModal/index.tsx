@@ -2,6 +2,7 @@ import { toast } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
+import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { clearNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
 import { removePdfPreviewProgress } from '@/components/business/PdfViewer/_store/usePdfPreviewProgressStore';
 import { useDriveService } from '@/domains';
@@ -34,6 +35,7 @@ function TrashDeleteModal({ isOpen, nodes, onOpenChange, onSuccess }: TrashDelet
     async () => {
       if (nodes.length === 0) return;
       await driveService.deleteTrashedNodes({ nodes });
+      requestDriveRefresh();
     },
     {
       manual: true,

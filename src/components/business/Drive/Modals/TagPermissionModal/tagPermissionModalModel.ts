@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { Key } from 'react';
 
-import { mapTagToFolderNode } from '@/domains/Drive/mapper/DriveServices.map';
+import { mapTagToFolderNode } from '@/domains/Drive';
 import type { GroupMember } from '@/domains/Group';
 import {
   ACCESS_CONTROL_SCOPE,

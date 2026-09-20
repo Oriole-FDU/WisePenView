@@ -11,7 +11,7 @@ const DEFAULT_DRIVE_REFRESH_STATE = {
   refreshVersion: 0,
 };
 
-export const useDriveRefreshStore = create<DriveRefreshState>()((set) => ({
+const useDriveRefreshStore = create<DriveRefreshState>()((set) => ({
   ...DEFAULT_DRIVE_REFRESH_STATE,
   requestRefresh: () => set((state) => ({ refreshVersion: state.refreshVersion + 1 })),
 }));
@@ -25,3 +25,12 @@ registerStore({
   scope: 'tab',
   reset: resetDriveRefreshStore,
 });
+
+/** 资源操作成功后通知所有 Drive 视图重新读取。 */
+export function requestDriveRefresh(): void {
+  useDriveRefreshStore.getState().requestRefresh();
+}
+
+export function useDriveRefreshVersion(): number {
+  return useDriveRefreshStore((state) => state.refreshVersion);
+}
