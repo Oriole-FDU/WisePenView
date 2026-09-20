@@ -1,6 +1,6 @@
 import { useMemoizedFn } from 'ahooks';
 import { History, Save } from 'lucide-react';
-import { type DependencyList, type ReactNode, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -20,11 +20,8 @@ import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import {
-  type ResourceHostLayoutConfig,
-  useResourceHostLayoutConfig,
-} from '@/views/resource/ResourceHostContext';
 
+import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDrawioEditorSession } from './_hooks/useDrawioEditorSession';
 import {
   buildDrawioUrl,
@@ -88,7 +85,7 @@ function readWisePenColorScheme(): string {
   return 'mist';
 }
 
-function DrawioLayoutConfig({
+function DrawioWorkspace({
   children,
   resourceId,
   resourceName,
@@ -100,7 +97,6 @@ function DrawioLayoutConfig({
   onResourceChanged,
   titleMeta,
   actions,
-  layoutDeps,
 }: {
   children: ReactNode;
   resourceId?: string;
@@ -113,7 +109,6 @@ function DrawioLayoutConfig({
   onResourceChanged?: () => unknown | Promise<unknown>;
   titleMeta?: ReactNode;
   actions?: ReactNode;
-  layoutDeps?: DependencyList;
 }) {
   const { t } = useTranslation('workspace');
   const displayResourceName = resourceName ?? t('drawio.defaultName');
@@ -135,23 +130,8 @@ function DrawioLayoutConfig({
         actions,
       },
     },
-  } satisfies ResourceHostLayoutConfig;
-  useResourceHostLayoutConfig(
-    () => frameConfig,
-    [
-      copyVersion,
-      currentActions,
-      onPermissionSuccess,
-      onResourceChanged,
-      ownerId,
-      resourceId,
-      resourceInfo,
-      displayResourceName,
-      ...(layoutDeps ?? []),
-    ]
-  );
-
-  return <>{children}</>;
+  } satisfies Omit<ResourceWorkspaceProps, 'children'>;
+  return <ResourceWorkspace {...frameConfig}>{children}</ResourceWorkspace>;
 }
 
 function SaveStatusText({ state }: { state: DrawioSaveState }) {
@@ -295,18 +275,9 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
       ) : null}
     </div>
   );
-  const layoutDeps = [
-    canEdit,
-    canViewVersions,
-    currentUser?.id,
-    currentVersion,
-    editorLoaded,
-    i18n.resolvedLanguage,
-    saveState,
-  ];
 
   return (
-    <DrawioLayoutConfig
+    <DrawioWorkspace
       resourceId={resourceId}
       resourceName={title}
       ownerId={noteInfoDisplay.ownerId}
@@ -317,7 +288,6 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
       onResourceChanged={onRefreshDrawioInfo}
       titleMeta={titleMeta}
       actions={headerActions}
-      layoutDeps={layoutDeps}
     >
       <div className={styles.content}>
         <iframe
@@ -342,7 +312,7 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
         versions={versions}
         onClose={() => setVersionOpen(false)}
       />
-    </DrawioLayoutConfig>
+    </DrawioWorkspace>
   );
 }
 
@@ -382,7 +352,7 @@ function DrawioView({ resourceId }: DrawioViewProps) {
 
   if (!resourceId) {
     return (
-      <DrawioLayoutConfig>
+      <DrawioWorkspace>
         <div className={styles.middleOverlay}>
           <ResultState
             status="warning"
@@ -394,13 +364,13 @@ function DrawioView({ resourceId }: DrawioViewProps) {
             }
           />
         </div>
-      </DrawioLayoutConfig>
+      </DrawioWorkspace>
     );
   }
 
   if (error) {
     return (
-      <DrawioLayoutConfig resourceId={resourceId}>
+      <DrawioWorkspace resourceId={resourceId}>
         <div className={styles.middleOverlay}>
           <ResultState
             status="warning"
@@ -413,41 +383,41 @@ function DrawioView({ resourceId }: DrawioViewProps) {
             }
           />
         </div>
-      </DrawioLayoutConfig>
+      </DrawioWorkspace>
     );
   }
 
   if (loadingDrawio && !data) {
     return (
-      <DrawioLayoutConfig resourceId={resourceId}>
+      <DrawioWorkspace resourceId={resourceId}>
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('drawio.loading')}</span>
           </div>
         </div>
-      </DrawioLayoutConfig>
+      </DrawioWorkspace>
     );
   }
 
   if (!data) {
     return (
-      <DrawioLayoutConfig resourceId={resourceId}>
+      <DrawioWorkspace resourceId={resourceId}>
         <div className={styles.middleOverlay}>
           <ResultState status="warning" title={t('drawio.emptyInfo')} />
         </div>
-      </DrawioLayoutConfig>
+      </DrawioWorkspace>
     );
   }
 
   const resourceType = data.noteInfoDisplay.resourceInfo?.resourceType?.trim().toLowerCase();
   if (resourceType !== RESOURCE_KIND.DRAWIO) {
     return (
-      <DrawioLayoutConfig resourceId={resourceId}>
+      <DrawioWorkspace resourceId={resourceId}>
         <div className={styles.middleOverlay}>
           <ResultState status="warning" title={t('drawio.wrongType')} />
         </div>
-      </DrawioLayoutConfig>
+      </DrawioWorkspace>
     );
   }
 

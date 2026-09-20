@@ -1,4 +1,4 @@
-﻿import { Alert } from '@heroui/react';
+import { Alert } from '@heroui/react';
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { Download, History } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -12,24 +12,29 @@ import type {
   NoteBodyEditorHandle,
   NoteOutlineItem,
 } from '@/components/business/Note/CustomBlockNote/index.type';
+import { NoteEditorSlot } from '@/components/business/Note/CustomBlockNote/NoteEditorSession';
+import { useNoteEditorStatus } from '@/components/business/Note/CustomBlockNote/useNoteEditorStatus';
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
+import { useInteractService } from '@/domains';
 import type { NoteInfoDisplayData } from '@/domains/Note';
 import { encodeNoteClientContentSignature } from '@/domains/Note';
+import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { isDesktop } from '@/utils/platform';
-import {
-  type ResourceHostLayoutConfig,
-  useResourceHostLayoutConfig,
-} from '@/views/resource/ResourceHostContext';
 
+import ResourceWorkspace, {
+  type ResourceWorkspaceProps,
+} from '../../../_components/ResourceWorkspace';
+import { ResourceChatBinding } from '../../../ResourceChatBinding';
 import styles from '../../style.module.less';
 import NoteInfoBar from '../NoteInfoBar';
 import NoteOutline, { NOTE_OUTLINE_TITLE_ID } from '../NoteOutline';
 import NoteTitle, { type NoteTitleHandle, type NoteTitleSaveStatus } from '../NoteTitle';
 import { resolveNoteHeaderSaveStatus } from './noteWorkspaceModel';
-import { useNoteWorkspaceController } from './useNoteWorkspaceController';
+import { useNoteActionsController } from './useNoteActionsController';
+import { useNoteCommentsController } from './useNoteCommentsController';
 
 interface NoteWorkspaceProps {
   resourceId: string;
@@ -41,18 +46,11 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const { t } = useTranslation('note');
   const bodyEditorRef = useRef<NoteBodyEditorHandle>(null);
   const titleEditorRef = useRef<NoteTitleHandle>(null);
-  const mainScrollRef = useRef<HTMLDivElement>(null);
-  const titleAnchorRef = useRef<HTMLDivElement>(null);
   const scrollBarHideTimerRef = useRef<number | null>(null);
   const [isMainScrolling, setIsMainScrolling] = useState(false);
   const [isOutlineOpen, setIsOutlineOpen] = useState(false);
   const [outlineItems, setOutlineItems] = useState<NoteOutlineItem[]>([]);
   const [activeHeadingId, setActiveHeadingId] = useState<string | undefined>(undefined);
-  const [aiBulkActionsPortalContainer, setAiBulkActionsPortalContainer] =
-    useState<HTMLDivElement | null>(null);
-  const [findBarPortalContainer, setFindBarPortalContainer] = useState<HTMLDivElement | null>(null);
-  const [aiDiffControlsPortalContainer, setAiDiffControlsPortalContainer] =
-    useState<HTMLDivElement | null>(null);
   const [titleSaveStatus, setTitleSaveStatus] = useState<NoteTitleSaveStatus>('saved');
   const [pendingImageUploadCount, setPendingImageUploadCount] = useState(0);
   const fallbackNoteTitle = noteInfoDisplay.noteTitle;
@@ -63,51 +61,22 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   const isNoteClientContentSignaturePending = !aiDiffBodyContentHash;
   const untitledTitle = t('title.untitled');
   const resourceName = useResourceDisplayName(resourceId, fallbackNoteTitle, untitledTitle);
-  const workspace = useNoteWorkspaceController({
+  const session = useNoteEditorStatus();
+  const comments = useNoteCommentsController(resourceId);
+  const actions = useNoteActionsController({
     bodyEditorRef,
     fallbackNoteTitle,
     isNoteClientContentSignaturePending,
     noteClientContentSignature,
-    noteInfoDisplay,
     resourceId,
     t,
     titleEditorRef,
     untitledTitle,
+    status: session.status,
   });
-  const {
-    activeInlineCommentThreadId,
-    blockLocalDocWrites,
-    canRenderBodyEditor,
-    collaborationUser,
-    currentUser,
-    doc,
-    exportPending,
-    handleAskAi,
-    handleDownloadMarkdown,
-    handleInlineCommentThreadSelect,
-    handlePrintPdf,
-    inlineCommentDraft,
-    inlineCommentScrollTarget,
-    inlineCommentSession,
-    inlineCommentSnapshot,
-    inlineCommentsBinding,
-    isConnected,
-    isDisconnected,
-    isEditorReadOnly,
-    isInlineCommentHistoryOpen,
-    isTitleReadOnly,
-    middleOverlayText,
-    noteChatStateProvider,
-    provider,
-    reconnect,
-    saveStatus,
-    setActiveInlineCommentThreadId,
-    setInlineCommentDraft,
-    setIsInlineCommentHistoryOpen,
-    showFullPageSpin,
-    status,
-  } = workspace;
-  const headerSaveStatus = resolveNoteHeaderSaveStatus(saveStatus, titleSaveStatus);
+  const interactService = useInteractService();
+  useApi(() => interactService.recordResourceRead(resourceId), { refreshDeps: [resourceId] });
+  const headerSaveStatus = resolveNoteHeaderSaveStatus(session.saveStatus, titleSaveStatus);
   const saveStatusText = t(`save.${headerSaveStatus}`);
   const imageUploadNavigationGuard = useUnsavedChangesGuard(pendingImageUploadCount > 0);
   const focusBody = () => {
@@ -119,15 +88,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
       bodyEditorRef.current?.scrollToAnchor({ kind: 'block', blockId: id });
       return;
     }
-    const anchor = titleAnchorRef.current;
-    if (!anchor) {
-      mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    anchor.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    window.requestAnimationFrame(() => {
-      anchor.querySelector<HTMLElement>('[contenteditable="true"]')?.focus();
-    });
+    titleEditorRef.current?.scrollIntoView();
   };
 
   useUnmount(() => {
@@ -155,12 +116,12 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
    * cleanup：没有订阅或延迟任务，无需清理。
    */
   useEffect(() => {
-    if (!inlineCommentScrollTarget) return;
+    if (!comments.scrollTarget) return;
     bodyEditorRef.current?.scrollToAnchor({
       kind: 'inlineComment',
-      threadId: inlineCommentScrollTarget.threadId,
+      threadId: comments.scrollTarget.threadId,
     });
-  }, [inlineCommentScrollTarget]);
+  }, [comments.scrollTarget]);
 
   /**
    * @wisepen-manual-effect
@@ -174,65 +135,21 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
     imageUploadNavigationGuard.proceed();
   }, [imageUploadNavigationGuard, pendingImageUploadCount]);
 
-  const resourceHostConfig = {
+  const workspaceProps = {
     className: styles.pageWrap,
-    chatStateProvider: noteChatStateProvider,
     sidePanel: noteInfoDisplay.resourceInfo
       ? {
           resource: noteInfoDisplay.resourceInfo,
           onResourceChanged: onRefreshNoteInfo,
           inlineComment: (
             <InlineComment
-              threads={inlineCommentSnapshot.threads}
-              resolvedThreads={inlineCommentSnapshot.resolvedThreads}
-              loading={inlineCommentSnapshot.loading}
-              error={inlineCommentSnapshot.error}
-              isHistoryOpen={isInlineCommentHistoryOpen}
-              draft={
-                inlineCommentDraft
-                  ? {
-                      key: `${inlineCommentDraft.anchor.start}:${inlineCommentDraft.anchor.end}`,
-                      quoteText: inlineCommentDraft.quoteText,
-                    }
-                  : undefined
-              }
-              activeThreadId={activeInlineCommentThreadId}
-              currentUserId={currentUser?.id}
+              {...comments.panel}
+              currentUserId={session.currentUser?.id}
               resourceOwnerId={noteInfoDisplay.ownerId}
               imageUpload={{
                 scene: 'PRIVATE_IMAGE_FOR_NOTE',
                 bizTag: `notes/${resourceId}/inline-comments`,
               }}
-              onHistoryOpenChange={setIsInlineCommentHistoryOpen}
-              onDraftClose={() => setInlineCommentDraft(undefined)}
-              onThreadSelect={handleInlineCommentThreadSelect}
-              onCreate={async ({ content, imageUrls, idempotencyKey }) => {
-                if (!inlineCommentDraft) return;
-                const thread = await inlineCommentSession.createThread({
-                  ...inlineCommentDraft,
-                  content,
-                  imageUrls,
-                  idempotencyKey,
-                });
-                handleInlineCommentThreadSelect(thread.threadId);
-                setInlineCommentDraft(undefined);
-              }}
-              onReply={async (threadId, { content, imageUrls, idempotencyKey }) => {
-                await inlineCommentSession.addComment(threadId, content, imageUrls, idempotencyKey);
-              }}
-              onReactionChange={({ threadId, itemId, emojiId, selected }) =>
-                inlineCommentSession.changeReaction(threadId, itemId, emojiId, selected)
-              }
-              onResolve={async (threadId) => {
-                await inlineCommentSession.resolveThread(threadId);
-                setActiveInlineCommentThreadId((currentThreadId) =>
-                  currentThreadId === threadId ? undefined : currentThreadId
-                );
-              }}
-              onReopen={(threadId) => inlineCommentSession.reopenThread(threadId)}
-              onDelete={({ threadId, itemId }) =>
-                inlineCommentSession.deleteComment(threadId, itemId)
-              }
             />
           ),
         }
@@ -248,7 +165,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
         permissionResourceType: RESOURCE_KIND.NOTE,
         ownerId: noteInfoDisplay.ownerId,
         onPermissionSuccess: onRefreshNoteInfo,
-        isDisabled: showFullPageSpin,
+        isDisabled: session.showFullPageSpin,
         titleMeta: (
           <span
             className={`${styles.headerSaveStatus} ${
@@ -258,74 +175,49 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
             {saveStatusText}
           </span>
         ),
-        leadingActions: <div ref={setAiDiffControlsPortalContainer} />,
+        leadingActions: <NoteEditorSlot name="aiDiffControls" />,
         moreMenu: {
           actions: [
             {
               id: 'inline-comment-history',
               label: t('comments.history', {
                 count:
-                  inlineCommentSnapshot.resolvedThreads.length > 0
-                    ? ` (${inlineCommentSnapshot.resolvedThreads.length})`
+                  comments.panel.resolvedThreads.length > 0
+                    ? ` (${comments.panel.resolvedThreads.length})`
                     : '',
               }),
               icon: History,
-              onAction: () => setIsInlineCommentHistoryOpen(true),
+              onAction: comments.openHistory,
             },
           ],
           onSearch: () => bodyEditorRef.current?.openFind(),
-          onPrint: handlePrintPdf,
+          onPrint: actions.printPdf,
           printLabel: isDesktop() ? t('export.downloadPdf') : t('export.printPdf'),
           printIcon: isDesktop() ? Download : undefined,
           download: {
             label: t('export.downloadMarkdown'),
-            onAction: handleDownloadMarkdown,
+            onAction: actions.downloadMarkdown,
           },
-          isPending: exportPending,
+          isPending: actions.exportPending,
         },
       },
     },
-  } satisfies ResourceHostLayoutConfig;
-  useResourceHostLayoutConfig(
-    () => resourceHostConfig,
-    [
-      activeInlineCommentThreadId,
-      currentUser?.id,
-      exportPending,
-      headerSaveStatus,
-      inlineCommentDraft,
-      inlineCommentSession,
-      inlineCommentSnapshot,
-      isInlineCommentHistoryOpen,
-      noteClientContentSignature,
-      noteInfoDisplay.ownerId,
-      noteInfoDisplay.resourceInfo,
-      noteInfoDisplay.version,
-      onRefreshNoteInfo,
-      resourceId,
-      resourceName,
-      saveStatusText,
-      showFullPageSpin,
-      status,
-      t,
-    ]
-  );
-
+  } satisfies Omit<ResourceWorkspaceProps, 'children'>;
   return (
-    <>
+    <ResourceWorkspace {...workspaceProps}>
+      <ResourceChatBinding resourceId={resourceId} provider={actions.chatProvider} />
       <div className={styles.mainScroll}>
-        <div className={styles.findBarDock} ref={setFindBarPortalContainer} />
+        <NoteEditorSlot name="findBar" className={styles.findBarDock} />
         <div
           className={`${styles.contentRow} ${isOutlineOpen ? styles.contentRowOutlineOpen : ''}`}
         >
-          <div className={styles.mainPanel} ref={setAiBulkActionsPortalContainer}>
+          <NoteEditorSlot name="aiBulkActions" className={styles.mainPanel}>
             <div
               className={`${styles.mainCol} ${isMainScrolling ? styles.mainColScrolling : ''}`}
-              ref={mainScrollRef}
               onScroll={handleMainScroll}
             >
               <div className={styles.root}>
-                {isDisconnected ? (
+                {session.isDisconnected ? (
                   <Alert className={styles.wsAlert} status="warning">
                     <Alert.Indicator />
                     <Alert.Content>
@@ -335,61 +227,44 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
                       <AppButton
                         variant="secondary"
                         size="sm"
-                        isDisabled={status !== 'disconnected'}
-                        onPress={reconnect}
+                        isDisabled={session.status !== 'disconnected'}
+                        onPress={session.reconnect}
                       >
                         {t('workspace.retry')}
                       </AppButton>
                     </div>
                   </Alert>
                 ) : null}
-                <div ref={titleAnchorRef}>
+                <NoteEditorSlot name="title">
                   <NoteTitle
                     key={`${resourceId}-${noteInfoDisplay.noteTitle}-${noteInfoDisplay.canCollaborativeEdit}`}
                     ref={titleEditorRef}
                     id={resourceId}
                     initialContent={noteInfoDisplay.noteTitle}
-                    readOnly={isTitleReadOnly}
-                    focusOnMount={isConnected && !isTitleReadOnly}
+                    readOnly={session.isTitleReadOnly}
+                    focusOnMount={session.isConnected && !session.isTitleReadOnly}
                     onEnterKey={focusBody}
                     onSaveStatusChange={setTitleSaveStatus}
                   />
-                </div>
+                </NoteEditorSlot>
                 <NoteInfoBar noteInfoDisplay={noteInfoDisplay} />
                 <div className={styles.body}>
-                  {canRenderBodyEditor ? (
+                  {session.canRenderBodyEditor ? (
                     <CustomBlockNote
                       key={`${resourceId}-${noteInfoDisplay.canCollaborativeEdit}`}
                       ref={bodyEditorRef}
-                      resourceId={resourceId}
-                      aiDiffPreview={noteInfoDisplay.aiDiffPreview}
-                      collaboration={{
-                        doc,
-                        provider,
-                        user: collaborationUser,
-                        ready: isConnected,
-                      }}
-                      state={{
-                        readOnly: isEditorReadOnly,
-                        blockLocalDocWrites,
-                      }}
                       onOutlineChange={setOutlineItems}
                       onActiveHeadingChange={setActiveHeadingId}
-                      onAskAi={handleAskAi}
-                      portalContainers={{
-                        aiBulkActions: aiBulkActionsPortalContainer,
-                        aiDiffControls: aiDiffControlsPortalContainer,
-                        findBar: findBarPortalContainer,
-                      }}
+                      onAskAi={actions.askAi}
                       onAiDiffBodyContentHashChange={setAiDiffBodyContentHash}
                       onImageUploadCountChange={setPendingImageUploadCount}
-                      inlineComments={inlineCommentsBinding}
+                      inlineComments={comments.binding}
                     />
                   ) : null}
                 </div>
               </div>
             </div>
-          </div>
+          </NoteEditorSlot>
 
           <NoteOutline
             open={isOutlineOpen}
@@ -402,11 +277,11 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
         </div>
       </div>
 
-      {showFullPageSpin ? (
+      {session.showFullPageSpin ? (
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
-            <span className={styles.middleOverlayText}>{middleOverlayText}</span>
+            <span className={styles.middleOverlayText}>{session.middleOverlayText}</span>
           </div>
         </div>
       ) : null}
@@ -419,7 +294,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
         onCancel={imageUploadNavigationGuard.reset}
         onConfirm={imageUploadNavigationGuard.reset}
       />
-    </>
+    </ResourceWorkspace>
   );
 }
 

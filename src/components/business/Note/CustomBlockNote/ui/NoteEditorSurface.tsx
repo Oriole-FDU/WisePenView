@@ -10,12 +10,12 @@ import FindBar from '@/views/resource/note/_components/FindBar';
 
 import { AiDiffBulkActions } from '../engines/aiDiff/BulkActions';
 import { NoteEditorReadOnlyProvider } from '../engines/editor/readOnly';
-import type { CustomBlockNoteProps } from '../index.type';
 import { NoteEmojiPickerPopover } from '../plugins/EmojiPlugin/EmojiPickerPopover';
 import NoteTableHandles from '../plugins/TablePlugin/ui/tableHandles';
 import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
 import type { NoteEditorRuntimeCoordinator } from '../registry/useNoteEditorRuntimeCoordinator';
 import { useNoteInteractionStore } from '../runtime/noteInteractionStore';
+import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 import styles from '../style.module.less';
 import NoteSideMenu from './sideMenu';
 import NoteSlashMenu from './slashMenu';
@@ -142,7 +142,7 @@ export function NoteEditorSurface({
 }: {
   editor: CustomBlockNoteEditor;
   runtimeCoordinator: NoteEditorRuntimeCoordinator;
-  props: CustomBlockNoteProps;
+  props: NoteEditorRuntimeProps;
 }) {
   const { resolvedTheme } = useAppTheme();
   const {

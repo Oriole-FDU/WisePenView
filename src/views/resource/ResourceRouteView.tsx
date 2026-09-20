@@ -8,8 +8,6 @@ import {
   type ResourceTarget,
 } from '@/utils/navigation/resourceTarget';
 
-import ResourceSidePanel from './_components/ResourceSidePanel';
-import { useResourceHostContext } from './ResourceHostContext';
 import ResourceRenderer from './ResourceRenderer';
 
 function ResourceRouteView() {
@@ -19,7 +17,6 @@ function ResourceRouteView() {
   }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { layoutConfig } = useResourceHostContext();
   const viewerParam = new URLSearchParams(location.search).get('viewer') ?? undefined;
 
   const target: ResourceTarget = {
@@ -49,13 +46,8 @@ function ResourceRouteView() {
     navigate(APP_ROUTE_PATH.DRIVE_PERSONAL);
   };
 
-  const sidePanelConfig =
-    layoutConfig.sidePanel?.resource.resourceId === resourceId ? layoutConfig.sidePanel : undefined;
-
   return (
-    <ResourceSidePanel resourceId={resourceId ?? ''} config={sidePanelConfig}>
-      <ResourceRenderer target={target} onTargetChange={handleTargetChange} onClose={handleClose} />
-    </ResourceSidePanel>
+    <ResourceRenderer target={target} onTargetChange={handleTargetChange} onClose={handleClose} />
   );
 }
 

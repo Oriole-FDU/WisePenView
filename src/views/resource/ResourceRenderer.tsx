@@ -17,7 +17,7 @@ import {
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
 
-import { type ResourceHostLayoutConfig, useResourceHostLayoutConfig } from './ResourceHostContext';
+import ResourceWorkspace from './_components/ResourceWorkspace';
 import styles from './ResourceRenderer.module.less';
 
 const AgentView = lazy(() => import('./agent'));
@@ -38,8 +38,6 @@ interface UnsupportedResourceProps extends ResourceTarget {
   onClose: () => void;
 }
 
-const HEADERLESS_LAYOUT_CONFIG: ResourceHostLayoutConfig = { header: false };
-
 function UnsupportedResource({
   resourceType,
   resourceId,
@@ -48,7 +46,6 @@ function UnsupportedResource({
   onClose,
 }: UnsupportedResourceProps) {
   const { t } = useTranslation('workspace');
-  useResourceHostLayoutConfig(() => HEADERLESS_LAYOUT_CONFIG, []);
 
   const readableType = resourceType
     ? t('renderer.resourceType', { type: resourceType })
@@ -57,27 +54,28 @@ function UnsupportedResource({
   const subTitle = message ?? [readableType, readableViewer].filter(Boolean).join('，');
 
   return (
-    <div className={styles.middleOverlay}>
-      <div className={styles.middleOverlayInner}>
-        <ResultState
-          status="warning"
-          title={resourceId ? t('renderer.unsupported') : t('renderer.cannotOpen')}
-          subTitle={subTitle || undefined}
-          extra={
-            <AppButton variant="secondary" onPress={onClose}>
-              {t('renderer.close')}
-            </AppButton>
-          }
-        />
+    <ResourceWorkspace header={false}>
+      <div className={styles.middleOverlay}>
+        <div className={styles.middleOverlayInner}>
+          <ResultState
+            status="warning"
+            title={resourceId ? t('renderer.unsupported') : t('renderer.cannotOpen')}
+            subTitle={subTitle || undefined}
+            extra={
+              <AppButton variant="secondary" onPress={onClose}>
+                {t('renderer.close')}
+              </AppButton>
+            }
+          />
+        </div>
       </div>
-    </div>
+    </ResourceWorkspace>
   );
 }
 
 function FileViewerResolver({ target, onTargetChange, onClose }: ResourceRendererProps) {
   const { t } = useTranslation('workspace');
   const documentService = useDocumentService();
-  useResourceHostLayoutConfig(() => HEADERLESS_LAYOUT_CONFIG, []);
 
   const { resourceId = '' } = target;
   const {
@@ -113,12 +111,14 @@ function FileViewerResolver({ target, onTargetChange, onClose }: ResourceRendere
 
   if (loading || !docInfo) {
     return (
-      <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
-        <div className={styles.middleOverlayLoading}>
-          <Spin size="large" />
-          <span className={styles.middleOverlayText}>{t('renderer.resolving')}</span>
+      <ResourceWorkspace header={false}>
+        <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
+          <div className={styles.middleOverlayLoading}>
+            <Spin size="large" />
+            <span className={styles.middleOverlayText}>{t('renderer.resolving')}</span>
+          </div>
         </div>
-      </div>
+      </ResourceWorkspace>
     );
   }
 

@@ -18,6 +18,7 @@ import {
 } from '../engines/search/findReplace';
 import type { NoteBodyEditorHandle, NoteFindResult, NoteReplaceResult } from '../index.type';
 import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
+import { useNoteEditorSessionContext } from '../session/NoteEditorSessionContext';
 import { useNoteInteractionStore } from './noteInteractionStore';
 import type { NoteScrollTargetResolver } from './useNoteEditorScroll';
 
@@ -41,6 +42,7 @@ export function useNoteEditorCommands(
   scrollToTarget: (resolveTarget: NoteScrollTargetResolver) => void,
   canReplace: boolean
 ): NoteEditorCommands {
+  const { titleContainer } = useNoteEditorSessionContext();
   const dispatch = useNoteInteractionStore((state) => state.dispatch);
   const displayMode = useNoteInteractionStore((state) => state.review.displayMode);
   const dispatchSearchMeta = useMemoizedFn((meta: SearchExtensionMeta) => {
@@ -188,7 +190,7 @@ export function useNoteEditorCommands(
         await waitForEditorPaint();
         await printNotePdfViaBrowser(editor, notePluginRegistry, {
           title: options?.title,
-          titleRoot: options?.titleRoot,
+          titleRoot: titleContainer?.querySelector<HTMLElement>('.ProseMirror') ?? null,
           defaultFileName: options?.defaultFileName,
         });
       } finally {

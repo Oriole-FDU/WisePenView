@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode } from 'react';
 
 import type { ResourceHeaderProps } from '../ResourceHeader/index.type';
 
@@ -16,8 +16,6 @@ export interface ResourceWorkspaceHeaderProps {
   canGoBack?: boolean;
   canGoForward?: boolean;
   leftSidebarCollapsed?: boolean;
-  /** Win：供 useResourceHeaderEndReserve 挂载，写入窗控留白 CSS 变量 */
-  headerRef?: Ref<HTMLElement>;
   onGoBack?: () => void;
   onGoForward?: () => void;
   onToggleLeftSidebar?: () => void;

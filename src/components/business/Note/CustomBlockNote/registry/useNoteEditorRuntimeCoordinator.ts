@@ -4,7 +4,6 @@ import { useMemoizedFn } from 'ahooks';
 import { useTranslation } from 'react-i18next';
 
 import { captureInlineCommentDraft } from '../engines/inlineComments/relativePosition';
-import type { CustomBlockNoteProps } from '../index.type';
 import {
   useNoteAiDiff,
   useNoteCollaboration,
@@ -17,9 +16,10 @@ import {
   useNoteImageUploadRuntime,
   useNoteOutlineRuntime,
 } from '../runtime';
+import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 import { notePluginRegistry } from './noteEditorComposition';
 
-export function useNoteEditorRuntimeCoordinator(props: CustomBlockNoteProps) {
+export function useNoteEditorRuntimeCoordinator(props: NoteEditorRuntimeProps) {
   const { t } = useTranslation('note');
   const {
     resourceId,

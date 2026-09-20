@@ -17,12 +17,12 @@ import {
   RESOURCE_VIEWER,
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
-import { useResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
 
+import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';
 import styles from './style.module.less';
 
-interface PdfLayoutConfigProps {
+interface PdfWorkspaceProps {
   children: ReactNode;
   resourceInfo?: ResourceItem;
   documentType?: string;
@@ -31,14 +31,14 @@ interface PdfLayoutConfigProps {
   onViewerSwitch?: (viewer: ResourceViewer) => void;
 }
 
-function PdfLayoutConfig({
+function PdfWorkspace({
   children,
   resourceInfo,
   documentType,
   onPermissionSuccess,
   onResourceChanged,
   onViewerSwitch,
-}: PdfLayoutConfigProps) {
+}: PdfWorkspaceProps) {
   const { t } = useTranslation('workspace');
   const frameConfig = {
     className: styles.container,
@@ -69,13 +69,8 @@ function PdfLayoutConfig({
           },
         }
       : {},
-  };
-  useResourceHostLayoutConfig(
-    () => frameConfig,
-    [documentType, onPermissionSuccess, onResourceChanged, onViewerSwitch, resourceInfo, t]
-  );
-
-  return <>{children}</>;
+  } satisfies Omit<ResourceWorkspaceProps, 'children'>;
+  return <ResourceWorkspace {...frameConfig}>{children}</ResourceWorkspace>;
 }
 
 interface PdfViewProps {
@@ -128,7 +123,7 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
 
   if (!resourceId) {
     return (
-      <PdfLayoutConfig>
+      <PdfWorkspace>
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -142,13 +137,13 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
             />
           </div>
         </div>
-      </PdfLayoutConfig>
+      </PdfWorkspace>
     );
   }
 
   if (docInfoError) {
     return (
-      <PdfLayoutConfig>
+      <PdfWorkspace>
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -163,27 +158,27 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
             />
           </div>
         </div>
-      </PdfLayoutConfig>
+      </PdfWorkspace>
     );
   }
 
   // 仅在初次加载（尚无数据）时展示全页 spinner；refresh 时保留旧 docInfo，不触发全页 loading
   if (isDocInfoLoading && !docInfo) {
     return (
-      <PdfLayoutConfig>
+      <PdfWorkspace>
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('pdf.loadingInfo')}</span>
           </div>
         </div>
-      </PdfLayoutConfig>
+      </PdfWorkspace>
     );
   }
 
   if (!docInfo) {
     return (
-      <PdfLayoutConfig>
+      <PdfWorkspace>
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -198,12 +193,12 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
             />
           </div>
         </div>
-      </PdfLayoutConfig>
+      </PdfWorkspace>
     );
   }
 
   return (
-    <PdfLayoutConfig
+    <PdfWorkspace
       resourceInfo={docInfo.resourceInfo}
       documentType={docInfo.docMetaInfo.uploadMeta.fileType}
       onPermissionSuccess={refreshDocInfo}
@@ -244,7 +239,7 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
           )}
         </div>
       </div>
-    </PdfLayoutConfig>
+    </PdfWorkspace>
   );
 }
 

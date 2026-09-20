@@ -15,7 +15,6 @@ function ResourceWorkspaceHeader({
   canGoBack = false,
   canGoForward = false,
   leftSidebarCollapsed = false,
-  headerRef,
   onGoBack,
   onGoForward,
   onToggleLeftSidebar,
@@ -25,13 +24,12 @@ function ResourceWorkspaceHeader({
 
   const titleBarInsetStart =
     desktopWindow.hasTitleBarInset && desktopWindow.titleBarInsetSide === 'start';
-  /** Win：挂 end 槽位；具体留白 px 由 headerRef 上的 CSS 变量驱动 */
+  /** Win：挂 end 槽位；具体留白继承宿主的 CSS 变量。 */
   const titleBarInsetEnd =
     desktopWindow.hasTitleBarInset && desktopWindow.titleBarInsetSide === 'end';
 
   return (
     <header
-      ref={headerRef}
       className={cn(
         styles.root,
         desktopWindow.isDesktop && styles.desktopRoot,

@@ -3,8 +3,8 @@ import type * as Y from 'yjs';
 import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
 
 import { useAiDiffSidecar } from '../engines/aiDiff/useAiDiffSidecar';
-import type { CustomBlockNoteProps } from '../index.type';
 import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
+import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 import { useNoteInteractionStore } from './noteInteractionStore';
 import type { NoteEditorDefinition } from './useNoteEditorDefinition';
 
@@ -19,11 +19,11 @@ export function useNoteAiDiff({
 }: {
   editor: CustomBlockNoteEditor;
   definition: NoteEditorDefinition;
-  doc: CustomBlockNoteProps['collaboration']['doc'];
+  doc: NoteEditorRuntimeProps['collaboration']['doc'];
   undoManager: Y.UndoManager;
   readOnly: boolean;
   blockLocalDocWrites: boolean;
-  onPresenceChange: CustomBlockNoteProps['onAiDiffPresenceChange'];
+  onPresenceChange: NoteEditorRuntimeProps['onAiDiffPresenceChange'];
 }) {
   const displayMode = useNoteInteractionStore((state) => state.review.displayMode);
   const dispatch = useNoteInteractionStore((state) => state.dispatch);

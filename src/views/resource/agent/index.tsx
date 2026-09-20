@@ -6,7 +6,7 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import ResourceLayoutConfig from '../_components/ResourceLayoutConfig';
+import ResourceWorkspace from '../_components/ResourceWorkspace';
 import AgentWorkspace from './_components/AgentWorkspace';
 import { useAgentVersionController } from './controllers/useAgentVersionController';
 import styles from './style.module.less';
@@ -21,7 +21,7 @@ export default function AgentView({ resourceId }: AgentViewProps) {
 
   if (version.error) {
     return (
-      <ResourceLayoutConfig className={styles.pageWrap} deps={[]}>
+      <ResourceWorkspace className={styles.pageWrap}>
         <div className={styles.overlay}>
           <ResultState
             status="warning"
@@ -34,18 +34,18 @@ export default function AgentView({ resourceId }: AgentViewProps) {
             }
           />
         </div>
-      </ResourceLayoutConfig>
+      </ResourceWorkspace>
     );
   }
 
   if (!version.data || !version.displayAgent) {
     return (
-      <ResourceLayoutConfig className={styles.pageWrap} deps={[]}>
+      <ResourceWorkspace className={styles.pageWrap}>
         <div className={styles.overlay} aria-busy="true" aria-live="polite">
           <Spin size="large" />
           <span>{t('agent:page.loading')}</span>
         </div>
-      </ResourceLayoutConfig>
+      </ResourceWorkspace>
     );
   }
 

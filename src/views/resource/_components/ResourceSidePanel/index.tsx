@@ -22,13 +22,13 @@ import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { cn } from '@/utils/cn';
 
 import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
-import type { ResourceHostSidePanelConfig } from '../../ResourceHostContext';
+import type { ResourceSidePanelContent } from '../ResourceWorkspace';
 import ResourceCommentPanel from './ResourceCommentPanel';
 import styles from './style.module.less';
 
 interface ResourceSidePanelProps {
   resourceId: string;
-  config?: ResourceHostSidePanelConfig;
+  config?: ResourceSidePanelContent;
   children: ReactNode;
 }
 

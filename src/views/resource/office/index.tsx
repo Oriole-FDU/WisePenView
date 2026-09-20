@@ -19,20 +19,16 @@ import {
   RESOURCE_VIEWER,
   type ResourceViewer,
 } from '@/utils/navigation/resourceTarget';
-import {
-  DEFAULT_RESOURCE_HOST_ID,
-  type ResourceHostLayoutConfig,
-  useResourceHostId,
-  useResourceHostLayoutConfig,
-} from '@/views/resource/ResourceHostContext';
+import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/views/resource/ResourceHostContext';
 
+import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';
 import styles from './style.module.less';
 
 const ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL = import.meta.env
   .VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL;
 
-interface OfficeLayoutConfigProps {
+interface OfficeWorkspaceProps {
   children: ReactNode;
   resourceInfo?: ResourceItem;
   documentType?: string;
@@ -53,14 +49,14 @@ interface OfficeViewProps {
   resourceId?: string;
 }
 
-function OfficeLayoutConfig({
+function OfficeWorkspace({
   children,
   resourceInfo,
   documentType,
   onPermissionSuccess,
   onResourceChanged,
   onViewerSwitch,
-}: OfficeLayoutConfigProps) {
+}: OfficeWorkspaceProps) {
   const { t } = useTranslation('workspace');
   const frameConfig = {
     className: styles.container,
@@ -91,13 +87,8 @@ function OfficeLayoutConfig({
           },
         }
       : {},
-  } satisfies ResourceHostLayoutConfig;
-  useResourceHostLayoutConfig(
-    () => frameConfig,
-    [documentType, onPermissionSuccess, onResourceChanged, onViewerSwitch, resourceInfo, t]
-  );
-
-  return <>{children}</>;
+  } satisfies Omit<ResourceWorkspaceProps, 'children'>;
+  return <ResourceWorkspace {...frameConfig}>{children}</ResourceWorkspace>;
 }
 
 function OfficeEditorHost({
@@ -193,7 +184,7 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
     setEditorReady(false);
   };
 
-  // 宿主布局依赖稳定函数身份，同时刷新时需要读取最新的文档数据。
+  // 刷新权限与评论数据时保留当前 Office 编辑实例。
   const refreshResourceInfo = useMemoizedFn(async () => {
     const docInfo = await documentService.getDocInfo(resourceId as string);
     if (data) mutateOfficeData({ ...data, docInfo });
@@ -201,7 +192,7 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
 
   if (!resourceId) {
     return (
-      <OfficeLayoutConfig>
+      <OfficeWorkspace>
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -215,13 +206,13 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
             />
           </div>
         </div>
-      </OfficeLayoutConfig>
+      </OfficeWorkspace>
     );
   }
 
   if (error) {
     return (
-      <OfficeLayoutConfig>
+      <OfficeWorkspace>
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -236,37 +227,37 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
             />
           </div>
         </div>
-      </OfficeLayoutConfig>
+      </OfficeWorkspace>
     );
   }
 
   if (isConfigLoading && !data) {
     return (
-      <OfficeLayoutConfig>
+      <OfficeWorkspace>
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('office.loading')}</span>
           </div>
         </div>
-      </OfficeLayoutConfig>
+      </OfficeWorkspace>
     );
   }
 
   if (!data?.editorConfig.config) {
     return (
-      <OfficeLayoutConfig>
+      <OfficeWorkspace>
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState status="warning" title={t('office.emptyConfig')} />
           </div>
         </div>
-      </OfficeLayoutConfig>
+      </OfficeWorkspace>
     );
   }
 
   return (
-    <OfficeLayoutConfig
+    <OfficeWorkspace
       resourceInfo={data.docInfo.resourceInfo}
       documentType={data.docInfo.docMetaInfo.uploadMeta.fileType}
       onPermissionSuccess={refreshOfficeData}
@@ -301,7 +292,7 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
           </div>
         )}
       </div>
-    </OfficeLayoutConfig>
+    </OfficeWorkspace>
   );
 }
 

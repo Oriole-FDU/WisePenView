@@ -10,12 +10,12 @@ import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/u
 
 import { getAiContentStore } from '../engines/aiDiff/store';
 import { importNoteMarkdown } from '../engines/markdown/markdownImport';
-import type { CustomBlockNoteProps } from '../index.type';
 import {
   createDefaultNoteBlock,
   type CustomBlockNoteEditor,
   notePluginRegistry,
 } from '../registry/noteEditorComposition';
+import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 
 const initializedAiDiffPreviews = new WeakMap<Y.Doc, NoteAiDiffPreviewData>();
 /** BlockNote 协同空文档使用的本地占位块 ID，正式写入 Yjs 后会被替换。 */
@@ -97,12 +97,12 @@ export function useNoteEditorHydration({
   scheduleBodyContentHashRefresh,
 }: {
   editor: CustomBlockNoteEditor;
-  doc: CustomBlockNoteProps['collaboration']['doc'];
+  doc: NoteEditorRuntimeProps['collaboration']['doc'];
   undoManager: Y.UndoManager;
   resourceId: string;
   collaborationReady: boolean;
   canWrite: boolean;
-  aiDiffPreview: CustomBlockNoteProps['aiDiffPreview'];
+  aiDiffPreview: NoteEditorRuntimeProps['aiDiffPreview'];
   scheduleBodyContentHashRefresh: () => void;
 }) {
   const { t } = useTranslation('note');

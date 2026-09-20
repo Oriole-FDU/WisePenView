@@ -12,9 +12,8 @@ import { SkillServicesMap } from '@/domains/Skill';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import type { ResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
 
-import ResourceLayoutConfig from '../_components/ResourceLayoutConfig';
+import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import SkillActionDialogs from './_components/SkillActionDialogs';
 import SkillEditorPanel from './_components/SkillEditorPanel';
 import SkillFileTreePanel from './_components/SkillFileTreePanel';
@@ -232,24 +231,7 @@ function SkillView({ resourceId }: SkillViewProps) {
         ) : undefined,
       },
     },
-  } satisfies ResourceHostLayoutConfig;
-  const layoutConfigDeps = [
-    canEdit,
-    canPreviewSelectedFile,
-    workspace.state.configDescription,
-    workspace.state.configName,
-    workspace.state.editing,
-    save.hasSaveableChanges,
-    headerSaveStatusText,
-    save.isSaving,
-    fileActions.moveLoading,
-    navigation.publishLoading,
-    resourceId,
-    save.savePhase,
-    resource.skill,
-    t,
-    workspace.state.viewingVersion,
-  ];
+  } satisfies Omit<ResourceWorkspaceProps, 'children'>;
   const configTreeNodes = [
     {
       key: SKILL_CONFIG_NODE_ID,
@@ -271,11 +253,7 @@ function SkillView({ resourceId }: SkillViewProps) {
 
   if (resource.error) {
     return (
-      <ResourceLayoutConfig
-        className={styles.pageWrap}
-        config={headerConfig}
-        deps={layoutConfigDeps}
-      >
+      <ResourceWorkspace className={styles.pageWrap} {...headerConfig}>
         <div className={styles.middleOverlay}>
           <ResultState
             status="warning"
@@ -288,29 +266,25 @@ function SkillView({ resourceId }: SkillViewProps) {
             }
           />
         </div>
-      </ResourceLayoutConfig>
+      </ResourceWorkspace>
     );
   }
 
   if (resource.loading && !resource.skill) {
     return (
-      <ResourceLayoutConfig
-        className={styles.pageWrap}
-        config={headerConfig}
-        deps={layoutConfigDeps}
-      >
+      <ResourceWorkspace className={styles.pageWrap} {...headerConfig}>
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span>{t('page.loading')}</span>
           </div>
         </div>
-      </ResourceLayoutConfig>
+      </ResourceWorkspace>
     );
   }
 
   return (
-    <ResourceLayoutConfig className={styles.pageWrap} config={headerConfig} deps={layoutConfigDeps}>
+    <ResourceWorkspace className={styles.pageWrap} {...headerConfig}>
       <div className={styles.page}>
         <div className={styles.mainArea}>
           {resource.skill ? (
@@ -382,7 +356,7 @@ function SkillView({ resourceId }: SkillViewProps) {
         hidden
         onChange={(event) => void fileActions.handleFileChange(event)}
       />
-    </ResourceLayoutConfig>
+    </ResourceWorkspace>
   );
 }
 
