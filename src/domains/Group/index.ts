@@ -7,6 +7,7 @@ export type {
   GroupOwnerInfo,
   GroupResConfig,
 } from './entity/group';
+export type { GroupQuotaInfo, UserGroupQuota } from './entity/quota';
 export {
   DEFAULT_MEMBER_ACTIONS,
   GROUP_FILE_ORG_LOGIC,
@@ -26,6 +27,7 @@ export type {
   JoinGroupRequest,
   KickMembersRequest,
   QuitGroupRequest,
+  SetGroupQuotaRequest,
   UpdateGroupResConfigRequest,
   UpdateMemberRoleRequest,
 } from './service/index.type';

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import QuotaBar from '@/components/base/QuotaBar';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
-import { useQuotaService } from '@/domains';
+import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import type { QuotaByGroupProps, UserGroupQuota } from './index.type';
@@ -28,17 +28,17 @@ const INITIAL_QUOTA_PAGE_DATA: QuotaPageData = {
 
 function QuotaByGroup({ pagination }: QuotaByGroupProps) {
   const { t } = useTranslation('group');
-  const quotaService = useQuotaService();
+  const groupService = useGroupService();
   const pageSize = pagination?.defaultPageSize ?? DEFAULT_PAGE_SIZE;
   const [quotaPageData, setQuotaPageData] = useState<QuotaPageData>(INITIAL_QUOTA_PAGE_DATA);
 
   const fetchQuotaPage = async (page: number): Promise<QuotaPageData> => {
-    const { quotas, total } = await quotaService.fetchUserGroupQuotas(page, pageSize);
+    const { quotas, total } = await groupService.fetchUserGroupQuotas(page, pageSize);
     return { quotas, total, currentPage: page };
   };
 
   const { loading } = useApi(() => fetchQuotaPage(1), {
-    refreshDeps: [quotaService, pageSize],
+    refreshDeps: [groupService, pageSize],
     onBefore: () => {
       setQuotaPageData(INITIAL_QUOTA_PAGE_DATA);
     },

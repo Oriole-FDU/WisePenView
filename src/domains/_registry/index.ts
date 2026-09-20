@@ -21,7 +21,6 @@ export {
   useInteractService,
   useMessageService,
   useNoteService,
-  useQuotaService,
   useResourcePermissionService,
   useResourceService,
   useSkillService,

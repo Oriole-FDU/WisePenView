@@ -1,19 +1,15 @@
-import type { AdminMessage, User, UserAccountProfile, UserSearchUser } from '@/domains/User';
+import type { User, UserAccountProfile, UserSearchUser } from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   AddFeedbackApiRequest,
-  AdminMessageApiModel,
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
   CheckEmailVerifyApiRequest,
   GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
-  ListAdminMessagesApiRequest,
-  ListAdminMessagesApiResponse,
   ListUserSearchSuggestionsApiRequest,
-  PublishMessageApiRequest,
   SearchUserApiRequest,
   UserSearchUserApiResponse,
 } from '../apis/UserApi.type';
@@ -34,10 +30,7 @@ import type {
   ConfirmEmailVerifyRequest,
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
-  ListAdminMessagesRequest,
-  ListAdminMessagesResponse,
   ListUserSearchSuggestionsRequest,
-  PublishMessageRequest,
   SearchUsersRequest,
   SendEmailVerifyRequest,
   SubmitFeedbackRequest,
@@ -161,45 +154,6 @@ const mapConfirmEmailVerifyRequest = (
   token: params.token,
 });
 
-const mapAdminMessageApiModelToEntity = (raw: AdminMessageApiModel): AdminMessage => ({
-  messageId: normalizeId(raw.messageId),
-  deliveryScope: raw.deliveryScope ?? undefined,
-  messageType: raw.messageType ?? undefined,
-  title: raw.title ?? undefined,
-  content: raw.content ?? undefined,
-  jumpUrl: raw.jumpUrl ?? undefined,
-  extra: raw.extra ?? undefined,
-  readCount: raw.readCount ?? 0,
-  createTime: raw.createTime ?? undefined,
-});
-
-const mapListAdminMessagesRequest = (
-  params: ListAdminMessagesRequest
-): ListAdminMessagesApiRequest => ({
-  page: params.page,
-  size: params.size,
-});
-
-const mapListAdminMessagesFromApi = (
-  data: ListAdminMessagesApiResponse
-): ListAdminMessagesResponse => ({
-  messages: data.list.map(mapAdminMessageApiModelToEntity),
-  total: data.total,
-  page: data.page,
-  size: data.size,
-  totalPage: data.totalPage,
-});
-
-const mapPublishMessageRequest = (params: PublishMessageRequest): PublishMessageApiRequest => ({
-  receiverUserIds: params.receiverUserIds,
-  deliveryScope: params.deliveryScope,
-  messageType: params.deliveryScope === 'ALL_USERS' ? 'SYSTEM' : params.messageType,
-  title: params.title,
-  content: params.content,
-  jumpUrl: params.jumpUrl,
-  extra: params.extra,
-});
-
 const hasFeedbackType = (types: FeedbackType[], type: FeedbackType): boolean =>
   types.includes(type);
 
@@ -308,9 +262,6 @@ export const UserServicesMap = {
   mapInitiateUISVerifyRequest,
   mapFudanUISVerifyStatusFromApi,
   mapConfirmEmailVerifyRequest,
-  mapListAdminMessagesRequest,
-  mapListAdminMessagesFromApi,
-  mapPublishMessageRequest,
   mapSubmitFeedbackRequest,
   mapTaskStatusesFromApi,
   mapTaskCheckInFromApi,

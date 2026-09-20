@@ -1,6 +1,11 @@
 import type { AdminUser } from '@/domains/Admin';
 
+import type { AdminMessage } from '../entity/message';
+
 export interface IAdminService {
+  listAdminMessages(params: ListAdminMessagesRequest): Promise<ListAdminMessagesResponse>;
+  publishMessage(params: PublishMessageRequest): Promise<void>;
+
   fetchUserList(params: FetchAdminUserListRequest): Promise<FetchAdminUserListResponse>;
   getUserInfo(params: GetAdminUserInfoRequest): Promise<GetAdminUserInfoResponse>;
   changeUserInfo(params: ChangeAdminUserInfoRequest): Promise<void>;
@@ -58,4 +63,30 @@ export interface ChangeAdminUserProfileRequest {
 export interface ResetAdminUserPasswordRequest {
   userId: string;
   newPassword?: string;
+}
+
+export interface ListAdminMessagesRequest {
+  page: number;
+  size: number;
+}
+
+export interface ListAdminMessagesResponse {
+  messages: AdminMessage[];
+  total: number;
+  page: number;
+  size: number;
+  totalPage: number;
+}
+
+export type PublishMessageDeliveryScope = 'DIRECT' | 'ALL_USERS';
+export type PublishMessageType = 'SYSTEM' | 'NORMAL';
+
+export interface PublishMessageRequest {
+  receiverUserIds: string[];
+  deliveryScope: PublishMessageDeliveryScope;
+  messageType: PublishMessageType;
+  title: string;
+  content: string;
+  jumpUrl?: string;
+  extra?: string;
 }

@@ -1,11 +1,13 @@
 import { GroupApi, GroupMemberApi, GroupResConfigApi } from '@domain-apis';
 
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig, ROLE } from '@/domains/Group';
-import { DEFAULT_MEMBER_ACTIONS } from '@/domains/Group';
+import { DEFAULT_MEMBER_ACTIONS, GROUP_TYPE } from '@/domains/Group';
 import { normalizeResourceActions } from '@/domains/Tag';
 import type { EnumKey } from '@/utils/enum';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
+import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
+import { GroupQuotaMap } from '../mapper/groupQuota.mapper';
 import { GroupServicesMap } from '../mapper/GroupServices.map';
 import type {
   CreateGroupRequest,
@@ -18,6 +20,7 @@ import type {
   JoinGroupRequest,
   KickMembersRequest,
   QuitGroupRequest,
+  SetGroupQuotaRequest,
   UpdateGroupResConfigRequest,
   UpdateMemberRoleRequest,
 } from './index.type';
@@ -128,6 +131,35 @@ const kickMembers = async (params: KickMembersRequest) => {
   await GroupMemberApi.kick(params);
 };
 
+const normalizePage = (page: number): number => Math.max(1, Math.floor(page));
+const normalizePageSize = (pageSize: number): number => Math.max(1, Math.floor(pageSize));
+
+/** GET /group/member/getAllMyGroupTokenInfo → PageR<GroupMemberTokenDetailResponse> */
+const fetchUserGroupQuotas = async (
+  page: number,
+  pageSize: number
+): Promise<{ quotas: UserGroupQuota[]; total: number }> => {
+  const data = await GroupMemberApi.getAllMyGroupTokenInfo({
+    page: normalizePage(page),
+    size: normalizePageSize(pageSize),
+  });
+  const mapped = GroupQuotaMap.mapFetchUserGroupQuotasFromApi(data);
+
+  return {
+    quotas: mapped.quotas.filter((quota) => quota.groupType === GROUP_TYPE.ADVANCED),
+    total: mapped.total,
+  };
+};
+
+const fetchGroupQuota = async (groupId: string | number): Promise<GroupQuotaInfo> => {
+  const data = await GroupMemberApi.getMyGroupMemberInfo({ groupId });
+  return GroupQuotaMap.mapFetchGroupQuotaFromApi(data);
+};
+
+const setGroupQuota = async (params: SetGroupQuotaRequest) => {
+  await GroupMemberApi.changeTokenLimit(params);
+};
+
 export const createGroupServices = (): IGroupService => ({
   fetchGroupList,
   fetchGroupBaseInfo,
@@ -144,4 +176,7 @@ export const createGroupServices = (): IGroupService => ({
   quitGroup,
   updateMemberRole,
   kickMembers,
+  fetchUserGroupQuotas,
+  fetchGroupQuota,
+  setGroupQuota,
 });

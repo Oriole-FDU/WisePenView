@@ -1,8 +1,16 @@
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
 import type { TagResourceAction } from '@/domains/Tag';
 
+import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
+
 /** GroupService 接口：供依赖注入使用 */
 export interface IGroupService {
+  fetchUserGroupQuotas(
+    page: number,
+    pageSize: number
+  ): Promise<{ quotas: UserGroupQuota[]; total: number }>;
+  fetchGroupQuota(groupId: string | number): Promise<GroupQuotaInfo>;
+  setGroupQuota(params: SetGroupQuotaRequest): Promise<void>;
   fetchGroupList(params: FetchGroupListRequest): Promise<FetchGroupListResponse>;
   fetchGroupBaseInfo(groupId: string): Promise<GroupBaseInfo>;
   fetchGroupInfo(groupId: string): Promise<Group>;
@@ -98,4 +106,11 @@ export interface KickMembersRequest {
 export interface UpdateGroupResConfigRequest {
   groupId: string;
   defaultMemberActions?: TagResourceAction[];
+}
+
+/** 设置成员配额请求参数（与 OpenAPI changeTokenLimit 对齐）；ID 用 string 避免大数精度丢失 */
+export interface SetGroupQuotaRequest {
+  groupId: string;
+  targetUserIds: string[];
+  newTokenLimit: number;
 }

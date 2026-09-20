@@ -1,4 +1,3 @@
-import type { AdminMessage } from '../entity/message';
 import type { User, UserAccountProfile, UserSearchUser } from '../entity/user';
 import type { UserTaskCheckInResult, UserTaskStatus } from '../entity/userTask';
 import type { DegreeLevel, FeedbackType } from '../enum';
@@ -23,13 +22,9 @@ export interface IUserService {
   /** 查询复旦 UIS 认证状态（单次，与 checkFudanUISVerify 对齐） */
   checkFudanUISVerify(): Promise<FudanUISVerifyStatusData>;
   confirmEmailVerify(params: ConfirmEmailVerifyRequest): Promise<void>;
-  listAdminMessages(params: ListAdminMessagesRequest): Promise<ListAdminMessagesResponse>;
-  publishMessage(params: PublishMessageRequest): Promise<void>;
   submitFeedback(params: SubmitFeedbackRequest): Promise<void>;
   listTaskStatus(): Promise<UserTaskStatus[]>;
   dailyCheckIn(): Promise<UserTaskCheckInResult>;
-  /** 退出登录时清理缓存 */
-  clearUserCache(): void;
 }
 
 /** 确认邮箱验证请求参数 */
@@ -70,32 +65,6 @@ export interface FudanUISVerifyStatusData {
   /** 需用户操作时：二维码图片的 base64 字符（PNG/JPEG）；可选带 data:image/*;base64, 前缀 */
   actionPayload: string;
   message: string;
-}
-
-export interface ListAdminMessagesRequest {
-  page: number;
-  size: number;
-}
-
-export interface ListAdminMessagesResponse {
-  messages: AdminMessage[];
-  total: number;
-  page: number;
-  size: number;
-  totalPage: number;
-}
-
-export type PublishMessageDeliveryScope = 'DIRECT' | 'ALL_USERS';
-export type PublishMessageType = 'SYSTEM' | 'NORMAL';
-
-export interface PublishMessageRequest {
-  receiverUserIds: string[];
-  deliveryScope: PublishMessageDeliveryScope;
-  messageType: PublishMessageType;
-  title: string;
-  content: string;
-  jumpUrl?: string;
-  extra?: string;
 }
 
 export interface SubmitFeedbackRequest {

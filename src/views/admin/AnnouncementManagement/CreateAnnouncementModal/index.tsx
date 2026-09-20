@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { FormField, Input, Select, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useUserService } from '@/domains';
-import type { PublishMessageDeliveryScope, PublishMessageType } from '@/domains/User';
+import { useAdminService } from '@/domains';
+import type { PublishMessageDeliveryScope, PublishMessageType } from '@/domains/Admin';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.less';
@@ -60,7 +60,7 @@ function CreateAnnouncementModal({
   onSuccess,
 }: CreateAnnouncementModalProps) {
   const { t } = useTranslation(['admin', 'common']);
-  const userService = useUserService();
+  const adminService = useAdminService();
   const [formValues, setFormValues] = useState<AnnouncementFormValues>(INITIAL_FORM_VALUES);
 
   function updateFormValue<K extends keyof AnnouncementFormValues>(
@@ -89,7 +89,7 @@ function CreateAnnouncementModal({
   const { loading: submitting, run: runPublishMessage } = useApi(
     async (values: AnnouncementFormValues) => {
       const receiverUserIds = parseReceiverUserIds(values.receiverUserIds);
-      await userService.publishMessage({
+      await adminService.publishMessage({
         deliveryScope: values.deliveryScope,
         messageType: values.deliveryScope === 'ALL_USERS' ? 'SYSTEM' : values.messageType,
         title: values.title,

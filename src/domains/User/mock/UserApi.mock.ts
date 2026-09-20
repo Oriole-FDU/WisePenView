@@ -1,9 +1,8 @@
-import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
+import { mockResponse } from '@/domains/_shared/mock/response';
 
 import type { UserApi as UserApiContract } from '../apis/UserApi';
 import type { GetUserInfoApiResponse, UserSearchUserApiResponse } from '../apis/UserApi.type';
 import mockdata from './mockdata.json';
-export { UserWalletApi } from './UserWalletApi.mock';
 
 const fullUserInfo = structuredClone(mockdata) as GetUserInfoApiResponse;
 const mockSearchUsers: UserSearchUserApiResponse[] = [
@@ -87,23 +86,5 @@ export const UserApi: typeof UserApiContract = {
   changeUserProfile: async (params) => {
     Object.assign(fullUserInfo.userProfile, params);
   },
-  listAdminMessages: (params) =>
-    mockResponse(
-      mockPage(
-        [
-          {
-            messageId: 'mock-message-1',
-            deliveryScope: 'ALL_USERS',
-            messageType: 'SYSTEM',
-            title: 'Mock 系统公告',
-            content: '这是一条用于 mock 环境展示的站内信。',
-            readCount: 3,
-            createTime: '2026-03-01T00:00:00Z',
-          },
-        ],
-        params
-      )
-    ),
-  publishMessage: async () => undefined,
   addFeedback: async () => undefined,
 };

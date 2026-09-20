@@ -23,7 +23,6 @@ import { createInlineCommentServices } from '@/domains/InlineComment/service/Inl
 import { createInteractServices } from '@/domains/Interact/service/InteractServices.impl';
 import { createMessageServices } from '@/domains/Message/service/MessageServices.impl';
 import { createNoteServices } from '@/domains/Note/service/NoteServices.impl';
-import { createQuotaServices } from '@/domains/Quota/service/QuotaServices.impl';
 import { createResourcePermissionServices } from '@/domains/Resource/service/ResourcePermissionServices.impl';
 import { createResourceServices } from '@/domains/Resource/service/ResourceServices.impl';
 import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl';
@@ -44,7 +43,6 @@ const imageService = createImageServices();
 const inlineCommentService = createInlineCommentServices();
 const interactService = createInteractServices();
 const messageService = createMessageServices();
-const quotaService = createQuotaServices();
 const resourceService = createResourceServices();
 const speechService = createSpeechServices();
 const tagService = createTagServices();
@@ -96,7 +94,6 @@ const servicesValue: ServicesContextValue = {
   interactService: interactService,
   messageService: messageService,
   noteService: noteService,
-  quotaService: quotaService,
   resourcePermissionService,
   resourceService: resourceService,
   skillService: skillService,

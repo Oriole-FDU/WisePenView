@@ -13,7 +13,6 @@ import type { IInlineCommentService } from '@/domains/InlineComment';
 import type { IInteractService } from '@/domains/Interact';
 import type { IMessageService } from '@/domains/Message';
 import type { INoteService } from '@/domains/Note';
-import type { IQuotaService } from '@/domains/Quota';
 import type { IResourcePermissionService, IResourceService } from '@/domains/Resource';
 import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
@@ -50,7 +49,6 @@ export const useInlineCommentService = (): IInlineCommentService =>
 export const useInteractService = (): IInteractService => useServicesContext().interactService;
 export const useMessageService = (): IMessageService => useServicesContext().messageService;
 export const useNoteService = (): INoteService => useServicesContext().noteService;
-export const useQuotaService = (): IQuotaService => useServicesContext().quotaService;
 export const useResourcePermissionService = (): IResourcePermissionService =>
   useServicesContext().resourcePermissionService;
 export const useResourceService = (): IResourceService => useServicesContext().resourceService;

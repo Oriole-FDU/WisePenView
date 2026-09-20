@@ -1,16 +1,16 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
 import { getMockGroup } from '@/domains/Group/mock/GroupApi.mock';
-import mockdata from '@/domains/Wallet/mock/mockdata.json';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { UserWalletApi as UserWalletApiContract } from '../apis/UserApi';
-import type { WalletTransactionRecordApiResponse } from '../apis/UserApi.type';
+import type { WalletApi as WalletApiContract } from '../apis/WalletApi';
+import type { WalletTransactionRecordApiResponse } from '../apis/WalletApi.type';
+import mockdata from './mockdata.json';
 
 let balance = Number(mockdata.tokenBalance);
 const records = structuredClone(
   mockdata.transactions.records
 ) as WalletTransactionRecordApiResponse[];
-export const UserWalletApi: typeof UserWalletApiContract = {
+export const WalletApi: typeof WalletApiContract = {
   getUserWalletInfo: () =>
     mockResponse({
       tokenBalance: balance.toString(),

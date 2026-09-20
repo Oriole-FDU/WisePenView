@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { Select } from '@/components/base/Input';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
-import { useUserService } from '@/domains';
-import type { AdminMessage } from '@/domains/User';
+import { useAdminService } from '@/domains';
+import type { AdminMessage } from '@/domains/Admin';
 import { useApi } from '@/hooks/useApi';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import AdminPageHeader from '@/views/admin/_common/AdminPageHeader';
@@ -31,15 +31,15 @@ const formatDateTime = (value?: string | null): string => {
 
 function AnnouncementManagement() {
   const { t } = useTranslation(['admin', 'common']);
-  const userService = useUserService();
+  const adminService = useAdminService();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const { data, loading, refresh } = useApi(
-    () => userService.listAdminMessages({ page: currentPage, size: pageSize }),
+    () => adminService.listAdminMessages({ page: currentPage, size: pageSize }),
     {
-      refreshDeps: [userService, currentPage, pageSize],
+      refreshDeps: [adminService, currentPage, pageSize],
     }
   );
 

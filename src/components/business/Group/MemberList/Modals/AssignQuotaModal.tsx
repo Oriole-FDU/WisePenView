@@ -6,7 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input } from '@/components/base/Input';
 import SelectedMemberList from '@/components/business/SelectedMemberList';
-import { useQuotaService } from '@/domains';
+import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import type { AssignQuotaModalProps } from './index.type';
@@ -72,7 +72,7 @@ function AssignQuotaModal({
 }: AssignQuotaModalProps) {
   const { i18n, t } = useTranslation(['group', 'common']);
   const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
-  const quotaService = useQuotaService();
+  const groupService = useGroupService();
   const [quotaValue, setQuotaValue] = useState<number | null>(null);
   const [quotaError, setQuotaError] = useState('');
   const [groupQuota, setGroupQuotaState] = useState<{ used: number; limit: number }>({
@@ -91,7 +91,7 @@ function AssignQuotaModal({
 
   const { loading, run: runSetQuota } = useApi(
     async (value: number) =>
-      quotaService.setGroupQuota({
+      groupService.setGroupQuota({
         groupId,
         targetUserIds: memberIds,
         newTokenLimit: Math.min(Math.floor(value), GROUP_MEMBER_TOKEN_LIMIT_MAX),
@@ -107,7 +107,7 @@ function AssignQuotaModal({
       },
     }
   );
-  useApi(() => quotaService.fetchGroupQuota(groupId), {
+  useApi(() => groupService.fetchGroupQuota(groupId), {
     ready: isOpen,
     refreshDeps: [groupId, isOpen],
     onSuccess: setGroupQuotaState,

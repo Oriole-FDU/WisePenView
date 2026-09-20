@@ -1,9 +1,9 @@
+import type { GroupQuotaInfo, UserGroupQuota } from '@/domains/Group';
 import type {
   GetAllMyGroupTokenInfoApiResponse,
   GetMyGroupMemberInfoApiResponse,
   GroupTokenInfoApiResponseItem,
 } from '@/domains/Group/apis/GroupApi.type';
-import type { GroupQuotaInfo, UserGroupQuota } from '@/domains/Wallet';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import {
   normalizeFiniteNumber,
@@ -39,7 +39,7 @@ const mapFetchGroupQuotaFromApi = (data: GetMyGroupMemberInfoApiResponse): Group
   limit: normalizeNonNegativeNumber(data.tokenLimit) ?? 0,
 });
 
-export const QuotaServicesMap = {
+export const GroupQuotaMap = {
   mapFetchUserGroupQuotasFromApi,
   mapFetchGroupQuotaFromApi,
 };
