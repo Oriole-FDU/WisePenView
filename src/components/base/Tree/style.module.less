@@ -135,8 +135,12 @@
       background: var(--item-hover);
     }
   }
+}
 
-  &:focus-visible {
+.row:focus-visible {
+  outline: none;
+
+  .content {
     box-shadow: 0 0 0 2px var(--focus);
   }
 }

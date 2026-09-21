@@ -303,6 +303,17 @@ function Tree({
             )}
             draggable={canDragNode(node)}
             role="treeitem"
+            tabIndex={canSelect || clickExpands ? 0 : undefined}
+            onKeyDown={(event) => {
+              if (event.target !== event.currentTarget) return;
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              event.preventDefault();
+              if (clickExpands && !canSelect) {
+                toggleExpand(node, !expanded);
+                return;
+              }
+              toggleSelect(node);
+            }}
             data-selectable={canSelect}
             aria-expanded={expandable ? expanded : undefined}
             aria-selected={canSelect ? selected : undefined}
@@ -379,18 +390,12 @@ function Tree({
             <div
               className={cn(styles.content, 'wisepen-tree__content')}
               data-selectable={canSelect}
-              role={canSelect || clickExpands ? 'button' : undefined}
-              tabIndex={canSelect || clickExpands ? 0 : undefined}
-              onClick={() => {
-                if (clickExpands && !canSelect) {
-                  toggleExpand(node, !expanded);
+              onClick={(event) => {
+                if (
+                  event.target instanceof Element &&
+                  event.target.closest('button, a, input, select, textarea, [role="button"]')
+                )
                   return;
-                }
-                toggleSelect(node);
-              }}
-              onKeyDown={(event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
                 if (clickExpands && !canSelect) {
                   toggleExpand(node, !expanded);
                   return;
