@@ -145,6 +145,9 @@ export interface ModelProviderMappingResponse {
   provider_id: string;
   provider_name?: string | null;
   provider_model_name: string;
+  input_billing_ratio: string;
+  cached_input_billing_ratio: string;
+  output_billing_ratio: string;
   support_runtime_options?: Record<string, unknown>;
   is_preferred: boolean;
   is_active: boolean;
@@ -156,7 +159,6 @@ export interface ModelResponse {
   scope: ModelScopeApi;
   display_name: string;
   model_family: ModelFamilyApi;
-  billing_ratio: number;
   support_thinking: boolean;
   support_vision: boolean;
   support_tools: boolean;
@@ -169,7 +171,6 @@ export interface ModelResponse {
 export interface CreateUserModelApiRequest {
   display_name: string;
   model_family?: ModelFamilyApi;
-  billing_ratio?: number;
   support_thinking?: boolean;
   support_vision?: boolean;
   support_tools?: boolean;
@@ -181,7 +182,6 @@ export interface UpdateUserModelApiRequest {
   model_id: string;
   display_name?: string;
   model_family?: ModelFamilyApi;
-  billing_ratio?: number;
   support_thinking?: boolean;
   support_vision?: boolean;
   support_tools?: boolean;

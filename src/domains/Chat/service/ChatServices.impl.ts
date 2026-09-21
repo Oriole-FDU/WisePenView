@@ -303,7 +303,6 @@ const createUserModel = async (params: CreateChatUserModelRequest): Promise<void
   await ChatApi.createUserModel({
     display_name: params.displayName,
     model_family: params.modelFamily,
-    billing_ratio: params.billingRatio,
     support_thinking: params.supportThinking,
     support_vision: params.supportVision,
     support_tools: params.supportTools,
@@ -317,7 +316,6 @@ const updateUserModel = async (params: UpdateChatUserModelRequest): Promise<void
     model_id: params.modelId,
     display_name: params.displayName,
     model_family: params.modelFamily,
-    billing_ratio: params.billingRatio,
     support_thinking: params.supportThinking,
     support_vision: params.supportVision,
     support_tools: params.supportTools,

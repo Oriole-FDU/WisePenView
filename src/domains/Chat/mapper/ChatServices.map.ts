@@ -79,6 +79,9 @@ const normalizeProviderOption = (
   providerId: mapping.provider_id,
   providerName: mapping.provider_name,
   providerModelName: mapping.provider_model_name,
+  inputBillingRatio: mapping.input_billing_ratio,
+  cachedInputBillingRatio: mapping.cached_input_billing_ratio,
+  outputBillingRatio: mapping.output_billing_ratio,
   provider: inferProviderKey(
     mapping.provider_name,
     mapping.provider_model_name,
@@ -131,6 +134,15 @@ const createFallbackProviderOption = (model: ModelResponse): ChatModelProviderOp
   };
 };
 
+const isFreeModel = (
+  model: ModelResponse,
+  providerOption: ChatModelProviderOption | undefined
+): boolean =>
+  model.scope.toUpperCase() === 'SYSTEM' &&
+  providerOption?.inputBillingRatio === '0' &&
+  providerOption?.cachedInputBillingRatio === '0' &&
+  providerOption?.outputBillingRatio === '0';
+
 const mapModelOption = (
   model: ModelResponse,
   providerOptions: ChatModelProviderOption[],
@@ -149,7 +161,7 @@ const mapModelOption = (
   providerOptions,
   scope: model.scope,
   modelFamily: model.model_family,
-  ratio: model.billing_ratio,
+  isFree: isFreeModel(model, providerOption),
   supportThinking: model.support_thinking,
   supportTools: model.support_tools,
   tags: buildModelTags(model, providerOption, index),
@@ -179,7 +191,16 @@ const mapGetModelsFromApi = (data: ListAvailableModelsApiResponse): ChatModel[] 
     });
   });
 
-  return modelOptions;
+  const firstFreeModelIndex = modelOptions.findIndex((model) => model.isFree);
+  const defaultModelIndex =
+    firstFreeModelIndex >= 0
+      ? firstFreeModelIndex
+      : modelOptions.findIndex((model) => model.isDefault);
+
+  return modelOptions.map((model, index) => ({
+    ...model,
+    isDefault: index === defaultModelIndex,
+  }));
 };
 
 const mapGetToolsFromApi = (data: ListToolsApiResponse): ToolOption[] =>
@@ -227,7 +248,6 @@ const mapModelConfigFromApi = (model: ModelResponse): ChatModelConfig => ({
   scope: model.scope,
   displayName: model.display_name,
   modelFamily: model.model_family as ChatModelConfig['modelFamily'],
-  billingRatio: model.billing_ratio,
   supportThinking: model.support_thinking,
   supportVision: model.support_vision,
   supportTools: model.support_tools,
@@ -238,6 +258,9 @@ const mapModelConfigFromApi = (model: ModelResponse): ChatModelConfig => ({
     providerId: mapping.provider_id,
     providerName: mapping.provider_name ?? null,
     providerModelName: mapping.provider_model_name,
+    inputBillingRatio: mapping.input_billing_ratio,
+    cachedInputBillingRatio: mapping.cached_input_billing_ratio,
+    outputBillingRatio: mapping.output_billing_ratio,
     isPreferred: mapping.is_preferred,
     isActive: mapping.is_active,
     priority: mapping.priority,

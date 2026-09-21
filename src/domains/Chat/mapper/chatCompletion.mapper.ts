@@ -1,3 +1,5 @@
+import { readBrowserTimeContext } from '@/utils/browser';
+
 import type {
   ChatCompletionRequest,
   ChatFrontendState,
@@ -20,6 +22,9 @@ function buildFrontendStates(options: SendSessionMessageOptions): ChatFrontendSt
       })),
     });
   }
+
+  // 浏览器时间上下文：每轮请求都重新读取浏览器本地时间
+  frontendStates.push({ key: 'time', value: readBrowserTimeContext() });
   return frontendStates;
 }
 

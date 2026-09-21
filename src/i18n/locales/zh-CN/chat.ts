@@ -4,6 +4,7 @@ const zhCNChat = {
     select: '选择模型',
     title: '模型',
     empty: '暂无可用模型',
+    free: '免费',
   },
   panel: {
     newChat: '新对话',

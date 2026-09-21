@@ -79,6 +79,24 @@
   gap: var(--space-3xs);
 }
 
+.nameRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--space-2xs);
+
+  > :global(.label) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.freeChip {
+  flex-shrink: 0;
+}
+
 .empty {
   color: var(--muted);
   font-size: var(--font-size-xs, var(--font-size-xs));

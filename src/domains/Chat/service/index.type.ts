@@ -62,6 +62,9 @@ export interface ChatModelConfigProviderMapping {
   providerId: string;
   providerName: string | null;
   providerModelName: string;
+  inputBillingRatio: string;
+  cachedInputBillingRatio: string;
+  outputBillingRatio: string;
   isPreferred: boolean;
   isActive: boolean;
   priority: number;
@@ -72,7 +75,6 @@ export interface ChatModelConfig {
   scope: ChatModelScope;
   displayName: string;
   modelFamily: ChatModelFamily;
-  billingRatio: number;
   supportThinking: boolean;
   supportVision: boolean;
   supportTools: boolean;
@@ -85,7 +87,6 @@ export interface ChatModelConfig {
 export interface CreateChatUserModelRequest {
   displayName: string;
   modelFamily?: ChatModelFamily;
-  billingRatio?: number;
   supportThinking?: boolean;
   supportVision?: boolean;
   supportTools?: boolean;
@@ -97,7 +98,6 @@ export interface UpdateChatUserModelRequest {
   modelId: string;
   displayName?: string;
   modelFamily?: ChatModelFamily;
-  billingRatio?: number;
   supportThinking?: boolean;
   supportVision?: boolean;
   supportTools?: boolean;
@@ -123,6 +123,9 @@ export interface ChatModelProviderOption {
   providerId: string;
   providerName?: string | null;
   providerModelName: string;
+  inputBillingRatio?: string;
+  cachedInputBillingRatio?: string;
+  outputBillingRatio?: string;
   provider: string;
   supportRuntimeOptions: Record<string, unknown>;
   isPreferred: boolean;
@@ -143,7 +146,7 @@ export interface ChatModel {
   providerOptions: ChatModelProviderOption[];
   scope: string;
   modelFamily: string;
-  ratio: number;
+  isFree: boolean;
   supportThinking: boolean;
   supportTools: boolean;
   tags: ChatModelTag[];
