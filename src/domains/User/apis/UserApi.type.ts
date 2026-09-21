@@ -1,4 +1,4 @@
-import type { NumericEnumApiValue } from '@/apis/api.type';
+import type { NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserVerificationMode } from '@/domains/User';
 
 export type UserIdentityTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
@@ -32,6 +32,7 @@ interface GetUserInfoApiResponseUserInfo {
 
 interface GetUserInfoApiResponseUserProfile {
   sex: UserSexApiValue;
+  inviteCode: string | null;
   university: string | null;
   college: string | null;
   major: string | null;
@@ -91,6 +92,23 @@ export interface InitiateFudanUISVerifyApiRequest {
 export interface CheckEmailVerifyApiRequest {
   token: string;
 }
+
+/** 用户邀请 API: /user/invite/* */
+
+export type UserInviteStatusApiValue = 'BOUND' | 'REWARDED';
+
+export type ListUserInviteRecordsApiRequest = PageApiRequest;
+
+export interface UserInviteRecordApiResponse {
+  id?: string | number | null;
+  inviteeUserId?: string | number | null;
+  inviteeDisplay?: UserDisplayBaseApiResponse | null;
+  status?: UserInviteStatusApiValue | null;
+  createTime?: string | null;
+  rewardTime?: string | null;
+}
+
+export type ListUserInviteRecordsApiResponse = PageR<UserInviteRecordApiResponse>;
 
 export interface AddFeedbackApiRequest {
   content: string;

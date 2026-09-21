@@ -1,0 +1,155 @@
+.inviteContainer {
+  padding: var(--space-xs) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.inviteCodeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-md) 0;
+}
+
+.inviteCodeLabel {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+
+.inviteCode {
+  font-size: var(--font-size-heading-2);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+.inviteHint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.inviteLink {
+  padding: 10px var(--space-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-tertiary);
+  color: var(--muted);
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    monospace;
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.recordSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-light);
+}
+
+.recordHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.recordTitle {
+  font-size: var(--font-size-md, 14px);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+}
+
+.recordCount {
+  font-size: var(--font-size-xs);
+  color: var(--muted);
+}
+
+.recordState {
+  padding: var(--space-sm) 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm, 13px);
+}
+
+.recordList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recordItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  padding: var(--space-2xs) 0;
+}
+
+.recordAvatar {
+  flex-shrink: 0;
+}
+
+.recordName {
+  flex: 1;
+  min-width: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-sm, 13px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recordStatus {
+  flex-shrink: 0;
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-tertiary);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+
+.recordStatusRewarded {
+  background-color: var(--success-soft);
+  color: var(--success-text);
+}
+
+.recordTime {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+
+.inviteFooter {
+  align-items: stretch;
+}
+
+.inviteActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+
+  :global(button) {
+    width: 100%;
+  }
+}

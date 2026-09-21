@@ -4,10 +4,16 @@ import type {
   IssueRecognitionCredentialApiRequest,
   IssueRecognitionCredentialApiResponse,
 } from '../apis/SpeechApi.type';
+import type { XfyunSpeechLanguage } from '../runtime/XfyunSpeechRecognizer';
 import type {
   IssueRecognitionCredentialRequest,
   SpeechRecognitionCredential,
 } from '../service/index.type';
+
+/** 界面语言 → 讯飞听写识别语言：英文界面走英文识别，其余按中文识别 */
+export function resolveXfyunSpeechLanguage(language: string | undefined): XfyunSpeechLanguage {
+  return language?.toLowerCase().startsWith('en') ? 'en_us' : 'zh_cn';
+}
 
 function mapIssueRecognitionCredentialRequest(
   params: IssueRecognitionCredentialRequest

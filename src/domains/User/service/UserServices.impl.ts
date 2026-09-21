@@ -10,6 +10,7 @@ import type {
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
   IUserService,
+  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
@@ -20,7 +21,7 @@ import type {
 
 type CachedUserSafe = Pick<
   User,
-  'id' | 'username' | 'nickname' | 'avatar' | 'identityType' | 'realName'
+  'id' | 'username' | 'nickname' | 'avatar' | 'identityType' | 'realName' | 'inviteCode'
 >;
 
 const USER_INFO_CACHE_KEY = 'current-user';
@@ -44,6 +45,12 @@ const listUserSearchSuggestions = async (params: ListUserSearchSuggestionsReques
   if (query.keyword.length < 2) return [];
   const data = await UserApi.listUserSearchSuggestions(query);
   return UserServicesMap.mapSearchUsersFromApi(data);
+};
+
+const listInviteRecords = async (params: ListUserInviteRecordsRequest) => {
+  const query = UserServicesMap.mapListInviteRecordsRequest(params);
+  const data = await UserApi.listInviteRecords(query);
+  return UserServicesMap.mapListInviteRecordsFromApi(data);
 };
 
 const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesRequest) => {
@@ -151,6 +158,7 @@ export const createUserServices = (): IUserService => {
     getUserInfo,
     searchUsers,
     listUserSearchSuggestions,
+    listInviteRecords,
     queryUserSearchCandidates,
     updateUserInfo,
     sendEmailVerify,

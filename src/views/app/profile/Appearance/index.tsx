@@ -10,6 +10,9 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import PageHeader from '@/components/business/PageHeader';
+import { changeAppLanguage } from '@/i18n';
+import { LANGUAGE_OPTIONS } from '@/i18n/language';
+import type { SupportedLanguage } from '@/i18n/resources';
 import {
   COLOR_SCHEME_OPTIONS,
   type ColorScheme,
@@ -23,6 +26,35 @@ import {
 
 import layout from '../style.module.less';
 import styles from './style.module.less';
+
+function LanguageSection() {
+  const { i18n, t } = useTranslation('profile');
+  const selectedLanguage: SupportedLanguage = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
+
+  return (
+    <section className={styles.section}>
+      <Heading level={3} className={layout.sectionTitle}>
+        {t('appearance.language')}
+      </Heading>
+      <Tabs
+        className={styles.sectionTabs}
+        selectedKey={selectedLanguage}
+        onSelectionChange={(next) => void changeAppLanguage(String(next) as SupportedLanguage)}
+      >
+        <Tabs.ListContainer className={styles.sectionTabsListContainer}>
+          <Tabs.List className={styles.sectionTabsList} aria-label={t('appearance.languageAria')}>
+            {LANGUAGE_OPTIONS.map((option) => (
+              <Tabs.Tab key={option.id} id={option.id} className={styles.sectionTab}>
+                {t(option.labelKey, { ns: 'common' })}
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
+    </section>
+  );
+}
 
 type ThemeModeSectionProps = {
   value: string;
@@ -38,14 +70,14 @@ function ThemeModeSection({ value, onChange }: ThemeModeSectionProps) {
         {t('appearance.mode')}
       </Heading>
       <Tabs
-        className={styles.modeTabs}
+        className={styles.sectionTabs}
         selectedKey={value}
         onSelectionChange={(next) => onChange(String(next) as ThemeMode)}
       >
-        <Tabs.ListContainer className={styles.modeTabsListContainer}>
-          <Tabs.List className={styles.modeTabsList} aria-label={t('appearance.mode')}>
+        <Tabs.ListContainer className={styles.sectionTabsListContainer}>
+          <Tabs.List className={styles.sectionTabsList} aria-label={t('appearance.mode')}>
             {THEME_MODE_OPTIONS.map((option) => (
-              <Tabs.Tab key={option.id} id={option.id} className={styles.modeTab}>
+              <Tabs.Tab key={option.id} id={option.id} className={styles.sectionTab}>
                 {t(option.labelKey)}
                 <Tabs.Indicator />
               </Tabs.Tab>
@@ -158,6 +190,8 @@ function Appearance() {
     <>
       <AppearanceHeader />
       <div className={styles.body}>
+        <LanguageSection />
+        <Separator className={styles.divider} />
         <ThemeModeSection value={theme} onChange={setTheme} />
         <Separator className={styles.divider} />
         <ColorSchemeSection value={colorScheme} onChange={setColorScheme} />

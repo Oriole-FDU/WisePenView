@@ -13,10 +13,14 @@ type UnknownRecord = Record<string, unknown>;
 
 export type XfyunSpeechRecognizerState = 'idle' | 'connecting' | 'listening' | 'finishing';
 
+/** 讯飞语音听写支持的识别语言 */
+export type XfyunSpeechLanguage = 'zh_cn' | 'en_us';
+
 export interface XfyunSpeechRecognizerOptions {
   credential: SpeechRecognitionCredential;
   mediaStream: MediaStream;
   processorModuleUrl: string;
+  language: XfyunSpeechLanguage;
   onText: (text: string) => void;
   onStateChange?: (state: XfyunSpeechRecognizerState) => void;
   onFinish?: (text: string) => void;
@@ -32,7 +36,6 @@ const IFLYTEK_AUDIO_CONFIG = {
   maxDurationMs: 55000,
 } as const;
 const IFLYTEK_BUSINESS_CONFIG = {
-  language: 'zh_cn',
   domain: 'iat',
   accent: 'mandarin',
   dwa: 'wpgs',
@@ -243,6 +246,7 @@ export class XfyunSpeechRecognizer {
       common: { app_id: appId },
       business: {
         ...IFLYTEK_BUSINESS_CONFIG,
+        language: this.options.language,
         eos: eosMs,
       },
       data,

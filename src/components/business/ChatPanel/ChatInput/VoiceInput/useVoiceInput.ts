@@ -1,9 +1,10 @@
 import { toast } from '@heroui/react';
 import { useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useSpeechService } from '@/domains';
-import { XfyunSpeechRecognizer } from '@/domains/Speech';
+import { resolveXfyunSpeechLanguage, XfyunSpeechRecognizer } from '@/domains/Speech';
 import { useApi } from '@/hooks/useApi';
 import {
   createClientError,
@@ -55,6 +56,7 @@ function mapMicrophoneError(error: unknown): Error {
 
 export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputProps {
   const speechService = useSpeechService();
+  const { i18n } = useTranslation();
   const store = useChatInputStoreApi();
   const [state, setState] = useState<VoiceInputState>('idle');
   const originalValueRef = useRef('');
@@ -108,6 +110,7 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
         credential,
         mediaStream,
         processorModuleUrl: pcmProcessorModuleUrl,
+        language: resolveXfyunSpeechLanguage(i18n.resolvedLanguage),
         onText: (transcript) => {
           if (recognizerRef.current !== recognizer) return;
           store.getState().setValue(mergeInputValue(originalValueRef.current, transcript));

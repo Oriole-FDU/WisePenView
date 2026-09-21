@@ -1,3 +1,4 @@
+import { readCurrentLanguage } from '@/i18n/language';
 import { readBrowserTimeContext } from '@/utils/browser';
 
 import type {
@@ -25,6 +26,8 @@ function buildFrontendStates(options: SendSessionMessageOptions): ChatFrontendSt
 
   // 浏览器时间上下文：每轮请求都重新读取浏览器本地时间
   frontendStates.push({ key: 'time', value: readBrowserTimeContext() });
+  // 语言上下文：每轮请求都重新读取界面语言，供后端决定回答语言
+  frontendStates.push({ key: 'locale', value: readCurrentLanguage() });
   return frontendStates;
 }
 

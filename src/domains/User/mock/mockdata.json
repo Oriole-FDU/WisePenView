@@ -14,6 +14,7 @@
   },
   "userProfile": {
     "sex": "MALE",
+    "inviteCode": "MOCKCODE",
     "university": "复旦大学",
     "college": "计算机科学技术学院",
     "major": "计算机科学与技术",

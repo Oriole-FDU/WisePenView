@@ -1,4 +1,4 @@
-import { Dropdown, Label, Tooltip } from '@heroui/react';
+import { Dropdown, Label, Separator, Tooltip } from '@heroui/react';
 import { useMount } from 'ahooks';
 import {
   ChartPie,
@@ -12,6 +12,7 @@ import {
   Settings,
   Shield,
   ShieldUser,
+  UserPlus,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +32,7 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import UserCheckIn from '../UserCheckIn';
 import UserFeedbackModal from '../UserFeedbackModal';
+import UserInviteModal from '../UserInviteModal';
 import styles from './style.module.less';
 
 interface UserProfileProps {
@@ -47,6 +49,7 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
   const { resolvedTheme } = useAppTheme();
   const { colorScheme } = useColorScheme();
   const [user, setUser] = useState<User | null>(null);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
   const authService = useAuthService();
@@ -138,6 +141,9 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
       case 'ai':
         navigate(APP_ROUTE_PATH.PROFILE_AI);
         break;
+      case 'invite':
+        setInviteModalOpen(true);
+        break;
       case 'feedback':
         setFeedbackModalOpen(true);
         break;
@@ -183,40 +189,59 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
           </>
         ) : (
           <>
-            <Dropdown.Item id="usage" textValue={t('userMenu.usage')}>
-              <ChartPie size={16} />
-              <Label>{t('userMenu.usage')}</Label>
-            </Dropdown.Item>
-            <Dropdown.Item id="account" textValue={t('userMenu.account')}>
-              <ShieldUser size={16} />
-              <Label>{t('userMenu.account')}</Label>
-            </Dropdown.Item>
-            <Dropdown.Item id="appearance" textValue={t('userMenu.appearance')}>
-              <Palette size={16} />
-              <Label>{t('userMenu.appearance')}</Label>
-            </Dropdown.Item>
-            <Dropdown.Item id="ai" textValue={t('userMenu.ai')}>
-              <KeyRound size={16} />
-              <Label>{t('userMenu.ai')}</Label>
-            </Dropdown.Item>
-            <Dropdown.Item id="feedback" textValue={t('userMenu.feedback')}>
-              <MessageSquare size={16} />
-              <Label>{t('userMenu.feedback')}</Label>
-            </Dropdown.Item>
-            {isAdmin && (
-              <Dropdown.Item id="enter-admin" textValue={t('userMenu.enterAdmin')}>
-                <Shield size={16} />
-                <Label>{t('userMenu.enterAdmin')}</Label>
+            {/* 账户：余额、邀请与账号资料，使用频率最高 */}
+            <Dropdown.Section id="section-account">
+              <Dropdown.Item id="usage" textValue={t('userMenu.usage')}>
+                <ChartPie size={16} />
+                <Label>{t('userMenu.usage')}</Label>
               </Dropdown.Item>
-            )}
-            <Dropdown.Item id="about" textValue={t('userMenu.about')}>
-              <Info size={16} />
-              <Label>{t('userMenu.about')}</Label>
-            </Dropdown.Item>
-            <Dropdown.Item id="logout" textValue={t('userMenu.logout')} variant="danger">
-              <LogOut size={16} />
-              <Label>{t('userMenu.logout')}</Label>
-            </Dropdown.Item>
+              <Dropdown.Item id="invite" textValue={t('userMenu.invite')}>
+                <UserPlus size={16} />
+                <Label>{t('userMenu.invite')}</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="account" textValue={t('userMenu.account')}>
+                <ShieldUser size={16} />
+                <Label>{t('userMenu.account')}</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
+            <Separator />
+            {/* 偏好：外观与 AI 服务配置 */}
+            <Dropdown.Section id="section-preferences">
+              <Dropdown.Item id="appearance" textValue={t('userMenu.appearance')}>
+                <Palette size={16} />
+                <Label>{t('userMenu.appearance')}</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="ai" textValue={t('userMenu.ai')}>
+                <KeyRound size={16} />
+                <Label>{t('userMenu.ai')}</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
+            <Separator />
+            {/* 帮助与信息 */}
+            <Dropdown.Section id="section-support">
+              <Dropdown.Item id="feedback" textValue={t('userMenu.feedback')}>
+                <MessageSquare size={16} />
+                <Label>{t('userMenu.feedback')}</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="about" textValue={t('userMenu.about')}>
+                <Info size={16} />
+                <Label>{t('userMenu.about')}</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
+            <Separator />
+            {/* 身份与退出：进入管理与退出登录同为身份相关操作 */}
+            <Dropdown.Section id="section-identity">
+              {isAdmin && (
+                <Dropdown.Item id="enter-admin" textValue={t('userMenu.enterAdmin')}>
+                  <Shield size={16} />
+                  <Label>{t('userMenu.enterAdmin')}</Label>
+                </Dropdown.Item>
+              )}
+              <Dropdown.Item id="logout" textValue={t('userMenu.logout')} variant="danger">
+                <LogOut size={16} />
+                <Label>{t('userMenu.logout')}</Label>
+              </Dropdown.Item>
+            </Dropdown.Section>
           </>
         )}
       </Dropdown.Menu>
@@ -289,6 +314,12 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
           </div>
         </div>
       </AppDisplayDialog>
+
+      <UserInviteModal
+        isOpen={inviteModalOpen}
+        onOpenChange={setInviteModalOpen}
+        inviteCode={user?.inviteCode}
+      />
 
       <UserFeedbackModal isOpen={feedbackModalOpen} onOpenChange={setFeedbackModalOpen} />
     </>

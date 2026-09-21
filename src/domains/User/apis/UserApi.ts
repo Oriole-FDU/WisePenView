@@ -10,6 +10,8 @@ import type {
   GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
+  ListUserInviteRecordsApiRequest,
+  ListUserInviteRecordsApiResponse,
   ListUserSearchSuggestionsApiRequest,
   SearchUserApiRequest,
   UserSearchUserApiResponse,
@@ -59,6 +61,12 @@ function addFeedback(req: AddFeedbackApiRequest): Promise<void> {
   return apiPost('/system/feedback/addFeedback', req);
 }
 
+function listInviteRecords(
+  req: ListUserInviteRecordsApiRequest
+): Promise<ListUserInviteRecordsApiResponse> {
+  return apiGet('/user/invite/listRecords', { params: req });
+}
+
 export const UserApi = {
   getUserInfo,
   searchUser,
@@ -70,4 +78,5 @@ export const UserApi = {
   changeUserInfo,
   changeUserProfile,
   addFeedback,
+  listInviteRecords,
 };

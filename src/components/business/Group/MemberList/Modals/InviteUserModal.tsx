@@ -5,18 +5,14 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
-import { copyText } from '@/utils/browser/copyText';
+import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
 import { buildInvitePath } from '@/utils/navigation/appRoute';
 
 import type { InviteUserModalProps } from './index.type';
 import styles from './style.module.less';
 
-const buildInviteUrl = (inviteCode?: string): string => {
-  if (!inviteCode) return '';
-  const path = buildInvitePath(inviteCode);
-  if (typeof window === 'undefined') return path;
-  return `${window.location.origin}${path}`;
-};
+const buildInviteUrl = (inviteCode?: string): string =>
+  inviteCode ? buildAbsoluteAppUrl(buildInvitePath(inviteCode)) : '';
 
 function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalProps) {
   const { t } = useTranslation(['group', 'common']);

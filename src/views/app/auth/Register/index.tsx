@@ -1,4 +1,5 @@
 import { Form, toast } from '@heroui/react';
+import { Gift } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -14,7 +15,8 @@ import { useAuthService } from '@/domains';
 import type { RegisterRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
 import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+import { APP_ROUTE_PATH, readRegisterInviteCode } from '@/utils/navigation/appRoute';
+import { normalizeInviteCode } from '@/utils/normalize/normalizeInviteCode';
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
 
 import AuthIconField from '../_common/AuthIconField';
@@ -22,8 +24,12 @@ import auth from '../_common/style.module.less';
 
 const USERNAME_MAX_LENGTH = 20;
 const USERNAME_PATTERN = /^[a-zA-Z0-9_]{4,20}$/;
-type RegisterFormValues = RegisterRequest & {
+const INVITE_CODE_MAX_LENGTH = 16;
+const INVITE_CODE_PATTERN = /^[A-Z0-9]{4,16}$/;
+type RegisterFormValues = Omit<RegisterRequest, 'inviteCode'> & {
   confirmPassword: string;
+  /** 表单内邀请码始终为字符串，提交时再决定是否携带 */
+  inviteCode: string;
 };
 type RegisterField = keyof RegisterFormValues;
 
@@ -31,6 +37,7 @@ const DEFAULT_REGISTER_VALUES: RegisterFormValues = {
   username: '',
   password: '',
   confirmPassword: '',
+  inviteCode: '',
 };
 
 function Register() {
@@ -38,11 +45,16 @@ function Register() {
   const { t } = useTranslation('auth');
   const [agreement, setAgreement] = useState(false);
   const [contractOpen, setContractOpen] = useState(false);
-  const [formValues, setFormValues] = useState<RegisterFormValues>(DEFAULT_REGISTER_VALUES);
-  const [formErrors, setFormErrors] = useState<FieldErrors<RegisterField>>({});
   const navigate = useNavigate();
   const location = useLocation();
   const redirectPath = readRedirectParam(location.search);
+  /** 邀请链接携带的邀请码，用于初始化表单 */
+  const linkedInviteCode = readRegisterInviteCode(location.search);
+  const [formValues, setFormValues] = useState<RegisterFormValues>(() => ({
+    ...DEFAULT_REGISTER_VALUES,
+    inviteCode: linkedInviteCode,
+  }));
+  const [formErrors, setFormErrors] = useState<FieldErrors<RegisterField>>({});
 
   const { run: submitLogin } = useApi(
     (values: RegisterRequest) =>
@@ -109,6 +121,15 @@ function Register() {
           message: t('register.confirmPasswordMismatch'),
         },
       ]),
+      inviteCode: runFieldValidation([
+        {
+          test: () => {
+            const inviteCode = normalizeInviteCode(formValues.inviteCode);
+            return inviteCode.length === 0 || INVITE_CODE_PATTERN.test(inviteCode);
+          },
+          message: t('register.inviteCodeInvalid'),
+        },
+      ]),
     };
     setFormErrors(nextErrors);
     return !hasFieldErrors(nextErrors);
@@ -121,9 +142,11 @@ function Register() {
       toast.danger(t('register.agreementRequired'));
       return;
     }
+    const inviteCode = normalizeInviteCode(formValues.inviteCode);
     submitRegister({
       username: formValues.username.trim(),
       password: formValues.password,
+      ...(inviteCode ? { inviteCode } : {}),
     });
   };
 
@@ -179,6 +202,23 @@ function Register() {
             autoComplete="new-password"
             showPasswordLabel={t('common.showPassword')}
             hidePasswordLabel={t('common.hidePassword')}
+          />
+        </FormField>
+
+        <FormField
+          aria-label={t('register.inviteCodeLabel')}
+          label={t('register.inviteCodeLabel')}
+          name="inviteCode"
+          value={formValues.inviteCode}
+          onChange={(value) => updateFormValue('inviteCode', normalizeInviteCode(value))}
+          errorMessage={formErrors.inviteCode}
+        >
+          <AuthIconField
+            icon={Gift}
+            placeholder={t('register.inviteCodePlaceholder')}
+            maxLength={INVITE_CODE_MAX_LENGTH}
+            autoComplete="off"
+            spellCheck={false}
           />
         </FormField>
 

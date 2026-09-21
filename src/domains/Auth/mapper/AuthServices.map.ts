@@ -1,3 +1,5 @@
+import { normalizeInviteCode } from '@/utils/normalize/normalizeInviteCode';
+
 import type {
   LoginApiRequest,
   NewPasswordApiRequest,
@@ -16,10 +18,14 @@ const mapLoginRequest = (params: LoginRequest): LoginApiRequest => ({
   password: params.password,
 });
 
-const mapRegisterRequest = (params: RegisterRequest): RegisterApiRequest => ({
-  username: params.username,
-  password: params.password,
-});
+const mapRegisterRequest = (params: RegisterRequest): RegisterApiRequest => {
+  const inviteCode = normalizeInviteCode(params.inviteCode);
+  return {
+    username: params.username,
+    password: params.password,
+    ...(inviteCode ? { inviteCode } : {}),
+  };
+};
 
 const mapResetPasswordRequest = (params: ResetPasswordRequest): ResetPasswordApiRequest => ({
   userName: params.userName,

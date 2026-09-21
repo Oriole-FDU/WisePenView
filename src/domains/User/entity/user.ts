@@ -9,6 +9,8 @@ export interface User {
   identityType: number;
   realName?: string;
   campusNo?: string;
+  /** 当前用户自己的邀请码，用于生成邀请链接 */
+  inviteCode?: string;
 }
 
 /** 后端 UserDisplayBase：用于作者/创建者等轻量展示 */
@@ -40,6 +42,7 @@ export interface UserAccountInfo {
 
 export interface UserProfileInfo {
   sex?: number;
+  inviteCode?: string;
   university?: string | null;
   college?: string;
   major?: string;

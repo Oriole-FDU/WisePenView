@@ -1,3 +1,4 @@
+export type { UserInviteRecord, UserInviteRecordList, UserInviteStatus } from './entity/invite';
 export type {
   User,
   UserAccountInfo,
@@ -31,6 +32,7 @@ export type {
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
   IUserService,
+  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,

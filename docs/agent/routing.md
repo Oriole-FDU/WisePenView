@@ -13,16 +13,18 @@
 
 ## 入口与认证
 
-| 路径                     | 参数与行为                   |
-| ------------------------ | ---------------------------- |
-| `/`                      | 匿名聊天假页；自动校验登录态 |
-| `/login`                 | 登录；可带 `redirect`        |
-| `/register`              | 注册；可带 `redirect`        |
-| `/onboarding/bind`       | 注册后的账号绑定             |
-| `/password/forgot`       | 发起密码重置                 |
-| `/password/reset?token=` | 设置新密码                   |
-| `/email/verify?token=`   | 验证邮箱                     |
-| `/chat`                  | 登录后的新对话               |
+| 路径                     | 参数与行为                      |
+| ------------------------ | ------------------------------- |
+| `/`                      | 匿名聊天假页；自动校验登录态    |
+| `/login`                 | 登录；可带 `redirect`           |
+| `/register`              | 注册；可带 `redirect`、`invite` |
+| `/onboarding/bind`       | 注册后的账号绑定                |
+| `/password/forgot`       | 发起密码重置                    |
+| `/password/reset?token=` | 设置新密码                      |
+| `/email/verify?token=`   | 验证邮箱                        |
+| `/chat`                  | 登录后的新对话                  |
+
+用户邀请链接固定为 `/register?invite=<邀请码>`：左下角用户菜单「邀请新用户」弹窗按 `buildRegisterInvitePath` 生成并复制该链接，注册页读取 `invite` 参数自动填入邀请码，提交时随 `/auth/register` 的 `inviteCode` 传给后端。邀请码统一经 `normalizeInviteCode` 去空格并转大写。
 
 门户已拆分到独立项目，本仓库不再承载门户页面。已登录用户仍可访问全部认证页面。`/` 挂载后会主动调用 `userService.getUserInfo({ forceRefresh: true })`：成功 replace 到 `/chat`，失败停留在匿名假页并提示“登录已过期”。匿名用户在 `/` 的左侧栏和聊天操作仅提示登录；左下角登录按钮进入 `/login?redirect=/chat`。任意 Axios 401 和用户主动退出都会清理会话并进入 `/login`。
 

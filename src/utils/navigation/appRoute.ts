@@ -1,3 +1,9 @@
+// 注意：本文件同时被 electron 工程（无 @/* 别名）引用，此处必须使用相对路径导入
+import { normalizeInviteCode } from '../normalize/normalizeInviteCode';
+
+/** 注册邀请链接的查询参数名，与后端注册接口 inviteCode 字段对应 */
+export const REGISTER_INVITE_QUERY_KEY = 'invite';
+
 export const APP_ROUTE_PATH = {
   HOME: '/',
   ANONYMOUS: '/anonymous',
@@ -141,10 +147,22 @@ export const buildGroupListPath = (query?: Partial<GroupListRouteQuery>): string
 
 export const buildInvitePath = (inviteCode?: string): string => {
   const search = new URLSearchParams();
-  const normalizedInviteCode = inviteCode?.trim();
+  const normalizedInviteCode = normalizeInviteCode(inviteCode);
   if (normalizedInviteCode) search.set('code', normalizedInviteCode);
   return appendSearch(APP_ROUTE_PATH.INVITE, search);
 };
+
+/** 用户邀请链接地址：注册页读取 invite 参数自动填入邀请码 */
+export const buildRegisterInvitePath = (inviteCode?: string): string => {
+  const search = new URLSearchParams();
+  const normalizedInviteCode = normalizeInviteCode(inviteCode);
+  if (normalizedInviteCode) search.set(REGISTER_INVITE_QUERY_KEY, normalizedInviteCode);
+  return appendSearch(APP_ROUTE_PATH.AUTH_REGISTER, search);
+};
+
+/** 从地址查询串中读取用户邀请码，非法或缺失时返回空串 */
+export const readRegisterInviteCode = (search: string): string =>
+  normalizeInviteCode(new URLSearchParams(search).get(REGISTER_INVITE_QUERY_KEY));
 
 export const buildCourseListPath = (query?: Partial<CourseListRouteQuery>): string => {
   const normalized: CourseListRouteQuery = {

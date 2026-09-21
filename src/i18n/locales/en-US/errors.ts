@@ -143,6 +143,8 @@ const enUSErrors = {
     '3811': 'TOKEN voucher does not exist.',
     '3821': 'TOKEN voucher is not available.',
     '3831': 'TOKEN voucher has expired.',
+    '4011': 'Invite code does not exist.',
+    '4012': 'You cannot use your own invite code.',
     '5111': 'Tag node does not exist.',
     '5112': 'Parent tag node does not exist.',
     '5121': 'A tag node with the same name already exists at this level.',

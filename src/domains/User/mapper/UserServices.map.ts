@@ -1,4 +1,10 @@
-import type { User, UserAccountProfile, UserSearchUser } from '@/domains/User';
+import type {
+  User,
+  UserAccountProfile,
+  UserInviteRecord,
+  UserInviteRecordList,
+  UserSearchUser,
+} from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -9,8 +15,11 @@ import type {
   GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
+  ListUserInviteRecordsApiRequest,
+  ListUserInviteRecordsApiResponse,
   ListUserSearchSuggestionsApiRequest,
   SearchUserApiRequest,
+  UserInviteRecordApiResponse,
   UserSearchUserApiResponse,
 } from '../apis/UserApi.type';
 import type {
@@ -30,6 +39,7 @@ import type {
   ConfirmEmailVerifyRequest,
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
+  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   SearchUsersRequest,
   SendEmailVerifyRequest,
@@ -48,7 +58,7 @@ import {
 
 type CachedUserSafe = Pick<
   User,
-  'id' | 'username' | 'nickname' | 'avatar' | 'identityType' | 'realName'
+  'id' | 'username' | 'nickname' | 'avatar' | 'identityType' | 'realName' | 'inviteCode'
 >;
 
 const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProfile => {
@@ -69,6 +79,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
     },
     userProfile: {
       sex: normalizeSexFromApi(userProfile.sex),
+      inviteCode: userProfile.inviteCode ?? undefined,
       university: userProfile.university,
       college: userProfile.college ?? undefined,
       major: userProfile.major ?? undefined,
@@ -89,6 +100,7 @@ const mapUserSafeFromAccountProfile = (data: UserAccountProfile): CachedUserSafe
   realName: data.userInfo.realName,
   avatar: data.userInfo.avatar,
   identityType: data.userInfo.identityType,
+  inviteCode: data.userProfile.inviteCode,
 });
 
 const mapSearchUsersRequest = (params: SearchUsersRequest): SearchUserApiRequest => ({
@@ -152,6 +164,32 @@ const mapConfirmEmailVerifyRequest = (
   params: ConfirmEmailVerifyRequest
 ): CheckEmailVerifyApiRequest => ({
   token: params.token,
+});
+
+const mapListInviteRecordsRequest = (
+  params: ListUserInviteRecordsRequest
+): ListUserInviteRecordsApiRequest => ({
+  page: params.page,
+  size: params.size,
+});
+
+const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRecord => ({
+  id: normalizeId(data.id),
+  inviteeUserId: normalizeId(data.inviteeUserId),
+  invitee: normalizeUserDisplayBaseFromApi(data.inviteeDisplay),
+  status: data.status === 'REWARDED' ? 'REWARDED' : 'BOUND',
+  createTime: data.createTime ?? undefined,
+  rewardTime: data.rewardTime ?? undefined,
+});
+
+const mapListInviteRecordsFromApi = (
+  data: ListUserInviteRecordsApiResponse
+): UserInviteRecordList => ({
+  records: data.list.map(mapInviteRecordFromApi),
+  total: data.total,
+  page: data.page,
+  size: data.size,
+  totalPage: data.totalPage,
 });
 
 const hasFeedbackType = (types: FeedbackType[], type: FeedbackType): boolean =>
@@ -262,6 +300,8 @@ export const UserServicesMap = {
   mapInitiateUISVerifyRequest,
   mapFudanUISVerifyStatusFromApi,
   mapConfirmEmailVerifyRequest,
+  mapListInviteRecordsRequest,
+  mapListInviteRecordsFromApi,
   mapSubmitFeedbackRequest,
   mapTaskStatusesFromApi,
   mapTaskCheckInFromApi,

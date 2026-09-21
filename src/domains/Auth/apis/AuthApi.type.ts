@@ -8,6 +8,8 @@ export interface LoginApiRequest {
 export interface RegisterApiRequest {
   username: string;
   password: string;
+  /** 邀请码，选填；与后端 AuthRegisterRequest.inviteCode 对齐 */
+  inviteCode?: string;
 }
 
 export interface ResetPasswordApiRequest {
