@@ -78,13 +78,12 @@ export function FileCaptionToolbarButton(buttonGroupProps: ButtonGroupChildProps
 
   return (
     <AppPopover isOpen={open} onOpenChange={handleOpenChange} deferContent={false}>
-      <AppPopover.Trigger>
-        <ToolbarButton
-          {...buttonGroupProps}
-          label={t('editor.image.editCaption')}
-          icon={<PencilLine size={20} />}
-        />
-      </AppPopover.Trigger>
+      <ToolbarButton
+        {...buttonGroupProps}
+        label={t('editor.image.editCaption')}
+        icon={<PencilLine size={20} />}
+      />
+
       <AppPopover.Content className={styles.formPopover} placement="bottom">
         <div className={styles.formPanel} onMouseDown={(event) => event.stopPropagation()}>
           <Input

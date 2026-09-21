@@ -150,7 +150,6 @@ export function CreateLinkToolbarButton({
         {...buttonGroupProps}
         label={state.url ? t('editor.link.edit') : t('editor.link.add')}
         icon={<Link size={20} />}
-        overlayTrigger={<AppPopover.Trigger />}
       />
       <AppPopover.Content className={styles.formPopover} placement="bottom">
         <div className={styles.formPanel} onMouseDown={(event) => event.stopPropagation()}>

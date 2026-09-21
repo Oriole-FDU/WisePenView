@@ -152,7 +152,6 @@ function SidebarDriveNodeTitle({
                 size="sm"
                 className={styles.nodeActionBtn}
                 tooltip={{ content: t('drive:create.menu') }}
-                overlayTrigger={<Dropdown.Trigger />}
               />
               <Dropdown.Popover className={styles.createMenuPanel} placement="right">
                 <Dropdown.Menu

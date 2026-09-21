@@ -78,7 +78,6 @@ function FavoriteCollectionList({
                       size="sm"
                       className={styles.collectionMoreButton}
                       tooltip={{ content: t('favorite.collection.moreActions') }}
-                      overlayTrigger={<Dropdown.Trigger />}
                     />
                     <Dropdown.Popover placement="bottom end">
                       <Dropdown.Menu aria-label={t('favorite.collection.menuAria')}>

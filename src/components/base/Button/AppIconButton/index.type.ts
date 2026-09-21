@@ -1,5 +1,5 @@
-import type { Tooltip } from '@heroui/react';
-import type { ComponentPropsWithRef, MouseEventHandler, ReactElement, ReactNode } from 'react';
+import type { Button, Tooltip } from '@heroui/react';
+import type { ComponentProps, ReactNode } from 'react';
 
 export interface AppIconButtonTooltipOptions {
   closeDelay?: Tooltip['Props']['closeDelay'];
@@ -12,17 +12,23 @@ export interface AppIconButtonTooltipOptions {
 }
 
 export interface AppIconButtonProps extends Omit<
-  ComponentPropsWithRef<'button'>,
-  'aria-label' | 'children' | 'disabled' | 'onClick' | 'type'
+  ComponentProps<typeof Button>,
+  | 'aria-label'
+  | 'children'
+  | 'className'
+  | 'isIconOnly'
+  | 'onPress'
+  | 'render'
+  | 'size'
+  | 'type'
+  | 'variant'
 > {
   icon: ReactNode;
   label: string;
   className?: string;
   isActive?: boolean;
   isDisabled?: boolean;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
   onPress?: () => void;
-  overlayTrigger?: ReactElement;
   size?: 'xs' | 'sm' | 'md';
   toggleId?: string;
   tooltip?: AppIconButtonTooltipOptions;

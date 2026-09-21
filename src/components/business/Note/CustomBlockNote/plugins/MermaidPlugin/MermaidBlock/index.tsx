@@ -146,7 +146,6 @@ function MermaidBlockView({ block, contentRef, editor }: MermaidBlockRenderProps
                 label={t('mermaid.displayMode')}
                 size="sm"
                 className={styles.viewButton}
-                overlayTrigger={<Dropdown.Trigger />}
                 tooltip={{ content: currentViewOption ? t(currentViewOption.labelKey) : undefined }}
                 onMouseDown={(event) => {
                   event.preventDefault();
@@ -176,7 +175,6 @@ function MermaidBlockView({ block, contentRef, editor }: MermaidBlockRenderProps
                 size="sm"
                 isDisabled={readOnly}
                 className={styles.templateButton}
-                overlayTrigger={<Dropdown.Trigger />}
                 tooltip={{ content: t('mermaid.template') }}
                 onMouseDown={(event) => {
                   event.preventDefault();

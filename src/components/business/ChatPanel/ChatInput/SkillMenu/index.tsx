@@ -137,7 +137,6 @@ function SkillMenu({ options, loading }: SkillMenuProps) {
         <AppIconButton
           icon={<Settings size={17} aria-hidden="true" />}
           label={t('input.skillMenu.configure')}
-          overlayTrigger={<Dropdown.Trigger />}
         />
       </span>
       <Dropdown.Popover className={styles.popoverPanelScrollable} placement="top">

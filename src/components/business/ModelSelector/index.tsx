@@ -80,24 +80,20 @@ function ModelSelector({
           }
           label={triggerLabel}
           isDisabled={disabled}
-          overlayTrigger={<Dropdown.Trigger />}
         />
       ) : (
-        <Dropdown.Trigger>
-          <button
-            type="button"
-            className={styles.trigger}
-            aria-label={triggerLabel}
-            disabled={disabled}
-          >
-            {loading ? (
-              <LoaderCircle size={16} className={styles.spinIcon} />
-            ) : (
-              <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
-            )}
-            <span>{triggerLabel}</span>
-            <ChevronDown size={16} />
-          </button>
+        <Dropdown.Trigger
+          className={styles.trigger}
+          aria-label={triggerLabel}
+          isDisabled={disabled}
+        >
+          {loading ? (
+            <LoaderCircle size={16} className={styles.spinIcon} />
+          ) : (
+            <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
+          )}
+          <span>{triggerLabel}</span>
+          <ChevronDown size={16} />
         </Dropdown.Trigger>
       )}
       <Dropdown.Popover className={styles.popover} placement={placement}>

@@ -51,12 +51,11 @@ function CreateMenu({ disabled = false, items, onSelect }: CreateMenuProps) {
 
   return (
     <Dropdown isOpen={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger>
-        <AppButton variant="secondary" size="sm" isDisabled={disabled}>
-          <Plus size={16} aria-hidden="true" />
-          {t('create.menu')}
-        </AppButton>
-      </Dropdown.Trigger>
+      <AppButton variant="secondary" size="sm" isDisabled={disabled}>
+        <Plus size={16} aria-hidden="true" />
+        {t('create.menu')}
+      </AppButton>
+
       <Dropdown.Popover className={styles.menuPopover} placement="bottom start">
         <Dropdown.Menu
           aria-label={t('create.menuAria')}

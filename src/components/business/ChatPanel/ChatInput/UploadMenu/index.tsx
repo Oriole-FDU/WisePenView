@@ -31,7 +31,6 @@ function UploadMenu() {
       <AppIconButton
         icon={<Plus size={18} aria-hidden="true" />}
         label={t('input.uploadMenu.trigger')}
-        overlayTrigger={<Dropdown.Trigger />}
       />
       <Dropdown.Popover placement="top">
         <Dropdown.Menu aria-label={t('input.uploadMenu.aria')} onAction={handleAction}>

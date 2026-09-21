@@ -65,13 +65,12 @@ export function BlockTypeMenu(buttonGroupProps: ButtonGroupChildProps) {
 
   return (
     <Dropdown>
-      <Dropdown.Trigger>
-        <ToolbarButton
-          {...buttonGroupProps}
-          icon={<SelectedIcon size={20} aria-hidden="true" />}
-          label={t('editor.blockType.label')}
-        />
-      </Dropdown.Trigger>
+      <ToolbarButton
+        {...buttonGroupProps}
+        icon={<SelectedIcon size={20} aria-hidden="true" />}
+        label={t('editor.blockType.label')}
+      />
+
       <Dropdown.Popover className={styles.blockTypeMenuPopover} placement="bottom start">
         <Dropdown.Menu
           aria-label={t('editor.blockType.label')}

@@ -7,7 +7,6 @@ import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import { UploadZone } from '@/components/base/Input';
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import { useImageService, useUserService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
 import { IDENTITY, USER_STATUS } from '@/domains/User';
@@ -123,32 +122,24 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
     <>
       <header className={styles.accountHeader}>
         <Tooltip>
-          <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-            <span
-              className={styles.avatarWrap}
-              role="button"
-              tabIndex={0}
-              aria-label={t('header.changeAvatar')}
-              onClick={openAvatarModal}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  openAvatarModal();
-                }
-              }}
-            >
-              <AppAvatar aria-label={nickname} className={styles.avatar}>
-                {user?.userInfo?.avatar && (
-                  <AppAvatar.Image alt={nickname} draggable={false} src={user.userInfo.avatar} />
-                )}
-                <AppAvatar.Fallback className={styles.avatarFallback}>
-                  {avatarLetter}
-                </AppAvatar.Fallback>
-              </AppAvatar>
-              <span className={styles.avatarOverlay} aria-hidden="true">
-                <Camera size={20} strokeWidth={1.75} />
-                <span className={styles.avatarOverlayLabel}>{t('header.changeAvatar')}</span>
-              </span>
+          <Tooltip.Trigger<'button'>
+            render={(props) => <button {...props} />}
+            type="button"
+            className={styles.avatarWrap}
+            aria-label={t('header.changeAvatar')}
+            onClick={openAvatarModal}
+          >
+            <AppAvatar aria-label={nickname} className={styles.avatar}>
+              {user?.userInfo?.avatar && (
+                <AppAvatar.Image alt={nickname} draggable={false} src={user.userInfo.avatar} />
+              )}
+              <AppAvatar.Fallback className={styles.avatarFallback}>
+                {avatarLetter}
+              </AppAvatar.Fallback>
+            </AppAvatar>
+            <span className={styles.avatarOverlay} aria-hidden="true">
+              <Camera size={20} strokeWidth={1.75} />
+              <span className={styles.avatarOverlayLabel}>{t('header.changeAvatar')}</span>
             </span>
           </Tooltip.Trigger>
           <Tooltip.Content>{t('header.changeAvatar')}</Tooltip.Content>

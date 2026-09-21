@@ -327,20 +327,6 @@
     z-index: var(--app-z-index-tooltip);
   }
 
-  /* Tooltip 穿透壳：见 TOOLTIP_FOCUS_PASSTHROUGH_PROPS */
-  .tooltip__trigger[data-focus-passthrough],
-  .tabs__tab .tooltip__trigger {
-    &:focus,
-    &:focus-visible,
-    &:focus-visible:not(:focus),
-    &[data-focus-visible] {
-      outline: none;
-      box-shadow: var(--shadow-none);
-      --tw-ring-shadow: 0 0 #0000;
-      --tw-ring-offset-shadow: 0 0 #0000;
-    }
-  }
-
   .modal__backdrop {
     z-index: var(--app-z-index-modal);
   }

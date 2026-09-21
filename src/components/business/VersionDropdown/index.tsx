@@ -12,13 +12,12 @@ function VersionDropdown({ items, disabledKeys, formatVersion, onSelect }: Versi
 
   return (
     <Dropdown>
-      <Dropdown.Trigger>
-        <AppButton aria-label={t('version.selectAria')} variant="secondary">
-          <GitBranch size={16} />
-          <span>{currentItem ? formatVersion(currentItem.version) : '-'}</span>
-          <ChevronDown size={10} />
-        </AppButton>
-      </Dropdown.Trigger>
+      <AppButton aria-label={t('version.selectAria')} variant="secondary">
+        <GitBranch size={16} />
+        <span>{currentItem ? formatVersion(currentItem.version) : '-'}</span>
+        <ChevronDown size={10} />
+      </AppButton>
+
       <Dropdown.Popover>
         <Dropdown.Menu
           disabledKeys={disabledKeys}
