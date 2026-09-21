@@ -123,12 +123,18 @@ function ResourceHeaderMore({
 
   return (
     <Dropdown>
-      <AppIconButton
-        icon={<Ellipsis className={styles.moreIcon} size={22} aria-hidden="true" />}
-        label={t('header.more')}
-        size="sm"
+      <Dropdown.Trigger
         isDisabled={isDisabled || isMenuPending}
-        aria-busy={isPending || undefined}
+        render={({ disabled, ...triggerProps }) => (
+          <AppIconButton
+            {...triggerProps}
+            isDisabled={disabled}
+            icon={<Ellipsis className={styles.moreIcon} size={22} aria-hidden="true" />}
+            label={t('header.more')}
+            size="sm"
+            aria-busy={isPending || undefined}
+          />
+        )}
       />
       <Dropdown.Popover placement="bottom end" className={styles.popover}>
         <Dropdown.Menu aria-label={t('header.menuAria')} onAction={handleAction}>

@@ -51,7 +51,15 @@ export function ToolbarButton({
 
   return (
     <Tooltip>
-      {button}
+      {isDisabled ? (
+        <Tooltip.Trigger<'span'>
+          render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+        >
+          {button}
+        </Tooltip.Trigger>
+      ) : (
+        button
+      )}
       <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
     </Tooltip>
   );
@@ -72,20 +80,32 @@ export function ToolbarToggleButton({
   isDisabled,
   onPress,
 }: ToolbarToggleButtonProps) {
+  const button = (
+    <ToggleButton
+      aria-label={label}
+      id={id}
+      isDisabled={isDisabled}
+      isIconOnly
+      size="sm"
+      variant="ghost"
+      onMouseDown={stopToolbarMouseDown}
+      onPress={onPress}
+    >
+      {icon}
+    </ToggleButton>
+  );
+
   return (
     <Tooltip>
-      <ToggleButton
-        aria-label={label}
-        id={id}
-        isDisabled={isDisabled}
-        isIconOnly
-        size="sm"
-        variant="ghost"
-        onMouseDown={stopToolbarMouseDown}
-        onPress={onPress}
-      >
-        {icon}
-      </ToggleButton>
+      {isDisabled ? (
+        <Tooltip.Trigger<'span'>
+          render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+        >
+          {button}
+        </Tooltip.Trigger>
+      ) : (
+        button
+      )}
       <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
     </Tooltip>
   );

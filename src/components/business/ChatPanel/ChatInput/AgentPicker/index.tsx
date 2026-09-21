@@ -173,10 +173,16 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   return (
     <>
       <Dropdown isOpen={open} onOpenChange={setOpen}>
-        <AppIconButton
-          icon={renderAgentIcon(selectedAgent, 17)}
-          label={t('input.agentPicker.trigger')}
-          tooltip={{ content: getAgentLabel(selectedAgent) }}
+        <Dropdown.Trigger
+          render={({ disabled, ...triggerProps }) => (
+            <AppIconButton
+              {...triggerProps}
+              isDisabled={disabled}
+              icon={renderAgentIcon(selectedAgent, 17)}
+              label={t('input.agentPicker.trigger')}
+              tooltip={{ content: getAgentLabel(selectedAgent) }}
+            />
+          )}
         />
         <Dropdown.Popover className={styles.popoverPanelAgent} placement="top">
           {showSkeleton ? (

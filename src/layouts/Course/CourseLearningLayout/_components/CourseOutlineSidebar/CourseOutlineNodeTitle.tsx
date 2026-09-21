@@ -106,12 +106,18 @@ function CourseOutlineNodeTitle({
           {!isResource ? (
             <>
               <Dropdown isOpen={createMenuOpen} onOpenChange={setCreateMenuOpen}>
-                <AppIconButton
-                  icon={<Plus size={14} aria-hidden />}
-                  label={t('editor.outline.createIn', { name: node.title })}
-                  size="sm"
-                  className={styles.outlineNodeActionButton}
-                  tooltip={{ content: t('editor.outline.addContent') }}
+                <Dropdown.Trigger
+                  render={({ disabled, ...triggerProps }) => (
+                    <AppIconButton
+                      {...triggerProps}
+                      isDisabled={disabled}
+                      icon={<Plus size={14} aria-hidden />}
+                      label={t('editor.outline.createIn', { name: node.title })}
+                      size="sm"
+                      className={styles.outlineNodeActionButton}
+                      tooltip={{ content: t('editor.outline.addContent') }}
+                    />
+                  )}
                 />
                 <Dropdown.Popover className={styles.outlineActionMenu} placement="right">
                   <Dropdown.Menu aria-label={t('editor.outline.addContent')}>
@@ -154,12 +160,18 @@ function CourseOutlineNodeTitle({
           ) : null}
 
           <Dropdown isOpen={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
-            <AppIconButton
-              icon={<Ellipsis size={14} aria-hidden />}
-              label={t('editor.outline.moreActions', { name: node.title })}
-              size="sm"
-              className={styles.outlineNodeActionButton}
-              tooltip={{ content: t('editor.outline.moreActionsLabel') }}
+            <Dropdown.Trigger
+              render={({ disabled, ...triggerProps }) => (
+                <AppIconButton
+                  {...triggerProps}
+                  isDisabled={disabled}
+                  icon={<Ellipsis size={14} aria-hidden />}
+                  label={t('editor.outline.moreActions', { name: node.title })}
+                  size="sm"
+                  className={styles.outlineNodeActionButton}
+                  tooltip={{ content: t('editor.outline.moreActionsLabel') }}
+                />
+              )}
             />
             <Dropdown.Popover className={styles.outlineActionMenu} placement="right">
               <Dropdown.Menu aria-label={t('editor.outline.moreActionsLabel')}>

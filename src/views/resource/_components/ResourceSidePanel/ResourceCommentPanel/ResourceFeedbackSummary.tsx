@@ -29,6 +29,20 @@ function ResourceFeedbackSummary({
   const { t } = useTranslation('resource');
   const likeTooltip = liked ? t('comment.unlike') : t('comment.feedback.likeLabel');
 
+  const likeButton = (
+    <ToggleButton
+      variant="ghost"
+      size="sm"
+      isSelected={liked}
+      isDisabled={likePending}
+      className={styles.feedbackMetricToggle}
+      aria-label={likeTooltip}
+      onChange={onLikeChange}
+    >
+      <ThumbsUp size={15} aria-hidden fill={liked ? 'currentColor' : 'none'} />
+    </ToggleButton>
+  );
+
   return (
     <section className={styles.feedback} aria-label={t('comment.feedback.statsAria')}>
       <div className={styles.feedbackMetrics}>
@@ -56,17 +70,15 @@ function ResourceFeedbackSummary({
 
         <div className={styles.feedbackMetric}>
           <Tooltip>
-            <ToggleButton
-              variant="ghost"
-              size="sm"
-              isSelected={liked}
-              isDisabled={likePending}
-              className={styles.feedbackMetricToggle}
-              aria-label={likeTooltip}
-              onChange={onLikeChange}
-            >
-              <ThumbsUp size={15} aria-hidden fill={liked ? 'currentColor' : 'none'} />
-            </ToggleButton>
+            {likePending ? (
+              <Tooltip.Trigger<'span'>
+                render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+              >
+                {likeButton}
+              </Tooltip.Trigger>
+            ) : (
+              likeButton
+            )}
 
             <Tooltip.Content>{likeTooltip}</Tooltip.Content>
           </Tooltip>

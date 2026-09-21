@@ -168,12 +168,18 @@ function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
 
   return (
     <AppPopover isOpen={open} onOpenChange={setOpen} deferContent={false}>
-      <AppIconButton
-        icon={<SmilePlus size={15} aria-hidden />}
-        label={label}
-        size="sm"
-        isDisabled={disabled}
-        className={styles.iconButton}
+      <AppPopover.Trigger<'button'>
+        disabled={disabled}
+        render={({ disabled, ...triggerProps }) => (
+          <AppIconButton
+            {...triggerProps}
+            isDisabled={disabled}
+            icon={<SmilePlus size={15} aria-hidden />}
+            label={label}
+            size="sm"
+            className={styles.iconButton}
+          />
+        )}
       />
       <AppPopover.Content placement="bottom end" bodyPadding="none">
         <EmojiPickerContent
