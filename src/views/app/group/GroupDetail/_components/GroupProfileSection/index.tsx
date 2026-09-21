@@ -191,6 +191,35 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
     ? t('profile.course.noDescription')
     : t('profile.noDescription');
 
+  const coverButtonProps = {
+    className: styles.coverButton,
+    type: 'button' as const,
+    'aria-label': changeCover,
+    disabled: saving,
+    onClick: handleCoverModalOpen,
+    children: (
+      <>
+        <img
+          className={styles.coverImage}
+          src={coverUrl}
+          alt={
+            isCourseGroup
+              ? t('profile.course.coverAlt', {
+                  name: draft.groupName || group.groupName,
+                })
+              : t('profile.coverAlt', {
+                  name: draft.groupName || group.groupName,
+                })
+          }
+          onError={handleCoverImageError}
+        />
+        <span className={styles.coverEditAffordance}>
+          <Pencil size={16} aria-hidden="true" />
+        </span>
+      </>
+    ),
+  };
+
   return (
     <>
       <GroupSettingsSection title={t('profile.creationInfo')} compact>
@@ -269,32 +298,18 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
             <span className={styles.coverLabel}>{coverLabel}</span>
             {canEdit ? (
               <Tooltip>
-                <Tooltip.Trigger<'button'>
-                  render={(props) => <button {...props} />}
-                  className={styles.coverButton}
-                  type="button"
-                  aria-label={changeCover}
-                  disabled={saving}
-                  onClick={handleCoverModalOpen}
-                >
-                  <img
-                    className={styles.coverImage}
-                    src={coverUrl}
-                    alt={
-                      isCourseGroup
-                        ? t('profile.course.coverAlt', {
-                            name: draft.groupName || group.groupName,
-                          })
-                        : t('profile.coverAlt', {
-                            name: draft.groupName || group.groupName,
-                          })
-                    }
-                    onError={handleCoverImageError}
+                {saving ? (
+                  <Tooltip.Trigger<'span'>
+                    render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+                  >
+                    <button {...coverButtonProps} />
+                  </Tooltip.Trigger>
+                ) : (
+                  <Tooltip.Trigger<'button'>
+                    {...coverButtonProps}
+                    render={(props) => <button {...props} />}
                   />
-                  <span className={styles.coverEditAffordance}>
-                    <Pencil size={16} aria-hidden="true" />
-                  </span>
-                </Tooltip.Trigger>
+                )}
                 <Tooltip.Content>{changeCoverShort}</Tooltip.Content>
               </Tooltip>
             ) : (

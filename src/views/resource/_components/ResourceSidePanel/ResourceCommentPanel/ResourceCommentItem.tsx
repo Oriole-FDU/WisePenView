@@ -53,6 +53,20 @@ function ResourceCommentItem({
   const dateTime = commentDate?.toISOString();
   const likeLabel = liked ? t('resource:comment.unlike') : t('resource:comment.like');
 
+  const likeButton = (
+    <AppButton
+      variant="ghost"
+      size="sm"
+      className={cn(styles.commentActionIcon, liked && styles.likedButton)}
+      isDisabled={likePending}
+      aria-label={likeLabel}
+      onPress={() => void onLike(comment)}
+    >
+      <Heart size={14} aria-hidden fill={liked ? 'currentColor' : 'none'} />
+      {comment.likeCount > 0 ? <span className={styles.likeCount}>{comment.likeCount}</span> : null}
+    </AppButton>
+  );
+
   return (
     <article className={styles.commentItem}>
       <AppAvatar aria-label={comment.author.name} className={styles.avatar}>
@@ -111,19 +125,15 @@ function ResourceCommentItem({
               onPress={() => onReply(comment)}
             />
             <Tooltip>
-              <AppButton
-                variant="ghost"
-                size="sm"
-                className={cn(styles.commentActionIcon, liked && styles.likedButton)}
-                isDisabled={likePending}
-                aria-label={likeLabel}
-                onPress={() => void onLike(comment)}
-              >
-                <Heart size={14} aria-hidden fill={liked ? 'currentColor' : 'none'} />
-                {comment.likeCount > 0 ? (
-                  <span className={styles.likeCount}>{comment.likeCount}</span>
-                ) : null}
-              </AppButton>
+              {likePending ? (
+                <Tooltip.Trigger<'span'>
+                  render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+                >
+                  {likeButton}
+                </Tooltip.Trigger>
+              ) : (
+                likeButton
+              )}
 
               <Tooltip.Content>{likeLabel}</Tooltip.Content>
             </Tooltip>

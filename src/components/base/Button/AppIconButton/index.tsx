@@ -1,7 +1,8 @@
-import { Button, ToggleButton, Tooltip } from '@heroui/react';
-import type { ComponentProps } from 'react';
+import { ToggleButton, Tooltip } from '@heroui/react';
+import type { ComponentProps, MouseEventHandler } from 'react';
 
 import { cn } from '@/utils/cn';
+import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import type { AppIconButtonProps } from './index.type';
 import styles from './style.module.less';
@@ -30,6 +31,22 @@ function AppIconButton({
   );
   // HeroUI 的 ToggleButton 将部分 DOM 事件声明为 div 泛型，但实际根节点和 ref 均为 button。
   const toggleButtonProps = buttonProps as ComponentProps<typeof ToggleButton>;
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    onClick?.(event);
+    onPress?.();
+  };
+  const nativeButtonProps = {
+    ...buttonProps,
+    type: 'button' as const,
+    disabled: isDisabled,
+    className: classNames,
+    onClick: isDisabled ? undefined : handleClick,
+    'aria-label': label,
+    'aria-pressed': isActive,
+    'aria-disabled': isDisabled || undefined,
+    'data-disabled': isDisabled || undefined,
+    children: icon,
+  };
   const button = toggleId ? (
     <ToggleButton
       {...toggleButtonProps}
@@ -46,24 +63,15 @@ function AppIconButton({
     >
       {icon}
     </ToggleButton>
+  ) : isDisabled ? (
+    <button {...nativeButtonProps} ref={ref} />
   ) : (
-    <Button
-      {...buttonProps}
-      ref={ref}
-      type="button"
-      isDisabled={isDisabled}
-      className={classNames}
-      // 保留原图标尺寸与按钮样式，只使用 HeroUI 的交互和浮层上下文。
-      render={(props) => <button {...props} className={classNames} />}
-      onClick={isDisabled ? undefined : onClick}
-      onPress={isDisabled ? undefined : onPress}
-      aria-label={label}
-      aria-pressed={isActive}
-      aria-disabled={isDisabled || undefined}
-      data-disabled={isDisabled || undefined}
-    >
-      {icon}
-    </Button>
+    <Tooltip.Trigger<'button'>
+      {...nativeButtonProps}
+      render={({ ref: tooltipRef, ...props }) => (
+        <button {...props} ref={mergeRefs(ref, tooltipRef)} />
+      )}
+    />
   );
 
   return (

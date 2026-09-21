@@ -33,21 +33,27 @@ function HighlightIconPicker({ block, editor }: HighlightBlockRenderProps) {
 
   return (
     <AppPopover isOpen={open} onOpenChange={setOpen} deferContent={false}>
-      <AppIconButton
-        icon={
-          <span className={styles.iconGlyph} data-highlight-block-icon="">
-            {props.icon}
-          </span>
-        }
-        label={t('highlight.changeIcon')}
-        size="sm"
-        isActive={open}
-        className={styles.iconButton}
-        tooltip={{ placement: 'top' }}
+      <AppPopover.Trigger<'button'>
         onMouseDown={(event) => {
           event.preventDefault();
           event.stopPropagation();
         }}
+        render={({ disabled, ...triggerProps }) => (
+          <AppIconButton
+            {...triggerProps}
+            isDisabled={disabled}
+            icon={
+              <span className={styles.iconGlyph} data-highlight-block-icon="">
+                {props.icon}
+              </span>
+            }
+            label={t('highlight.changeIcon')}
+            size="sm"
+            isActive={open}
+            className={styles.iconButton}
+            tooltip={{ placement: 'top' }}
+          />
+        )}
       />
       <AppPopover.Content placement="bottom start" bodyPadding="none">
         <EmojiPickerContent ariaLabel={t('highlight.emojiPicker')} onSelect={handleSelect} />

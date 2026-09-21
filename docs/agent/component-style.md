@@ -65,7 +65,7 @@ ComponentName/
 - 纯图标按钮统一使用 `AppIconButton`，必须同时提供 hover/focus tooltip 和可访问名称；不要用 `title` 代替 tooltip。
 - 带有清晰可见文字的按钮不重复显示同义 tooltip；截断文本、禁用原因或复杂状态按需提供 tooltip。
 - `AppIconButton` 的 hover 背景统一为圆角方形，业务样式不得覆盖其圆角；圆形控件仅用于头像、状态点等本身具有圆形语义的元素。
-- `AppIconButton`、`AppButton` 直接放在 Dropdown 或 AppPopover 根节点内，由 HeroUI / React Aria 的上下文提供触发行为，不再外包 `Dropdown.Trigger` / `AppPopover.Trigger`。图标按钮的 Tooltip 由 `AppIconButton` 统一提供；Tooltip、菜单或 Popover 不得为同一动作创建第二个 button、role="button" 或 Tab 停靠点。
+- `AppIconButton` 保留原生按钮的事件语义；作为浮层触发器时，通过 `Dropdown.Trigger` 或 `AppPopover.Trigger<'button'>` 的 `render` 渲染它，并透传事件、ref、ARIA 属性及禁用状态，让触发器与按钮共用一个 DOM 节点。`AppButton` 已使用 HeroUI Button，可直接承接浮层上下文。Tooltip 由 `AppIconButton` 统一提供；Tooltip、菜单或 Popover 不得为同一动作创建第二个 button、role="button" 或 Tab 停靠点。禁用提示可使用无角色、不可聚焦的容器接收 hover。
 - Tooltip 方向由所在控件组统一决定，不由单个按钮随意选择：顶部工具栏向下、底部工具栏向上、左侧竖向工具栏向右、右侧竖向工具栏向左；同一控件组必须一致，仅在视口空间不足时允许浮层自动翻转。
 - 表格、菜单、tabs、开关、滑块等控件使用符合用户预期的交互形态。
 - 弹窗 footer 的确定/取消按钮由 Overlay 组件统一控制间距，业务代码只按视觉顺序传入按钮或 actions。

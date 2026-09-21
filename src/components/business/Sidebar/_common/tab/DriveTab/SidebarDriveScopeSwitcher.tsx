@@ -54,12 +54,18 @@ function SidebarDriveScopeSwitcher() {
 
   return (
     <Dropdown isOpen={open} onOpenChange={setOpen}>
-      <AppIconButton
-        icon={<ChevronsUpDown size={14} aria-hidden="true" />}
-        label={t('sidebar.switchScope')}
-        size="sm"
-        className={styles.nodeActionBtn}
-        tooltip={{ content: t('sidebar.switchDrive') }}
+      <Dropdown.Trigger
+        render={({ disabled, ...triggerProps }) => (
+          <AppIconButton
+            {...triggerProps}
+            isDisabled={disabled}
+            icon={<ChevronsUpDown size={14} aria-hidden="true" />}
+            label={t('sidebar.switchScope')}
+            size="sm"
+            className={styles.nodeActionBtn}
+            tooltip={{ content: t('sidebar.switchDrive') }}
+          />
+        )}
       />
       <Dropdown.Popover className={styles.scopeMenuPanel} placement="right">
         <Dropdown.Menu
