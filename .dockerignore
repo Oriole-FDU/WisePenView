@@ -1,0 +1,17 @@
+.git
+.github
+.husky
+.storybook
+.pnpm-store
+node_modules
+release
+storybook-static
+.electron
+logs
+*.log
+pnpm-debug.log*
+
+Dockerfile
+!Dockerfile
+!nginx.conf
+!dist/**

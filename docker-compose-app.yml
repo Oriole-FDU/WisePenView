@@ -1,0 +1,7 @@
+services:
+  frontend:
+    image: ${DOCKER_REGISTRY}/wisepenview:${APP_VERSION}
+    container_name: wisepen-view
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-8085}:80"
