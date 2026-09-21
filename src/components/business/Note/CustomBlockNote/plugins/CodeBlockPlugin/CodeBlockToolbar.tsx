@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import AppIconButton from '@/components/base/Button/AppIconButton';
+import AppIconButton, { type AppIconButtonProps } from '@/components/base/Button/AppIconButton';
 import { copyText } from '@/utils/browser/copyText';
 
 const COPY_FEEDBACK_DURATION = 1200;
@@ -70,7 +70,7 @@ export function CodeBlockToolbar({
   const activeLanguageOptionId =
     activeLanguageIndex >= 0 ? `${languageListId}-option-${activeLanguageIndex}` : undefined;
 
-  const handleCopy = async (event: MouseEvent<HTMLButtonElement>) => {
+  const handleCopy: AppIconButtonProps['onClick'] = async (event) => {
     event.preventDefault();
     event.stopPropagation();
     const copied = await copyText(codeElement.textContent ?? '');
@@ -80,7 +80,7 @@ export function CodeBlockToolbar({
     }
   };
 
-  const handleToggleCollapsed = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleToggleCollapsed: AppIconButtonProps['onClick'] = (event) => {
     event.preventDefault();
     event.stopPropagation();
     setCollapsed((prev) => {

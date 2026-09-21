@@ -22,7 +22,6 @@ function TableRowActions({ actions, ariaLabel, onAction }: TableRowActionsProps)
         label={resolvedAriaLabel}
         size="sm"
         className={styles.trigger}
-        overlayTrigger={<Dropdown.Trigger />}
       />
       <Dropdown.Popover placement="bottom end">
         <Dropdown.Menu

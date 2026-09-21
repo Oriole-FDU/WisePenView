@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 
 import type { CourseEditorForm, UpdateCourseEditorForm } from '../../model';
 import styles from '../../style.module.less';
@@ -77,22 +76,21 @@ function CourseBasicSection({
         <div className={styles.coverField}>
           <span className={styles.coverLabel}>{t('editor.fields.cover')}</span>
           <Tooltip>
-            <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-              <button
-                type="button"
-                className={styles.coverButton}
-                aria-label={t('editor.actions.changeCover')}
-                onClick={onChangeCover}
-              >
-                <img
-                  src={coverUrl}
-                  alt={t('editor.fields.coverAlt', { name: form.name })}
-                  onError={onCoverImageError}
-                />
-                <span>
-                  <Pencil size={16} aria-hidden />
-                </span>
-              </button>
+            <Tooltip.Trigger<'button'>
+              render={(props) => <button {...props} />}
+              type="button"
+              className={styles.coverButton}
+              aria-label={t('editor.actions.changeCover')}
+              onClick={onChangeCover}
+            >
+              <img
+                src={coverUrl}
+                alt={t('editor.fields.coverAlt', { name: form.name })}
+                onError={onCoverImageError}
+              />
+              <span>
+                <Pencil size={16} aria-hidden />
+              </span>
             </Tooltip.Trigger>
             <Tooltip.Content>{t('editor.actions.changeCover')}</Tooltip.Content>
           </Tooltip>

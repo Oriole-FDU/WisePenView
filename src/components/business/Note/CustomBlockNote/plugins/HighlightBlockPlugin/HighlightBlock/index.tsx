@@ -43,7 +43,6 @@ function HighlightIconPicker({ block, editor }: HighlightBlockRenderProps) {
         size="sm"
         isActive={open}
         className={styles.iconButton}
-        overlayTrigger={<AppPopover.Trigger />}
         tooltip={{ placement: 'top' }}
         onMouseDown={(event) => {
           event.preventDefault();

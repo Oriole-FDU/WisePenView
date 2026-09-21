@@ -77,13 +77,12 @@ export function ColorMenu(buttonGroupProps: ButtonGroupChildProps) {
 
   return (
     <AppPopover isOpen={open} onOpenChange={setOpen} deferContent={false}>
-      <AppPopover.Trigger>
-        <ToolbarButton
-          {...buttonGroupProps}
-          icon={<ColorTextIcon textClassName={selectedTextColor.textClassName} />}
-          label={t('editor.color.label')}
-        />
-      </AppPopover.Trigger>
+      <ToolbarButton
+        {...buttonGroupProps}
+        icon={<ColorTextIcon textClassName={selectedTextColor.textClassName} />}
+        label={t('editor.color.label')}
+      />
+
       <AppPopover.Content placement="bottom" bodyPadding="none">
         <ColorPaletteContent
           text={

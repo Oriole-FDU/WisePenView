@@ -112,7 +112,6 @@ function CourseOutlineNodeTitle({
                   size="sm"
                   className={styles.outlineNodeActionButton}
                   tooltip={{ content: t('editor.outline.addContent') }}
-                  overlayTrigger={<Dropdown.Trigger />}
                 />
                 <Dropdown.Popover className={styles.outlineActionMenu} placement="right">
                   <Dropdown.Menu aria-label={t('editor.outline.addContent')}>
@@ -161,7 +160,6 @@ function CourseOutlineNodeTitle({
               size="sm"
               className={styles.outlineNodeActionButton}
               tooltip={{ content: t('editor.outline.moreActionsLabel') }}
-              overlayTrigger={<Dropdown.Trigger />}
             />
             <Dropdown.Popover className={styles.outlineActionMenu} placement="right">
               <Dropdown.Menu aria-label={t('editor.outline.moreActionsLabel')}>

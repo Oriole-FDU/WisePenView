@@ -174,7 +174,6 @@ function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
         size="sm"
         isDisabled={disabled}
         className={styles.iconButton}
-        overlayTrigger={<AppPopover.Trigger />}
       />
       <AppPopover.Content placement="bottom end" bodyPadding="none">
         <EmojiPickerContent

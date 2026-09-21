@@ -129,7 +129,6 @@ function ResourceHeaderMore({
         size="sm"
         isDisabled={isDisabled || isMenuPending}
         aria-busy={isPending || undefined}
-        overlayTrigger={<Dropdown.Trigger />}
       />
       <Dropdown.Popover placement="bottom end" className={styles.popover}>
         <Dropdown.Menu aria-label={t('header.menuAria')} onAction={handleAction}>

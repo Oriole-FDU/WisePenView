@@ -60,7 +60,6 @@ function SidebarDriveScopeSwitcher() {
         size="sm"
         className={styles.nodeActionBtn}
         tooltip={{ content: t('sidebar.switchDrive') }}
-        overlayTrigger={<Dropdown.Trigger />}
       />
       <Dropdown.Popover className={styles.scopeMenuPanel} placement="right">
         <Dropdown.Menu

@@ -1,7 +1,6 @@
-import { ToggleButton, Tooltip } from '@heroui/react';
-import { cloneElement, type ComponentProps } from 'react';
+import { Button, ToggleButton, Tooltip } from '@heroui/react';
+import type { ComponentProps } from 'react';
 
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import { cn } from '@/utils/cn';
 
 import type { AppIconButtonProps } from './index.type';
@@ -15,7 +14,6 @@ function AppIconButton({
   isDisabled = false,
   onClick,
   onPress,
-  overlayTrigger,
   ref,
   size = 'md',
   toggleId,
@@ -23,8 +21,6 @@ function AppIconButton({
   variant = 'ghost',
   ...buttonProps
 }: AppIconButtonProps) {
-  // ToggleButton 与原生 button 的事件泛型不同，实际仅透传二者共有的 DOM 属性。
-  const toggleButtonProps = buttonProps as ComponentProps<typeof ToggleButton>;
   const classNames = cn(
     styles.root,
     styles[size],
@@ -32,6 +28,8 @@ function AppIconButton({
     isActive && styles.active,
     className
   );
+  // HeroUI 的 ToggleButton 将部分 DOM 事件声明为 div 泛型，但实际根节点和 ref 均为 button。
+  const toggleButtonProps = buttonProps as ComponentProps<typeof ToggleButton>;
   const button = toggleId ? (
     <ToggleButton
       {...toggleButtonProps}
@@ -49,39 +47,38 @@ function AppIconButton({
       {icon}
     </ToggleButton>
   ) : (
-    <button
+    <Button
       {...buttonProps}
       ref={ref}
       type="button"
-      disabled={isDisabled}
+      isDisabled={isDisabled}
       className={classNames}
-      onClick={
-        isDisabled
-          ? undefined
-          : (event) => {
-              onClick?.(event);
-              onPress?.();
-            }
-      }
+      // 保留原图标尺寸与按钮样式，只使用 HeroUI 的交互和浮层上下文。
+      render={(props) => <button {...props} className={classNames} />}
+      onClick={isDisabled ? undefined : onClick}
+      onPress={isDisabled ? undefined : onPress}
       aria-label={label}
       aria-pressed={isActive}
       aria-disabled={isDisabled || undefined}
       data-disabled={isDisabled || undefined}
     >
       {icon}
-    </button>
+    </Button>
   );
-
-  const trigger = overlayTrigger ? cloneElement(overlayTrigger, undefined, button) : button;
 
   return (
     <Tooltip delay={tooltip.delay} closeDelay={tooltip.closeDelay}>
-      <Tooltip.Trigger
-        className={cn(styles.tooltipTrigger, tooltip.triggerClassName)}
-        {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}
-      >
-        {trigger}
-      </Tooltip.Trigger>
+      {isDisabled ? (
+        // disabled 按钮不接收 hover，用无角色、不可聚焦的布局节点保留禁用提示。
+        <Tooltip.Trigger<'span'>
+          className={cn(styles.tooltipTrigger, tooltip.triggerClassName)}
+          render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+        >
+          {button}
+        </Tooltip.Trigger>
+      ) : (
+        <span className={cn(styles.tooltipTrigger, tooltip.triggerClassName)}>{button}</span>
+      )}
       <Tooltip.Content
         placement={tooltip.placement}
         offset={tooltip.offset}

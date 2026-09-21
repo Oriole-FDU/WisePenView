@@ -69,17 +69,15 @@ function UserMessageAttachments({
 
       {overflowCount > 0 ? (
         <AppPopover isOpen={moreOpen} onOpenChange={setMoreOpen} deferContent={false}>
-          <AppPopover.Trigger
+          <AppPopover.Trigger<'button'>
+            render={(props) => <button {...props} />}
+            type="button"
             title={t('message.attachments.viewAll', { count: attachments.length })}
+            className={styles.moreTrigger}
+            aria-label={t('message.attachments.remaining', { count: overflowCount })}
+            aria-expanded={moreOpen}
           >
-            <button
-              type="button"
-              className={styles.moreTrigger}
-              aria-label={t('message.attachments.remaining', { count: overflowCount })}
-              aria-expanded={moreOpen}
-            >
-              +{overflowCount}
-            </button>
+            +{overflowCount}
           </AppPopover.Trigger>
           <AppPopover.Content
             className={styles.morePopover}

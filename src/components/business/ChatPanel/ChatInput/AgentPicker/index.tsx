@@ -177,7 +177,6 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
           icon={renderAgentIcon(selectedAgent, 17)}
           label={t('input.agentPicker.trigger')}
           tooltip={{ content: getAgentLabel(selectedAgent) }}
-          overlayTrigger={<Dropdown.Trigger />}
         />
         <Dropdown.Popover className={styles.popoverPanelAgent} placement="top">
           {showSkeleton ? (
