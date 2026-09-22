@@ -17,7 +17,7 @@ import auth from '../_common/style.module.less';
 type ResetPasswordField = keyof ResetPasswordRequest;
 
 const DEFAULT_RESET_PASSWORD_VALUES: ResetPasswordRequest = {
-  userName: '',
+  username: '',
 };
 
 function ResetPassword() {
@@ -43,10 +43,10 @@ function ResetPassword() {
 
   const validateForm = () => {
     const nextErrors: FieldErrors<ResetPasswordField> = {
-      userName: runFieldValidation([
+      username: runFieldValidation([
         {
-          test: () => formValues.userName.trim().length > 0,
-          message: t('resetPassword.userNameRequired'),
+          test: () => formValues.username.trim().length > 0,
+          message: t('resetPassword.usernameRequired'),
         },
       ]),
     };
@@ -57,7 +57,7 @@ function ResetPassword() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!validateForm()) return;
-    submitResetPassword({ userName: formValues.userName.trim() });
+    submitResetPassword({ username: formValues.username.trim() });
   };
 
   return (
@@ -75,16 +75,16 @@ function ResetPassword() {
       </Alert>
       <Form onSubmit={handleSubmit} className={auth.form}>
         <FormField
-          aria-label={t('resetPassword.userNameLabel')}
-          label={t('resetPassword.userNameLabel')}
-          name="userName"
-          value={formValues.userName}
-          onChange={(value) => updateFormValue('userName', value)}
-          errorMessage={formErrors.userName}
+          aria-label={t('resetPassword.usernameLabel')}
+          label={t('resetPassword.usernameLabel')}
+          name="username"
+          value={formValues.username}
+          onChange={(value) => updateFormValue('username', value)}
+          errorMessage={formErrors.username}
           isRequired
         >
           <AuthIconField
-            placeholder={t('resetPassword.userNamePlaceholder')}
+            placeholder={t('resetPassword.usernamePlaceholder')}
             autoComplete="username"
           />
         </FormField>
