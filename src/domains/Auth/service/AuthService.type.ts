@@ -14,7 +14,7 @@ export interface RegisterRequest {
 
 /** 忘记密码-发送邮件请求参数 */
 export interface ResetPasswordRequest {
-  userName: string;
+  username: string;
 }
 
 /** 忘记密码-重置新密码请求参数 */

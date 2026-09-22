@@ -13,7 +13,7 @@ export interface RegisterApiRequest {
 }
 
 export interface ResetPasswordApiRequest {
-  userName: string;
+  username: string;
   code?: string;
   uuid?: string;
 }
