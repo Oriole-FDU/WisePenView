@@ -1,0 +1,101 @@
+name: 自动发布版本
+
+# 触发时机：
+# - main 收到推送（含 PR 合并）后，检查 package.json 的 version 是否刷新，
+#   刷新则打标签 v<version> 并创建 GitHub Release，未刷新则直接跳过。
+# - 支持手动触发，用于补发版本或重跑失败任务。
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+# 创建标签与 Release 需要写权限
+permissions:
+  contents: write
+
+# 同一分支串行执行，避免并发建标签
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: 检测版本号并发布
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # 需要与上一个提交比较 package.json，必须拉取完整历史
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: 解析版本号变化
+        id: version
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 读取工作区或指定提交的 package.json version
+          read_version() {
+            if [ -z "${1:-}" ]; then
+              node -p "require('./package.json').version"
+            else
+              git show "${1}:package.json" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version"
+            fi
+          }
+
+          ZERO_SHA="0000000000000000000000000000000000000000"
+          BEFORE="${BEFORE_SHA:-}"
+          # 首次推送或手动触发时拿不到 before，退化为与父提交比较
+          if [ -z "${BEFORE}" ] || [ "${BEFORE}" = "${ZERO_SHA}" ] || ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            BEFORE="$(git rev-parse --verify --quiet 'HEAD^' || echo '')"
+          fi
+
+          CURRENT_VERSION="$(read_version)"
+          PREVIOUS_VERSION=""
+          if [ -n "${BEFORE}" ]; then
+            PREVIOUS_VERSION="$(read_version "${BEFORE}" || echo '')"
+          fi
+
+          echo "上一个版本：${PREVIOUS_VERSION:-<无>}，当前版本：${CURRENT_VERSION}"
+          echo "本次提交：${AFTER_SHA}"
+
+          if [ "${CURRENT_VERSION}" = "${PREVIOUS_VERSION}" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "package.json 版本号未刷新，跳过发布"
+            exit 0
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "tag=v${CURRENT_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: 创建标签与 GitHub Release
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 标签已存在说明该版本发布过，保持幂等
+          if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
+            echo "标签 ${TAG} 已存在，跳过发布" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          gh release create "${TAG}" \
+            --target "${TARGET_SHA}" \
+            --title "${TAG}" \
+            --generate-notes
+
+          echo "已发布 ${TAG}，提交 ${TARGET_SHA}" >> "$GITHUB_STEP_SUMMARY"
