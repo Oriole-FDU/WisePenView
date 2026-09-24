@@ -1,8 +1,10 @@
 import { ArrowLeft } from 'lucide-react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import AppForm from '@/components/business/AppForm';
 import { useCourseContext } from '@/layouts/Course/CourseContext';
 import { buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
@@ -11,12 +13,10 @@ import CourseAssessmentSection from './_components/CourseAssessmentSection';
 import CourseBasicSection from './_components/CourseBasicSection';
 import CourseCoverModal from './_components/CourseCoverModal';
 import CourseDangerSection from './_components/CourseDangerSection';
-import CourseEditorNav from './_components/CourseEditorNav';
 import CourseGoalsSection from './_components/CourseGoalsSection';
 import CoursePermissionSection from './_components/CoursePermissionSection';
 import CourseScheduleSection from './_components/CourseScheduleSection';
 import { useCourseEditorFormController } from './controllers/useCourseEditorFormController';
-import { useCourseEditorNavigationController } from './controllers/useCourseEditorNavigationController';
 import styles from './style.module.less';
 
 function CourseEditorPage() {
@@ -24,9 +24,23 @@ function CourseEditorPage() {
   const { course, refreshCourse } = useCourseContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const editorScrollRef = useRef<HTMLElement | null>(null);
   const editor = useCourseEditorFormController({ course, refreshCourse });
-  const { activeSection, setEditorScrollElement, navigateToSection, handleEditorScroll } =
-    useCourseEditorNavigationController();
+  const navGroups = [
+    {
+      title: t('editor.groups.info'),
+      items: [
+        { id: 'course-editor-basic', label: t('editor.nav.basic') },
+        { id: 'course-editor-goals', label: t('editor.nav.goals') },
+        { id: 'course-editor-schedule', label: t('editor.nav.schedule') },
+        { id: 'course-editor-assessment', label: t('editor.nav.assessment') },
+      ],
+    },
+    {
+      title: t('editor.groups.management'),
+      items: [{ id: 'course-editor-access', label: t('editor.nav.access') }],
+    },
+  ];
 
   return (
     <div className={styles.editorShell}>
@@ -50,13 +64,15 @@ function CourseEditorPage() {
       </header>
 
       <div className={styles.editorBody}>
-        <CourseEditorNav activeSection={activeSection} onNavigate={navigateToSection} />
+        <AppForm.AnchorNav
+          ariaLabel={t('editor.navigationAria')}
+          items={navGroups}
+          scrollContainerRef={editorScrollRef}
+          scrollOffset={32}
+          activationOffset={32}
+        />
 
-        <main
-          ref={setEditorScrollElement}
-          className={styles.editorScroll}
-          onScroll={handleEditorScroll}
-        >
+        <main ref={editorScrollRef} className={styles.editorScroll}>
           <div className={styles.editorContent}>
             <CourseBasicSection
               form={editor.form}

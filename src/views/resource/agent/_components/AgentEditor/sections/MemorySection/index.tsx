@@ -4,12 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { FormField, TextArea } from '@/components/base/Input';
+import AppForm from '@/components/business/AppForm';
 import type { AgentSpec } from '@/domains/Agent';
 
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';
 import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
-import SectionShell from '../../shared/SectionShell';
-import SettingRow from '../../shared/SettingRow';
 import styles from './style.module.less';
 
 interface Props {
@@ -41,8 +40,13 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
 
   return (
     <>
-      <SectionShell id="memory" title={t('memory.title')} description={t('memory.description')}>
-        <SettingRow
+      <AppForm.Section
+        id="memory"
+        title={t('memory.title')}
+        description={t('memory.description')}
+        variant="editor"
+      >
+        <AppForm.Row
           title={t('memory.chat')}
           description={t('memory.chatDescription')}
           selected={policy.enableChatMemory}
@@ -51,14 +55,14 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
         />
         {policy.enableChatMemory ? (
           <>
-            <SettingRow
+            <AppForm.Row
               title={t('memory.persist')}
               description={t('memory.persistDescription')}
               selected={policy.enablePersistenceChatMemory}
               disabled={disabled}
               onChange={(value) => updatePolicy({ enablePersistenceChatMemory: value })}
             />
-            <SettingRow
+            <AppForm.Row
               title={t('memory.summary')}
               description={t('memory.summaryDescription')}
               selected={policy.enableChatMemorySummary}
@@ -67,7 +71,7 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
             />
           </>
         ) : null}
-        <SettingRow
+        <AppForm.Row
           title={t('memory.longTerm')}
           description={t('memory.longTermDescription')}
           selected={policy.enableLongTermMemory}
@@ -193,7 +197,7 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
             </FormField>
           </div>
         ) : null}
-      </SectionShell>
+      </AppForm.Section>
       <PresetRestoreConfirmDialog
         isOpen={restoreOpen}
         onOpenChange={setRestoreOpen}

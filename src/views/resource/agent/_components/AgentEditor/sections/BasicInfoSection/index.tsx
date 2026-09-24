@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import { FormField, Input, TextArea } from '@/components/base/Input';
+import AppForm from '@/components/business/AppForm';
 import type { AgentSpec } from '@/domains/Agent';
 
-import SectionShell from '../../shared/SectionShell';
-import SettingRow from '../../shared/SettingRow';
 import styles from './style.module.less';
 
 interface Props {
@@ -29,7 +28,12 @@ export default function BasicInfoSection({
   const { t } = useTranslation('agent');
 
   return (
-    <SectionShell id="agent-info" title={t('basic.title')} description={t('basic.description')}>
+    <AppForm.Section
+      id="agent-info"
+      title={t('basic.title')}
+      description={t('basic.description')}
+      variant="editor"
+    >
       <div className={styles.form}>
         <FormField
           label="name"
@@ -49,7 +53,7 @@ export default function BasicInfoSection({
         >
           <TextArea maxLength={500} rows={4} placeholder={t('basic.descriptionPlaceholder')} />
         </FormField>
-        <SettingRow
+        <AppForm.Row
           title={t('basic.autoTitle')}
           description={t('basic.autoTitleDescription')}
           selected={spec.autoGenerateTitle}
@@ -57,6 +61,6 @@ export default function BasicInfoSection({
           onChange={(value) => onSpecChange({ ...spec, autoGenerateTitle: value })}
         />
       </div>
-    </SectionShell>
+    </AppForm.Section>
   );
 }

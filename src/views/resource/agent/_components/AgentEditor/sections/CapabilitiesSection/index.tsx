@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
+import AppForm from '@/components/business/AppForm';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ToolOption } from '@/domains/Chat';
 import type { SkillSummary } from '@/domains/Skill';
 
-import SectionShell from '../../shared/SectionShell';
-import SettingRow from '../../shared/SettingRow';
 import CapabilityPolicyPanel, { type CapabilityPolicyOption } from './CapabilityPolicyPanel';
 
 interface Props {
@@ -69,12 +68,13 @@ export default function CapabilitiesSection({ spec, tools, skills, disabled, onC
   };
 
   return (
-    <SectionShell
+    <AppForm.Section
       id="capabilities"
       title={t('capabilities.title')}
       description={t('capabilities.description')}
+      variant="editor"
     >
-      <SettingRow
+      <AppForm.Row
         title={t('capabilities.defaultToolSelection')}
         description={t('capabilities.defaultToolSelectionDescription')}
         selected={policy.toolSelectionDefaultEnabled}
@@ -120,6 +120,6 @@ export default function CapabilitiesSection({ spec, tools, skills, disabled, onC
         disabled={disabled}
         onChange={(ids) => updatePolicy({ onDemandSkillIds: ids })}
       />
-    </SectionShell>
+    </AppForm.Section>
   );
 }

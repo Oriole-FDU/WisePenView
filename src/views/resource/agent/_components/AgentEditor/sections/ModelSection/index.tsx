@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import AppForm from '@/components/business/AppForm';
 import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/Chat';
 
-import SectionShell from '../../shared/SectionShell';
-import SettingRow from '../../shared/SettingRow';
 import styles from './style.module.less';
 
 interface Props {
@@ -39,7 +38,12 @@ export default function ModelSection({ spec, models, disabled, onChange }: Props
   };
 
   return (
-    <SectionShell id="model" title={t('model.title')} description={t('model.description')}>
+    <AppForm.Section
+      id="model"
+      title={t('model.title')}
+      description={t('model.description')}
+      variant="editor"
+    >
       <div className={styles.modelRow}>
         <div>
           <strong>{t('model.default')}</strong>
@@ -54,7 +58,7 @@ export default function ModelSection({ spec, models, disabled, onChange }: Props
           disabled={disabled || models.length === 0}
         />
       </div>
-      <SettingRow
+      <AppForm.Row
         title={t('model.allowSwitch')}
         description={t('model.allowSwitchDescription')}
         selected={spec.modelPolicy.allowRequestOverride}
@@ -66,6 +70,6 @@ export default function ModelSection({ spec, models, disabled, onChange }: Props
           })
         }
       />
-    </SectionShell>
+    </AppForm.Section>
   );
 }
