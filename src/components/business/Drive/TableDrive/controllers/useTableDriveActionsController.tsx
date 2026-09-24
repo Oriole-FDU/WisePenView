@@ -7,6 +7,7 @@ import {
   getSupportedDriveDocumentFiles,
   useDriveDocumentUpload,
 } from '@/components/business/Drive/common/useDriveDocumentUpload';
+import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import {
   DriveCreateModal,
   type DriveCreateType,
@@ -108,9 +109,10 @@ export function useTableDriveActionsController({
       if (selectedNodes.length === 0) return;
       if (scope.type === 'group') {
         await driveService.removeNodesFromGroup({ nodes: selectedNodes });
-        return;
+      } else {
+        await driveService.moveNodesToTrash({ nodes: selectedNodes });
       }
-      await driveService.moveNodesToTrash({ nodes: selectedNodes });
+      requestDriveRefresh();
     },
     {
       manual: true,

@@ -63,6 +63,8 @@ function DataTable<T extends object>({
   getRowClassName,
   sortDescriptor,
   onSortChange,
+  selection,
+  virtualized = true,
 }: DataTableProps<T>) {
   const { t, i18n } = useTranslation('table');
   const sortLocale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
@@ -132,12 +134,16 @@ function DataTable<T extends object>({
   );
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Virtual 官方 hook 与 React Compiler 的兼容提示，当前组件需要虚拟滚动能力。
   const rowVirtualizer = useVirtualizer({
+    enabled: virtualized,
     count: sortedItems.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => VIRTUAL_ROW_ESTIMATE_SIZE,
     overscan: VIRTUAL_ROW_OVERSCAN,
   });
   const virtualRows = rowVirtualizer.getVirtualItems();
+  const renderedRows = virtualized
+    ? virtualRows.map((virtualRow) => sortedItems[virtualRow.index])
+    : sortedItems;
   const virtualTopPadding = virtualRows[0]?.start ?? 0;
   const virtualBottomPadding =
     virtualRows.length > 0
@@ -179,6 +185,10 @@ function DataTable<T extends object>({
             data-eq-count={eqColumnCount}
             sortDescriptor={sortDescriptor}
             onSortChange={onSortChange}
+            selectionMode={selection ? 'multiple' : undefined}
+            selectedKeys={selection?.selectedKeys ?? []}
+            onSelectionChange={selection?.onSelectionChange}
+            disabledKeys={selection?.disabledKeys}
           >
             <Table.Header>
               {columns.map((column) => {
@@ -240,8 +250,7 @@ function DataTable<T extends object>({
                       />
                     </Table.Row>
                   ) : null}
-                  {virtualRows.map((virtualRow) => {
-                    const row = sortedItems[virtualRow.index];
+                  {renderedRows.map((row) => {
                     if (!row) return null;
                     const rowId = String(row[rowKey]);
                     const ctx: DataTableRowContext<T> = { row, rowId };
@@ -259,7 +268,8 @@ function DataTable<T extends object>({
                             className={joinClassNames(
                               styles.bodyCell,
                               resolveReadonlyColumnWidthClass(column.width, equalColumnLayout),
-                              column.className
+                              column.className,
+                              column.getCellClassName?.(row, ctx)
                             )}
                           >
                             <TableCellAlign

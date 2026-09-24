@@ -222,15 +222,15 @@ try {
   const candidates = await user.queryUserSearchCandidates({ keyword: 'xiaoming' });
   assert.equal(candidates.length, 1);
   assert(
-    (await wallet.listMergedTransactions({ typeA: 1, typeB: 2, page: 1, size: 20 })).records
-      .length > 0
+    (await wallet.listTransactions({ transactionTypes: ['REFILL', 'SPEND'], page: 1, size: 20 }))
+      .records.length > 0
   );
   const groupBalance = await group.getGroupWalletInfo({ groupId: '1' });
   const userBalance = (await wallet.getUserWalletInfo()).balance;
   await wallet.transferTokenBetweenGroupAndUser({
     groupId: '1',
     tokenCount: 100,
-    tokenTransferType: 1,
+    tokenTransferType: 'GROUP_INFLOW',
   });
   assert.equal(await group.getGroupWalletInfo({ groupId: '1' }), groupBalance + 100);
   assert.equal((await wallet.getUserWalletInfo()).balance, userBalance - 100);

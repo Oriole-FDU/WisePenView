@@ -6,11 +6,11 @@ import {
   useAttachNoteYjsUndoStack,
   useNoteYjsUndoManager,
 } from '../engines/collaboration/useNoteYjsUndoStack';
-import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
+import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 import type { NoteEditorDefinition } from './useNoteEditorDefinition';
 
-type CollaborationUser = CustomBlockNoteProps['collaboration']['user'];
+type CollaborationUser = NoteEditorRuntimeProps['collaboration']['user'];
 type YCursorExtensionHandle = {
   updateUser?: (user: CollaborationUser) => void;
 };
@@ -25,7 +25,7 @@ export function useNoteCollaboration({
 }: {
   editor: CustomBlockNoteEditor;
   definition: NoteEditorDefinition;
-  collaboration: CustomBlockNoteProps['collaboration'];
+  collaboration: NoteEditorRuntimeProps['collaboration'];
   readOnly: boolean;
 }) {
   const { color: collaborationUserColor, name: collaborationUserName } = collaborationUser;

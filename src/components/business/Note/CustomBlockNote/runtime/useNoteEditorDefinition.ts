@@ -9,13 +9,13 @@ import { getAiContentStore } from '../engines/aiDiff/store';
 import { useNoteYjsFragment } from '../engines/collaboration/useNoteYjsUndoStack';
 import { createNoteReadOnlyFilterExtension } from '../engines/editor/readOnly';
 import { createInlineCommentExtension } from '../engines/inlineComments/extension';
-import type { CustomBlockNoteProps, NoteCollaborationUser } from '../index.type';
 import {
   blockNoteSchema,
   collectNoteEditorExtensions,
   collectNoteEditorProps,
   notePluginRegistry,
 } from '../registry/noteEditorComposition';
+import type { NoteCollaborationUser, NoteEditorRuntimeProps } from '../runtime/runtime.type';
 
 type CreateBlockNoteOptions = NonNullable<Parameters<typeof useCreateBlockNote>[0]>;
 type BlockNoteCollaborationConfig = NonNullable<CreateBlockNoteOptions['collaboration']>;
@@ -121,7 +121,7 @@ export function useNoteEditorDefinition(
     collaboration: { doc, provider, user: collaborationUser },
     state: { blockLocalDocWrites },
     inlineComments,
-  }: CustomBlockNoteProps,
+  }: NoteEditorRuntimeProps,
   {
     uploadFile,
   }: {

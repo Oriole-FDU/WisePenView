@@ -10,11 +10,8 @@ import type {
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
   IUserService,
-  ListAdminMessagesRequest,
-  ListAdminMessagesResponse,
   ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
-  PublishMessageRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
   SendEmailVerifyRequest,
@@ -93,19 +90,6 @@ const confirmEmailVerify = async (params: ConfirmEmailVerifyRequest): Promise<vo
   await UserApi.checkEmailVerify(query);
 };
 
-const listAdminMessages = async (
-  params: ListAdminMessagesRequest
-): Promise<ListAdminMessagesResponse> => {
-  const query = UserServicesMap.mapListAdminMessagesRequest(params);
-  const data = await UserApi.listAdminMessages(query);
-  return UserServicesMap.mapListAdminMessagesFromApi(data);
-};
-
-const publishMessage = async (params: PublishMessageRequest): Promise<void> => {
-  const payload = UserServicesMap.mapPublishMessageRequest(params);
-  await UserApi.publishMessage(payload);
-};
-
 const submitFeedback = async (params: SubmitFeedbackRequest): Promise<void> => {
   const payload = UserServicesMap.mapSubmitFeedbackRequest(params);
   await UserApi.addFeedback(payload);
@@ -181,11 +165,8 @@ export const createUserServices = (): IUserService => {
     initiateUISVerify,
     checkFudanUISVerify,
     confirmEmailVerify,
-    listAdminMessages,
-    publishMessage,
     submitFeedback,
     listTaskStatus,
     dailyCheckIn,
-    clearUserCache,
   };
 };

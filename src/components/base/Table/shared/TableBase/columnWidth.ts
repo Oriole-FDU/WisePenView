@@ -20,16 +20,6 @@ const FOLDER_COLUMN_WIDTH_CLASS: Record<FolderColumnWidth, string> = {
   folderAction: tableStyles.colFolderAction,
 };
 
-/** Editable 型专用 alias */
-export type EditableColumnWidth = TableColumnWidth | 'action' | 'checkbox' | 'enum';
-
-const EDITABLE_COLUMN_WIDTH_CLASS: Record<EditableColumnWidth, string> = {
-  ...BASE_COLUMN_WIDTH_CLASS,
-  action: tableStyles.colAction,
-  checkbox: tableStyles.colCheckbox,
-  enum: tableStyles.colEnum,
-};
-
 export function resolveBaseColumnWidthClass(width?: TableColumnWidth): string | undefined {
   if (!width) {
     return undefined;
@@ -42,13 +32,6 @@ export function resolveFolderColumnWidthClass(width?: FolderColumnWidth): string
     return undefined;
   }
   return FOLDER_COLUMN_WIDTH_CLASS[width];
-}
-
-export function resolveEditableColumnWidthClass(width?: EditableColumnWidth): string | undefined {
-  if (!width) {
-    return undefined;
-  }
-  return EDITABLE_COLUMN_WIDTH_CLASS[width];
 }
 
 export function isReadonlyEqualColumnLayout(columns: Array<{ width?: TableColumnWidth }>): boolean {

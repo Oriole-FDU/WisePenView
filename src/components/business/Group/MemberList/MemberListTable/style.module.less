@@ -1,3 +1,127 @@
+@import (reference) '@/components/base/Table/shared/styles/table.module.less';
+
+.management {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.managementTable {
+  --member-selection-offset: 0px;
+
+  :global(.table__content),
+  :global(.table__header),
+  :global(.table__body .table__row) {
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+  }
+
+  :global(.table-root--secondary .table__row .table__cell) {
+    :global(.select),
+    :global(.text-field) {
+      gap: 0;
+      max-height: @row-content-height;
+    }
+    :global(.select__trigger),
+    :global(input),
+    :global(.input) {
+      box-sizing: border-box;
+      height: @action-icon-size;
+      min-height: @action-icon-size;
+      max-height: @action-icon-size;
+      font-family: @table-font-family;
+      font-size: @table-font-size-body;
+      line-height: @table-line-height-body;
+    }
+    height: @table-row-height;
+    min-height: @table-row-height;
+    max-height: @table-row-height;
+  }
+
+  .selectionColumn,
+  .memberColumn,
+  .actionColumn {
+    position: sticky;
+    z-index: var(--app-z-index-sticky);
+    background: var(--surface);
+  }
+
+  .selectionColumn:global(.table__column),
+  .memberColumn:global(.table__column),
+  .actionColumn:global(.table__column) {
+    z-index: var(--app-z-index-sticky-header);
+    background: var(--table-chrome-bg);
+  }
+
+  .selectionColumn {
+    left: 0;
+    padding-inline: 0;
+    z-index: var(--app-z-index-sticky-raised);
+  }
+
+  .memberColumn {
+    left: var(--member-selection-offset);
+  }
+
+  .actionColumn {
+    right: 0;
+    padding-inline: 0;
+  }
+
+  :global(.table-root--secondary .table__row[data-selected='true'] .table__cell) {
+    background: var(--table-row-selected-bg);
+  }
+
+  :global(.table-root--secondary .table__row[aria-disabled='true'] .table__cell),
+  :global(.table-root--secondary .table__row[data-disabled='true'] .table__cell) {
+    opacity: var(--disabled-opacity);
+  }
+
+  @media (hover: hover) {
+    :global(.table-root--secondary .table__row:hover .table__cell),
+    :global(.table-root--secondary .table__row[data-hovered='true'] .table__cell) {
+      background: var(--table-row-hover-bg);
+    }
+
+    :global(.table-root--secondary .table__row[data-selected='true']:hover .table__cell) {
+      background: var(--table-row-selected-hover-bg);
+    }
+  }
+
+  :global(.table-root--secondary) .editingRow > :global(.table__cell),
+  :global(.table-root--secondary) .editingRow:hover > :global(.table__cell) {
+    background: var(--surface);
+  }
+
+  .editingMemberCell {
+    border-inline-start: 2px solid var(--accent);
+  }
+}
+
+.withSelection {
+  --member-selection-offset: @checkbox-column-width;
+}
+
+.inlineEditActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: @table-gap-inline;
+  :global(button) {
+    width: @action-icon-size;
+    min-width: @action-icon-size;
+    height: @action-icon-size;
+    min-height: @action-icon-size;
+  }
+}
+
+.editFieldDisabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
 .quotaItem {
   width: 100%;
   min-width: 180px;

@@ -4,9 +4,11 @@ import { useTranslation } from 'react-i18next';
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import type { ResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
+import { ResourceChatBinding } from '@/views/resource/ResourceChatBinding';
 
-import ResourceLayoutConfig from '../../../_components/ResourceLayoutConfig';
+import ResourceWorkspace, {
+  type ResourceWorkspaceProps,
+} from '../../../_components/ResourceWorkspace';
 import type { AgentVersionItem, AgentWorkspaceData } from '../../model';
 import styles from '../../style.module.less';
 import AgentEditor from '../AgentEditor';
@@ -56,16 +58,16 @@ export default function AgentWorkspace({
     }
     onVersionSelect(version);
   };
+  const agentDebug =
+    isOwner && viewingVersion === null
+      ? {
+          agent: draftSession.currentDraftAgent,
+          isDirty: draftSession.isDirty,
+          isSaving: draftSession.saveLoading,
+          onSaveDraft: draftSession.saveDraftForDebug,
+        }
+      : undefined;
   const headerConfig = {
-    chatAgentDebug:
-      isOwner && viewingVersion === null
-        ? {
-            agent: draftSession.currentDraftAgent,
-            isDirty: draftSession.isDirty,
-            isSaving: draftSession.saveLoading,
-            onSaveDraft: draftSession.saveDraftForDebug,
-          }
-        : undefined,
     header: {
       resource: {
         resourceId: agent.resourceId,
@@ -105,23 +107,12 @@ export default function AgentWorkspace({
         ) : undefined,
       },
     },
-  } satisfies ResourceHostLayoutConfig;
-  const layoutConfigDeps = [
-    agent,
-    draftSession.draft,
-    draftSession.isDirty,
-    draftSession.publishLoading,
-    draftSession.saveLoading,
-    draftSession.savePhase,
-    isOwner,
-    t,
-    versionLoading,
-    viewingVersion,
-  ];
+  } satisfies Omit<ResourceWorkspaceProps, 'children'>;
 
   return (
-    <ResourceLayoutConfig className={styles.pageWrap} config={headerConfig} deps={layoutConfigDeps}>
+    <ResourceWorkspace className={styles.pageWrap} {...headerConfig}>
       <>
+        <ResourceChatBinding resourceId={resourceId} agentDebug={agentDebug} />
         <AgentEditor
           assets={agent.assets}
           draft={draftSession.draft}
@@ -150,6 +141,6 @@ export default function AgentWorkspace({
           onConfirm={() => void draftSession.saveAndLeave()}
         />
       </>
-    </ResourceLayoutConfig>
+    </ResourceWorkspace>
   );
 }

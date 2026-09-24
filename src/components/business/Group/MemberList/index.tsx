@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { useGroupService, useQuotaService } from '@/domains';
+import { useGroupService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
 import { useApiPagination } from '@/hooks/useApi';
@@ -29,7 +29,6 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
   const { i18n, t } = useTranslation(['group', 'common']);
   const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const groupService = useGroupService();
-  const quotaService = useQuotaService();
   const selectedMembersMapRef = useRef<Map<string, GroupMember>>(new Map());
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
   const [selectedMembersList, setSelectedMembersList] = useState<GroupMember[]>([]);
@@ -204,7 +203,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
           setSavingRowId(null);
           return;
         }
-        await quotaService.setGroupQuota({
+        await groupService.setGroupQuota({
           groupId,
           targetUserIds: [member.userId],
           newTokenLimit: quota,

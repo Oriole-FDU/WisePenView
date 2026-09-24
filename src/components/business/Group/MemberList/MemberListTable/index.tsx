@@ -1,17 +1,19 @@
 import { ListBox } from '@heroui/react';
 import type { TFunction } from 'i18next';
+import { Check, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { Spin } from '@/components/base/Feedback';
 import { FormField, Input, Select } from '@/components/base/Input';
 import QuotaBar from '@/components/base/QuotaBar';
-import {
-  DataTable,
-  type DataTableColumn,
-  ManageTable,
-  type ManageTableColumn,
-} from '@/components/base/Table';
+import { DataTable, type DataTableColumn } from '@/components/base/Table';
+import { tableStyles } from '@/components/base/Table/shared/styles';
+import TableRowActions from '@/components/base/Table/shared/TableRowActions';
+import TableSelectionCheckbox from '@/components/base/Table/shared/TableSelectionCheckbox';
 import { GROUP_TYPE, type GroupMember, ROLE } from '@/domains/Group';
+import { cn } from '@/utils/cn';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
 import {
@@ -25,11 +27,14 @@ import type {
   MemberListPaginationConfig,
   MemberListTableProps,
 } from './index.type';
+import InlineEditError from './InlineEditError';
 import styles from './style.module.less';
 
 type MemberRecord = GroupMember & { key: string };
 type ReadonlyColumn = DataTableColumn<MemberRecord>;
-type EditableColumn = ManageTableColumn<MemberRecord>;
+type EditableColumn = DataTableColumn<MemberRecord> & {
+  renderEditCell?: (row: MemberRecord) => ReactNode;
+};
 
 const EMPTY_TEXT = '-';
 const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;
@@ -310,7 +315,8 @@ function buildEditableColumns(
     if (column.id === 'role') {
       return {
         ...column,
-        width: 'enum',
+        width: 'sm',
+        className: tableStyles.colEnum,
         renderCell: column.renderCell,
         renderEditCell: (member) =>
           props.editingKind === 'role'
@@ -346,6 +352,7 @@ function buildEditableColumns(
 
 function MemberListTable(props: MemberListTableProps) {
   const { t } = useTranslation('group');
+  const { t: tableT } = useTranslation('table');
   const {
     pagination,
     members,
@@ -409,68 +416,165 @@ function MemberListTable(props: MemberListTableProps) {
     );
   }
 
-  return (
-    <ManageTable
-      ariaLabel={t('member.table.manageAria')}
-      items={dataSource}
-      rowKey="key"
-      columns={buildEditableColumns(props, t)}
-      loading={loading}
-      emptyText={t('member.table.empty')}
-      toolbar={toolbar}
-      sortDescriptor={sortDescriptor}
-      onSortChange={onSortChange}
-      batchSelection={
-        batchEditMode
-          ? {
-              selectedKeys,
-              disabledKeys: disabledSelectionKeys,
-              onSelectionChange: (keys) => onSelectionChange(keys, dataSource),
-            }
-          : undefined
+  const disabledKeys = new Set(disabledSelectionKeys);
+  const selectableIds = dataSource
+    .map((member) => member.key)
+    .filter((id) => !disabledKeys.has(id));
+  const selectedIds = new Set(
+    selectedKeys === 'all' ? selectableIds : Array.from(selectedKeys, String)
+  );
+  const selectedCount = selectableIds.filter((id) => selectedIds.has(id)).length;
+  const allSelected = selectableIds.length > 0 && selectedCount === selectableIds.length;
+  const changeSelection = (ids: string[], selected: boolean) => {
+    const nextKeys = new Set(selectedIds);
+    ids.forEach((id) => {
+      if (disabledKeys.has(id)) return;
+      if (selected) nextKeys.add(id);
+      else nextKeys.delete(id);
+    });
+    onSelectionChange(nextKeys, dataSource);
+  };
+  const isEditing = (member: MemberRecord) =>
+    member.key === editingRowId || member.key === savingRowId || member.key === errorRowId;
+  const columns: DataTableColumn<MemberRecord>[] = buildEditableColumns(props, t).map((column) => ({
+    ...column,
+    className: cn(column.className, column.isRowHeader && styles.memberColumn),
+    getCellClassName: (member) =>
+      cn(
+        member.key === savingRowId && styles.editFieldDisabled,
+        isEditing(member) && column.isRowHeader && styles.editingMemberCell
+      ),
+    renderCell: (member, ctx) =>
+      isEditing(member) && column.renderEditCell
+        ? column.renderEditCell(member)
+        : column.renderCell(member, ctx),
+  }));
+  if (batchEditMode) {
+    columns.unshift({
+      id: '__selection',
+      align: 'center',
+      className: cn(styles.selectionColumn, tableStyles.colCheckbox),
+      label: (
+        <TableSelectionCheckbox
+          ariaLabel={tableT('aria.selectAll')}
+          isSelected={allSelected}
+          isIndeterminate={selectedCount > 0 && !allSelected}
+          isDisabled={selectableIds.length === 0}
+          onChange={(selected) => changeSelection(selectableIds, selected)}
+        />
+      ),
+      renderCell: (member) => (
+        <TableSelectionCheckbox
+          ariaLabel={tableT('aria.selectRow', { id: member.key })}
+          isSelected={selectedIds.has(member.key)}
+          isDisabled={disabledKeys.has(member.key)}
+          onChange={(selected) => changeSelection([member.key], selected)}
+        />
+      ),
+    });
+  }
+  columns.push({
+    id: '__actions',
+    label: tableT('column.actions'),
+    align: 'center',
+    className: cn(styles.actionColumn, tableStyles.colAction),
+    renderCell: (member) => {
+      if (isEditing(member)) {
+        const saving = member.key === savingRowId;
+        return (
+          <div className={styles.inlineEditActions}>
+            <AppIconButton
+              icon={saving ? <Spin size="small" /> : <Check size={16} aria-hidden />}
+              label={tableT(saving ? 'aria.saving' : 'aria.save')}
+              size="sm"
+              variant="primary"
+              isDisabled={saving}
+              onPress={() => {
+                void onInlineSave(member);
+              }}
+            />
+            <AppIconButton
+              icon={<X size={16} aria-hidden />}
+              label={tableT('aria.cancel')}
+              size="sm"
+              isDisabled={saving}
+              onPress={onInlineCancel}
+            />
+          </div>
+        );
       }
-      inlineEdit={{
-        editingRowId,
-        savingRowId,
-        errorRowId,
-        errorMessage,
-        onDismissError: onDismissInlineError,
-        onSave: onInlineSave,
-        onCancel: onInlineCancel,
-      }}
-      rowActions={(member) => [
+      const actions = [
         {
           key: 'editRole',
           label: t('member.actions.editPermission'),
           visible: props.groupDisplayConfig.canModifyPermission,
           disabled: !canEditRole(member, props),
-          onPress: () => onStartInlineEdit(member, 'role'),
         },
         {
           key: 'editQuota',
           label: t('member.actions.assignQuota'),
           visible: props.groupDisplayConfig.canAssignQuota && props.groupDisplayConfig.showQuotas,
           disabled: !canEditQuota(member, props),
-          onPress: () => onStartInlineEdit(member, 'quota'),
         },
         {
           key: 'deleteMember',
           label: t('member.actions.delete'),
-          variant: 'danger',
+          variant: 'danger' as const,
           visible: props.groupDisplayConfig.canRemoveMember,
           disabled: !canRemoveMember(member, props),
-          onPress: () => onDeleteMember(member),
         },
-      ]}
-      pagination={{
-        total,
-        current: currentPage,
-        pageSize,
-        onChange: onPageChange,
-        summary: t('member.table.summary', { count: total }),
-        pageSizeControl,
-      }}
-    />
+      ].filter((action) => action.visible);
+      return actions.length > 0 ? (
+        <TableRowActions
+          actions={actions}
+          onAction={(key) => {
+            if (key === 'editRole') onStartInlineEdit(member, 'role');
+            else if (key === 'editQuota') onStartInlineEdit(member, 'quota');
+            else if (key === 'deleteMember') onDeleteMember(member);
+          }}
+        />
+      ) : null;
+    },
+  });
+
+  return (
+    <div className={styles.management}>
+      {errorMessage ? (
+        <InlineEditError message={errorMessage} onDismiss={onDismissInlineError} />
+      ) : null}
+      <DataTable
+        ariaLabel={t('member.table.manageAria')}
+        className={cn(styles.managementTable, batchEditMode && styles.withSelection)}
+        items={dataSource}
+        rowKey="key"
+        columns={columns}
+        loading={loading}
+        emptyText={t('member.table.empty')}
+        toolbar={toolbar}
+        sortDescriptor={sortDescriptor}
+        onSortChange={onSortChange}
+        virtualized={false}
+        summary={t('member.table.summary', { count: total })}
+        getRowClassName={(member) => (isEditing(member) ? styles.editingRow : undefined)}
+        selection={
+          batchEditMode
+            ? {
+                selectedKeys,
+                disabledKeys,
+                onSelectionChange: (keys) => onSelectionChange(keys, dataSource),
+              }
+            : undefined
+        }
+        pagination={{
+          total,
+          current: currentPage,
+          pageSize,
+          onChange: onPageChange,
+          summary: t('member.table.summary', { count: total }),
+          pageSizeControl,
+        }}
+      />
+    </div>
   );
 }
 

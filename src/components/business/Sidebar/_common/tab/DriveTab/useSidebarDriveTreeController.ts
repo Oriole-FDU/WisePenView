@@ -9,9 +9,9 @@ import {
   getDriveScopeGroupId,
 } from '@/components/business/Drive/common/driveComponentModel';
 import { useDrivePagedTreeChildren } from '@/components/business/Drive/common/useDrivePagedTreeChildren';
+import { useDriveRefreshVersion } from '@/components/business/Drive/driveRefresh';
 import { useDriveService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
-import { useDriveRefreshStore } from '@/domains/Drive/store/useDriveRefreshStore';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
@@ -51,7 +51,7 @@ export function useSidebarDriveTreeController({
   const driveService = useDriveService();
   const expansionScopeKey = scope.rootId;
   const groupId = getDriveScopeGroupId(scope);
-  const refreshVersion = useDriveRefreshStore((state) => state.refreshVersion);
+  const refreshVersion = useDriveRefreshVersion();
   const [nodeMap, setNodeMap] = useState<Map<string, DriveViewNode>>(new Map());
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);

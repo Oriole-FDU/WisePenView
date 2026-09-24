@@ -1,10 +1,3 @@
-import type {
-  ListTransactionsApiRequest,
-  ListTransactionsApiResponse,
-  WalletBusinessTypeApiValue,
-  WalletTransactionRecordApiResponse,
-  WalletTransactionTypeApiValue,
-} from '@/domains/User/apis/UserApi.type';
 import {
   WALLET_BUSINESS_TYPE,
   WALLET_TRANSACTION_KIND,
@@ -13,6 +6,13 @@ import {
 } from '@/domains/Wallet';
 import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
 
+import type {
+  ListTransactionsApiRequest,
+  ListTransactionsApiResponse,
+  WalletBusinessTypeApiValue,
+  WalletTransactionRecordApiResponse,
+  WalletTransactionTypeApiValue,
+} from '../apis/WalletApi.type';
 import type {
   GetWalletInfoResponse,
   ListWalletTransactionsRequest,

@@ -1,5 +1,4 @@
 export type { UserInviteRecord, UserInviteRecordList, UserInviteStatus } from './entity/invite';
-export type { AdminMessage, MessageDeliveryScope, MessageType } from './entity/message';
 export type {
   User,
   UserAccountInfo,
@@ -33,13 +32,8 @@ export type {
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
   IUserService,
-  ListAdminMessagesRequest,
-  ListAdminMessagesResponse,
   ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
-  PublishMessageDeliveryScope,
-  PublishMessageRequest,
-  PublishMessageType,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
   SendEmailVerifyRequest,

@@ -1,32 +1,22 @@
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
+import { NoteEditorSession } from '@/components/business/Note/CustomBlockNote/NoteEditorSession';
 import { useNoteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import {
-  type ResourceHostLayoutConfig,
-  useResourceHostLayoutConfig,
-} from '@/views/resource/ResourceHostContext';
 
+import ResourceWorkspace from '../_components/ResourceWorkspace';
 import NoteWorkspace from './_components/NoteWorkspace';
 import styles from './style.module.less';
-
-const NOTE_FRAME_CONFIG: ResourceHostLayoutConfig = { className: styles.pageWrap };
-
-function NoteFrame({ children }: { children: ReactNode }) {
-  useResourceHostLayoutConfig(() => NOTE_FRAME_CONFIG, []);
-  return <>{children}</>;
-}
 
 function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
   const { t } = useTranslation('note');
   return (
-    <NoteFrame>
+    <ResourceWorkspace className={styles.pageWrap}>
       <div className={styles.middleOverlay}>
         <div className={styles.middleOverlayInner}>
           <ResultState
@@ -41,21 +31,21 @@ function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
           />
         </div>
       </div>
-    </NoteFrame>
+    </ResourceWorkspace>
   );
 }
 
 function NoteInfoLoading() {
   const { t } = useTranslation('note');
   return (
-    <NoteFrame>
+    <ResourceWorkspace className={styles.pageWrap}>
       <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
         <div className={styles.middleOverlayLoading}>
           <Spin size="large" />
           <span className={styles.middleOverlayText}>{t('workspace.loadingInfo')}</span>
         </div>
       </div>
-    </NoteFrame>
+    </ResourceWorkspace>
   );
 }
 
@@ -96,12 +86,18 @@ function NoteView({ resourceId }: { resourceId: string }) {
   }
 
   return (
-    <NoteWorkspace
+    <NoteEditorSession
       key={`${resourceId}:${Boolean(noteInfoDisplay.aiDiffPreview)}`}
       resourceId={resourceId}
-      noteInfoDisplay={noteInfoDisplay}
-      onRefreshNoteInfo={refresh}
-    />
+      canCollaborativeEdit={noteInfoDisplay.canCollaborativeEdit}
+      aiDiffPreview={noteInfoDisplay.aiDiffPreview}
+    >
+      <NoteWorkspace
+        resourceId={resourceId}
+        noteInfoDisplay={noteInfoDisplay}
+        onRefreshNoteInfo={refresh}
+      />
+    </NoteEditorSession>
   );
 }
 

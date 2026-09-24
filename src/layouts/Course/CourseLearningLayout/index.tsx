@@ -9,15 +9,14 @@ import {
   SystemResizablePanel,
   SystemResizablePanelGroup,
 } from '@/components/base/SystemResizable';
-import ChatPanel from '@/components/business/ChatPanel';
-import {
-  createResourceChatStateProvider,
-  type ResourceChatContext,
-} from '@/components/business/ChatPanel/ResourceChatProtocol';
+import { type ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import { COURSE_ROLE } from '@/domains/Course';
 import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 import { cn } from '@/utils/cn';
-import type { ResourceHostLayoutConfig } from '@/views/resource/ResourceHostContext';
+import {
+  ResourceChatBindingProvider,
+  ResourceChatPanel,
+} from '@/views/resource/ResourceChatBinding';
 
 import { useCourseContext } from '../CourseContext';
 import CourseResourceHost from '../CourseResourceHost';
@@ -35,44 +34,13 @@ function CourseLearningLayout() {
   const { course } = useCourseContext();
   const navigation = useCourseLearningNavigationController(course.courseId);
   const chatDock = useCourseChatDockController();
-  const [resourceLayoutConfig, setResourceLayoutConfig] = useState<ResourceHostLayoutConfig>({});
   const [resourceChatContext, setResourceChatContext] = useState<ResourceChatContext>();
   const selectedNode = navigation.selectedNode;
-  const registeredHeader =
-    resourceLayoutConfig.header === false ? undefined : resourceLayoutConfig.header;
-  const registeredResourceHeader =
-    selectedNode?.nodeType === 'RESOURCE' &&
-    registeredHeader?.resource?.resourceId === selectedNode.resourceId
-      ? registeredHeader
-      : undefined;
-  const fallbackChatStateProvider =
-    selectedNode?.nodeType === 'RESOURCE'
-      ? createResourceChatStateProvider({
-          resourceId: selectedNode.resourceId,
-          resourceType: selectedNode.resourceType,
-          viewer: selectedNode.viewer,
-        })
-      : undefined;
-  const chatStateProvider =
-    registeredResourceHeader?.resource && resourceLayoutConfig.chatStateProvider
-      ? resourceLayoutConfig.chatStateProvider
-      : fallbackChatStateProvider;
-
   const handleClearResourceChatContext = (context?: ResourceChatContext) => {
     setResourceChatContext((current) => (context && current !== context ? current : undefined));
   };
 
-  const workspaceHeader = registeredResourceHeader?.resource ? (
-    <ResourceWorkspaceHeader
-      {...registeredResourceHeader}
-      resource={{
-        ...registeredResourceHeader.resource,
-        breadcrumbItems: [],
-        chatPanelCollapsed: chatDock.collapsed,
-        onToggleChatPanel: chatDock.toggle,
-      }}
-    />
-  ) : (
+  const workspaceHeader = (
     <ResourceWorkspaceHeader
       inlineTitle={
         <span className={styles.workspaceTitle}>
@@ -98,120 +66,130 @@ function CourseLearningLayout() {
   );
 
   return (
-    <SystemResizablePanelGroup
-      orientation="horizontal"
-      className={cn(styles.root, chatDock.open && styles.rootChatOpen)}
-      resizeTargetMinimumSize={RESIZE_TARGET_MINIMUM_SIZE}
-      onLayoutChanged={chatDock.handleLayoutChanged}
-    >
-      <SystemResizablePanel
-        id="course-learning-main"
-        minSize={COURSE_LEARNING_MAIN_MIN_WIDTH}
-        className={styles.learningPanel}
+    <ResourceChatBindingProvider>
+      <SystemResizablePanelGroup
+        orientation="horizontal"
+        className={cn(styles.root, chatDock.open && styles.rootChatOpen)}
+        resizeTargetMinimumSize={RESIZE_TARGET_MINIMUM_SIZE}
+        onLayoutChanged={chatDock.handleLayoutChanged}
       >
-        <section className={styles.studyShell}>
-          <CourseOutlineSidebar
-            courseId={course.courseId}
-            courseName={course.name}
-            editable={course.myRole === COURSE_ROLE.TEACHER}
-            nodes={navigation.visibleNodes}
-            allNodes={navigation.outlineNodes}
-            selectedNodeId={selectedNode?.nodeId}
-            searchQuery={navigation.searchQuery}
-            expandSearchResults={Boolean(navigation.normalizedQuery)}
-            loading={navigation.loading}
-            error={navigation.error}
-            resourcePageStateMap={navigation.resourcePageStateMap}
-            onSearchQueryChange={navigation.setSearchQuery}
-            onSelectNode={navigation.openOutlineNode}
-            onOpenCourseHome={navigation.openCourseHome}
-            onExpandNode={navigation.expandOutlineNode}
-            onLoadMoreResources={navigation.loadMoreOutlineResources}
-            onRefresh={navigation.refresh}
-            onRetry={navigation.refresh}
-          />
+        <SystemResizablePanel
+          id="course-learning-main"
+          minSize={COURSE_LEARNING_MAIN_MIN_WIDTH}
+          className={styles.learningPanel}
+        >
+          <section className={styles.studyShell}>
+            <CourseOutlineSidebar
+              courseId={course.courseId}
+              courseName={course.name}
+              editable={course.myRole === COURSE_ROLE.TEACHER}
+              nodes={navigation.visibleNodes}
+              allNodes={navigation.outlineNodes}
+              selectedNodeId={selectedNode?.nodeId}
+              searchQuery={navigation.searchQuery}
+              expandSearchResults={Boolean(navigation.normalizedQuery)}
+              loading={navigation.loading}
+              error={navigation.error}
+              resourcePageStateMap={navigation.resourcePageStateMap}
+              onSearchQueryChange={navigation.setSearchQuery}
+              onSelectNode={navigation.openOutlineNode}
+              onOpenCourseHome={navigation.openCourseHome}
+              onExpandNode={navigation.expandOutlineNode}
+              onLoadMoreResources={navigation.loadMoreOutlineResources}
+              onRefresh={navigation.refresh}
+              onRetry={navigation.refresh}
+            />
 
-          <div className={styles.studyWorkspace}>
-            {workspaceHeader}
-            <main className={styles.studyMain}>
-              {selectedNode ? (
-                selectedNode.nodeType === 'RESOURCE' ? (
-                  selectedNode.viewer === 'video' ? (
-                    <div className={styles.resourceViewer}>
-                      <Video size={44} aria-hidden />
-                      <h2>{selectedNode.title}</h2>
-                      <p>{t('outline.videoUnsupported')}</p>
-                    </div>
+            <div className={styles.studyWorkspace}>
+              {selectedNode?.nodeType === 'RESOURCE' && selectedNode.viewer !== 'video'
+                ? null
+                : workspaceHeader}
+              <main className={styles.studyMain}>
+                {selectedNode ? (
+                  selectedNode.nodeType === 'RESOURCE' ? (
+                    selectedNode.viewer === 'video' ? (
+                      <div className={styles.resourceViewer}>
+                        <Video size={44} aria-hidden />
+                        <h2>{selectedNode.title}</h2>
+                        <p>{t('outline.videoUnsupported')}</p>
+                      </div>
+                    ) : (
+                      <CourseResourceHost
+                        key={selectedNode.nodeId}
+                        courseId={course.courseId}
+                        target={{
+                          resourceId: selectedNode.resourceId,
+                          resourceType: selectedNode.resourceType,
+                          resourceName: selectedNode.title,
+                          viewer: selectedNode.viewer,
+                        }}
+                        chatPanelCollapsed={chatDock.collapsed}
+                        onToggleChatPanel={chatDock.toggle}
+                        fallbackHeader={workspaceHeader}
+                        onTargetChange={(target) => {
+                          if (target.resourceId) navigation.openResource(target.resourceId);
+                        }}
+                        onOpenChatPanel={chatDock.openPanel}
+                        onSetChatContext={setResourceChatContext}
+                        onClearChatContext={handleClearResourceChatContext}
+                        onClose={navigation.openCourseHome}
+                      />
+                    )
                   ) : (
-                    <CourseResourceHost
+                    <CourseOutlineOverview
                       key={selectedNode.nodeId}
                       courseId={course.courseId}
-                      target={{
-                        resourceId: selectedNode.resourceId,
-                        resourceType: selectedNode.resourceType,
-                        resourceName: selectedNode.title,
-                        viewer: selectedNode.viewer,
-                      }}
-                      layoutConfig={resourceLayoutConfig}
-                      onTargetChange={(target) => {
-                        if (target.resourceId) navigation.openResource(target.resourceId);
-                      }}
-                      onLayoutConfigChange={setResourceLayoutConfig}
-                      onOpenChatPanel={chatDock.openPanel}
-                      onSetChatContext={setResourceChatContext}
-                      onClearChatContext={handleClearResourceChatContext}
-                      onClose={navigation.openCourseHome}
+                      node={selectedNode}
+                      resources={navigation.selectedResources}
+                      editable={course.myRole === COURSE_ROLE.TEACHER}
+                      onOpenResource={(nodeId) => navigation.openOutlineNode(nodeId)}
+                      onSaved={navigation.refresh}
                     />
                   )
                 ) : (
-                  <CourseOutlineOverview
-                    key={selectedNode.nodeId}
-                    courseId={course.courseId}
-                    node={selectedNode}
-                    resources={navigation.selectedResources}
-                    editable={course.myRole === COURSE_ROLE.TEACHER}
-                    onOpenResource={(nodeId) => navigation.openOutlineNode(nodeId)}
-                    onSaved={navigation.refresh}
-                  />
-                )
-              ) : (
-                <div className={styles.emptyMain}>{t('outline.empty')}</div>
-              )}
-            </main>
-          </div>
-        </section>
-      </SystemResizablePanel>
+                  <div className={styles.emptyMain}>{t('outline.empty')}</div>
+                )}
+              </main>
+            </div>
+          </section>
+        </SystemResizablePanel>
 
-      <SystemResizableHandle
-        collapsed={!chatDock.open}
-        disabled={!chatDock.open}
-        aria-label={t('learning.resizeChat')}
-      />
-      <SystemResizablePanel
-        id="course-learning-chat"
-        panelRef={chatDock.panelRef}
-        defaultSize={chatDock.panelSize}
-        minSize={chatDock.minSize}
-        maxSize={chatDock.maxSize}
-        groupResizeBehavior="preserve-pixel-size"
-        className={styles.chatDock}
-        aria-label={t('learning.chat')}
-        aria-hidden={!chatDock.open ? true : undefined}
-        onResize={chatDock.handleResize}
-      >
-        {chatDock.open ? (
-          <ChatPanel
-            showHeader={true}
-            showCollapseButton={false}
-            resourceChat={{
-              provider: chatStateProvider,
-              context: resourceChatContext,
-              clearContext: handleClearResourceChatContext,
-            }}
-          />
-        ) : null}
-      </SystemResizablePanel>
-    </SystemResizablePanelGroup>
+        <SystemResizableHandle
+          collapsed={!chatDock.open}
+          disabled={!chatDock.open}
+          aria-label={t('learning.resizeChat')}
+        />
+        <SystemResizablePanel
+          id="course-learning-chat"
+          panelRef={chatDock.panelRef}
+          defaultSize={chatDock.panelSize}
+          minSize={chatDock.minSize}
+          maxSize={chatDock.maxSize}
+          groupResizeBehavior="preserve-pixel-size"
+          className={styles.chatDock}
+          aria-label={t('learning.chat')}
+          aria-hidden={!chatDock.open ? true : undefined}
+          onResize={chatDock.handleResize}
+        >
+          {chatDock.open ? (
+            <ResourceChatPanel
+              target={
+                selectedNode?.nodeType === 'RESOURCE'
+                  ? {
+                      resourceId: selectedNode.resourceId,
+                      resourceType: selectedNode.resourceType,
+                      viewer: selectedNode.viewer,
+                    }
+                  : undefined
+              }
+              showCollapseButton={false}
+              context={resourceChatContext}
+              clearContext={handleClearResourceChatContext}
+            />
+          ) : null}
+        </SystemResizablePanel>
+      </SystemResizablePanelGroup>
+    </ResourceChatBindingProvider>
   );
 }
 

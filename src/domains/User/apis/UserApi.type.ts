@@ -1,9 +1,4 @@
-import type {
-  NumericEnumApiValue,
-  OptionalPageApiRequest,
-  PageApiRequest,
-  PageR,
-} from '@/apis/api.type';
+import type { NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserVerificationMode } from '@/domains/User';
 
 export type UserIdentityTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
@@ -98,22 +93,6 @@ export interface CheckEmailVerifyApiRequest {
   token: string;
 }
 
-export type ListAdminMessagesApiRequest = PageApiRequest;
-
-export interface AdminMessageApiModel {
-  messageId?: string | number | null;
-  deliveryScope?: string | null;
-  messageType?: string | null;
-  title?: string | null;
-  content?: string | null;
-  jumpUrl?: string | null;
-  extra?: string | null;
-  readCount?: number | null;
-  createTime?: string | null;
-}
-
-export type ListAdminMessagesApiResponse = PageR<AdminMessageApiModel>;
-
 /** 用户邀请 API: /user/invite/* */
 
 export type UserInviteStatusApiValue = 'BOUND' | 'REWARDED';
@@ -131,19 +110,6 @@ export interface UserInviteRecordApiResponse {
 
 export type ListUserInviteRecordsApiResponse = PageR<UserInviteRecordApiResponse>;
 
-export type PublishMessageApiDeliveryScope = 'DIRECT' | 'ALL_USERS';
-export type PublishMessageApiType = 'SYSTEM' | 'NORMAL';
-
-export interface PublishMessageApiRequest {
-  receiverUserIds: string[];
-  deliveryScope: PublishMessageApiDeliveryScope;
-  messageType: PublishMessageApiType;
-  title: string;
-  content: string;
-  jumpUrl?: string;
-  extra?: string;
-}
-
 export interface AddFeedbackApiRequest {
   content: string;
   contact: string;
@@ -153,49 +119,4 @@ export interface AddFeedbackApiRequest {
   consultation: boolean;
   complaint: boolean;
   other: boolean;
-}
-
-export interface RedeemVoucherApiRequest {
-  voucherCode: string;
-}
-
-export type WalletTransactionTypeApiValue =
-  | 'REFILL'
-  | 'SPEND'
-  | 'TRANSFER_IN'
-  | 'TRANSFER_OUT'
-  | 'INCOME'
-  | 'EXCHANGE'
-  | 'REVERSE'
-  | 'GIFT'
-  | 'ONLY_RECORD_META';
-
-export type WalletBusinessTypeApiValue = 'TOKEN' | 'COIN';
-
-export interface WalletTransactionRecordApiResponse {
-  traceId?: string | null;
-  operatorId?: string | number | null;
-  count?: string | number | null;
-  walletTransactionType?: WalletTransactionTypeApiValue | null;
-  walletBusinessType?: WalletBusinessTypeApiValue | null;
-  meta?: string | null;
-  billingDetail?: string | null;
-  operatorDisplay?: UserDisplayBaseApiResponse | null;
-  createTime?: string | null;
-}
-
-export interface ListTransactionsApiRequest extends OptionalPageApiRequest {
-  groupId?: string;
-  walletTransactionTypes?: WalletTransactionTypeApiValue[];
-  walletBusinessType?: WalletBusinessTypeApiValue;
-}
-
-export type ListTransactionsApiResponse = PageR<WalletTransactionRecordApiResponse>;
-
-export type TokenTransferTypeApiValue = 'GROUP_INFLOW' | 'USER_INFLOW';
-
-export interface TransferTokenBetweenGroupAndUserApiRequest {
-  groupId: string;
-  tokenCount: number;
-  tokenTransferType: TokenTransferTypeApiValue;
 }

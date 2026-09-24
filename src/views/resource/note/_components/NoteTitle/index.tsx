@@ -10,7 +10,6 @@ import { type KeyboardEvent, type Ref, useEffect, useImperativeHandle, useRef } 
 import { useTranslation } from 'react-i18next';
 
 import { useNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
-import { getProseMirrorRoot } from '@/components/business/Note/CustomBlockNote/engines/editor/dom';
 import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
@@ -20,8 +19,8 @@ import styles from './style.module.less';
 export interface NoteTitleHandle {
   /** 当前标题编辑区纯文本，空则“未命名笔记”。 */
   getPlainTitle: () => string;
-  /** 标题 BlockNote 的 ProseMirror 根 DOM，供打印克隆。 */
-  getProseMirrorRoot: () => HTMLElement | null;
+  /** 滚动到标题并聚焦标题编辑器。 */
+  scrollIntoView: () => void;
 }
 
 export type NoteTitleSaveStatus = 'saving' | 'saved' | 'failed';
@@ -109,6 +108,7 @@ function NoteTitle({
   const noteService = useNoteService();
   const latestIdRef = useLatest(id);
   const latestFocusOnMountRef = useLatest(focusOnMount);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasAutoFocusedRef = useRef(false);
   const saveVersionRef = useRef(0);
@@ -159,7 +159,10 @@ function NoteTitle({
         const trimmed = raw.trim();
         return trimmed || untitledTitle;
       },
-      getProseMirrorRoot: () => getProseMirrorRoot(editor),
+      scrollIntoView: () => {
+        wrapperRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        editor.focus();
+      },
     }),
     [editor, untitledTitle]
   );
@@ -305,7 +308,7 @@ function NoteTitle({
   };
 
   return (
-    <div className={styles.wrapper} onKeyDownCapture={handleKeyDown}>
+    <div ref={wrapperRef} className={styles.wrapper} onKeyDownCapture={handleKeyDown}>
       <BlockNoteView
         editor={editor}
         theme={resolvedTheme}
