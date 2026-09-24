@@ -6,9 +6,7 @@
  */
 :root,
 .light,
-.mist,
-[data-theme='light'],
-[data-theme='mist'] {
+[data-theme='light'] {
   --wisepen-mist-1: #fafdff;
   --wisepen-mist-2: #f2f9ff;
   --wisepen-mist-3: #e2f4ff;
