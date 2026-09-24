@@ -165,21 +165,23 @@ interface EmojiPickerProps {
 
 function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
   const [open, setOpen] = useState(false);
+  const buttonProps = {
+    icon: <SmilePlus size={15} aria-hidden />,
+    label,
+    size: 'sm' as const,
+    className: styles.iconButton,
+  };
+
+  if (disabled) {
+    // Popover.Trigger 不向 Pressable 传递禁用状态；禁用时卸载浮层并清除打开状态。
+    if (open) setOpen(false);
+    return <AppIconButton {...buttonProps} isDisabled />;
+  }
 
   return (
     <AppPopover isOpen={open} onOpenChange={setOpen} deferContent={false}>
       <AppPopover.Trigger<'button'>
-        disabled={disabled}
-        render={({ disabled, ...triggerProps }) => (
-          <AppIconButton
-            {...triggerProps}
-            isDisabled={disabled}
-            icon={<SmilePlus size={15} aria-hidden />}
-            label={label}
-            size="sm"
-            className={styles.iconButton}
-          />
-        )}
+        render={(triggerProps) => <AppIconButton {...triggerProps} {...buttonProps} />}
       />
       <AppPopover.Content placement="bottom end" bodyPadding="none">
         <EmojiPickerContent
