@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
-import { DEFAULT_COLOR_SCHEME, DEFAULT_HEROUI_THEME } from './constants';
+import { DEFAULT_COLOR_SCHEME } from '../colorScheme/constants';
+import { applyColorSchemeFavicon, applyColorSchemeToDOM } from '../colorScheme/dom';
+import { useColorScheme } from '../colorScheme/useColorScheme';
+import { DEFAULT_HEROUI_THEME } from '../mode/constants';
+import { applyReadingModeToDOM } from '../readingMode/dom';
+import { useReadingMode } from '../readingMode/useReadingMode';
 import { ThemeContextProvider } from './ThemeContext';
-import { applyReadingModeToDOM, useAccentNeutralized } from './useAccentNeutralized';
-import { applyColorSchemeFavicon, applyColorSchemeToDOM, useColorScheme } from './useColorScheme';
 
 type ThemeApplierProps = {
   children: ReactNode;
@@ -22,7 +25,7 @@ export function ThemeApplier({ children, defaultTheme = DEFAULT_HEROUI_THEME }: 
 
 function ThemeGlobalApplier({ children }: { children: ReactNode }) {
   const { colorScheme } = useColorScheme(DEFAULT_COLOR_SCHEME);
-  const { isAccentNeutralized } = useAccentNeutralized();
+  const { isReadingMode } = useReadingMode();
 
   /**
    * @wisepen-manual-effect
@@ -43,8 +46,8 @@ function ThemeGlobalApplier({ children }: { children: ReactNode }) {
    * cleanup：无；这里只做同步写入，不注册监听器。
    */
   useEffect(() => {
-    applyReadingModeToDOM(isAccentNeutralized);
-  }, [isAccentNeutralized]);
+    applyReadingModeToDOM(isReadingMode);
+  }, [isReadingMode]);
 
   return <>{children}</>;
 }

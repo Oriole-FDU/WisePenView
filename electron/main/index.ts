@@ -22,7 +22,11 @@ import {
   WINDOW_MIN_HEIGHT,
   WINDOW_MIN_WIDTH,
 } from '../../src/constants/layoutScale';
-import { COLOR_SCHEME, type ColorScheme, DEFAULT_COLOR_SCHEME } from '../../src/theme/constants';
+import {
+  COLOR_SCHEME,
+  type ColorScheme,
+  DEFAULT_COLOR_SCHEME,
+} from '../../src/theme/colorScheme/constants';
 import { APP_ROUTE_PATH, isAuthenticatedAppRoutePath } from '../../src/utils/navigation/appRoute';
 import { DESKTOP_CHANNEL, type DesktopNavigationState } from '../shared/channels';
 
@@ -35,12 +39,12 @@ const preloadPath = join(currentDirectory, '../preload/index.cjs');
 const PDF_EXPORT_TIMEOUT_MS = 30_000;
 const DESKTOP_ICON_DIRECTORY = join('electron', 'assets', 'app-icons');
 const DESKTOP_ICON_FILENAMES: Record<ColorScheme, string> = {
-  mist: 'default.png',
-  floral: 'floral.png',
-  aqua: 'aqua.png',
-  sunset: 'sunset.png',
-  emerald: 'emerald.png',
-  lavender: 'lavender.png',
+  [COLOR_SCHEME.AQUA]: 'aqua.png',
+  [COLOR_SCHEME.MIST]: 'mist.png',
+  [COLOR_SCHEME.FLORAL]: 'floral.png',
+  [COLOR_SCHEME.SUNSET]: 'sunset.png',
+  [COLOR_SCHEME.EMERALD]: 'emerald.png',
+  [COLOR_SCHEME.LAVENDER]: 'lavender.png',
 };
 const COLOR_SCHEME_VALUES = new Set<ColorScheme>(Object.values(COLOR_SCHEME));
 

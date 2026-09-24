@@ -2,7 +2,6 @@ import { useSyncExternalStore } from 'react';
 
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 
-import { COLOR_SCHEME_ICON_SRC } from './colorSchemeIcons';
 import { COLOR_SCHEME, type ColorScheme, DEFAULT_COLOR_SCHEME } from './constants';
 
 const COLOR_SCHEME_VALUES = new Set<string>(Object.values(COLOR_SCHEME));
@@ -20,25 +19,6 @@ function readStoredColorScheme(defaultScheme: ColorScheme): ColorScheme {
   const stored = localStorage.getItem(STORAGE_KEYS.colorScheme);
   if (stored === LEGACY_MIST_COLOR_SCHEME) return COLOR_SCHEME.MIST;
   return stored && isColorScheme(stored) ? stored : defaultScheme;
-}
-
-export function applyColorSchemeToDOM(scheme: ColorScheme) {
-  document.documentElement.setAttribute('data-color-scheme', scheme);
-}
-
-export function applyColorSchemeFavicon(scheme: ColorScheme) {
-  if (typeof document === 'undefined') return;
-
-  const href = COLOR_SCHEME_ICON_SRC[scheme] ?? COLOR_SCHEME_ICON_SRC[DEFAULT_COLOR_SCHEME];
-  const existingLink = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
-  const link = existingLink ?? document.createElement('link');
-  link.rel = 'icon';
-  link.type = 'image/svg+xml';
-  link.href = href;
-
-  if (!existingLink) {
-    document.head.appendChild(link);
-  }
 }
 
 function emitColorSchemeChange() {

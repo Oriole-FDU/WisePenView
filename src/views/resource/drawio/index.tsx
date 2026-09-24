@@ -17,6 +17,7 @@ import type {
 import type { ResourceAction, ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
+import { DEFAULT_COLOR_SCHEME } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
@@ -82,7 +83,7 @@ function readWisePenColorScheme(): string {
     // localStorage 不可用时使用默认主题。
   }
 
-  return 'mist';
+  return DEFAULT_COLOR_SCHEME;
 }
 
 function DrawioWorkspace({

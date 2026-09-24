@@ -2,11 +2,11 @@
 
 @import 'tailwindcss';
 @import '@heroui/styles';
-@import '../theme/heroui/radix-colors.css' layer(base);
-@import '../theme/heroui/custom-accents.css' layer(base);
-@import '../theme/heroui/palette.css' layer(base);
+@import '../theme/radix-colors.css' layer(base);
+@import '../theme/custom-accents.css' layer(base);
+@import '../theme/palette.css' layer(base);
 /* 与 HeroUI token 位于同一层，通过选择器明确覆盖主题。 */
-@import '../theme/heroui/wisepen.css' layer(base);
+@import '../theme/tokens.css' layer(base);
 @import './heroui-overrides.css' layer(components);
 
 @theme inline {
