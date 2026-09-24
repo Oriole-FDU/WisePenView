@@ -48,72 +48,6 @@
   grid-template-columns: 280px minmax(0, 1fr);
 }
 
-.editorNav {
-  min-height: 0;
-  overflow-y: auto;
-  .appSubtleScrollbar();
-  padding: var(--space-md-plus) var(--space-sm);
-  border-right: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.editorNav h2 {
-  margin: 0 var(--space-xs) 14px;
-  color: var(--foreground);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-}
-
-.editorNavGroup + .editorNavGroup {
-  margin-top: 22px;
-}
-
-.editorNav button {
-  display: flex;
-  width: 100%;
-  min-height: 36px;
-  align-items: center;
-  gap: 9px;
-  margin: var(--space-3xs) 0;
-  padding: 0 9px;
-  border: 0;
-  border-radius: var(--radius-sm, var(--radius-md));
-  color: color-mix(in srgb, var(--foreground) 64%, var(--muted));
-  background: transparent;
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  text-align: left;
-}
-
-.editorNav button::before {
-  width: 5px;
-  height: 5px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--foreground) 42%, var(--border));
-  content: '';
-}
-
-.editorNav button:hover:not(:disabled) {
-  color: var(--foreground);
-  background: var(--surface-secondary);
-}
-
-.editorNav button:disabled {
-  cursor: default;
-  opacity: var(--disabled-opacity);
-}
-
-.editorNav button.active {
-  color: var(--accent-text);
-  background: var(--accent-soft);
-  font-weight: var(--font-weight-semibold);
-}
-
-.editorNav button.active::before {
-  background: var(--accent);
-}
-
 .editorScroll {
   min-height: 0;
   overflow: auto;
@@ -478,10 +412,6 @@
 @media (max-width: @breakpoint-md) {
   .editorBody {
     grid-template-columns: 1fr;
-  }
-
-  .editorNav {
-    display: none;
   }
 
   .editorContent {

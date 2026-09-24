@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import AppForm from '@/components/business/AppForm';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
-import SectionShell from '../../shared/SectionShell';
 import styles from './style.module.less';
 interface Props {
   assets: AgentAsset[];
@@ -71,10 +71,11 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
   };
 
   return (
-    <SectionShell
+    <AppForm.Section
       id="assets"
       title={t('assets.title')}
       description={t('assets.description')}
+      variant="editor"
       actions={
         <AppButton
           size="sm"
@@ -148,6 +149,6 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
           e.target.value = '';
         }}
       />
-    </SectionShell>
+    </AppForm.Section>
   );
 }

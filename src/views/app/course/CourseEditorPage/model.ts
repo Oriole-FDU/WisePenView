@@ -37,15 +37,6 @@ export const COURSE_WEEKDAYS = ['周一', '周二', '周三', '周四', '周五'
 export const COURSE_ASSESSMENT_TYPES: CourseFinalAssessment['type'][] = Object.values(
   COURSE_FINAL_ASSESSMENT_TYPE
 );
-export const COURSE_EDITOR_SECTION_IDS = [
-  'course-editor-basic',
-  'course-editor-goals',
-  'course-editor-schedule',
-  'course-editor-assessment',
-  'course-editor-access',
-] as const;
-export type CourseEditorSectionId = (typeof COURSE_EDITOR_SECTION_IDS)[number];
-
 export const createCourseMeeting = (): CourseMeeting => ({
   meetingId: createUuid(),
   weekPattern: COURSE_WEEK_PATTERN.EVERY,

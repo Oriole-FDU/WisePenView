@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { FormField, TextArea } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
+import AppForm from '@/components/business/AppForm';
 
 import type { GuidedPromptFields, SoulFieldKey } from '../../../../guidedPrompt';
 import {
@@ -15,7 +16,6 @@ import {
   syncGuidedPrompt,
 } from '../../../../guidedPrompt';
 import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
-import SectionShell from '../../shared/SectionShell';
 import styles from './style.module.less';
 interface Props {
   markdown: string;
@@ -64,10 +64,11 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
   };
   return (
     <>
-      <SectionShell
+      <AppForm.Section
         id="prompt"
         title={t('prompt.title')}
         description={t('prompt.description')}
+        variant="editor"
         actions={
           <Tabs
             className={styles.tabs}
@@ -190,7 +191,7 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
             ) : null}
           </div>
         )}
-      </SectionShell>
+      </AppForm.Section>
       <PresetRestoreConfirmDialog
         isOpen={restoreOpen}
         onOpenChange={setRestoreOpen}

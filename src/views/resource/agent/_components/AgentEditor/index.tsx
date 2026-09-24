@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
+import AppForm from '@/components/business/AppForm';
 import type { AgentAsset, AgentSpec } from '@/domains/Agent';
 import type { ChatModel, ToolOption } from '@/domains/Chat';
 import type { SkillSummary } from '@/domains/Skill';
 
 import type { AgentDraft } from '../../model';
 import styles from '../../style.module.less';
-import AgentSectionNav from './AgentSectionNav';
 import { useAgentAssetsController } from './controllers/useAgentAssetsController';
 import AssetsSection from './sections/AssetsSection';
 import BasicInfoSection from './sections/BasicInfoSection';
@@ -62,11 +62,19 @@ export default function AgentEditor({
     resourceId,
     t,
   });
-  const anchors = anchorSections.map(([id, key]) => [id, t(`agent:page.anchor.${key}`)] as const);
+  const anchors = anchorSections.map(([id, key]) => ({
+    id,
+    label: t(`agent:page.anchor.${key}`),
+  }));
 
   return (
     <div className={styles.page}>
-      <AgentSectionNav items={anchors} scrollContainerId={AGENT_SCROLL_CONTAINER_ID} />
+      <AppForm.AnchorNav
+        title={t('agent:navigation.title')}
+        ariaLabel={t('agent:navigation.aria')}
+        items={anchors}
+        scrollContainerId={AGENT_SCROLL_CONTAINER_ID}
+      />
       <main id={AGENT_SCROLL_CONTAINER_ID} className={styles.content}>
         <BasicInfoSection
           name={draft.name}
