@@ -162,17 +162,21 @@ function MainShell({
         {isMobileLayout ? (
           <>
             {mainColumn}
-            <Drawer isOpen={drawerOpen} onOpenChange={setDrawerOpen}>
-              <Drawer.Backdrop className={styles.drawerBackdrop} isDismissable>
-                <Drawer.Content placement="left" className={styles.drawerContent}>
-                  <Drawer.Dialog className={styles.drawerDialog} aria-label={sidebarAriaLabel}>
-                    <Drawer.Body className={styles.drawerBody}>
-                      {renderDrawerSidebar({ onNavigate: () => setDrawerOpen(false) })}
-                    </Drawer.Body>
-                  </Drawer.Dialog>
-                </Drawer.Content>
-              </Drawer.Backdrop>
-            </Drawer>
+            {/* 侧栏由外部按钮控制，直接控制 Backdrop，避免创建没有触发器的 PressResponder。 */}
+            <Drawer.Backdrop
+              className={styles.drawerBackdrop}
+              isDismissable
+              isOpen={drawerOpen}
+              onOpenChange={setDrawerOpen}
+            >
+              <Drawer.Content placement="left" className={styles.drawerContent}>
+                <Drawer.Dialog className={styles.drawerDialog} aria-label={sidebarAriaLabel}>
+                  <Drawer.Body className={styles.drawerBody}>
+                    {renderDrawerSidebar({ onNavigate: () => setDrawerOpen(false) })}
+                  </Drawer.Body>
+                </Drawer.Dialog>
+              </Drawer.Content>
+            </Drawer.Backdrop>
           </>
         ) : (
           <SystemResizablePanelGroup

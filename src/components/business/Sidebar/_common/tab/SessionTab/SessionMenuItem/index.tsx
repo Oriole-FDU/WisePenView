@@ -72,7 +72,12 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
         {session.title || t('chat:session.untitled')}
       </span>
 
-      <div className={`${styles.sessionActions} sessionActionsVisibleOnItem`}>
+      <div
+        className={`${styles.sessionActions} sessionActionsVisibleOnItem`}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') event.stopPropagation();
+        }}
+      >
         <AppIconButton
           icon={<Pencil size={14} aria-hidden="true" />}
           label={t('chat:session.renameAction', {
