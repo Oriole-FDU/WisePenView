@@ -7,6 +7,21 @@
 :root,
 .light,
 [data-theme='light'] {
+  --wisepen-aqua-1: #fafefe;
+  --wisepen-aqua-2: #f3fbfb;
+  --wisepen-aqua-3: #e1f7f8;
+  --wisepen-aqua-4: #cef1f2;
+  --wisepen-aqua-5: #bbe8ea;
+  --wisepen-aqua-a5: #00a9b144;
+  --wisepen-aqua-6: #a5dbdd;
+  --wisepen-aqua-7: #8acacd;
+  --wisepen-aqua-8: #60b5b9;
+  --wisepen-aqua-9: #248286;
+  --wisepen-aqua-10: #0c7478;
+  --wisepen-aqua-11: #11777b;
+  --wisepen-aqua-12: #1c3f40;
+  --wisepen-aqua-contrast: #fff;
+
   --wisepen-mist-1: #fafdff;
   --wisepen-mist-2: #f2f9ff;
   --wisepen-mist-3: #e2f4ff;
@@ -36,21 +51,6 @@
   --wisepen-floral-11: #ba4057;
   --wisepen-floral-12: #5d212b;
   --wisepen-floral-contrast: #fff;
-
-  --wisepen-aqua-1: #fafefe;
-  --wisepen-aqua-2: #f3fbfb;
-  --wisepen-aqua-3: #e1f7f8;
-  --wisepen-aqua-4: #cef1f2;
-  --wisepen-aqua-5: #bbe8ea;
-  --wisepen-aqua-a5: #00a9b144;
-  --wisepen-aqua-6: #a5dbdd;
-  --wisepen-aqua-7: #8acacd;
-  --wisepen-aqua-8: #60b5b9;
-  --wisepen-aqua-9: #248286;
-  --wisepen-aqua-10: #0c7478;
-  --wisepen-aqua-11: #11777b;
-  --wisepen-aqua-12: #1c3f40;
-  --wisepen-aqua-contrast: #fff;
 
   --wisepen-sunset-1: #fefcfc;
   --wisepen-sunset-2: #fff7f4;
@@ -100,6 +100,21 @@
 
 .dark,
 [data-theme='dark'] {
+  --wisepen-aqua-1: #0b1313;
+  --wisepen-aqua-2: #111c1c;
+  --wisepen-aqua-3: #0d2d2e;
+  --wisepen-aqua-4: #033a3c;
+  --wisepen-aqua-5: #084749;
+  --wisepen-aqua-a5: #00f7ff3c;
+  --wisepen-aqua-6: #135658;
+  --wisepen-aqua-7: #1b686b;
+  --wisepen-aqua-8: #1c7d81;
+  --wisepen-aqua-9: #248286;
+  --wisepen-aqua-10: #0c7478;
+  --wisepen-aqua-11: #74cbcf;
+  --wisepen-aqua-12: #a8eef1;
+  --wisepen-aqua-contrast: #fff;
+
   --wisepen-mist-1: #05101a;
   --wisepen-mist-2: #0b1a26;
   --wisepen-mist-3: #032943;
@@ -129,21 +144,6 @@
   --wisepen-floral-11: #ff8d9e;
   --wisepen-floral-12: #ffd1d5;
   --wisepen-floral-contrast: #fff;
-
-  --wisepen-aqua-1: #0b1313;
-  --wisepen-aqua-2: #111c1c;
-  --wisepen-aqua-3: #0d2d2e;
-  --wisepen-aqua-4: #033a3c;
-  --wisepen-aqua-5: #084749;
-  --wisepen-aqua-a5: #00f7ff3c;
-  --wisepen-aqua-6: #135658;
-  --wisepen-aqua-7: #1b686b;
-  --wisepen-aqua-8: #1c7d81;
-  --wisepen-aqua-9: #248286;
-  --wisepen-aqua-10: #0c7478;
-  --wisepen-aqua-11: #74cbcf;
-  --wisepen-aqua-12: #a8eef1;
-  --wisepen-aqua-contrast: #fff;
 
   --wisepen-sunset-1: #160f0e;
   --wisepen-sunset-2: #1e1512;

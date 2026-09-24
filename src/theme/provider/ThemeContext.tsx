@@ -1,7 +1,7 @@
 import { useTheme as useHeroUITheme } from '@heroui/react';
 import { type ReactNode, useEffect } from 'react';
 
-import { DEFAULT_HEROUI_THEME } from './constants';
+import { DEFAULT_HEROUI_THEME } from '../mode/constants';
 import { type ResolvedTheme, ThemeContext, type ThemeMode } from './ThemeContextValue';
 
 export type { ResolvedTheme, ThemeContextValue, ThemeMode } from './ThemeContextValue';

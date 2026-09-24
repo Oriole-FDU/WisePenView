@@ -5,10 +5,10 @@
 
 ## 分层
 
-1. `src/theme/heroui/radix-colors.css` 导入 Radix 官方 neutral 与状态色 light/dark 色阶。
-2. `src/theme/heroui/custom-accents.css` 保存由 Radix 官方生成器生成的六套品牌色阶。
-3. `src/theme/heroui/palette.css` 选择每套配色的 accent 与 neutral，并映射为语义 token。
-4. `src/bootstrap/index.css` 将语义 token 暴露为 Tailwind 主题颜色。
+1. `src/styles/theme/radix-colors.css` 导入 Radix 官方 neutral 与状态色 light/dark 色阶。
+2. `src/styles/theme/custom-accents.css` 保存由 Radix 官方生成器生成的六套品牌色阶。
+3. `src/styles/theme/palette.css` 选择每套配色的 accent 与 neutral，并映射为语义 token。
+4. `src/styles/global/index.css` 将语义 token 暴露为 Tailwind 主题颜色。
 5. 组件和页面只使用 `--accent`、`--surface`、`--foreground` 等语义 token。
 
 ## Radix 阶号职责

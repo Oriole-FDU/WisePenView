@@ -19,9 +19,9 @@ import {
   type ColorSchemeOption,
   THEME_MODE_OPTIONS,
   type ThemeMode,
-  useAccentNeutralized,
   useAppTheme,
   useColorScheme,
+  useReadingMode,
 } from '@/theme';
 
 import layout from '../style.module.less';
@@ -126,7 +126,7 @@ function ColorSchemeSection({ value, onChange }: ColorSchemeSectionProps) {
 
 function ReadingModeSection() {
   const { t } = useTranslation('profile');
-  const { isAccentNeutralized, setAccentNeutralized } = useAccentNeutralized();
+  const { isReadingMode, setReadingMode } = useReadingMode();
 
   return (
     <section className={styles.section}>
@@ -142,8 +142,8 @@ function ReadingModeSection() {
         <Switch
           size="md"
           aria-label={t('appearance.readingMode.title')}
-          isSelected={isAccentNeutralized}
-          onChange={setAccentNeutralized}
+          isSelected={isReadingMode}
+          onChange={setReadingMode}
         >
           <Switch.Content className={styles.switchContent}>
             <Switch.Control>

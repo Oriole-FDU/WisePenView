@@ -2,8 +2,6 @@ import { useSyncExternalStore } from 'react';
 
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 
-const READING_MODE_ACCENT_SURFACE_NEUTRAL_MIX_PERCENT = 40;
-const READING_MODE_ACCENT_FOREGROUND_NEUTRAL_MIX_PERCENT = 10;
 const readingModeListeners = new Set<() => void>();
 
 function readStoredReadingMode(defaultValue: boolean): boolean {
@@ -12,18 +10,6 @@ function readStoredReadingMode(defaultValue: boolean): boolean {
 }
 
 let sharedReadingMode = readStoredReadingMode(false);
-
-export function applyReadingModeToDOM(isReadingMode: boolean) {
-  document.documentElement.setAttribute('data-reading-mode', String(isReadingMode));
-  document.documentElement.style.setProperty(
-    '--palette-accent-surface-neutral-mix',
-    isReadingMode ? `${READING_MODE_ACCENT_SURFACE_NEUTRAL_MIX_PERCENT}%` : '0%'
-  );
-  document.documentElement.style.setProperty(
-    '--palette-accent-foreground-neutral-mix',
-    isReadingMode ? `${READING_MODE_ACCENT_FOREGROUND_NEUTRAL_MIX_PERCENT}%` : '0%'
-  );
-}
 
 function emitReadingModeChange() {
   for (const listener of readingModeListeners) {
@@ -45,16 +31,16 @@ function setSharedReadingMode(isReadingMode: boolean) {
   emitReadingModeChange();
 }
 
-/** 阅读模式：浅阶（含 AI Diff 底）混入 40% neutral，深阶（边框等）混入 10% neutral。 */
-export function useAccentNeutralized(defaultValue = false) {
-  const isAccentNeutralized = useSyncExternalStore(
+/** 阅读模式共享状态：保存用户选择并同步所有订阅者。 */
+export function useReadingMode(defaultValue = false) {
+  const isReadingMode = useSyncExternalStore(
     subscribeReadingMode,
     () => sharedReadingMode,
     () => readStoredReadingMode(defaultValue)
   );
 
   return {
-    isAccentNeutralized,
-    setAccentNeutralized: setSharedReadingMode,
+    isReadingMode,
+    setReadingMode: setSharedReadingMode,
   };
 }

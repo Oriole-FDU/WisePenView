@@ -11,10 +11,14 @@ import logoFullMistLight from '@/assets/logos/logo-full-mist-light.svg';
 import logoFullSunsetDark from '@/assets/logos/logo-full-sunset-dark.svg';
 import logoFullSunsetLight from '@/assets/logos/logo-full-sunset-light.svg';
 
+import type { ResolvedTheme } from '../mode/constants';
 import { COLOR_SCHEME, type ColorScheme } from './constants';
-import type { ResolvedTheme } from './ThemeContextValue';
 
 export const COLOR_SCHEME_LOGO_SRC: Record<ColorScheme, Record<ResolvedTheme, string>> = {
+  [COLOR_SCHEME.AQUA]: {
+    light: logoFullAquaLight,
+    dark: logoFullAquaDark,
+  },
   [COLOR_SCHEME.MIST]: {
     light: logoFullMistLight,
     dark: logoFullMistDark,
@@ -22,10 +26,6 @@ export const COLOR_SCHEME_LOGO_SRC: Record<ColorScheme, Record<ResolvedTheme, st
   [COLOR_SCHEME.FLORAL]: {
     light: logoFullFloralLight,
     dark: logoFullFloralDark,
-  },
-  [COLOR_SCHEME.AQUA]: {
-    light: logoFullAquaLight,
-    dark: logoFullAquaDark,
   },
   [COLOR_SCHEME.SUNSET]: {
     light: logoFullSunsetLight,
