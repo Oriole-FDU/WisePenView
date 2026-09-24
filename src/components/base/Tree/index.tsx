@@ -78,6 +78,13 @@ interface FlatNode {
   expandable: boolean;
 }
 
+function isInteractiveTarget(target: EventTarget): boolean {
+  return (
+    target instanceof Element &&
+    target.closest('button, a, input, select, textarea, [role="button"]') !== null
+  );
+}
+
 function normalizeKeys(keys: Key[] | undefined): string[] {
   return (keys ?? []).map(String);
 }
@@ -391,18 +398,15 @@ function Tree({
               className={cn(styles.content, 'wisepen-tree__content')}
               data-selectable={canSelect}
               onClick={(event) => {
-                if (
-                  event.target instanceof Element &&
-                  event.target.closest('button, a, input, select, textarea, [role="button"]')
-                )
-                  return;
+                if (isInteractiveTarget(event.target)) return;
                 if (clickExpands && !canSelect) {
                   toggleExpand(node, !expanded);
                   return;
                 }
                 toggleSelect(node);
               }}
-              onDoubleClick={() => {
+              onDoubleClick={(event) => {
+                if (isInteractiveTarget(event.target)) return;
                 if (expandAction !== 'doubleClick' || !expandable) return;
                 toggleExpand(node, !expanded);
               }}
