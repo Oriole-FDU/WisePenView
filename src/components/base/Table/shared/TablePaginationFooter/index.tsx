@@ -1,79 +1,11 @@
 import { Pagination, Table } from '@heroui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { buildExpandedPaginationItems, getTotalPages } from '@/utils/pagination';
+
 import { joinClassNames } from '../TableBase/cellAlign';
 import type { TablePaginationFooterProps } from './index.type';
 import styles from './style.module.less';
-
-type PaginationItem = number | 'ellipsis';
-
-interface BuildPaginationItemsOptions {
-  /** HeroUI v2 siblings */
-  siblingCount?: number;
-  /** HeroUI v2 boundaries */
-  boundaryCount?: number;
-}
-
-function range(start: number, end: number): number[] {
-  if (end < start) {
-    return [];
-  }
-  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
-}
-
-/** 页码过多时在中间插入 ellipsis */
-function buildPaginationItems(
-  current: number,
-  totalPages: number,
-  options?: BuildPaginationItemsOptions
-): PaginationItem[] {
-  const siblingCount = options?.siblingCount ?? 1;
-  const boundaryCount = options?.boundaryCount ?? 1;
-
-  if (totalPages <= 1) {
-    return [1];
-  }
-
-  const totalPageNumbers = siblingCount * 2 + 3 + boundaryCount * 2;
-  if (totalPages <= totalPageNumbers) {
-    return range(1, totalPages);
-  }
-
-  const leftSiblingIndex = Math.max(current - siblingCount, 1);
-  const rightSiblingIndex = Math.min(current + siblingCount, totalPages);
-  const shouldShowLeftEllipsis = leftSiblingIndex > boundaryCount + 2;
-  const shouldShowRightEllipsis = rightSiblingIndex < totalPages - boundaryCount - 1;
-
-  if (!shouldShowLeftEllipsis && shouldShowRightEllipsis) {
-    const leftItemCount = 3 + 2 * siblingCount;
-    return [
-      ...range(1, leftItemCount),
-      'ellipsis',
-      ...range(totalPages - boundaryCount + 1, totalPages),
-    ];
-  }
-
-  if (shouldShowLeftEllipsis && !shouldShowRightEllipsis) {
-    const rightItemCount = 3 + 2 * siblingCount;
-    return [
-      ...range(1, boundaryCount),
-      'ellipsis',
-      ...range(totalPages - rightItemCount + 1, totalPages),
-    ];
-  }
-
-  if (shouldShowLeftEllipsis && shouldShowRightEllipsis) {
-    return [
-      ...range(1, boundaryCount),
-      'ellipsis',
-      ...range(leftSiblingIndex, rightSiblingIndex),
-      'ellipsis',
-      ...range(totalPages - boundaryCount + 1, totalPages),
-    ];
-  }
-
-  return range(1, totalPages);
-}
 
 function TablePaginationFooter({
   summary,
@@ -86,8 +18,8 @@ function TablePaginationFooter({
   boundaryCount,
   className,
 }: TablePaginationFooterProps) {
-  const totalPages = Math.max(Math.ceil(total / pageSize), 1);
-  const pages = buildPaginationItems(current, totalPages, {
+  const totalPages = getTotalPages(total, pageSize);
+  const pages = buildExpandedPaginationItems(current, totalPages, {
     siblingCount,
     boundaryCount,
   });
