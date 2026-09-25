@@ -5,8 +5,8 @@ import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-route
 
 import { AppButton } from '@/components/base/Button';
 import { Empty, Spin } from '@/components/base/Feedback';
+import PageHeader from '@/components/base/PageHeader';
 import CourseCard from '@/components/business/CourseCard';
-import PageHeader from '@/components/business/PageHeader';
 import { useCourseService, useUserService } from '@/domains';
 import { IDENTITY } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';

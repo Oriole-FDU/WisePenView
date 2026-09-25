@@ -7,7 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { EmptyState, ResultState, Spin } from '@/components/base/Feedback';
-import PageHeader from '@/components/business/PageHeader';
+import PageHeader from '@/components/base/PageHeader';
 import { useMessageService } from '@/domains';
 import type { UserMessage } from '@/domains/Message';
 import { useApi, useApiInfiniteScroll } from '@/hooks/useApi';
