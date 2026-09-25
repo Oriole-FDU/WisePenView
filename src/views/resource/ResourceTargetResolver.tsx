@@ -15,7 +15,7 @@ import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
 import ResourceWorkspace from './_components/ResourceWorkspace';
-import ResourceRenderer from './ResourceRenderer';
+import ResourceRenderer, { type ResolvedResourceTarget } from './ResourceRenderer';
 import styles from './ResourceRenderer.module.less';
 
 interface ResourceTargetResolverProps {
@@ -152,13 +152,18 @@ function ResourceTargetResolver({ target, onTargetChange, onClose }: ResourceTar
     return <FileViewerResolver target={target} onTargetChange={onTargetChange} onClose={onClose} />;
   }
 
-  return (
-    <ResourceRenderer
-      target={{ ...target, resourceType, viewer }}
-      onTargetChange={onTargetChange}
-      onClose={onClose}
-    />
-  );
+  if (!viewer) {
+    return <UnsupportedResource {...target} resourceType={resourceType} onClose={onClose} />;
+  }
+
+  const resolvedTarget: ResolvedResourceTarget = {
+    resourceId,
+    resourceType,
+    resourceName: target.resourceName,
+    viewer,
+  };
+
+  return <ResourceRenderer target={resolvedTarget} />;
 }
 
 export default ResourceTargetResolver;

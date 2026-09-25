@@ -7,7 +7,7 @@ import {
   type ResourceHostContextValue,
   ResourceHostProvider,
 } from '@/layouts/Resource/_context';
-import ResourceRenderer from '@/views/resource/ResourceRenderer';
+import ResourceTargetResolver from '@/views/resource/ResourceTargetResolver';
 
 interface CourseResourceHostProps {
   courseId: string;
@@ -56,7 +56,7 @@ function CourseResourceHost({
   };
   return (
     <ResourceHostProvider value={resourceHostContext}>
-      <ResourceRenderer target={target} onTargetChange={onTargetChange} onClose={onClose} />
+      <ResourceTargetResolver target={target} onTargetChange={onTargetChange} onClose={onClose} />
     </ResourceHostProvider>
   );
 }
