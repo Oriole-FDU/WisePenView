@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
 import type { Group, GroupResConfig } from '@/domains/Group';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
@@ -12,25 +12,7 @@ export interface GroupContextValue {
   refreshGroup: () => void;
 }
 
-interface GroupContextProviderProps extends GroupContextValue {
-  children: ReactNode;
-}
-
 export const GroupContext = createContext<GroupContextValue | null>(null);
-
-export function GroupContextProvider({
-  group,
-  currentUserRole,
-  groupResConfig,
-  refreshGroup,
-  children,
-}: GroupContextProviderProps) {
-  return (
-    <GroupContext value={{ group, currentUserRole, groupResConfig, refreshGroup }}>
-      {children}
-    </GroupContext>
-  );
-}
 
 export const useGroupContext = (): GroupContextValue => {
   const value = useContext(GroupContext);

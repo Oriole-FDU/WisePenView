@@ -9,10 +9,8 @@ import type { Group, GroupResConfig } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import {
-  GroupContextProvider,
-  type GroupCurrentUserRole,
-} from '@/views/app/group/GroupRoute/GroupContext';
+import { type GroupCurrentUserRole } from '@/views/app/group/GroupRoute/GroupContext';
+import { GroupContextProvider } from '@/views/app/group/GroupRoute/GroupContextProvider';
 
 import styles from './style.module.less';
 
