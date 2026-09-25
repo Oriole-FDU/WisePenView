@@ -2,10 +2,10 @@ import { Switch, Tabs } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
 import { FormField, TextArea } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
-import AppForm from '@/components/business/AppForm';
 
 import type { GuidedPromptFields, SoulFieldKey } from '../../../../guidedPrompt';
 import {

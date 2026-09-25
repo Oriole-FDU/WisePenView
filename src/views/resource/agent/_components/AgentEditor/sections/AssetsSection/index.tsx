@@ -3,9 +3,9 @@ import { Trash2, Upload } from 'lucide-react';
 import { type DragEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import AppForm from '@/components/business/AppForm';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
