@@ -1,9 +1,9 @@
 import { ColorSwatchPicker } from '@heroui/react';
+import { clsx } from 'clsx';
 import { Baseline } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { cn } from '@/utils/cn';
 
 import {
   colorItems,
@@ -60,18 +60,18 @@ function ColorSection({
             color={item.value}
             aria-label={`${title}${getColorItemLabel(item)}`}
             className={({ isSelected }) =>
-              cn(styles.colorSwatchItem, isSelected && styles.colorSwatchSelected)
+              clsx(styles.colorSwatchItem, isSelected && styles.colorSwatchSelected)
             }
             onPress={() => onSelect(item.key)}
           >
             {mode === 'text' ? (
               <Baseline
                 size={20}
-                className={cn(styles.colorTextPreview, item.textClassName)}
+                className={clsx(styles.colorTextPreview, item.textClassName)}
                 aria-hidden="true"
               />
             ) : (
-              <span className={cn(styles.colorBackgroundPreview, item.backgroundClassName)} />
+              <span className={clsx(styles.colorBackgroundPreview, item.backgroundClassName)} />
             )}
           </ColorSwatchPicker.Item>
         ))}
@@ -88,7 +88,7 @@ export function ColorPaletteContent({
 }: ColorPaletteContentProps) {
   const { t } = useTranslation('note');
   return (
-    <div className={cn(styles.colorPanel, className)}>
+    <div className={clsx(styles.colorPanel, className)}>
       {text ? (
         <ColorSection
           title={t('editor.color.text')}

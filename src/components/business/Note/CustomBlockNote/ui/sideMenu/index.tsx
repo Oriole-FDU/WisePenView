@@ -9,6 +9,7 @@ import {
 } from '@blocknote/react';
 import { Dropdown, Label, Separator } from '@heroui/react';
 import { useEventListener } from 'ahooks';
+import { clsx } from 'clsx';
 import {
   AlignCenter,
   AlignLeft,
@@ -66,7 +67,6 @@ import {
 } from '@/components/business/Note/CustomBlockNote/ui/slashMenu/slashMenuModel';
 import { SlashMenuDropdownItems } from '@/components/business/Note/CustomBlockNote/ui/slashMenu/slashMenuView';
 import { copyText } from '@/utils/browser/copyText';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -598,7 +598,7 @@ function CustomSideMenu({
 
   return (
     <div
-      className={cn('bn-side-menu', styles.sideMenu)}
+      className={clsx('bn-side-menu', styles.sideMenu)}
       data-block-type={block.type}
       data-interaction-hidden={hiddenByTextInteraction && !dragging ? 'true' : undefined}
       {...Object.fromEntries(
@@ -621,7 +621,7 @@ function CustomSideMenu({
         <div className={styles.dragHandleWrapper}>
           <button
             type="button"
-            className={cn(styles.sideMenuButton, styles.dragHandleButton)}
+            className={clsx(styles.sideMenuButton, styles.dragHandleButton)}
             draggable="true"
             aria-label={t('sideMenu.blockMenu')}
             onClick={() => {

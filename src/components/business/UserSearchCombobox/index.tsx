@@ -1,5 +1,6 @@
 import { TextField } from '@heroui/react';
 import { useDebounceFn, useUnmount } from 'ahooks';
+import { clsx } from 'clsx';
 import type { KeyboardEvent } from 'react';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +10,6 @@ import { AppButton } from '@/components/base/Button';
 import { Input } from '@/components/base/Input';
 import type { UserSearchUser } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
-import { cn } from '@/utils/cn';
 
 import type { UserSearchComboboxProps } from './index.type';
 import styles from './style.module.less';
@@ -188,7 +188,7 @@ function UserSearchCombobox({
         type="button"
         role="option"
         aria-selected={selected}
-        className={cn(styles.option, selected && styles.optionActive)}
+        className={clsx(styles.option, selected && styles.optionActive)}
         onMouseEnter={() => setActiveOption({ keyword, index })}
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => selectUser(user)}

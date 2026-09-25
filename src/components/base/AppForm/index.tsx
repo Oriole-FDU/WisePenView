@@ -1,8 +1,7 @@
 import { Switch } from '@heroui/react';
+import { clsx } from 'clsx';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
-
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -123,17 +122,17 @@ function AppFormSection({
   actionsClassName,
 }: AppFormSectionProps) {
   return (
-    <section id={id} className={cn(styles.section, className)} data-variant={variant}>
-      <div className={cn(styles.sectionInner, innerClassName)}>
-        <header className={cn(styles.sectionHeader, headerClassName)}>
+    <section id={id} className={clsx(styles.section, className)} data-variant={variant}>
+      <div className={clsx(styles.sectionInner, innerClassName)}>
+        <header className={clsx(styles.sectionHeader, headerClassName)}>
           <div className={styles.sectionCopy}>
-            <h2 className={cn(styles.sectionTitle, titleClassName)}>{title}</h2>
+            <h2 className={clsx(styles.sectionTitle, titleClassName)}>{title}</h2>
             {description ? (
-              <p className={cn(styles.sectionDescription, descriptionClassName)}>{description}</p>
+              <p className={clsx(styles.sectionDescription, descriptionClassName)}>{description}</p>
             ) : null}
           </div>
           {actions ? (
-            <div className={cn(styles.sectionActions, actionsClassName)}>{actions}</div>
+            <div className={clsx(styles.sectionActions, actionsClassName)}>{actions}</div>
           ) : null}
         </header>
         {children}
@@ -143,7 +142,7 @@ function AppFormSection({
 }
 
 function AppFormRows({ children, className }: AppFormRowsProps) {
-  return <div className={cn(styles.rows, className)}>{children}</div>;
+  return <div className={clsx(styles.rows, className)}>{children}</div>;
 }
 
 function AppFormRow({
@@ -177,14 +176,14 @@ function AppFormRow({
     ) : null);
 
   return (
-    <div className={cn(styles.row, className)}>
-      <div className={cn(styles.rowCopy, copyClassName)}>
+    <div className={clsx(styles.row, className)}>
+      <div className={clsx(styles.rowCopy, copyClassName)}>
         <strong>{title}</strong>
         {description ? <span>{description}</span> : null}
         {children}
       </div>
       {resolvedControl ? (
-        <div className={cn(styles.rowControl, controlClassName)}>{resolvedControl}</div>
+        <div className={clsx(styles.rowControl, controlClassName)}>{resolvedControl}</div>
       ) : null}
     </div>
   );
@@ -313,7 +312,7 @@ function AppFormAnchorNav({
   };
 
   return (
-    <nav className={cn(styles.anchorNav, className)} aria-label={ariaLabel}>
+    <nav className={clsx(styles.anchorNav, className)} aria-label={ariaLabel}>
       {title ? <h2>{title}</h2> : null}
       {items.map((entry) => {
         if (isAnchorGroup(entry)) {
@@ -322,7 +321,7 @@ function AppFormAnchorNav({
               ? entry.title
               : entry.items.map((item) => item.id).join(':');
           return (
-            <div key={groupKey} className={cn(styles.anchorGroup, groupClassName)}>
+            <div key={groupKey} className={clsx(styles.anchorGroup, groupClassName)}>
               {entry.title ? <h2>{entry.title}</h2> : null}
               {entry.items.map((item) => (
                 <button

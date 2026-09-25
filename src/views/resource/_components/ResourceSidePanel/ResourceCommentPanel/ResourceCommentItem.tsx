@@ -1,4 +1,5 @@
 import { Tooltip } from '@heroui/react';
+import { clsx } from 'clsx';
 import { Heart, MessageCircle, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +7,6 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { ResourceComment } from '@/domains/Interact';
-import { cn } from '@/utils/cn';
 import {
   formatRelativeTimestamp,
   formatTimestampToDateTime,
@@ -57,7 +57,7 @@ function ResourceCommentItem({
     <AppButton
       variant="ghost"
       size="sm"
-      className={cn(styles.commentActionIcon, liked && styles.likedButton)}
+      className={clsx(styles.commentActionIcon, liked && styles.likedButton)}
       isDisabled={likePending}
       aria-label={likeLabel}
       onPress={() => void onLike(comment)}

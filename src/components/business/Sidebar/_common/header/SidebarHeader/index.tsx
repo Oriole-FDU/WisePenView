@@ -1,6 +1,7 @@
+import { clsx } from 'clsx';
+
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
-import { cn } from '@/utils/cn';
 
 import NavigationControls from '../NavigationControls';
 import type { SidebarHeaderProps } from './index.type';
@@ -43,7 +44,7 @@ function SidebarHeader({
 
   return (
     <div
-      className={cn(
+      className={clsx(
         styles.header,
         desktopWindow.isDesktop && styles.desktopHeader,
         desktopWindow.hasTitleBarInset &&
@@ -53,24 +54,28 @@ function SidebarHeader({
     >
       {desktopWindow.isDesktop ? (
         <>
-          <div className={cn(styles.headerTop, collapsed && styles.collapsedHeaderTop)}>
+          <div className={clsx(styles.headerTop, collapsed && styles.collapsedHeaderTop)}>
             {navigationControls}
           </div>
           {!collapsed ? (
-            <div className={cn(styles.logo, labelsHidden && styles.logoHidden)}>{logoContent}</div>
+            <div className={clsx(styles.logo, labelsHidden && styles.logoHidden)}>
+              {logoContent}
+            </div>
           ) : null}
         </>
       ) : (
-        <div className={cn(styles.webHeader, collapsed && styles.collapsedWebHeader)}>
+        <div className={clsx(styles.webHeader, collapsed && styles.collapsedWebHeader)}>
           {!collapsed ? (
-            <div className={cn(styles.logo, labelsHidden && styles.logoHidden)}>{logoContent}</div>
+            <div className={clsx(styles.logo, labelsHidden && styles.logoHidden)}>
+              {logoContent}
+            </div>
           ) : null}
           {navigationControls}
         </div>
       )}
 
       {hasNav ? (
-        <div className={cn(styles.headerNav, collapsed && styles.headerNavCollapsed)}>{nav}</div>
+        <div className={clsx(styles.headerNav, collapsed && styles.headerNavCollapsed)}>{nav}</div>
       ) : null}
     </div>
   );

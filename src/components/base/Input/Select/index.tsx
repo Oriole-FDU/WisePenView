@@ -1,7 +1,6 @@
 import { Label, Select as HeroSelect } from '@heroui/react';
+import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
-
-import { cn } from '@/utils/cn';
 
 import type {
   SelectIndicatorProps,
@@ -24,7 +23,7 @@ function SelectRoot<T extends object = object, M extends 'single' | 'multiple' =
   return (
     <HeroSelect
       variant={variant}
-      className={cn(styles.select, className)}
+      className={clsx(styles.select, className)}
       isRequired={isRequired}
       {...props}
     >
@@ -40,7 +39,7 @@ function SelectRoot<T extends object = object, M extends 'single' | 'multiple' =
 
 function SelectTrigger({ children, className, ...props }: SelectTriggerProps) {
   return (
-    <HeroSelect.Trigger className={cn(styles.selectTrigger, className)} {...props}>
+    <HeroSelect.Trigger className={clsx(styles.selectTrigger, className)} {...props}>
       {children === undefined ? (
         <>
           <SelectValue />
@@ -62,7 +61,7 @@ function SelectIndicator({ className, ...props }: SelectIndicatorProps) {
 }
 
 function SelectPopover({ className, ...props }: SelectPopoverProps) {
-  return <HeroSelect.Popover className={cn(styles.selectPopover, className)} {...props} />;
+  return <HeroSelect.Popover className={clsx(styles.selectPopover, className)} {...props} />;
 }
 
 const Select = Object.assign(SelectRoot, {

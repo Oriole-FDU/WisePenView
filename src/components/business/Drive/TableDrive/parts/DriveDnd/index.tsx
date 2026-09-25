@@ -1,4 +1,5 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core';
+import { clsx } from 'clsx';
 import {
   cloneElement,
   type DragEvent,
@@ -10,7 +11,6 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import EntryIcon from '@/components/base/Icons/EntryIcon';
-import { cn } from '@/utils/cn';
 
 import type { DriveTableRow } from '../../index.type';
 import styles from '../../style.module.less';
@@ -95,7 +95,7 @@ export function DriveDndRow({
     children as ReactElement<DriveDndRowElementProps>,
     {
       ref: setRowNodeRef,
-      className: cn(childProps.className, styles.dndBodyRow),
+      className: clsx(childProps.className, styles.dndBodyRow),
       'data-dragging': draggable.isDragging ? 'true' : undefined,
       'data-drive-dnd-drop-target': droppable.isOver ? 'true' : undefined,
       onMouseDownCapture: handleMouseDownCapture,

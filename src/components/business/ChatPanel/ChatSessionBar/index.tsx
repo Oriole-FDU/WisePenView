@@ -1,9 +1,9 @@
 import { useInfiniteScroll, useKeyPress } from 'ahooks';
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
-import { cn } from '@/utils/cn';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import styles from '../style.module.less';
@@ -74,7 +74,7 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
             <button
               key={session.id}
               type="button"
-              className={cn(styles.sessionItem, active && styles.sessionItemActive)}
+              className={clsx(styles.sessionItem, active && styles.sessionItemActive)}
               onClick={() => onSelectSession(session)}
               aria-current={active ? 'page' : undefined}
             >

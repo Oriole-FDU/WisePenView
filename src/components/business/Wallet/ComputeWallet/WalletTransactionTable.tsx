@@ -1,10 +1,10 @@
 import { Chip } from '@heroui/react';
+import { clsx } from 'clsx';
 import { ArrowDown, ArrowRight, ArrowUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { WALLET_TRANSACTION_KIND, type WalletTransactionRecord } from '@/domains/Wallet';
-import { cn } from '@/utils/cn';
 import { formatCompactNumber } from '@/utils/format/formatNumber';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
@@ -113,7 +113,7 @@ function WalletTransactionTable({
           const tone = getTransactionTone(row.type);
           return (
             <Chip
-              className={cn(styles.typeChip, getToneChipClassName(tone))}
+              className={clsx(styles.typeChip, getToneChipClassName(tone))}
               size="md"
               variant="soft"
             >
@@ -153,7 +153,7 @@ function WalletTransactionTable({
           const prefix = amount > 0 ? '+' : '';
           const tone = getTransactionTone(row.type);
           return (
-            <span className={cn(styles.amount, getToneAmountClassName(tone))}>
+            <span className={clsx(styles.amount, getToneAmountClassName(tone))}>
               {prefix}
               {formatCompactNumber(amount)}
             </span>

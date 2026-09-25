@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { clsx } from 'clsx';
 
 import styles from './style.module.less';
 
@@ -9,7 +9,7 @@ interface ColorTextIconProps {
 function ColorTextIcon({ textClassName }: ColorTextIconProps) {
   return (
     <span className={styles.root} aria-hidden="true">
-      <span className={cn(styles.text, textClassName)}>A</span>
+      <span className={clsx(styles.text, textClassName)}>A</span>
     </span>
   );
 }

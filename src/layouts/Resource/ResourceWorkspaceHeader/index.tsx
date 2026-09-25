@@ -1,6 +1,7 @@
+import { clsx } from 'clsx';
+
 import NavigationControls from '@/components/business/Sidebar/_common/header/NavigationControls';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
-import { cn } from '@/utils/cn';
 
 import ResourceHeader from '../ResourceHeader';
 import type { ResourceWorkspaceHeaderProps } from './index.type';
@@ -30,7 +31,7 @@ function ResourceWorkspaceHeader({
 
   return (
     <header
-      className={cn(
+      className={clsx(
         styles.root,
         desktopWindow.isDesktop && styles.desktopRoot,
         titleBarInsetStart && styles.titleBarInsetStartAligned,

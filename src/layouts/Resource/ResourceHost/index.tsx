@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -28,7 +29,6 @@ import { useMainShell } from '@/layouts/MainShell/MainShellContext';
 import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
-import { cn } from '@/utils/cn';
 import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 import { normalizeResourceKind, resolveResourceViewer } from '@/utils/navigation/resourceTarget';
 import {
@@ -131,7 +131,7 @@ function ResourceHost() {
   return (
     <ResourceChatBindingProvider>
       <ResourceHostContext value={resourceHostContext}>
-        <div className={cn(styles.shell, overlayChatOpen && styles.shellWithOverlay)}>
+        <div className={clsx(styles.shell, overlayChatOpen && styles.shellWithOverlay)}>
           <SystemResizablePanelGroup
             orientation="horizontal"
             className={styles.root}

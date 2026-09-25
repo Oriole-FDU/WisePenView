@@ -1,11 +1,11 @@
 import { Tabs, Tooltip } from '@heroui/react';
+import { clsx } from 'clsx';
 import { BookOpen, FolderOpen, type LucideIcon, MessageSquare } from 'lucide-react';
 import type { ComponentPropsWithRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CommandPaletteTrigger from '@/components/business/CommandPalette/Trigger';
 import { useAppAuth } from '@/layouts/App/AppAuthContext';
-import { cn } from '@/utils/cn';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import {
@@ -153,7 +153,7 @@ function AppSidebarTabs() {
 
         <div className={styles.panelViewport}>
           <div
-            className={cn(
+            className={clsx(
               styles.panelTrack,
               selectedTab === SIDEBAR_VIEW_TAB.DRIVE && styles.panelTrackDrive,
               selectedTab === SIDEBAR_VIEW_TAB.COURSES && styles.panelTrackCourses
@@ -161,21 +161,21 @@ function AppSidebarTabs() {
           >
             <Tabs.Panel
               id={SIDEBAR_VIEW_TAB.SESSIONS}
-              className={cn(styles.tabPanel, styles.sessionPanel)}
+              className={clsx(styles.tabPanel, styles.sessionPanel)}
               shouldForceMount
             >
               <SessionTab />
             </Tabs.Panel>
             <Tabs.Panel
               id={SIDEBAR_VIEW_TAB.DRIVE}
-              className={cn(styles.tabPanel, styles.drivePanel)}
+              className={clsx(styles.tabPanel, styles.drivePanel)}
               shouldForceMount
             >
               <DriveTab />
             </Tabs.Panel>
             <Tabs.Panel
               id={SIDEBAR_VIEW_TAB.COURSES}
-              className={cn(styles.tabPanel, styles.coursePanel)}
+              className={clsx(styles.tabPanel, styles.coursePanel)}
               shouldForceMount
             >
               <CourseTab />

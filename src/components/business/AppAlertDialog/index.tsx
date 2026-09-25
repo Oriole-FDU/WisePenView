@@ -1,10 +1,10 @@
+import { clsx } from 'clsx';
 import { CircleAlert, TriangleAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { Modal } from '@/components/base/Modal';
-import { cn } from '@/utils/cn';
 
 import type {
   AppAlertDialogBodyProps,
@@ -24,11 +24,11 @@ const STATUS_MAP = {
 } satisfies Record<AppAlertDialogType, AppAlertDialogStatus>;
 
 function AppAlertDialogBody({ className, ...props }: AppAlertDialogBodyProps) {
-  return <Modal.Body className={cn(styles.body, className)} {...props} />;
+  return <Modal.Body className={clsx(styles.body, className)} {...props} />;
 }
 
 function AppAlertDialogFooter({ className, ...props }: AppAlertDialogFooterProps) {
-  return <Modal.Footer className={cn(styles.footer, className)} {...props} />;
+  return <Modal.Footer className={clsx(styles.footer, className)} {...props} />;
 }
 
 function AppAlertDialogRoot({
@@ -127,22 +127,22 @@ function AppAlertDialogRoot({
       deferContent={deferContent}
     >
       <Modal.Backdrop
-        className={cn(backdropClassName, classNames?.backdrop)}
+        className={clsx(backdropClassName, classNames?.backdrop)}
         isDismissable={canDismiss}
         isKeyboardDismissDisabled={!canDismiss}
       >
         <Modal.Container
           size={size}
           placement={placement}
-          className={cn(styles.container, containerClassName, classNames?.container)}
+          className={clsx(styles.container, containerClassName, classNames?.container)}
         >
           <Modal.Dialog
-            className={cn(styles.dialog, className, dialogClassName, classNames?.dialog)}
+            className={clsx(styles.dialog, className, dialogClassName, classNames?.dialog)}
           >
-            <Modal.Header className={cn(styles.header, classNames?.header)}>
+            <Modal.Header className={clsx(styles.header, classNames?.header)}>
               {hasIcon ? (
                 <Modal.Icon
-                  className={cn(styles.icon, classNames?.icon)}
+                  className={clsx(styles.icon, classNames?.icon)}
                   data-status={status}
                   aria-hidden
                 >
@@ -150,11 +150,11 @@ function AppAlertDialogRoot({
                 </Modal.Icon>
               ) : null}
               <div className={styles.headerContent}>
-                <Modal.Heading className={cn(styles.heading, classNames?.heading)}>
+                <Modal.Heading className={clsx(styles.heading, classNames?.heading)}>
                   {title}
                 </Modal.Heading>
                 {description ? (
-                  <div className={cn(styles.description, classNames?.description)}>
+                  <div className={clsx(styles.description, classNames?.description)}>
                     {description}
                   </div>
                 ) : null}
@@ -162,13 +162,13 @@ function AppAlertDialogRoot({
             </Modal.Header>
 
             {children != null ? (
-              <AppAlertDialogBody className={cn(bodyClassName, classNames?.body)}>
+              <AppAlertDialogBody className={clsx(bodyClassName, classNames?.body)}>
                 {children}
               </AppAlertDialogBody>
             ) : null}
 
             {footerContent != null && footerContent !== false ? (
-              <AppAlertDialogFooter className={cn(footerClassName, classNames?.footer)}>
+              <AppAlertDialogFooter className={clsx(footerClassName, classNames?.footer)}>
                 {footerContent}
               </AppAlertDialogFooter>
             ) : null}

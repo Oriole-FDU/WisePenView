@@ -1,5 +1,6 @@
 import { ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
 import { useInfiniteScroll, useMemoizedFn } from 'ahooks';
+import { clsx } from 'clsx';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +10,6 @@ import { useChatSessionHistoryRefreshStore } from '@/components/business/ChatPan
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
-import { cn } from '@/utils/cn';
 import { buildChatPath } from '@/utils/navigation/appRoute';
 
 import { useSidebarSessionHistoryStore } from './_store/useSidebarSessionHistoryStore';
@@ -133,7 +133,7 @@ function SessionTab() {
                 key={session.id}
                 id={`session-${session.id}`}
                 textValue={session.title || t('session.untitled')}
-                className={cn(styles.sessionItem, styles.sessionItemWithActions)}
+                className={clsx(styles.sessionItem, styles.sessionItemWithActions)}
                 onPress={() => selectSession(session)}
               >
                 <SessionMenuItem session={session} onUpdated={refresh} onDeleted={handleDeleted} />

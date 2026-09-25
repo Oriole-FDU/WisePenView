@@ -1,7 +1,6 @@
+import { clsx } from 'clsx';
 import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { cn } from '@/utils/cn';
 
 import type { RatingProps } from './index.type';
 import styles from './style.module.less';
@@ -48,7 +47,7 @@ function Rating({
 
   return (
     <div
-      className={cn(styles.rating, size === 'sm' && styles.ratingSmall, className)}
+      className={clsx(styles.rating, size === 'sm' && styles.ratingSmall, className)}
       role="radiogroup"
       aria-label={ariaLabel ?? t('rating.aria')}
       aria-disabled={isDisabled || undefined}
@@ -63,7 +62,7 @@ function Rating({
           <button
             key={itemValue}
             type="button"
-            className={cn(
+            className={clsx(
               styles.item,
               isActive && styles.itemActive,
               isPressed && styles.itemPressed

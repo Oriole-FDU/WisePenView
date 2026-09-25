@@ -1,11 +1,11 @@
 import { useUnmount } from 'ahooks';
 import { isTextUIPart } from 'ai';
+import { clsx } from 'clsx';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMessageScroller, useMessageScrollerVisibility } from '@/components/_shadcn';
 import type { WisePenUIMessage } from '@/domains/Chat';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -175,7 +175,7 @@ function MessageHistoryNavigator({
   return (
     <div
       ref={rootRef}
-      className={cn(
+      className={clsx(
         styles.historyNavigator,
         styles.historyNavigatorRail,
         open && styles.historyNavigatorRailOpen
