@@ -4,14 +4,13 @@ import {
   REGEXP_ONLY_DIGITS,
   REGEXP_ONLY_DIGITS_AND_CHARS,
 } from '@heroui/react';
-
-import { cn } from '@/utils/cn';
+import { clsx } from 'clsx';
 
 import type { InputOTPProps } from './index.type';
 import styles from './style.module.less';
 
 function InputOTPRoot({ className, variant = 'secondary', ...props }: InputOTPProps) {
-  return <HeroInputOTP variant={variant} className={cn(styles.inputOtp, className)} {...props} />;
+  return <HeroInputOTP variant={variant} className={clsx(styles.inputOtp, className)} {...props} />;
 }
 
 const InputOTP = Object.assign(InputOTPRoot, {

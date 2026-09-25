@@ -1,9 +1,9 @@
+import { clsx } from 'clsx';
 import { History, PanelRightClose, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
-import { cn } from '@/utils/cn';
 
 import styles from '../style.module.less';
 import type { ChatPanelHeaderProps } from './index.type';
@@ -29,7 +29,7 @@ function ChatPanelHeader({
     desktopWindow.titleBarInsetSide === 'end';
 
   return (
-    <div className={cn(styles.header, titleBarInsetEnd && styles.titleBarInsetEnd)}>
+    <div className={clsx(styles.header, titleBarInsetEnd && styles.titleBarInsetEnd)}>
       <div className={styles.headerLeft}>
         {showCollapseButton ? (
           <AppIconButton

@@ -1,10 +1,10 @@
+import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { Modal } from '@/components/base/Modal';
-import { cn } from '@/utils/cn';
 
 import type {
   AppDisplayDialogAction,
@@ -15,11 +15,11 @@ import type {
 import styles from './style.module.less';
 
 function AppDisplayDialogBody({ className, ...props }: AppDisplayDialogBodyProps) {
-  return <Modal.Body className={cn(styles.body, className)} {...props} />;
+  return <Modal.Body className={clsx(styles.body, className)} {...props} />;
 }
 
 function AppDisplayDialogFooter({ className, ...props }: AppDisplayDialogFooterProps) {
-  return <Modal.Footer className={cn(styles.footer, className)} {...props} />;
+  return <Modal.Footer className={clsx(styles.footer, className)} {...props} />;
 }
 
 function renderAction(
@@ -107,41 +107,47 @@ function AppDisplayDialogRoot({
         <Modal.Container
           size={size}
           placement={placement}
-          className={cn(styles.container, containerClassName, classNames?.container)}
+          className={clsx(styles.container, containerClassName, classNames?.container)}
         >
           <Modal.Dialog
-            className={cn(styles.dialog, className, dialogClassName, classNames?.dialog)}
+            className={clsx(styles.dialog, className, dialogClassName, classNames?.dialog)}
           >
             {hasCloseTrigger ? (
               <Modal.CloseTrigger
                 aria-label={t('overlay.closeAria')}
-                className={cn(styles.closeTrigger, closeTriggerClassName, classNames?.closeTrigger)}
+                className={clsx(
+                  styles.closeTrigger,
+                  closeTriggerClassName,
+                  classNames?.closeTrigger
+                )}
               >
                 <X size={16} aria-hidden />
               </Modal.CloseTrigger>
             ) : null}
             <Modal.Header
-              className={cn(
+              className={clsx(
                 styles.header,
                 hasCloseTrigger && styles.headerWithCloseTrigger,
                 headerClassName,
                 classNames?.header
               )}
             >
-              <Modal.Heading className={cn(styles.heading, classNames?.heading)}>
+              <Modal.Heading className={clsx(styles.heading, classNames?.heading)}>
                 {title}
               </Modal.Heading>
               {description ? (
-                <div className={cn(styles.description, classNames?.description)}>{description}</div>
+                <div className={clsx(styles.description, classNames?.description)}>
+                  {description}
+                </div>
               ) : null}
             </Modal.Header>
 
-            <AppDisplayDialogBody className={cn(bodyClassName, classNames?.body)}>
+            <AppDisplayDialogBody className={clsx(bodyClassName, classNames?.body)}>
               {children}
             </AppDisplayDialogBody>
 
             {footerContent != null ? (
-              <AppDisplayDialogFooter className={cn(footerClassName, classNames?.footer)}>
+              <AppDisplayDialogFooter className={clsx(footerClassName, classNames?.footer)}>
                 {footerContent}
               </AppDisplayDialogFooter>
             ) : null}

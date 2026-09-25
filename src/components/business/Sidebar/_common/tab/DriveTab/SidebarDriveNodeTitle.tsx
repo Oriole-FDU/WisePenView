@@ -1,4 +1,5 @@
 import { Dropdown, Label } from '@heroui/react';
+import { clsx } from 'clsx';
 import {
   CloudUpload,
   FileInput,
@@ -20,7 +21,6 @@ import type {
 } from '@/components/business/Drive/common/driveComponentModel';
 import type { FolderNode, RootNode } from '@/domains/Drive';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -122,7 +122,7 @@ function SidebarDriveNodeTitle({
 
   return (
     <span className={styles.nodeTitle}>
-      <span className={cn(styles.nodeMain, node.type === 'root' && styles.nodeMainRoot)}>
+      <span className={clsx(styles.nodeMain, node.type === 'root' && styles.nodeMainRoot)}>
         <span className={styles.nodeIcon} aria-hidden="true">
           <EntryIcon
             entryType={node.type}
@@ -140,7 +140,7 @@ function SidebarDriveNodeTitle({
       </span>
       {canCreateFolder || canDelete ? (
         <span
-          className={cn(styles.nodeActions, node.type === 'root' && styles.nodeActionsPinned)}
+          className={clsx(styles.nodeActions, node.type === 'root' && styles.nodeActionsPinned)}
           onClick={stopTreeAction}
           onKeyDown={stopTreeAction}
         >
@@ -233,7 +233,7 @@ function SidebarDriveNodeTitle({
               label={t('drive:sidebar.deleteNode', { name: label })}
               size="sm"
               variant="danger"
-              className={cn(styles.nodeActionBtn, styles.nodeActionBtnDanger)}
+              className={clsx(styles.nodeActionBtn, styles.nodeActionBtnDanger)}
               tooltip={{ content: t('common:actions.delete') }}
               onClick={() => onDeleteNode(node)}
             />

@@ -1,6 +1,5 @@
 import { Description, ErrorMessage, Label, TextField } from '@heroui/react';
-
-import { cn } from '@/utils/cn';
+import { clsx } from 'clsx';
 
 import type { FormFieldProps } from './index.type';
 import styles from './style.module.less';
@@ -22,24 +21,24 @@ function FormField({
 
   return (
     <TextField
-      className={cn(styles.field, className)}
+      className={clsx(styles.field, className)}
       isInvalid={invalid}
       isRequired={isRequired}
       {...props}
     >
       {label ? (
-        <Label className={cn(styles.label, labelClassName)} isRequired={isRequired}>
+        <Label className={clsx(styles.label, labelClassName)} isRequired={isRequired}>
           {label}
         </Label>
       ) : null}
       {children}
       {description ? (
-        <Description className={cn(styles.description, descriptionClassName)}>
+        <Description className={clsx(styles.description, descriptionClassName)}>
           {description}
         </Description>
       ) : null}
       {errorMessage ? (
-        <ErrorMessage className={cn(styles.error, errorClassName)}>{errorMessage}</ErrorMessage>
+        <ErrorMessage className={clsx(styles.error, errorClassName)}>{errorMessage}</ErrorMessage>
       ) : null}
     </TextField>
   );

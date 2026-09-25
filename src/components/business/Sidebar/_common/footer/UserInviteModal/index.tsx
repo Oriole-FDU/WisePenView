@@ -1,4 +1,5 @@
 import { toast } from '@heroui/react';
+import { clsx } from 'clsx';
 import { Copy, Link as LinkIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,6 @@ import { useUserService } from '@/domains';
 import type { UserInviteRecord } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
-import { cn } from '@/utils/cn';
 import { formatTimestampToDate } from '@/utils/format';
 import { buildRegisterInvitePath } from '@/utils/navigation/appRoute';
 
@@ -106,7 +106,7 @@ function UserInviteModal({ isOpen, onOpenChange, inviteCode }: UserInviteModalPr
                 </AppAvatar>
                 <span className={styles.recordName}>{inviteeName}</span>
                 <span
-                  className={cn(
+                  className={clsx(
                     styles.recordStatus,
                     record.status === 'REWARDED' && styles.recordStatusRewarded
                   )}

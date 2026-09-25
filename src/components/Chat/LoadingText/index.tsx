@@ -1,6 +1,5 @@
+import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
-
-import { cn } from '@/utils/cn';
 
 import type { LoadingTextProps } from './index.type';
 import styles from './style.module.less';
@@ -28,7 +27,7 @@ function LoadingText({
 
   return (
     <Component
-      className={cn(styles.root, className)}
+      className={clsx(styles.root, className)}
       data-tone={tone}
       data-size={size}
       data-animated={animated ? 'true' : 'false'}

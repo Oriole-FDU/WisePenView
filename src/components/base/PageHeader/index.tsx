@@ -1,7 +1,6 @@
 import { Heading, Paragraph } from '@heroui/react';
+import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
-
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -27,10 +26,10 @@ function PageHeader({
   actionsClassName,
 }: PageHeaderProps) {
   return (
-    <div className={cn(styles.pageHeader, className)}>
+    <div className={clsx(styles.pageHeader, className)}>
       <div className={styles.main}>
         {leading ? <div className={styles.leading}>{leading}</div> : null}
-        <div className={cn(styles.content, contentClassName)}>
+        <div className={clsx(styles.content, contentClassName)}>
           <Heading level={1} id={titleId} className={styles.title}>
             {title}
           </Heading>
@@ -41,7 +40,7 @@ function PageHeader({
           ) : null}
         </div>
       </div>
-      {actions ? <div className={cn(styles.actions, actionsClassName)}>{actions}</div> : null}
+      {actions ? <div className={clsx(styles.actions, actionsClassName)}>{actions}</div> : null}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 'use client';
 
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { cn } from '@/utils/cn';
+import { clsx } from 'clsx';
 import * as React from 'react';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
 import styles from './attachment.module.less';
 
 type AttachmentState = 'idle' | 'uploading' | 'processing' | 'error' | 'done';
@@ -48,7 +49,7 @@ function Attachment({
       data-state={state}
       data-size={size}
       data-orientation={orientation}
-      className={cn(
+      className={clsx(
         styles.attachment,
         attachmentSizeClassName[size],
         attachmentOrientationClassName[orientation],
@@ -64,7 +65,7 @@ function AttachmentMedia({ className, variant = 'icon', ...props }: AttachmentMe
     <div
       data-slot="attachment-media"
       data-variant={variant}
-      className={cn(styles.media, variant === 'image' && styles.mediaImage, className)}
+      className={clsx(styles.media, variant === 'image' && styles.mediaImage, className)}
       {...props}
     />
   );
@@ -72,19 +73,19 @@ function AttachmentMedia({ className, variant = 'icon', ...props }: AttachmentMe
 
 function AttachmentContent({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="attachment-content" className={cn(styles.content, className)} {...props} />
+    <div data-slot="attachment-content" className={clsx(styles.content, className)} {...props} />
   );
 }
 
 function AttachmentTitle({ className, ...props }: React.ComponentProps<'span'>) {
-  return <span data-slot="attachment-title" className={cn(styles.title, className)} {...props} />;
+  return <span data-slot="attachment-title" className={clsx(styles.title, className)} {...props} />;
 }
 
 function AttachmentDescription({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
       data-slot="attachment-description"
-      className={cn(styles.description, className)}
+      className={clsx(styles.description, className)}
       {...props}
     />
   );
@@ -92,7 +93,7 @@ function AttachmentDescription({ className, ...props }: React.ComponentProps<'sp
 
 function AttachmentActions({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="attachment-actions" className={cn(styles.actions, className)} {...props} />
+    <div data-slot="attachment-actions" className={clsx(styles.actions, className)} {...props} />
   );
 }
 
@@ -107,7 +108,7 @@ function AttachmentAction({
       icon={children}
       data-slot="attachment-action"
       size={size}
-      className={cn(styles.action, className)}
+      className={clsx(styles.action, className)}
       {...props}
     />
   );
@@ -115,14 +116,14 @@ function AttachmentAction({
 
 function AttachmentTrigger({ asChild = false, className, type, ...props }: AttachmentTriggerProps) {
   if (asChild) {
-    return <AttachmentTriggerSlot className={cn(styles.trigger, className)} {...props} />;
+    return <AttachmentTriggerSlot className={clsx(styles.trigger, className)} {...props} />;
   }
 
   return (
     <button
       data-slot="attachment-trigger"
       type={type ?? 'button'}
-      className={cn(styles.trigger, className)}
+      className={clsx(styles.trigger, className)}
       {...props}
     />
   );
@@ -143,12 +144,12 @@ function AttachmentTriggerSlot({
   return React.cloneElement(children, {
     ...props,
     'data-slot': 'attachment-trigger',
-    className: cn(styles.trigger, className, childClassName),
+    className: clsx(styles.trigger, className, childClassName),
   });
 }
 
 function AttachmentGroup({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div data-slot="attachment-group" className={cn(styles.group, className)} {...props} />;
+  return <div data-slot="attachment-group" className={clsx(styles.group, className)} {...props} />;
 }
 
 export {

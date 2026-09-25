@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn';
+import { clsx } from 'clsx';
 
 import type {
   ChatMessageActionsProps,
@@ -14,7 +14,7 @@ import styles from './style.module.less';
 
 function ChatMessageAssistant({ className, children, ...props }: ChatMessageAssistantProps) {
   return (
-    <div data-role="assistant" className={cn(styles.assistant, className)} {...props}>
+    <div data-role="assistant" className={clsx(styles.assistant, className)} {...props}>
       {children}
     </div>
   );
@@ -22,7 +22,7 @@ function ChatMessageAssistant({ className, children, ...props }: ChatMessageAssi
 
 function ChatMessageUser({ className, children, ...props }: ChatMessageUserProps) {
   return (
-    <div data-role="user" className={cn(styles.user, className)} {...props}>
+    <div data-role="user" className={clsx(styles.user, className)} {...props}>
       <div className={styles.userInner}>{children}</div>
     </div>
   );
@@ -31,7 +31,7 @@ function ChatMessageUser({ className, children, ...props }: ChatMessageUserProps
 function ChatMessageAvatar({ className, children, ...props }: ChatMessageAvatarProps) {
   return (
     <div
-      className={cn(styles.avatar, className)}
+      className={clsx(styles.avatar, className)}
       aria-hidden={props['aria-hidden'] ?? true}
       {...props}
     >
@@ -42,7 +42,7 @@ function ChatMessageAvatar({ className, children, ...props }: ChatMessageAvatarP
 
 function ChatMessageMeta({ className, name, children, ...props }: ChatMessageMetaProps) {
   return (
-    <div className={cn(styles.meta, className)} {...props}>
+    <div className={clsx(styles.meta, className)} {...props}>
       {name ? <span className={styles.metaName}>{name}</span> : null}
       {children}
     </div>
@@ -51,7 +51,7 @@ function ChatMessageMeta({ className, name, children, ...props }: ChatMessageMet
 
 function ChatMessageBody({ className, children, ...props }: ChatMessageBodyProps) {
   return (
-    <div className={cn(styles.body, className)} {...props}>
+    <div className={clsx(styles.body, className)} {...props}>
       {children}
     </div>
   );
@@ -59,7 +59,7 @@ function ChatMessageBody({ className, children, ...props }: ChatMessageBodyProps
 
 function ChatMessageBubble({ className, children, ...props }: ChatMessageBubbleProps) {
   return (
-    <div className={cn(styles.bubble, className)} {...props}>
+    <div className={clsx(styles.bubble, className)} {...props}>
       {children}
     </div>
   );
@@ -67,7 +67,7 @@ function ChatMessageBubble({ className, children, ...props }: ChatMessageBubbleP
 
 function ChatMessageContent({ className, children, ...props }: ChatMessageContentProps) {
   return (
-    <div className={cn(styles.content, className)} {...props}>
+    <div className={clsx(styles.content, className)} {...props}>
       {children}
     </div>
   );
@@ -75,7 +75,7 @@ function ChatMessageContent({ className, children, ...props }: ChatMessageConten
 
 function ChatMessageActions({ className, children, ...props }: ChatMessageActionsProps) {
   return (
-    <div className={cn(styles.actions, className)} {...props}>
+    <div className={clsx(styles.actions, className)} {...props}>
       {children}
     </div>
   );

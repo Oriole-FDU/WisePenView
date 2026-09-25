@@ -1,6 +1,5 @@
 import { Fieldset as HeroFieldset } from '@heroui/react';
-
-import { cn } from '@/utils/cn';
+import { clsx } from 'clsx';
 
 import type {
   FieldGroupProps,
@@ -11,19 +10,19 @@ import type {
 import styles from './style.module.less';
 
 function FieldsetRoot({ className, ...props }: FieldsetProps) {
-  return <HeroFieldset className={cn(styles.fieldset, className)} {...props} />;
+  return <HeroFieldset className={clsx(styles.fieldset, className)} {...props} />;
 }
 
 function FieldsetLegend({ className, ...props }: FieldsetLegendProps) {
-  return <HeroFieldset.Legend className={cn(styles.legend, className)} {...props} />;
+  return <HeroFieldset.Legend className={clsx(styles.legend, className)} {...props} />;
 }
 
 function FieldGroup({ className, ...props }: FieldGroupProps) {
-  return <HeroFieldset.Group className={cn(styles.group, className)} {...props} />;
+  return <HeroFieldset.Group className={clsx(styles.group, className)} {...props} />;
 }
 
 function FieldsetActions({ className, ...props }: FieldsetActionsProps) {
-  return <HeroFieldset.Actions className={cn(styles.actions, className)} {...props} />;
+  return <HeroFieldset.Actions className={clsx(styles.actions, className)} {...props} />;
 }
 
 const Fieldset = Object.assign(FieldsetRoot, {

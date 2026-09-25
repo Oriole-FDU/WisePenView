@@ -1,9 +1,9 @@
+import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import type { ResourceItem } from '@/domains/Resource';
 import type { ResourceHeaderConfig } from '@/layouts/Resource/ResourceHeader/index.type';
 import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
-import { cn } from '@/utils/cn';
 
 import { useResourceHostContext } from '../../ResourceHostContext';
 import ResourceSidePanel from '../ResourceSidePanel';
@@ -62,7 +62,7 @@ export default function ResourceWorkspace({
   );
 
   return (
-    <div className={cn(styles.root, className)}>
+    <div className={clsx(styles.root, className)}>
       {workspaceHeader}
       <div className={styles.body}>
         <ResourceSidePanel resourceId={host.routeContext.resourceId ?? ''} config={sidePanel}>
