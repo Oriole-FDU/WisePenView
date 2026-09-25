@@ -1,8 +1,7 @@
 import { ToggleButton, Tooltip } from '@heroui/react';
-import { cloneElement, type ReactElement, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { AppButton, type AppButtonProps } from '@/components/base/Button';
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import { cn } from '@/utils/cn';
 
 import styles from '../style.module.less';
@@ -20,7 +19,6 @@ interface ToolbarButtonProps extends ButtonGroupChildProps {
   className?: string;
   onHoverChange?: AppButtonProps['onHoverChange'];
   onPress?: () => void;
-  overlayTrigger?: ReactElement;
 }
 
 export function ToolbarButton({
@@ -31,7 +29,6 @@ export function ToolbarButton({
   className,
   onHoverChange,
   onPress,
-  overlayTrigger,
   __button_group_child: isButtonGroupChild,
 }: ToolbarButtonProps) {
   const button = (
@@ -54,9 +51,15 @@ export function ToolbarButton({
 
   return (
     <Tooltip>
-      <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-        {overlayTrigger ? cloneElement(overlayTrigger, undefined, button) : button}
-      </Tooltip.Trigger>
+      {isDisabled ? (
+        <Tooltip.Trigger<'span'>
+          render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+        >
+          {button}
+        </Tooltip.Trigger>
+      ) : (
+        button
+      )}
       <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
     </Tooltip>
   );
@@ -77,22 +80,32 @@ export function ToolbarToggleButton({
   isDisabled,
   onPress,
 }: ToolbarToggleButtonProps) {
+  const button = (
+    <ToggleButton
+      aria-label={label}
+      id={id}
+      isDisabled={isDisabled}
+      isIconOnly
+      size="sm"
+      variant="ghost"
+      onMouseDown={stopToolbarMouseDown}
+      onPress={onPress}
+    >
+      {icon}
+    </ToggleButton>
+  );
+
   return (
     <Tooltip>
-      <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-        <ToggleButton
-          aria-label={label}
-          id={id}
-          isDisabled={isDisabled}
-          isIconOnly
-          size="sm"
-          variant="ghost"
-          onMouseDown={stopToolbarMouseDown}
-          onPress={onPress}
+      {isDisabled ? (
+        <Tooltip.Trigger<'span'>
+          render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
         >
-          {icon}
-        </ToggleButton>
-      </Tooltip.Trigger>
+          {button}
+        </Tooltip.Trigger>
+      ) : (
+        button
+      )}
       <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
     </Tooltip>
   );

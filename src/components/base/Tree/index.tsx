@@ -78,6 +78,13 @@ interface FlatNode {
   expandable: boolean;
 }
 
+function isInteractiveTarget(target: EventTarget): boolean {
+  return (
+    target instanceof Element &&
+    target.closest('button, a, input, select, textarea, [role="button"]') !== null
+  );
+}
+
 function normalizeKeys(keys: Key[] | undefined): string[] {
   return (keys ?? []).map(String);
 }
@@ -303,6 +310,17 @@ function Tree({
             )}
             draggable={canDragNode(node)}
             role="treeitem"
+            tabIndex={canSelect || clickExpands ? 0 : undefined}
+            onKeyDown={(event) => {
+              if (event.target !== event.currentTarget) return;
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              event.preventDefault();
+              if (clickExpands && !canSelect) {
+                toggleExpand(node, !expanded);
+                return;
+              }
+              toggleSelect(node);
+            }}
             data-selectable={canSelect}
             aria-expanded={expandable ? expanded : undefined}
             aria-selected={canSelect ? selected : undefined}
@@ -379,25 +397,16 @@ function Tree({
             <div
               className={cn(styles.content, 'wisepen-tree__content')}
               data-selectable={canSelect}
-              role={canSelect || clickExpands ? 'button' : undefined}
-              tabIndex={canSelect || clickExpands ? 0 : undefined}
-              onClick={() => {
+              onClick={(event) => {
+                if (isInteractiveTarget(event.target)) return;
                 if (clickExpands && !canSelect) {
                   toggleExpand(node, !expanded);
                   return;
                 }
                 toggleSelect(node);
               }}
-              onKeyDown={(event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                if (clickExpands && !canSelect) {
-                  toggleExpand(node, !expanded);
-                  return;
-                }
-                toggleSelect(node);
-              }}
-              onDoubleClick={() => {
+              onDoubleClick={(event) => {
+                if (isInteractiveTarget(event.target)) return;
                 if (expandAction !== 'doubleClick' || !expandable) return;
                 toggleExpand(node, !expanded);
               }}

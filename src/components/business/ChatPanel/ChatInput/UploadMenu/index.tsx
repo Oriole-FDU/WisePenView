@@ -28,10 +28,15 @@ function UploadMenu() {
 
   return (
     <Dropdown isOpen={open} onOpenChange={setAttachmentOpen}>
-      <AppIconButton
-        icon={<Plus size={18} aria-hidden="true" />}
-        label={t('input.uploadMenu.trigger')}
-        overlayTrigger={<Dropdown.Trigger />}
+      <Dropdown.Trigger
+        render={({ disabled, ...triggerProps }) => (
+          <AppIconButton
+            {...triggerProps}
+            isDisabled={disabled}
+            icon={<Plus size={18} aria-hidden="true" />}
+            label={t('input.uploadMenu.trigger')}
+          />
+        )}
       />
       <Dropdown.Popover placement="top">
         <Dropdown.Menu aria-label={t('input.uploadMenu.aria')} onAction={handleAction}>

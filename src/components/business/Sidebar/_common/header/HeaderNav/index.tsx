@@ -1,8 +1,8 @@
 import { ListBox, ListBoxItem, ListBoxSection, Separator, Tooltip } from '@heroui/react';
-import { useLayoutEffect, useRef } from 'react';
+import { type ComponentPropsWithRef, useLayoutEffect, useRef } from 'react';
 
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import { cn } from '@/utils/cn';
+import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import type { HeaderNavItem, HeaderNavProps, HeaderNavSection } from './index.type';
 import styles from './style.module.less';
@@ -86,6 +86,7 @@ function HeaderNav({
         id={item.key}
         ref={setItemRef(item.key)}
         textValue={item.name}
+        aria-label={item.name}
         aria-current={isActive ? 'page' : undefined}
         data-nav-active={isActive ? 'true' : undefined}
         isDisabled={item.isDisabled}
@@ -96,17 +97,32 @@ function HeaderNav({
           isActive && styles.menuItemActive
         )}
         onAction={item.onPress}
+        render={
+          collapsed
+            ? (domProps) => {
+                // 导航项只使用 onAction，不传 href；React Aria 在此始终渲染 div。
+                const { ref: itemRef, ...itemProps } = domProps as ComponentPropsWithRef<'div'>;
+                return (
+                  <Tooltip isDisabled={item.isDisabled}>
+                    <Tooltip.Trigger
+                      {...itemProps}
+                      render={({ ref: tooltipRef, ...tooltipProps }) => (
+                        <div
+                          {...tooltipProps}
+                          tabIndex={itemProps.tabIndex}
+                          ref={mergeRefs(itemRef, tooltipRef)}
+                        />
+                      )}
+                    />
+                    <Tooltip.Content placement="right">{item.name}</Tooltip.Content>
+                  </Tooltip>
+                );
+              }
+            : undefined
+        }
       >
         {collapsed ? (
-          <Tooltip>
-            <Tooltip.Trigger
-              className={styles.menuTooltipTrigger}
-              {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}
-            >
-              {icon}
-            </Tooltip.Trigger>
-            <Tooltip.Content placement="right">{item.name}</Tooltip.Content>
-          </Tooltip>
+          <span className={styles.menuTooltipTrigger}>{icon}</span>
         ) : (
           <>
             {icon}

@@ -3,8 +3,8 @@ import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import PageHeader from '@/components/base/PageHeader';
 import DriveBrowser from '@/components/business/Drive/DriveBrowser';
-import PageHeader from '@/components/business/PageHeader';
 import { useDriveService } from '@/domains';
 import { buildDriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';

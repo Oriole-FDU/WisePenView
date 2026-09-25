@@ -368,14 +368,13 @@ export function TableCellBackgroundAction(buttonGroupProps: ButtonGroupChildProp
 
   return (
     <AppPopover isOpen={open} onOpenChange={setOpen} deferContent={false}>
-      <AppPopover.Trigger>
-        <ToolbarButton
-          {...buttonGroupProps}
-          icon={<Paintbrush size={20} aria-hidden="true" />}
-          isActive={open}
-          label={t('editor.color.cellBackground')}
-        />
-      </AppPopover.Trigger>
+      <ToolbarButton
+        {...buttonGroupProps}
+        icon={<Paintbrush size={20} aria-hidden="true" />}
+        isActive={open}
+        label={t('editor.color.cellBackground')}
+      />
+
       <AppPopover.Content placement="bottom" bodyPadding="none">
         <ColorPaletteContent
           background={{

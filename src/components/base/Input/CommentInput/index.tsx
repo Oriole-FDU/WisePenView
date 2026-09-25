@@ -7,37 +7,10 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { TextArea } from '@/components/base/Input';
 import EmojiPicker from '@/components/base/Input/EmojiPicker';
 
+import type { CommentInputImage, CommentInputProps } from './index.type';
 import styles from './style.module.less';
 
-export interface CommentInputImage {
-  id: string;
-  file: File;
-}
-
-interface CommentInputLabels {
-  insertEmoji: string;
-  addImage: string;
-  removeImage(name: string): string;
-  submit: string;
-  cancel?: string;
-}
-
-interface CommentInputProps {
-  value: string;
-  placeholder: string;
-  labels: CommentInputLabels;
-  pendingImages: CommentInputImage[];
-  canSubmit: boolean;
-  disabled?: boolean;
-  autoFocus?: boolean;
-  imageUploadEnabled?: boolean;
-  showActions?: boolean;
-  onChange(value: string): void;
-  onAddImages(files: File[]): void;
-  onRemoveImage(imageId: string): void;
-  onCancel?: () => void;
-  onSubmit(): void;
-}
+export type { CommentInputImage } from './index.type';
 
 function PendingImagePreview({
   image,

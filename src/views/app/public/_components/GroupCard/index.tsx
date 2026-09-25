@@ -2,7 +2,7 @@ import { Card } from '@heroui/react';
 import type { KeyboardEvent, SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import UserCapsule from '@/components/business/UserCapsule';
+import UserCapsule from '@/components/base/Avatar/UserCapsule';
 import { GROUP_TYPE } from '@/domains/Group';
 import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 

@@ -141,17 +141,24 @@ function MermaidBlockView({ block, contentRef, editor }: MermaidBlockRenderProps
           <span className={styles.title}>mermaid</span>
           <div className={styles.toolbarActions} data-mermaid-toolbar-actions="">
             <Dropdown isOpen={viewOpen} onOpenChange={setViewOpen}>
-              <AppIconButton
-                icon={<Eye size={14} aria-hidden="true" />}
-                label={t('mermaid.displayMode')}
-                size="sm"
-                className={styles.viewButton}
-                overlayTrigger={<Dropdown.Trigger />}
-                tooltip={{ content: currentViewOption ? t(currentViewOption.labelKey) : undefined }}
+              <Dropdown.Trigger
                 onMouseDown={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
                 }}
+                render={({ disabled, ...triggerProps }) => (
+                  <AppIconButton
+                    {...triggerProps}
+                    isDisabled={disabled}
+                    icon={<Eye size={14} aria-hidden="true" />}
+                    label={t('mermaid.displayMode')}
+                    size="sm"
+                    className={styles.viewButton}
+                    tooltip={{
+                      content: currentViewOption ? t(currentViewOption.labelKey) : undefined,
+                    }}
+                  />
+                )}
               />
               <Dropdown.Popover placement="bottom end">
                 <Dropdown.Menu
@@ -170,18 +177,23 @@ function MermaidBlockView({ block, contentRef, editor }: MermaidBlockRenderProps
               </Dropdown.Popover>
             </Dropdown>
             <Dropdown isOpen={templateOpen} onOpenChange={setTemplateOpen}>
-              <AppIconButton
-                icon={<LayoutTemplate size={14} aria-hidden="true" />}
-                label={t('mermaid.template')}
-                size="sm"
+              <Dropdown.Trigger
                 isDisabled={readOnly}
-                className={styles.templateButton}
-                overlayTrigger={<Dropdown.Trigger />}
-                tooltip={{ content: t('mermaid.template') }}
                 onMouseDown={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
                 }}
+                render={({ disabled, ...triggerProps }) => (
+                  <AppIconButton
+                    {...triggerProps}
+                    isDisabled={disabled}
+                    icon={<LayoutTemplate size={14} aria-hidden="true" />}
+                    label={t('mermaid.template')}
+                    size="sm"
+                    className={styles.templateButton}
+                    tooltip={{ content: t('mermaid.template') }}
+                  />
+                )}
               />
               <Dropdown.Popover placement="bottom end">
                 <Dropdown.Menu

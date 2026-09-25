@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import CommentInput, { type CommentInputImage } from '@/components/business/CommentInput';
+import CommentInput, { type CommentInputImage } from '@/components/base/Input/CommentInput';
 import { useImageService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';

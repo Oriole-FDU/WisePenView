@@ -3,7 +3,6 @@ import { Eye, ThumbsUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import { formatReadCount } from '@/utils/format/formatNumber';
 
 import styles from './style.module.less';
@@ -29,6 +28,20 @@ function ResourceFeedbackSummary({
 }: ResourceFeedbackSummaryProps) {
   const { t } = useTranslation('resource');
   const likeTooltip = liked ? t('comment.unlike') : t('comment.feedback.likeLabel');
+
+  const likeButton = (
+    <ToggleButton
+      variant="ghost"
+      size="sm"
+      isSelected={liked}
+      isDisabled={likePending}
+      className={styles.feedbackMetricToggle}
+      aria-label={likeTooltip}
+      onChange={onLikeChange}
+    >
+      <ThumbsUp size={15} aria-hidden fill={liked ? 'currentColor' : 'none'} />
+    </ToggleButton>
+  );
 
   return (
     <section className={styles.feedback} aria-label={t('comment.feedback.statsAria')}>
@@ -57,19 +70,16 @@ function ResourceFeedbackSummary({
 
         <div className={styles.feedbackMetric}>
           <Tooltip>
-            <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-              <ToggleButton
-                variant="ghost"
-                size="sm"
-                isSelected={liked}
-                isDisabled={likePending}
-                className={styles.feedbackMetricToggle}
-                aria-label={likeTooltip}
-                onChange={onLikeChange}
+            {likePending ? (
+              <Tooltip.Trigger<'span'>
+                render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
               >
-                <ThumbsUp size={15} aria-hidden fill={liked ? 'currentColor' : 'none'} />
-              </ToggleButton>
-            </Tooltip.Trigger>
+                {likeButton}
+              </Tooltip.Trigger>
+            ) : (
+              likeButton
+            )}
+
             <Tooltip.Content>{likeTooltip}</Tooltip.Content>
           </Tooltip>
           <span className={styles.feedbackMetricCount}>{formatReadCount(likeCount)}</span>

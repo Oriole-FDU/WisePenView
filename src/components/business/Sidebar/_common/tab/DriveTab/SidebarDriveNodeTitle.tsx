@@ -146,13 +146,18 @@ function SidebarDriveNodeTitle({
         >
           {canCreateFolder ? (
             <Dropdown isOpen={createMenuOpen} onOpenChange={setCreateMenuOpen}>
-              <AppIconButton
-                icon={<Plus size={14} aria-hidden="true" />}
-                label={t('drive:sidebar.createIn', { name: label })}
-                size="sm"
-                className={styles.nodeActionBtn}
-                tooltip={{ content: t('drive:create.menu') }}
-                overlayTrigger={<Dropdown.Trigger />}
+              <Dropdown.Trigger
+                render={({ disabled, ...triggerProps }) => (
+                  <AppIconButton
+                    {...triggerProps}
+                    isDisabled={disabled}
+                    icon={<Plus size={14} aria-hidden="true" />}
+                    label={t('drive:sidebar.createIn', { name: label })}
+                    size="sm"
+                    className={styles.nodeActionBtn}
+                    tooltip={{ content: t('drive:create.menu') }}
+                  />
+                )}
               />
               <Dropdown.Popover className={styles.createMenuPanel} placement="right">
                 <Dropdown.Menu

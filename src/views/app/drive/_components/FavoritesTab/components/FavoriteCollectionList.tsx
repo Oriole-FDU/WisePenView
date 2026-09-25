@@ -69,16 +69,22 @@ function FavoriteCollectionList({
               >
                 {!collection.isDefault ? (
                   <Dropdown>
-                    <AppIconButton
-                      icon={<EllipsisVertical size={16} aria-hidden="true" />}
-                      label={t('favorite.collection.actionsAria', {
-                        name:
-                          collection.collectionName ?? t('favorite.picker.defaultCollectionName'),
-                      })}
-                      size="sm"
-                      className={styles.collectionMoreButton}
-                      tooltip={{ content: t('favorite.collection.moreActions') }}
-                      overlayTrigger={<Dropdown.Trigger />}
+                    <Dropdown.Trigger
+                      render={({ disabled, ...triggerProps }) => (
+                        <AppIconButton
+                          {...triggerProps}
+                          isDisabled={disabled}
+                          icon={<EllipsisVertical size={16} aria-hidden="true" />}
+                          label={t('favorite.collection.actionsAria', {
+                            name:
+                              collection.collectionName ??
+                              t('favorite.picker.defaultCollectionName'),
+                          })}
+                          size="sm"
+                          className={styles.collectionMoreButton}
+                          tooltip={{ content: t('favorite.collection.moreActions') }}
+                        />
+                      )}
                     />
                     <Dropdown.Popover placement="bottom end">
                       <Dropdown.Menu aria-label={t('favorite.collection.menuAria')}>

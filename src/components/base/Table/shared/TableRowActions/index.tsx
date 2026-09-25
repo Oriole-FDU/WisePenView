@@ -17,12 +17,17 @@ function TableRowActions({ actions, ariaLabel, onAction }: TableRowActionsProps)
 
   return (
     <Dropdown>
-      <AppIconButton
-        icon={<EllipsisVertical size={16} aria-hidden="true" />}
-        label={resolvedAriaLabel}
-        size="sm"
-        className={styles.trigger}
-        overlayTrigger={<Dropdown.Trigger />}
+      <Dropdown.Trigger
+        render={({ disabled, ...triggerProps }) => (
+          <AppIconButton
+            {...triggerProps}
+            isDisabled={disabled}
+            icon={<EllipsisVertical size={16} aria-hidden="true" />}
+            label={resolvedAriaLabel}
+            size="sm"
+            className={styles.trigger}
+          />
+        )}
       />
       <Dropdown.Popover placement="bottom end">
         <Dropdown.Menu

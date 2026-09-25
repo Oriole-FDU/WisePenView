@@ -99,7 +99,7 @@ function SubjectPermissionPopover({
 
   return (
     <Dropdown>
-      <Dropdown.Trigger>{trigger}</Dropdown.Trigger>
+      {trigger}
       <Dropdown.Popover className={styles.permissionPopover} placement="bottom end">
         <Dropdown.Menu
           aria-label={t('permission.optionsAria', { name: subject.name })}

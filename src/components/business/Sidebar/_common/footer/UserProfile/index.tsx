@@ -20,7 +20,6 @@ import { useNavigate } from 'react-router-dom';
 
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useAuthService, useUserService } from '@/domains';
 import type { User } from '@/domains/User';
@@ -81,19 +80,17 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
       >
         {collapsed ? (
           <Tooltip>
-            <Tooltip.Trigger
-              className={styles.avatarTooltipTrigger}
-              {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}
-            >
-              <button
+            <span className={styles.avatarTooltipTrigger}>
+              <Tooltip.Trigger<'button'>
+                render={(props) => <button {...props} />}
                 type="button"
                 className={styles.avatarTrigger}
                 aria-label={t('anonymous.login')}
                 onClick={handleLogin}
               >
                 <LogIn size={18} aria-hidden="true" />
-              </button>
-            </Tooltip.Trigger>
+              </Tooltip.Trigger>
+            </span>
             <Tooltip.Content placement="right">{t('anonymous.login')}</Tooltip.Content>
           </Tooltip>
         ) : (
@@ -259,23 +256,20 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
         )}
       >
         {collapsed ? (
-          <Tooltip>
-            <Tooltip.Trigger
-              className={styles.avatarTooltipTrigger}
-              {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}
-            >
-              <Dropdown>
+          <Dropdown>
+            <Tooltip>
+              <span className={styles.avatarTooltipTrigger}>
                 <Dropdown.Trigger
                   aria-label={t('userMenu.openAria')}
                   className={styles.avatarTrigger}
                 >
                   {userAvatar}
                 </Dropdown.Trigger>
-                {userMenu}
-              </Dropdown>
-            </Tooltip.Trigger>
-            <Tooltip.Content placement="right">{displayName}</Tooltip.Content>
-          </Tooltip>
+              </span>
+              <Tooltip.Content placement="right">{displayName}</Tooltip.Content>
+            </Tooltip>
+            {userMenu}
+          </Dropdown>
         ) : (
           <>
             <span className={styles.avatarSlot}>{userAvatar}</span>

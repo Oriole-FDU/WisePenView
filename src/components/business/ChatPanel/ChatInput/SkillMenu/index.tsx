@@ -134,10 +134,15 @@ function SkillMenu({ options, loading }: SkillMenuProps) {
         {selectedOptionCount > 0 ? (
           <span className={styles.skillMenuBadge}>{selectedOptionCount}</span>
         ) : null}
-        <AppIconButton
-          icon={<Settings size={17} aria-hidden="true" />}
-          label={t('input.skillMenu.configure')}
-          overlayTrigger={<Dropdown.Trigger />}
+        <Dropdown.Trigger
+          render={({ disabled, ...triggerProps }) => (
+            <AppIconButton
+              {...triggerProps}
+              isDisabled={disabled}
+              icon={<Settings size={17} aria-hidden="true" />}
+              label={t('input.skillMenu.configure')}
+            />
+          )}
         />
       </span>
       <Dropdown.Popover className={styles.popoverPanelScrollable} placement="top">

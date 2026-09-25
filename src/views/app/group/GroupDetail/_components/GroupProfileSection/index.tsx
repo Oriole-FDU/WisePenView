@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea, UploadZone } from '@/components/base/Input';
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import { useGroupService, useImageService } from '@/domains';
 import { type EditGroupRequest, type Group, GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
@@ -192,6 +191,35 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
     ? t('profile.course.noDescription')
     : t('profile.noDescription');
 
+  const coverButtonProps = {
+    className: styles.coverButton,
+    type: 'button' as const,
+    'aria-label': changeCover,
+    disabled: saving,
+    onClick: handleCoverModalOpen,
+    children: (
+      <>
+        <img
+          className={styles.coverImage}
+          src={coverUrl}
+          alt={
+            isCourseGroup
+              ? t('profile.course.coverAlt', {
+                  name: draft.groupName || group.groupName,
+                })
+              : t('profile.coverAlt', {
+                  name: draft.groupName || group.groupName,
+                })
+          }
+          onError={handleCoverImageError}
+        />
+        <span className={styles.coverEditAffordance}>
+          <Pencil size={16} aria-hidden="true" />
+        </span>
+      </>
+    ),
+  };
+
   return (
     <>
       <GroupSettingsSection title={t('profile.creationInfo')} compact>
@@ -270,33 +298,18 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
             <span className={styles.coverLabel}>{coverLabel}</span>
             {canEdit ? (
               <Tooltip>
-                <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-                  <button
-                    className={styles.coverButton}
-                    type="button"
-                    aria-label={changeCover}
-                    disabled={saving}
-                    onClick={handleCoverModalOpen}
+                {saving ? (
+                  <Tooltip.Trigger<'span'>
+                    render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
                   >
-                    <img
-                      className={styles.coverImage}
-                      src={coverUrl}
-                      alt={
-                        isCourseGroup
-                          ? t('profile.course.coverAlt', {
-                              name: draft.groupName || group.groupName,
-                            })
-                          : t('profile.coverAlt', {
-                              name: draft.groupName || group.groupName,
-                            })
-                      }
-                      onError={handleCoverImageError}
-                    />
-                    <span className={styles.coverEditAffordance}>
-                      <Pencil size={16} aria-hidden="true" />
-                    </span>
-                  </button>
-                </Tooltip.Trigger>
+                    <button {...coverButtonProps} />
+                  </Tooltip.Trigger>
+                ) : (
+                  <Tooltip.Trigger<'button'>
+                    {...coverButtonProps}
+                    render={(props) => <button {...props} />}
+                  />
+                )}
                 <Tooltip.Content>{changeCoverShort}</Tooltip.Content>
               </Tooltip>
             ) : (

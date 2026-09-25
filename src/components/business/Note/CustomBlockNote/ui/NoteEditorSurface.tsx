@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useAppTheme } from '@/theme';
-import FindBar from '@/views/resource/note/_components/FindBar';
 
 import { AiDiffBulkActions } from '../engines/aiDiff/BulkActions';
 import { NoteEditorReadOnlyProvider } from '../engines/editor/readOnly';
@@ -17,6 +16,7 @@ import type { NoteEditorRuntimeCoordinator } from '../registry/useNoteEditorRunt
 import { useNoteInteractionStore } from '../runtime/noteInteractionStore';
 import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 import styles from '../style.module.less';
+import FindBar from './findBar';
 import NoteSideMenu from './sideMenu';
 import NoteSlashMenu from './slashMenu';
 import NoteToolbar from './toolbar';

@@ -60,6 +60,12 @@ function ModelSelector({
   const triggerLabel = loading
     ? t('modelSelector.loading')
     : (selected?.name ?? t('modelSelector.select'));
+  // Trigger 的 hover/press 更新不重建原始 SVG，避免指针事件途中丢失目标节点。
+  const triggerIcon = loading ? (
+    <LoaderCircle size={16} className={styles.spinIcon} aria-hidden="true" />
+  ) : (
+    <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
+  );
   const handleAction = (key: Key) => {
     const model = models.find((item) => item.id === key);
     if (model) {
@@ -70,34 +76,30 @@ function ModelSelector({
   return (
     <Dropdown isOpen={isOpen} onOpenChange={onOpenChange}>
       {iconOnly ? (
-        <AppIconButton
-          icon={
-            loading ? (
-              <LoaderCircle size={16} className={styles.spinIcon} aria-hidden="true" />
-            ) : (
-              <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
-            )
-          }
-          label={triggerLabel}
+        <Dropdown.Trigger
           isDisabled={disabled}
-          overlayTrigger={<Dropdown.Trigger />}
+          render={({ disabled, ...triggerProps }) => (
+            <AppIconButton
+              {...triggerProps}
+              isDisabled={disabled}
+              icon={triggerIcon}
+              label={triggerLabel}
+            />
+          )}
         />
       ) : (
-        <Dropdown.Trigger>
-          <button
-            type="button"
-            className={styles.trigger}
-            aria-label={triggerLabel}
-            disabled={disabled}
-          >
-            {loading ? (
-              <LoaderCircle size={16} className={styles.spinIcon} />
-            ) : (
-              <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
-            )}
-            <span>{triggerLabel}</span>
-            <ChevronDown size={16} />
-          </button>
+        <Dropdown.Trigger
+          className={styles.trigger}
+          aria-label={triggerLabel}
+          isDisabled={disabled}
+        >
+          {loading ? (
+            <LoaderCircle size={16} className={styles.spinIcon} />
+          ) : (
+            <ProviderLogo provider={selected?.provider ?? 'openai'} size={16} />
+          )}
+          <span>{triggerLabel}</span>
+          <ChevronDown size={16} />
         </Dropdown.Trigger>
       )}
       <Dropdown.Popover className={styles.popover} placement={placement}>

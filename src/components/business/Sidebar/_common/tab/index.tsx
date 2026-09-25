@@ -1,11 +1,12 @@
 import { Tabs, Tooltip } from '@heroui/react';
 import { BookOpen, FolderOpen, type LucideIcon, MessageSquare } from 'lucide-react';
+import type { ComponentPropsWithRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import CommandPaletteTrigger from '@/components/business/CommandPalette/Trigger';
 import { useAppAuth } from '@/layouts/App/AppAuthContext';
 import { cn } from '@/utils/cn';
+import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import {
   SIDEBAR_VIEW_TAB,
@@ -26,18 +27,38 @@ interface SidebarViewTabProps {
 
 function SidebarViewTab({ id, label, icon: Icon, selected }: SidebarViewTabProps) {
   return (
-    <Tabs.Tab id={id} className={styles.tab} aria-label={label}>
-      <Tooltip isDisabled={selected}>
-        <Tooltip.Trigger className={styles.tabTooltipTrigger} {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-          <span className={styles.tabContent}>
-            <Icon size={18} aria-hidden="true" />
-            <span className={styles.tabLabel}>
-              <span className={styles.tabLabelInner}>{label}</span>
-            </span>
+    <Tabs.Tab
+      id={id}
+      className={styles.tab}
+      aria-label={label}
+      render={(domProps) => {
+        // Tab 不消费 Tooltip 上下文，两者在此共用原本的 div 与焦点节点。
+        const { ref: tabRef, ...tabProps } = domProps as ComponentPropsWithRef<'div'>;
+        return (
+          <Tooltip isDisabled={selected}>
+            <Tooltip.Trigger
+              {...tabProps}
+              render={({ ref: tooltipRef, ...tooltipProps }) => (
+                <div
+                  {...tooltipProps}
+                  tabIndex={tabProps.tabIndex}
+                  ref={mergeRefs(tabRef, tooltipRef)}
+                />
+              )}
+            />
+            <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
+          </Tooltip>
+        );
+      }}
+    >
+      <span className={styles.tabTooltipTrigger}>
+        <span className={styles.tabContent}>
+          <Icon size={18} aria-hidden="true" />
+          <span className={styles.tabLabel}>
+            <span className={styles.tabLabelInner}>{label}</span>
           </span>
-        </Tooltip.Trigger>
-        <Tooltip.Content placement="bottom">{label}</Tooltip.Content>
-      </Tooltip>
+        </span>
+      </span>
     </Tabs.Tab>
   );
 }

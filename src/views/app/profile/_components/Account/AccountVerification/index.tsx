@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import AppBanner from '@/components/base/AppBanner';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
+import AccountVerificationForm from '@/components/business/AccountVerification/AccountVerificationForm';
+import AccountVerificationOutcomeDialog from '@/components/business/AccountVerification/AccountVerificationOutcomeDialog';
+import { useAccountVerificationController } from '@/components/business/AccountVerification/useAccountVerificationController';
 import { USER_STATUS } from '@/domains/User';
 
 import VerifyBanner from '../VerifyBanner';
-import AccountVerificationForm from './AccountVerificationForm';
-import AccountVerificationOutcomeDialog from './AccountVerificationOutcomeDialog';
 import type { AccountVerificationProps } from './index.type';
 import styles from './style.module.less';
-import { useAccountVerificationController } from './useAccountVerificationController';
 
 function AccountVerification({
   user,

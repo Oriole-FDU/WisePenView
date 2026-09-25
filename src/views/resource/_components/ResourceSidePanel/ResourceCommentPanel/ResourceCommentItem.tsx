@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { TOOLTIP_FOCUS_PASSTHROUGH_PROPS } from '@/components/base/Tooltip';
 import type { ResourceComment } from '@/domains/Interact';
 import { cn } from '@/utils/cn';
 import {
@@ -53,6 +52,20 @@ function ResourceCommentItem({
     : unknownTime;
   const dateTime = commentDate?.toISOString();
   const likeLabel = liked ? t('resource:comment.unlike') : t('resource:comment.like');
+
+  const likeButton = (
+    <AppButton
+      variant="ghost"
+      size="sm"
+      className={cn(styles.commentActionIcon, liked && styles.likedButton)}
+      isDisabled={likePending}
+      aria-label={likeLabel}
+      onPress={() => void onLike(comment)}
+    >
+      <Heart size={14} aria-hidden fill={liked ? 'currentColor' : 'none'} />
+      {comment.likeCount > 0 ? <span className={styles.likeCount}>{comment.likeCount}</span> : null}
+    </AppButton>
+  );
 
   return (
     <article className={styles.commentItem}>
@@ -112,21 +125,16 @@ function ResourceCommentItem({
               onPress={() => onReply(comment)}
             />
             <Tooltip>
-              <Tooltip.Trigger {...TOOLTIP_FOCUS_PASSTHROUGH_PROPS}>
-                <AppButton
-                  variant="ghost"
-                  size="sm"
-                  className={cn(styles.commentActionIcon, liked && styles.likedButton)}
-                  isDisabled={likePending}
-                  aria-label={likeLabel}
-                  onPress={() => void onLike(comment)}
+              {likePending ? (
+                <Tooltip.Trigger<'span'>
+                  render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
                 >
-                  <Heart size={14} aria-hidden fill={liked ? 'currentColor' : 'none'} />
-                  {comment.likeCount > 0 ? (
-                    <span className={styles.likeCount}>{comment.likeCount}</span>
-                  ) : null}
-                </AppButton>
-              </Tooltip.Trigger>
+                  {likeButton}
+                </Tooltip.Trigger>
+              ) : (
+                likeButton
+              )}
+
               <Tooltip.Content>{likeLabel}</Tooltip.Content>
             </Tooltip>
             {canDelete ? (
