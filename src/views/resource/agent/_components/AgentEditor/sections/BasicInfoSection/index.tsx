@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
+import AppForm from '@/components/base/AppForm';
 import { FormField, Input, TextArea } from '@/components/base/Input';
-import AppForm from '@/components/business/AppForm';
 import type { AgentSpec } from '@/domains/Agent';
 
 import styles from './style.module.less';

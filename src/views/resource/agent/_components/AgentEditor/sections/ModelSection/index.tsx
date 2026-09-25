@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import AppForm from '@/components/business/AppForm';
+import AppForm from '@/components/base/AppForm';
 import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/Chat';

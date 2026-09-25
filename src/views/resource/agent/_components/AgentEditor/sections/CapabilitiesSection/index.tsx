@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import AppForm from '@/components/business/AppForm';
+import AppForm from '@/components/base/AppForm';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ToolOption } from '@/domains/Chat';
 import type { SkillSummary } from '@/domains/Skill';

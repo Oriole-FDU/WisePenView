@@ -3,8 +3,8 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import AppForm from '@/components/base/AppForm';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import AppForm from '@/components/business/AppForm';
 import { useCourseContext } from '@/layouts/Course/CourseContext';
 import { buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
