@@ -16,7 +16,7 @@ import { parseErrorMessage } from '@/utils/error';
 
 import ResourceWorkspace from './_components/ResourceWorkspace';
 import ResourceRenderer, { type ResolvedResourceTarget } from './ResourceRenderer';
-import styles from './ResourceRenderer.module.less';
+import styles from './ResourceTargetResolver.module.less';
 
 interface ResourceTargetResolverProps {
   target: ResourceTarget;
