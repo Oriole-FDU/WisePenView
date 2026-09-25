@@ -18,7 +18,7 @@ Skill 只写触发条件、执行步骤和完成标准；长说明放在 `refere
 ```text
 Bug 描述
   -> 定位根因和验收标准
-  -> 创建 agent-* 分支或 Codex Worktree
+  -> 创建符合 docs/commit.md 的 <type>/<topic> 分支或 Codex Worktree
   -> 修改代码
   -> 按变更范围验证
   -> 生成 PR

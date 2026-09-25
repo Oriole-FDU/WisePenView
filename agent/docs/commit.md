@@ -4,25 +4,33 @@
 
 ## 一、分支命名
 
-Agent 自动创建分支时使用英文短横线命名：
+新建工作分支（包括 Agent 创建的分支）统一使用：
 
 ```text
-agent-<content>
+<type>/<topic>
 ```
 
-人工开发分支如需按功能类型区分，可以使用：
+例如：
 
 ```text
-feat/<content>
-fix/<content>
-refactor/<content>
+feat/group-role
+fix/login-timeout
+refactor/resource-mapper
+docs/branch-convention
 ```
 
 规则：
 
-- `content` 推荐英文短横线，例如 `agent-docs`、`feat/group-role`、`fix/group-role`。
-- 不使用空格和中文，避免远程分支、脚本和 CLI 兼容问题。
-- 文档类变更也可以使用 `feat/docs-agent` 或 `fix/docs-agent`，按实际意图选择。
+- `type` 使用下文 commitlint 的 type 白名单，按工作意图选择，不以执行者身份命名。
+- `topic` 使用小写英文字母或数字组成的词，以 `-` 分隔；建议从模块或领域名开始，再补充具体任务，例如 `group-role`。
+- `topic` 是分支主题，commit 的 scope 可以对应其模块，但不要求与整个 `topic` 相同；例如 `feat/group-role` 可提交 `feat(group): ...`。
+- 已存在的分支不强制重命名；在原 PR 分支继续修改时沿用原分支名。
+
+新分支格式可用以下正则核对（commitlint 本身只校验 commit message，不校验分支名）：
+
+```text
+^(feat|fix|docs|style|refactor|perf|test|chore)/[a-z0-9]+(-[a-z0-9]+)*$
+```
 
 ## 二、Commit 格式
 
@@ -80,7 +88,7 @@ refactor(domain): 收敛资源映射逻辑
 
 ## 七、检查清单
 
-- [ ] Agent 分支名符合 `agent-<content>`。
+- [ ] 新建工作分支符合 `<type>/<topic>`。
 - [ ] commit type 属于白名单。
 - [ ] subject 是中文。
 - [ ] 一次 commit 只表达一个意图。

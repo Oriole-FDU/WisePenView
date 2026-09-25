@@ -14,7 +14,7 @@ description: 为已完成并验证的 WisePenView 修改准备分支、commit �
 ## 执行步骤
 
 1. 检查当前分支、远端、工作区和 staged 文件；发现非本任务改动或范围重叠时停止并说明。
-2. 默认以 `main` 为基线创建 `agent-<content>` 分支；只有用户明确指定时使用 `dev`。
+2. 默认以 `main` 为基线，按 `agent/docs/commit.md` 创建 `<type>/<topic>` 分支；只有用户明确指定时使用 `dev`。
 3. 使用中文 Conventional Commit，type 仅使用 commitlint 白名单，subject 描述真实意图。
 4. 校验 diff：没有密钥、用户隐私、无关格式化、临时文件或构建产物。
 5. 使用 `agent/templates/pull-request.md` 生成 PR body，填写实际验证结果和未验证项。

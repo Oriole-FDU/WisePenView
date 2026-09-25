@@ -2,7 +2,7 @@
 
 ## 分支
 
-- 日常 Bug、功能和重构默认从 `main` 创建 `agent-*` 分支并提交到 `main` PR。
+- 日常 Bug、功能和重构默认从 `main` 创建符合 `agent/docs/commit.md` 的 `<type>/<topic>` 分支，并提交到 `main` PR。
 - `dev` 只有在用户明确说明集成、版本或发布目标时使用。
 - 发布版本通过 `package.json#version` 驱动 `.github/workflows/release.yml`；不要手工移动已有版本标签。
 

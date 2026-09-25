@@ -20,7 +20,7 @@
 
 ## 阶段三：实现与验证
 
-默认从 `main` 创建 `agent-fix-*` 分支；大任务使用 Codex Worktree。修改完成后按 `agent/docs/verification.md` 验证，运行态检查必须得到用户授权。
+默认从 `main` 创建符合 `agent/docs/commit.md` 的 `fix/<topic>` 分支；大任务使用 Codex Worktree。修改完成后按 `agent/docs/verification.md` 验证，运行态检查必须得到用户授权。
 
 ## 阶段四：提交与 PR
 
