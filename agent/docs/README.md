@@ -8,6 +8,7 @@
 - AI 开发基建说明：`agent/README.md`
 - 验证矩阵：`agent/docs/verification.md`
 - 提交规范：`agent/docs/commit.md`
+- 发布与分支：`agent/docs/release.md`
 
 ## Domain 任务
 
