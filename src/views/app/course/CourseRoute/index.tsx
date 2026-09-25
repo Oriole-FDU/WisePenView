@@ -6,7 +6,7 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { CourseContextProvider } from '@/layouts/Course/CourseContext';
+import { CourseContextProvider } from '@/layouts/Course/CourseContextProvider';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
