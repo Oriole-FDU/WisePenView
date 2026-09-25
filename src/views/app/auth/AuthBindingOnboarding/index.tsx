@@ -7,13 +7,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { readRedirectParam } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
+import AccountVerificationForm from '@/components/business/AccountVerification/AccountVerificationForm';
+import AccountVerificationOutcomeDialog from '@/components/business/AccountVerification/AccountVerificationOutcomeDialog';
+import { useAccountVerificationController } from '@/components/business/AccountVerification/useAccountVerificationController';
 import { useUserService } from '@/domains';
 import type { UserAccountProfile } from '@/domains/User';
 import { USER_STATUS } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
-import AccountVerificationForm from '@/views/app/profile/_components/Account/AccountVerification/AccountVerificationForm';
-import AccountVerificationOutcomeDialog from '@/views/app/profile/_components/Account/AccountVerification/AccountVerificationOutcomeDialog';
-import { useAccountVerificationController } from '@/views/app/profile/_components/Account/AccountVerification/useAccountVerificationController';
 
 import auth from '../_common/style.module.less';
 
