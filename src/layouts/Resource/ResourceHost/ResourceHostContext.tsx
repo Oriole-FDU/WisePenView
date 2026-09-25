@@ -52,6 +52,16 @@ export const ResourceHostContext = createContext<ResourceHostContextValue | null
 
 export const DEFAULT_RESOURCE_HOST_ID = 'default';
 
+export function ResourceHostContextProvider({
+  value,
+  children,
+}: {
+  value: ResourceHostContextValue;
+  children: ReactNode;
+}) {
+  return <ResourceHostContext value={value}>{children}</ResourceHostContext>;
+}
+
 export function useResourceHostContext() {
   const context = useContext(ResourceHostContext);
   if (!context) {

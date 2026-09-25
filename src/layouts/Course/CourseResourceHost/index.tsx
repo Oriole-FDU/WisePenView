@@ -4,7 +4,7 @@ import type { ResourceChatContext } from '@/components/business/ChatPanel/Resour
 import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import {
   type OpenResourceFn,
-  ResourceHostContext,
+  ResourceHostContextProvider,
   type ResourceHostContextValue,
 } from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 import ResourceRenderer from '@/views/resource/ResourceRenderer';
@@ -55,9 +55,9 @@ function CourseResourceHost({
     clearChatContext: onClearChatContext,
   };
   return (
-    <ResourceHostContext value={resourceHostContext}>
+    <ResourceHostContextProvider value={resourceHostContext}>
       <ResourceRenderer target={target} onTargetChange={onTargetChange} onClose={onClose} />
-    </ResourceHostContext>
+    </ResourceHostContextProvider>
   );
 }
 

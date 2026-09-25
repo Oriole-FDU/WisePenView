@@ -40,7 +40,7 @@ import {
 } from '@/layouts/Resource/ResourceChatBinding';
 import {
   DEFAULT_RESOURCE_HOST_ID,
-  ResourceHostContext,
+  ResourceHostContextProvider,
   type ResourceHostContextValue,
 } from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 
@@ -133,7 +133,7 @@ function ResourceHost() {
 
   return (
     <ResourceChatBindingProvider>
-      <ResourceHostContext value={resourceHostContext}>
+      <ResourceHostContextProvider value={resourceHostContext}>
         <div className={clsx(styles.shell, overlayChatOpen && styles.shellWithOverlay)}>
           <SystemResizablePanelGroup
             orientation="horizontal"
@@ -186,7 +186,7 @@ function ResourceHost() {
             </div>
           ) : null}
         </div>
-      </ResourceHostContext>
+      </ResourceHostContextProvider>
     </ResourceChatBindingProvider>
   );
 }
