@@ -16,7 +16,7 @@ import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader'
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,
-} from '@/views/resource/ResourceChatBinding';
+} from '@/layouts/Resource/ResourceChatBinding';
 
 import { useCourseContext } from '../CourseContext';
 import CourseResourceHost from '../CourseResourceHost';

@@ -37,7 +37,7 @@ import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,
-} from '@/views/resource/ResourceChatBinding';
+} from '@/layouts/Resource/ResourceChatBinding';
 import {
   DEFAULT_RESOURCE_HOST_ID,
   ResourceHostContext,
