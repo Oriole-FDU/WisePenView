@@ -18,8 +18,8 @@ import {
 } from '../engines/search/findReplace';
 import type { NoteBodyEditorHandle, NoteFindResult, NoteReplaceResult } from '../index.type';
 import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
-import { useNoteEditorSessionContext } from '../session/NoteEditorSessionContext';
-import { useNoteInteractionStore } from './noteInteractionStore';
+import { useNoteEditorSessionContext } from '../session/_context';
+import { useNoteInteractionStore } from './_context';
 import type { NoteScrollTargetResolver } from './useNoteEditorScroll';
 
 type NoteEditorCommands = Pick<

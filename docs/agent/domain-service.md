@@ -85,7 +85,7 @@ src/domains/<Domain>/
 - `src/domains/_registry/registry.types.ts`
 - `src/domains/_registry/registry.ts`
 - 有新增 API 時，同步更新 `apis.impl.ts` 與 `apis.mock.ts`
-- `src/domains/_registry/hooks.ts`
+- `src/domains/_registry/_context/useServices.ts`
 - `src/domains/index.ts`
 
 ## 六、检查清单

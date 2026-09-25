@@ -9,8 +9,8 @@ import type { Group, GroupResConfig } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { GroupContext, type GroupCurrentUserRole } from '@/views/app/group/GroupRoute/GroupContext';
 
+import { type GroupCurrentUserRole, GroupProvider } from './_context';
 import styles from './style.module.less';
 
 type GroupRouteLoaded = {
@@ -68,7 +68,7 @@ function GroupRoute() {
   }
 
   return (
-    <GroupContext.Provider
+    <GroupProvider
       value={{
         group: data.group,
         currentUserRole: data.currentUserRole,
@@ -77,7 +77,7 @@ function GroupRoute() {
       }}
     >
       <Outlet />
-    </GroupContext.Provider>
+    </GroupProvider>
   );
 }
 

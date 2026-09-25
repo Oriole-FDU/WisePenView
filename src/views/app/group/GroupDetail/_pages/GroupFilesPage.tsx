@@ -4,7 +4,7 @@ import DriveBrowser from '@/components/business/Drive/DriveBrowser';
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import { buildDriveNodeScope } from '@/domains/Drive';
 import { buildGroupFilesPath } from '@/utils/navigation/appRoute';
-import { useGroupContext } from '@/views/app/group/GroupRoute/GroupContext';
+import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
 import layout from '../../style.module.less';
 import page from '../style.module.less';

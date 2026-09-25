@@ -9,7 +9,7 @@ import type { CourseMember } from '@/domains/Course';
 import { COURSE_ROLE } from '@/domains/Course';
 import { GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 
 import styles from './style.module.less';
 

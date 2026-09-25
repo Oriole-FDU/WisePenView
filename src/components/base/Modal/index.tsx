@@ -1,8 +1,9 @@
 import { Modal as HeroModal } from '@heroui/react';
-import { createContext, useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
+import { ModalRootControlProvider, useModalRootControl } from './_context';
 import type {
   ModalBackdropProps,
   ModalRootControlContextValue,
@@ -10,8 +11,6 @@ import type {
 } from './index.type';
 
 const DEFAULT_MODAL_CONTENT_DELAY = 120;
-
-const ModalRootControlContext = createContext<ModalRootControlContextValue | null>(null);
 
 function hasRootOverlayControl({
   defaultOpen,
@@ -51,17 +50,13 @@ function ModalRoot({
   } satisfies ModalRootControlContextValue;
 
   if (shouldUseBackdropControl) {
-    return (
-      <ModalRootControlContext.Provider value={rootControl}>
-        {children}
-      </ModalRootControlContext.Provider>
-    );
+    return <ModalRootControlProvider value={rootControl}>{children}</ModalRootControlProvider>;
   }
 
   return (
-    <ModalRootControlContext.Provider value={null}>
+    <ModalRootControlProvider value={null}>
       <HeroModal {...props}>{children}</HeroModal>
-    </ModalRootControlContext.Provider>
+    </ModalRootControlProvider>
   );
 }
 
@@ -74,7 +69,7 @@ function ModalBackdrop({
   onOpenChange,
   ...props
 }: ModalBackdropProps) {
-  const rootControl = useContext(ModalRootControlContext);
+  const rootControl = useModalRootControl();
   const resolvedDefaultOpen = defaultOpen ?? rootControl?.defaultOpen;
   const resolvedIsOpen = isOpen ?? rootControl?.isOpen;
   const resolvedOnOpenChange = onOpenChange ?? rootControl?.onOpenChange;

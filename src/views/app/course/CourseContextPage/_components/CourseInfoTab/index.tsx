@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import { PieChart } from '@/components/base/Chart';
 import { formatCoursePeriodRange, getCoursePeriodTimeRange } from '@/domains/Course';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
 import styles from './style.module.less';

@@ -14,14 +14,12 @@ import { mapChatInputToolSelectionOverrides } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
+import { useChatInputFiles, useChatInputStore, useChatInputStoreApi } from '../_context';
 import {
   selectChatInputCompletionState,
   selectChatInputSelectedModel,
-  useChatInputStore,
-  useChatInputStoreApi,
-} from '../_store/ChatInputStore';
+} from '../_context/ChatInputStore';
 import type { ChatInputProps } from '../index.type';
-import { useChatInputFiles } from '../useChatInputFiles';
 import { useVoiceInput } from '../VoiceInput/useVoiceInput';
 
 interface UseChatInputControllerOptions {

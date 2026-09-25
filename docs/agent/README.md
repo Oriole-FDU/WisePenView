@@ -24,6 +24,7 @@
 
 - `component-boundary.md`：组件放置位置、复用边界、归属判断。
 - `component-react.md`：React、Hooks、JSX、TypeScript 编码规范。
+- `context.md`：Context 的组成、归属、Provider 和消费规范。
 - `component-style.md`：Less、CSS Modules、HeroUI 与样式规则。
 
 推荐阅读顺序：`component-boundary.md -> component-react.md -> component-style.md`。
@@ -43,6 +44,7 @@ view/component -> service -> mapper -> api -> entity/enum
 - 调整后端字段：`domain-mapper.md`、`domain-entity.md`、必要时补读 `domain-api.md`。
 - 新增可复用组件：`component-boundary.md`、`component-react.md`、`component-style.md`。
 - 路由、页面级 Tab 与面包屑：`routing.md`。
+- 新增或调整 Context：`context.md`，涉及组件状态时补读 `store.md`。
 - 提交或写 PR：`commit.md`。
 
 ## 五、收敛约定

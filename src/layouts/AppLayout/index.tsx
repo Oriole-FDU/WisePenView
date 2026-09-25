@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import AppSidebar from '@/components/business/Sidebar/AppSidebar';
 import { APP_MAIN_MIN_WIDTH } from '@/constants/layoutScale';
-import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
+import { useAppNavigation } from '@/layouts/AppNavigation/_context';
 import MainShell from '@/layouts/MainShell';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';

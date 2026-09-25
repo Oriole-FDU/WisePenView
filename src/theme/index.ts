@@ -1,3 +1,4 @@
+export { useAppTheme } from './_context';
 export {
   COLOR_SCHEME,
   COLOR_SCHEME_OPTIONS,
@@ -16,5 +17,4 @@ export {
   type ThemeMode,
 } from './mode/constants';
 export { ThemeApplier } from './provider/ThemeApplier';
-export { useAppTheme } from './provider/useAppTheme';
 export { useReadingMode } from './readingMode/useReadingMode';

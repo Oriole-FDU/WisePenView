@@ -2,7 +2,7 @@ import { useOutletContext } from 'react-router-dom';
 
 import ComputeWallet from '@/components/business/Wallet/ComputeWallet';
 import { WALLET_TARGET_TYPE } from '@/domains/Wallet';
-import { useGroupContext } from '@/views/app/group/GroupRoute/GroupContext';
+import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
 import layout from '../../style.module.less';
 import type { GroupDetailOutletContextValue } from '..';

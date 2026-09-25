@@ -16,7 +16,7 @@ import { MAIN_SIDEBAR_RAIL_WIDTH } from '@/constants/layoutScale';
 import { SIDEBAR_TOGGLE_BUTTON_PROPS } from '@/constants/sidebarToggle';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
-import { MainShellContext, type MainShellContextValue } from './MainShellContext';
+import { type MainShellContextValue, MainShellProvider } from './_context';
 import SkipToMainLink, { MAIN_CONTENT_ID } from './SkipToMainLink';
 import styles from './style.module.less';
 import { useMainShellMobileSnapshot } from './useMainShellMobile';
@@ -147,7 +147,7 @@ function MainShell({
   );
 
   return (
-    <MainShellContext value={mainShellContext}>
+    <MainShellProvider value={mainShellContext}>
       <div
         className={clsx(
           styles.root,
@@ -220,7 +220,7 @@ function MainShell({
           </SystemResizablePanelGroup>
         )}
       </div>
-    </MainShellContext>
+    </MainShellProvider>
   );
 }
 

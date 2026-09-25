@@ -14,7 +14,7 @@ import {
 } from '@/components/_shadcn';
 import EntryIcon from '@/components/base/Icons/EntryIcon';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.less';
 
 function getUploadAttachmentState(status: 'uploading' | 'failed') {

@@ -6,10 +6,11 @@ import { fn } from 'storybook/test';
 import type { AppRouteHandle } from '@/bootstrap/router';
 import { APP_SIDEBAR_HEADER_NAV_KEY } from '@/config/appSidebar';
 import { ServicesProvider } from '@/domains';
+import { AppAuthProvider } from '@/layouts/App/_context';
 import {
-  AppNavigationContext,
   type AppNavigationContextValue,
-} from '@/layouts/AppNavigation/AppNavigationContext';
+  AppNavigationProvider,
+} from '@/layouts/AppNavigation/_context';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import UserFeedbackModal from './_common/footer/UserFeedbackModal';
@@ -33,9 +34,11 @@ const appNavigationValue: AppNavigationContextValue = {
 function SidebarStoryFrame({ children }: { children: ReactNode }) {
   return (
     <ServicesProvider>
-      <AppNavigationContext.Provider value={appNavigationValue}>
-        <MemoryRouter>{children}</MemoryRouter>
-      </AppNavigationContext.Provider>
+      <AppAuthProvider mode="authenticated">
+        <AppNavigationProvider value={appNavigationValue}>
+          <MemoryRouter>{children}</MemoryRouter>
+        </AppNavigationProvider>
+      </AppAuthProvider>
     </ServicesProvider>
   );
 }
@@ -64,9 +67,11 @@ function AppSidebarStory() {
 
   return (
     <ServicesProvider>
-      <AppNavigationContext.Provider value={appNavigationValue}>
-        <RouterProvider router={router} />
-      </AppNavigationContext.Provider>
+      <AppAuthProvider mode="authenticated">
+        <AppNavigationProvider value={appNavigationValue}>
+          <RouterProvider router={router} />
+        </AppNavigationProvider>
+      </AppAuthProvider>
     </ServicesProvider>
   );
 }

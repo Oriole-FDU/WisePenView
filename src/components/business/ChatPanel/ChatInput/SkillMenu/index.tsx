@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/Chat';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.less';
 
 const SKILL_SKELETON_PRIMARY_ROWS = [0, 1] as const;

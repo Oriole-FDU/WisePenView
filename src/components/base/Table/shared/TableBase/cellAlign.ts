@@ -1,19 +1,9 @@
-import { createContext, useContext } from 'react';
-
 import { tableCellStyles } from '../styles';
 import type { TableColumnBase, TableColumnWidth } from './index.type';
 
 export type TableCellAlignValue = NonNullable<TableColumnBase<object>['align']>;
 
 export const DEFAULT_TABLE_COLUMN_ALIGN: TableCellAlignValue = 'center';
-
-export const TableColumnAlignContext = createContext<TableCellAlignValue>(
-  DEFAULT_TABLE_COLUMN_ALIGN
-);
-
-export function useTableColumnAlign(): TableCellAlignValue {
-  return useContext(TableColumnAlignContext);
-}
 
 export function resolveColumnAlign(align?: TableCellAlignValue): TableCellAlignValue {
   return align ?? DEFAULT_TABLE_COLUMN_ALIGN;

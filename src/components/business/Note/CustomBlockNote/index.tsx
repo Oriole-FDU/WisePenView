@@ -4,9 +4,9 @@ import { type Ref, useImperativeHandle } from 'react';
 
 import type { CustomBlockNoteProps, NoteBodyEditorHandle } from './index.type';
 import { useNoteEditorRuntimeCoordinator } from './registry/useNoteEditorRuntimeCoordinator';
-import { NoteInteractionStoreProvider } from './runtime/NoteInteractionStoreProvider';
+import { NoteInteractionStoreProvider } from './runtime/_context';
 import type { NoteEditorRuntimeProps } from './runtime/runtime.type';
-import { useNoteEditorSessionContext } from './session/NoteEditorSessionContext';
+import { useNoteEditorSessionContext } from './session/_context';
 import { NoteEditorSurface } from './ui/NoteEditorSurface';
 
 function CustomBlockNote({

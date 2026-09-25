@@ -4,7 +4,7 @@ import { SuggestionMenuController, useBlockNoteEditor } from '@blocknote/react';
 import { ListBox, ListBoxItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/_context';
 
 import { blockNoteSchema, type CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteContentPlugin } from '../../registry/types';

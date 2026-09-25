@@ -3,13 +3,18 @@ import 'katex/dist/katex.min.css';
 import type { ParsedBlock, RootContent } from '@incremark/core';
 import katex from 'katex';
 import { CornerUpLeft } from 'lucide-react';
-import { createContext, Fragment, memo, type MouseEvent, type ReactNode, useContext } from 'react';
+import { Fragment, memo, type MouseEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Checkbox } from '@/components/base/Input';
 import { MATH_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/html/sanitizeHtml';
 
+import {
+  type MarkdownResourceResolver,
+  MarkdownResourceResolverProvider,
+  useMarkdownResourceResolver,
+} from './_context';
 import CodeBlock from './CodeBlock';
 import MermaidBlock from './MermaidBlock';
 import { isMermaidLanguage } from './MermaidBlock/language';
@@ -30,16 +35,7 @@ interface MarkdownBlockProps {
 
 export type MarkdownLinkMode = 'external' | 'safe';
 
-export interface MarkdownResourceResolver {
-  /** 返回 undefined 时保留 Markdown 的默认 URL 处理；null 会阻止渲染该资源。 */
-  resolveUrl?: (url: string, kind: 'link' | 'image') => string | null | undefined;
-  /** 返回 true 时由调用方接管链接跳转。 */
-  onLinkClick?: (url: string) => boolean;
-}
-
-const MarkdownResourceResolverContext = createContext<MarkdownResourceResolver | undefined>(
-  undefined
-);
+export type { MarkdownResourceResolver } from './_context';
 
 interface MarkdownRendererProps {
   blocks: ParsedBlock[];
@@ -231,7 +227,7 @@ function MarkdownLink({
   title?: string;
   linkMode: MarkdownLinkMode;
 }) {
-  const resourceResolver = useContext(MarkdownResourceResolverContext);
+  const resourceResolver = useMarkdownResourceResolver();
   const href = resolveResourceUrl(url, 'link', linkMode, resourceResolver);
   if (!href) return <>{children}</>;
 
@@ -261,7 +257,7 @@ function MarkdownImage({
   title?: string;
   linkMode: MarkdownLinkMode;
 }) {
-  const resourceResolver = useContext(MarkdownResourceResolverContext);
+  const resourceResolver = useMarkdownResourceResolver();
   const src = resolveResourceUrl(url, 'image', linkMode, resourceResolver);
   if (!src) return <>{alt}</>;
 
@@ -697,7 +693,7 @@ function MarkdownRenderer({
   resourceResolver,
 }: MarkdownRendererProps) {
   return (
-    <MarkdownResourceResolverContext.Provider value={resourceResolver}>
+    <MarkdownResourceResolverProvider value={resourceResolver}>
       {blocks.map((block, index) => (
         <MarkdownBlock
           key={block.id}
@@ -711,7 +707,7 @@ function MarkdownRenderer({
       {showFootnotes ? (
         <MarkdownFootnotes renderContext={renderContext} linkMode={linkMode} />
       ) : null}
-    </MarkdownResourceResolverContext.Provider>
+    </MarkdownResourceResolverProvider>
   );
 }
 

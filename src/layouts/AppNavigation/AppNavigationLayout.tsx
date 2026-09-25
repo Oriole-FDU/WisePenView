@@ -3,9 +3,9 @@ import { useState, useSyncExternalStore } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import CommandPalette from '@/components/business/CommandPalette';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
+import { useAppAuth } from '@/layouts/App/_context';
 
-import { AppNavigationContext, type AppNavigationContextValue } from './AppNavigationContext';
+import { type AppNavigationContextValue, AppNavigationProvider } from './_context';
 
 const HISTORY_BACK = 1;
 const HISTORY_FORWARD = 2;
@@ -66,12 +66,12 @@ function AppNavigationLayout() {
   };
 
   return (
-    <AppNavigationContext.Provider value={value}>
+    <AppNavigationProvider value={value}>
       <Outlet />
       {appAuth.isAuthenticated ? (
         <CommandPalette isOpen={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} />
       ) : null}
-    </AppNavigationContext.Provider>
+    </AppNavigationProvider>
   );
 }
 

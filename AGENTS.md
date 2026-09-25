@@ -59,6 +59,7 @@
 - Entity、Enum、常量：`docs/agent/domain-entity.md`
 - 组件放置位置、components 与 views 边界：`docs/agent/component-boundary.md`
 - React、Hooks、JSX、TypeScript：`docs/agent/component-react.md`
+- Context 的组成、归属和消费：`docs/agent/context.md`
 - 大组件、复杂 Hook 与 Controller 拆分：`docs/agent/component-controller.md`
 - 样式、UI 组件库、Overlay：`docs/agent/component-style.md`、`docs/agent/overlay.md`
 - 颜色系统、Radix 色阶和语义 token：`docs/agent/color-system.md`

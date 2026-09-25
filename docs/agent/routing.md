@@ -88,7 +88,7 @@ home 与 info 是同级路由。settings 只允许教师访问；无权限时保
 ## 路由布局、Tab 与面包屑
 
 - 需要共享内容容器的路由通过 `AppScrollablePageLayout`、`AppFixedPageLayout` 或 `ResourceHost` 嵌套表达；不要使用 route `handle` 存放布局配置。
-- 资源工作区由 `src/layouts/Resource/ResourceHost` 作为路由布局元素提供顶栏、对话栏和 `ResourceHostContext`；`AppLayout` 只负责应用端主壳，不感知具体业务路由，页面按需通过 `useMainShell` 取侧栏折叠态与切换命令。
+- 资源工作区由 `src/layouts/Resource/ResourceHost` 作为路由布局元素提供顶栏、对话栏和 `src/layouts/Resource/_context` 的资源宿主能力；`AppLayout` 只负责应用端主壳，不感知具体业务路由，页面按需通过 `useMainShell` 取侧栏折叠态与切换命令。
 - 壳 chrome（侧栏面板、折叠 rail、窄屏顶栏与侧栏 Drawer、主内容区、`MainShellContext`）由 `src/layouts/MainShell` 统一提供；`AppLayout` 与 `AdminLayout` 基于 `MainShell` 构建，只传入面板 id、展开态侧栏内容、rail 导航内容与窄屏标题，保证两端壳行为一致。
 - 路由通过 `handle.appSidebar.selectedHeaderNavKey` 声明一级侧栏选中项；使用 `null` 明确表示不选中任何入口，侧栏不反向解析 pathname。
 - 小组和课程页面使用 `useMatch` 判断当前子路由；页面级 Tab 直接调用领域 route builder，不抽象 `useRouteTab`。

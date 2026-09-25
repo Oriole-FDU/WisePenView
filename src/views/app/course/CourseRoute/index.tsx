@@ -6,7 +6,7 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { CourseContext } from '@/layouts/Course/CourseContext';
+import { CourseProvider } from '@/layouts/Course/_context';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
@@ -54,9 +54,9 @@ function CourseRoute() {
   }
 
   return (
-    <CourseContext.Provider value={{ course: data, refreshCourse: refresh }}>
+    <CourseProvider value={{ course: data, refreshCourse: refresh }}>
       <Outlet />
-    </CourseContext.Provider>
+    </CourseProvider>
   );
 }
 
