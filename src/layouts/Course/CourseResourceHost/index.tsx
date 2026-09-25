@@ -4,9 +4,9 @@ import type { ResourceChatContext } from '@/components/business/ChatPanel/Resour
 import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import {
   type OpenResourceFn,
-  ResourceHostContextProvider,
   type ResourceHostContextValue,
 } from '@/layouts/Resource/ResourceHost/ResourceHostContext';
+import { ResourceHostContextProvider } from '@/layouts/Resource/ResourceHost/ResourceHostContextProvider';
 import ResourceRenderer from '@/views/resource/ResourceRenderer';
 
 interface CourseResourceHostProps {

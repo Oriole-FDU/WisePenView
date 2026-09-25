@@ -12,11 +12,11 @@ import {
 } from '@/components/base/SystemResizable';
 import { type ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import { COURSE_ROLE } from '@/domains/Course';
-import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,
 } from '@/layouts/Resource/ResourceChatBinding';
+import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 
 import { useCourseContext } from '../CourseContext';
 import CourseResourceHost from '../CourseResourceHost';

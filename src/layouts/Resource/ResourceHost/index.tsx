@@ -31,18 +31,18 @@ import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
 import { useMainShell } from '@/layouts/MainShell/MainShellContext';
 import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
-import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
-import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
-import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,
 } from '@/layouts/Resource/ResourceChatBinding';
 import {
   DEFAULT_RESOURCE_HOST_ID,
-  ResourceHostContextProvider,
   type ResourceHostContextValue,
 } from '@/layouts/Resource/ResourceHost/ResourceHostContext';
+import { ResourceHostContextProvider } from '@/layouts/Resource/ResourceHost/ResourceHostContextProvider';
+import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
+import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
+import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 
 import styles from './style.module.less';
 
