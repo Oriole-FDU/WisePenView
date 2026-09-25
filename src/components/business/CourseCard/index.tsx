@@ -3,8 +3,8 @@ import type { KeyboardEvent, SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import UserCapsule from '@/components/base/Avatar/UserCapsule';
+import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import type { CourseSummary } from '@/domains/Course';
-import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 
 import styles from './style.module.less';
 

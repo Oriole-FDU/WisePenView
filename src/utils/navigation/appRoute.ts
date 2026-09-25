@@ -1,5 +1,5 @@
 // 注意：本文件同时被 electron 工程（无 @/* 别名）引用，此处必须使用相对路径导入
-import { normalizeInviteCode } from '../normalize/normalizeInviteCode';
+import { normalizeInviteCode } from '../../domains/Auth/utils/normalizeInviteCode';
 
 /** 注册邀请链接的查询参数名，与后端注册接口 inviteCode 字段对应 */
 export const REGISTER_INVITE_QUERY_KEY = 'invite';

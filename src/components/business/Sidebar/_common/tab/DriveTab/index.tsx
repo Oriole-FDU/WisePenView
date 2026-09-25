@@ -25,10 +25,10 @@ import {
 } from '@/components/business/Note/useMarkdownNoteImport';
 import { useGroupService, useNoteService } from '@/domains';
 import type { DriveResourceLocation, FolderNode, RootNode } from '@/domains/Drive';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
 import {

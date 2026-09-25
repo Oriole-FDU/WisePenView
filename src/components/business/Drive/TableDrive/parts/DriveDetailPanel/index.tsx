@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import EntryIcon from '@/components/base/Icons/EntryIcon';
 import { useDocumentService, useNoteService } from '@/domains';
 import { RESOURCE_ACTION, type ResourceAction, type ResourceItem } from '@/domains/Resource';
+import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { ACCESS_CONTROL_SCOPE, type AccessControlScope } from '@/domains/Tag';
 import type { UserDisplayBase } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { formatFileSize } from '@/utils/format/formatFileSize';
-import { resolveResourceKind, RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import { isDriveActionTarget } from '../../../common/driveComponentModel';
 import { resolveTagPermissionActionPresetKey } from '../../../common/tagPermissionPreset';

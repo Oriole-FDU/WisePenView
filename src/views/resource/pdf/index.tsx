@@ -8,15 +8,15 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import PdfViewer from '@/components/business/PdfViewer/index';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
-import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import {
   isOfficeResourceType,
   RESOURCE_KIND,
   RESOURCE_VIEWER,
   type ResourceViewer,
-} from '@/utils/navigation/resourceTarget';
+} from '@/domains/Resource/model/resourceTarget';
+import { useApi } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';

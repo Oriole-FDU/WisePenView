@@ -8,9 +8,9 @@ import { FormField, Input, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useAgentService, useDriveService, useNoteService, useSkillService } from '@/domains';
+import { validateReservedName } from '@/domains/Drive/validation/validateReservedName';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { validateReservedName } from '@/utils/tag/validateReservedName';
 
 import type { DriveCreateModalProps } from './index.type';
 import styles from './style.module.less';

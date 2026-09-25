@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
-import type { ResourceTarget } from '@/utils/navigation/resourceTarget';
+import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import {
   type OpenResourceFn,
   ResourceHostContext,

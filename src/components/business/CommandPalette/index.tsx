@@ -30,11 +30,11 @@ import { Spin } from '@/components/base/Feedback';
 import { DriveCreateModal, type DriveCreateType } from '@/components/business/Drive/Modals';
 import { useDriveService, useNoteService } from '@/domains';
 import type { RootNode } from '@/domains/Drive';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import ResourceSearchResults from './ResourceSearchResults';
 import styles from './style.module.less';
