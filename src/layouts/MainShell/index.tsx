@@ -1,4 +1,5 @@
 import { Drawer } from '@heroui/react';
+import { clsx } from 'clsx';
 import { Menu } from 'lucide-react';
 import { type CSSProperties, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +15,6 @@ import {
 import { MAIN_SIDEBAR_RAIL_WIDTH } from '@/constants/layoutScale';
 import { SIDEBAR_TOGGLE_BUTTON_PROPS } from '@/constants/sidebarToggle';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
-import { cn } from '@/utils/cn';
 
 import { MainShellContext, type MainShellContextValue } from './MainShellContext';
 import SkipToMainLink, { MAIN_CONTENT_ID } from './SkipToMainLink';
@@ -117,7 +117,7 @@ function MainShell({
 
   const mainColumn = (
     <div
-      className={cn(
+      className={clsx(
         styles.mainColumn,
         desktopWindow.hasTitleBarInset &&
           desktopWindow.titleBarInsetSide === 'end' &&
@@ -139,7 +139,7 @@ function MainShell({
       <main
         id={MAIN_CONTENT_ID}
         tabIndex={-1}
-        className={cn(styles.mainContent, mainContentScroll && styles.mainContentScroll)}
+        className={clsx(styles.mainContent, mainContentScroll && styles.mainContentScroll)}
       >
         {children}
       </main>
@@ -149,7 +149,7 @@ function MainShell({
   return (
     <MainShellContext value={mainShellContext}>
       <div
-        className={cn(
+        className={clsx(
           styles.root,
           sidebar.motionPhase === 'collapsed' && styles.rootCollapsed,
           isMobileLayout && styles.rootMobile

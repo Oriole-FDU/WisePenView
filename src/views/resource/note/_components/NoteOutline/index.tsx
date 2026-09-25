@@ -1,9 +1,9 @@
+import { clsx } from 'clsx';
 import { ChevronsLeft, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { NoteOutlineItem } from '@/components/business/Note/CustomBlockNote/index.type';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -72,7 +72,7 @@ function NoteOutline({ items, activeId, onNavigate, title, open, onOpenChange }:
                       key={it.id}
                       type="button"
                       role="listitem"
-                      className={cn(
+                      className={clsx(
                         styles.item,
                         resolveLevelClass(it.level),
                         it.level === 0 && styles.titleItem,

@@ -1,5 +1,6 @@
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
 import { Dropdown, Header, Label, ListBoxItem, ListBoxSection } from '@heroui/react';
+import { clsx } from 'clsx';
 import {
   Braces,
   CheckSquare,
@@ -23,7 +24,6 @@ import {
 import { createElement } from 'react';
 
 import i18n from '@/i18n';
-import { cn } from '@/utils/cn';
 
 import { getSlashMenuItemKey } from './buildSlashMenuItems';
 import {
@@ -92,7 +92,7 @@ function resolveSlashMenuIcon(item: DefaultReactSuggestionItem) {
 function SlashMenuItemContent({ item }: { item: DefaultReactSuggestionItem }) {
   return (
     <>
-      <span className={cn(styles.icon, resolveSlashMenuIconColor(item))}>
+      <span className={clsx(styles.icon, resolveSlashMenuIconColor(item))}>
         {resolveSlashMenuIcon(item)}
       </span>
       <Label className={styles.label}>{resolveSlashMenuTitle(item)}</Label>

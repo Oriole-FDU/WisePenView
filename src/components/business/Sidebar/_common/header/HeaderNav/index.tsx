@@ -1,7 +1,7 @@
 import { ListBox, ListBoxItem, ListBoxSection, Separator, Tooltip } from '@heroui/react';
+import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, useLayoutEffect, useRef } from 'react';
 
-import { cn } from '@/utils/cn';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import type { HeaderNavItem, HeaderNavProps, HeaderNavSection } from './index.type';
@@ -90,7 +90,7 @@ function HeaderNav({
         aria-current={isActive ? 'page' : undefined}
         data-nav-active={isActive ? 'true' : undefined}
         isDisabled={item.isDisabled}
-        className={cn(
+        className={clsx(
           styles.menuItem,
           collapsed && styles.menuItemCollapsed,
           labelsHidden && styles.menuItemLabelsHidden,
@@ -146,19 +146,19 @@ function HeaderNav({
       {showIndicator ? (
         <div
           ref={indicatorRef}
-          className={cn(styles.indicator, collapsed && styles.indicatorCollapsed)}
+          className={clsx(styles.indicator, collapsed && styles.indicatorCollapsed)}
         />
       ) : null}
       <ListBox
         aria-label={ariaLabel}
         selectionMode="none"
-        className={cn(styles.headerMenu, collapsed && styles.headerMenuCollapsed)}
+        className={clsx(styles.headerMenu, collapsed && styles.headerMenuCollapsed)}
       >
         {shouldRenderSections ? navSections.map(renderSection) : navItems.map(renderItem)}
       </ListBox>
       <Separator
         aria-hidden="true"
-        className={cn(styles.divider, labelsHidden && styles.dividerHidden)}
+        className={clsx(styles.divider, labelsHidden && styles.dividerHidden)}
       />
     </div>
   );

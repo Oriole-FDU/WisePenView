@@ -1,4 +1,5 @@
 import { ProgressBar } from '@heroui/react';
+import { clsx } from 'clsx';
 import { FileText, Image as ImageIcon, Paperclip, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -11,7 +12,6 @@ import {
   AttachmentMedia,
   AttachmentTitle,
 } from '@/components/_shadcn/attachment';
-import { cn } from '@/utils/cn';
 
 import type {
   ChatAttachmentChipKind,
@@ -52,7 +52,7 @@ function ChatAttachmentChip({
 
   return (
     <Attachment
-      className={cn(styles.root, className)}
+      className={clsx(styles.root, className)}
       state={state}
       size={attachmentSizeMap[size]}
       {...props}

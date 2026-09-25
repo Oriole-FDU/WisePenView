@@ -1,7 +1,7 @@
 'use client';
 
-import { cn } from '@/utils/cn';
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
+import { clsx } from 'clsx';
 import { ChevronDown } from 'lucide-react';
 import styles from './accordion.module.less';
 
@@ -9,7 +9,7 @@ function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (
     <AccordionPrimitive.Root
       data-slot="accordion"
-      className={cn(styles.accordion, className)}
+      className={clsx(styles.accordion, className)}
       {...props}
     />
   );
@@ -19,7 +19,7 @@ function AccordionItem({ className, ...props }: AccordionPrimitive.Item.Props) {
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
-      className={cn(styles.item, className)}
+      className={clsx(styles.item, className)}
       {...props}
     />
   );
@@ -30,7 +30,7 @@ function AccordionTrigger({ className, children, ...props }: AccordionPrimitive.
     <AccordionPrimitive.Header data-slot="accordion-header" className={styles.header}>
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
-        className={cn(styles.trigger, className)}
+        className={clsx(styles.trigger, className)}
         {...props}
       >
         <span className={styles.triggerContent}>{children}</span>
@@ -44,7 +44,7 @@ function AccordionContent({ className, children, ...props }: AccordionPrimitive.
   return (
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
-      className={cn(styles.content, className)}
+      className={clsx(styles.content, className)}
       {...props}
     >
       <div className={styles.contentInner}>{children}</div>

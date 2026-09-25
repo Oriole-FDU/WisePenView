@@ -1,6 +1,5 @@
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
-
-import { cn } from '@/utils/cn';
 
 import styles from './ErrorPageShell.module.less';
 import type { ErrorPageShellProps } from './index.type';
@@ -16,9 +15,9 @@ function ErrorPageShell({
   const { t } = useTranslation('errors');
 
   return (
-    <div className={cn(styles.root, className)}>
+    <div className={clsx(styles.root, className)}>
       <main className={styles.main}>
-        <div className={cn(styles.content, styles[`size${size}`], contentClassName)}>
+        <div className={clsx(styles.content, styles[`size${size}`], contentClassName)}>
           {children}
         </div>
       </main>

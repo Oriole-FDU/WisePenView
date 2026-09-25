@@ -1,5 +1,6 @@
 import { Dropdown, Label, Separator, Tooltip } from '@heroui/react';
 import { useMount } from 'ahooks';
+import { clsx } from 'clsx';
 import {
   ChartPie,
   Home,
@@ -26,7 +27,6 @@ import type { User } from '@/domains/User';
 import { IDENTITY } from '@/domains/User';
 import { useAppAuth } from '@/layouts/App/AppAuthContext';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
-import { cn } from '@/utils/cn';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import UserCheckIn from '../UserCheckIn';
@@ -71,7 +71,7 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
 
     return (
       <div
-        className={cn(
+        className={clsx(
           styles.profile,
           collapsed && styles.collapsed,
           !collapsed && styles.expanded,
@@ -248,7 +248,7 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
   return (
     <>
       <div
-        className={cn(
+        className={clsx(
           styles.profile,
           collapsed && styles.collapsed,
           !collapsed && styles.expanded,

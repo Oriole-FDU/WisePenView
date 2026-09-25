@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { type ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -19,7 +20,6 @@ import {
   RESOURCE_SIDE_PANEL_MIN_WIDTH,
 } from '@/constants/layoutScale';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
-import { cn } from '@/utils/cn';
 
 import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
 import type { ResourceSidePanelContent } from '../ResourceWorkspace';
@@ -78,7 +78,7 @@ function ResourceSidePanel({ resourceId, config, children }: ResourceSidePanelPr
     <div className={styles.scrollHost}>
       <SystemResizablePanelGroup
         orientation="horizontal"
-        className={cn(styles.root, open && styles.rootWithSidePanel)}
+        className={clsx(styles.root, open && styles.rootWithSidePanel)}
         resizeTargetMinimumSize={RESIZE_TARGET_MINIMUM_SIZE}
         onLayoutChanged={handleLayoutChanged}
       >

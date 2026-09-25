@@ -1,9 +1,9 @@
+import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
-import { cn } from '@/utils/cn';
 
 import AuthBackground from './AuthBackground';
 import styles from './style.module.less';
@@ -22,7 +22,7 @@ function AuthLayout() {
     <main className={styles.root}>
       {desktopWindow.isDesktop ? (
         <div
-          className={cn(
+          className={clsx(
             styles.desktopTitleBar,
             titleBarInsetStart && styles.titleBarInsetStart,
             titleBarInsetEnd && styles.titleBarInsetEnd

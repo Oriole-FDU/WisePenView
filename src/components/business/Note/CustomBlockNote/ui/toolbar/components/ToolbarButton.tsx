@@ -1,8 +1,8 @@
 import { ToggleButton, Tooltip } from '@heroui/react';
+import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import { AppButton, type AppButtonProps } from '@/components/base/Button';
-import { cn } from '@/utils/cn';
 
 import styles from '../style.module.less';
 import { stopToolbarMouseDown } from '../utils';
@@ -36,7 +36,7 @@ export function ToolbarButton({
       __button_group_child={isButtonGroupChild}
       aria-label={label}
       aria-pressed={isActive}
-      className={cn(styles.toolbarButton, className)}
+      className={clsx(styles.toolbarButton, className)}
       isDisabled={isDisabled}
       isIconOnly
       size="sm"

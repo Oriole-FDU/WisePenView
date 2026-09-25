@@ -1,7 +1,6 @@
+import { clsx } from 'clsx';
 import type { ComponentProps } from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
-
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -14,7 +13,7 @@ function SystemResizablePanelGroup({
   return (
     <ResizablePrimitive.Group
       data-slot="system-resizable-panel-group"
-      className={cn(styles.panelGroup, className)}
+      className={clsx(styles.panelGroup, className)}
       {...props}
     />
   );
@@ -39,7 +38,7 @@ function SystemResizableHandle({
   return (
     <ResizablePrimitive.Separator
       data-slot="system-resizable-handle"
-      className={cn(styles.handle, collapsed && styles.handleCollapsed, className)}
+      className={clsx(styles.handle, collapsed && styles.handleCollapsed, className)}
       {...props}
     />
   );

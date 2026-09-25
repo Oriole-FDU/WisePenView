@@ -1,9 +1,11 @@
 'use client';
 
-import AppIconButton from '@/components/base/Button/AppIconButton';
+import { clsx } from 'clsx';
 import { ArrowDownIcon } from 'lucide-react';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import {
   MessageScroller as MessageScrollerPrimitive,
@@ -11,7 +13,6 @@ import {
   useMessageScrollerScrollable,
   useMessageScrollerVisibility,
 } from './message-scroller.primitive';
-import { cn } from './utils';
 
 function MessageScrollerProvider(
   props: React.ComponentProps<typeof MessageScrollerPrimitive.Provider>
@@ -26,7 +27,7 @@ function MessageScroller({
   return (
     <MessageScrollerPrimitive.Root
       data-slot="message-scroller"
-      className={cn(
+      className={clsx(
         'group/message-scroller relative flex size-full min-h-0 flex-col overflow-hidden',
         className
       )}
@@ -42,7 +43,7 @@ function MessageScrollerViewport({
   return (
     <MessageScrollerPrimitive.Viewport
       data-slot="message-scroller-viewport"
-      className={cn(
+      className={clsx(
         'size-full min-h-0 min-w-0 scroll-fade-b scrollbar-thin scrollbar-gutter-stable overflow-y-auto overscroll-contain contain-content',
         className
       )}
@@ -58,7 +59,7 @@ function MessageScrollerContent({
   return (
     <MessageScrollerPrimitive.Content
       data-slot="message-scroller-content"
-      className={cn('flex h-max min-h-full flex-col gap-8', className)}
+      className={clsx('flex h-max min-h-full flex-col gap-8', className)}
       {...props}
     />
   );
@@ -73,7 +74,7 @@ function MessageScrollerItem({
     <MessageScrollerPrimitive.Item
       data-slot="message-scroller-item"
       scrollAnchor={scrollAnchor}
-      className={cn(
+      className={clsx(
         'min-w-0 shrink-0 [contain-intrinsic-size:auto_10rem] [content-visibility:auto]',
         className
       )}
@@ -103,7 +104,7 @@ function MessageScrollerButton({
       data-variant={variant}
       data-size={size}
       direction={direction}
-      className={cn(
+      className={clsx(
         'absolute inset-s-1/2 -translate-x-1/2 border-border bg-background text-foreground transition-[translate,scale,opacity] duration-200 hover:bg-surface-tertiary hover:text-foreground data-[active=false]:pointer-events-none data-[active=false]:scale-95 data-[active=false]:opacity-0 data-[active=false]:duration-400 data-[active=false]:ease-[cubic-bezier(0.7,0,0.84,0)] data-[active=true]:translate-y-0 data-[active=true]:scale-100 data-[active=true]:opacity-100 data-[active=true]:ease-[cubic-bezier(0.23,1,0.32,1)] data-[direction=end]:bottom-4 data-[direction=end]:data-[active=false]:translate-y-full data-[direction=start]:top-4 data-[direction=start]:data-[active=false]:-translate-y-full rtl:translate-x-1/2 data-[direction=start]:[&_svg]:rotate-180',
         className
       )}

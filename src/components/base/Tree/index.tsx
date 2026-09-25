@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { ChevronRight, LoaderCircle } from 'lucide-react';
 import type { CSSProperties, DragEvent, Key, ReactNode } from 'react';
 import { useState } from 'react';
@@ -5,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Checkbox } from '@/components/base/Input';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -274,7 +274,7 @@ function Tree({
 
   return (
     <div
-      className={cn(
+      className={clsx(
         styles.tree,
         'file-tree',
         'wisepen-tree',
@@ -297,7 +297,7 @@ function Tree({
         return (
           <div
             key={key}
-            className={cn(
+            className={clsx(
               styles.row,
               'file-tree-item',
               'wisepen-tree__item',
@@ -368,7 +368,7 @@ function Tree({
                 icon={<span className={styles.switcherIcon}>{renderSwitcherIcon(loading)}</span>}
                 label={expanded ? t('tree.collapse') : t('tree.expand')}
                 size="xs"
-                className={cn(styles.switcher, 'wisepen-tree__switcher')}
+                className={clsx(styles.switcher, 'wisepen-tree__switcher')}
                 data-expanded={expanded}
                 isDisabled={disabled}
                 onClick={(event) => {
@@ -378,14 +378,14 @@ function Tree({
               />
             ) : (
               <span
-                className={cn(styles.switcherPlaceholder, 'wisepen-tree__switcher-placeholder')}
+                className={clsx(styles.switcherPlaceholder, 'wisepen-tree__switcher-placeholder')}
                 aria-hidden
               />
             )}
 
             {showCheckbox ? (
               <Checkbox
-                className={cn(styles.checkbox, 'wisepen-tree__checkbox')}
+                className={clsx(styles.checkbox, 'wisepen-tree__checkbox')}
                 isSelected={checked}
                 isDisabled={!canCheck}
                 aria-label={t('tree.select')}
@@ -395,7 +395,7 @@ function Tree({
             ) : null}
 
             <div
-              className={cn(styles.content, 'wisepen-tree__content')}
+              className={clsx(styles.content, 'wisepen-tree__content')}
               data-selectable={canSelect}
               onClick={(event) => {
                 if (isInteractiveTarget(event.target)) return;
@@ -411,7 +411,7 @@ function Tree({
                 toggleExpand(node, !expanded);
               }}
             >
-              <span className={cn(styles.title, 'wisepen-tree__title')}>
+              <span className={clsx(styles.title, 'wisepen-tree__title')}>
                 {node.title ?? String(node.key)}
               </span>
             </div>

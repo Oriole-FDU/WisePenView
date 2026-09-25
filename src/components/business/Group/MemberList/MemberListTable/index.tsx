@@ -1,4 +1,5 @@
 import { ListBox } from '@heroui/react';
+import { clsx } from 'clsx';
 import type { TFunction } from 'i18next';
 import { Check, X } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -13,7 +14,6 @@ import { tableStyles } from '@/components/base/Table/shared/styles';
 import TableRowActions from '@/components/base/Table/shared/TableRowActions';
 import TableSelectionCheckbox from '@/components/base/Table/shared/TableSelectionCheckbox';
 import { GROUP_TYPE, type GroupMember, ROLE } from '@/domains/Group';
-import { cn } from '@/utils/cn';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
 import {
@@ -438,9 +438,9 @@ function MemberListTable(props: MemberListTableProps) {
     member.key === editingRowId || member.key === savingRowId || member.key === errorRowId;
   const columns: DataTableColumn<MemberRecord>[] = buildEditableColumns(props, t).map((column) => ({
     ...column,
-    className: cn(column.className, column.isRowHeader && styles.memberColumn),
+    className: clsx(column.className, column.isRowHeader && styles.memberColumn),
     getCellClassName: (member) =>
-      cn(
+      clsx(
         member.key === savingRowId && styles.editFieldDisabled,
         isEditing(member) && column.isRowHeader && styles.editingMemberCell
       ),
@@ -453,7 +453,7 @@ function MemberListTable(props: MemberListTableProps) {
     columns.unshift({
       id: '__selection',
       align: 'center',
-      className: cn(styles.selectionColumn, tableStyles.colCheckbox),
+      className: clsx(styles.selectionColumn, tableStyles.colCheckbox),
       label: (
         <TableSelectionCheckbox
           ariaLabel={tableT('aria.selectAll')}
@@ -477,7 +477,7 @@ function MemberListTable(props: MemberListTableProps) {
     id: '__actions',
     label: tableT('column.actions'),
     align: 'center',
-    className: cn(styles.actionColumn, tableStyles.colAction),
+    className: clsx(styles.actionColumn, tableStyles.colAction),
     renderCell: (member) => {
       if (isEditing(member)) {
         const saving = member.key === savingRowId;
@@ -544,7 +544,7 @@ function MemberListTable(props: MemberListTableProps) {
       ) : null}
       <DataTable
         ariaLabel={t('member.table.manageAria')}
-        className={cn(styles.managementTable, batchEditMode && styles.withSelection)}
+        className={clsx(styles.managementTable, batchEditMode && styles.withSelection)}
         items={dataSource}
         rowKey="key"
         columns={columns}

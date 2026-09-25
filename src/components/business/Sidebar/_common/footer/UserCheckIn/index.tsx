@@ -1,4 +1,5 @@
 import { useInterval } from 'ahooks';
+import { clsx } from 'clsx';
 import { CalendarCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,6 @@ import { AppButton, AppIconButton } from '@/components/base/Button';
 import { useUserService } from '@/domains';
 import type { UserTaskCheckInResult, UserTaskRewardPreview } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -161,7 +161,7 @@ function UserCheckIn() {
           </p>
           {alreadyCheckedIn ? null : (
             <div
-              className={cn(styles.reward, result ? styles.rewardSettled : styles.rewardRolling)}
+              className={clsx(styles.reward, result ? styles.rewardSettled : styles.rewardRolling)}
             >
               <strong className={styles.rewardAmount}>{shownReward}</strong>
               <span className={styles.rewardType}>{rewardUnit}</span>

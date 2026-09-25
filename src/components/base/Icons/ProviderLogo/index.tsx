@@ -7,9 +7,8 @@ import metaIcon from '@lobehub/icons-static-svg/icons/meta.svg?raw';
 import mistralIcon from '@lobehub/icons-static-svg/icons/mistral.svg?raw';
 import openAiIcon from '@lobehub/icons-static-svg/icons/openai.svg?raw';
 import qwenIcon from '@lobehub/icons-static-svg/icons/qwen.svg?raw';
+import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
-
-import { cn } from '@/utils/cn';
 
 import type { ProviderLogoProps } from './index.type';
 import styles from './style.module.less';
@@ -42,7 +41,7 @@ function ProviderLogo({ provider, size = 16, className }: ProviderLogoProps) {
 
   return (
     <span
-      className={cn(styles.logo, className)}
+      className={clsx(styles.logo, className)}
       aria-hidden="true"
       style={logoStyle}
       dangerouslySetInnerHTML={{ __html: iconSvg }}

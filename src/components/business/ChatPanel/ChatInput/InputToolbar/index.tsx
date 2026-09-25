@@ -1,8 +1,8 @@
+import { clsx } from 'clsx';
 import { ArrowUp, Bot, Mic, Plus, Settings, SlidersHorizontal, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { cn } from '@/utils/cn';
 
 import AgentPicker from '../AgentPicker';
 import ModelPicker from '../ModelPicker';
@@ -71,7 +71,10 @@ function InputToolbar({
 
       <div className={styles.toolsRight}>
         <div
-          className={cn(styles.modelSelectorShell, modelIconOnly && styles.modelSelectorShellIcon)}
+          className={clsx(
+            styles.modelSelectorShell,
+            modelIconOnly && styles.modelSelectorShellIcon
+          )}
         >
           {isAuthenticated ? (
             <ModelPicker iconOnly={modelIconOnly} />

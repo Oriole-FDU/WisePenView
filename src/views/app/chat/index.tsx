@@ -1,6 +1,7 @@
+import { clsx } from 'clsx';
+
 import ChatPanel from '@/components/business/ChatPanel';
 import { useMainShell } from '@/layouts/MainShell/MainShellContext';
-import { cn } from '@/utils/cn';
 
 import styles from './style.module.less';
 
@@ -9,7 +10,7 @@ function ChatPage() {
   const { isMobileLayout: isCompactChat } = useMainShell();
 
   return (
-    <div className={cn(styles.root, isCompactChat && styles.compact)}>
+    <div className={clsx(styles.root, isCompactChat && styles.compact)}>
       <div className={styles.chatPanelHost}>
         <ChatPanel fullWidth={!isCompactChat} showHeader={false} showCollapseButton={false} />
       </div>

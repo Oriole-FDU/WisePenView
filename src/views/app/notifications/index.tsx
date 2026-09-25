@@ -1,5 +1,6 @@
 import { toast } from '@heroui/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { clsx } from 'clsx';
 import { CheckCheck, ChevronDown, ChevronUp, ExternalLink, RotateCw } from 'lucide-react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +12,6 @@ import PageHeader from '@/components/base/PageHeader';
 import { useMessageService } from '@/domains';
 import type { UserMessage } from '@/domains/Message';
 import { useApi, useApiInfiniteScroll } from '@/hooks/useApi';
-import { cn } from '@/utils/cn';
 import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { extractMarkdownPlainText } from '@/utils/markdown/extractMarkdownPlainText';
@@ -257,7 +257,7 @@ function NotificationsPage() {
                   key={message.messageId}
                   data-index={virtualItem.index}
                   ref={messageVirtualizer.measureElement}
-                  className={cn(styles.messageItem, isSelected && styles.messageItemSelected)}
+                  className={clsx(styles.messageItem, isSelected && styles.messageItemSelected)}
                 >
                   <div className={styles.messageSummary}>
                     <button
@@ -268,7 +268,7 @@ function NotificationsPage() {
                     >
                       <span className={styles.messageStatusLine}>
                         <span
-                          className={cn(styles.statusDot, !isUnread && styles.statusDotRead)}
+                          className={clsx(styles.statusDot, !isUnread && styles.statusDotRead)}
                           aria-hidden="true"
                         />
                         <span>{typeLabel}</span>

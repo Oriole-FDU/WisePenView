@@ -1,7 +1,7 @@
 import { ToggleButton, Tooltip } from '@heroui/react';
+import { clsx } from 'clsx';
 import type { ComponentProps, MouseEventHandler } from 'react';
 
-import { cn } from '@/utils/cn';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import type { AppIconButtonProps } from './index.type';
@@ -22,7 +22,7 @@ function AppIconButton({
   variant = 'ghost',
   ...buttonProps
 }: AppIconButtonProps) {
-  const classNames = cn(
+  const classNames = clsx(
     styles.root,
     styles[size],
     styles[variant],
@@ -79,13 +79,13 @@ function AppIconButton({
       {isDisabled ? (
         // disabled 按钮不接收 hover，用无角色、不可聚焦的布局节点保留禁用提示。
         <Tooltip.Trigger<'span'>
-          className={cn(styles.tooltipTrigger, tooltip.triggerClassName)}
+          className={clsx(styles.tooltipTrigger, tooltip.triggerClassName)}
           render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
         >
           {button}
         </Tooltip.Trigger>
       ) : (
-        <span className={cn(styles.tooltipTrigger, tooltip.triggerClassName)}>{button}</span>
+        <span className={clsx(styles.tooltipTrigger, tooltip.triggerClassName)}>{button}</span>
       )}
       <Tooltip.Content
         placement={tooltip.placement}

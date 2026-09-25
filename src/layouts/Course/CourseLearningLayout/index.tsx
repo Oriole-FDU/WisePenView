@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { PanelRightClose, PanelRightOpen, Video } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +13,6 @@ import {
 import { type ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import { COURSE_ROLE } from '@/domains/Course';
 import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
-import { cn } from '@/utils/cn';
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,
@@ -69,7 +69,7 @@ function CourseLearningLayout() {
     <ResourceChatBindingProvider>
       <SystemResizablePanelGroup
         orientation="horizontal"
-        className={cn(styles.root, chatDock.open && styles.rootChatOpen)}
+        className={clsx(styles.root, chatDock.open && styles.rootChatOpen)}
         resizeTargetMinimumSize={RESIZE_TARGET_MINIMUM_SIZE}
         onLayoutChanged={chatDock.handleLayoutChanged}
       >

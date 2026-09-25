@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { createContext, useContext, useId, type ComponentProps, type ReactNode } from 'react';
 import {
   Tooltip as RechartsTooltip,
@@ -6,7 +7,6 @@ import {
   type TooltipValueType,
 } from 'recharts';
 import styles from './chart.module.less';
-import { cn } from './utils';
 
 export type ChartConfig = Record<string, { label?: ReactNode; color?: string }>;
 
@@ -33,7 +33,7 @@ function ChartContainer({ id, className, config, children, ...props }: ChartCont
 
   return (
     <ChartContext.Provider value={{ config }}>
-      <div data-chart={chartId} className={cn(styles.container, className)} {...props}>
+      <div data-chart={chartId} className={clsx(styles.container, className)} {...props}>
         <ResponsiveContainer initialDimension={{ width: 180, height: 180 }}>
           {children}
         </ResponsiveContainer>
