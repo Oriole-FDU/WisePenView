@@ -5,7 +5,7 @@ import { createOssStsClientManager } from '@/domains/_shared/ossStsClient';
 import type { IResourceService } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import { SkillServicesMap } from '../mapper/SkillServices.map';
 import type {

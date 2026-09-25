@@ -1,4 +1,4 @@
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 const NOTE_CONTENT_SIGNATURE_VERSION = 1;
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };

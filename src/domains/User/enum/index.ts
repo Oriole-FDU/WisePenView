@@ -1,5 +1,5 @@
-import type { EnumValue } from '@/utils/enum';
-import { createEnum } from '@/utils/enum';
+import type { EnumValue } from '@/utils/type/enum';
+import { createEnum } from '@/utils/type/enum';
 
 /** 邮箱后缀类型（发起邮箱验证用）：0 -> @m.fudan.edu.cn；1 -> @fudan.edu.cn */
 export const EMAIL_SUFFIX = createEnum([

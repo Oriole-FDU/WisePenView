@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import i18n from '@/i18n';
 import { copyText } from '@/utils/browser/copyText';
-import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/sanitizeHtml';
+import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
 
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
 import { renderNoteMermaidDiagram } from '../mermaidRuntime';

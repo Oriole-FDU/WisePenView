@@ -6,13 +6,13 @@ import {
   type TagResourceAction,
 } from '@/domains/Tag';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import type { EnumKey } from '@/utils/enum';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import {
   normalizeFiniteNumber,
   normalizeNonNegativeNumber,
 } from '@/utils/normalize/normalizeNumber';
+import type { EnumKey } from '@/utils/type/enum';
 
 import type {
   AddGroupApiRequest,

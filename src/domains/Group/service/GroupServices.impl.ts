@@ -3,8 +3,8 @@ import { GroupApi, GroupMemberApi, GroupResConfigApi } from '@domain-apis';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig, ROLE } from '@/domains/Group';
 import { DEFAULT_MEMBER_ACTIONS, GROUP_TYPE } from '@/domains/Group';
 import { normalizeResourceActions } from '@/domains/Tag';
-import type { EnumKey } from '@/utils/enum';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import type { EnumKey } from '@/utils/type/enum';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
 import { GroupQuotaMap } from '../mapper/groupQuota.mapper';

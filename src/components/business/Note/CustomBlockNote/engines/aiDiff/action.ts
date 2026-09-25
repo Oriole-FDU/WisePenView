@@ -1,7 +1,7 @@
 import type * as Y from 'yjs';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type {

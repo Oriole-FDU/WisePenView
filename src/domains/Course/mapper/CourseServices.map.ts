@@ -26,7 +26,7 @@ import {
 import type { Group, GroupMember } from '@/domains/Group';
 import type { ResourceItem } from '@/domains/Resource';
 import { TAG_META_SCHEMA, type TagMetaInfo, type TagTreeNode } from '@/domains/Tag';
-import { isPlainRecord } from '@/utils/typeGuards';
+import { isPlainRecord } from '@/utils/type/typeGuards';
 
 const COURSE_META_SCHEMA = 'wisepen.course.v1';
 const COURSE_META_KEYS = new Set([

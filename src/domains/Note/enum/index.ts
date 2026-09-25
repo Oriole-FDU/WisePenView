@@ -1,5 +1,5 @@
-import type { EnumValue } from '@/utils/enum';
-import { createEnum } from '@/utils/enum';
+import type { EnumValue } from '@/utils/type/enum';
+import { createEnum } from '@/utils/type/enum';
 
 export const AI_DIFF_DISPLAY_MODE = createEnum([
   { value: 'oldOnly', key: 'OLD_ONLY', label: '仅旧文本' },

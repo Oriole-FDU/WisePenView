@@ -7,7 +7,7 @@ import {
   type CodeHighlightToken,
   normalizeCodeLanguage,
   tokenizeCodeLines,
-} from '@/utils/codeHighlight';
+} from '@/utils/code/codeHighlight';
 
 import type { CodeBlockFrameProps, CodeBlockProps, HighlightedCodeProps } from './index.type';
 import styles from './style.module.less';

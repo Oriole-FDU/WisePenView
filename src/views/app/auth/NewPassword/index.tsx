@@ -11,8 +11,12 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useAuthService } from '@/domains';
 import type { NewPasswordRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
-import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+import {
+  type FieldErrors,
+  hasFieldErrors,
+  runFieldValidation,
+} from '@/utils/validation/formValidation';
 
 import auth from '../_common/style.module.less';
 

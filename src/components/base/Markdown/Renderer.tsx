@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Checkbox } from '@/components/base/Input';
-import { MATH_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/sanitizeHtml';
+import { MATH_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/html/sanitizeHtml';
 
 import CodeBlock from './CodeBlock';
 import MermaidBlock from './MermaidBlock';

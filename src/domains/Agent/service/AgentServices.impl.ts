@@ -1,7 +1,7 @@
 import { AgentApi, putOssPresignedUrl } from '@domain-apis';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { computeFileMd5 } from '@/utils/oss/computeFileMd5';
+import { computeFileMd5 } from '@/utils/file/computeFileMd5';
 
 import { AgentServicesMap } from '../mapper/AgentServices.map';
 import type { IAgentService } from './index.type';

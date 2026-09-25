@@ -1,5 +1,5 @@
-import { normalizeCodeLanguage, tokenizeCodeLines } from '@/utils/codeHighlight';
-import { isRecord } from '@/utils/typeGuards';
+import { normalizeCodeLanguage, tokenizeCodeLines } from '@/utils/code/codeHighlight';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import { renderHighlightedLine } from './highlight';
 import { getCodeBlockLanguageLabel } from './language';

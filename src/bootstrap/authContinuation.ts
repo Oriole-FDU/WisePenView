@@ -1,6 +1,6 @@
 import { STORAGE_KEYS, STORAGE_PREFIXES } from '@/constants/storageKeys';
 import { APP_ROUTE_PATH, isAuthRoutePath } from '@/utils/navigation/appRoute';
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 const AUTH_CONTINUATION_TTL_MS = 30 * 60_000;
 

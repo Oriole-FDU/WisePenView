@@ -7,7 +7,7 @@ import type {
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import type { NotePluginRegistry } from '../../registry/types';
 import { resolveNoteAiDiffBlock } from '../aiDiff/contentState';

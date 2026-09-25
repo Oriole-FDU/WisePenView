@@ -9,8 +9,12 @@ import { FormField, PasswordInput } from '@/components/base/Input';
 import { useAuthService } from '@/domains';
 import type { LoginRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
-import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+import {
+  type FieldErrors,
+  hasFieldErrors,
+  runFieldValidation,
+} from '@/utils/validation/formValidation';
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
 
 import AuthIconField from '../_common/AuthIconField';
