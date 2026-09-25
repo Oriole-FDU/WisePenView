@@ -19,7 +19,10 @@ import {
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/views/resource/ResourceHostContext';
+import {
+  DEFAULT_RESOURCE_HOST_ID,
+  useResourceHostId,
+} from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 
 import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';

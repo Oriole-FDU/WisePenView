@@ -42,7 +42,7 @@ import {
   DEFAULT_RESOURCE_HOST_ID,
   ResourceHostContext,
   type ResourceHostContextValue,
-} from '@/views/resource/ResourceHostContext';
+} from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 
 import styles from './style.module.less';
 

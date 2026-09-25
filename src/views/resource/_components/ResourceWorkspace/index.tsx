@@ -5,7 +5,7 @@ import type { ResourceItem } from '@/domains/Resource';
 import type { ResourceHeaderConfig } from '@/layouts/Resource/ResourceHeader/index.type';
 import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 
-import { useResourceHostContext } from '../../ResourceHostContext';
+import { useResourceHostContext } from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 import ResourceSidePanel from '../ResourceSidePanel';
 import ResourceSidePanelActions from '../ResourceSidePanel/Actions';
 import styles from './style.module.less';

@@ -6,7 +6,7 @@ import { type RefObject, useState } from 'react';
 import type { NoteBodyEditorHandle } from '@/components/business/Note/CustomBlockNote/index.type';
 import type { NoteSelectionSnapshot, NoteSessionStatus } from '@/domains/Note';
 import { parseErrorMessage } from '@/utils/error';
-import { useResourceHostChatContextActions } from '@/views/resource/ResourceHostContext';
+import { useResourceHostChatContextActions } from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 
 import {
   createNoteChatStateProvider,

@@ -6,7 +6,7 @@ import {
   type OpenResourceFn,
   ResourceHostContext,
   type ResourceHostContextValue,
-} from '@/views/resource/ResourceHostContext';
+} from '@/layouts/Resource/ResourceHost/ResourceHostContext';
 import ResourceRenderer from '@/views/resource/ResourceRenderer';
 
 interface CourseResourceHostProps {
