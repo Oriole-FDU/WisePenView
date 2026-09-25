@@ -4,8 +4,8 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import type { NoteFindResult } from '@/components/business/Note/CustomBlockNote/index.type';
 
+import type { NoteFindResult } from '../../index.type';
 import styles from './style.module.less';
 
 interface FindBarProps {
