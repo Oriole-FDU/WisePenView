@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, Outlet, useMatch, useNavigate } from 'react-router-dom';
 
 import { AppButton, AppIconButton } from '@/components/base/Button';
+import PageHeader from '@/components/base/PageHeader';
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import InviteUserModal from '@/components/business/Group/MemberList/Modals/InviteUserModal';
-import PageHeader from '@/components/business/PageHeader';
 import { GROUP_TYPE } from '@/domains/Group';
 import {
   APP_ROUTE_PATH,

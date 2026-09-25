@@ -9,7 +9,7 @@ import {
 } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
-import PageHeader from '@/components/business/PageHeader';
+import PageHeader from '@/components/base/PageHeader';
 import { changeAppLanguage } from '@/i18n';
 import { LANGUAGE_OPTIONS } from '@/i18n/language';
 import type { SupportedLanguage } from '@/i18n/resources';

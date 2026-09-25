@@ -7,7 +7,7 @@ import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-route
 import { AppButton } from '@/components/base/Button';
 import { Empty, Spin } from '@/components/base/Feedback';
 import Select from '@/components/base/Input/Select';
-import PageHeader from '@/components/business/PageHeader';
+import PageHeader from '@/components/base/PageHeader';
 import { useGroupService } from '@/domains';
 import { GROUP_ROLE_FILTER_MAP, GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';

@@ -5,7 +5,7 @@
 import { Card } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
-import PageHeader from '@/components/business/PageHeader';
+import PageHeader from '@/components/base/PageHeader';
 import { WALLET_TARGET_TYPE } from '@/domains/Wallet';
 import ComputeWallet from '@/views/app/_common/Wallet/ComputeWallet';
 

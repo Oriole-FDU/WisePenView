@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Spin } from '@/components/base/Feedback';
-import PageHeader from '@/components/business/PageHeader';
+import PageHeader from '@/components/base/PageHeader';
 import { useUserService } from '@/domains';
 import type { UserAccountProfile } from '@/domains/User';
 import { IDENTITY } from '@/domains/User';
