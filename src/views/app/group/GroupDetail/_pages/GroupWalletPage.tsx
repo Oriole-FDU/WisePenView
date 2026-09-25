@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 
+import ComputeWallet from '@/components/business/Wallet/ComputeWallet';
 import { WALLET_TARGET_TYPE } from '@/domains/Wallet';
-import ComputeWallet from '@/views/app/_common/Wallet/ComputeWallet';
 import { useGroupContext } from '@/views/app/group/GroupRoute/GroupContext';
 
 import layout from '../../style.module.less';
