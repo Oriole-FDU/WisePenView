@@ -5,7 +5,7 @@
 
 import type { ROLE } from '@/domains/Group';
 import { GROUP_TYPE } from '@/domains/Group';
-import type { EnumKey } from '@/utils/enum';
+import type { EnumKey } from '@/utils/type/enum';
 
 export type GroupRole = EnumKey<typeof ROLE>;
 export type EditableRole = Exclude<EnumKey<typeof ROLE>, 'OWNER'>;

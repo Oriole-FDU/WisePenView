@@ -9,7 +9,7 @@ import SelectedMemberList from '@/components/business/SelectedMemberList';
 import { useGroupService } from '@/domains';
 import { ROLE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import type { EnumKey } from '@/utils/enum';
+import type { EnumKey } from '@/utils/type/enum';
 
 import type { EditPermissionModalProps } from './index.type';
 import styles from './style.module.less';

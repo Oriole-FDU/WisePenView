@@ -1,6 +1,6 @@
 import type { TagResourceAction } from '@/domains/Tag';
 import { TAG_PERMISSION_PRESET_VALUES } from '@/domains/Tag';
-import { createEnum } from '@/utils/enum';
+import { createEnum } from '@/utils/type/enum';
 
 /** 小组类型 */
 export const GROUP_TYPE = createEnum([

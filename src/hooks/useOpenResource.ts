@@ -4,14 +4,14 @@ import { parsePath, useLocation, useNavigate } from 'react-router-dom';
 
 import { usePdfPreviewProgressStore } from '@/components/business/PdfViewer/_store/usePdfPreviewProgressStore';
 import type { DriveResourceLocation } from '@/domains/Drive';
-import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
-import { buildResourcePath } from '@/utils/navigation/resourceRoute';
 import {
   resolveResourceKind,
   resolveResourceViewer,
   RESOURCE_VIEWER,
   type ResourceViewer,
-} from '@/utils/navigation/resourceTarget';
+} from '@/domains/Resource/model/resourceTarget';
+import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
+import { buildResourcePath } from '@/utils/navigation/resourceRoute';
 
 export interface OpenResourceNavigationTarget {
   resourceId: string;

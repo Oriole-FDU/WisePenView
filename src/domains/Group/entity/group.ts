@@ -1,6 +1,6 @@
 import type { GROUP_FILE_ORG_LOGIC, ROLE } from '@/domains/Group';
 import type { TagResourceAction } from '@/domains/Tag';
-import type { EnumKey, EnumValue } from '@/utils/enum';
+import type { EnumKey, EnumValue } from '@/utils/type/enum';
 
 /** 成员列表领域模型（由 OpenAPI GroupMemberDetailResponse 映射）；userId 对应接口 memberId，避免大数精度丢失 */
 export interface GroupMember {

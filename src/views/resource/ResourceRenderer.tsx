@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { useDocumentService } from '@/domains';
-import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import {
   isResourceViewerCompatible,
   normalizeResourceKind,
@@ -15,7 +13,9 @@ import {
   RESOURCE_VIEWER,
   type ResourceTarget,
   type ResourceViewer,
-} from '@/utils/navigation/resourceTarget';
+} from '@/domains/Resource/model/resourceTarget';
+import { useApi } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
 
 import ResourceWorkspace from './_components/ResourceWorkspace';
 import styles from './ResourceRenderer.module.less';

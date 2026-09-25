@@ -7,8 +7,8 @@ import {
 } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import type { ChatFrontendState } from '@/domains/Chat';
 import type { NoteSelectionSnapshot, NoteSessionStatus, SelectedNoteScope } from '@/domains/Note';
+import { RESOURCE_KIND, RESOURCE_VIEWER } from '@/domains/Resource/model/resourceTarget';
 import i18n from '@/i18n';
-import { RESOURCE_KIND, RESOURCE_VIEWER } from '@/utils/navigation/resourceTarget';
 
 const NOTE_EDITOR_SKILL_ID = 'builtin:current-note-editor';
 

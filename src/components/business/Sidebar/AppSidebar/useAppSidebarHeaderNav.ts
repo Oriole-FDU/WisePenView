@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrentRouteHandle } from '@/bootstrap/router';
 import type { HeaderNavItem } from '@/components/business/Sidebar/_common/header/HeaderNav/index.type';
 import { useNoteService } from '@/domains';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { useAppAuth } from '@/layouts/App/AppAuthContext';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import { APP_SIDEBAR_HEADER_ITEMS, type AppSidebarNavigateItem } from './appSidebarNavigation';
 

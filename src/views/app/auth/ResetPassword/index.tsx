@@ -8,8 +8,12 @@ import { FormField } from '@/components/base/Input';
 import { useAuthService } from '@/domains';
 import type { ResetPasswordRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
-import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+import {
+  type FieldErrors,
+  hasFieldErrors,
+  runFieldValidation,
+} from '@/utils/validation/formValidation';
 
 import AuthIconField from '../_common/AuthIconField';
 import auth from '../_common/style.module.less';

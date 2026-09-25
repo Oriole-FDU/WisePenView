@@ -1,5 +1,5 @@
-import { normalizeCodeLanguage } from '@/utils/codeHighlight';
-import { isRecord } from '@/utils/typeGuards';
+import { normalizeCodeLanguage } from '@/utils/code/codeHighlight';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import type { NoteMarkdownBlockImport } from '../../registry/types';
 

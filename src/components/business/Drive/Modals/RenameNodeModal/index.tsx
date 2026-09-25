@@ -6,8 +6,8 @@ import { FormField, Input } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useDriveService } from '@/domains';
+import { validateReservedName } from '@/domains/Drive/validation/validateReservedName';
 import { useApi } from '@/hooks/useApi';
-import { validateReservedName } from '@/utils/tag/validateReservedName';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { RenameNodeModalProps } from './index.type';

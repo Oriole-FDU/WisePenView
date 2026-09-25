@@ -9,8 +9,8 @@ import {
   type ResourceChatContext,
   type ResourceChatStateProvider,
 } from '@/components/business/ChatPanel/ResourceChatProtocol';
+import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import type { ResourceTarget } from '@/utils/navigation/resourceTarget';
 
 interface ResourceChatBindingValue {
   resourceId: string;

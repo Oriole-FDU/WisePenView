@@ -1,8 +1,8 @@
 import { useMemoizedFn } from 'ahooks';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { RESOURCE_KIND, type ResourceViewer } from '@/domains/Resource/model/resourceTarget';
 import { buildResourcePathWithSearch } from '@/utils/navigation/resourceRoute';
-import { RESOURCE_KIND, type ResourceViewer } from '@/utils/navigation/resourceTarget';
 
 export function useDocumentViewerSwitcher(resourceId?: string) {
   const location = useLocation();

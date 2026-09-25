@@ -7,7 +7,7 @@ import {
   RESOURCE_KIND,
   RESOURCE_VIEWER,
   type ResourceViewer,
-} from '@/utils/navigation/resourceTarget';
+} from '@/domains/Resource/model/resourceTarget';
 
 import {
   type DriveActionTarget,

@@ -9,8 +9,8 @@ import {
   type TagResourceAction,
   type TagVisibilityModeString,
 } from '@/domains/Tag';
+import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
 
 import type {
   AddTagApiRequest,

@@ -28,12 +28,12 @@ import {
   resourceActionsInclude,
   type ResourceItem,
 } from '@/domains/Resource';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
 import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import ResourceTargetModal from './ResourceTargetModal';
 

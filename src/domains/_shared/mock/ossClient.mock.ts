@@ -1,5 +1,5 @@
+import type { OssPresignedPutParams } from '@/domains/_shared/apis/ossPresignedPut';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import type { OssPresignedPutParams } from '@/utils/oss/ossPresignedPut';
 
 import type { OssReadClient } from '../apis/ossClient';
 

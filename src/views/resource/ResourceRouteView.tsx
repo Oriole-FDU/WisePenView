@@ -1,12 +1,12 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { buildResourcePathWithSearch } from '@/utils/navigation/resourceRoute';
 import {
   normalizeResourceKind,
   normalizeResourceViewer,
   type ResourceTarget,
-} from '@/utils/navigation/resourceTarget';
+} from '@/domains/Resource/model/resourceTarget';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+import { buildResourcePathWithSearch } from '@/utils/navigation/resourceRoute';
 
 import ResourceRenderer from './ResourceRenderer';
 

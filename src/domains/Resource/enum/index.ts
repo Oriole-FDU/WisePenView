@@ -1,5 +1,5 @@
-import type { EnumKey, EnumValue } from '@/utils/enum';
-import { createEnum } from '@/utils/enum';
+import type { EnumKey, EnumValue } from '@/utils/type/enum';
+import { createEnum } from '@/utils/type/enum';
 
 /** 排序字段枚举 */
 export const RESOURCE_SORT_BY = createEnum([

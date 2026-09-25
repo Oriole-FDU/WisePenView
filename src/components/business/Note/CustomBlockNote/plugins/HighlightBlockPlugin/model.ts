@@ -1,6 +1,6 @@
 import type { BlockConfig } from '@blocknote/core';
 
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 export const HIGHLIGHT_COLOR_KEYS = [
   'default',

@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '@/constants/storageKeys';
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 export type AuthSessionEventType = 'login' | 'logout' | 'unauthorized';
 

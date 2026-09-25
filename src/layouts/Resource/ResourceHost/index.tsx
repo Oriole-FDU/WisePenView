@@ -22,6 +22,10 @@ import {
   clampChatPanelWidth,
   RESOURCE_MAIN_MIN_WIDTH,
 } from '@/constants/layoutScale';
+import {
+  normalizeResourceKind,
+  resolveResourceViewer,
+} from '@/domains/Resource/model/resourceTarget';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
@@ -30,7 +34,6 @@ import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResou
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
-import { normalizeResourceKind, resolveResourceViewer } from '@/utils/navigation/resourceTarget';
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,

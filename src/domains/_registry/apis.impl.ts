@@ -1,5 +1,6 @@
 /** 构建期选择 API 实现；service 与 mapper 始终共用。 */
 export { createOssClient } from '@/domains/_shared/apis/ossClient';
+export { putOssPresignedUrl } from '@/domains/_shared/apis/ossPresignedPut';
 export { AdminMessageApi } from '@/domains/Admin/apis/AdminMessageApi';
 export { AdminUserApi } from '@/domains/Admin/apis/AdminUserApi';
 export { AgentApi } from '@/domains/Agent/apis/AgentApi';
@@ -22,4 +23,3 @@ export { TagApi } from '@/domains/Tag/apis/TagApi';
 export { UserApi } from '@/domains/User/apis/UserApi';
 export { UserTaskApi } from '@/domains/User/apis/UserTaskApi';
 export { WalletApi } from '@/domains/Wallet/apis/WalletApi';
-export { putOssPresignedUrl } from '@/utils/oss/ossPresignedPut';

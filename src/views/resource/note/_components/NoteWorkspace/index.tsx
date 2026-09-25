@@ -18,10 +18,10 @@ import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import { useInteractService } from '@/domains';
 import type { NoteInfoDisplayData } from '@/domains/Note';
 import { encodeNoteClientContentSignature } from '@/domains/Note';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 import { isDesktop } from '@/utils/platform';
 
 import ResourceWorkspace, {

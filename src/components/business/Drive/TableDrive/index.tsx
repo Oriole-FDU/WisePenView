@@ -13,7 +13,7 @@ import AppBreadcrumb from '@/components/base/AppBreadcrumb';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FolderTable } from '@/components/base/Table';
-import type { ResourceViewer } from '@/utils/navigation/resourceTarget';
+import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
 import { resolveCurrentFolderTagId, resolveDriveScope } from '../common/driveComponentModel';

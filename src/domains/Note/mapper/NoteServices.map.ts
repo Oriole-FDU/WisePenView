@@ -12,7 +12,7 @@ import {
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import type {
   CreateNoteRequest,

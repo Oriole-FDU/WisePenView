@@ -1,8 +1,8 @@
 import { DocumentApi, putOssPresignedUrl } from '@domain-apis';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { computeFileMd5 } from '@/utils/oss/computeFileMd5';
-import { parseExtension } from '@/utils/parser/extensionParser';
+import { computeFileMd5 } from '@/utils/file/computeFileMd5';
+import { parseExtension } from '@/utils/file/parseExtension';
 
 import type { UploadDocApiRequest, UploadDocApiResponse } from '../apis/DocumentApi.type';
 import { DocumentServicesMap } from '../mapper/DocumentServices.map';
