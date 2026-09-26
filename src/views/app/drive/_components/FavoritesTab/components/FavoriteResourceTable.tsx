@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { FolderTable, type FolderTableColumn, type FolderTableRow } from '@/components/base/Table';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
 import type { FavoriteItem } from '@/domains/Interact';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
@@ -60,9 +61,7 @@ function toFavoriteResourceTableRow(
   return {
     id: item.resourceId,
     name: resource?.resourceName ?? t('favorite.resource.deleted'),
-    entryType: 'resource',
-    resourceType: resource?.resourceType,
-    resourceIconType: resource?.resourceIconType,
+    entryType: 'file',
     typeLabel: resource?.resourceType ?? t('favorite.resource.unknownType'),
     item,
   };
@@ -93,6 +92,13 @@ function FavoriteResourceTable({
         ariaLabel={t('favorite.resource.tableAria')}
         items={rows}
         onRowActivate={(row) => controller.onOpenResource(row.item)}
+        renderEntryIcon={(row) => (
+          <EntryIcon
+            entryType="resource"
+            resourceType={row.item.resourceInfo?.resourceType}
+            resourceIconType={row.item.resourceInfo?.resourceIconType}
+          />
+        )}
         columns={buildFavoriteResourceColumns(t)}
         renderNameContent={(content, row) =>
           row.item.resourceInfo ? (

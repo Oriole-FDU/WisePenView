@@ -1,5 +1,5 @@
 import { ProgressBar } from '@heroui/react';
-import { UploadCloud, X } from 'lucide-react';
+import { File, UploadCloud, X } from 'lucide-react';
 import { type ChangeEvent, type DragEvent, type KeyboardEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,6 @@ import {
   AttachmentTitle,
 } from '@/components/_shadcn';
 import { AppButton } from '@/components/base/Button';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
 import type { UploadZoneProps } from './index.type';
@@ -152,7 +151,7 @@ function UploadZone({
                 key={getFileKey(selectedFile)}
               >
                 <AttachmentMedia>
-                  <EntryIcon entryType="resource" size={18} />
+                  <File size={18} aria-hidden="true" />
                 </AttachmentMedia>
                 <AttachmentContent className={styles.fileInfo}>
                   <div className={styles.fileTextRow}>

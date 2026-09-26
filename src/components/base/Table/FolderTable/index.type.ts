@@ -1,24 +1,16 @@
 import type { SortDescriptor } from '@heroui/react';
 import type { DragEvent, ReactElement, ReactNode } from 'react';
 
-import type { ResourceIconType } from '@/domains/Resource';
-
 import type { FolderColumnWidth } from '../shared/TableBase/columnWidth';
 import type { TableColumnBase, TableLoadMore } from '../shared/TableBase/index.type';
 import type { TableRowAction } from '../shared/TableRowActions/index.type';
 
-export type FolderTableEntryType = 'root' | 'folder' | 'link' | 'resource' | 'loading';
+export type FolderTableEntryType = 'root' | 'folder' | 'file' | 'link' | 'loading';
 
 export interface FolderTableRow {
   id: string;
   name: string;
   entryType: FolderTableEntryType;
-  /** 文件夹图标细分展示；由业务层按需要注入 */
-  folderVariant?: 'default' | 'shared';
-  /** resource 类型时使用 EntryIcon */
-  resourceType?: string;
-  /** resource 类型时使用 EntryIcon 的细分图标 */
-  resourceIconType?: ResourceIconType;
   /** 展示用，如「—」「45 KB」 */
   sizeLabel?: string;
   typeLabel: string;

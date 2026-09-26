@@ -40,11 +40,6 @@ export function toDriveTableRow(node: DriveRow, t: TFunction<'drive'>): DriveTab
       break;
   }
 
-  const resourceType = node.type === 'resource' ? node.resourceType : undefined;
-  const resourceIconType =
-    node.type === 'resource' || node.type === 'link' ? node.resourceIconType : undefined;
-  const folderVariant =
-    node.type === 'folder' && node.systemType === 'shared' ? 'shared' : undefined;
   const sizeLabel =
     (node.type === 'resource' || node.type === 'link') && node.size != null
       ? formatFileSize(node.size)
@@ -55,10 +50,7 @@ export function toDriveTableRow(node: DriveRow, t: TFunction<'drive'>): DriveTab
   return {
     id: node.id,
     name,
-    entryType: node.type,
-    resourceType,
-    resourceIconType,
-    folderVariant,
+    entryType: node.type === 'resource' ? 'file' : node.type,
     sizeLabel,
     typeLabel,
     isExpandable,

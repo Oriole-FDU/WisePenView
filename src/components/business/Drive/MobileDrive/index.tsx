@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppBreadcrumb from '@/components/base/AppBreadcrumb';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
 import { FolderTable } from '@/components/base/Table';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
 import { resolveDriveScope } from '../common/driveComponentModel';
@@ -62,10 +62,16 @@ function MobileDrive({
     <span className={styles.mobileNameContent}>
       <span className={styles.mobileEntryIcon}>
         <EntryIcon
-          entryType={row.entryType}
-          folderVariant={row.folderVariant}
-          resourceType={row.resourceType}
-          resourceIconType={row.resourceIconType}
+          entryType={row.node.type === 'resource' ? 'resource' : row.node.type}
+          folderVariant={
+            row.node.type === 'folder' && row.node.systemType === 'shared' ? 'shared' : undefined
+          }
+          resourceType={row.node.type === 'resource' ? row.node.resourceType : undefined}
+          resourceIconType={
+            row.node.type === 'resource' || row.node.type === 'link'
+              ? row.node.resourceIconType
+              : undefined
+          }
           size={22}
         />
       </span>
@@ -96,6 +102,20 @@ function MobileDrive({
         expandedRowKeys={navigation.expandedRowKeys}
         onExpandedChange={navigation.handleExpandedChange}
         onRowActivate={handleActivateNode}
+        renderEntryIcon={(row) => (
+          <EntryIcon
+            entryType={row.node.type === 'resource' ? 'resource' : row.node.type}
+            resourceType={row.node.type === 'resource' ? row.node.resourceType : undefined}
+            resourceIconType={
+              row.node.type === 'resource' || row.node.type === 'link'
+                ? row.node.resourceIconType
+                : undefined
+            }
+            folderVariant={
+              row.node.type === 'folder' && row.node.systemType === 'shared' ? 'shared' : undefined
+            }
+          />
+        )}
         renderNameContent={renderNameContent}
         loadMore={{
           loading: navigation.loadingMore,

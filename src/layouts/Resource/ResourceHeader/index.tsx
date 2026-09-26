@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import ResourcePermissionModal from '@/components/business/Resource/ResourcePermissionModal';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
