@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { type KeyboardEvent, useState } from 'react';
+import { type KeyboardEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { RatingProps } from './index.type';
@@ -17,6 +17,7 @@ function Rating({
   const { t } = useTranslation('common');
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const [pressedValue, setPressedValue] = useState<number | null>(null);
+  const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const values = Array.from({ length: Math.max(maxValue, 0) }, (_, index) => index + 1);
   const displayValue = hoverValue ?? value;
 
@@ -43,6 +44,7 @@ function Rating({
     if (nextValue == null) return;
     event.preventDefault();
     updateValue(nextValue);
+    requestAnimationFrame(() => buttonRefs.current[nextValue - 1]?.focus());
   };
 
   return (
@@ -61,6 +63,9 @@ function Rating({
         return (
           <button
             key={itemValue}
+            ref={(element) => {
+              buttonRefs.current[itemValue - 1] = element;
+            }}
             type="button"
             className={clsx(
               styles.item,

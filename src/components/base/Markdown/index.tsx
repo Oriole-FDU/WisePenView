@@ -11,6 +11,7 @@ interface MarkdownContentProps {
   streaming?: boolean;
   linkMode?: 'external' | 'safe';
   resourceResolver?: MarkdownResourceResolver;
+  onAnchorNavigate?: (hash: string) => void;
 }
 
 function Markdown({
@@ -18,6 +19,7 @@ function Markdown({
   streaming = false,
   linkMode = 'safe',
   resourceResolver,
+  onAnchorNavigate,
 }: MarkdownContentProps) {
   const [runtime] = useState(() => createMarkdownRuntime(content, streaming));
   const snapshot = useSyncExternalStore(
@@ -45,6 +47,7 @@ function Markdown({
         streaming={streaming}
         linkMode={linkMode}
         resourceResolver={resourceResolver}
+        onAnchorNavigate={onAnchorNavigate}
       />
     </div>
   );

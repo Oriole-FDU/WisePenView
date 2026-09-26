@@ -5,7 +5,6 @@ import katex from 'katex';
 import { CornerUpLeft } from 'lucide-react';
 import { Fragment, memo, type MouseEvent, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Checkbox } from '@/components/base/Input';
 import { MATH_HTML_SANITIZE_CONFIG, sanitizeHtml } from '@/utils/html/sanitizeHtml';
@@ -31,6 +30,7 @@ interface MarkdownBlockProps {
   streaming: boolean;
   linkMode: MarkdownLinkMode;
   isLastBlock: boolean;
+  onAnchorNavigate?: (hash: string) => void;
 }
 
 export type MarkdownLinkMode = 'external' | 'safe';
@@ -44,6 +44,7 @@ interface MarkdownRendererProps {
   streaming: boolean;
   linkMode: MarkdownLinkMode;
   resourceResolver?: MarkdownResourceResolver;
+  onAnchorNavigate?: (hash: string) => void;
 }
 
 type RuntimeMathNode = { type: 'inlineMath' | 'math'; value: string };
@@ -270,6 +271,7 @@ interface FootnoteNavigationLinkProps {
   ariaLabel?: string;
   className?: string;
   children: ReactNode;
+  onAnchorNavigate?: (hash: string) => void;
 }
 
 function FootnoteNavigationLink({
@@ -278,10 +280,8 @@ function FootnoteNavigationLink({
   ariaLabel,
   className,
   children,
+  onAnchorNavigate,
 }: FootnoteNavigationLinkProps) {
-  const location = useLocation();
-  const navigate = useNavigate();
-
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     const target = document.getElementById(href.slice(1));
     if (!target) return;
@@ -293,10 +293,7 @@ function FootnoteNavigationLink({
       block: 'center',
       inline: 'nearest',
     });
-    void navigate(
-      { pathname: location.pathname, search: location.search, hash: href },
-      { preventScrollReset: true }
-    );
+    onAnchorNavigate?.(href);
   };
 
   return (
@@ -317,10 +314,11 @@ function renderInlineNodes(
   nodes: readonly RootContent[],
   renderContext: MarkdownRenderContext,
   keyPrefix: string,
-  linkMode: MarkdownLinkMode
+  linkMode: MarkdownLinkMode,
+  onAnchorNavigate?: (hash: string) => void
 ): ReactNode[] {
   return nodes.map((node, index) =>
-    renderInlineNode(node, renderContext, `${keyPrefix}-${index}`, linkMode)
+    renderInlineNode(node, renderContext, `${keyPrefix}-${index}`, linkMode, onAnchorNavigate)
   );
 }
 
@@ -328,7 +326,8 @@ function renderInlineNode(
   node: RootContent,
   renderContext: MarkdownRenderContext,
   key: string,
-  linkMode: MarkdownLinkMode
+  linkMode: MarkdownLinkMode,
+  onAnchorNavigate?: (hash: string) => void
 ): ReactNode {
   const inlineMathExpression = readMathExpression(node, 'inlineMath');
   if (inlineMathExpression != null) {
@@ -340,10 +339,16 @@ function renderInlineNode(
       return <Fragment key={key}>{renderTextWithInlineStyles(node.value, key)}</Fragment>;
     case 'strong':
       return (
-        <strong key={key}>{renderInlineNodes(node.children, renderContext, key, linkMode)}</strong>
+        <strong key={key}>
+          {renderInlineNodes(node.children, renderContext, key, linkMode, onAnchorNavigate)}
+        </strong>
       );
     case 'emphasis':
-      return <em key={key}>{renderInlineNodes(node.children, renderContext, key, linkMode)}</em>;
+      return (
+        <em key={key}>
+          {renderInlineNodes(node.children, renderContext, key, linkMode, onAnchorNavigate)}
+        </em>
+      );
     case 'delete': {
       const subscript = readNumericSubscript(node);
       if (subscript != null) {
@@ -353,14 +358,24 @@ function renderInlineNode(
           </sub>
         );
       }
-      return <del key={key}>{renderInlineNodes(node.children, renderContext, key, linkMode)}</del>;
+      return (
+        <del key={key}>
+          {renderInlineNodes(node.children, renderContext, key, linkMode, onAnchorNavigate)}
+        </del>
+      );
     }
     case 'inlineCode':
       return <code key={key}>{node.value}</code>;
     case 'break':
       return <br key={key} />;
     case 'link': {
-      const children = renderInlineNodes(node.children, renderContext, key, linkMode);
+      const children = renderInlineNodes(
+        node.children,
+        renderContext,
+        key,
+        linkMode,
+        onAnchorNavigate
+      );
       if (node.url === MARKDOWN_UNDERLINE_URL) {
         return (
           <span key={key} className={styles.inlineUnderline}>
@@ -376,7 +391,13 @@ function renderInlineNode(
     }
     case 'linkReference': {
       const definition = resolveDefinition(node.identifier, renderContext.definitions);
-      const children = renderInlineNodes(node.children, renderContext, key, linkMode);
+      const children = renderInlineNodes(
+        node.children,
+        renderContext,
+        key,
+        linkMode,
+        onAnchorNavigate
+      );
       if (!definition) return <Fragment key={key}>{children}</Fragment>;
       return (
         <MarkdownLink
@@ -417,7 +438,11 @@ function renderInlineNode(
       const fragmentId = encodeURIComponent(node.identifier);
       return (
         <sup key={key} className={styles.footnoteReference}>
-          <FootnoteNavigationLink id={`fnref-${fragmentId}`} href={`#fn-${fragmentId}`}>
+          <FootnoteNavigationLink
+            id={`fnref-${fragmentId}`}
+            href={`#fn-${fragmentId}`}
+            onAnchorNavigate={onAnchorNavigate}
+          >
             {node.identifier}
           </FootnoteNavigationLink>
         </sup>
@@ -430,7 +455,7 @@ function renderInlineNode(
       if ('children' in node && Array.isArray(node.children)) {
         return (
           <Fragment key={key}>
-            {renderInlineNodes(node.children, renderContext, key, linkMode)}
+            {renderInlineNodes(node.children, renderContext, key, linkMode, onAnchorNavigate)}
           </Fragment>
         );
       }
@@ -445,9 +470,10 @@ function renderHeading(
   node: Extract<RootContent, { type: 'heading' }>,
   renderContext: MarkdownRenderContext,
   key: string,
-  linkMode: MarkdownLinkMode
+  linkMode: MarkdownLinkMode,
+  onAnchorNavigate?: (hash: string) => void
 ): ReactNode {
-  const children = renderInlineNodes(node.children, renderContext, key, linkMode);
+  const children = renderInlineNodes(node.children, renderContext, key, linkMode, onAnchorNavigate);
   switch (node.depth) {
     case 1:
       return <h1 key={key}>{children}</h1>;
@@ -469,7 +495,8 @@ function renderList(
   renderContext: MarkdownRenderContext,
   keyPrefix: string,
   streaming: boolean,
-  linkMode: MarkdownLinkMode
+  linkMode: MarkdownLinkMode,
+  onAnchorNavigate?: (hash: string) => void
 ): ReactNode {
   const items = node.children.map((item, index) => {
     const isTaskItem = typeof item.checked === 'boolean';
@@ -484,7 +511,8 @@ function renderList(
             renderContext,
             `${keyPrefix}-${index}-${childIndex}`,
             streaming,
-            linkMode
+            linkMode,
+            onAnchorNavigate
           )
         )}
       </li>
@@ -504,7 +532,8 @@ function renderTable(
   node: Extract<RootContent, { type: 'table' }>,
   renderContext: MarkdownRenderContext,
   keyPrefix: string,
-  linkMode: MarkdownLinkMode
+  linkMode: MarkdownLinkMode,
+  onAnchorNavigate?: (hash: string) => void
 ): ReactNode {
   const [head, ...body] = node.children;
   const getAlignClass = (index: number): string | undefined => {
@@ -527,7 +556,8 @@ function renderTable(
                     cell.children,
                     renderContext,
                     `${keyPrefix}-head-${index}`,
-                    linkMode
+                    linkMode,
+                    onAnchorNavigate
                   )}
                 </th>
               ))}
@@ -546,7 +576,8 @@ function renderTable(
                     cell.children,
                     renderContext,
                     `${keyPrefix}-row-${rowIndex}-${cellIndex}`,
-                    linkMode
+                    linkMode,
+                    onAnchorNavigate
                   )}
                 </td>
               ))}
@@ -563,7 +594,8 @@ function renderBlockNode(
   renderContext: MarkdownRenderContext,
   key: string,
   streaming: boolean,
-  linkMode: MarkdownLinkMode
+  linkMode: MarkdownLinkMode,
+  onAnchorNavigate?: (hash: string) => void
 ): ReactNode {
   const mathExpression = readMathExpression(node, 'math');
   if (mathExpression != null) {
@@ -572,21 +604,32 @@ function renderBlockNode(
 
   switch (node.type) {
     case 'paragraph':
-      return <p key={key}>{renderInlineNodes(node.children, renderContext, key, linkMode)}</p>;
+      return (
+        <p key={key}>
+          {renderInlineNodes(node.children, renderContext, key, linkMode, onAnchorNavigate)}
+        </p>
+      );
     case 'heading':
-      return renderHeading(node, renderContext, key, linkMode);
+      return renderHeading(node, renderContext, key, linkMode, onAnchorNavigate);
     case 'blockquote':
       return (
         <blockquote key={key}>
           {node.children.map((child, index) =>
-            renderBlockNode(child, renderContext, `${key}-${index}`, streaming, linkMode)
+            renderBlockNode(
+              child,
+              renderContext,
+              `${key}-${index}`,
+              streaming,
+              linkMode,
+              onAnchorNavigate
+            )
           )}
         </blockquote>
       );
     case 'list':
-      return renderList(node, renderContext, key, streaming, linkMode);
+      return renderList(node, renderContext, key, streaming, linkMode, onAnchorNavigate);
     case 'table':
-      return renderTable(node, renderContext, key, linkMode);
+      return renderTable(node, renderContext, key, linkMode, onAnchorNavigate);
     case 'thematicBreak':
       return <hr key={key} />;
     case 'code':
@@ -607,7 +650,7 @@ function renderBlockNode(
     case 'footnoteDefinition':
       return null;
     default:
-      return renderInlineNode(node, renderContext, key, linkMode);
+      return renderInlineNode(node, renderContext, key, linkMode, onAnchorNavigate);
   }
 }
 
@@ -617,6 +660,7 @@ function MarkdownBlockView({
   streaming,
   linkMode,
   isLastBlock,
+  onAnchorNavigate,
 }: MarkdownBlockProps) {
   return (
     <div
@@ -624,7 +668,14 @@ function MarkdownBlockView({
       data-markdown-last-block={isLastBlock ? 'true' : undefined}
       data-markdown-start-offset={block.startOffset}
     >
-      {renderBlockNode(block.node, renderContext, `block-${block.id}`, streaming, linkMode)}
+      {renderBlockNode(
+        block.node,
+        renderContext,
+        `block-${block.id}`,
+        streaming,
+        linkMode,
+        onAnchorNavigate
+      )}
     </div>
   );
 }
@@ -636,15 +687,18 @@ const MarkdownBlock = memo(
     previous.renderContext === next.renderContext &&
     previous.streaming === next.streaming &&
     previous.linkMode === next.linkMode &&
+    previous.onAnchorNavigate === next.onAnchorNavigate &&
     previous.isLastBlock === next.isLastBlock
 );
 
 function MarkdownFootnotes({
   renderContext,
   linkMode,
+  onAnchorNavigate,
 }: {
   renderContext: MarkdownRenderContext;
   linkMode: MarkdownLinkMode;
+  onAnchorNavigate?: (hash: string) => void;
 }) {
   const { t } = useTranslation('common');
 
@@ -666,13 +720,15 @@ function MarkdownFootnotes({
                   renderContext,
                   `footnote-${fragmentId}-${index}`,
                   false,
-                  linkMode
+                  linkMode,
+                  onAnchorNavigate
                 )
               )}
               <FootnoteNavigationLink
                 href={`#fnref-${fragmentId}`}
                 ariaLabel={t('markdown.footnoteBack')}
                 className={styles.footnoteBackLink}
+                onAnchorNavigate={onAnchorNavigate}
               >
                 <CornerUpLeft size={12} aria-hidden="true" />
               </FootnoteNavigationLink>
@@ -691,6 +747,7 @@ function MarkdownRenderer({
   streaming,
   linkMode,
   resourceResolver,
+  onAnchorNavigate,
 }: MarkdownRendererProps) {
   return (
     <MarkdownResourceResolverProvider value={resourceResolver}>
@@ -702,10 +759,15 @@ function MarkdownRenderer({
           streaming={streaming}
           linkMode={linkMode}
           isLastBlock={index === blocks.length - 1}
+          onAnchorNavigate={onAnchorNavigate}
         />
       ))}
       {showFootnotes ? (
-        <MarkdownFootnotes renderContext={renderContext} linkMode={linkMode} />
+        <MarkdownFootnotes
+          renderContext={renderContext}
+          linkMode={linkMode}
+          onAnchorNavigate={onAnchorNavigate}
+        />
       ) : null}
     </MarkdownResourceResolverProvider>
   );

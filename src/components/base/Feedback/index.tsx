@@ -97,6 +97,8 @@ function Spin({ size = 'default', spinning = true, tip, children, className }: S
     );
   }
 
+  if (!spinning) return null;
+
   if (tip) {
     return (
       <div className={cx(styles.loadingState, className)} aria-busy="true" aria-live="polite">
