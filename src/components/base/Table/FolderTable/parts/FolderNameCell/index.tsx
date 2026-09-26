@@ -1,9 +1,16 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  File,
+  Folder,
+  HardDrive,
+  Link,
+  LoaderCircle,
+} from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
 
 import TableTextCell from '../../../shared/cells/TextCell';
 import type { FolderTableRow } from '../../index.type';
@@ -24,16 +31,7 @@ function FolderTableNameCell<T extends FolderTableRow>({
   const nameContent = (
     <span className={styles.nameContent}>
       <span className={styles.entryIcon}>
-        {renderEntryIcon ? (
-          renderEntryIcon(row, ctx)
-        ) : (
-          <EntryIcon
-            entryType={row.entryType}
-            folderVariant={row.folderVariant}
-            resourceType={row.resourceType}
-            resourceIconType={row.resourceIconType}
-          />
-        )}
+        {renderEntryIcon ? renderEntryIcon(row, ctx) : renderGenericEntryIcon(row.entryType)}
       </span>
       <TableTextCell emphasis className={styles.nameText}>
         {row.name}
@@ -65,6 +63,21 @@ function FolderTableNameCell<T extends FolderTableRow>({
       {content}
     </div>
   );
+}
+
+function renderGenericEntryIcon(entryType: FolderTableRow['entryType']) {
+  switch (entryType) {
+    case 'root':
+      return <HardDrive size={18} aria-hidden="true" />;
+    case 'folder':
+      return <Folder size={18} aria-hidden="true" />;
+    case 'link':
+      return <Link size={18} aria-hidden="true" />;
+    case 'loading':
+      return <LoaderCircle size={18} aria-hidden="true" />;
+    case 'file':
+      return <File size={18} aria-hidden="true" />;
+  }
 }
 
 export default FolderTableNameCell;

@@ -12,7 +12,7 @@ import {
   AttachmentMedia,
   AttachmentTitle,
 } from '@/components/_shadcn';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.less';

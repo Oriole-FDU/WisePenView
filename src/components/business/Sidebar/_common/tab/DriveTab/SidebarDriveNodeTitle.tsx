@@ -14,11 +14,11 @@ import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
 import type {
   DriveActionTarget,
   DriveViewNode,
 } from '@/components/business/Drive/common/driveComponentModel';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { FolderNode, RootNode } from '@/domains/Drive';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
