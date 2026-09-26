@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { ChevronRight, LoaderCircle } from 'lucide-react';
 import type { CSSProperties, DragEvent, Key, ReactNode } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -61,6 +61,7 @@ export interface TreeProps {
   draggable?: boolean | ((node: DataNode) => boolean);
   allowDrop?: (info: TreeAllowDropInfo) => boolean;
   loadData?: (node: DataNode) => Promise<void> | void;
+  onLoadError?: (error: unknown, node: DataNode) => void;
   onSelect?: (selectedKeys: Key[], info: TreeSelectInfo) => void;
   onCheck?: (
     checkedKeys: Key[] | { checked: Key[]; halfChecked: Key[] },
@@ -152,6 +153,7 @@ function Tree({
   draggable,
   allowDrop,
   loadData,
+  onLoadError,
   onSelect,
   onCheck,
   onExpand,
@@ -164,6 +166,7 @@ function Tree({
     defaultExpandAll ? collectExpandableKeys(treeData) : normalizeKeys(defaultExpandedKeys)
   );
   const [loadingKeys, setLoadingKeys] = useState<string[]>([]);
+  const loadingKeyRef = useRef(new Set<string>());
   const [draggingKey, setDraggingKey] = useState('');
   const [dropTarget, setDropTarget] = useState<{
     key: string;
@@ -190,22 +193,27 @@ function Tree({
     if (
       disabled ||
       !loadData ||
-      loadingKeySet.has(key) ||
+      loadingKeyRef.current.has(key) ||
       node.isLeaf === true ||
       node.children !== undefined
     )
       return;
 
+    loadingKeyRef.current.add(key);
     setLoadingKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
     try {
       await loadData(node);
+    } catch (error) {
+      if (onLoadError) onLoadError(error, node);
+      else console.error('[Tree] 节点懒加载失败', error, node);
     } finally {
+      loadingKeyRef.current.delete(key);
       setLoadingKeys((prev) => prev.filter((item) => item !== key));
     }
   };
 
   const toggleExpand = (node: DataNode, expanded: boolean) => {
-    if (disabled) return;
+    if (disabled || node.disabled) return;
     const key = String(node.key);
     const nextKeys = buildNextKeys(finalExpandedKeys, key, expanded);
     emitExpandedKeys(nextKeys, { node, expanded });
