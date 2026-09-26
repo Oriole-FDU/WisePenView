@@ -130,6 +130,8 @@ function AutocompleteStory() {
 
 const meta = {
   title: 'Input/选项浮层',
+  component: Select,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },

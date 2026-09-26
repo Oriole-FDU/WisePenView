@@ -6,8 +6,8 @@ import '@fontsource-variable/noto-sans-sc/wght.css';
 import type { Preview } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 
-import '../src/bootstrap/index.css';
-import '../src/bootstrap/scrollbar.less';
+import '../src/styles/global/index.css';
+import '../src/styles/global/scrollbar.less';
 
 function StorybookThemeDecorator(Story: () => ReactNode) {
   return (
