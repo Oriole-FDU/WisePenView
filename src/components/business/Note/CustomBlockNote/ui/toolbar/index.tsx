@@ -15,7 +15,8 @@ import { type ComponentProps, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/_context';
+import { TableToolbarProvider } from '@/components/business/Note/CustomBlockNote/plugins/TablePlugin/ui/_context';
 import {
   type TableRailSelectionOrientation,
   useTableRailSelectionState,
@@ -24,7 +25,6 @@ import {
   TableCellBackgroundAction,
   TableDeleteAction,
   TableStructureActions,
-  TableToolbarProvider,
 } from '@/components/business/Note/CustomBlockNote/plugins/TablePlugin/ui/TableToolbar';
 import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 import {

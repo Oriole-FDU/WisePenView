@@ -11,7 +11,7 @@ import { useLatest } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '../../../engines/editor/_context';
 import { renderKatexInto } from '../katexRender';
 import { LatexEditPopover } from '../LatexEditPopover';
 import {

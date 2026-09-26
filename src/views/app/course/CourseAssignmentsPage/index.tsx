@@ -7,7 +7,7 @@ import { Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { COURSE_ASSIGNMENT_STATUS } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { buildCourseAssignmentPath } from '@/utils/navigation/appRoute';

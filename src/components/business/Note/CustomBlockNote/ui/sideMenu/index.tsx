@@ -31,7 +31,7 @@ import { type DragEvent, type ReactNode, useEffect, useRef, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/_context';
 import {
   exportNoteFullHtml,
   exportNoteMarkdown,

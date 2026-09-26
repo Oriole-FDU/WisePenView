@@ -1,15 +1,6 @@
 import { createExtension, type ExtensionFactoryInstance } from '@blocknote/core';
 import { Plugin, PluginKey, type Transaction } from '@tiptap/pm/state';
-import { createContext, use } from 'react';
 import { ySyncPluginKey } from 'y-prosemirror';
-
-const NoteEditorReadOnlyContext = createContext(false);
-
-export const NoteEditorReadOnlyProvider = NoteEditorReadOnlyContext.Provider;
-
-export function useNoteEditorReadOnlyContext(): boolean {
-  return use(NoteEditorReadOnlyContext);
-}
 
 function isYjsSyncTransaction(tr: Transaction): boolean {
   return tr.getMeta(ySyncPluginKey) !== undefined || tr.getMeta('y-sync$') !== undefined;

@@ -17,7 +17,7 @@ import {
   type GroupRoutePage,
 } from '@/utils/navigation/appRoute';
 import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
-import { useGroupContext } from '@/views/app/group/GroupRoute/GroupContext';
+import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
 import page from './style.module.less';
 

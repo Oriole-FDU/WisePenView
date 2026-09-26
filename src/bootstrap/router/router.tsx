@@ -4,7 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import type { AppRouteHandle } from '@/bootstrap/router/routeHandle';
 import { APP_SIDEBAR_HEADER_NAV_KEY } from '@/config/appSidebar';
 import AdminLayout from '@/layouts/AdminLayout';
-import { AppAuthProvider } from '@/layouts/App/AppAuthProvider';
+import { AppAuthProvider } from '@/layouts/App/_context';
 import { AppFixedPageLayout, AppScrollablePageLayout } from '@/layouts/App/AppPageLayout';
 import AppLayout from '@/layouts/AppLayout';
 import AppNavigationLayout from '@/layouts/AppNavigation/AppNavigationLayout';

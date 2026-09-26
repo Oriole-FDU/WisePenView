@@ -8,7 +8,7 @@ import { Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { COURSE_ROLE } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 import { parseErrorMessage } from '@/utils/error';
 import { buildCourseLearningPath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';

@@ -7,6 +7,7 @@ import { fn } from 'storybook/test';
 import { ServicesProvider } from '@/domains';
 import type { ChatSession } from '@/domains/Chat';
 import { buildDriveNodeScope, type RootNode } from '@/domains/Drive';
+import { AppAuthProvider } from '@/layouts/App/_context';
 
 import UserFeedbackModal from './_common/footer/UserFeedbackModal';
 import UserProfile from './_common/footer/UserProfile';
@@ -56,7 +57,9 @@ const headerItems: readonly HeaderNavItem[] = [
 function LeafStoryFrame({ children }: { children: ReactNode }) {
   return (
     <ServicesProvider>
-      <MemoryRouter>{children}</MemoryRouter>
+      <AppAuthProvider mode="authenticated">
+        <MemoryRouter>{children}</MemoryRouter>
+      </AppAuthProvider>
     </ServicesProvider>
   );
 }

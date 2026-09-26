@@ -1,4 +1,4 @@
-import { useGroupContext } from '@/views/app/group/GroupRoute/GroupContext';
+import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
 import GroupDescriptionSettings from '../_components/GroupDescriptionSettings';
 

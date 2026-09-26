@@ -7,7 +7,7 @@ import { useNoteService } from '@/domains';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
+import { useAppAuth } from '@/layouts/App/_context';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { APP_SIDEBAR_HEADER_ITEMS, type AppSidebarNavigateItem } from './appSidebarNavigation';

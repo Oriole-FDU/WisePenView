@@ -6,7 +6,7 @@ import type { DriveSelectionItem } from '@/components/business/Drive/common/driv
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { usePickerSelection } from '@/hooks/usePickerSelection';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import type { LocalResourcePayload } from '../index.type';
 import styles from './style.module.less';
 

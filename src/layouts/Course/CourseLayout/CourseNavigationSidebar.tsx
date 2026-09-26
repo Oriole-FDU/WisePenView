@@ -11,7 +11,7 @@ import {
 } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 
-import { useCourseContext } from '../CourseContext';
+import { useCourseContext } from '../_context';
 import styles from './style.module.less';
 
 function CourseNavigationSidebar() {

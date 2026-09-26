@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
 import { COURSE_ROLE } from '@/domains/Course';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 import ForbiddenRoute from '@/views/app/error/ForbiddenRoute';
 
 function CourseSettingsRouteGuard() {

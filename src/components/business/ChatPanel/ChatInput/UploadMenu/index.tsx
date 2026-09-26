@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
-import { useChatInputFiles } from '../useChatInputFiles';
+import { useChatInputFiles, useChatInputStore, useChatInputStoreApi } from '../_context';
 
 function UploadMenu() {
   const { t } = useTranslation('chat');
