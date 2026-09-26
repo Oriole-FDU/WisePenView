@@ -3,8 +3,8 @@ import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import CopyButton, { MESSAGE_ACTION_ICON_SIZE } from '@/components/base/Button/CopyButton';
-import ProviderLogo from '@/components/base/Icons/ProviderLogo';
+import CopyButton from '@/components/base/Button/CopyButton';
+import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 import type { ChatModel, WisePenUIMessage } from '@/domains/Chat';
 
 import ChatMessage from '../ChatMessage';
@@ -109,13 +109,13 @@ function AssistantMessage({
           <ChatMessage.Actions>
             <CopyButton text={textContent} />
             <AppIconButton
-              icon={<ThumbsUp size={MESSAGE_ACTION_ICON_SIZE} aria-hidden="true" />}
+              icon={<ThumbsUp size={17} aria-hidden="true" />}
               label={t('message.like')}
               className={styles.actionButton}
               tooltip={{ delay: 0 }}
             />
             <AppIconButton
-              icon={<ThumbsDown size={MESSAGE_ACTION_ICON_SIZE} aria-hidden="true" />}
+              icon={<ThumbsDown size={17} aria-hidden="true" />}
               label={t('message.dislike')}
               className={styles.actionButton}
               tooltip={{ delay: 0 }}

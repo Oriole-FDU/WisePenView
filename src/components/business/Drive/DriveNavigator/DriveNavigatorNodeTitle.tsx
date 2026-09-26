@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
 import type { DriveViewNode } from '../common/driveComponentModel';

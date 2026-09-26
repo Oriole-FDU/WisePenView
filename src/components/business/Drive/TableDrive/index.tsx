@@ -13,6 +13,7 @@ import AppBreadcrumb from '@/components/base/AppBreadcrumb';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FolderTable } from '@/components/base/Table';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
@@ -322,6 +323,22 @@ function TableDrive({
                 selectedRowKey={interaction.selectedRow?.id}
                 onRowSelect={handleRowSelect}
                 onRowActivate={handleActivateNode}
+                renderEntryIcon={(row) => (
+                  <EntryIcon
+                    entryType={row.node.type === 'resource' ? 'resource' : row.node.type}
+                    resourceType={row.node.type === 'resource' ? row.node.resourceType : undefined}
+                    resourceIconType={
+                      row.node.type === 'resource' || row.node.type === 'link'
+                        ? row.node.resourceIconType
+                        : undefined
+                    }
+                    folderVariant={
+                      row.node.type === 'folder' && row.node.systemType === 'shared'
+                        ? 'shared'
+                        : undefined
+                    }
+                  />
+                )}
                 renderNameContent={renderNameContent}
                 renderRow={dnd.renderRow}
                 bodyDragHandlers={externalDnd.bodyDragHandlers}

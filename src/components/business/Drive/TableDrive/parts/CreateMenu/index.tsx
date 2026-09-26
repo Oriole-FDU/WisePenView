@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 
 import styles from './index.module.less';
 import type { CreateMenuItem, CreateMenuProps } from './index.type';

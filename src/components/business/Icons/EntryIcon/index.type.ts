@@ -1,6 +1,6 @@
 import type { ResourceIconType } from '@/domains/Resource';
 
-export type EntryType = 'root' | 'folder' | 'resource' | 'link' | 'loading';
+export type EntryType = 'root' | 'folder' | 'file' | 'resource' | 'link' | 'loading';
 
 export interface EntryIconProps {
   /** 展示对象类型；resource 可结合 resourceType 渲染具体资源图标 */

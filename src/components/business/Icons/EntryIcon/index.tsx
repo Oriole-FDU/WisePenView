@@ -93,6 +93,7 @@ function EntryIcon({
       }
       return <Folder size={size} color={color ?? COLOR_FOLDER} />;
     case 'resource':
+    case 'file':
       return renderResourceIcon(resourceType, resourceIconType, size, color);
     case 'link':
       return <Link size={size} color={color ?? COLOR_LINK} />;
