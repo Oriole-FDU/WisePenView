@@ -1,4 +1,4 @@
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import { stableStringify } from '../../engines/aiDiff/contentState';
 import {

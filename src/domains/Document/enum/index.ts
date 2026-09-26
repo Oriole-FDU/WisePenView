@@ -1,4 +1,4 @@
-import { createEnum } from '@/utils/enum';
+import { createEnum } from '@/utils/type/enum';
 
 /** 文档处理状态（与后端 syncPendingDocStatus 返回的 status 字符串对齐） */
 export const DOCUMENT_PROCESS = createEnum([

@@ -19,7 +19,7 @@ import {
 } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
+import { useAppAuth } from '@/layouts/App/_context';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { SendOptions } from './ChatInput/index.type';

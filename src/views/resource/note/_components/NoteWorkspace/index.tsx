@@ -18,16 +18,16 @@ import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import { useInteractService } from '@/domains';
 import type { NoteInfoDisplayData } from '@/domains/Note';
 import { encodeNoteClientContentSignature } from '@/domains/Note';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
+import { ResourceChatBinding } from '@/layouts/Resource/_context';
 import { isDesktop } from '@/utils/platform';
 
 import ResourceWorkspace, {
   type ResourceWorkspaceProps,
 } from '../../../_components/ResourceWorkspace';
-import { ResourceChatBinding } from '../../../ResourceChatBinding';
 import styles from '../../style.module.less';
 import NoteInfoBar from '../NoteInfoBar';
 import NoteOutline, { NOTE_OUTLINE_TITLE_ID } from '../NoteOutline';

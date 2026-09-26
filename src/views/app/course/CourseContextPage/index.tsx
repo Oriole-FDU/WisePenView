@@ -2,7 +2,7 @@ import { Tabs } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 import { APP_ROUTE_PATH, buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 import underlineTabs from '@/views/app/_common/underlineTabs.module.less';

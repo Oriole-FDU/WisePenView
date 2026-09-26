@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea, UploadZone } from '@/components/base/Input';
+import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { useGroupService, useImageService } from '@/domains';
 import { type EditGroupRequest, type Group, GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
-import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
 import GroupSettingsSection from '../GroupSettingsSection';

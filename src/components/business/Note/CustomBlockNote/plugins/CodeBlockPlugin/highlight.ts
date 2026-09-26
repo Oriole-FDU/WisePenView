@@ -1,4 +1,4 @@
-import type { CodeHighlightToken } from '@/utils/codeHighlight';
+import type { CodeHighlightToken } from '@/utils/code/codeHighlight';
 
 /** 把一行 tokens 渲进容器；保留 Shiki 配色。 */
 export function renderHighlightedLine(

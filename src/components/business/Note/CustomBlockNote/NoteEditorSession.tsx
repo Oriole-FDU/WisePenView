@@ -7,12 +7,12 @@ import { type NoteAiDiffPreviewData, useNoteSession } from '@/domains/Note';
 import { useApi } from '@/hooks/useApi';
 import { useSmoothFlag } from '@/hooks/useSmoothFlag';
 
-import { buildNoteCollaborationUser } from './session/collaborationUser';
 import {
-  NoteEditorSessionContext,
+  NoteEditorSessionProvider,
   type NoteEditorSlotName,
   useNoteEditorSessionContext,
-} from './session/NoteEditorSessionContext';
+} from './session/_context';
+import { buildNoteCollaborationUser } from './session/collaborationUser';
 
 export function NoteEditorSession({
   resourceId,
@@ -80,7 +80,7 @@ export function NoteEditorSession({
     titleContainer: slots.title,
     setSlot,
   };
-  return <NoteEditorSessionContext value={value}>{children}</NoteEditorSessionContext>;
+  return <NoteEditorSessionProvider value={value}>{children}</NoteEditorSessionProvider>;
 }
 
 export function NoteEditorSlot({

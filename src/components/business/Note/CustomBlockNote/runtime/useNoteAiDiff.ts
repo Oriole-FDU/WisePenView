@@ -5,7 +5,7 @@ import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
 import { useAiDiffSidecar } from '../engines/aiDiff/useAiDiffSidecar';
 import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
 import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
-import { useNoteInteractionStore } from './noteInteractionStore';
+import { useNoteInteractionStore } from './_context';
 import type { NoteEditorDefinition } from './useNoteEditorDefinition';
 
 export function useNoteAiDiff({

@@ -4,7 +4,7 @@ import {
   normalizeResourceViewer,
   RESOURCE_KIND,
   RESOURCE_VIEWER,
-} from '@/utils/navigation/resourceTarget';
+} from '@/domains/Resource/model/resourceTarget';
 
 export interface ResourceChatResource {
   resourceId: string;

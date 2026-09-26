@@ -5,7 +5,7 @@ import { createRoot, type Root } from 'react-dom/client';
 
 import { useApi } from '@/hooks/useApi';
 import i18n from '@/i18n';
-import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/sanitizeHtml';
+import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
 
 import styles from './MermaidBlock/style.module.less';
 import { renderNoteMermaidDiagram } from './mermaidRuntime';

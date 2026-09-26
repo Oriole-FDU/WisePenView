@@ -9,7 +9,7 @@ import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { type ChatAgentOption } from '@/domains/Chat';
 import type { ResourceSkillSummary } from '@/domains/Resource';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from './style.module.less';
 
 interface SkillSelectionOption {

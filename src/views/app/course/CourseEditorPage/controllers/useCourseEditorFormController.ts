@@ -2,11 +2,11 @@ import { toast } from '@heroui/react';
 import { type SyntheticEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { useCourseService, useImageService } from '@/domains';
 import type { CourseAssessmentItem, CourseDetail, CourseMeeting } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { PLACEHOLDER_IMAGE } from '@/utils/image/placeholder';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
 import {

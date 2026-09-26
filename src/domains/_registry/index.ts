@@ -28,6 +28,6 @@ export {
   useTagService,
   useUserService,
   useWalletService,
-} from './hooks';
+} from './_context';
+export { ServicesProvider } from './_context';
 export type { ServicesContextValue } from './registry.types';
-export { ServicesProvider } from './ServicesProvider';

@@ -4,7 +4,7 @@ export type NoteBlock = ReturnType<CustomBlockNoteEditor['getTextCursorPosition'
 export type NoteBlockUpdate = Parameters<CustomBlockNoteEditor['updateBlock']>[1];
 export type NotePartialBlock = Parameters<CustomBlockNoteEditor['insertBlocks']>[0][number];
 
-export { isRecord } from '@/utils/typeGuards';
+export { isRecord } from '@/utils/type/typeGuards';
 
 export function toBlockUpdate(update: {
   type?: string;

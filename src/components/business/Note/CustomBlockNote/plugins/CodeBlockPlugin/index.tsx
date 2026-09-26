@@ -2,8 +2,8 @@ import { codeBlockOptions } from '@blocknote/code-block';
 import { createCodeBlockSpec } from '@blocknote/core';
 import { createRoot } from 'react-dom/client';
 
-import { getCodeBlockHighlighter, normalizeCodeLanguage } from '@/utils/codeHighlight';
-import { isRecord } from '@/utils/typeGuards';
+import { getCodeBlockHighlighter, normalizeCodeLanguage } from '@/utils/code/codeHighlight';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import { createBlockKeyboardNavigationExtension } from '../../engines/editor/keyboardNavigation';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';

@@ -22,25 +22,26 @@ import {
   clampChatPanelWidth,
   RESOURCE_MAIN_MIN_WIDTH,
 } from '@/constants/layoutScale';
+import {
+  normalizeResourceKind,
+  resolveResourceViewer,
+} from '@/domains/Resource/model/resourceTarget';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
-import { useAppNavigation } from '@/layouts/AppNavigation/AppNavigationContext';
-import { useMainShell } from '@/layouts/MainShell/MainShellContext';
+import { useAppNavigation } from '@/layouts/AppNavigation/_context';
+import { useMainShell } from '@/layouts/MainShell/_context';
 import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
-import { normalizeResourceKind, resolveResourceViewer } from '@/utils/navigation/resourceTarget';
-import {
-  ResourceChatBindingProvider,
-  ResourceChatPanel,
-} from '@/views/resource/ResourceChatBinding';
+
 import {
   DEFAULT_RESOURCE_HOST_ID,
-  ResourceHostContext,
+  ResourceChatBindingProvider,
+  ResourceChatPanel,
   type ResourceHostContextValue,
-} from '@/views/resource/ResourceHostContext';
-
+  ResourceHostProvider,
+} from '../_context';
 import styles from './style.module.less';
 
 function ResourceHost() {
@@ -130,7 +131,7 @@ function ResourceHost() {
 
   return (
     <ResourceChatBindingProvider>
-      <ResourceHostContext value={resourceHostContext}>
+      <ResourceHostProvider value={resourceHostContext}>
         <div className={clsx(styles.shell, overlayChatOpen && styles.shellWithOverlay)}>
           <SystemResizablePanelGroup
             orientation="horizontal"
@@ -183,7 +184,7 @@ function ResourceHost() {
             </div>
           ) : null}
         </div>
-      </ResourceHostContext>
+      </ResourceHostProvider>
     </ResourceChatBindingProvider>
   );
 }

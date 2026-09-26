@@ -1,4 +1,4 @@
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 /** Slash Menu 新建 Mermaid 图表时使用的可直接渲染示例。 */
 export const DEFAULT_MERMAID_SOURCE = 'flowchart TD\n  A[开始] --> B[结束]';
 

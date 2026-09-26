@@ -1,6 +1,6 @@
 import { codeBlockOptions } from '@blocknote/code-block';
 
-import { normalizeCodeLanguage } from '@/utils/codeHighlight';
+import { normalizeCodeLanguage } from '@/utils/code/codeHighlight';
 
 import type { CodeBlockLanguageOption } from './CodeBlockToolbar';
 

@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 
+import { ThemeProvider } from '../_context';
 import { DEFAULT_COLOR_SCHEME } from '../colorScheme/constants';
 import { applyColorSchemeFavicon, applyColorSchemeToDOM } from '../colorScheme/dom';
 import { useColorScheme } from '../colorScheme/useColorScheme';
 import { DEFAULT_HEROUI_THEME } from '../mode/constants';
 import { applyReadingModeToDOM } from '../readingMode/dom';
 import { useReadingMode } from '../readingMode/useReadingMode';
-import { ThemeContextProvider } from './ThemeContext';
 
 type ThemeApplierProps = {
   children: ReactNode;
@@ -17,9 +17,9 @@ type ThemeApplierProps = {
 /** 根节点同步明暗与配色到 documentElement */
 export function ThemeApplier({ children, defaultTheme = DEFAULT_HEROUI_THEME }: ThemeApplierProps) {
   return (
-    <ThemeContextProvider defaultTheme={defaultTheme}>
+    <ThemeProvider defaultTheme={defaultTheme}>
       <ThemeGlobalApplier>{children}</ThemeGlobalApplier>
-    </ThemeContextProvider>
+    </ThemeProvider>
   );
 }
 

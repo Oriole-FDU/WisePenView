@@ -10,16 +10,16 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
-import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import {
   isOfficeResourceType,
   RESOURCE_KIND,
   RESOURCE_VIEWER,
   type ResourceViewer,
-} from '@/utils/navigation/resourceTarget';
-import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/views/resource/ResourceHostContext';
+} from '@/domains/Resource/model/resourceTarget';
+import { useApi } from '@/hooks/useApi';
+import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/layouts/Resource/_context';
+import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';

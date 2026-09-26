@@ -13,10 +13,14 @@ import { AppButton } from '@/components/base/Button';
 import { Checkbox, FormField, PasswordInput } from '@/components/base/Input';
 import { useAuthService } from '@/domains';
 import type { RegisterRequest } from '@/domains/Auth';
+import { normalizeInviteCode } from '@/domains/Auth/utils/normalizeInviteCode';
 import { useApi } from '@/hooks/useApi';
-import { type FieldErrors, hasFieldErrors, runFieldValidation } from '@/utils/formValidation';
 import { APP_ROUTE_PATH, readRegisterInviteCode } from '@/utils/navigation/appRoute';
-import { normalizeInviteCode } from '@/utils/normalize/normalizeInviteCode';
+import {
+  type FieldErrors,
+  hasFieldErrors,
+  runFieldValidation,
+} from '@/utils/validation/formValidation';
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
 
 import AuthIconField from '../_common/AuthIconField';

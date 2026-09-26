@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 
 import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
 
-import { useNoteEditorReadOnlyContext } from '../../engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '../../engines/editor/_context';
 import { blockNoteSchema } from '../../registry/noteEditorComposition';
 import {
   closeNoteEmojiPicker,

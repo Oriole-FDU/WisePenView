@@ -5,7 +5,7 @@ import type { ComponentPropsWithRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CommandPaletteTrigger from '@/components/business/CommandPalette/Trigger';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
+import { useAppAuth } from '@/layouts/App/_context';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import {

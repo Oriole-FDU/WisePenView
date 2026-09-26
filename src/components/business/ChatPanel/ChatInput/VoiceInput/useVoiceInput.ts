@@ -13,7 +13,7 @@ import {
   parseErrorMessage,
 } from '@/utils/error';
 
-import { useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStoreApi } from '../_context';
 import type { VoiceInputProps, VoiceInputState } from './index.type';
 import pcmProcessorModuleUrl from './pcmProcessor.worklet.ts?worker&url';
 

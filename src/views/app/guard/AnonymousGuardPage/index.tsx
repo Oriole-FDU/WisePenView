@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
+import { useAppAuth } from '@/layouts/App/_context';
 import { COLOR_SCHEME_ICON_SRC, useColorScheme } from '@/theme';
 
 import styles from './style.module.less';

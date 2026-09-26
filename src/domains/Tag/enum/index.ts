@@ -10,8 +10,8 @@ import {
   type ResourceAction,
   updateResourceActionSelection,
 } from '@/domains/Resource';
-import type { EnumKey, EnumValue } from '@/utils/enum';
-import { createEnum } from '@/utils/enum';
+import type { EnumKey, EnumValue } from '@/utils/type/enum';
+import { createEnum } from '@/utils/type/enum';
 
 export const TAG_META_SCHEMA = 'wisepen.tag-meta.v1';
 

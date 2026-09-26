@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import DriveBrowser from '@/components/business/Drive/DriveBrowser';
 import { COURSE_ROLE } from '@/domains/Course';
-import { useCourseContext } from '@/layouts/Course/CourseContext';
+import { useCourseContext } from '@/layouts/Course/_context';
 
 import styles from './style.module.less';
 

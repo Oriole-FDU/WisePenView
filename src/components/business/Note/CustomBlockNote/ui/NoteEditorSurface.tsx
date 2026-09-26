@@ -8,12 +8,12 @@ import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useAppTheme } from '@/theme';
 
 import { AiDiffBulkActions } from '../engines/aiDiff/BulkActions';
-import { NoteEditorReadOnlyProvider } from '../engines/editor/readOnly';
+import { NoteEditorReadOnlyProvider } from '../engines/editor/_context';
 import { NoteEmojiPickerPopover } from '../plugins/EmojiPlugin/EmojiPickerPopover';
 import NoteTableHandles from '../plugins/TablePlugin/ui/tableHandles';
 import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/noteEditorComposition';
 import type { NoteEditorRuntimeCoordinator } from '../registry/useNoteEditorRuntimeCoordinator';
-import { useNoteInteractionStore } from '../runtime/noteInteractionStore';
+import { useNoteInteractionStore } from '../runtime/_context';
 import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
 import styles from '../style.module.less';
 import FindBar from './findBar';

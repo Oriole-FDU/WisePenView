@@ -8,7 +8,7 @@ import AppPopover from '@/components/base/AppPopover';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
 
-import { useNoteEditorReadOnlyContext } from '../../../engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '../../../engines/editor/_context';
 import {
   highlightBlockConfig,
   readHighlightBlockProps,

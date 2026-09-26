@@ -2,10 +2,10 @@ import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import type { ResourceItem } from '@/domains/Resource';
+import { useResourceHostContext } from '@/layouts/Resource/_context';
 import type { ResourceHeaderConfig } from '@/layouts/Resource/ResourceHeader/index.type';
 import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 
-import { useResourceHostContext } from '../../ResourceHostContext';
 import ResourceSidePanel from '../ResourceSidePanel';
 import ResourceSidePanelActions from '../ResourceSidePanel/Actions';
 import styles from './style.module.less';

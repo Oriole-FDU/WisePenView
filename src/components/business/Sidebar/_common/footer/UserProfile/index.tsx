@@ -25,7 +25,7 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useAuthService, useUserService } from '@/domains';
 import type { User } from '@/domains/User';
 import { IDENTITY } from '@/domains/User';
-import { useAppAuth } from '@/layouts/App/AppAuthContext';
+import { useAppAuth } from '@/layouts/App/_context';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 

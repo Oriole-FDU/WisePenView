@@ -28,10 +28,10 @@ import {
 } from '@/components/business/Note/useMarkdownNoteImport';
 import { useDriveService, useNoteService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';

@@ -1,9 +1,9 @@
 import { tableCellStyles } from '../../styles';
+import { TableColumnAlignProvider } from '../../TableBase/_context';
 import {
   joinClassNames,
   resolveCellContentHostClass,
   resolveColumnAlign,
-  TableColumnAlignContext,
 } from '../../TableBase/cellAlign';
 import type { TableCellAlignProps } from './index.type';
 
@@ -11,7 +11,7 @@ function TableCellAlign({ align, stretch = false, children, className }: TableCe
   const resolvedAlign = resolveColumnAlign(align);
 
   return (
-    <TableColumnAlignContext.Provider value={resolvedAlign}>
+    <TableColumnAlignProvider value={resolvedAlign}>
       <div
         className={joinClassNames(
           resolveCellContentHostClass(resolvedAlign),
@@ -21,7 +21,7 @@ function TableCellAlign({ align, stretch = false, children, className }: TableCe
       >
         {children}
       </div>
-    </TableColumnAlignContext.Provider>
+    </TableColumnAlignProvider>
   );
 }
 

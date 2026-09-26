@@ -6,9 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 import { FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH } from '@/constants/layoutScale';
 
-import { ChatInputStoreProvider } from './_store/ChatInputStoreProvider';
+import { ChatInputFileProvider, ChatInputStoreProvider } from './_context';
 import AttachmentStrip from './AttachmentStrip';
-import { ChatInputFileProvider } from './ChatInputFileContext';
 import DocumentPickerModal from './DocumentPickerModal';
 import DropOverlay from './DropOverlay';
 import type { ChatInputProps } from './index.type';

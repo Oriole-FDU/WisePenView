@@ -23,6 +23,7 @@
 
 - `component-boundary.md`：组件放置、复用范围和 base/business 边界。
 - `component-react.md`：React、Hooks、JSX、TypeScript 和副作用治理。
+- `context.md`：Context 的组成、归属、Provider 和消费规范。
 - `component-controller.md`：复杂组件和 Controller 拆分。
 - `component-style.md`：Less、CSS Modules、HeroUI 和样式规则。
 - `overlay.md`：弹层触发、焦点和可访问性边界。

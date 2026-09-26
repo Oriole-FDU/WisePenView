@@ -1,5 +1,5 @@
 import type { ROLE } from '@/domains/Group';
-import type { EnumKey } from '@/utils/enum';
+import type { EnumKey } from '@/utils/type/enum';
 
 import {
   canEditSelectedMembers,

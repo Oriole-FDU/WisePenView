@@ -8,10 +8,10 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import type { DataNode } from '@/components/base/Tree';
 import VersionDropdown from '@/components/business/VersionDropdown';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { SkillServicesMap } from '@/domains/Skill';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
 
 import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import SkillActionDialogs from './_components/SkillActionDialogs';

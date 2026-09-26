@@ -12,7 +12,7 @@ import {
 } from '@/domains/Document';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { parseExtension } from '@/utils/parser/extensionParser';
+import { parseExtension } from '@/utils/file/parseExtension';
 import { createUuid } from '@/utils/random/createUuid';
 
 const DOCUMENT_ALLOWED_EXTENSION_SET = new Set<string>(DOCUMENT_ALLOWED_EXTENSIONS);

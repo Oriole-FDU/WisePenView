@@ -1,4 +1,4 @@
-import { isRecord } from '@/utils/typeGuards';
+import { isRecord } from '@/utils/type/typeGuards';
 
 export interface ParsedApiErrorBody {
   code?: number;

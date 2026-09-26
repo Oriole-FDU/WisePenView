@@ -12,7 +12,7 @@ import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { useChatService } from '@/domains';
 import { buildDefaultPersonalAgent, type ChatAgentOption, type PageResult } from '@/domains/Chat';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.less';
 
 interface AgentPickerProps {

@@ -3,8 +3,8 @@ import { useLatest } from 'ahooks';
 import { DefaultChatTransport } from 'ai';
 import { useRef } from 'react';
 
+import { buildApiUrl } from '@/apis/buildApiUrl';
 import { applyXDeveloperHeader, awaitAddrReady, notifyAddrFailure } from '@/apis/runtime';
-import { buildApiUrl } from '@/utils/api/buildApiUrl';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';

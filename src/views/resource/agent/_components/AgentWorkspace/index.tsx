@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import type { AgentDetail } from '@/domains/Agent';
-import { RESOURCE_KIND } from '@/utils/navigation/resourceTarget';
-import { ResourceChatBinding } from '@/views/resource/ResourceChatBinding';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { ResourceChatBinding } from '@/layouts/Resource/_context';
 
 import ResourceWorkspace, {
   type ResourceWorkspaceProps,

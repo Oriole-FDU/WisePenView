@@ -1,4 +1,4 @@
-import { normalizeInviteCode } from '@/utils/normalize/normalizeInviteCode';
+import { normalizeInviteCode } from '@/domains/Auth/utils/normalizeInviteCode';
 
 import type {
   LoginApiRequest,

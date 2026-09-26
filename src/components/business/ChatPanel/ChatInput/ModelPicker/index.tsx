@@ -4,7 +4,7 @@ import ModelSelector from '@/components/business/ModelSelector';
 import { useChatService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_store/ChatInputStore';
+import { useChatInputStore, useChatInputStoreApi } from '../_context';
 
 function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {
   const chatService = useChatService();

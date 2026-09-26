@@ -3,8 +3,8 @@ import { TagApi } from '@domain-apis';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createTtlCache } from '@/domains/_shared/ttlCache';
 import { TAG_META_SCHEMA, type TagTreeNode } from '@/domains/Tag';
+import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
 
 import { TagServicesMap } from '../mapper/TagServices.map';
 import type {

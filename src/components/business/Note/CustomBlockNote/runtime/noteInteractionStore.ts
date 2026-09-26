@@ -1,10 +1,7 @@
-import { createContext, useContext } from 'react';
-import { useStore } from 'zustand';
 import { createStore, type StoreApi } from 'zustand/vanilla';
 
 import type { AiDiffDisplayMode } from '@/domains/Note';
 import { AI_DIFF_DISPLAY_MODE } from '@/domains/Note';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { NoteFindResult } from '../index.type';
 
@@ -67,8 +64,6 @@ export interface NoteInteractionStoreState extends NoteInteractionState {
 }
 
 export type NoteInteractionStoreApi = StoreApi<NoteInteractionStoreState>;
-
-export const NoteInteractionStoreContext = createContext<NoteInteractionStoreApi | null>(null);
 
 function createInitialState(access: NoteInteractionState['access']): NoteInteractionState {
   return {
@@ -205,18 +200,4 @@ export function createNoteInteractionStore(
         dispatch: state.dispatch,
       })),
   }));
-}
-
-export function useNoteInteractionStoreApi(): NoteInteractionStoreApi {
-  const store = useContext(NoteInteractionStoreContext);
-  if (store == null) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'useNoteInteractionStoreApi must be used within NoteInteractionStoreProvider',
-    });
-  }
-  return store;
-}
-
-export function useNoteInteractionStore<T>(selector: (state: NoteInteractionStoreState) => T): T {
-  return useStore(useNoteInteractionStoreApi(), selector);
 }

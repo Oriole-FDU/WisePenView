@@ -1,6 +1,6 @@
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import MemberList from '@/components/business/Group/MemberList';
-import { useGroupContext } from '@/views/app/group/GroupRoute/GroupContext';
+import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
 import layout from '../../style.module.less';
 

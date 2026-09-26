@@ -7,9 +7,9 @@ import { useGroupService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
 import { useApiPagination } from '@/hooks/useApi';
-import type { EnumKey } from '@/utils/enum';
 import { parseErrorMessage } from '@/utils/error';
 import { normalizeId } from '@/utils/normalize/normalizeId';
+import type { EnumKey } from '@/utils/type/enum';
 
 import type { MemberListProps } from './index.type';
 import MemberListTable from './MemberListTable';

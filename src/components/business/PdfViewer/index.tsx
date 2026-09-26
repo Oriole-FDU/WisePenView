@@ -9,7 +9,7 @@ import { clsx } from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { buildApiUrl } from '@/utils/api/buildApiUrl';
+import { buildApiUrl } from '@/apis/buildApiUrl';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 
 import type { PdfViewerProps } from './index.type';

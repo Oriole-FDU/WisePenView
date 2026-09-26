@@ -1,5 +1,5 @@
-import type { EnumValue } from '@/utils/enum';
-import { createEnum } from '@/utils/enum';
+import type { EnumValue } from '@/utils/type/enum';
+import { createEnum } from '@/utils/type/enum';
 
 /**
  * 钱包展示主体（仅前端区分个人 / 小组 Tab，接口统一走 /user/wallet）。

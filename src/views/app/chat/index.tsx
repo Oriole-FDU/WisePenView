@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 
 import ChatPanel from '@/components/business/ChatPanel';
-import { useMainShell } from '@/layouts/MainShell/MainShellContext';
+import { useMainShell } from '@/layouts/MainShell/_context';
 
 import styles from './style.module.less';
 

@@ -1,6 +1,6 @@
 import { resolveResourceIconType, type ResourceItem } from '@/domains/Resource';
 import type { TagTreeNode } from '@/domains/Tag';
-import { normalizeTagGroupId } from '@/utils/normalize/normalizeTagGroupId';
+import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
 
 import type {
   DriveNodeScope,

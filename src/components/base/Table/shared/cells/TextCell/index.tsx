@@ -2,7 +2,8 @@ import { Tooltip } from '@heroui/react';
 import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
 
 import { tableCellStyles } from '../../styles';
-import { joinClassNames, resolveColumnAlign, useTableColumnAlign } from '../../TableBase/cellAlign';
+import { useTableColumnAlign } from '../../TableBase/_context';
+import { joinClassNames, resolveColumnAlign } from '../../TableBase/cellAlign';
 import type { TableTextCellProps } from './index.type';
 import styles from './style.module.less';
 

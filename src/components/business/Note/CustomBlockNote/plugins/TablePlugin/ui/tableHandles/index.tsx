@@ -28,7 +28,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/readOnly';
+import { useNoteEditorReadOnlyContext } from '@/components/business/Note/CustomBlockNote/engines/editor/_context';
 import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 
 import { tableRailSelectionState, useTableRailSelectionState } from './railSelectionState';
