@@ -8,7 +8,7 @@ import {
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { buildResourcePathWithSearch } from '@/utils/navigation/resourceRoute';
 
-import ResourceRenderer from './ResourceRenderer';
+import ResourceTargetResolver from './ResourceTargetResolver';
 
 function ResourceRouteView() {
   const { resourceType: rawResourceType, resourceId } = useParams<{
@@ -47,7 +47,11 @@ function ResourceRouteView() {
   };
 
   return (
-    <ResourceRenderer target={target} onTargetChange={handleTargetChange} onClose={handleClose} />
+    <ResourceTargetResolver
+      target={target}
+      onTargetChange={handleTargetChange}
+      onClose={handleClose}
+    />
   );
 }
 
