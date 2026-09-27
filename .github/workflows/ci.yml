@@ -2,9 +2,16 @@ name: Continuous Integration
 
 on:
   push:
-    branches: ['main', 'dev']
+    branches: ['main']
   pull_request:
-    branches: ['main', 'dev']
+    branches: ['main']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify-and-build:
@@ -37,9 +44,18 @@ jobs:
       - name: Validate PR Commits
         uses: wagoid/commitlint-github-action@v6
 
+      - name: Check whitespace errors
+        env:
+          BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: git diff --check "${BEFORE_SHA}...${AFTER_SHA}"
+
       # 使用 pnpm 执行脚本
       - name: Lint Code
         run: pnpm lint
+
+      - name: Check mock contract
+        run: pnpm check:mock
 
       # 构建编译（build 脚本已包含 solution-style TypeScript 检查）
       - name: Type Check & Build

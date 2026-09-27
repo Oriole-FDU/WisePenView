@@ -2,7 +2,9 @@
 
 WisePenView 前端项目，基于 React、Vite、TypeScript、HeroUI 与 Shadcn。
 
-开发规约入口见 `AGENTS.md`，专题规约位于 `docs/agent/`。
+开发规约入口见 `AGENTS.md`，专题规约位于 `agent/docs/`。
+
+面向 Codex 的 Bug、PR 和 Review 工作流位于 `agent/`；标准命令和验证矩阵见 `agent/docs/repo-map.md` 与 `agent/docs/verification.md`。
 
 ## 快速开始
 

@@ -36,8 +36,6 @@ release
 *.sw?
 
 docs/*
-!docs/agent/
-!docs/agent/*.md
 
 CLAUDE.md
 

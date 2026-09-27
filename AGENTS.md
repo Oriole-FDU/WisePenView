@@ -1,86 +1,47 @@
 # WisePenView Agent 规约
 
-本文件是 WisePenView 的 agent 主入口。开始代码修改前先读这里；只在任务涉及对应领域时，再阅读 `docs/agent` 下的专题文档。
+这是 WisePenView 的常驻 agent 入口。先读本文件，再根据任务类型读取 `agent/docs`、`agent/skills` 或 `agent/workflows` 中的相关内容；不要一次性预读全部文档。
 
 ## 项目事实
 
-- 技术栈：Vite、React 19、TypeScript strict、Less CSS Modules、HeroUI、ahooks、zustand。
-- 包管理和脚本使用 `pnpm`：`pnpm lint`、`pnpm typecheck`、`pnpm build`、`pnpm dev`、`pnpm mock`。
-- 注释使用中文，commit message 使用中文。
-- UI 基础控件使用 HeroUI 或项目已有封装。
+- 技术栈：Vite、React 19、TypeScript strict、Less CSS Modules、HeroUI、ahooks、zustand；运行版本以 `.nvmrc` 和 `package.json#packageManager` 为准。
+- 注释使用中文；commit message 使用中文 Conventional Commit。
 
-## 工作方式
+## 任务路由
 
-- 修改前查看 `git status --short`，不要回滚或覆盖用户已有改动。
-- 先用 `rg` 查找同域、同类型实现，复用当前代码模式。
-- 保持改动范围贴近任务，不做无关重构、格式化或依赖升级。
-- 不确定业务接口、字段含义、权限边界或后端契约时先确认，不用兜底代码掩盖不确定性。
-- 第三方 API 不确定时优先看官方文档或项目内既有用法，不盲扫 `node_modules`。
-- 未经用户明确要求，不启动服务（如 `pnpm dev`、`pnpm mock`）或进入浏览器/可视化调试；需要运行态验证时，先说明原因并等待确认。
+- Bug 或缺陷：先读 `agent/workflows/bug-to-pr.md`，需要重复执行时读 `agent/skills/bug-fix/SKILL.md`。
+- 创建分支和 PR：读 `agent/skills/pr-create/SKILL.md` 与 `agent/templates/pull-request.md`。
+- 处理 PR Review：读 `agent/workflows/review-to-patch.md` 与 `agent/skills/pr-review-followup/SKILL.md`。
+- CI 失败：读 `agent/skills/ci-failure/SKILL.md`。
+- 发布或版本任务：读 `agent/workflows/release.md` 与 `agent/docs/release.md`。
+- 编码与架构：按 `agent/docs/README.md` 定位 Domain、Component、路由、状态等专题。
+- Context 的组成、归属和消费：`agent/docs/context.md`。
+- 验证和提交：分别读 `agent/docs/verification.md`、`agent/docs/commit.md`。
 
-## 重构与迁移
+## 工作边界
 
-- 当任务涉及重构、迁移、替换、改名、统一 API、删除旧实现时，默认一次性迁移到目标设计。
-- 不要为了“兼容旧调用方”“逐步迁移”“减小改动面”而保留 wrapper、alias、deprecated API、双路径逻辑或临时桥接层。
-- 旧 hook、旧组件、旧类型、旧函数、旧文件应在迁移完成后同步删除，除非用户明确要求保留。
-- 需要全局搜索并更新所有调用点，确保代码库只剩目标 API 和目标实现。
-- 兼容层只能在以下情况保留：外部公开 API、第三方依赖要求、后端协议兼容、或用户明确要求保留兼容。
-- 如果认为必须保留兼容层，先说明原因并等待确认，不要自行添加。
-- 完成标准：无旧 API 引用、无无用 wrapper、无重复实现、测试或类型检查通过。
+- 修改前必须查看 `git status --short`，不得覆盖或回滚用户已有改动。
+- 先用 `rg` 查找同域、同类型实现，保持改动范围贴近任务。
+- 不确定接口字段、权限边界或后端契约时先确认，不用 fallback 掩盖不确定性。
+- 未经用户明确要求，不启动 `pnpm dev`、`pnpm mock`，不进入浏览器或可视化调试。
+- 外部写操作（push、创建 PR、发送 Review 回复、修改 GitHub 设置）必须得到用户明确授权。
 
-## 代码边界
+## 验证和交付
 
-- 领域链路保持 `component/view -> useXxxService -> service -> mapper -> api -> request`。
-- API DTO 只放在 `src/domains/<Domain>/apis/*Api.type.ts`，不直接泄漏到组件 props。
-- 字段映射、协议兼容、ID/时间/枚举归一化集中在 mapper。
-- service 负责编排和抛错，不做 UI 提示，不直接 import Axios，不直接 import 其它 service 实现。
-- 正式與 mock 共用 `src/domains/_registry/registry.ts` 的 service 裝配；service 經 `@domain-apis` 呼叫 API，由建置模式選擇正式或 mock I/O。
-- 组件通过 `useXxxService()` 获取领域能力；跨 service 依赖通过 registry 显式注入。
-- `src/layouts` 只放路由壳与壳内私有实现（壳组件、壳状态、壳 controller）。a11y 适配、样式 mixin、通用 hook、DOM/工具函数、跨层常量属于全局基建，按归属放 `src/styles`、`src/hooks`、`src/utils`、`src/constants`、`src/components/base`，禁止落到 `layouts` 下。
+- 按 `agent/docs/verification.md` 选择并记录检查；代码任务至少运行 `pnpm lint`。
+- 只有用户明确要求时才运行运行态验证，并记录浏览器、窗口尺寸和场景。
+- 交付说明必须包含：改动、原因、验证结果、未验证项和剩余风险。
 
-## React 与样式
+## Git 与 PR
 
-- 只写函数组件和 Hooks，不使用 `React.FC` / `FC`，不新增 `any`。
-- 默认不使用 `useEffect`；请求用 `useRequest`，交互逻辑放事件处理函数，生命周期语义优先用已有 hook。
-- 必须使用 effect 时，直接使用 React `useEffect`，并在调用点用带 `@wisepen-manual-effect` 标记的中文 JSDoc 说明执行时机、不可替代原因和 cleanup。React Hooks lint 规则不做豁免。
-- 业务代码默认禁止 `useMemo`、`useCallback`、`useUpdateEffect`；确有必要时直接使用 React `useMemo` / `useCallback`，并在调用点用带 `@wisepen-manual-memo` 标记的中文 JSDoc 说明为什么、收益和失效条件。React Hooks lint 规则不做豁免。
-- `useRef` 优先用于 DOM 节点、第三方实例、定时器、异步竞态标记等不参与渲染的数据；父子组件的业务状态同步优先使用 props、状态或版本号。
-- 只有确实需要操控子组件实例命令（例如聚焦编辑器、滚动到选区、打开查找框）时，才通过 `useImperativeHandle` 暴露 interface；不要用 ref 传递普通刷新、重新请求等业务事件。
-- 第三方组件的 ref 和实例类型必须优先使用官方类型；禁止用 `RefObject<never>` 或宽泛类型断言掩盖类型不匹配。发现本地类型与第三方 API 不一致时，应先按真实契约收敛调用。
-- 新增或修改 ref 后必须确认 `ref.current` 被实际读取；未读取的 ref、仅为预留而存在的 ref 和已迁移 API 的旧 ref 类型应及时删除。
-- 样式使用 Less CSS Modules，类名用 camelCase，避免非必要内联样式。
-- 业务弹窗优先使用 `AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`、`AppModal`；普通业务代码不直接使用底层 `Modal` / `AlertDialog`。
+- 分支与提交格式遵循 `agent/docs/commit.md`；默认基于 `main`。
+- 除非用户特别说明，PR 默认提交到 `main`。
+- PR 必须说明问题、根因、变更、验证、未验证项和 Review 重点。
+- Review 修改应回到原 PR 分支，逐条对应评论并重新验证，不新开无关 PR。
 
-## 按需阅读
+## 文档和 Codex 配置
 
-- 领域 API、请求类型：`docs/agent/domain-api.md`
-- 字段映射、fallback、协议兼容：`docs/agent/domain-mapper.md`
-- Service 编排、依赖注入、错误处理：`docs/agent/domain-service.md`
-- Entity、Enum、常量：`docs/agent/domain-entity.md`
-- 组件放置位置、components 与 views 边界：`docs/agent/component-boundary.md`
-- React、Hooks、JSX、TypeScript：`docs/agent/component-react.md`
-- Context 的组成、归属和消费：`docs/agent/context.md`
-- 大组件、复杂 Hook 与 Controller 拆分：`docs/agent/component-controller.md`
-- 样式、UI 组件库、Overlay：`docs/agent/component-style.md`、`docs/agent/overlay.md`
-- 颜色系统、Radix 色阶和语义 token：`docs/agent/color-system.md`
-- Store 归属、注册和生命周期：`docs/agent/store.md`
-- 分支与 commit：`docs/agent/commit.md`
-
-跨层任务按数据流补读：`view/component -> service -> mapper -> api -> entity/enum`。
-
-## 隐私与安全
-
-- 不在提交时泄漏用户隐私、敏感信息、后端协议或第三方 API key。
-- mock数据应该采用虚拟化、匿名化、脱敏化处理，避免泄漏真实用户和开发者信息。
-
-## 验证与交付
-
-- 默认至少运行 `pnpm lint`；涉及类型、构建或跨层链路时运行 `pnpm typecheck` 或 `pnpm build`。
-- 如果某项验证未运行，交付说明里明确原因和建议命令。
-- 最终说明包含：改了什么、为什么这样改、跑了哪些验证、仍需确认的风险。
-
-## Codex 加载建议
-
-- 仓库级持久规则放在根目录 `AGENTS.md`，保持短而准；专题细则放在 `docs/agent`。
-- 个人表达偏好、默认审批/沙箱、MCP 等放在 `~/.codex/config.toml` 或 `~/.codex/AGENTS.md`，不要写进仓库规约。
-- 若必须继续使用其它文件名，在 Codex 配置里设置 `project_doc_fallback_filenames`；本仓库优先使用标准 `AGENTS.md`。
+- 流程位于 `agent/workflows`；可复用 Skill 位于 `agent/skills`。
+- 项目级 `.codex` 只放安全、可共享的环境设置，不放模型、审批策略、沙箱权限、个人路径或密钥；当前仓库不提交项目级 Codex 配置文件。
+- 个人偏好、默认审批、MCP 和凭据放在 `~/.codex` 或组织级配置中。
+- 涉及 Codex、OpenAI API 或 Codex 配置时，优先查阅官方 OpenAI 文档。
