@@ -12,7 +12,7 @@ import {
 } from '@/components/_shadcn';
 import AppPopover from '@/components/base/AppPopover';
 import CopyButton from '@/components/base/Button/CopyButton';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/Chat';
 
 import ChatMessage from '../ChatMessage';

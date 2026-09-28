@@ -163,6 +163,8 @@ function UploadZoneStory() {
 
 const meta = {
   title: 'Input/基础输入',
+  component: Input,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CommandGroup, CommandItem } from '@/components/_shadcn';
 import { Empty, Spin } from '@/components/base/Feedback';
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceService } from '@/domains';
 import type { SearchHitItem, SearchResultPage } from '@/domains/Resource';
 import { SEARCH_SCOPE } from '@/domains/Resource';

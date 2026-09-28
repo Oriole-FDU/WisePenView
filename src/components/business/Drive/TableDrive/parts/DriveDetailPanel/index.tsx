@@ -2,7 +2,7 @@ import { Clock3, FileType2, GitBranch, HardDrive, ShieldCheck, UserRound } from 
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import EntryIcon from '@/components/base/Icons/EntryIcon';
+import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useDocumentService, useNoteService } from '@/domains';
 import { RESOURCE_ACTION, type ResourceAction, type ResourceItem } from '@/domains/Resource';
 import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
@@ -237,9 +237,15 @@ function DriveDetailPanel({ selectedRow, isEditMode, selectedCount }: DriveDetai
       <div className={styles.detailHeader}>
         <span className={styles.detailIcon} aria-hidden="true">
           <EntryIcon
-            entryType={selectedRow.entryType}
-            resourceType={selectedRow.resourceType}
-            resourceIconType={selectedRow.resourceIconType}
+            entryType={selectedRow.node.type === 'resource' ? 'resource' : selectedRow.node.type}
+            resourceType={
+              selectedRow.node.type === 'resource' ? selectedRow.node.resourceType : undefined
+            }
+            resourceIconType={
+              selectedRow.node.type === 'resource' || selectedRow.node.type === 'link'
+                ? selectedRow.node.resourceIconType
+                : undefined
+            }
           />
         </span>
         <div className={styles.detailTitleBlock}>
