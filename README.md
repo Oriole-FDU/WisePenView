@@ -50,6 +50,7 @@ Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 s
 - `pnpm build`：构建产物
 - `pnpm lint`：执行全量 ESLint 检查，error 或 warning 均会失败
 - `pnpm lint:fix`：自动整理导入、移除未使用的导入并修复可自动处理的问题
+- `pnpm format:check`：检查 JS、TS、JSON、Markdown 与 GitHub workflow 的格式
 - `pnpm typecheck`：执行 TypeScript 类型检查
 - `pnpm check:mock`：離線檢查 mock API 與正式 service 的跨領域讀寫，不啟動伺服器
 
