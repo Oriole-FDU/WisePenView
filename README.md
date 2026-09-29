@@ -62,6 +62,7 @@ Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 s
 - `pnpm format:check`：检查 JS、TS、JSON、Markdown 与 GitHub workflow 的格式
 - `pnpm typecheck`：执行 TypeScript 类型检查
 - `pnpm check:mock`：離線檢查 mock API 與正式 service 的跨領域讀寫，不啟動伺服器
+- `pnpm check:api-contract`：离线检查统一 API response envelope 的运行期契约
 
 提交前由 lint-staged 对暂存的 JS、MJS、CJS、TS、TSX 文件执行 ESLint 自动修复，再交给
 Prettier 格式化。全量 lint、提交钩子与 CI 共用同一份 ESLint 规则。

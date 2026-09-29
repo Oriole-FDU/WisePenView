@@ -6,6 +6,7 @@ export const FRONTEND_NETWORK_ERROR = {
   BAD_REQUEST: 13,
   SERVER: 14,
   HTTP: 15,
+  INVALID_RESPONSE: 16,
   UNKNOWN: 99,
 } as const;
 

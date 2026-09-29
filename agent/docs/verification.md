@@ -21,7 +21,7 @@
 
 ## CI 契约
 
-PR CI 固定执行 commitlint、lint、build、mock contract 和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
+PR CI 固定执行 commitlint、lint、build、mock contract、API response contract 和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
 
 ## 运行态记录
 

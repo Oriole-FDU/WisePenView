@@ -1,6 +1,7 @@
 import type {
   AddNoteApiRequest,
   GetNoteInfoApiResponse,
+  ListNoteVersionsApiResponse,
   SaveDrawIoSnapshotApiRequest,
 } from '@/domains/Note/apis/NoteApi.type';
 import {
@@ -124,13 +125,13 @@ const mapSaveDrawIoSnapshotRequest = (
   plainText: params.plainText,
 });
 
-const readNumber = (value: unknown, fallback = 0): number =>
+const readNumber = (value: number | null | undefined, fallback = 0): number =>
   typeof value === 'number' ? value : fallback;
 
-const mapNoteVersionListPageFromApi = (raw: unknown): NoteVersionListPage => {
-  const page = isRecord(raw) ? raw : {};
-  const list = Array.isArray(page.list) ? page.list : [];
-
+const mapNoteVersionListPageFromApi = (
+  data: ListNoteVersionsApiResponse | null | undefined
+): NoteVersionListPage => {
+  const list = Array.isArray(data?.list) ? data.list : [];
   return {
     list: list.filter(isRecord).map((item) => ({
       version: typeof item.version === 'number' ? item.version : undefined,
@@ -139,10 +140,10 @@ const mapNoteVersionListPageFromApi = (raw: unknown): NoteVersionListPage => {
         ? item.createdBy.filter((value): value is number => typeof value === 'number')
         : undefined,
     })),
-    total: readNumber(page.total),
-    page: readNumber(page.page, 1),
-    size: readNumber(page.size, 20),
-    totalPage: readNumber(page.totalPage),
+    total: readNumber(data?.total),
+    page: readNumber(data?.page, 1),
+    size: readNumber(data?.size, 20),
+    totalPage: readNumber(data?.totalPage),
   };
 };
 

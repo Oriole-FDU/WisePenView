@@ -12,6 +12,8 @@ API 层只负责：
 - 返回已经由 `src/apis/request.ts` 解包后的 `data`。
 - 做极轻协议适配，例如 GET 参数放入 `params`、POST 空 body 使用 `null` 或 `undefined`。
 
+`src/apis/request.ts` 在解包前会运行期校验统一 response envelope：`code` 必须是有限数字，必须存在 `data`；Python response 的 `msg` 必须是字符串，带 `key` 的 Java response 允许 `msg` 为字符串或 `null`，`key` 只能是字符串或 `null`。envelope 不符合契约时抛出传输层 `WisePenError`，不会把未验证的响应继续交给领域 API。
+
 API 层禁止：
 
 - 做业务字段映射。
@@ -27,6 +29,7 @@ API 层禁止：
 - DTO 字段必须与后端接口文档对齐，不做字段重命名或展示语义加工。
 - 如果接口字段、枚举或响应结构不确定，先向用户确认接口文档，不要盲猜。
 - API DTO 只作为后端协议类型，不允许泄漏到组件展示层。
+- API 方法必须返回明确的 DTO 类型；禁止使用 `Promise<unknown>` 或 `Promise<Record<string, unknown>>` 作为领域 API 的返回契约。协议中确实开放的 JSON 字段可以在 DTO 内显式使用 `Record<string, unknown>`，并由 mapper 决定如何消费。
 
 命名建议：
 
@@ -79,6 +82,7 @@ api -> views/components
 - [ ] API 文件只做请求薄封装。
 - [ ] API DTO 手写在同域 `apis/*Api.type.ts`，字段与后端接口文档对齐。
 - [ ] API DTO 未泄漏到组件展示层。
+- [ ] API 方法返回明确 DTO，不以 `unknown` 作为未分层的响应出口。
 - [ ] 未新增 `any`。
 - [ ] 未在 API 层做 fallback、字段映射、UI 提示或缓存。
 - [ ] 同一 URL 没有重复定义。

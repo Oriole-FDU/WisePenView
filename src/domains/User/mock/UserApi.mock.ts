@@ -2,6 +2,7 @@ import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
 
 import type { UserApi as UserApiContract } from '../apis/UserApi';
 import type {
+  CheckFudanUISVerifyApiResponse,
   GetUserInfoApiResponse,
   UserInviteRecordApiResponse,
   UserSearchUserApiResponse,
@@ -61,7 +62,7 @@ let mockUisPollCount = 0;
 const MOCK_UIS_QR_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
-const checkFudanUISVerify = async (): Promise<unknown> => {
+const checkFudanUISVerify = async (): Promise<CheckFudanUISVerifyApiResponse> => {
   mockUisPollCount += 1;
   if (mockUisPollCount < 3) {
     return {

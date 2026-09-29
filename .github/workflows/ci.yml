@@ -60,6 +60,9 @@ jobs:
       - name: Check mock contract
         run: pnpm check:mock
 
+      - name: Check API response contract
+        run: pnpm check:api-contract
+
       # 构建编译（build 脚本已包含 solution-style TypeScript 检查）
       - name: Type Check & Build
         run: pnpm build
