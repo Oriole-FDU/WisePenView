@@ -38,6 +38,8 @@ Mapper 不应处理：
 
 - Mapper 输入类型贴近 API response。
 - Mapper 输出类型贴近 `entity` 或 service 的业务返回类型。
+- API response 的 envelope 已由 `src/apis/request.ts` 校验；mapper 只处理 DTO payload 的可选字段、历史字段和领域归一化，不重复解包响应 envelope。
+- DTO 已声明的可选／可空字段仍需在 mapper 中做运行期类型判断，避免后端字段异常直接泄漏到 entity 或 view。
 - 不要在组件中重复定义与领域实体相同语义的类型。
 - 不要把后端 raw DTO 直接作为组件 Props。
 
@@ -64,4 +66,5 @@ src/domains/<Domain>/mapper/<entity>.mapper.ts
 - [ ] ID、时间、枚举在 mapper 中归一化。
 - [ ] 组件没有直接消费后端 raw DTO。
 - [ ] service 中没有堆叠大量字段兼容逻辑。
+- [ ] mapper 输入使用明确 API DTO，不接收未分层的 `unknown` 响应。
 - [ ] 未新增 `any`。
