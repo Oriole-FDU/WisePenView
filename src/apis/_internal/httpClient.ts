@@ -1,5 +1,4 @@
 // axios request 封装
-import { toast } from '@heroui/react';
 import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 
 import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/_internal/apiServerAddr';
@@ -22,7 +21,6 @@ const httpClient = axios.create({
   withCredentials: true,
 });
 
-const UNAUTHORIZED_TOAST_DEBOUNCE_MS = 3000;
 const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_RETRY_DELAY_MS = 300;
 
@@ -30,20 +28,10 @@ type RetryableAxiosConfig = InternalAxiosRequestConfig & {
   __wisePenRetryCount?: number;
 };
 
-let lastUnauthorizedToastAt = 0;
-
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => {
     window.setTimeout(resolve, ms);
   });
-
-const notifyUnauthorized = (): void => {
-  const now = Date.now();
-  if (now - lastUnauthorizedToastAt < UNAUTHORIZED_TOAST_DEBOUNCE_MS) return;
-
-  lastUnauthorizedToastAt = now;
-  toast.danger('无权访问');
-};
 
 const getRetryLimit = (config: RetryableAxiosConfig): number => {
   if (config.retry === false) return 0;
@@ -114,7 +102,6 @@ httpClient.interceptors.response.use(
       !requestConfig.skipUnauthorizedHandling &&
       requestConfig.__wisePenAuthSessionVersion === authSessionCoordinator.getSessionVersion()
     ) {
-      notifyUnauthorized();
       authSessionCoordinator.publish('unauthorized');
     }
     return Promise.reject(mapAxiosErrorToWisePenError(error, authSessionState));

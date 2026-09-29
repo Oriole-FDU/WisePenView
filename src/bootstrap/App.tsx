@@ -3,6 +3,7 @@ import { useMount, useUnmount } from 'ahooks';
 import { Suspense, useRef } from 'react';
 import { type ClientOnErrorFunction, RouterProvider } from 'react-router-dom';
 
+import { startApiServerAddressMonitoring, stopApiServerAddressMonitoring } from '@/apis/runtime';
 import { Spin } from '@/components/base/Feedback';
 import DesktopWindowControls from '@/components/business/DesktopWindowControls';
 import { ServicesProvider } from '@/domains';
@@ -11,7 +12,7 @@ import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
 import { resetSessionStores } from '@/store/lifecycle';
 import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';
-import { reportError } from '@/utils/error';
+import { installGlobalErrorReporting, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import styles from './App.module.less';
@@ -50,6 +51,7 @@ function PageLoadingFallback() {
 
 function App() {
   const unsubscribeAuthSessionRef = useRef<(() => void) | null>(null);
+  const stopGlobalErrorReportingRef = useRef<(() => void) | null>(null);
   const sessionEndedRef = useRef(false);
   useViewportLayoutScale();
 
@@ -75,9 +77,14 @@ function App() {
 
   useMount(() => {
     unsubscribeAuthSessionRef.current = authSessionCoordinator.subscribe(handleAuthSessionEvent);
+    stopGlobalErrorReportingRef.current = installGlobalErrorReporting();
+    startApiServerAddressMonitoring();
   });
 
   useUnmount(() => {
+    stopApiServerAddressMonitoring();
+    stopGlobalErrorReportingRef.current?.();
+    stopGlobalErrorReportingRef.current = null;
     unsubscribeAuthSessionRef.current?.();
     unsubscribeAuthSessionRef.current = null;
   });
