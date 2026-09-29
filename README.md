@@ -39,6 +39,15 @@ Mock 模式：
 pnpm mock
 ```
 
+### 4 公开配置与初始化
+
+浏览器只从 `src/config/runtimeConfig.ts` 读取公开环境配置，解析规则集中在
+`src/config/publicConfig.ts`。API、Office、Draw.io、mock 模式和开发流量标记不再由页面分别读取
+`import.meta.env`；配置只允许显式列出的 `VITE_*` 值，未配置或 URL／数值格式错误会在构建入口直接报错。
+
+生产模式额外需要校内 API、探测路径和超时；开发与 mock 模式不会启动内外网探测。浏览器网络监听与轮询由
+`App` 挂载时启动、卸载时停止，HTTP 层只发布会话失效事件，未授权提示与登录跳转由 `App` 统一处理。
+
 Mock 與正式環境共用 service、mapper、快取和 registry，只在 `@domain-apis` 替換 API 與 OSS I/O。模擬資料存於記憶體，重新整理後重置；API 契約變更時需同步更新 mock API。
 
 Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 service 尚未提供的能力，在 mock 中也維持未開放狀態。Chat 串流、外部協作、Office 編輯與語音辨識不在此模擬範圍。

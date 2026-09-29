@@ -8,6 +8,7 @@
 - `src/components/business/`：跨页面复用的业务组件。
 - `src/views/`：页面私有业务 UI、Controller、配置和状态。
 - `src/layouts/`：路由壳和壳内私有实现。
+- `src/config/`：公开运行时配置的声明、验证与浏览器入口。
 - `src/apis/`：Axios 与请求基础设施。
 - `scripts/`：构建和离线检查脚本。
 - `.github/workflows/`：CI 和发布工作流。
