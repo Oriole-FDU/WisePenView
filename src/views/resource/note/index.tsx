@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import { NoteEditorSession } from '@/components/business/Note/CustomBlockNote/NoteEditorSession';
+import { publicAppConfig } from '@/config/runtimeConfig';
 import { useNoteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
@@ -60,7 +61,7 @@ function NoteView({ resourceId }: { resourceId: string }) {
   } = useApi(
     async () => {
       const info = await noteService.getNoteInfoDisplay({ resourceId });
-      if (import.meta.env.MODE === 'mock') {
+      if (publicAppConfig.mode === 'mock') {
         const { getNotePreview } = await import('./mock/notePreview');
         return { ...info, aiDiffPreview: getNotePreview(resourceId) };
       }

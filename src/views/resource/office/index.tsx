@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
+import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import {
@@ -24,9 +25,6 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDocumentViewerSwitcher } from '../_hooks/useDocumentViewerSwitcher';
 import styles from './style.module.less';
-
-const ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL = import.meta.env
-  .VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL;
 
 interface OfficeWorkspaceProps {
   children: ReactNode;
@@ -268,7 +266,7 @@ function OfficeView({ resourceId }: OfficeViewProps = {}) {
         <OfficeEditorHost
           key={`${resourceId}-${data.editorConfig.sessionId ?? 'session'}`}
           config={data.editorConfig.config}
-          documentServerUrl={ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL}
+          documentServerUrl={publicAppConfig.office.documentServerUrl}
           resourceId={resourceId}
           onReady={handleEditorReady}
           onError={handleEditorError}

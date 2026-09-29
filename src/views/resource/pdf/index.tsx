@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import PdfViewer from '@/components/business/PdfViewer/index';
+import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import {
@@ -91,7 +92,7 @@ function PdfView({ resourceId }: PdfViewProps = {}) {
   } = useApi(
     async () => {
       const info = await documentService.getDocInfo(resourceId as string);
-      if (import.meta.env.MODE === 'mock') {
+      if (publicAppConfig.mode === 'mock') {
         const { MOCK_PDF_PREVIEW_URL } = await import('./mock/pdfPreview');
         return { ...info, previewUrl: MOCK_PDF_PREVIEW_URL };
       }
