@@ -3,6 +3,7 @@ import type { SkillDetail } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
 
 interface SkillResourceData {
+  currentUserId: string;
   isOwner: boolean;
   skill: SkillDetail;
 }
@@ -27,7 +28,7 @@ export function useSkillResourceController(resourceId: string) {
         targetVersion > 0
           ? await skillService.getSkillVersionFiles(resourceId, targetVersion)
           : baseSkill;
-      return { isOwner, skill };
+      return { currentUserId: currentUser.id, isOwner, skill };
     },
     {
       ready: Boolean(resourceId),
@@ -41,6 +42,7 @@ export function useSkillResourceController(resourceId: string) {
   });
 
   return {
+    currentUserId: data?.currentUserId,
     error,
     isOwner: data?.isOwner ?? false,
     loading,

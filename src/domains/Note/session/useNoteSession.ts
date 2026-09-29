@@ -9,9 +9,9 @@ import { NoteSaveStatusObserver } from './NoteSaveStatusObserver';
 import { NoteStatusObserver } from './NoteStatusObserver';
 import { WisepenProvider } from './WisepenProvider';
 
-/** y-indexeddb 存储键：单条笔记一个 room，与 resourceId 对应（不承诺离线冷启动可打开） */
-export function noteYjsIdbRoomName(resourceId: string): string {
-  return `${STORAGE_PREFIXES.noteYjsIdbRoom}${resourceId}`;
+/** y-indexeddb 存储键：按账号和笔记隔离 room（不承诺离线冷启动可打开）。 */
+export function noteYjsIdbRoomName(resourceId: string, accountId: string): string {
+  return `${STORAGE_PREFIXES.noteYjsIdbRoom}${encodeURIComponent(accountId)}:${encodeURIComponent(resourceId)}`;
 }
 
 type IndexeddbSyncedObservable = {
@@ -73,7 +73,10 @@ export function useNoteSession(resourceId: string, options: UseNoteSessionOption
   const [session] = useState(() => {
     const doc = new Y.Doc();
     const provider = new WisepenProvider(resourceId, doc, { connect: false });
-    const idb = localOnly ? null : new IndexeddbPersistence(noteYjsIdbRoomName(resourceId), doc);
+    const idb =
+      localOnly || !actorUserId
+        ? null
+        : new IndexeddbPersistence(noteYjsIdbRoomName(resourceId, actorUserId), doc);
     const observer = new NoteStatusObserver();
     const saveObserver = new NoteSaveStatusObserver();
     const idbObserver = new NoteIndexeddbSyncObserver(idb);

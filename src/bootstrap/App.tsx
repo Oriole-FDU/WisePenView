@@ -6,6 +6,7 @@ import { type ClientOnErrorFunction, RouterProvider } from 'react-router-dom';
 import { startApiServerAddressMonitoring, stopApiServerAddressMonitoring } from '@/apis/runtime';
 import { Spin } from '@/components/base/Feedback';
 import DesktopWindowControls from '@/components/business/DesktopWindowControls';
+import { INDEXED_DB_NAMES, STORAGE_PREFIXES } from '@/constants/storageKeys';
 import { ServicesProvider } from '@/domains';
 import { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
@@ -14,6 +15,7 @@ import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';
 import { installGlobalErrorReporting, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+import { clearIndexedDbDatabases } from '@/utils/storage/localData';
 
 import styles from './App.module.less';
 import { buildLoginPathForCurrentLocation } from './authContinuation';
@@ -22,9 +24,15 @@ import router from './router';
 const UNAUTHORIZED_TOAST_DEBOUNCE_MS = 3000;
 let lastUnauthorizedToastAt = 0;
 
-const resetSessionState = (): void => {
+const resetSessionState = (clearPersistentData = false): void => {
   clearAllServiceCaches();
   resetSessionStores();
+  if (clearPersistentData) {
+    void clearIndexedDbDatabases([
+      INDEXED_DB_NAMES.skillDraftCache,
+      STORAGE_PREFIXES.noteYjsIdbRoom,
+    ]);
+  }
 };
 
 const redirectToLogin = (): void => {
@@ -64,7 +72,7 @@ function App() {
 
     if (sessionEndedRef.current) return;
     sessionEndedRef.current = true;
-    resetSessionState();
+    resetSessionState(true);
     if (event.type === 'unauthorized') {
       const now = Date.now();
       if (now - lastUnauthorizedToastAt >= UNAUTHORIZED_TOAST_DEBOUNCE_MS) {
