@@ -2,7 +2,10 @@ import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
 import { addMockResource, getMockResource } from '@/domains/Resource/mock/resourceStore';
 
 import type { NoteApi as NoteApiContract } from '../apis/NoteApi';
-import type { GetDrawIoLatestSnapshotApiResponse } from '../apis/NoteApi.type';
+import type {
+  GetDrawIoLatestSnapshotApiResponse,
+  ListNoteVersionsApiResponse,
+} from '../apis/NoteApi.type';
 
 const snapshots = new Map<string, GetDrawIoLatestSnapshotApiResponse>();
 export const NoteApi: typeof NoteApiContract = {
@@ -29,5 +32,6 @@ export const NoteApi: typeof NoteApiContract = {
       source.resourceType ?? 'NOTE'
     );
   },
-  listNoteVersions: (params) => mockResponse(mockPage([], params)),
+  listNoteVersions: (params): Promise<ListNoteVersionsApiResponse> =>
+    mockResponse(mockPage([], params)),
 };

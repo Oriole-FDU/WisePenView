@@ -7,6 +7,7 @@ import {
 import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
+  GetUserWalletInfoApiResponse,
   ListTransactionsApiRequest,
   ListTransactionsApiResponse,
   WalletBusinessTypeApiValue,
@@ -86,7 +87,7 @@ const mapTransactionRowFromApi = (
   };
 };
 
-const mapGetUserWalletInfoFromApi = (data: Record<string, unknown>): GetWalletInfoResponse => {
+const mapGetUserWalletInfoFromApi = (data: GetUserWalletInfoApiResponse): GetWalletInfoResponse => {
   const tokenBalance = toNum(data.tokenBalance, 0);
   const tokenUsed = toNum(data.tokenUsed, 0);
   return { tokenBalance, tokenUsed, balance: tokenBalance };

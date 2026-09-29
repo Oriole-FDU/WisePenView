@@ -9,6 +9,7 @@ import type {
   GetNoteInfoApiRequest,
   GetNoteInfoApiResponse,
   ListNoteVersionsApiRequest,
+  ListNoteVersionsApiResponse,
   SaveDrawIoSnapshotApiRequest,
 } from './NoteApi.type';
 
@@ -34,7 +35,7 @@ function forkNote(req: ForkNoteApiRequest): Promise<string> {
   return apiPost('/note/forkNote', req);
 }
 
-function listNoteVersions(req: ListNoteVersionsApiRequest): Promise<unknown> {
+function listNoteVersions(req: ListNoteVersionsApiRequest): Promise<ListNoteVersionsApiResponse> {
   return apiGet('/note/listNoteVersions', { params: req });
 }
 

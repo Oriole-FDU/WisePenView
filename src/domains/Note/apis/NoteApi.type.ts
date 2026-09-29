@@ -52,6 +52,20 @@ export interface ForkNoteApiRequest {
   forkedResourceName?: string;
 }
 
+export interface NoteVersionSummaryApiResponse {
+  version?: number | null;
+  type?: string | null;
+  createdBy?: number[] | null;
+}
+
+export interface ListNoteVersionsApiResponse {
+  list?: NoteVersionSummaryApiResponse[] | null;
+  total?: number | null;
+  page?: number | null;
+  size?: number | null;
+  totalPage?: number | null;
+}
+
 export interface ListNoteVersionsApiRequest extends OptionalPageApiRequest {
   resourceId: string;
 }

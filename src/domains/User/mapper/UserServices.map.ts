@@ -12,6 +12,7 @@ import type {
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
   CheckEmailVerifyApiRequest,
+  CheckFudanUISVerifyApiResponse,
   GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
@@ -142,21 +143,14 @@ const mapInitiateUISVerifyRequest = (
   uisPassword: params.uisPassword,
 });
 
-const mapFudanUISVerifyStatusFromApi = (raw: unknown): FudanUISVerifyStatusData => {
-  if (!raw || typeof raw !== 'object') {
-    return {
-      completed: false,
-      requireAction: false,
-      actionPayload: '',
-      message: '',
-    };
-  }
-  const data = raw as Record<string, unknown>;
+const mapFudanUISVerifyStatusFromApi = (
+  data: CheckFudanUISVerifyApiResponse | null | undefined
+): FudanUISVerifyStatusData => {
   return {
-    completed: Boolean(data.completed),
-    requireAction: Boolean(data.requireAction),
-    actionPayload: typeof data.actionPayload === 'string' ? data.actionPayload : '',
-    message: typeof data.message === 'string' ? data.message : '',
+    completed: data?.completed === true,
+    requireAction: data?.requireAction === true,
+    actionPayload: typeof data?.actionPayload === 'string' ? data.actionPayload : '',
+    message: typeof data?.message === 'string' ? data.message : '',
   };
 };
 
