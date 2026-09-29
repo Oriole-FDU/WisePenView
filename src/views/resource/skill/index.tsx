@@ -44,7 +44,7 @@ function SkillView({ resourceId }: SkillViewProps) {
   const { t } = useTranslation('skill');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resource = useSkillResourceController(resourceId);
-  const workspace = useSkillWorkspaceDraftController(resource.skill);
+  const workspace = useSkillWorkspaceDraftController(resource.skill, resource.currentUserId);
   const canEdit = canEditSkill(resource.skill, workspace.state.viewingVersion, resource.isOwner);
   const isConfigSelected = workspace.state.selectedTreeNodeId === SKILL_CONFIG_NODE_ID;
   const selectedFile = isConfigSelected ? null : workspace.selectedFile;

@@ -50,21 +50,33 @@ function workspaceReducer(
   return action.type === 'replace' ? action.state : action.update(state);
 }
 
-function isMatchingCache(snapshot: SkillDraftCacheSnapshot, draftVersion: number): boolean {
-  return snapshot.schemaVersion === 2 && snapshot.draftVersion === draftVersion;
+function isMatchingCache(
+  snapshot: SkillDraftCacheSnapshot,
+  accountId: string,
+  draftVersion: number
+): boolean {
+  return (
+    snapshot.schemaVersion === 2 &&
+    snapshot.accountId === accountId &&
+    snapshot.draftVersion === draftVersion
+  );
 }
 
-export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
+export function useSkillWorkspaceDraftController(skill?: SkillDetail, accountId?: string) {
   const [state, dispatch] = useReducer(workspaceReducer, undefined, createEmptySkillWorkspaceState);
   const cacheWriteVersionRef = useRef(0);
-  const resourceKey = skill ? createSkillWorkspaceResourceKey(skill) : '';
+  const normalizedAccountId = accountId?.trim() ?? '';
+  const resourceKey =
+    skill && normalizedAccountId
+      ? `${normalizedAccountId}:${createSkillWorkspaceResourceKey(skill)}`
+      : '';
   const [cacheReadyKey, setCacheReadyKey] = useState<string | null>(null);
 
   const skillResourceId = skill?.resourceId ?? '';
   const skillDraftVersion = skill?.draftVersion ?? 0;
 
-  if (skill && state.resourceKey !== resourceKey) {
-    const initialState = createInitialSkillWorkspaceState(skill);
+  if (skill && normalizedAccountId && state.resourceKey !== resourceKey) {
+    const initialState = { ...createInitialSkillWorkspaceState(skill), resourceKey };
     dispatch({ type: 'replace', state: initialState });
   }
 
@@ -77,9 +89,9 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
   };
 
   const clearDraftCache = async () => {
-    if (!skillResourceId) return;
+    if (!skillResourceId || !normalizedAccountId) return;
     invalidateCacheWrites();
-    await clearSkillDraftCache(skillResourceId).catch(() => undefined);
+    await clearSkillDraftCache(skillResourceId, normalizedAccountId).catch(() => undefined);
   };
 
   /**
@@ -92,10 +104,10 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
     if (!skillResourceId || !skillDraftVersion || !resourceKey) return;
     let disposed = false;
     cacheWriteVersionRef.current += 1;
-    void loadSkillDraftCache(skillResourceId)
+    void loadSkillDraftCache(skillResourceId, normalizedAccountId)
       .then((snapshot) => {
         if (disposed) return;
-        if (snapshot && isMatchingCache(snapshot, skillDraftVersion)) {
+        if (snapshot && isMatchingCache(snapshot, normalizedAccountId, skillDraftVersion)) {
           const restoredState: SkillWorkspaceDraftState = {
             ...snapshot.workspace,
             resourceKey,
@@ -113,7 +125,7 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
           });
           toast.warning(i18n.t('toast.draftRestored', { ns: 'skill' }));
         } else if (snapshot) {
-          void clearSkillDraftCache(skillResourceId);
+          void clearSkillDraftCache(skillResourceId, normalizedAccountId);
         }
         setCacheReadyKey(resourceKey);
       })
@@ -123,7 +135,7 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
     return () => {
       disposed = true;
     };
-  }, [resourceKey, skillDraftVersion, skillResourceId]);
+  }, [normalizedAccountId, resourceKey, skillDraftVersion, skillResourceId]);
 
   const isConfigDirty = state.configDirty;
   const dirtyFileIds = new Set(Object.values(state.fileDrafts).map((draft) => draft.fileId));
@@ -149,6 +161,7 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
       if (cacheWriteVersionRef.current !== writeVersion) return;
       const cacheToken = `${resourceKey}:${writeVersion}:${Date.now()}`;
       const snapshot: SkillDraftCacheSnapshot = {
+        accountId: normalizedAccountId,
         schemaVersion: 2,
         resourceId: skillResourceId,
         draftVersion: skillDraftVersion,
@@ -159,14 +172,24 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
       void saveSkillDraftCache(snapshot)
         .then(() => {
           if (cacheWriteVersionRef.current === writeVersion) return;
-          void loadSkillDraftCache(snapshot.resourceId).then((cached) => {
-            if (cached?.cacheToken === cacheToken) void clearSkillDraftCache(snapshot.resourceId);
+          void loadSkillDraftCache(snapshot.resourceId, normalizedAccountId).then((cached) => {
+            if (cached?.cacheToken === cacheToken) {
+              void clearSkillDraftCache(snapshot.resourceId, normalizedAccountId);
+            }
           });
         })
         .catch(() => undefined);
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [cacheReadyKey, hasUnsavedChanges, resourceKey, skillDraftVersion, skillResourceId, state]);
+  }, [
+    cacheReadyKey,
+    hasUnsavedChanges,
+    normalizedAccountId,
+    resourceKey,
+    skillDraftVersion,
+    skillResourceId,
+    state,
+  ]);
 
   /**
    * @wisepen-manual-effect
@@ -175,10 +198,16 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail) {
    * cleanup：删除操作幂等，无额外订阅需要清理。
    */
   useEffect(() => {
-    if (!skillResourceId || cacheReadyKey !== resourceKey || hasUnsavedChanges) return;
+    if (
+      !skillResourceId ||
+      !normalizedAccountId ||
+      cacheReadyKey !== resourceKey ||
+      hasUnsavedChanges
+    )
+      return;
     cacheWriteVersionRef.current += 1;
-    void clearSkillDraftCache(skillResourceId).catch(() => undefined);
-  }, [cacheReadyKey, hasUnsavedChanges, resourceKey, skillResourceId]);
+    void clearSkillDraftCache(skillResourceId, normalizedAccountId).catch(() => undefined);
+  }, [cacheReadyKey, hasUnsavedChanges, normalizedAccountId, resourceKey, skillResourceId]);
 
   const selectedFile = state.selectedFileId ? findFile(state.files, state.selectedFileId) : null;
   const activeContent = getSkillFileContent(selectedFile, state.fileDrafts);

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useUserService } from '@/domains';
 import { type NoteAiDiffPreviewData, useNoteSession } from '@/domains/Note';
+import type { User } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { useSmoothFlag } from '@/hooks/useSmoothFlag';
 
@@ -25,10 +26,39 @@ export function NoteEditorSession({
   aiDiffPreview?: NoteAiDiffPreviewData;
   children: ReactNode;
 }) {
-  const { t } = useTranslation('note');
   const userService = useUserService();
   const { data: currentUser, error: currentUserError } = useApi(() => userService.getUserInfo());
   const shouldWaitCurrentUser = !currentUser && !currentUserError;
+  return (
+    <NoteEditorSessionRuntime
+      key={`${resourceId}:${currentUser?.id ?? 'pending'}:${Boolean(aiDiffPreview)}`}
+      resourceId={resourceId}
+      canCollaborativeEdit={canCollaborativeEdit}
+      aiDiffPreview={aiDiffPreview}
+      currentUser={currentUser}
+      shouldWaitCurrentUser={shouldWaitCurrentUser}
+    >
+      {children}
+    </NoteEditorSessionRuntime>
+  );
+}
+
+function NoteEditorSessionRuntime({
+  resourceId,
+  canCollaborativeEdit,
+  aiDiffPreview,
+  currentUser,
+  shouldWaitCurrentUser,
+  children,
+}: {
+  resourceId: string;
+  canCollaborativeEdit: boolean;
+  aiDiffPreview?: NoteAiDiffPreviewData;
+  currentUser?: User;
+  shouldWaitCurrentUser: boolean;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation('note');
   const { status, saveStatus, doc, provider, reconnect, idbSynced } = useNoteSession(resourceId, {
     actorUserId: currentUser?.id,
     enabled: !shouldWaitCurrentUser,
