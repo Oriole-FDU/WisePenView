@@ -7,6 +7,7 @@ import type {
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
   CheckEmailVerifyApiRequest,
+  CheckFudanUISVerifyApiResponse,
   GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
@@ -41,7 +42,7 @@ function initiateFudanUISVerify(req: InitiateFudanUISVerifyApiRequest): Promise<
   return apiPost('/user/verify/initiateFudanUISVerify', null, { params: req });
 }
 
-function checkFudanUISVerify(): Promise<unknown> {
+function checkFudanUISVerify(): Promise<CheckFudanUISVerifyApiResponse> {
   return apiGet('/user/verify/checkFudanUISVerify');
 }
 

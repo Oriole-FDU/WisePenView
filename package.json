@@ -25,6 +25,7 @@
     "format:check": "prettier --check \"**/*.{js,jsx,mjs,cjs,ts,tsx,json,md}\" \".github/**/*.{yml,yaml}\"",
     "typecheck": "tsc -b",
     "check:mock": "node scripts/check-mock.mjs",
+    "check:api-contract": "node scripts/check-api-contract.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

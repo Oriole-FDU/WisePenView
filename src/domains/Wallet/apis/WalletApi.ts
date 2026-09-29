@@ -1,6 +1,7 @@
 import { apiGet, apiPost } from '@/apis/request';
 
 import type {
+  GetUserWalletInfoApiResponse,
   ListTransactionsApiRequest,
   ListTransactionsApiResponse,
   RedeemVoucherApiRequest,
@@ -26,7 +27,7 @@ const serializeWalletTransactionsQuery = (params: ListTransactionsApiRequest): s
   return searchParams.toString();
 };
 
-function getUserWalletInfo(): Promise<Record<string, unknown>> {
+function getUserWalletInfo(): Promise<GetUserWalletInfoApiResponse> {
   return apiGet('/user/wallet/getUserWalletInfo');
 }
 

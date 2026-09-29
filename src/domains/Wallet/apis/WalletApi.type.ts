@@ -5,6 +5,11 @@ export interface RedeemVoucherApiRequest {
   voucherCode: string;
 }
 
+export interface GetUserWalletInfoApiResponse {
+  tokenBalance?: number | string | null;
+  tokenUsed?: number | string | null;
+}
+
 export type WalletTransactionTypeApiValue =
   | 'REFILL'
   | 'SPEND'

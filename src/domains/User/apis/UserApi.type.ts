@@ -89,6 +89,13 @@ export interface InitiateFudanUISVerifyApiRequest {
   uisPassword: string;
 }
 
+export interface CheckFudanUISVerifyApiResponse {
+  completed?: boolean | null;
+  requireAction?: boolean | null;
+  actionPayload?: string | null;
+  message?: string | null;
+}
+
 export interface CheckEmailVerifyApiRequest {
   token: string;
 }
