@@ -1,49 +1,49 @@
+import { publicAppConfig } from '@/config/runtimeConfig';
+
 /**
  * 运行时 API 地址单例。
  *
- * dev / mock：直接使用 `VITE_API_BASE_URL`。
- * production：默认外网兜底，后台探测内网 `ping`，可达后切到校内地址。
+ * dev / mock：直接使用公开 API 地址。
+ * production：由应用入口启动内外网探测；停止时移除监听、清理轮询并终止探测。
  */
 
 const POLL_INTERVAL_MS = 60_000;
 const ADDR_READY_AWAIT_MS = 1_500;
-const EXTRANET_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const { api: apiConfig } = publicAppConfig;
+const switchingEnabled = apiConfig.switchByNetwork;
+const extranetBaseUrl = apiConfig.baseUrl;
 
-let serverBaseUrl = EXTRANET_BASE_URL;
-let switchingEnabled = false;
-let intranetBaseUrl = '';
-let pingPath = '';
-let probeTimeoutMs = 1_000;
+let serverBaseUrl = extranetBaseUrl;
+let monitoringStarted = false;
 let addrSuspectedDead = false;
 let probeInflight: Promise<void> | null = null;
+let probeAbortController: AbortController | null = null;
 let pollTimerId: number | null = null;
+let lifecycleToken = 0;
 
-// 生产环境下，启用内外网切换逻辑
-if (import.meta.env.MODE === 'production') {
-  switchingEnabled = true;
-  intranetBaseUrl = import.meta.env.VITE_API_BASE_URL_INTRANET;
-  pingPath = import.meta.env.VITE_INTRANET_PING_PATH;
-  probeTimeoutMs = Number(import.meta.env.VITE_NETWORK_PROBE_TIMEOUT);
+const handleOnline = (): void => {
+  triggerImmediateProbe();
+};
 
-  void runProbe();
+const handleOffline = (): void => {
+  if (monitoringStarted) addrSuspectedDead = true;
+};
 
-  window.addEventListener('online', () => {
+const handleVisibilityChange = (): void => {
+  if (document.visibilityState === 'visible') {
     triggerImmediateProbe();
-  });
-  window.addEventListener('offline', () => {
-    addrSuspectedDead = true;
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      triggerImmediateProbe();
-    }
-  });
-}
+  }
+};
 
 async function probeIntranet(): Promise<boolean> {
-  const url = new URL(pingPath, intranetBaseUrl).toString();
+  const intranetBaseUrl = apiConfig.intranetBaseUrl;
+  const intranetPingPath = apiConfig.intranetPingPath;
+  if (!intranetBaseUrl || !intranetPingPath) return false;
+
+  const url = new URL(intranetPingPath, intranetBaseUrl).toString();
   const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), probeTimeoutMs);
+  probeAbortController = controller;
+  const timer = window.setTimeout(() => controller.abort(), apiConfig.networkProbeTimeoutMs);
   try {
     const res = await fetch(url, {
       method: 'GET',
@@ -57,45 +57,84 @@ async function probeIntranet(): Promise<boolean> {
     return false;
   } finally {
     window.clearTimeout(timer);
+    if (probeAbortController === controller) probeAbortController = null;
   }
 }
 
-async function probeAndSwitch(): Promise<void> {
+async function probeAndSwitch(token: number): Promise<void> {
   const intranetOk = await probeIntranet();
-  if (intranetOk) {
-    serverBaseUrl = intranetBaseUrl;
-  } else {
-    serverBaseUrl = EXTRANET_BASE_URL;
-  }
+  if (!monitoringStarted || token !== lifecycleToken) return;
+
+  serverBaseUrl = intranetOk ? (apiConfig.intranetBaseUrl ?? extranetBaseUrl) : extranetBaseUrl;
   addrSuspectedDead = false;
 }
 
+function scheduleNextProbe(token: number): void {
+  if (!monitoringStarted || token !== lifecycleToken) return;
+  if (pollTimerId !== null) window.clearTimeout(pollTimerId);
+  pollTimerId = window.setTimeout(() => {
+    if (!monitoringStarted || token !== lifecycleToken) return;
+    pollTimerId = null;
+    void runProbe();
+  }, POLL_INTERVAL_MS);
+}
+
 function runProbe(): Promise<void> {
+  if (!switchingEnabled || !monitoringStarted) return Promise.resolve();
   if (probeInflight) return probeInflight;
-  probeInflight = (async () => {
+
+  const token = lifecycleToken;
+  const currentProbe = (async () => {
     try {
-      await probeAndSwitch();
+      await probeAndSwitch(token);
     } finally {
-      probeInflight = null;
-      if (pollTimerId !== null) {
-        window.clearTimeout(pollTimerId);
+      if (monitoringStarted && token === lifecycleToken) {
+        probeInflight = null;
+        scheduleNextProbe(token);
       }
-      pollTimerId = window.setTimeout(() => {
-        pollTimerId = null;
-        void runProbe();
-      }, POLL_INTERVAL_MS);
     }
   })();
-  return probeInflight;
+  probeInflight = currentProbe;
+  return currentProbe;
 }
 
 function triggerImmediateProbe(): void {
-  if (!switchingEnabled) return;
+  if (!switchingEnabled || !monitoringStarted) return;
   if (pollTimerId !== null) {
     window.clearTimeout(pollTimerId);
     pollTimerId = null;
   }
   void runProbe();
+}
+
+export function startApiServerAddressMonitoring(): void {
+  if (!switchingEnabled || monitoringStarted) return;
+
+  monitoringStarted = true;
+  lifecycleToken += 1;
+  window.addEventListener('online', handleOnline);
+  window.addEventListener('offline', handleOffline);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  void runProbe();
+}
+
+export function stopApiServerAddressMonitoring(): void {
+  if (!switchingEnabled || !monitoringStarted) return;
+
+  monitoringStarted = false;
+  lifecycleToken += 1;
+  window.removeEventListener('online', handleOnline);
+  window.removeEventListener('offline', handleOffline);
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+  if (pollTimerId !== null) {
+    window.clearTimeout(pollTimerId);
+    pollTimerId = null;
+  }
+  probeAbortController?.abort();
+  probeAbortController = null;
+  probeInflight = null;
+  addrSuspectedDead = false;
+  serverBaseUrl = extranetBaseUrl;
 }
 
 export function notifyAddrFailure(): void {
@@ -105,8 +144,7 @@ export function notifyAddrFailure(): void {
 }
 
 export async function awaitAddrReady(maxWaitMs: number = ADDR_READY_AWAIT_MS): Promise<void> {
-  if (!switchingEnabled) return;
-  if (!addrSuspectedDead) return;
+  if (!switchingEnabled || !monitoringStarted || !addrSuspectedDead) return;
   const inflight = probeInflight;
   if (!inflight) return;
   await Promise.race([

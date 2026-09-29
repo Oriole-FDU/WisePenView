@@ -7,11 +7,10 @@ import App from './bootstrap/App';
 import './styles/global/index.css';
 import './styles/global/scrollbar.less';
 import { syncViewportLayoutScale } from '@/utils/browser/layoutScale';
-import { installGlobalErrorReporting, reportError } from './utils/error';
+import { reportError } from './utils/error';
 import RootErrorFallback from './views/app/error/RootErrorFallback';
 
 syncViewportLayoutScale();
-installGlobalErrorReporting();
 
 const root = createRoot(document.getElementById('root')!, {
   onUncaughtError: (error, errorInfo) => {

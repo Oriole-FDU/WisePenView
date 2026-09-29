@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
+import { publicAppConfig } from '@/config/runtimeConfig';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { useInteractService, useNoteService, useUserService } from '@/domains';
 import type {
@@ -35,7 +36,6 @@ import styles from './style.module.less';
 
 const WISEPEN_COLOR_SCHEMES = new Set(['mist', 'floral', 'aqua', 'sunset', 'emerald', 'lavender']);
 const LEGACY_MIST_COLOR_SCHEME = 'default';
-const DRAWIO_EMBED_URL = import.meta.env.VITE_DRAWIO_EMBED_URL || 'https://embed.diagrams.net/';
 
 interface DrawioViewProps {
   resourceId?: string;
@@ -202,13 +202,13 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
   const canViewVersions = Boolean(noteInfoDisplay.ownerId);
   const title = useResourceDisplayName(resourceId, noteInfoDisplay.noteTitle, t('drawio.unnamed'));
   const drawioUrl = buildDrawioUrl({
-    embedUrl: DRAWIO_EMBED_URL,
+    embedUrl: publicAppConfig.drawio.embedUrl,
     canEdit,
     language: i18n.resolvedLanguage ?? 'zh-CN',
     theme: readWisePenTheme(),
     colorScheme: readWisePenColorScheme(),
   });
-  const drawioOrigin = readDrawioEmbedOrigin(DRAWIO_EMBED_URL);
+  const drawioOrigin = readDrawioEmbedOrigin(publicAppConfig.drawio.embedUrl);
   const { iframeRef, currentVersion, saveState, editorReady, editorLoaded, requestSave } =
     useDrawioEditorSession({
       canEdit,

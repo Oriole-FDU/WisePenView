@@ -9,14 +9,15 @@
 
 ## 按变更范围选择
 
-| 变更范围                             | 必需验证                                         | 条件验证                             |
-| ------------------------------------ | ------------------------------------------------ | ------------------------------------ |
-| Markdown、模板、普通配置             | `git diff --check`                               | `pnpm lint`（若影响 JS 配置）        |
-| `src/**/*.ts(x)`                     | `pnpm lint`、`pnpm typecheck`                    | `pnpm build`（跨层或构建配置）       |
-| `src/domains/**`、registry、mock     | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock` | `pnpm build`                         |
-| `vite.config.ts`、tsconfig、Electron | `pnpm lint`、`pnpm typecheck`、`pnpm build`      | 对应打包脚本                         |
-| Storybook 配置或 stories             | `pnpm lint`、`pnpm typecheck`                    | `pnpm build-storybook`               |
-| UI 交互、路由、浮层                  | 上述静态检查                                     | 用户明确授权后运行 mock 或浏览器回归 |
+| 变更范围                             | 必需验证                                                       | 条件验证                                                     |
+| ------------------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------ |
+| Markdown、模板、普通配置             | `git diff --check`                                             | `pnpm lint`（若影响 JS 配置）                                |
+| `src/**/*.ts(x)`                     | `pnpm lint`、`pnpm typecheck`                                  | `pnpm build`（跨层或构建配置）                               |
+| `src/domains/**`、registry、mock     | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`               | `pnpm build`                                                 |
+| `vite.config.ts`、tsconfig、Electron | `pnpm lint`、`pnpm typecheck`、`pnpm build`                    | 对应打包脚本                                                 |
+| F23／F31 配置与初始化生命周期        | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm build` | `pnpm build --mode mock`、配置错误启动检查、浏览器运行态回归 |
+| Storybook 配置或 stories             | `pnpm lint`、`pnpm typecheck`                                  | `pnpm build-storybook`                                       |
+| UI 交互、路由、浮层                  | 上述静态检查                                                   | 用户明确授权后运行 mock 或浏览器回归                         |
 
 ## CI 契约
 
@@ -25,3 +26,5 @@ PR CI 固定执行 commitlint、lint、build、mock contract、API response cont
 ## 运行态记录
 
 运行 mock 或浏览器时记录：日期、浏览器版本、窗口尺寸、操作步骤、预期结果、实际结果和控制台错误。没有启动服务时，不要声称完成页面行为验证。
+
+F23／F31 运行态至少覆盖 `/login`、`/chat`、`/drive/personal`、资源 PDF／Note／Office／Draw.io 路由；生产模式还要观察首次探测、online／offline、visibilitychange 及停止后的网络请求。应确认 Office／Draw.io 使用集中配置，mock 模式不发起校内探测，401 只由 App 提示一次并完成登录回跳。
