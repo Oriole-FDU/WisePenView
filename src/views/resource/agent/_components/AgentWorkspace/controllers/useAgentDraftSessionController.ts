@@ -1,6 +1,6 @@
 import { toast } from '@heroui/react';
 import type { TFunction } from 'i18next';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useAgentService } from '@/domains';
 import type { AgentDetail, AgentSpec } from '@/domains/Agent';
@@ -55,6 +55,7 @@ export function useAgentDraftSessionController({
   const [savePhase, setSavePhase] = useState<AgentSavePhase>(() =>
     snapshotAgentDraft(initialDraft) === snapshotAgentDraft(initialSavedDraft) ? 'clean' : 'dirty'
   );
+  const savePromiseRef = useRef<Promise<unknown> | null>(null);
   const isDirty = savePhase === 'dirty' || savePhase === 'failed';
 
   const setDraft = (updater: (current: AgentDraft) => AgentDraft) =>
@@ -65,22 +66,27 @@ export function useAgentDraftSessionController({
     });
 
   const saveRequest = useApi(
-    async () => {
+    async (draftSnapshot: AgentDraft) => {
       if (!isOwner || viewingVersion !== null) return;
       setSavePhase('saving');
       await agentService.saveAgentDraft({
         resourceId,
         draftVersion: baseAgent.draftVersion,
-        name: draft.name.trim(),
-        description: draft.description.trim(),
-        spec: draft.spec,
+        name: draftSnapshot.name.trim(),
+        description: draftSnapshot.description.trim(),
+        spec: draftSnapshot.spec,
       });
+      return snapshotAgentDraft(draftSnapshot);
     },
     {
       manual: true,
-      onSuccess: () => {
-        setSavedSnapshot(snapshotAgentDraft(draft));
-        setSavePhase('clean');
+      onSuccess: (savedDraftSnapshot) => {
+        if (!savedDraftSnapshot) return;
+        setSavedSnapshot(savedDraftSnapshot);
+        setDraftState((current) => {
+          setSavePhase(snapshotAgentDraft(current) === savedDraftSnapshot ? 'clean' : 'dirty');
+          return current;
+        });
         toast.success(t('agent:page.saved'));
       },
       onErrorEffect: () => {
@@ -89,10 +95,25 @@ export function useAgentDraftSessionController({
     }
   );
 
+  const saveDraftRequest = async () => {
+    if (savePromiseRef.current) {
+      await savePromiseRef.current;
+      return;
+    }
+    const draftSnapshot = structuredClone(draft);
+    const request = saveRequest.runAsync(draftSnapshot);
+    savePromiseRef.current = request;
+    try {
+      await request;
+    } finally {
+      savePromiseRef.current = null;
+    }
+  };
+
   const publishRequest = useApi(
     async () => {
       if (!isOwner) return;
-      if (isDirty) await saveRequest.runAsync();
+      if (isDirty) await saveDraftRequest();
       await agentService.publishVersion(resourceId);
     },
     {
@@ -108,7 +129,7 @@ export function useAgentDraftSessionController({
 
   const saveAndLeave = async () => {
     try {
-      await saveRequest.runAsync();
+      await saveDraftRequest();
       unsavedChangesGuard.proceed();
     } catch {
       // 保存失败时保留当前页面，用户可以继续编辑。
@@ -117,7 +138,7 @@ export function useAgentDraftSessionController({
 
   const saveDraftForDebug = async (): Promise<boolean> => {
     try {
-      await saveRequest.runAsync();
+      await saveDraftRequest();
       return true;
     } catch {
       return false;
@@ -143,7 +164,9 @@ export function useAgentDraftSessionController({
     publishDraft: () => publishRequest.run(),
     publishLoading: publishRequest.loading,
     saveAndLeave,
-    saveDraft: () => saveRequest.run(),
+    saveDraft: () => {
+      void saveDraftRequest().catch(() => undefined);
+    },
     saveDraftForDebug,
     saveLoading: saveRequest.loading,
     savePhase,

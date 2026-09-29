@@ -36,6 +36,9 @@ export function useDrawioEditorSession({
   const lastSavedXmlRef = useRef(initialXml);
   const exportTimerRef = useRef<number | null>(null);
   const pendingExportForSaveRef = useRef(false);
+  const savePromiseRef = useRef<Promise<void> | null>(null);
+  const pendingXmlRef = useRef<string | null>(null);
+  const mountedRef = useRef(true);
   const [currentVersion, setCurrentVersion] = useState(initialVersion);
   const [saveState, setSaveState] = useState<DrawioSaveState>('saved');
   const [editorReady, setEditorReady] = useState(false);
@@ -52,31 +55,61 @@ export function useDrawioEditorSession({
     }
   };
 
-  const persistXml = async (xml: string) => {
+  const persistXml = async (xml: string): Promise<void> => {
     if (!canEdit) {
       toast.danger(t('drawio.noEditPermission'));
       return;
     }
 
-    const nextVersion = currentVersionRef.current + 1;
-    setSaveState('saving');
+    if (savePromiseRef.current) {
+      if (xml !== lastSavedXmlRef.current) pendingXmlRef.current = xml;
+      await savePromiseRef.current;
+      return;
+    }
+
+    const request = (async () => {
+      let nextXml: string | null = xml;
+      while (nextXml !== null) {
+        const xmlToSave = nextXml;
+        pendingXmlRef.current = null;
+        const nextVersion = currentVersionRef.current + 1;
+        if (mountedRef.current) setSaveState('saving');
+        try {
+          await noteService.saveDrawIoSnapshot({
+            resourceId,
+            version: nextVersion,
+            xml: xmlToSave,
+            plainText: extractDrawioPlainText(xmlToSave),
+          });
+          currentVersionRef.current = nextVersion;
+          lastSavedXmlRef.current = xmlToSave;
+          if (mountedRef.current) setCurrentVersion(nextVersion);
+        } catch (error) {
+          if (mountedRef.current) {
+            setSaveState('failed');
+            postToEditor({ action: 'status', message: t('drawio.status.failed'), modified: true });
+            toast.danger(parseErrorMessage(error));
+          }
+          return;
+        }
+
+        nextXml = pendingXmlRef.current;
+        if (!nextXml || nextXml === lastSavedXmlRef.current) {
+          pendingXmlRef.current = null;
+          nextXml = null;
+          if (mountedRef.current) {
+            setSaveState('saved');
+            postToEditor({ action: 'status', message: t('drawio.status.saved'), modified: false });
+            toast.success(t('drawio.status.saved'));
+          }
+        }
+      }
+    })();
+    savePromiseRef.current = request;
     try {
-      await noteService.saveDrawIoSnapshot({
-        resourceId,
-        version: nextVersion,
-        xml,
-        plainText: extractDrawioPlainText(xml),
-      });
-      currentVersionRef.current = nextVersion;
-      lastSavedXmlRef.current = xml;
-      setCurrentVersion(nextVersion);
-      setSaveState('saved');
-      postToEditor({ action: 'status', message: t('drawio.status.saved'), modified: false });
-      toast.success(t('drawio.status.saved'));
-    } catch (error) {
-      setSaveState('failed');
-      postToEditor({ action: 'status', message: t('drawio.status.failed'), modified: true });
-      toast.danger(parseErrorMessage(error));
+      await request;
+    } finally {
+      savePromiseRef.current = null;
     }
   };
 
@@ -162,7 +195,10 @@ export function useDrawioEditorSession({
   };
 
   useEventListener('message', handleMessage);
-  useUnmount(clearExportTimer);
+  useUnmount(() => {
+    mountedRef.current = false;
+    clearExportTimer();
+  });
 
   return {
     iframeRef,

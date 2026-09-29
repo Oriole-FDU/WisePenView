@@ -87,8 +87,8 @@ export function useSkillSaveController({
   const { t } = useTranslation('skill');
   const skillService = useSkillService();
   const [executionItems, setExecutionItems] = useState<SkillSaveQueueItem[]>([]);
-  const fileSaveInFlightRef = useRef(false);
-  const configSaveInFlightRef = useRef(false);
+  const fileSavePromiseRef = useRef<Promise<void> | null>(null);
+  const configSavePromiseRef = useRef<Promise<void> | null>(null);
 
   const { loading: fileSaveLoading, runAsync: runSaveFiles } = useApi(
     async (snapshots: SkillFileSaveSnapshot[], options?: SaveOptions) => {
@@ -223,12 +223,17 @@ export function useSkillSaveController({
   );
 
   const saveFiles = async (snapshots: SkillFileSaveSnapshot[], options?: SaveOptions) => {
-    if (!canEdit || snapshots.length === 0 || fileSaveInFlightRef.current) return;
-    fileSaveInFlightRef.current = true;
+    if (!canEdit || snapshots.length === 0) return;
+    if (fileSavePromiseRef.current) {
+      await fileSavePromiseRef.current;
+      return;
+    }
+    const request = runSaveFiles(snapshots, options).then(() => undefined);
+    fileSavePromiseRef.current = request;
     try {
-      await runSaveFiles(snapshots, options);
+      await request;
     } finally {
-      fileSaveInFlightRef.current = false;
+      fileSavePromiseRef.current = null;
     }
   };
 
@@ -237,12 +242,17 @@ export function useSkillSaveController({
   };
 
   const saveConfigSnapshot = async (snapshot: SkillConfigSaveSnapshot, options?: SaveOptions) => {
-    if (!canEdit || configSaveInFlightRef.current) return;
-    configSaveInFlightRef.current = true;
+    if (!canEdit) return;
+    if (configSavePromiseRef.current) {
+      await configSavePromiseRef.current;
+      return;
+    }
+    const request = runSaveConfig(snapshot, options).then(() => undefined);
+    configSavePromiseRef.current = request;
     try {
-      await runSaveConfig(snapshot, options);
+      await request;
     } finally {
-      configSaveInFlightRef.current = false;
+      configSavePromiseRef.current = null;
     }
   };
 
