@@ -23,6 +23,8 @@ const httpClient = axios.create({
 
 const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_RETRY_DELAY_MS = 300;
+// 只对可安全重复的读取方法默认重试；写入请求需由调用方确认幂等后显式设置 retry。
+const DEFAULT_RETRYABLE_METHODS = new Set(['get', 'head', 'options']);
 
 type RetryableAxiosConfig = InternalAxiosRequestConfig & {
   __wisePenRetryCount?: number;
@@ -36,7 +38,9 @@ const delay = (ms: number): Promise<void> =>
 const getRetryLimit = (config: RetryableAxiosConfig): number => {
   if (config.retry === false) return 0;
   if (typeof config.retry === 'number') return Math.max(0, config.retry);
-  return DEFAULT_RETRY_COUNT;
+  return DEFAULT_RETRYABLE_METHODS.has((config.method ?? 'get').toLowerCase())
+    ? DEFAULT_RETRY_COUNT
+    : 0;
 };
 
 const isRetryableAxiosError = (error: AxiosError): boolean => {
