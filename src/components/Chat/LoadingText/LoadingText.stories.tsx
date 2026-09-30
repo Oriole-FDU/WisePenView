@@ -8,7 +8,7 @@ import styles from './LoadingText.stories.module.less';
 type LoadingTextTone = NonNullable<LoadingTextProps['tone']>;
 type LoadingTextSize = NonNullable<LoadingTextProps['size']>;
 
-const tones: LoadingTextTone[] = ['muted', 'default', 'accent'];
+const tones: LoadingTextTone[] = ['muted', 'default', 'accent', 'danger'];
 const sizes: LoadingTextSize[] = ['xs', 'sm', 'inherit'];
 
 const meta = {

@@ -1,0 +1,146 @@
+@import '@/styles/mixins/scrollbar.less';
+
+/* 过程提示行的统一排版：折叠主行、展开后的节点行共用一套字重、行高与内缩 */
+.hintRowBase() {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2xs);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 var(--space-2xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.wrapper {
+  min-width: 0;
+}
+
+.trigger {
+  && {
+    .hintRowBase();
+
+    height: auto;
+    border: 0;
+    border-radius: var(--radius);
+    background: transparent;
+    /* 关闭 HeroUI Button 默认按下 scale(0.97) */
+    transform: none;
+  }
+
+  &&:hover:not(:disabled) {
+    color: var(--foreground);
+    background: transparent;
+  }
+
+  &&:active,
+  &&[data-pressed='true'] {
+    transform: none;
+  }
+}
+
+.hintRow {
+  .hintRowBase();
+}
+
+@keyframes traceHeadlineIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.triggerMain {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex: 0 1 auto;
+  min-width: 0;
+  animation: traceHeadlineIn var(--motion-duration-mid) var(--motion-ease-out);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  color: currentColor;
+
+  &[data-tone='accent'] {
+    color: var(--accent-text, var(--accent));
+  }
+
+  &[data-tone='danger'] {
+    color: var(--danger-text);
+  }
+}
+
+/* 工具名可能很长：截断留给标签，chevron 始终可见 */
+.labelClip {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.indicator {
+  flex-shrink: 0;
+  color: currentColor;
+  transition: transform var(--motion-duration-mid) var(--motion-ease-fluid);
+
+  &[data-expanded='true'] {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: var(--motion-duration-reduced);
+  }
+}
+
+.collapse {
+  overflow: hidden;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  min-width: 0;
+}
+
+.reasoning {
+  max-height: min(36vh, 260px);
+  /* 与标签行留出间距；折叠容器自带 overflow: hidden，不会被裁掉 */
+  margin: var(--space-2xs) 0 0;
+  padding: var(--space-xs);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-xl);
+  background-color: var(--surface-secondary);
+  color: var(--muted);
+  font-size: var(--chat-thinking-font-size);
+  line-height: var(--chat-thinking-line-height);
+  text-align: start;
+  white-space: pre-wrap;
+  word-break: break-word;
+  content-visibility: auto;
+  contain: layout paint;
+  .appSubtleScrollbar();
+}

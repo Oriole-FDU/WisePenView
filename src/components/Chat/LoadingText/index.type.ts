@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 
-export type LoadingTextTone = 'muted' | 'default' | 'accent';
+export type LoadingTextTone = 'muted' | 'default' | 'accent' | 'danger';
 export type LoadingTextSize = 'xs' | 'sm' | 'inherit';
 export type LoadingTextAs = Extract<ElementType, 'span' | 'div' | 'p'>;
 

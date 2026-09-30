@@ -14,6 +14,20 @@
   text-align: start;
 }
 
+/* 首字未到达时的单行提示，与过程行的图标、间距、行高完全对齐 */
+.generating {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 28px;
+  padding: 0 var(--space-2xs);
+}
+
+.generatingIcon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
 .actionButton {
   color: var(--muted);
 }

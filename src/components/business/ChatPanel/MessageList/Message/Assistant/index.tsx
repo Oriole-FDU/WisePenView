@@ -1,18 +1,19 @@
-import { isReasoningUIPart, isTextUIPart, isToolUIPart } from 'ai';
-import { ThumbsDown, ThumbsUp } from 'lucide-react';
+import { isTextUIPart } from 'ai';
+import { Brain, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import CopyButton from '@/components/base/Button/CopyButton';
 import ProviderLogo from '@/components/business/Icons/ProviderLogo';
+import { LoadingText } from '@/components/Chat';
 import type { ChatModel, WisePenUIMessage } from '@/domains/Chat';
 
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
-import MessageLoaderSkeleton from '../Loader';
-import ReasoningBlock from './ReasoningBlock';
+import ProcessTrace from './ProcessTrace';
 import styles from './style.module.less';
-import ToolCallBlock from './ToolCallBlock';
+import ToolApprovalDialog from './ToolApprovalDialog';
+import { buildAssistantSegments, findPendingApprovalPart } from './traceModel';
 
 interface AssistantMessageProps {
   message: WisePenUIMessage;
@@ -36,17 +37,12 @@ function AssistantMessage({
     .filter(isTextUIPart)
     .map((part) => part.text)
     .join('');
-  const lastReasoningIndex = message.parts.reduce(
-    (lastIndex, part, index) => (isReasoningUIPart(part) ? index : lastIndex),
-    -1
-  );
-  const hasVisibleContent = message.parts.some((part) => {
-    if (isTextUIPart(part)) return Boolean(part.text);
-    if (isReasoningUIPart(part)) return Boolean(part.text) || part.state === 'streaming';
-    if (isToolUIPart(part)) return true;
-    return false;
+  const segments = buildAssistantSegments(message.parts, {
+    streaming,
+    reasoningDurationSeconds: message.metadata?.reasoningDurationSeconds,
   });
-  const showLoadingSkeleton = streaming && !hasVisibleContent;
+  const showGeneratingHint = streaming && segments.length === 0;
+  const pendingApproval = findPendingApprovalPart(message.parts, approvalDecisions);
   // TODO: 后端历史透出 metadata.provider / modelName 后优先用消息级快照
   const displayProvider = model?.provider || 'openai';
   const displayModelName = model?.name || t('message.assistant');
@@ -61,49 +57,24 @@ function AssistantMessage({
       </div>
 
       <ChatMessage.Body>
-        {message.parts.map((part, index) => {
-          const key = isToolUIPart(part) ? part.toolCallId : `${part.type}-${index}`;
-          if (isTextUIPart(part)) {
-            if (!part.text) return null;
-            return (
-              <ChatMessage.Content key={key} className={styles.text}>
-                <MessageContent
-                  content={part.text}
-                  markdown
-                  streaming={streaming && part.state !== 'done'}
-                />
-              </ChatMessage.Content>
-            );
-          }
-          if (isReasoningUIPart(part)) {
-            return (
-              <ReasoningBlock
-                key={key}
-                content={part.text}
-                loading={part.state === 'streaming'}
-                durationSeconds={
-                  index === lastReasoningIndex
-                    ? message.metadata?.reasoningDurationSeconds
-                    : undefined
-                }
-              />
-            );
-          }
-          if (isToolUIPart(part)) {
-            return (
-              <ToolCallBlock
-                key={key}
-                part={part}
-                approvalDecision={approvalDecisions[part.toolCallId]}
-                approvalSubmitting={approvalSubmitting}
-                onApprovalDecision={(approved) => onApprovalDecision(part.toolCallId, approved)}
-              />
-            );
-          }
-          return null;
-        })}
+        {segments.map((segment) =>
+          segment.kind === 'text' ? (
+            <ChatMessage.Content key={segment.key} className={styles.text}>
+              <MessageContent content={segment.text} markdown streaming={segment.streaming} />
+            </ChatMessage.Content>
+          ) : (
+            <ProcessTrace key={segment.key} items={segment.items} streaming={streaming} />
+          )
+        )}
 
-        {showLoadingSkeleton ? <MessageLoaderSkeleton /> : null}
+        {showGeneratingHint ? (
+          <div className={styles.generating}>
+            <Brain size={14} aria-hidden="true" className={styles.generatingIcon} />
+            <LoadingText tone="muted" size="sm">
+              {t('message.reasoning.loading')}
+            </LoadingText>
+          </div>
+        ) : null}
 
         {!streaming && textContent ? (
           <ChatMessage.Actions>
@@ -121,6 +92,14 @@ function AssistantMessage({
               tooltip={{ delay: 0 }}
             />
           </ChatMessage.Actions>
+        ) : null}
+
+        {pendingApproval ? (
+          <ToolApprovalDialog
+            part={pendingApproval}
+            submitting={approvalSubmitting}
+            onDecision={(approved) => onApprovalDecision(pendingApproval.toolCallId, approved)}
+          />
         ) : null}
       </ChatMessage.Body>
     </ChatMessage.Assistant>

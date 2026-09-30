@@ -36,6 +36,12 @@
   --loading-text-highlight: var(--accent-text-strong, var(--foreground));
 }
 
+.root[data-tone='danger'] {
+  --loading-text-color: var(--danger-text);
+  --loading-text-base: var(--danger-text);
+  --loading-text-highlight: color-mix(in srgb, var(--danger-text) 55%, var(--foreground));
+}
+
 .root[data-animated='true'] {
   background-image: linear-gradient(
     90deg,
