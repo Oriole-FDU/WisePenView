@@ -1,12 +1,12 @@
 import { blockHasType, editorHasBlockWithType } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { Input } from '@heroui/react';
 import { PencilLine } from 'lucide-react';
 import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppPopover from '@/components/base/AppPopover';
 import { AppButton } from '@/components/base/Button';
+import { Input } from '@/components/base/Input';
 import { blockNoteSchema } from '@/components/business/Note/CustomBlockNote/registry/noteEditorComposition';
 
 import styles from '../style.module.less';
@@ -87,6 +87,7 @@ export function FileCaptionToolbarButton(buttonGroupProps: ButtonGroupChildProps
       <AppPopover.Content className={styles.formPopover} placement="bottom">
         <div className={styles.formPanel} onMouseDown={(event) => event.stopPropagation()}>
           <Input
+            fullWidth
             autoFocus
             aria-label={t('editor.image.caption')}
             placeholder={t('editor.image.captionPlaceholder')}

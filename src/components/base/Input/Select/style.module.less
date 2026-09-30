@@ -1,34 +1,14 @@
+@import '../_common/field.less';
+
 .select:global(.select) {
-  --app-select-trigger-bg: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-select-trigger-bg-hover: color-mix(
-    in oklab,
-    var(--surface-tertiary) 70%,
-    var(--surface) 30%
-  );
-  --app-select-trigger-bg-focus: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-select-trigger-border: var(--field-border);
-  --app-select-trigger-border-hover: var(--field-border-hover);
-  --app-select-trigger-border-focus: var(--field-border-focus);
-  --app-select-trigger-border-width: 1px;
-  --app-select-trigger-focus-ring-width: 1px;
-  --app-select-trigger-focus-ring-color: var(--focus);
-  --app-select-trigger-focus-ring: inset 0 0 0 var(--app-select-trigger-focus-ring-width)
-    var(--app-select-trigger-focus-ring-color);
-  --app-select-trigger-danger-ring: inset 0 0 0 var(--app-select-trigger-focus-ring-width)
-    var(--danger-soft);
-  --select-trigger-bg: var(--app-select-trigger-bg);
-  --select-trigger-bg-hover: var(--app-select-trigger-bg-hover);
-  --select-trigger-bg-focus: var(--app-select-trigger-bg-focus);
-  --field-background: var(--app-select-trigger-bg);
-  --field-focus: var(--app-select-trigger-bg-focus);
+  .fieldTokens();
+
+  /* HeroUI Select 变量映射 */
+  --select-trigger-bg: var(--app-field-bg);
+  --select-trigger-bg-hover: var(--app-field-bg-hover);
+  --select-trigger-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
   --field-shadow: none;
 
   background-color: transparent;
@@ -37,37 +17,26 @@
 .selectTrigger:global(.select__trigger) {
   width: 100%;
   min-height: var(--control-height, 36px);
-  box-sizing: border-box;
   align-items: center;
-  border-width: var(--app-select-trigger-border-width);
-  border-color: var(--app-select-trigger-border);
-  background-color: var(--app-select-trigger-bg);
-  color: var(--field-foreground, var(--foreground));
-  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
-  box-shadow: var(--shadow-none);
-  letter-spacing: 0;
+  .fieldSurface();
 }
 
 .selectTrigger:global(.select__trigger):hover,
 .selectTrigger:global(.select__trigger)[data-hovered='true'] {
-  border-color: var(--app-select-trigger-border-hover);
-  background-color: var(--app-select-trigger-bg-hover);
+  .fieldSurfaceHover();
 }
 
 .selectTrigger:global(.select__trigger):focus,
 .selectTrigger:global(.select__trigger):focus-visible,
 .selectTrigger:global(.select__trigger)[data-focus='true'],
 .selectTrigger:global(.select__trigger)[data-focus-visible='true'] {
-  border-color: var(--app-select-trigger-border-focus);
-  background-color: var(--app-select-trigger-bg-focus);
-  box-shadow: var(--app-select-trigger-focus-ring);
+  .fieldSurfaceFocus();
   outline: none;
 }
 
 .select:global(.select)[data-invalid='true'] .selectTrigger:global(.select__trigger),
 .select:global(.select)[aria-invalid='true'] .selectTrigger:global(.select__trigger) {
-  border-color: var(--danger-border);
-  background-color: var(--danger-soft);
+  .fieldSurfaceInvalid();
 }
 
 .select:global(.select)[data-invalid='true'] .selectTrigger:global(.select__trigger):focus,
@@ -76,15 +45,13 @@
 .select:global(.select)[aria-invalid='true'] .selectTrigger:global(.select__trigger):focus,
 .select:global(.select)[aria-invalid='true']
   .selectTrigger:global(.select__trigger)[data-focus='true'] {
-  box-shadow: var(--app-select-trigger-danger-ring);
+  .fieldSurfaceInvalidFocus();
 }
 
 .selectTrigger:global(.select__trigger):disabled,
 .selectTrigger:global(.select__trigger)[data-disabled='true'],
 .selectTrigger:global(.select__trigger)[aria-disabled='true'] {
-  border-color: color-mix(in oklab, var(--app-select-trigger-border) 76%, transparent);
-  background-color: color-mix(in oklab, var(--app-select-trigger-bg) 78%, transparent);
-  box-shadow: var(--shadow-none);
+  .fieldSurfaceDisabled();
 }
 
 .select:global(.select) :global(.select__value) {
@@ -94,16 +61,16 @@
 }
 
 .select:global(.select) :global(.select__value[data-placeholder='true']) {
-  color: var(--field-placeholder, var(--muted));
+  .fieldPlaceholder();
 }
 
 .select:global(.select) :global(.select__indicator) {
-  color: var(--field-placeholder, var(--muted));
+  .fieldPlaceholder();
 }
 
 /* 下拉层跟表单控件同一套圆角，避免 HeroUI 默认 radius-3xl（最大 32px）过圆 */
 .selectPopover:global(.select__popover) {
-  border-radius: var(--radius-field);
-  --app-radius-popover: var(--radius-field);
-  --app-radius-popover-item: var(--radius-field);
+  border-radius: var(--app-field-radius);
+  --app-radius-popover: var(--app-field-radius);
+  --app-radius-popover-item: var(--app-field-radius);
 }

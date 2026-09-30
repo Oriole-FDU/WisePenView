@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
-import UploadZone from '@/components/base/Input/UploadZone';
+import { UploadZone } from '@/components/base/Input';
 import { useCourseService } from '@/domains';
 import { COURSE_ASSIGNMENT_STATUS } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';

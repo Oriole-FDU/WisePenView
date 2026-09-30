@@ -1,9 +1,9 @@
-import { TextArea } from '@heroui/react';
 import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { TextArea } from '@/components/base/Input';
 import { FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH } from '@/constants/layoutScale';
 
 import { ChatInputFileProvider, ChatInputStoreProvider } from './_context';

@@ -1,0 +1,59 @@
+@import '../_common/field.less';
+
+.numberField:global(.number-field) {
+  .fieldTokens();
+
+  /* HeroUI NumberField 变量映射 */
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
+  --field-shadow: none;
+}
+
+.numberField:global(.number-field) :global(.number-field__group) {
+  min-height: var(--control-height, 36px);
+  .fieldSurface();
+}
+
+.numberField:global(.number-field) :global(.number-field__group):hover:not(:focus-within),
+.numberField:global(.number-field)
+  :global(.number-field__group)[data-hovered='true']:not([data-focus-within='true']) {
+  .fieldSurfaceHover();
+}
+
+.numberField:global(.number-field) :global(.number-field__group):focus-within,
+.numberField:global(.number-field)
+  :global(.number-field__group)[data-focus-within='true'] {
+  .fieldSurfaceFocus();
+}
+
+.numberField:global(.number-field)[data-invalid='true'] :global(.number-field__group),
+.numberField:global(.number-field)[aria-invalid='true'] :global(.number-field__group) {
+  .fieldSurfaceInvalid();
+}
+
+.numberField:global(.number-field)[data-invalid='true']
+  :global(.number-field__group):focus-within,
+.numberField:global(.number-field)[aria-invalid='true']
+  :global(.number-field__group):focus-within {
+  .fieldSurfaceInvalidFocus();
+}
+
+.numberField:global(.number-field) :global(.number-field__group)[data-disabled='true'],
+.numberField:global(.number-field) :global(.number-field__group)[aria-disabled='true'] {
+  .fieldSurfaceDisabled();
+}
+
+.numberField:global(.number-field) :global(.number-field__input) {
+  background-color: transparent;
+  letter-spacing: 0;
+}
+
+.numberField:global(.number-field) :global(.number-field__input)::placeholder {
+  .fieldPlaceholder();
+}
+
+.numberField:global(.number-field) :global(.number-field__increment-button),
+.numberField:global(.number-field) :global(.number-field__decrement-button) {
+  border-color: var(--app-field-border);
+  color: var(--field-foreground, var(--foreground));
+}
