@@ -22,8 +22,6 @@ export interface ChatPanelConversationProps {
   sessionBarOpen: boolean;
   sessionId?: string;
   status: ChatStatus;
-  toolApprovalDecisions: Readonly<Record<string, boolean>>;
-  onApprovalDecision: (toolCallId: string, approved: boolean) => void;
   onCancel?: () => void | Promise<void>;
   onClearContext?: () => void;
   onCloseSessionBar: () => void;

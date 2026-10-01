@@ -3,12 +3,12 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import LoadingText from '@/components/business/ChatPanel/_common/LoadingText';
 
+import LoadingText from '../../LoadingText';
 import TraceIcon from '../TraceIcon';
-import { useCollapseHeight } from '../useCollapseHeight';
 import type { TraceRowProps } from './index.type';
 import styles from './style.module.less';
+import { useCollapseHeight } from './useCollapseHeight';
 
 /**
  * 过程行的公共骨架：一行提示 + 指示箭头 + 可折叠正文。

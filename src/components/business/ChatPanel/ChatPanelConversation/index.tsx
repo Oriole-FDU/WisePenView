@@ -21,8 +21,6 @@ function ChatPanelConversation({
   sessionBarOpen,
   sessionId,
   status,
-  toolApprovalDecisions,
-  onApprovalDecision,
   onCancel,
   onClearContext,
   onCloseSessionBar,
@@ -56,17 +54,14 @@ function ChatPanelConversation({
           <div className={styles.messageViewport}>
             <MessageList
               messages={messages}
-              sessionId={sessionId}
+              resetKey={sessionId}
               canLoadMoreHistory={canLoadMoreHistory}
               loadingInitialHistory={loadingInitialHistory}
               loadingMoreHistory={loadingMoreHistory}
               onLoadMoreHistory={onLoadMoreHistory}
-              status={status}
+              generating={status === 'submitted' || status === 'streaming'}
               model={currentModel}
               fullWidth={fullWidth}
-              approvalDecisions={toolApprovalDecisions}
-              approvalSubmitting={status === 'submitted' || status === 'streaming'}
-              onApprovalDecision={onApprovalDecision}
             />
           </div>
 

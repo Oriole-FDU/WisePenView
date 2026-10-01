@@ -14,7 +14,8 @@ const OPEN_DELAY_MS = 24;
 const CLOSE_DELAY_MS = 140;
 
 interface MessageHistoryNavigatorProps {
-  messages: WisePenUIMessage[];
+  messages: readonly WisePenUIMessage[];
+  fullWidth: boolean;
   scrollAnchorOffsetRatio: number;
 }
 
@@ -43,8 +44,8 @@ function getMessagePreview(
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
-function useUserMessageAnchors(
-  messages: WisePenUIMessage[],
+function getUserMessageAnchors(
+  messages: readonly WisePenUIMessage[],
   emptyPreview: string,
   attachmentPreview: string
 ) {
@@ -85,10 +86,11 @@ function HistoryBar({ active, anchorId }: { active: boolean; anchorId?: string }
 /** 右侧垂直居中横条轨；hover / 点击展开文案浮层 */
 function MessageHistoryNavigator({
   messages,
+  fullWidth,
   scrollAnchorOffsetRatio,
 }: MessageHistoryNavigatorProps) {
   const { t } = useTranslation('chat');
-  const anchors = useUserMessageAnchors(
+  const anchors = getUserMessageAnchors(
     messages,
     t('message.history.emptyPreview'),
     t('message.history.attachmentPreview')
@@ -181,6 +183,7 @@ function MessageHistoryNavigator({
         open && styles.historyNavigatorRailOpen
       )}
       data-open={open ? 'true' : 'false'}
+      data-full-width={fullWidth}
       onMouseEnter={scheduleOpen}
       onMouseLeave={scheduleClose}
       onFocusCapture={scheduleOpen}

@@ -10,7 +10,6 @@ import {
   type CreateSessionRequest,
   useChatHistory,
   useChatSession,
-  type WisePenUIMessage,
 } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
@@ -19,6 +18,7 @@ import { parseErrorMessage } from '@/utils/error';
 
 import type { SendOptions } from '../ChatInput/index.type';
 import type { ResourceChatProtocolPort } from '../ResourceChatProtocol';
+import { listToolApprovalRequests } from './toolApprovalModel';
 
 interface UseChatTurnControllerOptions {
   /** 会话域提供的按需建会话能力，用于发送前确保存在目标会话 */
@@ -26,18 +26,6 @@ interface UseChatTurnControllerOptions {
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
   resourceChat?: ResourceChatProtocolPort;
-}
-
-function listPendingToolApprovalIds(messages: readonly WisePenUIMessage[]): string[] {
-  return Array.from(
-    new Set(
-      messages.flatMap((message) =>
-        message.parts.flatMap((part) =>
-          isToolUIPart(part) && part.state === 'approval-requested' ? [part.toolCallId] : []
-        )
-      )
-    )
-  );
 }
 
 /**
@@ -108,6 +96,12 @@ export function useChatTurnController({
       return isToolUIPart(part);
     })
   );
+  const toolApprovalRequests = listToolApprovalRequests(messages);
+  const pendingToolApproval = currentSessionId
+    ? toolApprovalRequests.find(
+        (request) => toolApprovalDecisions[request.toolCallId] === undefined
+      )
+    : undefined;
 
   const loadHistoryMessages = async (sessionId: string): Promise<boolean> => {
     try {
@@ -265,7 +259,7 @@ export function useChatTurnController({
   const decideToolApproval = (toolCallId: string, approved: boolean) => {
     if (!currentSessionId || status === 'submitted' || status === 'streaming') return;
 
-    const pendingToolCallIds = listPendingToolApprovalIds(messages);
+    const pendingToolCallIds = toolApprovalRequests.map((request) => request.toolCallId);
     if (!pendingToolCallIds.includes(toolCallId)) return;
 
     const nextDecisions = { ...toolApprovalDecisions, [toolCallId]: approved };
@@ -288,7 +282,8 @@ export function useChatTurnController({
   return {
     approval: {
       decide: decideToolApproval,
-      decisions: toolApprovalDecisions,
+      pending: pendingToolApproval,
+      submitting: status === 'submitted' || status === 'streaming',
     },
     cancel,
     cancelling: cancellingSessionId === currentSessionId,

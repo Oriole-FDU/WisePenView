@@ -4,22 +4,24 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
-import { formatToolPayload, getToolDisplayName, type RenderableToolPart } from '../traceModel';
+import type { ToolApprovalDialogProps } from './index.type';
 import styles from './style.module.less';
 
-interface ToolApprovalDialogProps {
-  part: RenderableToolPart;
-  submitting: boolean;
-  onDecision: (approved: boolean) => void;
+function formatToolPayload(value: unknown): string {
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
 }
 
 /**
- * 高危工具审批：过程行折叠后内联按钮不再可见，改为必须显式选择的危险弹窗。
+ * 高危工具审批展示；目标选择、决策记录和恢复对话由 turn 域维护。
  */
-function ToolApprovalDialog({ part, submitting, onDecision }: ToolApprovalDialogProps) {
+function ToolApprovalDialog({ name, input, submitting, onDecision }: ToolApprovalDialogProps) {
   const { t } = useTranslation('chat');
-  const name = getToolDisplayName(part);
-  const inputText = part.input === undefined ? '' : formatToolPayload(part.input);
+  const inputText = input === undefined ? '' : formatToolPayload(input);
 
   /**
    * 审批必须落到“允许”或“拒绝”：遮罩、Esc 与关闭按钮都不产生隐式决定，

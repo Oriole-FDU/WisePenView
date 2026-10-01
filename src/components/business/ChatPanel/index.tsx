@@ -13,6 +13,7 @@ import type { SendOptions } from './ChatInput/index.type';
 import ChatPanelConversation from './ChatPanelConversation';
 import ChatPanelHeader from './ChatPanelHeader';
 import styles from './style.module.less';
+import ToolApprovalDialog from './ToolApprovalDialog';
 
 function ChatPanel({
   fullWidth = false,
@@ -33,6 +34,7 @@ function ChatPanel({
   });
   const debugSend = useAgentDebugSendController({ agentDebug, send: turn.send });
   const { syncNewSessionHistoryRefresh } = session;
+  const pendingToolApproval = turn.approval.pending;
 
   /**
    * @wisepen-manual-effect
@@ -91,8 +93,6 @@ function ChatPanel({
           sessionBarOpen={session.sessionBarOpen}
           sessionId={session.currentSessionId}
           status={turn.status}
-          toolApprovalDecisions={turn.approval.decisions}
-          onApprovalDecision={turn.approval.decide}
           onCancel={turn.cancel}
           onClearContext={resourceChat?.clearContext}
           onCloseSessionBar={session.closeSessionBar}
@@ -101,6 +101,15 @@ function ChatPanel({
           onSend={handleSend}
         />
       </div>
+      {pendingToolApproval ? (
+        <ToolApprovalDialog
+          key={pendingToolApproval.toolCallId}
+          name={pendingToolApproval.name}
+          input={pendingToolApproval.input}
+          submitting={turn.approval.submitting}
+          onDecision={(approved) => turn.approval.decide(pendingToolApproval.toolCallId, approved)}
+        />
+      ) : null}
       <AppAlertDialog
         type="warning"
         isOpen={debugSend.isDialogOpen}

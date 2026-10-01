@@ -1,6 +1,27 @@
 @import '@/styles/mixins/scrollbar.less';
 
 .container {
+  --chat-message-font-size: 14px;
+  --chat-message-font-weight: var(--font-weight-regular);
+  --chat-markdown-font-weight: var(--font-weight-medium);
+  --chat-user-message-font-weight: var(--font-weight-medium);
+  --chat-message-line-height: 1.6;
+  --chat-thinking-font-size: var(--font-size-xs);
+  --chat-thinking-line-height: 1.6;
+  --chat-hr-margin-bottom: var(--space-sm);
+  --chat-user-message-max-width: 72%;
+  --chat-avatar-size: 24px;
+  --chat-model-meta-font-size: var(--font-size-base);
+
+  &[data-full-width='true'] {
+    --chat-message-font-size: 15px;
+    --chat-thinking-font-size: var(--font-size-sm);
+    --chat-thinking-line-height: 1.75;
+    --chat-hr-margin-bottom: var(--space-lg);
+    --chat-user-message-max-width: 520px;
+    --chat-avatar-size: 28px;
+  }
+
   flex: 1;
   min-height: 0;
   position: relative;
@@ -47,18 +68,11 @@
 .welcomeItem {
   flex: 1 1 auto;
   width: 100%;
-  max-width: var(--chat-input-max-width);
+  max-width: var(--chat-content-max-width, 720px);
   min-height: 100%;
   margin-inline: auto;
   display: flex;
   content-visibility: visible;
-}
-
-.loadMoreWrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-bottom: var(--space-sm);
 }
 
 .scrollToBottomButton {
@@ -110,292 +124,6 @@
   }
 }
 
-  /* 历史提问：右侧垂直居中 FloatingToc 横条轨（尺寸由 ChatPanel CSS 变量控制） */
-.historyNavigator {
-  --history-nav-panel-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --history-nav-panel-duration: 0.14s;
-  --history-nav-item-duration: 0.12s;
-  --history-nav-item-stagger: 0.016s;
-
-  position: absolute;
-  z-index: var(--app-z-index-elevated);
-}
-
-.historyNavigatorRail {
-  top: var(--history-nav-rail-top, 66%);
-  right: var(--space-xs);
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.historyNavigatorRailTriggerWrap {
-  position: relative;
-  z-index: var(--app-z-index-elevated);
-  max-height: min(50vh, 280px);
-  border-radius: var(--radius-sm);
-  opacity: 1;
-  transform: translateX(0);
-  visibility: visible;
-  transition:
-    opacity var(--motion-duration-fast) var(--motion-ease-standard),
-    transform var(--motion-duration-fast) var(--history-nav-panel-ease),
-    visibility 0s linear 0s;
-
-  @media (prefers-reduced-motion: reduce) {
-    transition-duration: var(--motion-duration-reduced);
-  }
-}
-
-.historyNavigatorRailTrigger {
-  position: relative;
-  z-index: var(--app-z-index-elevated);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: var(--history-nav-bar-gap);
-  box-sizing: border-box;
-  width: 28px;
-  max-height: min(50vh, 280px);
-  padding: var(--space-xs) 5px;
-  margin: 0;
-  border: none;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  cursor: pointer;
-  overflow-x: hidden;
-  overflow-y: auto;
-  .appSubtleScrollbar();
-  overscroll-behavior: contain;
-  opacity: 1;
-  transform: translateX(0);
-  -ms-overflow-style: none;
-  transition:
-    opacity var(--motion-duration-mid) var(--history-nav-panel-ease),
-    transform var(--motion-duration-slow) var(--history-nav-panel-ease),
-    visibility 0s linear 0s;
-
-  &:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    transition-duration: var(--motion-duration-reduced);
-  }
-}
-
-.historyNavigatorRailOpen .historyNavigatorRailTriggerWrap {
-  opacity: 0;
-  transform: translateX(8px);
-  pointer-events: none;
-  visibility: hidden;
-  transition:
-    opacity var(--motion-duration-fast) var(--motion-ease-standard),
-    transform var(--motion-duration-fast) var(--history-nav-panel-ease),
-    visibility 0s linear var(--motion-duration-fast);
-}
-
-.historyNavigatorRailOpen .historyNavigatorRailTrigger {
-  /* 收起动画改由 wrap 控制，避免双重淡出 */
-  opacity: 1;
-  transform: none;
-  pointer-events: none;
-  visibility: visible;
-  transition: none;
-}
-
-.historyNavigatorBar {
-  --history-nav-bar-ease: cubic-bezier(0.22, 1, 0.36, 1);
-
-  display: block;
-  flex-shrink: 0;
-  width: var(--history-nav-bar-width);
-  height: var(--history-nav-bar-height);
-  border-radius: var(--radius-full, 999px);
-  background: var(--border);
-  transform-origin: right center;
-  transition:
-    width var(--motion-duration-slow) var(--history-nav-bar-ease),
-    height var(--motion-duration-slow) var(--history-nav-bar-ease),
-    background-color var(--motion-duration-slow) var(--history-nav-bar-ease),
-    transform var(--motion-duration-slow) var(--history-nav-bar-ease),
-    opacity var(--motion-duration-mid) var(--motion-ease-standard);
-
-  @media (prefers-reduced-motion: reduce) {
-    transition-duration: var(--motion-duration-reduced);
-  }
-
-  &:hover {
-    width: var(--history-nav-bar-hover-width, 12px);
-    height: var(--history-nav-bar-hover-height, 3px);
-    background: color-mix(in srgb, var(--accent) 55%, var(--border));
-  }
-
-  &[data-active='true'] {
-    width: var(--history-nav-bar-active-width);
-    height: var(--history-nav-bar-active-height);
-    background: var(--accent);
-  }
-
-  &[data-active='true']:hover {
-    width: var(--history-nav-bar-active-width);
-    height: var(--history-nav-bar-active-height);
-    background: var(--accent);
-    transform: scaleX(1.06);
-  }
-}
-
-.historyNavigatorRailPanel {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  z-index: var(--app-z-index-raised);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs, var(--space-3xs));
-  width: max-content;
-  min-width: var(--history-nav-panel-min-width, 148px);
-  max-width: min(var(--history-nav-panel-max-width, 220px), calc(100vw - var(--space-2xl)));
-  max-height: min(50vh, 300px);
-  padding: var(--history-nav-panel-padding-block, var(--space-md))
-    var(--history-nav-panel-padding-inline, var(--space-lg));
-  border: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--overlay, var(--surface)) 94%, transparent);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--foreground) 5%, transparent),
-    0 8px 24px color-mix(in srgb, var(--foreground) 7%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  .appSubtleScrollbar();
-  overscroll-behavior: contain;
-  -ms-overflow-style: none;
-  transform-origin: right center;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(-50%) translateX(10px);
-  transition:
-    opacity var(--history-nav-panel-duration) var(--history-nav-panel-ease),
-    transform var(--history-nav-panel-duration) var(--history-nav-panel-ease),
-    visibility 0s linear var(--history-nav-panel-duration),
-    box-shadow var(--history-nav-panel-duration) var(--motion-ease-standard);
-  &[data-open='true'] {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(-50%) translateX(0);
-    transition:
-      opacity var(--history-nav-panel-duration) var(--history-nav-panel-ease),
-      transform var(--history-nav-panel-duration) var(--history-nav-panel-ease),
-      visibility 0s linear 0s,
-      box-shadow var(--history-nav-panel-duration) var(--motion-ease-standard);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    transition-duration: var(--motion-duration-reduced);
-    transform: translateY(-50%);
-
-    &[data-open='true'] {
-      transform: translateY(-50%);
-    }
-  }
-}
-
-.historyNavigatorRailItem {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--history-nav-item-gap, var(--space-sm));
-  width: 100%;
-  min-width: 0;
-  padding: var(--history-nav-item-padding-block, var(--space-2xs))
-    var(--history-nav-item-padding-inline, var(--space-xs));
-  border-radius: var(--radius-sm);
-  margin: 0;
-  border: none;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  text-align: end;
-  opacity: 0;
-  /* 收起态藏在右侧；展开时由右向左滑入 */
-  transform: translateX(14px);
-  /* 关闭时快速收起，不拖慢 */
-  transition:
-    opacity var(--motion-duration-fast) var(--motion-ease-standard),
-    transform var(--motion-duration-fast) var(--motion-ease-standard);
-
-  .historyNavigatorBar {
-    transition: none;
-  }
-
-  .historyNavigatorRailPanel[data-open='true'] & {
-    opacity: 1;
-    transform: translateX(0);
-    transition:
-      opacity var(--history-nav-item-duration) var(--motion-ease-out),
-      transform var(--history-nav-item-duration) var(--history-nav-panel-ease);
-  }
-
-  /* 从上到下 stagger，避免内联 --history-nav-stagger-index */
-  .history-nav-stagger(@i) when (@i > 0) {
-    .historyNavigatorRailPanel[data-open='true'] &:nth-child(@{i}) {
-      transition-delay: calc((@i - 1) * var(--history-nav-item-stagger));
-    }
-    .history-nav-stagger((@i - 1));
-  }
-  .history-nav-stagger(48);
-
-  @media (prefers-reduced-motion: reduce) {
-    opacity: 1;
-    transform: none;
-    transition-duration: var(--motion-duration-reduced);
-    transition-delay: 0s !important;
-  }
-
-  &:hover,
-  &:focus-visible {
-    color: var(--accent-text);
-    background: var(--surface-hover, var(--surface-secondary));
-
-    .historyNavigatorBar:not([data-active='true']) {
-      width: var(--history-nav-bar-hover-width, 12px);
-      height: var(--history-nav-bar-hover-height, 3px);
-      background: color-mix(in srgb, var(--accent) 55%, var(--border));
-    }
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-
-  &[data-active='true'] {
-    color: var(--accent-text);
-
-    .historyNavigatorRailPreview {
-      font-weight: var(--font-weight-semibold);
-    }
-  }
-}
-
-.historyNavigatorRailPreview {
-  min-width: 0;
-  overflow: hidden;
-  font-size: var(--history-nav-preview-font-size, var(--font-size-xs));
-  font-weight: var(--font-weight-medium);
-  line-height: 1.5;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .srOnly {
   position: absolute;
   width: 1px;
@@ -406,4 +134,11 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* 与应用壳的布局密度一致，紧凑侧栏允许用户气泡占更大宽度。 */
+:global(html[data-layout-density='compact']) {
+  .container[data-full-width='false'] {
+    --chat-user-message-max-width: 88%;
+  }
 }

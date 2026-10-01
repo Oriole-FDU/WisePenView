@@ -11,7 +11,7 @@ const tones: LoadingTextTone[] = ['muted', 'default', 'accent', 'danger'];
 const sizes: LoadingTextSize[] = ['xs', 'sm', 'inherit'];
 
 const meta = {
-  title: 'ChatPanel/LoadingText',
+  title: 'ChatPanel/MessageList/Assistant/LoadingText',
   component: LoadingText,
   parameters: {
     controls: {

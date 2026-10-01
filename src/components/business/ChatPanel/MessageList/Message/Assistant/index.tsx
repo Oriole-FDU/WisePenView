@@ -6,23 +6,15 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import CopyButton from '@/components/base/Button/CopyButton';
 import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 
-import LoadingText from '../../../_common/LoadingText';
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
 import type { AssistantMessageProps } from './index.type';
+import LoadingText from './LoadingText';
 import ProcessTrace from './ProcessTrace';
 import styles from './style.module.less';
-import ToolApprovalDialog from './ToolApprovalDialog';
-import { buildAssistantSegments, findPendingApprovalPart } from './traceModel';
+import { buildAssistantSegments } from './traceModel';
 
-function AssistantMessage({
-  message,
-  model,
-  streaming,
-  approvalDecisions,
-  approvalSubmitting,
-  onApprovalDecision,
-}: AssistantMessageProps) {
+function AssistantMessage({ message, model, streaming }: AssistantMessageProps) {
   const { t } = useTranslation('chat');
   const textContent = message.parts
     .filter(isTextUIPart)
@@ -33,7 +25,6 @@ function AssistantMessage({
     reasoningDurationSeconds: message.metadata?.reasoningDurationSeconds,
   });
   const showGeneratingHint = streaming && segments.length === 0;
-  const pendingApproval = findPendingApprovalPart(message.parts, approvalDecisions);
   // TODO: 后端历史透出 metadata.provider / modelName 后优先用消息级快照
   const displayProvider = model?.provider || 'openai';
   const displayModelName = model?.name || t('message.assistant');
@@ -83,14 +74,6 @@ function AssistantMessage({
               tooltip={{ delay: 0 }}
             />
           </ChatMessage.Actions>
-        ) : null}
-
-        {pendingApproval ? (
-          <ToolApprovalDialog
-            part={pendingApproval}
-            submitting={approvalSubmitting}
-            onDecision={(approved) => onApprovalDecision(pendingApproval.toolCallId, approved)}
-          />
         ) : null}
       </ChatMessage.Body>
     </ChatMessage.Assistant>

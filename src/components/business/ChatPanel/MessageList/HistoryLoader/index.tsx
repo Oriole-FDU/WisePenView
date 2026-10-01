@@ -12,13 +12,8 @@ import {
 import markerStyles from '@/components/_shadcn/marker.module.less';
 import { Spin } from '@/components/base/Feedback';
 
+import type { HistoryLoaderProps } from './index.type';
 import styles from './style.module.less';
-
-interface HistoryLoaderProps {
-  canLoadMoreHistory: boolean;
-  loadingMoreHistory: boolean;
-  onLoadMoreHistory: () => Promise<void>;
-}
 
 function HistoryLoader({
   canLoadMoreHistory,
@@ -34,7 +29,7 @@ function HistoryLoader({
    * @wisepen-manual-effect
    * 执行时机：滚动器到达历史起点且仍有更早消息可加载时发起分页请求。
    * 不可替代原因：滚动器位置和异步请求状态来自 React 外部系统，不能在渲染期触发请求。
-   * cleanup：请求本身由历史服务管理；pendingRef 阻止同一组件实例内的重复请求。
+   * cleanup：请求及结果由调用方管理；pendingRef 阻止同一组件实例内的重复触发。
    */
   useEffect(() => {
     if (start || !canLoadMoreHistory || loadingMoreHistory || pendingRef.current) return;
@@ -48,7 +43,7 @@ function HistoryLoader({
   if (!loadingMoreHistory) return null;
 
   return (
-    <MessageScrollerItem className={styles.loadMoreWrapper}>
+    <MessageScrollerItem className={styles.wrapper}>
       <Marker variant="separator" role="status">
         <MarkerIcon>
           <Spin size="small" />

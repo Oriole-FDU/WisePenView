@@ -94,15 +94,6 @@ export function getToolDisplayName(part: RenderableToolPart): string {
   return title || getToolName(part);
 }
 
-export function formatToolPayload(value: unknown): string {
-  if (typeof value === 'string') return value;
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value);
-  }
-}
-
 export function isTraceItemActive(item: TraceItem): boolean {
   if (item.kind === 'reasoning') return item.streaming;
   return RUNNING_TOOL_STATES.has(item.part.state);
@@ -235,17 +226,4 @@ export function buildAssistantSegments(
 
   flushTrace();
   return segments;
-}
-
-/** 尚未决策的高危工具审批，按时间顺序返回第一个 */
-export function findPendingApprovalPart(
-  parts: WisePenUIMessage['parts'],
-  decisions: Readonly<Record<string, boolean>>
-): RenderableToolPart | undefined {
-  return parts.find(
-    (part): part is RenderableToolPart =>
-      isToolUIPart(part) &&
-      part.state === 'approval-requested' &&
-      decisions[part.toolCallId] === undefined
-  );
 }
