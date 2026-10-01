@@ -418,6 +418,7 @@ function InlineComment({
     estimateSize: () => INLINE_RESOLVED_THREAD_ESTIMATE_SIZE,
     overscan: INLINE_THREAD_OVERSCAN,
     enabled: isHistoryOpen,
+    initialRect: { width: 0, height: INLINE_RESOLVED_THREAD_ESTIMATE_SIZE },
     getItemKey: (index) => resolvedThreads[index]?.threadId ?? index,
   });
   const virtualResolvedThreads = resolvedThreadVirtualizer.getVirtualItems();
