@@ -16,7 +16,7 @@ import styles from './style.module.less';
 import ToolApprovalDialog from './ToolApprovalDialog';
 
 function ChatPanel({
-  fullWidth = false,
+  fullWidth = 'panel',
   showHeader,
   resourceChat,
   agentDebug,
@@ -62,15 +62,19 @@ function ChatPanel({
     layout.collapsePanel();
   };
 
+  /** 子组件仍以布尔消费宽度差异，只在面板边界把布局模式收敛成一次判断。 */
+  const isFullWidth = fullWidth === 'page';
+
   return (
     <>
-      <div className={`${styles.panel} ${fullWidth ? styles.fullWidth : ''}`}>
+      {/* data-chat-layout 是跨模块样式锚点：子组件用 [data-chat-layout] 分支 panel/page */}
+      <div className={styles.panel} data-chat-layout={fullWidth}>
         {showHeader ? (
           <ChatPanelHeader
             panelTitle={session.panelTitle}
             sessionBarOpen={session.sessionBarOpen}
             showCollapseButton={showCollapseButton}
-            reserveTitleBarEnd={!fullWidth}
+            reserveTitleBarEnd={!isFullWidth}
             onCollapsePanel={handleCollapsePanel}
             onNewChat={session.startNewChat}
             onToggleSessionBar={session.toggleSessionBar}
@@ -83,7 +87,7 @@ function ChatPanel({
           canLoadMoreHistory={turn.history.canLoadMore}
           contextPreview={resourceChat?.context?.preview}
           currentModel={turn.currentModel}
-          fullWidth={fullWidth}
+          fullWidth={isFullWidth}
           getUploadSessionId={session.ensureSession}
           isEmpty={turn.isEmpty}
           loadingInitialHistory={turn.history.loadingInitial}

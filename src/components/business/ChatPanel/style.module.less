@@ -27,7 +27,7 @@
   );
   --chat-input-max-width: var(--chat-content-max-width);
 
-  &.fullWidth {
+  &[data-chat-layout='page'] {
     min-width: 0;
     width: 100%;
     height: 100%;
@@ -285,7 +285,7 @@
 
 /* 与应用壳 Drawer / data-layout-density 同源，避免 ChatPanel 早于侧栏切换。 */
 :global(html[data-layout-density='compact']) {
-  .panel:not(.fullWidth) .header {
+  .panel:not([data-chat-layout='page']) .header {
     padding-inline: var(--space-sm) var(--space-md);
   }
 }

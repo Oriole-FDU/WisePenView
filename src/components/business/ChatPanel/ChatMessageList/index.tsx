@@ -46,7 +46,7 @@ function ChatMessageList({
       scrollEdgeThreshold={AUTO_LOAD_EDGE_THRESHOLD}
       scrollPreviousItemPeek={72}
     >
-      <MessageScroller className={styles.container} data-full-width={fullWidth}>
+      <MessageScroller className={styles.container}>
         <MessageScrollerViewport className={styles.viewport}>
           <MessageScrollerContent className={styles.scrollColumn}>
             <StreamingScrollFollower active={generating} messages={messages} />
@@ -90,7 +90,6 @@ function ChatMessageList({
         </MessageScrollerButton>
         <MessageHistoryNavigator
           messages={messages}
-          fullWidth={fullWidth}
           scrollAnchorOffsetRatio={HISTORY_ANCHOR_TOP_RATIO}
         />
       </MessageScroller>

@@ -15,7 +15,6 @@ const CLOSE_DELAY_MS = 140;
 
 interface MessageHistoryNavigatorProps {
   messages: readonly WisePenUIMessage[];
-  fullWidth: boolean;
   scrollAnchorOffsetRatio: number;
 }
 
@@ -86,7 +85,6 @@ function HistoryBar({ active, anchorId }: { active: boolean; anchorId?: string }
 /** 右侧垂直居中横条轨；hover / 点击展开文案浮层 */
 function MessageHistoryNavigator({
   messages,
-  fullWidth,
   scrollAnchorOffsetRatio,
 }: MessageHistoryNavigatorProps) {
   const { t } = useTranslation('chat');
@@ -183,7 +181,6 @@ function MessageHistoryNavigator({
         open && styles.historyNavigatorRailOpen
       )}
       data-open={open ? 'true' : 'false'}
-      data-full-width={fullWidth}
       onMouseEnter={scheduleOpen}
       onMouseLeave={scheduleClose}
       onFocusCapture={scheduleOpen}

@@ -13,7 +13,7 @@
   --chat-avatar-size: 24px;
   --chat-model-meta-font-size: var(--font-size-base);
 
-  &[data-full-width='true'] {
+  :global([data-chat-layout='page']) & {
     --chat-message-font-size: 15px;
     --chat-thinking-font-size: var(--font-size-sm);
     --chat-thinking-line-height: 1.75;
@@ -138,7 +138,7 @@
 
 /* 与应用壳的布局密度一致，紧凑侧栏允许用户气泡占更大宽度。 */
 :global(html[data-layout-density='compact']) {
-  .container[data-full-width='false'] {
+  :global([data-chat-layout='panel']) .container {
     --chat-user-message-max-width: 88%;
   }
 }
