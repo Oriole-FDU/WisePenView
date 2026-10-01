@@ -1,22 +1,12 @@
 import { useState } from 'react';
 
-import styles from './ProcessTrace.module.less';
-import {
-  describeTraceItem,
-  findActiveTraceIndex,
-  type TraceHeadline,
-  type TraceItem,
-} from './traceModel';
+import { describeTraceItem, findActiveTraceIndex, type TraceHeadline } from '../traceModel';
+import type { ProcessTraceProps } from './index.type';
+import ReasoningBlock from './ReasoningBlock';
+import styles from './style.module.less';
 import TraceRow from './TraceRow';
 import TraceStepDetail from './TraceStepDetail';
 import { useTraceReasoningDurations } from './useTraceReasoningDurations';
-
-interface ProcessTraceProps {
-  /** 连续的思考与工具调用节点，按发生顺序排列 */
-  items: readonly TraceItem[];
-  /** 消息是否仍在流式输出；非流式时不再轮换“当前节点”，只展示收敛后的结果 */
-  streaming: boolean;
-}
 
 /**
  * 思考、工具调用与 Skill 加载的统一过程行。
@@ -43,7 +33,7 @@ function ProcessTrace({ items, streaming }: ProcessTraceProps) {
 
   const panelContent = isSingleItem ? (
     singleItemContent ? (
-      <blockquote className={styles.reasoning}>{singleItemContent}</blockquote>
+      <ReasoningBlock>{singleItemContent}</ReasoningBlock>
     ) : null
   ) : (
     <ol className={styles.steps}>

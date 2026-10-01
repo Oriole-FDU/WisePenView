@@ -1,12 +1,7 @@
 import { Brain, Sparkles, Wrench } from 'lucide-react';
 
-import { getToolDisplayName, type TraceItem, type TraceTone } from './traceModel';
-
-interface TraceIconProps {
-  item: TraceItem;
-  tone: TraceTone;
-  className?: string;
-}
+import { getToolDisplayName } from '../../traceModel';
+import type { TraceIconProps } from './index.type';
 
 /** 过程节点类别图标：思考、Skill 加载、普通工具调用 */
 function TraceIcon({ item, tone, className }: TraceIconProps) {

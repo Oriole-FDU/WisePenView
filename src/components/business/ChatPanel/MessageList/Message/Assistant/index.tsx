@@ -5,24 +5,15 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import CopyButton from '@/components/base/Button/CopyButton';
 import ProviderLogo from '@/components/business/Icons/ProviderLogo';
-import type { ChatModel, WisePenUIMessage } from '@/domains/Chat';
 
 import LoadingText from '../../../_common/LoadingText';
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
+import type { AssistantMessageProps } from './index.type';
 import ProcessTrace from './ProcessTrace';
 import styles from './style.module.less';
 import ToolApprovalDialog from './ToolApprovalDialog';
 import { buildAssistantSegments, findPendingApprovalPart } from './traceModel';
-
-interface AssistantMessageProps {
-  message: WisePenUIMessage;
-  model: ChatModel | null;
-  streaming: boolean;
-  approvalDecisions: Readonly<Record<string, boolean>>;
-  approvalSubmitting: boolean;
-  onApprovalDecision: (toolCallId: string, approved: boolean) => void;
-}
 
 function AssistantMessage({
   message,

@@ -1,13 +1,10 @@
 import { useState } from 'react';
 
-import styles from './ProcessTrace.module.less';
-import { describeTraceItem, type TraceItem } from './traceModel';
-import TraceRow from './TraceRow';
-
-interface TraceStepDetailProps {
-  item: TraceItem;
-  measuredDurations: Readonly<Record<string, number>>;
-}
+import { describeTraceItem } from '../../traceModel';
+import ReasoningBlock from '../ReasoningBlock';
+import TraceRow from '../TraceRow';
+import type { TraceStepDetailProps } from './index.type';
+import styles from './style.module.less';
 
 /**
  * 过程组展开后的单个节点：只有一行标签，思考正文需要再展开一次才露出。
@@ -28,9 +25,7 @@ function TraceStepDetail({ item, measuredDurations }: TraceStepDetailProps) {
         animated={isStreaming}
         onToggle={() => setExpanded((current) => !current)}
       >
-        {reasoningContent ? (
-          <blockquote className={styles.reasoning}>{reasoningContent}</blockquote>
-        ) : null}
+        {reasoningContent ? <ReasoningBlock>{reasoningContent}</ReasoningBlock> : null}
       </TraceRow>
     </li>
   );

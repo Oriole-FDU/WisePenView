@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
-import styles from './ToolApprovalDialog.module.less';
-import { formatToolPayload, getToolDisplayName, type RenderableToolPart } from './traceModel';
+import { formatToolPayload, getToolDisplayName, type RenderableToolPart } from '../traceModel';
+import styles from './style.module.less';
 
 interface ToolApprovalDialogProps {
   part: RenderableToolPart;

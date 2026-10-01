@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { TraceItem } from './traceModel';
+import type { TraceItem } from '../traceModel';
 
 /**
  * 本地兜底测量推理耗时。

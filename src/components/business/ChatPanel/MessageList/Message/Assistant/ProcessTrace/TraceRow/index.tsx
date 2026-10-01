@@ -1,27 +1,14 @@
 import { ChevronDown } from 'lucide-react';
-import { type ReactNode, useId } from 'react';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
+import LoadingText from '@/components/business/ChatPanel/_common/LoadingText';
 
-import LoadingText from '../../../_common/LoadingText';
-import styles from './ProcessTrace.module.less';
-import TraceIcon from './TraceIcon';
-import type { TraceHeadline, TraceItem } from './traceModel';
-import { useCollapseHeight } from './useCollapseHeight';
-
-interface TraceRowProps {
-  /** 折叠面板正文；为空时整行只显示提示，不可展开 */
-  children?: ReactNode;
-  expanded: boolean;
-  /** 行标文案与色调 */
-  headline: TraceHeadline;
-  /** 行首图标所属节点 */
-  item: TraceItem;
-  /** 流式中是否让行标做轮换动画 */
-  animated: boolean;
-  onToggle: () => void;
-}
+import TraceIcon from '../TraceIcon';
+import { useCollapseHeight } from '../useCollapseHeight';
+import type { TraceRowProps } from './index.type';
+import styles from './style.module.less';
 
 /**
  * 过程行的公共骨架：一行提示 + 指示箭头 + 可折叠正文。
