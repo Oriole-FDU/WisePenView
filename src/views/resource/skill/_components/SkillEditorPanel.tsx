@@ -2,7 +2,6 @@ import { Tabs } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import type { editor as MonacoEditor } from 'monaco-editor';
 import type { RefObject } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Empty } from '@/components/base/Feedback';
 import Markdown, { type MarkdownResourceResolver } from '@/components/base/Markdown';
@@ -28,6 +27,7 @@ interface SkillEditorPanelProps {
   markdownPreviewRef: RefObject<HTMLDivElement | null>;
   markdownResourceResolver?: MarkdownResourceResolver;
   navigationVersionLoading: boolean;
+  onAnchorNavigate?: (hash: string) => void;
   resourceId: string;
   selectedFile: SkillFileNode | null;
   selectedMarkdownView: string;
@@ -57,6 +57,7 @@ function SkillEditorPanel({
   markdownPreviewRef,
   markdownResourceResolver,
   navigationVersionLoading,
+  onAnchorNavigate,
   resourceId,
   selectedFile,
   selectedMarkdownView,
@@ -71,15 +72,6 @@ function SkillEditorPanel({
   onMarkdownPreviewScroll,
   onMarkdownViewChange,
 }: SkillEditorPanelProps) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const handleAnchorNavigate = (hash: string) => {
-    void navigate(
-      { pathname: location.pathname, search: location.search, hash },
-      { preventScrollReset: true }
-    );
-  };
-
   if (isConfigSelected) {
     return (
       <SkillConfigPanel
@@ -142,7 +134,7 @@ function SkillEditorPanel({
               <Markdown
                 content={activeContent}
                 resourceResolver={markdownResourceResolver}
-                onAnchorNavigate={handleAnchorNavigate}
+                onAnchorNavigate={onAnchorNavigate}
               />
             </div>
           </div>

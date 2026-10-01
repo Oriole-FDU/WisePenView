@@ -1,7 +1,6 @@
 import { toast } from '@heroui/react';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 import { isDriveTrashFolderNode } from '@/components/business/Drive/common/driveComponentModel';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
@@ -30,10 +29,8 @@ import {
 } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
-import { useOpenResource } from '@/hooks/useOpenResource';
+import { useResourceHostContext } from '@/layouts/Resource/_context';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { buildDrivePath } from '@/utils/navigation/driveRoute';
-import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 
 import ResourceTargetModal from './ResourceTargetModal';
 
@@ -78,10 +75,8 @@ function ResourceHeaderOperations({
   const documentService = useDocumentService();
   const skillService = useSkillService();
   const resourceService = useResourceService();
-  const openResource = useOpenResource();
-  const navigate = useNavigate();
-  const routeLocation = useLocation();
-  const driveLocation = parseResourceDriveLocation(new URLSearchParams(routeLocation.search));
+  const { routeContext, openResource, navigateToDrive } = useResourceHostContext();
+  const driveLocation = routeContext.driveLocation;
   const scope = driveLocation?.scope ?? buildDriveNodeScope();
   const groupId = scope.type === 'group' ? scope.groupId : undefined;
   const [targetModal, setTargetModal] = useState<TargetModal>(null);
@@ -245,7 +240,7 @@ function ResourceHeaderOperations({
   };
 
   const handleDeleteSuccess = () => {
-    navigate(buildDrivePath({ scope, nodeId: node?.parentId }), { replace: true });
+    navigateToDrive({ scope, nodeId: node?.parentId });
   };
 
   const handlers: ResourceHeaderOperationHandlers = {

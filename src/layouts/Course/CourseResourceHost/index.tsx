@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import type { ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
-import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
+import { RESOURCE_KIND, type ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import {
   type OpenResourceFn,
   type ResourceHostContextValue,
@@ -50,6 +50,14 @@ function CourseResourceHost({
     fallbackHeader,
     routeContext: target,
     openResource,
+    navigateToDrive: () => onClose(),
+    switchResourceViewer: ({ resourceId, viewer }) =>
+      onTargetChange({
+        ...target,
+        resourceId,
+        resourceType: RESOURCE_KIND.FILE,
+        viewer,
+      }),
     openChatPanel: onOpenChatPanel,
     setChatContext: onSetChatContext,
     clearChatContext: onClearChatContext,

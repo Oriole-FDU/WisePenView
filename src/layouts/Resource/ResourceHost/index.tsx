@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   Layout,
@@ -7,7 +7,6 @@ import type {
   PanelImperativeHandle,
   PanelSize,
 } from 'react-resizable-panels';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
 
 import {
   RESIZE_TARGET_MINIMUM_SIZE,
@@ -21,30 +20,43 @@ import {
   clampChatPanelWidth,
   RESOURCE_MAIN_MIN_WIDTH,
 } from '@/constants/layoutScale';
-import {
-  normalizeResourceKind,
-  resolveResourceViewer,
-} from '@/domains/Resource/model/resourceTarget';
-import { useOpenResource } from '@/hooks/useOpenResource';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/_context';
 import { useMainShell } from '@/layouts/MainShell/_context';
 import { useChatDockLayoutStore } from '@/layouts/MainShell/_store/useChatDockLayoutStore';
 import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
-import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
-import { parseResourceDriveLocation } from '@/utils/navigation/resourceRoute';
 
 import {
   DEFAULT_RESOURCE_HOST_ID,
+  type OpenResourceFn,
   ResourceChatBindingProvider,
   ResourceChatPanel,
   type ResourceHostContextValue,
+  type ResourceHostDriveNavigationTarget,
   ResourceHostProvider,
+  type ResourceHostRouteContext,
+  type ResourceHostViewerNavigationTarget,
 } from '../_context';
 import styles from './style.module.less';
 
-function ResourceHost() {
+interface ResourceHostProps {
+  children: ReactNode;
+  routeContext: ResourceHostRouteContext;
+  openResource: OpenResourceFn;
+  navigateToDrive: (target: ResourceHostDriveNavigationTarget) => void;
+  switchResourceViewer: (target: ResourceHostViewerNavigationTarget) => void;
+  navigateResourceHash?: (hash: string) => void;
+}
+
+function ResourceHost({
+  children,
+  routeContext,
+  openResource,
+  navigateToDrive,
+  switchResourceViewer,
+  navigateResourceHash,
+}: ResourceHostProps) {
   const { t } = useTranslation('workspace');
   const { sidebarCollapsed, isMobileLayout, onToggleSidebar } = useMainShell();
   const appNavigation = useAppNavigation();
@@ -56,25 +68,6 @@ function ResourceHost() {
   const setChatPanelWidth = useChatDockLayoutStore((state) => state.setChatPanelWidth);
   const clearResourceChatContext = useResourceChatProtocolStore((state) => state.clearContext);
   const resourceChatContext = useResourceChatProtocolStore((state) => state.context);
-  const openResource = useOpenResource();
-  const location = useLocation();
-  const resourceRouteParams = useParams<{ resourceType?: string; resourceId?: string }>();
-  const routeContext = (() => {
-    const rawResourceType = resourceRouteParams.resourceType;
-    const resourceId = resourceRouteParams.resourceId;
-    const resourceType = normalizeResourceKind(rawResourceType);
-    const viewer = resolveResourceViewer({
-      resourceType: rawResourceType,
-      viewer: new URLSearchParams(location.search).get('viewer') ?? undefined,
-    });
-
-    return {
-      resourceId,
-      resourceType,
-      viewer,
-      driveLocation: parseResourceDriveLocation(new URLSearchParams(location.search)),
-    };
-  })();
   const resourceBreadcrumbItems = useResourceBreadcrumb(
     routeContext.resourceId,
     routeContext.driveLocation
@@ -90,6 +83,9 @@ function ResourceHost() {
     hostId: DEFAULT_RESOURCE_HOST_ID,
     routeContext,
     openResource,
+    navigateToDrive,
+    switchResourceViewer,
+    navigateResourceHash,
     headerNavigation: {
       leftSidebarCollapsed: sidebarCollapsed,
       canGoBack: appNavigation.canGoBack,
@@ -143,9 +139,7 @@ function ResourceHost() {
               minSize={isMobileLayout ? 0 : RESOURCE_MAIN_MIN_WIDTH}
               className={styles.resourcePanel}
             >
-              <RouteOutletBoundary>
-                <Outlet />
-              </RouteOutletBoundary>
+              {children}
             </SystemResizablePanel>
 
             {!isMobileLayout ? (
