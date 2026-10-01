@@ -16,12 +16,6 @@ const zhCNChat = {
       close: '关闭会话列表',
     },
     contextMismatch: '所选上下文属于其他资源，请移除后在当前资源中重新选择',
-    debugSave: {
-      title: '保存后再调试？',
-      description:
-        '当前 Agent 配置有未保存修改。调试会使用已保存的草稿版本；如需测试当前改动，请先保存。',
-      confirm: '保存并发送',
-    },
   },
   input: {
     placeholder: '输入消息...',

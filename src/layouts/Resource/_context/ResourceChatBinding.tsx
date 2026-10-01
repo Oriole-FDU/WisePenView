@@ -15,7 +15,7 @@ import { useResourceChatBinding } from './useResourceChatBinding';
 export function ResourceChatBinding({
   resourceId,
   provider,
-  agentDebug,
+  hostAgentPort,
 }: ResourceChatBindingValue) {
   const store = useResourceChatBinding();
   /**
@@ -25,12 +25,12 @@ export function ResourceChatBinding({
    * cleanup：仅移除当前实例的绑定，避免旧资源卸载时清除新资源的能力。
    */
   useEffect(() => {
-    const binding = { resourceId, provider, agentDebug };
+    const binding = { resourceId, provider, hostAgentPort };
     store.setState({ binding });
     return () => {
       if (store.getState().binding === binding) store.setState({ binding: undefined });
     };
-  }, [store, resourceId, provider, agentDebug]);
+  }, [store, resourceId, provider, hostAgentPort]);
   return null;
 }
 
@@ -62,7 +62,7 @@ export function ResourceChatPanel({
       showHeader
       showCollapseButton={showCollapseButton}
       resourceChat={{ provider, context, clearContext }}
-      agentDebug={binding?.agentDebug}
+      hostAgentPort={binding?.hostAgentPort}
     />
   );
 }

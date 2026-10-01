@@ -7,7 +7,8 @@ import Welcome from './Welcome';
 
 /** 对话区：把对话域与会话域拆成消息列表、输入区和会话浮层，自身不持有业务状态。 */
 function ChatPanelConversation({
-  agentDebug,
+  injectedAgents,
+  preferredAgent,
   contextPreview,
   fullWidth,
   session,
@@ -77,8 +78,8 @@ function ChatPanelConversation({
                   onCancel={cancelling ? undefined : cancel}
                   contextPreview={contextPreview}
                   onClearContext={onClearContext}
-                  injectedAgents={agentDebug ? [agentDebug.agent] : undefined}
-                  preferredAgent={agentDebug?.agent}
+                  injectedAgents={injectedAgents}
+                  preferredAgent={preferredAgent}
                   fullWidth={fullWidth}
                 />
               </div>

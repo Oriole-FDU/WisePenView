@@ -17,12 +17,6 @@ const enUSChat = {
     },
     contextMismatch:
       'The selected context belongs to another resource. Remove it and select it again from the current resource.',
-    debugSave: {
-      title: 'Save before debugging?',
-      description:
-        'This Agent has unsaved changes. Debugging uses the saved draft. Save first to test your current changes.',
-      confirm: 'Save and send',
-    },
   },
   input: {
     placeholder: 'Type a message...',

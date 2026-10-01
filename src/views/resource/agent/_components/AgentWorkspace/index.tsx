@@ -1,6 +1,7 @@
 import { toast } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import AppAlertDialog from '@/components/business/AppAlertDialog';
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
@@ -13,6 +14,7 @@ import type { AgentVersionItem, AgentWorkspaceData } from '../../model';
 import styles from '../../style.module.less';
 import AgentEditor from '../AgentEditor';
 import AgentHeaderActions from './AgentHeaderActions';
+import { useAgentDebugSendGuardController } from './controllers/useAgentDebugSendGuardController';
 import { useAgentDraftSessionController } from './controllers/useAgentDraftSessionController';
 
 interface AgentWorkspaceProps {
@@ -58,15 +60,21 @@ export default function AgentWorkspace({
     }
     onVersionSelect(version);
   };
-  const agentDebug =
-    isOwner && viewingVersion === null
-      ? {
-          agent: draftSession.currentDraftAgent,
-          isDirty: draftSession.isDirty,
-          isSaving: draftSession.saveLoading,
-          onSaveDraft: draftSession.saveDraftForDebug,
-        }
-      : undefined;
+  /** 只有草稿归属当前编辑者且未切到历史版本时，才把草稿 Agent 交给聊天调试。 */
+  const debugAgent =
+    isOwner && viewingVersion === null ? draftSession.currentDraftAgent : undefined;
+  const debugGuard = useAgentDebugSendGuardController({
+    agent: debugAgent,
+    isDirty: draftSession.isDirty,
+    saveDraft: draftSession.saveDraftForDebug,
+  });
+  const hostAgentPort = debugAgent
+    ? {
+        injectedAgents: [debugAgent],
+        preferredAgent: debugAgent,
+        interceptSend: debugGuard.interceptSend,
+      }
+    : undefined;
   const headerConfig = {
     header: {
       resource: {
@@ -112,7 +120,7 @@ export default function AgentWorkspace({
   return (
     <ResourceWorkspace className={styles.pageWrap} {...headerConfig}>
       <>
-        <ResourceChatBinding resourceId={resourceId} agentDebug={agentDebug} />
+        <ResourceChatBinding resourceId={resourceId} hostAgentPort={hostAgentPort} />
         <AgentEditor
           assets={agent.assets}
           draft={draftSession.draft}
@@ -126,6 +134,19 @@ export default function AgentWorkspace({
           onNameChange={draftSession.setName}
           onSpecChange={draftSession.setSpec}
           onSystemPromptChange={draftSession.setSystemPrompt}
+        />
+        <AppAlertDialog
+          type="warning"
+          isOpen={debugGuard.isDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) debugGuard.cancel();
+          }}
+          title={t('agent:page.debugSave.title')}
+          description={t('agent:page.debugSave.description')}
+          cancelText={t('common:actions.cancel')}
+          confirmText={t('agent:page.debugSave.confirm')}
+          isConfirmLoading={debugGuard.saving || draftSession.saveLoading}
+          onConfirm={() => void debugGuard.confirm()}
         />
         <UnsavedChangesDialog
           type="confirm"

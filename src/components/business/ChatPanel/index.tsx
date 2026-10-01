@@ -1,11 +1,10 @@
+import { useLatest } from 'ahooks';
 import { memo, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 
-import AppAlertDialog from '@/components/business/AppAlertDialog';
 import type { ChatPanelProps } from '@/components/business/ChatPanel/index.type';
+import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 
-import { useAgentDebugSendController } from './_controllers/useAgentDebugSendController';
 import { useChatPanelLayout } from './_controllers/useChatPanelLayout';
 import { useChatSessionController } from './_controllers/useChatSessionController';
 import { useChatTurnController } from './_controllers/useChatTurnController';
@@ -19,11 +18,12 @@ function ChatPanel({
   fullWidth = 'panel',
   showHeader,
   resourceChat,
-  agentDebug,
+  hostAgentPort,
   showCollapseButton = true,
 }: ChatPanelProps) {
-  const { t } = useTranslation(['chat', 'common']);
   const { isAuthenticated, requireLogin } = useAppAuth();
+  const { locationKey } = useChatSessionRoute();
+  const locationKeyLatest = useLatest(locationKey);
   const layout = useChatPanelLayout();
   const session = useChatSessionController({ resourceChat });
   const turn = useChatTurnController({
@@ -32,7 +32,6 @@ function ChatPanel({
     clearNewlyCreatedSession: session.clearNewlyCreatedSession,
     resourceChat,
   });
-  const debugSend = useAgentDebugSendController({ agentDebug, send: turn.send });
   const { syncNewSessionHistoryRefresh } = session;
   const pendingToolApproval = turn.approval.pending;
 
@@ -46,15 +45,22 @@ function ChatPanel({
     syncNewSessionHistoryRefresh(turn.hasRenderableChatContent);
   }, [syncNewSessionHistoryRefresh, turn.hasRenderableChatContent]);
 
-  /** 发送前先过登录，再让调试域判断是否需要保存草稿，未命中则直接发送。 */
+  /**
+   * 发送前先过登录，再交给宿主的发送前置守卫；守卫挂起期间路由已切换时放弃发送，
+   * 避免守卫的结论落到过期会话。未命中守卫则直接发送。
+   */
   const handleSend = (text: string, opts?: SendOptions) => {
     if (!isAuthenticated) {
       requireLogin();
       return false;
     }
-    const intercepted = debugSend.tryInterceptSend(text, opts);
-    if (intercepted) return intercepted;
-    return turn.send(text, opts);
+    const guarded = hostAgentPort?.interceptSend?.(text, opts);
+    if (!guarded) return turn.send(text, opts);
+    const pendingLocationKey = locationKeyLatest.current;
+    return guarded.then((accepted) => {
+      if (!accepted || locationKeyLatest.current !== pendingLocationKey) return false;
+      return turn.send(text, opts);
+    });
   };
 
   const handleCollapsePanel = () => {
@@ -82,7 +88,8 @@ function ChatPanel({
         ) : null}
 
         <ChatPanelConversation
-          agentDebug={agentDebug}
+          injectedAgents={hostAgentPort?.injectedAgents}
+          preferredAgent={hostAgentPort?.preferredAgent}
           contextPreview={resourceChat?.context?.preview}
           fullWidth={isFullWidth}
           session={session}
@@ -100,19 +107,6 @@ function ChatPanel({
           onDecision={(approved) => turn.approval.decide(pendingToolApproval.toolCallId, approved)}
         />
       ) : null}
-      <AppAlertDialog
-        type="warning"
-        isOpen={debugSend.isDialogOpen}
-        onOpenChange={(open) => {
-          if (!open) debugSend.cancel();
-        }}
-        title={t('panel.debugSave.title')}
-        description={t('panel.debugSave.description')}
-        cancelText={t('actions.cancel', { ns: 'common' })}
-        confirmText={t('panel.debugSave.confirm')}
-        isConfirmLoading={debugSend.saving || agentDebug?.isSaving}
-        onConfirm={() => void debugSend.confirm()}
-      />
     </>
   );
 }
