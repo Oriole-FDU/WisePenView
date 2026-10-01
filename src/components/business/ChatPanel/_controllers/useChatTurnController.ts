@@ -300,6 +300,7 @@ export function useChatTurnController({
       loadingInitial: loadingInitialHistory,
       loadingMore: loadingMoreHistory,
     },
+    isEmpty: messages.length === 0,
     messages,
     send,
     status,

@@ -54,7 +54,8 @@ function MessageList({
 }: MessageListProps) {
   const { t } = useTranslation('chat');
   const isGenerating = status === 'submitted' || status === 'streaming';
-  const showConversationLoading = messages.length === 0 && loadingInitialHistory;
+  const isEmpty = messages.length === 0;
+  const showConversationLoading = isEmpty && loadingInitialHistory;
 
   return (
     <MessageScrollerProvider
@@ -70,12 +71,12 @@ function MessageList({
           <MessageScrollerContent className={styles.scrollColumn}>
             <StreamingScrollFollower active={isGenerating} messages={messages} />
 
-            <div className={styles.messagesBody} data-empty={messages.length === 0}>
+            <div className={styles.messagesBody} data-empty={isEmpty}>
               {showConversationLoading ? (
                 <MessageScrollerItem className={styles.welcomeItem}>
                   <ConversationLoading />
                 </MessageScrollerItem>
-              ) : messages.length === 0 ? null : (
+              ) : isEmpty ? null : (
                 <>
                   <HistoryLoader
                     canLoadMoreHistory={canLoadMoreHistory}

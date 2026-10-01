@@ -83,6 +83,7 @@ function ChatPanel({
           currentModel={turn.currentModel}
           fullWidth={fullWidth}
           getUploadSessionId={session.ensureSession}
+          isEmpty={turn.isEmpty}
           loadingInitialHistory={turn.history.loadingInitial}
           loadingMoreHistory={turn.history.loadingMore}
           messages={turn.messages}

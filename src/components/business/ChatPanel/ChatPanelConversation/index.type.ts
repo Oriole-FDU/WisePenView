@@ -13,6 +13,8 @@ export interface ChatPanelConversationProps {
   currentModel: ChatModel | null;
   fullWidth: boolean;
   getUploadSessionId: () => Promise<string | undefined>;
+  /** 当前会话尚无任何消息；welcome 展示由此判断，不再依赖 messages 数组 */
+  isEmpty: boolean;
   loadingInitialHistory: boolean;
   loadingMoreHistory: boolean;
   messages: WisePenUIMessage[];

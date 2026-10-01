@@ -13,6 +13,7 @@ function ChatPanelConversation({
   currentModel,
   fullWidth,
   getUploadSessionId,
+  isEmpty,
   loadingInitialHistory,
   loadingMoreHistory,
   messages,
@@ -30,7 +31,7 @@ function ChatPanelConversation({
   onSend,
 }: ChatPanelConversationProps) {
   const sending = cancelling || status === 'submitted' || status === 'streaming';
-  const isWelcome = messages.length === 0 && !loadingInitialHistory;
+  const isWelcome = isEmpty && !loadingInitialHistory;
   const showWelcome = isWelcome && !sessionBarOpen;
   const renderWelcomeSlot = () => (
     <div
