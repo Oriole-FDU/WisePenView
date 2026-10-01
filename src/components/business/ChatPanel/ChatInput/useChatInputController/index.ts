@@ -12,6 +12,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useChatService } from '@/domains';
 import { mapChatInputToolSelectionOverrides } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
+import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
 import { useChatInputFiles, useChatInputStore, useChatInputStoreApi } from '../_context';
@@ -25,19 +26,16 @@ import { useVoiceInput } from '../VoiceInput/useVoiceInput';
 interface UseChatInputControllerOptions {
   onSend: ChatInputProps['onSend'];
   onCancel?: ChatInputProps['onCancel'];
-  onRequireLogin?: ChatInputProps['onRequireLogin'];
-  isAuthenticated: boolean;
   sending: boolean;
 }
 
 export function useChatInputController({
   onSend,
   onCancel,
-  onRequireLogin,
-  isAuthenticated,
   sending,
 }: UseChatInputControllerOptions) {
   const { t } = useTranslation('chat');
+  const { isAuthenticated, requireLogin } = useAppAuth();
   const chatService = useChatService();
   const store = useChatInputStoreApi();
   const dragCounterRef = useRef(0);
@@ -89,7 +87,7 @@ export function useChatInputController({
     const text = completionState.value.trim();
     if (!text || sending) return;
     if (!isAuthenticated) {
-      onRequireLogin?.();
+      requireLogin();
       return;
     }
     if (!selectedModel) return;
@@ -177,7 +175,7 @@ export function useChatInputController({
     setIsDragOver(false);
     if (e.dataTransfer.files.length > 0) {
       if (!isAuthenticated) {
-        onRequireLogin?.();
+        requireLogin();
         return;
       }
       void routeFiles(e.dataTransfer.files);
@@ -191,7 +189,7 @@ export function useChatInputController({
       if (item.type.startsWith('image/')) {
         e.preventDefault();
         if (!isAuthenticated) {
-          onRequireLogin?.();
+          requireLogin();
           return;
         }
         const file = item.getAsFile();
@@ -224,8 +222,6 @@ export function useChatInputController({
       sendDisabled,
       sending,
       voiceInputProps,
-      isAuthenticated,
-      onRequireLogin,
       onSend: () => void handleSend(),
       onCancel,
     },

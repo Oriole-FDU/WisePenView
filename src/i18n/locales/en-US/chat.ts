@@ -17,12 +17,6 @@ const enUSChat = {
     },
     contextMismatch:
       'The selected context belongs to another resource. Remove it and select it again from the current resource.',
-    debugSave: {
-      title: 'Save before debugging?',
-      description:
-        'This Agent has unsaved changes. Debugging uses the saved draft. Save first to test your current changes.',
-      confirm: 'Save and send',
-    },
   },
   input: {
     placeholder: 'Type a message...',
@@ -135,36 +129,33 @@ const enUSChat = {
       attachmentPreview: 'Message with attachments',
       emptyPreview: 'Empty message',
     },
-    generating: 'Generating a response',
     assistant: 'AI Assistant',
     like: 'Like',
     dislike: 'Dislike',
+    trace: {
+      summary: 'Process · {{count}} steps',
+    },
     reasoning: {
       loading: 'Thinking...',
       duration: 'Thought for {{count}} seconds',
       title: 'Reasoning',
     },
     tool: {
-      status: {
-        pending: 'Pending',
-        running: 'Running',
-        awaitingApproval: 'Awaiting approval',
-        responded: 'Responded',
-        completed: 'Completed',
-        error: 'Error',
-        denied: 'Denied',
-      },
-      detail: {
-        input: 'Input',
-        output: 'Output',
-        error: 'Error',
-        failed: 'Tool call failed',
-        empty: 'No details available',
+      activity: {
+        running: 'Running {{name}}',
+        awaitingApproval: 'Awaiting approval: {{name}}',
+        completed: 'Called {{name}}',
+        error: 'Call failed: {{name}}',
+        denied: 'Call denied: {{name}}',
+        skillLoading: 'Loading Skill: {{name}}',
+        skillLoaded: 'Loaded Skill: {{name}}',
+        skillFailed: 'Failed to load Skill: {{name}}',
+        skillDenied: 'Skill load denied: {{name}}',
       },
       approval: {
         title: 'High-risk tool requires approval',
         description: 'This tool may modify data or perform an external action. Continue?',
-        actions: 'Tool approval actions',
+        target: 'Tool: {{name}}',
         reject: 'Reject',
         allow: 'Allow',
       },

@@ -7,21 +7,21 @@ import type {
   PanelSize,
 } from 'react-resizable-panels';
 
-import { useChatPanelStore } from '@/components/business/ChatPanel/_store/useChatPanelStore';
 import {
   CHAT_PANEL_MAX_WIDTH,
   CHAT_PANEL_MIN_WIDTH,
   clampChatPanelWidth,
 } from '@/constants/layoutScale';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
+import { useChatDockLayoutStore } from '@/layouts/MainShell/_store/useChatDockLayoutStore';
 
 export const useCourseChatDockController = () => {
   const panelRef = useRef<PanelImperativeHandle | null>(null);
   const pendingWidthRef = useRef<number | null>(null);
-  const collapsed = useChatPanelStore((state) => state.chatPanelCollapsed);
-  const width = useChatPanelStore((state) => state.chatPanelWidth);
-  const setCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
-  const setWidth = useChatPanelStore((state) => state.setChatPanelWidth);
+  const collapsed = useChatDockLayoutStore((state) => state.chatPanelCollapsed);
+  const width = useChatDockLayoutStore((state) => state.chatPanelWidth);
+  const setCollapsed = useChatDockLayoutStore((state) => state.setChatPanelCollapsed);
+  const setWidth = useChatDockLayoutStore((state) => state.setChatPanelWidth);
   const open = !collapsed;
   const panelSize = open ? clampChatPanelWidth(width) : 0;
 

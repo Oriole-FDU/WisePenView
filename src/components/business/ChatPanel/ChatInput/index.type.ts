@@ -13,8 +13,6 @@ export interface ChatInputProps {
   preferredAgent?: ChatAgentOption | null;
   /** 全宽页默认可展示模型名；窄宽时自动仅图标（与侧栏一致） */
   fullWidth: boolean;
-  isAuthenticated?: boolean;
-  onRequireLogin?: () => void;
 }
 
 export interface LocalAttachmentPayload {

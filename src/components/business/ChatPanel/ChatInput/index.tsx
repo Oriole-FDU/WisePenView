@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH } from '@/constants/layoutScale';
+import { useAppAuth } from '@/layouts/App/_context';
 
 import { ChatInputFileProvider, ChatInputStoreProvider } from './_context';
 import AttachmentStrip from './AttachmentStrip';
@@ -25,17 +26,14 @@ function ChatInputContent({
   injectedAgents,
   preferredAgent,
   fullWidth,
-  isAuthenticated = true,
-  onRequireLogin,
 }: ChatInputProps) {
   const { t } = useTranslation('chat');
+  const { isAuthenticated } = useAppAuth();
   const inputCardRef = useRef<HTMLDivElement>(null);
   const [measuredCompactModelTrigger, setMeasuredCompactModelTrigger] = useState(false);
   const { containerProps, isDragOver, textAreaProps, toolbarProps } = useChatInputController({
     onSend,
     onCancel,
-    onRequireLogin,
-    isAuthenticated,
     sending,
   });
 

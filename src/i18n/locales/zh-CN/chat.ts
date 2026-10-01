@@ -16,12 +16,6 @@ const zhCNChat = {
       close: '关闭会话列表',
     },
     contextMismatch: '所选上下文属于其他资源，请移除后在当前资源中重新选择',
-    debugSave: {
-      title: '保存后再调试？',
-      description:
-        '当前 Agent 配置有未保存修改。调试会使用已保存的草稿版本；如需测试当前改动，请先保存。',
-      confirm: '保存并发送',
-    },
   },
   input: {
     placeholder: '输入消息...',
@@ -133,36 +127,33 @@ const zhCNChat = {
       attachmentPreview: '附件消息',
       emptyPreview: '空消息',
     },
-    generating: '正在生成回复',
     assistant: 'AI 助手',
     like: '点赞',
     dislike: '点踩',
+    trace: {
+      summary: '处理过程 · {{count}} 步',
+    },
     reasoning: {
       loading: '思考中...',
       duration: '思考了 {{count}} 秒',
       title: '思考过程',
     },
     tool: {
-      status: {
-        pending: '待处理',
-        running: '运行中',
-        awaitingApproval: '等待批准',
-        responded: '已回复',
-        completed: '已完成',
-        error: '错误',
-        denied: '已拒绝',
-      },
-      detail: {
-        input: '输入',
-        output: '输出',
-        error: '错误',
-        failed: '调用失败',
-        empty: '暂无详情',
+      activity: {
+        running: '正在调用 {{name}}',
+        awaitingApproval: '等待确认：{{name}}',
+        completed: '已调用 {{name}}',
+        error: '调用失败：{{name}}',
+        denied: '已拒绝调用 {{name}}',
+        skillLoading: '正在加载 Skill：{{name}}',
+        skillLoaded: '已加载 Skill：{{name}}',
+        skillFailed: '加载 Skill 失败：{{name}}',
+        skillDenied: '已拒绝加载 Skill：{{name}}',
       },
       approval: {
         title: '高危工具需要确认',
         description: '该工具可能修改数据或执行外部操作，请确认是否继续。',
-        actions: '工具审批操作',
+        target: '工具：{{name}}',
         reject: '拒绝',
         allow: '允许',
       },

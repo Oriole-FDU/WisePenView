@@ -1,0 +1,136 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+
+import LoadingText from './index';
+import type { LoadingTextProps } from './index.type';
+import styles from './LoadingText.stories.module.less';
+
+type LoadingTextTone = NonNullable<LoadingTextProps['tone']>;
+type LoadingTextSize = NonNullable<LoadingTextProps['size']>;
+
+const tones: LoadingTextTone[] = ['muted', 'default', 'accent', 'danger'];
+const sizes: LoadingTextSize[] = ['xs', 'sm', 'inherit'];
+
+const meta = {
+  title: 'ChatPanel/ChatMessageList/Assistant/LoadingText',
+  component: LoadingText,
+  parameters: {
+    controls: {
+      include: ['as', 'children', 'tone', 'size', 'animated', 'duration'],
+    },
+  },
+  args: {
+    children: 'Thinking through the next response...',
+    tone: 'muted',
+    size: 'inherit',
+    animated: true,
+    duration: '2s',
+  },
+  argTypes: {
+    as: {
+      control: 'select',
+      options: ['span', 'div', 'p'],
+    },
+    tone: {
+      control: 'inline-radio',
+      options: tones,
+    },
+    size: {
+      control: 'inline-radio',
+      options: sizes,
+    },
+    animated: {
+      control: 'boolean',
+    },
+    duration: {
+      control: 'text',
+    },
+  },
+} satisfies Meta<typeof LoadingText>;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {};
+
+export const Tones: Story = {
+  parameters: {
+    controls: {
+      exclude: ['children', 'tone'],
+    },
+  },
+  render: ({ children: _children, tone: _tone, ...args }) => {
+    return (
+      <div className={styles.matrix}>
+        {tones.map((tone) => (
+          <LoadingText {...args} key={tone} tone={tone}>
+            {tone}: Streaming partial reasoning while the model is working.
+          </LoadingText>
+        ))}
+      </div>
+    );
+  },
+};
+
+export const Sizes: Story = {
+  parameters: {
+    controls: {
+      exclude: ['children', 'size'],
+    },
+  },
+  render: ({ children: _children, size: _size, ...args }) => {
+    return (
+      <div className={styles.matrix}>
+        {sizes.map((size) => (
+          <LoadingText {...args} key={size} size={size}>
+            {size}: Reading context, messages, and attached resources.
+          </LoadingText>
+        ))}
+      </div>
+    );
+  },
+};
+
+export const Static: Story = {
+  parameters: {
+    controls: {
+      exclude: ['animated', 'duration'],
+    },
+  },
+  args: {
+    animated: false,
+    children: 'Static loading copy for reduced emphasis.',
+  },
+};
+
+export const Speeds: Story = {
+  parameters: {
+    controls: {
+      exclude: ['children', 'duration'],
+    },
+  },
+  render: ({ children: _children, duration: _duration, ...args }) => {
+    return (
+      <div className={styles.matrix}>
+        <LoadingText {...args} duration="1s">
+          fast: Scanning recent context.
+        </LoadingText>
+        <LoadingText {...args} duration="2s">
+          normal: Thinking through the next response.
+        </LoadingText>
+        <LoadingText {...args} duration="3.5s">
+          slow: Waiting for model output.
+        </LoadingText>
+      </div>
+    );
+  },
+};
+
+export const BlockElement: Story = {
+  args: {
+    as: 'div',
+    tone: 'accent',
+    size: 'sm',
+    children: 'Block-level loading text can occupy a full message line.',
+  },
+};

@@ -1,0 +1,21 @@
+@import '@/styles/mixins/scrollbar.less';
+
+.reasoning {
+  max-height: min(36vh, 260px);
+  /* 与标签行留出间距；折叠容器自带 overflow: hidden，不会被裁掉 */
+  margin: var(--space-2xs) 0 0;
+  padding: var(--space-xs);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-xl);
+  background-color: var(--surface-secondary);
+  color: var(--muted);
+  font-size: var(--chat-thinking-font-size);
+  line-height: var(--chat-thinking-line-height);
+  text-align: start;
+  white-space: pre-wrap;
+  word-break: break-word;
+  content-visibility: auto;
+  contain: layout paint;
+  .appSubtleScrollbar();
+}
