@@ -1,40 +1,36 @@
-import ChatInput from './ChatInput';
-import ChatSessionBar from './ChatSessionBar';
-import type { ChatPanelAgentDebugConfig } from './index.type';
-import MessageList from './MessageList';
-import Welcome from './MessageList/Welcome';
-import styles from './style.module.less';
-import type { ChatPanelController } from './useChatPanelController';
+import ChatInput from '../ChatInput';
+import ChatSessionBar from '../ChatSessionBar';
+import MessageList from '../MessageList';
+import styles from '../style.module.less';
+import type { ChatPanelConversationProps } from './index.type';
+import Welcome from './Welcome';
 
-interface ChatPanelBodyProps {
-  agentDebug?: ChatPanelAgentDebugConfig;
-  controller: ChatPanelController;
-  fullWidth: boolean;
-}
-
-function ChatPanelBody({ agentDebug, controller, fullWidth }: ChatPanelBodyProps) {
-  const {
-    canLoadMoreHistory,
-    cancelling,
-    currentModel,
-    currentSessionId,
-    handleCancel,
-    handleCloseSessionBar,
-    handleSelectSession,
-    handleSend,
-    handleToolApprovalDecision,
-    loadMoreHistoryMessages,
-    loadingInitialHistory,
-    loadingMoreHistory,
-    messages,
-    promoteDraftToolSelection,
-    resourceChatContext,
-    clearResourceChatContext,
-    sessionBarOpen,
-    status,
-    toolApprovalDecisions,
-    ensureChatSession,
-  } = controller;
+function ChatPanelConversation({
+  agentDebug,
+  cancelling,
+  canLoadMoreHistory,
+  contextPreview,
+  currentModel,
+  fullWidth,
+  getUploadSessionId,
+  isAuthenticated,
+  loadingInitialHistory,
+  loadingMoreHistory,
+  messages,
+  promoteDraftToolSelection,
+  sessionBarOpen,
+  sessionId,
+  status,
+  toolApprovalDecisions,
+  onApprovalDecision,
+  onCancel,
+  onClearContext,
+  onCloseSessionBar,
+  onLoadMoreHistory,
+  onRequireLogin,
+  onSelectSession,
+  onSend,
+}: ChatPanelConversationProps) {
   const sending = cancelling || status === 'submitted' || status === 'streaming';
   const isWelcome = messages.length === 0 && !loadingInitialHistory;
   const showWelcome = isWelcome && !sessionBarOpen;
@@ -61,17 +57,17 @@ function ChatPanelBody({ agentDebug, controller, fullWidth }: ChatPanelBodyProps
           <div className={styles.messageViewport}>
             <MessageList
               messages={messages}
-              sessionId={currentSessionId}
+              sessionId={sessionId}
               canLoadMoreHistory={canLoadMoreHistory}
               loadingInitialHistory={loadingInitialHistory}
               loadingMoreHistory={loadingMoreHistory}
-              onLoadMoreHistory={loadMoreHistoryMessages}
+              onLoadMoreHistory={onLoadMoreHistory}
               status={status}
               model={currentModel}
               fullWidth={fullWidth}
               approvalDecisions={toolApprovalDecisions}
               approvalSubmitting={status === 'submitted' || status === 'streaming'}
-              onApprovalDecision={handleToolApprovalDecision}
+              onApprovalDecision={onApprovalDecision}
             />
           </div>
 
@@ -81,16 +77,16 @@ function ChatPanelBody({ agentDebug, controller, fullWidth }: ChatPanelBodyProps
             <div className={styles.footerSlot}>
               <div className={styles.inputColumn}>
                 <ChatInput
-                  onSend={handleSend}
-                  getUploadSessionId={ensureChatSession}
+                  onSend={onSend}
+                  getUploadSessionId={getUploadSessionId}
                   sending={sending}
-                  sessionId={currentSessionId}
+                  sessionId={sessionId}
                   promoteDraftToolSelection={promoteDraftToolSelection}
-                  onCancel={cancelling ? undefined : handleCancel}
-                  isAuthenticated={controller.isAuthenticated}
-                  onRequireLogin={controller.requireLogin}
-                  contextPreview={resourceChatContext?.preview}
-                  onClearContext={clearResourceChatContext}
+                  onCancel={cancelling ? undefined : onCancel}
+                  isAuthenticated={isAuthenticated}
+                  onRequireLogin={onRequireLogin}
+                  contextPreview={contextPreview}
+                  onClearContext={onClearContext}
                   injectedAgents={agentDebug ? [agentDebug.agent] : undefined}
                   preferredAgent={agentDebug?.agent}
                   fullWidth={fullWidth}
@@ -104,9 +100,9 @@ function ChatPanelBody({ agentDebug, controller, fullWidth }: ChatPanelBodyProps
 
         {sessionBarOpen ? (
           <ChatSessionBar
-            activeSessionId={currentSessionId}
-            onClose={handleCloseSessionBar}
-            onSelectSession={handleSelectSession}
+            activeSessionId={sessionId}
+            onClose={onCloseSessionBar}
+            onSelectSession={onSelectSession}
           />
         ) : null}
       </div>
@@ -116,4 +112,4 @@ function ChatPanelBody({ agentDebug, controller, fullWidth }: ChatPanelBodyProps
   );
 }
 
-export default ChatPanelBody;
+export default ChatPanelConversation;

@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { useChatSessionHistoryRefreshStore } from '@/components/business/ChatPanel/_store/useChatSessionHistoryRefreshStore';
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
+import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { buildChatPath } from '@/utils/navigation/appRoute';
 
 import { useSidebarSessionHistoryStore } from './_store/useSidebarSessionHistoryStore';

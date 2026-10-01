@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Chat } from '@/components/Chat';
-
+import LoadingText from './index';
 import type { LoadingTextProps } from './index.type';
 import styles from './LoadingText.stories.module.less';
 
@@ -12,8 +11,8 @@ const tones: LoadingTextTone[] = ['muted', 'default', 'accent', 'danger'];
 const sizes: LoadingTextSize[] = ['xs', 'sm', 'inherit'];
 
 const meta = {
-  title: 'Chat/LoadingText',
-  component: Chat.LoadingText,
+  title: 'ChatPanel/LoadingText',
+  component: LoadingText,
   parameters: {
     controls: {
       include: ['as', 'children', 'tone', 'size', 'animated', 'duration'],
@@ -46,7 +45,7 @@ const meta = {
       control: 'text',
     },
   },
-} satisfies Meta<typeof Chat.LoadingText>;
+} satisfies Meta<typeof LoadingText>;
 
 export default meta;
 
@@ -64,9 +63,9 @@ export const Tones: Story = {
     return (
       <div className={styles.matrix}>
         {tones.map((tone) => (
-          <Chat.LoadingText {...args} key={tone} tone={tone}>
+          <LoadingText {...args} key={tone} tone={tone}>
             {tone}: Streaming partial reasoning while the model is working.
-          </Chat.LoadingText>
+          </LoadingText>
         ))}
       </div>
     );
@@ -83,9 +82,9 @@ export const Sizes: Story = {
     return (
       <div className={styles.matrix}>
         {sizes.map((size) => (
-          <Chat.LoadingText {...args} key={size} size={size}>
+          <LoadingText {...args} key={size} size={size}>
             {size}: Reading context, messages, and attached resources.
-          </Chat.LoadingText>
+          </LoadingText>
         ))}
       </div>
     );
@@ -113,15 +112,15 @@ export const Speeds: Story = {
   render: ({ children: _children, duration: _duration, ...args }) => {
     return (
       <div className={styles.matrix}>
-        <Chat.LoadingText {...args} duration="1s">
+        <LoadingText {...args} duration="1s">
           fast: Scanning recent context.
-        </Chat.LoadingText>
-        <Chat.LoadingText {...args} duration="2s">
+        </LoadingText>
+        <LoadingText {...args} duration="2s">
           normal: Thinking through the next response.
-        </Chat.LoadingText>
-        <Chat.LoadingText {...args} duration="3.5s">
+        </LoadingText>
+        <LoadingText {...args} duration="3.5s">
           slow: Waiting for model output.
-        </Chat.LoadingText>
+        </LoadingText>
       </div>
     );
   },

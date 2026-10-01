@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import CopyButton from '@/components/base/Button/CopyButton';
 import ProviderLogo from '@/components/business/Icons/ProviderLogo';
-import { LoadingText } from '@/components/Chat';
 import type { ChatModel, WisePenUIMessage } from '@/domains/Chat';
 
+import LoadingText from '../../../_common/LoadingText';
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
 import ProcessTrace from './ProcessTrace';
