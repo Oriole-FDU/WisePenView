@@ -12,7 +12,7 @@ import {
 
 import ConversationLoading from './ConversationLoading';
 import HistoryLoader from './HistoryLoader';
-import type { MessageListProps } from './index.type';
+import type { ChatMessageListProps } from './index.type';
 import Message from './Message';
 import MessageHistoryNavigator from './MessageHistoryNavigator';
 import StreamingScrollFollower from './StreamingScrollFollower';
@@ -22,7 +22,7 @@ const AUTO_LOAD_EDGE_THRESHOLD = 96;
 const HISTORY_ANCHOR_TOP_RATIO = 1 / 3;
 
 /** 组合消息展示与滚动交互，不拥有会话、分页请求或工具审批状态。 */
-function MessageList({
+function ChatMessageList({
   messages,
   resetKey,
   generating,
@@ -32,7 +32,7 @@ function MessageList({
   onLoadMoreHistory,
   model,
   fullWidth,
-}: MessageListProps) {
+}: ChatMessageListProps) {
   const { t } = useTranslation('chat');
   const isEmpty = messages.length === 0;
   const showConversationLoading = isEmpty && loadingInitialHistory;
@@ -98,4 +98,4 @@ function MessageList({
   );
 }
 
-export default MessageList;
+export default ChatMessageList;

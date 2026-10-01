@@ -1,6 +1,6 @@
 import ChatInput from '../ChatInput';
+import ChatMessageList from '../ChatMessageList';
 import ChatSessionBar from '../ChatSessionBar';
-import MessageList from '../MessageList';
 import styles from '../style.module.less';
 import type { ChatPanelConversationProps } from './index.type';
 import Welcome from './Welcome';
@@ -52,7 +52,7 @@ function ChatPanelConversation({
           hidden={sessionBarOpen}
         >
           <div className={styles.messageViewport}>
-            <MessageList
+            <ChatMessageList
               messages={messages}
               resetKey={sessionId}
               canLoadMoreHistory={canLoadMoreHistory}
