@@ -3,6 +3,7 @@ import { ArrowUp, Bot, Mic, Plus, Settings, SlidersHorizontal, Square } from 'lu
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { useAppAuth } from '@/layouts/App/_context';
 
 import AgentPicker from '../AgentPicker';
 import ModelPicker from '../ModelPicker';
@@ -21,15 +22,15 @@ function InputToolbar({
   injectedAgents,
   preferredAgent,
   modelIconOnly,
-  isAuthenticated,
-  onRequireLogin,
   onSend,
   onCancel,
 }: InputToolbarProps) {
   const { t } = useTranslation('chat');
+  const { isAuthenticated, requireLogin } = useAppAuth();
+
   function handlePrimaryAction(): void {
     if (!isAuthenticated) {
-      onRequireLogin?.();
+      requireLogin();
       return;
     }
     if (sending) {
@@ -53,17 +54,17 @@ function InputToolbar({
             <AppIconButton
               icon={<Plus size={18} aria-hidden="true" />}
               label={t('input.uploadMenu.trigger')}
-              onPress={onRequireLogin}
+              onPress={requireLogin}
             />
             <AppIconButton
               icon={<Bot size={17} aria-hidden="true" />}
               label={t('input.agentPicker.trigger')}
-              onPress={onRequireLogin}
+              onPress={requireLogin}
             />
             <AppIconButton
               icon={<Settings size={17} aria-hidden="true" />}
               label={t('input.skillMenu.configure')}
-              onPress={onRequireLogin}
+              onPress={requireLogin}
             />
           </>
         )}
@@ -82,7 +83,7 @@ function InputToolbar({
             <AppIconButton
               icon={<SlidersHorizontal size={17} aria-hidden="true" />}
               label={t('modelSelector.select')}
-              onPress={onRequireLogin}
+              onPress={requireLogin}
             />
           )}
         </div>
@@ -92,7 +93,7 @@ function InputToolbar({
           <AppIconButton
             icon={<Mic size={17} aria-hidden="true" />}
             label={t('input.voice.idle')}
-            onPress={onRequireLogin}
+            onPress={requireLogin}
           />
         )}
         <AppIconButton

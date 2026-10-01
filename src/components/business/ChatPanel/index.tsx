@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import type { ChatPanelProps } from '@/components/business/ChatPanel/index.type';
+import { useAppAuth } from '@/layouts/App/_context';
 
 import { useAgentDebugSendController } from './_controllers/useAgentDebugSendController';
 import { useChatPanelLayout } from './_controllers/useChatPanelLayout';
@@ -21,6 +22,7 @@ function ChatPanel({
   showCollapseButton = true,
 }: ChatPanelProps) {
   const { t } = useTranslation(['chat', 'common']);
+  const { isAuthenticated, requireLogin } = useAppAuth();
   const layout = useChatPanelLayout();
   const session = useChatSessionController({ resourceChat });
   const turn = useChatTurnController({
@@ -44,8 +46,8 @@ function ChatPanel({
 
   /** 发送前先过登录，再让调试域判断是否需要保存草稿，未命中则直接发送。 */
   const handleSend = (text: string, opts?: SendOptions) => {
-    if (!session.isAuthenticated) {
-      session.requireLogin();
+    if (!isAuthenticated) {
+      requireLogin();
       return false;
     }
     const intercepted = debugSend.tryInterceptSend(text, opts);
@@ -81,7 +83,6 @@ function ChatPanel({
           currentModel={turn.currentModel}
           fullWidth={fullWidth}
           getUploadSessionId={session.ensureSession}
-          isAuthenticated={session.isAuthenticated}
           loadingInitialHistory={turn.history.loadingInitial}
           loadingMoreHistory={turn.history.loadingMore}
           messages={turn.messages}
@@ -95,7 +96,6 @@ function ChatPanel({
           onClearContext={resourceChat?.clearContext}
           onCloseSessionBar={session.closeSessionBar}
           onLoadMoreHistory={turn.history.loadMore}
-          onRequireLogin={session.requireLogin}
           onSelectSession={session.selectSession}
           onSend={handleSend}
         />

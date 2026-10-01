@@ -184,12 +184,10 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
     closeSessionBar,
     currentSessionId,
     ensureSession,
-    isAuthenticated: appAuth.isAuthenticated,
     isNewlyCreatedSession,
     panelTitle,
     promoteDraftToolSelection:
       currentSessionId !== undefined && currentSessionId === newChatSessionId,
-    requireLogin: appAuth.requireLogin,
     selectSession: handleSelectSession,
     sessionBarOpen,
     startNewChat,

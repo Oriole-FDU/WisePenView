@@ -13,7 +13,6 @@ function ChatPanelConversation({
   currentModel,
   fullWidth,
   getUploadSessionId,
-  isAuthenticated,
   loadingInitialHistory,
   loadingMoreHistory,
   messages,
@@ -27,7 +26,6 @@ function ChatPanelConversation({
   onClearContext,
   onCloseSessionBar,
   onLoadMoreHistory,
-  onRequireLogin,
   onSelectSession,
   onSend,
 }: ChatPanelConversationProps) {
@@ -83,8 +81,6 @@ function ChatPanelConversation({
                   sessionId={sessionId}
                   promoteDraftToolSelection={promoteDraftToolSelection}
                   onCancel={cancelling ? undefined : onCancel}
-                  isAuthenticated={isAuthenticated}
-                  onRequireLogin={onRequireLogin}
                   contextPreview={contextPreview}
                   onClearContext={onClearContext}
                   injectedAgents={agentDebug ? [agentDebug.agent] : undefined}

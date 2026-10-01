@@ -13,7 +13,6 @@ export interface ChatPanelConversationProps {
   currentModel: ChatModel | null;
   fullWidth: boolean;
   getUploadSessionId: () => Promise<string | undefined>;
-  isAuthenticated: boolean;
   loadingInitialHistory: boolean;
   loadingMoreHistory: boolean;
   messages: WisePenUIMessage[];
@@ -27,7 +26,6 @@ export interface ChatPanelConversationProps {
   onClearContext?: () => void;
   onCloseSessionBar: () => void;
   onLoadMoreHistory: () => Promise<void>;
-  onRequireLogin: () => void;
   onSelectSession: (session: ChatSession) => void;
   onSend: (text: string, opts?: SendOptions) => boolean | void | Promise<boolean | void>;
 }
