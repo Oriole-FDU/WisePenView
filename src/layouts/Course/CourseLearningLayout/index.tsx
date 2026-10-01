@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import { PanelRightClose, PanelRightOpen, Video } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -10,9 +10,13 @@ import {
   SystemResizablePanel,
   SystemResizablePanelGroup,
 } from '@/components/base/SystemResizable';
-import { type ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import { COURSE_ROLE } from '@/domains/Course';
+import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
 import { ResourceChatBindingProvider, ResourceChatPanel } from '@/layouts/Resource/_context';
+import {
+  buildResourceOpenState,
+  type ResourceChatContext,
+} from '@/layouts/Resource/_context/resourceChatModel';
 import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 
 import { useCourseContext } from '../_context';
@@ -32,10 +36,53 @@ function CourseLearningLayout() {
   const navigation = useCourseLearningNavigationController(course.courseId);
   const chatDock = useCourseChatDockController();
   const [resourceChatContext, setResourceChatContext] = useState<ResourceChatContext>();
+  const resourceChatContextRef = useRef<ResourceChatContext | undefined>(undefined);
   const selectedNode = navigation.selectedNode;
-  const handleClearResourceChatContext = (context?: ResourceChatContext) => {
-    setResourceChatContext((current) => (context && current !== context ? current : undefined));
+  const openResource = selectedNode?.nodeType === 'RESOURCE' ? selectedNode : undefined;
+  const openResourceId = openResource?.resourceId;
+  const openResourceType = openResource?.resourceType;
+  const openResourceViewer = openResource?.viewer;
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：课程当前资源变化时同步聊天请求中的打开资源。
+   * 不可替代原因：课程聊天面板可折叠，资源身份由课程布局持有。
+   * cleanup：按写入版本清理旧资源。
+   */
+  useEffect(() => {
+    if (!openResourceId || !openResourceType) {
+      clearFrontendStates({ source: FRONTEND_STATE_SOURCE.RESOURCE });
+      return;
+    }
+    const revision = setFrontendStates({
+      source: FRONTEND_STATE_SOURCE.RESOURCE,
+      resourceId: openResourceId,
+      entries: [
+        buildResourceOpenState({
+          resourceId: openResourceId,
+          resourceType: openResourceType,
+          viewer: openResourceViewer,
+        }),
+      ],
+    });
+    return () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.RESOURCE, revision });
+  }, [openResourceId, openResourceType, openResourceViewer]);
+  const handleSetResourceChatContext = (context: ResourceChatContext) => {
+    resourceChatContextRef.current = context;
+    setResourceChatContext(context);
   };
+  const handleClearResourceChatContext = (context?: ResourceChatContext) => {
+    if (context && resourceChatContextRef.current !== context) return;
+    resourceChatContextRef.current = undefined;
+    setResourceChatContext(undefined);
+    clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION });
+  };
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：离开课程学习页面时清理未发送的选区。
+   * 不可替代原因：课程本地状态卸载时，共享模块仍按标签存在。
+   * cleanup：移除该课程的选区。
+   */
+  useEffect(() => () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION }), []);
 
   const workspaceHeader = (
     <ResourceWorkspaceHeader
@@ -127,7 +174,7 @@ function CourseLearningLayout() {
                           if (target.resourceId) navigation.openResource(target.resourceId);
                         }}
                         onOpenChatPanel={chatDock.openPanel}
-                        onSetChatContext={setResourceChatContext}
+                        onSetChatContext={handleSetResourceChatContext}
                         onClearChatContext={handleClearResourceChatContext}
                         onClose={navigation.openCourseHome}
                       />

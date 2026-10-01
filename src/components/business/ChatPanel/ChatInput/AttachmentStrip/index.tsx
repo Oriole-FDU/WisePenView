@@ -13,6 +13,12 @@ import {
   AttachmentTitle,
 } from '@/components/_shadcn';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
+import {
+  clearFrontendStates,
+  FRONTEND_STATE_SOURCE,
+  setFrontendStates,
+  useFrontendStateValue,
+} from '@/frontendState';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.less';
@@ -30,14 +36,25 @@ function getUploadAttachmentDescriptionKey(status: 'uploading' | 'failed') {
 function AttachmentStrip() {
   const { t } = useTranslation('chat');
   const store = useChatInputStoreApi();
-  const { resources, attachments, uploads } = useChatInputStore(
+  const resources = useFrontendStateValue('selected_resources') ?? [];
+  const { attachments, uploads } = useChatInputStore(
     useShallow((state) => ({
-      resources: state.activeDocRefs,
       attachments: state.activeAttachments,
       uploads: state.pendingAttachmentUploads,
     }))
   );
-  const { removeActiveAttachment, removeDocRef, removePendingAttachmentUpload } = store.getState();
+  const { removeActiveAttachment, removePendingAttachmentUpload } = store.getState();
+  const removeDocRef = (resourceId: string) => {
+    const remaining = resources.filter((resource) => resource.resource_id !== resourceId);
+    if (remaining.length === 0) {
+      clearFrontendStates({ source: FRONTEND_STATE_SOURCE.INPUT });
+    } else {
+      setFrontendStates({
+        source: FRONTEND_STATE_SOURCE.INPUT,
+        entries: [{ key: 'selected_resources', value: remaining }],
+      });
+    }
+  };
 
   const hasAny = resources.length > 0 || attachments.length > 0 || uploads.length > 0;
 
@@ -50,13 +67,13 @@ function AttachmentStrip() {
         aria-label={t('input.attachments.contextAria')}
       >
         {resources.map((resource) => (
-          <Attachment key={resource.resourceId} size="xs" className={styles.chatAttachment}>
+          <Attachment key={resource.resource_id} size="xs" className={styles.chatAttachment}>
             <AttachmentMedia>
-              <EntryIcon entryType="resource" resourceType={resource.resourceType} size={14} />
+              <EntryIcon entryType="resource" resourceType={resource.resource_type} size={14} />
             </AttachmentMedia>
             <AttachmentContent>
-              <AttachmentTitle title={resource.resourceName}>
-                {resource.resourceName}
+              <AttachmentTitle title={resource.resource_name}>
+                {resource.resource_name}
               </AttachmentTitle>
               <AttachmentDescription>
                 {t('input.attachments.documentReference')}
@@ -64,8 +81,8 @@ function AttachmentStrip() {
             </AttachmentContent>
             <AttachmentActions>
               <AttachmentAction
-                label={t('input.attachments.removeDocument', { name: resource.resourceName })}
-                onPress={() => removeDocRef(resource.resourceId)}
+                label={t('input.attachments.removeDocument', { name: resource.resource_name })}
+                onPress={() => removeDocRef(resource.resource_id)}
               >
                 <X size={12} />
               </AttachmentAction>

@@ -123,7 +123,6 @@ export function useChatInputController({
       const sendAccepted = await onSend(text, {
         model: selectedModel,
         selectedAgent: latestCompletionState.selectedAgent,
-        activeDocRefs: latestCompletionState.activeDocRefs,
         activeAttachments: latestCompletionState.activeAttachments,
         selectedSkills: latestCompletionState.selectedSkills,
         toolSelectionOverrides: mapChatInputToolSelectionOverrides(

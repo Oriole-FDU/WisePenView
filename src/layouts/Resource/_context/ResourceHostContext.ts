@@ -1,9 +1,10 @@
 import { createContext, type ReactNode } from 'react';
 
-import type { ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import type { DriveResourceLocation } from '@/domains/Drive';
 import type { ResourceHeaderProps } from '@/layouts/Resource/ResourceHeader/index.type';
 import type { ResourceWorkspaceHeaderProps } from '@/layouts/Resource/ResourceWorkspaceHeader/index.type';
+
+import type { ResourceChatContext } from './resourceChatModel';
 
 export interface OpenResourceTarget {
   resourceId: string;

@@ -1,10 +1,11 @@
 import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import type { TFunction } from 'i18next';
-import { type RefObject, useState } from 'react';
+import { type RefObject, useEffect, useState } from 'react';
 
 import type { NoteBodyEditorHandle } from '@/components/business/Note/CustomBlockNote/index.type';
 import type { NoteSelectionSnapshot, NoteSessionStatus } from '@/domains/Note';
+import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
 import { useResourceHostChatContextActions } from '@/layouts/Resource/_context';
 import { parseErrorMessage } from '@/utils/error';
 
@@ -40,6 +41,32 @@ export function useNoteActionsController({
 }: UseNoteActionsControllerOptions) {
   const { openChatPanel, setChatContext } = useResourceHostChatContextActions();
   const [exportPending, setExportPending] = useState(false);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：笔记资源或内容签名变化时同步发送状态。
+   * 不可替代原因：签名来自当前编辑器实例，聊天面板可能独立挂载。
+   * cleanup：仅清理该编辑器版本写入的签名。
+   */
+  useEffect(() => {
+    const revision = setFrontendStates({
+      source: FRONTEND_STATE_SOURCE.NOTE_EDITOR,
+      resourceId,
+      entries: noteClientContentSignature
+        ? [
+            {
+              key: 'note_client_content_signature',
+              value: noteClientContentSignature,
+              disabled: true,
+            },
+          ]
+        : [],
+    });
+    return () =>
+      clearFrontendStates({
+        source: FRONTEND_STATE_SOURCE.NOTE_EDITOR,
+        revision,
+      });
+  }, [noteClientContentSignature, resourceId]);
   const handlePrintPdf = useMemoizedFn(async () => {
     const bodyApi = bodyEditorRef.current;
     if (!bodyApi) {
@@ -88,11 +115,16 @@ export function useNoteActionsController({
     resourceId,
     syncStatus: status,
     isClientContentSignaturePending: isNoteClientContentSignaturePending,
-    clientContentSignature: noteClientContentSignature,
   });
 
   const handleAskAi = useMemoizedFn((selection: NoteSelectionSnapshot) => {
-    setChatContext(createNoteSelectionChatContext(resourceId, selection));
+    const { context, entries } = createNoteSelectionChatContext(resourceId, selection);
+    setFrontendStates({
+      source: FRONTEND_STATE_SOURCE.SELECTION,
+      resourceId,
+      entries,
+    });
+    setChatContext(context);
     openChatPanel();
   });
 

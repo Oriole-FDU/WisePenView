@@ -1,10 +1,10 @@
-import type { ChatFrontendState } from '@/domains/Chat';
 import {
   normalizeResourceKind,
   normalizeResourceViewer,
   RESOURCE_KIND,
   RESOURCE_VIEWER,
 } from '@/domains/Resource/model/resourceTarget';
+import type { FrontendStateEntry } from '@/frontendState';
 
 export interface ResourceChatResource {
   resourceId: string;
@@ -13,40 +13,18 @@ export interface ResourceChatResource {
   editorType?: string;
 }
 
-interface ResourceOpenStateValue {
-  resource_id: string;
-  resource_type: string;
-  viewer?: string;
-  editor_type?: string;
-}
-
-export type ResourceOpenChatState = ChatFrontendState<
-  'workspace_open_resource',
-  ResourceOpenStateValue
->;
-
-export interface ResourceChatStateProvider<State extends ChatFrontendState = ChatFrontendState> {
+export interface ResourceChatProvider {
   key: string;
   getBlockedReason?: () => string | undefined;
-  getStates: () => State[];
   onDemandSkillIds?: readonly string[];
 }
 
-export interface ResourceChatContext<State extends ChatFrontendState = ChatFrontendState> {
+export interface ResourceChatContext {
   providerKey: string;
-  preview: string;
-  states: State[];
-}
-
-export interface ResourceChatProtocolPort {
-  provider?: ResourceChatStateProvider;
-  context?: ResourceChatContext;
-  clearContext: (context?: ResourceChatContext) => void;
 }
 
 function resolveResourceEditorType(resource: ResourceChatResource): string | undefined {
   if (resource.editorType) return resource.editorType;
-
   const resourceType = normalizeResourceKind(resource.resourceType);
   const viewer = normalizeResourceViewer(resource.viewer);
   if (resourceType === RESOURCE_KIND.FILE) {
@@ -68,7 +46,9 @@ export function createResourceChatProviderKey(resource: ResourceChatResource): s
     .join(':');
 }
 
-export function buildResourceOpenState(resource: ResourceChatResource): ResourceOpenChatState {
+export function buildResourceOpenState(
+  resource: ResourceChatResource
+): FrontendStateEntry<'workspace_open_resource'> {
   return {
     key: 'workspace_open_resource',
     value: {
@@ -80,11 +60,6 @@ export function buildResourceOpenState(resource: ResourceChatResource): Resource
   };
 }
 
-export function createResourceChatStateProvider(
-  resource: ResourceChatResource
-): ResourceChatStateProvider {
-  return {
-    key: createResourceChatProviderKey(resource),
-    getStates: () => [buildResourceOpenState(resource)],
-  };
+export function createResourceChatProvider(resource: ResourceChatResource): ResourceChatProvider {
+  return { key: createResourceChatProviderKey(resource) };
 }

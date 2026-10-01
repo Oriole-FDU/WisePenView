@@ -1,8 +1,4 @@
-export interface ChatFrontendState<Key extends string = string, Value = unknown> {
-  key: Key;
-  value: Value;
-  disabled?: boolean;
-}
+import type { FrontendStateEntry } from '@/frontendState/definitions';
 
 interface ChatSelectedResourceContext {
   resourceId: string;
@@ -23,7 +19,7 @@ export interface ChatCompletionRequest {
   model?: string;
   provider_id?: string;
   runtime_options?: Record<string, unknown>;
-  frontend_states?: ChatFrontendState[];
+  frontend_states?: FrontendStateEntry[];
   user_defined_attachment_ids?: string[];
   tool_selection_default_enabled: true;
   tool_selection_overrides?: Record<string, boolean>;
@@ -59,7 +55,7 @@ export interface SendSessionMessageOptions {
   model?: string;
   providerId?: string;
   runtimeOptions?: Record<string, unknown>;
-  frontendStates?: ChatFrontendState[];
+  frontendStates?: FrontendStateEntry[];
   selectedResources?: ChatSelectedResourceContext[];
   uploadedAttachments?: ChatUploadedAttachmentContext[];
   toolSelectionOverrides?: Record<string, boolean>;

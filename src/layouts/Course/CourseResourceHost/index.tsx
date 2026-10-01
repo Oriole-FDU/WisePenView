@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 
-import type { ResourceChatContext } from '@/components/business/ChatPanel/ResourceChatProtocol';
 import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import {
   type OpenResourceFn,
   type ResourceHostContextValue,
   ResourceHostProvider,
 } from '@/layouts/Resource/_context';
+import type { ResourceChatContext } from '@/layouts/Resource/_context/resourceChatModel';
 import ResourceTargetResolver from '@/views/resource/ResourceTargetResolver';
 
 interface CourseResourceHostProps {

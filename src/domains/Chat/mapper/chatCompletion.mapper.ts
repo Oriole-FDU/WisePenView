@@ -1,35 +1,9 @@
-import { readCurrentLanguage } from '@/i18n/language';
-import { readBrowserTimeContext } from '@/utils/browser';
-
 import type {
   ChatCompletionRequest,
-  ChatFrontendState,
   ClientToolCapability,
   ClientToolCapabilityRequest,
   SendSessionMessageOptions,
 } from '../session/index.type';
-
-function buildFrontendStates(options: SendSessionMessageOptions): ChatFrontendState[] {
-  const frontendStates = [...(options.frontendStates ?? [])];
-
-  const activeResources = (options.selectedResources ?? []).filter((resource) => resource.enabled);
-  if (activeResources.length > 0) {
-    frontendStates.push({
-      key: 'selected_resources',
-      value: activeResources.map((resource) => ({
-        resource_id: resource.resourceId,
-        resource_name: resource.resourceName,
-        resource_type: resource.resourceType,
-      })),
-    });
-  }
-
-  // 浏览器时间上下文：每轮请求都重新读取浏览器本地时间
-  frontendStates.push({ key: 'time', value: readBrowserTimeContext() });
-  // 语言上下文：每轮请求都重新读取界面语言，供后端决定回答语言
-  frontendStates.push({ key: 'locale', value: readCurrentLanguage() });
-  return frontendStates;
-}
 
 function unique(values?: readonly string[]): string[] {
   return Array.from(new Set(values ?? []));
@@ -51,7 +25,7 @@ export function mapChatCompletionRequest(params: {
 }): ChatCompletionRequest {
   const { defaultSessionId, defaultModel, query, options = {} } = params;
   const resolvedModel = options.model ?? defaultModel;
-  const frontendStates = buildFrontendStates(options);
+  const frontendStates = options.frontendStates ?? [];
   const attachmentIds = (options.uploadedAttachments ?? [])
     .filter((attachment) => attachment.enabled)
     .map((attachment) => attachment.attachmentId);

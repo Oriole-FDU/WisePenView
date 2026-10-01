@@ -2,6 +2,7 @@ import { useLatest } from 'ahooks';
 import { memo, useEffect } from 'react';
 
 import type { ChatPanelProps } from '@/components/business/ChatPanel/index.type';
+import { useFrontendStateValue } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 
@@ -18,6 +19,7 @@ function ChatPanel({
   fullWidth = 'panel',
   showHeader,
   resourceChat,
+  resourceId,
   hostAgentPort,
   showCollapseButton = true,
 }: ChatPanelProps) {
@@ -25,12 +27,14 @@ function ChatPanel({
   const { locationKey } = useChatSessionRoute();
   const locationKeyLatest = useLatest(locationKey);
   const layout = useChatPanelLayout();
+  const selectedText = useFrontendStateValue('selected_text');
   const session = useChatSessionController({ resourceChat });
   const turn = useChatTurnController({
     ensureSession: session.ensureSession,
     isNewlyCreatedSession: session.isNewlyCreatedSession,
     clearNewlyCreatedSession: session.clearNewlyCreatedSession,
     resourceChat,
+    resourceId,
   });
   const { syncNewSessionHistoryRefresh } = session;
   const pendingToolApproval = turn.approval.pending;
@@ -90,7 +94,7 @@ function ChatPanel({
         <ChatPanelConversation
           injectedAgents={hostAgentPort?.injectedAgents}
           preferredAgent={hostAgentPort?.preferredAgent}
-          contextPreview={resourceChat?.context?.preview}
+          contextPreview={resourceChat?.context ? selectedText : undefined}
           fullWidth={isFullWidth}
           session={session}
           turn={turn}
