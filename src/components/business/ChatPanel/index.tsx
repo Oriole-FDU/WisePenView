@@ -83,25 +83,11 @@ function ChatPanel({
 
         <ChatPanelConversation
           agentDebug={agentDebug}
-          cancelling={turn.cancelling}
-          canLoadMoreHistory={turn.history.canLoadMore}
           contextPreview={resourceChat?.context?.preview}
-          currentModel={turn.currentModel}
           fullWidth={isFullWidth}
-          getUploadSessionId={session.ensureSession}
-          isEmpty={turn.isEmpty}
-          loadingInitialHistory={turn.history.loadingInitial}
-          loadingMoreHistory={turn.history.loadingMore}
-          messages={turn.messages}
-          promoteDraftToolSelection={session.promoteDraftToolSelection}
-          sessionBarOpen={session.sessionBarOpen}
-          sessionId={session.currentSessionId}
-          status={turn.status}
-          onCancel={turn.cancel}
+          session={session}
+          turn={turn}
           onClearContext={resourceChat?.clearContext}
-          onCloseSessionBar={session.closeSessionBar}
-          onLoadMoreHistory={turn.history.loadMore}
-          onSelectSession={session.selectSession}
           onSend={handleSend}
         />
       </div>

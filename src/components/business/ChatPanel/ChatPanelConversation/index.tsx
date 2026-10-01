@@ -5,31 +5,29 @@ import styles from '../style.module.less';
 import type { ChatPanelConversationProps } from './index.type';
 import Welcome from './Welcome';
 
+/** 对话区：把对话域与会话域拆成消息列表、输入区和会话浮层，自身不持有业务状态。 */
 function ChatPanelConversation({
   agentDebug,
-  cancelling,
-  canLoadMoreHistory,
   contextPreview,
-  currentModel,
   fullWidth,
-  getUploadSessionId,
-  isEmpty,
-  loadingInitialHistory,
-  loadingMoreHistory,
-  messages,
-  promoteDraftToolSelection,
-  sessionBarOpen,
-  sessionId,
-  status,
-  onCancel,
+  session,
+  turn,
   onClearContext,
-  onCloseSessionBar,
-  onLoadMoreHistory,
-  onSelectSession,
   onSend,
 }: ChatPanelConversationProps) {
-  const sending = cancelling || status === 'submitted' || status === 'streaming';
-  const isWelcome = isEmpty && !loadingInitialHistory;
+  const { cancel, cancelling, currentModel, history, isEmpty, messages, status } = turn;
+  const {
+    closeSessionBar,
+    currentSessionId,
+    ensureSession,
+    promoteDraftToolSelection,
+    selectSession,
+    sessionBarOpen,
+  } = session;
+
+  const generating = status === 'submitted' || status === 'streaming';
+  const sending = cancelling || generating;
+  const isWelcome = isEmpty && !history.loadingInitial;
   const showWelcome = isWelcome && !sessionBarOpen;
   const renderWelcomeSlot = () => (
     <div
@@ -54,12 +52,12 @@ function ChatPanelConversation({
           <div className={styles.messageViewport}>
             <ChatMessageList
               messages={messages}
-              resetKey={sessionId}
-              canLoadMoreHistory={canLoadMoreHistory}
-              loadingInitialHistory={loadingInitialHistory}
-              loadingMoreHistory={loadingMoreHistory}
-              onLoadMoreHistory={onLoadMoreHistory}
-              generating={status === 'submitted' || status === 'streaming'}
+              resetKey={currentSessionId}
+              canLoadMoreHistory={history.canLoadMore}
+              loadingInitialHistory={history.loadingInitial}
+              loadingMoreHistory={history.loadingMore}
+              onLoadMoreHistory={history.loadMore}
+              generating={generating}
               model={currentModel}
               fullWidth={fullWidth}
             />
@@ -72,11 +70,11 @@ function ChatPanelConversation({
               <div className={styles.inputColumn}>
                 <ChatInput
                   onSend={onSend}
-                  getUploadSessionId={getUploadSessionId}
+                  getUploadSessionId={ensureSession}
                   sending={sending}
-                  sessionId={sessionId}
+                  sessionId={currentSessionId}
                   promoteDraftToolSelection={promoteDraftToolSelection}
-                  onCancel={cancelling ? undefined : onCancel}
+                  onCancel={cancelling ? undefined : cancel}
                   contextPreview={contextPreview}
                   onClearContext={onClearContext}
                   injectedAgents={agentDebug ? [agentDebug.agent] : undefined}
@@ -92,9 +90,9 @@ function ChatPanelConversation({
 
         {sessionBarOpen ? (
           <ChatSessionBar
-            activeSessionId={sessionId}
-            onClose={onCloseSessionBar}
-            onSelectSession={onSelectSession}
+            activeSessionId={currentSessionId}
+            onClose={closeSessionBar}
+            onSelectSession={selectSession}
           />
         ) : null}
       </div>
