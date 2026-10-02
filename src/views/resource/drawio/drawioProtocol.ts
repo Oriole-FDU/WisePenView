@@ -3,6 +3,13 @@ export const EMPTY_DRAWIO_XML = `<mxfile host="WisePen"><diagram name="Page-1"><
 export type DrawioSaveState = 'saved' | 'dirty' | 'saving' | 'failed';
 export type WisePenTheme = 'light' | 'dark';
 
+export interface DrawioThemeCommand {
+  action: 'wisepenTheme';
+  theme: WisePenTheme;
+  colorScheme: string;
+  tokens: Record<string, string>;
+}
+
 export type DrawioEditorCommand =
   | {
       action: 'load';
@@ -14,7 +21,8 @@ export type DrawioEditorCommand =
       xml: string;
     }
   | { action: 'status'; message: string; modified: boolean }
-  | { action: 'export'; format: 'xml' };
+  | { action: 'export'; format: 'xml' }
+  | DrawioThemeCommand;
 
 export interface DrawioMessage {
   event?: string;
@@ -85,6 +93,7 @@ export function buildDrawioUrl({
   url.searchParams.set('saveAndExit', '0');
   url.searchParams.set('wisepenTheme', theme);
   url.searchParams.set('wisepenColorScheme', colorScheme);
+  url.searchParams.set('wisepenOrigin', window.location.origin);
   url.searchParams.set('dark', theme === 'dark' ? '1' : '0');
   url.searchParams.set('lang', language.startsWith('zh') ? 'zh' : 'en');
   if (!canEdit) {
