@@ -1,7 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
 import { RESOURCE_KIND, type ResourceTarget } from '@/domains/Resource/model/resourceTarget';
-import type { ResourceChatContext } from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import {
   type OpenResourceFn,
@@ -13,26 +12,16 @@ import ResourceTargetResolver from '@/views/resource/ResourceTargetResolver';
 interface CourseResourceHostProps {
   courseId: string;
   target: ResourceTarget;
-  chatPanelCollapsed: boolean;
-  onToggleChatPanel: () => void;
   fallbackHeader: ReactNode;
   onTargetChange: (target: ResourceTarget) => void;
-  onOpenChatPanel: () => void;
-  onSetChatContext: (context: ResourceChatContext) => void;
-  onClearChatContext: (context?: ResourceChatContext) => void;
   onClose: () => void;
 }
 
 function CourseResourceHost({
   courseId,
   target,
-  chatPanelCollapsed,
-  onToggleChatPanel,
   fallbackHeader,
   onTargetChange,
-  onOpenChatPanel,
-  onSetChatContext,
-  onClearChatContext,
   onClose,
 }: CourseResourceHostProps) {
   const { requestExit } = useResourceEditor();
@@ -63,8 +52,6 @@ function CourseResourceHost({
 
   const resourceHostContext: ResourceHostContextValue = {
     hostId: `course:${courseId}`,
-    chatPanelCollapsed,
-    toggleChatPanel: onToggleChatPanel,
     fallbackHeader,
     routeContext: effectiveTarget,
     openResource,
@@ -76,9 +63,6 @@ function CourseResourceHost({
         resourceType: RESOURCE_KIND.FILE,
         viewer,
       }),
-    openChatPanel: onOpenChatPanel,
-    setChatContext: onSetChatContext,
-    clearChatContext: onClearChatContext,
   };
   return (
     <ResourceHostProvider value={resourceHostContext}>

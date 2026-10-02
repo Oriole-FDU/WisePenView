@@ -16,8 +16,8 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { UploadDocumentModal } from '@/components/business/Drive/Modals';
 import type { CourseOutlineContainerNode, CourseOutlineNode } from '@/domains/Course';
+import ResourceHeaderBar from '@/layouts/Resource/ResourceLayout/ResourceHeaderBar';
 import { parseErrorMessage } from '@/utils/error';
-import ResourceWorkspaceHeader from '@/views/resource/ResourceWorkspaceHeader';
 
 import { type CourseOutlineResourcePageState, findOutlineNode } from '../../model';
 import styles from '../../style.module.less';
@@ -286,7 +286,7 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
   return (
     <>
       <aside className={styles.outlineSidebar}>
-        <ResourceWorkspaceHeader
+        <ResourceHeaderBar
           className={styles.outlineHeader}
           inlineTitle={
             <span className={styles.courseRow}>

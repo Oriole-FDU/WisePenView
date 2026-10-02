@@ -60,6 +60,4 @@ export interface ResourceHeaderConfig {
 export interface ResourceHeaderProps extends ResourceHeaderConfig {
   breadcrumbItems: AppBreadcrumbItem[];
   trailingActions?: ReactNode;
-  chatPanelCollapsed?: boolean;
-  onToggleChatPanel?: () => void;
 }

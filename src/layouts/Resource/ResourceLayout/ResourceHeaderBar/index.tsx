@@ -4,14 +4,14 @@ import NavigationControls from '@/components/business/Sidebar/_common/header/Nav
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
 import ResourceHeader from '../ResourceHeader';
-import type { ResourceWorkspaceHeaderProps } from './index.type';
+import type { ResourceHeaderBarProps } from './index.type';
 import styles from './style.module.less';
 
-function ResourceWorkspaceHeader({
+function ResourceHeaderBar({
   resource,
   inlineTitle,
   extra,
-  resourceSidePanelActions,
+  sidePanelActions,
   titleBlock,
   canGoBack = false,
   canGoForward = false,
@@ -20,7 +20,7 @@ function ResourceWorkspaceHeader({
   onGoForward,
   onToggleLeftSidebar,
   className,
-}: ResourceWorkspaceHeaderProps) {
+}: ResourceHeaderBarProps) {
   const desktopWindow = useDesktopWindowState();
 
   const titleBarInsetStart =
@@ -60,7 +60,7 @@ function ResourceWorkspaceHeader({
           ) : null}
           {resource ? (
             <div className={styles.resourceHeader}>
-              <ResourceHeader {...resource} trailingActions={resourceSidePanelActions} />
+              <ResourceHeader {...resource} trailingActions={sidePanelActions} />
             </div>
           ) : (
             <div className={styles.toolbarMiddle}>
@@ -70,7 +70,7 @@ function ResourceWorkspaceHeader({
           {resource ? null : (
             <div className={styles.toolbarEnd}>
               {extra}
-              {resourceSidePanelActions}
+              {sidePanelActions}
             </div>
           )}
         </div>
@@ -84,4 +84,4 @@ function ResourceWorkspaceHeader({
   );
 }
 
-export default ResourceWorkspaceHeader;
+export default ResourceHeaderBar;

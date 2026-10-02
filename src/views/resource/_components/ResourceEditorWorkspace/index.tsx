@@ -13,12 +13,13 @@ import {
   RESOURCE_KIND,
   RESOURCE_VIEWER,
 } from '@/domains/Resource/model/resourceTarget';
+import { chatDockActions } from '@/layouts/ChatDockLayout';
 import { ResourceChatBinding } from '@/layouts/Resource/_context/chatBinding';
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
-
-import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
-import ResourceWorkspace from '../ResourceWorkspace';
+import { resourceChatContextActions } from '@/layouts/Resource/ResourceChatDock';
+import ResourceChatToggleButton from '@/layouts/Resource/ResourceChatDock/ResourceChatToggleButton';
+import { ResourceLayout, resourceSidePanelActions } from '@/layouts/Resource/ResourceLayout';
 
 /**
  * 把编辑器挂载进资源工作区。
@@ -70,10 +71,10 @@ export default function ResourceEditorWorkspace({ target }: { target: EditorTarg
         : {};
     }
     return (
-      <ResourceWorkspace {...workspace}>
+      <ResourceLayout {...workspace} headerTrailingActions={<ResourceChatToggleButton />}>
         {chat ? <ResourceChatBinding resourceId={target.resourceId} {...chat} /> : null}
         {body}
-      </ResourceWorkspace>
+      </ResourceLayout>
     );
   };
 
@@ -84,11 +85,10 @@ export default function ResourceEditorWorkspace({ target }: { target: EditorTarg
       renderWorkspace={renderWorkspace}
       host={{
         hostId: host.hostId,
-        openChatPanel: host.openChatPanel,
-        setChatContext: host.setChatContext,
+        openChatPanel: chatDockActions.open,
+        setChatContext: resourceChatContextActions.setContext,
         navigateResourceHash: host.navigateResourceHash,
-        openInlineComments: (resourceId) =>
-          useResourceSidePanelStore.getState().setMode(resourceId, 'inlineComment'),
+        openInlineComments: resourceSidePanelActions.openInlineComments,
       }}
     />
   );

@@ -99,7 +99,6 @@ const enUSCourse = {
     openChat: 'Open course chat',
     closeChat: 'Close course chat',
     resource: 'Learning resource',
-    resizeChat: 'Resize course chat',
   },
   assignments: {
     title: 'Assignments',

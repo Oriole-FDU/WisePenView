@@ -13,10 +13,10 @@ import {
   type ResourceTarget,
 } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
+import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 import { parseErrorMessage } from '@/utils/error';
 
 import ResourceEditorWorkspace from './_components/ResourceEditorWorkspace';
-import ResourceWorkspace from './_components/ResourceWorkspace';
 import styles from './ResourceTargetResolver.module.less';
 
 interface ResourceTargetResolverProps {
@@ -46,7 +46,7 @@ function UnsupportedResource({
   const subTitle = message ?? [readableType, readableViewer].filter(Boolean).join('，');
 
   return (
-    <ResourceWorkspace header={false}>
+    <ResourceLayout header={false}>
       <div className={styles.middleOverlay}>
         <div className={styles.middleOverlayInner}>
           <ResultState
@@ -61,7 +61,7 @@ function UnsupportedResource({
           />
         </div>
       </div>
-    </ResourceWorkspace>
+    </ResourceLayout>
   );
 }
 
@@ -103,14 +103,14 @@ function FileViewerResolver({ target, onTargetChange, onClose }: ResourceTargetR
 
   if (loading || !docInfo) {
     return (
-      <ResourceWorkspace header={false}>
+      <ResourceLayout header={false}>
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('renderer.resolving')}</span>
           </div>
         </div>
-      </ResourceWorkspace>
+      </ResourceLayout>
     );
   }
 

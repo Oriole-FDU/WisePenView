@@ -99,7 +99,6 @@ const zhCNCourse = {
     openChat: '展开课程对话',
     closeChat: '收起课程对话',
     resource: '学习资源',
-    resizeChat: '调整课程对话宽度',
   },
   assignments: {
     title: '作业',

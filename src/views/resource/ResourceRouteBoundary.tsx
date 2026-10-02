@@ -10,6 +10,7 @@ import {
   type ResourceViewer,
 } from '@/domains/Resource/model/resourceTarget';
 import { useOpenResource } from '@/hooks/useOpenResource';
+import { ResourceChatDock } from '@/layouts/Resource/ResourceChatDock';
 import ResourceHost from '@/layouts/Resource/ResourceHost';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
@@ -88,21 +89,23 @@ function ResourceRouteBoundary() {
   };
 
   return (
-    <ResourceHost
-      routeContext={routeContext}
-      openResource={openResource}
-      navigateToDrive={navigateToDrive}
-      switchResourceViewer={switchResourceViewer}
-      navigateResourceHash={navigateResourceHash}
-    >
-      <RouteOutletBoundary>
-        <ResourceRouteView
-          target={target}
-          onTargetChange={handleTargetChange}
-          onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
-        />
-      </RouteOutletBoundary>
-    </ResourceHost>
+    <ResourceChatDock target={routeContext}>
+      <ResourceHost
+        routeContext={routeContext}
+        openResource={openResource}
+        navigateToDrive={navigateToDrive}
+        switchResourceViewer={switchResourceViewer}
+        navigateResourceHash={navigateResourceHash}
+      >
+        <RouteOutletBoundary>
+          <ResourceRouteView
+            target={target}
+            onTargetChange={handleTargetChange}
+            onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
+          />
+        </RouteOutletBoundary>
+      </ResourceHost>
+    </ResourceChatDock>
   );
 }
 

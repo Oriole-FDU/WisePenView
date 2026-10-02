@@ -1,17 +1,13 @@
 import { Dropdown, Label } from '@heroui/react';
 import {
-  ChevronRight,
   Copy,
   Download,
   Ellipsis,
   ExternalLink,
   FolderInput,
-  HardDrive,
   Link2,
   type LucideIcon,
   MessageSquare,
-  PanelRightClose,
-  PanelRightOpen,
   Printer,
   Search,
   Settings2,
@@ -19,18 +15,17 @@ import {
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import EntryIcon from '@/components/business/Icons/EntryIcon';
-import ResourcePermissionModal from '@/components/business/Resource/ResourcePermissionModal';
-import { useUserService } from '@/domains';
-import { useApi } from '@/hooks/useApi';
-import { normalizeId } from '@/utils/normalize/normalizeId';
+import type {
+  ResourceAction,
+  ResourceItem,
+  ResourcePermissionResourceType,
+} from '@/domains/Resource';
 
-import type { ResourceHeaderMoreMenu, ResourceHeaderProps } from './index.type';
+import type { ResourceHeaderMoreMenu } from './index.type';
 import ResourceHeaderOperations, {
   type ResourceHeaderOperationHandlers,
 } from './ResourceHeaderOperations';
@@ -267,154 +262,68 @@ function ResourceHeaderMore({
   );
 }
 
-function ResourceHeader({
+export interface ResourceHeaderActionsProps {
+  resourceId?: string;
+  resourceName: string;
+  resourceType?: string;
+  permissionResourceType: ResourcePermissionResourceType;
+  resourceInfo?: ResourceItem;
+  currentActions?: ResourceAction[] | null;
+  copyVersion?: number;
+  moreMenu?: ResourceHeaderMoreMenu;
+  isDisabled?: boolean;
+  leadingActions?: ReactNode;
+  actions?: ReactNode;
+  trailingActions?: ReactNode;
+  canManagePermission: boolean;
+  onOpenPermission: () => void;
+}
+
+/** 资源顶栏动作区：编辑器提供的动作节点、资源管理菜单与右侧栏动作都走这里。 */
+export default function ResourceHeaderActions({
   resourceId,
   resourceName,
   resourceType,
-  resourceIconType,
+  permissionResourceType,
   resourceInfo,
   currentActions,
   copyVersion,
-  permissionResourceType,
-  ownerId,
-  onPermissionSuccess,
+  moreMenu,
   isDisabled,
-  titleMeta,
-  breadcrumbItems,
   leadingActions,
   actions,
-  moreMenu,
-  hideBreadcrumb,
   trailingActions,
-  chatPanelCollapsed,
-  onToggleChatPanel,
-}: ResourceHeaderProps) {
-  const { t } = useTranslation(['resource', 'chat']);
-  const userService = useUserService();
-  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
-  const normalizedOwnerId = normalizeId(ownerId);
-  const { data: currentUser } = useApi(() => userService.getUserInfo(), {
-    ready: Boolean(resourceId && normalizedOwnerId),
-    refreshDeps: [resourceId, normalizedOwnerId],
-  });
-  const canManagePermission = Boolean(
-    resourceId && normalizedOwnerId && currentUser?.id === normalizedOwnerId
-  );
-  const currentBreadcrumbItem: AppBreadcrumbItem = {
-    key: `resource:${resourceId ?? resourceName}`,
-    current: true,
-    label: (
-      <>
-        <span className={styles.titleIcon} aria-hidden="true">
-          <EntryIcon
-            entryType="resource"
-            resourceType={resourceType}
-            resourceIconType={resourceIconType}
-          />
-        </span>
-        <span className={styles.titleText}>{resourceName}</span>
-      </>
-    ),
-  };
-  const headerBreadcrumbItems: AppBreadcrumbItem[] = [
-    ...breadcrumbItems.map((item, index) =>
-      index === 0
-        ? {
-            ...item,
-            label: (
-              <>
-                <HardDrive
-                  className={styles.breadcrumbIcon}
-                  size={14}
-                  aria-hidden
-                  color="var(--accent)"
-                />
-                {item.label}
-              </>
-            ),
-          }
-        : item
-    ),
-    currentBreadcrumbItem,
-  ];
+  canManagePermission,
+  onOpenPermission,
+}: ResourceHeaderActionsProps) {
   return (
-    <>
-      <div className={styles.root}>
-        <div className={styles.title}>
-          {!hideBreadcrumb ? (
-            <AppBreadcrumb
-              items={headerBreadcrumbItems}
-              ariaLabel={t('header.breadcrumbAria')}
-              className={styles.breadcrumb}
-              separator={
-                <ChevronRight className={styles.breadcrumbSeparator} size={14} aria-hidden />
-              }
+    <div className={styles.actions}>
+      {leadingActions ? <div className={styles.actionGroup}>{leadingActions}</div> : null}
+      {actions ? <div className={styles.actionGroup}>{actions}</div> : null}
+      {resourceId || trailingActions ? (
+        <div className={styles.actionGroup}>
+          {resourceId ? (
+            <ResourceHeaderOperations
+              resourceId={resourceId}
+              resourceName={resourceName}
+              resourceType={resourceType ?? permissionResourceType}
+              resourceInfo={resourceInfo}
+              currentActions={currentActions}
+              copyVersion={copyVersion}
+              onResolve={(operations: ResourceHeaderOperationHandlers) => (
+                <ResourceHeaderMore
+                  menu={moreMenu}
+                  operations={operations}
+                  canManagePermission={canManagePermission}
+                  isDisabled={isDisabled}
+                  onOpenPermission={onOpenPermission}
+                />
+              )}
             />
-          ) : (
-            <span className={styles.breadcrumbCurrent} aria-current="page">
-              {currentBreadcrumbItem.label}
-            </span>
-          )}
-          {titleMeta ? <span className={styles.titleMeta}>{titleMeta}</span> : null}
-        </div>
-        <div className={styles.actions}>
-          {leadingActions ? <div className={styles.actionGroup}>{leadingActions}</div> : null}
-          {actions ? <div className={styles.actionGroup}>{actions}</div> : null}
-          {resourceId || trailingActions || onToggleChatPanel ? (
-            <div className={styles.actionGroup}>
-              {resourceId ? (
-                <ResourceHeaderOperations
-                  resourceId={resourceId}
-                  resourceName={resourceName}
-                  resourceType={resourceType ?? permissionResourceType}
-                  resourceInfo={resourceInfo}
-                  currentActions={currentActions}
-                  copyVersion={copyVersion}
-                  onResolve={(operations) => (
-                    <ResourceHeaderMore
-                      menu={moreMenu}
-                      operations={operations}
-                      canManagePermission={canManagePermission}
-                      isDisabled={isDisabled}
-                      onOpenPermission={() => setIsPermissionModalOpen(true)}
-                    />
-                  )}
-                />
-              ) : null}
-              {trailingActions}
-              {onToggleChatPanel ? (
-                <AppIconButton
-                  icon={
-                    chatPanelCollapsed ? (
-                      <PanelRightOpen size={18} aria-hidden="true" />
-                    ) : (
-                      <PanelRightClose size={18} aria-hidden="true" />
-                    )
-                  }
-                  label={
-                    chatPanelCollapsed
-                      ? t('panel.expand', { ns: 'chat' })
-                      : t('panel.collapse', { ns: 'chat' })
-                  }
-                  size="sm"
-                  onPress={onToggleChatPanel}
-                />
-              ) : null}
-            </div>
           ) : null}
+          {trailingActions}
         </div>
-      </div>
-      {resourceId && canManagePermission ? (
-        <ResourcePermissionModal
-          isOpen={isPermissionModalOpen}
-          onOpenChange={setIsPermissionModalOpen}
-          resourceId={resourceId}
-          resourceType={permissionResourceType}
-          onSuccess={onPermissionSuccess}
-        />
       ) : null}
-    </>
+    </div>
   );
 }
-
-export default ResourceHeader;

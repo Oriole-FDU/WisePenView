@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
-import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
+import { useResourceSidePanelStore } from '../_store/useResourceSidePanelStore';
 
 interface ResourceSidePanelActionsProps {
   resourceId: string;
