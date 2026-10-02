@@ -25,6 +25,7 @@ import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/_context';
 import { useMainShell } from '@/layouts/MainShell/_context';
 import { useChatDockLayoutStore } from '@/layouts/MainShell/_store/useChatDockLayoutStore';
+import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context';
 import {
   buildResourceOpenState,
   type ResourceChatContext,
@@ -54,7 +55,7 @@ interface ResourceHostProps {
   navigateResourceHash?: (hash: string) => void;
 }
 
-function ResourceHost({
+function ResourceHostContent({
   children,
   routeContext,
   openResource,
@@ -91,7 +92,8 @@ function ResourceHost({
     },
     []
   );
-  const { resourceId, resourceType, viewer } = routeContext;
+  const { snapshot: editorSnapshot } = useResourceEditor();
+  const { resourceId, resourceType, viewer } = editorSnapshot?.openedResource ?? routeContext;
   /**
    * @wisepen-manual-effect
    * 执行时机：资源路由变化时更新当前面板的打开资源。
@@ -230,4 +232,10 @@ function ResourceHost({
   );
 }
 
-export default ResourceHost;
+export default function ResourceHost(props: ResourceHostProps) {
+  return (
+    <ResourceEditorProvider>
+      <ResourceHostContent {...props} />
+    </ResourceEditorProvider>
+  );
+}

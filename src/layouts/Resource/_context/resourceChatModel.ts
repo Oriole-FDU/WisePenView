@@ -1,51 +1,16 @@
+import type { EditorChatProvider as ResourceChatProvider } from '@/components/editors/editor.type';
 import {
-  normalizeResourceKind,
-  normalizeResourceViewer,
-  RESOURCE_KIND,
-  RESOURCE_VIEWER,
-} from '@/domains/Resource/model/resourceTarget';
+  createEditorChatProviderKey,
+  type EditorChatResource as ResourceChatResource,
+  resolveResourceEditorType,
+} from '@/components/editors/runtime/editorChat';
 import type { FrontendStateEntry } from '@/frontendState';
 
-export interface ResourceChatResource {
-  resourceId: string;
-  resourceType: string;
-  viewer?: string;
-  editorType?: string;
-}
-
-export interface ResourceChatProvider {
-  key: string;
-  getBlockedReason?: () => string | undefined;
-  onDemandSkillIds?: readonly string[];
-}
-
-export interface ResourceChatContext {
-  providerKey: string;
-}
-
-function resolveResourceEditorType(resource: ResourceChatResource): string | undefined {
-  if (resource.editorType) return resource.editorType;
-  const resourceType = normalizeResourceKind(resource.resourceType);
-  const viewer = normalizeResourceViewer(resource.viewer);
-  if (resourceType === RESOURCE_KIND.FILE) {
-    if (viewer === RESOURCE_VIEWER.PDF_PREVIEW) return 'pdf';
-    if (viewer === RESOURCE_VIEWER.OFFICE) return 'office';
-    return 'file';
-  }
-  return viewer;
-}
-
-export function createResourceChatProviderKey(resource: ResourceChatResource): string {
-  return [
-    resource.resourceType,
-    resource.resourceId,
-    resource.viewer,
-    resolveResourceEditorType(resource),
-  ]
-    .filter(Boolean)
-    .join(':');
-}
-
+export type {
+  EditorChatContext as ResourceChatContext,
+  EditorChatProvider as ResourceChatProvider,
+} from '@/components/editors/editor.type';
+export type { EditorChatResource as ResourceChatResource } from '@/components/editors/runtime/editorChat';
 export function buildResourceOpenState(
   resource: ResourceChatResource
 ): FrontendStateEntry<'workspace_open_resource'> {
@@ -61,5 +26,5 @@ export function buildResourceOpenState(
 }
 
 export function createResourceChatProvider(resource: ResourceChatResource): ResourceChatProvider {
-  return { key: createResourceChatProviderKey(resource) };
+  return { key: createEditorChatProviderKey(resource) };
 }

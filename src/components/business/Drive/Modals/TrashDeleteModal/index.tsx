@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { clearNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
-import { removePdfPreviewProgress } from '@/components/business/PdfViewer/_store/usePdfPreviewProgressStore';
+import { clearNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
+import { removePdfPreviewProgress } from '@/components/editors/pdf/components/PdfViewer/_store/usePdfPreviewProgressStore';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 

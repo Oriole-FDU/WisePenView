@@ -1,0 +1,79 @@
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { AppButton } from '@/components/base/Button';
+import { ResultState, Spin } from '@/components/base/Feedback';
+import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import { parseErrorMessage } from '@/utils/error';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+
+import { EditorSurfaceProvider, useEditorSurface } from '../_context';
+import type { EditorSurfaceProps } from '../editor.type';
+import { useEditorRuntime } from '../runtime/useEditorRuntime';
+import AgentWorkspace from './components/AgentWorkspace';
+import { useAgentVersionController } from './controllers/useAgentVersionController';
+import styles from './style.module.less';
+
+function AgentEditorContent() {
+  const {
+    target: { resourceId },
+  } = useEditorSurface();
+  const { t } = useTranslation(['agent', 'common']);
+  const version = useAgentVersionController({ resourceId });
+
+  useEditorRuntime({ error: version.error, ...(!version.displayAgent ? { loading: true } : {}) });
+
+  if (version.error) {
+    return (
+      <EditorWorkspace className={styles.pageWrap}>
+        <div className={styles.overlay}>
+          <ResultState
+            status="warning"
+            title={t('agent:page.openFailed')}
+            subTitle={parseErrorMessage(version.error)}
+            extra={
+              <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
+                <AppButton variant="secondary">{t('agent:page.backToDrive')}</AppButton>
+              </Link>
+            }
+          />
+        </div>
+      </EditorWorkspace>
+    );
+  }
+
+  if (!version.data || !version.displayAgent) {
+    return (
+      <EditorWorkspace className={styles.pageWrap}>
+        <div className={styles.overlay} aria-busy="true" aria-live="polite">
+          <Spin size="large" />
+          <span>{t('agent:page.loading')}</span>
+        </div>
+      </EditorWorkspace>
+    );
+  }
+
+  return (
+    <AgentWorkspace
+      key={`${resourceId}:${version.sourceRevision}`}
+      agent={version.displayAgent}
+      data={version.data}
+      disabledVersionKeys={version.disabledVersionKeys}
+      isOwner={version.isOwner}
+      resourceId={resourceId}
+      versionItems={version.versionItems}
+      versionLoading={version.versionLoading}
+      viewingVersion={version.viewingVersion}
+      onRefresh={version.refresh}
+      onVersionSelect={version.selectVersion}
+    />
+  );
+}
+
+export default function AgentEditor(props: EditorSurfaceProps) {
+  return (
+    <EditorSurfaceProvider {...props} kind="agent">
+      <AgentEditorContent />
+    </EditorSurfaceProvider>
+  );
+}

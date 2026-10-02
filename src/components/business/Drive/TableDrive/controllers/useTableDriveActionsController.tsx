@@ -21,11 +21,11 @@ import {
   TrashDeleteModal,
   UploadFileToGroupModal,
 } from '@/components/business/Drive/Modals';
-import { useNewNoteStore } from '@/components/business/Note/_store/useNewNoteStore';
+import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import {
   MARKDOWN_NOTE_FILE_ACCEPT,
   useMarkdownNoteImport,
-} from '@/components/business/Note/useMarkdownNoteImport';
+} from '@/components/editors/note/hooks/useMarkdownNoteImport';
 import { useDriveService, useNoteService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';

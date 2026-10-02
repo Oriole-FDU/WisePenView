@@ -12,7 +12,12 @@ import {
 } from '@/components/base/SystemResizable';
 import { COURSE_ROLE } from '@/domains/Course';
 import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
-import { ResourceChatBindingProvider, ResourceChatPanel } from '@/layouts/Resource/_context';
+import {
+  ResourceChatBindingProvider,
+  ResourceChatPanel,
+  ResourceEditorProvider,
+  useResourceEditor,
+} from '@/layouts/Resource/_context';
 import {
   buildResourceOpenState,
   type ResourceChatContext,
@@ -30,7 +35,7 @@ import styles from './style.module.less';
 
 const COURSE_LEARNING_MAIN_MIN_WIDTH = 700;
 
-function CourseLearningLayout() {
+function CourseLearningLayoutContent() {
   const { t } = useTranslation('course');
   const { course } = useCourseContext();
   const navigation = useCourseLearningNavigationController(course.courseId);
@@ -39,9 +44,11 @@ function CourseLearningLayout() {
   const resourceChatContextRef = useRef<ResourceChatContext | undefined>(undefined);
   const selectedNode = navigation.selectedNode;
   const openResource = selectedNode?.nodeType === 'RESOURCE' ? selectedNode : undefined;
-  const openResourceId = openResource?.resourceId;
-  const openResourceType = openResource?.resourceType;
-  const openResourceViewer = openResource?.viewer;
+  const { snapshot: editorSnapshot } = useResourceEditor();
+  const openedResource = editorSnapshot?.openedResource ?? openResource;
+  const openResourceId = openedResource?.resourceId;
+  const openResourceType = openedResource?.resourceType;
+  const openResourceViewer = openedResource?.viewer;
   /**
    * @wisepen-manual-effect
    * 执行时机：课程当前资源变化时同步聊天请求中的打开资源。
@@ -237,4 +244,10 @@ function CourseLearningLayout() {
   );
 }
 
-export default CourseLearningLayout;
+export default function CourseLearningLayout() {
+  return (
+    <ResourceEditorProvider>
+      <CourseLearningLayoutContent />
+    </ResourceEditorProvider>
+  );
+}
