@@ -22,10 +22,11 @@
 `src/components` 内部按“是否绑定业务语义”分为两层：
 
 - `src/components/base`：不带业务语义的通用组件，包含原子层（`Modal`、`Popover`、`DeferredContent`）、基础控件（`Button`、`Input`、`Table`、`Tree`、`Chart`、`Markdown`、`Feedback`、`Icons`、`Avatar`、`Rating`、`StepDots`、`QuotaBar`）和只提供结构的 App 级外壳（`AppModal`、`AppPopover`、`AppBanner`、`AppBreadcrumb`）。
-- `src/components/business`：绑定业务语义但跨页面复用的组件，包含语义弹窗（`AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`、`UnsavedChangesDialog`）和领域块（`ChatPanel`、`Drive`、`Note`、`Skill`、`Group`、`Resource`、`PdfViewer`、`ModelSelector` 等）。
+- `src/components/business`：绑定业务语义但跨页面复用的组件，包含语义弹窗（`AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`、`UnsavedChangesDialog`）和领域块（`ChatPanel`、`Drive`、`Group`、`Resource`、`ModelSelector` 等）。
+- `src/components/editors`：资源编辑器层。六种编辑器（`agent`、`drawio`、`note`、`office`、`pdf`、`skill`）通过 `editor.type` 的契约与宿主通信，`runtime` 负责快照上报与退出协商，`ResourceEditor` 按 `EditorTarget` 从 `editorRegistry` 分发并挂载编辑器。工作区外壳（`ResourceWorkspace`、`ResourceWorkspaceHeader`、`ResourceSidePanel`、批注面板）属于资源视图，位于 `src/views/resource/`，由宿主装配并通过 `EditorSurfaceProps` 的 `renderWorkspace`、`host` 注入；编辑器只上报领域展示信息，不持有宿主布局，也不判断顶栏／侧栏内容。
 - `src/components/_shadcn`：第三方与生成态基础组件，保持独立目录，不放业务逻辑。
 
-依赖方向单向：`business` 可以依赖 `base`，`base` 不得依赖 `business`。新增组件先判断是否带业务语义，再决定落在哪一层；分层只回答“通用还是业务”，不替代“是否该留在 `src/components`”的判断。
+依赖方向单向：`business` 与 `editors` 可以依赖 `base`，`base` 不得依赖 `business` 或 `editors`。新增组件先判断是否带业务语义，再决定落在哪一层；分层只回答“通用还是业务”，不替代“是否该留在 `src/components`”的判断。
 
 ## 三、业务组件下沉到 views
 

@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 
+import type { ResourceHeaderNavigation } from '@/layouts/Resource/_context/ResourceHostContext';
+
 import type { ResourceHeaderProps } from '../ResourceHeader/index.type';
 
-export interface ResourceWorkspaceHeaderProps {
+export interface ResourceWorkspaceHeaderProps extends ResourceHeaderNavigation {
   /** 资源工作区顶栏；存在时替代 inlineTitle 与 extra。 */
   resource?: ResourceHeaderProps;
   /** 工具条中间区：如 PDF 图标 + 文件名 */
@@ -13,11 +15,5 @@ export interface ResourceWorkspaceHeaderProps {
   resourceSidePanelActions?: ReactNode;
   /** 工具条下方整块区域，如笔记可编辑标题 */
   titleBlock?: ReactNode;
-  canGoBack?: boolean;
-  canGoForward?: boolean;
-  leftSidebarCollapsed?: boolean;
-  onGoBack?: () => void;
-  onGoForward?: () => void;
-  onToggleLeftSidebar?: () => void;
   className?: string;
 }

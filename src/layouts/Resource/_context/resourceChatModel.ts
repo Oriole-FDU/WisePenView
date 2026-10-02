@@ -1,16 +1,16 @@
-import type { EditorChatProvider as ResourceChatProvider } from '@/components/editors/editor.type';
 import {
   createEditorChatProviderKey,
   type EditorChatResource as ResourceChatResource,
   resolveResourceEditorType,
-} from '@/components/editors/runtime/editorChat';
+} from '@/components/editors/_runtime/editorChat';
+import type { EditorChatProvider as ResourceChatProvider } from '@/components/editors/editor.type';
 import type { FrontendStateEntry } from '@/frontendState';
 
+export type { EditorChatResource as ResourceChatResource } from '@/components/editors/_runtime/editorChat';
 export type {
   EditorChatContext as ResourceChatContext,
   EditorChatProvider as ResourceChatProvider,
 } from '@/components/editors/editor.type';
-export type { EditorChatResource as ResourceChatResource } from '@/components/editors/runtime/editorChat';
 export function buildResourceOpenState(
   resource: ResourceChatResource
 ): FrontendStateEntry<'workspace_open_resource'> {

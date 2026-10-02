@@ -22,7 +22,7 @@ import {
   buildResourceOpenState,
   type ResourceChatContext,
 } from '@/layouts/Resource/_context/resourceChatModel';
-import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
+import ResourceWorkspaceHeader from '@/views/resource/ResourceWorkspaceHeader';
 
 import { useCourseContext } from '../_context';
 import CourseResourceHost from '../CourseResourceHost';

@@ -1,11 +1,20 @@
 import { createContext, type ReactNode } from 'react';
 
+import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import type { DriveNodeScope, DriveResourceLocation } from '@/domains/Drive';
 import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
-import type { ResourceHeaderProps } from '@/layouts/Resource/ResourceHeader/index.type';
-import type { ResourceWorkspaceHeaderProps } from '@/layouts/Resource/ResourceWorkspaceHeader/index.type';
 
 import type { ResourceChatContext } from './resourceChatModel';
+
+/** 宿主向资源顶栏提供的导航能力；顶栏实现消费它，而不是反过来定义宿主契约。 */
+export interface ResourceHeaderNavigation {
+  leftSidebarCollapsed?: boolean;
+  canGoBack?: boolean;
+  canGoForward?: boolean;
+  onGoBack?: () => void;
+  onGoForward?: () => void;
+  onToggleLeftSidebar?: () => void;
+}
 
 export interface OpenResourceTarget {
   resourceId: string;
@@ -44,17 +53,9 @@ export interface ResourceHostContextValue {
   navigateToDrive: (target: ResourceHostDriveNavigationTarget) => void;
   switchResourceViewer: (target: ResourceHostViewerNavigationTarget) => void;
   navigateResourceHash?: (hash: string) => void;
-  headerNavigation?: Pick<
-    ResourceWorkspaceHeaderProps,
-    | 'leftSidebarCollapsed'
-    | 'canGoBack'
-    | 'canGoForward'
-    | 'onGoBack'
-    | 'onGoForward'
-    | 'onToggleLeftSidebar'
-  >;
+  headerNavigation?: ResourceHeaderNavigation;
   fallbackHeader?: ReactNode;
-  breadcrumbItems?: ResourceHeaderProps['breadcrumbItems'];
+  breadcrumbItems?: AppBreadcrumbItem[];
   chatPanelCollapsed: boolean;
   toggleChatPanel: () => void;
   openChatPanel: () => void;

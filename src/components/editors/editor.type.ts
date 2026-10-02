@@ -104,6 +104,7 @@ export interface EditorPresentation {
   };
 }
 export interface EditorHostCapabilities {
+  hostId: string;
   openChatPanel(): void;
   setChatContext(context: EditorChatContext): void;
   openInlineComments(resourceId: string): void;

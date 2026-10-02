@@ -3,8 +3,8 @@ import { RESOURCE_KIND, RESOURCE_VIEWER } from '@/domains/Resource/model/resourc
 import type { FrontendStateEntry, SelectedNoteScopeValue } from '@/frontendState';
 import i18n from '@/i18n';
 
+import { createEditorChatProviderKey } from '../_runtime/editorChat';
 import type { EditorChatContext, EditorChatProvider } from '../editor.type';
-import { createEditorChatProviderKey } from '../runtime/editorChat';
 
 const NOTE_EDITOR_SKILL_ID = 'builtin:current-note-editor';
 

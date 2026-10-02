@@ -16,8 +16,8 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { UploadDocumentModal } from '@/components/business/Drive/Modals';
 import type { CourseOutlineContainerNode, CourseOutlineNode } from '@/domains/Course';
-import ResourceWorkspaceHeader from '@/layouts/Resource/ResourceWorkspaceHeader';
 import { parseErrorMessage } from '@/utils/error';
+import ResourceWorkspaceHeader from '@/views/resource/ResourceWorkspaceHeader';
 
 import { type CourseOutlineResourcePageState, findOutlineNode } from '../../model';
 import styles from '../../style.module.less';

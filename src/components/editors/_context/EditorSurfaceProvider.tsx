@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react';
 
+import { createEditorRuntime } from '../_runtime/editorRuntime';
 import type { EditorKind, EditorSurfaceProps } from '../editor.type';
-import { createEditorRuntime } from '../runtime/editorRuntime';
 import { EditorSurfaceContext } from './EditorSurfaceContext';
 
 export function EditorSurfaceProvider({

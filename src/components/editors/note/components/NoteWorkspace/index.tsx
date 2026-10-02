@@ -25,8 +25,8 @@ import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 import { isDesktop } from '@/utils/platform';
 
 import { useEditorSurface } from '../../../_context';
-import { waitForEditor } from '../../../runtime/editorRuntime';
-import { useEditorRuntime } from '../../../runtime/useEditorRuntime';
+import { waitForEditor } from '../../../_runtime/editorRuntime';
+import { useEditorRuntime } from '../../../_runtime/useEditorRuntime';
 import styles from '../../style.module.less';
 import NoteInfoBar from '../NoteInfoBar';
 import NoteOutline, { NOTE_OUTLINE_TITLE_ID } from '../NoteOutline';

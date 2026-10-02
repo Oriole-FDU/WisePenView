@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
+import { createEditorHost } from '@/components/editors/_runtime/editorHost';
 import type {
   EditorExitChoice,
   EditorExitPrompt,
   EditorExitReason,
 } from '@/components/editors/editor.type';
-import { createEditorHost } from '@/components/editors/runtime/editorHost';
 
 import { useResourceEditorNavigation } from '../controllers/useResourceEditorNavigation';
 import { ResourceEditorContext } from './ResourceEditorContext';

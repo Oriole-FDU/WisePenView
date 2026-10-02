@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
+import type { EditorTarget } from '@/components/editors';
 import { useDocumentService } from '@/domains';
 import {
   isResourceViewerCompatible,
@@ -14,8 +15,8 @@ import {
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
+import ResourceEditorWorkspace from './_components/ResourceEditorWorkspace';
 import ResourceWorkspace from './_components/ResourceWorkspace';
-import ResourceRenderer, { type ResolvedResourceTarget } from './ResourceRenderer';
 import styles from './ResourceTargetResolver.module.less';
 
 interface ResourceTargetResolverProps {
@@ -156,14 +157,14 @@ function ResourceTargetResolver({ target, onTargetChange, onClose }: ResourceTar
     return <UnsupportedResource {...target} resourceType={resourceType} onClose={onClose} />;
   }
 
-  const resolvedTarget: ResolvedResourceTarget = {
+  const resolvedTarget: EditorTarget = {
     resourceId,
     resourceType,
     resourceName: target.resourceName,
     viewer,
   };
 
-  return <ResourceRenderer target={resolvedTarget} />;
+  return <ResourceEditorWorkspace target={resolvedTarget} />;
 }
 
 export default ResourceTargetResolver;

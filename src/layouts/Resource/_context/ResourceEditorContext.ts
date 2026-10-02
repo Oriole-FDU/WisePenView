@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
+import type { createEditorHost } from '@/components/editors/_runtime/editorHost';
 import type { Editor, EditorExitReason } from '@/components/editors/editor.type';
-import type { createEditorHost } from '@/components/editors/runtime/editorHost';
 
 export interface ResourceEditorContextValue {
   host: ReturnType<typeof createEditorHost>;

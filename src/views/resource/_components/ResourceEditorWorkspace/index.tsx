@@ -1,9 +1,13 @@
 import { FilePenLine, FileText } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { EditorPresentation, EditorTarget } from '@/components/editors';
-import { editorRegistry, resolveEditorKind } from '@/components/editors';
+import {
+  type EditorPresentation,
+  type EditorTarget,
+  resolveEditorKind,
+  ResourceEditor,
+} from '@/components/editors';
 import {
   isOfficeResourceType,
   RESOURCE_KIND,
@@ -15,19 +19,19 @@ import {
   useResourceHostContext,
 } from '@/layouts/Resource/_context';
 
-import ResourceWorkspace from './_components/ResourceWorkspace';
-import { useResourceSidePanelStore } from './_store/useResourceSidePanelStore';
+import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
+import ResourceWorkspace from '../ResourceWorkspace';
 
-export type ResolvedResourceTarget = EditorTarget;
-
-function ResolvedEditor({ target }: { target: EditorTarget }) {
+/**
+ * 把编辑器挂载进资源工作区。
+ * 顶栏、侧栏与聊天绑定属于资源视图，在这里装配；编辑器只上报领域展示信息。
+ */
+export default function ResourceEditorWorkspace({ target }: { target: EditorTarget }) {
   const { t } = useTranslation('workspace');
   const host = useResourceHostContext();
   const { registerEditor } = useResourceEditor();
-  const [instanceId] = useState(() => `${host.hostId}:${crypto.randomUUID()}`);
   const kind = resolveEditorKind(target);
-  if (!kind) return null;
-  const Surface = editorRegistry[kind];
+
   const renderWorkspace = (presentation: EditorPresentation, body: ReactNode) => {
     const { document, chat, ...workspace } = presentation;
     if (document) {
@@ -74,13 +78,14 @@ function ResolvedEditor({ target }: { target: EditorTarget }) {
       </ResourceWorkspace>
     );
   };
+
   return (
-    <Surface
+    <ResourceEditor
       target={target}
-      instanceId={instanceId}
       onRegister={registerEditor}
       renderWorkspace={renderWorkspace}
       host={{
+        hostId: host.hostId,
         openChatPanel: host.openChatPanel,
         setChatContext: host.setChatContext,
         navigateResourceHash: host.navigateResourceHash,
@@ -88,11 +93,5 @@ function ResolvedEditor({ target }: { target: EditorTarget }) {
           useResourceSidePanelStore.getState().setMode(resourceId, 'inlineComment'),
       }}
     />
-  );
-}
-
-export default function ResourceRenderer({ target }: { target: EditorTarget }) {
-  return (
-    <ResolvedEditor key={`${target.resourceId}:${resolveEditorKind(target)}`} target={target} />
   );
 }

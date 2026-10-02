@@ -7,13 +7,13 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
+import ResourceFavoriteAction from '@/components/business/Resource/ResourceFavoriteAction';
 import { useInteractService, useUserService } from '@/domains';
 import type { CommentSortBy, ResourceComment } from '@/domains/Interact';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import ResourceFavoriteAction from '../../ResourceFavoriteAction';
 import CommentComposer from './CommentComposer';
 import ResourceCommentThread from './ResourceCommentThread';
 import ResourceFeedbackSummary from './ResourceFeedbackSummary';

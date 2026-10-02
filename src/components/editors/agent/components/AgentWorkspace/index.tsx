@@ -8,8 +8,8 @@ import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 
 import { useEditorSurface } from '../../../_context';
-import { prepareDraftExit } from '../../../runtime/draftExit';
-import { useEditorRuntime } from '../../../runtime/useEditorRuntime';
+import { prepareDraftExit } from '../../../_runtime/draftExit';
+import { useEditorRuntime } from '../../../_runtime/useEditorRuntime';
 import type { AgentVersionItem, AgentWorkspaceData } from '../../model';
 import styles from '../../style.module.less';
 import AgentEditor from '../AgentEditor';

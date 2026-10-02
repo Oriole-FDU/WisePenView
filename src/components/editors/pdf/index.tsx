@@ -14,8 +14,8 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
+import { useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
-import { useEditorRuntime } from '../runtime/useEditorRuntime';
 import styles from './style.module.less';
 
 interface PdfWorkspaceProps {

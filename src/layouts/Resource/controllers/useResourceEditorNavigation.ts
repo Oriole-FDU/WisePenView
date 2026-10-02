@@ -2,8 +2,8 @@ import { useMemoizedFn } from 'ahooks';
 import { useEffect } from 'react';
 import { useBeforeUnload, useBlocker } from 'react-router-dom';
 
+import type { createEditorHost } from '@/components/editors/_runtime/editorHost';
 import type { EditorExitReason } from '@/components/editors/editor.type';
-import type { createEditorHost } from '@/components/editors/runtime/editorHost';
 
 export function useResourceEditorNavigation(
   host: ReturnType<typeof createEditorHost>,

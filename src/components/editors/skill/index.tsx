@@ -16,9 +16,9 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
+import { prepareDraftExit } from '../_runtime/draftExit';
+import { useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
-import { prepareDraftExit } from '../runtime/draftExit';
-import { useEditorRuntime } from '../runtime/useEditorRuntime';
 import SkillActionDialogs from './components/SkillActionDialogs';
 import SkillEditorPanel from './components/SkillEditorPanel';
 import SkillFileTreePanel from './components/SkillFileTreePanel';
