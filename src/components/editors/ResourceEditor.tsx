@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { createUuid } from '@/utils/random/createUuid';
+
 import type { EditorHostCapabilities, EditorSurfaceProps, EditorTarget } from './editor.type';
 import { editorRegistry, resolveEditorKind } from './editorRegistry';
 
@@ -11,7 +13,7 @@ export interface ResourceEditorProps {
 }
 
 function MountedEditor({ target, host, onRegister, onPresentationChange }: ResourceEditorProps) {
-  const [instanceId] = useState(() => `${host.hostId}:${crypto.randomUUID()}`);
+  const [instanceId] = useState(() => `${host.hostId}:${createUuid()}`);
   const kind = resolveEditorKind(target);
   if (!kind) return null;
   const Surface = editorRegistry[kind];
