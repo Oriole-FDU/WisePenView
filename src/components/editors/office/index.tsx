@@ -1,7 +1,7 @@
 import type { Config } from '@onlyoffice/doceditor-types';
 import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import { useMemoizedFn } from 'ahooks';
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -12,12 +12,13 @@ import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
-import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/layouts/Resource/_context/host';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
+import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
+import { isOfficeReadOnly, prepareOfficeExit, reduceOfficeSession } from './officeSession';
 import styles from './style.module.less';
 
 interface OfficePresentationBindingProps {
@@ -30,7 +31,7 @@ interface OfficePresentationBindingProps {
 interface OfficeEditorHostProps {
   config: Config;
   documentServerUrl: string;
-  resourceId: string;
+  resourceName: string;
   onReady: () => void;
   onError: (error: unknown) => void;
 }
@@ -52,17 +53,32 @@ function OfficePresentationBinding({
 function OfficeEditorHost({
   config,
   documentServerUrl,
-  resourceId,
+  resourceName,
   onReady,
   onError,
 }: OfficeEditorHostProps) {
-  const hostId = useResourceHostId();
-  const containerId = (() => {
-    const safeResourceId = resourceId.replace(/[^a-z0-9_-]/gi, '-');
-    if (hostId === DEFAULT_RESOURCE_HOST_ID) return `onlyoffice-editor-${safeResourceId}`;
-    const safeHostId = hostId.replace(/[^a-z0-9_-]/gi, '-');
-    return `onlyoffice-editor-${safeHostId}-${safeResourceId}`;
-  })();
+  const { instanceId, target } = useEditorSurface();
+  const [{ ready, modified, error }, dispatch] = useReducer(reduceOfficeSession, {
+    ready: false,
+    modified: false,
+  });
+  const containerId = `onlyoffice-editor-${instanceId.replace(/[^a-z0-9_-]/gi, '-')}`;
+  useEditorRuntime(
+    {
+      openedResource: { ...target, resourceName },
+      loading: !ready && !error,
+      error,
+      readOnly: isOfficeReadOnly(config),
+      hasUnsavedChanges: modified,
+      pendingWork: modified && !error,
+      warnBeforeUnload: modified,
+    },
+    (context, editor) => prepareOfficeExit(editor, context)
+  );
+  const handleError = (nextError: unknown) => {
+    dispatch({ type: 'error', error: nextError });
+    onError(nextError);
+  };
 
   return (
     <div className={styles.editorHost}>
@@ -72,9 +88,13 @@ function OfficeEditorHost({
         config={config}
         width="100%"
         height="100%"
-        events_onDocumentReady={onReady}
+        events_onDocumentReady={() => {
+          dispatch({ type: 'ready' });
+          onReady();
+        }}
+        events_onDocumentStateChange={(event) => dispatch({ type: 'modified', event })}
         events_onError={(event) =>
-          onError(
+          handleError(
             createClientError(
               FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED,
               { errorCode: 'unknown' },
@@ -83,7 +103,7 @@ function OfficeEditorHost({
           )
         }
         onLoadComponentError={(errorCode, errorDescription) => {
-          onError(
+          handleError(
             createClientError(FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED, {
               errorCode,
               errorDescription,
@@ -134,6 +154,8 @@ function OfficeEditorContent() {
     refreshDeps: [resourceId],
   });
 
+  useEditorLoadState({ loading: isConfigLoading && !data, error });
+
   const handleEditorReady = () => {
     setEditorReady(true);
     setEditorError(null);
@@ -171,7 +193,7 @@ function OfficeEditorContent() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <>
         <OfficePresentationBinding />
@@ -233,7 +255,7 @@ function OfficeEditorContent() {
           key={`${resourceId}-${data.editorConfig.sessionId ?? 'session'}`}
           config={data.editorConfig.config}
           documentServerUrl={publicAppConfig.office.documentServerUrl}
-          resourceId={resourceId}
+          resourceName={data.docInfo.resourceInfo.resourceName}
           onReady={handleEditorReady}
           onError={handleEditorError}
         />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useEditorSurface } from '../../_context';
 import type { EditorPresentation } from '../../editor.type';
@@ -14,6 +14,7 @@ export default function EditorPresentationBinding(presentation: EditorPresentati
     advanced: createPresentationSlot(),
     inlineComment: createPresentationSlot(true),
   }));
+  const unregister = useRef<(() => void) | undefined>(undefined);
   const resource = presentation.header && presentation.header.resource;
   const inlineComment = presentation.sidePanel?.inlineComment;
   const reported: EditorPresentation = {
@@ -45,9 +46,18 @@ export default function EditorPresentationBinding(presentation: EditorPresentati
    * @wisepen-manual-effect
    * 执行时机：编辑器内容提交后同步外层布局所需的展示信息。
    * 不可替代原因：标题、动作与批注由领域会话产生，布局在另一子树中独立订阅。
-   * cleanup：仅撤销本次上报，防止已卸载的会话继续占用顶栏和侧栏。
+   * cleanup：更新不清空展示，统一由卸载清理撤销最后一次上报。
    */
-  useEffect(() => onPresentationChange(reported));
+  useEffect(() => {
+    unregister.current = onPresentationChange(reported);
+  });
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：展示绑定挂载时建立注销生命周期。
+   * 不可替代原因：上报产生的注销函数必须对应最后一次展示。
+   * cleanup：仅撤销当前绑定的最新上报，旧绑定不能清理新绑定。
+   */
+  useEffect(() => () => unregister.current?.(), []);
 
   return (
     <>

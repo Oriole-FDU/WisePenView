@@ -19,13 +19,13 @@ import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import type { EditorResourcePresentation } from '@/components/editors/editor.type';
 import type {
   ResourceAction,
   ResourceItem,
   ResourcePermissionResourceType,
 } from '@/domains/Resource';
 
-import type { ResourceToolbarMoreMenu } from './index.type';
 import ResourceToolbarOperations, {
   type ResourceToolbarOperationHandlers,
 } from './ResourceToolbarOperations';
@@ -58,7 +58,7 @@ function ResourceToolbarMore({
   isDisabled,
   onOpenPermission,
 }: {
-  menu?: ResourceToolbarMoreMenu;
+  menu?: EditorResourcePresentation['moreMenu'];
   operations: ResourceToolbarOperationHandlers;
   canManagePermission: boolean;
   isDisabled?: boolean;
@@ -270,7 +270,7 @@ export interface ResourceToolbarActionsProps {
   resourceInfo?: ResourceItem;
   currentActions?: ResourceAction[] | null;
   copyVersion?: number;
-  moreMenu?: ResourceToolbarMoreMenu;
+  moreMenu?: EditorResourcePresentation['moreMenu'];
   isDisabled?: boolean;
   leadingActions?: ReactNode;
   actions?: ReactNode;

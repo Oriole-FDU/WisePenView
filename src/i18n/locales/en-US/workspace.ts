@@ -1,4 +1,5 @@
 const enUSWorkspace = {
+  editorExit: { preparing: 'Waiting for saving or changes to sync. You can cancel leaving.' },
   shell: {
     appSidebar: 'Application sidebar',
     chatPanel: 'Chat panel',
@@ -33,6 +34,12 @@ const enUSWorkspace = {
     starting: 'Starting ONLYOFFICE editor...',
   },
   drawio: {
+    leave: {
+      title: 'Unsaved diagram changes',
+      description: 'Save the diagram before leaving, or discard your changes.',
+      save: 'Save and leave',
+      discard: 'Discard and leave',
+    },
     defaultName: 'Draw.io diagram',
     unnamed: 'Untitled diagram',
     cannotOpen: 'Cannot open Draw.io diagram',

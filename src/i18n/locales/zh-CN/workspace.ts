@@ -1,4 +1,5 @@
 const zhCNWorkspace = {
+  editorExit: { preparing: '正在等待保存或修改同步，可取消退出' },
   shell: {
     appSidebar: '应用侧边栏',
     chatPanel: '聊天面板',
@@ -33,6 +34,12 @@ const zhCNWorkspace = {
     starting: '正在启动 ONLYOFFICE 编辑器...',
   },
   drawio: {
+    leave: {
+      title: '图表有未保存的修改',
+      description: '离开前保存图表，或丢弃本次修改。',
+      save: '保存并离开',
+      discard: '丢弃并离开',
+    },
     defaultName: 'Draw.io 图',
     unnamed: '未命名图表',
     cannotOpen: '无法打开 Draw.io 图',

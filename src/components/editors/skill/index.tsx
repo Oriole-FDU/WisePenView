@@ -170,7 +170,11 @@ function SkillEditorContent() {
       readOnly: !canEdit,
       hasUnsavedChanges: workspace.hasUnsavedChanges,
       pendingWork: save.isSaving || fileActions.moveLoading || fileActions.deleteLoading,
-      warnBeforeUnload: workspace.hasUnsavedChanges || save.isSaving || fileActions.moveLoading,
+      warnBeforeUnload:
+        workspace.hasUnsavedChanges ||
+        save.isSaving ||
+        fileActions.moveLoading ||
+        fileActions.deleteLoading,
     },
     (context, editor) =>
       prepareDraftExit(

@@ -57,6 +57,9 @@ jobs:
       - name: Lint Code
         run: pnpm lint
 
+      - name: Check editor runtime
+        run: pnpm check:editor-runtime
+
       - name: Check mock contract
         run: pnpm check:mock
 

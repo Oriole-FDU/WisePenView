@@ -8,7 +8,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
-import { useEditorRuntime } from '../_runtime/useEditorRuntime';
+import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import AgentWorkspace from './components/AgentWorkspace';
 import { useAgentVersionController } from './controllers/useAgentVersionController';
@@ -21,9 +21,9 @@ function AgentEditorContent() {
   const { t } = useTranslation(['agent', 'common']);
   const version = useAgentVersionController({ resourceId });
 
-  useEditorRuntime({ error: version.error, ...(!version.displayAgent ? { loading: true } : {}) });
+  useEditorLoadState({ error: version.error, loading: version.loading && !version.displayAgent });
 
-  if (version.error) {
+  if (version.error && !version.displayAgent) {
     return (
       <>
         <EditorPresentationBinding className={styles.pageWrap} />

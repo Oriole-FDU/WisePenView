@@ -1,3 +1,4 @@
+import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import { History, Save } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
@@ -26,7 +27,8 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
-import { useEditorRuntime } from '../_runtime/useEditorRuntime';
+import { prepareDraftExit } from '../_runtime/draftExit';
+import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import {
   buildDrawioUrl,
@@ -199,6 +201,24 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
   const canEdit = noteInfoDisplay.canCollaborativeEdit;
   const canViewVersions = Boolean(noteInfoDisplay.ownerId);
   const title = useResourceDisplayName(resourceId, noteInfoDisplay.noteTitle, t('drawio.unnamed'));
+  const drawioOrigin = readDrawioEmbedOrigin(publicAppConfig.drawio.embedUrl);
+  const {
+    iframeRef,
+    currentVersion,
+    saveState,
+    error: editorError,
+    editorReady,
+    editorLoaded,
+    requestSave,
+  } = useDrawioEditorSession({
+    canEdit,
+    drawioOrigin,
+    initialVersion,
+    initialXml,
+    noteService,
+    resourceId,
+  });
+
   const drawioUrl = buildDrawioUrl({
     embedUrl: publicAppConfig.drawio.embedUrl,
     canEdit,
@@ -206,16 +226,38 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
     theme: readWisePenTheme(),
     colorScheme: readWisePenColorScheme(),
   });
-  const drawioOrigin = readDrawioEmbedOrigin(publicAppConfig.drawio.embedUrl);
-  const { iframeRef, currentVersion, saveState, editorReady, editorLoaded, requestSave } =
-    useDrawioEditorSession({
-      canEdit,
-      drawioOrigin,
-      initialVersion,
-      initialXml,
-      noteService,
-      resourceId,
-    });
+
+  const { target } = useEditorSurface();
+  useEditorRuntime(
+    {
+      openedResource: { ...target, resourceName: title, version: currentVersion },
+      loading: !editorLoaded && !editorError,
+      error: editorError,
+      readOnly: !canEdit,
+      hasUnsavedChanges: saveState !== 'saved',
+      pendingWork: saveState === 'saving',
+      warnBeforeUnload: saveState !== 'saved',
+    },
+    (context, editor) =>
+      prepareDraftExit(
+        editor,
+        context,
+        {
+          title: t('drawio.leave.title'),
+          description: t('drawio.leave.description'),
+          confirmText: t('drawio.leave.save'),
+          discardText: t('drawio.leave.discard'),
+        },
+        {
+          save: async () => {
+            await requestSave();
+            await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+          },
+          // 丢弃仅放行当前退出，不取消已提交到后端的保存。
+          discard: async () => {},
+        }
+      )
+  );
 
   const { data: currentUser } = useApi(() => userService.getUserInfo(), {
     ready: Boolean(noteInfoDisplay.ownerId),
@@ -261,7 +303,9 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
           size="sm"
           variant="primary"
           isDisabled={!editorLoaded || saveState === 'saved' || saveState === 'saving'}
-          onPress={requestSave}
+          onPress={() =>
+            void requestSave().catch((error) => toast.danger(parseErrorMessage(error)))
+          }
           aria-label={t('actions.save', { ns: 'common' })}
         >
           <Save size={16} />
@@ -353,7 +397,7 @@ function DrawioEditorContent() {
     refreshDeps: [resourceId],
   });
 
-  useEditorRuntime({ error, ...(!data ? { loading: loadingDrawio } : {}) });
+  useEditorLoadState({ error, loading: loadingDrawio && !data });
 
   if (!resourceId) {
     return (
@@ -374,7 +418,7 @@ function DrawioEditorContent() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <>
         <DrawioPresentationBinding resourceId={resourceId} />

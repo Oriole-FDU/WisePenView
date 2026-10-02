@@ -12,7 +12,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
-import { useEditorRuntime } from '../_runtime/useEditorRuntime';
+import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import NoteWorkspace from './components/NoteWorkspace';
 import styles from './style.module.less';
@@ -81,12 +81,12 @@ function NoteEditorContent() {
     }
   );
 
-  useEditorRuntime({ error, ...(!noteInfoDisplay ? { loading } : {}) });
+  useEditorLoadState({ error, loading: loading && !noteInfoDisplay });
 
   if (!resourceId) {
     return <NoteOpenFailure />;
   }
-  if (error) {
+  if (error && !noteInfoDisplay) {
     return <NoteOpenFailure subTitle={parseErrorMessage(error)} />;
   }
   if (loading && !noteInfoDisplay) {

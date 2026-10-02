@@ -26,6 +26,7 @@
     "typecheck": "tsc -b",
     "check:mock": "node scripts/check-mock.mjs",
     "check:api-contract": "node scripts/check-api-contract.mjs",
+    "check:editor-runtime": "node --test scripts/check-editor-runtime.mjs",
     "check:frontend-state": "node --test scripts/check-frontend-state.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",

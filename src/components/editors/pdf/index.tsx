@@ -73,18 +73,21 @@ function PdfEditorContent() {
     refreshDeps: [resourceId],
   });
 
+  const currentResourceId = resourceId ?? '';
+  const viewerError = viewerErrorMap[currentResourceId];
   useEditorRuntime({
     loading: isDocInfoLoading && !docInfo,
-    error: docInfoError,
+    error: docInfoError ?? viewerError,
     readOnly: true,
+    hasUnsavedChanges: false,
+    pendingWork: false,
+    warnBeforeUnload: false,
     openedResource: {
       ...useEditorSurface().target,
       resourceName: docInfo?.resourceInfo.resourceName,
     },
   });
 
-  const currentResourceId = resourceId ?? '';
-  const viewerError = viewerErrorMap[currentResourceId];
   const handleViewerLoadError = (error: unknown) => {
     if (!currentResourceId) {
       return;

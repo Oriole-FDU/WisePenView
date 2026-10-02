@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { createStore } from 'zustand/vanilla';
 
 import { ResourceEditor } from '@/components/editors';
 import { chatDockActions } from '@/layouts/ChatDockLayout';
@@ -9,19 +8,8 @@ import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { resourceSidePanelActions } from '@/layouts/Resource/ResourceLayout';
 
 import ResourceWorkspacePresentation from './_components/ResourceWorkspacePresentation';
-import type { ResourceEditorWorkspaceProps, WorkspacePresentationState } from './index.type';
-
-function createWorkspacePresentationStore() {
-  return createStore<WorkspacePresentationState>((set, get) => ({
-    presentation: {},
-    onPresentationChange: (presentation) => {
-      set({ presentation });
-      return () => {
-        if (get().presentation === presentation) set({ presentation: {} });
-      };
-    },
-  }));
-}
+import type { ResourceEditorWorkspaceProps } from './index.type';
+import { createWorkspacePresentationStore } from './workspacePresentationStore';
 
 /** 组合外层资源布局与编辑器实例；展示信息由独立子树订阅。 */
 export default function ResourceEditorWorkspace({ target }: ResourceEditorWorkspaceProps) {
