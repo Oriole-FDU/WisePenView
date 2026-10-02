@@ -59,7 +59,7 @@ const AuthBindingOnboarding = lazy(() => import('@/views/app/auth/AuthBindingOnb
 const ResetPassword = lazy(() => import('@/views/app/auth/ResetPassword'));
 const NewPassword = lazy(() => import('@/views/app/auth/NewPassword'));
 const VerifyEmail = lazy(() => import('@/views/app/auth/VerifyEmail'));
-const ResourceRouteBoundary = lazy(() => import('@/views/resource/ResourceRouteBoundary'));
+const ResourceRouteBoundary = lazy(() => import('@/views/app/resource/ResourceRouteBoundary'));
 const ChatPage = lazy(() => import('@/views/app/chat'));
 const NotificationsPage = lazy(() => import('@/views/app/notifications'));
 const CourseRoute = lazy(() => import('@/views/app/course/CourseRoute'));

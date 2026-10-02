@@ -7,7 +7,7 @@ import {
   type ResourceHostContextValue,
   ResourceHostProvider,
 } from '@/layouts/Resource/_context/host';
-import ResourceTargetResolver from '@/views/resource/ResourceTargetResolver';
+import ResourceTargetResolver from '@/views/app/resource/ResourceTargetResolver';
 
 interface CourseResourceHostProps {
   courseId: string;

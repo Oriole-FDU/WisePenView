@@ -21,7 +21,7 @@ import {
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { ResourceLayout, resourceSidePanelActions } from '@/layouts/Resource/ResourceLayout';
-import ResourceChatToggleButton from '@/views/resource/_components/ResourceChatToggleButton';
+import ResourceChatToggleButton from '@/views/app/resource/_components/ResourceChatToggleButton';
 
 /**
  * 把编辑器挂载进资源工作区。
