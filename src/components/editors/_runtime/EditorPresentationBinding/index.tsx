@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { useEditorSurface } from '../_context';
-import type { EditorPresentation } from '../editor.type';
+import { useEditorSurface } from '../../_context';
+import type { EditorPresentation } from '../../editor.type';
 import { createPresentationSlot } from './createPresentationSlot';
 
 /** 同步编辑器展示信息并渲染扩展槽位，与正文并列挂载。 */

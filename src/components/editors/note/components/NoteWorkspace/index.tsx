@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import InlineComment from '@/components/business/InlineComment';
+import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import type { EditorPresentation } from '@/components/editors/editor.type';
-import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import CustomBlockNote from '@/components/editors/note/CustomBlockNote';
 import type {
   NoteBodyEditorHandle,

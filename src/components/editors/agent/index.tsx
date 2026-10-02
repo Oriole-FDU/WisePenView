@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
-import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
+import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
