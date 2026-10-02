@@ -13,11 +13,9 @@ import {
   RESOURCE_KIND,
   RESOURCE_VIEWER,
 } from '@/domains/Resource/model/resourceTarget';
-import {
-  ResourceChatBinding,
-  useResourceEditor,
-  useResourceHostContext,
-} from '@/layouts/Resource/_context';
+import { ResourceChatBinding } from '@/layouts/Resource/_context/chatBinding';
+import { useResourceEditor } from '@/layouts/Resource/_context/editor';
+import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 
 import { useResourceSidePanelStore } from '../../_store/useResourceSidePanelStore';
 import ResourceWorkspace from '../ResourceWorkspace';

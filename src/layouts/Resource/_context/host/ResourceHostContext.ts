@@ -4,7 +4,7 @@ import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import type { DriveNodeScope, DriveResourceLocation } from '@/domains/Drive';
 import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
 
-import type { ResourceChatContext } from './resourceChatModel';
+import type { ResourceChatContext } from '../chatBinding/resourceChatModel';
 
 /** 宿主向资源顶栏提供的导航能力；顶栏实现消费它，而不是反过来定义宿主契约。 */
 export interface ResourceHeaderNavigation {

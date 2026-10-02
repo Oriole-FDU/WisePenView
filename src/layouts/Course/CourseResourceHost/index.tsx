@@ -1,13 +1,13 @@
 import { type ReactNode, useState } from 'react';
 
 import { RESOURCE_KIND, type ResourceTarget } from '@/domains/Resource/model/resourceTarget';
+import type { ResourceChatContext } from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
+import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import {
   type OpenResourceFn,
   type ResourceHostContextValue,
   ResourceHostProvider,
-  useResourceEditor,
-} from '@/layouts/Resource/_context';
-import type { ResourceChatContext } from '@/layouts/Resource/_context/resourceChatModel';
+} from '@/layouts/Resource/_context/host';
 import ResourceTargetResolver from '@/views/resource/ResourceTargetResolver';
 
 interface CourseResourceHostProps {

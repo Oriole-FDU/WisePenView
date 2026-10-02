@@ -29,7 +29,7 @@ import {
 } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
-import { useResourceHostContext } from '@/layouts/Resource/_context';
+import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import ResourceTargetModal from './ResourceTargetModal';

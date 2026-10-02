@@ -25,25 +25,24 @@ import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/_context';
 import { useMainShell } from '@/layouts/MainShell/_context';
 import { useChatDockLayoutStore } from '@/layouts/MainShell/_store/useChatDockLayoutStore';
-import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context';
 import {
   buildResourceOpenState,
   type ResourceChatContext,
-} from '@/layouts/Resource/_context/resourceChatModel';
+} from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
+import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 
+import { ResourceChatBindingProvider, ResourceChatPanel } from '../_context/chatBinding';
 import {
   DEFAULT_RESOURCE_HOST_ID,
   type OpenResourceFn,
-  ResourceChatBindingProvider,
-  ResourceChatPanel,
   type ResourceHostContextValue,
   type ResourceHostDriveNavigationTarget,
   ResourceHostProvider,
   type ResourceHostRouteContext,
   type ResourceHostViewerNavigationTarget,
-} from '../_context';
+} from '../_context/host';
 import styles from './style.module.less';
 
 interface ResourceHostProps {

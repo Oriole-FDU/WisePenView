@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import type { ResourceItem } from '@/domains/Resource';
-import { useResourceHostContext } from '@/layouts/Resource/_context';
+import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 
 import type { ResourceHeaderConfig } from '../../ResourceHeader/index.type';
 import ResourceWorkspaceHeader from '../../ResourceWorkspaceHeader';

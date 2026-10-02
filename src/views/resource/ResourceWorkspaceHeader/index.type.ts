@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { ResourceHeaderNavigation } from '@/layouts/Resource/_context/ResourceHostContext';
+import type { ResourceHeaderNavigation } from '@/layouts/Resource/_context/host/ResourceHostContext';
 
 import type { ResourceHeaderProps } from '../ResourceHeader/index.type';
 

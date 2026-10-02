@@ -15,13 +15,12 @@ import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@
 import {
   ResourceChatBindingProvider,
   ResourceChatPanel,
-  ResourceEditorProvider,
-  useResourceEditor,
-} from '@/layouts/Resource/_context';
+} from '@/layouts/Resource/_context/chatBinding';
 import {
   buildResourceOpenState,
   type ResourceChatContext,
-} from '@/layouts/Resource/_context/resourceChatModel';
+} from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
+import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context/editor';
 import ResourceWorkspaceHeader from '@/views/resource/ResourceWorkspaceHeader';
 
 import { useCourseContext } from '../_context';

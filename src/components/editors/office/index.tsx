@@ -12,7 +12,7 @@ import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
-import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/layouts/Resource/_context';
+import { DEFAULT_RESOURCE_HOST_ID, useResourceHostId } from '@/layouts/Resource/_context/host';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
