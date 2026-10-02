@@ -2,7 +2,7 @@ import { useMemoizedFn } from 'ahooks';
 import { startTransition } from 'react';
 import { parsePath, useLocation, useNavigate } from 'react-router-dom';
 
-import { usePdfPreviewProgressStore } from '@/components/business/PdfViewer/_store/usePdfPreviewProgressStore';
+import { usePdfPreviewProgressStore } from '@/components/editors/pdf/components/PdfViewer/_store/usePdfPreviewProgressStore';
 import type { DriveResourceLocation } from '@/domains/Drive';
 import {
   resolveResourceKind,

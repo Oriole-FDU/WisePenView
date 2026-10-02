@@ -1,0 +1,116 @@
+.scrollHost {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rootWithOverlay > :global([data-slot='system-resizable-panel']):last-child {
+  /* 分栏外壳仍保持零宽，避免浮层宽度参与分栏库的尺寸测量。 */
+  overflow: visible;
+}
+
+.rootWithOverlay .sidePanel {
+  /* 只定位内层内容，保留评论草稿和编辑器批注的挂载状态。 */
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: var(--app-z-index-local-overlay);
+  width: min(100%, var(--resource-side-panel-width));
+  height: 100%;
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-z-index-floating);
+  padding: 0;
+  border: 0;
+  background: var(--backdrop);
+  cursor: pointer;
+}
+
+.closeButton {
+  position: absolute;
+  top: 6px;
+  right: var(--space-sm);
+  z-index: var(--app-z-index-raised);
+}
+
+.resourceRenderer,
+.sidePanel {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.resourceRenderer {
+  position: relative;
+  z-index: var(--app-z-index-base);
+  overflow: hidden;
+}
+
+.sidePanel {
+  position: relative;
+  z-index: var(--app-z-index-raised);
+  background: var(--surface);
+}
+
+.panelFrame {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  container-type: inline-size;
+  container-name: resource-side-panel;
+}
+
+.panelHeader {
+  display: flex;
+  min-height: 44px;
+  flex: 0 0 44px;
+  align-items: center;
+  padding: 0 var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.panelTitle {
+  margin: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.panelBody {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+
+  > * {
+    min-width: 0;
+    min-height: 0;
+    flex: 1;
+  }
+}

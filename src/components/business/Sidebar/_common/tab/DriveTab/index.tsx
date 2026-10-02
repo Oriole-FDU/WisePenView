@@ -22,7 +22,7 @@ import {
 import {
   MARKDOWN_NOTE_FILE_ACCEPT,
   useMarkdownNoteImport,
-} from '@/components/business/Note/useMarkdownNoteImport';
+} from '@/components/editors/note/hooks/useMarkdownNoteImport';
 import { useGroupService, useNoteService } from '@/domains';
 import type { DriveResourceLocation, FolderNode, RootNode } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';

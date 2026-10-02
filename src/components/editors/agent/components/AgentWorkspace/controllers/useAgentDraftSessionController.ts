@@ -1,0 +1,167 @@
+import { toast } from '@heroui/react';
+import type { TFunction } from 'i18next';
+import { useRef, useState } from 'react';
+
+import { useAgentService } from '@/domains';
+import type { AgentDetail, AgentSpec } from '@/domains/Agent';
+import { useApi } from '@/hooks/useApi';
+
+import { buildGuidedPrompt, getDefaultGuidedPromptFields } from '../../../guidedPrompt';
+import {
+  type AgentDraft,
+  buildAgentDraft,
+  buildCurrentDraftAgent,
+  snapshotAgentDraft,
+} from '../../../model';
+
+type AgentSavePhase = 'clean' | 'dirty' | 'saving' | 'failed';
+
+interface UseAgentDraftSessionControllerOptions {
+  agent: AgentDetail;
+  baseAgent: AgentDetail;
+  isOwner: boolean;
+  onPublished: () => void;
+  resourceId: string;
+  t: TFunction<'agent' | 'common'>;
+  versionLoading: boolean;
+  viewingVersion: number | null;
+}
+
+export function useAgentDraftSessionController({
+  agent,
+  baseAgent,
+  isOwner,
+  onPublished,
+  resourceId,
+  t,
+  versionLoading,
+  viewingVersion,
+}: UseAgentDraftSessionControllerOptions) {
+  const agentService = useAgentService();
+  const initialSavedDraft = buildAgentDraft(agent);
+  const initialDraft =
+    isOwner && viewingVersion === null && !initialSavedDraft.spec.systemPrompt
+      ? {
+          ...initialSavedDraft,
+          spec: {
+            ...initialSavedDraft.spec,
+            systemPrompt: buildGuidedPrompt(getDefaultGuidedPromptFields(), true),
+          },
+        }
+      : initialSavedDraft;
+  const [draft, setDraftState] = useState(initialDraft);
+  const [savedSnapshot, setSavedSnapshot] = useState(() => snapshotAgentDraft(initialSavedDraft));
+  const [savePhase, setSavePhase] = useState<AgentSavePhase>(() =>
+    snapshotAgentDraft(initialDraft) === snapshotAgentDraft(initialSavedDraft) ? 'clean' : 'dirty'
+  );
+  const savePromiseRef = useRef<Promise<unknown> | null>(null);
+  const isDirty = savePhase === 'dirty' || savePhase === 'failed';
+
+  const setDraft = (updater: (current: AgentDraft) => AgentDraft) =>
+    setDraftState((current) => {
+      const next = updater(current);
+      setSavePhase(snapshotAgentDraft(next) === savedSnapshot ? 'clean' : 'dirty');
+      return next;
+    });
+
+  const saveRequest = useApi(
+    async (draftSnapshot: AgentDraft) => {
+      if (!isOwner || viewingVersion !== null) return;
+      setSavePhase('saving');
+      await agentService.saveAgentDraft({
+        resourceId,
+        draftVersion: baseAgent.draftVersion,
+        name: draftSnapshot.name.trim(),
+        description: draftSnapshot.description.trim(),
+        spec: draftSnapshot.spec,
+      });
+      return snapshotAgentDraft(draftSnapshot);
+    },
+    {
+      manual: true,
+      onSuccess: (savedDraftSnapshot) => {
+        if (!savedDraftSnapshot) return;
+        setSavedSnapshot(savedDraftSnapshot);
+        setDraftState((current) => {
+          setSavePhase(snapshotAgentDraft(current) === savedDraftSnapshot ? 'clean' : 'dirty');
+          return current;
+        });
+        toast.success(t('agent:page.saved'));
+      },
+      onErrorEffect: () => {
+        setSavePhase('failed');
+      },
+    }
+  );
+
+  const saveDraftRequest = async () => {
+    if (savePromiseRef.current) {
+      await savePromiseRef.current;
+      return;
+    }
+    const draftSnapshot = structuredClone(draft);
+    const request = saveRequest.runAsync(draftSnapshot);
+    savePromiseRef.current = request;
+    try {
+      await request;
+    } finally {
+      savePromiseRef.current = null;
+    }
+  };
+
+  const publishRequest = useApi(
+    async () => {
+      if (!isOwner) return;
+      if (isDirty) await saveDraftRequest();
+      await agentService.publishVersion(resourceId);
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        toast.success(t('agent:page.published'));
+        onPublished();
+      },
+    }
+  );
+
+  const saveDraftForDebug = async (): Promise<boolean> => {
+    try {
+      await saveDraftRequest();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const setSpec = (spec: AgentSpec) => setDraft((current) => ({ ...current, spec }));
+  const isReadOnly =
+    !isOwner ||
+    viewingVersion !== null ||
+    saveRequest.loading ||
+    publishRequest.loading ||
+    versionLoading;
+
+  return {
+    currentDraftAgent: buildCurrentDraftAgent(baseAgent, draft, t('agent:page.currentAgent')),
+    draft,
+    isDirty,
+    isReadOnly,
+    publishDraft: () => publishRequest.run(),
+    publishLoading: publishRequest.loading,
+    saveDraft: () => {
+      void saveDraftRequest().catch(() => undefined);
+    },
+    saveDraftForDebug,
+    saveDraftRequest,
+    saveLoading: saveRequest.loading,
+    savePhase,
+    setDescription: (description: string) => setDraft((current) => ({ ...current, description })),
+    setName: (name: string) => setDraft((current) => ({ ...current, name })),
+    setSpec,
+    setSystemPrompt: (systemPrompt: string) =>
+      setDraft((current) => ({
+        ...current,
+        spec: { ...current.spec, systemPrompt },
+      })),
+  };
+}

@@ -1,0 +1,291 @@
+import type { Config } from '@onlyoffice/doceditor-types';
+import { DocumentEditor } from '@onlyoffice/document-editor-react';
+import { useMemoizedFn } from 'ahooks';
+import { useReducer, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { AppButton } from '@/components/base/Button';
+import { ResultState, Spin } from '@/components/base/Feedback';
+import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
+import { publicAppConfig } from '@/config/runtimeConfig';
+import { useDocumentService, useInteractService } from '@/domains';
+import type { ResourceItem } from '@/domains/Resource';
+import { useApi } from '@/hooks/useApi';
+import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+
+import { EditorSurfaceProvider, useEditorSurface } from '../_context';
+import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
+import type { EditorSurfaceProps } from '../editor.type';
+import { isOfficeReadOnly, prepareOfficeExit, reduceOfficeSession } from './officeSession';
+import styles from './style.module.less';
+
+interface OfficePresentationBindingProps {
+  resourceInfo?: ResourceItem;
+  documentType?: string;
+  onPermissionSuccess?: () => void;
+  onResourceChanged?: () => unknown | Promise<unknown>;
+}
+
+interface OfficeEditorHostProps {
+  config: Config;
+  documentServerUrl: string;
+  resourceName: string;
+  onReady: () => void;
+  onError: (error: unknown) => void;
+}
+
+function OfficePresentationBinding({
+  resourceInfo,
+  documentType,
+  onPermissionSuccess,
+  onResourceChanged,
+}: OfficePresentationBindingProps) {
+  return (
+    <EditorPresentationBinding
+      className={styles.container}
+      document={{ resourceInfo, documentType, onPermissionSuccess, onResourceChanged }}
+    />
+  );
+}
+
+function OfficeEditorHost({
+  config,
+  documentServerUrl,
+  resourceName,
+  onReady,
+  onError,
+}: OfficeEditorHostProps) {
+  const { instanceId, target } = useEditorSurface();
+  const [{ ready, modified, error }, dispatch] = useReducer(reduceOfficeSession, {
+    ready: false,
+    modified: false,
+  });
+  const containerId = `onlyoffice-editor-${instanceId.replace(/[^a-z0-9_-]/gi, '-')}`;
+  useEditorRuntime(
+    {
+      openedResource: { ...target, resourceName },
+      loading: !ready && !error,
+      error,
+      readOnly: isOfficeReadOnly(config),
+      hasUnsavedChanges: modified,
+      pendingWork: modified && !error,
+      warnBeforeUnload: modified,
+    },
+    (context, editor) => prepareOfficeExit(editor, context)
+  );
+  const handleError = (nextError: unknown) => {
+    dispatch({ type: 'error', error: nextError });
+    onError(nextError);
+  };
+
+  return (
+    <div className={styles.editorHost}>
+      <DocumentEditor
+        id={containerId}
+        documentServerUrl={documentServerUrl}
+        config={config}
+        width="100%"
+        height="100%"
+        events_onDocumentReady={() => {
+          dispatch({ type: 'ready' });
+          onReady();
+        }}
+        events_onDocumentStateChange={(event) => dispatch({ type: 'modified', event })}
+        events_onError={(event) =>
+          handleError(
+            createClientError(
+              FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED,
+              { errorCode: 'unknown' },
+              event
+            )
+          )
+        }
+        onLoadComponentError={(errorCode, errorDescription) => {
+          handleError(
+            createClientError(FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED, {
+              errorCode,
+              errorDescription,
+            })
+          );
+        }}
+      />
+    </div>
+  );
+}
+
+function OfficeEditorContent() {
+  const {
+    target: { resourceId },
+  } = useEditorSurface();
+  const { t } = useTranslation('workspace');
+  const documentService = useDocumentService();
+  const interactService = useInteractService();
+  const [editorReady, setEditorReady] = useState(false);
+  const [editorError, setEditorError] = useState<unknown>(null);
+
+  const {
+    data,
+    error,
+    loading: isConfigLoading,
+    mutate: mutateOfficeData,
+    refresh: refreshOfficeData,
+  } = useApi(
+    async () => {
+      const [docInfo, editorConfig] = await Promise.all([
+        documentService.getDocInfo(resourceId as string),
+        documentService.getOnlyOfficeEditorConfig(resourceId as string),
+      ]);
+      return { docInfo, editorConfig };
+    },
+    {
+      ready: Boolean(resourceId),
+      refreshDeps: [resourceId],
+      onBefore: () => {
+        setEditorReady(false);
+        setEditorError(null);
+      },
+    }
+  );
+
+  useApi(() => interactService.recordResourceRead(resourceId as string), {
+    ready: Boolean(resourceId),
+    refreshDeps: [resourceId],
+  });
+
+  useEditorLoadState({ loading: isConfigLoading && !data, error });
+
+  const handleEditorReady = () => {
+    setEditorReady(true);
+    setEditorError(null);
+  };
+
+  const handleEditorError = (nextError: unknown) => {
+    setEditorError(nextError);
+    setEditorReady(false);
+  };
+
+  // 刷新权限与评论数据时保留当前 Office 编辑实例。
+  const refreshResourceInfo = useMemoizedFn(async () => {
+    const docInfo = await documentService.getDocInfo(resourceId as string);
+    if (data) mutateOfficeData({ ...data, docInfo });
+  });
+
+  if (!resourceId) {
+    return (
+      <>
+        <OfficePresentationBinding />
+        <div className={styles.middleOverlay}>
+          <div className={styles.middleOverlayInner}>
+            <ResultState
+              status="warning"
+              title={t('office.cannotOpen')}
+              extra={
+                <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
+                  <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>
+                </Link>
+              }
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <>
+        <OfficePresentationBinding />
+        <div className={styles.middleOverlay}>
+          <div className={styles.middleOverlayInner}>
+            <ResultState
+              status="warning"
+              title={t('office.loadFailed')}
+              subTitle={parseErrorMessage(error)}
+              extra={
+                <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
+                  <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>
+                </Link>
+              }
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (isConfigLoading && !data) {
+    return (
+      <>
+        <OfficePresentationBinding />
+        <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
+          <div className={styles.middleOverlayLoading}>
+            <Spin size="large" />
+            <span className={styles.middleOverlayText}>{t('office.loading')}</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!data?.editorConfig.config) {
+    return (
+      <>
+        <OfficePresentationBinding />
+        <div className={styles.middleOverlay}>
+          <div className={styles.middleOverlayInner}>
+            <ResultState status="warning" title={t('office.emptyConfig')} />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <OfficePresentationBinding
+        resourceInfo={data.docInfo.resourceInfo}
+        documentType={data.docInfo.docMetaInfo.uploadMeta.fileType}
+        onPermissionSuccess={refreshOfficeData}
+        onResourceChanged={refreshResourceInfo}
+      />
+      <div className={styles.content}>
+        <OfficeEditorHost
+          key={`${resourceId}-${data.editorConfig.sessionId ?? 'session'}`}
+          config={data.editorConfig.config}
+          documentServerUrl={publicAppConfig.office.documentServerUrl}
+          resourceName={data.docInfo.resourceInfo.resourceName}
+          onReady={handleEditorReady}
+          onError={handleEditorError}
+        />
+        {(!editorReady || Boolean(editorError)) && (
+          <div className={styles.loadingOverlay} aria-busy={!editorError} aria-live="polite">
+            {editorError ? (
+              <div className={styles.middleOverlayInner}>
+                <ResultState
+                  status="warning"
+                  title={t('office.loadFailed')}
+                  subTitle={parseErrorMessage(editorError)}
+                />
+              </div>
+            ) : (
+              <div className={styles.middleOverlayLoading}>
+                <Spin size="large" />
+                <span className={styles.middleOverlayText}>{t('office.starting')}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+export default function OfficeEditor(props: EditorSurfaceProps) {
+  return (
+    <EditorSurfaceProvider {...props} kind="office">
+      <OfficeEditorContent />
+    </EditorSurfaceProvider>
+  );
+}

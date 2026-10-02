@@ -1,0 +1,460 @@
+import { toast } from '@heroui/react';
+import { useMemoizedFn } from 'ahooks';
+import { History, Save } from 'lucide-react';
+import { type ReactNode, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { AppButton } from '@/components/base/Button';
+import { ResultState, Spin } from '@/components/base/Feedback';
+import AppDisplayDialog from '@/components/business/AppDisplayDialog';
+import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
+import type { EditorPresentation } from '@/components/editors/editor.type';
+import { publicAppConfig } from '@/config/runtimeConfig';
+import { useInteractService, useNoteService, useUserService } from '@/domains';
+import type {
+  DrawIoLatestSnapshotData,
+  NoteInfoDisplayData,
+  NoteVersionListPage,
+} from '@/domains/Note';
+import type { ResourceAction, ResourceItem } from '@/domains/Resource';
+import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { useApi } from '@/hooks/useApi';
+import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
+import { parseErrorMessage } from '@/utils/error';
+import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
+
+import { EditorSurfaceProvider, useEditorSurface } from '../_context';
+import { prepareDraftExit } from '../_runtime/draftExit';
+import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
+import type { EditorSurfaceProps } from '../editor.type';
+import {
+  buildDrawioUrl,
+  decodeBase64Utf8,
+  type DrawioSaveState,
+  readDrawioEmbedOrigin,
+} from './drawioProtocol';
+import { useDrawioEditorSession } from './hooks/useDrawioEditorSession';
+import { useDrawioTheme } from './hooks/useDrawioTheme';
+import styles from './style.module.less';
+
+interface DrawioViewData {
+  noteInfoDisplay: NoteInfoDisplayData;
+  snapshot: DrawIoLatestSnapshotData;
+  initialXml: string;
+}
+
+interface DrawioViewConnectedProps {
+  resourceId: string;
+  data: DrawioViewData;
+  onRefreshDrawioInfo: () => void;
+}
+
+function DrawioPresentationBinding({
+  resourceId,
+  resourceName,
+  ownerId,
+  currentActions,
+  resourceInfo,
+  copyVersion,
+  onPermissionSuccess,
+  onResourceChanged,
+  titleMeta,
+  actions,
+}: {
+  resourceId?: string;
+  resourceName?: string;
+  ownerId?: string | null;
+  currentActions?: ResourceAction[] | null;
+  resourceInfo?: ResourceItem;
+  copyVersion?: number;
+  onPermissionSuccess?: () => void;
+  onResourceChanged?: () => unknown | Promise<unknown>;
+  titleMeta?: ReactNode;
+  actions?: ReactNode;
+}) {
+  const { t } = useTranslation('workspace');
+  const displayResourceName = resourceName ?? t('drawio.defaultName');
+  const frameConfig = {
+    className: styles.container,
+    sidePanel: resourceInfo ? { resource: resourceInfo, onResourceChanged } : undefined,
+    header: {
+      resource: {
+        resourceId,
+        resourceName: displayResourceName,
+        resourceIconType: 'drawio',
+        resourceInfo,
+        currentActions,
+        copyVersion,
+        permissionResourceType: RESOURCE_KIND.DRAWIO,
+        ownerId,
+        onPermissionSuccess,
+        titleMeta,
+        actions,
+      },
+    },
+  } satisfies EditorPresentation;
+  return <EditorPresentationBinding {...frameConfig} />;
+}
+
+function SaveStatusText({ state }: { state: DrawioSaveState }) {
+  const { t } = useTranslation('workspace');
+  return <span className={styles.saveStatus}>{t(`drawio.status.${state}`)}</span>;
+}
+
+function VersionModal({
+  open,
+  loading,
+  error,
+  versions,
+  onClose,
+}: {
+  open: boolean;
+  loading: boolean;
+  error?: unknown;
+  versions?: NoteVersionListPage;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation(['workspace', 'common']);
+
+  return (
+    <AppDisplayDialog
+      isOpen={open}
+      onOpenChange={(visible) => !visible && onClose()}
+      title={t('drawio.versions')}
+      size="md"
+      closeText={t('actions.close', { ns: 'common' })}
+    >
+      {loading ? (
+        <div className={styles.modalState}>
+          <Spin />
+          <span>{t('drawio.versionsLoading')}</span>
+        </div>
+      ) : error ? (
+        <ResultState
+          status="warning"
+          title={t('drawio.versionsFailed')}
+          subTitle={parseErrorMessage(error)}
+        />
+      ) : !versions || versions.list.length === 0 ? (
+        <ResultState status="info" title={t('drawio.versionsEmpty')} />
+      ) : (
+        <div className={styles.versionList}>
+          {versions.list.map((item) => (
+            <div key={`${item.version}-${item.type}`} className={styles.versionRow}>
+              <span>v{item.version ?? '-'}</span>
+              <span>{item.type ?? '-'}</span>
+              <span>{item.createdBy?.join(', ') || '-'}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </AppDisplayDialog>
+  );
+}
+
+function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioViewConnectedProps) {
+  const { i18n, t } = useTranslation(['workspace', 'common']);
+  const { noteInfoDisplay, snapshot, initialXml } = data;
+  const noteService = useNoteService();
+  const userService = useUserService();
+  const initialVersion = Math.max(noteInfoDisplay.version ?? 0, snapshot.version ?? 0);
+  const [versionOpen, setVersionOpen] = useState(false);
+  const canEdit = noteInfoDisplay.canCollaborativeEdit;
+  const canViewVersions = Boolean(noteInfoDisplay.ownerId);
+  const title = useResourceDisplayName(resourceId, noteInfoDisplay.noteTitle, t('drawio.unnamed'));
+  const drawioOrigin = readDrawioEmbedOrigin(publicAppConfig.drawio.embedUrl);
+  const {
+    iframeRef,
+    currentVersion,
+    saveState,
+    error: editorError,
+    editorReady,
+    editorLoaded,
+    requestSave,
+  } = useDrawioEditorSession({
+    canEdit,
+    drawioOrigin,
+    initialVersion,
+    initialXml,
+    noteService,
+    resourceId,
+  });
+
+  const initialTheme = useDrawioTheme(iframeRef, drawioOrigin);
+  const drawioUrl = buildDrawioUrl({
+    embedUrl: publicAppConfig.drawio.embedUrl,
+    canEdit,
+    language: i18n.resolvedLanguage ?? 'zh-CN',
+    ...initialTheme,
+  });
+
+  const { target } = useEditorSurface();
+  useEditorRuntime(
+    {
+      openedResource: { ...target, resourceName: title, version: currentVersion },
+      loading: !editorLoaded && !editorError,
+      error: editorError,
+      readOnly: !canEdit,
+      hasUnsavedChanges: saveState !== 'saved',
+      pendingWork: saveState === 'saving',
+      warnBeforeUnload: saveState !== 'saved',
+    },
+    (context, editor) =>
+      prepareDraftExit(
+        editor,
+        context,
+        {
+          title: t('drawio.leave.title'),
+          description: t('drawio.leave.description'),
+          confirmText: t('drawio.leave.save'),
+          discardText: t('drawio.leave.discard'),
+        },
+        {
+          save: async () => {
+            await requestSave();
+            await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+          },
+          // 丢弃仅放行当前退出，不取消已提交到后端的保存。
+          discard: async () => {},
+        }
+      )
+  );
+
+  const { data: currentUser } = useApi(() => userService.getUserInfo(), {
+    ready: Boolean(noteInfoDisplay.ownerId),
+    refreshDeps: [noteInfoDisplay.ownerId],
+  });
+
+  const {
+    data: versions,
+    error: versionsError,
+    loading: versionsLoading,
+    run: runLoadVersions,
+  } = useApi(() => noteService.listNoteVersions({ resourceId, page: 1, size: 20 }), {
+    manual: true,
+  });
+
+  const handleOpenVersions = useMemoizedFn(() => {
+    setVersionOpen(true);
+    runLoadVersions();
+  });
+
+  const titleMeta = (
+    <>
+      <span className={styles.versionBadge}>v{currentVersion}</span>
+      <SaveStatusText state={saveState} />
+    </>
+  );
+
+  const headerActions = (
+    <div className={styles.headerExtra}>
+      {currentUser?.id === noteInfoDisplay.ownerId && canViewVersions ? (
+        <AppButton
+          size="sm"
+          variant="secondary"
+          onPress={handleOpenVersions}
+          aria-label={t('drawio.versions')}
+        >
+          <History size={16} />
+          <span>{t('drawio.version')}</span>
+        </AppButton>
+      ) : null}
+      {canEdit ? (
+        <AppButton
+          size="sm"
+          variant="primary"
+          isDisabled={!editorLoaded || saveState === 'saved' || saveState === 'saving'}
+          onPress={() =>
+            void requestSave().catch((error) => toast.danger(parseErrorMessage(error)))
+          }
+          aria-label={t('actions.save', { ns: 'common' })}
+        >
+          <Save size={16} />
+          <span>
+            {saveState === 'saving'
+              ? t('drawio.status.saving')
+              : t('actions.save', { ns: 'common' })}
+          </span>
+        </AppButton>
+      ) : null}
+    </div>
+  );
+
+  return (
+    <>
+      <DrawioPresentationBinding
+        resourceId={resourceId}
+        resourceName={title}
+        ownerId={noteInfoDisplay.ownerId}
+        currentActions={noteInfoDisplay.resourceInfo?.currentActions}
+        resourceInfo={noteInfoDisplay.resourceInfo}
+        copyVersion={currentVersion}
+        onPermissionSuccess={onRefreshDrawioInfo}
+        onResourceChanged={onRefreshDrawioInfo}
+        titleMeta={titleMeta}
+        actions={headerActions}
+      />
+      <div className={styles.content}>
+        <iframe
+          key={`${resourceId}-${canEdit ? 'edit' : 'view'}`}
+          ref={iframeRef}
+          className={styles.iframe}
+          src={drawioUrl}
+          title={title}
+          allow="clipboard-read; clipboard-write"
+        />
+        {(!editorReady || !editorLoaded) && (
+          <div className={styles.loadingOverlay} aria-busy="true" aria-live="polite">
+            <Spin size="large" />
+            <span>{t('drawio.editorLoading')}</span>
+          </div>
+        )}
+      </div>
+      <VersionModal
+        open={versionOpen}
+        loading={versionsLoading}
+        error={versionsError}
+        versions={versions}
+        onClose={() => setVersionOpen(false)}
+      />
+    </>
+  );
+}
+
+function DrawioEditorContent() {
+  const {
+    target: { resourceId },
+  } = useEditorSurface();
+  const { t } = useTranslation('workspace');
+  const noteService = useNoteService();
+  const interactService = useInteractService();
+  const {
+    data,
+    error,
+    loading: loadingDrawio,
+    refresh: refreshDrawioInfo,
+  } = useApi(
+    async () => {
+      const [noteInfoDisplay, snapshot] = await Promise.all([
+        noteService.getNoteInfoDisplay({ resourceId: resourceId as string }),
+        noteService.getDrawIoLatestSnapshot({ resourceId: resourceId as string }),
+      ]);
+
+      return {
+        noteInfoDisplay,
+        snapshot,
+        initialXml: decodeBase64Utf8(snapshot.fullSnapshot),
+      };
+    },
+    {
+      ready: Boolean(resourceId),
+      refreshDeps: [resourceId],
+    }
+  );
+  const refreshDrawioInfoStable = useMemoizedFn(refreshDrawioInfo);
+
+  useApi(() => interactService.recordResourceRead(resourceId as string), {
+    ready: Boolean(resourceId),
+    refreshDeps: [resourceId],
+  });
+
+  useEditorLoadState({ error, loading: loadingDrawio && !data });
+
+  if (!resourceId) {
+    return (
+      <>
+        <DrawioPresentationBinding />
+        <div className={styles.middleOverlay}>
+          <ResultState
+            status="warning"
+            title={t('drawio.cannotOpen')}
+            extra={
+              <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
+                <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>
+              </Link>
+            }
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (error && !data) {
+    return (
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
+        <div className={styles.middleOverlay}>
+          <ResultState
+            status="warning"
+            title={t('drawio.loadFailed')}
+            subTitle={parseErrorMessage(error)}
+            extra={
+              <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
+                <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>
+              </Link>
+            }
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (loadingDrawio && !data) {
+    return (
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
+        <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
+          <div className={styles.middleOverlayLoading}>
+            <Spin size="large" />
+            <span className={styles.middleOverlayText}>{t('drawio.loading')}</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!data) {
+    return (
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
+        <div className={styles.middleOverlay}>
+          <ResultState status="warning" title={t('drawio.emptyInfo')} />
+        </div>
+      </>
+    );
+  }
+
+  const resourceType = data.noteInfoDisplay.resourceInfo?.resourceType?.trim().toLowerCase();
+  if (resourceType !== RESOURCE_KIND.DRAWIO) {
+    return (
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
+        <div className={styles.middleOverlay}>
+          <ResultState status="warning" title={t('drawio.wrongType')} />
+        </div>
+      </>
+    );
+  }
+
+  const drawioSessionKey = `${resourceId}:${data.noteInfoDisplay.version ?? 'none'}:${
+    data.snapshot.version ?? 'none'
+  }`;
+
+  return (
+    <DrawioViewConnected
+      key={drawioSessionKey}
+      resourceId={resourceId}
+      data={data}
+      onRefreshDrawioInfo={refreshDrawioInfoStable}
+    />
+  );
+}
+
+export default function DrawioEditor(props: EditorSurfaceProps) {
+  return (
+    <EditorSurfaceProvider {...props} kind="drawio">
+      <DrawioEditorContent />
+    </EditorSurfaceProvider>
+  );
+}

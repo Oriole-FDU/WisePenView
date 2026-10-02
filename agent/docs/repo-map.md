@@ -6,6 +6,7 @@
 - `src/domains/`：API、mapper、service、entity、mock 和 registry。
 - `src/components/base/`：无业务语义的基础控件。
 - `src/components/business/`：跨页面复用的业务组件。
+- `src/components/editors/`：资源编辑器层，承载编辑器契约、运行时、注册表与挂载分发；资源工作区外壳与路由目标解析留在 `src/views/resource/`。
 - `src/views/`：页面私有业务 UI、Controller、配置和状态。
 - `src/layouts/`：路由壳和壳内私有实现。
 - `src/config/`：公开运行时配置的声明、验证与浏览器入口。

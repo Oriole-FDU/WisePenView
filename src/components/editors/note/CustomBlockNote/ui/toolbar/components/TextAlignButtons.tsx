@@ -1,0 +1,141 @@
+import {
+  blockHasType,
+  defaultProps,
+  type InlineContentSchema,
+  mapTableCell,
+  type StyleSchema,
+  type TableContent,
+} from '@blocknote/core';
+import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
+import { ToggleButtonGroup } from '@heroui/react';
+import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+import { getSafeTableCellSelection } from '@/components/editors/note/CustomBlockNote/plugins/TablePlugin/ui/tableHandles/safe';
+import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
+
+import { getSelectedBlocks, toBlockUpdate } from '../utils';
+import { ToolbarToggleButton } from './ToolbarButton';
+
+const textAlignButtons = [
+  { key: 'left', icon: AlignLeft },
+  { key: 'center', icon: AlignCenter },
+  { key: 'right', icon: AlignRight },
+] as const;
+
+type TextAlignment = (typeof textAlignButtons)[number]['key'];
+
+export function TextAlignButtons() {
+  const { t } = useTranslation('note');
+  const editor = useBlockNoteEditor(blockNoteSchema);
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => {
+      if (!editor.isEditable) {
+        return undefined;
+      }
+      const selectedBlocks = getSelectedBlocks(editor);
+      const firstBlock = selectedBlocks[0];
+      if (
+        blockHasType(firstBlock, editor, firstBlock.type, {
+          textAlignment: defaultProps.textAlignment,
+        })
+      ) {
+        return {
+          kind: 'blocks' as const,
+          textAlignment: firstBlock.props.textAlignment as TextAlignment,
+          blocks: selectedBlocks,
+        };
+      }
+
+      if (selectedBlocks.length === 1 && blockHasType(firstBlock, editor, 'table')) {
+        const cellSelection = getSafeTableCellSelection(editor);
+        if (!cellSelection) {
+          return undefined;
+        }
+        const tableContent = firstBlock.content as TableContent<InlineContentSchema, StyleSchema>;
+        return {
+          kind: 'table' as const,
+          textAlignment: mapTableCell(tableContent.rows[0].cells[0]).props
+            .textAlignment as TextAlignment,
+          block: firstBlock,
+          cellSelection,
+        };
+      }
+      return undefined;
+    },
+  });
+
+  if (!state) {
+    return null;
+  }
+
+  const setTextAlignment = (alignment: TextAlignment) => {
+    editor.focus();
+    if (state.kind === 'blocks') {
+      for (const block of state.blocks) {
+        if (
+          blockHasType(block, editor, block.type, {
+            textAlignment: defaultProps.textAlignment,
+          })
+        ) {
+          editor.updateBlock(block, toBlockUpdate({ props: { textAlignment: alignment } }));
+        }
+      }
+      return;
+    }
+
+    const tableContent = state.block.content as TableContent<InlineContentSchema, StyleSchema>;
+    const rows = tableContent.rows.map((row) => ({
+      ...row,
+      cells: row.cells.map((cell) => mapTableCell(cell)),
+    }));
+    for (const cell of state.cellSelection.cells) {
+      const targetCell = rows[cell.row]?.cells[cell.col];
+      if (targetCell) {
+        targetCell.props.textAlignment = alignment;
+      }
+    }
+    editor.updateBlock(
+      state.block,
+      toBlockUpdate({
+        type: 'table',
+        content: {
+          ...tableContent,
+          type: 'tableContent',
+          rows,
+        },
+      })
+    );
+    editor.setTextCursorPosition(state.block);
+  };
+
+  return (
+    <ToggleButtonGroup
+      aria-label={t('editor.align.label')}
+      selectionMode="single"
+      selectedKeys={new Set([state.textAlignment])}
+      onSelectionChange={(keys) => {
+        const [key] = [...keys];
+        if (key != null) {
+          setTextAlignment(String(key) as TextAlignment);
+        }
+      }}
+      orientation="horizontal"
+      size="sm"
+      disallowEmptySelection
+    >
+      {textAlignButtons.map((item) => {
+        const Icon = item.icon;
+        return (
+          <ToolbarToggleButton
+            key={item.key}
+            id={item.key}
+            label={t(`editor.align.${item.key}`)}
+            icon={<Icon size={20} />}
+          />
+        );
+      })}
+    </ToggleButtonGroup>
+  );
+}

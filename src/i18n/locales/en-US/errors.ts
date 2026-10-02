@@ -3,6 +3,7 @@ const enUSErrors = {
     unknown: 'An unknown error occurred. Please try again later.',
   },
   code: {
+    203: 'Diagram export or save failed. Please retry.',
     '10': 'Request timed out. Please check your network and try again.',
     '11': 'Network connection failed. Please check your network and try again.',
     '12': 'Request was canceled.',

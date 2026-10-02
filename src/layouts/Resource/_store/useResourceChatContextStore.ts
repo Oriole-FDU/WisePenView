@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { ResourceChatContext } from '@/layouts/Resource/_context/resourceChatModel';
+import type { ResourceChatContext } from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
 import { registerStore } from '@/store/lifecycle';
 
 interface ResourceChatContextState {
