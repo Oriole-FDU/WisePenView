@@ -69,7 +69,6 @@ export function useNoteEditorRuntimeCoordinator(props: NoteEditorRuntimeProps) {
     editor,
     definition,
     transactions: notePluginRegistry.services.transactions,
-    resourceId,
     blockLocalDocWrites,
     onAskAi,
     onAiDiffBodyContentHashChange,

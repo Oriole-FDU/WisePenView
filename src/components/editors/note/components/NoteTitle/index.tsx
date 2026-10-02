@@ -9,7 +9,6 @@ import { useDebounceFn, useLatest, useMemoizedFn, useMount, useUnmount } from 'a
 import { type KeyboardEvent, type Ref, useEffect, useImperativeHandle, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
@@ -35,6 +34,7 @@ interface NoteTitleProps {
   focusOnMount: boolean;
   readOnly: boolean;
   onSaveStatusChange: (status: NoteTitleSaveStatus) => void;
+  onTitleChange?: (title: string) => void;
 }
 
 /** 与 Pipeline 一致的防抖时长（ms） */
@@ -101,6 +101,7 @@ function NoteTitle({
   focusOnMount,
   readOnly,
   onSaveStatusChange,
+  onTitleChange,
   ref,
 }: NoteTitleProps & { ref?: Ref<NoteTitleHandle> }) {
   const { i18n, t } = useTranslation('note');
@@ -113,6 +114,7 @@ function NoteTitle({
   const hasAutoFocusedRef = useRef(false);
   const saveVersionRef = useRef(0);
   const emitSaveStatus = useMemoizedFn(onSaveStatusChange);
+  const handleTitleChange = useMemoizedFn((title: string) => onTitleChange?.(title));
   const untitledTitle = t('title.untitled');
   const editorDictionary = i18n.resolvedLanguage === 'en-US' ? en : zh;
 
@@ -182,6 +184,8 @@ function NoteTitle({
         return;
       }
       if (latestFocusOnMountRef.current) {
+        const block = editor.document[0];
+        if (block) editor.setTextCursorPosition(block, 'end');
         editor.focus();
         hasAutoFocusedRef.current = true;
         focusTimerRef.current = null;
@@ -217,19 +221,15 @@ function NoteTitle({
       const firstBlock = editor.document[0];
       if (!firstBlock) return;
 
+      if (onTitleChange) {
+        handleTitleChange(getBlockPlainText(firstBlock as { content?: unknown[] }));
+        return;
+      }
       const currentId = latestIdRef.current;
       saveVersionRef.current += 1;
       const saveVersion = saveVersionRef.current;
       emitSaveStatus('saving');
       scheduleTitleSync(currentId, saveVersion);
-
-      const newNoteState = useNewNoteStore.getState();
-      if (newNoteState.newNoteResourceId === currentId) {
-        const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
-        if (raw.trim()) {
-          newNoteState.markNewNoteDirty(currentId);
-        }
-      }
     });
 
     const detachBeforeChange = editor.onBeforeChange(({ getChanges }) => {
@@ -257,7 +257,15 @@ function NoteTitle({
       detachOnChange();
       detachBeforeChange();
     };
-  }, [editor, emitSaveStatus, latestIdRef, readOnly, scheduleTitleSync]);
+  }, [
+    editor,
+    emitSaveStatus,
+    handleTitleChange,
+    latestIdRef,
+    onTitleChange,
+    readOnly,
+    scheduleTitleSync,
+  ]);
 
   useUnmount(() => {
     if (focusTimerRef.current) {

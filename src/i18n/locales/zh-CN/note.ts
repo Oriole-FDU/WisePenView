@@ -1,4 +1,10 @@
 const zhCNNote = {
+  draft: {
+    hint: '开始编辑后自动创建笔记',
+    leaveTitle: '笔记尚未保存',
+    leaveDescription: '创建或保存未完成，可以重试或放弃本次编辑。',
+    discard: '放弃编辑',
+  },
   workspace: {
     openFailed: '无法打开笔记',
     emptyInfo: '笔记信息为空，请稍后重试',

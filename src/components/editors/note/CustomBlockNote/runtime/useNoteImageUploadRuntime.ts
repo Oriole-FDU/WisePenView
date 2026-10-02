@@ -30,10 +30,12 @@ export interface NoteImageUploadRuntime {
 
 export function useNoteImageUploadRuntime({
   resourceId,
+  getResourceId,
   readOnly,
   onPendingCountChange,
 }: {
   resourceId: string;
+  getResourceId?: () => Promise<string>;
   readOnly: boolean;
   onPendingCountChange?: CustomBlockNoteProps['onImageUploadCountChange'];
 }): NoteImageUploadRuntime {
@@ -85,10 +87,11 @@ export function useNoteImageUploadRuntime({
       }
 
       assertImageProxyUploadLimit(file);
+      const uploadResourceId = getResourceId ? await getResourceId() : resourceId;
       const { publicUrl } = await imageService.uploadImage({
         file,
         scene: 'PRIVATE_IMAGE_FOR_NOTE',
-        bizTag: `notes/${resourceId}`,
+        bizTag: `notes/${uploadResourceId}`,
       });
       return publicUrl;
     } catch (error) {

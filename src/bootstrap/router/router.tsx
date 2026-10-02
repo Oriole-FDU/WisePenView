@@ -284,6 +284,11 @@ const router = createBrowserRouter([
                 ],
               },
               {
+                path: 'resources/note/new',
+                element: <ResourceRouteBoundary newNote />,
+                handle: driveRouteHandle,
+              },
+              {
                 path: 'resources/:resourceType/:resourceId',
                 element: <ResourceRouteBoundary />,
                 handle: driveRouteHandle,

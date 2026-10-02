@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import { Spin } from '@/components/base/Feedback';
 import { RESOURCE_MAIN_MIN_WIDTH } from '@/constants/layoutScale';
 import type { DriveNodeScope } from '@/domains/Drive';
 import {
@@ -32,7 +33,11 @@ import {
 
 import ResourceTargetResolver from '../ResourceTargetResolver';
 
-function ResourceRouteBoundary() {
+const NewNoteWorkspace = lazy(
+  () => import('@/components/editors/note/components/NewNoteWorkspace')
+);
+
+function ResourceRouteBoundary({ newNote = false }: { newNote?: boolean }) {
   const { t } = useTranslation('workspace');
   const { isMobileLayout } = useMainShell();
   const location = useLocation();
@@ -50,7 +55,7 @@ function ResourceRouteBoundary() {
     viewer: viewerParam,
   };
   const routeContext = {
-    resourceId,
+    resourceId: newNote ? undefined : resourceId,
     resourceType: normalizeResourceKind(rawResourceType),
     viewer: resolveResourceViewer({ resourceType: rawResourceType, viewer: viewerParam }),
     driveLocation: parseResourceDriveLocation(search),
@@ -124,11 +129,19 @@ function ResourceRouteBoundary() {
             navigateResourceHash={navigateResourceHash}
           >
             <RouteOutletBoundary>
-              <ResourceTargetResolver
-                target={target}
-                onTargetChange={handleTargetChange}
-                onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
-              />
+              {newNote ? (
+                <Suspense fallback={<Spin />}>
+                  <NewNoteWorkspace
+                    key={`${routeContext.driveLocation?.scope.rootId}:${routeContext.driveLocation?.mountTagId}`}
+                  />
+                </Suspense>
+              ) : (
+                <ResourceTargetResolver
+                  target={target}
+                  onTargetChange={handleTargetChange}
+                  onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
+                />
+              )}
             </RouteOutletBoundary>
           </ResourceHost>
         }

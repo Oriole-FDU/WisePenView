@@ -37,11 +37,17 @@ import { useNoteCommentsController } from './useNoteCommentsController';
 
 interface NoteWorkspaceProps {
   resourceId: string;
+  focusTitleOnMount?: boolean;
   noteInfoDisplay: NoteInfoDisplayData;
   onRefreshNoteInfo: () => unknown | Promise<unknown>;
 }
 
-function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteWorkspaceProps) {
+function NoteWorkspace({
+  resourceId,
+  noteInfoDisplay,
+  onRefreshNoteInfo,
+  focusTitleOnMount = true,
+}: NoteWorkspaceProps) {
   const { t } = useTranslation('note');
   const bodyEditorRef = useRef<NoteBodyEditorHandle>(null);
   const titleEditorRef = useRef<NoteTitleHandle>(null);
@@ -255,7 +261,9 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
                     id={resourceId}
                     initialContent={noteInfoDisplay.noteTitle}
                     readOnly={session.isTitleReadOnly}
-                    focusOnMount={session.isConnected && !session.isTitleReadOnly}
+                    focusOnMount={
+                      focusTitleOnMount && session.isConnected && !session.isTitleReadOnly
+                    }
                     onEnterKey={focusBody}
                     onSaveStatusChange={setTitleSaveStatus}
                   />

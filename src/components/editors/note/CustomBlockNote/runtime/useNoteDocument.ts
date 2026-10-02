@@ -5,7 +5,6 @@ import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import type { NoteSelectionSnapshot, SelectedNoteScope } from '@/domains/Note';
 import { computeNoteBodyContentHash } from '@/domains/Note';
 
@@ -51,7 +50,6 @@ export function useNoteDocument({
   editor,
   definition,
   transactions,
-  resourceId,
   blockLocalDocWrites,
   onAskAi,
   onAiDiffBodyContentHashChange,
@@ -59,7 +57,6 @@ export function useNoteDocument({
   editor: CustomBlockNoteEditor;
   definition: NoteEditorDefinition;
   transactions: NoteTransactionService;
-  resourceId: string;
   blockLocalDocWrites: boolean;
   onAskAi: CustomBlockNoteProps['onAskAi'];
   onAiDiffBodyContentHashChange: CustomBlockNoteProps['onAiDiffBodyContentHashChange'];
@@ -133,20 +130,6 @@ export function useNoteDocument({
       if (!analysis.docChanged) return;
       activateWriteGuard();
       scheduleBodyContentHashRefresh();
-
-      const newNoteState = useNewNoteStore.getState();
-      if (newNoteState.newNoteResourceId !== resourceId || analysis.changedBlocks.length === 0) {
-        return;
-      }
-      const changedBlocks = analysis.changedBlocks
-        .map(({ id }) => editor.getBlock(id))
-        .filter((block): block is NonNullable<typeof block> => Boolean(block));
-      if (
-        changedBlocks.length > 0 &&
-        editor.blocksToMarkdownLossy(changedBlocks).trim().length > 0
-      ) {
-        newNoteState.markNewNoteDirty(resourceId);
-      }
     });
 
     if (definition.hasBlockLocalDocWritesProp()) {

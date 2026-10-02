@@ -21,17 +21,16 @@ import {
   TrashDeleteModal,
   UploadFileToGroupModal,
 } from '@/components/business/Drive/Modals';
-import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import {
   MARKDOWN_NOTE_FILE_ACCEPT,
   useMarkdownNoteImport,
 } from '@/components/editors/note/hooks/useMarkdownNoteImport';
-import { useDriveService, useNoteService } from '@/domains';
+import { useDriveService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
+import { useOpenNewNote } from '@/hooks/useOpenNewNote';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
@@ -99,7 +98,7 @@ export function useTableDriveActionsController({
   const { t } = useTranslation('drive');
   const openResource = useOpenResource();
   const groupId = scope.type === 'group' ? scope.groupId : undefined;
-  const noteService = useNoteService();
+  const openNewNote = useOpenNewNote();
   const driveService = useDriveService();
   const toolbarConfig = { ...DEFAULT_TOOLBAR_CONFIG, ...actions?.toolbar };
 
@@ -170,31 +169,6 @@ export function useTableDriveActionsController({
   });
   const documentFileInputRef = useRef<HTMLInputElement>(null);
   const { queueDocuments } = useDriveDocumentUpload({ pathTagId: mountTagId, onSuccess: refresh });
-
-  const { loading: creatingNote, run: runCreateNote } = useApi(
-    async () => {
-      const { resourceId } = await noteService.createNote({
-        title: t('create.defaultNoteTitle'),
-        pathTagId: mountTagId,
-      });
-      if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return resourceId;
-    },
-    {
-      manual: true,
-      onSuccess: (resourceId) => {
-        useNewNoteStore.getState().setNewNoteResourceId(resourceId);
-        refresh();
-        openResource({
-          resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          driveLocation: resourceDriveLocation,
-        });
-      },
-    }
-  );
 
   const handleDriveCreateSuccess = (createdId: string, type: DriveCreateType) => {
     if (type === 'folder') {
@@ -352,19 +326,7 @@ export function useTableDriveActionsController({
     setUploadOpen(true);
   };
 
-  const handleCreateNote = () => {
-    if (creatingNote) return;
-    const pendingNewNoteId = useNewNoteStore.getState().newNoteResourceId;
-    if (!groupId && pendingNewNoteId) {
-      openResource({
-        resourceId: pendingNewNoteId,
-        resourceType: RESOURCE_KIND.NOTE,
-        driveLocation: resourceDriveLocation,
-      });
-      return;
-    }
-    runCreateNote();
-  };
+  const handleCreateNote = () => openNewNote(resourceDriveLocation);
 
   const handleCreateMenuSelect = (id: CreateMenuItem['id']) => {
     switch (id) {
@@ -411,7 +373,7 @@ export function useTableDriveActionsController({
       items.push({ id: 'drawio', label: t('create.drawio') });
     }
     if (canCreateInCurrentFolder && toolbarConfig.canCreateNote) {
-      items.push({ id: 'note', label: t('create.note'), disabled: creatingNote });
+      items.push({ id: 'note', label: t('create.note') });
       items.push({
         id: 'importNote',
         label: t('create.importNote'),

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type * as Y from 'yjs';
 
+import { usePendingNoteDraftStore } from '@/components/editors/note/_store/usePendingNoteDraftStore';
 import { usePendingNoteImportStore } from '@/components/editors/note/_store/usePendingNoteImportStore';
 import type { NoteAiDiffPreviewData } from '@/domains/Note';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
@@ -106,9 +107,20 @@ export function useNoteEditorHydration({
   scheduleBodyContentHashRefresh: () => void;
 }) {
   const { t } = useTranslation('note');
-  const applyPendingMarkdownImport = useMemoizedFn(() => {
+  const applyPendingContent = useMemoizedFn(() => {
     if (!collaborationReady) {
       return;
+    }
+
+    const draft = usePendingNoteDraftStore.getState().pendingByResourceId[resourceId];
+    if (draft && canWrite && !aiDiffPreview) {
+      editor.replaceBlocks(editor.document, draft.blocks);
+      undoManager.clear();
+      if (draft.focusBody) {
+        editor._tiptapEditor.commands.setTextSelection(draft.selection);
+        editor.focus();
+      }
+      usePendingNoteDraftStore.getState().removeDraft(resourceId);
     }
 
     const pendingImport = usePendingNoteImportStore.getState().pendingByResourceId[resourceId];
@@ -136,17 +148,17 @@ export function useNoteEditorHydration({
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：协作编辑器就绪或资源切换后初始化空正文并消费该资源待导入的 Markdown。
+   * 执行时机：协作编辑器就绪或资源切换后初始化空正文并消费该资源待导入的草稿和 Markdown。
    * 不可替代原因：空协同文档的首个 block 仅存在于本地编辑器，必须通过 BlockNote 命令写入 Yjs；
    * 待导入数据位于 Zustand，也必须写入 BlockNote/Yjs 外部编辑器运行时。
    * cleanup：导入是同步事务且消费后立即移除待办，无需清理。
    */
   useEffect(() => {
-    applyPendingMarkdownImport();
+    applyPendingContent();
     persistInitialEmptyBlock();
   }, [
     aiDiffPreview,
-    applyPendingMarkdownImport,
+    applyPendingContent,
     canWrite,
     collaborationReady,
     persistInitialEmptyBlock,

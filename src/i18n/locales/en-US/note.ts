@@ -1,4 +1,10 @@
 const enUSNote = {
+  draft: {
+    hint: 'Start editing to create a note',
+    leaveTitle: 'Note not saved',
+    leaveDescription: 'Creating or saving is incomplete. Retry or discard these edits.',
+    discard: 'Discard edits',
+  },
   workspace: {
     openFailed: 'Unable to open note',
     emptyInfo: 'Note information is unavailable. Please try again later.',

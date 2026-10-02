@@ -24,6 +24,7 @@ const [
   officeModule,
   drawioModule,
   presentationModule,
+  noteDraftModule,
 ] = await Promise.all([
   bundle('src/components/editors/_runtime/editorRuntime.ts'),
   bundle('src/components/editors/_runtime/editorHost.ts'),
@@ -34,7 +35,9 @@ const [
   bundle(
     'src/views/app/resource/ResourceTargetResolver/_components/ResourceEditorWorkspace/workspacePresentationStore.ts'
   ),
+  bundle('src/components/editors/note/components/NewNoteWorkspace/noteDraftSession.ts'),
 ]);
+const { createNoteDraftSession, hasNoteDraftContent } = noteDraftModule;
 const { createEditorRuntime, waitForEditor } = runtimeModule;
 const { createEditorHost } = hostModule;
 const { prepareDraftExit } = draftModule;
@@ -389,4 +392,68 @@ test('展示信息直接替换，旧绑定注销不清空新绑定，最后注�
   assert.equal(store.getState().presentation, second);
   unregisterSecond();
   assert.deepEqual(store.getState().presentation, {});
+});
+
+test('空白笔记页初始化不创建资源，连续编辑与上传共用一次创建', async () => {
+  let calls = 0;
+  const task = deferred();
+  const session = createNoteDraftSession();
+  const create = () => {
+    calls += 1;
+    return task.promise;
+  };
+  assert.equal(calls, 0);
+  const typing = session.ensureResource(create);
+  const upload = session.ensureResource(create);
+  assert.equal(calls, 1);
+  task.resolve('note-1');
+  assert.deepEqual(await Promise.all([typing, upload]), ['note-1', 'note-1']);
+  assert.equal(await session.ensureResource(create), 'note-1');
+  assert.equal(calls, 1);
+});
+
+test('创建失败保留重试能力，后续保存失败不再次创建资源', async () => {
+  const session = createNoteDraftSession();
+  const error = new Error('网络错误');
+  await assert.rejects(
+    session.ensureResource(async () => {
+      throw error;
+    }),
+    error
+  );
+  assert.equal(await session.ensureResource(async () => 'note-retry'), 'note-retry');
+  assert.equal(
+    await session.ensureResource(async () => {
+      throw new Error('不应重复创建');
+    }),
+    'note-retry'
+  );
+});
+
+test('默认空段落、空白文字和空链接不触发创建', () => {
+  assert.equal(hasNoteDraftContent([{ type: 'paragraph', content: [], children: [] }]), false);
+  assert.equal(
+    hasNoteDraftContent([{ type: 'paragraph', content: [{ type: 'text', text: '  ' }] }]),
+    false
+  );
+  assert.equal(
+    hasNoteDraftContent([
+      { type: 'paragraph', content: [{ type: 'link', content: [{ type: 'text', text: '' }] }] },
+    ]),
+    false
+  );
+});
+
+test('正文文字、结构块、公式和嵌套内容都触发创建', () => {
+  for (const block of [
+    { type: 'paragraph', content: [{ type: 'text', text: '笔记正文' }] },
+    { type: 'image' },
+    { type: 'table' },
+    { type: 'paragraph', content: [{ type: 'inlineMath', props: { formula: 'x' } }] },
+    {
+      type: 'paragraph',
+      children: [{ type: 'paragraph', content: [{ type: 'text', text: '嵌套正文' }] }],
+    },
+  ])
+    assert.equal(hasNoteDraftContent([block]), true);
 });

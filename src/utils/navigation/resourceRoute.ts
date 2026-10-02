@@ -86,3 +86,10 @@ export const buildResourcePathWithSearch = (
 
   return appendSearch(pathname, search);
 };
+
+/** 空白笔记只携带目标目录，不具有后端资源身份。 */
+export const buildNewNotePath = (driveLocation?: DriveResourceLocation): string => {
+  const search = new URLSearchParams();
+  if (driveLocation) appendResourceDriveLocation(search, driveLocation);
+  return appendSearch(APP_ROUTE_PATH.NOTE_NEW, search);
+};
