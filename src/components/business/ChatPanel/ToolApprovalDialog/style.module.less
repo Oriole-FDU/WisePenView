@@ -1,0 +1,32 @@
+@import '@/styles/mixins/scrollbar.less';
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.target {
+  margin: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.payload {
+  max-height: min(36vh, 240px);
+  margin: 0;
+  padding: var(--space-xs);
+  overflow: auto;
+  overscroll-behavior: contain;
+  .appSubtleScrollbar();
+  border-radius: var(--radius);
+  background-color: var(--surface-secondary);
+  color: var(--foreground);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

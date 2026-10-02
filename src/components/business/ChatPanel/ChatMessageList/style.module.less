@@ -1,0 +1,144 @@
+@import '@/styles/mixins/scrollbar.less';
+
+.container {
+  --chat-message-font-size: 14px;
+  --chat-message-font-weight: var(--font-weight-regular);
+  --chat-markdown-font-weight: var(--font-weight-medium);
+  --chat-user-message-font-weight: var(--font-weight-medium);
+  --chat-message-line-height: 1.6;
+  --chat-thinking-font-size: var(--font-size-xs);
+  --chat-thinking-line-height: 1.6;
+  --chat-hr-margin-bottom: var(--space-sm);
+  --chat-user-message-max-width: 72%;
+  --chat-avatar-size: 24px;
+  --chat-model-meta-font-size: var(--font-size-base);
+
+  :global([data-chat-layout='page']) & {
+    --chat-message-font-size: 15px;
+    --chat-thinking-font-size: var(--font-size-sm);
+    --chat-thinking-line-height: 1.75;
+    --chat-hr-margin-bottom: var(--space-lg);
+    --chat-user-message-max-width: 520px;
+    --chat-avatar-size: 28px;
+  }
+
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.viewport {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  .appSubtleScrollbar();
+}
+
+.scrollColumn {
+  gap: 0;
+  width: 100%;
+  max-width: var(--chat-message-max-width, none);
+  min-height: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.messagesBody {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  user-select: text;
+  -webkit-user-select: text;
+  padding: var(--space-md)
+    var(--chat-message-inline-padding-end, var(--chat-message-inline-padding, var(--space-lg)))
+    var(--space-lg) var(--chat-message-inline-padding, var(--space-lg));
+  box-sizing: border-box;
+
+  &[data-empty='true'] {
+    /* 空会话与输入框共用对称中心轴，不需要为历史导航预留右侧空间 */
+    padding-inline-end: var(
+      --chat-welcome-inline-padding-end,
+      var(--chat-message-inline-padding-end, var(--chat-message-inline-padding, var(--space-lg)))
+    );
+  }
+}
+
+.welcomeItem {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: var(--chat-content-max-width, 720px);
+  min-height: 100%;
+  margin-inline: auto;
+  display: flex;
+  content-visibility: visible;
+}
+
+.scrollToBottomButton {
+  bottom: calc(var(--chat-footer-scroll-offset, 132px) + var(--space-md)) !important;
+  z-index: var(--app-z-index-elevated);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--card-shadow);
+  transition:
+    color var(--motion-duration-mid) var(--motion-ease-standard),
+    background var(--motion-duration-mid) var(--motion-ease-standard),
+    border-color var(--motion-duration-mid) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-mid) var(--motion-ease-standard);
+
+  && {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full, 999px);
+    background: var(--surface);
+    color: var(--muted);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &:hover:not(:disabled) {
+    && {
+      color: var(--foreground);
+      background: var(--surface-tertiary);
+      border-color: var(--border);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  &[data-active='false'] {
+    display: none;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 与应用壳的布局密度一致，紧凑侧栏允许用户气泡占更大宽度。 */
+:global(html[data-layout-density='compact']) {
+  :global([data-chat-layout='panel']) .container {
+    --chat-user-message-max-width: 88%;
+  }
+}

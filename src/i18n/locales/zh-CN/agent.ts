@@ -37,6 +37,12 @@ const zhCNAgent = {
       cancel: '继续自由编辑',
       confirm: '清空并切换',
     },
+    debugSave: {
+      title: '保存后再调试？',
+      description:
+        '当前 Agent 配置有未保存修改。调试会使用已保存的草稿版本；如需测试当前改动，请先保存。',
+      confirm: '保存并发送',
+    },
     leave: {
       title: '保存后离开页面？',
       description: '当前 Agent 有未保存修改。保存后再离开可避免丢失本次编辑。',

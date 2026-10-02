@@ -15,7 +15,6 @@ import {
   SystemResizablePanel,
   SystemResizablePanelGroup,
 } from '@/components/base/SystemResizable';
-import { useChatPanelStore } from '@/components/business/ChatPanel/_store/useChatPanelStore';
 import {
   CHAT_PANEL_MAX_WIDTH,
   CHAT_PANEL_MIN_WIDTH,
@@ -30,6 +29,7 @@ import { useOpenResource } from '@/hooks/useOpenResource';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/_context';
 import { useMainShell } from '@/layouts/MainShell/_context';
+import { useChatDockLayoutStore } from '@/layouts/MainShell/_store/useChatDockLayoutStore';
 import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
@@ -50,10 +50,10 @@ function ResourceHost() {
   const appNavigation = useAppNavigation();
   const chatPanelRef = useRef<PanelImperativeHandle | null>(null);
   const pendingChatWidthRef = useRef<number | null>(null);
-  const chatPanelCollapsed = useChatPanelStore((state) => state.chatPanelCollapsed);
-  const chatPanelWidth = useChatPanelStore((state) => state.chatPanelWidth);
-  const setChatPanelCollapsed = useChatPanelStore((state) => state.setChatPanelCollapsed);
-  const setChatPanelWidth = useChatPanelStore((state) => state.setChatPanelWidth);
+  const chatPanelCollapsed = useChatDockLayoutStore((state) => state.chatPanelCollapsed);
+  const chatPanelWidth = useChatDockLayoutStore((state) => state.chatPanelWidth);
+  const setChatPanelCollapsed = useChatDockLayoutStore((state) => state.setChatPanelCollapsed);
+  const setChatPanelWidth = useChatDockLayoutStore((state) => state.setChatPanelWidth);
   const clearResourceChatContext = useResourceChatProtocolStore((state) => state.clearContext);
   const resourceChatContext = useResourceChatProtocolStore((state) => state.context);
   const openResource = useOpenResource();
