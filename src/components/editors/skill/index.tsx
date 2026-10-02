@@ -9,7 +9,7 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import type { DataNode } from '@/components/base/Tree';
 import VersionDropdown from '@/components/business/VersionDropdown';
 import type { EditorPresentation } from '@/components/editors/editor.type';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { SkillServicesMap } from '@/domains/Skill';
 import { parseErrorMessage } from '@/utils/error';
@@ -296,7 +296,8 @@ function SkillEditorContent() {
 
   if (resource.error) {
     return (
-      <EditorWorkspace className={styles.pageWrap} {...headerConfig}>
+      <>
+        <EditorPresentationBinding className={styles.pageWrap} {...headerConfig} />
         <div className={styles.middleOverlay}>
           <ResultState
             status="warning"
@@ -309,25 +310,27 @@ function SkillEditorContent() {
             }
           />
         </div>
-      </EditorWorkspace>
+      </>
     );
   }
 
   if (resource.loading && !resource.skill) {
     return (
-      <EditorWorkspace className={styles.pageWrap} {...headerConfig}>
+      <>
+        <EditorPresentationBinding className={styles.pageWrap} {...headerConfig} />
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span>{t('page.loading')}</span>
           </div>
         </div>
-      </EditorWorkspace>
+      </>
     );
   }
 
   return (
-    <EditorWorkspace className={styles.pageWrap} {...headerConfig}>
+    <>
+      <EditorPresentationBinding className={styles.pageWrap} {...headerConfig} />
       <div className={styles.page}>
         <div className={styles.mainArea}>
           {resource.skill ? (
@@ -400,7 +403,7 @@ function SkillEditorContent() {
         hidden
         onChange={(event) => void fileActions.handleFileChange(event)}
       />
-    </EditorWorkspace>
+    </>
   );
 }
 

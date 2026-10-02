@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import type { EditorPresentation } from '@/components/editors/editor.type';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 
@@ -153,36 +153,35 @@ export default function AgentWorkspace({
   } satisfies EditorPresentation;
 
   return (
-    <EditorWorkspace className={styles.pageWrap} {...headerConfig}>
-      <>
-        <AgentEditor
-          assets={agent.assets}
-          draft={draftSession.draft}
-          draftVersion={data.agent.draftVersion}
-          models={data.models}
-          readOnly={draftSession.isReadOnly}
-          resourceId={resourceId}
-          skills={data.skills}
-          tools={data.tools}
-          onDescriptionChange={draftSession.setDescription}
-          onNameChange={draftSession.setName}
-          onSpecChange={draftSession.setSpec}
-          onSystemPromptChange={draftSession.setSystemPrompt}
-        />
-        <AppAlertDialog
-          type="warning"
-          isOpen={debugGuard.isDialogOpen}
-          onOpenChange={(open) => {
-            if (!open) debugGuard.cancel();
-          }}
-          title={t('agent:page.debugSave.title')}
-          description={t('agent:page.debugSave.description')}
-          cancelText={t('common:actions.cancel')}
-          confirmText={t('agent:page.debugSave.confirm')}
-          isConfirmLoading={debugGuard.saving || draftSession.saveLoading}
-          onConfirm={() => void debugGuard.confirm()}
-        />
-      </>
-    </EditorWorkspace>
+    <>
+      <EditorPresentationBinding className={styles.pageWrap} {...headerConfig} />
+      <AgentEditor
+        assets={agent.assets}
+        draft={draftSession.draft}
+        draftVersion={data.agent.draftVersion}
+        models={data.models}
+        readOnly={draftSession.isReadOnly}
+        resourceId={resourceId}
+        skills={data.skills}
+        tools={data.tools}
+        onDescriptionChange={draftSession.setDescription}
+        onNameChange={draftSession.setName}
+        onSpecChange={draftSession.setSpec}
+        onSystemPromptChange={draftSession.setSystemPrompt}
+      />
+      <AppAlertDialog
+        type="warning"
+        isOpen={debugGuard.isDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) debugGuard.cancel();
+        }}
+        title={t('agent:page.debugSave.title')}
+        description={t('agent:page.debugSave.description')}
+        cancelText={t('common:actions.cancel')}
+        confirmText={t('agent:page.debugSave.confirm')}
+        isConfirmLoading={debugGuard.saving || draftSession.saveLoading}
+        onConfirm={() => void debugGuard.confirm()}
+      />
+    </>
   );
 }

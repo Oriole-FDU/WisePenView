@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import { NoteEditorSession } from '@/components/editors/note/CustomBlockNote/NoteEditorSession';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useNoteService } from '@/domains';
@@ -20,7 +20,8 @@ import styles from './style.module.less';
 function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
   const { t } = useTranslation('note');
   return (
-    <EditorWorkspace className={styles.pageWrap}>
+    <>
+      <EditorPresentationBinding className={styles.pageWrap} />
       <div className={styles.middleOverlay}>
         <div className={styles.middleOverlayInner}>
           <ResultState
@@ -35,21 +36,22 @@ function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
           />
         </div>
       </div>
-    </EditorWorkspace>
+    </>
   );
 }
 
 function NoteInfoLoading() {
   const { t } = useTranslation('note');
   return (
-    <EditorWorkspace className={styles.pageWrap}>
+    <>
+      <EditorPresentationBinding className={styles.pageWrap} />
       <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
         <div className={styles.middleOverlayLoading}>
           <Spin size="large" />
           <span className={styles.middleOverlayText}>{t('workspace.loadingInfo')}</span>
         </div>
       </div>
-    </EditorWorkspace>
+    </>
   );
 }
 

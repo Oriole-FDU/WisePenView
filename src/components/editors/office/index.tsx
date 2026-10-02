@@ -1,13 +1,13 @@
 import type { Config } from '@onlyoffice/doceditor-types';
 import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import { useMemoizedFn } from 'ahooks';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
@@ -20,8 +20,7 @@ import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import type { EditorSurfaceProps } from '../editor.type';
 import styles from './style.module.less';
 
-interface OfficeWorkspaceProps {
-  children: ReactNode;
+interface OfficePresentationBindingProps {
   resourceInfo?: ResourceItem;
   documentType?: string;
   onPermissionSuccess?: () => void;
@@ -36,20 +35,17 @@ interface OfficeEditorHostProps {
   onError: (error: unknown) => void;
 }
 
-function OfficeWorkspace({
-  children,
+function OfficePresentationBinding({
   resourceInfo,
   documentType,
   onPermissionSuccess,
   onResourceChanged,
-}: OfficeWorkspaceProps) {
+}: OfficePresentationBindingProps) {
   return (
-    <EditorWorkspace
+    <EditorPresentationBinding
       className={styles.container}
       document={{ resourceInfo, documentType, onPermissionSuccess, onResourceChanged }}
-    >
-      {children}
-    </EditorWorkspace>
+    />
   );
 }
 
@@ -156,7 +152,8 @@ function OfficeEditorContent() {
 
   if (!resourceId) {
     return (
-      <OfficeWorkspace>
+      <>
+        <OfficePresentationBinding />
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -170,13 +167,14 @@ function OfficeEditorContent() {
             />
           </div>
         </div>
-      </OfficeWorkspace>
+      </>
     );
   }
 
   if (error) {
     return (
-      <OfficeWorkspace>
+      <>
+        <OfficePresentationBinding />
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -191,42 +189,45 @@ function OfficeEditorContent() {
             />
           </div>
         </div>
-      </OfficeWorkspace>
+      </>
     );
   }
 
   if (isConfigLoading && !data) {
     return (
-      <OfficeWorkspace>
+      <>
+        <OfficePresentationBinding />
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('office.loading')}</span>
           </div>
         </div>
-      </OfficeWorkspace>
+      </>
     );
   }
 
   if (!data?.editorConfig.config) {
     return (
-      <OfficeWorkspace>
+      <>
+        <OfficePresentationBinding />
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState status="warning" title={t('office.emptyConfig')} />
           </div>
         </div>
-      </OfficeWorkspace>
+      </>
     );
   }
 
   return (
-    <OfficeWorkspace
-      resourceInfo={data.docInfo.resourceInfo}
-      documentType={data.docInfo.docMetaInfo.uploadMeta.fileType}
-      onPermissionSuccess={refreshOfficeData}
-      onResourceChanged={refreshResourceInfo}
-    >
+    <>
+      <OfficePresentationBinding
+        resourceInfo={data.docInfo.resourceInfo}
+        documentType={data.docInfo.docMetaInfo.uploadMeta.fileType}
+        onPermissionSuccess={refreshOfficeData}
+        onResourceChanged={refreshResourceInfo}
+      />
       <div className={styles.content}>
         <OfficeEditorHost
           key={`${resourceId}-${data.editorConfig.sessionId ?? 'session'}`}
@@ -255,7 +256,7 @@ function OfficeEditorContent() {
           </div>
         )}
       </div>
-    </OfficeWorkspace>
+    </>
   );
 }
 

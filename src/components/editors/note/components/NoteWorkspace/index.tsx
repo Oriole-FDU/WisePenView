@@ -8,7 +8,7 @@ import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import InlineComment from '@/components/business/InlineComment';
 import type { EditorPresentation } from '@/components/editors/editor.type';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import CustomBlockNote from '@/components/editors/note/CustomBlockNote';
 import type {
   NoteBodyEditorHandle,
@@ -217,7 +217,8 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
     },
   } satisfies EditorPresentation;
   return (
-    <EditorWorkspace {...workspaceProps}>
+    <>
+      <EditorPresentationBinding {...workspaceProps} />
       <div className={styles.mainScroll}>
         <NoteEditorSlot name="findBar" className={styles.findBarDock} />
         <div
@@ -297,7 +298,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
           </div>
         </div>
       ) : null}
-    </EditorWorkspace>
+    </>
   );
 }
 

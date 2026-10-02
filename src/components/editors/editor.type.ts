@@ -115,5 +115,6 @@ export interface EditorSurfaceProps {
   instanceId: string;
   host: EditorHostCapabilities;
   onRegister(editor: Editor): () => void;
-  renderWorkspace(presentation: EditorPresentation, body: ReactNode): ReactNode;
+  /** 提交展示信息并返回当前上报的注销函数，宿主负责外层布局。 */
+  onPresentationChange(presentation: EditorPresentation): () => void;
 }

@@ -7,10 +7,10 @@ export interface ResourceEditorProps {
   target: EditorTarget;
   host: EditorHostCapabilities;
   onRegister: EditorSurfaceProps['onRegister'];
-  renderWorkspace: EditorSurfaceProps['renderWorkspace'];
+  onPresentationChange: EditorSurfaceProps['onPresentationChange'];
 }
 
-function MountedEditor({ target, host, onRegister, renderWorkspace }: ResourceEditorProps) {
+function MountedEditor({ target, host, onRegister, onPresentationChange }: ResourceEditorProps) {
   const [instanceId] = useState(() => `${host.hostId}:${crypto.randomUUID()}`);
   const kind = resolveEditorKind(target);
   if (!kind) return null;
@@ -21,14 +21,14 @@ function MountedEditor({ target, host, onRegister, renderWorkspace }: ResourceEd
       instanceId={instanceId}
       host={host}
       onRegister={onRegister}
-      renderWorkspace={renderWorkspace}
+      onPresentationChange={onPresentationChange}
     />
   );
 }
 
 /**
  * 解析资源目标对应的编辑器并挂载。
- * 工作区外壳（顶栏、侧栏、聊天绑定）与宿主能力由调用方注入，编辑器层不感知宿主布局；
+ * 编辑器上报展示信息并接收宿主能力，工作区外壳由调用方在外层装配；
  * 按资源与编辑器类型重建实例，保证运行态身份跟随挂载生命周期。
  */
 export default function ResourceEditor(props: ResourceEditorProps) {

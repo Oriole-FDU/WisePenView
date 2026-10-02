@@ -30,7 +30,7 @@ import {
   parseResourceDriveLocation,
 } from '@/utils/navigation/resourceRoute';
 
-import ResourceRouteView from './ResourceRouteView';
+import ResourceTargetResolver from '../ResourceTargetResolver';
 
 function ResourceRouteBoundary() {
   const { t } = useTranslation('workspace');
@@ -124,7 +124,7 @@ function ResourceRouteBoundary() {
             navigateResourceHash={navigateResourceHash}
           >
             <RouteOutletBoundary>
-              <ResourceRouteView
+              <ResourceTargetResolver
                 target={target}
                 onTargetChange={handleTargetChange}
                 onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}

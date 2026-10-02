@@ -8,7 +8,7 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import type { EditorPresentation } from '@/components/editors/editor.type';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { useInteractService, useNoteService, useUserService } from '@/domains';
@@ -86,8 +86,7 @@ function readWisePenColorScheme(): string {
   return DEFAULT_COLOR_SCHEME;
 }
 
-function DrawioWorkspace({
-  children,
+function DrawioPresentationBinding({
   resourceId,
   resourceName,
   ownerId,
@@ -99,7 +98,6 @@ function DrawioWorkspace({
   titleMeta,
   actions,
 }: {
-  children: ReactNode;
   resourceId?: string;
   resourceName?: string;
   ownerId?: string | null;
@@ -132,7 +130,7 @@ function DrawioWorkspace({
       },
     },
   } satisfies EditorPresentation;
-  return <EditorWorkspace {...frameConfig}>{children}</EditorWorkspace>;
+  return <EditorPresentationBinding {...frameConfig} />;
 }
 
 function SaveStatusText({ state }: { state: DrawioSaveState }) {
@@ -278,18 +276,19 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
   );
 
   return (
-    <DrawioWorkspace
-      resourceId={resourceId}
-      resourceName={title}
-      ownerId={noteInfoDisplay.ownerId}
-      currentActions={noteInfoDisplay.resourceInfo?.currentActions}
-      resourceInfo={noteInfoDisplay.resourceInfo}
-      copyVersion={currentVersion}
-      onPermissionSuccess={onRefreshDrawioInfo}
-      onResourceChanged={onRefreshDrawioInfo}
-      titleMeta={titleMeta}
-      actions={headerActions}
-    >
+    <>
+      <DrawioPresentationBinding
+        resourceId={resourceId}
+        resourceName={title}
+        ownerId={noteInfoDisplay.ownerId}
+        currentActions={noteInfoDisplay.resourceInfo?.currentActions}
+        resourceInfo={noteInfoDisplay.resourceInfo}
+        copyVersion={currentVersion}
+        onPermissionSuccess={onRefreshDrawioInfo}
+        onResourceChanged={onRefreshDrawioInfo}
+        titleMeta={titleMeta}
+        actions={headerActions}
+      />
       <div className={styles.content}>
         <iframe
           key={`${resourceId}-${canEdit ? 'edit' : 'view'}`}
@@ -313,7 +312,7 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
         versions={versions}
         onClose={() => setVersionOpen(false)}
       />
-    </DrawioWorkspace>
+    </>
   );
 }
 
@@ -358,7 +357,8 @@ function DrawioEditorContent() {
 
   if (!resourceId) {
     return (
-      <DrawioWorkspace>
+      <>
+        <DrawioPresentationBinding />
         <div className={styles.middleOverlay}>
           <ResultState
             status="warning"
@@ -370,13 +370,14 @@ function DrawioEditorContent() {
             }
           />
         </div>
-      </DrawioWorkspace>
+      </>
     );
   }
 
   if (error) {
     return (
-      <DrawioWorkspace resourceId={resourceId}>
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
         <div className={styles.middleOverlay}>
           <ResultState
             status="warning"
@@ -389,41 +390,44 @@ function DrawioEditorContent() {
             }
           />
         </div>
-      </DrawioWorkspace>
+      </>
     );
   }
 
   if (loadingDrawio && !data) {
     return (
-      <DrawioWorkspace resourceId={resourceId}>
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('drawio.loading')}</span>
           </div>
         </div>
-      </DrawioWorkspace>
+      </>
     );
   }
 
   if (!data) {
     return (
-      <DrawioWorkspace resourceId={resourceId}>
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
         <div className={styles.middleOverlay}>
           <ResultState status="warning" title={t('drawio.emptyInfo')} />
         </div>
-      </DrawioWorkspace>
+      </>
     );
   }
 
   const resourceType = data.noteInfoDisplay.resourceInfo?.resourceType?.trim().toLowerCase();
   if (resourceType !== RESOURCE_KIND.DRAWIO) {
     return (
-      <DrawioWorkspace resourceId={resourceId}>
+      <>
+        <DrawioPresentationBinding resourceId={resourceId} />
         <div className={styles.middleOverlay}>
           <ResultState status="warning" title={t('drawio.wrongType')} />
         </div>
-      </DrawioWorkspace>
+      </>
     );
   }
 

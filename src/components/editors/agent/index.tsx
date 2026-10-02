@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
@@ -25,7 +25,8 @@ function AgentEditorContent() {
 
   if (version.error) {
     return (
-      <EditorWorkspace className={styles.pageWrap}>
+      <>
+        <EditorPresentationBinding className={styles.pageWrap} />
         <div className={styles.overlay}>
           <ResultState
             status="warning"
@@ -38,18 +39,19 @@ function AgentEditorContent() {
             }
           />
         </div>
-      </EditorWorkspace>
+      </>
     );
   }
 
   if (!version.data || !version.displayAgent) {
     return (
-      <EditorWorkspace className={styles.pageWrap}>
+      <>
+        <EditorPresentationBinding className={styles.pageWrap} />
         <div className={styles.overlay} aria-busy="true" aria-live="polite">
           <Spin size="large" />
           <span>{t('agent:page.loading')}</span>
         </div>
-      </EditorWorkspace>
+      </>
     );
   }
 

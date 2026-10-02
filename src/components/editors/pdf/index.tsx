@@ -1,10 +1,10 @@
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
-import EditorWorkspace from '@/components/editors/EditorWorkspace';
+import EditorPresentationBinding from '@/components/editors/EditorPresentationBinding';
 import PdfViewer from '@/components/editors/pdf/components/PdfViewer/index';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
@@ -18,28 +18,24 @@ import { useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import styles from './style.module.less';
 
-interface PdfWorkspaceProps {
-  children: ReactNode;
+interface PdfPresentationBindingProps {
   resourceInfo?: ResourceItem;
   documentType?: string;
   onPermissionSuccess?: () => void;
   onResourceChanged?: () => unknown | Promise<unknown>;
 }
 
-function PdfWorkspace({
-  children,
+function PdfPresentationBinding({
   resourceInfo,
   documentType,
   onPermissionSuccess,
   onResourceChanged,
-}: PdfWorkspaceProps) {
+}: PdfPresentationBindingProps) {
   return (
-    <EditorWorkspace
+    <EditorPresentationBinding
       className={styles.container}
       document={{ resourceInfo, documentType, onPermissionSuccess, onResourceChanged }}
-    >
-      {children}
-    </EditorWorkspace>
+    />
   );
 }
 
@@ -101,7 +97,8 @@ function PdfEditorContent() {
 
   if (!resourceId) {
     return (
-      <PdfWorkspace>
+      <>
+        <PdfPresentationBinding />
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -115,13 +112,14 @@ function PdfEditorContent() {
             />
           </div>
         </div>
-      </PdfWorkspace>
+      </>
     );
   }
 
   if (docInfoError) {
     return (
-      <PdfWorkspace>
+      <>
+        <PdfPresentationBinding />
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -136,27 +134,29 @@ function PdfEditorContent() {
             />
           </div>
         </div>
-      </PdfWorkspace>
+      </>
     );
   }
 
   // 仅在初次加载（尚无数据）时展示全页 spinner；refresh 时保留旧 docInfo，不触发全页 loading
   if (isDocInfoLoading && !docInfo) {
     return (
-      <PdfWorkspace>
+      <>
+        <PdfPresentationBinding />
         <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
           <div className={styles.middleOverlayLoading}>
             <Spin size="large" />
             <span className={styles.middleOverlayText}>{t('pdf.loadingInfo')}</span>
           </div>
         </div>
-      </PdfWorkspace>
+      </>
     );
   }
 
   if (!docInfo) {
     return (
-      <PdfWorkspace>
+      <>
+        <PdfPresentationBinding />
         <div className={styles.middleOverlay}>
           <div className={styles.middleOverlayInner}>
             <ResultState
@@ -171,17 +171,18 @@ function PdfEditorContent() {
             />
           </div>
         </div>
-      </PdfWorkspace>
+      </>
     );
   }
 
   return (
-    <PdfWorkspace
-      resourceInfo={docInfo.resourceInfo}
-      documentType={docInfo.docMetaInfo.uploadMeta.fileType}
-      onPermissionSuccess={refreshDocInfo}
-      onResourceChanged={refreshDocInfo}
-    >
+    <>
+      <PdfPresentationBinding
+        resourceInfo={docInfo.resourceInfo}
+        documentType={docInfo.docMetaInfo.uploadMeta.fileType}
+        onPermissionSuccess={refreshDocInfo}
+        onResourceChanged={refreshDocInfo}
+      />
       <div className={styles.content}>
         <div className={styles.root}>
           {viewerError ? (
@@ -216,7 +217,7 @@ function PdfEditorContent() {
           )}
         </div>
       </div>
-    </PdfWorkspace>
+    </>
   );
 }
 
