@@ -1,7 +1,8 @@
-import { Autocomplete, ComboBox, Dropdown, Input, ListBox } from '@heroui/react';
+import { Dropdown, ListBox } from '@heroui/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import styles from '../Input.stories.module.less';
 import Select from './index';
 
 const OPTIONS = [
@@ -15,11 +16,41 @@ function SelectStory() {
 
   return (
     <Select
+      fullWidth
       label="反馈类型"
       placeholder="请选择反馈类型"
       selectionMode="multiple"
       value={value}
       onChange={(nextValue) => setValue(nextValue.map(String))}
+    >
+      <Select.Trigger>
+        <Select.Value />
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover>
+        <ListBox aria-label="反馈类型">
+          {OPTIONS.map((option) => (
+            <ListBox.Item key={option.id} id={option.id} textValue={option.label}>
+              {option.label}
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          ))}
+        </ListBox>
+      </Select.Popover>
+    </Select>
+  );
+}
+
+function SelectSingleStory() {
+  const [value, setValue] = useState<string>('feature');
+
+  return (
+    <Select
+      fullWidth
+      label="反馈类型"
+      placeholder="请选择反馈类型"
+      value={value}
+      onChange={(nextValue) => setValue(String(nextValue))}
     >
       <Select.Trigger>
         <Select.Value />
@@ -73,61 +104,6 @@ function DropdownStory() {
   );
 }
 
-function ComboBoxStory() {
-  const [selectedKey, setSelectedKey] = useState<string | null>('feedback');
-
-  return (
-    <ComboBox
-      selectedKey={selectedKey}
-      onSelectionChange={(key) => setSelectedKey(key == null ? null : String(key))}
-    >
-      <ComboBox.InputGroup>
-        <Input aria-label="搜索反馈类型" placeholder="搜索反馈类型" variant="secondary" />
-        <ComboBox.Trigger aria-label="展开反馈类型" />
-      </ComboBox.InputGroup>
-      <ComboBox.Popover>
-        <ListBox aria-label="反馈类型">
-          {OPTIONS.map((option) => (
-            <ListBox.Item key={option.id} id={option.id} textValue={option.label}>
-              {option.label}
-              <ListBox.ItemIndicator />
-            </ListBox.Item>
-          ))}
-        </ListBox>
-      </ComboBox.Popover>
-    </ComboBox>
-  );
-}
-
-function AutocompleteStory() {
-  const [value, setValue] = useState<string[]>(['feedback']);
-
-  return (
-    <Autocomplete
-      placeholder="请选择反馈类型"
-      selectionMode="multiple"
-      value={value}
-      onChange={(nextValue) => setValue(nextValue.map(String))}
-    >
-      <Autocomplete.Trigger>
-        <Autocomplete.Value />
-        <Autocomplete.ClearButton />
-        <Autocomplete.Indicator />
-      </Autocomplete.Trigger>
-      <Autocomplete.Popover>
-        <ListBox aria-label="反馈类型">
-          {OPTIONS.map((option) => (
-            <ListBox.Item key={option.id} id={option.id} textValue={option.label}>
-              {option.label}
-              <ListBox.ItemIndicator />
-            </ListBox.Item>
-          ))}
-        </ListBox>
-      </Autocomplete.Popover>
-    </Autocomplete>
-  );
-}
-
 const meta = {
   title: 'Input/选项浮层',
   component: Select,
@@ -135,7 +111,14 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-} satisfies Meta;
+  decorators: [
+    (Story) => (
+      <div className={styles.stack}>
+        <Story />
+      </div>
+    ),
+  ],
+} satisfies Meta<typeof Select>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -144,14 +127,30 @@ export const SelectMultiple: Story = {
   render: () => <SelectStory />,
 };
 
+export const SelectSingle: Story = {
+  render: () => <SelectSingleStory />,
+};
+
+export const SelectDisabled: Story = {
+  render: () => (
+    <Select fullWidth isDisabled label="反馈类型" defaultSelectedKey="feedback">
+      <Select.Trigger>
+        <Select.Value />
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover>
+        <ListBox aria-label="反馈类型">
+          {OPTIONS.map((option) => (
+            <ListBox.Item key={option.id} id={option.id} textValue={option.label}>
+              {option.label}
+            </ListBox.Item>
+          ))}
+        </ListBox>
+      </Select.Popover>
+    </Select>
+  ),
+};
+
 export const DropdownMultiple: Story = {
   render: () => <DropdownStory />,
-};
-
-export const ComboBoxSingle: Story = {
-  render: () => <ComboBoxStory />,
-};
-
-export const AutocompleteMultiple: Story = {
-  render: () => <AutocompleteStory />,
 };

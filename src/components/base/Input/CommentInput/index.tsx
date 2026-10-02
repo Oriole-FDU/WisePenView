@@ -10,7 +10,7 @@ import EmojiPicker from '@/components/base/Input/EmojiPicker';
 import type { CommentInputImage, CommentInputProps } from './index.type';
 import styles from './style.module.less';
 
-export type { CommentInputImage } from './index.type';
+export type { CommentInputImage, CommentInputProps } from './index.type';
 
 function PendingImagePreview({
   image,

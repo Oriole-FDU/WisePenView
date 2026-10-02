@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import AppPopover from '@/components/base/AppPopover';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
+import type { EmojiPickerContentProps, EmojiPickerProps } from './index.type';
 import styles from './style.module.less';
 
 interface EmojiMartSelection {
@@ -105,11 +106,6 @@ function getPickerData(locale: 'en' | 'zh'): EmojiMartData {
   return localizedData;
 }
 
-export interface EmojiPickerContentProps {
-  ariaLabel?: string;
-  onSelect(emojiId: string): void | Promise<void>;
-}
-
 export function EmojiPickerContent({ ariaLabel, onSelect }: EmojiPickerContentProps) {
   const { i18n, t } = useTranslation('common');
   const emojiLocale = i18n.resolvedLanguage === 'en-US' ? 'en' : 'zh';
@@ -157,12 +153,6 @@ export function EmojiPickerContent({ ariaLabel, onSelect }: EmojiPickerContentPr
   );
 }
 
-interface EmojiPickerProps {
-  label: string;
-  disabled?: boolean;
-  onSelect(emojiId: string): void | Promise<void>;
-}
-
 function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
   const [open, setOpen] = useState(false);
   const buttonProps = {
@@ -195,4 +185,5 @@ function EmojiPicker({ label, disabled, onSelect }: EmojiPickerProps) {
   );
 }
 
+export type { EmojiPickerContentProps, EmojiPickerProps };
 export default EmojiPicker;

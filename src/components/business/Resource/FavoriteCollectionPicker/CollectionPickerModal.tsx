@@ -109,6 +109,7 @@ function CollectionPickerModal({
         )}
 
         {showCreateInput ? (
+          /* 列表内的无边框内联输入，样式由 inlineCreateRow 控制，不使用带字段表面的 Input 封装 */
           <TextField
             aria-label={t('favorite.picker.createNameLabel')}
             className={styles.createInput}

@@ -1,10 +1,10 @@
-import { Label, NumberField, Slider } from '@heroui/react';
+import { Label, Slider } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
-import { FormField, TextArea } from '@/components/base/Input';
+import { FormField, NumberField, TextArea } from '@/components/base/Input';
 import type { AgentSpec } from '@/domains/Agent';
 
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';

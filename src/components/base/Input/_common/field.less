@@ -1,0 +1,82 @@
+/**
+ * 表单控件公共样式。
+ *
+ * Input、TextArea、Select、InputGroup、InputOTP、SearchField、Autocomplete、
+ * NumberField 等控件共用同一套表面、状态和焦点样式，各组件只保留自己的选择器
+ * 与 HeroUI 变量映射，避免同一份取值在多处漂移。
+ *
+ * 焦点环统一用「1px 边框 + 1px 外发光」两层同色叠加：外发光的圆角由浏览器
+ * 以外层边框盒为基准推导，和边框弧线严格同心，不会在四角露出底色缝隙。
+ */
+
+/* 统一的表面 token：取值只在此处定义 */
+.fieldTokens() {
+  --app-field-bg: color-mix(in oklab, var(--surface-tertiary) 35%, var(--surface) 65%);
+  --app-field-bg-hover: color-mix(in oklab, var(--surface-tertiary) 70%, var(--surface) 30%);
+  --app-field-bg-focus: var(--app-field-bg);
+  --app-field-border: var(--field-border);
+  --app-field-border-hover: var(--field-border-hover);
+  --app-field-border-focus: var(--field-border-focus);
+  --app-field-border-width: 1px;
+  --app-field-radius: var(--radius-field);
+  --app-field-ring-width: 1px;
+  --app-field-ring-color: var(--focus);
+  --app-field-ring: 0 0 0 var(--app-field-ring-width) var(--app-field-ring-color);
+  --app-field-danger-ring: 0 0 0 var(--app-field-ring-width) var(--danger-soft);
+  --app-field-danger-border: var(--danger-border);
+  --app-field-danger-bg: var(--danger-soft);
+  --app-field-disabled-border: color-mix(in oklab, var(--app-field-border) 76%, transparent);
+  --app-field-disabled-bg: color-mix(in oklab, var(--app-field-bg) 78%, transparent);
+}
+
+/* 控件外壳基础样式（背景、边框、文字） */
+.fieldSurface() {
+  box-sizing: border-box;
+  border-width: var(--app-field-border-width);
+  border-color: var(--app-field-border);
+  background-color: var(--app-field-bg);
+  color: var(--field-foreground, var(--foreground));
+  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
+  letter-spacing: 0;
+  box-shadow: var(--shadow-none);
+}
+
+.fieldPlaceholder() {
+  color: var(--field-placeholder, var(--muted));
+}
+
+.fieldSurfaceHover() {
+  border-color: var(--app-field-border-hover);
+  background-color: var(--app-field-bg-hover);
+}
+
+/* 聚焦：边框与外发光同色，外发光的弧线以外层边框盒为基准 */
+.fieldSurfaceFocus() {
+  border-color: var(--app-field-border-focus);
+  background-color: var(--app-field-bg-focus);
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  box-shadow: var(--app-field-ring);
+}
+
+.fieldSurfaceFocusVisible() {
+  border-color: var(--app-field-border-focus);
+  outline: none;
+}
+
+.fieldSurfaceInvalid() {
+  border-color: var(--app-field-danger-border);
+  background-color: var(--app-field-danger-bg);
+}
+
+.fieldSurfaceInvalidFocus() {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  box-shadow: var(--app-field-danger-ring);
+}
+
+.fieldSurfaceDisabled() {
+  border-color: var(--app-field-disabled-border);
+  background-color: var(--app-field-disabled-bg);
+  box-shadow: var(--shadow-none);
+}

@@ -19,15 +19,47 @@ const DEMO_UPLOAD_FILE = new File(['storybook upload preview'], '需求说明.pd
   type: 'application/pdf',
 });
 
+/** 控件默认不撑满父级，实例化时要保证外层容器有明确宽度 */
 function TextInputStory() {
   const [value, setValue] = useState('WisePen');
 
   return (
-    <Input
-      aria-label="工作区名称"
-      value={value}
-      onChange={(event) => setValue(event.target.value)}
-    />
+    <div className={styles.stack}>
+      <Input
+        fullWidth
+        aria-label="工作区名称"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+      />
+    </div>
+  );
+}
+
+function InputStatesStory() {
+  const [value, setValue] = useState('WisePen');
+  const [invalidValue, setInvalidValue] = useState('WisePen 团队');
+
+  return (
+    <div className={styles.stack}>
+      <FormField label="默认" value={value} onChange={setValue}>
+        <Input />
+      </FormField>
+      <FormField
+        label="校验失败"
+        value={invalidValue}
+        onChange={setInvalidValue}
+        isInvalid
+        errorMessage="该名称已被占用"
+      >
+        <Input />
+      </FormField>
+      <FormField label="禁用" isDisabled defaultValue="WisePen">
+        <Input />
+      </FormField>
+      <FormField label="只读" isReadOnly defaultValue="WisePen">
+        <Input />
+      </FormField>
+    </div>
   );
 }
 
@@ -45,15 +77,17 @@ function FormFieldStory() {
   const [value, setValue] = useState('');
 
   return (
-    <FormField
-      label="工作区名称"
-      value={value}
-      onChange={setValue}
-      description="该名称会展示给工作区成员。"
-      isRequired
-    >
-      <Input placeholder="请输入工作区名称" />
-    </FormField>
+    <div className={styles.stack}>
+      <FormField
+        label="工作区名称"
+        value={value}
+        onChange={setValue}
+        description="该名称会展示给工作区成员。"
+        isRequired
+      >
+        <Input fullWidth placeholder="请输入工作区名称" />
+      </FormField>
+    </div>
   );
 }
 
@@ -61,14 +95,16 @@ function InputGroupStory() {
   const [value, setValue] = useState('hello@wisepen.ai');
 
   return (
-    <FormField label="邮箱" value={value} onChange={setValue}>
-      <InputGroup>
-        <InputGroup.Prefix>
-          <Mail size={18} aria-hidden="true" />
-        </InputGroup.Prefix>
-        <InputGroup.Input type="email" placeholder="name@example.com" />
-      </InputGroup>
-    </FormField>
+    <div className={styles.stack}>
+      <FormField label="邮箱" value={value} onChange={setValue}>
+        <InputGroup>
+          <InputGroup.Prefix>
+            <Mail size={18} aria-hidden="true" />
+          </InputGroup.Prefix>
+          <InputGroup.Input type="email" placeholder="name@example.com" />
+        </InputGroup>
+      </FormField>
+    </div>
   );
 }
 
@@ -103,13 +139,16 @@ function PasswordInputStory() {
   const [value, setValue] = useState('password');
 
   return (
-    <PasswordInput
-      aria-label="密码"
-      value={value}
-      onChange={(event) => setValue(event.target.value)}
-      showPasswordLabel="显示密码"
-      hidePasswordLabel="隐藏密码"
-    />
+    <div className={styles.stack}>
+      <PasswordInput
+        fullWidth
+        aria-label="密码"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        showPasswordLabel="显示密码"
+        hidePasswordLabel="隐藏密码"
+      />
+    </div>
   );
 }
 
@@ -117,9 +156,11 @@ function TextAreaStory() {
   const [value, setValue] = useState('请描述你希望改进的使用体验。');
 
   return (
-    <FormField label="反馈内容" value={value} onChange={setValue} isRequired>
-      <TextArea rows={4} />
-    </FormField>
+    <div className={styles.stack}>
+      <FormField label="反馈内容" value={value} onChange={setValue} isRequired>
+        <TextArea fullWidth rows={4} />
+      </FormField>
+    </div>
   );
 }
 
@@ -150,14 +191,16 @@ function UploadZoneStory() {
   const [file, setFile] = useState<File | null>(DEMO_UPLOAD_FILE);
 
   return (
-    <UploadZone
-      file={file}
-      accept=".pdf,.doc,.docx"
-      label="上传需求文档"
-      description="支持 PDF、DOC、DOCX 格式，单个文件不超过 20 MB。"
-      getFileProgress={() => 64}
-      onFileChange={setFile}
-    />
+    <div className={styles.stack}>
+      <UploadZone
+        file={file}
+        accept=".pdf,.doc,.docx"
+        label="上传需求文档"
+        description="支持 PDF、DOC、DOCX 格式，单个文件不超过 20 MB。"
+        getFileProgress={() => 64}
+        onFileChange={setFile}
+      />
+    </div>
   );
 }
 
@@ -175,6 +218,10 @@ type Story = StoryObj<typeof meta>;
 
 export const TextInput: Story = {
   render: () => <TextInputStory />,
+};
+
+export const States: Story = {
+  render: () => <InputStatesStory />,
 };
 
 export const CheckboxControl: Story = {
@@ -210,9 +257,5 @@ export const GroupedFields: Story = {
 };
 
 export const Upload: Story = {
-  render: () => (
-    <div className={styles.stack}>
-      <UploadZoneStory />
-    </div>
-  ),
+  render: () => <UploadZoneStory />,
 };

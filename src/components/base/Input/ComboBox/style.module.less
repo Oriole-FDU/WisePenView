@@ -1,0 +1,35 @@
+@import '../_common/field.less';
+
+.comboBox:global(.combo-box) {
+  .fieldTokens();
+
+  --field-shadow: none;
+}
+
+.comboBoxInputGroup:global(.combo-box__input-group) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.comboBoxTrigger:global(.combo-box__trigger) {
+  color: var(--field-placeholder, var(--muted));
+}
+
+.comboBox:global(.combo-box) :global(.combo-box__trigger):focus-visible:not(:focus),
+.comboBox:global(.combo-box) :global(.combo-box__trigger)[data-focus-visible='true'] {
+  outline: none;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  box-shadow: 0 0 0 1px var(--app-field-ring-color);
+  border-radius: var(--app-field-radius);
+}
+
+/* 下拉层跟表单控件同一套圆角，避免 HeroUI 默认 radius-3xl（最大 32px）过圆 */
+.comboBoxPopover:global(.combo-box__popover) {
+  border-radius: var(--app-field-radius);
+  --app-radius-popover: var(--app-field-radius);
+  --app-radius-popover-item: var(--app-field-radius);
+}
