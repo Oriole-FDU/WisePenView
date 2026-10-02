@@ -1,13 +1,4 @@
-import {
-  Autocomplete,
-  EmptyState,
-  ListBox,
-  SearchField,
-  Tabs,
-  Tag,
-  TagGroup,
-  useFilter,
-} from '@heroui/react';
+import { EmptyState, ListBox, Tabs, Tag, TagGroup, useFilter } from '@heroui/react';
 import { X } from 'lucide-react';
 import type { Key, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +9,7 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Empty, Spin } from '@/components/base/Feedback';
+import { Autocomplete, SearchField } from '@/components/base/Input';
 import {
   TAG_PERMISSION_ACTION_PRESET_OPTIONS,
   type TagPermissionResourceStrategy,
@@ -192,7 +184,7 @@ const TagPolicyModalBase = ({
           </Autocomplete.Trigger>
           <Autocomplete.Popover className={styles.memberPickerPopover}>
             <Autocomplete.Filter filter={contains}>
-              <SearchField autoFocus name={`${policy.target}MemberSearch`} variant="secondary">
+              <SearchField fullWidth autoFocus name={`${policy.target}MemberSearch`}>
                 <SearchField.Group>
                   <SearchField.SearchIcon />
                   <SearchField.Input placeholder={t('permission.tag.searchPlaceholder')} />

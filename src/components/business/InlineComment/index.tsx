@@ -8,7 +8,7 @@ import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import EmojiPicker from '@/components/base/Input/EmojiPicker';
+import { EmojiPicker } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import type { InlineCommentItem, InlineCommentReactionGroup } from '@/domains/InlineComment';

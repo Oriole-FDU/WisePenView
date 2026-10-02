@@ -1,4 +1,3 @@
-import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 
 import { registerStore } from '@/store/lifecycle';
@@ -11,16 +10,19 @@ interface SessionCache {
 }
 
 // 只快取伺服器資料；目前選中的 ID 一律從 URL 取得，不持久化或反向導航。
-const sessionCache = createStore<SessionCache>(() => ({ sessions: new Map(), generation: 0 }));
+export const chatSessionCache = createStore<SessionCache>(() => ({
+  sessions: new Map(),
+  generation: 0,
+}));
 
-export const getSessionCacheSnapshot = sessionCache.getState;
+export const getSessionCacheSnapshot = chatSessionCache.getState;
 
 export function cacheSessions(
   sessions: ChatSession[],
   snapshot: SessionCache,
   fromList = false
 ): void {
-  sessionCache.setState((state) => {
+  chatSessionCache.setState((state) => {
     if (state.generation !== snapshot.generation) return state;
     const next = new Map(state.sessions);
     for (const session of sessions) {
@@ -34,7 +36,7 @@ export function cacheSessions(
 }
 
 export function removeCachedSession(sessionId: string, snapshot: SessionCache): void {
-  sessionCache.setState((state) => {
+  chatSessionCache.setState((state) => {
     if (state.generation !== snapshot.generation) return state;
     const sessions = new Map(state.sessions);
     sessions.delete(sessionId);
@@ -42,12 +44,12 @@ export function removeCachedSession(sessionId: string, snapshot: SessionCache): 
   });
 }
 
-export const useChatSessionMetadata = (sessionId?: string): ChatSession | undefined =>
-  useStore(sessionCache, (state) => (sessionId ? state.sessions.get(sessionId) : undefined));
-
 registerStore({
   id: 'chat.session-metadata',
   scope: 'session',
   reset: () =>
-    sessionCache.setState((state) => ({ sessions: new Map(), generation: state.generation + 1 })),
+    chatSessionCache.setState((state) => ({
+      sessions: new Map(),
+      generation: state.generation + 1,
+    })),
 });

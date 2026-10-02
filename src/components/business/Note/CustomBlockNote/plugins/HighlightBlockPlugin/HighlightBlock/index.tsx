@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppPopover from '@/components/base/AppPopover';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
+import { EmojiPickerContent } from '@/components/base/Input';
 
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/_context';
 import {

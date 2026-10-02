@@ -1,85 +1,51 @@
+@import '../_common/field.less';
+
 .textarea:global(.textarea) {
-  --app-textarea-bg: color-mix(
-    in oklab,
-    var(--surface-tertiary) 45%,
-    var(--surface) 55%
-  );
-  --app-textarea-bg-hover: color-mix(
-    in oklab,
-    var(--surface-tertiary) 58%,
-    var(--surface) 42%
-  );
-  --app-textarea-bg-focus: color-mix(
-    in oklab,
-    var(--surface-tertiary) 38%,
-    var(--surface) 62%
-  );
-  --app-textarea-border: var(--field-border);
-  --app-textarea-border-hover: var(--field-border-hover);
-  --app-textarea-border-focus: var(--field-border-focus);
-  --app-textarea-border-width: 1px;
-  --app-textarea-focus-ring-width: 1px;
-  --app-textarea-focus-ring-color: var(--focus);
-  --app-textarea-focus-ring: inset 0 0 0 var(--app-textarea-focus-ring-width)
-    var(--app-textarea-focus-ring-color);
-  --app-textarea-danger-ring: inset 0 0 0 var(--app-textarea-focus-ring-width)
-    var(--danger-soft);
-  --textarea-bg: var(--app-textarea-bg);
-  --textarea-bg-hover: var(--app-textarea-bg-hover);
-  --textarea-bg-focus: var(--app-textarea-bg-focus);
-  --field-background: var(--app-textarea-bg);
-  --field-focus: var(--app-textarea-bg-focus);
+  .fieldTokens();
+
+  /* HeroUI TextArea 变量映射 */
+  --textarea-bg: var(--app-field-bg);
+  --textarea-bg-hover: var(--app-field-bg-hover);
+  --textarea-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
   --field-shadow: none;
 
-  box-sizing: border-box;
-  border-width: var(--app-textarea-border-width);
-  border-color: var(--app-textarea-border);
-  background-color: var(--app-textarea-bg);
-  color: var(--field-foreground, var(--foreground));
-  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
-  box-shadow: var(--shadow-none);
-  letter-spacing: 0;
+  .fieldSurface();
 }
 
 .textarea:global(.textarea)::placeholder {
-  color: var(--field-placeholder, var(--muted));
+  .fieldPlaceholder();
 }
 
 .textarea:global(.textarea):hover:not(:focus):not(:focus-visible),
 .textarea:global(.textarea)[data-hovered='true']:not([data-focused='true']):not(
     [data-focus-visible='true']
   ) {
-  border-color: var(--app-textarea-border-hover);
-  background-color: var(--app-textarea-bg-hover);
+  .fieldSurfaceHover();
 }
 
 .textarea:global(.textarea):focus,
 .textarea:global(.textarea)[data-focused='true'] {
-  border-color: var(--app-textarea-border-focus);
-  background-color: var(--app-textarea-bg-focus);
-  box-shadow: var(--app-textarea-focus-ring);
+  .fieldSurfaceFocus();
 }
 
 .textarea:global(.textarea):focus-visible,
 .textarea:global(.textarea)[data-focus-visible='true'] {
-  border-color: var(--app-textarea-border-focus);
-  outline: none;
+  .fieldSurfaceFocusVisible();
 }
 
 .textarea:global(.textarea)[data-invalid='true'] {
-  border-color: var(--danger-border);
-  background-color: var(--danger-soft);
+  .fieldSurfaceInvalid();
 }
 
 .textarea:global(.textarea)[data-invalid='true']:focus,
 .textarea:global(.textarea)[data-invalid='true'][data-focused='true'] {
-  box-shadow: var(--app-textarea-danger-ring);
+  .fieldSurfaceInvalidFocus();
 }
 
 .textarea:global(.textarea):disabled,
 .textarea:global(.textarea)[data-disabled='true'],
 .textarea:global(.textarea)[aria-disabled='true'] {
-  border-color: color-mix(in oklab, var(--app-textarea-border) 76%, transparent);
-  background-color: color-mix(in oklab, var(--app-textarea-bg) 78%, transparent);
-  box-shadow: var(--shadow-none);
+  .fieldSurfaceDisabled();
 }
