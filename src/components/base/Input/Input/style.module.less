@@ -1,85 +1,52 @@
+@import '../_common/field.less';
+
 .input:global(.input) {
-  --app-input-slot-bg: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-input-slot-bg-hover: color-mix(
-    in oklab,
-    var(--surface-tertiary) 70%,
-    var(--surface) 30%
-  );
-  --app-input-slot-bg-focus: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-input-slot-border: var(--field-border);
-  --app-input-slot-border-hover: var(--field-border-hover);
-  --app-input-slot-border-focus: var(--field-border-focus);
-  --app-input-slot-border-width: 1px;
-  --app-input-slot-focus-ring-width: 1px;
-  --app-input-slot-focus-ring-color: var(--focus);
-  --app-input-slot-focus-ring: inset 0 0 0 var(--app-input-slot-focus-ring-width)
-    var(--app-input-slot-focus-ring-color);
-  --app-input-slot-danger-ring: inset 0 0 0 var(--app-input-slot-focus-ring-width)
-    var(--danger-soft);
-  --input-bg: var(--app-input-slot-bg);
-  --input-bg-hover: var(--app-input-slot-bg-hover);
-  --input-bg-focus: var(--app-input-slot-bg-focus);
-  --field-background: var(--app-input-slot-bg);
-  --field-focus: var(--app-input-slot-bg-focus);
+  .fieldTokens();
+
+  /* HeroUI Input 变量映射 */
+  --input-bg: var(--app-field-bg);
+  --input-bg-hover: var(--app-field-bg-hover);
+  --input-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
   --field-shadow: none;
 
   min-height: var(--control-height, 36px);
-  box-sizing: border-box;
-  border-width: var(--app-input-slot-border-width);
-  border-color: var(--app-input-slot-border);
-  background-color: var(--app-input-slot-bg);
-  color: var(--field-foreground, var(--foreground));
-  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
-  box-shadow: var(--shadow-none);
+  .fieldSurface();
 }
 
 .input:global(.input)::placeholder {
-  color: var(--field-placeholder, var(--muted));
+  .fieldPlaceholder();
 }
 
 .input:global(.input):hover:not(:focus):not(:focus-visible),
 .input:global(.input)[data-hovered='true']:not([data-focused='true']):not(
     [data-focus-visible='true']
   ) {
-  border-color: var(--app-input-slot-border-hover);
-  background-color: var(--app-input-slot-bg-hover);
+  .fieldSurfaceHover();
 }
 
 .input:global(.input):focus,
 .input:global(.input)[data-focused='true'] {
-  border-color: var(--app-input-slot-border-focus);
-  background-color: var(--app-input-slot-bg-focus);
-  box-shadow: var(--app-input-slot-focus-ring);
+  .fieldSurfaceFocus();
 }
 
 .input:global(.input):focus-visible,
 .input:global(.input)[data-focus-visible='true'] {
-  border-color: var(--app-input-slot-border-focus);
-  outline: none;
+  .fieldSurfaceFocusVisible();
 }
 
 .input:global(.input)[data-invalid='true'] {
-  border-color: var(--danger-border);
-  background-color: var(--danger-soft);
+  .fieldSurfaceInvalid();
 }
 
 .input:global(.input)[data-invalid='true']:focus,
 .input:global(.input)[data-invalid='true'][data-focused='true'] {
-  box-shadow: var(--app-input-slot-danger-ring);
+  .fieldSurfaceInvalidFocus();
 }
 
 .input:global(.input):disabled,
 .input:global(.input)[data-disabled='true'],
 .input:global(.input)[aria-disabled='true'] {
-  border-color: color-mix(in oklab, var(--app-input-slot-border) 76%, transparent);
-  background-color: color-mix(in oklab, var(--app-input-slot-bg) 78%, transparent);
-  box-shadow: var(--shadow-none);
+  .fieldSurfaceDisabled();
 }

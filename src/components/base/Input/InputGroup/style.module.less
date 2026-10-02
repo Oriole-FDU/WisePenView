@@ -1,65 +1,37 @@
+@import '../_common/field.less';
+
 .inputGroup:global(.input-group) {
-  --app-input-group-bg: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-input-group-bg-hover: color-mix(
-    in oklab,
-    var(--surface-tertiary) 70%,
-    var(--surface) 30%
-  );
-  --app-input-group-bg-focus: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-input-group-border: var(--field-border);
-  --app-input-group-border-hover: var(--field-border-hover);
-  --app-input-group-border-focus: var(--field-border-focus);
-  --app-input-group-border-width: 1px;
-  --app-input-group-focus-ring-width: 1px;
-  --app-input-group-focus-ring-color: var(--focus);
-  --app-input-group-focus-ring: inset 0 0 0 var(--app-input-group-focus-ring-width)
-    var(--app-input-group-focus-ring-color);
-  --app-input-group-danger-ring: inset 0 0 0 var(--app-input-group-focus-ring-width)
-    var(--danger-soft);
-  --input-group-bg: var(--app-input-group-bg);
-  --input-group-bg-hover: var(--app-input-group-bg-hover);
-  --input-group-bg-focus: var(--app-input-group-bg-focus);
-  --field-background: var(--app-input-group-bg);
-  --field-focus: var(--app-input-group-bg-focus);
+  .fieldTokens();
+
+  /* HeroUI InputGroup 变量映射 */
+  --input-group-bg: var(--app-field-bg);
+  --input-group-bg-hover: var(--app-field-bg-hover);
+  --input-group-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
   --field-shadow: none;
 
-  box-sizing: border-box;
-  border-width: var(--app-input-group-border-width);
-  border-color: var(--app-input-group-border);
-  background-color: var(--app-input-group-bg);
-  box-shadow: var(--shadow-none);
+  .fieldSurface();
 }
 
 .inputGroup:global(.input-group):hover:not(:focus-within),
 .inputGroup:global(.input-group)[data-hovered='true']:not([data-focus-within='true']) {
-  border-color: var(--app-input-group-border-hover);
-  background-color: var(--app-input-group-bg-hover);
+  .fieldSurfaceHover();
 }
 
 .inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:focus)),
 .inputGroup:global(.input-group):has(:global([data-slot='input-group-textarea']:focus)) {
-  border-color: var(--app-input-group-border-focus);
-  background-color: var(--app-input-group-bg-focus);
-  box-shadow: var(--app-input-group-focus-ring);
+  .fieldSurfaceFocus();
 }
 
 .inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:-webkit-autofill)),
 .inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:autofill)) {
-  border-color: var(--app-input-group-border-focus);
-  background-color: var(--app-input-group-bg-focus);
+  border-color: var(--app-field-border-focus);
+  background-color: var(--app-field-bg-focus);
 }
 
 .inputGroup:global(.input-group)[data-invalid='true'] {
-  border-color: var(--danger-border);
-  background-color: var(--danger-soft);
+  .fieldSurfaceInvalid();
 }
 
 .inputGroup:global(.input-group)[data-invalid='true']:has(
@@ -68,7 +40,7 @@
 .inputGroup:global(.input-group)[data-invalid='true']:has(
     :global([data-slot='input-group-textarea']:focus)
   ) {
-  box-shadow: var(--app-input-group-danger-ring);
+  .fieldSurfaceInvalidFocus();
 }
 
 .inputGroup:global(.input-group) :global([data-slot='input-group-input']),
@@ -80,8 +52,8 @@
 
 .inputGroup:global(.input-group) :global([data-slot='input-group-prefix']),
 .inputGroup:global(.input-group) :global([data-slot='input-group-suffix']) {
-  border-color: var(--app-input-group-border);
-  color: var(--field-placeholder, var(--muted));
+  border-color: var(--app-field-border);
+  .fieldPlaceholder();
 }
 
 .inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:focus))
@@ -92,5 +64,10 @@
   :global([data-slot='input-group-prefix']),
 .inputGroup:global(.input-group):has(:global([data-slot='input-group-textarea']:focus))
   :global([data-slot='input-group-suffix']) {
-  border-color: var(--app-input-group-border-focus);
+  border-color: var(--app-field-border-focus);
+}
+
+.inputGroup:global(.input-group) :global([data-slot='input-group-input'])::placeholder,
+.inputGroup:global(.input-group) :global([data-slot='input-group-textarea'])::placeholder {
+  .fieldPlaceholder();
 }

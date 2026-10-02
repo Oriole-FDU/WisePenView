@@ -1,0 +1,76 @@
+@import '../_common/field.less';
+
+.autocomplete:global(.autocomplete) {
+  .fieldTokens();
+
+  /* HeroUI Autocomplete 变量映射 */
+  --autocomplete-trigger-bg: var(--app-field-bg);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
+  --field-shadow: none;
+}
+
+.autocompleteTrigger:global(.autocomplete__trigger) {
+  width: 100%;
+  min-height: var(--control-height, 36px);
+  align-items: center;
+  .fieldSurface();
+}
+
+.autocompleteTrigger:global(.autocomplete__trigger):hover:not(
+    :has(:global(.autocomplete__clear-button:hover))
+  ),
+.autocompleteTrigger:global(.autocomplete__trigger)[data-hovered='true']:not(
+    :has(:global(.autocomplete__clear-button:hover))
+  ) {
+  .fieldSurfaceHover();
+}
+
+.autocompleteTrigger:global(.autocomplete__trigger):focus,
+.autocompleteTrigger:global(.autocomplete__trigger):focus-visible,
+.autocompleteTrigger:global(.autocomplete__trigger)[data-focus='true'],
+.autocompleteTrigger:global(.autocomplete__trigger)[data-focus-visible='true'] {
+  .fieldSurfaceFocus();
+  outline: none;
+}
+
+.autocomplete:global(.autocomplete)[data-invalid='true']
+  .autocompleteTrigger:global(.autocomplete__trigger),
+.autocomplete:global(.autocomplete)[aria-invalid='true']
+  .autocompleteTrigger:global(.autocomplete__trigger) {
+  .fieldSurfaceInvalid();
+}
+
+.autocomplete:global(.autocomplete)[data-invalid='true']
+  .autocompleteTrigger:global(.autocomplete__trigger):focus,
+.autocomplete:global(.autocomplete)[aria-invalid='true']
+  .autocompleteTrigger:global(.autocomplete__trigger):focus {
+  .fieldSurfaceInvalidFocus();
+}
+
+.autocompleteTrigger:global(.autocomplete__trigger):disabled,
+.autocompleteTrigger:global(.autocomplete__trigger)[data-disabled='true'],
+.autocompleteTrigger:global(.autocomplete__trigger)[aria-disabled='true'] {
+  .fieldSurfaceDisabled();
+}
+
+.autocomplete:global(.autocomplete) :global(.autocomplete__value) {
+  min-width: 0;
+  line-height: var(--line-height-base);
+  letter-spacing: 0;
+}
+
+.autocomplete:global(.autocomplete) :global(.autocomplete__value[data-placeholder='true']) {
+  .fieldPlaceholder();
+}
+
+.autocomplete:global(.autocomplete) :global(.autocomplete__indicator) {
+  .fieldPlaceholder();
+}
+
+/* 下拉层跟表单控件同一套圆角，避免 HeroUI 默认 radius-3xl（最大 32px）过圆 */
+.autocompletePopover:global(.autocomplete__popover) {
+  border-radius: var(--app-field-radius);
+  --app-radius-popover: var(--app-field-radius);
+  --app-radius-popover-item: var(--app-field-radius);
+}

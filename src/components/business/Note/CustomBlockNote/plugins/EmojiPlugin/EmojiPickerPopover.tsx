@@ -7,7 +7,7 @@ import {
 import { useEventListener } from 'ahooks';
 import { useEffect } from 'react';
 
-import { EmojiPickerContent } from '@/components/base/Input/EmojiPicker';
+import { EmojiPickerContent } from '@/components/base/Input';
 
 import { useNoteEditorReadOnlyContext } from '../../engines/editor/_context';
 import { blockNoteSchema } from '../../registry/noteEditorComposition';
