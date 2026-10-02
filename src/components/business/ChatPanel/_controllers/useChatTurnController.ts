@@ -5,12 +5,13 @@ import { useTranslation } from 'react-i18next';
 
 import { useChatService } from '@/domains';
 import { type ChatModel, type CreateSessionRequest, useChatSession } from '@/domains/Chat';
+import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { SendOptions } from '../ChatInput/index.type';
-import type { ResourceChatProtocolPort } from '../ResourceChatProtocol';
+import type { ChatPanelProps } from '../index.type';
 import { hasRenderableChatContent } from './chatTurnModel';
 import { useChatToolApproval } from './useChatToolApproval';
 import { useChatTurnHistory } from './useChatTurnHistory';
@@ -20,7 +21,8 @@ interface UseChatTurnControllerOptions {
   ensureSession: (agentParams?: CreateSessionRequest) => Promise<string | undefined>;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
-  resourceChat?: ResourceChatProtocolPort;
+  resourceChat?: ChatPanelProps['resourceChat'];
+  resourceId?: string;
 }
 
 /**
@@ -35,6 +37,7 @@ export function useChatTurnController({
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
   resourceChat,
+  resourceId,
 }: UseChatTurnControllerOptions) {
   const { t } = useTranslation(['chat', 'common']);
   const appAuth = useAppAuth();
@@ -119,6 +122,24 @@ export function useChatTurnController({
     }
     if (!targetSessionId) return false;
 
+    const frontendState = readFrontendStates({ resourceId });
+    if (frontendState.resourceMismatch) {
+      toast.warning(t('panel.contextMismatch'));
+      return false;
+    }
+    const selectedResourceState = frontendState.states.find(
+      (state) => state.key === 'selected_resources'
+    );
+    const selectedResources =
+      selectedResourceState?.key === 'selected_resources'
+        ? selectedResourceState.value.map((resource) => ({
+            resourceId: resource.resource_id,
+            resourceName: resource.resource_name,
+            resourceType: resource.resource_type,
+            enabled: true,
+          }))
+        : undefined;
+
     const selectedSkillIds = opts?.selectedSkills?.map((skill) => skill.skillId);
     const resourceSkillIds = resourceStateProvider?.onDemandSkillIds;
     const onDemandSkillIds =
@@ -130,11 +151,8 @@ export function useChatTurnController({
       model: targetModel.modelId,
       providerId: targetModel.providerId,
       sessionId: targetSessionId,
-      frontendStates: [
-        ...(resourceStateProvider?.getStates() ?? []),
-        ...(resourceChatContext?.states ?? []),
-      ],
-      selectedResources: opts?.activeDocRefs,
+      frontendStates: frontendState.states,
+      selectedResources,
       uploadedAttachments: opts?.activeAttachments,
       toolSelectionOverrides: opts?.toolSelectionOverrides,
       onDemandSkillIds,
@@ -142,6 +160,7 @@ export function useChatTurnController({
       toast.danger(parseErrorMessage(error));
     });
 
+    frontendState.finishSend();
     if (resourceChatContext) {
       clearResourceChatContext?.(resourceChatContext);
     }

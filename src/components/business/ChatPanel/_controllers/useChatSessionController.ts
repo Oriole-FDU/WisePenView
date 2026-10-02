@@ -14,10 +14,10 @@ import { useAppAuth } from '@/layouts/App/_context';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { ResourceChatProtocolPort } from '../ResourceChatProtocol';
+import type { ChatPanelProps } from '../index.type';
 
 interface UseChatSessionControllerOptions {
-  resourceChat?: ResourceChatProtocolPort;
+  resourceChat?: ChatPanelProps['resourceChat'];
 }
 
 /**

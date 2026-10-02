@@ -1,7 +1,6 @@
 import type { ChatAgentOption } from '@/domains/Chat';
 
 import type { SendOptions } from './ChatInput/index.type';
-import type { ResourceChatProtocolPort } from './ResourceChatProtocol';
 
 /** 面板布局：panel = 贴合窗口右缘的侧栏面板；page = 铺满内容区的整页模式 */
 export type ChatPanelLayout = 'panel' | 'page';
@@ -26,9 +25,18 @@ export interface ChatHostAgentPort {
 }
 
 export interface ChatPanelProps {
+  resourceId?: string;
   fullWidth?: ChatPanelLayout;
   showHeader: boolean;
-  resourceChat?: ResourceChatProtocolPort;
+  resourceChat?: {
+    provider?: {
+      key: string;
+      getBlockedReason?: () => string | undefined;
+      onDemandSkillIds?: readonly string[];
+    };
+    context?: { providerKey: string };
+    clearContext: (context?: { providerKey: string }) => void;
+  };
   /** 宿主注入的 Agent 端口，面板只做转发 */
   hostAgentPort?: ChatHostAgentPort;
   showCollapseButton?: boolean;

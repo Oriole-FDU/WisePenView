@@ -23,13 +23,6 @@ export interface LocalAttachmentPayload {
   thumbnailUrl?: string;
 }
 
-export interface LocalResourcePayload {
-  resourceId: string;
-  resourceName: string;
-  resourceType: string;
-  enabled: boolean;
-}
-
 export interface LocalAttachmentUpload {
   id: string;
   filename: string;
@@ -41,7 +34,6 @@ export interface LocalAttachmentUpload {
 export interface SendOptions {
   model?: ChatModel;
   selectedAgent?: ChatAgentOption;
-  activeDocRefs?: LocalResourcePayload[];
   activeAttachments?: LocalAttachmentPayload[];
   selectedSkills?: CapabilitySkillSelection[];
   toolSelectionOverrides?: Record<string, boolean>;

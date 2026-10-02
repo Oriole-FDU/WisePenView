@@ -55,7 +55,6 @@ export type {
 } from './service/index.type';
 export type {
   ChatCompletionRequest,
-  ChatFrontendState,
   ChatRecoverRequest,
   ClientToolCapability,
   ClientToolCapabilityRequest,

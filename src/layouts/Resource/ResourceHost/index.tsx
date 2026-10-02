@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   Layout,
@@ -20,11 +20,16 @@ import {
   clampChatPanelWidth,
   RESOURCE_MAIN_MIN_WIDTH,
 } from '@/constants/layoutScale';
+import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useAppNavigation } from '@/layouts/AppNavigation/_context';
 import { useMainShell } from '@/layouts/MainShell/_context';
 import { useChatDockLayoutStore } from '@/layouts/MainShell/_store/useChatDockLayoutStore';
-import { useResourceChatProtocolStore } from '@/layouts/Resource/_store/useResourceChatProtocolStore';
+import {
+  buildResourceOpenState,
+  type ResourceChatContext,
+} from '@/layouts/Resource/_context/resourceChatModel';
+import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';
 
 import {
@@ -66,8 +71,50 @@ function ResourceHost({
   const chatPanelWidth = useChatDockLayoutStore((state) => state.chatPanelWidth);
   const setChatPanelCollapsed = useChatDockLayoutStore((state) => state.setChatPanelCollapsed);
   const setChatPanelWidth = useChatDockLayoutStore((state) => state.setChatPanelWidth);
-  const clearResourceChatContext = useResourceChatProtocolStore((state) => state.clearContext);
-  const resourceChatContext = useResourceChatProtocolStore((state) => state.context);
+  const resourceChatContext = useResourceChatContextStore((state) => state.context);
+  const clearResourceChatContext = (context?: ResourceChatContext) => {
+    const current = useResourceChatContextStore.getState().context;
+    if (context && current !== context) return;
+    useResourceChatContextStore.getState().clearContext(context);
+    clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION });
+  };
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：资源宿主离开页面时结束未发送的选区。
+   * 不可替代原因：共享状态按标签存在，资源宿主卸载不会自动清理它。
+   * cleanup：移除当前宿主的选区和匹配信息。
+   */
+  useEffect(
+    () => () => {
+      useResourceChatContextStore.getState().clearContext();
+      clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION });
+    },
+    []
+  );
+  const { resourceId, resourceType, viewer } = routeContext;
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：资源路由变化时更新当前面板的打开资源。
+   * 不可替代原因：资源页和聊天面板可分别挂载，发送读取必须使用当前路由。
+   * cleanup：仅清理本次写入，避免旧资源卸载覆盖新资源。
+   */
+  useEffect(() => {
+    if (!resourceId || !resourceType) {
+      clearFrontendStates({ source: FRONTEND_STATE_SOURCE.RESOURCE });
+      return;
+    }
+    const revision = setFrontendStates({
+      source: FRONTEND_STATE_SOURCE.RESOURCE,
+      resourceId,
+      entries: [buildResourceOpenState({ resourceId, resourceType, viewer })],
+    });
+    return () =>
+      clearFrontendStates({
+        source: FRONTEND_STATE_SOURCE.RESOURCE,
+        revision,
+      });
+  }, [resourceId, resourceType, viewer]);
+
   const resourceBreadcrumbItems = useResourceBreadcrumb(
     routeContext.resourceId,
     routeContext.driveLocation
@@ -98,8 +145,8 @@ function ResourceHost({
     chatPanelCollapsed,
     toggleChatPanel: () => setChatPanelCollapsed(!chatPanelCollapsed),
     openChatPanel: () => setChatPanelCollapsed(false),
-    setChatContext: useResourceChatProtocolStore.getState().setContext,
-    clearChatContext: useResourceChatProtocolStore.getState().clearContext,
+    setChatContext: useResourceChatContextStore.getState().setContext,
+    clearChatContext: clearResourceChatContext,
   } satisfies ResourceHostContextValue;
 
   const chatPanel = (

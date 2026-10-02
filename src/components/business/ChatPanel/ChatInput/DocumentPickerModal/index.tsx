@@ -4,26 +4,31 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
+import {
+  FRONTEND_STATE_SOURCE,
+  type SelectedResourceReference,
+  setFrontendStates,
+  useFrontendStateValue,
+} from '@/frontendState';
 import { usePickerSelection } from '@/hooks/usePickerSelection';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import type { LocalResourcePayload } from '../index.type';
 import styles from './style.module.less';
 
-function mapDriveSelectionToDocRef(item: DriveSelectionItem): LocalResourcePayload | null {
+function mapDriveSelectionToDocRef(item: DriveSelectionItem): SelectedResourceReference | null {
   if ((item.kind !== 'resource' && item.kind !== 'link') || !item.resourceId) return null;
   return {
-    resourceId: item.resourceId,
-    resourceName: item.label || item.resourceId,
-    resourceType: item.resourceType ?? '',
-    enabled: true,
+    resource_id: item.resourceId,
+    resource_name: item.label || item.resourceId,
+    resource_type: item.resourceType ?? '',
   };
 }
 
 function DocumentPickerContent() {
   const { t } = useTranslation(['chat', 'common']);
-  const { addDocRefs, setDocumentPickerOpen } = useChatInputStoreApi().getState();
-  const selection = usePickerSelection<LocalResourcePayload[]>({
+  const { setDocumentPickerOpen } = useChatInputStoreApi().getState();
+  const resources = useFrontendStateValue('selected_resources') ?? [];
+  const selection = usePickerSelection<SelectedResourceReference[]>({
     initialValue: [],
     getCount: (value) => value.length,
   });
@@ -32,7 +37,7 @@ function DocumentPickerContent() {
     selection.setValue(
       items
         .map((item) => mapDriveSelectionToDocRef(item))
-        .filter((item): item is LocalResourcePayload => item != null)
+        .filter((item): item is SelectedResourceReference => item != null)
     );
   }
 
@@ -42,7 +47,12 @@ function DocumentPickerContent() {
   }
 
   function handleConfirm(): void {
-    addDocRefs(selection.value);
+    const existingIds = new Set(resources.map((resource) => resource.resource_id));
+    const additions = selection.value.filter((resource) => !existingIds.has(resource.resource_id));
+    setFrontendStates({
+      source: FRONTEND_STATE_SOURCE.INPUT,
+      entries: [{ key: 'selected_resources', value: [...resources, ...additions] }],
+    });
     handleClose();
   }
 

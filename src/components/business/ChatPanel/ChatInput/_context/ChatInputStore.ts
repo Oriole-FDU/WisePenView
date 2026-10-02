@@ -11,11 +11,7 @@ import {
 import type { ResourceSkillSummary } from '@/domains/Resource';
 import { createStoreJSONStorage } from '@/store/persistence';
 
-import type {
-  LocalAttachmentPayload,
-  LocalAttachmentUpload,
-  LocalResourcePayload,
-} from '../index.type';
+import type { LocalAttachmentPayload, LocalAttachmentUpload } from '../index.type';
 
 const DEFAULT_PERSONAL_AGENT = buildDefaultPersonalAgent();
 const NEW_CHAT_TOOL_SELECTION_SCOPE = '__new_chat__';
@@ -51,14 +47,12 @@ interface ChatInputCompletionState {
   selectedAgent: ChatAgentOption;
   selectedSkills: CapabilitySkillSelection[];
   selectedTools: CapabilityToolOption[];
-  activeDocRefs: LocalResourcePayload[];
   activeAttachments: LocalAttachmentPayload[];
 }
 
 interface ChatInputState {
   // 真正切換會話時遞增，讓舊輸入的非同步工作失效；草稿升級保留同一版本。
   sessionVersion: number;
-  activeDocRefs: LocalResourcePayload[];
   activeAttachments: LocalAttachmentPayload[];
   attachmentOpen: boolean;
   availableModels: ChatModel[];
@@ -80,12 +74,10 @@ interface ChatInputState {
 
 interface ChatInputActions {
   addActiveAttachment: (attachment: LocalAttachmentPayload) => void;
-  addDocRefs: (resources: LocalResourcePayload[]) => void;
   addPendingAttachmentUpload: (upload: LocalAttachmentUpload) => void;
   clearAfterSend: () => void;
   clearCapabilities: () => void;
   removeActiveAttachment: (attachmentId: string) => void;
-  removeDocRef: (resourceId: string) => void;
   removePendingAttachmentUpload: (id: string) => void;
   removeSkill: (skillId: string) => void;
   removeTool: (toolId: string) => void;
@@ -124,7 +116,6 @@ interface ChatInputPersistedState {
 
 const INITIAL_STATE: ChatInputState = {
   sessionVersion: 0,
-  activeDocRefs: [],
   activeAttachments: [],
   attachmentOpen: false,
   availableModels: [],
@@ -176,13 +167,6 @@ export function createChatInputStore(): ChatInputStoreApi {
               : [...state.activeAttachments, attachment],
           })),
 
-        addDocRefs: (resources) =>
-          set((state) => {
-            const existingIds = new Set(state.activeDocRefs.map((resource) => resource.resourceId));
-            const additions = resources.filter((resource) => !existingIds.has(resource.resourceId));
-            return { activeDocRefs: [...state.activeDocRefs, ...additions] };
-          }),
-
         addPendingAttachmentUpload: (upload) =>
           set((state) => ({
             pendingAttachmentUploads: [...state.pendingAttachmentUploads, upload],
@@ -190,7 +174,6 @@ export function createChatInputStore(): ChatInputStoreApi {
 
         clearAfterSend: () =>
           set({
-            activeDocRefs: [],
             activeAttachments: [],
             pendingAttachmentUploads: [],
             value: '',
@@ -210,13 +193,6 @@ export function createChatInputStore(): ChatInputStoreApi {
           set((state) => ({
             activeAttachments: state.activeAttachments.filter(
               (attachment) => attachment.attachmentId !== attachmentId
-            ),
-          })),
-
-        removeDocRef: (resourceId) =>
-          set((state) => ({
-            activeDocRefs: state.activeDocRefs.filter(
-              (resource) => resource.resourceId !== resourceId
             ),
           })),
 
@@ -314,7 +290,6 @@ export function createChatInputStore(): ChatInputStoreApi {
               ...(!shouldPromoteDraft && {
                 sessionVersion: state.sessionVersion + 1,
                 value: '',
-                activeDocRefs: [],
                 activeAttachments: [],
                 pendingAttachmentUploads: [],
               }),
@@ -368,7 +343,6 @@ export function selectChatInputCompletionState(
     selectedAgent: state.selectedAgent,
     selectedSkills: state.selectedSkills,
     selectedTools: state.selectedTools,
-    activeDocRefs: state.activeDocRefs,
     activeAttachments: state.activeAttachments,
   };
 }

@@ -3,6 +3,7 @@
 ## 一、目录归属
 
 - `src/store` 只放生命周期注册和持久化基础设施，不放业务 store，不提供统一业务导出。
+- `src/frontendState` 是跨业务的聊天请求状态协议层：当前标签页只保留一组状态，写者按来源写入，发送前统一读取；它不是 `src/store` 的业务导出目录。
 - 组件状态放到对应组件的 `_store` 目录，例如 `src/components/business/ChatPanel/_store`。
 - 页面私有状态放到对应 view 的 `_store` 目录。
 - 布局状态放到对应 layout 的 `_store` 目录。

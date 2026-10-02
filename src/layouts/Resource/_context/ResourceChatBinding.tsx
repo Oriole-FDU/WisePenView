@@ -2,13 +2,10 @@ import { useEffect } from 'react';
 import { useStore } from 'zustand';
 
 import ChatPanel from '@/components/business/ChatPanel';
-import {
-  createResourceChatStateProvider,
-  type ResourceChatContext,
-} from '@/components/business/ChatPanel/ResourceChatProtocol';
 import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 
 import { type ResourceChatBindingValue } from './ResourceChatBindingContext';
+import { createResourceChatProvider, type ResourceChatContext } from './resourceChatModel';
 import { useResourceChatBinding } from './useResourceChatBinding';
 
 /** 只同步聊天所需的编辑运行态，不参与宿主布局。 */
@@ -51,7 +48,7 @@ export function ResourceChatPanel({
   const provider =
     binding?.provider ??
     (target?.resourceId && target.resourceType
-      ? createResourceChatStateProvider({
+      ? createResourceChatProvider({
           resourceId: target.resourceId,
           resourceType: target.resourceType,
           viewer: target.viewer,
@@ -59,6 +56,7 @@ export function ResourceChatPanel({
       : undefined);
   return (
     <ChatPanel
+      resourceId={target?.resourceId}
       showHeader
       showCollapseButton={showCollapseButton}
       resourceChat={{ provider, context, clearContext }}
