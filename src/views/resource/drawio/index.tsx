@@ -8,7 +8,6 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { publicAppConfig } from '@/config/runtimeConfig';
-import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { useInteractService, useNoteService, useUserService } from '@/domains';
 import type {
   DrawIoLatestSnapshotData,
@@ -19,23 +18,19 @@ import type { ResourceAction, ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
-import { DEFAULT_COLOR_SCHEME } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import ResourceWorkspace, { type ResourceWorkspaceProps } from '../_components/ResourceWorkspace';
 import { useDrawioEditorSession } from './_hooks/useDrawioEditorSession';
+import { useDrawioTheme } from './_hooks/useDrawioTheme';
 import {
   buildDrawioUrl,
   decodeBase64Utf8,
   type DrawioSaveState,
   readDrawioEmbedOrigin,
-  type WisePenTheme,
 } from './drawioProtocol';
 import styles from './style.module.less';
-
-const WISEPEN_COLOR_SCHEMES = new Set(['mist', 'floral', 'aqua', 'sunset', 'emerald', 'lavender']);
-const LEGACY_MIST_COLOR_SCHEME = 'default';
 
 interface DrawioViewProps {
   resourceId?: string;
@@ -51,39 +46,6 @@ interface DrawioViewConnectedProps {
   resourceId: string;
   data: DrawioViewData;
   onRefreshDrawioInfo: () => void;
-}
-
-function readWisePenTheme(): WisePenTheme {
-  const root = document.documentElement;
-  const dataTheme = root.getAttribute('data-theme');
-
-  if (dataTheme === 'dark' || root.classList.contains('dark')) {
-    return 'dark';
-  }
-
-  return 'light';
-}
-
-function readWisePenColorScheme(): string {
-  const rootScheme = document.documentElement.getAttribute('data-color-scheme');
-
-  if (rootScheme && WISEPEN_COLOR_SCHEMES.has(rootScheme)) {
-    return rootScheme;
-  }
-  if (rootScheme === LEGACY_MIST_COLOR_SCHEME) return 'mist';
-
-  try {
-    const storedScheme = window.localStorage.getItem(STORAGE_KEYS.colorScheme);
-
-    if (storedScheme && WISEPEN_COLOR_SCHEMES.has(storedScheme)) {
-      return storedScheme;
-    }
-    if (storedScheme === LEGACY_MIST_COLOR_SCHEME) return 'mist';
-  } catch {
-    // localStorage 不可用时使用默认主题。
-  }
-
-  return DEFAULT_COLOR_SCHEME;
 }
 
 function DrawioWorkspace({
@@ -201,13 +163,6 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
   const canEdit = noteInfoDisplay.canCollaborativeEdit;
   const canViewVersions = Boolean(noteInfoDisplay.ownerId);
   const title = useResourceDisplayName(resourceId, noteInfoDisplay.noteTitle, t('drawio.unnamed'));
-  const drawioUrl = buildDrawioUrl({
-    embedUrl: publicAppConfig.drawio.embedUrl,
-    canEdit,
-    language: i18n.resolvedLanguage ?? 'zh-CN',
-    theme: readWisePenTheme(),
-    colorScheme: readWisePenColorScheme(),
-  });
   const drawioOrigin = readDrawioEmbedOrigin(publicAppConfig.drawio.embedUrl);
   const { iframeRef, currentVersion, saveState, editorReady, editorLoaded, requestSave } =
     useDrawioEditorSession({
@@ -218,6 +173,14 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
       noteService,
       resourceId,
     });
+
+  const initialTheme = useDrawioTheme(iframeRef, drawioOrigin);
+  const drawioUrl = buildDrawioUrl({
+    embedUrl: publicAppConfig.drawio.embedUrl,
+    canEdit,
+    language: i18n.resolvedLanguage ?? 'zh-CN',
+    ...initialTheme,
+  });
 
   const { data: currentUser } = useApi(() => userService.getUserInfo(), {
     ready: Boolean(noteInfoDisplay.ownerId),
