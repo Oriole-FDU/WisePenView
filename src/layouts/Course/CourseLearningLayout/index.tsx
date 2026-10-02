@@ -10,12 +10,12 @@ import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@
 import { chatDockActions, ChatDockLayout, useChatDockState } from '@/layouts/ChatDockLayout';
 import {
   ResourceChatBindingProvider,
+  resourceChatContextActions,
   ResourceChatPanel,
 } from '@/layouts/Resource/_context/chatBinding';
 import { buildResourceOpenState } from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
 import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
-import { resourceChatContextActions } from '@/layouts/Resource/ResourceChatDock';
 import ResourceHeaderBar from '@/layouts/Resource/ResourceLayout/ResourceHeaderBar';
 
 import { useCourseContext } from '../_context';
@@ -100,14 +100,87 @@ function CourseLearningLayoutContent() {
     />
   );
 
+  const studyArea = (
+    <section className={styles.studyShell}>
+      <CourseOutlineSidebar
+        courseId={course.courseId}
+        courseName={course.name}
+        editable={course.myRole === COURSE_ROLE.TEACHER}
+        nodes={navigation.visibleNodes}
+        allNodes={navigation.outlineNodes}
+        selectedNodeId={selectedNode?.nodeId}
+        searchQuery={navigation.searchQuery}
+        expandSearchResults={Boolean(navigation.normalizedQuery)}
+        loading={navigation.loading}
+        error={navigation.error}
+        resourcePageStateMap={navigation.resourcePageStateMap}
+        onSearchQueryChange={navigation.setSearchQuery}
+        onSelectNode={navigation.openOutlineNode}
+        onOpenCourseHome={navigation.openCourseHome}
+        onExpandNode={navigation.expandOutlineNode}
+        onLoadMoreResources={navigation.loadMoreOutlineResources}
+        onRefresh={navigation.refresh}
+        onRetry={navigation.refresh}
+      />
+
+      <div className={styles.studyWorkspace}>
+        {selectedNode?.nodeType === 'RESOURCE' && selectedNode.viewer !== 'video'
+          ? null
+          : workspaceHeader}
+        <main className={styles.studyMain}>
+          {selectedNode ? (
+            selectedNode.nodeType === 'RESOURCE' ? (
+              selectedNode.viewer === 'video' ? (
+                <div className={styles.resourceViewer}>
+                  <Video size={44} aria-hidden />
+                  <h2>{selectedNode.title}</h2>
+                  <p>{t('outline.videoUnsupported')}</p>
+                </div>
+              ) : (
+                <CourseResourceHost
+                  key={selectedNode.nodeId}
+                  courseId={course.courseId}
+                  target={{
+                    resourceId: selectedNode.resourceId,
+                    resourceType: selectedNode.resourceType,
+                    resourceName: selectedNode.title,
+                    viewer: selectedNode.viewer,
+                  }}
+                  fallbackHeader={workspaceHeader}
+                  onTargetChange={(target) => {
+                    if (target.resourceId) navigation.openResource(target.resourceId);
+                  }}
+                  onClose={navigation.openCourseHome}
+                />
+              )
+            ) : (
+              <CourseOutlineOverview
+                key={selectedNode.nodeId}
+                courseId={course.courseId}
+                node={selectedNode}
+                resources={navigation.selectedResources}
+                editable={course.myRole === COURSE_ROLE.TEACHER}
+                onOpenResource={(nodeId) => navigation.openOutlineNode(nodeId)}
+                onSaved={navigation.refresh}
+              />
+            )
+          ) : (
+            <div className={styles.emptyMain}>{t('outline.empty')}</div>
+          )}
+        </main>
+      </div>
+    </section>
+  );
+
   return (
     <ResourceChatBindingProvider>
       <ChatDockLayout
-        mainMinWidth={COURSE_LEARNING_MAIN_MIN_WIDTH}
+        leftMinWidth={COURSE_LEARNING_MAIN_MIN_WIDTH}
         panelId="course-learning-chat"
         chatLabel={t('learning.chat')}
         className={clsx(styles.root, chatDock.open && styles.rootChatOpen)}
-        chat={
+        left={studyArea}
+        right={
           <ResourceChatPanel
             target={
               selectedNode?.nodeType === 'RESOURCE'
@@ -123,77 +196,7 @@ function CourseLearningLayoutContent() {
             clearContext={resourceChatContextActions.clearContext}
           />
         }
-      >
-        <section className={styles.studyShell}>
-          <CourseOutlineSidebar
-            courseId={course.courseId}
-            courseName={course.name}
-            editable={course.myRole === COURSE_ROLE.TEACHER}
-            nodes={navigation.visibleNodes}
-            allNodes={navigation.outlineNodes}
-            selectedNodeId={selectedNode?.nodeId}
-            searchQuery={navigation.searchQuery}
-            expandSearchResults={Boolean(navigation.normalizedQuery)}
-            loading={navigation.loading}
-            error={navigation.error}
-            resourcePageStateMap={navigation.resourcePageStateMap}
-            onSearchQueryChange={navigation.setSearchQuery}
-            onSelectNode={navigation.openOutlineNode}
-            onOpenCourseHome={navigation.openCourseHome}
-            onExpandNode={navigation.expandOutlineNode}
-            onLoadMoreResources={navigation.loadMoreOutlineResources}
-            onRefresh={navigation.refresh}
-            onRetry={navigation.refresh}
-          />
-
-          <div className={styles.studyWorkspace}>
-            {selectedNode?.nodeType === 'RESOURCE' && selectedNode.viewer !== 'video'
-              ? null
-              : workspaceHeader}
-            <main className={styles.studyMain}>
-              {selectedNode ? (
-                selectedNode.nodeType === 'RESOURCE' ? (
-                  selectedNode.viewer === 'video' ? (
-                    <div className={styles.resourceViewer}>
-                      <Video size={44} aria-hidden />
-                      <h2>{selectedNode.title}</h2>
-                      <p>{t('outline.videoUnsupported')}</p>
-                    </div>
-                  ) : (
-                    <CourseResourceHost
-                      key={selectedNode.nodeId}
-                      courseId={course.courseId}
-                      target={{
-                        resourceId: selectedNode.resourceId,
-                        resourceType: selectedNode.resourceType,
-                        resourceName: selectedNode.title,
-                        viewer: selectedNode.viewer,
-                      }}
-                      fallbackHeader={workspaceHeader}
-                      onTargetChange={(target) => {
-                        if (target.resourceId) navigation.openResource(target.resourceId);
-                      }}
-                      onClose={navigation.openCourseHome}
-                    />
-                  )
-                ) : (
-                  <CourseOutlineOverview
-                    key={selectedNode.nodeId}
-                    courseId={course.courseId}
-                    node={selectedNode}
-                    resources={navigation.selectedResources}
-                    editable={course.myRole === COURSE_ROLE.TEACHER}
-                    onOpenResource={(nodeId) => navigation.openOutlineNode(nodeId)}
-                    onSaved={navigation.refresh}
-                  />
-                )
-              ) : (
-                <div className={styles.emptyMain}>{t('outline.empty')}</div>
-              )}
-            </main>
-          </div>
-        </section>
-      </ChatDockLayout>
+      />
     </ResourceChatBindingProvider>
   );
 }

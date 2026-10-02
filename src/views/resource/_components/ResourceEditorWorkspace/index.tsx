@@ -14,12 +14,14 @@ import {
   RESOURCE_VIEWER,
 } from '@/domains/Resource/model/resourceTarget';
 import { chatDockActions } from '@/layouts/ChatDockLayout';
-import { ResourceChatBinding } from '@/layouts/Resource/_context/chatBinding';
+import {
+  ResourceChatBinding,
+  resourceChatContextActions,
+} from '@/layouts/Resource/_context/chatBinding';
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
-import { resourceChatContextActions } from '@/layouts/Resource/ResourceChatDock';
-import ResourceChatToggleButton from '@/layouts/Resource/ResourceChatDock/ResourceChatToggleButton';
 import { ResourceLayout, resourceSidePanelActions } from '@/layouts/Resource/ResourceLayout';
+import ResourceChatToggleButton from '@/views/resource/_components/ResourceChatToggleButton';
 
 /**
  * 把编辑器挂载进资源工作区。

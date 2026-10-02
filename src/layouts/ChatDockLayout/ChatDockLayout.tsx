@@ -14,16 +14,16 @@ import type { ChatDockLayoutProps } from './index.type';
 import styles from './style.module.less';
 
 /**
- * 对话 dock 布局：只负责主内容与对话面板的关系。
+ * 对话 dock 布局：只负责左侧内容与右侧对话面板的关系。
  *
- * 桌面端把对话面板挂在主内容右侧并支持拖拽、折叠与宽度持久化；窄屏改成覆盖式 overlay。
- * 主内容与对话面板都以槽位传入，布局不感知资源、课程或聊天的业务语义。
+ * 桌面端把对话面板挂在左侧内容右侧并支持拖拽、折叠与宽度持久化；窄屏改成覆盖式 overlay。
+ * 左右两侧都以槽位传入，布局不感知资源、课程或聊天的业务语义。
  */
 export default function ChatDockLayout({
-  children,
-  chat,
+  left,
+  right,
+  leftMinWidth,
   chatLabel,
-  mainMinWidth,
   panelId = 'app-chat-dock',
   className,
 }: ChatDockLayoutProps) {
@@ -44,10 +44,10 @@ export default function ChatDockLayout({
         onLayoutChanged={panel.handleLayoutChanged}
       >
         <SystemResizablePanel
-          minSize={isMobileLayout ? 0 : mainMinWidth}
+          minSize={isMobileLayout ? 0 : leftMinWidth}
           className={styles.mainPanel}
         >
-          {children}
+          {left}
         </SystemResizablePanel>
 
         {!isMobileLayout ? (
@@ -69,7 +69,7 @@ export default function ChatDockLayout({
               aria-hidden={!panel.open ? true : undefined}
               onResize={panel.handleResize}
             >
-              {panel.open ? chat : null}
+              {panel.open ? right : null}
             </SystemResizablePanel>
           </>
         ) : null}
@@ -77,7 +77,7 @@ export default function ChatDockLayout({
 
       {overlayOpen ? (
         <div className={styles.chatOverlay} role="dialog" aria-modal="true" aria-label={chatLabel}>
-          {chat}
+          {right}
         </div>
       ) : null}
     </div>

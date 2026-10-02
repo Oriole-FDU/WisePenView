@@ -4,10 +4,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { useChatDockState } from '@/layouts/ChatDockLayout';
 
-/**
- * 资源顶栏里的聊天开关。
- * 折叠态读应用壳 chat dock store，资源布局不持有聊天状态，只把开关作为顶栏动作插槽传入。
- */
+/** 资源顶栏里的对话开关：只读对话 dock 状态，不带任何资源布局语义。 */
 export default function ResourceChatToggleButton() {
   const { t } = useTranslation('chat');
   const { collapsed, toggle } = useChatDockState();

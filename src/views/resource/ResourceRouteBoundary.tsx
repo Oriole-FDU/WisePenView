@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import { RESOURCE_MAIN_MIN_WIDTH } from '@/constants/layoutScale';
 import type { DriveNodeScope } from '@/domains/Drive';
 import {
   normalizeResourceKind,
@@ -10,7 +13,14 @@ import {
   type ResourceViewer,
 } from '@/domains/Resource/model/resourceTarget';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { ResourceChatDock } from '@/layouts/Resource/ResourceChatDock';
+import { ChatDockLayout } from '@/layouts/ChatDockLayout';
+import { useMainShell } from '@/layouts/MainShell/_context';
+import {
+  ResourceChatBindingProvider,
+  resourceChatContextActions,
+  ResourceChatPanel,
+} from '@/layouts/Resource/_context/chatBinding';
+import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
 import ResourceHost from '@/layouts/Resource/ResourceHost';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
@@ -23,6 +33,8 @@ import {
 import ResourceRouteView from './ResourceRouteView';
 
 function ResourceRouteBoundary() {
+  const { t } = useTranslation('workspace');
+  const { isMobileLayout } = useMainShell();
   const location = useLocation();
   const navigate = useNavigate();
   const openResource = useOpenResource();
@@ -81,6 +93,15 @@ function ResourceRouteBoundary() {
     );
   };
 
+  const chatContext = useResourceChatContextStore((state) => state.context);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：离开资源视图时结束未发送的选区。
+   * 不可替代原因：聊天上下文按标签存在，卸载不会自动清理它。
+   * cleanup：移除当前资源的选区和匹配信息。
+   */
+  useEffect(() => () => resourceChatContextActions.clearContext(), []);
+
   const navigateResourceHash = (hash: string) => {
     void navigate(
       { pathname: location.pathname, search: location.search, hash },
@@ -89,23 +110,38 @@ function ResourceRouteBoundary() {
   };
 
   return (
-    <ResourceChatDock target={routeContext}>
-      <ResourceHost
-        routeContext={routeContext}
-        openResource={openResource}
-        navigateToDrive={navigateToDrive}
-        switchResourceViewer={switchResourceViewer}
-        navigateResourceHash={navigateResourceHash}
-      >
-        <RouteOutletBoundary>
-          <ResourceRouteView
-            target={target}
-            onTargetChange={handleTargetChange}
-            onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
+    <ResourceChatBindingProvider>
+      <ChatDockLayout
+        leftMinWidth={RESOURCE_MAIN_MIN_WIDTH}
+        panelId="app-resource-chat"
+        chatLabel={t('shell.chatPanel')}
+        left={
+          <ResourceHost
+            routeContext={routeContext}
+            openResource={openResource}
+            navigateToDrive={navigateToDrive}
+            switchResourceViewer={switchResourceViewer}
+            navigateResourceHash={navigateResourceHash}
+          >
+            <RouteOutletBoundary>
+              <ResourceRouteView
+                target={target}
+                onTargetChange={handleTargetChange}
+                onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
+              />
+            </RouteOutletBoundary>
+          </ResourceHost>
+        }
+        right={
+          <ResourceChatPanel
+            target={routeContext}
+            showCollapseButton={isMobileLayout}
+            context={chatContext}
+            clearContext={resourceChatContextActions.clearContext}
           />
-        </RouteOutletBoundary>
-      </ResourceHost>
-    </ResourceChatDock>
+        }
+      />
+    </ResourceChatBindingProvider>
   );
 }
 
