@@ -62,6 +62,6 @@ export type {
   ToolApprovalStatusRequest,
   UseChatSessionOptions,
 } from './session/index.type';
-export { useChatSessionMetadata } from './session/sessionCache';
 export { useChatHistory } from './session/useChatHistory';
 export { useChatSession } from './session/useChatSession';
+export { useChatSessionMetadata } from './session/useChatSessionMetadata';

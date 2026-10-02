@@ -2,7 +2,7 @@ import { ResourceItemApi, ResourcePlacementApi } from '@domain-apis';
 
 import type { ListResourceItemsApiRequest } from '../apis/ResourceApi.type';
 import { ResourceServicesMap } from '../mapper/ResourceServices.map';
-import { useResourceDisplayNameStore } from '../store/useResourceDisplayNameStore';
+import { setResourceDisplayName } from '../session/resourceDisplayNameCache';
 import type {
   GetGroupResourceRequest,
   GetUserResourcesRequest,
@@ -40,7 +40,7 @@ const getGroupResources = async (params: GetGroupResourceRequest): Promise<Resou
 
 const renameResource = async (params: RenameResourceRequest): Promise<void> => {
   await ResourceItemApi.renameResource(params);
-  useResourceDisplayNameStore.getState().setDisplayName(params.resourceId, params.newName);
+  setResourceDisplayName(params.resourceId, params.newName);
 };
 
 const removeResources = async (params: RemoveResourcesRequest): Promise<void> => {
