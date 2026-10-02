@@ -1,4 +1,4 @@
-import { Autocomplete, EmptyState, type Key, ListBox, SearchField, useFilter } from '@heroui/react';
+import { EmptyState, type Key, ListBox, useFilter } from '@heroui/react';
 import { Plus, Sparkles, Trash2, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { Autocomplete, SearchField } from '@/components/base/Input';
 
 import styles from './style.module.less';
 
@@ -142,7 +143,7 @@ export default function CapabilityPolicyPanel({
       >
         <div className={styles.modalPicker}>
           <Autocomplete.Filter filter={contains}>
-            <SearchField autoFocus variant="secondary">
+            <SearchField fullWidth autoFocus>
               <SearchField.Group>
                 <SearchField.SearchIcon />
                 <SearchField.Input placeholder={searchPlaceholder} />

@@ -144,58 +144,13 @@
   width: 100%;
 }
 
+/* 表面、悬浮与焦点样式统一由 Autocomplete.Trigger 提供，这里只保留多选成员所需的尺寸约束 */
 .memberPickerTrigger {
-  --app-input-slot-bg: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-input-slot-bg-hover: color-mix(
-    in oklab,
-    var(--surface-tertiary) 70%,
-    var(--surface) 30%
-  );
-  --app-input-slot-bg-focus: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
-  --app-input-slot-border: var(--field-border);
-  --app-input-slot-border-hover: var(--field-border-hover);
-  --app-input-slot-border-focus: var(--field-border-focus);
-  --app-input-slot-focus-ring: inset 0 0 0 1px var(--focus);
+  --control-height: var(--control-height-lg);
 
-  width: 100%;
-  min-height: 40px;
   max-height: 72px;
   overflow: auto;
   .appSubtleScrollbar();
-  box-sizing: border-box;
-  border: 1px solid var(--app-input-slot-border);
-  background-color: var(--app-input-slot-bg);
-  color: var(--foreground);
-  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
-  box-shadow: var(--shadow-none);
-}
-
-.memberPickerTrigger:hover,
-.memberPickerTrigger[data-hovered='true'] {
-  border-color: var(--app-input-slot-border-hover);
-  background-color: var(--app-input-slot-bg-hover);
-}
-
-.memberPickerTrigger:focus-within,
-.memberPickerTrigger[data-focused='true'],
-.memberPickerTrigger[data-focus-within='true'],
-.memberPickerTrigger[data-open='true'] {
-  border-color: var(--app-input-slot-border-focus);
-  background-color: var(--app-input-slot-bg-focus);
-  box-shadow: var(--app-input-slot-focus-ring);
-}
-
-.memberPickerTrigger:focus-visible,
-.memberPickerTrigger[data-focus-visible='true'] {
-  outline: none;
 }
 
 .memberPickerTrigger :global([data-slot='autocomplete-value']) {

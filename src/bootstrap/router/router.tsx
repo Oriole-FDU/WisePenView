@@ -11,7 +11,6 @@ import AppNavigationLayout from '@/layouts/AppNavigation/AppNavigationLayout';
 import AuthLayout from '@/layouts/Auth/AuthLayout';
 import CourseLayout from '@/layouts/Course/CourseLayout';
 import CourseLearningLayout from '@/layouts/Course/CourseLearningLayout';
-import ResourceHost from '@/layouts/Resource/ResourceHost';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import AdminRouteGuard from '@/views/admin/guard/AdminRouteGuard';
 import AppError from '@/views/app/error/AppError';
@@ -60,7 +59,7 @@ const AuthBindingOnboarding = lazy(() => import('@/views/app/auth/AuthBindingOnb
 const ResetPassword = lazy(() => import('@/views/app/auth/ResetPassword'));
 const NewPassword = lazy(() => import('@/views/app/auth/NewPassword'));
 const VerifyEmail = lazy(() => import('@/views/app/auth/VerifyEmail'));
-const ResourceRouteView = lazy(() => import('@/views/resource/ResourceRouteView'));
+const ResourceRouteBoundary = lazy(() => import('@/views/resource/ResourceRouteBoundary'));
 const ChatPage = lazy(() => import('@/views/app/chat'));
 const NotificationsPage = lazy(() => import('@/views/app/notifications'));
 const CourseRoute = lazy(() => import('@/views/app/course/CourseRoute'));
@@ -286,14 +285,8 @@ const router = createBrowserRouter([
               },
               {
                 path: 'resources/:resourceType/:resourceId',
-                element: <ResourceHost />,
-                children: [
-                  {
-                    index: true,
-                    element: <ResourceRouteView />,
-                    handle: driveRouteHandle,
-                  },
-                ],
+                element: <ResourceRouteBoundary />,
+                handle: driveRouteHandle,
               },
               {
                 path: 'courses/:courseId',

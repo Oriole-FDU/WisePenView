@@ -1,6 +1,7 @@
 import { createContext, type ReactNode } from 'react';
 
-import type { DriveResourceLocation } from '@/domains/Drive';
+import type { DriveNodeScope, DriveResourceLocation } from '@/domains/Drive';
+import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
 import type { ResourceHeaderProps } from '@/layouts/Resource/ResourceHeader/index.type';
 import type { ResourceWorkspaceHeaderProps } from '@/layouts/Resource/ResourceWorkspaceHeader/index.type';
 
@@ -26,10 +27,23 @@ export interface ResourceHostRouteContext {
   driveLocation?: DriveResourceLocation;
 }
 
+export interface ResourceHostDriveNavigationTarget {
+  scope: DriveNodeScope;
+  nodeId?: string;
+}
+
+export interface ResourceHostViewerNavigationTarget {
+  resourceId: string;
+  viewer: ResourceViewer;
+}
+
 export interface ResourceHostContextValue {
   hostId: string;
   routeContext: ResourceHostRouteContext;
   openResource: OpenResourceFn;
+  navigateToDrive: (target: ResourceHostDriveNavigationTarget) => void;
+  switchResourceViewer: (target: ResourceHostViewerNavigationTarget) => void;
+  navigateResourceHash?: (hash: string) => void;
   headerNavigation?: Pick<
     ResourceWorkspaceHeaderProps,
     | 'leftSidebarCollapsed'

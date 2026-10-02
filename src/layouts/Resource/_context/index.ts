@@ -5,6 +5,9 @@ export {
   DEFAULT_RESOURCE_HOST_ID,
   type OpenResourceFn,
   type ResourceHostContextValue,
+  type ResourceHostDriveNavigationTarget,
+  type ResourceHostRouteContext,
+  type ResourceHostViewerNavigationTarget,
 } from './ResourceHostContext';
 export { ResourceHostProvider } from './ResourceHostProvider';
 export {
