@@ -10,6 +10,7 @@ import type { DataNode } from '@/components/base/Tree';
 import VersionDropdown from '@/components/business/VersionDropdown';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { SkillServicesMap } from '@/domains/Skill';
+import { useResourceHostContext } from '@/layouts/Resource/_context';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
@@ -42,6 +43,7 @@ interface SkillViewProps {
 
 function SkillView({ resourceId }: SkillViewProps) {
   const { t } = useTranslation('skill');
+  const { navigateResourceHash } = useResourceHostContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resource = useSkillResourceController(resourceId);
   const workspace = useSkillWorkspaceDraftController(resource.skill, resource.currentUserId);
@@ -322,6 +324,7 @@ function SkillView({ resourceId }: SkillViewProps) {
                     markdownPreviewRef={markdownPreviewRef}
                     markdownResourceResolver={markdownResourceResolver}
                     navigationVersionLoading={navigation.versionLoading}
+                    onAnchorNavigate={navigateResourceHash}
                     resourceId={resourceId}
                     selectedFile={selectedFile}
                     selectedMarkdownView={selectedMarkdownView}

@@ -1,57 +1,16 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-
-import {
-  normalizeResourceKind,
-  normalizeResourceViewer,
-  type ResourceTarget,
-} from '@/domains/Resource/model/resourceTarget';
-import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { buildResourcePathWithSearch } from '@/utils/navigation/resourceRoute';
+import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 
 import ResourceTargetResolver from './ResourceTargetResolver';
 
-function ResourceRouteView() {
-  const { resourceType: rawResourceType, resourceId } = useParams<{
-    resourceType?: string;
-    resourceId?: string;
-  }>();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const viewerParam = new URLSearchParams(location.search).get('viewer') ?? undefined;
+interface ResourceRouteViewProps {
+  target: ResourceTarget;
+  onTargetChange: (target: ResourceTarget) => void;
+  onClose: () => void;
+}
 
-  const target: ResourceTarget = {
-    resourceType: rawResourceType,
-    resourceId,
-    viewer: viewerParam,
-  };
-
-  const handleTargetChange = (nextTarget: ResourceTarget) => {
-    const resourceType = normalizeResourceKind(nextTarget.resourceType);
-    const nextResourceId = nextTarget.resourceId?.trim();
-    if (!resourceType || !nextResourceId) return;
-    navigate(
-      buildResourcePathWithSearch(
-        {
-          resourceType,
-          resourceId: nextResourceId,
-          viewer: normalizeResourceViewer(nextTarget.viewer),
-        },
-        location.search
-      ),
-      { replace: true }
-    );
-  };
-
-  const handleClose = () => {
-    navigate(APP_ROUTE_PATH.DRIVE_PERSONAL);
-  };
-
+function ResourceRouteView({ target, onTargetChange, onClose }: ResourceRouteViewProps) {
   return (
-    <ResourceTargetResolver
-      target={target}
-      onTargetChange={handleTargetChange}
-      onClose={handleClose}
-    />
+    <ResourceTargetResolver target={target} onTargetChange={onTargetChange} onClose={onClose} />
   );
 }
 
