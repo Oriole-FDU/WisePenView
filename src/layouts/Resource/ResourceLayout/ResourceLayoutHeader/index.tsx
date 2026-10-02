@@ -3,12 +3,13 @@ import { clsx } from 'clsx';
 import NavigationControls from '@/components/business/Sidebar/_common/header/NavigationControls';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
-import ResourceHeader from '../ResourceHeader';
-import type { ResourceHeaderBarProps } from './index.type';
+import ResourceToolbar from '../ResourceToolbar';
+import type { ResourceLayoutHeaderProps } from './index.type';
 import styles from './style.module.less';
 
-function ResourceHeaderBar({
-  resource,
+/** 布局顶栏外壳：装配宿主导航、资源工具栏与标题区，并处理桌面窗口留白。 */
+function ResourceLayoutHeader({
+  resourceToolbar,
   inlineTitle,
   extra,
   sidePanelActions,
@@ -20,7 +21,7 @@ function ResourceHeaderBar({
   onGoForward,
   onToggleLeftSidebar,
   className,
-}: ResourceHeaderBarProps) {
+}: ResourceLayoutHeaderProps) {
   const desktopWindow = useDesktopWindowState();
 
   const titleBarInsetStart =
@@ -58,16 +59,16 @@ function ResourceHeaderBar({
               />
             </div>
           ) : null}
-          {resource ? (
-            <div className={styles.resourceHeader}>
-              <ResourceHeader {...resource} trailingActions={sidePanelActions} />
+          {resourceToolbar ? (
+            <div className={styles.resourceToolbar}>
+              <ResourceToolbar {...resourceToolbar} trailingActions={sidePanelActions} />
             </div>
           ) : (
             <div className={styles.toolbarMiddle}>
               {inlineTitle ? <div className={styles.inlineTitle}>{inlineTitle}</div> : null}
             </div>
           )}
-          {resource ? null : (
+          {resourceToolbar ? null : (
             <div className={styles.toolbarEnd}>
               {extra}
               {sidePanelActions}
@@ -84,4 +85,4 @@ function ResourceHeaderBar({
   );
 }
 
-export default ResourceHeaderBar;
+export default ResourceLayoutHeader;

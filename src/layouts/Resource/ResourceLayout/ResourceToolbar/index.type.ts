@@ -9,25 +9,25 @@ import type {
   ResourcePermissionResourceType,
 } from '@/domains/Resource';
 
-export interface ResourceHeaderDownloadAction {
+export interface ResourceToolbarDownloadAction {
   label: string;
   onAction: () => void;
 }
 
-export interface ResourceHeaderMoreAction {
+export interface ResourceToolbarMoreAction {
   id: string;
   label: string;
   icon: LucideIcon;
   onAction(): void;
 }
 
-export interface ResourceHeaderMoreMenu {
+export interface ResourceToolbarMoreMenu {
   advanced?: ReactNode;
-  actions?: readonly ResourceHeaderMoreAction[];
+  actions?: readonly ResourceToolbarMoreAction[];
   onPrint?: () => void;
   printLabel?: string;
   printIcon?: LucideIcon;
-  download?: ResourceHeaderDownloadAction;
+  download?: ResourceToolbarDownloadAction;
   isPending?: boolean;
   /** 全文搜索：点击后由页面自行展示搜索条（非菜单 hover 子面板） */
   onSearch?: () => void;
@@ -37,7 +37,7 @@ export interface ResourceHeaderMoreMenu {
   onInlineCommentHistory?: () => void;
 }
 
-export interface ResourceHeaderConfig {
+export interface ResourceToolbarConfig {
   resourceId?: string;
   resourceName: string;
   resourceType?: string;
@@ -52,12 +52,12 @@ export interface ResourceHeaderConfig {
   titleMeta?: ReactNode;
   leadingActions?: ReactNode;
   actions?: ReactNode;
-  moreMenu?: ResourceHeaderMoreMenu;
+  moreMenu?: ResourceToolbarMoreMenu;
   /** 隐藏面包屑导航（笔记编辑页等场景） */
   hideBreadcrumb?: boolean;
 }
 
-export interface ResourceHeaderProps extends ResourceHeaderConfig {
+export interface ResourceToolbarProps extends ResourceToolbarConfig {
   breadcrumbItems: AppBreadcrumbItem[];
   trailingActions?: ReactNode;
 }

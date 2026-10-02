@@ -25,23 +25,23 @@ import type {
   ResourcePermissionResourceType,
 } from '@/domains/Resource';
 
-import type { ResourceHeaderMoreMenu } from './index.type';
-import ResourceHeaderOperations, {
-  type ResourceHeaderOperationHandlers,
-} from './ResourceHeaderOperations';
+import type { ResourceToolbarMoreMenu } from './index.type';
+import ResourceToolbarOperations, {
+  type ResourceToolbarOperationHandlers,
+} from './ResourceToolbarOperations';
 import styles from './style.module.less';
 
-interface ResourceHeaderMenuItemContentProps {
+interface ResourceToolbarMenuItemContentProps {
   icon: LucideIcon;
   label: string;
   trailing?: ReactNode;
 }
 
-function ResourceHeaderMenuItemContent({
+function ResourceToolbarMenuItemContent({
   icon: Icon,
   label,
   trailing,
-}: ResourceHeaderMenuItemContentProps) {
+}: ResourceToolbarMenuItemContentProps) {
   return (
     <>
       <Icon size={16} aria-hidden="true" />
@@ -51,15 +51,15 @@ function ResourceHeaderMenuItemContent({
   );
 }
 
-function ResourceHeaderMore({
+function ResourceToolbarMore({
   menu,
   operations,
   canManagePermission,
   isDisabled,
   onOpenPermission,
 }: {
-  menu?: ResourceHeaderMoreMenu;
-  operations: ResourceHeaderOperationHandlers;
+  menu?: ResourceToolbarMoreMenu;
+  operations: ResourceToolbarOperationHandlers;
   canManagePermission: boolean;
   isDisabled?: boolean;
   onOpenPermission: () => void;
@@ -136,7 +136,7 @@ function ResourceHeaderMore({
           {operations.onOpenOriginal ? (
             <Dropdown.Section>
               <Dropdown.Item id="open-original" textValue={t('header.openOriginal')}>
-                <ResourceHeaderMenuItemContent
+                <ResourceToolbarMenuItemContent
                   icon={ExternalLink}
                   label={t('header.openOriginal')}
                 />
@@ -146,7 +146,7 @@ function ResourceHeaderMore({
           {operations.onCopy ? (
             <Dropdown.Section>
               <Dropdown.Item id="create-copy" textValue={t('header.createCopy')}>
-                <ResourceHeaderMenuItemContent icon={Copy} label={t('header.createCopy')} />
+                <ResourceToolbarMenuItemContent icon={Copy} label={t('header.createCopy')} />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
@@ -154,17 +154,17 @@ function ResourceHeaderMore({
             <Dropdown.Section>
               {operations.onCreateLink ? (
                 <Dropdown.Item id="add-link" textValue={t('header.addLink')}>
-                  <ResourceHeaderMenuItemContent icon={Link2} label={t('header.addLink')} />
+                  <ResourceToolbarMenuItemContent icon={Link2} label={t('header.addLink')} />
                 </Dropdown.Item>
               ) : null}
               {operations.onMove ? (
                 <Dropdown.Item id="move-to" textValue={t('header.moveTo')}>
-                  <ResourceHeaderMenuItemContent icon={FolderInput} label={t('header.moveTo')} />
+                  <ResourceToolbarMenuItemContent icon={FolderInput} label={t('header.moveTo')} />
                 </Dropdown.Item>
               ) : null}
               {operations.onShare ? (
                 <Dropdown.Item id="share-to" textValue={t('header.shareToGroup')}>
-                  <ResourceHeaderMenuItemContent icon={Share2} label={t('header.shareToGroup')} />
+                  <ResourceToolbarMenuItemContent icon={Share2} label={t('header.shareToGroup')} />
                 </Dropdown.Item>
               ) : null}
             </Dropdown.Section>
@@ -172,7 +172,7 @@ function ResourceHeaderMore({
           {canManagePermission ? (
             <Dropdown.Section>
               <Dropdown.Item id="permission" textValue={t('header.permission')}>
-                <ResourceHeaderMenuItemContent icon={ShieldCheck} label={t('header.permission')} />
+                <ResourceToolbarMenuItemContent icon={ShieldCheck} label={t('header.permission')} />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
@@ -183,7 +183,7 @@ function ResourceHeaderMore({
                 textValue={t('header.inlineCommentHistory')}
                 isDisabled={!menu.onInlineCommentHistory}
               >
-                <ResourceHeaderMenuItemContent
+                <ResourceToolbarMenuItemContent
                   icon={MessageSquare}
                   label={t('header.inlineCommentHistory')}
                 />
@@ -193,7 +193,7 @@ function ResourceHeaderMore({
           {menu?.onSearch ? (
             <Dropdown.Section>
               <Dropdown.Item id="search" textValue={t('header.fullTextSearch')}>
-                <ResourceHeaderMenuItemContent icon={Search} label={t('header.fullTextSearch')} />
+                <ResourceToolbarMenuItemContent icon={Search} label={t('header.fullTextSearch')} />
               </Dropdown.Item>
             </Dropdown.Section>
           ) : null}
@@ -201,7 +201,7 @@ function ResourceHeaderMore({
             <Dropdown.Section>
               {menu.actions.map((action) => (
                 <Dropdown.Item key={action.id} id={action.id} textValue={action.label}>
-                  <ResourceHeaderMenuItemContent icon={action.icon} label={action.label} />
+                  <ResourceToolbarMenuItemContent icon={action.icon} label={action.label} />
                 </Dropdown.Item>
               ))}
             </Dropdown.Section>
@@ -210,7 +210,7 @@ function ResourceHeaderMore({
             <Dropdown.Section>
               {menu.onPrint ? (
                 <Dropdown.Item id="print" textValue={menu.printLabel ?? t('header.print')}>
-                  <ResourceHeaderMenuItemContent
+                  <ResourceToolbarMenuItemContent
                     icon={menu.printIcon ?? Printer}
                     label={menu.printLabel ?? t('header.print')}
                   />
@@ -218,7 +218,7 @@ function ResourceHeaderMore({
               ) : null}
               {menu.download ? (
                 <Dropdown.Item id="download" textValue={menu.download.label}>
-                  <ResourceHeaderMenuItemContent icon={Download} label={menu.download.label} />
+                  <ResourceToolbarMenuItemContent icon={Download} label={menu.download.label} />
                 </Dropdown.Item>
               ) : null}
             </Dropdown.Section>
@@ -227,7 +227,7 @@ function ResourceHeaderMore({
             <Dropdown.Section>
               <Dropdown.SubmenuTrigger>
                 <Dropdown.Item id="advanced" textValue={t('header.advanced')}>
-                  <ResourceHeaderMenuItemContent
+                  <ResourceToolbarMenuItemContent
                     icon={Settings2}
                     label={t('header.advanced')}
                     trailing={<Dropdown.SubmenuIndicator />}
@@ -249,7 +249,7 @@ function ResourceHeaderMore({
                 textValue={operations.deleteLabel ?? t('header.deleteFile')}
                 variant="danger"
               >
-                <ResourceHeaderMenuItemContent
+                <ResourceToolbarMenuItemContent
                   icon={Trash2}
                   label={operations.deleteLabel ?? t('header.deleteFile')}
                 />
@@ -262,7 +262,7 @@ function ResourceHeaderMore({
   );
 }
 
-export interface ResourceHeaderActionsProps {
+export interface ResourceToolbarActionsProps {
   resourceId?: string;
   resourceName: string;
   resourceType?: string;
@@ -270,7 +270,7 @@ export interface ResourceHeaderActionsProps {
   resourceInfo?: ResourceItem;
   currentActions?: ResourceAction[] | null;
   copyVersion?: number;
-  moreMenu?: ResourceHeaderMoreMenu;
+  moreMenu?: ResourceToolbarMoreMenu;
   isDisabled?: boolean;
   leadingActions?: ReactNode;
   actions?: ReactNode;
@@ -279,8 +279,8 @@ export interface ResourceHeaderActionsProps {
   onOpenPermission: () => void;
 }
 
-/** 资源顶栏动作区：编辑器提供的动作节点、资源管理菜单与右侧栏动作都走这里。 */
-export default function ResourceHeaderActions({
+/** 资源工具栏动作区：编辑器提供的动作节点、资源管理菜单与右侧栏动作都走这里。 */
+export default function ResourceToolbarActions({
   resourceId,
   resourceName,
   resourceType,
@@ -295,7 +295,7 @@ export default function ResourceHeaderActions({
   trailingActions,
   canManagePermission,
   onOpenPermission,
-}: ResourceHeaderActionsProps) {
+}: ResourceToolbarActionsProps) {
   return (
     <div className={styles.actions}>
       {leadingActions ? <div className={styles.actionGroup}>{leadingActions}</div> : null}
@@ -303,15 +303,15 @@ export default function ResourceHeaderActions({
       {resourceId || trailingActions ? (
         <div className={styles.actionGroup}>
           {resourceId ? (
-            <ResourceHeaderOperations
+            <ResourceToolbarOperations
               resourceId={resourceId}
               resourceName={resourceName}
               resourceType={resourceType ?? permissionResourceType}
               resourceInfo={resourceInfo}
               currentActions={currentActions}
               copyVersion={copyVersion}
-              onResolve={(operations: ResourceHeaderOperationHandlers) => (
-                <ResourceHeaderMore
+              onResolve={(operations: ResourceToolbarOperationHandlers) => (
+                <ResourceToolbarMore
                   menu={moreMenu}
                   operations={operations}
                   canManagePermission={canManagePermission}

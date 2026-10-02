@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 
 import type { ResourceLayoutProps } from './index.type';
-import ResourceHeaderBar from './ResourceHeaderBar';
+import ResourceLayoutHeader from './ResourceLayoutHeader';
 import ResourceSidePanel from './ResourceSidePanel';
 import ResourceSidePanelActions from './ResourceSidePanel/Actions';
 import styles from './style.module.less';
@@ -22,7 +22,7 @@ export default function ResourceLayout({
   headerTrailingActions,
 }: ResourceLayoutProps) {
   const host = useResourceHostContext();
-  const resource =
+  const resourceToolbar =
     header && header.resource
       ? {
           ...header.resource,
@@ -35,29 +35,29 @@ export default function ResourceLayout({
         <ResourceSidePanelActions
           resourceId={sidePanel.resource.resourceId}
           inlineCommentAvailable={Boolean(sidePanel.inlineComment)}
-          disabled={resource?.isDisabled}
+          disabled={resourceToolbar?.isDisabled}
         />
       ) : null}
       {headerTrailingActions}
     </>
   );
   const hasTrailingActions = Boolean(sidePanel || headerTrailingActions);
-  const headerBar = resource ? (
-    <ResourceHeaderBar
+  const layoutHeader = resourceToolbar ? (
+    <ResourceLayoutHeader
       {...host.headerNavigation}
-      resource={resource}
+      resourceToolbar={resourceToolbar}
       sidePanelActions={hasTrailingActions ? trailingActions : undefined}
     />
   ) : (
     (host.fallbackHeader ??
     (header !== false || host.headerNavigation?.leftSidebarCollapsed ? (
-      <ResourceHeaderBar {...host.headerNavigation} />
+      <ResourceLayoutHeader {...host.headerNavigation} />
     ) : null))
   );
 
   return (
     <div className={clsx(styles.root, className)}>
-      {headerBar}
+      {layoutHeader}
       <div className={styles.body}>
         <ResourceSidePanel resourceId={host.routeContext.resourceId ?? ''} config={sidePanel}>
           {children}

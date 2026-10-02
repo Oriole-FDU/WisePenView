@@ -34,7 +34,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import ResourceTargetModal from './ResourceTargetModal';
 
-export interface ResourceHeaderOperationHandlers {
+export interface ResourceToolbarOperationHandlers {
   deleteLabel?: string;
   isLocating: boolean;
   onCopy?: () => void;
@@ -47,20 +47,20 @@ export interface ResourceHeaderOperationHandlers {
 
 type TargetModal = 'copy' | 'link' | 'share' | null;
 
-interface ResourceHeaderOperationsProps {
+interface ResourceToolbarOperationsProps {
   resourceId: string;
   resourceName: string;
   resourceType?: string;
   resourceInfo?: ResourceItem;
   currentActions?: ResourceAction[] | null;
   copyVersion?: number;
-  onResolve: (handlers: ResourceHeaderOperationHandlers) => ReactNode;
+  onResolve: (handlers: ResourceToolbarOperationHandlers) => ReactNode;
 }
 
 const normalizeResourceType = (resourceType?: string): string =>
   resourceType?.trim().toLowerCase() ?? '';
 
-function ResourceHeaderOperations({
+function ResourceToolbarOperations({
   resourceId,
   resourceName,
   resourceType,
@@ -68,7 +68,7 @@ function ResourceHeaderOperations({
   currentActions,
   copyVersion,
   onResolve,
-}: ResourceHeaderOperationsProps) {
+}: ResourceToolbarOperationsProps) {
   const { t } = useTranslation(['resource', 'drive']);
   const driveService = useDriveService();
   const noteService = useNoteService();
@@ -243,7 +243,7 @@ function ResourceHeaderOperations({
     navigateToDrive({ scope, nodeId: node?.parentId });
   };
 
-  const handlers: ResourceHeaderOperationHandlers = {
+  const handlers: ResourceToolbarOperationHandlers = {
     deleteLabel:
       node?.type === 'link'
         ? t('drive:delete.deleteLink')
@@ -325,4 +325,4 @@ function ResourceHeaderOperations({
   );
 }
 
-export default ResourceHeaderOperations;
+export default ResourceToolbarOperations;

@@ -16,7 +16,7 @@ import {
 import { buildResourceOpenState } from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
 import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
-import ResourceHeaderBar from '@/layouts/Resource/ResourceLayout/ResourceHeaderBar';
+import ResourceLayoutHeader from '@/layouts/Resource/ResourceLayout/ResourceLayoutHeader';
 
 import { useCourseContext } from '../_context';
 import CourseResourceHost from '../CourseResourceHost';
@@ -76,7 +76,7 @@ function CourseLearningLayoutContent() {
   useEffect(() => () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION }), []);
 
   const workspaceHeader = (
-    <ResourceHeaderBar
+    <ResourceLayoutHeader
       inlineTitle={
         <span className={styles.workspaceTitle}>
           {selectedNode ? <CourseResourceIcon node={selectedNode} size={18} /> : null}

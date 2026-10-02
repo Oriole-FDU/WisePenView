@@ -5,18 +5,18 @@ import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
-import type { ResourceHeaderProps } from './index.type';
-import ResourceHeaderActions from './ResourceHeaderActions';
-import ResourceHeaderBreadcrumb from './ResourceHeaderBreadcrumb';
+import type { ResourceToolbarProps } from './index.type';
+import ResourceToolbarActions from './ResourceToolbarActions';
+import ResourceToolbarBreadcrumb from './ResourceToolbarBreadcrumb';
 import styles from './style.module.less';
 
 /**
- * 资源顶栏：面包屑区与动作区分开装配。
+ * 资源工具栏：在布局顶栏内装配面包屑与动作，不负责顶栏外壳。
  *
  * 面包屑表达资源在驱动器里的位置，动作区承载编辑器提供的动作与资源管理菜单；
  * 权限弹窗由这里持有，因为它依赖当前用户与资源所有者的比对结果。
  */
-export default function ResourceHeader({
+export default function ResourceToolbar({
   resourceId,
   resourceName,
   resourceType,
@@ -35,7 +35,7 @@ export default function ResourceHeader({
   moreMenu,
   hideBreadcrumb,
   trailingActions,
-}: ResourceHeaderProps) {
+}: ResourceToolbarProps) {
   const userService = useUserService();
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
   const normalizedOwnerId = normalizeId(ownerId);
@@ -50,7 +50,7 @@ export default function ResourceHeader({
   return (
     <>
       <div className={styles.root}>
-        <ResourceHeaderBreadcrumb
+        <ResourceToolbarBreadcrumb
           resourceId={resourceId}
           resourceName={resourceName}
           resourceType={resourceType}
@@ -59,7 +59,7 @@ export default function ResourceHeader({
           hideBreadcrumb={hideBreadcrumb}
           titleMeta={titleMeta}
         />
-        <ResourceHeaderActions
+        <ResourceToolbarActions
           resourceId={resourceId}
           resourceName={resourceName}
           resourceType={resourceType}

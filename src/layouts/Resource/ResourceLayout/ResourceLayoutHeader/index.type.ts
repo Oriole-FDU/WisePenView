@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 
 import type { ResourceHeaderNavigation } from '@/layouts/Resource/_context/host';
 
-import type { ResourceHeaderProps } from '../ResourceHeader/index.type';
+import type { ResourceToolbarProps } from '../ResourceToolbar/index.type';
 
-export interface ResourceHeaderBarProps extends ResourceHeaderNavigation {
-  /** 资源顶栏；存在时替代 inlineTitle 与 extra。 */
-  resource?: ResourceHeaderProps;
+export interface ResourceLayoutHeaderProps extends ResourceHeaderNavigation {
+  /** 资源工具栏配置；存在时替代 inlineTitle 与 extra。 */
+  resourceToolbar?: ResourceToolbarProps;
   /** 工具条中间区：如 PDF 图标 + 文件名 */
   inlineTitle?: ReactNode;
   /** 右侧操作区（分享等） */

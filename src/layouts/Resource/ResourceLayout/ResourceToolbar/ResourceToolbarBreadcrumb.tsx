@@ -8,7 +8,7 @@ import type { ResourceIconType } from '@/domains/Resource';
 
 import styles from './style.module.less';
 
-export interface ResourceHeaderBreadcrumbProps {
+export interface ResourceToolbarBreadcrumbProps {
   resourceId?: string;
   resourceName: string;
   resourceType?: string;
@@ -21,7 +21,7 @@ export interface ResourceHeaderBreadcrumbProps {
 }
 
 /** 资源顶栏面包屑区：只负责导航层级与资源标题，不持有任何操作动作。 */
-export default function ResourceHeaderBreadcrumb({
+export default function ResourceToolbarBreadcrumb({
   resourceId,
   resourceName,
   resourceType,
@@ -29,7 +29,7 @@ export default function ResourceHeaderBreadcrumb({
   breadcrumbItems,
   hideBreadcrumb,
   titleMeta,
-}: ResourceHeaderBreadcrumbProps) {
+}: ResourceToolbarBreadcrumbProps) {
   const { t } = useTranslation('resource');
   const currentBreadcrumbItem: AppBreadcrumbItem = {
     key: `resource:${resourceId ?? resourceName}`,
