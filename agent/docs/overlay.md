@@ -100,22 +100,22 @@ LaTeX 编辑浮层因依赖编辑器选区和手工测量位置，不迁移 Hero
 
 这些场景没有归到 `AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`，因为它们承载复杂业务流程、复杂选择器、上传队列或组合内容。
 
-| 文件                                                                        | 业务                                         |
-| --------------------------------------------------------------------------- | -------------------------------------------- |
-| `src/components/business/Drive/Modals/DriveCreateModal/index.tsx`           | 创建 Agent、Skill，多字段输入和描述编辑。    |
-| `src/views/workspace/note/_components/NotePermissionModal/index.tsx`        | 笔记权限配置，权限模式、用户选择、保存。     |
-| `src/views/app/profile/_components/Account/AccountHeader/index.tsx`         | 更换头像，上传图片并保存。                   |
-| `src/views/app/profile/_components/Account/AccountVerification/index.tsx`   | 账号验证发起，邮箱/UIS tabs 表单。           |
-| `src/views/app/group/_components/GroupModals/CreateGroupModal/index.tsx`    | 创建小组，信息填写、封面上传、默认权限。     |
-| `src/views/app/group/_components/GroupModals/EditGroupInfoModal/index.tsx`  | 编辑小组信息，表单、封面、默认权限。         |
-| `src/components/business/Group/MemberList/Modals/EditPermissionModal.tsx`   | 修改成员权限，成员列表和角色选择。           |
-| `src/components/business/Group/MemberList/Modals/AssignQuotaModal.tsx`      | 分配成员配额，成员列表和额度输入。           |
-| `src/components/business/ChatPanel/ChatInput/DocumentPickerModal/index.tsx` | 从云盘选择引用文档，树选择、多选、延迟加载。 |
-| `src/components/business/ChatPanel/ChatInput/OtherSkillModal/index.tsx`     | 选择其他 Skill，树结构选择和确认。           |
-| `src/components/business/Drive/Modals/UploadDocumentModal/index.tsx`        | 上传文档，上传队列和挂载信息。               |
-| `src/components/business/Drive/Modals/TagPermissionModal/index.tsx`         | 标签权限管理，标签树、权限模式、用户权限。   |
-| `src/components/business/Drive/Modals/MoveNodeModal/index.tsx`              | 移动文件/文件夹，目标目录选择。              |
-| `src/components/business/Drive/Modals/UploadFileToGroupModal/index.tsx`     | 上传个人文件到小组，选择文件和目标小组目录。 |
+| 文件                                                                       | 业务                                         |
+| -------------------------------------------------------------------------- | -------------------------------------------- |
+| `src/components/business/Drive/Modals/DriveCreateModal/index.tsx`          | 创建 Agent、Skill，多字段输入和描述编辑。    |
+| `src/views/workspace/note/_components/NotePermissionModal/index.tsx`       | 笔记权限配置，权限模式、用户选择、保存。     |
+| `src/views/app/profile/_components/Account/AccountHeader/index.tsx`        | 更换头像，上传图片并保存。                   |
+| `src/views/app/profile/_components/Account/AccountVerification/index.tsx`  | 账号验证发起，邮箱/UIS tabs 表单。           |
+| `src/views/app/group/_components/GroupModals/CreateGroupModal/index.tsx`   | 创建小组，信息填写、封面上传、默认权限。     |
+| `src/views/app/group/_components/GroupModals/EditGroupInfoModal/index.tsx` | 编辑小组信息，表单、封面、默认权限。         |
+| `src/components/business/Group/MemberList/Modals/EditPermissionModal.tsx`  | 修改成员权限，成员列表和角色选择。           |
+| `src/components/business/Group/MemberList/Modals/AssignQuotaModal.tsx`     | 分配成员配额，成员列表和额度输入。           |
+| `src/components/business/Chat/ChatInput/DocumentPickerModal/index.tsx`     | 从云盘选择引用文档，树选择、多选、延迟加载。 |
+| `src/components/business/Chat/ChatInput/OtherSkillModal/index.tsx`         | 选择其他 Skill，树结构选择和确认。           |
+| `src/components/business/Drive/Modals/UploadDocumentModal/index.tsx`       | 上传文档，上传队列和挂载信息。               |
+| `src/components/business/Drive/Modals/TagPermissionModal/index.tsx`        | 标签权限管理，标签树、权限模式、用户权限。   |
+| `src/components/business/Drive/Modals/MoveNodeModal/index.tsx`             | 移动文件/文件夹，目标目录选择。              |
+| `src/components/business/Drive/Modals/UploadFileToGroupModal/index.tsx`    | 上传个人文件到小组，选择文件和目标小组目录。 |
 
 ## 底层 Modal 例外
 

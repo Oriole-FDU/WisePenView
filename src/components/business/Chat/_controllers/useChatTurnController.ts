@@ -11,7 +11,7 @@ import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { SendOptions } from '../ChatInput/index.type';
-import type { ChatPanelProps } from '../index.type';
+import type { ChatProps } from '../index.type';
 import { hasRenderableChatContent } from './chatTurnModel';
 import { useChatToolApproval } from './useChatToolApproval';
 import { useChatTurnHistory } from './useChatTurnHistory';
@@ -21,7 +21,7 @@ interface UseChatTurnControllerOptions {
   ensureSession: (agentParams?: CreateSessionRequest) => Promise<string | undefined>;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
-  resourceChat?: ChatPanelProps['resourceChat'];
+  resourceChat?: ChatProps['resourceChat'];
   resourceId?: string;
 }
 

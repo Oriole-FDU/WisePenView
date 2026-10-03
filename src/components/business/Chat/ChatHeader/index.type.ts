@@ -1,4 +1,4 @@
-export interface ChatPanelHeaderProps {
+export interface ChatHeaderProps {
   panelTitle: string;
   sessionBarOpen: boolean;
   showCollapseButton: boolean;

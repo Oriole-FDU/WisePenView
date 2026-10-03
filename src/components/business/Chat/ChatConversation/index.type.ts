@@ -4,7 +4,7 @@ import type { useChatSessionController } from '../_controllers/useChatSessionCon
 import type { useChatTurnController } from '../_controllers/useChatTurnController';
 import type { SendOptions } from '../ChatInput/index.type';
 
-export interface ChatPanelConversationProps {
+export interface ChatConversationProps {
   /** 对话域：消息、运行状态、历史分页与取消；由对话区按需解包 */
   turn: ReturnType<typeof useChatTurnController>;
   /** 会话域：当前会话身份、会话列表浮层与新建会话；由对话区按需解包 */

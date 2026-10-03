@@ -5,7 +5,7 @@ import { registerStore } from '@/store/lifecycle';
 /**
  * 会话历史刷新信号。
  *
- * 归属 AppLayout：ChatPanel 在新建会话收到首个可渲染内容时递增版本，
+ * 归属 AppLayout：Chat 在新建会话收到首个可渲染内容时递增版本，
  * 同一壳层下的会话列表（AppSidebar / SessionTab）订阅该版本重新加载。
  * 两个组件都只依赖这份协议，不互相引用对方的内部状态。
  */

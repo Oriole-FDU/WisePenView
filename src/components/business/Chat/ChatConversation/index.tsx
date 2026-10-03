@@ -2,11 +2,11 @@ import ChatInput from '../ChatInput';
 import ChatMessageList from '../ChatMessageList';
 import ChatSessionBar from '../ChatSessionBar';
 import styles from '../style.module.less';
-import type { ChatPanelConversationProps } from './index.type';
+import type { ChatConversationProps } from './index.type';
 import Welcome from './Welcome';
 
 /** 对话区：把对话域与会话域拆成消息列表、输入区和会话浮层，自身不持有业务状态。 */
-function ChatPanelConversation({
+function ChatConversation({
   injectedAgents,
   preferredAgent,
   contextPreview,
@@ -15,7 +15,7 @@ function ChatPanelConversation({
   turn,
   onClearContext,
   onSend,
-}: ChatPanelConversationProps) {
+}: ChatConversationProps) {
   const { cancel, cancelling, currentModel, history, isEmpty, messages, status } = turn;
   const {
     closeSessionBar,
@@ -103,4 +103,4 @@ function ChatPanelConversation({
   );
 }
 
-export default ChatPanelConversation;
+export default ChatConversation;
