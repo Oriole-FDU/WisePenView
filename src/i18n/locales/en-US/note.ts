@@ -1,6 +1,5 @@
 const enUSNote = {
   draft: {
-    hint: 'Start editing to create a note',
     leaveTitle: 'Note not saved',
     leaveDescription: 'Creating or saving is incomplete. Retry or discard these edits.',
     discard: 'Discard edits',

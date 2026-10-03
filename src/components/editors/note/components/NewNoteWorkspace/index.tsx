@@ -158,12 +158,6 @@ function NewNoteContent({ onResourceCreated }: NewNoteWorkspaceProps) {
   useEffect(() => {
     if (resourceId) handleResourceCreated(resourceId);
   }, [resourceId, handleResourceCreated]);
-  const saveStatusText = (() => {
-    if (!started) return t('draft.hint');
-    if (error) return t('save.failed');
-    if (!connected && resourceId) return t('save.waiting');
-    return t(unsaved ? 'save.saving' : 'save.saved');
-  })();
   const handleTitleChange = (value: string) => {
     titleRef.current = value;
     setTitle(value);
@@ -192,7 +186,7 @@ function NewNoteContent({ onResourceCreated }: NewNoteWorkspaceProps) {
           onTitleChange: handleTitleChange,
           onDocumentChange: handleDocumentChange,
           ensureResourceId: ensureResource,
-          saveStatusText,
+          titleSaveStatus: error ? 'failed' : titleSaved ? 'saved' : 'saving',
           hasUnsavedChanges: unsaved,
           pendingWork,
           error,

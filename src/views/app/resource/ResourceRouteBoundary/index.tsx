@@ -33,6 +33,7 @@ import {
 
 import ResourceTargetResolver from '../ResourceTargetResolver';
 import { updateNoteDraftRouteSession } from './noteDraftRouteSession';
+import styles from './style.module.less';
 
 const NewNoteWorkspace = lazy(
   () => import('@/components/editors/note/components/NewNoteWorkspace')
@@ -164,7 +165,13 @@ function ResourceRouteBoundary() {
           >
             <RouteOutletBoundary>
               {keepDraftEditor ? (
-                <Suspense fallback={<Spin />}>
+                <Suspense
+                  fallback={
+                    <div className={styles.loading}>
+                      <Spin size="large" />
+                    </div>
+                  }
+                >
                   <NewNoteWorkspace
                     key={nextDraftSession.key}
                     onResourceCreated={handleNoteCreated}

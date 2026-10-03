@@ -49,7 +49,7 @@ interface NoteWorkspaceProps {
     onTitleChange(title: string): void;
     onDocumentChange: CustomBlockNoteProps['onDocumentChange'];
     ensureResourceId(): Promise<string>;
-    saveStatusText: string;
+    titleSaveStatus: NoteTitleSaveStatus;
     hasUnsavedChanges: boolean;
     pendingWork: boolean;
     error?: unknown;
@@ -101,8 +101,11 @@ function NoteWorkspace({
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });
-  const headerSaveStatus = resolveNoteHeaderSaveStatus(session.saveStatus, titleSaveStatus);
-  const saveStatusText = newNote?.saveStatusText ?? t(`save.${headerSaveStatus}`);
+  const headerSaveStatus = resolveNoteHeaderSaveStatus(
+    session.saveStatus,
+    newNote?.titleSaveStatus ?? titleSaveStatus
+  );
+  const saveStatusText = t(`save.${headerSaveStatus}`);
   const { target } = useEditorSurface();
   useEditorRuntime(
     {
@@ -195,52 +198,54 @@ function NoteWorkspace({
         }
       : undefined,
     header: {
-      resource: {
-        resourceId,
-        resourceName,
-        resourceIconType: 'note',
-        resourceInfo: noteInfoDisplay.resourceInfo,
-        currentActions: noteInfoDisplay.resourceInfo?.currentActions,
-        copyVersion: noteInfoDisplay.version,
-        permissionResourceType: RESOURCE_KIND.NOTE,
-        ownerId: noteInfoDisplay.ownerId,
-        onPermissionSuccess: onRefreshNoteInfo,
-        isDisabled: session.showFullPageSpin,
-        titleMeta: (
-          <span
-            className={`${styles.headerSaveStatus} ${
-              headerSaveStatus === 'waiting' ? styles.headerSaveStatusWaiting : ''
-            } ${headerSaveStatus === 'failed' ? styles.headerSaveStatusFailed : ''}`}
-          >
-            {saveStatusText}
-          </span>
-        ),
-        leadingActions: <NoteEditorSlot name="aiDiffControls" />,
-        moreMenu: {
-          actions: [
-            {
-              id: 'inline-comment-history',
-              label: t('comments.history', {
-                count:
-                  comments.panel.resolvedThreads.length > 0
-                    ? ` (${comments.panel.resolvedThreads.length})`
-                    : '',
-              }),
-              icon: History,
-              onAction: comments.openHistory,
+      resource: resourceId
+        ? {
+            resourceId,
+            resourceName,
+            resourceIconType: 'note',
+            resourceInfo: noteInfoDisplay.resourceInfo,
+            currentActions: noteInfoDisplay.resourceInfo?.currentActions,
+            copyVersion: noteInfoDisplay.version,
+            permissionResourceType: RESOURCE_KIND.NOTE,
+            ownerId: noteInfoDisplay.ownerId,
+            onPermissionSuccess: onRefreshNoteInfo,
+            isDisabled: session.showFullPageSpin,
+            titleMeta: (
+              <span
+                className={`${styles.headerSaveStatus} ${
+                  headerSaveStatus === 'waiting' ? styles.headerSaveStatusWaiting : ''
+                } ${headerSaveStatus === 'failed' ? styles.headerSaveStatusFailed : ''}`}
+              >
+                {saveStatusText}
+              </span>
+            ),
+            leadingActions: <NoteEditorSlot name="aiDiffControls" />,
+            moreMenu: {
+              actions: [
+                {
+                  id: 'inline-comment-history',
+                  label: t('comments.history', {
+                    count:
+                      comments.panel.resolvedThreads.length > 0
+                        ? ` (${comments.panel.resolvedThreads.length})`
+                        : '',
+                  }),
+                  icon: History,
+                  onAction: comments.openHistory,
+                },
+              ],
+              onSearch: () => bodyEditorRef.current?.openFind(),
+              onPrint: actions.printPdf,
+              printLabel: isDesktop() ? t('export.downloadPdf') : t('export.printPdf'),
+              printIcon: isDesktop() ? Download : undefined,
+              download: {
+                label: t('export.downloadMarkdown'),
+                onAction: actions.downloadMarkdown,
+              },
+              isPending: actions.exportPending,
             },
-          ],
-          onSearch: () => bodyEditorRef.current?.openFind(),
-          onPrint: actions.printPdf,
-          printLabel: isDesktop() ? t('export.downloadPdf') : t('export.printPdf'),
-          printIcon: isDesktop() ? Download : undefined,
-          download: {
-            label: t('export.downloadMarkdown'),
-            onAction: actions.downloadMarkdown,
-          },
-          isPending: actions.exportPending,
-        },
-      },
+          }
+        : undefined,
     },
   } satisfies EditorPresentation;
   return (
