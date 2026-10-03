@@ -37,6 +37,11 @@ export class WisepenProvider extends WebsocketProvider {
     });
   }
 
+  /** 空白笔记创建完成后绑定后端身份，保持既有 Y.Doc 和 awareness 实例。 */
+  setResourceId(resourceId: string): void {
+    this.params.resourceId = resourceId;
+  }
+
   setActorUserId(actorUserId?: string): void {
     const normalizedActorUserId = actorUserId?.trim();
     if (normalizedActorUserId) {

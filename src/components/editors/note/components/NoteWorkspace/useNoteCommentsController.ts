@@ -27,10 +27,17 @@ export function useNoteCommentsController(resourceId: string) {
   }>();
   const [isInlineCommentHistoryOpen, setIsInlineCommentHistoryOpen] = useState(false);
 
-  useApi(() => inlineCommentSession.refresh(), {
-    pollingInterval: INLINE_COMMENT_POLLING_INTERVAL,
-    refreshDeps: [inlineCommentSession],
-  });
+  useApi(
+    () => {
+      inlineCommentSession.bindResourceId(resourceId);
+      return inlineCommentSession.refresh();
+    },
+    {
+      pollingInterval: INLINE_COMMENT_POLLING_INTERVAL,
+      ready: Boolean(resourceId),
+      refreshDeps: [resourceId, inlineCommentSession],
+    }
+  );
 
   useUnmount(() => inlineCommentSession.destroy());
 

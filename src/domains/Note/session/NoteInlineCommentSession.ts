@@ -22,7 +22,7 @@ interface NoteInlineCommentSessionOptions {
 }
 
 export class NoteInlineCommentSession {
-  readonly resourceId: string;
+  private _resourceId: string;
   private readonly inlineCommentService: IInlineCommentService;
   private readonly threadsById = new Map<string, NoteInlineCommentThread>();
   private resolvedThreads: NoteInlineCommentThread[] = [];
@@ -40,8 +40,22 @@ export class NoteInlineCommentSession {
   private destroyed = false;
 
   constructor(options: NoteInlineCommentSessionOptions) {
-    this.resourceId = options.resourceId;
+    this._resourceId = options.resourceId;
     this.inlineCommentService = options.inlineCommentService;
+  }
+
+  get resourceId(): string {
+    return this._resourceId;
+  }
+
+  /** 首次创建笔记后原位绑定身份，锚点与订阅继续归属同一个编辑器。 */
+  bindResourceId(resourceId: string): void {
+    if (this._resourceId && this._resourceId !== resourceId) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: '批注会话不能切换到其它笔记',
+      });
+    }
+    this._resourceId = resourceId;
   }
 
   getSnapshot = (): NoteInlineCommentSessionSnapshot => this.snapshot;

@@ -1,104 +1,93 @@
-import '@blocknote/mantine/style.css';
-
-import { en, zh } from '@blocknote/core/locales';
-import { BlockNoteView } from '@blocknote/mantine';
-import { useCreateBlockNote } from '@blocknote/react';
-import { useMemoizedFn, useUnmount } from 'ahooks';
-import { useRef, useState } from 'react';
+import { useDebounceFn, useMemoizedFn, useUnmount } from 'ahooks';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { AppButton } from '@/components/base/Button';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { EditorSurfaceProvider } from '@/components/editors/_context';
-import { useEditorRuntime } from '@/components/editors/_runtime/useEditorRuntime';
-import { usePendingNoteDraftStore } from '@/components/editors/note/_store/usePendingNoteDraftStore';
+import { createEditorPresentationStore } from '@/components/editors/_runtime/editorPresentationStore';
+import { waitForEditor } from '@/components/editors/_runtime/editorRuntime';
+import EditorWorkspacePresentation from '@/components/editors/_runtime/EditorWorkspacePresentation';
+import type { Editor, EditorExitContext } from '@/components/editors/editor.type';
+import type { CustomBlockNoteEditor } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
 import {
-  blockNoteSchema,
-  collectNoteEditorExtensions,
-  collectNoteEditorProps,
-  notePluginRegistry,
-} from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
-import {
-  useNoteImageUploadEditorBinding,
-  useNoteImageUploadRuntime,
-} from '@/components/editors/note/CustomBlockNote/runtime/useNoteImageUploadRuntime';
-import editorStyles from '@/components/editors/note/CustomBlockNote/style.module.less';
-import NoteSideMenu from '@/components/editors/note/CustomBlockNote/ui/sideMenu';
-import NoteSlashMenu from '@/components/editors/note/CustomBlockNote/ui/slashMenu';
-import { useNoteService } from '@/domains';
+  NoteEditorSessionProvider,
+  type NoteEditorSlotName,
+} from '@/components/editors/note/CustomBlockNote/session/_context';
+import { buildNoteCollaborationUser } from '@/components/editors/note/CustomBlockNote/session/collaborationUser';
+import { useNoteService, useUserService } from '@/domains';
+import type { NoteInfoDisplayData } from '@/domains/Note';
 import { RESOURCE_KIND, RESOURCE_VIEWER } from '@/domains/Resource/model/resourceTarget';
+import type { User } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
-import { useOpenResource } from '@/hooks/useOpenResource';
+import { chatDockActions } from '@/layouts/ChatDockLayout';
+import { resourceChatContextActions } from '@/layouts/Resource/_context/chatBinding';
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
-import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
-import { useAppTheme } from '@/theme';
+import { resourceSidePanelActions } from '@/layouts/Resource/ResourceLayout';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import styles from '../../style.module.less';
-import NoteTitle from '../NoteTitle';
+import NoteWorkspace from '../NoteWorkspace';
 import { createNoteDraftSession, hasNoteDraftContent } from './noteDraftSession';
+import { useNewNoteCollaboration } from './useNewNoteCollaboration';
 
 const DRAFT_TARGET = {
   resourceId: '',
   resourceType: RESOURCE_KIND.NOTE,
   viewer: RESOURCE_VIEWER.NOTE,
 };
+interface NewNoteWorkspaceProps {
+  onResourceCreated(resourceId: string): void;
+}
 
-function NewNoteContent() {
-  const { t, i18n } = useTranslation('note');
-  const { resolvedTheme } = useAppTheme();
+function NewNoteContent({ onResourceCreated }: NewNoteWorkspaceProps) {
+  const { t } = useTranslation('note');
   const noteService = useNoteService();
-  const openResource = useOpenResource();
+  const userService = useUserService();
+  const { data: currentUser, refresh: refreshUser } = useApi(() => userService.getUserInfo());
   const {
     routeContext: { driveLocation },
   } = useResourceHostContext();
   const [title, setTitle] = useState('');
   const titleRef = useRef('');
-  const [dirty, setDirty] = useState(false);
-  const [finalizing, setFinalizing] = useState(false);
-  const pendingImages = useRef(0);
-  const composing = useRef(false);
-  const focusBody = useRef(false);
+  const savedTitle = useRef('');
+  const [titleSaved, setTitleSaved] = useState(true);
+  const [resourceId, setResourceId] = useState('');
+  const [started, setStarted] = useState(false);
   const saving = useRef(false);
-  const handedOff = useRef(false);
   const active = useRef(true);
-  useUnmount(() => {
-    active.current = false;
-  });
   const [session] = useState(createNoteDraftSession);
-  const ensureResource = () =>
+  const collaboration = useNewNoteCollaboration(session.doc, resourceId, currentUser?.id);
+  const ensureResource = useMemoizedFn(() =>
     session.ensureResource(async () => {
+      setStarted(true);
+      const initialTitle = titleRef.current.trim() || t('title.untitled');
       const result = await noteService.createNote({
-        title: titleRef.current.trim() || t('title.untitled'),
+        title: initialTitle,
         pathTagId: driveLocation?.mountTagId,
       });
       if (!result.resourceId)
         throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+      if (active.current) {
+        savedTitle.current = initialTitle;
+        setResourceId(result.resourceId);
+        requestDriveRefresh();
+      }
       return result.resourceId;
-    });
-  const handleUploadCountChange = (count: number) => {
-    pendingImages.current = count;
-    if (count === 0)
-      queueMicrotask(() => {
-        if (active.current) persist();
-      });
+    })
+  );
+  const { data: info, refresh: refreshInfo } = useApi(
+    () => noteService.getNoteInfoDisplay({ resourceId }),
+    {
+      ready: Boolean(resourceId),
+      refreshDeps: [resourceId],
+    }
+  );
+  const noteInfo: NoteInfoDisplayData = info ?? {
+    noteTitle: t('title.untitled'),
+    authors: [],
+    lastEditedAtText: '',
+    canCollaborativeEdit: true,
   };
-  const uploads = useNoteImageUploadRuntime({
-    resourceId: '',
-    getResourceId: ensureResource,
-    readOnly: finalizing,
-    onPendingCountChange: handleUploadCountChange,
-  });
-  const editor = useCreateBlockNote({
-    schema: blockNoteSchema,
-    dictionary: i18n.resolvedLanguage === 'en-US' ? en : zh,
-    extensions: collectNoteEditorExtensions(notePluginRegistry),
-    _tiptapOptions: { editorProps: collectNoteEditorProps(notePluginRegistry) },
-    uploadFile: uploads.uploadFile,
-  });
-  useNoteImageUploadEditorBinding({ editor, runtime: uploads });
-
   const {
     loading,
     error,
@@ -107,165 +96,205 @@ function NewNoteContent() {
     async () => {
       saving.current = true;
       try {
-        const resourceId = await ensureResource();
-        // 输入法和图片上传结束后再交接，避免截断组合输入或丢失图片 URL。
-        if (!active.current || composing.current || pendingImages.current > 0) return;
-        let savedTitle: string;
-        do {
-          savedTitle = titleRef.current.trim() || t('title.untitled');
-          await noteService.syncTitle({ resourceId, newName: savedTitle });
-        } while (savedTitle !== (titleRef.current.trim() || t('title.untitled')));
-        if (!active.current || composing.current || pendingImages.current > 0) return;
-        setFinalizing(true);
-        usePendingNoteDraftStore.getState().setDraft(resourceId, {
-          blocks: editor.document,
-          focusBody: focusBody.current,
-          selection: {
-            from: editor.prosemirrorState.selection.from,
-            to: editor.prosemirrorState.selection.to,
-          },
-        });
-        requestDriveRefresh();
-        handedOff.current = true;
-        setDirty(false);
-        openResource({
-          resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          driveLocation,
-          replace: true,
-        });
+        const id = await ensureResource();
+        // 按最新标题串行保存；正文从挂载起就绑定同一个 Y.Doc，创建与连接不影响输入。
+        while (active.current) {
+          const nextTitle = titleRef.current.trim() || t('title.untitled');
+          if (savedTitle.current === nextTitle) break;
+          await noteService.syncTitle({ resourceId: id, newName: nextTitle });
+          savedTitle.current = nextTitle;
+        }
+        if (active.current) setTitleSaved(true);
       } finally {
         saving.current = false;
-        if (!handedOff.current) setFinalizing(false);
       }
     },
     { manual: true }
   );
   const persist = useMemoizedFn(() => {
-    if (!active.current || saving.current || handedOff.current) return;
-    if (!dirty && !titleRef.current.trim() && !hasNoteDraftContent(editor.document)) return;
-    setDirty(true);
+    if (!active.current || saving.current) return;
     save();
   });
-  useEditorRuntime(
-    {
-      openedResource: { ...DRAFT_TARGET, resourceName: title.trim() || t('title.untitled') },
-      loading: false,
-      readOnly: finalizing,
-      hasUnsavedChanges: dirty,
-      pendingWork: loading || uploads.pendingCount > 0,
-      warnBeforeUnload: dirty,
-    },
-    async (context) => {
-      if (handedOff.current) return true;
-      if (!dirty && !saving.current && pendingImages.current === 0) return true;
-      if (saving.current || pendingImages.current > 0) return false;
-      const choice = await context.confirm({
-        title: t('draft.leaveTitle'),
-        description: t('draft.leaveDescription'),
-        confirmText: t('workspace.retry'),
-        discardText: t('draft.discard'),
-      });
-      if (context.signal.aborted || choice === 'cancel') return false;
-      if (choice === 'discard') return true;
-      persist();
+  const { run: scheduleTitleSave, cancel: cancelTitleSave } = useDebounceFn(persist, { wait: 500 });
+  useUnmount(() => {
+    active.current = false;
+    cancelTitleSave();
+  });
+  const connected = collaboration.status === 'connected';
+  const bodySaved = connected && collaboration.saveStatus === 'saved';
+  const unsaved = started && (!resourceId || !titleSaved || !bodySaved || loading);
+  const pendingWork =
+    loading ||
+    (started && !titleSaved && !error) ||
+    (connected && collaboration.saveStatus === 'saving');
+  const retry = () => {
+    persist();
+    refreshUser();
+    if (resourceId) refreshInfo();
+    collaboration.reconnect();
+  };
+  const prepareExit = async (context: EditorExitContext, runtime: Editor) => {
+    if (!(await waitForEditor(runtime, (snapshot) => !snapshot.pendingWork, context.signal)))
       return false;
-    }
-  );
-
+    if (!runtime.getSnapshot().hasUnsavedChanges) return true;
+    const choice = await context.confirm({
+      title: t('draft.leaveTitle'),
+      description: t('draft.leaveDescription'),
+      confirmText: t('workspace.retry'),
+      discardText: t('draft.discard'),
+    });
+    if (context.signal.aborted || choice === 'cancel') return false;
+    if (choice === 'discard') return true;
+    retry();
+    return false;
+  };
+  const handleResourceCreated = useMemoizedFn(onResourceCreated);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：子级工作区已向编辑器宿主提交后端资源身份后升级 URL。
+   * 不可替代原因：路由退出守卫读取外部编辑器快照，必须先完成运行时身份上报才能识别同一编辑器。
+   * cleanup：同步通知，无延迟任务；路由升级保留当前编辑器和 Y.Doc。
+   */
+  useEffect(() => {
+    if (resourceId) handleResourceCreated(resourceId);
+  }, [resourceId, handleResourceCreated]);
+  const saveStatusText = (() => {
+    if (!started) return t('draft.hint');
+    if (error) return t('save.failed');
+    if (!connected && resourceId) return t('save.waiting');
+    return t(unsaved ? 'save.saving' : 'save.saved');
+  })();
+  const handleTitleChange = (value: string) => {
+    titleRef.current = value;
+    setTitle(value);
+    if (!started && !value.trim()) return;
+    setTitleSaved(false);
+    if (!resourceId) persist();
+    else scheduleTitleSave();
+  };
+  const handleDocumentChange = (blocks: CustomBlockNoteEditor['document']) => {
+    if (resourceId || (!started && !hasNoteDraftContent(blocks))) return;
+    persist();
+  };
   return (
-    <ResourceLayout
-      className={styles.pageWrap}
-      header={{
-        resource: {
-          resourceName: title.trim() || t('title.untitled'),
-          resourceIconType: 'note',
-          permissionResourceType: RESOURCE_KIND.NOTE,
-          titleMeta: (
-            <span className={styles.headerSaveStatus}>
-              {loading ? t('save.saving') : error ? t('save.failed') : t('draft.hint')}
-            </span>
-          ),
-        },
-      }}
+    <NewNoteSession
+      resourceId={resourceId}
+      collaboration={collaboration}
+      currentUser={currentUser}
+      canCollaborativeEdit={noteInfo.canCollaborativeEdit}
     >
-      <div
-        className={styles.mainScroll}
-        onCompositionStart={() => {
-          composing.current = true;
+      <NoteWorkspace
+        resourceId={resourceId}
+        noteInfoDisplay={noteInfo}
+        onRefreshNoteInfo={refreshInfo}
+        newNote={{
+          title,
+          onTitleChange: handleTitleChange,
+          onDocumentChange: handleDocumentChange,
+          ensureResourceId: ensureResource,
+          saveStatusText,
+          hasUnsavedChanges: unsaved,
+          pendingWork,
+          error,
+          retry,
+          prepareExit,
         }}
-        onCompositionEnd={() => {
-          composing.current = false;
-          persist();
-        }}
-      >
-        <div className={styles.mainCol}>
-          <div className={styles.root}>
-            {error ? (
-              <AppButton variant="secondary" onPress={persist}>
-                {t('workspace.retry')}
-              </AppButton>
-            ) : null}
-            <NoteTitle
-              id=""
-              initialContent=""
-              readOnly={finalizing}
-              focusOnMount
-              onSaveStatusChange={() => undefined}
-              onTitleChange={(value) => {
-                titleRef.current = value;
-                setTitle(value);
-                focusBody.current = false;
-                persist();
-              }}
-              onEnterKey={() => {
-                focusBody.current = true;
-                editor.focus();
-              }}
-            />
-            <div className={`${styles.body} ${editorStyles.editorShell}`}>
-              <BlockNoteView
-                className="bodyBlockNoteView"
-                editor={editor}
-                theme={resolvedTheme}
-                editable={!finalizing}
-                slashMenu={false}
-                sideMenu={false}
-                onChange={() => {
-                  focusBody.current = true;
-                  persist();
-                }}
-              >
-                <NoteSlashMenu editor={editor} plugins={notePluginRegistry.contentPlugins} />
-                <NoteSideMenu plugins={notePluginRegistry.contentPlugins} />
-              </BlockNoteView>
-            </div>
-          </div>
-        </div>
-      </div>
-    </ResourceLayout>
+      />
+    </NewNoteSession>
   );
 }
 
-/** 空白页复用资源宿主的导航保护，但不会上报后端资源身份或请求资源信息。 */
-export default function NewNoteWorkspace() {
+function NewNoteSession({
+  resourceId,
+  collaboration,
+  currentUser,
+  canCollaborativeEdit,
+  children,
+}: {
+  resourceId: string;
+  collaboration: ReturnType<typeof useNewNoteCollaboration>;
+  currentUser: User | undefined;
+  canCollaborativeEdit: boolean;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation('note');
+  const [slots, setSlots] = useState<Record<NoteEditorSlotName, HTMLElement | null>>({
+    aiBulkActions: null,
+    findBar: null,
+    aiDiffControls: null,
+    title: null,
+  });
+  const setSlot = useMemoizedFn((name: NoteEditorSlotName, node: HTMLElement | null) =>
+    setSlots((current) => (current[name] === node ? current : { ...current, [name]: node }))
+  );
+  const connected = collaboration.status === 'connected';
+  return (
+    <NoteEditorSessionProvider
+      value={{
+        runtime: {
+          resourceId,
+          collaboration: {
+            doc: collaboration.doc,
+            provider: collaboration.provider,
+            user: buildNoteCollaborationUser(currentUser, t('workspace.currentUser')),
+            ready: connected,
+          },
+          state: {
+            readOnly: !canCollaborativeEdit,
+            blockLocalDocWrites: connected && !canCollaborativeEdit,
+          },
+          portalContainers: slots,
+        },
+        ui: {
+          status: collaboration.status,
+          saveStatus: collaboration.saveStatus,
+          reconnect: collaboration.reconnect,
+          currentUser,
+          isConnected: connected,
+          isDisconnected: Boolean(resourceId) && collaboration.status === 'disconnected',
+          isTitleReadOnly: !canCollaborativeEdit,
+          canRenderBodyEditor: true,
+          showFullPageSpin: false,
+          middleOverlayText: '',
+        },
+        titleContainer: slots.title,
+        setSlot,
+      }}
+    >
+      {children}
+    </NoteEditorSessionProvider>
+  );
+}
+
+/** 从空白页到正式资源页始终装配完整工作区，后台创建不替换编辑器实例。 */
+export default function NewNoteWorkspace({ onResourceCreated }: NewNoteWorkspaceProps) {
   const { registerEditor } = useResourceEditor();
   const host = useResourceHostContext();
+  const [store] = useState(createEditorPresentationStore);
+  const [resourceId, setResourceId] = useState('');
+  const target = { ...DRAFT_TARGET, resourceId };
+  const handleResourceCreated = (id: string) => {
+    setResourceId(id);
+    onResourceCreated(id);
+  };
   return (
-    <EditorSurfaceProvider
-      kind="note"
-      target={DRAFT_TARGET}
-      instanceId="new-note"
-      host={{
-        hostId: host.hostId,
-        openChatPanel: () => undefined,
-        setChatContext: () => undefined,
-        openInlineComments: () => undefined,
-      }}
-      onRegister={registerEditor}
-      onPresentationChange={() => () => undefined}
-    >
-      <NewNoteContent />
-    </EditorSurfaceProvider>
+    <EditorWorkspacePresentation target={target} store={store}>
+      <EditorSurfaceProvider
+        kind="note"
+        target={target}
+        instanceId="new-note"
+        host={{
+          hostId: host.hostId,
+          openChatPanel: chatDockActions.open,
+          setChatContext: resourceChatContextActions.setContext,
+          openInlineComments: resourceSidePanelActions.openInlineComments,
+          navigateResourceHash: host.navigateResourceHash,
+        }}
+        onRegister={registerEditor}
+        onPresentationChange={store.getState().onPresentationChange}
+      >
+        <NewNoteContent onResourceCreated={handleResourceCreated} />
+      </EditorSurfaceProvider>
+    </EditorWorkspacePresentation>
   );
 }

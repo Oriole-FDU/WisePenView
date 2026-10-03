@@ -53,6 +53,7 @@ export function useNoteDocument({
   blockLocalDocWrites,
   onAskAi,
   onAiDiffBodyContentHashChange,
+  onDocumentChange,
 }: {
   editor: CustomBlockNoteEditor;
   definition: NoteEditorDefinition;
@@ -60,8 +61,10 @@ export function useNoteDocument({
   blockLocalDocWrites: boolean;
   onAskAi: CustomBlockNoteProps['onAskAi'];
   onAiDiffBodyContentHashChange: CustomBlockNoteProps['onAiDiffBodyContentHashChange'];
+  onDocumentChange?: CustomBlockNoteProps['onDocumentChange'];
 }) {
   const { t } = useTranslation('note');
+  const handleDocumentChange = useMemoizedFn(() => onDocumentChange?.(editor.document));
   const bodyOnChangeCleanupRef = useRef<(() => void) | null>(null);
   const selectionRangeSnapshotRef = useRef<NoteSelectionRangeSnapshot | null>(null);
   const bodyContentHashTimerRef = useRef<number | null>(null);
@@ -130,6 +133,7 @@ export function useNoteDocument({
       if (!analysis.docChanged) return;
       activateWriteGuard();
       scheduleBodyContentHashRefresh();
+      handleDocumentChange();
     });
 
     if (definition.hasBlockLocalDocWritesProp()) {

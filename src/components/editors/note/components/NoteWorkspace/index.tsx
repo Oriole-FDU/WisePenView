@@ -8,9 +8,14 @@ import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import InlineComment from '@/components/business/InlineComment';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
-import type { EditorPresentation } from '@/components/editors/editor.type';
+import type {
+  Editor,
+  EditorExitContext,
+  EditorPresentation,
+} from '@/components/editors/editor.type';
 import CustomBlockNote from '@/components/editors/note/CustomBlockNote';
 import type {
+  CustomBlockNoteProps,
   NoteBodyEditorHandle,
   NoteOutlineItem,
 } from '@/components/editors/note/CustomBlockNote/index.type';
@@ -37,16 +42,27 @@ import { useNoteCommentsController } from './useNoteCommentsController';
 
 interface NoteWorkspaceProps {
   resourceId: string;
-  focusTitleOnMount?: boolean;
   noteInfoDisplay: NoteInfoDisplayData;
   onRefreshNoteInfo: () => unknown | Promise<unknown>;
+  newNote?: {
+    title: string;
+    onTitleChange(title: string): void;
+    onDocumentChange: CustomBlockNoteProps['onDocumentChange'];
+    ensureResourceId(): Promise<string>;
+    saveStatusText: string;
+    hasUnsavedChanges: boolean;
+    pendingWork: boolean;
+    error?: unknown;
+    retry(): void;
+    prepareExit(context: EditorExitContext, editor: Editor): Promise<boolean>;
+  };
 }
 
 function NoteWorkspace({
   resourceId,
   noteInfoDisplay,
   onRefreshNoteInfo,
-  focusTitleOnMount = true,
+  newNote,
 }: NoteWorkspaceProps) {
   const { t } = useTranslation('note');
   const bodyEditorRef = useRef<NoteBodyEditorHandle>(null);
@@ -65,7 +81,8 @@ function NoteWorkspace({
     : undefined;
   const isNoteClientContentSignaturePending = !aiDiffBodyContentHash;
   const untitledTitle = t('title.untitled');
-  const resourceName = useResourceDisplayName(resourceId, fallbackNoteTitle, untitledTitle);
+  const savedResourceName = useResourceDisplayName(resourceId, fallbackNoteTitle, untitledTitle);
+  const resourceName = newNote ? newNote.title.trim() || untitledTitle : savedResourceName;
   const session = useNoteEditorStatus();
   const comments = useNoteCommentsController(resourceId);
   const actions = useNoteActionsController({
@@ -80,20 +97,24 @@ function NoteWorkspace({
     status: session.status,
   });
   const interactService = useInteractService();
-  useApi(() => interactService.recordResourceRead(resourceId), { refreshDeps: [resourceId] });
+  useApi(() => interactService.recordResourceRead(resourceId), {
+    ready: Boolean(resourceId),
+    refreshDeps: [resourceId],
+  });
   const headerSaveStatus = resolveNoteHeaderSaveStatus(session.saveStatus, titleSaveStatus);
-  const saveStatusText = t(`save.${headerSaveStatus}`);
+  const saveStatusText = newNote?.saveStatusText ?? t(`save.${headerSaveStatus}`);
   const { target } = useEditorSurface();
   useEditorRuntime(
     {
-      openedResource: { ...target, resourceName, version: noteInfoDisplay.version },
+      openedResource: { ...target, resourceId, resourceName, version: noteInfoDisplay.version },
       loading: session.showFullPageSpin,
       readOnly: !noteInfoDisplay.canCollaborativeEdit,
-      hasUnsavedChanges: headerSaveStatus !== 'saved',
-      pendingWork: pendingImageUploadCount > 0,
-      warnBeforeUnload: pendingImageUploadCount > 0,
+      hasUnsavedChanges: newNote?.hasUnsavedChanges ?? headerSaveStatus !== 'saved',
+      pendingWork: Boolean(newNote?.pendingWork) || pendingImageUploadCount > 0,
+      warnBeforeUnload: Boolean(newNote?.hasUnsavedChanges) || pendingImageUploadCount > 0,
     },
     async (context, editor) => {
+      if (newNote) return newNote.prepareExit(context, editor);
       if (!editor.getSnapshot().pendingWork) return true;
       const done = waitForEditor(editor, (snapshot) => !snapshot.pendingWork, context.signal);
       const cancelled = context
@@ -236,6 +257,11 @@ function NoteWorkspace({
               onScroll={handleMainScroll}
             >
               <div className={styles.root}>
+                {newNote?.error ? (
+                  <AppButton variant="secondary" onPress={newNote.retry}>
+                    {t('workspace.retry')}
+                  </AppButton>
+                ) : null}
                 {session.isDisconnected ? (
                   <Alert className={styles.wsAlert} status="warning">
                     <Alert.Indicator />
@@ -256,24 +282,35 @@ function NoteWorkspace({
                 ) : null}
                 <NoteEditorSlot name="title">
                   <NoteTitle
-                    key={`${resourceId}-${noteInfoDisplay.noteTitle}-${noteInfoDisplay.canCollaborativeEdit}`}
+                    key={
+                      newNote
+                        ? 'new-note-title'
+                        : `${resourceId}-${noteInfoDisplay.noteTitle}-${noteInfoDisplay.canCollaborativeEdit}`
+                    }
                     ref={titleEditorRef}
                     id={resourceId}
-                    initialContent={noteInfoDisplay.noteTitle}
+                    initialContent={newNote ? '' : noteInfoDisplay.noteTitle}
                     readOnly={session.isTitleReadOnly}
                     focusOnMount={
-                      focusTitleOnMount && session.isConnected && !session.isTitleReadOnly
+                      Boolean(newNote) || (session.isConnected && !session.isTitleReadOnly)
                     }
                     onEnterKey={focusBody}
                     onSaveStatusChange={setTitleSaveStatus}
+                    onTitleChange={newNote?.onTitleChange}
                   />
                 </NoteEditorSlot>
                 <NoteInfoBar noteInfoDisplay={noteInfoDisplay} />
                 <div className={styles.body}>
                   {session.canRenderBodyEditor ? (
                     <CustomBlockNote
-                      key={`${resourceId}-${noteInfoDisplay.canCollaborativeEdit}`}
+                      key={
+                        newNote
+                          ? 'new-note-body'
+                          : `${resourceId}-${noteInfoDisplay.canCollaborativeEdit}`
+                      }
                       ref={bodyEditorRef}
+                      onDocumentChange={newNote?.onDocumentChange}
+                      ensureResourceId={newNote?.ensureResourceId}
                       onOutlineChange={setOutlineItems}
                       onActiveHeadingChange={setActiveHeadingId}
                       onAskAi={actions.askAi}

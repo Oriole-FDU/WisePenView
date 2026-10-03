@@ -93,3 +93,15 @@ export const buildNewNotePath = (driveLocation?: DriveResourceLocation): string 
   if (driveLocation) appendResourceDriveLocation(search, driveLocation);
   return appendSearch(APP_ROUTE_PATH.NOTE_NEW, search);
 };
+
+/** 获得资源 ID 后只升级 URL 身份，当前笔记编辑器和未保存内容继续留在原位。 */
+export const isNoteDraftResourceUpgrade = (
+  currentPathname: string,
+  nextPathname: string,
+  openedResource: { resourceId: string; resourceType: string }
+): boolean =>
+  currentPathname === APP_ROUTE_PATH.NOTE_NEW &&
+  Boolean(openedResource.resourceId) &&
+  openedResource.resourceType === 'note' &&
+  nextPathname ===
+    buildResourcePath({ resourceType: 'note', resourceId: openedResource.resourceId });

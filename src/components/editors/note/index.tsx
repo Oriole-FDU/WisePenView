@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +14,6 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
-import { usePendingNoteDraftStore } from './_store/usePendingNoteDraftStore';
 import NoteWorkspace from './components/NoteWorkspace';
 import styles from './style.module.less';
 
@@ -61,9 +59,6 @@ function NoteEditorContent() {
   const {
     target: { resourceId },
   } = useEditorSurface();
-  const [focusTitleOnMount] = useState(
-    () => !usePendingNoteDraftStore.getState().pendingByResourceId[resourceId]?.focusBody
-  );
   const { t } = useTranslation('note');
   const noteService = useNoteService();
   const {
@@ -110,7 +105,6 @@ function NoteEditorContent() {
     >
       <NoteWorkspace
         resourceId={resourceId}
-        focusTitleOnMount={focusTitleOnMount}
         noteInfoDisplay={noteInfoDisplay}
         onRefreshNoteInfo={refresh}
       />

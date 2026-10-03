@@ -184,8 +184,6 @@ function NoteTitle({
         return;
       }
       if (latestFocusOnMountRef.current) {
-        const block = editor.document[0];
-        if (block) editor.setTextCursorPosition(block, 'end');
         editor.focus();
         hasAutoFocusedRef.current = true;
         focusTimerRef.current = null;

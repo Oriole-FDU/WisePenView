@@ -25,6 +25,9 @@ const [
   drawioModule,
   presentationModule,
   noteDraftModule,
+  noteDraftRouteModule,
+  resourceRouteModule,
+  noteHydrationModule,
 ] = await Promise.all([
   bundle('src/components/editors/_runtime/editorRuntime.ts'),
   bundle('src/components/editors/_runtime/editorHost.ts'),
@@ -32,11 +35,15 @@ const [
   bundle('src/components/editors/_runtime/editorExitPrompt.ts'),
   bundle('src/components/editors/office/officeSession.ts'),
   bundle('src/components/editors/drawio/drawioSaveSession.ts'),
-  bundle(
-    'src/views/app/resource/ResourceTargetResolver/_components/ResourceEditorWorkspace/workspacePresentationStore.ts'
-  ),
+  bundle('src/components/editors/_runtime/editorPresentationStore.ts'),
   bundle('src/components/editors/note/components/NewNoteWorkspace/noteDraftSession.ts'),
+  bundle('src/views/app/resource/ResourceRouteBoundary/noteDraftRouteSession.ts'),
+  bundle('src/utils/navigation/resourceRoute.ts'),
+  bundle('src/components/editors/note/CustomBlockNote/runtime/noteHydrationModel.ts'),
 ]);
+const { shouldPersistInitialEmptyBlock } = noteHydrationModule;
+const { updateNoteDraftRouteSession } = noteDraftRouteModule;
+const { isNoteDraftResourceUpgrade } = resourceRouteModule;
 const { createNoteDraftSession, hasNoteDraftContent } = noteDraftModule;
 const { createEditorRuntime, waitForEditor } = runtimeModule;
 const { createEditorHost } = hostModule;
@@ -44,7 +51,7 @@ const { prepareDraftExit } = draftModule;
 const { createEditorExitPrompt } = promptsModule;
 const { prepareOfficeExit, reduceOfficeSession, isOfficeReadOnly } = officeModule;
 const { createDrawioSaveSession } = drawioModule;
-const { createWorkspacePresentationStore } = presentationModule;
+const { createEditorPresentationStore } = presentationModule;
 const prompt = {
   title: '未保存',
   description: '保存后离开',
@@ -380,7 +387,7 @@ test('Drawio 生命周期重挂允许重新保存，旧后端响应不能写入�
 });
 
 test('展示信息直接替换，旧绑定注销不清空新绑定，最后注销释放展示', () => {
-  const store = createWorkspacePresentationStore();
+  const store = createEditorPresentationStore();
   const seen = [];
   store.subscribe((state) => seen.push(state.presentation));
   const first = { className: 'first' };
@@ -456,4 +463,91 @@ test('正文文字、结构块、公式和嵌套内容都触发创建', () => {
     },
   ])
     assert.equal(hasNoteDraftContent([block]), true);
+});
+
+test('创建响应迟到时连续输入留在同一份协作文档，成功后仍可继续编辑', async () => {
+  const session = createNoteDraftSession();
+  const doc = session.doc;
+  const text = doc.getText('test-input');
+  text.insert(0, '第');
+  const task = deferred();
+  const pending = session.ensureResource(() => task.promise);
+  text.insert(text.length, '一个字后继续输入');
+  task.resolve('note-background');
+  assert.equal(await pending, 'note-background');
+  assert.equal(session.doc, doc);
+  assert.equal(text.toString(), '第一个字后继续输入');
+  text.insert(text.length, '，创建后继续');
+  assert.equal(text.toString(), '第一个字后继续输入，创建后继续');
+  doc.destroy();
+});
+
+test('后台连接初始化仅替换空占位段落，保留连接前已输入的正文与结构', () => {
+  const block = { id: 'initialBlockId', type: 'paragraph', content: [], children: [] };
+  assert.equal(shouldPersistInitialEmptyBlock([block]), true);
+  assert.equal(shouldPersistInitialEmptyBlock([]), false);
+  for (const edited of [
+    { ...block, content: [{ type: 'text', text: '先输入的正文' }] },
+    { ...block, type: 'heading' },
+    { ...block, children: [{ type: 'paragraph' }] },
+    { ...block, id: 'persisted-block' },
+  ])
+    assert.equal(shouldPersistInitialEmptyBlock([edited]), false);
+  assert.equal(shouldPersistInitialEmptyBlock([block, block]), false);
+});
+
+test('空白页升级资源 URL 保留实例 key；聊天 query 更新同样保留会话', () => {
+  const draft = { pathname: '/resources/note/new', key: 'editor-instance', resourceId: 'note-1' };
+  const route = {
+    pathname: '/resources/note/note-1',
+    key: 'new-history-key',
+    resourceId: 'note-1',
+    newNote: false,
+    noteEditor: true,
+  };
+  const upgraded = updateNoteDraftRouteSession(draft, route);
+  assert.equal(upgraded.key, draft.key);
+  assert.equal(upgraded.resourceId, 'note-1');
+  assert.equal(
+    updateNoteDraftRouteSession(upgraded, { ...route, key: 'chat-query-key' }),
+    upgraded
+  );
+});
+
+test('切换资源或再次新建结束旧笔记会话，不复用之前的正文', () => {
+  const session = { pathname: '/resources/note/note-1', key: 'old-instance', resourceId: 'note-1' };
+  for (const route of [
+    { pathname: '/resources/note/note-2', resourceId: 'note-2', newNote: false, noteEditor: true },
+    { pathname: '/resources/note/new', resourceId: 'new', newNote: true, noteEditor: true },
+    { pathname: '/resources/file/note-1', resourceId: 'note-1', newNote: false, noteEditor: false },
+    { pathname: '/resources/note/note-1', resourceId: 'note-1', newNote: false, noteEditor: false },
+  ]) {
+    const next = updateNoteDraftRouteSession(session, { ...route, key: 'new-instance' });
+    assert.equal(next.key, 'new-instance');
+    assert.equal(next.resourceId, undefined);
+  }
+});
+
+test('只有当前空白笔记升级为自己的资源身份才绕过退出守卫', () => {
+  const target = { resourceId: 'note-1', resourceType: 'note' };
+  assert.equal(
+    isNoteDraftResourceUpgrade('/resources/note/new', '/resources/note/note-1', target),
+    true
+  );
+  assert.equal(
+    isNoteDraftResourceUpgrade('/resources/note/new', '/resources/note/other-note', target),
+    false
+  );
+  assert.equal(isNoteDraftResourceUpgrade('/resources/note/new', '/drive/personal', target), false);
+  assert.equal(
+    isNoteDraftResourceUpgrade('/resources/note/new', '/resources/note/note-1', {
+      ...target,
+      resourceId: '',
+    }),
+    false
+  );
+  assert.equal(
+    isNoteDraftResourceUpgrade('/resources/note/note-1', '/resources/note/note-2', target),
+    false
+  );
 });

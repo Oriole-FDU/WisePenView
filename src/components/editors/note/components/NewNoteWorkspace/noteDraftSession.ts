@@ -1,8 +1,12 @@
+import * as Y from 'yjs';
+
 /** 同一空白页共享创建请求，创建成功后重试保存也复用资源，避免重复笔记。 */
 export function createNoteDraftSession() {
+  const doc = new Y.Doc();
   let resourceId: string | undefined;
   let pending: Promise<string> | undefined;
   return {
+    doc,
     ensureResource(create: () => Promise<string>) {
       if (resourceId) return Promise.resolve(resourceId);
       if (!pending) {

@@ -48,6 +48,7 @@ export function useNoteActionsController({
    * cleanup：仅清理该编辑器版本写入的签名。
    */
   useEffect(() => {
+    if (!resourceId) return;
     const revision = setFrontendStates({
       source: FRONTEND_STATE_SOURCE.NOTE_EDITOR,
       resourceId,
@@ -118,6 +119,10 @@ export function useNoteActionsController({
   });
 
   const handleAskAi = useMemoizedFn((selection: NoteSelectionSnapshot) => {
+    if (!resourceId) {
+      toast.info(t('save.saving'));
+      return;
+    }
     const { context, entries } = createNoteSelectionChatContext(resourceId, selection);
     setFrontendStates({
       source: FRONTEND_STATE_SOURCE.SELECTION,
