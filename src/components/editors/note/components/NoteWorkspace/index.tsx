@@ -198,54 +198,52 @@ function NoteWorkspace({
         }
       : undefined,
     header: {
-      resource: resourceId
-        ? {
-            resourceId,
-            resourceName,
-            resourceIconType: 'note',
-            resourceInfo: noteInfoDisplay.resourceInfo,
-            currentActions: noteInfoDisplay.resourceInfo?.currentActions,
-            copyVersion: noteInfoDisplay.version,
-            permissionResourceType: RESOURCE_KIND.NOTE,
-            ownerId: noteInfoDisplay.ownerId,
-            onPermissionSuccess: onRefreshNoteInfo,
-            isDisabled: session.showFullPageSpin,
-            titleMeta: (
-              <span
-                className={`${styles.headerSaveStatus} ${
-                  headerSaveStatus === 'waiting' ? styles.headerSaveStatusWaiting : ''
-                } ${headerSaveStatus === 'failed' ? styles.headerSaveStatusFailed : ''}`}
-              >
-                {saveStatusText}
-              </span>
-            ),
-            leadingActions: <NoteEditorSlot name="aiDiffControls" />,
-            moreMenu: {
-              actions: [
-                {
-                  id: 'inline-comment-history',
-                  label: t('comments.history', {
-                    count:
-                      comments.panel.resolvedThreads.length > 0
-                        ? ` (${comments.panel.resolvedThreads.length})`
-                        : '',
-                  }),
-                  icon: History,
-                  onAction: comments.openHistory,
-                },
-              ],
-              onSearch: () => bodyEditorRef.current?.openFind(),
-              onPrint: actions.printPdf,
-              printLabel: isDesktop() ? t('export.downloadPdf') : t('export.printPdf'),
-              printIcon: isDesktop() ? Download : undefined,
-              download: {
-                label: t('export.downloadMarkdown'),
-                onAction: actions.downloadMarkdown,
-              },
-              isPending: actions.exportPending,
+      resource: {
+        resourceId,
+        resourceName,
+        resourceIconType: 'note',
+        resourceInfo: noteInfoDisplay.resourceInfo,
+        currentActions: noteInfoDisplay.resourceInfo?.currentActions,
+        copyVersion: noteInfoDisplay.version,
+        permissionResourceType: RESOURCE_KIND.NOTE,
+        ownerId: noteInfoDisplay.ownerId,
+        onPermissionSuccess: onRefreshNoteInfo,
+        isDisabled: !resourceId || session.showFullPageSpin,
+        titleMeta: resourceId ? (
+          <span
+            className={`${styles.headerSaveStatus} ${
+              headerSaveStatus === 'waiting' ? styles.headerSaveStatusWaiting : ''
+            } ${headerSaveStatus === 'failed' ? styles.headerSaveStatusFailed : ''}`}
+          >
+            {saveStatusText}
+          </span>
+        ) : undefined,
+        leadingActions: <NoteEditorSlot name="aiDiffControls" />,
+        moreMenu: {
+          actions: [
+            {
+              id: 'inline-comment-history',
+              label: t('comments.history', {
+                count:
+                  comments.panel.resolvedThreads.length > 0
+                    ? ` (${comments.panel.resolvedThreads.length})`
+                    : '',
+              }),
+              icon: History,
+              onAction: comments.openHistory,
             },
-          }
-        : undefined,
+          ],
+          onSearch: () => bodyEditorRef.current?.openFind(),
+          onPrint: actions.printPdf,
+          printLabel: isDesktop() ? t('export.downloadPdf') : t('export.printPdf'),
+          printIcon: isDesktop() ? Download : undefined,
+          download: {
+            label: t('export.downloadMarkdown'),
+            onAction: actions.downloadMarkdown,
+          },
+          isPending: actions.exportPending,
+        },
+      },
     },
   } satisfies EditorPresentation;
   return (

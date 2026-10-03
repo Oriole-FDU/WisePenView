@@ -296,11 +296,12 @@ export default function ResourceToolbarActions({
   canManagePermission,
   onOpenPermission,
 }: ResourceToolbarActionsProps) {
+  const { t } = useTranslation('resource');
   return (
     <div className={styles.actions}>
       {leadingActions ? <div className={styles.actionGroup}>{leadingActions}</div> : null}
       {actions ? <div className={styles.actionGroup}>{actions}</div> : null}
-      {resourceId || trailingActions ? (
+      {resourceId || moreMenu || trailingActions ? (
         <div className={styles.actionGroup}>
           {resourceId ? (
             <ResourceToolbarOperations
@@ -319,6 +320,13 @@ export default function ResourceToolbarActions({
                   onOpenPermission={onOpenPermission}
                 />
               )}
+            />
+          ) : moreMenu ? (
+            <AppIconButton
+              isDisabled
+              icon={<Ellipsis className={styles.moreIcon} size={22} aria-hidden="true" />}
+              label={t('header.more')}
+              size="sm"
             />
           ) : null}
           {trailingActions}
