@@ -10,8 +10,8 @@ import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { SendOptions } from '../ChatInput/index.type';
 import type { ChatProps } from '../index.type';
+import type { SendOptions } from '../send.type';
 import { hasRenderableChatContent } from './chatTurnModel';
 import { useChatToolApproval } from './useChatToolApproval';
 import { useChatTurnHistory } from './useChatTurnHistory';

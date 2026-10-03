@@ -7,7 +7,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { generateThumbnail } from '@/utils/file/upload';
 import { createUuid } from '@/utils/random/createUuid';
 
-import type { LocalAttachmentPayload } from '../index.type';
+import type { LocalAttachmentPayload } from '../../../send.type';
 import { ChatInputFileContext, type ChatInputFileContextValue } from './ChatInputFileContext';
 import { selectChatInputSelectedModel } from './ChatInputStore';
 import { useChatInputStoreApi } from './useChatInputStore';

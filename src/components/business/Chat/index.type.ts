@@ -1,6 +1,6 @@
 import type { ChatAgentOption } from '@/domains/Chat';
 
-import type { SendOptions } from './ChatInput/index.type';
+import type { SendOptions } from './send.type';
 
 /** 面板布局：panel = 贴合窗口右缘的侧栏面板；page = 铺满内容区的整页模式 */
 export type ChatLayout = 'panel' | 'page';

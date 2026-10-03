@@ -6,7 +6,7 @@ import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import styles from '../style.module.less';
+import styles from '../../style.module.less';
 
 interface ChatSessionBarProps {
   activeSessionId?: string | null;

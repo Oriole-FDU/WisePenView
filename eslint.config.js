@@ -472,7 +472,7 @@ export default defineConfig([
   {
     // ChatInput 与富文本工具栏依赖底层 textarea/input 的特殊组合行为，单独留白名单。
     files: [
-      'src/components/business/Chat/ChatInput/index.tsx',
+      'src/components/business/Chat/ChatConversation/ChatInput/index.tsx',
       'src/components/business/Note/CustomBlockNote/ui/toolbar/components/FileButtons.tsx',
       'src/components/business/Note/CustomBlockNote/ui/toolbar/components/LinkButton.tsx',
       'src/components/business/Resource/FavoriteCollectionPicker/CollectionPickerModal.tsx',

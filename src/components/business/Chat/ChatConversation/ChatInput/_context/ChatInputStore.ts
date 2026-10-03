@@ -11,7 +11,7 @@ import {
 import type { ResourceSkillSummary } from '@/domains/Resource';
 import { createStoreJSONStorage } from '@/store/persistence';
 
-import type { LocalAttachmentPayload, LocalAttachmentUpload } from '../index.type';
+import type { LocalAttachmentPayload, LocalAttachmentUpload } from '../../../send.type';
 
 const DEFAULT_PERSONAL_AGENT = buildDefaultPersonalAgent();
 const NEW_CHAT_TOOL_SELECTION_SCOPE = '__new_chat__';

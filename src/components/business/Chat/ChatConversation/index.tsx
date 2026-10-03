@@ -1,7 +1,7 @@
-import ChatInput from '../ChatInput';
-import ChatMessageList from '../ChatMessageList';
-import ChatSessionBar from '../ChatSessionBar';
 import styles from '../style.module.less';
+import ChatInput from './ChatInput';
+import ChatMessageList from './ChatMessageList';
+import ChatSessionBar from './ChatSessionBar';
 import type { ChatConversationProps } from './index.type';
 import Welcome from './Welcome';
 

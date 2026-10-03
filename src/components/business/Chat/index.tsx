@@ -11,7 +11,7 @@ import { useChatSessionController } from './_controllers/useChatSessionControlle
 import { useChatTurnController } from './_controllers/useChatTurnController';
 import ChatConversation from './ChatConversation';
 import ChatHeader from './ChatHeader';
-import type { SendOptions } from './ChatInput/index.type';
+import type { SendOptions } from './send.type';
 import styles from './style.module.less';
 import ToolApprovalDialog from './ToolApprovalDialog';
 
