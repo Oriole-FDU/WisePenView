@@ -4,6 +4,7 @@ import { useBeforeUnload, useBlocker } from 'react-router-dom';
 
 import type { createEditorHost } from '@/components/editors/_runtime/editorHost';
 import type { EditorExitReason } from '@/components/editors/editor.type';
+import { isNoteDraftResourceUpgrade } from '@/utils/navigation/resourceRoute';
 
 export function useResourceEditorNavigation(
   host: ReturnType<typeof createEditorHost>,
@@ -16,10 +17,23 @@ export function useResourceEditorNavigation(
     }: {
       currentLocation: { pathname: string; search: string };
       nextLocation: { pathname: string; search: string };
-    }) =>
-      Boolean(host.getSnapshot()) &&
-      (currentLocation.pathname !== nextLocation.pathname ||
-        currentLocation.search !== nextLocation.search)
+    }) => {
+      const editor = host.getSnapshot();
+      if (!editor) return false;
+      if (
+        currentLocation.search === nextLocation.search &&
+        isNoteDraftResourceUpgrade(
+          currentLocation.pathname,
+          nextLocation.pathname,
+          editor.getSnapshot().openedResource
+        )
+      )
+        return false;
+      return (
+        currentLocation.pathname !== nextLocation.pathname ||
+        currentLocation.search !== nextLocation.search
+      );
+    }
   );
   const blocker = useBlocker(shouldBlock);
   useBeforeUnload(

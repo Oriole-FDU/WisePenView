@@ -15,11 +15,10 @@ import {
   type CustomBlockNoteEditor,
   notePluginRegistry,
 } from '../registry/noteEditorComposition';
+import { shouldPersistInitialEmptyBlock } from './noteHydrationModel';
 import type { NoteEditorRuntimeProps } from './runtime.type';
 
 const initializedAiDiffPreviews = new WeakMap<Y.Doc, NoteAiDiffPreviewData>();
-/** BlockNote 协同空文档使用的本地占位块 ID，正式写入 Yjs 后会被替换。 */
-const INITIAL_BLOCK_ID = 'initialBlockId';
 
 function splitAiDiffPreviewBlocks(
   blocks: NoteAiDiffPreviewData['content'],
@@ -76,7 +75,7 @@ function initializeAiDiffPreview(params: {
 
 function persistInitialEmptyNoteBlock(editor: CustomBlockNoteEditor): boolean {
   const blocks = editor.document;
-  if (blocks.length !== 1 || blocks[0]?.id !== INITIAL_BLOCK_ID) {
+  if (!shouldPersistInitialEmptyBlock(blocks)) {
     return false;
   }
 

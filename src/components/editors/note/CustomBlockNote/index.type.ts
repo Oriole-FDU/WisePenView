@@ -5,6 +5,7 @@ import type {
 } from '@/domains/Note';
 
 import type { NoteOutlineItem } from './engines/outline';
+import type { CustomBlockNoteEditor } from './registry/noteEditorComposition';
 
 export type { NoteOutlineItem } from './engines/outline';
 
@@ -44,6 +45,8 @@ export interface NoteInlineCommentsBinding {
 }
 
 export interface CustomBlockNoteProps {
+  onDocumentChange?: (blocks: CustomBlockNoteEditor['document']) => void;
+  ensureResourceId?: () => Promise<string>;
   onOutlineChange?: (items: NoteOutlineItem[]) => void;
   onActiveHeadingChange?: (activeId: string | undefined) => void;
   onAiDiffPresenceChange?: (hasAiDiffContent: boolean) => void;

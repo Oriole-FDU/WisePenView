@@ -28,10 +28,10 @@ import {
 } from '@/components/_shadcn';
 import { Spin } from '@/components/base/Feedback';
 import { DriveCreateModal, type DriveCreateType } from '@/components/business/Drive/Modals';
-import { useDriveService, useNoteService } from '@/domains';
+import { useDriveService } from '@/domains';
 import type { RootNode } from '@/domains/Drive';
-import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
+import { useOpenNewNote } from '@/hooks/useOpenNewNote';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
@@ -65,14 +65,12 @@ interface PreparedModalResult {
   root: RootNode;
 }
 
-interface CreatedNoteResult {
+interface PreparedNoteResult {
   kind: 'note';
-  resourceId: string;
-  title: string;
   root: RootNode;
 }
 
-type PrepareCreateResult = PreparedModalResult | CreatedNoteResult;
+type PrepareCreateResult = PreparedModalResult | PreparedNoteResult;
 
 const normalizeSearchText = (value: string): string => value.trim().toLocaleLowerCase();
 
@@ -86,7 +84,7 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
   const { t } = useTranslation(['shell', 'drive', 'profile', 'resource']);
   const navigate = useNavigate();
   const driveService = useDriveService();
-  const noteService = useNoteService();
+  const openNewNote = useOpenNewNote();
   const openResource = useOpenResource();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -162,12 +160,7 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
 
       if (type !== 'note') return { kind: 'modal', type, root };
 
-      const title = t('create.defaultNoteTitle', { ns: 'drive' });
-      const result = await noteService.createNote({ title, pathTagId: root.tagId });
-      if (!result.resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return { kind: 'note', resourceId: result.resourceId, title, root };
+      return { kind: 'note', root };
     },
     {
       manual: true,
@@ -177,14 +170,11 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
           setCreateModalTarget({ type: result.type, root: result.root });
           return;
         }
-        openResource({
-          resourceId: result.resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          resourceName: result.title,
-          driveLocation: result.root.tagId
+        openNewNote(
+          result.root.tagId
             ? { scope: result.root.scope, mountTagId: result.root.tagId }
-            : undefined,
-        });
+            : undefined
+        );
       },
       onFinally: () => {
         setPreparingType(undefined);

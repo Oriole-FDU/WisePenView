@@ -23,10 +23,11 @@ import {
   MARKDOWN_NOTE_FILE_ACCEPT,
   useMarkdownNoteImport,
 } from '@/components/editors/note/hooks/useMarkdownNoteImport';
-import { useGroupService, useNoteService } from '@/domains';
+import { useGroupService } from '@/domains';
 import type { DriveResourceLocation, FolderNode, RootNode } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
+import { useOpenNewNote } from '@/hooks/useOpenNewNote';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
@@ -52,11 +53,10 @@ interface SidebarDriveCreateTarget {
 function DriveTab() {
   const { t } = useTranslation('drive');
   const groupService = useGroupService();
-  const noteService = useNoteService();
+  const openNewNote = useOpenNewNote();
   const scope = useSidebarDriveScopeStore((state) => state.scope);
   const groupId = getDriveScopeGroupId(scope);
   const openResource = useOpenResource();
-  const [noteTarget, setNoteTarget] = useState<RootNode | FolderNode | null>(null);
   const [uploadDocumentPathTagId, setUploadDocumentPathTagId] = useState<string>();
   const [driveCreateTarget, setDriveCreateTarget] = useState<SidebarDriveCreateTarget | null>(null);
   const [renameTarget, setRenameTarget] = useState<DriveActionTarget | null>(null);
@@ -129,7 +129,7 @@ function DriveTab() {
         setDriveCreateTarget({ type: 'folder', target: node });
         break;
       case 'note':
-        setNoteTarget(node);
+        openNewNote(resolveContainerResourceLocation(node));
         break;
       case 'importNote':
         if (importingMarkdownNote) return;
@@ -214,42 +214,6 @@ function DriveTab() {
       });
     },
   });
-
-  useApi(
-    async () => {
-      if (!noteTarget) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '笔记创建目标不存在',
-        });
-      }
-      const { resourceId } = await noteService.createNote({
-        title: t('create.defaultNoteTitle'),
-        pathTagId: resolveContainerMountTagId(noteTarget),
-      });
-      if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return {
-        resourceId,
-        target: noteTarget,
-      };
-    },
-    {
-      ready: Boolean(noteTarget),
-      refreshDeps: [noteTarget],
-      onSuccess: ({ resourceId, target }) => {
-        setNoteTarget(null);
-        openResource({
-          resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          driveLocation: resolveContainerResourceLocation(target),
-        });
-      },
-      onErrorEffect: () => {
-        setNoteTarget(null);
-      },
-    }
-  );
 
   const showSpin = treeLoading && treeData.length === 0;
   const showEmpty = !treeLoading && treeData.length === 0;

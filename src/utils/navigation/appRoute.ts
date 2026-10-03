@@ -24,6 +24,7 @@ export const APP_ROUTE_PATH = {
   COURSES: '/courses',
   INVITE: '/invite',
   RESOURCES: '/resources',
+  NOTE_NEW: '/resources/note/new',
   PROFILE: '/profile',
   PROFILE_ACCOUNT: '/profile/account',
   PROFILE_USAGE: '/profile/usage',

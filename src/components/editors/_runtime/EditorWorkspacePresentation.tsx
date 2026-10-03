@@ -1,5 +1,7 @@
 import { FilePenLine, FileText, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { StoreApi } from 'zustand';
 import { useStore } from 'zustand';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -14,14 +16,21 @@ import { ResourceChatBinding } from '@/layouts/Resource/_context/chatBinding';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 
-import type { ResourceWorkspacePresentationProps } from '../index.type';
+import type { EditorTarget } from '../editor.type';
+import type { EditorPresentationState } from './editorPresentationStore';
+
+interface EditorWorkspacePresentationProps {
+  target: EditorTarget;
+  store: StoreApi<EditorPresentationState>;
+  children: ReactNode;
+}
 
 /** 单独订阅展示信息，保留正文 children 的引用，避免上报触发编辑器重复渲染。 */
-export default function ResourceWorkspacePresentation({
+export default function EditorWorkspacePresentation({
   target,
   store,
   children,
-}: ResourceWorkspacePresentationProps) {
+}: EditorWorkspacePresentationProps) {
   const { t } = useTranslation('workspace');
   const { t: tChat } = useTranslation('chat');
   const { collapsed, toggle } = useChatDockState();

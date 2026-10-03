@@ -45,15 +45,16 @@ Chat 的目前會話只由 URL 決定：主聊天頁讀取 `/chat/:sessionId`，
 
 ## 云盘与资源
 
-| 路径                                      | 参数与行为          |
-| ----------------------------------------- | ------------------- |
-| `/drive`                                  | replace 到 personal |
-| `/drive/personal[/folder/:folderId]`      | 个人云盘及文件夹    |
-| `/drive/{upload-queue\|favorites\|trash}` | 系统视图            |
-| `/drive/trash/folder/:folderId`           | 回收站文件夹        |
-| `/resources/:resourceType/:resourceId`    | 资源工作区          |
+| 路径                                           | 参数与行为                                     |
+| ---------------------------------------------- | ---------------------------------------------- |
+| `/drive`                                       | replace 到 personal                            |
+| `/drive/personal[/folder/:folderId]`           | 个人云盘及文件夹                               |
+| `/drive/{upload-queue\|favorites\|trash}`      | 系统视图                                       |
+| `/drive/trash/folder/:folderId`                | 回收站文件夹                                   |
+| `/resources/note/new[?scope=&tagId=&groupId=]` | 空白笔记页，首次编辑后台创建并原位升级资源 URL |
+| `/resources/:resourceType/:resourceId`         | 资源工作区                                     |
 
-资源工作区保留 `viewer`，PDF 可保留 `page`、`zoom` query。没有 `resourceId` 的资源路径无效。Skill 的版本、文件、配置和预览状态不进入 URL。
+资源工作区保留 `viewer`，PDF 可保留 `page`、`zoom` query。没有 `resourceId` 的资源路径无效；`/resources/note/new` 是独立的空白笔记入口，`new` 为保留路径，不代表后端资源 ID。只打开或聚焦此页不会创建笔记。首次编辑后台创建资源，现有编辑器与 Y.Doc 保持挂载；收到后端 ID 后仅 replace URL，连接与保存状态不阻塞输入。Skill 的版本、文件、配置和预览状态不进入 URL。
 
 ## 小组与课程
 

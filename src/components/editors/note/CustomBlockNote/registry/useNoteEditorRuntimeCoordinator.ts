@@ -36,6 +36,7 @@ export function useNoteEditorRuntimeCoordinator(props: NoteEditorRuntimeProps) {
     resourceId,
     readOnly,
     onPendingCountChange: props.onImageUploadCountChange,
+    getResourceId: props.ensureResourceId,
   });
   const definition = useNoteEditorDefinition(props, {
     uploadFile: imageUploadRuntime.uploadFile,
@@ -69,10 +70,10 @@ export function useNoteEditorRuntimeCoordinator(props: NoteEditorRuntimeProps) {
     editor,
     definition,
     transactions: notePluginRegistry.services.transactions,
-    resourceId,
     blockLocalDocWrites,
     onAskAi,
     onAiDiffBodyContentHashChange,
+    onDocumentChange: props.onDocumentChange,
   });
 
   useNoteEditorHydration({

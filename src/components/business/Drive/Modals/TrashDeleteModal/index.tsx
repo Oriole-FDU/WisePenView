@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { clearNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import { removePdfPreviewProgress } from '@/components/editors/pdf/components/PdfViewer/_store/usePdfPreviewProgressStore';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
@@ -17,12 +16,8 @@ function getNodeName(node: DriveActionTarget | undefined, fallback: string): str
 }
 
 function clearDeletedNodeRuntime(nodes: DriveActionTarget[]): void {
-  if (nodes.some((node) => node.type === 'folder')) {
-    clearNewNoteStore();
-  }
   nodes.forEach((node) => {
     if (node.type !== 'resource') return;
-    clearNewNoteStore(node.resourceId);
     removePdfPreviewProgress(node.resourceId);
   });
 }

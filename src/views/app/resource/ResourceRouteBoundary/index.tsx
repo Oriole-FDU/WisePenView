@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
+import { Spin } from '@/components/base/Feedback';
 import { RESOURCE_MAIN_MIN_WIDTH } from '@/constants/layoutScale';
 import type { DriveNodeScope } from '@/domains/Drive';
 import {
@@ -31,6 +32,12 @@ import {
 } from '@/utils/navigation/resourceRoute';
 
 import ResourceTargetResolver from '../ResourceTargetResolver';
+import { updateNoteDraftRouteSession } from './noteDraftRouteSession';
+import styles from './style.module.less';
+
+const NewNoteWorkspace = lazy(
+  () => import('@/components/editors/note/components/NewNoteWorkspace')
+);
 
 function ResourceRouteBoundary() {
   const { t } = useTranslation('workspace');
@@ -44,13 +51,46 @@ function ResourceRouteBoundary() {
   }>();
   const search = new URLSearchParams(location.search);
   const viewerParam = search.get('viewer') ?? undefined;
+  const noteEditor =
+    rawResourceType === RESOURCE_KIND.NOTE && (!viewerParam || viewerParam === 'note');
+  const newNote = noteEditor && resourceId === 'new';
+  const [draftSession, setDraftSession] = useState(() => ({
+    pathname: location.pathname,
+    key: location.key,
+    resourceId: undefined as string | undefined,
+  }));
+  const nextDraftSession = updateNoteDraftRouteSession(draftSession, {
+    pathname: location.pathname,
+    key: location.key,
+    resourceId,
+    newNote,
+    noteEditor,
+  });
+  if (nextDraftSession !== draftSession) setDraftSession(nextDraftSession);
+  const keepDraftEditor =
+    noteEditor &&
+    (newNote ||
+      (Boolean(nextDraftSession.resourceId) && nextDraftSession.resourceId === resourceId));
+  const handleNoteCreated = (createdResourceId: string) => {
+    setDraftSession((session) => ({ ...session, resourceId: createdResourceId }));
+    void navigate(
+      buildResourcePathWithSearch(
+        {
+          resourceType: RESOURCE_KIND.NOTE,
+          resourceId: createdResourceId,
+        },
+        location.search
+      ),
+      { replace: true }
+    );
+  };
   const target: ResourceTarget = {
     resourceType: rawResourceType,
     resourceId,
     viewer: viewerParam,
   };
   const routeContext = {
-    resourceId,
+    resourceId: newNote ? undefined : resourceId,
     resourceType: normalizeResourceKind(rawResourceType),
     viewer: resolveResourceViewer({ resourceType: rawResourceType, viewer: viewerParam }),
     driveLocation: parseResourceDriveLocation(search),
@@ -124,11 +164,26 @@ function ResourceRouteBoundary() {
             navigateResourceHash={navigateResourceHash}
           >
             <RouteOutletBoundary>
-              <ResourceTargetResolver
-                target={target}
-                onTargetChange={handleTargetChange}
-                onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
-              />
+              {keepDraftEditor ? (
+                <Suspense
+                  fallback={
+                    <div className={styles.loading}>
+                      <Spin size="large" />
+                    </div>
+                  }
+                >
+                  <NewNoteWorkspace
+                    key={nextDraftSession.key}
+                    onResourceCreated={handleNoteCreated}
+                  />
+                </Suspense>
+              ) : (
+                <ResourceTargetResolver
+                  target={target}
+                  onTargetChange={handleTargetChange}
+                  onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
+                />
+              )}
             </RouteOutletBoundary>
           </ResourceHost>
         }
