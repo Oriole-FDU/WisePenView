@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useStore } from 'zustand';
 
-import ChatPanel from '@/components/business/ChatPanel';
+import Chat from '@/components/business/Chat';
 import type { ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 
 import { type ResourceChatBindingValue } from './ResourceChatBindingContext';
@@ -55,7 +55,7 @@ export function ResourceChatPanel({
         })
       : undefined);
   return (
-    <ChatPanel
+    <Chat
       resourceId={target?.resourceId}
       showHeader
       showCollapseButton={showCollapseButton}

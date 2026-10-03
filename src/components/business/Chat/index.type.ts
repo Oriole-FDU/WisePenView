@@ -1,9 +1,9 @@
 import type { ChatAgentOption } from '@/domains/Chat';
 
-import type { SendOptions } from './ChatInput/index.type';
+import type { SendOptions } from './send.type';
 
 /** 面板布局：panel = 贴合窗口右缘的侧栏面板；page = 铺满内容区的整页模式 */
-export type ChatPanelLayout = 'panel' | 'page';
+export type ChatLayout = 'panel' | 'page';
 
 /**
  * 发送前置守卫：返回 Promise 表示本次发送被挂起，由守卫方决定是否继续发送；
@@ -24,9 +24,9 @@ export interface ChatHostAgentPort {
   interceptSend?: ChatSendInterceptor;
 }
 
-export interface ChatPanelProps {
+export interface ChatProps {
   resourceId?: string;
-  fullWidth?: ChatPanelLayout;
+  fullWidth?: ChatLayout;
   showHeader: boolean;
   resourceChat?: {
     provider?: {

@@ -6,9 +6,9 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
 import styles from '../style.module.less';
-import type { ChatPanelHeaderProps } from './index.type';
+import type { ChatHeaderProps } from './index.type';
 
-function ChatPanelHeader({
+function ChatHeader({
   panelTitle,
   sessionBarOpen,
   showCollapseButton,
@@ -16,7 +16,7 @@ function ChatPanelHeader({
   onCollapsePanel,
   onNewChat,
   onToggleSessionBar,
-}: ChatPanelHeaderProps) {
+}: ChatHeaderProps) {
   const { t } = useTranslation('chat');
   const desktopWindow = useDesktopWindowState();
   const sessionBarLabel = sessionBarOpen
@@ -60,4 +60,4 @@ function ChatPanelHeader({
   );
 }
 
-export default ChatPanelHeader;
+export default ChatHeader;

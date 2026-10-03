@@ -1,32 +1,32 @@
 import { useLatest } from 'ahooks';
 import { memo, useEffect } from 'react';
 
-import type { ChatPanelProps } from '@/components/business/ChatPanel/index.type';
+import type { ChatProps } from '@/components/business/Chat/index.type';
 import { useFrontendStateValue } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 
-import { useChatPanelLayout } from './_controllers/useChatPanelLayout';
+import { useChatLayout } from './_controllers/useChatLayout';
 import { useChatSessionController } from './_controllers/useChatSessionController';
 import { useChatTurnController } from './_controllers/useChatTurnController';
-import type { SendOptions } from './ChatInput/index.type';
-import ChatPanelConversation from './ChatPanelConversation';
-import ChatPanelHeader from './ChatPanelHeader';
+import ChatConversation from './ChatConversation';
+import ChatHeader from './ChatHeader';
+import type { SendOptions } from './send.type';
 import styles from './style.module.less';
 import ToolApprovalDialog from './ToolApprovalDialog';
 
-function ChatPanel({
+function Chat({
   fullWidth = 'panel',
   showHeader,
   resourceChat,
   resourceId,
   hostAgentPort,
   showCollapseButton = true,
-}: ChatPanelProps) {
+}: ChatProps) {
   const { isAuthenticated, requireLogin } = useAppAuth();
   const { locationKey } = useChatSessionRoute();
   const locationKeyLatest = useLatest(locationKey);
-  const layout = useChatPanelLayout();
+  const layout = useChatLayout();
   const selectedText = useFrontendStateValue('selected_text');
   const session = useChatSessionController({ resourceChat });
   const turn = useChatTurnController({
@@ -80,7 +80,7 @@ function ChatPanel({
       {/* data-chat-layout 是跨模块样式锚点：子组件用 [data-chat-layout] 分支 panel/page */}
       <div className={styles.panel} data-chat-layout={fullWidth}>
         {showHeader ? (
-          <ChatPanelHeader
+          <ChatHeader
             panelTitle={session.panelTitle}
             sessionBarOpen={session.sessionBarOpen}
             showCollapseButton={showCollapseButton}
@@ -91,7 +91,7 @@ function ChatPanel({
           />
         ) : null}
 
-        <ChatPanelConversation
+        <ChatConversation
           injectedAgents={hostAgentPort?.injectedAgents}
           preferredAgent={hostAgentPort?.preferredAgent}
           contextPreview={resourceChat?.context ? selectedText : undefined}
@@ -115,4 +115,4 @@ function ChatPanel({
   );
 }
 
-export default memo(ChatPanel);
+export default memo(Chat);
