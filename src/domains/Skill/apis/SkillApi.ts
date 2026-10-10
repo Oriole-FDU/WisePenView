@@ -1,6 +1,9 @@
 import { apiGet, apiPost } from '@/apis/request';
 import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
-import type { InitUploadAssetsApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
+import type {
+  CancelUploadAssetsApiRequest,
+  InitUploadAssetsApiResponse,
+} from '@/domains/_shared/apis/versionAssetApi.type';
 
 import type {
   CreateSkillApiRequest,
@@ -54,6 +57,10 @@ function deleteSkillAssets(body: DeleteSkillAssetsApiRequest): Promise<void> {
   return apiPost('/skill/deleteSkillAssets', body);
 }
 
+function cancelUploadSkillAssets(body: CancelUploadAssetsApiRequest): Promise<void> {
+  return apiPost('/skill/cancelUploadSkillAssets', body);
+}
+
 function publishSkillVersion(body: PublishSkillVersionApiRequest): Promise<void> {
   return apiPost('/skill/publishSkillVersion', body);
 }
@@ -66,6 +73,7 @@ export const SkillApi = {
   getSkillAssetStsToken,
   changeSkillInfo,
   initUploadSkillAssets,
+  cancelUploadSkillAssets,
   deleteSkillAssets,
   publishSkillVersion,
 };

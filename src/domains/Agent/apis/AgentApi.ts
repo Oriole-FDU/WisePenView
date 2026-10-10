@@ -1,5 +1,8 @@
 import { apiPost } from '@/apis/request';
-import type { InitUploadAssetsApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
+import type {
+  CancelUploadAssetsApiRequest,
+  InitUploadAssetsApiResponse,
+} from '@/domains/_shared/apis/versionAssetApi.type';
 
 import type {
   AgentInfoApiResponse,
@@ -40,6 +43,9 @@ const initUploadAgentAssets = (
 const deleteAgentAssets = (body: DeleteAgentAssetsApiRequest): Promise<void> =>
   apiPost('/agent/deleteAgentAssets', body);
 
+const cancelUploadAgentAssets = (body: CancelUploadAssetsApiRequest): Promise<void> =>
+  apiPost('/agent/cancelUploadAgentAssets', body);
+
 export const AgentApi = {
   createAgent,
   getAgentInfo,
@@ -48,5 +54,6 @@ export const AgentApi = {
   updateAgentSpec,
   publishAgentVersion,
   initUploadAgentAssets,
+  cancelUploadAgentAssets,
   deleteAgentAssets,
 };

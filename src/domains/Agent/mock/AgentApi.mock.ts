@@ -1,5 +1,11 @@
 import type { VersionResourceInfoApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
 import { mockResponse } from '@/domains/_shared/mock/response';
+import {
+  assertMockVersionUploadsComplete,
+  cancelMockVersionUploads,
+  deleteMockVersionAssets,
+  initMockVersionAssets,
+} from '@/domains/_shared/mock/versionAssets.mock';
 import { addMockResource, getMockResource } from '@/domains/Resource/mock/resourceStore';
 
 import type { AgentApi as AgentApiContract } from '../apis/AgentApi';
@@ -50,6 +56,7 @@ export const AgentApi: typeof AgentApiContract = {
     const data = info(resourceId);
     const version = (data.version ?? 0) + 1;
     const published = bundle(resourceId, version);
+    assertMockVersionUploadsComplete(published);
     published.status = 'PUBLISHED';
     data.version = version;
     bundles.set(`${resourceId}:${version + 1}`, {
@@ -63,22 +70,14 @@ export const AgentApi: typeof AgentApiContract = {
     return {
       resourceId,
       version: draftVersion,
-      assetUploadTickets: assets.map((asset) => {
-        const assetId = `mock-asset-${crypto.randomUUID()}`;
-        const objectKey = `mock-agent/${resourceId}/${assetId}`;
-        (target.assets ??= []).push({
-          ...asset,
-          id: assetId,
-          objectKey,
-          size: asset.expectedSize?.toString(),
-          uploadStatus: 'AVAILABLE',
-        });
-        return { assetId, objectKey, putUrl: objectKey, callbackHeader: 'mock' };
-      }),
+      assetUploadTickets: initMockVersionAssets(target, assets, `mock-agent/${resourceId}`),
     };
+  },
+  cancelUploadAgentAssets: async ({ resourceId, draftVersion, objectKeys }) => {
+    cancelMockVersionUploads(bundle(resourceId, draftVersion), objectKeys);
   },
   deleteAgentAssets: async ({ resourceId, draftVersion, assetIds }) => {
     const target = bundle(resourceId, draftVersion);
-    target.assets = target.assets?.filter((asset) => !assetIds.includes(asset.id ?? ''));
+    deleteMockVersionAssets(target, assetIds);
   },
 };

@@ -59,12 +59,23 @@ export const createAgentServices = (): IAgentService => ({
     if (!ticket?.assetId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.AGENT_UPLOAD_ASSET_ID_MISSING);
     }
-    if (ticket.putUrl && ticket.callbackHeader) {
-      await putOssPresignedUrl({
-        putUrl: ticket.putUrl,
-        callbackHeader: ticket.callbackHeader,
-        body: file,
-      });
+    try {
+      if (ticket.putUrl && ticket.callbackHeader) {
+        await putOssPresignedUrl({
+          putUrl: ticket.putUrl,
+          callbackHeader: ticket.callbackHeader,
+          body: file,
+        });
+      }
+    } catch (error) {
+      if (ticket.objectKey) {
+        await AgentApi.cancelUploadAgentAssets({
+          resourceId,
+          draftVersion,
+          objectKeys: [ticket.objectKey],
+        }).catch(() => undefined);
+      }
+      throw error;
     }
   },
   async deleteAssets(resourceId, draftVersion, assetIds) {

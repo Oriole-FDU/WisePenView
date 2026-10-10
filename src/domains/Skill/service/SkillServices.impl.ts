@@ -282,11 +282,12 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
               objectKey: ticket.objectKey,
             };
           } catch (error) {
-            if (ticket?.assetId) {
-              await SkillApi.deleteSkillAssets({
+            if (ticket?.objectKey) {
+              // 覆盖上传沿用 assetId，失败只能取消本次候选对象，不能删除原文件。
+              await SkillApi.cancelUploadSkillAssets({
                 resourceId,
                 draftVersion,
-                assetIds: [ticket.assetId],
+                objectKeys: [ticket.objectKey],
               }).catch(() => undefined);
             }
             return {
@@ -333,25 +334,20 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
       })
     );
     const results = await uploadAssets(resourceId, draftVersion, uploadRequests);
-    const createdAssetIds = results.flatMap((result) =>
-      result.assetId && !result.error ? [result.assetId] : []
-    );
     const failedResult = results.find((result) => result.error);
     if (failedResult?.error) {
-      await deleteAssets(resourceId, draftVersion, createdAssetIds).catch(() => undefined);
+      // 部分成功的目标可能是覆盖已有文件，不能把返回的 ID 当作新文件回滚删除。
       throw failedResult.error;
     }
 
     const missingAssetIdResult = results.find((result) => !result.assetId);
     if (missingAssetIdResult || results.length !== assets.length) {
-      await deleteAssets(resourceId, draftVersion, createdAssetIds).catch(() => undefined);
       throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
         fileName: missingAssetIdResult?.name,
       });
     }
     const missingObjectKeyResult = results.find((result) => !result.objectKey);
     if (missingObjectKeyResult) {
-      await deleteAssets(resourceId, draftVersion, createdAssetIds).catch(() => undefined);
       throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING, {
         fileName: missingObjectKeyResult.name,
       });
