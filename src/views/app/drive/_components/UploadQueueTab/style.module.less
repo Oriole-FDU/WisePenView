@@ -14,6 +14,29 @@
   flex-direction: column;
 }
 
+.uploadTable {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+
+  :global(.table-root),
+  :global(.table__column),
+  :global(.table__cell),
+  :global(.table__row .table__cell) {
+    background: transparent;
+  }
+
+  :global(.table__footer) {
+    border-top: 0;
+    background: transparent;
+  }
+}
+
 .nameText {
   display: block;
   min-width: 0;

@@ -10,6 +10,39 @@
   overflow: hidden;
   .tableShellRadius();
   background: var(--surface);
+
+  // 挂在 shell 下提高优先级，避免被表体默认透明底 / 行 hover 盖掉
+  .selectedRow:global(.table__row),
+  :global(.table__row[data-folder-selected='true']) {
+    :global(.table__cell) {
+      background: var(--table-row-selected-bg);
+    }
+  }
+
+  &[data-edit-mode='true'] {
+    .checkboxCellInner :global(.wisepen-table-selection-checkbox) {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  @media (hover: hover) {
+    .bodyRow:global(.table__row:hover) {
+      .checkboxCellInner :global(.wisepen-table-selection-checkbox) {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    .selectedRow:global(.table__row:hover),
+    .selectedRow:global(.table__row)[data-hovered='true'],
+    :global(.table__row[data-folder-selected='true']:hover),
+    :global(.table__row[data-folder-selected='true'][data-hovered='true']) {
+      :global(.table__cell) {
+        background: var(--table-row-selected-hover-bg);
+      }
+    }
+  }
 }
 
 .headerBar {
@@ -95,8 +128,9 @@
   }
 
   @media (hover: hover) {
-    :global(.table__row:hover .table__cell),
-    :global(.table__row[data-hovered='true'] .table__cell) {
+    // 选中行使用独立高亮，避免被其他行 hover / data-hovered 样式吞掉
+    :global(.table__row:hover:not([data-folder-selected='true']) .table__cell),
+    :global(.table__row[data-hovered='true']:not([data-folder-selected='true']) .table__cell) {
       background: var(--table-row-hover-bg);
     }
   }
@@ -167,34 +201,6 @@
   height: @row-content-height;
   min-width: 0;
   user-select: none;
-}
-
-.selectedRow:global(.table__row) {
-  :global(.table__cell) {
-    background: var(--table-row-selected-bg);
-  }
-}
-
-.shell[data-edit-mode='true'] {
-  .checkboxCellInner :global(.wisepen-table-selection-checkbox) {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-@media (hover: hover) {
-  .bodyRow:global(.table__row:hover) {
-    .checkboxCellInner :global(.wisepen-table-selection-checkbox) {
-      opacity: 1;
-      pointer-events: auto;
-    }
-  }
-
-  .selectedRow:global(.table__row:hover) {
-    :global(.table__cell) {
-      background: var(--table-row-selected-hover-bg);
-    }
-  }
 }
 
 @media (hover: none) {

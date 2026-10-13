@@ -93,6 +93,7 @@ function UploadQueueTab() {
           loading={listLoading}
           emptyText={t('uploadQueue.empty')}
           summary={false}
+          className={styles.uploadTable}
         />
       </main>
     </div>

@@ -23,9 +23,9 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--border-light);
-  border-radius: var(--table-shell-radius, var(--radius-xl));
-  background: var(--surface);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .splitLayout {
@@ -44,7 +44,7 @@
   flex-direction: column;
   padding: var(--space-md) var(--space-sm);
   border-right: 1px solid var(--table-inner-border);
-  background: var(--accent-softer);
+  background: transparent;
 }
 
 .collectionPanelHeader {
@@ -203,10 +203,28 @@
   border-radius: 0;
   background: transparent;
 
+  :global(.table-root),
+  :global(.table__scroll-container),
+  :global(.table__content),
+  :global(.table__header),
+  :global(.table__body) {
+    background: transparent;
+  }
+
   :global(.table-root) {
     padding-top: @table-gap-compact;
   }
 
+  :global(.table__column),
+  :global(.table__cell),
+  :global(.table__row .table__cell) {
+    background: transparent;
+  }
+
+  :global(.table__footer) {
+    border-top: 0;
+    background: transparent;
+  }
 }
 
 .resourceNameColumn:global(.table__column),
@@ -233,7 +251,7 @@
   .collectionPanel {
     max-height: 220px;
     border-right: 0;
-    border-bottom: 1px solid var(--table-inner-border);
+    border-bottom: 0;
   }
 
   .resourceTablePanel {

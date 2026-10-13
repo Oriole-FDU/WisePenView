@@ -223,7 +223,8 @@ function FolderTableBodyRowBase<T extends FolderTableRow>({
       id={rowId}
       textValue={row.name}
       data-folder-row-id={rowId}
-      data-selected={isSelected ? 'true' : undefined}
+      // HeroUI/RAC Row 会覆盖 data-selected，这里用业务属性承载行选中态
+      data-folder-selected={isSelected ? 'true' : undefined}
       className={joinClassNames(
         styles.bodyRow,
         isSelected ? styles.selectedRow : undefined,

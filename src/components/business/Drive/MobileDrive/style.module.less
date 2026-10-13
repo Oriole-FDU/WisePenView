@@ -7,9 +7,9 @@
   min-height: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .breadcrumb {
@@ -29,6 +29,13 @@
   min-width: 0;
   border: 0;
   border-radius: 0;
+  background: transparent;
+
+  :global(.table-root),
+  :global(.table__cell),
+  :global(.table__row .table__cell) {
+    background: transparent;
+  }
 
   :global(.table__scroll-container),
   :global(.table__content) {

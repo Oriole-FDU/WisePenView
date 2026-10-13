@@ -81,19 +81,28 @@ function PublicGroupsPage() {
   if (boundedPath) return <Navigate to={boundedPath} replace />;
 
   return (
-    <>
+    <div className={styles.publicPage}>
       <PageHeader
+        className={styles.publicPageHeader}
+        actionsClassName={styles.publicPageHeaderActions}
         title={t('list.title')}
-        subtitle={t('list.subtitle')}
         actions={
           <div className={styles.actionsRow}>
-            <AppButton variant="secondary" onPress={() => setCreateModalOpen(true)}>
+            <AppButton
+              variant="secondary"
+              aria-label={t('list.create')}
+              onPress={() => setCreateModalOpen(true)}
+            >
               <Plus size={16} aria-hidden />
-              {t('list.create')}
+              <span className={styles.actionLabel}>{t('list.create')}</span>
             </AppButton>
-            <AppButton variant="primary" onPress={() => setJoinModalOpen(true)}>
+            <AppButton
+              variant="primary"
+              aria-label={t('list.join')}
+              onPress={() => setJoinModalOpen(true)}
+            >
               <UserPlus size={16} aria-hidden />
-              {t('list.join')}
+              <span className={styles.actionLabel}>{t('list.join')}</span>
             </AppButton>
           </div>
         }
@@ -135,15 +144,17 @@ function PublicGroupsPage() {
           <Spin size="large" />
         </div>
       ) : groups.length > 0 ? (
-        <div className={styles.grid}>
-          {groups.map((group) => (
-            <div key={group.groupId} className={styles.gridItem}>
-              <GroupCard
-                group={group}
-                onClick={() => navigate(buildGroupFilesPath(group.groupId))}
-              />
-            </div>
-          ))}
+        <div className={styles.gridWrap}>
+          <div className={styles.grid}>
+            {groups.map((group) => (
+              <div key={group.groupId} className={styles.gridItem}>
+                <GroupCard
+                  group={group}
+                  onClick={() => navigate(buildGroupFilesPath(group.groupId))}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className={styles.emptyState}>
@@ -167,7 +178,7 @@ function PublicGroupsPage() {
         onOpenChange={setCreateModalOpen}
         onSuccess={handleModalSuccess}
       />
-    </>
+    </div>
   );
 }
 

@@ -1,7 +1,31 @@
 @import (reference) '@/styles/mixins/breakpoints.less';
-.actionsRow {
+@public-grid-single-column-breakpoint: 664px;
+
+.publicPage {
   display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  box-sizing: border-box;
+  container: public-page / inline-size;
+}
+
+.actionsRow {
+  --public-action-button-width: 160px;
+
+  display: flex;
+  flex: 0 0 auto;
   gap: var(--space-sm);
+}
+
+.actionsRow > * {
+  flex: 0 0 var(--public-action-button-width);
+  width: var(--public-action-button-width);
+  min-width: var(--public-action-button-width);
+  white-space: nowrap;
+}
+
+.actionLabel {
+  display: inline;
 }
 
 .listControls {
@@ -10,7 +34,12 @@
   justify-content: space-between;
   gap: var(--space-md);
   min-height: calc(var(--control-height, 36px) + 2px);
-  margin-top: var(--space-md);
+  margin-top: 0;
+}
+
+.listControls > :first-child {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .roleFilter {
@@ -18,11 +47,23 @@
   flex: 0 0 auto;
 }
 
+.gridWrap {
+  --public-card-target-width: 320px;
+  --public-card-gap: var(--space-lg);
+
+  container-type: inline-size;
+  margin-top: var(--space-xl);
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
-  margin-top: var(--space-xl);
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--public-card-target-width)), var(--public-card-target-width))
+  );
+  align-items: start;
+  justify-content: center;
+  gap: var(--public-card-gap);
 }
 
 .gridItem {
@@ -43,38 +84,57 @@
   text-align: center;
 }
 
-@media (max-width: @breakpoint-md) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@container public-page (max-width: (@public-grid-single-column-breakpoint - 1px)) {
+  .publicPageHeader {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
   }
-}
 
-@media (max-width: @breakpoint-sm) {
+  .publicPageHeaderActions {
+    width: auto;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+  }
+
   .actionsRow {
-    width: 100%;
+    --public-action-button-width: var(--control-height-lg, 40px);
+
+    gap: var(--space-xs);
   }
 
   .actionsRow > * {
-    flex: 1 1 0;
-    min-width: 0;
+    padding-inline: 0;
+  }
+
+  .actionLabel {
+    display: none;
   }
 
   .listControls {
-    align-items: stretch;
-    flex-direction: column;
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: auto;
+    gap: var(--space-sm);
   }
 
-  .roleFilter {
-    width: 100%;
-  }
+  .gridWrap {
+    --public-card-gap: var(--space-sm);
 
-  .grid {
-    grid-template-columns: 1fr;
+    margin-top: var(--space-lg);
   }
 }
 
-@media (max-width: 360px) {
-  .actionsRow {
-    flex-direction: column;
+@container (min-width: @public-grid-single-column-breakpoint) {
+  .grid {
+    justify-content: start;
+  }
+}
+
+@container public-page (max-width: (@public-grid-single-column-breakpoint - 1px)) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: center;
   }
 }

@@ -225,7 +225,7 @@
 
   .menu-item,
   .list-box-item {
-    border-radius: var(--app-radius-interactive, var(--radius-2xl));
+    border-radius: var(--app-radius-interactive, var(--radius-xl));
   }
 
   .tabs:not(.tabs--secondary) > .tabs__list-container > .tabs__list {
@@ -288,7 +288,7 @@
       calc(var(--app-radius-popover) - var(--app-popover-content-padding))
     );
     border: 1px solid var(--border-light, var(--border));
-    border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+    border-radius: var(--app-radius-popover, var(--radius-2xl));
     background: var(--app-popover-surface, var(--overlay));
     box-shadow: var(--overlay-shadow, var(--card-shadow));
     overflow: clip;

@@ -13,14 +13,14 @@
   width: 100%;
   /* 列表+详情并排下限；GroupDetail 等复用处也靠此触发横向滚动 */
   min-width: var(--layout-drive-layout-min-width, 860px);
-  flex: 0 0 auto;
-  min-height: var(--table-drive-layout-max-height, calc(100dvh - 240px));
-  height: var(--table-drive-layout-max-height, calc(100dvh - 240px));
-  max-height: var(--table-drive-layout-max-height, calc(100dvh - 240px));
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  max-height: none;
   overflow: hidden;
-  border: 1px solid var(--border-light);
-  border-radius: var(--table-shell-radius, var(--radius-xl));
-  background: var(--surface);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .fileDropOverlay {
@@ -47,12 +47,21 @@
 }
 
 .tablePanel {
+  display: flex;
   flex: 1 1 auto;
-  min-width: var(--layout-drive-table-min-width, 560px);
+  flex-direction: column;
   min-height: 0;
+  min-width: var(--layout-drive-table-min-width, 560px);
 }
 
 .table {
+  --app-checkbox-control-bg: var(--paper);
+  --app-checkbox-control-bg-hover: var(--paper);
+  --app-checkbox-control-border: var(--border-light);
+  --app-checkbox-control-border-hover: var(--accent);
+  --table-row-selected-bg: var(--accent-soft);
+  --table-row-selected-hover-bg: var(--accent-soft);
+
   flex: 1;
   min-width: 0;
   min-height: 0;
@@ -63,6 +72,36 @@
   border: none;
   border-radius: 0;
   background: transparent;
+
+  // 云盘列表使用页面背景作为底色，保留表头和行分隔来维持扫描层次。
+  :global(.table-root),
+  :global(.table__header),
+  :global(.table__column),
+  :global(.table__cell),
+  :global(.table__row .table__cell) {
+    background: transparent;
+  }
+
+  :global(.table__footer) {
+    border-top: 0;
+    background: transparent;
+  }
+
+  :global(.table__body .table__row:not(:hover):not([data-folder-selected='true']) .table__cell) {
+    background: transparent;
+  }
+
+  :global(.table__body .table__row[data-folder-selected='true'] .table__cell),
+  :global(.table__body .table__row[data-folder-selected='true']:hover .table__cell),
+  :global(
+      .table__body .table__row[data-folder-selected='true'][data-hovered='true'] .table__cell
+    ) {
+    background: var(--accent-soft);
+  }
+}
+
+.table > div:first-child {
+  background: transparent;
 }
 
 .detailPanel {
@@ -71,8 +110,8 @@
   flex-direction: column;
   min-width: var(--table-drive-detail-panel-width, 300px);
   max-width: var(--table-drive-detail-panel-width, 300px);
-  border-left: 1px solid var(--table-inner-border);
-  background: var(--surface);
+  border-left: 0;
+  background: transparent;
 
   &[data-collapsed='true'] {
     flex-basis: 0;

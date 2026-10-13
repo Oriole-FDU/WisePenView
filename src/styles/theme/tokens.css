@@ -103,8 +103,8 @@
   --radius-field: var(--radius);
   --app-popover-content-padding: var(--space-xs);
   --app-popover-item-inset: calc(var(--app-popover-content-padding) + var(--space-2xs));
-  --app-radius-sidebar-item: var(--radius-2xl);
-  --app-radius-popover: min(32px, var(--radius-3xl));
+  --app-radius-sidebar-item: var(--radius-xl);
+  --app-radius-popover: var(--radius-2xl);
   /* 内层选中项圆角随外壳与全局 --radius 伸缩，不做固定 px 上限 */
   --app-radius-popover-item: max(
     0px,

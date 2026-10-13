@@ -186,12 +186,7 @@ function TableDrive({
       void navigation.loadMoreChildren(row.node.parentId);
       return;
     }
-    if (interaction.selectedRow?.id === row.id) {
-      // 已选中状态，单击打开（checkbox 未生效时的策略）
-      handleActivateNode(row);
-    } else {
-      interaction.setSelectedRowId(row.id);
-    }
+    interaction.setSelectedRowId(row.id);
   };
 
   const resolveRowActions = useTableDriveRowActionsController({

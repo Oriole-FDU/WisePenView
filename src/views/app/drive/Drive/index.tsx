@@ -93,7 +93,7 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
 
   return (
     <>
-      <PageHeader title={t('page.title')} subtitle={t('page.subtitle')} />
+      <PageHeader title={t('page.title')} />
 
       <Tabs
         variant="secondary"

@@ -64,8 +64,10 @@ function PublicCoursesPage() {
   if (boundedPath) return <Navigate to={boundedPath} replace />;
 
   return (
-    <>
+    <div className={styles.publicPage}>
       <PageHeader
+        className={styles.publicPageHeader}
+        actionsClassName={styles.publicPageHeaderActions}
         title={t('list.title')}
         subtitle={t('list.subtitle')}
         actions={
@@ -74,16 +76,21 @@ function PublicCoursesPage() {
               {canCreateCourse ? (
                 <AppButton
                   variant={canJoinCourse ? 'secondary' : 'primary'}
+                  aria-label={t('list.create')}
                   onPress={() => setCreateModalOpen(true)}
                 >
                   <Plus size={16} aria-hidden />
-                  {t('list.create')}
+                  <span className={styles.actionLabel}>{t('list.create')}</span>
                 </AppButton>
               ) : null}
               {canJoinCourse ? (
-                <AppButton variant="primary" onPress={() => setJoinModalOpen(true)}>
+                <AppButton
+                  variant="primary"
+                  aria-label={t('list.join')}
+                  onPress={() => setJoinModalOpen(true)}
+                >
                   <UserPlus size={16} aria-hidden />
-                  {t('list.join')}
+                  <span className={styles.actionLabel}>{t('list.join')}</span>
                 </AppButton>
               ) : null}
             </div>
@@ -102,15 +109,17 @@ function PublicCoursesPage() {
           <Spin size="large" />
         </div>
       ) : courses.length > 0 ? (
-        <div className={styles.grid}>
-          {courses.map((course) => (
-            <div key={course.courseId} className={styles.gridItem}>
-              <CourseCard
-                course={course}
-                onClick={() => navigate(buildCoursePath(course.courseId, 'home'))}
-              />
-            </div>
-          ))}
+        <div className={styles.gridWrap}>
+          <div className={styles.grid}>
+            {courses.map((course) => (
+              <div key={course.courseId} className={styles.gridItem}>
+                <CourseCard
+                  course={course}
+                  onClick={() => navigate(buildCoursePath(course.courseId, 'home'))}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className={styles.emptyState}>
@@ -134,7 +143,7 @@ function PublicCoursesPage() {
         onOpenChange={setCreateModalOpen}
         onCreated={(courseId) => navigate(buildCoursePath(courseId, 'home'))}
       />
-    </>
+    </div>
   );
 }
 

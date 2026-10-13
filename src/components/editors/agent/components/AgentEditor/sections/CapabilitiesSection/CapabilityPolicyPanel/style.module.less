@@ -7,7 +7,7 @@
 
 .panel {
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   background: var(--surface);
 }
 
@@ -18,7 +18,7 @@
   gap: var(--space-sm);
   padding: 10px var(--space-sm);
   border-bottom: 1px solid var(--separator);
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   background: var(--surface-secondary);
 }
 
@@ -118,7 +118,7 @@
 }
 
 .selectedList {
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
   background: var(--surface);
 }
 
@@ -146,7 +146,7 @@
 .selectedIcon {
   width: 28px;
   height: 28px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .selectedCopy {
