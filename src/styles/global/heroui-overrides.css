@@ -1,6 +1,6 @@
 /* 第三方组件的全局覆盖集中放在 bootstrap，业务样式只保留上下文差异。 */
 
-/* 所有选项浮层沿用 HeroUI 结构与交互，只将视觉语义接入 WisePen 的 Radix 主题。 */
+/* 选项浮层 */
 :is(
   .dropdown__popover,
   .select__popover,
@@ -9,10 +9,77 @@
 ) {
   --app-popover-surface: var(--background);
 
+  border-radius: var(--app-radius-popover) !important;
+  overflow: clip;
+
   color: var(--muted);
   font-family: var(--app-font-family);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-sm);
+}
+
+/* 按钮 */
+:is(.button, .toggle-button) {
+  border-radius: var(--app-radius-button);
+}
+
+/* Tooltip */
+.tooltip {
+  border-radius: var(--app-radius-tooltip);
+}
+
+/* 按钮组 */
+:is(.button-group, .toggle-button-group) > :is(.button, .toggle-button) {
+  border-radius: 0;
+}
+
+:is(.button-group, .toggle-button-group):is(
+    .button-group--horizontal,
+    .toggle-button-group--horizontal
+  )
+  > :is(.button, .toggle-button):first-child {
+  border-start-start-radius: var(--app-radius-button);
+  border-end-start-radius: var(--app-radius-button);
+}
+
+:is(.button-group, .toggle-button-group):is(
+    .button-group--horizontal,
+    .toggle-button-group--horizontal
+  )
+  > :is(.button, .toggle-button):last-child {
+  border-start-end-radius: var(--app-radius-button);
+  border-end-end-radius: var(--app-radius-button);
+}
+
+:is(.button-group, .toggle-button-group):is(
+    .button-group--vertical,
+    .toggle-button-group--vertical
+  )
+  > :is(.button, .toggle-button):first-child {
+  border-start-start-radius: var(--app-radius-button);
+  border-start-end-radius: var(--app-radius-button);
+}
+
+:is(.button-group, .toggle-button-group):is(
+    .button-group--vertical,
+    .toggle-button-group--vertical
+  )
+  > :is(.button, .toggle-button):last-child {
+  border-end-start-radius: var(--app-radius-button);
+  border-end-end-radius: var(--app-radius-button);
+}
+
+:is(.toggle-button-group--detached) > .toggle-button {
+  border-radius: var(--app-radius-button);
+}
+
+/* Modal */
+:is(.modal__dialog, .alert-dialog__dialog):not(
+    .modal__dialog--full,
+    .alert-dialog__dialog--full
+  ) {
+  border-radius: var(--app-radius-modal) !important;
+  overflow: clip;
 }
 
 .dropdown__popover .header {
@@ -138,6 +205,10 @@
   font: inherit;
 }
 
-.table-root :is(.button, [data-slot='button'], .select__trigger) {
-  border-radius: var(--table-control-radius, var(--table-shell-radius, var(--radius-xl)));
+.table-root :is(.button, [data-slot='button']) {
+  border-radius: var(--app-radius-button);
+}
+
+.table-root .select__trigger {
+  border-radius: var(--app-radius-field);
 }

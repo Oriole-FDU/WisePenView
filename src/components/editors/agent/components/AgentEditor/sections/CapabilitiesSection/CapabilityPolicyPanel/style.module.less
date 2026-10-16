@@ -7,7 +7,7 @@
 
 .panel {
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--app-radius-content);
   background: var(--surface);
 }
 
@@ -18,7 +18,7 @@
   gap: var(--space-sm);
   padding: 10px var(--space-sm);
   border-bottom: 1px solid var(--separator);
-  border-radius: 16px 16px 0 0;
+  border-radius: var(--app-radius-content) var(--app-radius-content) 0 0;
   background: var(--surface-secondary);
 }
 
@@ -82,7 +82,7 @@
 .optionIcon {
   width: 24px;
   height: 24px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--app-radius-content);
 }
 
 .optionCopy {
@@ -118,7 +118,7 @@
 }
 
 .selectedList {
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 var(--app-radius-content) var(--app-radius-content);
   background: var(--surface);
 }
 
@@ -146,7 +146,7 @@
 .selectedIcon {
   width: 28px;
   height: 28px;
-  border-radius: 10px;
+  border-radius: var(--app-radius-content);
 }
 
 .selectedCopy {
@@ -200,7 +200,7 @@
   min-height: 320px;
   max-height: 460px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-popover);
   background: var(--surface);
 }
 

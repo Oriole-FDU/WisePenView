@@ -37,7 +37,7 @@
 .host :global(.bn-table-cell-handle) {
   min-width: calc(var(--control-height-sm) + var(--space-2xs));
   min-height: var(--control-height-sm);
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-menu-item);
 }
 
 .tableCellHandleIcon {
@@ -71,7 +71,7 @@
   position: absolute;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--app-radius-inline);
   background: transparent;
   cursor: pointer;
   pointer-events: auto;
@@ -85,7 +85,7 @@
 }
 
 .selectionRail::before {
-  border-radius: var(--radius-sm);
+  border-radius: var(--app-radius-inline);
   background: var(--surface-tertiary);
 }
 
@@ -222,7 +222,7 @@
   top: 50%;
   width: var(--note-table-insert-dot-size);
   height: var(--note-table-insert-dot-size);
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-pill);
   background: var(--muted);
   transform: translate(-50%, -50%);
   transition:

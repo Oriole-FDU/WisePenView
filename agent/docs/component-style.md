@@ -9,6 +9,7 @@ WisePenView 使用 Less、CSS Modules 和 HeroUI。新增代码都应遵循 Hero
 - 样式类名使用 camelCase。
 - 避免非必要内联样式。
 - 动态样式优先通过 className、CSS 变量或组件受控属性表达。
+- 全局样式分两份：`src/styles/global/index.css` 提供 token、排版与基础重置，应用和 Storybook 预览共用；桌面端外壳约束（`html`/`body` 占满视口、整页不滚动、`#root` 接管滚动与选区）放在 `src/styles/global/app-shell.css`，只有应用入口引入，否则 Storybook 预览与 Docs 页面会被裁掉且无法滚动。
 
 推荐结构：
 
@@ -58,7 +59,45 @@ ComponentName/
 - 不要使用纯装饰性渐变球、光斑、无意义背景图。
 - 不要用 viewport 宽度直接缩放字体。
 
-## 六、组件库使用
+## 六、圆角层级
+
+圆角按“8px 基准 → 基础圆角 → 应用圆角”单向定义，三层变量集中在 `src/styles/theme/radius.css`，其他 token 文件不再定义圆角；规范示例 story 放在 `src/styles/_stories/Radius.stories.tsx`。后续新增其他 token 家族时沿用同一形态（基准、刻度、应用语义三层，一处源头）。
+
+基准圆角（`--radius`）和基础圆角（`--radius-xs` 到 `--radius-4xl`）只是把数值参数化，不表达业务含义，组件与业务样式不得直接引用；组件与业务样式只使用应用圆角，缺少匹配语义时先在应用层补 token。
+
+| 语义         | Token                                                        | 当前值      | 使用范围                                                                                             |
+| ------------ | ------------------------------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------- |
+| 装饰细节     | `--app-radius-detail`                                        | 2px         | 图表图例色块、Tab 指示线、行内文本高亮、分隔块                                                       |
+| 行内小面     | `--app-radius-inline`                                        | 4px         | 行内 code、内联公式、嵌入预览块、骨架块                                                              |
+| 勾选控件     | `--app-radius-checkbox`                                      | 4px         | Checkbox 控件本体（含表格选择框、Tree、Markdown/BlockNote 任务列表）                                 |
+| 浮层内控件   | `--app-radius-popover-control`                               | 4px（派生） | 浮层内与内容 padding 对齐的操作控件，等于外壳圆角减去 `--app-popover-content-padding`                |
+| 菜单项       | `--app-radius-menu-item`                                     | 6px         | Dropdown、Popover、Select 等选项                                                                     |
+| 提示气泡     | `--app-radius-tooltip`                                       | 6px         | Tooltip 与图表 tooltip 的气泡本体                                                                    |
+| 浮层内选中项 | `--app-radius-popover-item`                                  | 6px（派生） | 浮层内部的选中项与 hover 背景，等于外壳圆角减去选项 inset                                            |
+| 字段控件     | `--app-radius-field`                                         | 8px         | Input、Select trigger、ComboBox/Autocomplete trigger                                                 |
+| 按钮         | `--app-radius-button`                                        | 8px         | Button、ToggleButton、IconButton、按钮组首尾边缘                                                     |
+| 内容容器     | `--app-radius-content`                                       | 8px         | 卡片、面板、表格外壳、正文内嵌块（代码块、Mermaid、拖拽预览、拖拽区）                                |
+| 导航项       | `--app-radius-sidebar-item` / `--app-radius-breadcrumb-item` | 8px         | Sidebar 与 Breadcrumb 导航项                                                                         |
+| 浮层         | `--app-radius-popover`                                       | 12px        | Popover、Dropdown、Select、ComboBox/Autocomplete、EmojiPicker、SlashMenu、编辑器浮动工具条与内联面板 |
+| Modal        | `--app-radius-modal`                                         | 12px        | Modal、AlertDialog、FormDialog、DisplayDialog；`size="cover"` 仍是 12px 圆角，`size="full"` 保持直角 |
+| 圆形语义     | `--app-radius-pill` / `--app-radius-scrollbar`               | 999px       | 头像、状态点、胶囊标签与滚动条滑块                                                                   |
+
+表格域另有别名：`--table-shell-radius`、`--table-control-radius`、`--table-overlay-radius`、`--table-inner-radius` 分别指向内容容器、字段控件、浮层和菜单项，只做转接，不引入新数值。
+
+规则：
+
+- Checkbox 不得复用 `--app-radius-field`，否则 16px 控件会被裁成正圆。
+- 非交互的小面按场景取 `--app-radius-detail`（装饰细节）或 `--app-radius-inline`（行内及内嵌小面）；两者与 `--app-radius-checkbox` 数值相同但语义不同，不要互相复用。
+- Select 收起状态的 trigger 属于字段控件，展开后的面板是独立浮层外壳，面板内部选项取 `--app-radius-popover-item`；ComboBox、Autocomplete trigger 遵循相同拆分。
+- Tooltip 的 `--app-radius-tooltip` 只作用于气泡本体；触发它的按钮或字段仍按自身语义取 token。
+- 嵌套浮层按外壳半径和内容 inset 计算内层半径，状态切换（hover、selected、focus-visible）不得改变同一控件的圆角。
+- Sidebar 导航项、hover 和 selected 背景使用 `--app-radius-sidebar-item`；头像、状态点、滚动条、胶囊标签等圆形语义元素使用 `--app-radius-pill`，正方形元素的整圆可以直接写 `50%`。
+- 新增圆角先选择语义 token；语义 token 缺失时在 `src/styles/theme/radius.css` 的应用语义层补一个，再让组件引用。
+- 组件样式不得直接引用 `--radius-*`，也不得硬编码圆角数值；需要更大或更小的几何值时报给应用语义层处理。新增语义 token 时同步更新本节表格。
+- 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
+- `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.less`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。
+
+## 七、组件库使用
 
 - 图标按钮优先使用已有图标库，例如 `lucide-react`。
 - 有明确图标语义时，不要用文字按钮代替图标按钮。
@@ -73,7 +112,7 @@ ComponentName/
 - 只有同一工具栏内的紧密图标按钮、强关联分段操作或显式 toggle 场景使用 `ButtonGroup` / `ToggleButtonGroup`。
 - 禁止用 `gap: 8px`、`marginLeft`、`marginRight` 等硬编码手动控制按钮间距；弹窗 footer 间距使用 `var(--space-sm, 12px)`。
 
-## 七、检查清单
+## 八、检查清单
 
 - [ ] 样式使用 Less + CSS Modules。
 - [ ] 没有非必要内联样式。

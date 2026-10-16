@@ -57,7 +57,7 @@
   min-height: 56px;
   align-items: center;
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--app-radius-menu-item);
   outline: none;
   transition:
     background-color var(--motion-duration-fast) var(--motion-ease-standard),
@@ -214,7 +214,7 @@
 .skeletonAvatar {
   width: 36px;
   height: 36px;
-  border-radius: 999px;
+  border-radius: var(--app-radius-pill);
 }
 
 .skeletonMeta {
@@ -227,19 +227,19 @@
 .skeletonName {
   width: min(180px, 58%);
   height: 16px;
-  border-radius: 999px;
+  border-radius: var(--app-radius-pill);
 }
 
 .skeletonDescription {
   width: min(260px, 72%);
   height: 12px;
-  border-radius: 999px;
+  border-radius: var(--app-radius-pill);
 }
 
 .skeletonAction {
   width: 148px;
   height: 32px;
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-field);
 }
 
 .skeletonAddRow {
@@ -253,12 +253,12 @@
 
 .skeletonInput {
   height: 36px;
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-field);
 }
 
 .skeletonAddButton {
   height: 36px;
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-field);
 }
 
 .stateText {

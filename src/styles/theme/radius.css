@@ -1,0 +1,65 @@
+/**
+ * 圆角变量集中在此文件，按三层组织，其他 token 文件不再定义圆角。
+ *
+ * 第 1 层 基准：单一几何基准值，仅第 2 层引用。
+ * 第 2 层 基础刻度：把基准参数化成一组数值刻度，不表达业务含义，组件与业务样式不得直接引用。
+ * 第 3 层 应用语义：业务与组件样式只引用这一层；语义缺失时在本层补 token，而不是回退到基础刻度。
+ */
+:root {
+  /* 第 1 层：基准 */
+  --radius: 8px;
+
+  /* 第 2 层：基础刻度 */
+  --radius-xs: calc(var(--radius) * 0.25);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: calc(var(--radius) * 1);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 3);
+  --radius-4xl: calc(var(--radius) * 4);
+  --radius-full: 999px;
+  --scrollbar-radius: 999px;
+
+  /* 第 3 层：应用语义 */
+  /* 装饰性微元素：图表图例色块、Tab 指示线、行内文本高亮、分隔块。 */
+  --app-radius-detail: var(--radius-xs);
+  /* 行内或内嵌的小型面：行内 code、内联公式、嵌入预览块、骨架块。 */
+  --app-radius-inline: var(--radius-sm);
+  /* 勾选控件本体：Checkbox 及其在各处的复用。 */
+  --app-radius-checkbox: var(--radius-sm);
+  /* 菜单项与小尺寸控件：下拉选项、列表行、紧凑图标按钮。 */
+  --app-radius-menu-item: var(--radius-md);
+  --app-radius-tooltip: var(--radius-md);
+  /* 字段控件：Input、Select trigger、ComboBox/Autocomplete trigger。 */
+  --app-radius-field: var(--radius-lg);
+  --app-radius-button: var(--radius-lg);
+  /* 内容容器：卡片、面板、表格外壳、编辑器块。 */
+  --app-radius-content: var(--radius-lg);
+  --app-radius-sidebar-item: var(--radius-lg);
+  --app-radius-breadcrumb-item: var(--radius-lg);
+  /* 浮层与弹窗外壳。 */
+  --app-radius-popover: var(--radius-xl);
+  --app-radius-modal: var(--radius-xl);
+  /* 具有明确圆形语义的元素。 */
+  --app-radius-pill: var(--radius-full);
+
+  /* 派生：嵌套浮层按外壳半径与内容 inset 计算内层半径，保持同心。 */
+  --app-popover-content-padding: var(--space-xs);
+  --app-popover-item-inset: var(--app-radius-menu-item);
+  --app-radius-popover-item: max(
+    0px,
+    calc(var(--app-radius-popover) - var(--app-popover-item-inset))
+  );
+  --app-radius-popover-control: max(
+    0px,
+    calc(var(--app-radius-popover) - var(--app-popover-content-padding))
+  );
+  --app-radius-scrollbar: var(--scrollbar-radius);
+
+  /* 表格域别名：表格样式经此转接，不直接读取应用语义之外的刻度。 */
+  --table-shell-radius: var(--app-radius-content);
+  --table-control-radius: var(--app-radius-field);
+  --table-overlay-radius: var(--app-radius-popover);
+  --table-inner-radius: var(--app-radius-menu-item);
+}

@@ -43,6 +43,7 @@ const THEME_TOKENS = [
   '--app-font-family',
   '--font-size-base',
   '--font-size-xs',
+  // iframe 内是第三方外壳样式，直接消费基础刻度名；这里按既有契约透传，不替换为应用语义 token。
   '--radius',
   '--radius-sm',
   '--radius-lg',

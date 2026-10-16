@@ -13,6 +13,7 @@
 | ------------------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------ |
 | Markdown、模板、普通配置             | `git diff --check`                                             | `pnpm lint`（若影响 JS 配置）                                |
 | `src/**/*.ts(x)`                     | `pnpm lint`、`pnpm typecheck`                                  | `pnpm build`（跨层或构建配置）                               |
+| `src/**/*.{less,css}`、主题 token    | `pnpm lint`、`pnpm check:radius`                               | `pnpm build-storybook`（stories 变更）                       |
 | `src/domains/**`、registry、mock     | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`               | `pnpm build`                                                 |
 | `vite.config.ts`、tsconfig、Electron | `pnpm lint`、`pnpm typecheck`、`pnpm build`                    | 对应打包脚本                                                 |
 | 应用初始化、认证与运行时配置         | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm build` | `pnpm build --mode mock`、配置错误启动检查、浏览器运行态回归 |
@@ -21,7 +22,7 @@
 
 ## CI 契约
 
-PR CI 固定执行 commitlint、lint、build、mock contract、API response contract 和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
+PR CI 固定执行 commitlint、lint、build、mock contract、API response contract、圆角 token 和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
 
 ## 运行态记录
 

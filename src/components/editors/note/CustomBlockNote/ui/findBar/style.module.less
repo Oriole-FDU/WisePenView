@@ -9,7 +9,7 @@
   padding: var(--space-2xs);
   background: var(--surface);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--app-radius-popover);
   box-shadow: var(--card-shadow);
 }
 
@@ -33,7 +33,7 @@
   flex: none;
   /* 与 AppIconButton md 同宽，展开时不再改成 28px 导致整行横移 */
   width: 32px;
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--app-radius-button);
 }
 
 .rootReplaceOpen .replaceToggle {
@@ -62,7 +62,7 @@
   padding-inline: var(--space-xs);
   background: color-mix(in srgb, var(--foreground) 3%, transparent);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm, var(--radius-sm));
+  border-radius: var(--app-radius-field);
   box-sizing: border-box;
 
   &:focus-within {

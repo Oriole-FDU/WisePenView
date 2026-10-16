@@ -68,9 +68,7 @@
   .fieldPlaceholder();
 }
 
-/* 下拉层跟表单控件同一套圆角，避免 HeroUI 默认 radius-3xl（最大 32px）过圆 */
+/* Select trigger 使用字段圆角；展开后的选项面板外壳使用浮层圆角。 */
 .selectPopover:global(.select__popover) {
-  border-radius: var(--app-field-radius);
-  --app-radius-popover: var(--app-field-radius);
-  --app-radius-popover-item: var(--app-field-radius);
+  border-radius: var(--app-radius-popover);
 }

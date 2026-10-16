@@ -18,7 +18,6 @@
   --app-field-border-hover: var(--field-border-hover);
   --app-field-border-focus: var(--field-border-focus);
   --app-field-border-width: 1px;
-  --app-field-radius: var(--radius-field);
   --app-field-ring-width: 1px;
   --app-field-ring-color: var(--focus);
   --app-field-ring: 0 0 0 var(--app-field-ring-width) var(--app-field-ring-color);
@@ -32,6 +31,7 @@
 /* 控件外壳基础样式（背景、边框、文字） */
 .fieldSurface() {
   box-sizing: border-box;
+  border-radius: var(--app-radius-field);
   border-width: var(--app-field-border-width);
   border-color: var(--app-field-border);
   background-color: var(--app-field-bg);

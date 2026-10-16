@@ -6,7 +6,7 @@
   height: 100%;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-popover);
   color: var(--overlay-foreground);
   background: var(--overlay);
 }
@@ -35,7 +35,7 @@
   max-height: calc(100vh - 32px);
   overflow: hidden;
   border: 1px solid var(--border, var(--separator));
-  border-radius: var(--radius-lg);
+  border-radius: var(--app-radius-modal);
   outline: none;
   color: var(--overlay-foreground);
   background: var(--overlay);
@@ -105,7 +105,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--app-radius-popover-item, var(--radius-xl));
+  border-radius: var(--app-radius-popover-item);
   color: var(--overlay-foreground);
   line-height: var(--line-height-sm);
   outline: none;

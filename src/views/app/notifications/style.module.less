@@ -100,7 +100,7 @@
   flex: none;
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--app-radius-pill);
   background: var(--accent);
 }
 
@@ -161,7 +161,7 @@
   margin-block: calc((1.45em - var(--control-height-sm)) / 2);
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm, var(--radius-md));
+  border-radius: var(--app-radius-button);
   outline: none;
   background: transparent;
   box-shadow: var(--shadow-none);
@@ -205,7 +205,7 @@
   margin: 0 var(--space-sm) var(--space-md);
   padding: var(--space-md);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-content);
   background: var(--surface);
   box-sizing: border-box;
 }
@@ -242,7 +242,7 @@
 .loadMoreButton {
   width: 100%;
   min-height: var(--control-height-sm);
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-content);
   color: var(--muted);
   font-size: var(--font-size-sm);
 }

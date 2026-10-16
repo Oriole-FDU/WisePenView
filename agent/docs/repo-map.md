@@ -9,6 +9,7 @@
 - `src/components/editors/`：资源编辑器层，承载编辑器契约、运行时、注册表与挂载分发；资源工作区外壳与路由目标解析留在 `src/views/resource/`。
 - `src/views/`：页面私有业务 UI、Controller、配置和状态。
 - `src/layouts/`：路由壳和壳内私有实现。
+- `src/styles/`：全局样式入口、主题 token（按域拆分，如 `theme/radius.css`）和规范示例 story。
 - `src/config/`：公开运行时配置的声明、验证与浏览器入口。
 - `src/apis/`：Axios 与请求基础设施。
 - `scripts/`：构建和离线检查脚本。

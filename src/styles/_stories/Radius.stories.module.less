@@ -1,0 +1,104 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: var(--space-lg);
+  align-items: center;
+  width: min(100%, 560px);
+  padding: var(--space-lg);
+}
+
+/* 小圆角语义示例：与样式规范表格的三行（装饰细节 / 行内小面 / 勾选控件）一一对应。 */
+.smallGrid {
+  display: grid;
+  gap: var(--space-md);
+  width: min(100%, 560px);
+  padding: var(--space-lg);
+}
+
+.sampleCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-light, var(--border));
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+}
+
+.sampleLabel {
+  color: var(--muted);
+  font-family: var(--app-font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.sampleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* 装饰细节 2px */
+.legendSwatch {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--app-radius-detail);
+  background: var(--accent);
+}
+
+.tabTrack {
+  position: relative;
+  width: 56px;
+  height: 2px;
+  background: var(--separator);
+}
+
+.tabIndicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 24px;
+  border-radius: var(--app-radius-detail);
+  background: var(--accent);
+}
+
+.textHighlight {
+  padding: 0 var(--space-3xs);
+  border-radius: var(--app-radius-detail);
+  background: var(--warning-soft);
+}
+
+.dividerBlock {
+  width: 1px;
+  height: 12px;
+  border-radius: var(--app-radius-detail);
+  background: var(--border);
+}
+
+/* 行内小面 4px */
+.inlineCode {
+  padding: calc(var(--space-2xs) / 4) var(--space-2xs);
+  border-radius: var(--app-radius-inline);
+  background: var(--surface-secondary);
+  font-family: var(--app-font-mono);
+  font-size: var(--font-size-sm);
+}
+
+.inlineFormula {
+  padding: var(--space-3xs) var(--space-2xs-plus);
+  border-radius: var(--app-radius-inline);
+  background: var(--surface-secondary);
+}
+
+.skeletonBlock {
+  width: 56px;
+  height: 12px;
+  border-radius: var(--app-radius-inline);
+  background: var(--surface-tertiary);
+}
+
+.sidebarFrame {
+  width: 320px;
+  min-height: 520px;
+}

@@ -6,6 +6,23 @@
 
 ## 分层
 
+### 圆角与操作区
+
+数值定义以 `component-style.md` 第六节为唯一来源，本节只记录 Overlay 场景到语义 token 的映射，不重复数值。
+
+| Overlay 层级                                                     | 规范 token                  |
+| ---------------------------------------------------------------- | --------------------------- |
+| Popover / Dropdown / Select 展开面板外壳                         | `--app-radius-popover`      |
+| Modal / AlertDialog 外壳                                         | `--app-radius-modal`        |
+| Footer Button / IconButton                                       | `--app-radius-button`       |
+| Input / Select trigger / ComboBox trigger / Autocomplete trigger | `--app-radius-field`        |
+| 浮层内菜单或 Picker 选中项                                       | `--app-radius-popover-item` |
+| Tooltip 气泡本体                                                 | `--app-radius-tooltip`      |
+
+- Modal 和 Popover 共用同一档外壳圆角，但语义不同的内部控件不跟随外壳机械放大：按钮和字段取自身语义 token，浮层内选中项取 `--app-radius-popover-item`。外壳、内容 inset 和内部控件需要保持同心关系，不要在业务调用方重新覆盖圆角。
+- Select 的 trigger 是收起状态下用户看到的字段控件，展开后的面板是独立浮层外壳，面板内部选项按浮层内选中项处理。ComboBox、Autocomplete trigger 遵循相同拆分。
+- HeroUI 对 dialog 的默认圆角由 `src/styles/global/heroui-overrides.css` 统一覆盖，不要在组件或业务侧重新启用；`size="full"` 保持直角以便贴合窗口边缘，`size="cover"` 保留外壳圆角。
+
 Overlay 组件按复用范围分开放：
 
 - `src/components/base/Modal`、`src/components/base/Popover`：底层原子层，统一 HeroUI 浮层的挂载时机与延迟渲染。
@@ -100,22 +117,22 @@ LaTeX 编辑浮层因依赖编辑器选区和手工测量位置，不迁移 Hero
 
 这些场景没有归到 `AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`，因为它们承载复杂业务流程、复杂选择器、上传队列或组合内容。
 
-| 文件                                                                        | 业务                                         |
-| --------------------------------------------------------------------------- | -------------------------------------------- |
-| `src/components/business/Drive/Modals/DriveCreateModal/index.tsx`           | 创建 Agent、Skill，多字段输入和描述编辑。    |
-| `src/views/workspace/note/_components/NotePermissionModal/index.tsx`        | 笔记权限配置，权限模式、用户选择、保存。     |
-| `src/views/app/profile/_components/Account/AccountHeader/index.tsx`         | 更换头像，上传图片并保存。                   |
-| `src/views/app/profile/_components/Account/AccountVerification/index.tsx`   | 账号验证发起，邮箱/UIS tabs 表单。           |
-| `src/views/app/group/_components/GroupModals/CreateGroupModal/index.tsx`    | 创建小组，信息填写、封面上传、默认权限。     |
-| `src/views/app/group/_components/GroupModals/EditGroupInfoModal/index.tsx`  | 编辑小组信息，表单、封面、默认权限。         |
-| `src/components/business/Group/MemberList/Modals/EditPermissionModal.tsx`   | 修改成员权限，成员列表和角色选择。           |
-| `src/components/business/Group/MemberList/Modals/AssignQuotaModal.tsx`      | 分配成员配额，成员列表和额度输入。           |
-| `src/components/business/ChatPanel/ChatInput/DocumentPickerModal/index.tsx` | 从云盘选择引用文档，树选择、多选、延迟加载。 |
-| `src/components/business/ChatPanel/ChatInput/OtherSkillModal/index.tsx`     | 选择其他 Skill，树结构选择和确认。           |
-| `src/components/business/Drive/Modals/UploadDocumentModal/index.tsx`        | 上传文档，上传队列和挂载信息。               |
-| `src/components/business/Drive/Modals/TagPermissionModal/index.tsx`         | 标签权限管理，标签树、权限模式、用户权限。   |
-| `src/components/business/Drive/Modals/MoveNodeModal/index.tsx`              | 移动文件/文件夹，目标目录选择。              |
-| `src/components/business/Drive/Modals/UploadFileToGroupModal/index.tsx`     | 上传个人文件到小组，选择文件和目标小组目录。 |
+| 文件                                                                                    | 业务                                         |
+| --------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `src/components/business/Drive/Modals/DriveCreateModal/index.tsx`                       | 创建 Agent、Skill，多字段输入和描述编辑。    |
+| `src/views/workspace/note/_components/NotePermissionModal/index.tsx`                    | 笔记权限配置，权限模式、用户选择、保存。     |
+| `src/views/app/profile/_components/Account/AccountHeader/index.tsx`                     | 更换头像，上传图片并保存。                   |
+| `src/views/app/profile/_components/Account/AccountVerification/index.tsx`               | 账号验证发起，邮箱/UIS tabs 表单。           |
+| `src/views/app/group/_components/GroupModals/CreateGroupModal/index.tsx`                | 创建小组，信息填写、封面上传、默认权限。     |
+| `src/views/app/group/_components/GroupModals/EditGroupInfoModal/index.tsx`              | 编辑小组信息，表单、封面、默认权限。         |
+| `src/components/business/Group/MemberList/Modals/EditPermissionModal.tsx`               | 修改成员权限，成员列表和角色选择。           |
+| `src/components/business/Group/MemberList/Modals/AssignQuotaModal.tsx`                  | 分配成员配额，成员列表和额度输入。           |
+| `src/components/business/Chat/ChatConversation/ChatInput/DocumentPickerModal/index.tsx` | 从云盘选择引用文档，树选择、多选、延迟加载。 |
+| `src/components/business/Chat/ChatConversation/ChatInput/OtherSkillModal/index.tsx`     | 选择其他 Skill，树结构选择和确认。           |
+| `src/components/business/Drive/Modals/UploadDocumentModal/index.tsx`                    | 上传文档，上传队列和挂载信息。               |
+| `src/components/business/Drive/Modals/TagPermissionModal/index.tsx`                     | 标签权限管理，标签树、权限模式、用户权限。   |
+| `src/components/business/Drive/Modals/MoveNodeModal/index.tsx`                          | 移动文件/文件夹，目标目录选择。              |
+| `src/components/business/Drive/Modals/UploadFileToGroupModal/index.tsx`                 | 上传个人文件到小组，选择文件和目标小组目录。 |
 
 ## 底层 Modal 例外
 

@@ -1,0 +1,80 @@
+/**
+ * 桌面端应用外壳：窗口占满视口、整页不滚动，滚动交给内部容器。
+ * 只有应用入口 src/main.tsx 引入；Storybook 预览不继承这两条约束，
+ * 否则预览画布与 Docs 页面会被裁掉且无法滚动。
+ */
+
+html {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+body {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root :is(input, textarea, [contenteditable='true'], [contenteditable=''], [role='textbox']) {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#root
+  :is(
+    input,
+    textarea,
+    [contenteditable='true'],
+    [contenteditable=''],
+    [role='textbox'],
+    .markdown,
+    .bn-editor,
+    .ProseMirror,
+    .cm-editor,
+    .cm-content,
+    .monaco-editor,
+    .pdfViewer,
+    .textLayer,
+    .docx-wrapper,
+    iframe
+  )
+  :is(*) {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#root
+  :is(
+    .markdown,
+    .bn-editor,
+    .ProseMirror,
+    .cm-editor,
+    .cm-content,
+    .monaco-editor,
+    .pdfViewer,
+    .textLayer,
+    .docx-wrapper,
+    pre,
+    code,
+    kbd,
+    samp,
+    iframe
+  ) {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#root img {
+  -webkit-user-drag: none;
+}

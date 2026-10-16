@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-import type { ChatHostAgentPort } from '@/components/business/ChatPanel/index.type';
+import type { ChatHostAgentPort } from '@/components/business/Chat/index.type';
 import type {
   ResourceAction,
   ResourceIconType,

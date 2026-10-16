@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import type { StoreApi } from 'zustand/vanilla';
 
-import type { ChatHostAgentPort } from '@/components/business/ChatPanel/index.type';
+import type { ChatHostAgentPort } from '@/components/business/Chat/index.type';
 
 import type { ResourceChatProvider } from './resourceChatModel';
 

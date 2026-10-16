@@ -35,9 +35,9 @@
 @table-footer-padding-block: var(--table-footer-padding-block, var(--space-2xs));
 
 /* 圆角：tokens.css --table-*-radius → 本文件 @table-*-radius → shell / 控件 */
-@table-shell-radius: var(--table-shell-radius, var(--radius-xl));
-@table-control-radius: var(--table-control-radius, @table-shell-radius);
-@table-inner-radius: var(--table-inner-radius, var(--radius-lg));
+@table-shell-radius: var(--table-shell-radius, var(--app-radius-content));
+@table-control-radius: var(--table-control-radius, var(--app-radius-field));
+@table-inner-radius: var(--table-inner-radius, var(--app-radius-menu-item));
 
 /* 排版 token */
 @table-font-family: var(--app-font-family);
@@ -109,10 +109,6 @@
   flex-shrink: 0;
   height: calc(@table-header-bar-min-height + @table-gap-compact + @table-header-row-height);
   min-height: calc(@table-header-bar-min-height + @table-gap-compact + @table-header-row-height);
-}
-
-.tableRootFlatHeader() {
-  --radius-2xl: 0;
 }
 
 .tableRootNoShadow() {

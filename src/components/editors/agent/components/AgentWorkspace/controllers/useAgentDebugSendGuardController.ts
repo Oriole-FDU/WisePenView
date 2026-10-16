@@ -1,7 +1,7 @@
 import { useLatest, useMemoizedFn, useUnmountedRef } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 
-import type { ChatSendInterceptor } from '@/components/business/ChatPanel/index.type';
+import type { ChatSendInterceptor } from '@/components/business/Chat/index.type';
 import type { ChatAgentOption } from '@/domains/Chat';
 
 interface UseAgentDebugSendGuardControllerOptions {

@@ -66,6 +66,9 @@ jobs:
       - name: Check API response contract
         run: pnpm check:api-contract
 
+      - name: Check radius tokens
+        run: pnpm check:radius
+
       # 构建编译（build 脚本已包含 solution-style TypeScript 检查）
       - name: Type Check & Build
         run: pnpm build

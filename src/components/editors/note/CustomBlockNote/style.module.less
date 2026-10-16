@@ -37,7 +37,7 @@
   height: var(--app-checkbox-control-size);
   margin: 3px var(--space-xs) 0 1px;
   border: 1px solid var(--app-checkbox-control-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--app-radius-checkbox);
   appearance: none;
   background-color: var(--app-checkbox-control-bg);
   box-shadow: var(--shadow-none);
@@ -69,7 +69,7 @@
   /* 正文批注原文高亮 */
   :global(.bodyBlockNoteView .bn-editor .bn-thread-mark:not([data-orphan='true'])) {
     background: var(--warning-soft);
-    border-radius: var(--radius-xs);
+    border-radius: var(--app-radius-detail);
   }
 
   :global(
@@ -107,7 +107,7 @@
     --bn-shadow-medium: var(--overlay-shadow);
     --bn-shadow-light: var(--surface-shadow);
     --bn-border: 1px solid var(--border-light);
-    --bn-border-radius: var(--radius-md);
+    --bn-border-radius: var(--app-radius-menu-item);
     --bn-ui-base-z-index: var(--app-z-index-editor-menu, 180);
     --prosemirror-highlight: var(--foreground);
     --prosemirror-highlight-bg: var(--surface);
@@ -148,7 +148,7 @@
     display: inline-block;
     min-height: 18px;
     padding: 1px var(--space-2xs) var(--space-3xs);
-    border-radius: var(--radius-xs);
+    border-radius: var(--app-radius-detail);
     font-family: var(--app-font-family);
     font-size: var(--font-size-xs);
     font-style: normal;
@@ -396,7 +396,7 @@
     margin: var(--space-xs) 0 10px;
     overflow: visible;
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
+    border-radius: var(--app-radius-content);
     background-color: var(--surface-secondary) !important;
     color: var(--foreground);
     box-shadow: var(--shadow-none);
@@ -579,7 +579,7 @@
     width: 220px;
     padding: var(--space-2xs-plus);
     border: 1px solid color-mix(in srgb, var(--prosemirror-highlight) 9%, var(--border));
-    border-radius: var(--radius-lg);
+    border-radius: var(--app-radius-popover);
     background: var(--surface);
     box-shadow: var(--overlay-shadow);
   }
@@ -593,7 +593,7 @@
     margin-bottom: var(--space-2xs-plus);
     padding: 0 var(--space-xs);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--app-radius-field);
     background: var(--surface);
     color: var(--foreground);
     font-family: var(--app-font-family);
@@ -627,7 +627,7 @@
     height: 28px;
     padding: 0 var(--space-xs);
     border: 0;
-    border-radius: var(--radius-md);
+    border-radius: var(--app-radius-menu-item);
     background: transparent;
     color: var(--foreground);
     cursor: pointer;
@@ -683,7 +683,7 @@
     height: 28px;
     padding: 0;
     border: 1px solid transparent;
-    border-radius: var(--radius-md);
+    border-radius: var(--app-radius-menu-item);
     background: transparent;
     color: color-mix(in srgb, var(--prosemirror-highlight) 64%, transparent);
     cursor: pointer;
@@ -881,7 +881,7 @@
   margin: var(--space-xs) 0 10px;
   overflow: visible;
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-content);
   background-color: var(--surface-secondary) !important;
   color: var(--foreground);
   box-shadow: var(--shadow-none);
@@ -1073,7 +1073,7 @@
   width: 220px;
   padding: var(--space-2xs-plus);
   border: 1px solid color-mix(in srgb, var(--prosemirror-highlight) 9%, var(--border));
-  border-radius: var(--radius-lg);
+  border-radius: var(--app-radius-popover);
   background: var(--surface);
   box-shadow: var(--overlay-shadow);
 }
@@ -1087,7 +1087,7 @@
   margin-bottom: var(--space-2xs-plus);
   padding: 0 var(--space-xs);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-field);
   background: var(--surface);
   color: var(--foreground);
   font-family: var(--app-font-family);
@@ -1123,7 +1123,7 @@
   height: 28px;
   padding: 0 var(--space-xs);
   border: 0;
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-menu-item);
   background: transparent;
   color: var(--foreground);
   cursor: pointer;
@@ -1183,7 +1183,7 @@
   height: 28px;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-menu-item);
   background: transparent;
   color: color-mix(in srgb, var(--prosemirror-highlight) 64%, transparent);
   cursor: pointer;
