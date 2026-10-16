@@ -7,6 +7,7 @@ import { clearNewNoteStore } from '@/components/editors/note/_store/useNewNoteSt
 import { removePdfPreviewProgress } from '@/components/editors/pdf/components/PdfViewer/_store/usePdfPreviewProgressStore';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { useMyNotesStore } from '@/layouts/Resource/_store/useMyNotesStore';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { TrashDeleteModalProps } from './index.type';
@@ -18,11 +19,16 @@ function getNodeName(node: DriveActionTarget | undefined, fallback: string): str
 
 function clearDeletedNodeRuntime(nodes: DriveActionTarget[]): void {
   if (nodes.some((node) => node.type === 'folder')) {
+    // 文件夹后代未在本地完整加载，只清新建草稿状态；
+    // 「我的笔记」条目都建在云盘根，不会随文件夹被删，因此不做候选的全局失效。
     clearNewNoteStore();
   }
   nodes.forEach((node) => {
     if (node.type !== 'resource') return;
     clearNewNoteStore(node.resourceId);
+    useMyNotesStore.setState((state) => ({
+      notes: state.notes.filter((note) => note.resourceId !== node.resourceId),
+    }));
     removePdfPreviewProgress(node.resourceId);
   });
 }

@@ -2,10 +2,13 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  /* 「我的笔记」列出全部笔记后条目可能很长：顶栏到上限后由导航区内部滚动。 */
+  max-height: var(--sidebar-header-max-height, 60%);
   background: transparent;
 }
 
 .headerTop {
+  flex: 0 0 auto;
   height: 48px;
   display: flex;
   align-items: center;
@@ -21,6 +24,7 @@
 
 .webHeader {
   box-sizing: border-box;
+  flex: 0 0 auto;
   height: 48px;
   margin-top: var(--space-xs);
   display: flex;
@@ -95,6 +99,10 @@
 }
 
 .headerNav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0;
 }
 

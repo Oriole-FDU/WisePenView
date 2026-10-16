@@ -72,6 +72,7 @@ function HeaderNav({
   }, [activeKey, showIndicator]);
 
   const renderItem = (item: HeaderNavItem) => {
+    if (collapsed && item.nested) return null;
     const isActive = item.key === activeKey;
     const Icon = item.icon;
     const icon = (
@@ -87,11 +88,13 @@ function HeaderNav({
         ref={setItemRef(item.key)}
         textValue={item.name}
         aria-label={item.name}
+        aria-expanded={item.expanded}
         aria-current={isActive ? 'page' : undefined}
         data-nav-active={isActive ? 'true' : undefined}
         isDisabled={item.isDisabled}
         className={clsx(
           styles.menuItem,
+          item.nested && styles.menuItemNested,
           collapsed && styles.menuItemCollapsed,
           labelsHidden && styles.menuItemLabelsHidden,
           isActive && styles.menuItemActive

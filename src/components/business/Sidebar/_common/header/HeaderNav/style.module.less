@@ -4,19 +4,21 @@
   --app-header-nav-icon-size: 18px;
   --app-header-nav-rail-item-width: 42px;
   --app-header-nav-item-pad-left: calc(
-    var(--sidebar-content-inset, var(--space-lg)) -
-      var(--sidebar-block-inset, var(--space-md))
+    var(--sidebar-content-inset, var(--space-lg)) - var(--sidebar-block-inset, var(--space-md))
   );
 
   position: relative;
   padding-bottom: var(--space-2xs-plus);
 }
 
+.menuItemNested:global(.list-box-item) {
+  padding-inline-start: calc(var(--app-header-nav-item-pad-left) + var(--space-lg));
+}
+
 .divider {
   box-sizing: border-box;
   width: calc(
-    100% - var(--sidebar-block-inset, var(--space-md)) -
-      var(--sidebar-block-inset, var(--space-md))
+    100% - var(--sidebar-block-inset, var(--space-md)) - var(--sidebar-block-inset, var(--space-md))
   );
   margin: var(--space-2xs-plus) var(--sidebar-block-inset, var(--space-md)) 0;
   background: var(--border-light);

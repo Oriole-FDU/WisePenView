@@ -29,6 +29,7 @@
     "check:radius": "node scripts/check-radius-tokens.mjs",
     "check:editor-runtime": "node --test scripts/check-editor-runtime.mjs",
     "check:frontend-state": "node --test scripts/check-frontend-state.mjs",
+    "check:note-reuse": "node --test scripts/check-note-reuse.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

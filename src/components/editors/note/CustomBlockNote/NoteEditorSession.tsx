@@ -2,6 +2,7 @@ import { useMemoizedFn } from 'ahooks';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { publicAppConfig } from '@/config/runtimeConfig';
 import { useUserService } from '@/domains';
 import { type NoteAiDiffPreviewData, useNoteSession } from '@/domains/Note';
 import type { User } from '@/domains/User';
@@ -59,10 +60,12 @@ function NoteEditorSessionRuntime({
   children: ReactNode;
 }) {
   const { t } = useTranslation('note');
+  // Mock 模式不接入协同服务：正文只保留在当前页面内存中，刷新即重置。
+  const localOnly = Boolean(aiDiffPreview) || publicAppConfig.mode === 'mock';
   const { status, saveStatus, doc, provider, reconnect, idbSynced } = useNoteSession(resourceId, {
     actorUserId: currentUser?.id,
     enabled: !shouldWaitCurrentUser,
-    localOnly: Boolean(aiDiffPreview),
+    localOnly,
   });
   const [slots, setSlots] = useState<Record<NoteEditorSlotName, HTMLElement | null>>({
     aiBulkActions: null,

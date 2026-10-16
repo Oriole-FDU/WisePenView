@@ -10,6 +10,8 @@ import type { DriveResourceLocation } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
 
+import { useMyNotesStore } from './_store/useMyNotesStore';
+
 export function useResourceBreadcrumb(resourceId?: string, driveLocation?: DriveResourceLocation) {
   const { t } = useTranslation('workspace');
   const driveService = useDriveService();
@@ -17,6 +19,10 @@ export function useResourceBreadcrumb(resourceId?: string, driveLocation?: Drive
   const scope = driveLocation?.scope;
   const groupId = scope ? getDriveScopeGroupId(scope) : undefined;
   const mountTagId = driveLocation?.mountTagId;
+  // 云盘打开笔记同样归入「我的笔记」打开方式，因此顶部来源只看是否在本地列表中。
+  const isMyNote = useMyNotesStore((state) =>
+    state.notes.some((note) => note.resourceId === resourceId)
+  );
 
   const { data } = useApi(
     async () => {
@@ -42,7 +48,7 @@ export function useResourceBreadcrumb(resourceId?: string, driveLocation?: Drive
       };
     },
     {
-      ready: Boolean(resourceId && driveLocation),
+      ready: Boolean(resourceId && driveLocation && !isMyNote),
       refreshDeps: [resourceId, mountTagId, scope?.rootId, groupId, t],
     }
   );
@@ -56,5 +62,5 @@ export function useResourceBreadcrumb(resourceId?: string, driveLocation?: Drive
       ? data.items
       : [];
 
-  return items;
+  return isMyNote ? [{ key: 'my-notes', label: t('shell:navigation.myNotes') }] : items;
 }

@@ -4,6 +4,8 @@ const enUSShell = {
     newChat: 'New chat',
     newNote: 'New note',
     defaultNoteTitle: 'Untitled note',
+    myNotes: 'My notes',
+    myNotesEmpty: '<Empty>',
     drive: 'Documents and Drive',
     notifications: 'Notifications',
     groups: 'My Groups',

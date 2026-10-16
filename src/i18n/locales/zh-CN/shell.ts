@@ -4,6 +4,8 @@ const zhCNShell = {
     newChat: '新建对话',
     newNote: '新建笔记',
     defaultNoteTitle: '未命名笔记',
+    myNotes: '我的笔记',
+    myNotesEmpty: '<空>',
     drive: '我的云盘',
     notifications: '消息通知',
     groups: '我的小组',

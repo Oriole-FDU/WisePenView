@@ -8,6 +8,7 @@ import { NoteEditorSession } from '@/components/editors/note/CustomBlockNote/Not
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useNoteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { useMyNotesStore } from '@/layouts/Resource/_store/useMyNotesStore';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
@@ -69,6 +70,8 @@ function NoteEditorContent() {
   } = useApi(
     async () => {
       const info = await noteService.getNoteInfoDisplay({ resourceId });
+      // 云盘打开与常规打开一致：打开即归入「我的笔记」，顶部来源随之切换。
+      useMyNotesStore.getState().add(resourceId, info.noteTitle);
       if (publicAppConfig.mode === 'mock') {
         const { getNotePreview } = await import('./mock/notePreview');
         return { ...info, aiDiffPreview: getNotePreview(resourceId) };
@@ -78,6 +81,7 @@ function NoteEditorContent() {
     {
       ready: Boolean(resourceId),
       refreshDeps: [resourceId],
+      onErrorEffect: () => useMyNotesStore.getState().update(resourceId, { eligible: false }),
     }
   );
 

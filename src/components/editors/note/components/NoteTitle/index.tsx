@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import { useNoteService } from '@/domains';
+import { useMyNotesStore } from '@/layouts/Resource/_store/useMyNotesStore';
+import { hasNoteContent } from '@/layouts/Resource/localNoteModel';
 import { useAppTheme } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
 
@@ -218,6 +220,8 @@ function NoteTitle({
       if (!firstBlock) return;
 
       const currentId = latestIdRef.current;
+      const rawTitle = getBlockPlainText(firstBlock as { content?: unknown[] });
+      useMyNotesStore.getState().update(currentId, { hasTitle: hasNoteContent(rawTitle) });
       saveVersionRef.current += 1;
       const saveVersion = saveVersionRef.current;
       emitSaveStatus('saving');

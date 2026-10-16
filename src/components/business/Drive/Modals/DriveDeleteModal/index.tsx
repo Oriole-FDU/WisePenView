@@ -5,6 +5,7 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { useMyNotesStore } from '@/layouts/Resource/_store/useMyNotesStore';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { DriveDeleteModalProps } from './index.type';
@@ -40,6 +41,14 @@ function DriveDeleteModal({
     {
       manual: true,
       onSuccess: () => {
+        // 「我的笔记」条目都建在个人云盘根，不会随某个文件夹一起被删；
+        // 这里只按资源精确移除，避免删任意文件夹就把整轮复用能力全部作废。
+        if (node?.scope.type === 'personal' && node.type === 'resource') {
+          const { resourceId } = node;
+          useMyNotesStore.setState((state) => ({
+            notes: state.notes.filter((note) => note.resourceId !== resourceId),
+          }));
+        }
         toast.success(
           node?.type === 'link'
             ? t('delete.feedback.linkDeleted')

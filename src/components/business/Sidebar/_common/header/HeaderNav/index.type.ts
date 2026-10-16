@@ -6,6 +6,8 @@ export interface HeaderNavItem {
   icon: LucideIcon;
   onPress: () => void;
   isDisabled?: boolean;
+  expanded?: boolean;
+  nested?: boolean;
 }
 
 export interface HeaderNavSection {

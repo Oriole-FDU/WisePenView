@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
 import type { NoteSelectionSnapshot, SelectedNoteScope } from '@/domains/Note';
 import { computeNoteBodyContentHash } from '@/domains/Note';
+import { useMyNotesStore } from '@/layouts/Resource/_store/useMyNotesStore';
+import { hasNoteContent } from '@/layouts/Resource/localNoteModel';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
@@ -131,6 +133,7 @@ export function useNoteDocument({
 
     bodyOnChangeCleanupRef.current = transactions.subscribe(editor, (analysis) => {
       if (!analysis.docChanged) return;
+      useMyNotesStore.getState().update(resourceId, { hasBody: hasNoteContent(editor.document) });
       activateWriteGuard();
       scheduleBodyContentHashRefresh();
 

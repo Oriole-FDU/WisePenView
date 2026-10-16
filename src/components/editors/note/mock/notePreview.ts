@@ -76,7 +76,13 @@ const COURSE_NOTE_MOCKS: Record<
       ],
     },
   },
+  // 通用 AI Diff 展示稿只绑定这一篇示例笔记，新建笔记不再被灌入演示正文。
+  'mock-note-graph': {
+    noteTitle: '图的存储结构',
+    aiDiffPreview: NOTE_AI_DIFF_PREVIEW_MOCK,
+  },
 };
 
+/** 只有显式登记的示例笔记带展示稿，其余（含新建笔记）返回 undefined。 */
 export const getNotePreview = (resourceId: string) =>
-  COURSE_NOTE_MOCKS[resourceId]?.aiDiffPreview ?? NOTE_AI_DIFF_PREVIEW_MOCK;
+  COURSE_NOTE_MOCKS[resourceId]?.aiDiffPreview;

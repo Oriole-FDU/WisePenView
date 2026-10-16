@@ -61,6 +61,21 @@ class NoteIndexeddbSyncObserver {
   };
 }
 
+/**
+ * localOnly（mock 预览、AI Diff 演示）既不连协同服务也不落 IndexedDB，
+ * 而组件卸载会销毁自己的 Y.Doc；因此按资源复用同一个文档，
+ * 否则「修改正文 → 切换笔记 → 切回来」正文会整段丢失。
+ */
+const localOnlyDocs = new Map<string, Y.Doc>();
+
+function acquireLocalOnlyDoc(resourceId: string): Y.Doc {
+  const existing = localOnlyDocs.get(resourceId);
+  if (existing) return existing;
+  const doc = new Y.Doc();
+  localOnlyDocs.set(resourceId, doc);
+  return doc;
+}
+
 export interface UseNoteSessionOptions {
   actorUserId?: string;
   enabled?: boolean;
@@ -71,7 +86,7 @@ export interface UseNoteSessionOptions {
 export function useNoteSession(resourceId: string, options: UseNoteSessionOptions = {}) {
   const { actorUserId, enabled = true, localOnly = false } = options;
   const [session] = useState(() => {
-    const doc = new Y.Doc();
+    const doc = localOnly ? acquireLocalOnlyDoc(resourceId) : new Y.Doc();
     const provider = new WisepenProvider(resourceId, doc, { connect: false });
     const idb =
       localOnly || !actorUserId
@@ -95,7 +110,8 @@ export function useNoteSession(resourceId: string, options: UseNoteSessionOption
       idbObserver.detach();
       provider.destroy();
       void idb?.destroy();
-      doc.destroy();
+      // 本地模式的文档由 localOnlyDocs 持有，跨挂载共享，卸载时不能销毁。
+      if (!localOnly) doc.destroy();
     };
 
     return { doc, provider, observer, saveObserver, idbObserver, reconnect, destroy };
