@@ -66,6 +66,9 @@ jobs:
       - name: Check API response contract
         run: pnpm check:api-contract
 
+      - name: Run unit tests
+        run: pnpm test
+
       - name: Check radius tokens
         run: pnpm check:radius
 

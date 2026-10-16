@@ -50,3 +50,9 @@ export interface InitUploadAssetsApiResponse {
   version?: number;
   assetUploadTickets?: AssetUploadTicketApiResponse[];
 }
+
+export interface CancelUploadAssetsApiRequest {
+  resourceId: string;
+  draftVersion: number;
+  objectKeys: string[];
+}

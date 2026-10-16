@@ -4,6 +4,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import type { OssReadClient } from '../apis/ossClient';
 
 export const mockObjects = new Map<string, Blob>();
+export const mockUploadCallbacks = new Map<string, () => void>();
 export const createOssClient = (): OssReadClient => ({
   async get(objectKey) {
     const content = mockObjects.get(objectKey);
@@ -17,5 +18,6 @@ export async function putOssPresignedUrl({
   onProgress,
 }: OssPresignedPutParams): Promise<void> {
   mockObjects.set(putUrl, body);
+  mockUploadCallbacks.get(putUrl)?.();
   onProgress?.(100);
 }
