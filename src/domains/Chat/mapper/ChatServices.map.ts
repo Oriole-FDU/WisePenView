@@ -49,6 +49,7 @@ const PROVIDER_KEY_HINTS: Array<{ key: string; patterns: string[] }> = [
   { key: 'doubao', patterns: ['doubao', 'bytedance'] },
   { key: 'meta', patterns: ['meta', 'llama'] },
   { key: 'mistral', patterns: ['mistral'] },
+  { key: 'zhipu', patterns: ['zhipu', 'chatglm', 'glm', '智谱'] },
   { key: 'openai', patterns: ['openai', 'gpt', 'o1', 'o3', 'o4'] },
   { key: 'qwen', patterns: ['qwen', 'tongyi', 'dashscope', 'alibaba'] },
 ];

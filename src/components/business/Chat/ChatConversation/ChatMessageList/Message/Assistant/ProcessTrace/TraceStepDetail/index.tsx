@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { describeTraceItem } from '../../traceModel';
+import { describeTraceItem, getToolOutputText } from '../../traceModel';
 import ReasoningBlock from '../ReasoningBlock';
 import TraceRow from '../TraceRow';
 import type { TraceStepDetailProps } from './index.type';
@@ -14,6 +14,7 @@ function TraceStepDetail({ item, measuredDurations }: TraceStepDetailProps) {
   const [expanded, setExpanded] = useState(false);
   const headline = describeTraceItem(item, measuredDurations);
   const reasoningContent = item.kind === 'reasoning' ? item.content : '';
+  const toolOutput = item.kind === 'tool' ? getToolOutputText(item.part) : undefined;
   const isStreaming = item.kind === 'reasoning' && item.streaming;
 
   return (
@@ -25,7 +26,9 @@ function TraceStepDetail({ item, measuredDurations }: TraceStepDetailProps) {
         animated={isStreaming}
         onToggle={() => setExpanded((current) => !current)}
       >
-        {reasoningContent ? <ReasoningBlock>{reasoningContent}</ReasoningBlock> : null}
+        {reasoningContent || toolOutput ? (
+          <ReasoningBlock>{reasoningContent || toolOutput}</ReasoningBlock>
+        ) : null}
       </TraceRow>
     </li>
   );

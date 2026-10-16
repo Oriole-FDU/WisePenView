@@ -1,0 +1,50 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: var(--space-lg);
+  align-items: center;
+  width: min(100%, 560px);
+  padding: var(--space-lg);
+}
+
+.popoverContent {
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+}
+
+.tableControl {
+  min-height: 36px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-field);
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.sidebar {
+  display: flex;
+  width: 220px;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+}
+
+.sidebarItem {
+  padding: var(--space-sm);
+  border: 0;
+  border-radius: var(--app-radius-sidebar-item);
+  color: var(--muted);
+  background: transparent;
+  text-align: start;
+}
+
+.sidebarItem:hover,
+.sidebarItem[data-hovered='true'],
+.sidebarItemSelected {
+  color: var(--accent-text-strong);
+  background: var(--item-selected);
+}

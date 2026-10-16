@@ -94,6 +94,20 @@ export function getToolDisplayName(part: RenderableToolPart): string {
   return title || getToolName(part);
 }
 
+/** 将工具结果转换为展开面板可直接阅读的文本。 */
+export function getToolOutputText(part: RenderableToolPart): string | undefined {
+  if (part.state === 'output-error') return part.errorText;
+  if (part.state === 'output-denied') return part.approval.reason;
+  if (part.state !== 'output-available' || part.output == null) return undefined;
+
+  if (typeof part.output === 'string') return part.output;
+  try {
+    return JSON.stringify(part.output, null, 2);
+  } catch {
+    return String(part.output);
+  }
+}
+
 export function isTraceItemActive(item: TraceItem): boolean {
   if (item.kind === 'reasoning') return item.streaming;
   return RUNNING_TOOL_STATES.has(item.part.state);

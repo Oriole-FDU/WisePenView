@@ -58,7 +58,31 @@ ComponentName/
 - 不要使用纯装饰性渐变球、光斑、无意义背景图。
 - 不要用 viewport 宽度直接缩放字体。
 
-## 六、组件库使用
+## 六、圆角层级
+
+圆角按“8px 基准 → 基础圆角 → 应用圆角”单向定义。组件和业务样式使用应用圆角；基础圆角仅用于应用语义未覆盖的局部几何细节。
+
+| 语义     | Token                                                        | 当前值 | 使用范围                                                                 |
+| -------- | ------------------------------------------------------------ | ------ | ------------------------------------------------------------------------ |
+| 字段控件 | `--app-radius-field`                                         | 8px    | Input、Select trigger、ComboBox/Autocomplete trigger                     |
+| 菜单项   | `--app-radius-menu-item`                                     | 6px    | Dropdown、Popover、Select 等选项                                         |
+| 按钮     | `--app-radius-button`                                        | 8px    | Button、ToggleButton、IconButton、按钮组首尾边缘                         |
+| 内容容器 | `--app-radius-content`                                       | 8px    | 卡片、面板、表格外壳                                                     |
+| 导航项   | `--app-radius-sidebar-item` / `--app-radius-breadcrumb-item` | 8px    | Sidebar 与 Breadcrumb 导航项                                             |
+| 浮层     | `--app-radius-popover`                                       | 12px   | Popover、Dropdown、Select、ComboBox/Autocomplete、EmojiPicker、SlashMenu |
+| Modal    | `--app-radius-modal`                                         | 12px   | Modal、AlertDialog、FormDialog、DisplayDialog；全屏 Modal 保持直角       |
+
+规则：
+
+- Button 与 Input 分别使用 `--app-radius-button` 和 `--app-radius-field`。
+- Popover / Modal 外壳使用 12px，内部选中项和操作控件分别遵循 6px / 8px，不得使用 HeroUI `radius-3xl` 作为默认值。
+- Select 的 6px 指收起状态的 trigger 输入框；展开后的选项面板外壳为 12px，面板内部选项为 6px。ComboBox、Autocomplete 遵循相同拆分。
+- Tooltip 指提示气泡本体使用 6px；触发它的按钮或字段仍按自身语义使用 8px 或 6px。
+- Sidebar 的主要导航项、hover 和 selected 背景使用 8px；头像、状态点、滚动条、胶囊标签等具有明确圆形语义的元素可以继续使用 `50%` 或 `999px`。
+- 嵌套浮层按外壳半径和内容 inset 计算内层半径，状态切换（hover、selected、focus-visible）不得改变同一控件的圆角。
+- 新增圆角先选择语义 token；只有明确的大型容器或特殊视觉场景才可以使用 `radius-2xl` 以上的 token，并在组件样式旁说明原因。
+
+## 七、组件库使用
 
 - 图标按钮优先使用已有图标库，例如 `lucide-react`。
 - 有明确图标语义时，不要用文字按钮代替图标按钮。
@@ -73,7 +97,7 @@ ComponentName/
 - 只有同一工具栏内的紧密图标按钮、强关联分段操作或显式 toggle 场景使用 `ButtonGroup` / `ToggleButtonGroup`。
 - 禁止用 `gap: 8px`、`marginLeft`、`marginRight` 等硬编码手动控制按钮间距；弹窗 footer 间距使用 `var(--space-sm, 12px)`。
 
-## 七、检查清单
+## 八、检查清单
 
 - [ ] 样式使用 Less + CSS Modules。
 - [ ] 没有非必要内联样式。

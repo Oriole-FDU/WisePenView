@@ -53,7 +53,7 @@
   position: relative;
   z-index: var(--app-z-index-elevated);
   max-height: min(50vh, 280px);
-  border-radius: var(--radius-sm);
+  border-radius: var(--app-radius-popover);
   opacity: 1;
   transform: translateX(0);
   visibility: visible;
@@ -81,7 +81,7 @@
   padding: var(--space-xs) 5px;
   margin: 0;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--app-radius-button);
   background: transparent;
   cursor: pointer;
   overflow-x: hidden;
@@ -133,7 +133,7 @@
   flex-shrink: 0;
   width: var(--history-nav-bar-width);
   height: var(--history-nav-bar-height);
-  border-radius: var(--radius-full, 999px);
+  border-radius: var(--app-radius-pill);
   background: var(--border);
   transform-origin: right center;
   transition:
@@ -182,7 +182,7 @@
   padding: var(--history-nav-panel-padding-block, var(--space-md))
     var(--history-nav-panel-padding-inline, var(--space-lg));
   border: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
-  border-radius: var(--radius-md);
+  border-radius: var(--app-radius-popover);
   background: color-mix(in srgb, var(--overlay, var(--surface)) 94%, transparent);
   box-shadow:
     0 1px 2px color-mix(in srgb, var(--foreground) 5%, transparent),
@@ -235,7 +235,7 @@
   min-width: 0;
   padding: var(--history-nav-item-padding-block, var(--space-2xs))
     var(--history-nav-item-padding-inline, var(--space-xs));
-  border-radius: var(--radius-sm);
+  border-radius: var(--app-radius-menu-item);
   margin: 0;
   border: none;
   background: transparent;

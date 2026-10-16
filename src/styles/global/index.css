@@ -81,7 +81,6 @@
   --color-field-foreground: var(--field-foreground, var(--foreground));
   --color-field-placeholder: var(--field-placeholder, var(--muted));
   --color-field-border: var(--field-border, var(--border));
-  --radius-field: var(--radius);
   --border-width-field: var(--field-border-width, var(--border-width));
 
   --color-background-secondary: var(--background-secondary);
@@ -127,15 +126,6 @@
 
   --color-border-secondary: var(--border-secondary);
   --color-border-tertiary: var(--border-tertiary);
-
-  --radius-xs: calc(var(--radius) * 0.25);
-  --radius-sm: calc(var(--radius) * 0.5);
-  --radius-md: calc(var(--radius) * 0.75);
-  --radius-lg: calc(var(--radius) * 1);
-  --radius-xl: calc(var(--radius) * 1.5);
-  --radius-2xl: calc(var(--radius) * 2);
-  --radius-3xl: calc(var(--radius) * 3);
-  --radius-4xl: calc(var(--radius) * 4);
 
   --ease-smooth: ease;
   --ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
@@ -225,7 +215,7 @@
 
   .menu-item,
   .list-box-item {
-    border-radius: var(--app-radius-interactive, var(--radius-2xl));
+    border-radius: var(--app-radius-menu-item);
   }
 
   .tabs:not(.tabs--secondary) > .tabs__list-container > .tabs__list {
@@ -242,7 +232,7 @@
   .select__popover .list-box-item,
   .combo-box__popover .list-box-item,
   .autocomplete__popover .list-box-item {
-    border-radius: var(--app-radius-popover-item, var(--radius-xl));
+    border-radius: var(--app-radius-popover-item);
   }
 
   /* 选中标记统一放在行尾，并将 HeroUI 默认的行首预留同步移到行尾。 */
@@ -270,7 +260,7 @@
   .select__popover,
   .combo-box__popover,
   .autocomplete__popover {
-    --app-popover-item-inset: 0.375rem;
+    --app-popover-item-inset: var(--app-radius-menu-item);
   }
 
   .popover,
@@ -278,7 +268,7 @@
   .select__popover,
   .combo-box__popover,
   .autocomplete__popover {
-    /* 内层选中项圆角随外壳与全局 --radius 伸缩，不做固定 px 上限 */
+    /* 外壳与选中项使用同心圆关系，避免 hover / selected 形状跳变。 */
     --app-radius-popover-item: max(
       0px,
       calc(var(--app-radius-popover) - var(--app-popover-item-inset))
@@ -288,7 +278,7 @@
       calc(var(--app-radius-popover) - var(--app-popover-content-padding))
     );
     border: 1px solid var(--border-light, var(--border));
-    border-radius: var(--app-radius-popover, min(32px, var(--radius-3xl)));
+    border-radius: var(--app-radius-popover);
     background: var(--app-popover-surface, var(--overlay));
     box-shadow: var(--overlay-shadow, var(--card-shadow));
     overflow: clip;

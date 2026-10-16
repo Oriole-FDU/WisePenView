@@ -10,7 +10,7 @@
   --scrollbar-width: thin;
   --scrollbar-size: 8px;
   --scrollbar-radius: 999px;
-  /* 系统基础圆角固定为 8px，不再提供主题级覆盖。 */
+  /* 圆角基准 */
   --radius: 8px;
 }
 
@@ -91,6 +91,7 @@
   --chat-input-container-padding-block: 8px;
   --layout-welcome-title-size: 2rem;
   --layout-welcome-icon-size: 3.75rem;
+  /* 基础圆角 */
   --radius-xs: calc(var(--radius) * 0.25);
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: calc(var(--radius) * 0.75);
@@ -100,12 +101,19 @@
   --radius-3xl: calc(var(--radius) * 3);
   --radius-4xl: calc(var(--radius) * 4);
   --radius-full: 999px;
-  --radius-field: var(--radius);
+  /* 应用圆角 */
+  --app-radius-field: var(--radius-lg);
+  --app-radius-tooltip: var(--radius-md);
+  --app-radius-menu-item: var(--radius-md);
+  --app-radius-button: var(--radius-lg);
+  --app-radius-pill: var(--radius-full);
+  --app-radius-content: var(--radius-lg);
+  --app-radius-sidebar-item: var(--radius-lg);
+  --app-radius-breadcrumb-item: var(--radius-lg);
+  --app-radius-modal: var(--radius-xl);
+  --app-radius-popover: var(--radius-xl);
   --app-popover-content-padding: var(--space-xs);
-  --app-popover-item-inset: calc(var(--app-popover-content-padding) + var(--space-2xs));
-  --app-radius-sidebar-item: var(--radius-2xl);
-  --app-radius-popover: min(32px, var(--radius-3xl));
-  /* 内层选中项圆角随外壳与全局 --radius 伸缩，不做固定 px 上限 */
+  --app-popover-item-inset: var(--app-radius-menu-item);
   --app-radius-popover-item: max(
     0px,
     calc(var(--app-radius-popover) - var(--app-popover-item-inset))
@@ -114,7 +122,6 @@
     0px,
     calc(var(--app-radius-popover) - var(--app-popover-content-padding))
   );
-  --app-radius-interactive: var(--app-radius-sidebar-item);
   --app-radius-scrollbar: var(--scrollbar-radius);
   /* 业务页统一内边距；运行时会按窗口尺寸覆盖，兜底值与“我的小组”常规窗口一致。 */
   --app-page-padding-block-start: var(--space-lg);
@@ -165,11 +172,10 @@
   /* 延迟显示 Tooltip，减少鼠标经密集图标区时的视觉干扰。 */
   --tooltip-delay: 400ms;
   --tooltip-close-delay: 100ms;
-  /* Table 圆角：shell / 行内按钮 / 下拉层统一；小控件（展开按钮、Chip）用 inner */
-  --table-shell-radius: var(--radius-xl);
-  --table-control-radius: var(--table-shell-radius);
-  --table-overlay-radius: var(--table-shell-radius);
-  --table-inner-radius: var(--radius-lg);
+  --table-shell-radius: var(--app-radius-content);
+  --table-control-radius: var(--app-radius-field);
+  --table-overlay-radius: var(--app-radius-popover);
+  --table-inner-radius: var(--app-radius-menu-item);
   /* Overlay 层级统一由主题维护，避免业务样式各自猜数字造成互相遮挡。 */
   --app-z-index-base: 0;
   --app-z-index-raised: 1;

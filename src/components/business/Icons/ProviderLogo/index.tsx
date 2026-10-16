@@ -7,6 +7,7 @@ import metaIcon from '@lobehub/icons-static-svg/icons/meta.svg?raw';
 import mistralIcon from '@lobehub/icons-static-svg/icons/mistral.svg?raw';
 import openAiIcon from '@lobehub/icons-static-svg/icons/openai.svg?raw';
 import qwenIcon from '@lobehub/icons-static-svg/icons/qwen.svg?raw';
+import zhipuIcon from '@lobehub/icons-static-svg/icons/zhipu.svg?raw';
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
@@ -21,10 +22,12 @@ const PROVIDER_ICON_MAP: Record<string, string> = {
   gemini: geminiIcon,
   google: geminiIcon,
   grok: grokIcon,
+  glm: zhipuIcon,
   meta: metaIcon,
   mistral: mistralIcon,
   openai: openAiIcon,
   qwen: qwenIcon,
+  zhipu: zhipuIcon,
 };
 
 function normalizeProvider(provider: string): string {

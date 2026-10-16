@@ -35,7 +35,7 @@
 
 .sizeDefault {
   gap: var(--space-xs);
-  border-radius: var(--radius-xl);
+  border-radius: var(--app-radius-content);
   font-size: var(--font-size-sm);
 
   &:has([data-slot='attachment-content']) {
@@ -49,7 +49,7 @@
 
 .sizeSm {
   gap: var(--space-xs);
-  border-radius: var(--radius-lg);
+  border-radius: var(--app-radius-content);
   font-size: var(--font-size-xs);
 
   &:has([data-slot='attachment-content']) {
@@ -63,7 +63,7 @@
 
 .sizeXs {
   gap: var(--space-2xs-plus);
-  border-radius: var(--radius);
+  border-radius: var(--app-radius-field);
   font-size: var(--font-size-xs);
 
   &:has([data-slot='attachment-content']) {
@@ -94,7 +94,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: var(--app-radius-content);
   background: var(--surface-secondary);
   color: var(--muted);
 
@@ -108,7 +108,7 @@
 
   .sizeXs & {
     width: 28px;
-    border-radius: var(--radius);
+    border-radius: var(--app-radius-field);
   }
 
   .attachment[data-state='error'] & {

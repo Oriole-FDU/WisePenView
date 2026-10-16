@@ -107,7 +107,7 @@
   gap: var(--space-xs);
   padding: 0 var(--space-sm) 0 0;
   border: 0;
-  border-radius: var(--radius-md, var(--radius-md));
+  border-radius: var(--app-radius-sidebar-item);
   color: var(--muted);
   background: transparent;
   font-family: inherit;
@@ -186,7 +186,7 @@
     min-height: 32px;
     width: 100%;
     padding-right: 0;
-    border-radius: var(--radius-md, var(--radius-md));
+    border-radius: var(--app-radius-sidebar-item);
     transition:
       background var(--motion-duration-mid) var(--motion-ease-standard),
       color var(--motion-duration-mid) var(--motion-ease-standard);
@@ -397,7 +397,7 @@
   overflow-y: auto;
   .appSubtleScrollbar();
   border: 1px solid var(--border);
-  border-radius: var(--radius-md, var(--radius-md));
+  border-radius: var(--app-radius-content);
 
   :global(.wisepen-tree__item[aria-expanded='true']) .outlineCollapsedIcon {
     display: none;
