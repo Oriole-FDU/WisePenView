@@ -24,6 +24,7 @@ const [
   officeModule,
   drawioModule,
   presentationModule,
+  noteContentPresenceModule,
 ] = await Promise.all([
   bundle('src/components/editors/_runtime/editorRuntime.ts'),
   bundle('src/components/editors/_runtime/editorHost.ts'),
@@ -34,6 +35,7 @@ const [
   bundle(
     'src/views/app/resource/ResourceTargetResolver/_components/ResourceEditorWorkspace/workspacePresentationStore.ts'
   ),
+  bundle('src/components/editors/note/noteContentPresence.ts'),
 ]);
 const { createEditorRuntime, waitForEditor } = runtimeModule;
 const { createEditorHost } = hostModule;
@@ -42,6 +44,7 @@ const { createEditorExitPrompt } = promptsModule;
 const { prepareOfficeExit, reduceOfficeSession, isOfficeReadOnly } = officeModule;
 const { createDrawioSaveSession } = drawioModule;
 const { createWorkspacePresentationStore } = presentationModule;
+const { isNoteBodyEmpty, isNoteTitleEmpty } = noteContentPresenceModule;
 const prompt = {
   title: '未保存',
   description: '保存后离开',
@@ -389,4 +392,137 @@ test('展示信息直接替换，旧绑定注销不清空新绑定，最后注�
   assert.equal(store.getState().presentation, second);
   unregisterSecond();
   assert.deepEqual(store.getState().presentation, {});
+});
+
+test('标题空白或默认为占位文案时判定为空', () => {
+  assert.equal(isNoteTitleEmpty(undefined, '未命名笔记'), true);
+  assert.equal(isNoteTitleEmpty('  \u200b ', '未命名笔记'), true);
+  assert.equal(isNoteTitleEmpty(' 未命名笔记 ', 'Untitled note'), true);
+  assert.equal(isNoteTitleEmpty('Untitled note', '未命名笔记'), true);
+  assert.equal(isNoteTitleEmpty('项目计划', '未命名笔记'), false);
+});
+
+test('正文仅有一个空 paragraph 块或仅剩 BlockNote 尾随空段时判定为空', () => {
+  assert.equal(
+    isNoteBodyEmpty([{ type: 'paragraph', props: {}, content: [], children: [] }]),
+    true
+  );
+  assert.equal(
+    isNoteBodyEmpty([
+      {
+        type: 'paragraph',
+        props: {},
+        content: [{ type: 'text', text: ' \n\t ', styles: {} }],
+        children: [],
+      },
+    ]),
+    true
+  );
+  assert.equal(
+    isNoteBodyEmpty([
+      { type: 'paragraph', props: {}, content: [], children: [] },
+      { type: 'paragraph', props: {}, content: [], children: [] },
+    ]),
+    true
+  );
+});
+
+test('空正文判定不接受其它块类型、多个用户空段或子块', () => {
+  const nonEmptyBodies = [
+    [],
+    [{ type: 'text', props: {}, content: [], children: [] }],
+    [
+      {
+        type: 'codeBlock',
+        props: { language: 'text' },
+        content: [{ type: 'text', text: '  ', styles: {} }],
+        children: [],
+      },
+    ],
+    [{ type: 'math', props: { expression: '  ' }, children: [] }],
+    [{ type: 'mermaid', props: {}, content: [], children: [] }],
+    [
+      { type: 'paragraph', props: {}, content: [], children: [] },
+      { type: 'paragraph', props: {}, content: [], children: [] },
+      { type: 'paragraph', props: {}, content: [], children: [] },
+    ],
+    [
+      {
+        type: 'paragraph',
+        props: {},
+        content: [],
+        children: [{ type: 'paragraph', props: {}, content: [], children: [] }],
+      },
+    ],
+    [
+      {
+        type: 'paragraph',
+        props: {},
+        content: [{ type: 'text', text: '正文', styles: {} }],
+        children: [],
+      },
+      { type: 'paragraph', props: {}, content: [], children: [] },
+    ],
+  ];
+  nonEmptyBodies.forEach((blocks, index) => {
+    assert.equal(isNoteBodyEmpty(blocks), false, `case ${index}`);
+  });
+});
+
+test('正文 paragraph 块存在任意实质内容时不判定为空', () => {
+  const substantiveBlocks = [
+    {
+      type: 'text',
+      props: {},
+      content: [{ type: 'text', text: '正文', styles: {} }],
+      children: [],
+    },
+    {
+      type: 'paragraph',
+      props: {},
+      content: [{ type: 'text', text: '正文', styles: {} }],
+      children: [],
+    },
+    {
+      type: 'image',
+      props: { url: 'https://example.com/image.png', caption: '' },
+      children: [],
+    },
+    {
+      type: 'file',
+      props: { url: 'https://example.com/attachment.pdf', name: '附件.pdf' },
+      children: [],
+    },
+    { type: 'table', props: {}, content: { type: 'tableContent', rows: [] }, children: [] },
+    { type: 'math', props: { expression: 'x^2' }, children: [] },
+    {
+      type: 'mermaid',
+      props: {},
+      content: [{ type: 'text', text: 'flowchart TD\nA --> B', styles: {} }],
+      children: [],
+    },
+    {
+      type: 'paragraph',
+      props: {},
+      content: [{ type: 'inlineMath', props: { expression: 'a+b' } }],
+      children: [],
+    },
+    { type: 'futureBlock', props: {}, content: [], children: [] },
+    {
+      type: 'bulletListItem',
+      props: {},
+      content: [],
+      children: [
+        {
+          type: 'paragraph',
+          props: {},
+          content: [{ type: 'text', text: '嵌套内容', styles: {} }],
+          children: [],
+        },
+      ],
+    },
+  ];
+  substantiveBlocks.forEach((block) => {
+    assert.equal(isNoteBodyEmpty([block]), false, block.type);
+  });
 });

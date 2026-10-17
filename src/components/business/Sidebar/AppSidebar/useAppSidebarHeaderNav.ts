@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useCurrentRouteHandle } from '@/bootstrap/router';
+import { useCurrentResourceRoute, useCurrentRouteHandle } from '@/bootstrap/router';
 import type { HeaderNavItem } from '@/components/business/Sidebar/_common/header/HeaderNav/index.type';
+import {
+  isNoteContentStatusEmpty,
+  useNoteContentStatusStore,
+} from '@/components/editors/note/_store/useNoteContentStatusStore';
 import { useNoteService } from '@/domains';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
@@ -29,6 +33,7 @@ export function useAppSidebarHeaderNav({
   const appAuth = useAppAuth();
   const noteService = useNoteService();
   const openResource = useOpenResource();
+  const currentResourceRoute = useCurrentResourceRoute();
   const selectedKey = useCurrentRouteHandle()?.appSidebar?.selectedHeaderNavKey ?? undefined;
 
   const { loading: creatingNote, run: createNote } = useApi(
@@ -43,6 +48,7 @@ export function useAppSidebarHeaderNav({
     {
       manual: true,
       onSuccess: ({ resourceId, title }) => {
+        useNoteContentStatusStore.getState().markCreatedEmptyNote(resourceId);
         openResource({
           resourceId,
           resourceType: RESOURCE_KIND.NOTE,
@@ -64,6 +70,17 @@ export function useAppSidebarHeaderNav({
   const handleCreateNote = () => {
     if (!appAuth.isAuthenticated) {
       appAuth.requireLogin();
+      return;
+    }
+    const openNoteId =
+      currentResourceRoute?.resourceType === RESOURCE_KIND.NOTE
+        ? currentResourceRoute.resourceId
+        : null;
+    // 当前笔记标题和正文都为空时保留现有资源，不重复创建或导航。
+    if (
+      openNoteId &&
+      isNoteContentStatusEmpty(useNoteContentStatusStore.getState().statusByResourceId[openNoteId])
+    ) {
       return;
     }
     if (!creatingNote) {

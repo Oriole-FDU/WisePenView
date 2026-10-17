@@ -6,6 +6,8 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
+import { useNoteContentStatusStore } from '@/components/editors/note/_store/useNoteContentStatusStore';
+import { isNoteBodyEmpty } from '@/components/editors/note/noteContentPresence';
 import type { NoteSelectionSnapshot, SelectedNoteScope } from '@/domains/Note';
 import { computeNoteBodyContentHash } from '@/domains/Note';
 
@@ -52,6 +54,7 @@ export function useNoteDocument({
   definition,
   transactions,
   resourceId,
+  collaborationReady,
   blockLocalDocWrites,
   onAskAi,
   onAiDiffBodyContentHashChange,
@@ -60,6 +63,7 @@ export function useNoteDocument({
   definition: NoteEditorDefinition;
   transactions: NoteTransactionService;
   resourceId: string;
+  collaborationReady: boolean;
   blockLocalDocWrites: boolean;
   onAskAi: CustomBlockNoteProps['onAskAi'];
   onAiDiffBodyContentHashChange: CustomBlockNoteProps['onAiDiffBodyContentHashChange'];
@@ -70,6 +74,7 @@ export function useNoteDocument({
   const bodyContentHashTimerRef = useRef<number | null>(null);
   const bodyContentHashIdleRef = useRef<number | null>(null);
   const bodyContentHashInvalidatedRef = useRef(false);
+  const hasJoinedCollaborationRef = useRef(false);
 
   const refreshBodyContentHash = useMemoizedFn(() => {
     bodyContentHashIdleRef.current = null;
@@ -113,11 +118,21 @@ export function useNoteDocument({
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：编辑器实例就绪或替换后安排一次正文内容哈希计算。
-   * 不可替代原因：计算由浏览器 timer/idle callback 调度，并读取命令式编辑器文档。
+   * 执行时机：编辑器实例或资源变化后同步正文空态，并安排一次正文内容哈希计算。
+   * 不可替代原因：正文只存在于 BlockNote 命令式文档中，状态需要同步给应用级创建入口。
    * cleanup：统一由 hook 卸载清理取消尚未执行的 timer/idle callback。
    */
-  useEffect(scheduleBodyContentHashRefresh, [editor, scheduleBodyContentHashRefresh]);
+  useEffect(() => {
+    if (collaborationReady) {
+      hasJoinedCollaborationRef.current = true;
+    }
+    if (hasJoinedCollaborationRef.current) {
+      useNoteContentStatusStore
+        .getState()
+        .reportBodyStatus(resourceId, isNoteBodyEmpty(editor.document) ? 'empty' : 'nonempty');
+    }
+    scheduleBodyContentHashRefresh();
+  }, [collaborationReady, editor, resourceId, scheduleBodyContentHashRefresh]);
 
   useMount(() => {
     let writeGuardActivated = false;
@@ -133,6 +148,11 @@ export function useNoteDocument({
       if (!analysis.docChanged) return;
       activateWriteGuard();
       scheduleBodyContentHashRefresh();
+      if (hasJoinedCollaborationRef.current) {
+        useNoteContentStatusStore
+          .getState()
+          .reportBodyStatus(resourceId, isNoteBodyEmpty(editor.document) ? 'empty' : 'nonempty');
+      }
 
       const newNoteState = useNewNoteStore.getState();
       if (newNoteState.newNoteResourceId !== resourceId || analysis.changedBlocks.length === 0) {

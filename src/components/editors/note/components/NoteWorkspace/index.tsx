@@ -9,6 +9,7 @@ import { Spin } from '@/components/base/Feedback';
 import InlineComment from '@/components/business/InlineComment';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import type { EditorPresentation } from '@/components/editors/editor.type';
+import { useNoteContentStatusStore } from '@/components/editors/note/_store/useNoteContentStatusStore';
 import CustomBlockNote from '@/components/editors/note/CustomBlockNote';
 import type {
   NoteBodyEditorHandle,
@@ -121,6 +122,8 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
   };
 
   useUnmount(() => {
+    // 清理当前资源的语义内容状态，避免旧笔记影响侧栏的新建判断。
+    useNoteContentStatusStore.getState().clearNoteContentStatus(resourceId);
     if (scrollBarHideTimerRef.current !== null) {
       window.clearTimeout(scrollBarHideTimerRef.current);
       scrollBarHideTimerRef.current = null;

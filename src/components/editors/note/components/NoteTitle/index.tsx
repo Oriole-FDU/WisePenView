@@ -10,6 +10,8 @@ import { type KeyboardEvent, type Ref, useEffect, useImperativeHandle, useRef } 
 import { useTranslation } from 'react-i18next';
 
 import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
+import { useNoteContentStatusStore } from '@/components/editors/note/_store/useNoteContentStatusStore';
+import { isNoteTitleEmpty } from '@/components/editors/note/noteContentPresence';
 import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
@@ -169,6 +171,19 @@ function NoteTitle({
 
   /**
    * @wisepen-manual-effect
+   * 执行时机：标题编辑器实例、资源或占位文案变化后上报初始标题语义。
+   * 不可替代原因：初始内容只存在于 BlockNote 编辑器实例中，需要在资源打开后同步给应用级创建入口。
+   * cleanup：标题状态由资源工作区卸载时统一清理，无需额外订阅。
+   */
+  useEffect(() => {
+    const raw = getBlockPlainText(editor.document[0] as { content?: unknown[] } | undefined);
+    useNoteContentStatusStore
+      .getState()
+      .reportTitleStatus(id, isNoteTitleEmpty(raw, untitledTitle) ? 'empty' : 'nonempty');
+  }, [editor, id, untitledTitle]);
+
+  /**
+   * @wisepen-manual-effect
    * 执行时机：标题编辑器挂载后，等待外部协同状态允许编辑时自动聚焦一次。
    * 不可替代原因：聚焦是浏览器 DOM 的命令式副作用，且协同连接状态可能晚于组件挂载完成。
    * cleanup：取消轮询 timer，避免卸载后继续检查旧编辑器状态。
@@ -223,12 +238,14 @@ function NoteTitle({
       emitSaveStatus('saving');
       scheduleTitleSync(currentId, saveVersion);
 
+      const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
+      useNoteContentStatusStore
+        .getState()
+        .reportTitleStatus(currentId, isNoteTitleEmpty(raw, untitledTitle) ? 'empty' : 'nonempty');
+
       const newNoteState = useNewNoteStore.getState();
-      if (newNoteState.newNoteResourceId === currentId) {
-        const raw = getBlockPlainText(firstBlock as { content?: unknown[] } | undefined);
-        if (raw.trim()) {
-          newNoteState.markNewNoteDirty(currentId);
-        }
+      if (newNoteState.newNoteResourceId === currentId && raw.trim()) {
+        newNoteState.markNewNoteDirty(currentId);
       }
     });
 
@@ -257,7 +274,7 @@ function NoteTitle({
       detachOnChange();
       detachBeforeChange();
     };
-  }, [editor, emitSaveStatus, latestIdRef, readOnly, scheduleTitleSync]);
+  }, [editor, emitSaveStatus, latestIdRef, readOnly, scheduleTitleSync, untitledTitle]);
 
   useUnmount(() => {
     if (focusTimerRef.current) {

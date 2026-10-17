@@ -70,6 +70,7 @@ export function useNoteEditorRuntimeCoordinator(props: NoteEditorRuntimeProps) {
     definition,
     transactions: notePluginRegistry.services.transactions,
     resourceId,
+    collaborationReady: collaborationBinding.ready,
     blockLocalDocWrites,
     onAskAi,
     onAiDiffBodyContentHashChange,
