@@ -55,7 +55,7 @@ export function useAgentDraftSessionController({
     snapshotAgentDraft(initialDraft) === snapshotAgentDraft(initialSavedDraft) ? 'clean' : 'dirty'
   );
   const savePromiseRef = useRef<Promise<unknown> | null>(null);
-  const isDirty = savePhase === 'dirty' || savePhase === 'failed';
+  const isDirty = savePhase === 'dirty' || savePhase === 'saving' || savePhase === 'failed';
 
   const setDraft = (updater: (current: AgentDraft) => AgentDraft) =>
     setDraftState((current) => {

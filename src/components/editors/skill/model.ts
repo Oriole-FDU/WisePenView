@@ -72,10 +72,7 @@ export function formatSkillSaveStatus(
   status: SkillSavePhase | undefined,
   t: TFunction<'skill'>
 ): string | null {
-  if (status === 'dirty') return t('saveStatus.dirty');
-  if (status === 'saving') return t('saveStatus.saving');
-  if (status === 'failed') return t('saveStatus.failed');
-  if (status === 'clean') return t('saveStatus.clean');
+  if (status === 'dirty' || status === 'failed') return t('saveStatus.dirty');
   return null;
 }
 

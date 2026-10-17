@@ -42,7 +42,7 @@ export default function AgentHeaderActions({
         onPress={onSave}
       >
         <Save size={15} />
-        {t('common:actions.save')}
+        {t(saveLoading ? 'agent:page.saveStatus.saving' : 'common:actions.save')}
       </AppButton>
       <VersionDropdown
         items={versionItems}

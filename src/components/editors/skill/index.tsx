@@ -214,13 +214,7 @@ function SkillEditorContent() {
         ownerId: resource.skill?.ownerId,
         onPermissionSuccess: resource.refreshSkill,
         titleMeta: headerSaveStatusText ? (
-          <span
-            className={`${styles.toolbarSaveStatus} ${
-              save.savePhase === 'dirty' || save.savePhase === 'failed'
-                ? styles.toolbarSaveStatusDirty
-                : ''
-            }`}
-          >
+          <span className={`${styles.toolbarSaveStatus} ${styles.toolbarSaveStatusDirty}`}>
             {headerSaveStatusText}
           </span>
         ) : undefined,
@@ -250,7 +244,7 @@ function SkillEditorContent() {
                     }
                   >
                     <Save size={16} />
-                    <span>{t('header.save')}</span>
+                    <span>{save.isSaving ? t('saveStatus.saving') : t('header.save')}</span>
                   </AppButton>
                 ) : null}
                 <VersionDropdown

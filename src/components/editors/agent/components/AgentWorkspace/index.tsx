@@ -121,19 +121,10 @@ export default function AgentWorkspace({
         copyVersion: agent.version,
         permissionResourceType: RESOURCE_KIND.AGENT,
         ownerId: agent.ownerId,
-        titleMeta: isOwner ? (
-          <span className={styles.saveStatus}>
-            {t(
-              `agent:page.saveStatus.${
-                draftSession.savePhase === 'dirty' ||
-                draftSession.savePhase === 'saving' ||
-                draftSession.savePhase === 'failed'
-                  ? draftSession.savePhase
-                  : 'clean'
-              }`
-            )}
-          </span>
-        ) : undefined,
+        titleMeta:
+          isOwner && (draftSession.savePhase === 'dirty' || draftSession.savePhase === 'failed') ? (
+            <span className={styles.saveStatus}>{t('agent:page.saveStatus.dirty')}</span>
+          ) : undefined,
         actions: isOwner ? (
           <AgentHeaderActions
             disabledVersionKeys={disabledVersionKeys}
