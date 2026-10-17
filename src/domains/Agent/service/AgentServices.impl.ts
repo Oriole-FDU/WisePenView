@@ -1,5 +1,6 @@
 import { AgentApi, putOssPresignedUrl } from '@domain-apis';
 
+import { mapUploadTickets } from '@/domains/_shared/mapper/versionAsset.map';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { computeFileMd5 } from '@/utils/file/computeFileMd5';
 
@@ -55,7 +56,7 @@ export const createAgentServices = (): IAgentService => ({
         },
       ],
     });
-    const ticket = response?.assetUploadTickets?.[0];
+    const ticket = mapUploadTickets(response)[0];
     if (!ticket?.assetId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.AGENT_UPLOAD_ASSET_ID_MISSING);
     }

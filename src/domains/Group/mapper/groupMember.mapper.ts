@@ -1,3 +1,4 @@
+import { invalidApiResponse, isApiId, isRecord, optionalApiString } from '@/apis/runtimeContract';
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
 import { normalizeId } from '@/utils/normalize/normalizeId';
@@ -15,15 +16,30 @@ const normalizeRoleFromApi = (value: unknown): GroupMember['role'] => {
 };
 
 /** OpenAPI GroupMemberDetailResponse -> 领域 GroupMember（userId <- memberId） */
-export const mapGroupMemberFromApi = (raw: GroupMemberApiResponse): GroupMember => ({
-  userId: normalizeId(raw.memberId),
-  realname: raw.memberInfo.realName ?? '',
-  nickname: raw.memberInfo.nickname,
-  campusNo: raw.memberInfo.campusNo ?? undefined,
-  email: raw.memberInfo.email ?? undefined,
-  role: normalizeRoleFromApi(raw.role),
-  joinTime: raw.joinTime,
-  avatar: raw.memberInfo.avatar ?? '',
-  limit: normalizeNonNegativeNumber(raw.tokenLimit) ?? 0,
-  used: normalizeNonNegativeNumber(raw.tokenUsed) ?? 0,
-});
+export const mapGroupMemberFromApi = (raw: GroupMemberApiResponse): GroupMember => {
+  if (
+    !isRecord(raw) ||
+    !isApiId(raw.memberId) ||
+    !isApiId(raw.groupId) ||
+    !isRecord(raw.memberInfo) ||
+    typeof raw.memberInfo.nickname !== 'string' ||
+    !(
+      (typeof raw.joinTime === 'string' && raw.joinTime.length > 0) ||
+      (typeof raw.joinTime === 'number' && Number.isFinite(raw.joinTime))
+    ) ||
+    !['0', '1', '2', '-1'].includes(String(raw.role))
+  )
+    invalidApiResponse('小组成员契约无效');
+  return {
+    userId: normalizeId(raw.memberId),
+    realname: optionalApiString(raw.memberInfo.realName) ?? '',
+    nickname: raw.memberInfo.nickname,
+    campusNo: optionalApiString(raw.memberInfo.campusNo),
+    email: optionalApiString(raw.memberInfo.email),
+    role: normalizeRoleFromApi(raw.role),
+    joinTime: String(raw.joinTime),
+    avatar: optionalApiString(raw.memberInfo.avatar) ?? '',
+    limit: normalizeNonNegativeNumber(raw.tokenLimit) ?? 0,
+    used: normalizeNonNegativeNumber(raw.tokenUsed) ?? 0,
+  };
+};

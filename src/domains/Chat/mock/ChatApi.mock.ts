@@ -8,10 +8,10 @@ import type {
 } from '../apis/ChatApi';
 import type {
   ChatSession as ChatSessionApiModel,
-  MessageResponse,
   ModelResponse,
   ProviderApiResponse,
   ToolApiResponse,
+  UIMessageResponse,
 } from '../apis/ChatApi.type';
 
 const MOCK_HISTORY_SIZE = 260;
@@ -39,6 +39,10 @@ let mockSessions: ChatSessionApiModel[] = [
     title: '项目需求讨论',
     created_at: '2026-04-08T09:00:00Z',
     updated_at: '2026-04-08T09:00:00Z',
+    temporary_attachment_refs: [],
+    resource_attachment_refs: [],
+    last_selected_skill_ids: [],
+    last_tool_selection_overrides: {},
   },
   {
     id: 'mock-session-2',
@@ -46,6 +50,10 @@ let mockSessions: ChatSessionApiModel[] = [
     title: '接口联调记录',
     created_at: '2026-04-07T10:00:00Z',
     updated_at: '2026-04-07T10:00:00Z',
+    temporary_attachment_refs: [],
+    resource_attachment_refs: [],
+    last_selected_skill_ids: [],
+    last_tool_selection_overrides: {},
   },
   {
     id: 'mock-session-3',
@@ -53,10 +61,14 @@ let mockSessions: ChatSessionApiModel[] = [
     title: '代码评审',
     created_at: '2026-04-06T11:00:00Z',
     updated_at: '2026-04-06T11:00:00Z',
+    temporary_attachment_refs: [],
+    resource_attachment_refs: [],
+    last_selected_skill_ids: [],
+    last_tool_selection_overrides: {},
   },
 ];
 
-const buildMockHistoryMessages = (sessionId: string, total: number): MessageResponse[] => {
+const buildMockHistoryMessages = (sessionId: string, total: number): UIMessageResponse[] => {
   return Array.from({ length: total }, (_, index) => {
     const messageNo = index + 1;
     const messageSeq = String(messageNo).padStart(4, '0');
@@ -66,7 +78,7 @@ const buildMockHistoryMessages = (sessionId: string, total: number): MessageResp
       MOCK_HISTORY_BASE_TS + index * MOCK_HISTORY_INTERVAL_MS
     ).toISOString();
 
-    const role: MessageResponse['role'] = isUser ? 'user' : 'assistant';
+    const role: UIMessageResponse['role'] = isUser ? 'user' : 'assistant';
     const baseText = isUser
       ? `【${sessionId}】第 ${round} 轮：请解释一下这个需求，并给出步骤。`
       : `【${sessionId}】第 ${round} 轮回复：已整理需求背景、约束条件与执行步骤。`;
@@ -96,13 +108,13 @@ const buildMockHistoryMessages = (sessionId: string, total: number): MessageResp
       role,
       parts: [{ type: 'text', text, state: 'done' }],
       metadata,
-      created_at: createdAt,
+      createdAt,
     };
   });
 };
 
-const mockHistoryMessagesBySessionId: Record<string, MessageResponse[]> = mockSessions.reduce<
-  Record<string, MessageResponse[]>
+const mockHistoryMessagesBySessionId: Record<string, UIMessageResponse[]> = mockSessions.reduce<
+  Record<string, UIMessageResponse[]>
 >((acc, session) => {
   acc[session.id] = buildMockHistoryMessages(session.id, MOCK_HISTORY_SIZE);
   return acc;
@@ -119,6 +131,7 @@ const models: ModelResponse[] = [
   scope: i < 3 ? 'SYSTEM' : 'USER',
   display_name: name,
   model_family: 'GENERIC',
+  billing_ratio: i === 0 ? 0 : 1,
   support_thinking: i >= 3,
   support_vision: i !== 1,
   support_tools: true,
@@ -129,16 +142,26 @@ const models: ModelResponse[] = [
       provider_id: `mock-provider-${i + 1}`,
       provider_name: ['OpenAI', 'DeepSeek', 'Google', 'Anthropic', 'OpenAI'][i],
       provider_model_name: name,
-      input_billing_ratio: i === 0 ? '0' : '1',
-      cached_input_billing_ratio: i === 0 ? '0' : '1',
-      output_billing_ratio: i === 0 ? '0' : '1',
+      support_runtime_options: {},
       is_preferred: true,
       is_active: true,
       priority: 0,
     },
   ],
 }));
-const providers: ProviderApiResponse[] = [];
+const providers: ProviderApiResponse[] = [
+  {
+    id: 'mock-provider-4',
+    name: 'Anthropic',
+    base_url: null,
+    api_key_fingerprint: 'mock***key',
+    scope: 'USER',
+    type: 'ANTHROPIC',
+    is_active: true,
+    token_usage: 1200,
+    billable_token_usage: 1500,
+  },
+];
 const tools: ToolApiResponse[] = [
   ['default_web_search', '默认 Web 搜索', true, true],
   ['mock_provider_search', 'Mock 搜索', false, true],
@@ -177,7 +200,10 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
       created_at: now,
       updated_at: now,
       agent_id: params.agent_id,
-      agent_version: params.agent_version,
+      temporary_attachment_refs: [],
+      resource_attachment_refs: [],
+      last_selected_skill_ids: [],
+      last_tool_selection_overrides: {},
     };
     mockSessions.unshift(session);
     mockHistoryMessagesBySessionId[session.id] = [];
@@ -187,7 +213,6 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
     const session = requireSession(params.session_id);
     Object.assign(session, {
       agent_id: params.agent_id,
-      agent_version: params.agent_version,
       updated_at: new Date().toISOString(),
     });
     return mockResponse(session);
@@ -277,6 +302,7 @@ export const ChatApi: typeof ChatApiContract = {
       scope: 'USER',
       display_name: params.display_name,
       model_family: params.model_family ?? 'GENERIC',
+      billing_ratio: 1,
       support_thinking: params.support_thinking ?? false,
       support_vision: params.support_vision ?? false,
       support_tools: params.support_tools ?? true,
@@ -312,9 +338,7 @@ export const ChatApi: typeof ChatApiContract = {
           provider_id: provider.id,
           provider_name: provider.name,
           provider_model_name: params.provider_model_name,
-          input_billing_ratio: '1',
-          cached_input_billing_ratio: '1',
-          output_billing_ratio: '1',
+          support_runtime_options: {},
           is_preferred: params.is_preferred ?? true,
           is_active: params.is_active ?? true,
           priority: model.mappings?.length ?? 0,
@@ -324,7 +348,7 @@ export const ChatApi: typeof ChatApiContract = {
   },
   unbindModelProvider: async ({ model_id, provider_id }) => {
     const model = models.find((m) => m.id === model_id);
-    if (model) model.mappings = model.mappings?.filter((m) => m.provider_id !== provider_id);
+    if (model) model.mappings = (model.mappings ?? []).filter((m) => m.provider_id !== provider_id);
     return null;
   },
   updateUserToolConfig: async ({ tool_name, enabled, secret_config }) => {

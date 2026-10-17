@@ -24,9 +24,12 @@ export interface AgentModelPolicyApi {
 }
 
 export interface AgentToolAndSkillPolicyApi {
+  enableUseTool?: boolean | null;
   toolSelectionDefaultEnabled?: boolean | null;
   toolSelectionOverrides?: Record<string, boolean> | null;
+  enableUseSkill?: boolean | null;
   onDemandSkillIds?: string[] | null;
+  skillMatchTopK?: number | null;
 }
 
 export interface AgentMemoryPolicyApi {
@@ -43,7 +46,10 @@ export interface AgentMemoryPolicyApi {
 
 export interface AgentSpecApi {
   systemPrompt?: string | null;
+  agentMd?: string | null;
   autoGenerateTitle?: boolean | null;
+  billingGroupId?: string | null;
+  agentMaxIterations?: number | null;
   modelPolicy?: AgentModelPolicyApi | null;
   toolAndSkillPolicy?: AgentToolAndSkillPolicyApi | null;
   memoryPolicy?: AgentMemoryPolicyApi | null;

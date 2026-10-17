@@ -1,3 +1,9 @@
+import {
+  assertApiPage,
+  assertApiRecord,
+  invalidApiResponse,
+  isFiniteNumber,
+} from '@/apis/runtimeContract';
 import type { AdminUser } from '@/domains/Admin';
 import {
   mapDegreeLevelToApi,
@@ -9,6 +15,8 @@ import {
   normalizeSexFromApi,
   normalizeUserStatusFromApi,
 } from '@/domains/User/mapper/userEnum.mapper';
+import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
+import { WisePenError } from '@/utils/error/WisePenError';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -29,7 +37,19 @@ import type {
   ResetAdminUserPasswordRequest,
 } from '../service/index.type';
 
+const isAdminUserApiModel = (value: unknown): value is AdminUserApiModel => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const row = value as Record<string, unknown>;
+  return (
+    ((typeof row.userId === 'string' && row.userId.length > 0) ||
+      (typeof row.userId === 'number' && Number.isFinite(row.userId))) &&
+    typeof row.username === 'string'
+  );
+};
+
 const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
+  assertApiRecord(raw, 'Admin 用户列表项契约无效');
+  if (!isAdminUserApiModel(raw)) invalidApiResponse('Admin 用户列表项契约无效');
   return {
     id: normalizeId(raw.userId),
     username: raw.username ?? '',
@@ -41,7 +61,7 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
     email: raw.email ?? undefined,
     mobile: raw.mobile ?? undefined,
     verificationMode: raw.verificationMode ?? null,
-    status: raw.status == null ? 0 : normalizeUserStatusFromApi(raw.status),
+    status: raw.userStatus == null ? 0 : normalizeUserStatusFromApi(raw.userStatus),
     createTime: raw.createTime ?? undefined,
     updateTime: raw.updateTime ?? undefined,
   };
@@ -49,47 +69,95 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
 
 const mapFetchAdminUserListRequest = (
   params: FetchAdminUserListRequest
-): FetchAdminUserListApiRequest => ({
-  page: params.page,
-  size: params.size,
-  keyword: params.keyword,
-  ...(mapUserStatusToApi(params.status) ? { status: mapUserStatusToApi(params.status) } : {}),
-  ...(mapIdentityTypeToApi(params.identityType)
-    ? { identityType: mapIdentityTypeToApi(params.identityType) }
-    : {}),
-});
+): FetchAdminUserListApiRequest => {
+  const status = params.status !== 0 ? mapUserStatusToApi(params.status) : undefined;
+  const identityType =
+    params.identityType > 0 ? mapIdentityTypeToApi(params.identityType) : undefined;
+  return {
+    page: params.page,
+    size: params.size,
+    keyword: params.keyword,
+    ...(status ? { userStatus: status } : {}),
+    ...(identityType ? { identityType } : {}),
+  };
+};
 
 const mapFetchAdminUserListFromApi = (
   data: FetchAdminUserListApiResponse
-): FetchAdminUserListResponse => ({
-  users: data.list.map(mapAdminUserApiModelToEntity),
-  total: data.total,
-  page: data.page,
-  size: data.size,
-  totalPage: data.totalPage,
-});
+): FetchAdminUserListResponse => {
+  const page = assertApiPage(data, isAdminUserApiModel, 'Admin 用户分页契约无效');
+  return {
+    users: page.list.map(mapAdminUserApiModelToEntity),
+    total: page.total,
+    page: page.page,
+    size: page.size,
+    totalPage: page.totalPage,
+  };
+};
 
 const mapAdminUserListFromApi = (data: AdminUserApiModel[]): AdminUser[] =>
-  data.map(mapAdminUserApiModelToEntity);
+  assertApiPage(
+    {
+      list: data,
+      total: data.length,
+      page: 1,
+      size: Math.max(data.length, 1),
+      totalPage: data.length ? 1 : 0,
+    },
+    isAdminUserApiModel,
+    'Admin 用户列表契约无效'
+  ).list.map(mapAdminUserApiModelToEntity);
 
 const mapGetAdminUserInfoFromApi = (
   data: GetAdminUserInfoApiResponse
-): GetAdminUserInfoResponse => ({
-  userProfile: {
-    ...data,
-    sex: data.sex == null ? undefined : normalizeSexFromApi(data.sex),
-    enrollmentYear: data.enrollmentYear == null ? undefined : String(data.enrollmentYear),
-    degreeLevel:
-      data.degreeLevel == null ? undefined : normalizeDegreeLevelFromApi(data.degreeLevel),
-  },
-});
+): GetAdminUserInfoResponse => {
+  if (
+    data == null ||
+    typeof data !== 'object' ||
+    Array.isArray(data) ||
+    !(
+      (typeof data.userId === 'string' && data.userId.length > 0) ||
+      (typeof data.userId === 'number' && isFiniteNumber(data.userId))
+    )
+  ) {
+    throw new WisePenError({
+      code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
+      source: 'api',
+      message: 'Admin 用户资料契约无效',
+    });
+  }
+  return {
+    userProfile: {
+      userId: normalizeId(data.userId),
+      ...(data.sex === 'MALE' || data.sex === 'FEMALE' || data.sex === 'UNKNOWN'
+        ? { sex: normalizeSexFromApi(data.sex) }
+        : {}),
+      ...(typeof data.university === 'string' ? { university: data.university } : {}),
+      ...(typeof data.college === 'string' ? { college: data.college } : {}),
+      ...(typeof data.major === 'string' ? { major: data.major } : {}),
+      ...(typeof data.className === 'string' ? { className: data.className } : {}),
+      ...(Number.isInteger(data.enrollmentYear)
+        ? { enrollmentYear: String(data.enrollmentYear) }
+        : {}),
+      ...(data.degreeLevel === 'UNKNOWN' ||
+      data.degreeLevel === 'UNDERGRADUATE' ||
+      data.degreeLevel === 'MASTER' ||
+      data.degreeLevel === 'DOCTOR'
+        ? { degreeLevel: normalizeDegreeLevelFromApi(data.degreeLevel) }
+        : {}),
+      ...(typeof data.academicTitle === 'string' ? { academicTitle: data.academicTitle } : {}),
+      ...(typeof data.createTime === 'string' ? { createTime: data.createTime } : {}),
+      ...(typeof data.updateTime === 'string' ? { updateTime: data.updateTime } : {}),
+    },
+  };
+};
 
 const mapChangeAdminUserInfoRequest = (
   params: ChangeAdminUserInfoRequest
 ): ChangeAdminUserInfoApiRequest => ({
   ...params,
   identityType: mapIdentityTypeToApi(params.identityType),
-  status: mapUserStatusToApi(params.status),
+  userStatus: mapUserStatusToApi(params.status),
 });
 
 const mapChangeAdminUserProfileRequest = (

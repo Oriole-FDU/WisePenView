@@ -1,3 +1,15 @@
+import {
+  assertApiArray,
+  assertApiPage,
+  assertApiRecord,
+  invalidApiResponse,
+  isApiId,
+  isRecord,
+  optionalApiBoolean,
+  optionalApiNumber,
+  optionalApiString,
+  optionalApiStrings,
+} from '@/apis/runtimeContract';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
@@ -32,13 +44,22 @@ import type {
 const normalizeTimestamp = (value: number | string | undefined): number =>
   normalizeFiniteNumber(value) ?? 0;
 
+const isCommentItemResponse = (value: unknown): value is ResourceCommentItemApiResponse =>
+  isRecord(value) &&
+  typeof value.commentId === 'string' &&
+  typeof value.authorId === 'string' &&
+  typeof value.createTime === 'number';
+
 function mapCommentAuthorFromApi(
   value: ResourceCommentItemApiResponse['authorInfo'],
   fallbackId: string
 ): CommentAuthor {
   return {
-    name: value?.realName?.trim() || value?.nickname?.trim() || fallbackId,
-    avatar: value?.avatar?.trim() || undefined,
+    name:
+      optionalApiString(value?.realName)?.trim() ||
+      optionalApiString(value?.nickname)?.trim() ||
+      fallbackId,
+    avatar: optionalApiString(value?.avatar)?.trim() || undefined,
   };
 }
 
@@ -50,43 +71,55 @@ function mapCommentFromApi(data: ResourceCommentItemApiResponse): ResourceCommen
     replyToUser: data.replyToUserId
       ? mapCommentAuthorFromApi(data.replyToUserInfo, data.replyToUserId)
       : undefined,
-    content: data.content ?? '',
-    imageUrls: data.imageUrls ?? [],
-    likeCount: data.likeCount ?? 0,
-    replyCount: data.replyCount ?? 0,
+    content: optionalApiString(data.content) ?? '',
+    imageUrls: optionalApiStrings(data.imageUrls) ?? [],
+    likeCount: optionalApiNumber(data.likeCount) ?? 0,
+    replyCount: optionalApiNumber(data.replyCount) ?? 0,
     createTime: data.createTime,
-    deleted: data.deleted ?? false,
+    deleted: optionalApiBoolean(data.deleted) ?? false,
   };
 }
 
-const mapCommentPageFromApi = (data: CommentPageApiResponse): CommentPage => ({
-  items: data.list.map(mapCommentFromApi),
-  total: data.total,
-  totalPage: data.totalPage,
-});
+const mapCommentPageFromApi = (data: CommentPageApiResponse): CommentPage => {
+  const page = assertApiPage(data, isCommentItemResponse, '评论分页响应契约无效');
+  return { items: page.list.map(mapCommentFromApi), total: page.total, totalPage: page.totalPage };
+};
 
 const mapResourceInteractionRecordFromApi = (
   data: GetUserInteractionRecordApiResponse | null | undefined
 ): ResourceInteractionRecord => ({
-  liked: data?.liked ?? false,
-  score: data?.score ?? 0,
-  likedCommentIds: new Set(data?.likedCommentIds ?? []),
+  liked: optionalApiBoolean(data?.liked) ?? false,
+  score: optionalApiNumber(data?.score) ?? 0,
+  likedCommentIds: new Set(optionalApiStrings(data?.likedCommentIds) ?? []),
 });
 
-const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] =>
-  (data.collectionIds ?? []).map(normalizeId).filter(Boolean);
+const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] => {
+  if (
+    !isRecord(data) ||
+    !Array.isArray(data.collectionIds) ||
+    !data.collectionIds.every((id) => typeof id === 'string' || typeof id === 'number')
+  )
+    invalidApiResponse('收藏状态响应契约无效');
+  return data.collectionIds.map(normalizeId).filter(Boolean);
+};
 
-const mapFavoriteCollectionFromApi = (data: FavoriteCollectionApiResponse): FavoriteCollection => ({
-  collectionId: normalizeId(data.collectionId),
-  collectionName: data.collectionName ?? null,
-  description: data.description ?? null,
-  isDefault: data.isDefault ?? false,
-  itemCount: data.itemCount ?? 0,
-});
+const mapFavoriteCollectionFromApi = (data: FavoriteCollectionApiResponse): FavoriteCollection => {
+  if (!isRecord(data) || !isApiId(data.collectionId)) invalidApiResponse('收藏夹响应契约无效');
+  return {
+    collectionId: normalizeId(data.collectionId),
+    collectionName: optionalApiString(data.collectionName) ?? null,
+    description: optionalApiString(data.description) ?? null,
+    isDefault: optionalApiBoolean(data.isDefault) ?? false,
+    itemCount: optionalApiNumber(data.itemCount) ?? 0,
+  };
+};
 
 const mapFavoriteCollectionsFromApi = (
   data: FavoriteCollectionApiResponse[]
-): FavoriteCollection[] => data.map(mapFavoriteCollectionFromApi);
+): FavoriteCollection[] => {
+  assertApiArray(data, isRecord, '收藏夹列表响应契约无效');
+  return data.map(mapFavoriteCollectionFromApi);
+};
 
 const mapUpdateFavoriteCollectionsRequest = (
   params: UpdateFavoriteCollectionsRequest
@@ -130,10 +163,12 @@ const mapListFavoritedResourcesRequest = (
 });
 
 const mapFavoriteItemFromApi = (data: FavoriteItemApiResponse): FavoriteItem => {
+  assertApiRecord(data, '收藏资源契约无效');
+  if (!isApiId(data.resourceId)) invalidApiResponse('收藏资源标识契约无效');
   const normalizedResource = data.resourceInfo
     ? ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo)
     : null;
-  const accessible = data.accessible ?? normalizedResource != null;
+  const accessible = optionalApiBoolean(data.accessible) ?? normalizedResource != null;
   const resourceInfo = accessible ? normalizedResource : null;
   return {
     resourceId: normalizeId(data.resourceId) || resourceInfo?.resourceId || '',
@@ -144,11 +179,14 @@ const mapFavoriteItemFromApi = (data: FavoriteItemApiResponse): FavoriteItem => 
 
 const mapFavoritedResourcesPageFromApi = (
   data: ListFavoritedResourcesApiResponse
-): FavoritedResourcesPage => ({
-  list: (data.list ?? []).map(mapFavoriteItemFromApi),
-  total: Number(data.total) || 0,
-  totalPage: data.totalPage,
-});
+): FavoritedResourcesPage => {
+  const page = assertApiPage(data, isRecord, '收藏资源分页响应契约无效');
+  return {
+    list: page.list.map(mapFavoriteItemFromApi),
+    total: page.total,
+    totalPage: page.totalPage,
+  };
+};
 
 export const InteractServicesMap = {
   mapCommentPageFromApi,

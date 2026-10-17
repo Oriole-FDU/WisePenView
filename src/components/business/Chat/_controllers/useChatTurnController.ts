@@ -107,10 +107,9 @@ export function useChatTurnController({
     if (selectedAgent?.resourceId) {
       agentParams = {
         agentId: selectedAgent.resourceId,
-        agentVersion: selectedAgent.agentVersion,
       };
     } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
-      agentParams = { agentId: null, agentVersion: null };
+      agentParams = { agentId: null };
     }
 
     let targetSessionId: string | undefined;

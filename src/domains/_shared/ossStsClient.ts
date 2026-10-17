@@ -6,6 +6,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/util
 import { isRecord } from '@/utils/type/typeGuards';
 
 import type { OssReadClient } from './apis/ossClient';
+import { mapOssStsToken } from './mapper/ossSts.map';
 
 export interface OssStsClientManagerOptions<Key> {
   loadToken: (key: Key) => Promise<OssStsTokenApiResponse | null | undefined>;
@@ -87,9 +88,7 @@ export const createOssStsClientManager = <Key>(
     const request: Promise<OssReadClient> = options
       .loadToken(key)
       .then((token) => {
-        if (!token) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
-        }
+        token = mapOssStsToken(token);
         if (requestGeneration !== cacheGeneration) {
           throw createClientError(FRONTEND_CLIENT_ERROR.AUTH_SESSION_CHANGED);
         }

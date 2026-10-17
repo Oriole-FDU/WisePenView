@@ -34,10 +34,7 @@ const assertDocumentUploadAllowed = (file: File): void => {
 
 const initUpload = async (body: UploadDocApiRequest): Promise<UploadDocApiResponse> => {
   const res = await DocumentApi.uploadDoc(body);
-  if (res == null) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_UPLOAD_INIT_EMPTY);
-  }
-  return res;
+  return DocumentServicesMap.mapUploadDocFromApi(res);
 };
 
 const uploadDocument = async (params: UploadDocumentParams): Promise<string> => {
@@ -120,7 +117,9 @@ const getDocPermissionOverview: IDocumentService['getDocPermissionOverview'] = a
 };
 
 const getOnlyOfficeEditorConfig = async (resourceId: string) => {
-  return await DocumentApi.getOnlyOfficeEditorConfig({ resourceId });
+  return DocumentServicesMap.mapOnlyOfficeConfigFromApi(
+    await DocumentApi.getOnlyOfficeEditorConfig({ resourceId })
+  );
 };
 
 export const createDocumentServices = (): IDocumentService => ({

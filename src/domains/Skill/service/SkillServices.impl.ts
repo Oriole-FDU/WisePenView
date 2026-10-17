@@ -1,6 +1,7 @@
 import { putOssPresignedUrl, SkillApi } from '@domain-apis';
 
 import type { AssetUploadTicketApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
+import { mapUploadTickets } from '@/domains/_shared/mapper/versionAsset.map';
 import { createOssStsClientManager } from '@/domains/_shared/ossStsClient';
 import type { IResourceService } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
@@ -238,7 +239,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
             expectedSize: request.size ?? body.size,
           })),
         });
-        tickets = res?.assetUploadTickets ?? [];
+        tickets = mapUploadTickets(res);
       } catch (error) {
         batchEntries.forEach(({ request, clientId }, batchIndex) => {
           results[start + batchIndex] = {

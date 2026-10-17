@@ -1,4 +1,13 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import {
+  assertApiArray,
+  assertApiRecord,
+  invalidApiResponse,
+  isRecord,
+  optionalApiBoolean,
+  optionalApiNumber,
+  optionalApiString,
+  optionalApiStrings,
+} from '@/apis/runtimeContract';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -39,22 +48,19 @@ type InlineCommentUserReactionApiValue = NonNullable<
 >[string];
 
 function requiredId(value: string | null | undefined, field: string): string {
+  if (typeof value !== 'string') invalidApiResponse(`行内批注 ${field} 无效`);
   const id = normalizeId(value);
   if (!id) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `行内批注 ${field} 缺失`,
-    });
+    invalidApiResponse(`行内批注 ${field} 缺失`);
   }
   return id;
 }
 
 function requiredTimestamp(value: number | null | undefined, field: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `行内批注 ${field} 无效`,
-    });
+    invalidApiResponse(`行内批注 ${field} 无效`);
   }
-  return value;
+  return value as number;
 }
 
 function optionalTimestamp(value: number | null | undefined): number | undefined {
@@ -65,11 +71,14 @@ function mapUserDisplay(
   raw: InlineCommentUserDisplayApiResponse | null | undefined,
   fallbackName?: string
 ): InlineCommentUserDisplay | undefined {
-  const name = raw?.nickname?.trim() || raw?.realName?.trim() || fallbackName?.trim();
+  const name =
+    optionalApiString(raw?.nickname)?.trim() ||
+    optionalApiString(raw?.realName)?.trim() ||
+    fallbackName?.trim();
   if (!name) return undefined;
   return {
     name,
-    avatar: raw?.avatar?.trim() || undefined,
+    avatar: optionalApiString(raw?.avatar)?.trim() || undefined,
   };
 }
 
@@ -87,15 +96,15 @@ function mapAuthor(
 function mapReactionGroups(
   groups: InlineCommentReactionGroupApiResponse[] | null | undefined
 ): InlineCommentReactionGroup[] {
-  return (groups ?? []).flatMap((group) => {
-    const emojiId = group.emojiId?.trim();
+  return (Array.isArray(groups) ? groups : []).filter(isRecord).flatMap((group) => {
+    const emojiId = optionalApiString(group.emojiId)?.trim();
     if (!emojiId) return [];
     return [
       {
         emojiId,
-        count: group.count ?? 0,
-        reactedByCurrentUser: group.reactedByCurrentUser ?? false,
-        users: (group.users ?? []).flatMap((user) => {
+        count: optionalApiNumber(group.count) ?? 0,
+        reactedByCurrentUser: optionalApiBoolean(group.reactedByCurrentUser) ?? false,
+        users: (Array.isArray(group.users) ? group.users : []).flatMap((user) => {
           const display = mapUserDisplay(user);
           return display ? [display] : [];
         }),
@@ -109,24 +118,25 @@ function mapUserReactions(
   reactions: InlineCommentUserReactionApiValue | null | undefined
 ): InlineCommentItem['reactions'] {
   return (Array.isArray(reactions) ? reactions : [reactions]).flatMap((reaction) => {
-    const emojiId = reaction?.emojiId?.trim();
+    const emojiId = optionalApiString(reaction?.emojiId)?.trim();
     if (!userId || !emojiId) return [];
     return [{ userId, emojiId, createdAt: optionalTimestamp(reaction?.createTime) }];
   });
 }
 
 function mapItem(raw: InlineCommentItemApiResponse): InlineCommentItem {
+  assertApiRecord(raw, '行内批注项目契约无效');
   const itemId = requiredId(raw.itemId, 'itemId');
   const authorId = requiredId(raw.authorId, 'authorId');
   return {
     itemId,
     authorId,
     author: mapAuthor(authorId, raw.authorInfo),
-    content: raw.content ?? '',
-    imageUrls: raw.imageUrls ?? [],
-    mentionUserIds: raw.mentionUserIds ?? [],
-    reactions: Object.entries(raw.reactions ?? {}).flatMap(([userId, reactions]) =>
-      mapUserReactions(userId, reactions)
+    content: optionalApiString(raw.content) ?? '',
+    imageUrls: optionalApiStrings(raw.imageUrls) ?? [],
+    mentionUserIds: optionalApiStrings(raw.mentionUserIds) ?? [],
+    reactions: Object.entries(isRecord(raw.reactions) ? raw.reactions : {}).flatMap(
+      ([userId, reactions]) => mapUserReactions(userId, reactions)
     ),
     reactionGroups: mapReactionGroups(raw.reactionGroups),
     createdAt: requiredTimestamp(raw.createTime, 'item.createTime'),
@@ -135,24 +145,26 @@ function mapItem(raw: InlineCommentItemApiResponse): InlineCommentItem {
 }
 
 function mapThread(raw: InlineCommentApiResponse): InlineCommentThread {
+  assertApiRecord(raw, '行内批注契约无效');
+  assertApiArray(raw.items, isRecord, '行内批注项目列表契约无效');
   const inlineCommentId = requiredId(raw.inlineCommentId, 'inlineCommentId');
   const resourceId = requiredId(raw.resourceId, 'resourceId');
   const creatorId = requiredId(raw.creatorId, 'creatorId');
-  const resolvedBy = normalizeId(raw.resolvedBy) || undefined;
+  const resolvedBy = normalizeId(optionalApiString(raw.resolvedBy)) || undefined;
   return {
     inlineCommentId,
     resourceId,
-    applicableFromVersion: raw.applicableFromVersion ?? undefined,
-    applicableToVersion: raw.applicableToVersion ?? undefined,
+    applicableFromVersion: optionalApiNumber(raw.applicableFromVersion) ?? undefined,
+    applicableToVersion: optionalApiNumber(raw.applicableToVersion) ?? undefined,
     creatorId,
     creator: mapAuthor(creatorId, raw.creatorInfo),
     anchor: {
-      externalAnchorId: raw.anchorRef?.externalAnchorId?.trim() ?? '',
-      quoteText: raw.anchorRef?.quoteText ?? '',
-      anchorPayload: raw.anchorRef?.anchorPayload ?? {},
+      externalAnchorId: optionalApiString(raw.anchorRef?.externalAnchorId)?.trim() ?? '',
+      quoteText: optionalApiString(raw.anchorRef?.quoteText) ?? '',
+      anchorPayload: isRecord(raw.anchorRef?.anchorPayload) ? raw.anchorRef.anchorPayload : {},
     },
     items: (raw.items ?? []).map(mapItem),
-    resolved: raw.resolved ?? false,
+    resolved: optionalApiBoolean(raw.resolved) ?? false,
     resolvedBy,
     resolvedByUser: resolvedBy ? mapAuthor(resolvedBy, raw.resolvedByInfo) : undefined,
     resolvedAt: optionalTimestamp(raw.resolvedAt),
@@ -218,8 +230,10 @@ const mapResolveRequest = (
   params: ChangeInlineCommentResolveStatusRequest
 ): ChangeInlineCommentResolveStatusApiRequest => ({ ...params });
 
-const mapListFromApi = (data: ListInlineCommentsApiResponse): InlineCommentThread[] =>
-  data.map(mapThread);
+const mapListFromApi = (data: ListInlineCommentsApiResponse): InlineCommentThread[] => {
+  assertApiArray(data, isRecord, '行内批注列表响应契约无效');
+  return data.map(mapThread);
+};
 
 const mapCreatedId = (value: string, field: string): string => requiredId(value, field);
 

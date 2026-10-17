@@ -24,7 +24,7 @@ const bundle = (id: string, version: number) => {
       resourceId: id,
       version,
       status: version <= (info(id).version ?? 0) ? 'PUBLISHED' : 'DRAFT',
-      spec: {},
+      spec: null,
       assets: [],
     };
     bundles.set(key, result);

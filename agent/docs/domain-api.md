@@ -23,6 +23,10 @@ API 层禁止：
 - 直接处理 React 生命周期或组件状态。
 - 直接 import service、mapper、view、component。
 
+Chat 的 Session、history、Model、Provider、Tool 和活动 turn 响应，以及 Admin 用户详情，在 mapper 入口校验必要字段和容器；失败统一抛出 `INVALID_RESPONSE`。可选字段异常由 mapper 省略，未知 Chat part 跳过，已知 part 的必要字段缺失则拒绝整笔响应。类型声明不能替代这些运行期检查。
+
+`pnpm check:api-contract` 同时执行 envelope 与领域 mapper 的正反例，并解析全部领域 API 的实际返回类型，拒绝顶层 `unknown`、`any` 或宽泛记录响应。Chat 的 tool input/output、metadata、工具配置 schema、runtime options，以及 InlineComment anchor payload 是明确允许的开放 JSON；Group/Course metadata 在 wire DTO 中为 JSON 字符串，由现有 mapper 解析，不建立虚假的固定 schema。其他领域的明确 DTO 通过静态审计，不代表所有字段已有运行期校验。
+
 ## 二、手写 DTO
 
 - 新增或改造 API 类型时，在同域 `apis/*Api.type.ts` 手写 request/response DTO。
@@ -77,7 +81,28 @@ api -> views/components
 - API 层不调用 `message.*`。
 - 客户端业务校验错误放到 service 层，通过 `createClientError` 抛出。
 
-## 五、检查清单
+## 五、F13 覆盖矩阵
+
+| 领域                    | 已覆盖的稳定响应                                                   |
+| ----------------------- | ------------------------------------------------------------------ |
+| Chat                    | history、session、model、provider、tool、SSE 已知事件              |
+| Admin                   | 用户分页、用户资料、公告消息分页                                   |
+| Agent／Skill            | 资源信息、版本 bundle、完整策略 spec、资产列表与上传回执           |
+| Document                | 待处理文档、文档详情、资源引用                                     |
+| Group                   | 小组详情、分页列表、成员分页、配置                                 |
+| Image／Speech           | 图片上传回执、语音凭据                                             |
+| InlineComment／Interact | 批注列表、评论分页、收藏夹与收藏资源分页                           |
+| Message／User           | 用户消息分页、邀请记录、用户资料、任务状态和签到                   |
+| Resource／Tag           | 资源详情和分页、搜索分页、标签树                                   |
+| 共享资产                | 版本资源信息、Agent／Skill 版本 bundle、资产上传票据、OSS STS 凭据 |
+
+上述 mapper 在入口拒绝缺失的必要记录、数组或分页容器，并统一抛出 `INVALID_RESPONSE`。可选字段类型错误会被省略；未知 Chat part 和未知但带有合法 `type` 的 SSE 事件继续透传。
+
+明确保留开放 JSON 的字段：Chat 工具 `input`／`output`／`metadata`、工具 schema、runtime options、OnlyOffice vendor config、Group／Tag metadata 字符串、InlineComment `anchorPayload`，以及按 ID 索引的权限映射。它们不建立虚假固定结构。
+
+`check:api-contract` 会执行各领域 mapper 的有效和缺失字段样例，同时用 TypeScript AST 检查领域 API 不得新增 `Promise<unknown>`、`Promise<any>` 或顶层宽泛记录响应；开放字段必须登记在脚本豁免表中。
+
+## 六、检查清单
 
 - [ ] API 文件只做请求薄封装。
 - [ ] API DTO 手写在同域 `apis/*Api.type.ts`，字段与后端接口文档对齐。

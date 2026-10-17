@@ -1,3 +1,11 @@
+import {
+  assertApiPage,
+  assertApiRecord,
+  invalidApiResponse,
+  isApiId,
+  isRecord,
+  optionalApiString,
+} from '@/apis/runtimeContract';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
 import { GROUP_FILE_ORG_LOGIC, ROLE } from '@/domains/Group';
 import {
@@ -73,12 +81,15 @@ const normalizeRoleCodeFromApi = (value: unknown): number | null =>
 const mapRoleToApi = (value: number): string => String(value);
 
 const mapGroupFromApi = (raw: GroupApiResponse): Group => {
+  assertApiRecord(raw, '小组响应契约无效');
+  if (!isApiId(raw.groupId) || typeof raw.groupName !== 'string')
+    invalidApiResponse('小组响应契约无效');
   const ownerInfo = normalizeUserDisplayBaseFromApi(raw.ownerInfo);
   return {
     groupId: normalizeId(raw.groupId),
     groupName: raw.groupName ?? '',
-    groupDesc: raw.groupDesc ?? '',
-    groupCoverUrl: raw.groupCoverUrl ?? '',
+    groupDesc: optionalApiString(raw.groupDesc) ?? '',
+    groupCoverUrl: optionalApiString(raw.groupCoverUrl) ?? '',
     groupMetaInfo: parseGroupMetaInfo(raw.groupMetaInfo),
     groupType: mapGroupTypeFromApi(raw.groupType),
     ownerId: raw.ownerId == null ? undefined : normalizeId(raw.ownerId),
@@ -92,8 +103,10 @@ const mapGroupFromApi = (raw: GroupApiResponse): Group => {
             identityType: ownerInfo.identityType,
           },
     memberCount: normalizeNonNegativeNumber(raw.memberCount) ?? 0,
-    createTime: formatTimestampToDate(raw.createTime),
-    inviteCode: raw.inviteCode ?? undefined,
+    createTime: formatTimestampToDate(
+      typeof raw.createTime === 'string' ? raw.createTime : undefined
+    ),
+    inviteCode: optionalApiString(raw.inviteCode) ?? undefined,
     tokenUsed: raw.tokenUsed == null ? undefined : (normalizeNonNegativeNumber(raw.tokenUsed) ?? 0),
     tokenBalance:
       raw.tokenBalance == null ? undefined : (normalizeNonNegativeNumber(raw.tokenBalance) ?? 0),
@@ -110,14 +123,17 @@ const mapFetchGroupListRequest = (params: FetchGroupListRequest): ListGroupApiRe
   size: params.size,
 });
 
-const mapFetchGroupListFromApi = (data: ListGroupApiResponse): FetchGroupListResponse => ({
-  groups: data.list.map(mapGroupFromApi),
-  total: data.total,
-  page: data.page,
-  size: data.size,
-  totalPage: data.totalPage,
-  hasMore: data.page < data.totalPage,
-});
+const mapFetchGroupListFromApi = (data: ListGroupApiResponse): FetchGroupListResponse => {
+  assertApiPage(data, isRecord, '小组分页响应契约无效');
+  return {
+    groups: data.list.map(mapGroupFromApi),
+    total: data.total,
+    page: data.page,
+    size: data.size,
+    totalPage: data.totalPage,
+    hasMore: data.page < data.totalPage,
+  };
+};
 
 const mapFetchGroupInfoFromApi = (data: GroupApiResponse): Group => mapGroupFromApi(data);
 
@@ -132,20 +148,27 @@ const mapFetchGroupBaseInfoRequest = (groupId: string): GetGroupBaseInfoApiReque
 const mapFetchGroupBaseInfoFromApi = (
   data: GetGroupBaseInfoApiResponse,
   fallbackGroupId: string
-): GroupBaseInfo => ({
-  // 基础信息接口若省略 groupId，使用请求入参保持调用方按 ID 回填。
-  groupId: normalizeId(data.groupId) || fallbackGroupId,
-  groupName: data.groupName ?? '',
-  groupDesc: data.groupDesc ?? '',
-  groupCoverUrl: data.groupCoverUrl ?? '',
-  groupMetaInfo: parseGroupMetaInfo(data.groupMetaInfo),
-  groupType: mapGroupTypeFromApi(data.groupType),
-});
+): GroupBaseInfo => {
+  assertApiRecord(data, '小组基础信息契约无效');
+  if (typeof data.groupName !== 'string') invalidApiResponse('小组基础信息契约无效');
+  return {
+    // 基础信息接口若省略 groupId，使用请求入参保持调用方按 ID 回填。
+    groupId: normalizeId(data.groupId) || fallbackGroupId,
+    groupName: data.groupName ?? '',
+    groupDesc: optionalApiString(data.groupDesc) ?? '',
+    groupCoverUrl: optionalApiString(data.groupCoverUrl) ?? '',
+    groupMetaInfo: parseGroupMetaInfo(data.groupMetaInfo),
+    groupType: mapGroupTypeFromApi(data.groupType),
+  };
+};
 
 const mapGroupWalletInfoFromApi = (data: GroupApiResponse): number =>
   normalizeNonNegativeNumber(data.tokenBalance) ?? 0;
 
 const mapFetchGroupResConfigFromApi = (data: GetGroupConfigApiResponse): GroupResConfig => {
+  assertApiRecord(data, '小组资源配置契约无效');
+  if (!isApiId(data.groupId) || !Array.isArray(data.defaultMemberActions))
+    invalidApiResponse('小组资源配置契约无效');
   return {
     groupId: normalizeId(data.groupId),
     fileOrgLogic: GROUP_FILE_ORG_LOGIC.TAG,
@@ -165,7 +188,10 @@ const mapUpdateGroupResConfigRequest = (
   defaultMemberActions: resourceActionsToApiKeys(params.defaultMemberActions),
 });
 
-const mapCreateGroupFromApi = (data: string | number): string => normalizeId(data);
+const mapCreateGroupFromApi = (data: string | number): string => {
+  if (!isApiId(data)) invalidApiResponse('小组标识契约无效');
+  return normalizeId(data);
+};
 
 const mapCreateGroupRequest = (params: CreateGroupRequest): AddGroupApiRequest => ({
   ...params,
@@ -194,10 +220,13 @@ const mapFetchGroupMembersRequest = (
   size,
 });
 
-const mapFetchGroupMembersFromApi = (data: FetchGroupMembersApiResponse): GroupMemberList => ({
-  members: data.list.map(mapGroupMemberFromApi),
-  total: data.total,
-});
+const mapFetchGroupMembersFromApi = (data: FetchGroupMembersApiResponse): GroupMemberList => {
+  assertApiPage(data, isRecord, '小组成员分页响应契约无效');
+  return {
+    members: data.list.map(mapGroupMemberFromApi),
+    total: data.total,
+  };
+};
 
 const mapFetchMyRoleInGroupRequest = (groupId: string): string => groupId;
 

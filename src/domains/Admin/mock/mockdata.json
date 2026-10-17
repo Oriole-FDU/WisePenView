@@ -11,7 +11,7 @@
       "email": "student@example.com",
       "mobile": "13800000001",
       "verificationMode": "EDU_EMAIL",
-      "status": "NORMAL",
+      "userStatus": "NORMAL",
       "createTime": "2026-05-01 10:00:00",
       "updateTime": "2026-05-10 12:00:00"
     },
@@ -26,7 +26,7 @@
       "email": "teacher@example.com",
       "mobile": "13800000002",
       "verificationMode": "FDU_UIS_SYS",
-      "status": "BANNED",
+      "userStatus": "BANNED",
       "createTime": "2026-05-02 11:00:00",
       "updateTime": "2026-05-11 13:00:00"
     }

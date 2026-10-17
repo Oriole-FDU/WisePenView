@@ -1,3 +1,8 @@
+import { assertApiRecord } from '@/apis/runtimeContract';
+import {
+  mapVersionResourceInfo,
+  validateVersionBundle,
+} from '@/domains/_shared/mapper/versionAsset.map';
 import { coerceResourceActions, type ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
@@ -81,7 +86,7 @@ function assetToFileNode(asset: SkillAssetApiInfo): SkillFileNode {
     path: normalizeDirectoryPath(asset.path),
     kind: 'file',
     language: resolveLanguage(name),
-    objectKey: asset.objectKey,
+    objectKey: typeof asset.objectKey === 'string' ? asset.objectKey : undefined,
     uploadStatus: asset.uploadStatus,
     size: normalizeNonNegativeNumber(asset.size),
   };
@@ -99,6 +104,9 @@ function sortSkillFiles(nodes: SkillFileNode[]): SkillFileNode[] {
 }
 
 function mapSkillFilesFromApi(bundle?: SkillVersionBundleApiResponse): SkillFileNode[] {
+  if (bundle != null) {
+    validateVersionBundle(bundle);
+  }
   const roots: SkillFileNode[] = [];
   const foldersByPath = new Map<string, SkillFileNode>();
 
@@ -120,8 +128,12 @@ function mapSkillDetail(params: {
   info?: SkillInfoApiResponse;
   bundle?: SkillVersionBundleApiResponse;
 }): SkillDetail {
+  if (params.info != null) assertApiRecord(params.info, 'Skill 信息响应契约无效');
+  if (params.bundle != null) assertApiRecord(params.bundle, 'Skill 版本响应契约无效');
   const resourceInfo = params.info?.resourceInfo;
-  const skillInfo = params.info?.skillInfo;
+  const skillInfo = params.info?.skillInfo
+    ? mapVersionResourceInfo(params.info.skillInfo)
+    : undefined;
   const version = skillInfo?.version ?? 0;
   const files = mapSkillFilesFromApi(params.bundle);
   const ownerId = resourceInfo?.ownerId ?? '';

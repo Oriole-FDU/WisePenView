@@ -199,9 +199,6 @@ const createSession = async (params?: CreateSessionRequest): Promise<ChatSession
   const snapshot = getSessionCacheSnapshot();
   const payload = ChatServicesMap.mapCreateSessionRequest(params);
   const data = await ChatSessionApi.createSession(payload);
-  if (!data) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_CREATE_SESSION_FAILED);
-  }
   const session = ChatServicesMap.mapCreateSessionFromApi(data);
   cacheSessions([session], snapshot);
   return session;
@@ -211,9 +208,6 @@ const setSessionAgent = async (params: SetSessionAgentRequest): Promise<ChatSess
   const snapshot = getSessionCacheSnapshot();
   const payload = ChatServicesMap.mapSetSessionAgentRequest(params);
   const data = await ChatSessionApi.setSessionAgent(payload);
-  if (!data) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_CREATE_SESSION_FAILED);
-  }
   const session = ChatServicesMap.mapSetSessionAgentFromApi(data);
   cacheSessions([session], snapshot);
   return session;
@@ -223,9 +217,6 @@ const renameSession = async (params: RenameSessionRequest): Promise<ChatSession>
   const snapshot = getSessionCacheSnapshot();
   const payload = ChatServicesMap.mapRenameSessionRequest(params);
   const data = await ChatSessionApi.renameSession(payload);
-  if (!data) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_RENAME_SESSION_FAILED);
-  }
   const session = ChatServicesMap.mapRenameSessionFromApi(data);
   cacheSessions([session], snapshot);
   return session;

@@ -27,6 +27,10 @@ const session: ChatSession = {
   title: 'Storybook 会话',
   createdAt: '2026-09-08T09:00:00Z',
   updatedAt: '2026-09-08T09:00:00Z',
+  temporaryAttachmentRefs: [],
+  resourceAttachmentRefs: [],
+  lastSelectedSkillIds: [],
+  lastToolSelectionOverrides: {},
 };
 
 const driveRoot: RootNode = {

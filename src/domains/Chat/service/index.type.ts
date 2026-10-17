@@ -62,9 +62,6 @@ export interface ChatModelConfigProviderMapping {
   providerId: string;
   providerName: string | null;
   providerModelName: string;
-  inputBillingRatio: string;
-  cachedInputBillingRatio: string;
-  outputBillingRatio: string;
   isPreferred: boolean;
   isActive: boolean;
   priority: number;
@@ -75,6 +72,7 @@ export interface ChatModelConfig {
   scope: ChatModelScope;
   displayName: string;
   modelFamily: ChatModelFamily;
+  billingRatio: number;
   supportThinking: boolean;
   supportVision: boolean;
   supportTools: boolean;
@@ -123,9 +121,6 @@ export interface ChatModelProviderOption {
   providerId: string;
   providerName?: string | null;
   providerModelName: string;
-  inputBillingRatio?: string;
-  cachedInputBillingRatio?: string;
-  outputBillingRatio?: string;
   provider: string;
   supportRuntimeOptions: Record<string, unknown>;
   isPreferred: boolean;
@@ -259,13 +254,11 @@ export interface RenameSessionRequest {
 export interface CreateSessionRequest {
   title?: string;
   agentId?: string | null;
-  agentVersion?: number | null;
 }
 
 export interface SetSessionAgentRequest {
   sessionId: string;
   agentId?: string | null;
-  agentVersion?: number | null;
 }
 
 /** 会话实体 */
@@ -277,6 +270,64 @@ export interface ChatSession {
   updatedAt: string;
   agentId?: string | null;
   agentVersion?: number | null;
+  agent?: {
+    agentId: string;
+    name: string;
+    description: string;
+    sourceType: string;
+    version: number;
+    versionStatus: string;
+    spec: {
+      systemPrompt: string;
+      agentMd?: string;
+      autoGenerateTitle: boolean;
+      billingGroupId?: string;
+      agentMaxIterations?: number;
+      modelPolicy: {
+        defaultModelId?: string;
+        defaultProviderId?: string;
+        allowRequestOverride: boolean;
+      };
+      toolAndSkillPolicy: {
+        enableUseTool: boolean;
+        toolSelectionDefaultEnabled: boolean;
+        toolSelectionOverrides: Record<string, boolean>;
+        enableUseSkill: boolean;
+        onDemandSkillIds?: string[];
+        skillMatchTopK?: number;
+      };
+      memoryPolicy: {
+        enableChatMemory: boolean;
+        enablePersistenceChatMemory: boolean;
+        enableChatMemorySummary: boolean;
+        highWatermarkRatio?: number;
+        lowWatermarkRatio?: number;
+        summaryPrompt?: string;
+        enableLongTermMemory: boolean;
+        longTermMemoryLimit?: number;
+        longTermMemoryScoreThreshold?: number;
+      };
+    };
+  } | null;
+  temporaryAttachmentRefs: Array<{
+    attachmentId: string;
+    attachmentType: string;
+    attachmentName: string;
+    objectKey: string;
+    extension: string;
+    fileSize: number;
+    mimeType?: string | null;
+  }>;
+  resourceAttachmentRefs: Array<{
+    attachmentId: string;
+    attachmentType: string;
+    attachmentName: string;
+    resourceId: string;
+    resourceType: string;
+  }>;
+  lastSelectedSkillIds: string[];
+  lastToolSelectionDefaultEnabled?: boolean | null;
+  lastToolSelectionOverrides: Record<string, boolean>;
 }
 
 /** 删除会话请求参数 */

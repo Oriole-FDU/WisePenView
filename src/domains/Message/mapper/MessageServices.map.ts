@@ -1,3 +1,10 @@
+import {
+  assertApiPage,
+  isApiId,
+  isRecord,
+  optionalApiNumber,
+  optionalApiString,
+} from '@/apis/runtimeContract';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -16,14 +23,17 @@ import { normalizeMessageType } from './messageType.mapper';
 
 const mapUserMessageApiModelToEntity = (raw: UserMessageApiModel): UserMessage => ({
   messageId: normalizeId(raw.messageId),
-  deliveryScope: raw.deliveryScope ?? undefined,
-  messageType: normalizeMessageType(raw.messageType ?? undefined) ?? raw.messageType ?? undefined,
-  title: raw.title?.trim() ?? '',
-  content: raw.content ?? '',
-  jumpUrl: raw.jumpUrl?.trim() || undefined,
-  extra: raw.extra ?? undefined,
-  read: Boolean(raw.readTime),
-  createTime: raw.createTime ?? undefined,
+  deliveryScope: optionalApiString(raw.deliveryScope) ?? undefined,
+  messageType:
+    normalizeMessageType(optionalApiString(raw.messageType) ?? undefined) ??
+    optionalApiString(raw.messageType) ??
+    undefined,
+  title: optionalApiString(raw.title)?.trim() ?? '',
+  content: optionalApiString(raw.content) ?? '',
+  jumpUrl: optionalApiString(raw.jumpUrl)?.trim() || undefined,
+  extra: optionalApiString(raw.extra) ?? undefined,
+  read: typeof raw.readTime === 'string' && Boolean(raw.readTime),
+  createTime: optionalApiNumber(raw.createTime) ?? undefined,
 });
 
 const mapListUserMessagesRequest = (
@@ -35,13 +45,20 @@ const mapListUserMessagesRequest = (
 
 const mapListUserMessagesFromApi = (
   data: ListUserMessagesApiResponse
-): ListUserMessagesResponse => ({
-  messages: data.list.map(mapUserMessageApiModelToEntity),
-  total: data.total,
-  page: data.page,
-  size: data.size,
-  totalPage: data.totalPage,
-});
+): ListUserMessagesResponse => {
+  const page = assertApiPage(
+    data,
+    (value): value is UserMessageApiModel => isRecord(value) && isApiId(value.messageId),
+    '用户消息分页响应契约无效'
+  );
+  return {
+    messages: page.list.map(mapUserMessageApiModelToEntity),
+    total: page.total,
+    page: page.page,
+    size: page.size,
+    totalPage: page.totalPage,
+  };
+};
 
 const mapReadMessagesRequest = (params: ReadMessagesRequest): ReadMessageApiRequest => ({
   messageIds: params.messageIds,

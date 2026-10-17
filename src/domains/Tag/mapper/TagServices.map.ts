@@ -1,3 +1,4 @@
+import { assertApiArray, invalidApiResponse, isRecord } from '@/apis/runtimeContract';
 import {
   ACCESS_CONTROL_SCOPE,
   type AccessControlScope,
@@ -68,7 +69,7 @@ const mapGrantedActionsFromApi = (
 };
 
 const parseTagMetaInfo = (value: string | undefined): TagMetaInfo | undefined => {
-  if (!value?.trim()) return undefined;
+  if (typeof value !== 'string' || !value.trim()) return undefined;
   try {
     const parsed: unknown = JSON.parse(value);
     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return undefined;
@@ -110,6 +111,10 @@ const sortTagTreeNodes = (nodes: TagTreeNode[]): TagTreeNode[] =>
     .map(({ node }) => node);
 
 const mapTagTreeNodeFromApi = (node: GetTagTreeApiResponse[number]): TagTreeNode => {
+  if (!isRecord(node) || typeof node.tagId !== 'string' || typeof node.tagName !== 'string')
+    invalidApiResponse('标签树节点契约无效');
+  if (node.children != null && (!Array.isArray(node.children) || !node.children.every(isRecord)))
+    invalidApiResponse('标签树子节点契约无效');
   const visibilityMode = node.visibilityMode;
   const tagMetaInfo = parseTagMetaInfo(node.tagMetaInfo);
   const normalizedVisibilityMode = isTagVisibilityModeString(visibilityMode)
@@ -133,8 +138,10 @@ const mapTagTreeNodeFromApi = (node: GetTagTreeApiResponse[number]): TagTreeNode
   };
 };
 
-const mapTagTreeFromApi = (data: GetTagTreeApiResponse): TagTreeNode[] =>
-  sortTagTreeNodes(data.map(mapTagTreeNodeFromApi));
+const mapTagTreeFromApi = (data: GetTagTreeApiResponse): TagTreeNode[] => {
+  assertApiArray(data, isRecord, '标签树响应契约无效');
+  return sortTagTreeNodes(data.map(mapTagTreeNodeFromApi));
+};
 
 const mapTagGrantedActions = (
   roots: TagTreeNode[]
@@ -161,8 +168,8 @@ const mapUpdateTagRequest = (params: TagUpdateRequest): ChangeTagApiRequest => (
 });
 
 const mapAddTagFromApi = (data: string): string => {
-  // fallback：旧接口可能返回空 data，保持原有空串行为
-  return data ?? '';
+  if (typeof data !== 'string' || !data) invalidApiResponse('标签标识契约无效');
+  return data;
 };
 
 export const TagServicesMap = {

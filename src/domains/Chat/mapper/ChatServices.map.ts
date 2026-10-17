@@ -1,5 +1,9 @@
 import type { DynamicToolUIPart, ToolUIPart, UITool, UIToolInvocation } from 'ai';
 
+import { isFiniteNumber, isRecord } from '@/apis/runtimeContract';
+import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
+import { WisePenError } from '@/utils/error/WisePenError';
+
 import type {
   ActiveChatTurnApiResponse,
   CreateSessionApiRequest,
@@ -54,6 +58,160 @@ const PROVIDER_KEY_HINTS: Array<{ key: string; patterns: string[] }> = [
   { key: 'qwen', patterns: ['qwen', 'tongyi', 'dashscope', 'alibaba'] },
 ];
 
+const optionalString = (value: unknown): string | null | undefined =>
+  value === null || typeof value === 'string' ? value : undefined;
+
+const optionalNumber = (value: unknown): number | null | undefined =>
+  value === null || isFiniteNumber(value) ? value : undefined;
+
+const optionalBoolean = (value: unknown): boolean | null | undefined =>
+  value === null || typeof value === 'boolean' ? value : undefined;
+
+const invalidChatResponse = (): never => {
+  throw new WisePenError({
+    code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
+    source: 'api',
+    message: 'Chat API response 契约无效',
+  });
+};
+
+const isTemporaryAttachmentRefResponse = (value: unknown): boolean =>
+  isRecord(value) &&
+  typeof value.attachment_id === 'string' &&
+  typeof value.attachment_type === 'string' &&
+  typeof value.attachment_name === 'string' &&
+  typeof value.object_key === 'string' &&
+  typeof value.extension === 'string' &&
+  Number.isSafeInteger(value.file_size) &&
+  Number(value.file_size) >= 0;
+
+const isResourceAttachmentRefResponse = (value: unknown): boolean =>
+  isRecord(value) &&
+  typeof value.attachment_id === 'string' &&
+  typeof value.attachment_type === 'string' &&
+  typeof value.attachment_name === 'string' &&
+  typeof value.resource_id === 'string' &&
+  typeof value.resource_type === 'string';
+
+const isChatAgentSpec = (value: unknown): boolean => {
+  if (
+    !isRecord(value) ||
+    typeof value.system_prompt !== 'string' ||
+    typeof value.auto_generate_title !== 'boolean'
+  )
+    return false;
+  const model = value.model_policy;
+  const tool = value.tool_and_skill_policy;
+  const memory = value.memory_policy;
+  return (
+    isRecord(model) &&
+    typeof model.allow_request_override === 'boolean' &&
+    isRecord(tool) &&
+    ['enable_use_tool', 'tool_selection_default_enabled', 'enable_use_skill'].every(
+      (key) => typeof tool[key] === 'boolean'
+    ) &&
+    isRecord(tool.tool_selection_overrides) &&
+    Object.values(tool.tool_selection_overrides).every((item) => typeof item === 'boolean') &&
+    (tool.on_demand_skill_ids == null ||
+      (Array.isArray(tool.on_demand_skill_ids) &&
+        tool.on_demand_skill_ids.every((item) => typeof item === 'string'))) &&
+    isRecord(memory) &&
+    [
+      'enable_chat_memory',
+      'enable_persistence_chat_memory',
+      'enable_chat_memory_summary',
+      'enable_long_term_memory',
+    ].every((key) => typeof memory[key] === 'boolean')
+  );
+};
+
+const isChatSessionAgentResponse = (value: unknown): boolean =>
+  isRecord(value) &&
+  typeof value.agent_id === 'string' &&
+  typeof value.name === 'string' &&
+  typeof value.description === 'string' &&
+  typeof value.source_type === 'string' &&
+  Number.isSafeInteger(value.version) &&
+  typeof value.version_status === 'string' &&
+  isChatAgentSpec(value.spec);
+
+const isChatSessionResponse = (value: unknown): value is CreateSessionApiResponse => {
+  if (!isRecord(value)) return false;
+  if (value.agent !== undefined && value.agent !== null && !isChatSessionAgentResponse(value.agent))
+    return false;
+  return (
+    typeof value.id === 'string' &&
+    typeof value.user_id === 'string' &&
+    typeof value.title === 'string' &&
+    typeof value.created_at === 'string' &&
+    typeof value.updated_at === 'string' &&
+    Array.isArray(value.temporary_attachment_refs) &&
+    value.temporary_attachment_refs.every(isTemporaryAttachmentRefResponse) &&
+    Array.isArray(value.resource_attachment_refs) &&
+    value.resource_attachment_refs.every(isResourceAttachmentRefResponse) &&
+    Array.isArray(value.last_selected_skill_ids) &&
+    value.last_selected_skill_ids.every((item) => typeof item === 'string') &&
+    isRecord(value.last_tool_selection_overrides) &&
+    Object.values(value.last_tool_selection_overrides).every((item) => typeof item === 'boolean')
+  );
+};
+
+const isChatHistoryResponse = (value: unknown): value is ListHistoryMessagesApiResponse => {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.list) ||
+    !['total', 'page', 'size', 'total_page'].every(
+      (key) => typeof value[key] === 'number' && Number.isFinite(value[key])
+    )
+  )
+    return false;
+  return value.list.every((item) => {
+    if (!isRecord(item) || typeof item.id !== 'string') return false;
+    if (item.role !== 'system' && item.role !== 'user' && item.role !== 'assistant') return false;
+    return (
+      Array.isArray(item.parts) &&
+      item.parts.every((part) => isRecord(part) && typeof part.type === 'string')
+    );
+  });
+};
+
+const isChatModelsResponse = (value: unknown): value is ListAvailableModelsApiResponse => {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.system_models) ||
+    !Array.isArray(value.user_models)
+  ) {
+    return false;
+  }
+  return [...value.system_models, ...value.user_models].every(
+    (model) =>
+      isRecord(model) &&
+      typeof model.id === 'string' &&
+      (model.scope === 'SYSTEM' || model.scope === 'USER') &&
+      typeof model.display_name === 'string' &&
+      typeof model.model_family === 'string' &&
+      ['QWEN', 'GPT', 'CLAUDE', 'GEMINI', 'GENERIC'].includes(model.model_family) &&
+      Number.isSafeInteger(model.billing_ratio) &&
+      typeof model.support_thinking === 'boolean' &&
+      typeof model.support_vision === 'boolean' &&
+      typeof model.support_tools === 'boolean' &&
+      typeof model.is_active === 'boolean' &&
+      (model.mappings === null ||
+        (Array.isArray(model.mappings) &&
+          model.mappings.every(
+            (mapping) =>
+              isRecord(mapping) &&
+              typeof mapping.model_id === 'string' &&
+              typeof mapping.provider_id === 'string' &&
+              typeof mapping.provider_model_name === 'string' &&
+              typeof mapping.is_preferred === 'boolean' &&
+              typeof mapping.is_active === 'boolean' &&
+              Number.isSafeInteger(mapping.priority) &&
+              isRecord(mapping.support_runtime_options)
+          )))
+  );
+};
+
 const MODEL_FAMILY_PROVIDER_MAP: Record<string, string> = {
   CLAUDE: 'anthropic',
   GEMINI: 'google',
@@ -78,13 +236,10 @@ const normalizeProviderOption = (
   model: ModelResponse
 ): ChatModelProviderOption => ({
   providerId: mapping.provider_id,
-  providerName: mapping.provider_name,
+  providerName: optionalString(mapping.provider_name),
   providerModelName: mapping.provider_model_name,
-  inputBillingRatio: mapping.input_billing_ratio,
-  cachedInputBillingRatio: mapping.cached_input_billing_ratio,
-  outputBillingRatio: mapping.output_billing_ratio,
   provider: inferProviderKey(
-    mapping.provider_name,
+    optionalString(mapping.provider_name),
     mapping.provider_model_name,
     MODEL_FAMILY_PROVIDER_MAP[model.model_family],
     model.display_name
@@ -135,14 +290,8 @@ const createFallbackProviderOption = (model: ModelResponse): ChatModelProviderOp
   };
 };
 
-const isFreeModel = (
-  model: ModelResponse,
-  providerOption: ChatModelProviderOption | undefined
-): boolean =>
-  model.scope.toUpperCase() === 'SYSTEM' &&
-  providerOption?.inputBillingRatio === '0' &&
-  providerOption?.cachedInputBillingRatio === '0' &&
-  providerOption?.outputBillingRatio === '0';
+const isFreeModel = (model: ModelResponse): boolean =>
+  model.scope === 'SYSTEM' && model.billing_ratio === 0;
 
 const mapModelOption = (
   model: ModelResponse,
@@ -162,18 +311,19 @@ const mapModelOption = (
   providerOptions,
   scope: model.scope,
   modelFamily: model.model_family,
-  isFree: isFreeModel(model, providerOption),
+  isFree: isFreeModel(model),
   supportThinking: model.support_thinking,
   supportTools: model.support_tools,
   tags: buildModelTags(model, providerOption, index),
   isDefault: model.is_active && index === 0,
   vision: model.support_vision,
   usageRank: index + 1,
-  contextWindowTokens: model.context_window_tokens,
-  maxOutputTokens: model.max_output_tokens,
+  contextWindowTokens: optionalNumber(model.context_window_tokens),
+  maxOutputTokens: optionalNumber(model.max_output_tokens),
 });
 
 const mapGetModelsFromApi = (data: ListAvailableModelsApiResponse): ChatModel[] => {
+  if (!isChatModelsResponse(data)) invalidChatResponse();
   const groupedModels = [...data.system_models, ...data.user_models].filter(
     (item) => item.is_active
   );
@@ -204,8 +354,33 @@ const mapGetModelsFromApi = (data: ListAvailableModelsApiResponse): ChatModel[] 
   }));
 };
 
-const mapGetToolsFromApi = (data: ListToolsApiResponse): ToolOption[] =>
-  data.tools.map((tool) => ({
+const mapGetToolsFromApi = (data: ListToolsApiResponse): ToolOption[] => {
+  if (
+    !isRecord(data) ||
+    !Array.isArray(data.tools) ||
+    !data.tools.every(
+      (tool) =>
+        isRecord(tool) &&
+        typeof tool.name === 'string' &&
+        typeof tool.display_name === 'string' &&
+        typeof tool.description === 'string' &&
+        (tool.selection_mode === 'user_selectable' || tool.selection_mode === 'contextual') &&
+        typeof tool.enabled === 'boolean' &&
+        typeof tool.configured === 'boolean' &&
+        typeof tool.requires_config === 'boolean' &&
+        isRecord(tool.config_schema) &&
+        isRecord(tool.secret_fingerprints) &&
+        Object.values(tool.secret_fingerprints).every((value) => typeof value === 'string') &&
+        (tool.source === null ||
+          (isRecord(tool.source) &&
+            typeof tool.source.type === 'string' &&
+            [tool.source.server_id, tool.source.server_display_name, tool.source.remote_name].every(
+              (value) => value === null || typeof value === 'string'
+            )))
+    )
+  )
+    invalidChatResponse();
+  return data.tools.map((tool) => ({
     toolId: tool.name,
     label: tool.display_name,
     displayName: tool.display_name,
@@ -225,6 +400,7 @@ const mapGetToolsFromApi = (data: ListToolsApiResponse): ToolOption[] =>
     configSchema: tool.config_schema,
     secretFingerprints: tool.secret_fingerprints,
   }));
+};
 
 const mapToolFromApi = (tool: ToolApiResponse): ToolOption =>
   mapGetToolsFromApi({ tools: [tool] })[0];
@@ -232,8 +408,8 @@ const mapToolFromApi = (tool: ToolApiResponse): ToolOption =>
 const mapProviderFromApi = (provider: ProviderApiResponse): ChatProvider => ({
   id: provider.id,
   name: provider.name,
-  baseUrl: provider.base_url ?? null,
-  apiKeyFingerprint: provider.api_key_fingerprint ?? null,
+  baseUrl: optionalString(provider.base_url) ?? null,
+  apiKeyFingerprint: optionalString(provider.api_key_fingerprint) ?? null,
   scope: provider.scope,
   type: provider.type,
   isActive: provider.is_active,
@@ -241,51 +417,75 @@ const mapProviderFromApi = (provider: ProviderApiResponse): ChatProvider => ({
   billableTokenUsage: provider.billable_token_usage,
 });
 
-const mapUserProvidersFromApi = (data: ListUserProvidersApiResponse): ChatProvider[] =>
-  data.providers.map(mapProviderFromApi);
+const mapUserProvidersFromApi = (data: ListUserProvidersApiResponse): ChatProvider[] => {
+  if (
+    !isRecord(data) ||
+    !Array.isArray(data.providers) ||
+    !data.providers.every(
+      (provider) =>
+        isRecord(provider) &&
+        typeof provider.id === 'string' &&
+        typeof provider.name === 'string' &&
+        (provider.scope === 'SYSTEM' || provider.scope === 'USER') &&
+        ['ALIBABA', 'OPENAI', 'ANTHROPIC', 'GOOGLE', 'OPENAI_COMPATIBLE'].includes(provider.type) &&
+        typeof provider.is_active === 'boolean' &&
+        Number.isSafeInteger(provider.token_usage) &&
+        Number.isSafeInteger(provider.billable_token_usage)
+    )
+  )
+    invalidChatResponse();
+  return data.providers.map(mapProviderFromApi);
+};
 
 const mapModelConfigFromApi = (model: ModelResponse): ChatModelConfig => ({
   id: model.id,
   scope: model.scope,
   displayName: model.display_name,
   modelFamily: model.model_family as ChatModelConfig['modelFamily'],
+  billingRatio: model.billing_ratio,
   supportThinking: model.support_thinking,
   supportVision: model.support_vision,
   supportTools: model.support_tools,
-  contextWindowTokens: model.context_window_tokens ?? null,
-  maxOutputTokens: model.max_output_tokens ?? null,
+  contextWindowTokens: optionalNumber(model.context_window_tokens) ?? null,
+  maxOutputTokens: optionalNumber(model.max_output_tokens) ?? null,
   isActive: model.is_active,
   mappings: (model.mappings ?? []).map((mapping) => ({
     providerId: mapping.provider_id,
-    providerName: mapping.provider_name ?? null,
+    providerName: optionalString(mapping.provider_name) ?? null,
     providerModelName: mapping.provider_model_name,
-    inputBillingRatio: mapping.input_billing_ratio,
-    cachedInputBillingRatio: mapping.cached_input_billing_ratio,
-    outputBillingRatio: mapping.output_billing_ratio,
     isPreferred: mapping.is_preferred,
     isActive: mapping.is_active,
     priority: mapping.priority,
   })),
 });
 
-const mapModelConfigsFromApi = (data: ListModelsApiResponse): ChatModelConfig[] =>
-  data.models.map(mapModelConfigFromApi);
+const mapModelConfigsFromApi = (data: ListModelsApiResponse): ChatModelConfig[] => {
+  if (!isRecord(data) || !isChatModelsResponse({ system_models: data.models, user_models: [] }))
+    invalidChatResponse();
+  return data.models.map(mapModelConfigFromApi);
+};
 
-const mapAvailableModelConfigsFromApi = (data: ListAvailableModelsApiResponse): ChatModelConfig[] =>
-  [...data.system_models, ...data.user_models].map(mapModelConfigFromApi);
+const mapAvailableModelConfigsFromApi = (
+  data: ListAvailableModelsApiResponse
+): ChatModelConfig[] => {
+  if (!isChatModelsResponse(data)) invalidChatResponse();
+  return [...data.system_models, ...data.user_models].map(mapModelConfigFromApi);
+};
 
-const mapActiveTurnIdFromApi = (data: ActiveChatTurnApiResponse): string | null => data.turn_id;
+const mapActiveTurnIdFromApi = (data: ActiveChatTurnApiResponse): string | null => {
+  if (!isRecord(data) || (data.turn_id !== null && typeof data.turn_id !== 'string'))
+    invalidChatResponse();
+  return data.turn_id;
+};
 
 const mapCreateSessionRequest = (params?: CreateSessionRequest): CreateSessionApiRequest => {
   const title = params?.title;
   const hasTitle = title !== undefined;
   const agentId = params?.agentId;
-  const agentVersion = params?.agentVersion;
 
   return {
     ...(hasTitle ? { title } : {}),
     ...(agentId !== undefined ? { agent_id: agentId } : {}),
-    ...(agentVersion !== undefined ? { agent_version: agentVersion } : {}),
   };
 };
 
@@ -295,21 +495,98 @@ const mapSessionFromApi = (data: CreateSessionApiResponse): ChatSession => ({
   title: data.title,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
-  agentId: data.agent_id,
-  agentVersion: data.agent_version,
+  agentId: optionalString(data.agent_id),
+  agentVersion: optionalNumber(data.agent_version),
+  agent:
+    data.agent && isChatSessionAgentResponse(data.agent)
+      ? {
+          agentId: data.agent.agent_id,
+          name: data.agent.name,
+          description: data.agent.description,
+          sourceType: data.agent.source_type,
+          version: data.agent.version,
+          versionStatus: data.agent.version_status,
+          spec: {
+            systemPrompt: data.agent.spec.system_prompt,
+            agentMd: optionalString(data.agent.spec.agent_md) ?? undefined,
+            autoGenerateTitle: data.agent.spec.auto_generate_title,
+            billingGroupId: optionalString(data.agent.spec.billing_group_id) ?? undefined,
+            agentMaxIterations: optionalNumber(data.agent.spec.agent_max_iterations) ?? undefined,
+            modelPolicy: {
+              defaultModelId:
+                optionalString(data.agent.spec.model_policy.default_model_id) ?? undefined,
+              defaultProviderId:
+                optionalString(data.agent.spec.model_policy.default_provider_id) ?? undefined,
+              allowRequestOverride: data.agent.spec.model_policy.allow_request_override,
+            },
+            toolAndSkillPolicy: {
+              enableUseTool: data.agent.spec.tool_and_skill_policy.enable_use_tool,
+              toolSelectionDefaultEnabled:
+                data.agent.spec.tool_and_skill_policy.tool_selection_default_enabled,
+              toolSelectionOverrides:
+                data.agent.spec.tool_and_skill_policy.tool_selection_overrides,
+              enableUseSkill: data.agent.spec.tool_and_skill_policy.enable_use_skill,
+              onDemandSkillIds: data.agent.spec.tool_and_skill_policy.on_demand_skill_ids?.filter(
+                (id): id is string => typeof id === 'string'
+              ),
+              skillMatchTopK:
+                optionalNumber(data.agent.spec.tool_and_skill_policy.skill_match_top_k) ??
+                undefined,
+            },
+            memoryPolicy: {
+              enableChatMemory: data.agent.spec.memory_policy.enable_chat_memory,
+              enablePersistenceChatMemory:
+                data.agent.spec.memory_policy.enable_persistence_chat_memory,
+              enableChatMemorySummary: data.agent.spec.memory_policy.enable_chat_memory_summary,
+              highWatermarkRatio:
+                optionalNumber(data.agent.spec.memory_policy.high_watermark_ratio) ?? undefined,
+              lowWatermarkRatio:
+                optionalNumber(data.agent.spec.memory_policy.low_watermark_ratio) ?? undefined,
+              summaryPrompt:
+                optionalString(data.agent.spec.memory_policy.summary_prompt) ?? undefined,
+              enableLongTermMemory: data.agent.spec.memory_policy.enable_long_term_memory,
+              longTermMemoryLimit:
+                optionalNumber(data.agent.spec.memory_policy.long_term_memory_limit) ?? undefined,
+              longTermMemoryScoreThreshold:
+                optionalNumber(data.agent.spec.memory_policy.long_term_memory_score_threshold) ??
+                undefined,
+            },
+          },
+        }
+      : data.agent === null
+        ? null
+        : undefined,
+  temporaryAttachmentRefs: data.temporary_attachment_refs.map((ref) => ({
+    attachmentId: ref.attachment_id,
+    attachmentType: ref.attachment_type,
+    attachmentName: ref.attachment_name,
+    objectKey: ref.object_key,
+    extension: ref.extension,
+    fileSize: ref.file_size,
+    mimeType: optionalString(ref.mime_type),
+  })),
+  resourceAttachmentRefs: data.resource_attachment_refs.map((ref) => ({
+    attachmentId: ref.attachment_id,
+    attachmentType: ref.attachment_type,
+    attachmentName: ref.attachment_name,
+    resourceId: ref.resource_id,
+    resourceType: ref.resource_type,
+  })),
+  lastSelectedSkillIds: data.last_selected_skill_ids,
+  lastToolSelectionDefaultEnabled: optionalBoolean(data.last_tool_selection_default_enabled),
+  lastToolSelectionOverrides: data.last_tool_selection_overrides,
 });
 
 const mapCreateSessionFromApi = (data: CreateSessionApiResponse): ChatSession =>
-  mapSessionFromApi(data);
+  mapSessionFromApi(isChatSessionResponse(data) ? data : invalidChatResponse());
 
 const mapSetSessionAgentRequest = (params: SetSessionAgentRequest): SetSessionAgentApiRequest => ({
   session_id: params.sessionId,
   ...(params.agentId !== undefined ? { agent_id: params.agentId } : {}),
-  ...(params.agentVersion !== undefined ? { agent_version: params.agentVersion } : {}),
 });
 
 const mapSetSessionAgentFromApi = (data: SetSessionAgentApiResponse): ChatSession =>
-  mapSessionFromApi(data);
+  mapSessionFromApi(isChatSessionResponse(data) ? data : invalidChatResponse());
 
 const mapRenameSessionRequest = (params: RenameSessionRequest): RenameSessionApiRequest => {
   const newTitle = params.newTitle;
@@ -322,7 +599,7 @@ const mapRenameSessionRequest = (params: RenameSessionRequest): RenameSessionApi
 };
 
 const mapRenameSessionFromApi = (data: RenameSessionApiResponse): ChatSession =>
-  mapSessionFromApi(data);
+  mapSessionFromApi(isChatSessionResponse(data) ? data : invalidChatResponse());
 
 const mapListSessionsRequest = (params?: ListSessionsRequest): ListSessionsApiRequest => ({
   ...(params?.page !== undefined ? { page: params.page } : {}),
@@ -330,6 +607,13 @@ const mapListSessionsRequest = (params?: ListSessionsRequest): ListSessionsApiRe
 });
 
 const mapListSessionsFromApi = (data: ListSessionsApiResponse): PageResult<ChatSession> => {
+  if (
+    !isRecord(data) ||
+    !Array.isArray(data.list) ||
+    !['total', 'page', 'size', 'total_page'].every((key) => isFiniteNumber(data[key]))
+  )
+    invalidChatResponse();
+  if (!data.list.every(isChatSessionResponse)) invalidChatResponse();
   return {
     list: data.list.map(mapSessionFromApi),
     total: data.total,
@@ -491,12 +775,13 @@ function mapMessagePartFromApi(value: unknown): WisePenMessagePart | null {
   if (!data || typeof data.type !== 'string') return null;
 
   if (data.type === 'text' || data.type === 'reasoning') {
-    if (typeof data.text !== 'string') return null;
+    if (typeof data.text !== 'string') return invalidChatResponse();
     const state = mapTextState(data.state);
     return { type: data.type, text: data.text, ...(state ? { state } : {}) };
   }
   if (data.type === 'step-start') return { type: 'step-start' };
-  if (data.type === 'dynamic-tool' || isToolPartType(data.type)) return mapToolPart(data);
+  if (data.type === 'dynamic-tool' || isToolPartType(data.type))
+    return mapToolPart(data) ?? invalidChatResponse();
 
   return null;
 }
@@ -520,15 +805,13 @@ function mapAttachmentSnapshot(value: unknown): MessageAttachmentSnapshot | null
   };
 }
 
-/** 历史 metadata / 模型字段占位：后端透出后即可回放附件与模型 icon */
+/** 历史 metadata / 模型字段占位：后端透出后即可回放附件与模型图标 */
 function mapMessageMetadata(data: {
-  metadata?: unknown;
-  createdAt?: unknown;
-  created_at?: unknown;
+  metadata?: Record<string, unknown> | null;
+  createdAt?: string | null;
 }): ChatMessageMetadata | undefined {
   const rawMetadata = getRecord(data.metadata);
-  const rawCreatedAt = data.createdAt ?? data.created_at;
-  const createdAt = typeof rawCreatedAt === 'string' ? rawCreatedAt : undefined;
+  const createdAt = typeof data.createdAt === 'string' ? data.createdAt : undefined;
   const selectedAttachments = Array.isArray(rawMetadata?.selectedAttachments)
     ? rawMetadata.selectedAttachments
         .map(mapAttachmentSnapshot)
@@ -567,20 +850,10 @@ function mapMessageMetadata(data: {
   };
 }
 
-function mapMessageFromApi(
-  data: ListHistoryMessagesApiResponse['list'][number]
-): WisePenUIMessage | null {
-  if (
-    typeof data.id !== 'string' ||
-    (data.role !== 'system' && data.role !== 'user' && data.role !== 'assistant')
-  ) {
-    return null;
-  }
-  const parts = Array.isArray(data.parts)
-    ? data.parts
-        .map(mapMessagePartFromApi)
-        .filter((part): part is WisePenMessagePart => part !== null)
-    : [];
+function mapMessageFromApi(data: ListHistoryMessagesApiResponse['list'][number]): WisePenUIMessage {
+  const parts = data.parts
+    .map(mapMessagePartFromApi)
+    .filter((part): part is WisePenMessagePart => part !== null);
   const metadata = mapMessageMetadata(data);
   return {
     id: data.id,
@@ -593,10 +866,9 @@ function mapMessageFromApi(
 const mapListHistoryMessagesFromApi = (
   data: ListHistoryMessagesApiResponse
 ): PageResult<WisePenUIMessage> => {
+  if (!isChatHistoryResponse(data)) invalidChatResponse();
   return {
-    list: data.list
-      .map(mapMessageFromApi)
-      .filter((message): message is WisePenUIMessage => message !== null),
+    list: data.list.map(mapMessageFromApi),
     total: data.total,
     page: data.page,
     size: data.size,
