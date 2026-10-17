@@ -53,7 +53,7 @@ Chat 的目前會話只由 URL 決定：主聊天頁讀取 `/chat/:sessionId`，
 | `/drive/trash/folder/:folderId`           | 回收站文件夹        |
 | `/resources/:resourceType/:resourceId`    | 资源工作区          |
 
-资源工作区保留 `viewer`，PDF 可保留 `page`、`zoom` query。没有 `resourceId` 的资源路径无效。Skill 的版本、文件、配置和预览状态不进入 URL。
+资源工作区保留 `viewer`，PDF 可保留 `page`、`zoom` query。没有 `resourceId` 的资源路径无效。Skill 编辑器内部状态的 URL 边界见 [Skill 编辑流程](../../src/components/editors/skill/BUSINESS.md)。
 
 ## 小组与课程
 

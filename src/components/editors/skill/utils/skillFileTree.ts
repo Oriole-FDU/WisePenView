@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- 文件树的路径、节点和移动算法共享同一树结构不变量。 */
 import type { SkillFileDropPosition } from '@/components/editors/skill/components/SkillFileTree/index.type';
 import type { SkillFileNode } from '@/domains/Skill';
 

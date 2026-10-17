@@ -57,6 +57,9 @@ jobs:
       - name: Lint Code
         run: pnpm lint
 
+      - name: Check file length rules
+        run: pnpm check:file-length
+
       - name: Check editor runtime
         run: pnpm check:editor-runtime
 
