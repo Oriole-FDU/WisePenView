@@ -10,58 +10,72 @@ export const chatTour: GuideTourConfig = {
       GUIDE_TOOL_ID.chatComposer,
       'chat.composer.title',
       'chat.composer.content',
-      'top',
+      'bottom',
       undefined,
-      { offset: 0 }
-    ),
-    step('voice', GUIDE_TOOL_ID.chatVoice, 'chat.voice.title', 'chat.voice.content', 'top'),
-    step(
-      'model',
-      GUIDE_TOOL_ID.chatModelOpen,
-      'chat.model.title',
-      'chat.model.content',
-      'top',
-      GUIDE_ACTION_ID.openModelMenu,
-      {
-        offset: 0,
-        restore: GUIDE_ACTION_ID.openModelMenu,
-        spotlightToolIds: [GUIDE_TOOL_ID.chatModel, GUIDE_TOOL_ID.chatModelOpen],
-      }
+      { offset: 0, preventFlip: false }
     ),
     step(
       'upload',
-      GUIDE_TOOL_ID.chatUploadOpen,
+      GUIDE_TOOL_ID.chatUpload,
       'chat.upload.title',
       'chat.upload.content',
-      'top',
+      'bottom',
       GUIDE_ACTION_ID.openUploadMenu,
       {
+        preventFlip: false,
         restore: GUIDE_ACTION_ID.openUploadMenu,
         spotlightToolIds: [GUIDE_TOOL_ID.chatUpload, GUIDE_TOOL_ID.chatUploadOpen],
       }
     ),
     step(
       'agent',
-      GUIDE_TOOL_ID.chatAgentOpen,
+      GUIDE_TOOL_ID.chatAgent,
       'chat.agent.title',
       'chat.agent.content',
-      'top',
+      'bottom',
       GUIDE_ACTION_ID.openAgentMenu,
       {
+        preventFlip: false,
         restore: GUIDE_ACTION_ID.openAgentMenu,
         spotlightToolIds: [GUIDE_TOOL_ID.chatAgent, GUIDE_TOOL_ID.chatAgentOpen],
       }
     ),
     step(
       'skill',
-      GUIDE_TOOL_ID.chatSkillOpen,
+      GUIDE_TOOL_ID.chatSkill,
       'chat.skill.title',
       'chat.skill.content',
-      'top',
+      'bottom',
       GUIDE_ACTION_ID.openSkillMenu,
       {
+        preventFlip: false,
         restore: GUIDE_ACTION_ID.openSkillMenu,
         spotlightToolIds: [GUIDE_TOOL_ID.chatSkill, GUIDE_TOOL_ID.chatSkillOpen],
+      }
+    ),
+    step(
+      'model',
+      GUIDE_TOOL_ID.chatModel,
+      'chat.model.title',
+      'chat.model.content',
+      'bottom',
+      GUIDE_ACTION_ID.openModelMenu,
+      {
+        offset: 0,
+        preventFlip: false,
+        restore: GUIDE_ACTION_ID.openModelMenu,
+        spotlightToolIds: [GUIDE_TOOL_ID.chatModel, GUIDE_TOOL_ID.chatModelOpen],
+      }
+    ),
+    step(
+      'voice',
+      GUIDE_TOOL_ID.chatVoice,
+      'chat.voice.title',
+      'chat.voice.content',
+      'bottom',
+      undefined,
+      {
+        preventFlip: false,
       }
     ),
   ],

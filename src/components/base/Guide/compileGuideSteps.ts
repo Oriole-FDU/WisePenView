@@ -132,6 +132,8 @@ export function compileGuideSteps(
       ...(step.offset !== undefined ? { offset: step.offset } : {}),
       floatingOptions: {
         strategy: 'fixed',
+        // 目标可能只改变位置而不改变尺寸；逐帧同步才能跟住响应式布局并正确复原气泡。
+        autoUpdate: { animationFrame: true },
         ...(step.preventFlip === false
           ? {
               flipOptions: false,

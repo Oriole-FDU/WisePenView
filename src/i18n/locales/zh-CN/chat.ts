@@ -18,7 +18,7 @@ const zhCNChat = {
     contextMismatch: '所选上下文属于其他资源，请移除后在当前资源中重新选择',
   },
   input: {
-    placeholder: '输入消息...',
+    placeholder: '今天能帮你做些什么？',
     loginRequired: '请先登录后使用聊天',
     disclaimer: 'AI 内容仅供参考，请仔细甄别',
     removeContext: '移除上下文',
@@ -59,6 +59,7 @@ const zhCNChat = {
       trigger: '选择 Agent',
       currentDraft: '当前草稿',
       defaultAgent: '无 Agent',
+      selectAgentTooltip: '请选择Agent',
       loadingAria: '正在加载 Agent 列表',
       selectFromGroup: '从组内选择',
       groupModalTitle: '从小组选择 Agent',
@@ -115,8 +116,8 @@ const zhCNChat = {
   },
   message: {
     welcome: {
-      title: '今天想要做点什么？',
-      titleWithName: '{{name}}，今天想要做点什么？',
+      title: '我帮你',
+      titleWithName: '{{name}}，我帮你',
     },
     conversationLoading: '加载对话中...',
     scrollToBottom: '滚动到底部',

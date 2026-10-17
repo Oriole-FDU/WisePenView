@@ -103,7 +103,7 @@ const enUSTour = {
     chat: {
       title: 'Edit with AI by your side',
       content:
-        'Open the AI chat on the right to discuss this note with AI and, when needed, have AI make changes for you.',
+        'Use this button to show or hide the AI chat panel, where you can find writing inspiration and ask AI to complete writing tasks.',
     },
   },
   drive: {
