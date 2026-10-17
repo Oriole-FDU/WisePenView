@@ -1,13 +1,15 @@
 import './style.module.less';
 
 import { useMount } from 'ahooks';
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJoyride } from 'react-joyride';
+import { useLocation } from 'react-router-dom';
 
 import {
   GUIDE_TOUR_CODE,
   GUIDE_TOURS,
+  type GuideToolId,
   type GuideTourConfig,
   type GuideTourId,
 } from '@/constants/tour';
@@ -16,6 +18,7 @@ import { useApi } from '@/hooks/useApi';
 
 import { getActivePageTourId, subscribeActivePageTour } from '../activePageTourStore';
 import { compileGuideSteps } from '../compileGuideSteps';
+import { findGuideTarget } from '../findGuideTarget';
 import type { GuideActionPort } from '../guideActions';
 import GuideSpotlight from '../GuideSpotlight';
 import { useGuideTaskStore } from '../guideTaskStore';
@@ -24,6 +27,9 @@ import type { GuideHostProps } from './index.type';
 
 const GUIDE_Z_INDEX_FALLBACK = 1050;
 const SCOPE_TRANSITION_GAP_MS = 500;
+const TARGET_RECOVERY_DELAY_MS = 200;
+const TARGET_RECOVERY_RETRY_MS = 600;
+const TARGET_RECOVERY_ATTEMPTS = 3;
 
 function readGuideZIndex(): number {
   const style = getComputedStyle(document.documentElement);
@@ -36,6 +42,74 @@ let guideZIndex: number | null = null;
 function getGuideZIndex(): number {
   if (!guideZIndex) guideZIndex = readGuideZIndex();
   return guideZIndex;
+}
+
+interface GuideTargetBindingState {
+  toolKey: string;
+  allTargetsPresent: boolean;
+}
+
+function guideTargetBindingReducer(
+  _state: GuideTargetBindingState | null,
+  next: GuideTargetBindingState
+): GuideTargetBindingState {
+  return next;
+}
+
+/**
+ * 响应式布局可能替换或卸载任意一个高亮目标。
+ * Joyride 只在渲染时读取 target，必须用节点身份变化触发重渲染，才能把气泡重新绑到新锚点。
+ */
+function useGuideTargetBinding(
+  toolId: GuideToolId | undefined,
+  spotlightToolIds: readonly GuideToolId[],
+  enabled: boolean
+): boolean {
+  /**
+   * @wisepen-manual-memo
+   * 为什么：目标列表用于逐帧比较节点身份，每次渲染新建数组会让检查 effect 反复重启。
+   * 收益：同一步骤内保持连续的目标检查循环。
+   * 失效条件：步骤目标或高亮目标变化时必须重建。
+   */
+  const targetToolIds = useMemo(() => {
+    if (!toolId) return [];
+    return [toolId, ...spotlightToolIds.filter((id) => id !== toolId)];
+  }, [spotlightToolIds, toolId]);
+  const toolKey = targetToolIds.join('|');
+  const [binding, setBinding] = useReducer(guideTargetBindingReducer, null);
+
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：引导播放期间持续检查当前步骤的所有高亮目标。
+   * 不可替代原因：响应式布局会替换或卸载目标 DOM，Joyride 只在渲染时读取 target；只有节点身份变化时重渲染才能重新绑定。
+   * cleanup：取消动画帧，步骤结束、目标切换或组件卸载后停止轮询。
+   */
+  useEffect(() => {
+    if (!enabled || targetToolIds.length === 0) return undefined;
+
+    let currentTargets = targetToolIds.map((id) => findGuideTarget(id));
+    const syncBinding = () =>
+      setBinding({
+        toolKey,
+        allTargetsPresent: currentTargets.every(Boolean),
+      });
+
+    syncBinding();
+    let frameId = 0;
+    const checkTarget = () => {
+      const nextTargets = targetToolIds.map((id) => findGuideTarget(id));
+      if (nextTargets.some((target, index) => target !== currentTargets[index])) {
+        currentTargets = nextTargets;
+        syncBinding();
+      }
+      frameId = window.requestAnimationFrame(checkTarget);
+    };
+
+    frameId = window.requestAnimationFrame(checkTarget);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [enabled, targetToolIds, toolKey]);
+
+  return enabled && binding && binding.toolKey === toolKey ? binding.allTargetsPresent : false;
 }
 
 interface GuidePlayerProps {
@@ -51,6 +125,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
   const [run, setRun] = useState(true);
   const backTo = useRef<number | null>(null);
   const backAttempts = useRef(0);
+  const seenTargetStepRef = useRef<string | null>(null);
 
   /**
    * @wisepen-manual-memo
@@ -260,6 +335,57 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
     [activeStepConfig]
   );
 
+  const allGuideTargetsPresent = useGuideTargetBinding(
+    activeStepConfig?.toolId,
+    spotlightToolIds,
+    run
+  );
+
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：当前步骤的目标曾在 DOM 中出现，随后因窗口缩放或响应式布局被关闭、卸载。
+   * 不可替代原因：多高亮步骤的弹窗目标通常由 prepare 打开；只重测坐标找不回已消失的节点，
+   * 必须重新执行该步骤的准备动作，让目标重新挂载，气泡才能恢复绑定。
+   * cleanup：清除重试计时器并移除 resize 监听。
+   */
+  useEffect(() => {
+    const stepId = activeStepConfig?.id;
+    const prepare = activeStepConfig?.prepare;
+    if (!run || !stepId) return undefined;
+
+    if (allGuideTargetsPresent) {
+      seenTargetStepRef.current = stepId;
+      return undefined;
+    }
+    if (!prepare || seenTargetStepRef.current !== stepId) return undefined;
+
+    let cancelled = false;
+    let timer = 0;
+    let attempts = 0;
+    const recoverTarget = () => {
+      if (cancelled) return;
+      if (spotlightToolIds.every((id) => findGuideTarget(id))) return;
+      attempts += 1;
+      void actions.prepare(prepare);
+      if (attempts < TARGET_RECOVERY_ATTEMPTS) {
+        timer = window.setTimeout(recoverTarget, TARGET_RECOVERY_RETRY_MS);
+      }
+    };
+    const scheduleRecovery = () => {
+      window.clearTimeout(timer);
+      attempts = 0;
+      timer = window.setTimeout(recoverTarget, TARGET_RECOVERY_DELAY_MS);
+    };
+
+    scheduleRecovery();
+    window.addEventListener('resize', scheduleRecovery);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      window.removeEventListener('resize', scheduleRecovery);
+    };
+  }, [actions, activeStepConfig, allGuideTargetsPresent, run, spotlightToolIds]);
+
   if (!run) return null;
   return (
     <>
@@ -268,6 +394,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
           key={activeStepConfig?.id}
           toolIds={spotlightToolIds}
           padding={activeStepConfig?.spotlightPadding}
+          radius={activeStepConfig?.spotlightRadius}
           zIndex={zIndex + 1}
         />
       ) : null}
@@ -279,6 +406,8 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
 /** 新手指引宿主。按后端引导记录决定是否播放，并在结束时汇报完成状态。 */
 function GuideHost({ shellTourId, actions }: GuideHostProps) {
   const userService = useUserService();
+  const location = useLocation();
+  const routeKey = `${location.pathname}${location.search}`;
   const tourStatusLoaded = useGuideTaskStore((state) => state.loaded);
   const pendingByTourId = useGuideTaskStore((state) => state.pendingByTourId);
   const beginLoading = useGuideTaskStore((state) => state.beginLoading);
@@ -309,31 +438,59 @@ function GuideHost({ shellTourId, actions }: GuideHostProps) {
         : null;
 
   const [visibleTourId, setVisibleTourId] = useState<GuideTourId | null>(null);
+  const [visibleTourRouteKey, setVisibleTourRouteKey] = useState<string | null>(null);
   const previousTourId = useRef<GuideTourId | null>(null);
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：当前 scope 切换时。
-   * 不可替代原因：上一条指引结束会立刻挂载下一条，遮罩没有消失窗口，用户感知不到 scope 已完成。
+   * 执行时机：路由真正变化时。
+   * 不可替代原因：scope 的短暂注销和路由切换都会让 activeTourId 变为空，必须用路由区分两者；
+   * 新路由的首条指引应立即出现，无需保留上一个 scope 的切换间隔。
+   * cleanup：无需清理。
+   */
+  useEffect(() => {
+    previousTourId.current = null;
+  }, [routeKey]);
+
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：当前 scope 或路由变化时。
+   * 不可替代原因：响应式布局重挂载页面会让同一 tour 短暂注销再登记；不能把这个空档当成 tour 结束，
+   * 否则 GuidePlayer 会被卸载，Joyride 从第一步重建。路由是否变化由 visibleTourRouteKey 判断。
    * cleanup：清掉尚未触发的延时，避免页面切换后把旧 scope 的指引重新挂出来。
    */
   useEffect(() => {
+    if (!activeTourId) return undefined;
+
     const previous = previousTourId.current;
     previousTourId.current = activeTourId;
-    if (!activeTourId) return undefined;
 
     // 两条 scope 之间留出空档；首次出现或页面重新挂载时立即展示。
     const delay = previous && previous !== activeTourId ? SCOPE_TRANSITION_GAP_MS : 0;
-    const timer = window.setTimeout(() => setVisibleTourId(activeTourId), delay);
+    const timer = window.setTimeout(() => {
+      setVisibleTourRouteKey(routeKey);
+      setVisibleTourId(activeTourId);
+    }, delay);
     return () => window.clearTimeout(timer);
-  }, [activeTourId]);
+  }, [activeTourId, routeKey]);
 
   const handleFinished = (tourId: GuideTourId) => {
     markCompleted(tourId);
+    previousTourId.current = null;
+    setVisibleTourRouteKey(null);
+    setVisibleTourId(null);
     void userService.completeTour(GUIDE_TOUR_CODE[tourId]).catch(() => undefined);
   };
 
-  const renderedTourId = visibleTourId === activeTourId ? visibleTourId : null;
+  const visibleTourPending = visibleTourId ? Boolean(pendingByTourId[visibleTourId]) : false;
+  const visibleTourMatchesRoute = visibleTourRouteKey === routeKey;
+  const renderedTourId =
+    visibleTourId &&
+    visibleTourPending &&
+    visibleTourMatchesRoute &&
+    (visibleTourId === activeTourId || !activeTourId)
+      ? visibleTourId
+      : null;
   const renderedTour = renderedTourId ? GUIDE_TOURS[renderedTourId] : null;
 
   if (!tourStatusLoaded || !renderedTour || !renderedTourId) return null;

@@ -34,6 +34,8 @@ export interface GuideStepConfig {
   spotlightToolIds?: readonly GuideToolId[];
   /** 覆盖这一步的高亮孔 padding；用于让高亮范围在分割线等边界前收住。 */
   spotlightPadding?: GuideSpotlightPadding;
+  /** 聚光孔圆角；默认跟随锚点自身圆角并叠加外扩距离。 */
+  spotlightRadius?: number;
 }
 
 export interface GuideTourConfig {

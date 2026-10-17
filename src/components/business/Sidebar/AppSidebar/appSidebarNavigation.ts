@@ -52,7 +52,7 @@ export const APP_SIDEBAR_HEADER_ITEMS: readonly AppSidebarHeaderItem[] = [
     key: APP_SIDEBAR_HEADER_NAV_KEY.PUBLIC,
     labelKey: 'navigation.groups',
     icon: Users,
-    to: APP_ROUTE_PATH.GROUPS,
+    to: APP_ROUTE_PATH.COURSES,
     toolId: GUIDE_TOOL_ID.sidebarGroups,
   },
   {

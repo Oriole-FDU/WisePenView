@@ -46,14 +46,15 @@ export const noteTour: GuideTourConfig = {
     ),
     step(
       'chat',
-      GUIDE_TOOL_ID.noteAiPanel,
+      GUIDE_TOOL_ID.noteChat,
       'note.chat.title',
       'note.chat.content',
-      'left',
+      'bottom',
       GUIDE_ACTION_ID.openChat,
       {
-        offset: 20,
+        offset: 8,
         preventFlip: false,
+        spotlightToolIds: [GUIDE_TOOL_ID.noteChat, GUIDE_TOOL_ID.noteAiPanel],
       }
     ),
   ],

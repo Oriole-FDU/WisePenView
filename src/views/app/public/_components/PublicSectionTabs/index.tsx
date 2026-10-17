@@ -17,8 +17,8 @@ function PublicSectionTabs({ selectedKey }: PublicSectionTabsProps) {
   const { t } = useTranslation('group');
   const navigate = useNavigate();
   const items = [
-    { key: 'groups', label: t('list.myGroups'), to: APP_ROUTE_PATH.GROUPS },
     { key: 'courses', label: t('list.myCourses'), to: APP_ROUTE_PATH.COURSES },
+    { key: 'groups', label: t('list.myGroups'), to: APP_ROUTE_PATH.GROUPS },
   ] satisfies Array<{ key: PublicSectionKey; label: string; to: string }>;
 
   return (

@@ -117,44 +117,44 @@ function ChatInputContent({
       data-model-trigger={modelIconOnly ? 'icon' : 'default'}
       {...containerProps}
     >
-      <div
-        ref={inputCardRef}
-        className={clsx(styles.inputCard, isDragOver && styles.inputCardDragOver)}
-      >
-        <AttachmentStrip />
+      <GuideAnchor id={GUIDE_TOOL_ID.chatComposer} asChild>
+        <div
+          ref={inputCardRef}
+          className={clsx(styles.inputCard, isDragOver && styles.inputCardDragOver)}
+        >
+          <AttachmentStrip />
 
-        {contextPreview ? (
-          <div className={styles.contextAttachment}>
-            <span className={styles.contextAttachmentPreview}>{contextPreview}</span>
-            <button
-              type="button"
-              className={styles.contextAttachmentClear}
-              aria-label={t('input.removeContext')}
-              onClick={() => onClearContext?.()}
-            >
-              <X size={14} aria-hidden="true" />
-            </button>
-          </div>
-        ) : null}
+          {contextPreview ? (
+            <div className={styles.contextAttachment}>
+              <span className={styles.contextAttachmentPreview}>{contextPreview}</span>
+              <button
+                type="button"
+                className={styles.contextAttachmentClear}
+                aria-label={t('input.removeContext')}
+                onClick={() => onClearContext?.()}
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            </div>
+          ) : null}
 
-        <GuideAnchor id={GUIDE_TOOL_ID.chatComposer} layout="area">
           <TextArea
             {...textAreaProps}
             placeholder={t('input.placeholder')}
             rows={1}
             className={styles.textarea}
           />
-        </GuideAnchor>
 
-        <InputToolbar
-          {...toolbarProps}
-          injectedAgents={injectedAgents}
-          preferredAgent={preferredAgent}
-          modelIconOnly={modelIconOnly}
-        />
+          <InputToolbar
+            {...toolbarProps}
+            injectedAgents={injectedAgents}
+            preferredAgent={preferredAgent}
+            modelIconOnly={modelIconOnly}
+          />
 
-        <DropOverlay visible={isDragOver} />
-      </div>
+          <DropOverlay visible={isDragOver} />
+        </div>
+      </GuideAnchor>
 
       {isAuthenticated ? <OtherSkillModal /> : null}
 

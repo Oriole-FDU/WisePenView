@@ -150,6 +150,10 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   const getAgentLabel = (agent: ChatAgentOption): string =>
     agent.isDefault ? t('input.agentPicker.defaultAgent') : agent.label;
 
+  const agentTooltip = selectedAgent.isDefault
+    ? t('input.agentPicker.selectAgentTooltip')
+    : getAgentLabel(selectedAgent);
+
   const renderAgentIcon = (agent: ChatAgentOption, size: number) =>
     agent.isDefault ? (
       <BotOff size={size} aria-hidden="true" />
@@ -183,7 +187,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
                 isDisabled={disabled}
                 icon={renderAgentIcon(selectedAgent, 17)}
                 label={t('input.agentPicker.trigger')}
-                tooltip={{ content: getAgentLabel(selectedAgent) }}
+                tooltip={{ content: agentTooltip }}
               />
             </GuideAnchor>
           )}

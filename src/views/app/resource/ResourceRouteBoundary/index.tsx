@@ -114,7 +114,10 @@ function ResourceRouteBoundary() {
   };
 
   return (
-    <GuideScope tourId={isNoteResource ? GUIDE_TOUR_ID.note : undefined}>
+    <GuideScope
+      tourId={isNoteResource ? GUIDE_TOUR_ID.note : undefined}
+      readyToolId={isNoteResource ? GUIDE_TOOL_ID.noteTitle : undefined}
+    >
       <ResourceChatBindingProvider>
         <ChatDockLayout
           leftMinWidth={RESOURCE_MAIN_MIN_WIDTH}

@@ -6,7 +6,7 @@ const zhCNShell = {
     defaultNoteTitle: '未命名笔记',
     drive: '我的云盘',
     notifications: '消息通知',
-    groups: '我的小组',
+    groups: '我的课程',
     back: '后退',
     forward: '前进',
     expandSidebar: '展开侧边栏',

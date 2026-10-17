@@ -8,8 +8,8 @@ import { useGuideSpotlightFrame } from './useGuideSpotlightFrame';
 const SPOTLIGHT_FEATHER = 1;
 
 /** 引导遮罩：为当前步骤需要说明的区域挖出柔边高亮孔。 */
-function GuideSpotlight({ toolIds, padding, zIndex }: GuideSpotlightProps) {
-  const frame = useGuideSpotlightFrame(toolIds, padding);
+function GuideSpotlight({ toolIds, padding, radius, zIndex }: GuideSpotlightProps) {
+  const frame = useGuideSpotlightFrame(toolIds, padding, radius);
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const maskId = `guide-spotlight-mask-${id}`;
   const featherId = `guide-spotlight-feather-${id}`;

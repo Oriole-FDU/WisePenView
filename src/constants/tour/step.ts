@@ -6,9 +6,10 @@ interface GuideStepOptions {
   restore?: GuideActionId;
   offset?: number;
   spotlightToolIds?: readonly GuideToolId[];
+  spotlightPadding?: GuideSpotlightPadding;
+  spotlightRadius?: number;
   preventFlip?: boolean;
   tooltipWidth?: string;
-  spotlightPadding?: GuideSpotlightPadding;
 }
 
 export function step(

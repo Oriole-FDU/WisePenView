@@ -140,15 +140,15 @@ function AppSidebarTabs() {
 
   return (
     <div className={styles.menuContainer}>
-      <GuideAnchor id={GUIDE_TOOL_ID.sidebarContent} layout="fill">
-        <Tabs
-          className={styles.tabs}
-          selectedKey={selectedTab}
-          onSelectionChange={(key) => {
-            setSelectedTab(key as SidebarViewTabKey);
-          }}
-        >
-          <Tabs.ListContainer className={styles.tabListContainer}>
+      <Tabs
+        className={styles.tabs}
+        selectedKey={selectedTab}
+        onSelectionChange={(key) => {
+          setSelectedTab(key as SidebarViewTabKey);
+        }}
+      >
+        <Tabs.ListContainer className={styles.tabListContainer}>
+          <GuideAnchor id={GUIDE_TOOL_ID.sidebarContentToolbar} asChild>
             <div className={styles.tabToolbar}>
               <Tabs.List className={styles.tabList} aria-label={t('sidebar.contentAria')}>
                 <SidebarViewTab
@@ -177,41 +177,41 @@ function AppSidebarTabs() {
                 <CommandPaletteTrigger />
               </span>
             </div>
-          </Tabs.ListContainer>
+          </GuideAnchor>
+        </Tabs.ListContainer>
 
-          <div className={styles.panelViewport}>
-            <div
-              className={clsx(
-                styles.panelTrack,
-                selectedTab === SIDEBAR_VIEW_TAB.DRIVE && styles.panelTrackDrive,
-                selectedTab === SIDEBAR_VIEW_TAB.COURSES && styles.panelTrackCourses
-              )}
+        <div className={styles.panelViewport}>
+          <div
+            className={clsx(
+              styles.panelTrack,
+              selectedTab === SIDEBAR_VIEW_TAB.DRIVE && styles.panelTrackDrive,
+              selectedTab === SIDEBAR_VIEW_TAB.COURSES && styles.panelTrackCourses
+            )}
+          >
+            <Tabs.Panel
+              id={SIDEBAR_VIEW_TAB.SESSIONS}
+              className={clsx(styles.tabPanel, styles.sessionPanel)}
+              shouldForceMount
             >
-              <Tabs.Panel
-                id={SIDEBAR_VIEW_TAB.SESSIONS}
-                className={clsx(styles.tabPanel, styles.sessionPanel)}
-                shouldForceMount
-              >
-                <SessionTab />
-              </Tabs.Panel>
-              <Tabs.Panel
-                id={SIDEBAR_VIEW_TAB.DRIVE}
-                className={clsx(styles.tabPanel, styles.drivePanel)}
-                shouldForceMount
-              >
-                <DriveTab />
-              </Tabs.Panel>
-              <Tabs.Panel
-                id={SIDEBAR_VIEW_TAB.COURSES}
-                className={clsx(styles.tabPanel, styles.coursePanel)}
-                shouldForceMount
-              >
-                <CourseTab />
-              </Tabs.Panel>
-            </div>
+              <SessionTab />
+            </Tabs.Panel>
+            <Tabs.Panel
+              id={SIDEBAR_VIEW_TAB.DRIVE}
+              className={clsx(styles.tabPanel, styles.drivePanel)}
+              shouldForceMount
+            >
+              <DriveTab />
+            </Tabs.Panel>
+            <Tabs.Panel
+              id={SIDEBAR_VIEW_TAB.COURSES}
+              className={clsx(styles.tabPanel, styles.coursePanel)}
+              shouldForceMount
+            >
+              <CourseTab />
+            </Tabs.Panel>
           </div>
-        </Tabs>
-      </GuideAnchor>
+        </div>
+      </Tabs>
     </div>
   );
 }

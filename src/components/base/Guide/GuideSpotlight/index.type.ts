@@ -19,5 +19,7 @@ export interface GuideSpotlightProps {
   toolIds: readonly GuideToolId[];
   /** 覆盖默认的高亮孔 padding。 */
   padding?: GuideSpotlightPadding;
+  /** 覆盖默认的聚光孔圆角。 */
+  radius?: number;
   zIndex: number;
 }

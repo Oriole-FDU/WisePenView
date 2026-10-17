@@ -16,8 +16,8 @@ export const GUIDE_TOOL_ID = {
   sidebarGroups: 'sidebar-groups',
   /** 侧栏 HeaderNav：消息 */
   sidebarNotifications: 'sidebar-notifications',
-  /** 侧栏内容区：标签栏与当前标签下的列表 */
-  sidebarContent: 'sidebar-content',
+  /** 侧栏内容区顶部的标签工具栏 */
+  sidebarContentToolbar: 'sidebar-content-toolbar',
   /** 侧栏“对话”标签 */
   sidebarSessionsTab: 'sidebar-sessions-tab',
   /** 侧栏“文件”标签 */
