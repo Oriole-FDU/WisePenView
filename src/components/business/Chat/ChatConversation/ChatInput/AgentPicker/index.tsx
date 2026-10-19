@@ -1,7 +1,6 @@
 import { Description, Dropdown, Header, Label, Separator, Skeleton } from '@heroui/react';
 import { useInfiniteScroll, useLatest } from 'ahooks';
 import { Bot, BotOff, ChevronDown, Folder } from 'lucide-react';
-import type { Key } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -161,21 +160,6 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
       <Bot size={size} aria-hidden="true" />
     );
 
-  const handleMenuAction = (key: Key) => {
-    if (key === LOAD_MORE_PERSONAL_ACTION) {
-      loadMorePersonal();
-      return;
-    }
-    if (key === SELECT_FROM_GROUP_ACTION) {
-      handleOpenGroupModal();
-      return;
-    }
-    const agent = displayAgents.find((item) => item.agentId === key);
-    if (agent) {
-      handleSelect(agent);
-    }
-  };
-
   return (
     <>
       <Dropdown isOpen={agentOpen} onOpenChange={setAgentOpen}>
@@ -197,10 +181,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
             {showSkeleton ? (
               skeleton
             ) : (
-              <Dropdown.Menu
-                aria-label={t('input.agentPicker.trigger')}
-                onAction={handleMenuAction}
-              >
+              <Dropdown.Menu aria-label={t('input.agentPicker.trigger')}>
                 <Dropdown.Section selectionMode="single" selectedKeys={[selectedAgent.agentId]}>
                   <Header>{t('input.agentPicker.title')}</Header>
                   {displayAgents.map((agent) => {
@@ -215,6 +196,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
                         key={agent.agentId}
                         id={agent.agentId}
                         textValue={getAgentLabel(agent)}
+                        onAction={() => handleSelect(agent)}
                       >
                         {renderAgentIcon(agent, 14)}
                         <span className={styles.listItemText}>
@@ -234,6 +216,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
                       textValue={t('session.loadMore')}
                       isDisabled={loadingMorePersonal}
                       shouldCloseOnSelect={false}
+                      onAction={() => loadMorePersonal()}
                     >
                       <ChevronDown size={14} aria-hidden="true" />
                       <Label>{t('session.loadMore')}</Label>
@@ -245,6 +228,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
                   <Dropdown.Item
                     id={SELECT_FROM_GROUP_ACTION}
                     textValue={t('input.agentPicker.selectFromGroup')}
+                    onAction={handleOpenGroupModal}
                   >
                     <Folder size={14} color="var(--resource-icon-folder)" aria-hidden="true" />
                     <Label>{t('input.agentPicker.selectFromGroup')}</Label>
