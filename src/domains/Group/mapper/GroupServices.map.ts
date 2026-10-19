@@ -34,6 +34,7 @@ import type {
   GetGroupConfigApiResponse,
   GetGroupInfoApiRequest,
   GroupApiResponse,
+  GroupMemberApiResponse,
   GroupRoleApiResponse,
   ListGroupApiRequest,
   ListGroupApiResponse,
@@ -124,14 +125,14 @@ const mapFetchGroupListRequest = (params: FetchGroupListRequest): ListGroupApiRe
 });
 
 const mapFetchGroupListFromApi = (data: ListGroupApiResponse): FetchGroupListResponse => {
-  assertApiPage(data, isRecord, '小组分页响应契约无效');
+  const page = assertApiPage(data, isRecord, '小组分页响应契约无效');
   return {
-    groups: data.list.map(mapGroupFromApi),
-    total: data.total,
-    page: data.page,
-    size: data.size,
-    totalPage: data.totalPage,
-    hasMore: data.page < data.totalPage,
+    groups: page.list.map(mapGroupFromApi),
+    total: page.total,
+    page: page.page,
+    size: page.size,
+    totalPage: page.totalPage,
+    hasMore: page.page < page.totalPage,
   };
 };
 
@@ -221,10 +222,14 @@ const mapFetchGroupMembersRequest = (
 });
 
 const mapFetchGroupMembersFromApi = (data: FetchGroupMembersApiResponse): GroupMemberList => {
-  assertApiPage(data, isRecord, '小组成员分页响应契约无效');
+  const page = assertApiPage(
+    data,
+    (value): value is GroupMemberApiResponse => isRecord(value),
+    '小组成员分页响应契约无效'
+  );
   return {
-    members: data.list.map(mapGroupMemberFromApi),
-    total: data.total,
+    members: page.list.map(mapGroupMemberFromApi),
+    total: page.total,
   };
 };
 

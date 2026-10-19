@@ -1,5 +1,6 @@
 import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
 import { WisePenError } from '@/utils/error/WisePenError';
+import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
 
 import type { ApiResponse } from './api.type';
 
@@ -63,7 +64,9 @@ export const assertApiPage = <T = unknown>(
     if (!isFiniteNumber(item) || !Number.isSafeInteger(item)) invalidApiResponse(message);
     return item as number;
   };
-  const total = integer(record.total);
+  // 后端 Long 字段可能序列化为数字字符串，仅对 total 兼容，其余分页字段保持严格整数校验。
+  const normalizedTotal = normalizeFiniteNumber(record.total);
+  const total = integer(normalizedTotal);
   const page = integer(record.page);
   const size = integer(record.size);
   const totalPage = integer(record.totalPage);
@@ -80,12 +83,13 @@ export const assertApiPage = <T = unknown>(
   ) {
     invalidApiResponse(message);
   }
-  return record as {
-    list: T[];
-    total: number;
-    page: number;
-    size: number;
-    totalPage: number;
+  const list = record.list as T[];
+  return {
+    list,
+    total,
+    page,
+    size,
+    totalPage,
   };
 };
 

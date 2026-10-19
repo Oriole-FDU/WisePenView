@@ -28,6 +28,7 @@ try {
         export { InlineCommentServicesMap } from '@/domains/InlineComment/mapper/InlineCommentServices.map';
         export { InteractServicesMap } from '@/domains/Interact/mapper/InteractServices.map';
         export { MessageServicesMap } from '@/domains/Message/mapper/MessageServices.map';
+        export { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
         export { SkillServicesMap } from '@/domains/Skill/mapper/SkillServices.map';
         export { mapUploadTickets, validateVersionBundle } from '@/domains/_shared/mapper/versionAsset.map';
         export { mapOssStsToken } from '@/domains/_shared/mapper/ossSts.map';
@@ -58,6 +59,7 @@ try {
     InlineCommentServicesMap,
     InteractServicesMap,
     MessageServicesMap,
+    ResourceServicesMap,
     SkillServicesMap,
     SpeechServicesMap,
     TagServicesMap,
@@ -91,8 +93,18 @@ try {
   assert.doesNotThrow(() =>
     assertApiPage({ list: [], total: 0, page: 1, size: 20, totalPage: 0 }, () => true)
   );
+  assert.deepEqual(
+    assertApiPage(
+      { list: [1], total: '1', page: 1, size: 20, totalPage: 1 },
+      (value) => value === 1
+    ),
+    { list: [1], total: 1, page: 1, size: 20, totalPage: 1 }
+  );
   for (const payload of [
     { list: [], total: -1, page: 1, size: 20, totalPage: 0 },
+    { list: [], total: '', page: 1, size: 20, totalPage: 0 },
+    { list: [], total: 'abc', page: 1, size: 20, totalPage: 0 },
+    { list: [], total: '1.5', page: 1, size: 20, totalPage: 0 },
     { list: [], total: 0, page: 0, size: 20, totalPage: 0 },
     { list: [], total: 0, page: 1.5, size: 20, totalPage: 0 },
     { list: [], total: 0, page: 1, size: 0, totalPage: 0 },
@@ -441,7 +453,12 @@ try {
   assert.deepEqual(DocumentServicesMap.mapListPendingDocsFromApi([]), []);
   rejects(() => DocumentServicesMap.mapListPendingDocsFromApi(null));
   assert.equal(GroupServicesMap.mapFetchGroupListFromApi(emptyPage).groups.length, 0);
+  assert.equal(GroupServicesMap.mapFetchGroupListFromApi({ ...emptyPage, total: '0' }).total, 0);
   rejects(() => GroupServicesMap.mapFetchGroupListFromApi({ list: [] }));
+  assert.equal(
+    ResourceServicesMap.mapResourceListPageFromApi({ ...emptyPage, total: '0' }).total,
+    0
+  );
   assert.equal(
     GroupServicesMap.mapFetchGroupMembersFromApi({
       list: [

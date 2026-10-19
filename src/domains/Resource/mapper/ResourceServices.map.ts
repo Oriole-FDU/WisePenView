@@ -717,8 +717,8 @@ const mapSearchHitFromApi = (raw: GlobalSearchApiResponse['list'][number]): Sear
   resourceIconType: resolveResourceIconType(raw.resourceType),
 });
 
-const mapSearchResultPageFromApi = (data: GlobalSearchApiResponse): SearchResultPage => ({
-  list: assertApiPage(
+const mapSearchResultPageFromApi = (data: GlobalSearchApiResponse): SearchResultPage => {
+  const page = assertApiPage(
     data,
     (value): value is GlobalSearchApiResponse['list'][number] =>
       isRecord(value) &&
@@ -728,12 +728,15 @@ const mapSearchResultPageFromApi = (data: GlobalSearchApiResponse): SearchResult
       (value.highlightContent === null || typeof value.highlightContent === 'string') &&
       typeof value.updateTime === 'string',
     '搜索结果分页契约无效'
-  ).list.map(mapSearchHitFromApi),
-  total: data.total,
-  page: data.page,
-  size: data.size,
-  totalPage: data.totalPage,
-});
+  );
+  return {
+    list: page.list.map(mapSearchHitFromApi),
+    total: page.total,
+    page: page.page,
+    size: page.size,
+    totalPage: page.totalPage,
+  };
+};
 
 export const ResourceServicesMap = {
   mapListResourceItemsRequest,
