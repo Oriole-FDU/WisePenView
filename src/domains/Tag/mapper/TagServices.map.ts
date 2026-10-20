@@ -5,9 +5,7 @@ import {
   normalizeResourceActions,
   permissionCodeToActions,
   resourceActionsToApiKeys,
-  TAG_VISIBILITY_MODE,
   type TagResourceAction,
-  type TagVisibilityModeString,
 } from '@/domains/Tag';
 import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
@@ -29,9 +27,6 @@ const mapGetTagTreeRequest = (groupId?: string): GetTagTreeApiRequest | undefine
       }
     : undefined;
 };
-
-const isTagVisibilityModeString = (value: unknown): value is TagVisibilityModeString =>
-  typeof value === 'string' && TAG_VISIBILITY_MODE.getKey(value) != null;
 
 const coerceAccessControlScope = (value: unknown): AccessControlScope | undefined => {
   if (typeof value === 'number' && value in ACCESS_CONTROL_SCOPE.configs) {
@@ -67,7 +62,7 @@ const mapGrantedActionsFromApi = (
   return normalizeResourceActions(permissionCodeToActions(mask));
 };
 
-const parseTagMetaInfo = (value: string | undefined): TagMetaInfo | undefined => {
+const parseTagMetaInfo = (value: string | null | undefined): TagMetaInfo | undefined => {
   if (!value?.trim()) return undefined;
   try {
     const parsed: unknown = JSON.parse(value);
@@ -110,26 +105,31 @@ const sortTagTreeNodes = (nodes: TagTreeNode[]): TagTreeNode[] =>
     .map(({ node }) => node);
 
 const mapTagTreeNodeFromApi = (node: GetTagTreeApiResponse[number]): TagTreeNode => {
-  const visibilityMode = node.visibilityMode;
   const tagMetaInfo = parseTagMetaInfo(node.tagMetaInfo);
-  const normalizedVisibilityMode = isTagVisibilityModeString(visibilityMode)
-    ? visibilityMode
-    : undefined;
 
   return {
-    ...node,
+    tagId: node.tagId,
+    tagName: node.tagName,
+    groupId: node.groupId,
+    tagDesc: node.tagDesc ?? undefined,
+    tagIcon: node.tagIcon ?? undefined,
+    tagColor: node.tagColor ?? undefined,
     tagMetaInfo,
-    creatorInfo: normalizeUserDisplayBaseFromApi(node.creatorInfo),
-    // fallback：兼容后端返回未约束的 visibilityMode 字符串
-    visibilityMode: normalizedVisibilityMode,
+    tagCreator: node.tagCreator ?? undefined,
+    creatorInfo: normalizeUserDisplayBaseFromApi(node.creatorInfo) ?? undefined,
+    isPath: node.isPath,
     taggedResourceAclGrantScope: coerceAccessControlScope(node.taggedResourceAclGrantScope),
+    taggedResourceAclGrantSpecifiedUsers: node.taggedResourceAclGrantSpecifiedUsers,
+    taggedResourceGrantedActionsMask: node.taggedResourceGrantedActionsMask ?? undefined,
     tagMountPermissionScope: coerceAccessControlScope(node.tagMountPermissionScope),
+    tagMountSpecifiedUsers: node.tagMountSpecifiedUsers,
     // fallback：兼容后端返回枚举名字符串、历史 number[] 或仅返回 mask 的 grantedActions
     grantedActions: mapGrantedActionsFromApi(
       node.grantedActions,
       node.taggedResourceGrantedActionsMask
     ),
-    children: node.children?.map(mapTagTreeNodeFromApi),
+    parentId: node.parentId,
+    children: node.children.map(mapTagTreeNodeFromApi),
   };
 };
 
@@ -151,12 +151,28 @@ const mapTagGrantedActions = (
 const mapAddTagRequest = (params: TagCreateRequest): AddTagApiRequest => ({
   ...params,
   tagMetaInfo: serializeTagMetaInfo(params.tagMetaInfo),
+  taggedResourceAclGrantScope:
+    params.taggedResourceAclGrantScope == null
+      ? undefined
+      : ACCESS_CONTROL_SCOPE.getKey(params.taggedResourceAclGrantScope),
+  tagMountPermissionScope:
+    params.tagMountPermissionScope == null
+      ? undefined
+      : ACCESS_CONTROL_SCOPE.getKey(params.tagMountPermissionScope),
   grantedActions: resourceActionsToApiKeys(params.grantedActions),
 });
 
 const mapUpdateTagRequest = (params: TagUpdateRequest): ChangeTagApiRequest => ({
   ...params,
   tagMetaInfo: serializeTagMetaInfo(params.tagMetaInfo),
+  taggedResourceAclGrantScope:
+    params.taggedResourceAclGrantScope == null
+      ? undefined
+      : ACCESS_CONTROL_SCOPE.getKey(params.taggedResourceAclGrantScope),
+  tagMountPermissionScope:
+    params.tagMountPermissionScope == null
+      ? undefined
+      : ACCESS_CONTROL_SCOPE.getKey(params.tagMountPermissionScope),
   grantedActions: resourceActionsToApiKeys(params.grantedActions),
 });
 

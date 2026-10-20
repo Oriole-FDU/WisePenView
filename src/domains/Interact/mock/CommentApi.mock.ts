@@ -24,7 +24,16 @@ const CURRENT_USER_ID = '1';
 const commentsByResource = new Map<string, MockComment[]>();
 const likedIdsByResource = new Map<string, Set<string>>();
 
-const author = (name: string) => ({ nickname: name });
+const author = (name: string): NonNullable<ResourceCommentItemApiResponse['authorInfo']> => ({
+  nickname: name,
+  username: `mock-${name}`,
+  realName: name,
+  avatar: null,
+  identityType: 'STUDENT',
+  campusNo: null,
+  email: null,
+  mobile: null,
+});
 const buildMockId = (resourceId: string, suffix: string) => `mock-${resourceId}-${suffix}`;
 
 function createInitialComments(resourceId: string): MockComment[] {
@@ -32,9 +41,12 @@ function createInitialComments(resourceId: string): MockComment[] {
   const rootCommentId = buildMockId(resourceId, 'comment-1');
   const featured: MockComment[] = [
     {
+      resourceId,
       commentId: rootCommentId,
       authorId: '10086',
       authorInfo: author('王明'),
+      replyToUserId: null,
+      replyToUserInfo: null,
       content: '这份内容结构清晰，第二部分的示例很有帮助。',
       imageUrls: [],
       likeCount: 8,
@@ -44,6 +56,7 @@ function createInitialComments(resourceId: string): MockComment[] {
       deleted: false,
     },
     {
+      resourceId,
       commentId: buildMockId(resourceId, 'reply-1'),
       rootCommentId,
       authorId: CURRENT_USER_ID,
@@ -59,6 +72,7 @@ function createInitialComments(resourceId: string): MockComment[] {
       deleted: false,
     },
     {
+      resourceId,
       commentId: buildMockId(resourceId, 'reply-2'),
       rootCommentId,
       authorId: '10087',
@@ -75,9 +89,12 @@ function createInitialComments(resourceId: string): MockComment[] {
     },
   ];
   const remaining = Array.from({ length: 11 }, (_, index): MockComment => ({
+    resourceId,
     commentId: buildMockId(resourceId, `comment-${index + 2}`),
     authorId: index % 2 === 0 ? CURRENT_USER_ID : '10088',
     authorInfo: author(index % 2 === 0 ? '张三' : '陈思齐'),
+    replyToUserId: null,
+    replyToUserInfo: null,
     content: `这是第 ${index + 2} 条资源讨论。`,
     imageUrls: [],
     likeCount: Math.max(0, 5 - index),
@@ -131,9 +148,12 @@ async function listMockReplies(params: ListRepliesApiRequest): Promise<CommentPa
 async function createMockComment(params: CreateCommentApiRequest): Promise<string> {
   const commentId = `mock-comment-${createUuid()}`;
   getComments(params.resourceId).unshift({
+    resourceId: params.resourceId,
     commentId,
     authorId: CURRENT_USER_ID,
     authorInfo: author('张三'),
+    replyToUserId: null,
+    replyToUserInfo: null,
     content: params.content,
     imageUrls: params.imageUrls ?? [],
     likeCount: 0,
@@ -154,6 +174,7 @@ async function createMockReply(params: CreateReplyApiRequest): Promise<string> {
   if (root) root.replyCount += 1;
   const commentId = `mock-reply-${createUuid()}`;
   comments.push({
+    resourceId: params.resourceId,
     commentId,
     rootCommentId,
     authorId: CURRENT_USER_ID,

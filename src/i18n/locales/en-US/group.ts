@@ -271,6 +271,7 @@ const enUSGroup = {
       DOWNLOAD_ORIGINAL: 'Download original',
       FORK: 'Duplicate resource',
       COMMENT: 'Comment',
+      MARKET_VIEW: 'Market read',
     },
   },
 };

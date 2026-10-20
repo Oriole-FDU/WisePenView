@@ -4,7 +4,7 @@
 
 import type { UserDisplayBase } from '@/domains/User';
 
-import type { AccessControlScope, TagResourceAction, TagVisibilityModeString } from '../enum';
+import type { AccessControlScope, TagResourceAction } from '../enum';
 
 /** 后端以 JSON 字符串透传；前端保留未知字段，避免不同功能相互覆盖。 */
 export interface TagMetaInfo {
@@ -25,7 +25,6 @@ export interface TagTreeNode {
   tagCreator?: string;
   creatorInfo?: UserDisplayBase;
   isPath?: boolean;
-  visibilityMode?: TagVisibilityModeString;
   taggedResourceAclGrantScope?: AccessControlScope;
   taggedResourceAclGrantSpecifiedUsers?: string[];
   taggedResourceGrantedActionsMask?: number;

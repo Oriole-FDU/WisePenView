@@ -13,14 +13,13 @@ export const createOssClient = (token: OssStsTokenApiResponse): OssReadClient =>
     !token.accessKeySecret ||
     !token.securityToken ||
     !token.bucket ||
-    (!token.region && !token.endpoint)
+    !token.region
   ) {
     throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
   }
 
   return new OSS({
     region: token.region,
-    endpoint: token.endpoint,
     bucket: token.bucket,
     accessKeyId: token.accessKeyId,
     accessKeySecret: token.accessKeySecret,

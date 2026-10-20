@@ -6,11 +6,11 @@ export const ImageApi: typeof ImageApiContract = {
   imageUpload: async (body) => {
     const file = body.get('file');
     return mockResponse({
-      fileId: Date.now(),
+      fileId: String(Date.now()),
       domain: 'https://mock-cdn.example.invalid',
       objectKey: `public/images/mock/${crypto.randomUUID()}`,
       md5: 'mock-md5',
-      size: file instanceof Blob ? file.size : 0,
+      size: String(file instanceof Blob ? file.size : 0),
     });
   },
 };

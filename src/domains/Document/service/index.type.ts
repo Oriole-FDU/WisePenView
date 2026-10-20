@@ -18,7 +18,7 @@ export type DocumentAllowedExtension = (typeof DOCUMENT_ALLOWED_EXTENSIONS)[numb
 
 interface DocumentUploadMeta {
   documentName: string;
-  uploaderId: string | null;
+  uploaderId: string;
   fileType: string;
   size: number;
 }
@@ -37,14 +37,13 @@ export interface DocMetaInfo {
 }
 
 export interface PendingDocItem extends DocMetaInfo {
-  /** 部分接口实现可能不返回该字段；缺失时前端仅展示，不允许重试/取消/sync */
-  documentId?: string;
+  documentId: string;
 }
 
 export interface DocDisplayInfoResponse {
   docMetaInfo: DocMetaInfo;
   resourceInfo: ResourceItem;
-  authorsDisplay?: Record<string, UserDisplayBase>;
+  authorsDisplay: Record<string, UserDisplayBase>;
   /** 可选的受控预览源；未提供时 Viewer 使用标准文档预览接口。 */
   previewUrl?: string;
 }
@@ -52,8 +51,8 @@ export interface DocDisplayInfoResponse {
 export type OnlyOfficeEditorConfig = Config;
 
 export interface OnlyOfficeEditorConfigResponse {
-  sessionId?: string;
-  config?: OnlyOfficeEditorConfig | null;
+  sessionId: string;
+  config: OnlyOfficeEditorConfig;
 }
 
 /** DocumentService：文档上传、重试转换、删除（路径与当前后端 DocumentController 一致） */

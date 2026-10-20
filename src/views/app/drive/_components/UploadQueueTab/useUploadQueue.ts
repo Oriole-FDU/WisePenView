@@ -58,9 +58,9 @@ export function useUploadQueue() {
   } = useApi(async () => documentService.listPendingDocs(), {
     manual: true,
     onSuccess: (nextItems) => {
-      const readyRows = nextItems.flatMap((item, index) =>
+      const readyRows = nextItems.flatMap((item) =>
         item.documentStatus.status === DOCUMENT_PROCESS.READY
-          ? [mapCompletedPendingItemToRow(item, index, t)]
+          ? [mapCompletedPendingItemToRow(item, t)]
           : []
       );
       const nextPendingItems = nextItems.filter(
@@ -151,9 +151,7 @@ export function useUploadQueue() {
 }
 
 function removeMatchingLocalUploads(rows: UploadQueueRow[]): void {
-  const completedDocumentIds = new Set(
-    rows.flatMap((row) => (row.documentId ? [row.documentId] : []))
-  );
+  const completedDocumentIds = new Set(rows.flatMap((row) => row.documentId ?? []));
   if (completedDocumentIds.size === 0) return;
 
   const { uploads, removeUpload } = useDriveUploadQueueStore.getState();

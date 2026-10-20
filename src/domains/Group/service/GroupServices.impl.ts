@@ -93,7 +93,7 @@ const deleteGroup = async (params: DeleteGroupRequest) => {
 };
 
 const fetchGroupMembers = async (
-  groupId: string | number,
+  groupId: string,
   page: number,
   size: number
 ): Promise<GroupMemberList> => {
@@ -151,7 +151,7 @@ const fetchUserGroupQuotas = async (
   };
 };
 
-const fetchGroupQuota = async (groupId: string | number): Promise<GroupQuotaInfo> => {
+const fetchGroupQuota = async (groupId: string): Promise<GroupQuotaInfo> => {
   const data = await GroupMemberApi.getMyGroupMemberInfo({ groupId });
   return GroupQuotaMap.mapFetchGroupQuotaFromApi(data);
 };

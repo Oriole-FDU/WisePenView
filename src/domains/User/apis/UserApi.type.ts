@@ -1,30 +1,30 @@
-import type { NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
+import type { PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserVerificationMode } from '@/domains/User';
 
-export type UserIdentityTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
+export type UserIdentityTypeApiValue = 'STUDENT' | 'TEACHER' | 'ADMIN';
 export type UserStatusApiValue = 'NORMAL' | 'UNIDENTIFIED' | 'BANNED';
 export type UserSexApiValue = 'MALE' | 'FEMALE' | 'UNKNOWN';
 export type UserDegreeLevelApiValue = 'UNKNOWN' | 'UNDERGRADUATE' | 'MASTER' | 'DOCTOR';
 export type UserVerificationProviderApiValue = 'FUDAN_UIS';
 
 export interface UserDisplayBaseApiResponse {
-  nickname?: string | null;
-  username?: string | null;
-  realName?: string | null;
-  avatar?: string | null;
-  identityType?: UserIdentityTypeApiValue | null;
-  campusNo?: string | null;
-  email?: string | null;
-  mobile?: string | null;
+  nickname: string;
+  username: string;
+  realName: string | null;
+  avatar: string | null;
+  identityType: UserIdentityTypeApiValue;
+  campusNo: string | null;
+  email: string | null;
+  mobile: string | null;
 }
 
 interface GetUserInfoApiResponseUserInfo {
-  nickname: string | null;
+  nickname: string;
   realName: string | null;
   avatar: string | null;
   identityType: UserIdentityTypeApiValue;
   username: string;
-  campusNo: string;
+  campusNo: string | null;
   email: string | null;
   mobile: string | null;
   verificationMode: UserVerificationMode | null;
@@ -33,22 +33,22 @@ interface GetUserInfoApiResponseUserInfo {
 }
 
 interface GetUserInfoApiResponseUserProfile {
-  sex: UserSexApiValue;
+  sex: UserSexApiValue | null;
   inviteCode: string | null;
   university: string | null;
   college: string | null;
   major: string | null;
   className: string | null;
-  enrollmentYear: number | string | null;
-  degreeLevel: UserDegreeLevelApiValue;
+  enrollmentYear: number | null;
+  degreeLevel: UserDegreeLevelApiValue | null;
   academicTitle: string | null;
 }
 
 export interface GetUserInfoApiResponse {
-  userId?: string | number;
+  userId: string;
   userInfo: GetUserInfoApiResponseUserInfo;
   userProfile: GetUserInfoApiResponseUserProfile;
-  readonlyFields: string[] | null;
+  readonlyFields: string[];
 }
 
 export interface SearchUserApiRequest {
@@ -60,8 +60,8 @@ export interface ListUserSearchSuggestionsApiRequest {
   size?: number;
 }
 
-export interface UserSearchUserApiResponse extends UserDisplayBaseApiResponse {
-  userId: string | number;
+export interface UserSearchUserApiResponse extends Omit<UserDisplayBaseApiResponse, 'username'> {
+  userId: string;
   username: string;
 }
 
@@ -92,10 +92,10 @@ export interface InitiateFudanUISVerifyApiRequest {
 }
 
 export interface CheckFudanUISVerifyApiResponse {
-  completed?: boolean | null;
-  requireAction?: boolean | null;
-  actionPayload?: string | null;
-  message?: string | null;
+  completed: boolean;
+  requireAction: boolean;
+  actionPayload: string | null;
+  message: string | null;
 }
 
 export interface CheckEmailVerifyApiRequest {
@@ -109,12 +109,12 @@ export type UserInviteStatusApiValue = 'BOUND' | 'REWARDED';
 export type ListUserInviteRecordsApiRequest = PageApiRequest;
 
 export interface UserInviteRecordApiResponse {
-  id?: string | number | null;
-  inviteeUserId?: string | number | null;
-  inviteeDisplay?: UserDisplayBaseApiResponse | null;
-  status?: UserInviteStatusApiValue | null;
-  createTime?: string | null;
-  rewardTime?: string | null;
+  id: string;
+  inviteeUserId: string;
+  inviteeDisplay: UserDisplayBaseApiResponse | null;
+  status: UserInviteStatusApiValue;
+  createTime: number;
+  rewardTime: number | null;
 }
 
 export type ListUserInviteRecordsApiResponse = PageR<UserInviteRecordApiResponse>;

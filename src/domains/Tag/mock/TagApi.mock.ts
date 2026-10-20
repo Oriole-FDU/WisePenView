@@ -1,14 +1,61 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
+import { createMockUserDisplay } from '@/domains/_shared/mock/userDisplay';
+import type { UserIdentityTypeApiValue } from '@/domains/User/apis/UserApi.type';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { TagApi as TagApiContract } from '../apis/TagApi';
 import type { TagTreeApiResponse } from '../apis/TagApi.type';
 import mockdata from './mockdata.json';
 
-const trees: Record<string, TagTreeApiResponse[]> = structuredClone(mockdata) as Record<
-  string,
-  TagTreeApiResponse[]
->;
+type MockTagNode = Omit<TagTreeApiResponse, 'creatorInfo' | 'children'> & {
+  creatorInfo?: {
+    nickname?: string;
+    realName?: string;
+    avatar?: string;
+    identityType?: number | string;
+  };
+  children?: MockTagNode[];
+};
+
+const normalizeIdentityType = (value: number | string | undefined): UserIdentityTypeApiValue => {
+  if (value === 2 || value === '2' || value === 'TEACHER') return 'TEACHER';
+  if (value === 3 || value === '3' || value === 'ADMIN') return 'ADMIN';
+  return 'STUDENT';
+};
+
+const normalizeTagNode = (node: MockTagNode, fallbackGroupId: string): TagTreeApiResponse => ({
+  tagId: node.tagId,
+  tagName: node.tagName,
+  groupId: node.groupId ?? fallbackGroupId,
+  tagDesc: node.tagDesc ?? null,
+  tagIcon: node.tagIcon ?? null,
+  tagColor: node.tagColor ?? null,
+  tagMetaInfo: node.tagMetaInfo ?? null,
+  tagCreator: node.tagCreator ?? null,
+  creatorInfo: node.creatorInfo
+    ? createMockUserDisplay({
+        ...node.creatorInfo,
+        identityType: normalizeIdentityType(node.creatorInfo.identityType),
+      })
+    : null,
+  isPath: node.isPath ?? false,
+  taggedResourceAclGrantScope: node.taggedResourceAclGrantScope ?? null,
+  taggedResourceAclGrantSpecifiedUsers: node.taggedResourceAclGrantSpecifiedUsers ?? [],
+  taggedResourceGrantedActionsMask: node.taggedResourceGrantedActionsMask ?? 0,
+  tagMountPermissionScope: node.tagMountPermissionScope ?? null,
+  tagMountSpecifiedUsers: node.tagMountSpecifiedUsers ?? [],
+  grantedActions: node.grantedActions ?? [],
+  parentId: node.parentId ?? '0',
+  children: (node.children ?? []).map((child) => normalizeTagNode(child, fallbackGroupId)),
+});
+
+const rawTrees = structuredClone(mockdata) as unknown as Record<string, MockTagNode[]>;
+const trees: Record<string, TagTreeApiResponse[]> = Object.fromEntries(
+  Object.entries(rawTrees).map(([groupId, nodes]) => [
+    groupId,
+    nodes.map((node) => normalizeTagNode(node, groupId || 'p_1')),
+  ])
+);
 const roots = (groupId = '') => (trees[groupId] ??= []);
 const findTag = (nodes: TagTreeApiResponse[], id: string): TagTreeApiResponse | undefined => {
   for (const node of nodes) {
@@ -37,9 +84,24 @@ export const TagApi: typeof TagApiContract = {
   getTagTree: (params) => mockResponse(roots(params?.groupId)),
   addTag: async (params) => {
     const tagId = `mock-tag-${crypto.randomUUID()}`;
+    const groupId = params.groupId ?? 'p_1';
     children(params.parentId, params.groupId).push({
-      ...params,
       tagId,
+      tagName: params.tagName,
+      groupId,
+      tagDesc: params.tagDesc ?? null,
+      tagIcon: params.tagIcon ?? null,
+      tagColor: params.tagColor ?? null,
+      tagMetaInfo: params.tagMetaInfo ?? null,
+      tagCreator: params.tagCreator ?? null,
+      creatorInfo: null,
+      isPath: params.isPath ?? false,
+      taggedResourceAclGrantScope: params.taggedResourceAclGrantScope ?? null,
+      taggedResourceAclGrantSpecifiedUsers: params.taggedResourceAclGrantSpecifiedUsers ?? [],
+      taggedResourceGrantedActionsMask: 0,
+      tagMountPermissionScope: params.tagMountPermissionScope ?? null,
+      tagMountSpecifiedUsers: params.tagMountSpecifiedUsers ?? [],
+      grantedActions: params.grantedActions ?? [],
       parentId: params.parentId ?? '0',
       children: [],
     });

@@ -1,5 +1,8 @@
 import type { ApiResponse } from './api.type';
 
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
 /** 运行期只确认统一响应 envelope；data 的领域形状由 API DTO 与 mapper 分层处理。 */
 export const isApiResponseEnvelope = (value: unknown): value is ApiResponse<unknown> => {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
@@ -10,11 +13,9 @@ export const isApiResponseEnvelope = (value: unknown): value is ApiResponse<unkn
   }
 
   if ('key' in record) {
-    return (
-      (record.key === null || typeof record.key === 'string') &&
-      (record.msg === null || typeof record.msg === 'string')
-    );
+    return isNonEmptyString(record.key) && isNonEmptyString(record.msg);
   }
 
-  return typeof record.msg === 'string';
+  // Python Cloud-AI 的 envelope 不含 key，但仍要求 msg 非空。
+  return isNonEmptyString(record.msg);
 };

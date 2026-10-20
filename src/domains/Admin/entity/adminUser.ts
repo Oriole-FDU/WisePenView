@@ -3,15 +3,16 @@ import type { UserVerificationMode } from '@/domains/User/enum';
 export interface AdminUser {
   id: string;
   username: string;
-  nickname?: string;
-  realName?: string;
-  avatar?: string;
+  nickname: string;
+  realName: string | null;
+  avatar: string | null;
   identityType: number;
-  campusNo?: string;
-  email?: string;
-  mobile?: string;
-  verificationMode?: UserVerificationMode | null;
+  campusNo: string | null;
+  email: string | null;
+  mobile: string | null;
+  verificationMode: UserVerificationMode | null;
+  verificationProviderCode: string | null;
   status: number;
-  createTime?: string;
-  updateTime?: string;
+  createTime: string | null;
+  updateTime: string | null;
 }

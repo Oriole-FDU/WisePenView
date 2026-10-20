@@ -1,6 +1,5 @@
 import type { Config } from '@onlyoffice/doceditor-types';
 
-import type { JavaLongApiValue } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
@@ -42,20 +41,20 @@ export interface GetOnlyOfficeEditorConfigApiRequest {
 export type OnlyOfficeEditorConfig = Config;
 
 export interface OnlyOfficeEditorConfigApiResponse {
-  sessionId?: string;
-  config?: OnlyOfficeEditorConfig | null;
+  sessionId: string;
+  config: OnlyOfficeEditorConfig;
 }
 
 interface DocumentUploadMetaApiResponse {
   documentName: string;
-  uploaderId?: string | number;
+  uploaderId: string;
   fileType: string;
-  size: JavaLongApiValue;
+  size: string;
 }
 
 export interface PendingDocumentStatusApiResponse {
   status: string;
-  errorMessage?: string | null;
+  errorMessage: string | null;
 }
 
 export interface DocMetaInfoApiResponse {
@@ -69,13 +68,14 @@ interface DocumentVersionInfoApiResponse extends DocMetaInfoApiResponse {
 }
 
 export interface PendingDocItemApiResponse extends DocMetaInfoApiResponse {
-  documentId?: string;
+  documentId: string;
 }
 
 export type ListPendingDocsApiResponse = PendingDocItemApiResponse[];
 
 export interface GetDocInfoApiResponse {
   resourceInfo: ResourceItemApiResponse;
-  documentVersionInfo?: DocumentVersionInfoApiResponse;
-  authorsDisplay?: Record<string, UserDisplayBaseApiResponse> | null;
+  documentVersionInfo: DocumentVersionInfoApiResponse | null;
+  updateTime: number;
+  authorsDisplay: Record<string, UserDisplayBaseApiResponse>;
 }

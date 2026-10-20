@@ -1,17 +1,8 @@
-import type { NumericEnumApiValue } from '@/apis/api.type';
+import type { ResourceActionApiKey } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
-type TagAccessControlScopeApiValue = 0 | 1 | 2 | 3;
-type TagResourceActionApiKey =
-  | 'DISCOVER'
-  | 'VIEW'
-  | 'LOAD'
-  | 'EDIT'
-  | 'INLINE_COMMENT'
-  | 'DOWNLOAD_WATERMARK'
-  | 'DOWNLOAD_ORIGINAL'
-  | 'FORK'
-  | 'COMMENT';
+type TagAccessControlScopeApiValue = 'ALL' | 'ONLY_ADMIN' | 'WHITELIST' | 'BLACKLIST';
+type TagResourceActionApiKey = ResourceActionApiKey;
 
 export interface AddTagApiRequest {
   groupId?: string;
@@ -23,7 +14,6 @@ export interface AddTagApiRequest {
   tagMetaInfo?: string;
   tagCreator?: string;
   isPath?: boolean;
-  visibilityMode?: string;
   taggedResourceAclGrantScope?: TagAccessControlScopeApiValue;
   taggedResourceAclGrantSpecifiedUsers?: string[];
   tagMountPermissionScope?: TagAccessControlScopeApiValue;
@@ -52,23 +42,22 @@ export interface GetTagTreeApiRequest {
 export interface TagTreeApiResponse {
   tagId: string;
   tagName: string;
-  groupId?: string;
-  tagDesc?: string;
-  tagIcon?: string;
-  tagColor?: string;
-  tagMetaInfo?: string;
-  tagCreator?: string;
-  creatorInfo?: UserDisplayBaseApiResponse | null;
-  isPath?: boolean;
-  visibilityMode?: string;
-  taggedResourceAclGrantScope?: TagAccessControlScopeApiValue;
-  taggedResourceAclGrantSpecifiedUsers?: string[];
-  taggedResourceGrantedActionsMask?: number;
-  tagMountPermissionScope?: TagAccessControlScopeApiValue;
-  tagMountSpecifiedUsers?: string[];
-  grantedActions?: Array<TagResourceActionApiKey | NumericEnumApiValue>;
-  parentId?: string;
-  children?: TagTreeApiResponse[];
+  groupId: string;
+  tagDesc: string | null;
+  tagIcon: string | null;
+  tagColor: string | null;
+  tagMetaInfo: string | null;
+  tagCreator: string | null;
+  creatorInfo: UserDisplayBaseApiResponse | null;
+  isPath: boolean;
+  taggedResourceAclGrantScope: TagAccessControlScopeApiValue | null;
+  taggedResourceAclGrantSpecifiedUsers: string[];
+  taggedResourceGrantedActionsMask: number | null;
+  tagMountPermissionScope: TagAccessControlScopeApiValue | null;
+  tagMountSpecifiedUsers: string[];
+  grantedActions: TagResourceActionApiKey[];
+  parentId: string;
+  children: TagTreeApiResponse[];
 }
 
 export type GetTagTreeApiResponse = TagTreeApiResponse[];

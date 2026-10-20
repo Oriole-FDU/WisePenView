@@ -53,6 +53,7 @@ export const RESOURCE_ACTION = createEnum([
   { value: 64, key: 'DOWNLOAD_ORIGINAL', label: '下载源文件' },
   { value: 128, key: 'FORK', label: '复制资源' },
   { value: 256, key: 'COMMENT', label: '评论' },
+  { value: 512, key: 'MARKET_VIEW', label: '市场阅读' },
 ] as const);
 
 export type TagQueryLogicMode = EnumValue<typeof TAG_QUERY_LOGIC_MODE>;
@@ -105,6 +106,7 @@ export const RESOURCE_ACTION_IMPLIED_MASK: Record<ResourceAction, number> = {
     RESOURCE_ACTION.DISCOVER,
   [RESOURCE_ACTION.COMMENT]:
     RESOURCE_ACTION.COMMENT | RESOURCE_ACTION.VIEW | RESOURCE_ACTION.DISCOVER,
+  [RESOURCE_ACTION.MARKET_VIEW]: RESOURCE_ACTION.MARKET_VIEW | RESOURCE_ACTION.DISCOVER,
 };
 
 export const RESOURCE_PERMISSION_ACTION_ORDER = RESOURCE_ACTION.options.map(
@@ -182,6 +184,9 @@ export const getSupportedResourcePermissionActions = (resourceType?: string): Re
   if (!AI_ASSET_RESOURCE_TYPES.has(normalizedType ?? '')) {
     unsupportedActions.add(RESOURCE_ACTION.LOAD);
   }
+
+  // MARKET_VIEW 只能由市场购买关系授予，不允许在普通资源权限面板中手动配置。
+  unsupportedActions.add(RESOURCE_ACTION.MARKET_VIEW);
 
   return RESOURCE_PERMISSION_ACTION_ORDER.filter((action) => !unsupportedActions.has(action));
 };

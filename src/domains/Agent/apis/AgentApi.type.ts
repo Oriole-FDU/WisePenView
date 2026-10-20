@@ -18,45 +18,48 @@ export type AgentAssetResourceTypeApiValue =
   (typeof AGENT_ASSET_RESOURCE_TYPE_API)[keyof typeof AGENT_ASSET_RESOURCE_TYPE_API];
 
 export interface AgentModelPolicyApi {
-  defaultModelId?: string | null;
-  defaultProviderId?: string | null;
-  allowRequestOverride?: boolean | null;
+  defaultModelId: string | null;
+  defaultProviderId: string | null;
+  allowRequestOverride: boolean | null;
 }
 
 export interface AgentToolAndSkillPolicyApi {
-  toolSelectionDefaultEnabled?: boolean | null;
-  toolSelectionOverrides?: Record<string, boolean> | null;
-  onDemandSkillIds?: string[] | null;
+  enableUseTool: boolean | null;
+  toolSelectionDefaultEnabled: boolean | null;
+  toolSelectionOverrides: Record<string, boolean> | null;
+  enableUseSkill: boolean | null;
+  onDemandSkillIds: string[] | null;
+  skillMatchTopK: number | null;
 }
 
 export interface AgentMemoryPolicyApi {
-  enableChatMemory?: boolean | null;
-  enablePersistenceChatMemory?: boolean | null;
-  enableChatMemorySummary?: boolean | null;
-  highWatermarkRatio?: number | null;
-  lowWatermarkRatio?: number | null;
-  summaryPrompt?: string | null;
-  enableLongTermMemory?: boolean | null;
-  longTermMemoryLimit?: number | null;
-  longTermMemoryScoreThreshold?: number | null;
+  enableChatMemory: boolean | null;
+  enablePersistenceChatMemory: boolean | null;
+  enableChatMemorySummary: boolean | null;
+  highWatermarkRatio: number | null;
+  lowWatermarkRatio: number | null;
+  summaryPrompt: string | null;
+  enableLongTermMemory: boolean | null;
+  longTermMemoryLimit: number | null;
+  longTermMemoryScoreThreshold: number | null;
 }
 
 export interface AgentSpecApi {
-  systemPrompt?: string | null;
-  autoGenerateTitle?: boolean | null;
-  modelPolicy?: AgentModelPolicyApi | null;
-  toolAndSkillPolicy?: AgentToolAndSkillPolicyApi | null;
-  memoryPolicy?: AgentMemoryPolicyApi | null;
+  systemPrompt: string | null;
+  autoGenerateTitle: boolean | null;
+  modelPolicy: AgentModelPolicyApi | null;
+  toolAndSkillPolicy: AgentToolAndSkillPolicyApi | null;
+  memoryPolicy: AgentMemoryPolicyApi | null;
 }
 
 export interface AgentInfoApiResponse {
-  resourceInfo?: ResourceItemApiResponse;
-  agentInfo?: VersionResourceInfoApiResponse;
+  resourceInfo: ResourceItemApiResponse;
+  agentInfo: VersionResourceInfoApiResponse;
 }
 
 export type AgentVersionBundleApiResponse =
   VersionBundleApiResponse<AgentAssetResourceTypeApiValue> & {
-    spec?: AgentSpecApi | null;
+    spec: AgentSpecApi | null;
   };
 
 export interface CreateAgentApiRequest {

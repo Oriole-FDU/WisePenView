@@ -1,13 +1,15 @@
-import type { JavaLongApiValue, NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
+import type { PageApiRequest, PageR } from '@/apis/api.type';
 import type { TagResourceActionKey } from '@/domains/Tag';
-import type { UserDisplayBase } from '@/domains/User';
-import type { UserIdentityTypeApiValue } from '@/domains/User/apis/UserApi.type';
+import type {
+  UserDisplayBaseApiResponse,
+  UserIdentityTypeApiValue,
+} from '@/domains/User/apis/UserApi.type';
 
 type GroupFileOrgLogicApiValue = 'FOLDER' | 'TAG';
-type GroupTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
+type GroupTypeApiValue = 'NORMAL_GROUP' | 'ADVANCED_GROUP' | 'MARKET_GROUP';
 type GroupTypeApiRequestValue = 'NORMAL_GROUP' | 'ADVANCED_GROUP' | 'MARKET_GROUP';
-type GroupRoleApiValue = '0' | '1' | '2' | '-1';
-type GroupResourceActionApiValue = TagResourceActionKey | NumericEnumApiValue;
+type GroupRoleApiValue = 'OWNER' | 'ADMIN' | 'MEMBER' | 'NOT_MEMBER';
+type GroupResourceActionApiValue = TagResourceActionKey;
 type GroupResourceActionApiList = GroupResourceActionApiValue[];
 
 export interface ListGroupApiRequest extends PageApiRequest {
@@ -16,20 +18,16 @@ export interface ListGroupApiRequest extends PageApiRequest {
 }
 
 export interface GroupApiResponse {
-  groupId?: string | number | null;
-  groupName?: string | null;
-  groupDesc?: string | null;
-  groupCoverUrl?: string | null;
-  groupMetaInfo?: string | null;
-  groupType?: GroupTypeApiValue;
-  ownerId?: string | number | null;
-  ownerInfo?:
-    (Omit<UserDisplayBase, 'identityType'> & { identityType?: UserIdentityTypeApiValue }) | null;
-  memberCount?: JavaLongApiValue;
-  createTime?: string;
-  inviteCode?: string | null;
-  tokenUsed?: JavaLongApiValue;
-  tokenBalance?: JavaLongApiValue;
+  groupId: string;
+  groupName: string;
+  groupDesc: string | null;
+  groupCoverUrl: string | null;
+  groupMetaInfo: string | null;
+  groupType: GroupTypeApiValue;
+  ownerId: string;
+  ownerInfo: UserDisplayBaseApiResponse | null;
+  memberCount: number;
+  createTime: number;
 }
 
 export type ListGroupApiResponse = PageR<GroupApiResponse>;
@@ -38,24 +36,30 @@ export interface GetGroupInfoApiRequest {
   groupId: string;
 }
 
-export type GetGroupInfoApiResponse = GroupApiResponse;
+export interface GroupDetailApiResponse extends GroupApiResponse {
+  inviteCode: string;
+  tokenUsed: number;
+  tokenBalance: number;
+}
+
+export type GetGroupInfoApiResponse = GroupDetailApiResponse;
 export type GetGroupBaseInfoApiRequest = GetGroupInfoApiRequest;
 export type GetGroupBaseInfoApiResponse = GroupApiResponse;
 export type AddGroupApiRequest = {
   groupName: string;
-  groupType: string;
+  groupType: GroupTypeApiRequestValue;
   groupDesc: string;
   groupCoverUrl?: string;
   groupMetaInfo?: string;
 };
-export type AddGroupApiResponse = string | number;
+export type AddGroupApiResponse = string;
 export type ChangeGroupApiRequest = {
   groupId: string;
   groupName: string;
   groupDesc: string;
   groupCoverUrl: string;
   groupMetaInfo?: string;
-  groupType: string;
+  groupType: GroupTypeApiRequestValue;
 };
 export interface RemoveGroupApiRequest {
   groupId: string;
@@ -66,9 +70,9 @@ export interface GetGroupConfigApiRequest {
 }
 
 export interface GetGroupConfigApiResponse {
-  groupId?: string;
-  fileOrgLogic?: GroupFileOrgLogicApiValue;
-  defaultMemberActions?: GroupResourceActionApiList;
+  groupId: string;
+  fileOrgLogic: GroupFileOrgLogicApiValue;
+  defaultMemberActions: GroupResourceActionApiList;
 }
 
 export interface ChangeGroupConfigApiRequest {
@@ -93,18 +97,18 @@ export interface GroupMemberBaseInfoApiResponse {
 
 export interface GroupMemberApiResponse {
   role: GroupRoleApiValue;
-  joinTime: string;
-  tokenLimit: JavaLongApiValue;
-  tokenUsed: JavaLongApiValue;
-  groupId: string | number;
-  memberId: string | number;
-  memberInfo: GroupMemberBaseInfoApiResponse;
+  joinTime: number;
+  tokenLimit: number;
+  tokenUsed: number;
+  groupId: string;
+  memberId: string;
+  memberInfo: GroupMemberBaseInfoApiResponse | null;
 }
 
 export type FetchGroupMembersApiResponse = PageR<GroupMemberApiResponse>;
 
 export interface ListMemberApiRequest extends PageApiRequest {
-  groupId: string | number;
+  groupId: string;
 }
 
 export type GroupRoleApiResponse = GroupRoleApiValue;
@@ -116,7 +120,7 @@ export interface QuitGroupApiRequest {
 export interface ChangeRoleApiRequest {
   groupId: string;
   targetUserIds: string[];
-  role: string;
+  role: GroupRoleApiValue;
 }
 
 export interface KickMemberApiRequest {
@@ -125,17 +129,17 @@ export interface KickMemberApiRequest {
 }
 
 export interface GetMyGroupMemberInfoApiRequest {
-  groupId: string | number;
+  groupId: string;
 }
 
 export interface GetMyGroupMemberInfoApiResponse {
-  role?: GroupRoleApiValue;
-  joinTime?: string;
-  tokenUsed?: JavaLongApiValue;
-  tokenLimit?: JavaLongApiValue;
-  groupId?: string | number;
-  memberId?: string | number;
-  memberInfo?: GroupMemberBaseInfoApiResponse;
+  role: GroupRoleApiValue;
+  joinTime: number;
+  tokenUsed: number;
+  tokenLimit: number;
+  groupId: string;
+  memberId: string;
+  memberInfo: GroupMemberBaseInfoApiResponse | null;
 }
 
 export interface ChangeTokenLimitApiRequest {
@@ -147,13 +151,13 @@ export interface ChangeTokenLimitApiRequest {
 export type GetAllMyGroupTokenInfoApiRequest = PageApiRequest;
 
 export interface GroupTokenInfoApiResponseItem {
-  groupDisplayBase?: {
-    groupId?: string | number;
-    groupName?: string;
-    groupType?: GroupTypeApiValue | null;
-  };
-  tokenLimit?: JavaLongApiValue;
-  tokenUsed?: JavaLongApiValue;
+  groupId: string;
+  groupDisplayBase: {
+    groupName: string;
+    groupType: GroupTypeApiValue;
+  } | null;
+  tokenLimit: number;
+  tokenUsed: number;
 }
 
 export type GetAllMyGroupTokenInfoApiResponse = PageR<GroupTokenInfoApiResponseItem>;

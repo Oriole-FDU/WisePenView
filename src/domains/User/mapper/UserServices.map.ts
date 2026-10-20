@@ -74,7 +74,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       avatar: userInfo.avatar ?? undefined,
       identityType: normalizeIdentityTypeFromApi(userInfo.identityType),
       username: userInfo.username,
-      campusNo: userInfo.campusNo,
+      campusNo: userInfo.campusNo ?? undefined,
       email: userInfo.email ?? undefined,
       mobile: userInfo.mobile ?? undefined,
       verificationMode: userInfo.verificationMode,
@@ -82,7 +82,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       status: normalizeUserStatusFromApi(userInfo.userStatus),
     },
     userProfile: {
-      sex: normalizeSexFromApi(userProfile.sex),
+      sex: userProfile.sex == null ? undefined : normalizeSexFromApi(userProfile.sex),
       inviteCode: userProfile.inviteCode ?? undefined,
       university: userProfile.university,
       college: userProfile.college ?? undefined,
@@ -90,10 +90,13 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       className: userProfile.className ?? undefined,
       enrollmentYear:
         userProfile.enrollmentYear == null ? undefined : String(userProfile.enrollmentYear),
-      degreeLevel: normalizeDegreeLevelFromApi(userProfile.degreeLevel),
+      degreeLevel:
+        userProfile.degreeLevel == null
+          ? undefined
+          : normalizeDegreeLevelFromApi(userProfile.degreeLevel),
       academicTitle: userProfile.academicTitle ?? undefined,
     },
-    readonlyFields: data.readonlyFields ?? [],
+    readonlyFields: data.readonlyFields,
   };
 };
 
@@ -147,13 +150,13 @@ const mapInitiateUISVerifyRequest = (
 });
 
 const mapFudanUISVerifyStatusFromApi = (
-  data: CheckFudanUISVerifyApiResponse | null | undefined
+  data: CheckFudanUISVerifyApiResponse
 ): FudanUISVerifyStatusData => {
   return {
-    completed: data?.completed === true,
-    requireAction: data?.requireAction === true,
-    actionPayload: typeof data?.actionPayload === 'string' ? data.actionPayload : '',
-    message: typeof data?.message === 'string' ? data.message : '',
+    completed: data.completed,
+    requireAction: data.requireAction,
+    actionPayload: data.actionPayload ?? '',
+    message: data.message ?? '',
   };
 };
 
@@ -175,8 +178,8 @@ const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRe
   inviteeUserId: normalizeId(data.inviteeUserId),
   invitee: normalizeUserDisplayBaseFromApi(data.inviteeDisplay),
   status: data.status === 'REWARDED' ? 'REWARDED' : 'BOUND',
-  createTime: data.createTime ?? undefined,
-  rewardTime: data.rewardTime ?? undefined,
+  createTime: data.createTime,
+  rewardTime: data.rewardTime,
 });
 
 const mapListInviteRecordsFromApi = (

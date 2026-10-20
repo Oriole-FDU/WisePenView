@@ -1,4 +1,5 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
+import { createMockUserDisplay } from '@/domains/_shared/mock/userDisplay';
 import { getMockGroup } from '@/domains/Group/mock/GroupApi.mock';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
@@ -10,14 +11,30 @@ import type {
 import mockdata from './mockdata.json';
 
 let balance = Number(mockdata.tokenBalance);
-const records = structuredClone(
-  mockdata.transactions.records
-) as WalletTransactionRecordApiResponse[];
+const records: WalletTransactionRecordApiResponse[] = mockdata.transactions.records.map(
+  (record) => ({
+    traceId: record.traceId,
+    operatorId: null,
+    count: record.count,
+    walletTransactionType:
+      record.walletTransactionType as WalletTransactionRecordApiResponse['walletTransactionType'],
+    walletBusinessType:
+      record.walletBusinessType as WalletTransactionRecordApiResponse['walletBusinessType'],
+    meta: record.meta,
+    billingDetail: null,
+    operatorDisplay: createMockUserDisplay({
+      ...record.operatorDisplay,
+      identityType: 'STUDENT',
+    }),
+    createTime: Date.parse(record.createTime),
+  })
+);
 export const WalletApi: typeof WalletApiContract = {
   getUserWalletInfo: (): Promise<GetUserWalletInfoApiResponse> =>
     mockResponse({
-      tokenBalance: balance.toString(),
-      tokenUsed: mockdata.tokenUsed.toString(),
+      tokenBalance: balance,
+      tokenUsed: mockdata.tokenUsed,
+      coinBalance: 0,
     }),
   redeemVoucher: async ({ voucherCode }) => {
     const code = voucherCode.replace(/[\s-]/g, '').toUpperCase();
@@ -30,21 +47,14 @@ export const WalletApi: typeof WalletApiContract = {
     balance += 500;
     records.unshift({
       traceId: `mock-${crypto.randomUUID()}`,
-      createTime: new Date().toISOString(),
+      createTime: Date.now(),
       walletTransactionType: 'REFILL',
       walletBusinessType: 'TOKEN',
       count: 500,
       meta: `****${code.slice(-4)}`,
-      operatorDisplay: {
-        nickname: '示例用户',
-        username: 'mock-user',
-        avatar: null,
-        identityType: 1,
-        realName: '示例用户',
-        campusNo: '20250000',
-        email: null,
-        mobile: null,
-      },
+      operatorId: null,
+      billingDetail: null,
+      operatorDisplay: createMockUserDisplay({ nickname: '示例用户', identityType: 'TEACHER' }),
     });
   },
   listTransactions: (params) => {
@@ -70,7 +80,7 @@ export const WalletApi: typeof WalletApiContract = {
   },
   transferTokenBetweenGroupAndUser: async ({ groupId, tokenCount, tokenTransferType }) => {
     const group = getMockGroup(groupId);
-    const groupBalance = Number(group.tokenBalance ?? 0);
+    const groupBalance = group.tokenBalance ?? 0;
     const isGroupInflow = tokenTransferType === 'GROUP_INFLOW';
     if (
       !Number.isFinite(tokenCount) ||
@@ -81,6 +91,6 @@ export const WalletApi: typeof WalletApiContract = {
     }
     const amount = isGroupInflow ? -tokenCount : tokenCount;
     balance += amount;
-    group.tokenBalance = (groupBalance - amount).toString();
+    group.tokenBalance = groupBalance - amount;
   },
 };

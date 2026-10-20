@@ -58,7 +58,7 @@ function UploadQueueTab() {
                 size="sm"
                 isDisabled={retryingId === row.documentId}
                 onPress={() => {
-                  if (row.documentId) retryPendingDoc(row.documentId);
+                  retryPendingDoc(row.documentId!);
                 }}
               >
                 {t('actions.retry', { ns: 'common' })}
@@ -70,7 +70,7 @@ function UploadQueueTab() {
                 size="sm"
                 isDisabled={cancelingId === row.documentId}
                 onPress={() => {
-                  if (row.documentId) cancelPendingDoc(row.documentId);
+                  cancelPendingDoc(row.documentId!);
                 }}
               >
                 {t('actions.cancel', { ns: 'common' })}

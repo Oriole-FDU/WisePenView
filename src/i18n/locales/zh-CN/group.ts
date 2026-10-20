@@ -268,6 +268,7 @@ const zhCNGroup = {
       DOWNLOAD_ORIGINAL: '下载源文件',
       FORK: '复制资源',
       COMMENT: '评论',
+      MARKET_VIEW: '市场阅读',
     },
   },
 };

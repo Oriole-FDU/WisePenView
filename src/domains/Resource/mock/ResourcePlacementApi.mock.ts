@@ -1,12 +1,17 @@
 import type { ResourcePlacementApi as ResourcePlacementApiContract } from '../apis/ResourcePlacementApi';
-import { getMockResource } from './resourceStore';
+import {
+  createMockResourceTagBind,
+  createMockResourceTagInfo,
+  getMockResource,
+  MOCK_PERSONAL_GROUP_ID,
+} from './resourceStore';
 
 const personalBind = (resourceId: string) => {
   const resource = getMockResource(resourceId);
   resource.tagBinds ??= [];
-  let bind = resource.tagBinds.find((item) => !item.groupId);
+  let bind = resource.tagBinds.find((item) => item.groupId === MOCK_PERSONAL_GROUP_ID);
   if (!bind) {
-    bind = { primaryTagId: 'tag-root', tags: {} };
+    bind = createMockResourceTagBind({ primaryTagId: 'tag-root', tags: {} });
     resource.tagBinds.push(bind);
   }
   return bind;
@@ -18,7 +23,10 @@ const setPath = (ids: string[], tagId: string) => {
       ([key, tag]) => key !== bind.primaryTagId && !tag?.isPath
     );
     bind.primaryTagId = tagId;
-    bind.tags = { ...Object.fromEntries(normalTags), [tagId]: { tagName: tagId, isPath: true } };
+    bind.tags = {
+      ...Object.fromEntries(normalTags),
+      [tagId]: createMockResourceTagInfo(tagId, { isPath: true }),
+    };
   }
   return { resourceCount: ids.length };
 };
@@ -32,7 +40,7 @@ export const ResourcePlacementApi: typeof ResourcePlacementApiContract = {
       bind.tags = Object.fromEntries(
         [...normalTagIds, bind.primaryTagId ?? 'tag-root'].map((key) => [
           key,
-          { tagName: key, isPath: key === bind.primaryTagId },
+          createMockResourceTagInfo(key, { isPath: key === bind.primaryTagId }),
         ])
       );
     }
@@ -44,10 +52,10 @@ export const ResourcePlacementApi: typeof ResourcePlacementApiContract = {
       resource.tagBinds ??= [];
       let bind = resource.tagBinds.find((item) => item.groupId === groupId);
       if (!bind) {
-        bind = { groupId, primaryTagId: targetTagId, tags: {} };
+        bind = createMockResourceTagBind({ groupId, primaryTagId: targetTagId, tags: {} });
         resource.tagBinds.push(bind);
       }
-      (bind.tags ??= {})[targetTagId] = { tagName: targetTagId };
+      (bind.tags ??= {})[targetTagId] = createMockResourceTagInfo(targetTagId, { groupId });
     }
     return { resourceCount: resourceIds.length };
   },
@@ -68,7 +76,7 @@ export const ResourcePlacementApi: typeof ResourcePlacementApiContract = {
       if (!bind) continue;
       bind.tags ??= {};
       delete bind.tags[tagId];
-      bind.tags[targetTagId] = { tagName: targetTagId };
+      bind.tags[targetTagId] = createMockResourceTagInfo(targetTagId, { groupId });
       if (bind.primaryTagId === tagId) bind.primaryTagId = targetTagId;
     }
     return { resourceCount: Object.keys(resourceSourceTagMap).length };

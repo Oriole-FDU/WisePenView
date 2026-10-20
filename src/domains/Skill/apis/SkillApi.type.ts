@@ -21,8 +21,8 @@ export type AssetResourceTypeEnum =
 export type SkillAssetApiInfo = VersionAssetApiInfo<AssetResourceTypeEnum>;
 
 export interface SkillInfoApiResponse {
-  resourceInfo?: ResourceItemApiResponse;
-  skillInfo?: VersionResourceInfoApiResponse;
+  resourceInfo: ResourceItemApiResponse;
+  skillInfo: VersionResourceInfoApiResponse;
 }
 
 export type SkillVersionBundleApiResponse = VersionBundleApiResponse<AssetResourceTypeEnum>;

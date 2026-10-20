@@ -175,7 +175,19 @@ const mapResourceTagBindsFromApi = (
   tagBinds?.map((bind) => ({
     groupId: bind.groupId,
     primaryTagId: bind.primaryTagId,
-    tags: bind.tags,
+    tags: Object.fromEntries(
+      Object.entries(bind.tags).map(([tagId, tagInfo]) => [
+        tagId,
+        {
+          tagName: tagInfo.tagName,
+          tagDesc: tagInfo.tagDesc ?? undefined,
+          tagIcon: tagInfo.tagIcon ?? undefined,
+          tagColor: tagInfo.tagColor ?? undefined,
+          tagCreator: tagInfo.tagCreator ?? undefined,
+          isPath: tagInfo.isPath,
+        },
+      ])
+    ),
   }));
 
 const mapMyInteractionFromApi = (
@@ -253,7 +265,7 @@ const mapResourceItemFromApi = (
     ownerId: raw.ownerId,
     ownerInfo: normalizeUserDisplayBaseFromApi(raw.ownerInfo) ?? {},
     resourceType: raw.resourceType,
-    preview: raw.preview,
+    preview: raw.preview ?? undefined,
     // 后端 resourceInfo.size 当前以字符串返回，前端统一归一化为 number。
     size: normalizeNonNegativeNumber(raw.size),
     tagBinds: mapResourceTagBindsFromApi(raw.tagBinds),
@@ -411,9 +423,17 @@ const resolveOwnerName = (ownerInfo: UserDisplayBase | undefined, ownerId?: stri
   ownerInfo?.realName?.trim() || ownerInfo?.nickname?.trim() || ownerId || '';
 
 const mapResourcePermissionOverviewFromApi = (
-  raw: ResourceItemApiResponse,
+  raw: ResourceItemApiResponse | null | undefined,
   fallbackResourceId: string
 ): ResourcePermissionOverview => {
+  if (!raw) {
+    return {
+      resourceId: fallbackResourceId,
+      subjects: [],
+      supportedActions: [],
+      actionOptions: [],
+    };
+  }
   const overrideGroupInfoById = mapOverrideGroupInfoByIdFromApi(raw.overrideGrantedActions);
   const specifiedUserInfoById = mapSpecifiedUserInfoByIdFromApi(raw.specifiedUsersGrantedActions);
   const resourceInfo = mapResourceItemFromApi(raw);

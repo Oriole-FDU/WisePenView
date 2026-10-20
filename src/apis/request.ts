@@ -14,7 +14,7 @@ function checkResponse(res: ApiResponse<unknown>): void {
     throw new WisePenError({
       code: res.code,
       source: 'api',
-      serverMsg: res.msg ?? undefined,
+      serverMsg: res.msg,
     });
   }
 }

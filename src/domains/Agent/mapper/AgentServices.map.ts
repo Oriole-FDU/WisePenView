@@ -84,9 +84,12 @@ const mapAgentSpecToApi = (spec: AgentSpec): AgentSpecApi => ({
   autoGenerateTitle: spec.autoGenerateTitle,
   modelPolicy: { ...spec.modelPolicy },
   toolAndSkillPolicy: {
-    ...spec.toolAndSkillPolicy,
+    enableUseTool: null,
     toolSelectionOverrides: { ...spec.toolAndSkillPolicy.toolSelectionOverrides },
+    toolSelectionDefaultEnabled: spec.toolAndSkillPolicy.toolSelectionDefaultEnabled,
+    enableUseSkill: null,
     onDemandSkillIds: [...spec.toolAndSkillPolicy.onDemandSkillIds],
+    skillMatchTopK: null,
   },
   memoryPolicy: { ...spec.memoryPolicy },
 });
@@ -144,12 +147,12 @@ const mapAgentDetail = (params: {
     status: params.bundle?.status ?? (publishedVersion > 0 ? 'PUBLISHED' : 'DRAFT'),
     spec: mapSpec(params.bundle?.spec),
     assets: (params.bundle?.assets ?? []).map((asset) => ({
-      id: asset.id ?? '',
-      name: asset.name ?? '',
-      path: asset.path ?? '/',
-      objectKey: asset.objectKey,
-      assetResourceType: asset.assetResourceType ?? 'TEXT',
-      uploadStatus: asset.uploadStatus ?? 'UPLOADING',
+      id: asset.id,
+      name: asset.name,
+      path: asset.path,
+      objectKey: asset.objectKey ?? undefined,
+      assetResourceType: asset.assetResourceType,
+      uploadStatus: asset.uploadStatus,
       size: normalizeNonNegativeNumber(asset.size) ?? 0,
     })),
     ownerId: resource?.ownerId,
@@ -161,10 +164,7 @@ const mapAgentPermissionOverviewFromApi = (
   info: AgentInfoApiResponse | null | undefined,
   resourceId: string
 ): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(
-    info?.resourceInfo ?? { resourceId, resourceName: '', ownerInfo: {} },
-    resourceId
-  );
+  ResourceServicesMap.mapResourcePermissionOverviewFromApi(info?.resourceInfo, resourceId);
 
 export const AgentServicesMap = {
   mapAgentDetail,

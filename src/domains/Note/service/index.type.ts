@@ -108,9 +108,9 @@ export interface ListNoteVersionsRequest {
 }
 
 export interface NoteVersionSummary {
-  version?: number;
-  type?: 'FULL' | 'DELTA' | string;
-  createdBy?: number[];
+  version: number;
+  type: 'FULL' | 'DELTA';
+  createdBy?: string[];
 }
 
 export interface NoteVersionListPage {

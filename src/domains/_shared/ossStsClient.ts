@@ -8,7 +8,7 @@ import { isRecord } from '@/utils/type/typeGuards';
 import type { OssReadClient } from './apis/ossClient';
 
 export interface OssStsClientManagerOptions<Key> {
-  loadToken: (key: Key) => Promise<OssStsTokenApiResponse | null | undefined>;
+  loadToken: (key: Key) => Promise<OssStsTokenApiResponse>;
   resolveCacheKey: (key: Key) => string;
   refreshBufferMs?: number;
   defaultExpiresInMs?: number;
@@ -31,11 +31,8 @@ interface CachedOssClient {
 const DEFAULT_REFRESH_BUFFER_MS = 60_000;
 const DEFAULT_EXPIRES_IN_MS = 55 * 60_000;
 
-const resolveExpiresAt = (expiration: string | undefined, defaultExpiresInMs: number): number => {
-  if (!expiration) return Date.now() + defaultExpiresInMs;
-  const expiresAt = Date.parse(expiration);
-  return Number.isFinite(expiresAt) ? expiresAt : Date.now() + defaultExpiresInMs;
-};
+const resolveExpiresAt = (expiration: number, defaultExpiresInMs: number): number =>
+  Number.isFinite(expiration) ? expiration : Date.now() + defaultExpiresInMs;
 
 const isOssAuthExpiredError = (error: unknown): boolean => {
   if (!isRecord(error)) return false;
@@ -87,9 +84,6 @@ export const createOssStsClientManager = <Key>(
     const request: Promise<OssReadClient> = options
       .loadToken(key)
       .then((token) => {
-        if (!token) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
-        }
         if (requestGeneration !== cacheGeneration) {
           throw createClientError(FRONTEND_CLIENT_ERROR.AUTH_SESSION_CHANGED);
         }

@@ -1,4 +1,4 @@
-import type { OptionalPageApiRequest } from '@/apis/api.type';
+import type { OptionalPageApiRequest, PageR } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
@@ -15,17 +15,13 @@ export interface GetNoteInfoApiRequest {
   targetVersion?: number;
 }
 
-export interface NoteMetaInfoApiResponse {
-  authors?: string[];
-  lastUpdatedAt?: number | string | null;
-}
-
 export interface GetNoteInfoApiResponse {
-  authorsDisplay?: Record<string, UserDisplayBaseApiResponse> | null;
+  authorsDisplay: Record<string, UserDisplayBaseApiResponse>;
   resourceInfo: ResourceItemApiResponse;
   /** 当前笔记版本号。 */
-  version?: number;
-  noteInfo?: NoteMetaInfoApiResponse;
+  version: number;
+  /** 笔记最近更新时间，毫秒时间戳。 */
+  updateTime: number;
 }
 
 export interface GetDrawIoLatestSnapshotApiRequest {
@@ -35,8 +31,8 @@ export interface GetDrawIoLatestSnapshotApiRequest {
 export interface GetDrawIoLatestSnapshotApiResponse {
   resourceId: string;
   version: number;
-  fullSnapshot?: string | null;
-  deltas?: string[] | null;
+  fullSnapshot: string | null;
+  deltas: string[];
 }
 
 export interface SaveDrawIoSnapshotApiRequest {
@@ -53,18 +49,12 @@ export interface ForkNoteApiRequest {
 }
 
 export interface NoteVersionSummaryApiResponse {
-  version?: number | null;
-  type?: string | null;
-  createdBy?: number[] | null;
+  version: number;
+  type: 'FULL' | 'DELTA';
+  createdBy: string[];
 }
 
-export interface ListNoteVersionsApiResponse {
-  list?: NoteVersionSummaryApiResponse[] | null;
-  total?: number | null;
-  page?: number | null;
-  size?: number | null;
-  totalPage?: number | null;
-}
+export type ListNoteVersionsApiResponse = PageR<NoteVersionSummaryApiResponse>;
 
 export interface ListNoteVersionsApiRequest extends OptionalPageApiRequest {
   resourceId: string;

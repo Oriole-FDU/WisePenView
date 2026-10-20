@@ -1,4 +1,5 @@
 import type { AdminUser } from '@/domains/Admin';
+import type { UserVerificationMode } from '@/domains/User/enum';
 
 import type { AdminMessage } from '../entity/message';
 
@@ -34,16 +35,35 @@ export interface GetAdminUserInfoRequest {
 }
 
 export interface GetAdminUserInfoResponse {
-  userProfile: Record<string, unknown>;
+  userProfile: AdminUserProfile;
+}
+
+export interface AdminUserProfile {
+  userId: string;
+  sex: number | null;
+  inviteCode: string | null;
+  university: string | null;
+  college: string | null;
+  major: string | null;
+  className: string | null;
+  enrollmentYear: string | null;
+  degreeLevel: number | null;
+  academicTitle: string | null;
+  createTime: string | null;
+  updateTime: string | null;
 }
 
 export interface ChangeAdminUserInfoRequest {
   userId: string;
+  username?: string;
   nickname?: string;
   realName?: string;
   avatar?: string;
   email?: string | null;
   mobile?: string | null;
+  campusNo?: string | null;
+  verificationMode?: UserVerificationMode | null;
+  verificationProviderCode?: string | null;
   status?: number;
   identityType?: number;
 }

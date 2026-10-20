@@ -50,20 +50,13 @@ export function buildUploadQueueRows(
   });
 
   const backendDocumentIds = new Set(
-    [...pendingItems, ...completedRows].flatMap((item) =>
-      item.documentId ? [item.documentId] : []
-    )
+    [...pendingItems, ...completedRows].flatMap((item) => item.documentId ?? [])
   );
   const localRows = localUploads
     .filter((upload) => !upload.documentId || !backendDocumentIds.has(upload.documentId))
     .map((upload) => mapLocalUploadToRow(upload, t));
-  const pendingRows = pendingItems.map((item, index) =>
-    mapPendingItemToRow(
-      item,
-      index,
-      item.documentId ? localUploadByDocumentId.get(item.documentId) : undefined,
-      t
-    )
+  const pendingRows = pendingItems.map((item) =>
+    mapPendingItemToRow(item, localUploadByDocumentId.get(item.documentId), t)
   );
   const activeRowKeys = new Set([...localRows, ...pendingRows].map((row) => row.queueRowKey));
 
@@ -76,11 +69,10 @@ export function buildUploadQueueRows(
 
 export function mapCompletedPendingItemToRow(
   item: PendingDocItem,
-  index: number,
   t: TFunction<'drive'>
 ): UploadQueueRow {
   return {
-    queueRowKey: getPendingQueueRowKey(item, index),
+    queueRowKey: getPendingQueueRowKey(item),
     documentId: item.documentId,
     documentName: item.uploadMeta.documentName,
     fileType: item.uploadMeta.fileType,
@@ -117,21 +109,19 @@ function mapLocalUploadToRow(upload: DriveUploadQueueItem, t: TFunction<'drive'>
 
 function mapPendingItemToRow(
   item: PendingDocItem,
-  index: number,
   localUpload: DriveUploadQueueItem | undefined,
   t: TFunction<'drive'>
 ): UploadQueueRow {
   const status = item.documentStatus.status;
-  const hasDocumentId = Boolean(item.documentId);
   return {
-    queueRowKey: getPendingQueueRowKey(item, index),
+    queueRowKey: getPendingQueueRowKey(item),
     documentId: item.documentId,
     documentName: item.uploadMeta.documentName,
     fileType: item.uploadMeta.fileType,
     size: item.uploadMeta.size,
     presentation: resolvePendingUploadPresentation(item.documentStatus, localUpload, t),
-    retryable: hasDocumentId && isDocumentRetryableStatus(status),
-    cancelable: hasDocumentId && isDocumentCancelableStatus(status),
+    retryable: isDocumentRetryableStatus(status),
+    cancelable: isDocumentCancelableStatus(status),
   };
 }
 
@@ -198,7 +188,6 @@ function isFailedDocumentStatus(status: string): boolean {
   );
 }
 
-function getPendingQueueRowKey(item: PendingDocItem, index: number): string {
-  if (item.documentId) return `pending:${item.documentId}`;
-  return `pending:${item.uploadMeta.documentName}:${item.uploadMeta.uploaderId ?? 'unknown'}:${String(index)}`;
+function getPendingQueueRowKey(item: PendingDocItem): string {
+  return `pending:${item.documentId}`;
 }

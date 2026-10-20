@@ -12,7 +12,14 @@ const info = (id: string) => {
   getMockResource(id);
   let result = infos.get(id);
   if (!result) {
-    result = { name: 'mock_skill', description: '', version: 0 };
+    result = {
+      resourceId: id,
+      name: 'mock_skill',
+      description: '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.now(),
+    };
     infos.set(id, result);
   }
   return result;
@@ -26,7 +33,7 @@ const bundle = (id: string, version: number) => {
     result = {
       resourceId: id,
       version,
-      status: version <= (info(id).version ?? 0) ? 'PUBLISHED' : 'DRAFT',
+      status: version <= info(id).version ? 'PUBLISHED' : 'DRAFT',
       assets: [
         {
           id: `${key}:skill-md`,
@@ -35,6 +42,7 @@ const bundle = (id: string, version: number) => {
           objectKey,
           assetResourceType: 'MD',
           uploadStatus: 'AVAILABLE',
+          size: null,
         },
       ],
     };
@@ -45,7 +53,14 @@ const bundle = (id: string, version: number) => {
 export const SkillApi: typeof SkillApiContract = {
   createSkill: async ({ title, name, description, mountTargetTagId }) => {
     const id = addMockResource(title, 'SKILL', mountTargetTagId);
-    infos.set(id, { name, description, version: 0 });
+    infos.set(id, {
+      resourceId: id,
+      name: name ?? '',
+      description: description ?? '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.now(),
+    });
     return id;
   },
   forkSkill: async ({ resourceId, forkedResourceName }) => {
@@ -62,7 +77,7 @@ export const SkillApi: typeof SkillApiContract = {
     securityToken: 'mock',
     bucket: 'mock',
     region: 'mock',
-    expiration: '2099-01-01T00:00:00Z',
+    expiration: new Date('2099-01-01T00:00:00Z').getTime(),
   }),
   changeSkillInfo: async ({ resourceId, name, description }) => {
     if (resourceId) Object.assign(info(resourceId), { name, description });
@@ -75,24 +90,33 @@ export const SkillApi: typeof SkillApiContract = {
       assetUploadTickets: assets.map((asset) => {
         const assetId = `mock-asset-${crypto.randomUUID()}`;
         const objectKey = `mock-skill/${resourceId}/${assetId}`;
-        (target.assets ??= []).push({
+        target.assets.push({
           ...asset,
           id: assetId,
           objectKey,
-          size: asset.expectedSize?.toString(),
+          size: asset.expectedSize?.toString() ?? null,
           uploadStatus: 'AVAILABLE',
         });
-        return { assetId, objectKey, putUrl: objectKey, callbackHeader: 'mock' };
+        return {
+          assetId,
+          path: asset.path,
+          name: asset.name,
+          objectKey,
+          putUrl: objectKey,
+          callbackHeader: 'mock',
+          flashUploaded: false,
+          domain: 'mock',
+        };
       }),
     };
   },
   deleteSkillAssets: async ({ resourceId, draftVersion, assetIds }) => {
     const target = bundle(resourceId, draftVersion);
-    target.assets = target.assets?.filter((asset) => !assetIds.includes(asset.id ?? ''));
+    target.assets = target.assets.filter((asset) => !assetIds.includes(asset.id));
   },
   publishSkillVersion: async ({ resourceId }) => {
     const data = info(resourceId);
-    const version = (data.version ?? 0) + 1;
+    const version = data.version + 1;
     const published = bundle(resourceId, version);
     published.status = 'PUBLISHED';
     data.version = version;

@@ -74,14 +74,14 @@ function getOrCreateFolder(
 }
 
 function assetToFileNode(asset: SkillAssetApiInfo): SkillFileNode {
-  const name = asset.name ?? '';
+  const name = asset.name;
   return {
-    id: asset.id ?? `${normalizeDirectoryPath(asset.path)}:${name}`,
+    id: asset.id,
     name,
     path: normalizeDirectoryPath(asset.path),
     kind: 'file',
     language: resolveLanguage(name),
-    objectKey: asset.objectKey,
+    objectKey: asset.objectKey ?? undefined,
     uploadStatus: asset.uploadStatus,
     size: normalizeNonNegativeNumber(asset.size),
   };
@@ -184,10 +184,7 @@ const mapSkillPermissionOverviewFromApi = (
   info: SkillInfoApiResponse | null | undefined,
   resourceId: string
 ): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(
-    info?.resourceInfo ?? { resourceId, resourceName: '', ownerInfo: {} },
-    resourceId
-  );
+  ResourceServicesMap.mapResourcePermissionOverviewFromApi(info?.resourceInfo, resourceId);
 
 export const SkillServicesMap = {
   formatVersion,

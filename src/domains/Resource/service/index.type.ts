@@ -64,7 +64,7 @@ export interface SearchHitItem {
   resourceIconType: ResourceIconType;
   resourceName: string;
   highlightContent: string | null;
-  updateTime: string;
+  updateTime: number;
 }
 
 /** 搜索分页结果 */

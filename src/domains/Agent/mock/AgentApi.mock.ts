@@ -11,7 +11,14 @@ const info = (id: string) => {
   getMockResource(id);
   let result = infos.get(id);
   if (!result) {
-    result = { name: '', description: '', version: 0 };
+    result = {
+      resourceId: id,
+      name: '',
+      description: '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.now(),
+    };
     infos.set(id, result);
   }
   return result;
@@ -23,8 +30,14 @@ const bundle = (id: string, version: number) => {
     result = {
       resourceId: id,
       version,
-      status: version <= (info(id).version ?? 0) ? 'PUBLISHED' : 'DRAFT',
-      spec: {},
+      status: version <= info(id).version ? 'PUBLISHED' : 'DRAFT',
+      spec: {
+        systemPrompt: null,
+        autoGenerateTitle: null,
+        modelPolicy: null,
+        toolAndSkillPolicy: null,
+        memoryPolicy: null,
+      },
       assets: [],
     };
     bundles.set(key, result);
@@ -34,7 +47,14 @@ const bundle = (id: string, version: number) => {
 export const AgentApi: typeof AgentApiContract = {
   createAgent: async ({ title, name, description, mountTargetTagId }) => {
     const id = addMockResource(title, 'AGENT', mountTargetTagId);
-    infos.set(id, { name, description, version: 0 });
+    infos.set(id, {
+      resourceId: id,
+      name: name ?? '',
+      description: description ?? '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.now(),
+    });
     return id;
   },
   getAgentInfo: (resourceId) =>
@@ -48,7 +68,7 @@ export const AgentApi: typeof AgentApiContract = {
   },
   publishAgentVersion: async (resourceId) => {
     const data = info(resourceId);
-    const version = (data.version ?? 0) + 1;
+    const version = data.version + 1;
     const published = bundle(resourceId, version);
     published.status = 'PUBLISHED';
     data.version = version;
@@ -66,19 +86,28 @@ export const AgentApi: typeof AgentApiContract = {
       assetUploadTickets: assets.map((asset) => {
         const assetId = `mock-asset-${crypto.randomUUID()}`;
         const objectKey = `mock-agent/${resourceId}/${assetId}`;
-        (target.assets ??= []).push({
+        target.assets.push({
           ...asset,
           id: assetId,
           objectKey,
-          size: asset.expectedSize?.toString(),
+          size: asset.expectedSize?.toString() ?? null,
           uploadStatus: 'AVAILABLE',
         });
-        return { assetId, objectKey, putUrl: objectKey, callbackHeader: 'mock' };
+        return {
+          assetId,
+          path: asset.path,
+          name: asset.name,
+          objectKey,
+          putUrl: objectKey,
+          callbackHeader: 'mock',
+          flashUploaded: false,
+          domain: 'mock',
+        };
       }),
     };
   },
   deleteAgentAssets: async ({ resourceId, draftVersion, assetIds }) => {
     const target = bundle(resourceId, draftVersion);
-    target.assets = target.assets?.filter((asset) => !assetIds.includes(asset.id ?? ''));
+    target.assets = target.assets.filter((asset) => !assetIds.includes(asset.id));
   },
 };

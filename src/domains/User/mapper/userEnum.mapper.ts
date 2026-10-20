@@ -8,8 +8,12 @@ import type {
 import type { UserDisplayBase } from '../entity/user';
 import { DEGREE, type DegreeLevel, SEX, USER_STATUS } from '../enum';
 
-export const normalizeIdentityTypeFromApi = (value: UserIdentityTypeApiValue): number =>
-  Number(value);
+export const normalizeIdentityTypeFromApi = (value: UserIdentityTypeApiValue): number => {
+  if (value === 'STUDENT') return 1;
+  if (value === 'TEACHER') return 2;
+  if (value === 'ADMIN') return 3;
+  return 0;
+};
 
 export const normalizeUserStatusFromApi = (value: UserStatusApiValue): number => {
   if (value === 'NORMAL') return USER_STATUS.NORMAL;
@@ -22,10 +26,16 @@ export const normalizeSexFromApi = (value: UserSexApiValue): number => SEX.value
 export const normalizeDegreeLevelFromApi = (value: UserDegreeLevelApiValue): DegreeLevel =>
   DEGREE.values[value] as DegreeLevel;
 
-export const mapIdentityTypeToApi = (value: number | undefined): string | undefined =>
-  value == null ? undefined : String(value);
+export const mapIdentityTypeToApi = (
+  value: number | undefined
+): UserIdentityTypeApiValue | undefined => {
+  if (value === 1) return 'STUDENT';
+  if (value === 2) return 'TEACHER';
+  if (value === 3) return 'ADMIN';
+  return undefined;
+};
 
-export const mapUserStatusToApi = (value: number | undefined): string | undefined => {
+export const mapUserStatusToApi = (value: number | undefined): UserStatusApiValue | undefined => {
   if (value == null) return undefined;
   const key = USER_STATUS.getKey(value);
   if (key === 'NORMAL') return 'NORMAL';
@@ -34,11 +44,12 @@ export const mapUserStatusToApi = (value: number | undefined): string | undefine
   return undefined;
 };
 
-export const mapSexToApi = (value: number | undefined): string | undefined =>
+export const mapSexToApi = (value: number | undefined): UserSexApiValue | undefined =>
   value == null ? undefined : SEX.getKey(value);
 
-export const mapDegreeLevelToApi = (value: number | undefined): string | undefined =>
-  value == null ? undefined : DEGREE.getKey(value);
+export const mapDegreeLevelToApi = (
+  value: number | undefined
+): UserDegreeLevelApiValue | undefined => (value == null ? undefined : DEGREE.getKey(value));
 
 export const normalizeUserDisplayBaseFromApi = (
   value: UserDisplayBaseApiResponse | null | undefined

@@ -50,12 +50,12 @@ function mapCommentFromApi(data: ResourceCommentItemApiResponse): ResourceCommen
     replyToUser: data.replyToUserId
       ? mapCommentAuthorFromApi(data.replyToUserInfo, data.replyToUserId)
       : undefined,
-    content: data.content ?? '',
-    imageUrls: data.imageUrls ?? [],
-    likeCount: data.likeCount ?? 0,
-    replyCount: data.replyCount ?? 0,
+    content: data.content,
+    imageUrls: data.imageUrls,
+    likeCount: data.likeCount,
+    replyCount: data.replyCount,
     createTime: data.createTime,
-    deleted: data.deleted ?? false,
+    deleted: data.deleted,
   };
 }
 
@@ -66,11 +66,11 @@ const mapCommentPageFromApi = (data: CommentPageApiResponse): CommentPage => ({
 });
 
 const mapResourceInteractionRecordFromApi = (
-  data: GetUserInteractionRecordApiResponse | null | undefined
+  data: GetUserInteractionRecordApiResponse
 ): ResourceInteractionRecord => ({
-  liked: data?.liked ?? false,
-  score: data?.score ?? 0,
-  likedCommentIds: new Set(data?.likedCommentIds ?? []),
+  liked: data.liked,
+  score: data.score ?? 0,
+  likedCommentIds: new Set(data.likedCommentIds),
 });
 
 const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] =>

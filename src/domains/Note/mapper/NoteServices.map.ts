@@ -13,7 +13,6 @@ import {
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
-import { isRecord } from '@/utils/type/typeGuards';
 
 import type {
   CreateNoteRequest,
@@ -68,17 +67,12 @@ const mapNoteInfoDisplayFromApi = (data: GetNoteInfoApiResponse): NoteInfoDispla
     resourceInfo.currentActions as unknown[] | undefined
   );
   const canCollaborativeEdit = resourceActionsInclude(currentActions, RESOURCE_ACTION.EDIT);
-  const authorsDisplay = data.authorsDisplay ?? {};
-  const authorIds =
-    data.noteInfo?.authors && data.noteInfo.authors.length > 0
-      ? data.noteInfo.authors
-      : Object.keys(authorsDisplay);
+  const authorsDisplay = data.authorsDisplay;
+  const authorIds = Object.keys(authorsDisplay);
   const authorsById = Object.fromEntries(
     authorIds.map((authorId) => [authorId, mapAuthorDisplay(authorId, authorsDisplay[authorId])])
   );
-  const lastEditedAtText = data.noteInfo?.lastUpdatedAt
-    ? formatTimestampToDateTime(data.noteInfo.lastUpdatedAt)
-    : '';
+  const lastEditedAtText = formatTimestampToDateTime(data.updateTime);
 
   return {
     noteTitle: resourceInfo.resourceName,
@@ -125,25 +119,17 @@ const mapSaveDrawIoSnapshotRequest = (
   plainText: params.plainText,
 });
 
-const readNumber = (value: number | null | undefined, fallback = 0): number =>
-  typeof value === 'number' ? value : fallback;
-
-const mapNoteVersionListPageFromApi = (
-  data: ListNoteVersionsApiResponse | null | undefined
-): NoteVersionListPage => {
-  const list = Array.isArray(data?.list) ? data.list : [];
+const mapNoteVersionListPageFromApi = (data: ListNoteVersionsApiResponse): NoteVersionListPage => {
   return {
-    list: list.filter(isRecord).map((item) => ({
-      version: typeof item.version === 'number' ? item.version : undefined,
-      type: typeof item.type === 'string' ? item.type : undefined,
-      createdBy: Array.isArray(item.createdBy)
-        ? item.createdBy.filter((value): value is number => typeof value === 'number')
-        : undefined,
+    list: data.list.map((item) => ({
+      version: item.version,
+      type: item.type,
+      createdBy: item.createdBy ?? undefined,
     })),
-    total: readNumber(data?.total),
-    page: readNumber(data?.page, 1),
-    size: readNumber(data?.size, 20),
-    totalPage: readNumber(data?.totalPage),
+    total: data.total,
+    page: data.page,
+    size: data.size,
+    totalPage: data.totalPage,
   };
 };
 

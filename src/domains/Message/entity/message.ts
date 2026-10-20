@@ -1,5 +1,5 @@
 export type MessageDeliveryScope = 'DIRECT' | 'ALL_USERS';
-export type MessageType = 'SYSTEM' | 'NORMAL' | 'GROUP';
+export type MessageType = 'SYSTEM' | 'NORMAL' | 'GROUP' | 'RESOURCE_INTERACTION';
 
 export interface UserMessage {
   messageId: string;

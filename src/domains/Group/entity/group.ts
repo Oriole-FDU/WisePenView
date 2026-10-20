@@ -11,7 +11,7 @@ export interface GroupMember {
   email?: string;
   /** 组内角色（由接口数字角色码经 ROLE.getKey 映射） */
   role: EnumKey<typeof ROLE>;
-  joinTime: string;
+  joinTime: number;
   avatar: string;
   limit?: number;
   used?: number;

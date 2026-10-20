@@ -1,59 +1,53 @@
-export interface InlineCommentUserDisplayApiResponse {
-  nickname?: string | null;
-  realName?: string | null;
-  avatar?: string | null;
-  identityType?: string | null;
-}
+import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
+
+export type InlineCommentUserDisplayApiResponse = UserDisplayBaseApiResponse;
 
 export interface InlineCommentAnchorRefApiResponse {
-  externalAnchorId?: string | null;
-  quoteText?: string | null;
-  anchorPayload?: Record<string, unknown> | null;
+  externalAnchorId: string;
+  quoteText: string;
+  anchorPayload: Record<string, unknown>;
 }
 
 export interface InlineCommentReactionApiResponse {
-  emojiId?: string | null;
-  createTime?: number | null;
+  emojiId: string;
+  createTime: number;
 }
 
 export interface InlineCommentReactionGroupApiResponse {
-  emojiId?: string | null;
-  count?: number | null;
-  reactedByCurrentUser?: boolean | null;
-  users?: Array<InlineCommentUserDisplayApiResponse | null> | null;
+  emojiId: string;
+  count: number;
+  reactedByCurrentUser: boolean;
+  users: InlineCommentUserDisplayApiResponse[];
 }
 
 export interface InlineCommentItemApiResponse {
-  itemId?: string | null;
-  authorId?: string | null;
-  authorInfo?: InlineCommentUserDisplayApiResponse | null;
-  content?: string | null;
-  imageUrls?: string[] | null;
-  mentionUserIds?: string[] | null;
-  reactions?: Record<
-    string,
-    InlineCommentReactionApiResponse | InlineCommentReactionApiResponse[] | null | undefined
-  > | null;
-  reactionGroups?: InlineCommentReactionGroupApiResponse[] | null;
-  createTime?: number | null;
-  updateTime?: number | null;
+  itemId: string;
+  authorId: string;
+  authorInfo: InlineCommentUserDisplayApiResponse | null;
+  content: string;
+  imageUrls: string[];
+  mentionUserIds: string[];
+  reactions: Record<string, InlineCommentReactionApiResponse[]>;
+  reactionGroups: InlineCommentReactionGroupApiResponse[];
+  createTime: number;
+  updateTime: number;
 }
 
 export interface InlineCommentApiResponse {
-  inlineCommentId?: string | null;
-  resourceId?: string | null;
-  applicableFromVersion?: number | null;
-  applicableToVersion?: number | null;
-  creatorId?: string | null;
-  creatorInfo?: InlineCommentUserDisplayApiResponse | null;
-  anchorRef?: InlineCommentAnchorRefApiResponse | null;
-  items?: InlineCommentItemApiResponse[] | null;
-  resolved?: boolean | null;
-  resolvedBy?: string | null;
-  resolvedByInfo?: InlineCommentUserDisplayApiResponse | null;
-  resolvedAt?: number | null;
-  createTime?: number | null;
-  updateTime?: number | null;
+  inlineCommentId: string;
+  resourceId: string;
+  applicableFromVersion: number | null;
+  applicableToVersion: number | null;
+  creatorId: string;
+  creatorInfo: InlineCommentUserDisplayApiResponse | null;
+  anchorRef: InlineCommentAnchorRefApiResponse;
+  items: InlineCommentItemApiResponse[];
+  resolved: boolean;
+  resolvedBy: string | null;
+  resolvedByInfo: InlineCommentUserDisplayApiResponse | null;
+  resolvedAt: number | null;
+  createTime: number;
+  updateTime: number;
 }
 
 export interface ListInlineCommentsApiRequest {

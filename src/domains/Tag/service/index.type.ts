@@ -8,7 +8,6 @@ import type {
   TagMetaInfo,
   TagResourceAction,
   TagTreeNode,
-  TagVisibilityModeString,
 } from '@/domains/Tag';
 
 /** TagService 接口：供依赖注入使用 */
@@ -49,7 +48,6 @@ export interface TagCreateRequest {
   tagMetaInfo?: TagMetaInfo;
   tagCreator?: string;
   isPath?: boolean;
-  visibilityMode?: TagVisibilityModeString;
   taggedResourceAclGrantScope?: AccessControlScope;
   taggedResourceAclGrantSpecifiedUsers?: string[];
   tagMountPermissionScope?: AccessControlScope;
@@ -67,7 +65,6 @@ export interface TagUpdateRequest {
   tagMetaInfo?: TagMetaInfo;
   tagCreator?: string;
   isPath?: boolean;
-  visibilityMode?: TagVisibilityModeString;
   taggedResourceAclGrantScope?: AccessControlScope;
   taggedResourceAclGrantSpecifiedUsers?: string[];
   tagMountPermissionScope?: AccessControlScope;

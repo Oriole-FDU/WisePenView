@@ -16,27 +16,27 @@ import type {
   UpdateSkillInfoApiRequest,
 } from './SkillApi.type';
 
-function createSkill(body: CreateSkillApiRequest): Promise<string | undefined> {
+function createSkill(body: CreateSkillApiRequest): Promise<string> {
   return apiPost('/skill/createSkill', body);
 }
 
-function forkSkill(body: ForkSkillApiRequest): Promise<string | undefined> {
+function forkSkill(body: ForkSkillApiRequest): Promise<string> {
   return apiPost('/skill/forkSkill', body);
 }
 
-function getSkillInfo(query: GetSkillInfoApiRequest): Promise<SkillInfoApiResponse | undefined> {
+function getSkillInfo(query: GetSkillInfoApiRequest): Promise<SkillInfoApiResponse> {
   return apiPost('/skill/getSkillInfo', null, { params: query });
 }
 
 function getSkillVersionBundleInfo(
   query: GetSkillVersionBundleInfoApiRequest
-): Promise<SkillVersionBundleApiResponse | undefined> {
+): Promise<SkillVersionBundleApiResponse> {
   return apiPost('/skill/getSkillVersionBundleInfo', null, { params: query });
 }
 
 function getSkillAssetStsToken(
   query: GetSkillAssetStsTokenApiRequest
-): Promise<OssStsTokenApiResponse | undefined> {
+): Promise<OssStsTokenApiResponse> {
   return apiGet('/skill/getSkillAssetStsToken', { params: query });
 }
 
@@ -46,7 +46,7 @@ function changeSkillInfo(body: UpdateSkillInfoApiRequest): Promise<void> {
 
 function initUploadSkillAssets(
   body: InitUploadSkillAssetsApiRequest
-): Promise<InitUploadAssetsApiResponse | undefined> {
+): Promise<InitUploadAssetsApiResponse> {
   return apiPost('/skill/initUploadSkillAssets', body);
 }
 

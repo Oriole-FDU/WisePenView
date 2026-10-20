@@ -9,6 +9,7 @@ import {
   normalizeSexFromApi,
   normalizeUserStatusFromApi,
 } from '@/domains/User/mapper/userEnum.mapper';
+import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -32,18 +33,19 @@ import type {
 const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
   return {
     id: normalizeId(raw.userId),
-    username: raw.username ?? '',
-    nickname: raw.nickname ?? undefined,
-    realName: raw.realName ?? undefined,
-    avatar: raw.avatar ?? undefined,
-    identityType: raw.identityType == null ? 0 : normalizeIdentityTypeFromApi(raw.identityType),
-    campusNo: raw.campusNo ?? undefined,
-    email: raw.email ?? undefined,
-    mobile: raw.mobile ?? undefined,
-    verificationMode: raw.verificationMode ?? null,
-    status: raw.status == null ? 0 : normalizeUserStatusFromApi(raw.status),
-    createTime: raw.createTime ?? undefined,
-    updateTime: raw.updateTime ?? undefined,
+    username: raw.username,
+    nickname: raw.nickname,
+    realName: raw.realName,
+    avatar: raw.avatar,
+    identityType: normalizeIdentityTypeFromApi(raw.identityType),
+    campusNo: raw.campusNo,
+    email: raw.email,
+    mobile: raw.mobile,
+    verificationMode: raw.verificationMode,
+    verificationProviderCode: raw.verificationProviderCode,
+    status: normalizeUserStatusFromApi(raw.userStatus),
+    createTime: raw.createTime == null ? null : formatTimestampToDate(raw.createTime),
+    updateTime: raw.updateTime == null ? null : formatTimestampToDate(raw.updateTime),
   };
 };
 
@@ -76,11 +78,18 @@ const mapGetAdminUserInfoFromApi = (
   data: GetAdminUserInfoApiResponse
 ): GetAdminUserInfoResponse => ({
   userProfile: {
-    ...data,
-    sex: data.sex == null ? undefined : normalizeSexFromApi(data.sex),
-    enrollmentYear: data.enrollmentYear == null ? undefined : String(data.enrollmentYear),
-    degreeLevel:
-      data.degreeLevel == null ? undefined : normalizeDegreeLevelFromApi(data.degreeLevel),
+    userId: normalizeId(data.userId),
+    sex: data.sex == null ? null : normalizeSexFromApi(data.sex),
+    inviteCode: data.inviteCode,
+    university: data.university,
+    college: data.college,
+    major: data.major,
+    className: data.className,
+    enrollmentYear: data.enrollmentYear == null ? null : String(data.enrollmentYear),
+    degreeLevel: data.degreeLevel == null ? null : normalizeDegreeLevelFromApi(data.degreeLevel),
+    academicTitle: data.academicTitle,
+    createTime: data.createTime == null ? null : formatTimestampToDate(data.createTime),
+    updateTime: data.updateTime == null ? null : formatTimestampToDate(data.updateTime),
   },
 });
 
@@ -89,7 +98,7 @@ const mapChangeAdminUserInfoRequest = (
 ): ChangeAdminUserInfoApiRequest => ({
   ...params,
   identityType: mapIdentityTypeToApi(params.identityType),
-  status: mapUserStatusToApi(params.status),
+  userStatus: mapUserStatusToApi(params.status),
 });
 
 const mapChangeAdminUserProfileRequest = (

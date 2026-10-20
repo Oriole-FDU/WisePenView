@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   PencilLine,
   ShieldCheck,
+  Store,
 } from 'lucide-react';
 
 import { RESOURCE_ACTION, type ResourceAction } from '@/domains/Resource';
@@ -29,6 +30,7 @@ const RESOURCE_PERMISSION_ACTION_ICON_MAP: Record<ResourceAction, LucideIcon> = 
   [RESOURCE_ACTION.DOWNLOAD_ORIGINAL]: Download,
   [RESOURCE_ACTION.FORK]: GitFork,
   [RESOURCE_ACTION.COMMENT]: MessageCircle,
+  [RESOURCE_ACTION.MARKET_VIEW]: Store,
 };
 
 function ResourcePermissionActionIcon({

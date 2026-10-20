@@ -6,8 +6,9 @@ export interface RedeemVoucherApiRequest {
 }
 
 export interface GetUserWalletInfoApiResponse {
-  tokenBalance?: number | string | null;
-  tokenUsed?: number | string | null;
+  tokenBalance: number;
+  tokenUsed: number;
+  coinBalance: number;
 }
 
 export type WalletTransactionTypeApiValue =
@@ -24,15 +25,15 @@ export type WalletTransactionTypeApiValue =
 export type WalletBusinessTypeApiValue = 'TOKEN' | 'COIN';
 
 export interface WalletTransactionRecordApiResponse {
-  traceId?: string | null;
-  operatorId?: string | number | null;
-  count?: string | number | null;
-  walletTransactionType?: WalletTransactionTypeApiValue | null;
-  walletBusinessType?: WalletBusinessTypeApiValue | null;
-  meta?: string | null;
-  billingDetail?: string | null;
-  operatorDisplay?: UserDisplayBaseApiResponse | null;
-  createTime?: string | null;
+  traceId: string;
+  operatorId: string | null;
+  count: number;
+  walletTransactionType: WalletTransactionTypeApiValue;
+  walletBusinessType: WalletBusinessTypeApiValue;
+  meta: string | null;
+  billingDetail: string | null;
+  operatorDisplay: UserDisplayBaseApiResponse | null;
+  createTime: number;
 }
 
 export interface ListTransactionsApiRequest extends OptionalPageApiRequest {

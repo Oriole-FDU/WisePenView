@@ -5,23 +5,23 @@ export type RewardTypeApiValue = 'TOKEN' | 'COIN' | 'NONE';
 
 export interface UserTaskRewardPreviewApiResponse {
   rewardType: RewardTypeApiValue;
-  rewardAmount?: number | null;
-  minRewardAmount?: number | null;
-  maxRewardAmount?: number | null;
-  rewardStepAmount?: number | null;
+  rewardAmount: number | null;
+  minRewardAmount: number | null;
+  maxRewardAmount: number | null;
+  rewardStepAmount: number | null;
 }
 
 export interface UserTaskOnceStatusApiResponse {
   completed: boolean;
-  completeTime?: string | null;
+  completeTime: number | null;
 }
 
 export interface UserTaskPeriodicStatusApiResponse {
   completedTimes: number;
   maxTimes: number;
-  windowStart?: string | null;
-  windowEnd?: string | null;
-  lastCompleteTime?: string | null;
+  windowStart: number | null;
+  windowEnd: number | null;
+  lastCompleteTime: number | null;
 }
 
 export interface UserTaskStatusApiResponse {
@@ -29,9 +29,9 @@ export interface UserTaskStatusApiResponse {
   taskType: UserTaskTypeApiValue;
   enabled: boolean;
   canComplete: boolean;
-  rewardPreview?: UserTaskRewardPreviewApiResponse | null;
-  once?: UserTaskOnceStatusApiResponse | null;
-  periodic?: UserTaskPeriodicStatusApiResponse | null;
+  rewardPreview: UserTaskRewardPreviewApiResponse | null;
+  once: UserTaskOnceStatusApiResponse | null;
+  periodic: UserTaskPeriodicStatusApiResponse | null;
 }
 
 export interface UserTaskCheckInApiResponse {

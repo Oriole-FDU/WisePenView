@@ -1,4 +1,4 @@
-import type { OptionalPageApiRequest } from '@/apis/api.type';
+import type { OptionalPageApiRequest, PageR } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 
 /** POST /resource/favorite/changeResourceFavoriteStatus 请求体 */
@@ -34,19 +34,21 @@ export interface GetFavoriteStatusApiResponse {
 
 /** 收藏集合响应；时间戳使用毫秒 */
 export interface FavoriteCollectionApiResponse {
-  collectionId?: string | number;
-  collectionName?: string | null;
-  description?: string | null;
-  isDefault?: boolean;
-  itemCount?: number;
+  collectionId: string;
+  collectionName: string;
+  description: string | null;
+  isDefault: boolean;
+  itemCount: number;
+  createTime: number;
 }
 
 /** 收藏条目响应 */
 export interface FavoriteItemApiResponse {
-  resourceId?: string | number;
-  resourceInfo?: ResourceItemApiResponse | null;
-  favoritedAt?: number | string;
-  accessible?: boolean;
+  resourceId: string;
+  resourceInfo: ResourceItemApiResponse | null;
+  favoritedAt: number;
+  collectionIds: string[];
+  accessible: boolean;
 }
 
 /** GET /resource/favorite/listFavoritedResources 请求参数 */
@@ -55,8 +57,4 @@ export interface ListFavoritedResourcesApiRequest extends OptionalPageApiRequest
 }
 
 /** GET /resource/favorite/listFavoritedResources 响应 data */
-export interface ListFavoritedResourcesApiResponse {
-  list: FavoriteItemApiResponse[];
-  total: number | string;
-  totalPage: number;
-}
+export type ListFavoritedResourcesApiResponse = PageR<FavoriteItemApiResponse>;

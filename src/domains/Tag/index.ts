@@ -10,8 +10,6 @@ export type {
   TagPermissionPresetValues,
   TagResourceAction,
   TagResourceActionKey,
-  TagVisibilityMode,
-  TagVisibilityModeString,
 } from './enum';
 export {
   ACCESS_CONTROL_SCOPE,
@@ -32,7 +30,6 @@ export {
   TAG_PERMISSION_LIST_ACTIONS,
   TAG_PERMISSION_PRESET_VALUES,
   TAG_RESOURCE_ACTION,
-  TAG_VISIBILITY_MODE,
   updateResourceActionSelection,
 } from './enum';
 export type {

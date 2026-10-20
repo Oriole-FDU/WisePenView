@@ -31,6 +31,7 @@ WisePen 将在 **今晚 23:30 - 23:50** 进行一次短暂维护。维护期间�
 
 维护结束后无需重新登录。若遇到异常，可先刷新页面，或通过用户反馈联系我们。`,
     jumpUrl: '/drive/personal',
+    extra: null,
     readTime: null,
     createTime: now,
   },
@@ -46,7 +47,9 @@ WisePen 将在 **今晚 23:30 - 23:50** 进行一次短暂维护。维护期间�
 - 关联任务：课堂讨论准备
 
 请进入课程页面查看详情，并根据材料中的检查项更新自己的学习笔记。`,
-    readTime: new Date(now).toISOString(),
+    readTime: now,
+    jumpUrl: null,
+    extra: null,
     createTime: now - 86_400_000,
   },
 ];
@@ -55,7 +58,6 @@ export const MessageApi: typeof MessageApiContract = {
   listUserMessages: (params) => mockResponse(mockPage(mockMessages, params)),
   readMessage: async ({ messageIds }) => {
     for (const message of mockMessages)
-      if (messageIds.includes(String(message.messageId)))
-        message.readTime = new Date().toISOString();
+      if (messageIds.includes(String(message.messageId))) message.readTime = Date.now();
   },
 };

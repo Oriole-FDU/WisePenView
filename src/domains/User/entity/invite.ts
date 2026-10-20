@@ -9,8 +9,8 @@ export interface UserInviteRecord {
   inviteeUserId: string;
   invitee?: UserDisplayBase;
   status: UserInviteStatus;
-  createTime?: string;
-  rewardTime?: string;
+  createTime: number | null;
+  rewardTime: number | null;
 }
 
 export interface UserInviteRecordList {

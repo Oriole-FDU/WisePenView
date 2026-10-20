@@ -39,6 +39,7 @@ const ACTION_LABEL_KEYS = {
   DOWNLOAD_ORIGINAL: 'permission.action.DOWNLOAD_ORIGINAL',
   FORK: 'permission.action.FORK',
   COMMENT: 'permission.action.COMMENT',
+  MARKET_VIEW: 'permission.action.MARKET_VIEW',
 } as const;
 
 const POLICY_SCOPE_OPTIONS = [

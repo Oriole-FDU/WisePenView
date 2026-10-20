@@ -1,5 +1,3 @@
-import { normalizeId } from '@/utils/normalize/normalizeId';
-
 import type {
   ListUserMessagesApiRequest,
   ListUserMessagesApiResponse,
@@ -15,15 +13,15 @@ import type {
 import { normalizeMessageType } from './messageType.mapper';
 
 const mapUserMessageApiModelToEntity = (raw: UserMessageApiModel): UserMessage => ({
-  messageId: normalizeId(raw.messageId),
-  deliveryScope: raw.deliveryScope ?? undefined,
-  messageType: normalizeMessageType(raw.messageType ?? undefined) ?? raw.messageType ?? undefined,
-  title: raw.title?.trim() ?? '',
-  content: raw.content ?? '',
+  messageId: raw.messageId,
+  deliveryScope: raw.deliveryScope,
+  messageType: normalizeMessageType(raw.messageType) ?? raw.messageType,
+  title: raw.title.trim(),
+  content: raw.content,
   jumpUrl: raw.jumpUrl?.trim() || undefined,
   extra: raw.extra ?? undefined,
-  read: Boolean(raw.readTime),
-  createTime: raw.createTime ?? undefined,
+  read: raw.readTime != null,
+  createTime: raw.createTime,
 });
 
 const mapListUserMessagesRequest = (

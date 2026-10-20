@@ -1,25 +1,25 @@
 import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 export type CommentSortByApiValue = 'CREATE_TIME' | 'LIKE_COUNT';
+export type CommentTypeApiValue = 'COMMENT' | 'REPLY_TO_COMMENT' | 'REPLY_TO_REPLY';
 
-export interface CommentAuthorApiResponse {
-  nickname?: string | null;
-  realName?: string | null;
-  avatar?: string | null;
-}
+export type CommentAuthorApiResponse = UserDisplayBaseApiResponse;
 
 export interface ResourceCommentItemApiResponse {
+  resourceId: string;
   commentId: string;
-  replyToUserId?: string | null;
+  replyToUserId: string | null;
   authorId: string;
-  authorInfo?: CommentAuthorApiResponse | null;
-  replyToUserInfo?: CommentAuthorApiResponse | null;
-  content?: string | null;
-  imageUrls?: string[] | null;
-  likeCount?: number | null;
-  replyCount?: number | null;
+  authorInfo: CommentAuthorApiResponse | null;
+  replyToUserInfo: CommentAuthorApiResponse | null;
+  content: string;
+  imageUrls: string[];
+  likeCount: number;
+  replyCount: number;
+  commentType: CommentTypeApiValue;
   createTime: number;
-  deleted?: boolean | null;
+  deleted: boolean;
 }
 
 export interface CreateCommentApiRequest {

@@ -11,16 +11,16 @@ import type {
   UpdateAgentSpecApiRequest,
 } from './AgentApi.type';
 
-const createAgent = (body: CreateAgentApiRequest): Promise<string | undefined> =>
+const createAgent = (body: CreateAgentApiRequest): Promise<string> =>
   apiPost('/agent/createAgent', body);
 
-const getAgentInfo = (resourceId: string): Promise<AgentInfoApiResponse | undefined> =>
+const getAgentInfo = (resourceId: string): Promise<AgentInfoApiResponse> =>
   apiPost('/agent/getAgentInfo', null, { params: { resourceId } });
 
 const getAgentVersionBundleInfo = (
   resourceId: string,
   version: number
-): Promise<AgentVersionBundleApiResponse | undefined> =>
+): Promise<AgentVersionBundleApiResponse> =>
   apiPost('/agent/getAgentVersionBundleInfo', null, { params: { resourceId, version } });
 
 const changeAgentInfo = (body: UpdateAgentInfoApiRequest): Promise<void> =>
@@ -34,8 +34,7 @@ const publishAgentVersion = (resourceId: string): Promise<void> =>
 
 const initUploadAgentAssets = (
   body: InitUploadAgentAssetsApiRequest
-): Promise<InitUploadAssetsApiResponse | undefined> =>
-  apiPost('/agent/initUploadAgentAssets', body);
+): Promise<InitUploadAssetsApiResponse> => apiPost('/agent/initUploadAgentAssets', body);
 
 const deleteAgentAssets = (body: DeleteAgentAssetsApiRequest): Promise<void> =>
   apiPost('/agent/deleteAgentAssets', body);

@@ -38,11 +38,6 @@ const mapUploadDocToApi = ({
   mountTargetTagId: pathTagId,
 });
 
-const normalizeOptionalId = (value: string | number | null | undefined): string | null => {
-  const normalized = normalizeId(value);
-  return normalized || null;
-};
-
 const mapDocumentProcessStatusFromApi = (
   data: PendingDocumentStatusApiResponse
 ): DocumentProcessStatus => ({
@@ -56,7 +51,7 @@ const mapDocMetaInfoFromApi = (
   ...data,
   uploadMeta: {
     ...data.uploadMeta,
-    uploaderId: normalizeOptionalId(data.uploadMeta.uploaderId),
+    uploaderId: normalizeId(data.uploadMeta.uploaderId),
     size: normalizeNonNegativeNumber(data.uploadMeta.size) ?? 0,
   },
   documentStatus: mapDocumentProcessStatusFromApi(data.documentStatus),
@@ -82,14 +77,12 @@ const readDocumentVersionInfoFromApi = (
 const mapGetDocInfoFromApi = (data: GetDocInfoApiResponse): DocDisplayInfoResponse => ({
   docMetaInfo: mapDocMetaInfoFromApi(readDocumentVersionInfoFromApi(data)),
   resourceInfo: ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo),
-  authorsDisplay: data.authorsDisplay
-    ? Object.fromEntries(
-        Object.entries(data.authorsDisplay).flatMap(([userId, userInfo]) => {
-          const normalized = normalizeUserDisplayBaseFromApi(userInfo);
-          return normalized ? [[userId, normalized] as const] : [];
-        })
-      )
-    : undefined,
+  authorsDisplay: Object.fromEntries(
+    Object.entries(data.authorsDisplay).flatMap(([userId, userInfo]) => {
+      const normalized = normalizeUserDisplayBaseFromApi(userInfo);
+      return normalized ? [[userId, normalized] as const] : [];
+    })
+  ),
 });
 
 const mapDocPermissionOverviewFromApi = (

@@ -1,4 +1,4 @@
-import type { JavaLongApiValue, NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
+import type { PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 export type ResourceActionApiKey =
@@ -10,78 +10,113 @@ export type ResourceActionApiKey =
   | 'DOWNLOAD_WATERMARK'
   | 'DOWNLOAD_ORIGINAL'
   | 'FORK'
-  | 'COMMENT';
-type ResourceActionApiValue = ResourceActionApiKey | NumericEnumApiValue;
+  | 'COMMENT'
+  | 'MARKET_VIEW';
+export type ResourceActionApiValue = ResourceActionApiKey;
 export type ResourceActionApiList = ResourceActionApiValue[];
+
+export type ResourceTypeApiValue =
+  | 'NOTE'
+  | 'DRAWIO'
+  | 'PDF'
+  | 'DOC'
+  | 'DOCX'
+  | 'PPT'
+  | 'PPTX'
+  | 'XLS'
+  | 'XLSX'
+  | 'SKILL'
+  | 'AGENT'
+  | 'UNKNOWN';
+
 export interface ResourceInteractionInfoApiResponse {
-  readCount?: JavaLongApiValue | null;
-  likeCount?: JavaLongApiValue | null;
-  scoreCount?: JavaLongApiValue | null;
-  scoreTotal?: JavaLongApiValue | null;
-  favoriteCount?: JavaLongApiValue | null;
-  commentCount?: JavaLongApiValue | null;
+  readCount: number;
+  likeCount: number;
+  scoreCount: number;
+  scoreTotal: number;
+  favoriteCount: number;
+  commentCount: number;
 }
 
 export interface ResourceUserInteractionRecordApiResponse {
-  read?: boolean | null;
-  liked?: boolean | null;
-  score?: number | null;
-  likedCommentIds?: string[] | null;
-  resourceId?: string | null;
+  read: boolean;
+  liked: boolean;
+  score: number | null;
+  likedCommentIds: string[];
+  resourceId: string;
 }
 
-interface ResourceTagInfoApiResponse {
-  tagName?: string;
-  tagDesc?: string;
-  tagIcon?: string;
-  tagColor?: string;
-  tagCreator?: string;
-  isPath?: boolean;
+export interface ResourceTagInfoApiResponse {
+  groupId: string;
+  tagName: string;
+  tagDesc: string | null;
+  tagIcon: string | null;
+  tagColor: string | null;
+  tagMetaInfo: string | null;
+  tagCreator: string | null;
+  isPath: boolean;
 }
 
-interface ResourceTagBindApiResponse {
-  groupId?: string;
-  primaryTagId?: string;
-  tags?: Record<string, ResourceTagInfoApiResponse | null | undefined>;
+export interface ResourceTagBindApiResponse {
+  groupId: string;
+  primaryTagId: string;
+  tags: Record<string, ResourceTagInfoApiResponse>;
 }
 
-type ResourceGroupTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
+type ResourceGroupTypeApiValue = 'NORMAL_GROUP' | 'ADVANCED_GROUP' | 'MARKET_GROUP';
 
 export interface ResourceGroupDisplayBaseApiResponse {
-  groupName?: string | null;
-  groupDesc?: string | null;
-  groupCoverUrl?: string | null;
-  groupType?: ResourceGroupTypeApiValue | null;
+  groupName: string;
+  groupDesc: string | null;
+  groupCoverUrl: string | null;
+  groupType: ResourceGroupTypeApiValue;
+  groupMetaInfo: string | null;
 }
 
 export interface ResourceGroupGrantedActionsApiResponse {
   groupId: string;
-  groupInfo?: ResourceGroupDisplayBaseApiResponse | null;
-  grantedActions?: ResourceActionApiList | null;
+  groupInfo: ResourceGroupDisplayBaseApiResponse | null;
+  grantedActions: ResourceActionApiList;
 }
 
 export interface ResourceSpecifiedUserGrantedActionsApiResponse {
   userId: string;
-  userInfo?: UserDisplayBaseApiResponse | null;
-  grantedActions?: ResourceActionApiList | null;
+  userInfo: UserDisplayBaseApiResponse | null;
+  grantedActions: ResourceActionApiList;
+}
+
+export interface MarketSaleTierApiResponse {
+  offerId: string;
+  grantedActions: ResourceActionApiList;
+  price: number;
+}
+
+export interface MarketSaleInfoApiResponse {
+  reviewActions: ResourceActionApiList;
+  reviewContentPercentage: number;
+  marketSaleTiers: MarketSaleTierApiResponse[];
+  status: 'PENDING_REVIEW' | 'PUBLISHED' | 'REJECTED' | 'BANNED' | 'OFF_SHELF';
+  offerVersion: number | null;
+  auditMessage: string | null;
+  auditAt: number | null;
 }
 
 export interface ResourceItemApiResponse {
   resourceId: string;
   resourceName: string;
-  ownerId?: string;
-  size?: JavaLongApiValue | null;
-  ownerInfo: UserDisplayBaseApiResponse;
-  resourceType?: string;
-  preview?: string;
-  path?: string;
-  resourceInteractionInfo?: ResourceInteractionInfoApiResponse;
-  myInteractionRecord?: ResourceUserInteractionRecordApiResponse | null;
-  tagBinds?: ResourceTagBindApiResponse[];
-  currentActions?: ResourceActionApiList | null;
-  resourceAccessRole?: 'OWNER' | 'OWNER_SPECIFIED' | 'GROUP_ADMIN' | 'GROUP_MEMBER' | 'NONE';
-  overrideGrantedActions?: ResourceGroupGrantedActionsApiResponse[] | null;
-  specifiedUsersGrantedActions?: ResourceSpecifiedUserGrantedActionsApiResponse[] | null;
+  ownerId: string;
+  size: string | null;
+  ownerInfo: UserDisplayBaseApiResponse | null;
+  resourceType: ResourceTypeApiValue;
+  preview: string | null;
+  resourceInteractionInfo: ResourceInteractionInfoApiResponse;
+  myInteractionRecord: ResourceUserInteractionRecordApiResponse | null;
+  tagBinds: ResourceTagBindApiResponse[];
+  currentActions: ResourceActionApiList;
+  resourceAccessRole: 'OWNER' | 'OWNER_SPECIFIED' | 'GROUP_ADMIN' | 'GROUP_MEMBER' | 'NONE';
+  overrideGrantedActions: ResourceGroupGrantedActionsApiResponse[];
+  specifiedUsersGrantedActions: ResourceSpecifiedUserGrantedActionsApiResponse[];
+  marketSaleInfos: Record<string, MarketSaleInfoApiResponse>;
 }
 
 export type ResourceListPageApiResponse = PageR<ResourceItemApiResponse>;
@@ -118,10 +153,10 @@ export interface GlobalSearchApiRequest extends PageApiRequest {
 
 export interface GlobalSearchItemApiResponse {
   resourceId: string;
-  resourceType: string;
+  resourceType: ResourceTypeApiValue;
   resourceName: string;
   highlightContent: string | null;
-  updateTime: string;
+  updateTime: number;
 }
 
 export type GlobalSearchApiResponse = PageR<GlobalSearchItemApiResponse>;

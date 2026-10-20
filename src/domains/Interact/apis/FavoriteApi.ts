@@ -20,7 +20,7 @@ const changeFavoriteStatus = (request: ChangeFavoriteStatusApiRequest): Promise<
 const listCollections = (): Promise<FavoriteCollectionApiResponse[]> =>
   apiGet('/resource/favorite/listCollections');
 
-const createCollection = (request: CreateCollectionApiRequest): Promise<string | number> =>
+const createCollection = (request: CreateCollectionApiRequest): Promise<string> =>
   apiPost('/resource/favorite/createCollection', request);
 
 const updateCollectionInfo = (request: UpdateCollectionInfoApiRequest): Promise<void> =>

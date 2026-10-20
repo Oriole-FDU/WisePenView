@@ -4,19 +4,17 @@ import type {
   GetMyGroupMemberInfoApiResponse,
   GroupTokenInfoApiResponseItem,
 } from '@/domains/Group/apis/GroupApi.type';
+import { mapGroupTypeFromApi } from '@/domains/Group/mapper/GroupServices.map';
 import { normalizeId } from '@/utils/normalize/normalizeId';
-import {
-  normalizeFiniteNumber,
-  normalizeNonNegativeNumber,
-} from '@/utils/normalize/normalizeNumber';
+import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApiResponseItem): UserGroupQuota => {
-  const base = item.groupDisplayBase ?? {};
+  const base = item.groupDisplayBase;
 
   return {
-    groupId: normalizeId(base.groupId),
-    groupName: base.groupName ?? '',
-    groupType: normalizeFiniteNumber(base.groupType) ?? 0,
+    groupId: normalizeId(item.groupId),
+    groupName: base?.groupName ?? '',
+    groupType: base ? mapGroupTypeFromApi(base.groupType) : 0,
     quotaLimit: normalizeNonNegativeNumber(item.tokenLimit) ?? 0,
     quotaUsed: normalizeNonNegativeNumber(item.tokenUsed) ?? 0,
   };

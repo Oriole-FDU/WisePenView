@@ -1,4 +1,5 @@
 import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
+import { createMockUserDisplay } from '@/domains/_shared/mock/userDisplay';
 import { addMockResource, getMockResource } from '@/domains/Resource/mock/resourceStore';
 
 import type { NoteApi as NoteApiContract } from '../apis/NoteApi';
@@ -15,15 +16,15 @@ export const NoteApi: typeof NoteApiContract = {
     mockResponse({
       resourceInfo: getMockResource(resourceId),
       version: 0,
-      noteInfo: { authors: ['1'], lastUpdatedAt: '2026-03-01T00:00:00Z' },
-      authorsDisplay: { '1': { nickname: '示例用户' } },
+      updateTime: Date.parse('2026-03-01T00:00:00Z'),
+      authorsDisplay: { '1': createMockUserDisplay() },
     }),
   getDrawIoLatestSnapshot: ({ resourceId }) =>
     mockResponse(
-      snapshots.get(resourceId) ?? { resourceId, version: 0, fullSnapshot: null, deltas: null }
+      snapshots.get(resourceId) ?? { resourceId, version: 0, fullSnapshot: null, deltas: [] }
     ),
   saveDrawIoSnapshot: async ({ resourceId, version, data }) => {
-    snapshots.set(resourceId, { resourceId, version, fullSnapshot: data, deltas: null });
+    snapshots.set(resourceId, { resourceId, version, fullSnapshot: data, deltas: [] });
   },
   forkNote: async ({ resourceId, forkedResourceName }) => {
     const source = getMockResource(resourceId);

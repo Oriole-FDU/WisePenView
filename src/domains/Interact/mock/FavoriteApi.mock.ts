@@ -21,10 +21,11 @@ const collections: (FavoriteCollectionApiResponse & { collectionId: string; item
   [
     {
       collectionId: DEFAULT_COLLECTION_ID,
-      collectionName: null,
+      collectionName: '默认收藏夹',
       description: null,
       isDefault: true,
       itemCount: 4,
+      createTime: Date.now() - 1000 * 60 * 60 * 24 * 30,
     },
     {
       collectionId: 'mock-favorite-reading',
@@ -32,6 +33,7 @@ const collections: (FavoriteCollectionApiResponse & { collectionId: string; item
       description: '需要继续跟进的资料',
       isDefault: false,
       itemCount: 2,
+      createTime: Date.now() - 1000 * 60 * 60 * 24 * 7,
     },
   ];
 const favoriteSeedTime = Date.now();
@@ -109,6 +111,7 @@ const createMockFavoriteCollection = async (
     description: params.description ?? null,
     isDefault: false,
     itemCount: 0,
+    createTime: Date.now(),
   });
   return collectionId;
 };
@@ -158,6 +161,8 @@ const listMockFavoritedResources = async (
       resourceId: resource.resourceId,
       favoritedAt: resourceFavoriteTimes.get(resource.resourceId) ?? Date.now(),
       resourceInfo: resource,
+      collectionIds: resourceCollectionIds.get(resource.resourceId) ?? [],
+      accessible: true,
     }))
     .sort((left, right) => Number(right.favoritedAt) - Number(left.favoritedAt));
   return mockResponse(mockPage(list, params));

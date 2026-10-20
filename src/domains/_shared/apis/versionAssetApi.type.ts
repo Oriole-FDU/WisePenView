@@ -1,30 +1,31 @@
-import type { JavaLongApiValue } from '@/apis/api.type';
-
 export type VersionStatusApiValue = 'DRAFT' | 'PUBLISHED';
 export type AssetUploadStatusApiValue = 'UPLOADING' | 'AVAILABLE';
+export type VersionResourceSourceTypeApiValue = 'BY_AGENT' | 'MANUAL';
 
 export interface VersionAssetApiInfo<AssetResourceType extends string = string> {
-  id?: string;
-  name?: string;
-  path?: string;
-  objectKey?: string;
-  assetResourceType?: AssetResourceType;
-  uploadStatus?: AssetUploadStatusApiValue;
-  size?: JavaLongApiValue;
+  id: string;
+  name: string;
+  path: string;
+  objectKey: string | null;
+  assetResourceType: AssetResourceType;
+  uploadStatus: AssetUploadStatusApiValue;
+  size: string | null;
 }
 
 export interface VersionBundleApiResponse<AssetResourceType extends string = string> {
-  version?: number;
-  status?: VersionStatusApiValue;
-  assets?: VersionAssetApiInfo<AssetResourceType>[];
-  resourceId?: string;
+  version: number;
+  status: VersionStatusApiValue;
+  assets: VersionAssetApiInfo<AssetResourceType>[];
+  resourceId: string;
 }
 
 export interface VersionResourceInfoApiResponse {
-  name?: string;
-  description?: string;
-  version?: number;
-  sourceType?: string;
+  resourceId: string;
+  name: string;
+  description: string | null;
+  version: number;
+  sourceType: VersionResourceSourceTypeApiValue;
+  updateTime: number;
 }
 
 export interface InitUploadAssetApiItem<AssetResourceType extends string = string> {
@@ -36,17 +37,18 @@ export interface InitUploadAssetApiItem<AssetResourceType extends string = strin
 }
 
 export interface AssetUploadTicketApiResponse {
-  assetId?: string;
-  path?: string;
-  name?: string;
-  objectKey?: string;
-  putUrl?: string;
-  callbackHeader?: string;
-  flashUploaded?: boolean;
+  assetId: string;
+  path: string;
+  name: string;
+  objectKey: string;
+  putUrl: string | null;
+  callbackHeader: string | null;
+  flashUploaded: boolean;
+  domain: string | null;
 }
 
 export interface InitUploadAssetsApiResponse {
-  resourceId?: string;
-  version?: number;
-  assetUploadTickets?: AssetUploadTicketApiResponse[];
+  resourceId: string;
+  version: number;
+  assetUploadTickets: AssetUploadTicketApiResponse[];
 }

@@ -8,19 +8,20 @@ import type {
 import type { UserVerificationMode } from '@/domains/User/enum';
 
 export interface AdminUserApiModel {
-  userId?: string | number;
-  username?: string;
-  nickname?: string;
-  realName?: string;
-  avatar?: string;
-  identityType?: UserIdentityTypeApiValue;
-  campusNo?: string;
-  email?: string;
-  mobile?: string;
-  verificationMode?: UserVerificationMode;
-  status?: UserStatusApiValue;
-  createTime?: string;
-  updateTime?: string;
+  userId: string;
+  username: string;
+  nickname: string;
+  realName: string | null;
+  avatar: string | null;
+  identityType: UserIdentityTypeApiValue;
+  campusNo: string | null;
+  email: string | null;
+  mobile: string | null;
+  verificationMode: UserVerificationMode | null;
+  verificationProviderCode: string | null;
+  userStatus: UserStatusApiValue;
+  createTime: number | null;
+  updateTime: number | null;
 }
 
 export interface FetchAdminUserListApiRequest extends PageApiRequest {
@@ -36,28 +37,33 @@ export interface GetAdminUserInfoApiRequest {
 }
 
 export interface GetAdminUserInfoApiResponse {
-  sex?: UserSexApiValue;
-  university?: string;
-  college?: string;
-  major?: string;
-  className?: string;
-  enrollmentYear?: number;
-  degreeLevel?: UserDegreeLevelApiValue;
-  academicTitle?: string;
-  userId?: string | number;
-  createTime?: string;
-  updateTime?: string;
+  userId: string;
+  sex: UserSexApiValue | null;
+  inviteCode: string | null;
+  university: string | null;
+  college: string | null;
+  major: string | null;
+  className: string | null;
+  enrollmentYear: number | null;
+  degreeLevel: UserDegreeLevelApiValue | null;
+  academicTitle: string | null;
+  createTime: number | null;
+  updateTime: number | null;
 }
 
 export interface ChangeAdminUserInfoApiRequest {
   userId: string;
+  username?: string;
   nickname?: string;
   realName?: string;
   avatar?: string;
   email?: string | null;
   mobile?: string | null;
-  status?: string;
-  identityType?: string;
+  campusNo?: string | null;
+  verificationMode?: UserVerificationMode | null;
+  verificationProviderCode?: string | null;
+  userStatus?: UserStatusApiValue;
+  identityType?: UserIdentityTypeApiValue;
 }
 
 export interface ChangeAdminUserProfileApiRequest {

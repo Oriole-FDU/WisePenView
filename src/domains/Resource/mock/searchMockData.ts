@@ -4,20 +4,26 @@ import type {
   GlobalSearchApiResponse,
   GlobalSearchItemApiResponse,
   ResourceItemApiResponse,
+  ResourceTypeApiValue,
 } from '../apis/ResourceApi.type';
 
 /** 一篇可被搜索的 mock 资源；content 仅 mock 内部用，后端不返回 */
 interface SearchCorpusItem {
   resourceId: string;
-  /** 小写资源类型，与后端 ResourceType 序列化值一致。 */
-  resourceType: string;
+  resourceType: ResourceTypeApiValue;
   resourceName: string;
   content: string;
+  updateTime: number;
+}
+
+interface SearchCorpusSourceItem extends Omit<SearchCorpusItem, 'resourceType' | 'updateTime'> {
+  /** 源数据沿用扩展名小写写法，导出时归一化为后端 canonical wire 值。 */
+  resourceType: string;
   updateTime: string;
 }
 
 /** 15 篇文档 + 8 篇笔记，覆盖 pdf/doc/docx/ppt/pptx/xls/xlsx/note */
-export const SEARCH_CORPUS: SearchCorpusItem[] = [
+const SEARCH_CORPUS_SOURCE: SearchCorpusSourceItem[] = [
   {
     resourceId: 'doc-ds-analysis',
     resourceType: 'pdf',
@@ -198,6 +204,32 @@ export const SEARCH_CORPUS: SearchCorpusItem[] = [
   },
 ];
 
+const SEARCH_RESOURCE_TYPE_VALUES = new Set<ResourceTypeApiValue>([
+  'NOTE',
+  'DRAWIO',
+  'PDF',
+  'DOC',
+  'DOCX',
+  'PPT',
+  'PPTX',
+  'XLS',
+  'XLSX',
+  'SKILL',
+  'AGENT',
+  'UNKNOWN',
+]);
+
+const normalizeSearchResourceType = (raw: string): ResourceTypeApiValue => {
+  const upper = raw.trim().toUpperCase() as ResourceTypeApiValue;
+  return SEARCH_RESOURCE_TYPE_VALUES.has(upper) ? upper : 'UNKNOWN';
+};
+
+export const SEARCH_CORPUS: SearchCorpusItem[] = SEARCH_CORPUS_SOURCE.map((item) => ({
+  ...item,
+  resourceType: normalizeSearchResourceType(item.resourceType),
+  updateTime: Date.parse(item.updateTime),
+}));
+
 /** 高亮标签，与后端 SearchConstants.HIGHLIGHT_PRE_TAG / POST_TAG 对齐 */
 const HIGHLIGHT_PRE = '<em class="wp-highlight">';
 const HIGHLIGHT_POST = '</em>';
@@ -254,8 +286,8 @@ export function simulateGlobalSearch(
     const resource = resources.get(item.resourceId);
     return resource ? [{ ...item, resourceName: resource.resourceName }] : [];
   }).filter((item) => {
-    if (scope === 'DOCUMENT') return item.resourceType !== 'note';
-    if (scope === 'NOTE') return item.resourceType === 'note';
+    if (scope === 'DOCUMENT') return item.resourceType !== 'NOTE';
+    if (scope === 'NOTE') return item.resourceType === 'NOTE';
     return true;
   });
 
