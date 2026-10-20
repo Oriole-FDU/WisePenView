@@ -1,4 +1,4 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 
 export type ListUserMessagesApiRequest = PageApiRequest;
 
@@ -11,9 +11,9 @@ export interface UserMessageApiModel {
   messageType: MessageTypeApiValue;
   title: string;
   content: string;
-  jumpUrl: string | null;
-  extra: string | null;
-  readTime: number | null;
+  jumpUrl: Nullable<string>;
+  extra: Nullable<string>;
+  readTime: Nullable<number>;
   createTime: number;
 }
 

@@ -1,4 +1,4 @@
-import type { OptionalPageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, OptionalPageApiRequest, PageR } from '@/apis/api.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 export interface RedeemVoucherApiRequest {
@@ -26,13 +26,13 @@ export type WalletBusinessTypeApiValue = 'TOKEN' | 'COIN';
 
 export interface WalletTransactionRecordApiResponse {
   traceId: string;
-  operatorId: string | null;
+  operatorId: Nullable<string>;
   count: number;
   walletTransactionType: WalletTransactionTypeApiValue;
   walletBusinessType: WalletBusinessTypeApiValue;
-  meta: string | null;
-  billingDetail: string | null;
-  operatorDisplay: UserDisplayBaseApiResponse | null;
+  meta: Nullable<string>;
+  billingDetail: Nullable<string>;
+  operatorDisplay: Nullable<UserDisplayBaseApiResponse>;
   createTime: number;
 }
 

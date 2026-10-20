@@ -1,4 +1,4 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 export type CommentSortByApiValue = 'CREATE_TIME' | 'LIKE_COUNT';
@@ -9,10 +9,10 @@ export type CommentAuthorApiResponse = UserDisplayBaseApiResponse;
 export interface ResourceCommentItemApiResponse {
   resourceId: string;
   commentId: string;
-  replyToUserId: string | null;
+  replyToUserId: Nullable<string>;
   authorId: string;
-  authorInfo: CommentAuthorApiResponse | null;
-  replyToUserInfo: CommentAuthorApiResponse | null;
+  authorInfo: Nullable<CommentAuthorApiResponse>;
+  replyToUserInfo: Nullable<CommentAuthorApiResponse>;
   content: string;
   imageUrls: string[];
   likeCount: number;

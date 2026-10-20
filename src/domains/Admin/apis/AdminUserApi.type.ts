@@ -1,4 +1,4 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 import type {
   UserDegreeLevelApiValue,
   UserIdentityTypeApiValue,
@@ -11,17 +11,17 @@ export interface AdminUserApiModel {
   userId: string;
   username: string;
   nickname: string;
-  realName: string | null;
-  avatar: string | null;
+  realName: Nullable<string>;
+  avatar: Nullable<string>;
   identityType: UserIdentityTypeApiValue;
-  campusNo: string | null;
-  email: string | null;
-  mobile: string | null;
-  verificationMode: UserVerificationMode | null;
-  verificationProviderCode: string | null;
+  campusNo: Nullable<string>;
+  email: Nullable<string>;
+  mobile: Nullable<string>;
+  verificationMode: Nullable<UserVerificationMode>;
+  verificationProviderCode: Nullable<string>;
   userStatus: UserStatusApiValue;
-  createTime: number | null;
-  updateTime: number | null;
+  createTime: Nullable<number>;
+  updateTime: Nullable<number>;
 }
 
 export interface FetchAdminUserListApiRequest extends PageApiRequest {
@@ -38,17 +38,17 @@ export interface GetAdminUserInfoApiRequest {
 
 export interface GetAdminUserInfoApiResponse {
   userId: string;
-  sex: UserSexApiValue | null;
-  inviteCode: string | null;
-  university: string | null;
-  college: string | null;
-  major: string | null;
-  className: string | null;
-  enrollmentYear: number | null;
-  degreeLevel: UserDegreeLevelApiValue | null;
-  academicTitle: string | null;
-  createTime: number | null;
-  updateTime: number | null;
+  sex: Nullable<UserSexApiValue>;
+  inviteCode: Nullable<string>;
+  university: Nullable<string>;
+  college: Nullable<string>;
+  major: Nullable<string>;
+  className: Nullable<string>;
+  enrollmentYear: Nullable<number>;
+  degreeLevel: Nullable<UserDegreeLevelApiValue>;
+  academicTitle: Nullable<string>;
+  createTime: Nullable<number>;
+  updateTime: Nullable<number>;
 }
 
 export interface ChangeAdminUserInfoApiRequest {
@@ -57,11 +57,11 @@ export interface ChangeAdminUserInfoApiRequest {
   nickname?: string;
   realName?: string;
   avatar?: string;
-  email?: string | null;
-  mobile?: string | null;
-  campusNo?: string | null;
-  verificationMode?: UserVerificationMode | null;
-  verificationProviderCode?: string | null;
+  email?: Nullable<string>;
+  mobile?: Nullable<string>;
+  campusNo?: Nullable<string>;
+  verificationMode?: Nullable<UserVerificationMode>;
+  verificationProviderCode?: Nullable<string>;
   userStatus?: UserStatusApiValue;
   identityType?: UserIdentityTypeApiValue;
 }
@@ -69,7 +69,7 @@ export interface ChangeAdminUserInfoApiRequest {
 export interface ChangeAdminUserProfileApiRequest {
   userId: string;
   sex?: string;
-  university?: string | null;
+  university?: Nullable<string>;
   college?: string;
   major?: string;
   className?: string;

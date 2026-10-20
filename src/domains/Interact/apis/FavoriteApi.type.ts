@@ -1,4 +1,4 @@
-import type { OptionalPageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, OptionalPageApiRequest, PageR } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 
 /** POST /resource/favorite/changeResourceFavoriteStatus 请求体 */
@@ -11,14 +11,14 @@ export interface ChangeFavoriteStatusApiRequest {
 /** POST /resource/favorite/createCollection 请求体 */
 export interface CreateCollectionApiRequest {
   collectionName: string;
-  description?: string | null;
+  description?: Nullable<string>;
 }
 
 /** POST /resource/favorite/updateCollectionInfo 请求体 */
 export interface UpdateCollectionInfoApiRequest {
   collectionId: string;
   collectionName: string;
-  description?: string | null;
+  description?: Nullable<string>;
 }
 
 /** POST /resource/favorite/deleteCollection 请求体 */
@@ -36,7 +36,7 @@ export interface GetFavoriteStatusApiResponse {
 export interface FavoriteCollectionApiResponse {
   collectionId: string;
   collectionName: string;
-  description: string | null;
+  description: Nullable<string>;
   isDefault: boolean;
   itemCount: number;
   createTime: number;
@@ -45,7 +45,7 @@ export interface FavoriteCollectionApiResponse {
 /** 收藏条目响应 */
 export interface FavoriteItemApiResponse {
   resourceId: string;
-  resourceInfo: ResourceItemApiResponse | null;
+  resourceInfo: Nullable<ResourceItemApiResponse>;
   favoritedAt: number;
   collectionIds: string[];
   accessible: boolean;

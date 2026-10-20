@@ -10,6 +10,7 @@ import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 import type { EnumKey } from '@/utils/type/enum';
+import { mapOptional } from '@/utils/type/nullable';
 
 import type {
   AddGroupApiRequest,
@@ -96,16 +97,13 @@ const mapGroupFromApi = (raw: GroupApiResponse | GroupDetailApiResponse): Group 
     groupCoverUrl: raw.groupCoverUrl ?? '',
     groupMetaInfo: parseGroupMetaInfo(raw.groupMetaInfo),
     groupType: mapGroupTypeFromApi(raw.groupType),
-    ownerId: raw.ownerId == null ? undefined : normalizeId(raw.ownerId),
-    ownerInfo:
-      ownerInfo == null
-        ? undefined
-        : {
-            nickname: ownerInfo.nickname ?? '',
-            realName: ownerInfo.realName,
-            avatar: ownerInfo.avatar,
-            identityType: ownerInfo.identityType,
-          },
+    ownerId: mapOptional(raw.ownerId, normalizeId),
+    ownerInfo: mapOptional(ownerInfo, (ownerInfo) => ({
+      nickname: ownerInfo.nickname ?? '',
+      realName: ownerInfo.realName,
+      avatar: ownerInfo.avatar,
+      identityType: ownerInfo.identityType,
+    })),
     memberCount: raw.memberCount,
     createTime: formatTimestampToDate(raw.createTime),
     inviteCode: 'inviteCode' in raw ? raw.inviteCode : undefined,

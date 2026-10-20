@@ -11,6 +11,7 @@ import {
 } from '@/domains/User/mapper/userEnum.mapper';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
+import { mapNullable, mapOptional } from '@/utils/type/nullable';
 
 import type {
   AdminUserApiModel,
@@ -44,8 +45,8 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
     verificationMode: raw.verificationMode,
     verificationProviderCode: raw.verificationProviderCode,
     status: normalizeUserStatusFromApi(raw.userStatus),
-    createTime: raw.createTime == null ? null : formatTimestampToDate(raw.createTime),
-    updateTime: raw.updateTime == null ? null : formatTimestampToDate(raw.updateTime),
+    createTime: mapNullable(raw.createTime, formatTimestampToDate),
+    updateTime: mapNullable(raw.updateTime, formatTimestampToDate),
   };
 };
 
@@ -79,17 +80,17 @@ const mapGetAdminUserInfoFromApi = (
 ): GetAdminUserInfoResponse => ({
   userProfile: {
     userId: normalizeId(data.userId),
-    sex: data.sex == null ? null : normalizeSexFromApi(data.sex),
+    sex: mapNullable(data.sex, normalizeSexFromApi),
     inviteCode: data.inviteCode,
     university: data.university,
     college: data.college,
     major: data.major,
     className: data.className,
-    enrollmentYear: data.enrollmentYear == null ? null : String(data.enrollmentYear),
-    degreeLevel: data.degreeLevel == null ? null : normalizeDegreeLevelFromApi(data.degreeLevel),
+    enrollmentYear: mapNullable(data.enrollmentYear, String),
+    degreeLevel: mapNullable(data.degreeLevel, normalizeDegreeLevelFromApi),
     academicTitle: data.academicTitle,
-    createTime: data.createTime == null ? null : formatTimestampToDate(data.createTime),
-    updateTime: data.updateTime == null ? null : formatTimestampToDate(data.updateTime),
+    createTime: mapNullable(data.createTime, formatTimestampToDate),
+    updateTime: mapNullable(data.updateTime, formatTimestampToDate),
   },
 });
 
@@ -104,7 +105,7 @@ const mapChangeAdminUserInfoRequest = (
 const mapChangeAdminUserProfileRequest = (
   params: ChangeAdminUserProfileRequest
 ): ChangeAdminUserProfileApiRequest => {
-  const enrollmentYear = params.enrollmentYear == null ? undefined : Number(params.enrollmentYear);
+  const enrollmentYear = mapOptional(params.enrollmentYear, Number);
   const payload: ChangeAdminUserProfileApiRequest = {
     userId: params.userId,
   };

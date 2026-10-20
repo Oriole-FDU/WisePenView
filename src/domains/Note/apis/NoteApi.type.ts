@@ -1,4 +1,4 @@
-import type { OptionalPageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, OptionalPageApiRequest, PageR } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
@@ -31,7 +31,7 @@ export interface GetDrawIoLatestSnapshotApiRequest {
 export interface GetDrawIoLatestSnapshotApiResponse {
   resourceId: string;
   version: number;
-  fullSnapshot: string | null;
+  fullSnapshot: Nullable<string>;
   deltas: string[];
 }
 

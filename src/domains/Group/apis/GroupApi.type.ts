@@ -1,4 +1,4 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 import type { TagResourceActionKey } from '@/domains/Tag';
 import type {
   UserDisplayBaseApiResponse,
@@ -20,12 +20,12 @@ export interface ListGroupApiRequest extends PageApiRequest {
 export interface GroupApiResponse {
   groupId: string;
   groupName: string;
-  groupDesc: string | null;
-  groupCoverUrl: string | null;
-  groupMetaInfo: string | null;
+  groupDesc: Nullable<string>;
+  groupCoverUrl: Nullable<string>;
+  groupMetaInfo: Nullable<string>;
   groupType: GroupTypeApiValue;
   ownerId: string;
-  ownerInfo: UserDisplayBaseApiResponse | null;
+  ownerInfo: Nullable<UserDisplayBaseApiResponse>;
   memberCount: number;
   createTime: number;
 }
@@ -87,12 +87,12 @@ export interface JoinGroupApiRequest {
 
 export interface GroupMemberBaseInfoApiResponse {
   nickname: string;
-  realName: string | null;
-  avatar: string | null;
+  realName: Nullable<string>;
+  avatar: Nullable<string>;
   identityType: UserIdentityTypeApiValue;
-  campusNo: string | null;
-  email: string | null;
-  mobile: string | null;
+  campusNo: Nullable<string>;
+  email: Nullable<string>;
+  mobile: Nullable<string>;
 }
 
 export interface GroupMemberApiResponse {
@@ -102,7 +102,7 @@ export interface GroupMemberApiResponse {
   tokenUsed: number;
   groupId: string;
   memberId: string;
-  memberInfo: GroupMemberBaseInfoApiResponse | null;
+  memberInfo: Nullable<GroupMemberBaseInfoApiResponse>;
 }
 
 export type FetchGroupMembersApiResponse = PageR<GroupMemberApiResponse>;
@@ -139,7 +139,7 @@ export interface GetMyGroupMemberInfoApiResponse {
   tokenLimit: number;
   groupId: string;
   memberId: string;
-  memberInfo: GroupMemberBaseInfoApiResponse | null;
+  memberInfo: Nullable<GroupMemberBaseInfoApiResponse>;
 }
 
 export interface ChangeTokenLimitApiRequest {
@@ -152,10 +152,10 @@ export type GetAllMyGroupTokenInfoApiRequest = PageApiRequest;
 
 export interface GroupTokenInfoApiResponseItem {
   groupId: string;
-  groupDisplayBase: {
+  groupDisplayBase: Nullable<{
     groupName: string;
     groupType: GroupTypeApiValue;
-  } | null;
+  }>;
   tokenLimit: number;
   tokenUsed: number;
 }

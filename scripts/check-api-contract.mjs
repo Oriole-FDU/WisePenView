@@ -62,6 +62,42 @@ const assertResponseTypesDoNotUseOptional = async () => {
   }
 };
 
+const assertApiTypesUseNullable = async () => {
+  const files = await collectFiles(
+    join(root, 'src/domains'),
+    (file) => file.includes('/apis/') && file.endsWith('.type.ts')
+  );
+  const violations = [];
+
+  for (const file of files) {
+    const source = ts.createSourceFile(
+      file,
+      await readFile(file, 'utf8'),
+      ts.ScriptTarget.Latest,
+      true
+    );
+    const visit = (node) => {
+      if (ts.isUnionTypeNode(node)) {
+        const containsNull = node.types.some(
+          (type) =>
+            type.kind === ts.SyntaxKind.NullKeyword ||
+            (ts.isLiteralTypeNode(type) && type.literal.kind === ts.SyntaxKind.NullKeyword)
+        );
+        if (containsNull) {
+          const { line, character } = source.getLineAndCharacterOfPosition(node.getStart(source));
+          violations.push(
+            `${relative(root, file)}:${line + 1}:${character + 1} 的可空联合类型必须使用 Nullable<T>`
+          );
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+  }
+
+  assert.deepEqual(violations, []);
+};
+
 const assertNoLegacyCompatibilityAliases = async () => {
   const files = await collectFiles(join(root, 'src'), (file) => file.endsWith('.ts'));
   for (const file of files) {
@@ -111,6 +147,7 @@ try {
   assert(!isApiResponseEnvelope([]));
   await assertNoLegacyCompatibilityAliases();
   await assertResponseTypesDoNotUseOptional();
+  await assertApiTypesUseNullable();
   console.log('API response envelope 契约离线检查通过');
 } finally {
   await rm(tempDir, { recursive: true, force: true });

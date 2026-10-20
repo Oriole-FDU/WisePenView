@@ -1,3 +1,5 @@
+import type { Nullable } from '@/apis/api.type';
+
 export type VersionStatusApiValue = 'DRAFT' | 'PUBLISHED';
 export type AssetUploadStatusApiValue = 'UPLOADING' | 'AVAILABLE';
 export type VersionResourceSourceTypeApiValue = 'BY_AGENT' | 'MANUAL';
@@ -6,10 +8,10 @@ export interface VersionAssetApiInfo<AssetResourceType extends string = string> 
   id: string;
   name: string;
   path: string;
-  objectKey: string | null;
+  objectKey: Nullable<string>;
   assetResourceType: AssetResourceType;
   uploadStatus: AssetUploadStatusApiValue;
-  size: string | null;
+  size: Nullable<string>;
 }
 
 export interface VersionBundleApiResponse<AssetResourceType extends string = string> {
@@ -22,7 +24,7 @@ export interface VersionBundleApiResponse<AssetResourceType extends string = str
 export interface VersionResourceInfoApiResponse {
   resourceId: string;
   name: string;
-  description: string | null;
+  description: Nullable<string>;
   version: number;
   sourceType: VersionResourceSourceTypeApiValue;
   updateTime: number;
@@ -41,10 +43,10 @@ export interface AssetUploadTicketApiResponse {
   path: string;
   name: string;
   objectKey: string;
-  putUrl: string | null;
-  callbackHeader: string | null;
+  putUrl: Nullable<string>;
+  callbackHeader: Nullable<string>;
   flashUploaded: boolean;
-  domain: string | null;
+  domain: Nullable<string>;
 }
 
 export interface InitUploadAssetsApiResponse {

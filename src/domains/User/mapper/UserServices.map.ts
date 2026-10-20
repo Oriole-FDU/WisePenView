@@ -7,6 +7,7 @@ import type {
   UserTourStatus,
 } from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
+import { mapOptional } from '@/utils/type/nullable';
 
 import type {
   AddFeedbackApiRequest,
@@ -82,18 +83,14 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       status: normalizeUserStatusFromApi(userInfo.userStatus),
     },
     userProfile: {
-      sex: userProfile.sex == null ? undefined : normalizeSexFromApi(userProfile.sex),
+      sex: mapOptional(userProfile.sex, normalizeSexFromApi),
       inviteCode: userProfile.inviteCode ?? undefined,
       university: userProfile.university,
       college: userProfile.college ?? undefined,
       major: userProfile.major ?? undefined,
       className: userProfile.className ?? undefined,
-      enrollmentYear:
-        userProfile.enrollmentYear == null ? undefined : String(userProfile.enrollmentYear),
-      degreeLevel:
-        userProfile.degreeLevel == null
-          ? undefined
-          : normalizeDegreeLevelFromApi(userProfile.degreeLevel),
+      enrollmentYear: mapOptional(userProfile.enrollmentYear, String),
+      degreeLevel: mapOptional(userProfile.degreeLevel, normalizeDegreeLevelFromApi),
       academicTitle: userProfile.academicTitle ?? undefined,
     },
     readonlyFields: data.readonlyFields,

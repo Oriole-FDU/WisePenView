@@ -1,4 +1,4 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserVerificationMode } from '@/domains/User';
 
 export type UserIdentityTypeApiValue = 'STUDENT' | 'TEACHER' | 'ADMIN';
@@ -10,38 +10,38 @@ export type UserVerificationProviderApiValue = 'FUDAN_UIS';
 export interface UserDisplayBaseApiResponse {
   nickname: string;
   username: string;
-  realName: string | null;
-  avatar: string | null;
+  realName: Nullable<string>;
+  avatar: Nullable<string>;
   identityType: UserIdentityTypeApiValue;
-  campusNo: string | null;
-  email: string | null;
-  mobile: string | null;
+  campusNo: Nullable<string>;
+  email: Nullable<string>;
+  mobile: Nullable<string>;
 }
 
 interface GetUserInfoApiResponseUserInfo {
   nickname: string;
-  realName: string | null;
-  avatar: string | null;
+  realName: Nullable<string>;
+  avatar: Nullable<string>;
   identityType: UserIdentityTypeApiValue;
   username: string;
-  campusNo: string | null;
-  email: string | null;
-  mobile: string | null;
-  verificationMode: UserVerificationMode | null;
-  verificationProviderCode: UserVerificationProviderApiValue | null;
+  campusNo: Nullable<string>;
+  email: Nullable<string>;
+  mobile: Nullable<string>;
+  verificationMode: Nullable<UserVerificationMode>;
+  verificationProviderCode: Nullable<UserVerificationProviderApiValue>;
   userStatus: UserStatusApiValue;
 }
 
 interface GetUserInfoApiResponseUserProfile {
-  sex: UserSexApiValue | null;
-  inviteCode: string | null;
-  university: string | null;
-  college: string | null;
-  major: string | null;
-  className: string | null;
-  enrollmentYear: number | null;
-  degreeLevel: UserDegreeLevelApiValue | null;
-  academicTitle: string | null;
+  sex: Nullable<UserSexApiValue>;
+  inviteCode: Nullable<string>;
+  university: Nullable<string>;
+  college: Nullable<string>;
+  major: Nullable<string>;
+  className: Nullable<string>;
+  enrollmentYear: Nullable<number>;
+  degreeLevel: Nullable<UserDegreeLevelApiValue>;
+  academicTitle: Nullable<string>;
 }
 
 export interface GetUserInfoApiResponse {
@@ -73,7 +73,7 @@ export interface ChangeUserInfoApiRequest {
 
 export interface ChangeUserProfileApiRequest {
   sex?: string;
-  university?: string | null;
+  university?: Nullable<string>;
   college?: string;
   major?: string;
   className?: string;
@@ -94,8 +94,8 @@ export interface InitiateFudanUISVerifyApiRequest {
 export interface CheckFudanUISVerifyApiResponse {
   completed: boolean;
   requireAction: boolean;
-  actionPayload: string | null;
-  message: string | null;
+  actionPayload: Nullable<string>;
+  message: Nullable<string>;
 }
 
 export interface CheckEmailVerifyApiRequest {
@@ -111,10 +111,10 @@ export type ListUserInviteRecordsApiRequest = PageApiRequest;
 export interface UserInviteRecordApiResponse {
   id: string;
   inviteeUserId: string;
-  inviteeDisplay: UserDisplayBaseApiResponse | null;
+  inviteeDisplay: Nullable<UserDisplayBaseApiResponse>;
   status: UserInviteStatusApiValue;
   createTime: number;
-  rewardTime: number | null;
+  rewardTime: Nullable<number>;
 }
 
 export type ListUserInviteRecordsApiResponse = PageR<UserInviteRecordApiResponse>;

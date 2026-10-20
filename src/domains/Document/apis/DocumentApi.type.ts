@@ -1,5 +1,6 @@
 import type { Config } from '@onlyoffice/doceditor-types';
 
+import type { Nullable } from '@/apis/api.type';
 import type { ResourceItemApiResponse } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
@@ -13,8 +14,8 @@ export interface UploadDocApiRequest {
 
 export interface UploadDocApiResponse {
   documentId: string;
-  putUrl: string | null;
-  callbackHeader: string | null;
+  putUrl: Nullable<string>;
+  callbackHeader: Nullable<string>;
   objectKey: string;
   flashUploaded: boolean;
 }
@@ -54,13 +55,13 @@ interface DocumentUploadMetaApiResponse {
 
 export interface PendingDocumentStatusApiResponse {
   status: string;
-  errorMessage: string | null;
+  errorMessage: Nullable<string>;
 }
 
 export interface DocMetaInfoApiResponse {
   uploadMeta: DocumentUploadMetaApiResponse;
   documentStatus: PendingDocumentStatusApiResponse;
-  maxPreviewPages: number | null;
+  maxPreviewPages: Nullable<number>;
 }
 
 interface DocumentVersionInfoApiResponse extends DocMetaInfoApiResponse {
@@ -75,7 +76,7 @@ export type ListPendingDocsApiResponse = PendingDocItemApiResponse[];
 
 export interface GetDocInfoApiResponse {
   resourceInfo: ResourceItemApiResponse;
-  documentVersionInfo: DocumentVersionInfoApiResponse | null;
+  documentVersionInfo: Nullable<DocumentVersionInfoApiResponse>;
   updateTime: number;
   authorsDisplay: Record<string, UserDisplayBaseApiResponse>;
 }

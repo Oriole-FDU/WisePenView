@@ -1,3 +1,4 @@
+import type { Nullable } from '@/apis/api.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 export type InlineCommentUserDisplayApiResponse = UserDisplayBaseApiResponse;
@@ -23,7 +24,7 @@ export interface InlineCommentReactionGroupApiResponse {
 export interface InlineCommentItemApiResponse {
   itemId: string;
   authorId: string;
-  authorInfo: InlineCommentUserDisplayApiResponse | null;
+  authorInfo: Nullable<InlineCommentUserDisplayApiResponse>;
   content: string;
   imageUrls: string[];
   mentionUserIds: string[];
@@ -36,16 +37,16 @@ export interface InlineCommentItemApiResponse {
 export interface InlineCommentApiResponse {
   inlineCommentId: string;
   resourceId: string;
-  applicableFromVersion: number | null;
-  applicableToVersion: number | null;
+  applicableFromVersion: Nullable<number>;
+  applicableToVersion: Nullable<number>;
   creatorId: string;
-  creatorInfo: InlineCommentUserDisplayApiResponse | null;
+  creatorInfo: Nullable<InlineCommentUserDisplayApiResponse>;
   anchorRef: InlineCommentAnchorRefApiResponse;
   items: InlineCommentItemApiResponse[];
   resolved: boolean;
-  resolvedBy: string | null;
-  resolvedByInfo: InlineCommentUserDisplayApiResponse | null;
-  resolvedAt: number | null;
+  resolvedBy: Nullable<string>;
+  resolvedByInfo: Nullable<InlineCommentUserDisplayApiResponse>;
+  resolvedAt: Nullable<number>;
   createTime: number;
   updateTime: number;
 }

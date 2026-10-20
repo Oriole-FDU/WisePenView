@@ -1,3 +1,4 @@
+import type { Nullable } from '@/apis/api.type';
 import type {
   InitUploadAssetApiItem,
   VersionBundleApiResponse,
@@ -18,38 +19,38 @@ export type AgentAssetResourceTypeApiValue =
   (typeof AGENT_ASSET_RESOURCE_TYPE_API)[keyof typeof AGENT_ASSET_RESOURCE_TYPE_API];
 
 export interface AgentModelPolicyApi {
-  defaultModelId: string | null;
-  defaultProviderId: string | null;
-  allowRequestOverride: boolean | null;
+  defaultModelId: Nullable<string>;
+  defaultProviderId: Nullable<string>;
+  allowRequestOverride: Nullable<boolean>;
 }
 
 export interface AgentToolAndSkillPolicyApi {
-  enableUseTool: boolean | null;
-  toolSelectionDefaultEnabled: boolean | null;
-  toolSelectionOverrides: Record<string, boolean> | null;
-  enableUseSkill: boolean | null;
-  onDemandSkillIds: string[] | null;
-  skillMatchTopK: number | null;
+  enableUseTool: Nullable<boolean>;
+  toolSelectionDefaultEnabled: Nullable<boolean>;
+  toolSelectionOverrides: Nullable<Record<string, boolean>>;
+  enableUseSkill: Nullable<boolean>;
+  onDemandSkillIds: Nullable<string[]>;
+  skillMatchTopK: Nullable<number>;
 }
 
 export interface AgentMemoryPolicyApi {
-  enableChatMemory: boolean | null;
-  enablePersistenceChatMemory: boolean | null;
-  enableChatMemorySummary: boolean | null;
-  highWatermarkRatio: number | null;
-  lowWatermarkRatio: number | null;
-  summaryPrompt: string | null;
-  enableLongTermMemory: boolean | null;
-  longTermMemoryLimit: number | null;
-  longTermMemoryScoreThreshold: number | null;
+  enableChatMemory: Nullable<boolean>;
+  enablePersistenceChatMemory: Nullable<boolean>;
+  enableChatMemorySummary: Nullable<boolean>;
+  highWatermarkRatio: Nullable<number>;
+  lowWatermarkRatio: Nullable<number>;
+  summaryPrompt: Nullable<string>;
+  enableLongTermMemory: Nullable<boolean>;
+  longTermMemoryLimit: Nullable<number>;
+  longTermMemoryScoreThreshold: Nullable<number>;
 }
 
 export interface AgentSpecApi {
-  systemPrompt: string | null;
-  autoGenerateTitle: boolean | null;
-  modelPolicy: AgentModelPolicyApi | null;
-  toolAndSkillPolicy: AgentToolAndSkillPolicyApi | null;
-  memoryPolicy: AgentMemoryPolicyApi | null;
+  systemPrompt: Nullable<string>;
+  autoGenerateTitle: Nullable<boolean>;
+  modelPolicy: Nullable<AgentModelPolicyApi>;
+  toolAndSkillPolicy: Nullable<AgentToolAndSkillPolicyApi>;
+  memoryPolicy: Nullable<AgentMemoryPolicyApi>;
 }
 
 export interface AgentInfoApiResponse {
@@ -59,7 +60,7 @@ export interface AgentInfoApiResponse {
 
 export type AgentVersionBundleApiResponse =
   VersionBundleApiResponse<AgentAssetResourceTypeApiValue> & {
-    spec: AgentSpecApi | null;
+    spec: Nullable<AgentSpecApi>;
   };
 
 export interface CreateAgentApiRequest {

@@ -1,4 +1,4 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 export type ResourceActionApiKey =
@@ -41,7 +41,7 @@ export interface ResourceInteractionInfoApiResponse {
 export interface ResourceUserInteractionRecordApiResponse {
   read: boolean;
   liked: boolean;
-  score: number | null;
+  score: Nullable<number>;
   likedCommentIds: string[];
   resourceId: string;
 }
@@ -49,11 +49,11 @@ export interface ResourceUserInteractionRecordApiResponse {
 export interface ResourceTagInfoApiResponse {
   groupId: string;
   tagName: string;
-  tagDesc: string | null;
-  tagIcon: string | null;
-  tagColor: string | null;
-  tagMetaInfo: string | null;
-  tagCreator: string | null;
+  tagDesc: Nullable<string>;
+  tagIcon: Nullable<string>;
+  tagColor: Nullable<string>;
+  tagMetaInfo: Nullable<string>;
+  tagCreator: Nullable<string>;
   isPath: boolean;
 }
 
@@ -67,21 +67,21 @@ type ResourceGroupTypeApiValue = 'NORMAL_GROUP' | 'ADVANCED_GROUP' | 'MARKET_GRO
 
 export interface ResourceGroupDisplayBaseApiResponse {
   groupName: string;
-  groupDesc: string | null;
-  groupCoverUrl: string | null;
+  groupDesc: Nullable<string>;
+  groupCoverUrl: Nullable<string>;
   groupType: ResourceGroupTypeApiValue;
-  groupMetaInfo: string | null;
+  groupMetaInfo: Nullable<string>;
 }
 
 export interface ResourceGroupGrantedActionsApiResponse {
   groupId: string;
-  groupInfo: ResourceGroupDisplayBaseApiResponse | null;
+  groupInfo: Nullable<ResourceGroupDisplayBaseApiResponse>;
   grantedActions: ResourceActionApiList;
 }
 
 export interface ResourceSpecifiedUserGrantedActionsApiResponse {
   userId: string;
-  userInfo: UserDisplayBaseApiResponse | null;
+  userInfo: Nullable<UserDisplayBaseApiResponse>;
   grantedActions: ResourceActionApiList;
 }
 
@@ -96,21 +96,21 @@ export interface MarketSaleInfoApiResponse {
   reviewContentPercentage: number;
   marketSaleTiers: MarketSaleTierApiResponse[];
   status: 'PENDING_REVIEW' | 'PUBLISHED' | 'REJECTED' | 'BANNED' | 'OFF_SHELF';
-  offerVersion: number | null;
-  auditMessage: string | null;
-  auditAt: number | null;
+  offerVersion: Nullable<number>;
+  auditMessage: Nullable<string>;
+  auditAt: Nullable<number>;
 }
 
 export interface ResourceItemApiResponse {
   resourceId: string;
   resourceName: string;
   ownerId: string;
-  size: string | null;
-  ownerInfo: UserDisplayBaseApiResponse | null;
+  size: Nullable<string>;
+  ownerInfo: Nullable<UserDisplayBaseApiResponse>;
   resourceType: ResourceTypeApiValue;
-  preview: string | null;
+  preview: Nullable<string>;
   resourceInteractionInfo: ResourceInteractionInfoApiResponse;
-  myInteractionRecord: ResourceUserInteractionRecordApiResponse | null;
+  myInteractionRecord: Nullable<ResourceUserInteractionRecordApiResponse>;
   tagBinds: ResourceTagBindApiResponse[];
   currentActions: ResourceActionApiList;
   resourceAccessRole: 'OWNER' | 'OWNER_SPECIFIED' | 'GROUP_ADMIN' | 'GROUP_MEMBER' | 'NONE';
@@ -138,8 +138,8 @@ export interface RenameResourceApiRequest {
 
 export interface ChangeResourceActionPermissionApiRequest {
   resourceId: string;
-  overrideGrantedActions?: Record<string, ResourceActionApiKey[] | null> | null;
-  specifiedUsersGrantedActions?: Record<string, ResourceActionApiKey[]> | null;
+  overrideGrantedActions?: Nullable<Record<string, Nullable<ResourceActionApiKey[]>>>;
+  specifiedUsersGrantedActions?: Nullable<Record<string, ResourceActionApiKey[]>>;
 }
 
 export interface RemoveResourcesApiRequest {
@@ -155,7 +155,7 @@ export interface GlobalSearchItemApiResponse {
   resourceId: string;
   resourceType: ResourceTypeApiValue;
   resourceName: string;
-  highlightContent: string | null;
+  highlightContent: Nullable<string>;
   updateTime: number;
 }
 

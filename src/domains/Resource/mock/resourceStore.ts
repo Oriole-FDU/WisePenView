@@ -199,7 +199,7 @@ const normalizeResourceItem = (raw: MockResourceItem): ResourceItemApiResponse =
     }),
     resourceType: normalizeResourceType(raw.resourceType ?? 'UNKNOWN'),
     preview: raw.preview ?? null,
-    size: raw.size == null ? null : String(raw.size),
+    size: raw.size?.toString() ?? null,
     resourceInteractionInfo: {
       ...createMockResourceInteractionInfo(),
       ...raw.resourceInteractionInfo,

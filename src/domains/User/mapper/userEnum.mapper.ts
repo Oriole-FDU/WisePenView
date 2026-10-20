@@ -1,3 +1,5 @@
+import { mapOptional } from '@/utils/type/nullable';
+
 import type {
   UserDegreeLevelApiValue,
   UserDisplayBaseApiResponse,
@@ -45,11 +47,11 @@ export const mapUserStatusToApi = (value: number | undefined): UserStatusApiValu
 };
 
 export const mapSexToApi = (value: number | undefined): UserSexApiValue | undefined =>
-  value == null ? undefined : SEX.getKey(value);
+  mapOptional(value, (value) => SEX.getKey(value));
 
 export const mapDegreeLevelToApi = (
   value: number | undefined
-): UserDegreeLevelApiValue | undefined => (value == null ? undefined : DEGREE.getKey(value));
+): UserDegreeLevelApiValue | undefined => mapOptional(value, (value) => DEGREE.getKey(value));
 
 export const normalizeUserDisplayBaseFromApi = (
   value: UserDisplayBaseApiResponse | null | undefined
@@ -59,7 +61,6 @@ export const normalizeUserDisplayBaseFromApi = (
     nickname: value.nickname ?? undefined,
     realName: value.realName ?? undefined,
     avatar: value.avatar ?? undefined,
-    identityType:
-      value.identityType == null ? undefined : normalizeIdentityTypeFromApi(value.identityType),
+    identityType: mapOptional(value.identityType, normalizeIdentityTypeFromApi),
   };
 };

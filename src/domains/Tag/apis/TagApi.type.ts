@@ -1,3 +1,4 @@
+import type { Nullable } from '@/apis/api.type';
 import type { ResourceActionApiKey } from '@/domains/Resource/apis/ResourceApi.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
@@ -43,17 +44,17 @@ export interface TagTreeApiResponse {
   tagId: string;
   tagName: string;
   groupId: string;
-  tagDesc: string | null;
-  tagIcon: string | null;
-  tagColor: string | null;
-  tagMetaInfo: string | null;
-  tagCreator: string | null;
-  creatorInfo: UserDisplayBaseApiResponse | null;
+  tagDesc: Nullable<string>;
+  tagIcon: Nullable<string>;
+  tagColor: Nullable<string>;
+  tagMetaInfo: Nullable<string>;
+  tagCreator: Nullable<string>;
+  creatorInfo: Nullable<UserDisplayBaseApiResponse>;
   isPath: boolean;
-  taggedResourceAclGrantScope: TagAccessControlScopeApiValue | null;
+  taggedResourceAclGrantScope: Nullable<TagAccessControlScopeApiValue>;
   taggedResourceAclGrantSpecifiedUsers: string[];
-  taggedResourceGrantedActionsMask: number | null;
-  tagMountPermissionScope: TagAccessControlScopeApiValue | null;
+  taggedResourceGrantedActionsMask: Nullable<number>;
+  tagMountPermissionScope: Nullable<TagAccessControlScopeApiValue>;
   tagMountSpecifiedUsers: string[];
   grantedActions: TagResourceActionApiKey[];
   parentId: string;

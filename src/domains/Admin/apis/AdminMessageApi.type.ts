@@ -1,17 +1,17 @@
-import type { PageApiRequest, PageR } from '@/apis/api.type';
+import type { Nullable, PageApiRequest, PageR } from '@/apis/api.type';
 
 export type ListAdminMessagesApiRequest = PageApiRequest;
 
 export interface AdminMessageApiModel {
-  messageId?: string | number | null;
-  deliveryScope?: string | null;
-  messageType?: string | null;
-  title?: string | null;
-  content?: string | null;
-  jumpUrl?: string | null;
-  extra?: string | null;
-  readCount?: number | null;
-  createTime?: string | null;
+  messageId?: Nullable<string | number>;
+  deliveryScope?: Nullable<string>;
+  messageType?: Nullable<string>;
+  title?: Nullable<string>;
+  content?: Nullable<string>;
+  jumpUrl?: Nullable<string>;
+  extra?: Nullable<string>;
+  readCount?: Nullable<number>;
+  createTime?: Nullable<string>;
 }
 
 export type ListAdminMessagesApiResponse = PageR<AdminMessageApiModel>;

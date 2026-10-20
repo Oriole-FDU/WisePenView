@@ -13,5 +13,6 @@ export * from './platform';
 export * from './random';
 export * from './tree';
 export * from './type/enum';
+export * from './type/nullable';
 export * from './type/typeGuards';
 export * from './validation/formValidation';

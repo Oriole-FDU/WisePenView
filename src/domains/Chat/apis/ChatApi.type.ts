@@ -1,11 +1,13 @@
+import type { Nullable } from '@/apis/api.type';
+
 export interface ChatSession {
   id: string;
   user_id: string;
   title: string;
   created_at: string;
   updated_at: string;
-  agent_id?: string | null;
-  agent_version?: number | null;
+  agent_id?: Nullable<string>;
+  agent_version?: Nullable<number>;
 }
 
 export interface MessageResponse {
@@ -46,9 +48,9 @@ export interface ListModelsApiResponse {
 
 interface ToolSourceApiResponse {
   type: string;
-  server_id: string | null;
-  server_display_name: string | null;
-  remote_name: string | null;
+  server_id: Nullable<string>;
+  server_display_name: Nullable<string>;
+  remote_name: Nullable<string>;
 }
 
 export interface ToolApiResponse {
@@ -59,7 +61,7 @@ export interface ToolApiResponse {
   requires_config: boolean;
   configured: boolean;
   enabled: boolean;
-  source: ToolSourceApiResponse | null;
+  source: Nullable<ToolSourceApiResponse>;
   missing_config_keys?: string[];
   config_schema: Record<string, unknown>;
   secret_fingerprints: Record<string, string>;
@@ -74,8 +76,8 @@ export type ProviderTypeApi = 'ALIBABA' | 'OPENAI' | 'ANTHROPIC' | 'GOOGLE' | 'O
 export interface ProviderApiResponse {
   id: string;
   name: string;
-  base_url?: string | null;
-  api_key_fingerprint?: string | null;
+  base_url?: Nullable<string>;
+  api_key_fingerprint?: Nullable<string>;
   scope: 'SYSTEM' | 'USER';
   type: ProviderTypeApi;
   is_active: boolean;
@@ -91,7 +93,7 @@ export interface CreateUserProviderApiRequest {
   name: string;
   type: ProviderTypeApi;
   api_key: string;
-  base_url?: string | null;
+  base_url?: Nullable<string>;
   is_active?: boolean;
 }
 
@@ -100,7 +102,7 @@ export interface UpdateUserProviderApiRequest {
   name?: string;
   type?: ProviderTypeApi;
   api_key?: string;
-  base_url?: string | null;
+  base_url?: Nullable<string>;
   is_active?: boolean;
 }
 
@@ -131,7 +133,7 @@ export interface ActiveChatTurnApiRequest {
 }
 
 export interface ActiveChatTurnApiResponse {
-  turn_id: string | null;
+  turn_id: Nullable<string>;
 }
 
 export interface CancelChatTurnApiRequest {
@@ -143,7 +145,7 @@ export type CancelChatTurnApiResponse = null;
 export interface ModelProviderMappingResponse {
   model_id: string;
   provider_id: string;
-  provider_name?: string | null;
+  provider_name?: Nullable<string>;
   provider_model_name: string;
   input_billing_ratio: string;
   cached_input_billing_ratio: string;
@@ -162,10 +164,10 @@ export interface ModelResponse {
   support_thinking: boolean;
   support_vision: boolean;
   support_tools: boolean;
-  context_window_tokens?: number | null;
-  max_output_tokens?: number | null;
+  context_window_tokens?: Nullable<number>;
+  max_output_tokens?: Nullable<number>;
   is_active: boolean;
-  mappings?: ModelProviderMappingResponse[] | null;
+  mappings?: Nullable<ModelProviderMappingResponse[]>;
 }
 
 export interface CreateUserModelApiRequest {
@@ -174,8 +176,8 @@ export interface CreateUserModelApiRequest {
   support_thinking?: boolean;
   support_vision?: boolean;
   support_tools?: boolean;
-  context_window_tokens?: number | null;
-  max_output_tokens?: number | null;
+  context_window_tokens?: Nullable<number>;
+  max_output_tokens?: Nullable<number>;
 }
 
 export interface UpdateUserModelApiRequest {
@@ -185,8 +187,8 @@ export interface UpdateUserModelApiRequest {
   support_thinking?: boolean;
   support_vision?: boolean;
   support_tools?: boolean;
-  context_window_tokens?: number | null;
-  max_output_tokens?: number | null;
+  context_window_tokens?: Nullable<number>;
+  max_output_tokens?: Nullable<number>;
   is_active?: boolean;
 }
 
@@ -213,18 +215,18 @@ export type DeleteUserModelApiResponse = null;
 export type BindModelProviderApiResponse = null;
 export type UnbindModelProviderApiResponse = null;
 export type CreateSessionApiRequest = {
-  title?: string | null;
-  agent_id?: string | null;
-  agent_version?: number | null;
+  title?: Nullable<string>;
+  agent_id?: Nullable<string>;
+  agent_version?: Nullable<number>;
 };
 export type CreateSessionApiResponse = ChatSession;
 export type SetSessionAgentApiRequest = {
   session_id: string;
-  agent_id?: string | null;
-  agent_version?: number | null;
+  agent_id?: Nullable<string>;
+  agent_version?: Nullable<number>;
 };
 export type SetSessionAgentApiResponse = ChatSession;
-export type RenameSessionApiRequest = { session_id: string; new_title?: string | null };
+export type RenameSessionApiRequest = { session_id: string; new_title?: Nullable<string> };
 export type RenameSessionApiResponse = ChatSession;
 export type DeleteSessionApiRequest = { session_id: string };
 export type DeleteSessionApiResponse = null;
@@ -245,7 +247,7 @@ export interface InitTemporaryAttachmentUploadApiRequest {
 export interface InitTemporaryAttachmentUploadApiResponse {
   attachment_id: string;
   object_key: string;
-  put_url?: string | null;
-  callback_header?: string | null;
+  put_url?: Nullable<string>;
+  callback_header?: Nullable<string>;
   flash_uploaded?: boolean;
 }
