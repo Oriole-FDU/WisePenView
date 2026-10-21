@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- 编辑器顶层只编排资源、草稿、保存与文件操作 Controller，保持跨流程组合点集中可见。 */
 import { toast } from '@heroui/react';
 import { Pencil, Save, Settings, Upload } from 'lucide-react';
 import { useRef } from 'react';

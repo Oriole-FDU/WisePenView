@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- 草稿模型集中维护文件树、版本和保存快照的不变量，保持纯函数边界。 */
 import type { SkillDetail, SkillFileNode, UploadSkillAssetResult } from '@/domains/Skill';
 
 import {

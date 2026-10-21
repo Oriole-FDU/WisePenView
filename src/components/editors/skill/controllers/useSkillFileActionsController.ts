@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- 文件操作、移动和删除共同维护 Skill 文件树行为链，拆开会重复传递状态和请求结果。 */
 import { toast } from '@heroui/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -286,8 +286,33 @@ const noHardcodedFrontendRouteRule = {
   },
 };
 
+const fileLengthRule = (limit) => ({
+  meta: {
+    type: 'suggestion',
+    docs: { description: `限制单文件不超过 ${limit} 行` },
+    schema: [],
+    messages: { tooLong: '文件 {{actual}} 行，超过 {{limit}} 行门槛。' },
+  },
+  create(context) {
+    return {
+      Program(node) {
+        const lines = context.sourceCode.lines;
+        const actual = lines.length - (lines.at(-1) === '' ? 1 : 0);
+        if (actual > limit) {
+          context.report({
+            node,
+            messageId: 'tooLong',
+            data: { actual, limit },
+          });
+        }
+      },
+    };
+  },
+});
+
 const wisePenPlugin = {
   rules: {
+    'max-lines-error': fileLengthRule(600),
     'no-hardcoded-frontend-route': noHardcodedFrontendRouteRule,
     'require-manual-effect-jsdoc': requireManualEffectJSDocRule,
     'require-manual-memo-jsdoc': requireManualMemoJSDocRule,
@@ -422,6 +447,21 @@ export default defineConfig([
       'no-restricted-syntax': ['error', ...projectRestrictedSyntaxRules],
       'wisepen/require-manual-effect-jsdoc': 'error',
       'wisepen/require-manual-memo-jsdoc': 'error',
+    },
+  },
+  {
+    files: [
+      'src/components/editors/skill/**/*.{ts,tsx,js,jsx}',
+      'src/domains/{Resource,Tag,Image,Document,Auth,User,Group,Wallet}/**/*.{ts,tsx,js,jsx}',
+    ],
+    ignores: [
+      '**/{fixtures,__fixtures__,snapshots,__snapshots__,generated,__generated__}/**',
+      '**/*.{fixture,snapshot,generated}.{ts,tsx,js,jsx}',
+    ],
+    plugins: { wisepen: wisePenPlugin },
+    rules: {
+      'max-lines': ['warn', { max: 400 }],
+      'wisepen/max-lines-error': 'error',
     },
   },
   {

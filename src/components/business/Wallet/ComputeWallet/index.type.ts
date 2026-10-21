@@ -8,8 +8,8 @@ export interface ComputeWalletProps {
   targetType: WalletTargetType;
 
   /**
-   * 小组为 groupId（string，防大数精度丢失），用于 getUserWalletInfo / listTransactions 的 query。
-   * USER 场景可不传 groupId（接口查当前用户）。
+   * 小组为 groupId（string，防大数精度丢失），用于 listTransactions 查询小组流水；小组余额另由 GroupService 读取。
+   * USER 场景可不传 groupId（流水接口查当前用户）。
    */
   targetId?: string;
   /**

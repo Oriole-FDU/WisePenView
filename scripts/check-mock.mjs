@@ -19,6 +19,8 @@ try {
       contents: `
         export { getContextValue } from '@/domains/_registry/registry';
         export { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
+        export { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
+        export { RESOURCE_ACTION } from '@/domains/Resource/enum';
       `,
       resolveDir: root,
     },
@@ -48,7 +50,12 @@ try {
       assert.fail('Mock service 不應開啟外部連線');
     }
   };
-  const { getContextValue, clearAllServiceCaches } = await import(pathToFileURL(outfile).href);
+  const {
+    getContextValue,
+    clearAllServiceCaches,
+    ResourceServicesMap: resourceMap,
+    RESOURCE_ACTION: action,
+  } = await import(pathToFileURL(outfile).href);
   const {
     courseService: course,
     driveService: drive,
@@ -66,6 +73,119 @@ try {
     groupService: group,
     inlineCommentService: inline,
   } = getContextValue();
+
+  // 拆分前后共用入口，锁定筛选、scope 与权限请求的业务语义。
+  const emptyQuery = resourceMap.mapListResourceItemsRequest({
+    page: 1,
+    size: 20,
+    resourceType: '',
+    tagIds: [],
+  });
+  assert(!Object.hasOwn(emptyQuery, 'resourceType'));
+  assert(!Object.hasOwn(emptyQuery, 'tagIds'));
+  assert.equal(emptyQuery.tagQueryLogicMode, 'OR');
+  const filteredQuery = resourceMap.mapListResourceItemsRequest(
+    { page: 1, size: 20, resourceType: 'note', tagIds: ['tag-group'], includeMyInteraction: false },
+    { groupId: 'group-1' }
+  );
+  assert.equal(filteredQuery.groupId, 'group-1');
+  assert.deepEqual(filteredQuery.tagIds, ['tag-group']);
+  assert.equal(filteredQuery.includeMyInteraction, false);
+
+  const rawResource = {
+    resourceId: 'mapper-resource',
+    resourceName: '映射验证',
+    ownerId: 'owner-1',
+    ownerInfo: {},
+    resourceType: 'note',
+    tagBinds: [
+      { groupId: 'group-1', primaryTagId: 'tag-group', tags: { 'tag-group': { tagName: '小组' } } },
+      {
+        groupId: 'p_owner-1',
+        primaryTagId: 'tag-personal',
+        tags: { 'tag-personal': { tagName: '个人' } },
+      },
+    ],
+    overrideGrantedActions: [
+      { groupId: 'p_owner-1', grantedActions: ['EDIT'] },
+      { groupId: 'group-1', grantedActions: ['EDIT', 'LOAD'] },
+    ],
+    specifiedUsersGrantedActions: [{ userId: 'user-1', grantedActions: ['VIEW'] }],
+  };
+  assert.equal(resourceMap.mapResourceItemFromApi(rawResource).mainTagId, 'tag-personal');
+  assert.equal(
+    resourceMap.mapResourceItemFromApi(rawResource, { groupId: 'group-1' }).mainTagId,
+    'tag-group'
+  );
+  assert.equal(
+    resourceMap.mapResourceItemFromApi(rawResource, { groupId: 'missing' }).mainTagId,
+    'tag-group'
+  );
+  const mappedOverview = resourceMap.mapResourcePermissionOverviewFromApi(rawResource, 'fallback');
+  assert.equal(mappedOverview.owner.readonly, true);
+  assert(!mappedOverview.subjects.some((subject) => subject.groupId?.startsWith('p_')));
+  assert(!mappedOverview.supportedActions.includes(action.LOAD));
+  assert(
+    mappedOverview.subjects.every((subject) =>
+      subject.effectiveActions.every((value) => mappedOverview.supportedActions.includes(value))
+    )
+  );
+  const emptyHydration = {
+    userInfoById: new Map(),
+    groupInfoById: new Map(),
+    inheritedActionsBySubjectId: new Map(),
+  };
+  assert.deepEqual(
+    resourceMap.mergeResourcePermissionHydration(mappedOverview, emptyHydration),
+    mappedOverview
+  );
+  const overrideSubject = mappedOverview.subjects.find(
+    (subject) => subject.source === 'resourceOverride'
+  );
+  assert(overrideSubject);
+  const inheritedOverview = resourceMap.mergeResourcePermissionHydration(mappedOverview, {
+    ...emptyHydration,
+    inheritedActionsBySubjectId: new Map([[overrideSubject.id, overrideSubject.editableActions]]),
+  });
+  const inheritedSubject = inheritedOverview.subjects.find(
+    (subject) => subject.groupId === 'group-1'
+  );
+  assert.equal(inheritedSubject.source, 'tag');
+  assert.deepEqual(inheritedSubject.effectiveActions, overrideSubject.editableActions);
+
+  for (const value of [undefined, null, {}]) {
+    const request = resourceMap.mapChangeResourceActionPermissionRequest({
+      resourceId: rawResource.resourceId,
+      overrideGrantedActions: value,
+      specifiedUsersGrantedActions: value,
+    });
+    assert.deepEqual(request.overrideGrantedActions, value);
+    assert.deepEqual(request.specifiedUsersGrantedActions, value);
+  }
+  const actionRequest = resourceMap.mapChangeResourceActionPermissionRequest({
+    resourceId: rawResource.resourceId,
+    overrideGrantedActions: { inherit: null, denied: [], edited: [action.EDIT] },
+    specifiedUsersGrantedActions: { denied: [], reader: [action.VIEW] },
+  });
+  assert.deepEqual(actionRequest.overrideGrantedActions, {
+    inherit: null,
+    denied: [],
+    edited: ['DISCOVER', 'VIEW', 'EDIT'],
+  });
+  assert.deepEqual(actionRequest.specifiedUsersGrantedActions, {
+    denied: [],
+    reader: ['DISCOVER', 'VIEW'],
+  });
+  const subjectRequest = resourceMap.mapChangeResourceActionPermissionRequestFromSubjects({
+    resourceId: rawResource.resourceId,
+    subjects: [
+      mappedOverview.owner,
+      inheritedSubject,
+      { ...overrideSubject, groupId: 'p_owner-1' },
+    ],
+  });
+  assert.deepEqual(subjectRequest.overrideGrantedActions, { 'group-1': null });
+  assert.equal(subjectRequest.specifiedUsersGrantedActions, null);
 
   const courses = await course.listMyCourses({ page: 1, size: 20 });
   assert(courses.list.length >= 3);
