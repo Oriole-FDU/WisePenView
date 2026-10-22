@@ -1,11 +1,12 @@
 # 样式与 UI 规范
 
-WisePenView 使用 Less、CSS Modules 和 HeroUI。新增代码都应遵循 HeroUI 风格与项目现有设计语言。
+WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題 token 與全域樣式入口。新增代码都应遵循 HeroUI 风格与项目现有设计语言。
 
 ## 一、样式组织
 
-- 样式使用 Less + CSS Modules。
-- 组件样式文件命名为 `style.module.less`。
+- 元件使用 SCSS + CSS Modules，檔名為 `style.module.scss`；不得新增 Less 來源、匯入或直接編譯相依。
+- 使用 Vite 原生支援的 `sass-embedded`，以具名 namespace 的 `@use` 引用共用定義，不使用 Sass `@import`、`@extend` 或 `additionalData` 隱式注入。
+- 共用 `_*.scss` partial 只包含變數、函式與 mixin，單獨載入不得輸出 CSS；實際類別保留在所屬 CSS Module，不跨元件匯入私有樣式，不以 `@extend` 取代 mixin 或 CSS Modules composition。
 - 样式类名使用 camelCase。
 - 避免非必要内联样式。
 - 动态样式优先通过 className、CSS 变量或组件受控属性表达。
@@ -17,7 +18,7 @@ WisePenView 使用 Less、CSS Modules 和 HeroUI。新增代码都应遵循 Hero
 ComponentName/
 ├── index.tsx
 ├── index.type.ts
-└── style.module.less
+└── style.module.scss
 ```
 
 ## 二、HeroUI 使用
@@ -95,7 +96,7 @@ ComponentName/
 - 新增圆角先选择语义 token；语义 token 缺失时在 `src/styles/theme/radius.css` 的应用语义层补一个，再让组件引用。
 - 组件样式不得直接引用 `--radius-*`，也不得硬编码圆角数值；需要更大或更小的几何值时报给应用语义层处理。新增语义 token 时同步更新本节表格。
 - 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
-- `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.less`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。
+- `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.scss`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。守衛亦能辨識誤加的 Less，但 `check:styles` 會直接拒絕該來源。
 
 ## 七、层级（z-index）
 
@@ -125,7 +126,7 @@ z-index 按“基准 → 基础刻度 → 应用语义”单向定义，三层�
 - 不写回退数值，例如 `var(--app-z-index-editor-toolbar, 220)`；数值只在 `src/styles/theme/z-index.css` 维护一处。
 - 内联样式仅在定位计算需要时出现，`zIndex` 必须引用 token，不写数字字面量。
 - 新增层级先选择语义 token；语义缺失时在 `src/styles/theme/z-index.css` 的应用语义层补一个，再让组件引用，并同步更新本节表格。
-- `pnpm check:z-index` 在 CI 拦截上述写法：扫描 `src/**` 的 `.less` / `.css` / `.ts` / `.tsx`（`src/styles/**` 是 token 与基础设施层，除外），样式文件只放行 `auto` 与 `--app-z-index-*`。
+- `pnpm check:z-index` 在 CI 拦截上述写法：扫描 `src/**` 的 `.scss` / `.css` / `.ts` / `.tsx`（`src/styles/**` 是 token 与基础设施层，除外），样式文件只放行 `auto` 与 `--app-z-index-*`。誤加 Less 的處理同圓角守衛。
 
 ## 八、组件库使用
 
@@ -144,7 +145,7 @@ z-index 按“基准 → 基础刻度 → 应用语义”单向定义，三层�
 
 ## 九、检查清单
 
-- [ ] 样式使用 Less + CSS Modules。
+- [ ] 元件樣式使用 SCSS + CSS Modules，共用 partial 單獨載入不輸出 CSS，無 Less 來源與引用。
 - [ ] 没有非必要内联样式。
 - [ ] 交互控件使用 HeroUI 或项目已有封装。
 - [ ] 文本和控件在常见宽度下不会重叠或溢出。

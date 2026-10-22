@@ -25,7 +25,7 @@
 - `component-react.md`：React、Hooks、JSX、TypeScript 和副作用治理。
 - `context.md`：Context 的组成、归属、Provider 和消费规范。
 - `component-controller.md`：复杂组件和 Controller 拆分。
-- `component-style.md`：Less、CSS Modules、HeroUI 和样式规则。
+- `component-style.md`：SCSS、CSS Modules、HeroUI 和样式规则。
 - `overlay.md`：弹层触发、焦点和可访问性边界。
 
 ## 其它领域
