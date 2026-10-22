@@ -482,7 +482,12 @@ function GuideHost({ shellTourId, actions }: GuideHostProps) {
   };
 
   const visibleTourPending = visibleTourId ? Boolean(pendingByTourId[visibleTourId]) : false;
-  const visibleTourMatchesRoute = visibleTourRouteKey === routeKey;
+  /**
+   * 课程资源指引会主动切到资料、人员页。此时作用域仍登记着同一条指引，
+   * 必须保留 GuidePlayer；否则路由变化会卸载 Joyride，下一步重新从第一步开始。
+   */
+  const visibleTourMatchesRoute =
+    visibleTourRouteKey === routeKey || visibleTourId === activeTourId;
   const renderedTourId =
     visibleTourId &&
     visibleTourPending &&
