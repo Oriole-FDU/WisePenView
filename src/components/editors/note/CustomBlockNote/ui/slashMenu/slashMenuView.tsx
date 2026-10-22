@@ -31,7 +31,7 @@ import {
   resolveSlashMenuGroupLabel,
   resolveSlashMenuTitle,
 } from './slashMenuModel';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const SLASH_MENU_ICON_MAP: Record<string, typeof Type> = {
   paragraph: Type,

@@ -29,7 +29,7 @@ import { isDesktop } from '@/utils/platform';
 import { useEditorSurface } from '../../../_context';
 import { waitForEditor } from '../../../_runtime/editorRuntime';
 import { useEditorRuntime } from '../../../_runtime/useEditorRuntime';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import NoteInfoBar from '../NoteInfoBar';
 import NoteOutline, { NOTE_OUTLINE_TITLE_ID } from '../NoteOutline';
 import NoteTitle, { type NoteTitleHandle, type NoteTitleSaveStatus } from '../NoteTitle';

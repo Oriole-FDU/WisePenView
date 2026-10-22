@@ -28,7 +28,7 @@ import {
   type AiDiffReviewUnit,
   createAiDiffReviewWidget,
 } from './reviewWidget';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface AiDiffExtensionMeta {
   displayMode?: AiDiffDisplayMode;

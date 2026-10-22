@@ -1,6 +1,6 @@
 import i18n from '@/i18n';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export type ColorKey =
   'default' | 'gray' | 'brown' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | 'pink';

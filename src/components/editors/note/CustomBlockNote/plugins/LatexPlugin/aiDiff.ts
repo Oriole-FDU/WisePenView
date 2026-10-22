@@ -2,7 +2,7 @@ import { isRecord } from '@/utils/type/typeGuards';
 
 import type { NoteBlockAiDiff, NoteInlineAiDiff } from '../../registry/types';
 import { renderKatexInto } from './katexRender';
-import mathBlockStyles from './MathBlock/style.module.less';
+import mathBlockStyles from './MathBlock/style.module.scss';
 
 function readExpression(value: Record<string, unknown>): string {
   const props = isRecord(value.props) ? value.props : value;

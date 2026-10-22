@@ -59,13 +59,7 @@
 
 .backgroundDefault {
   background:
-    linear-gradient(
-      135deg,
-      transparent 48%,
-      var(--accent) 49%,
-      var(--accent) 51%,
-      transparent 52%
-    ),
+    linear-gradient(135deg, transparent 48%, var(--accent) 49%, var(--accent) 51%, transparent 52%),
     var(--surface);
 }
 

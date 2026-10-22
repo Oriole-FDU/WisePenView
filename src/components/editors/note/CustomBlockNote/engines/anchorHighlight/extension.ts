@@ -5,9 +5,9 @@ import type { EditorView } from '@tiptap/pm/view';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 import type { NoteEditorExtension } from '../../registry/types';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
-/** 目标块闪烁时长：前 1s 满亮度保持，随后 250ms 迅速衰减到透明，与 style.module.less 的关键帧一致。 */
+/** 目标块闪烁时长：前 1s 满亮度保持，随后 250ms 迅速衰减到透明，与 style.module.scss 的关键帧一致。 */
 export const NOTE_ANCHOR_HIGHLIGHT_DURATION_MS = 1_250;
 
 interface AnchorHighlightMeta {

@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .panel,
 .collapsedPanel {
@@ -55,9 +55,9 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  .appSubtleScrollbar();
   border: none;
   outline: none;
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .collapsedContent {

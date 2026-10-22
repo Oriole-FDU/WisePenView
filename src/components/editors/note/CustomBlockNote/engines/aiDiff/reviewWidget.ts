@@ -10,7 +10,7 @@ import type {
 } from '../../registry/types';
 import type { NoteAiDiffActionRequest } from './action';
 import { addAiDiffDomCleanup, addAiDiffDomListener } from './domCleanup';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface AiDiffReviewUnit {
   key: string;

@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .host {
   display: contents;
@@ -91,8 +91,8 @@
   z-index: var(--app-z-index-elevated);
   max-height: var(--note-slash-menu-effective-max-height);
   overflow-y: auto;
-  .appSubtleScrollbar();
   overscroll-behavior: contain;
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .menu,

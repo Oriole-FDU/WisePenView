@@ -68,7 +68,7 @@ import {
 import { SlashMenuDropdownItems } from '@/components/editors/note/CustomBlockNote/ui/slashMenu/slashMenuView';
 import { copyText } from '@/utils/browser/copyText';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type TextAlignment = 'left' | 'center' | 'right';
 type BlockColorTarget = 'textColor' | 'backgroundColor';

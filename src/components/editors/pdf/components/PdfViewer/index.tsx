@@ -14,7 +14,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/util
 
 import type { PdfViewerProps } from './index.type';
 import { DEFAULT_PDF_VIEWER_CONFIG } from './pdf.config';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function readConfigSection(value: unknown): Record<string, unknown> {
   return value != null && typeof value === 'object' && !Array.isArray(value)

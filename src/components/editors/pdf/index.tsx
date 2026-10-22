@@ -16,7 +16,7 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface PdfPresentationBindingProps {
   resourceInfo?: ResourceItem;

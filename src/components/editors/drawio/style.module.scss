@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .container {
   --resource-view-max-width: 100%;
@@ -96,7 +96,7 @@
   gap: var(--space-xs);
   max-height: 360px;
   overflow: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .versionRow {

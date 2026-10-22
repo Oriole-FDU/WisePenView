@@ -17,7 +17,7 @@ import { AppButton } from '@/components/base/Button';
 import { Input } from '@/components/base/Input';
 import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import { blockHasInlineContent, getSelectedBlocks } from '../utils';
 import { type ButtonGroupChildProps, ToolbarButton } from './ToolbarButton';
 

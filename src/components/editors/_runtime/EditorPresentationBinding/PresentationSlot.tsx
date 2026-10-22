@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { type StoreApi, useStore } from 'zustand';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface PresentationSlotState {
   container: HTMLElement | null;

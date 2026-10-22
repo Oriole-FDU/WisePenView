@@ -11,7 +11,7 @@ import {
   getAvailableBlockTypeItems,
 } from '@/components/editors/note/CustomBlockNote/ui/editorMenus/blockTypes';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import { getSelectedBlocks } from '../utils';
 import { type ButtonGroupChildProps, ToolbarButton } from './ToolbarButton';
 

@@ -33,7 +33,7 @@ import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/regis
 
 import { tableRailSelectionState, useTableRailSelectionState } from './railSelectionState';
 import { getTableHandles, hasMountedEditorView } from './safe';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type RowInsertTarget = { orientation: 'row'; index: number; side: 'above' | 'below' };
 type ColumnInsertTarget = { orientation: 'column'; index: number; side: 'left' | 'right' };

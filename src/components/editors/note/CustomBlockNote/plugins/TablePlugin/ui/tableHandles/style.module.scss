@@ -192,8 +192,9 @@
 .insertButtonTrigger {
   position: absolute;
   left: calc(
-    var(--table-edge, 0px) - var(--note-table-insert-size) - var(--note-table-insert-outset) -
-      var(--note-table-insert-hit-offset)
+    var(--table-edge, 0px) - var(--note-table-insert-size) - var(--note-table-insert-outset) - var(
+        --note-table-insert-hit-offset
+      )
   );
   top: 50%;
   width: var(--note-table-insert-hit-size);
@@ -286,8 +287,9 @@
 .insertHandle[data-orientation='column'] .insertButtonTrigger {
   left: 50%;
   top: calc(
-    var(--table-edge, 0px) - var(--note-table-insert-size) - var(--note-table-insert-outset) -
-      var(--note-table-insert-hit-offset)
+    var(--table-edge, 0px) - var(--note-table-insert-size) - var(--note-table-insert-outset) - var(
+        --note-table-insert-hit-offset
+      )
   );
   transform: translateX(-50%);
 }

@@ -40,7 +40,7 @@ import { NestButtons } from './components/NestButtons';
 import { TextAlignButtons } from './components/TextAlignButtons';
 import { TextStyleButtons } from './components/TextStyleButtons';
 import { ToolbarButton } from './components/ToolbarButton';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useFloatingToolbarState } from './useFloatingToolbarState';
 import { getSelectedBlocks, stopToolbarMouseDown } from './utils';
 

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
-import popoverStyles from '../InlineMath/style.module.less';
+import popoverStyles from '../InlineMath/style.module.scss';
 import { sanitizeLatexInput } from '../latexInput';
 
 interface LatexEditPopoverProps {
@@ -63,7 +63,7 @@ function handleTextareaBeforeInput(event: FormEvent<HTMLTextAreaElement>): void 
 }
 
 /**
- * 行内 / 块级公式共用的 LaTeX 编辑浮层（Portal → body，样式来自 InlineMath/style.module.less）。
+ * 行内 / 块级公式共用的 LaTeX 编辑浮层（Portal → body，样式来自 InlineMath/style.module.scss）。
  */
 export function LatexEditPopover(props: LatexEditPopoverProps) {
   const { t } = useTranslation('note');

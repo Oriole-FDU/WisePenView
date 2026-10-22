@@ -20,7 +20,7 @@ import {
 } from '@/components/editors/note/CustomBlockNote/ui/toolbar/components/ToolbarButton';
 
 import { useTableToolbarContext } from './_context';
-import styles from './TableToolbar.module.less';
+import styles from './TableToolbar.module.scss';
 
 export function TableStructureActions() {
   const { t } = useTranslation('note');

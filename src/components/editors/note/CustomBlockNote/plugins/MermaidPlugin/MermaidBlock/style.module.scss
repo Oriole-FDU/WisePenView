@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .root {
   position: relative;
@@ -119,7 +119,7 @@
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .diagram {
@@ -161,7 +161,6 @@
   margin: 0;
   padding: var(--space-sm);
   overflow: auto;
-  .appSubtleScrollbar();
   color: var(--foreground);
   font-family:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
@@ -172,6 +171,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
+  @include scrollbar.appSubtleScrollbar();
 
   :global(.bn-inline-content) {
     display: block;
@@ -200,7 +200,6 @@
   margin: 0;
   padding: var(--space-sm);
   overflow: auto;
-  .appSubtleScrollbar();
   font-family:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
@@ -210,6 +209,7 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .aiDiffComparison {
@@ -322,7 +322,7 @@
   display: none;
 }
 
-@media (max-width: @breakpoint-lg) {
+@media (max-width: breakpoints.$breakpoint-lg) {
   .body {
     grid-template-columns: minmax(0, 1fr);
   }

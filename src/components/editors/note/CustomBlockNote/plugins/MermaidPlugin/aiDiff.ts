@@ -1,6 +1,6 @@
 import type { NoteBlockAiDiff } from '../../registry/types';
 import { createMermaidAiDiffPanel } from './MermaidAiDiffPanel';
-import styles from './MermaidBlock/style.module.less';
+import styles from './MermaidBlock/style.module.scss';
 import { readMermaidSource } from './source';
 
 function isMermaidContent(value: unknown): value is string | unknown[] {

@@ -15,7 +15,7 @@ import {
 } from './buildSlashMenuItems';
 import { sortSuggestionItemsForDisplay } from './slashMenuModel';
 import { SlashMenuListBoxItems } from './slashMenuView';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { getSlashMenuItemId, useSlashMenuNavigation } from './useSlashMenuNavigation';
 
 interface NoteSlashMenuProps {
