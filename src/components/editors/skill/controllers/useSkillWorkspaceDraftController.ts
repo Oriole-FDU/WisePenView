@@ -1,8 +1,6 @@
-import { toast } from '@heroui/react';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useReducer } from 'react';
 
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
-import i18n from '@/i18n';
 
 import {
   applySavedSkillFiles,
@@ -27,17 +25,12 @@ import {
   updateLoadedSkillFileContent,
 } from '../models/workspaceDraft';
 import {
-  clearSkillDraftCache,
-  loadSkillDraftCache,
-  saveSkillDraftCache,
-  type SkillDraftCacheSnapshot,
-} from '../utils/skillDraftCache';
-import {
   canPreviewSkillFile,
   findFile,
   getFirstFile,
   isLocalAssetId,
 } from '../utils/skillFileTree';
+import { useSkillWorkspaceCacheController } from './useSkillWorkspaceCacheController';
 
 type WorkspaceAction =
   | { type: 'replace'; state: SkillWorkspaceDraftState }
@@ -50,27 +43,13 @@ function workspaceReducer(
   return action.type === 'replace' ? action.state : action.update(state);
 }
 
-function isMatchingCache(
-  snapshot: SkillDraftCacheSnapshot,
-  accountId: string,
-  draftVersion: number
-): boolean {
-  return (
-    snapshot.schemaVersion === 2 &&
-    snapshot.accountId === accountId &&
-    snapshot.draftVersion === draftVersion
-  );
-}
-
 export function useSkillWorkspaceDraftController(skill?: SkillDetail, accountId?: string) {
   const [state, dispatch] = useReducer(workspaceReducer, undefined, createEmptySkillWorkspaceState);
-  const cacheWriteVersionRef = useRef(0);
   const normalizedAccountId = accountId?.trim() ?? '';
   const resourceKey =
     skill && normalizedAccountId
       ? `${normalizedAccountId}:${createSkillWorkspaceResourceKey(skill)}`
       : '';
-  const [cacheReadyKey, setCacheReadyKey] = useState<string | null>(null);
 
   const skillResourceId = skill?.resourceId ?? '';
   const skillDraftVersion = skill?.draftVersion ?? 0;
@@ -84,130 +63,46 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail, accountId?
     dispatch({ type: 'update', update: updater });
   };
 
-  const invalidateCacheWrites = () => {
-    cacheWriteVersionRef.current += 1;
-  };
-
-  const clearDraftCache = async () => {
-    if (!skillResourceId || !normalizedAccountId) return;
-    invalidateCacheWrites();
-    await clearSkillDraftCache(skillResourceId, normalizedAccountId).catch(() => undefined);
-  };
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：Skill 资源或草稿版本变化后读取对应的 IndexedDB 多文件草稿。
-   * 不可替代原因：IndexedDB 是 React 外部异步存储，恢复结果必须与当前资源 key 校验后写入状态。
-   * cleanup：废弃旧资源的异步读取，避免其覆盖新资源状态。
-   */
-  useEffect(() => {
-    if (!skillResourceId || !skillDraftVersion || !resourceKey) return;
-    let disposed = false;
-    cacheWriteVersionRef.current += 1;
-    void loadSkillDraftCache(skillResourceId, normalizedAccountId)
-      .then((snapshot) => {
-        if (disposed) return;
-        if (snapshot && isMatchingCache(snapshot, normalizedAccountId, skillDraftVersion)) {
-          const restoredState: SkillWorkspaceDraftState = {
-            ...snapshot.workspace,
-            resourceKey,
-            savingFileRevisions: {},
-            savingConfigRevision: null,
-            configDirty:
-              snapshot.workspace.configDirty ??
-              (snapshot.workspace.configName !== snapshot.workspace.savedConfigName ||
-                snapshot.workspace.configDescription !== snapshot.workspace.savedConfigDescription),
-            pendingIntent: null,
-          };
-          dispatch({
-            type: 'replace',
-            state: restoredState,
-          });
-          toast.warning(i18n.t('toast.draftRestored', { ns: 'skill' }));
-        } else if (snapshot) {
-          void clearSkillDraftCache(skillResourceId, normalizedAccountId);
-        }
-        setCacheReadyKey(resourceKey);
-      })
-      .catch(() => {
-        if (!disposed) setCacheReadyKey(resourceKey);
-      });
-    return () => {
-      disposed = true;
-    };
-  }, [normalizedAccountId, resourceKey, skillDraftVersion, skillResourceId]);
-
   const isConfigDirty = state.configDirty;
   const dirtyFileIds = new Set(Object.values(state.fileDrafts).map((draft) => draft.fileId));
   const hasFileDrafts = dirtyFileIds.size > 0;
   const hasUnsavedChanges = hasFileDrafts || isConfigDirty;
 
   /**
-   * @wisepen-manual-effect
-   * 执行时机：多文件草稿、文件树或 Config 草稿变化后防抖写入 IndexedDB。
-   * 不可替代原因：IndexedDB 与 Blob 持久化属于 React 外部异步存储。
-   * cleanup：取消未开始的写入，并通过版本令牌废弃已失效任务。
+   * @wisepen-manual-memo
+   * 为什么：缓存恢复需要按当前资源作用域重建工作区状态。
+   * 收益：保持缓存 Controller 的恢复回调稳定，避免重复读取 IndexedDB。
+   * 失效条件：工作区 reducer 的 dispatch 引用发生变化。
    */
-  useEffect(() => {
-    if (
-      !skillResourceId ||
-      !skillDraftVersion ||
-      cacheReadyKey !== resourceKey ||
-      !hasUnsavedChanges
-    )
-      return;
-    const writeVersion = cacheWriteVersionRef.current;
-    const timer = window.setTimeout(() => {
-      if (cacheWriteVersionRef.current !== writeVersion) return;
-      const cacheToken = `${resourceKey}:${writeVersion}:${Date.now()}`;
-      const snapshot: SkillDraftCacheSnapshot = {
-        accountId: normalizedAccountId,
-        schemaVersion: 2,
-        resourceId: skillResourceId,
-        draftVersion: skillDraftVersion,
-        cacheToken,
-        workspace: { ...state, pendingIntent: null },
-        updatedAt: Date.now(),
-      };
-      void saveSkillDraftCache(snapshot)
-        .then(() => {
-          if (cacheWriteVersionRef.current === writeVersion) return;
-          void loadSkillDraftCache(snapshot.resourceId, normalizedAccountId).then((cached) => {
-            if (cached?.cacheToken === cacheToken) {
-              void clearSkillDraftCache(snapshot.resourceId, normalizedAccountId);
-            }
-          });
-        })
-        .catch(() => undefined);
-    }, 500);
-    return () => window.clearTimeout(timer);
-  }, [
-    cacheReadyKey,
-    hasUnsavedChanges,
-    normalizedAccountId,
-    resourceKey,
-    skillDraftVersion,
-    skillResourceId,
-    state,
-  ]);
+  const restoreCachedWorkspace = useCallback(
+    (workspace: SkillWorkspaceDraftState) => {
+      dispatch({
+        type: 'replace',
+        state: {
+          ...workspace,
+          resourceKey,
+          savingFileRevisions: {},
+          savingConfigRevision: null,
+          configDirty:
+            workspace.configDirty ??
+            (workspace.configName !== workspace.savedConfigName ||
+              workspace.configDescription !== workspace.savedConfigDescription),
+          pendingIntent: null,
+        },
+      });
+    },
+    [resourceKey]
+  );
 
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：工作区恢复完成且所有草稿均已保存或丢弃时删除本地快照。
-   * 不可替代原因：IndexedDB 是 React 外部持久化存储，需要显式清理。
-   * cleanup：删除操作幂等，无额外订阅需要清理。
-   */
-  useEffect(() => {
-    if (
-      !skillResourceId ||
-      !normalizedAccountId ||
-      cacheReadyKey !== resourceKey ||
-      hasUnsavedChanges
-    )
-      return;
-    cacheWriteVersionRef.current += 1;
-    void clearSkillDraftCache(skillResourceId, normalizedAccountId).catch(() => undefined);
-  }, [cacheReadyKey, hasUnsavedChanges, normalizedAccountId, resourceKey, skillResourceId]);
+  const { clearDraftCache } = useSkillWorkspaceCacheController({
+    accountId: normalizedAccountId,
+    resourceKey,
+    resourceId: skillResourceId,
+    draftVersion: skillDraftVersion,
+    state,
+    hasUnsavedChanges,
+    onRestore: restoreCachedWorkspace,
+  });
 
   const selectedFile = state.selectedFileId ? findFile(state.files, state.selectedFileId) : null;
   const activeContent = getSkillFileContent(selectedFile, state.fileDrafts);

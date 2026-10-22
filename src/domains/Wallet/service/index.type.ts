@@ -9,7 +9,7 @@ import type {
  * IWalletService：/user/wallet 下个人钱包、流水、点卡兑换（仅本人）、组长↔小组划拨。
  */
 
-/** GET /user/wallet/getUserWalletInfo — 无参为当前用户；可选 groupId 查小组池（与后端约定一致时） */
+/** GET /user/wallet/getUserWalletInfo — 无参读取当前用户余额；小组资金池余额由 GroupService 读取。 */
 export interface GetWalletInfoResponse {
   tokenBalance: number;
   tokenUsed: number;

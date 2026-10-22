@@ -21,6 +21,7 @@
 
 ## Component 与 View 任务
 
+- `architecture-guidelines.md`：ESLint 文件长度告警、拆分决策、目录归属与高内聚低耦合。
 - `component-boundary.md`：组件放置、复用范围和 base/business 边界。
 - `component-react.md`：React、Hooks、JSX、TypeScript 和副作用治理。
 - `context.md`：Context 的组成、归属、Provider 和消费规范。
@@ -30,8 +31,9 @@
 
 ## 其它领域
 
+- `business-knowledge.md`：业务知识文件的唯一来源、迁移和分批审查。
 - `routing.md`：URL、页面级 Tab、面包屑和导航历史。
 - `store.md`：状态归属、注册、持久化和生命周期。
 - `color-system.md`：颜色阶、语义 token 和主题。
 
-跨层任务按 `view/component -> service -> mapper -> api -> entity/enum` 读取，修改完成后删除旧实现和无效兼容层。
+跨层任务按 `view/component -> service -> mapper -> api -> entity/enum` 读取；涉及拆分时先读 `architecture-guidelines.md`，涉及业务知识时再读 `business-knowledge.md`。修改完成后删除旧实现和无效兼容层。
