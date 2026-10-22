@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { ArrowRenderProps } from 'react-joyride';
 
 import type { GuideTooltipProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const ARROW_OVERLAP = 2;
 

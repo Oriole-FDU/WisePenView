@@ -8,7 +8,7 @@ import Checkbox from './Checkbox';
 import Fieldset from './Fieldset';
 import FormField from './FormField';
 import Input from './Input';
-import styles from './Input.stories.module.less';
+import styles from './Input.stories.module.scss';
 import InputGroup from './InputGroup';
 import InputOTP, { REGEXP_ONLY_DIGITS } from './InputOTP';
 import PasswordInput from './PasswordInput';

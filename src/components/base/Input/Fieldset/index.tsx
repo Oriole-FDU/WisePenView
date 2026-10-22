@@ -7,7 +7,7 @@ import type {
   FieldsetLegendProps,
   FieldsetProps,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function FieldsetRoot({ className, ...props }: FieldsetProps) {
   return <HeroFieldset className={clsx(styles.fieldset, className)} {...props} />;

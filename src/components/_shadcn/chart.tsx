@@ -6,7 +6,7 @@ import {
   type TooltipContentProps,
   type TooltipValueType,
 } from 'recharts';
-import styles from './chart.module.less';
+import styles from './chart.module.scss';
 
 export type ChartConfig = Record<string, { label?: ReactNode; color?: string }>;
 

@@ -3,7 +3,7 @@ import { cloneElement, isValidElement, type ReactElement } from 'react';
 import type { GuideToolId } from '@/constants/tour';
 
 import type { GuideAnchorProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const LAYOUT_CLASS = {
   inline: styles.inline,

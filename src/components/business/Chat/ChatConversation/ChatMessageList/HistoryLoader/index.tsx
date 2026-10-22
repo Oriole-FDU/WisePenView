@@ -9,7 +9,7 @@ import {
   MessageScrollerItem,
   useMessageScrollerScrollable,
 } from '@/components/_shadcn';
-import markerStyles from '@/components/_shadcn/marker.module.less';
+import markerStyles from '@/components/_shadcn/marker.module.scss';
 import { Spin } from '@/components/base/Feedback';
 
 import type { HistoryLoaderProps } from './index.type';

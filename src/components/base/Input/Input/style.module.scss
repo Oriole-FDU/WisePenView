@@ -1,7 +1,7 @@
-@import '../_common/field.less';
+@use '../_common/field' as field;
 
 .input:global(.input) {
-  .fieldTokens();
+  @include field.fieldTokens();
 
   /* HeroUI Input 变量映射 */
   --input-bg: var(--app-field-bg);
@@ -12,41 +12,41 @@
   --field-shadow: none;
 
   min-height: var(--control-height, 36px);
-  .fieldSurface();
+  @include field.fieldSurface();
 }
 
 .input:global(.input)::placeholder {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 .input:global(.input):hover:not(:focus):not(:focus-visible),
 .input:global(.input)[data-hovered='true']:not([data-focused='true']):not(
     [data-focus-visible='true']
   ) {
-  .fieldSurfaceHover();
+  @include field.fieldSurfaceHover();
 }
 
 .input:global(.input):focus,
 .input:global(.input)[data-focused='true'] {
-  .fieldSurfaceFocus();
+  @include field.fieldSurfaceFocus();
 }
 
 .input:global(.input):focus-visible,
 .input:global(.input)[data-focus-visible='true'] {
-  .fieldSurfaceFocusVisible();
+  @include field.fieldSurfaceFocusVisible();
 }
 
 .input:global(.input)[data-invalid='true'] {
-  .fieldSurfaceInvalid();
+  @include field.fieldSurfaceInvalid();
 }
 
 .input:global(.input)[data-invalid='true']:focus,
 .input:global(.input)[data-invalid='true'][data-focused='true'] {
-  .fieldSurfaceInvalidFocus();
+  @include field.fieldSurfaceInvalidFocus();
 }
 
 .input:global(.input):disabled,
 .input:global(.input)[data-disabled='true'],
 .input:global(.input)[aria-disabled='true'] {
-  .fieldSurfaceDisabled();
+  @include field.fieldSurfaceDisabled();
 }

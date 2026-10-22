@@ -11,7 +11,7 @@ import type {
   AutocompleteTriggerProps,
   AutocompleteValueProps,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AutocompleteRoot<T extends object = object, M extends 'single' | 'multiple' = 'single'>({
   className,

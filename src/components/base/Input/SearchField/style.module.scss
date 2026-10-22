@@ -1,7 +1,7 @@
-@import '../_common/field.less';
+@use '../_common/field' as field;
 
 .searchField:global(.search-field) {
-  .fieldTokens();
+  @include field.fieldTokens();
 
   /* HeroUI SearchField 变量映射 */
   --search-field-group-bg: var(--app-field-bg);
@@ -14,31 +14,28 @@
 
 .searchField:global(.search-field) :global(.search-field__group) {
   min-height: var(--control-height, 36px);
-  .fieldSurface();
+  @include field.fieldSurface();
 }
 
 .searchField:global(.search-field) :global(.search-field__group):hover:not(:focus-within),
 .searchField:global(.search-field)
   :global(.search-field__group)[data-hovered='true']:not([data-focus-within='true']) {
-  .fieldSurfaceHover();
+  @include field.fieldSurfaceHover();
 }
 
 .searchField:global(.search-field) :global(.search-field__group):focus-within,
-.searchField:global(.search-field)
-  :global(.search-field__group)[data-focus-within='true'] {
-  .fieldSurfaceFocus();
+.searchField:global(.search-field) :global(.search-field__group)[data-focus-within='true'] {
+  @include field.fieldSurfaceFocus();
 }
 
 .searchField:global(.search-field)[data-invalid='true'] :global(.search-field__group),
 .searchField:global(.search-field)[aria-invalid='true'] :global(.search-field__group) {
-  .fieldSurfaceInvalid();
+  @include field.fieldSurfaceInvalid();
 }
 
-.searchField:global(.search-field)[data-invalid='true']
-  :global(.search-field__group):focus-within,
-.searchField:global(.search-field)[aria-invalid='true']
-  :global(.search-field__group):focus-within {
-  .fieldSurfaceInvalidFocus();
+.searchField:global(.search-field)[data-invalid='true'] :global(.search-field__group):focus-within,
+.searchField:global(.search-field)[aria-invalid='true'] :global(.search-field__group):focus-within {
+  @include field.fieldSurfaceInvalidFocus();
 }
 
 .searchField:global(.search-field) :global(.search-field__input) {
@@ -49,9 +46,9 @@
 }
 
 .searchField:global(.search-field) :global(.search-field__input)::placeholder {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 .searchField:global(.search-field) :global(.search-field__search-icon) {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }

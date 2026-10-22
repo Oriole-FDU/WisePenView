@@ -3,7 +3,7 @@ import { type KeyboardEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { RatingProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function Rating({
   value = 0,

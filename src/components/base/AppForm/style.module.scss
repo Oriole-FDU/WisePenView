@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .section {
   min-width: 0;
@@ -111,10 +111,10 @@
 .anchorNav {
   min-height: 0;
   overflow-y: auto;
-  .appSubtleScrollbar();
   padding: var(--space-md-plus) var(--space-sm);
   border-right: 1px solid var(--border);
   background: var(--surface);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .anchorNav h2 {
@@ -182,7 +182,7 @@
   background: var(--accent);
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .section[data-variant='editor'] {
     padding: 0 15px;
   }

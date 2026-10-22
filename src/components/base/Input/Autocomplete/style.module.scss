@@ -1,7 +1,7 @@
-@import '../_common/field.less';
+@use '../_common/field' as field;
 
 .autocomplete:global(.autocomplete) {
-  .fieldTokens();
+  @include field.fieldTokens();
 
   /* HeroUI Autocomplete 变量映射 */
   --autocomplete-trigger-bg: var(--app-field-bg);
@@ -14,7 +14,7 @@
   width: 100%;
   min-height: var(--control-height, 36px);
   align-items: center;
-  .fieldSurface();
+  @include field.fieldSurface();
 }
 
 .autocompleteTrigger:global(.autocomplete__trigger):hover:not(
@@ -23,14 +23,14 @@
 .autocompleteTrigger:global(.autocomplete__trigger)[data-hovered='true']:not(
     :has(:global(.autocomplete__clear-button:hover))
   ) {
-  .fieldSurfaceHover();
+  @include field.fieldSurfaceHover();
 }
 
 .autocompleteTrigger:global(.autocomplete__trigger):focus,
 .autocompleteTrigger:global(.autocomplete__trigger):focus-visible,
 .autocompleteTrigger:global(.autocomplete__trigger)[data-focus='true'],
 .autocompleteTrigger:global(.autocomplete__trigger)[data-focus-visible='true'] {
-  .fieldSurfaceFocus();
+  @include field.fieldSurfaceFocus();
   outline: none;
 }
 
@@ -38,20 +38,20 @@
   .autocompleteTrigger:global(.autocomplete__trigger),
 .autocomplete:global(.autocomplete)[aria-invalid='true']
   .autocompleteTrigger:global(.autocomplete__trigger) {
-  .fieldSurfaceInvalid();
+  @include field.fieldSurfaceInvalid();
 }
 
 .autocomplete:global(.autocomplete)[data-invalid='true']
   .autocompleteTrigger:global(.autocomplete__trigger):focus,
 .autocomplete:global(.autocomplete)[aria-invalid='true']
   .autocompleteTrigger:global(.autocomplete__trigger):focus {
-  .fieldSurfaceInvalidFocus();
+  @include field.fieldSurfaceInvalidFocus();
 }
 
 .autocompleteTrigger:global(.autocomplete__trigger):disabled,
 .autocompleteTrigger:global(.autocomplete__trigger)[data-disabled='true'],
 .autocompleteTrigger:global(.autocomplete__trigger)[aria-disabled='true'] {
-  .fieldSurfaceDisabled();
+  @include field.fieldSurfaceDisabled();
 }
 
 .autocomplete:global(.autocomplete) :global(.autocomplete__value) {
@@ -61,11 +61,11 @@
 }
 
 .autocomplete:global(.autocomplete) :global(.autocomplete__value[data-placeholder='true']) {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 .autocomplete:global(.autocomplete) :global(.autocomplete__indicator) {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 /* Autocomplete trigger 使用字段圆角；展开后的选项面板外壳使用浮层圆角。 */

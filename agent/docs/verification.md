@@ -26,7 +26,7 @@ PR CI 固定执行 commitlint、lint、build、mock contract、API response cont
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
 
-Less → SCSS 每個遷移批次另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對該批編譯 CSS 與使用中的 CSS Modules 匯出鍵。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、試點元件樣式與 SCSS 守衛；後續批次在同一檢查加入 Table、Chat 與 Less 清零契約。建置與靜態比對不能代替已授權的視覺／互動驗收。
+Less → SCSS 每個遷移批次另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對該批編譯 CSS 與使用中的 CSS Modules 匯出鍵。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、Input field 狀態、AppBreadcrumb 匯出與通用字體 token、非 Table 基礎元件及 `_shadcn` 的 SCSS 編譯邊界、scrollbar 宣告不拆分父規則，以及試點元件樣式與 SCSS 守衛；後續批次在同一檢查加入 Table、Chat 與 Less 清零契約。建置與靜態比對不能代替已授權的視覺／互動驗收。
 
 ## 运行态记录
 

@@ -7,7 +7,7 @@ import {
 import { clsx } from 'clsx';
 
 import type { InputOTPProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function InputOTPRoot({ className, variant = 'secondary', ...props }: InputOTPProps) {
   return <HeroInputOTP variant={variant} className={clsx(styles.inputOtp, className)} {...props} />;

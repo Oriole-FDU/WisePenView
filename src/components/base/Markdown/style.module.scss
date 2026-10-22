@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .markdown {
   white-space: normal;
@@ -195,8 +195,8 @@
   margin: 0 0 var(--space-md);
   overflow-x: auto;
   overflow-y: hidden;
-  .appSubtleScrollbar();
   text-align: center;
+  @include scrollbar.appSubtleScrollbar();
 
   :global(.katex-display) {
     margin: 0;
@@ -241,7 +241,7 @@
   width: 100%;
   margin: 0 0 var(--space-sm);
   overflow-x: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .tableAlignLeft {

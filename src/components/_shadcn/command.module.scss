@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .command {
   display: flex;
@@ -80,7 +80,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   scroll-padding-block: 4px;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .list:global(.list-box) {

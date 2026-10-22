@@ -3,7 +3,7 @@
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { clsx } from 'clsx';
 import { ChevronDown } from 'lucide-react';
-import styles from './accordion.module.less';
+import styles from './accordion.module.scss';
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (

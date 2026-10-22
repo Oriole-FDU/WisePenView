@@ -1,4 +1,4 @@
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/breakpoints' as breakpoints;
 .pageHeader {
   position: relative;
   display: flex;
@@ -52,7 +52,7 @@
   gap: var(--space-sm);
 }
 
-@media (max-width: @breakpoint-sm) {
+@media (max-width: breakpoints.$breakpoint-sm) {
   .pageHeader {
     align-items: stretch;
     flex-direction: column;

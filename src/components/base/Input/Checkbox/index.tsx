@@ -2,7 +2,7 @@ import { Checkbox as HeroCheckbox } from '@heroui/react';
 import { clsx } from 'clsx';
 
 import type { CheckboxProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function Checkbox({
   children,

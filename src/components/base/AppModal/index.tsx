@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Modal } from '@/components/base/Modal';
 
 import type { AppModalBodyProps, AppModalFooterProps, AppModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AppModalBody({ className, ...props }: AppModalBodyProps) {
   return <Modal.Body className={clsx(styles.body, className)} {...props} />;

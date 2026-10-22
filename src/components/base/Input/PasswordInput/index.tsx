@@ -5,7 +5,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import Input from '../Input';
 import type { PasswordInputProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function PasswordInput({
   className,

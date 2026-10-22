@@ -10,11 +10,7 @@
 }
 
 .dropArea {
-  --upload-zone-background: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
+  --upload-zone-background: color-mix(in oklab, var(--surface-tertiary) 35%, var(--surface) 65%);
   --upload-zone-background-hover: color-mix(
     in oklab,
     var(--surface-tertiary) 70%,

@@ -1,4 +1,4 @@
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/breakpoints' as breakpoints;
 .panel {
   --pie-chart-color-1: color-mix(in oklch, var(--accent) 72%, var(--surface));
   --pie-chart-color-2: color-mix(in oklch, var(--accent) 82%, var(--foreground));
@@ -144,7 +144,7 @@
   font-weight: var(--font-weight-medium);
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .body,
   .section .body {
     grid-template-columns: 1fr;

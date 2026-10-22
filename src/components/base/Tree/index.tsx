@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Checkbox } from '@/components/base/Input';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface DataNode {
   key: Key;

@@ -1,4 +1,4 @@
-import './style.module.less';
+import './style.module.scss';
 
 import { useMount } from 'ahooks';
 import { useEffect, useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react';

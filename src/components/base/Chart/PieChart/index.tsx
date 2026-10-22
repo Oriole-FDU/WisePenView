@@ -9,7 +9,7 @@ import {
 } from '@/components/_shadcn';
 
 import type { PieChartItem, PieChartProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface PieDatum extends PieChartItem {
   fill: string;

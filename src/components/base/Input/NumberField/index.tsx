@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import type { NumberFieldProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function NumberFieldRoot({
   className,

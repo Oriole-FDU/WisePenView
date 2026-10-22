@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
 
 import type { StepDotsProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function StepDots({ items, current, className }: StepDotsProps) {
   return (

@@ -1,5 +1,3 @@
-@import '../Table/shared/styles/table.module.less';
-
 .breadcrumb {
   display: flex;
   flex-wrap: nowrap;
@@ -25,9 +23,9 @@
 
 .separator {
   color: var(--muted);
-  font-family: @table-font-family;
-  font-size: @table-font-size-meta;
-  line-height: @table-line-height-meta;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
 }
 
 .link,
@@ -41,9 +39,9 @@
   border-radius: var(--app-radius-breadcrumb-item);
   background: transparent;
   color: var(--muted);
-  font-family: @table-font-family;
-  font-size: @table-font-size-meta;
-  line-height: @table-line-height-meta;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
   text-decoration: none;
   cursor: pointer;
 
@@ -59,7 +57,7 @@
   max-width: 100%;
   overflow: hidden;
   color: var(--foreground);
-  font-weight: @table-font-weight-medium;
+  font-weight: var(--font-weight-medium);
   text-overflow: ellipsis;
   cursor: default;
 

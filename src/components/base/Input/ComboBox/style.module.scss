@@ -1,7 +1,7 @@
-@import '../_common/field.less';
+@use '../_common/field' as field;
 
 .comboBox:global(.combo-box) {
-  .fieldTokens();
+  @include field.fieldTokens();
 
   --field-shadow: none;
 }

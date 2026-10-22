@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import type { ComponentProps } from 'react';
 import * as ResizablePrimitive from 'react-resizable-panels';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const RESIZE_TARGET_MINIMUM_SIZE = { fine: 16, coarse: 32 } as const;
 

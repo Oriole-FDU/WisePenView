@@ -18,7 +18,7 @@ import CodeBlock from './CodeBlock';
 import MermaidBlock from './MermaidBlock';
 import { isMermaidLanguage } from './MermaidBlock/language';
 import { MARKDOWN_UNDERLINE_URL, type MarkdownRenderContext } from './runtime';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const SAFE_PROTOCOL = /^(https?|ircs?|mailto|xmpp)$/i;
 

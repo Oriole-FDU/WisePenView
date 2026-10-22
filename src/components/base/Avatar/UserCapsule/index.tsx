@@ -1,7 +1,7 @@
 import AppAvatar from '@/components/base/Avatar';
 
 import type { UserCapsuleProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function UserCapsule({ name, avatar, variant = 'bare' }: UserCapsuleProps) {
   const displayName = name.trim() || '-';

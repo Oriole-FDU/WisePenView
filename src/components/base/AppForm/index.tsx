@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface AppFormSectionProps {
   id?: string;

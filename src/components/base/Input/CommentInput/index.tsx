@@ -8,7 +8,7 @@ import { TextArea } from '@/components/base/Input';
 import EmojiPicker from '@/components/base/Input/EmojiPicker';
 
 import type { CommentInputImage, CommentInputProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export type { CommentInputImage, CommentInputProps } from './index.type';
 

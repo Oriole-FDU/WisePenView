@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .composer {
   display: flex;
@@ -61,8 +61,8 @@
   line-height: 1.5;
   resize: none !important;
   overflow-y: auto;
-  .appSubtleScrollbar();
   field-sizing: content;
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .inlineActions {

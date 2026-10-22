@@ -1,7 +1,7 @@
-@import '../_common/field.less';
+@use '../_common/field' as field;
 
 .numberField:global(.number-field) {
-  .fieldTokens();
+  @include field.fieldTokens();
 
   /* HeroUI NumberField 变量映射 */
   --field-background: var(--app-field-bg);
@@ -11,36 +11,33 @@
 
 .numberField:global(.number-field) :global(.number-field__group) {
   min-height: var(--control-height, 36px);
-  .fieldSurface();
+  @include field.fieldSurface();
 }
 
 .numberField:global(.number-field) :global(.number-field__group):hover:not(:focus-within),
 .numberField:global(.number-field)
   :global(.number-field__group)[data-hovered='true']:not([data-focus-within='true']) {
-  .fieldSurfaceHover();
+  @include field.fieldSurfaceHover();
 }
 
 .numberField:global(.number-field) :global(.number-field__group):focus-within,
-.numberField:global(.number-field)
-  :global(.number-field__group)[data-focus-within='true'] {
-  .fieldSurfaceFocus();
+.numberField:global(.number-field) :global(.number-field__group)[data-focus-within='true'] {
+  @include field.fieldSurfaceFocus();
 }
 
 .numberField:global(.number-field)[data-invalid='true'] :global(.number-field__group),
 .numberField:global(.number-field)[aria-invalid='true'] :global(.number-field__group) {
-  .fieldSurfaceInvalid();
+  @include field.fieldSurfaceInvalid();
 }
 
-.numberField:global(.number-field)[data-invalid='true']
-  :global(.number-field__group):focus-within,
-.numberField:global(.number-field)[aria-invalid='true']
-  :global(.number-field__group):focus-within {
-  .fieldSurfaceInvalidFocus();
+.numberField:global(.number-field)[data-invalid='true'] :global(.number-field__group):focus-within,
+.numberField:global(.number-field)[aria-invalid='true'] :global(.number-field__group):focus-within {
+  @include field.fieldSurfaceInvalidFocus();
 }
 
 .numberField:global(.number-field) :global(.number-field__group)[data-disabled='true'],
 .numberField:global(.number-field) :global(.number-field__group)[aria-disabled='true'] {
-  .fieldSurfaceDisabled();
+  @include field.fieldSurfaceDisabled();
 }
 
 .numberField:global(.number-field) :global(.number-field__input) {
@@ -49,7 +46,7 @@
 }
 
 .numberField:global(.number-field) :global(.number-field__input)::placeholder {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 .numberField:global(.number-field) :global(.number-field__increment-button),

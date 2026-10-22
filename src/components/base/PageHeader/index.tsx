@@ -2,7 +2,7 @@ import { Heading, Paragraph } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface PageHeaderProps {
   title: ReactNode;

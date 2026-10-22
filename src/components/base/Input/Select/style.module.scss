@@ -1,7 +1,7 @@
-@import '../_common/field.less';
+@use '../_common/field' as field;
 
 .select:global(.select) {
-  .fieldTokens();
+  @include field.fieldTokens();
 
   /* HeroUI Select 变量映射 */
   --select-trigger-bg: var(--app-field-bg);
@@ -18,25 +18,25 @@
   width: 100%;
   min-height: var(--control-height, 36px);
   align-items: center;
-  .fieldSurface();
+  @include field.fieldSurface();
 }
 
 .selectTrigger:global(.select__trigger):hover,
 .selectTrigger:global(.select__trigger)[data-hovered='true'] {
-  .fieldSurfaceHover();
+  @include field.fieldSurfaceHover();
 }
 
 .selectTrigger:global(.select__trigger):focus,
 .selectTrigger:global(.select__trigger):focus-visible,
 .selectTrigger:global(.select__trigger)[data-focus='true'],
 .selectTrigger:global(.select__trigger)[data-focus-visible='true'] {
-  .fieldSurfaceFocus();
+  @include field.fieldSurfaceFocus();
   outline: none;
 }
 
 .select:global(.select)[data-invalid='true'] .selectTrigger:global(.select__trigger),
 .select:global(.select)[aria-invalid='true'] .selectTrigger:global(.select__trigger) {
-  .fieldSurfaceInvalid();
+  @include field.fieldSurfaceInvalid();
 }
 
 .select:global(.select)[data-invalid='true'] .selectTrigger:global(.select__trigger):focus,
@@ -45,13 +45,13 @@
 .select:global(.select)[aria-invalid='true'] .selectTrigger:global(.select__trigger):focus,
 .select:global(.select)[aria-invalid='true']
   .selectTrigger:global(.select__trigger)[data-focus='true'] {
-  .fieldSurfaceInvalidFocus();
+  @include field.fieldSurfaceInvalidFocus();
 }
 
 .selectTrigger:global(.select__trigger):disabled,
 .selectTrigger:global(.select__trigger)[data-disabled='true'],
 .selectTrigger:global(.select__trigger)[aria-disabled='true'] {
-  .fieldSurfaceDisabled();
+  @include field.fieldSurfaceDisabled();
 }
 
 .select:global(.select) :global(.select__value) {
@@ -61,11 +61,11 @@
 }
 
 .select:global(.select) :global(.select__value[data-placeholder='true']) {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 .select:global(.select) :global(.select__indicator) {
-  .fieldPlaceholder();
+  @include field.fieldPlaceholder();
 }
 
 /* Select trigger 使用字段圆角；展开后的选项面板外壳使用浮层圆角。 */

@@ -2,7 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import MarkdownRenderer, { type MarkdownResourceResolver } from './Renderer';
 import { createMarkdownRuntime, updateMarkdownRuntime } from './runtime';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export type { MarkdownResourceResolver } from './Renderer';
 

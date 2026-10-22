@@ -4,7 +4,7 @@ import { CircleAlert } from 'lucide-react';
 import { Popover } from '@/components/base/Popover';
 
 import type { AppPopoverContentProps, AppPopoverHeaderProps, AppPopoverProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AppPopoverHeader({
   variant = 'default',

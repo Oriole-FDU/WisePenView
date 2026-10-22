@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface ColorTextIconProps {
   textClassName?: string;

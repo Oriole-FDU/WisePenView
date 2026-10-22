@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .attachment {
   position: relative;
@@ -240,7 +240,7 @@
   padding-block: var(--space-2xs);
   scroll-padding-inline: 4px;
   scroll-snap-type: x mandatory;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 
   > [data-slot='attachment'] {
     flex: none;
