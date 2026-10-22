@@ -6,7 +6,7 @@ import type { ResourceLayoutProps } from './index.type';
 import ResourceLayoutHeader from './ResourceLayoutHeader';
 import ResourceSidePanel from './ResourceSidePanel';
 import ResourceSidePanelActions from './ResourceSidePanel/Actions';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /**
  * 资源外壳：负责资源自己的顶栏与侧栏。

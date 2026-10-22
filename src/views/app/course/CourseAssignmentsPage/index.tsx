@@ -12,7 +12,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { buildCourseAssignmentPath } from '@/utils/navigation/appRoute';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseAssignmentsPage() {
   const { t } = useTranslation('course');

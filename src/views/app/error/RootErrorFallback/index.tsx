@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getErrorReportId } from '@/utils/error';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function RootErrorFallback({ error }: FallbackProps) {
   const { t } = useTranslation('errors');

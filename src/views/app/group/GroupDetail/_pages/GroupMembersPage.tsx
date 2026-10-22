@@ -2,7 +2,7 @@ import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayC
 import MemberList from '@/components/business/Group/MemberList';
 import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
-import layout from '../../style.module.less';
+import layout from '../../style.module.scss';
 
 function GroupMembersPage() {
   const { group, currentUserRole } = useGroupContext();

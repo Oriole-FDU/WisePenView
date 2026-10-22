@@ -6,7 +6,7 @@ import { IDENTITY } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import styles from './AdminRouteGuard.module.less';
+import styles from './AdminRouteGuard.module.scss';
 
 function AdminRouteGuard() {
   const userService = useUserService();

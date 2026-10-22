@@ -6,7 +6,7 @@ import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBrea
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { ResourceIconType } from '@/domains/Resource';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface ResourceToolbarBreadcrumbProps {
   resourceId?: string;

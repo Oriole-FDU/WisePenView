@@ -25,7 +25,7 @@ import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/inde
 
 import AuthIconField from '../_common/AuthIconField';
 import { validateConfirmPasswordField, validatePasswordField } from '../_common/passwordValidation';
-import auth from '../_common/style.module.less';
+import auth from '../_common/style.module.scss';
 
 const USERNAME_MIN_LENGTH = 4;
 const USERNAME_MAX_LENGTH = 20;

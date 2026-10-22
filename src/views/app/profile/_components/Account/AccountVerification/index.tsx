@@ -12,7 +12,7 @@ import { USER_STATUS } from '@/domains/User';
 
 import VerifyBanner from '../VerifyBanner';
 import type { AccountVerificationProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AccountVerification({
   user,

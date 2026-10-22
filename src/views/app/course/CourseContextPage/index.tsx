@@ -6,9 +6,9 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useCourseContext } from '@/layouts/Course/_context';
 import { APP_ROUTE_PATH, buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
+import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const COURSE_CONTEXT_TAB_KEYS = ['home', 'info'] as const;
 type CourseContextTabKey = (typeof COURSE_CONTEXT_TAB_KEYS)[number];

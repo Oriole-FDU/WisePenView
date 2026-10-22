@@ -6,7 +6,7 @@ import { MAIN_MIN_WIDTH } from '@/constants/layoutScale';
 import MainShell from '@/layouts/MainShell';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const ADMIN_LAYOUT_PANEL_GROUP_ID = 'admin-layout-panels';
 

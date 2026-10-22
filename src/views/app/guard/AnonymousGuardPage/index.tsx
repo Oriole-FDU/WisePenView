@@ -6,7 +6,7 @@ import { AppButton } from '@/components/base/Button';
 import { useAppAuth } from '@/layouts/App/_context';
 import { COLOR_SCHEME_ICON_SRC, useColorScheme } from '@/theme';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AnonymousGuardPage() {
   const { t } = useTranslation('shell');

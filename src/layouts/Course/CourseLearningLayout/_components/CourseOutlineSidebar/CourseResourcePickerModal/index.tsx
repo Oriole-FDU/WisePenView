@@ -9,7 +9,7 @@ import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { usePickerSelection } from '@/hooks/usePickerSelection';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface CourseResourcePickerModalProps {
   isOpen: boolean;

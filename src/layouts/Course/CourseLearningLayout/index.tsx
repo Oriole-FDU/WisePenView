@@ -24,7 +24,7 @@ import CourseOutlineOverview from './_components/CourseOutlineOverview';
 import CourseOutlineSidebar from './_components/CourseOutlineSidebar';
 import CourseResourceIcon from './_components/CourseResourceIcon';
 import { useCourseLearningNavigationController } from './controllers/useCourseLearningNavigationController';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const COURSE_LEARNING_MAIN_MIN_WIDTH = 700;
 

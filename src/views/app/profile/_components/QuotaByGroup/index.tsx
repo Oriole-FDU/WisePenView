@@ -8,7 +8,7 @@ import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import type { QuotaByGroupProps, UserGroupQuota } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type QuotaRecord = UserGroupQuota & { key: string };
 

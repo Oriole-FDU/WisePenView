@@ -5,7 +5,7 @@ import { ResultState } from '@/components/base/Feedback';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 
 import type { UnsupportedResourceProps } from '../index.type';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 export default function UnsupportedResource({
   resourceType,

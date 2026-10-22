@@ -18,7 +18,7 @@ import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
 import { type MainShellContextValue, MainShellProvider } from './_context';
 import SkipToMainLink, { MAIN_CONTENT_ID } from './SkipToMainLink';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useMainShellMobileSnapshot } from './useMainShellMobile';
 import { SIDEBAR_COLLAPSE_DURATION_MS, SIDEBAR_COLLAPSE_EASING } from './useSidebarCollapseMotion';
 import { useSystemSidebarPanel } from './useSystemSidebarPanel';

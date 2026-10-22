@@ -4,7 +4,7 @@ import AppBanner from '@/components/base/AppBanner';
 import { AppButton } from '@/components/base/Button';
 
 import type { VerifyBannerProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function VerifyBanner({ visible, onGoVerify }: VerifyBannerProps) {
   const { t } = useTranslation('profile');

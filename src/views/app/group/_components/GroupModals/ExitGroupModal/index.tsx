@@ -8,7 +8,7 @@ import type { QuitGroupRequest } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import styles from './index.module.less';
+import styles from './index.module.scss';
 import type { ExitGroupModalProps } from './index.type';
 
 function ExitGroupModal({

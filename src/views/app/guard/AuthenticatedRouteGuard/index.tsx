@@ -5,7 +5,7 @@ import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AuthenticatedRouteGuard() {
   const userService = useUserService();

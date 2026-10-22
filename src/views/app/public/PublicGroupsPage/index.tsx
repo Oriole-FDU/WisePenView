@@ -23,7 +23,7 @@ import GroupCard from '../_components/GroupCard';
 import PublicListPagination from '../_components/PublicListPagination';
 import { JoinGroupModal } from '../_components/PublicModals';
 import PublicSectionTabs from '../_components/PublicSectionTabs';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 function PublicGroupsPage() {
   const { t } = useTranslation('group');

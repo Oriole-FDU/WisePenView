@@ -1,0 +1,107 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.page {
+  --course-workflow-gutter: clamp(var(--space-xl), 5vw, 64px);
+  box-sizing: border-box;
+  width: min(100%, 1280px);
+  min-width: 0;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--course-workflow-gutter);
+}
+
+.header {
+  margin-bottom: var(--space-xl);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: var(--font-size-heading-3);
+  font-weight: 600;
+}
+
+.header p {
+  margin: var(--space-xs) 0 0;
+  color: var(--muted);
+}
+
+.announcementFeed {
+  display: grid;
+}
+
+.announcementItem {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: var(--space-lg);
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.announcementMarker {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: var(--app-radius-content);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.announcementBody {
+  min-width: 0;
+}
+
+.announcementTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.announcementTitleRow > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.announcementTitleRow h3 {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.announcementTitleRow time,
+.announcementBody small {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.announcementTitleRow time {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.announcementBody p {
+  margin: var(--space-md) 0 var(--space-sm);
+  color: var(--muted);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .announcementItem {
+    grid-template-columns: 1fr;
+  }
+
+  .announcementTitleRow {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .page {
+    --course-workflow-gutter: var(--space-lg);
+    padding-block: var(--space-lg);
+  }
+}

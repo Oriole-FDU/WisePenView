@@ -10,7 +10,7 @@ import ComputeWallet from '@/components/business/Wallet/ComputeWallet';
 import { WALLET_TARGET_TYPE } from '@/domains/Wallet';
 
 import QuotaByGroup from '../_components/QuotaByGroup';
-import layout from '../style.module.less';
+import layout from '../style.module.scss';
 
 function Usage() {
   const { t } = useTranslation('profile');

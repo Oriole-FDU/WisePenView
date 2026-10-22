@@ -15,7 +15,7 @@ import {
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 
 import { useCourseContext } from '../_context';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseNavigationSidebar() {
   const { t } = useTranslation('course');

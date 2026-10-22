@@ -17,7 +17,7 @@ import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/form
 import { extractMarkdownPlainText } from '@/utils/markdown/extractMarkdownPlainText';
 import { buildNotificationPath } from '@/utils/navigation/appRoute';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const MESSAGE_PAGE_SIZE = 100;
 const MESSAGE_ITEM_ESTIMATE_SIZE = 156;

@@ -8,7 +8,7 @@ import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { ResourceTargetResolverProps } from '../index.type';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import UnsupportedResource from './UnsupportedResource';
 
 export default function FileViewerResolver({

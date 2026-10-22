@@ -6,7 +6,7 @@ import { AppButton } from '@/components/base/Button';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { formatFileType, type UploadQueueRow } from './uploadQueueModel';
 import { useUploadQueue } from './useUploadQueue';
 

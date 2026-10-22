@@ -28,7 +28,7 @@ import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 import { useResourceSidePanelStore } from '../_store/useResourceSidePanelStore';
 import type { ResourceSidePanelContent } from '../index.type';
 import ResourceCommentPanel from './ResourceCommentPanel';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface ResourceSidePanelProps {
   resourceId: string;

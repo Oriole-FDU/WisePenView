@@ -8,7 +8,7 @@ import { useInteractService } from '@/domains';
 import type { FavoriteCollection } from '@/domains/Interact';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface EditCollectionModalProps {
   onOpenChange: (open: boolean) => void;

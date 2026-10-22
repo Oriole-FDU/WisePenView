@@ -17,7 +17,7 @@ import { ServicesProvider } from '@/domains';
 import { AppAuthProvider } from '@/layouts/App/_context';
 import { AppNavigationProvider } from '@/layouts/AppNavigation/_context';
 
-import styles from './Radius.stories.module.less';
+import styles from './Radius.stories.module.scss';
 
 const OPTIONS = [
   { id: 'all', label: '全部' },

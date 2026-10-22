@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ADMIN_PAGE_CONFIGS, type AdminPageKey } from '@/views/admin/pages';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface AdminPageHeaderProps {
   page: AdminPageKey;

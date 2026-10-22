@@ -17,7 +17,7 @@ import { installGlobalErrorReporting, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { clearIndexedDbDatabases } from '@/utils/storage/localData';
 
-import styles from './App.module.less';
+import styles from './App.module.scss';
 import { buildLoginPathForCurrentLocation } from './authContinuation';
 import router from './router';
 

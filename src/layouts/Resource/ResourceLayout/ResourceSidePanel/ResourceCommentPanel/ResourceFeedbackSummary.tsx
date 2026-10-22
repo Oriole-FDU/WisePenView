@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { formatReadCount } from '@/utils/format/formatNumber';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface ResourceFeedbackSummaryProps {
   readCount?: number | null;

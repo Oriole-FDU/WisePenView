@@ -8,7 +8,7 @@ import { useAdminService } from '@/domains';
 import type { PublishMessageDeliveryScope, PublishMessageType } from '@/domains/Admin';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface CreateAnnouncementModalProps {
   isOpen: boolean;

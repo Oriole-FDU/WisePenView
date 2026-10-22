@@ -11,7 +11,7 @@ import { useMainShell } from '@/layouts/MainShell/_context';
 
 import { useChatDockPanel } from './controllers/useChatDockPanel';
 import type { ChatDockLayoutProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /**
  * 对话 dock 布局：只负责左侧内容与右侧对话面板的关系。

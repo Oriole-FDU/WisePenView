@@ -11,7 +11,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import CourseTourScope from './CourseTourScope';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseRoute() {
   const { t } = useTranslation('course');

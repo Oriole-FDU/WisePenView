@@ -1,0 +1,436 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.editorShell {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--background);
+}
+
+.editorHeader {
+  display: flex;
+  min-height: 64px;
+  flex: 0 0 64px;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  /* 返回图标略向右，与其它页返回控件一致 */
+  padding-inline-start: calc(var(--space-lg) + var(--space-2xs));
+  border-bottom: 1px solid var(--border-light);
+  background: var(--surface);
+}
+
+.editorHeader > div {
+  display: grid;
+  min-width: 0;
+}
+
+.editorHeader strong {
+  overflow: hidden;
+  font-size: var(--font-size-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editorHeader span {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+
+.editorBody {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.editorScroll {
+  min-height: 0;
+  overflow: auto;
+  background: var(--surface);
+  scroll-behavior: smooth;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.editorContent {
+  width: min(100%, 1080px);
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 38px clamp(28px, 5vw, 72px) 90px;
+}
+
+.sectionHead p,
+.subsectionHead p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.editorSection {
+  scroll-margin-top: var(--space-md-plus);
+  padding: 30px 0 36px;
+  border-top: 1px solid var(--border-light);
+}
+
+.editorSection:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.sectionHead,
+.subsectionHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.sectionHead h2,
+.subsectionHead h3,
+.finalAssessment h3 {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.saveActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.saved,
+.unsaved,
+.totalValid,
+.totalInvalid {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.saved::before,
+.unsaved::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: var(--space-xs);
+  border-radius: 50%;
+  background: var(--success);
+  content: '';
+}
+
+.unsaved::before {
+  background: var(--warning);
+}
+
+.totalInvalid {
+  color: var(--warning-foreground);
+}
+
+.basicLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--space-xl);
+}
+
+.basicFields,
+.meetingList,
+.assessmentList,
+.finalAssessment {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.meetingList {
+  gap: var(--space-sm);
+}
+
+.coverField {
+  display: grid;
+  width: 100%;
+  max-width: 320px;
+  align-content: start;
+  gap: var(--space-sm);
+}
+
+.coverLabel {
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.coverButton {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+  cursor: pointer;
+  outline: none;
+  aspect-ratio: 16 / 9;
+}
+
+.coverButton img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverButton > span {
+  position: absolute;
+  right: var(--space-sm);
+  bottom: var(--space-sm);
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--surface) 68%, transparent);
+  border-radius: var(--app-radius-content);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.coverButton:hover,
+.coverButton:focus-visible {
+  border-color: var(--accent);
+}
+
+.coverButton:hover > span,
+.coverButton:focus-visible > span {
+  opacity: 1;
+}
+
+.descriptionField {
+  margin-top: var(--space-lg);
+}
+
+.courseTextArea {
+  min-height: calc(3 * var(--line-height-base) + 18px);
+  max-height: calc(5 * var(--line-height-base) + 18px);
+  overflow-y: auto;
+  resize: none;
+  field-sizing: content;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.finalTypeField {
+  width: calc((100% - var(--space-lg)) / 2);
+}
+
+.finalTypeTrigger {
+  border-color: var(--field-border);
+  background: var(--default);
+}
+
+.finalTypeTrigger:hover,
+.finalTypeTrigger[data-hovered='true'] {
+  background: var(--default-hover);
+}
+
+.finalExamFields,
+.finalDeadlineFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md) var(--space-lg);
+}
+
+.finalTimeFields {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.finalCustomName {
+  grid-column: 1 / -1;
+}
+
+.dateRangeField {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.dateRangePicker {
+  width: 20rem;
+  max-width: 100%;
+  flex: 0 0 20rem;
+}
+
+.dateRangePopover {
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+}
+
+.datePickerPopover {
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100vw - 32px);
+}
+
+.subsectionHead {
+  align-items: center;
+  margin-top: var(--space-xl);
+}
+
+.meetingColumns,
+.meetingRow {
+  display: grid;
+  grid-template-columns: 104px 96px 96px 96px 118px minmax(160px, 1fr) 36px;
+  gap: var(--space-sm);
+}
+
+.meetingColumns {
+  align-items: center;
+  padding: 0 0 var(--space-3xs);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+
+.meetingRow {
+  align-items: center;
+}
+
+.meetingRow > * {
+  min-width: 0;
+}
+
+.meetingControl {
+  --control-height: 36px;
+
+  height: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.meetingTime {
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assessmentRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(112px, 1fr) 36px;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.assessmentWorkbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr);
+  align-items: stretch;
+  gap: clamp(28px, 5vw, 64px);
+}
+
+.assessmentEditor {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-sm);
+}
+
+.assessmentColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(112px, 1fr) 36px;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-3xs);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+}
+
+.assessmentColumns > span:last-child {
+  text-align: left;
+}
+
+.assessmentEditor > button {
+  width: fit-content;
+  margin-top: var(--space-xs);
+}
+
+.finalAssessment {
+  width: 100%;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border-light);
+}
+
+.finalAssessment .subsectionHead {
+  margin-bottom: 0;
+}
+
+.totalValid {
+  color: var(--foreground);
+}
+
+.permissionActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.dangerActions {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: breakpoints.$breakpoint-lg) {
+  .assessmentWorkbench {
+    grid-template-columns: 1fr;
+  }
+
+  .meetingColumns {
+    display: none;
+  }
+
+  .meetingRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .editorBody {
+    grid-template-columns: 1fr;
+  }
+
+  .editorContent {
+    padding: var(--space-lg);
+  }
+
+  .basicLayout,
+  .finalExamFields,
+  .finalDeadlineFields {
+    grid-template-columns: 1fr;
+  }
+
+  .finalTypeField {
+    width: 100%;
+  }
+
+  .sectionHead,
+  .saveActions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -16,10 +16,10 @@ import {
   buildGroupPath,
   type GroupRoutePage,
 } from '@/utils/navigation/appRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
+import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
 import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
-import page from './style.module.less';
+import page from './style.module.scss';
 
 export interface GroupDetailOutletContextValue {
   walletRefreshVersion: number;
