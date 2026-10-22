@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import type { TableRowActionsProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function TableRowActions({ actions, ariaLabel, onAction }: TableRowActionsProps) {
   const { t } = useTranslation('table');

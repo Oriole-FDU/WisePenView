@@ -1,47 +1,47 @@
-@import '../shared/styles/table.module.less';
+@use '../shared/styles/table' as table;
 
 .shell {
-  .tableShellTypography();
-  .tableShellBorder();
-  .tableShellStretch();
+  @include table.tableShellTypography();
+  @include table.tableShellBorder();
+  @include table.tableShellStretch();
   width: 100%;
   overflow: hidden;
-  .tableShellRadius();
+  @include table.tableShellRadius();
   background: var(--surface);
 }
 
 .headerBar {
-  .tableHeaderBarLayout();
-  padding: @table-shell-padding-block @table-shell-padding-inline 0;
+  @include table.tableHeaderBarLayout();
+  padding: table.$table-shell-padding-block table.$table-shell-padding-inline 0;
 }
 
 .headerBarSpacer {
-  .tableHeaderBarSpacer();
+  @include table.tableHeaderBarSpacer();
 }
 
 .title {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  min-height: @table-line-height-body;
+  min-height: table.$table-line-height-body;
   color: var(--foreground);
-  font-family: @table-font-family;
-  font-size: @table-font-size-body;
-  font-weight: @table-font-weight-medium;
-  line-height: @table-line-height-body;
+  font-family: table.$table-font-family;
+  font-size: table.$table-font-size-body;
+  font-weight: table.$table-font-weight-medium;
+  line-height: table.$table-line-height-body;
 }
 
 .toolbar {
-  .tableHeaderToolbarEnd();
+  @include table.tableHeaderToolbarEnd();
 
   :global(button) {
-    min-height: @table-control-min-height;
-    padding-inline: @table-gap-compact;
+    min-height: table.$table-control-min-height;
+    padding-inline: table.$table-gap-compact;
     color: var(--muted);
-    font-family: @table-font-family;
-    font-size: @table-font-size-body;
-    font-weight: @table-font-weight-medium;
-    line-height: @table-line-height-body;
+    font-family: table.$table-font-family;
+    font-size: table.$table-font-size-body;
+    font-weight: table.$table-font-weight-medium;
+    line-height: table.$table-line-height-body;
   }
 }
 
@@ -61,8 +61,8 @@
 .tableRoot {
   width: 100%;
   background: var(--surface);
-  .tableRootNoShadow();
-  .tableRootStretch();
+  @include table.tableRootNoShadow();
+  @include table.tableRootStretch();
 
   :global(.table__scroll-container) {
     width: 100%;
@@ -73,23 +73,23 @@
     table-layout: fixed;
   }
 
-  .tableHeaderBlock();
+  @include table.tableHeaderBlock();
 
   :global(.table__cell) {
     box-sizing: border-box;
-    height: @table-row-height;
-    min-height: @table-row-height;
-    max-height: @table-row-height;
-    padding: @row-cell-padding-block @row-cell-padding-inline;
+    height: table.$table-row-height;
+    min-height: table.$table-row-height;
+    max-height: table.$table-row-height;
+    padding: table.$row-cell-padding-block table.$row-cell-padding-inline;
     overflow: hidden;
     border-bottom: 1px solid var(--table-inner-border);
     border-inline: 0;
     background: var(--surface);
     color: var(--foreground);
-    font-family: @table-font-family;
-    font-size: @table-font-size-body;
-    font-weight: @table-font-weight-regular;
-    line-height: @table-line-height-body;
+    font-family: table.$table-font-family;
+    font-size: table.$table-font-size-body;
+    font-weight: table.$table-font-weight-regular;
+    line-height: table.$table-line-height-body;
     vertical-align: middle;
   }
 
@@ -117,20 +117,17 @@
 
 .scrollContainer {
   width: 100%;
-  .tableSplitBodyScroll();
-}
-
-.generateReadonlyEqColumnCounts(@max, @i: 1) when (@i =< @max) {
-  &[data-eq-count='@{i}'] {
-    --table-eq-column-count: @i;
-  }
-  .generateReadonlyEqColumnCounts(@max, (@i + 1));
+  @include table.tableSplitBodyScroll();
 }
 
 .tableContent {
   width: 100%;
   --table-eq-column-count: 1;
-  .generateReadonlyEqColumnCounts(16);
+  @for $i from 1 through 16 {
+    &[data-eq-count='#{$i}'] {
+      --table-eq-column-count: #{$i};
+    }
+  }
 }
 
 .bodyRow {

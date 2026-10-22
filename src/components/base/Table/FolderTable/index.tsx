@@ -55,7 +55,7 @@ import type {
 import TableBatchFooter from './parts/BatchFooter';
 import FolderTableNameCell from './parts/FolderNameCell';
 import FolderTableLoadingSkeleton from './parts/LoadingSkeleton';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const LOAD_MORE_THRESHOLD_PX = 48;
 const VIRTUAL_ROW_ESTIMATE_SIZE = 60;

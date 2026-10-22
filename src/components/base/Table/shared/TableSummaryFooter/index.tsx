@@ -2,7 +2,7 @@ import { Table } from '@heroui/react';
 import type { ReactNode } from 'react';
 
 import { joinClassNames } from '../TableBase/cellAlign';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface TableSummaryFooterProps {
   summary?: ReactNode;

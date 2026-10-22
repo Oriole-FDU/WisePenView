@@ -1,6 +1,6 @@
-@import '@/styles/mixins/scrollbar.less';
-@import '../../../../../components/base/Table/shared/styles/table.module.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+@use '@/styles/mixins/layoutMixins' as layout;
 
 .container {
   display: flex;
@@ -74,7 +74,7 @@
 .collectionList {
   min-height: 0;
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .collectionListItem {
@@ -151,11 +151,11 @@
 }
 
 .resourcePanelHeader {
-  .tableHeaderBarLayout();
-  display: flex;
+  @include layout.flexBetween(var(--table-gap, var(--space-sm)));
   flex: 0 0 auto;
-  min-height: @table-header-bar-min-height;
-  padding: @table-shell-padding-block @table-shell-padding-inline 0;
+  min-height: var(--table-header-bar-min-height, 44px);
+  padding: var(--table-shell-padding-block, var(--space-sm)) var(--table-shell-padding-inline, 14px)
+    0;
 }
 
 .resourcePanelCopy {
@@ -168,19 +168,19 @@
 .resourcePanelTitle {
   margin: 0;
   color: var(--foreground);
-  font-family: @table-font-family;
-  font-size: @table-header-bar-font-size;
-  font-weight: @table-font-weight-medium;
-  line-height: @table-header-bar-line-height;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
 }
 
 .resourcePanelDescription {
   flex: 0 0 auto;
   margin: 0;
   color: var(--muted);
-  font-family: @table-font-family;
-  font-size: @table-font-size-meta;
-  line-height: @table-line-height-meta;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
 }
 
 .resourceTablePanel {
@@ -204,9 +204,8 @@
   background: transparent;
 
   :global(.table-root) {
-    padding-top: @table-gap-compact;
+    padding-top: var(--table-gap-compact, var(--space-xs));
   }
-
 }
 
 .resourceNameColumn:global(.table__column),
@@ -224,7 +223,7 @@
   color: var(--muted);
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .splitLayout {
     grid-template-columns: 1fr;
     gap: var(--space-md);

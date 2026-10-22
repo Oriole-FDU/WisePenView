@@ -8,9 +8,9 @@ import {
   resolveFolderColumnWidthClassForColumn,
   resolveFolderSkeletonBarWidth,
 } from '../../../shared/TableBase/columnWidth';
-import folderStyles from '../../style.module.less';
+import folderStyles from '../../style.module.scss';
 import type { FolderTableLoadingSkeletonProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function FolderTableLoadingSkeleton({
   rowCount = 4,

@@ -15,7 +15,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import TableTextCell from '../../../shared/cells/TextCell';
 import type { FolderTableRow } from '../../index.type';
 import type { FolderTableNameCellProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function FolderTableNameCell<T extends FolderTableRow>({
   row,

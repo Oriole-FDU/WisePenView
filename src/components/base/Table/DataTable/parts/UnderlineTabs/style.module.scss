@@ -1,10 +1,10 @@
-@import '../../../shared/styles/table.module.less';
+@use '../../../shared/styles/table' as table;
 
 .tabList {
   position: relative;
   display: flex;
   align-items: flex-start;
-  padding: var(--space-xs) @table-shell-padding-inline 0;
+  padding: var(--space-xs) table.$table-shell-padding-inline 0;
   border-bottom: 1px solid var(--table-inner-border);
 }
 
@@ -29,10 +29,10 @@
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-family: @table-font-family;
-  font-size: @table-font-size-body;
-  font-weight: @table-font-weight-regular;
-  line-height: @table-line-height-body;
+  font-family: table.$table-font-family;
+  font-size: table.$table-font-size-body;
+  font-weight: table.$table-font-weight-regular;
+  line-height: table.$table-line-height-body;
   text-align: center;
   cursor: pointer;
   transition: color var(--motion-duration-mid) var(--motion-ease-standard);
@@ -40,5 +40,5 @@
 
 .tabActive {
   color: var(--accent-text);
-  font-weight: @table-font-weight-medium;
+  font-weight: table.$table-font-weight-medium;
 }

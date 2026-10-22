@@ -1,7 +1,7 @@
 import { Loader } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export function TableRefreshIndicator() {
   const { t } = useTranslation('table');

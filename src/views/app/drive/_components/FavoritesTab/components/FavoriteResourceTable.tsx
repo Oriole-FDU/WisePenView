@@ -8,7 +8,7 @@ import type { FavoriteItem } from '@/domains/Interact';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
 import { useFavoriteResourceTableController } from '../hooks/useFavoriteResourceTableController';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import UnfavoriteResourceModal from './UnfavoriteResourceModal';
 
 interface FavoriteResourceTableProps {
