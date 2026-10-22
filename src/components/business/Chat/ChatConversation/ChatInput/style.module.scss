@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .container {
   flex-shrink: 0;
@@ -49,9 +49,9 @@
     gap: var(--space-xs);
     overflow-x: auto;
     overflow-y: hidden;
-    .appSubtleScrollbar();
     padding-block: var(--space-2xs) var(--space-xs);
     -webkit-overflow-scrolling: touch;
+    @include scrollbar.appSubtleScrollbar();
   }
 }
 
@@ -100,7 +100,6 @@
   min-height: calc(1.6em + 16px);
   max-height: var(--chat-input-textarea-max-height, calc(16em + 16px));
   overflow-y: auto;
-  .appSubtleScrollbar();
   resize: none !important;
   field-sizing: content;
   border: none !important;
@@ -110,6 +109,7 @@
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--foreground);
+  @include scrollbar.appSubtleScrollbar();
 
   &::placeholder {
     color: var(--field-placeholder);
@@ -206,7 +206,7 @@
   width: min(320px, calc(100vw - var(--space-xl, 32px)));
   max-height: min(360px, 70vh);
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .modelMenu {
@@ -217,7 +217,7 @@
   width: 240px;
   max-height: 280px;
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .popoverPanelAgentSkeleton {
@@ -346,11 +346,11 @@
   min-height: 240px;
   max-height: min(52vh, 460px);
   overflow: auto;
-  .appSubtleScrollbar();
   padding: var(--space-xs);
   border: 1px solid var(--border-light);
   border-radius: var(--app-radius-popover);
   background: var(--background);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .modelSelectorShell {
@@ -447,7 +447,7 @@
   line-height: 1.4;
 }
 
-@media (max-width: @breakpoint-sm) {
+@media (max-width: breakpoints.$breakpoint-sm) {
   .container {
     padding-inline: var(--space-sm);
   }

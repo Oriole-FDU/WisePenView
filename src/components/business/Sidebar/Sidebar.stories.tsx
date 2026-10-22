@@ -21,7 +21,7 @@ import DriveTab from './_common/tab/DriveTab';
 import SessionTab from './_common/tab/SessionTab';
 import AdminSidebar from './AdminSidebar';
 import AppSidebar from './AppSidebar';
-import styles from './Sidebar.stories.module.less';
+import styles from './Sidebar.stories.module.scss';
 
 const appNavigationValue: AppNavigationContextValue = {
   canGoBack: false,

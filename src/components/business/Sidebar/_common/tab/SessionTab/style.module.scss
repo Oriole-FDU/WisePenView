@@ -1,4 +1,4 @@
-@import '@/styles/mixins/focusRing.less';
+@use '@/styles/mixins/focusRing' as focusRing;
 
 .sessionMenu {
   width: 100%;
@@ -26,7 +26,9 @@
   align-items: center;
   border-radius: var(--app-radius-sidebar-item);
   padding: 0 var(--space-xs) 0
-    calc(var(--sidebar-content-inset, var(--space-lg)) - var(--sidebar-block-inset, var(--space-md)));
+    calc(
+      var(--sidebar-content-inset, var(--space-lg)) - var(--sidebar-block-inset, var(--space-md))
+    );
   color: var(--muted);
   cursor: pointer;
   outline: none;
@@ -37,7 +39,7 @@
   &:focus-visible,
   &:focus-visible:not(:focus),
   &[data-focus-visible] {
-    .clearHeroFocusRing();
+    @include focusRing.clearHeroFocusRing();
   }
 
   &:hover,

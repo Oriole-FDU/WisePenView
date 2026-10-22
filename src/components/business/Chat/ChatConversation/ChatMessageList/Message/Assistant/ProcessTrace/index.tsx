@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { describeTraceItem, findActiveTraceIndex, type TraceHeadline } from '../traceModel';
 import type { ProcessTraceProps } from './index.type';
 import ReasoningBlock from './ReasoningBlock';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import TraceRow from './TraceRow';
 import TraceStepDetail from './TraceStepDetail';
 import { useTraceReasoningDurations } from './useTraceReasoningDurations';

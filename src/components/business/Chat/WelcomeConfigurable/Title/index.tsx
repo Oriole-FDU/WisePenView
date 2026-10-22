@@ -5,7 +5,7 @@ import { useApi } from '@/hooks/useApi';
 import { COLOR_SCHEME_ICON_SRC, useColorScheme } from '@/theme';
 
 import type { WelcomeTitleProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** 默认问候标题区（Logo + 文案）；字段来自 WelcomeScreenConfig.hero，也可由 Host 的 hero 插槽整体替换。 */
 function WelcomeTitle({ iconSrc, title, greetWithUserName = true }: WelcomeTitleProps) {

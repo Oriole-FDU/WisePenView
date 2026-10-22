@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .wrapper {
   display: flex;
@@ -11,13 +11,19 @@
   color: var(--muted);
 }
 
-.treeNav {
+.treeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-height: 420px;
+  overflow: hidden;
+}
+
+.navTree {
   flex: 1;
   min-height: 280px;
-  max-height: 420px;
   overflow: auto;
-  .appSubtleScrollbar();
   border: 1px solid var(--border);
   border-radius: var(--app-radius-modal);
-  padding: var(--space-sm);
+  @include scrollbar.appSubtleScrollbar();
 }

@@ -1,4 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/desktopTitleBar' as titleBar;
 
 .panel {
   display: flex;
@@ -95,8 +96,6 @@
   }
 }
 
-@import '@/styles/mixins/desktopTitleBar.less';
-
 .header {
   box-sizing: border-box;
   width: 100%;
@@ -111,10 +110,10 @@
 
 /* 与 Workspace 顶栏同高、同垂直居中；右侧留白给固定窗口按钮 */
 .titleBarInsetEnd {
-  .desktopTitleBarChrome();
+  @include titleBar.desktopTitleBarChrome();
   padding-right: var(--desktop-window-controls-width, 116px);
   padding-left: var(--space-sm);
-  .desktopTitleBarEndNoDragHole();
+  @include titleBar.desktopTitleBarEndNoDragHole();
 
   .headerLeft,
   .headerRight {
@@ -341,8 +340,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  .appSubtleScrollbar();
   padding: var(--space-xs);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .sessionStateText {

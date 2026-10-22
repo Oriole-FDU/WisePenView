@@ -16,7 +16,7 @@ import DropOverlay from './DropOverlay';
 import type { ChatInputProps } from './index.type';
 import InputToolbar from './InputToolbar';
 import OtherSkillModal from './OtherSkillModal';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useChatInputController } from './useChatInputController';
 
 function ChatInputContent({

@@ -76,7 +76,8 @@
   width: fit-content;
   max-width: 100%;
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--app-radius-content) var(--app-radius-button) var(--app-radius-content) var(--app-radius-content);
+  border-radius: var(--app-radius-content) var(--app-radius-button) var(--app-radius-content)
+    var(--app-radius-content);
   background-color: var(--accent-soft);
   color: var(--foreground);
   font-size: var(--chat-message-font-size);

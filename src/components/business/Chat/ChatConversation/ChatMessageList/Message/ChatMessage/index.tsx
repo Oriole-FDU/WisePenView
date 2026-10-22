@@ -10,7 +10,7 @@ import type {
   ChatMessageMetaProps,
   ChatMessageUserProps,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function ChatMessageAssistant({ className, children, ...props }: ChatMessageAssistantProps) {
   return (

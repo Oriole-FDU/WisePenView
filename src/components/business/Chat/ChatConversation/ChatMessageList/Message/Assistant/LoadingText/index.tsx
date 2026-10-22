@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
 import type { LoadingTextProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type LoadingTextStyle = CSSProperties & {
   '--loading-text-duration'?: string;

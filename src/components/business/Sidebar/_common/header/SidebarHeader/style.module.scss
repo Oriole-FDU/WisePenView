@@ -1,3 +1,4 @@
+@use '@/styles/mixins/desktopTitleBar' as titleBar;
 .header {
   display: flex;
   flex-direction: column;
@@ -34,15 +35,12 @@
   padding: 0;
 }
 
-@import '@/styles/mixins/desktopTitleBar.less';
-
 /* 桌面侧栏顶栏：加高 + 上方拖拽带 */
 .desktopHeader .headerTop {
-  box-sizing: border-box;
-  .desktopTitleBarChrome();
+  @include titleBar.desktopTitleBarChrome();
 
   > * {
-    .desktopTitleBarNoDrag();
+    @include titleBar.desktopTitleBarNoDrag();
   }
 }
 

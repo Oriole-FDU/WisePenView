@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import LoadingText from './index';
 import type { LoadingTextProps } from './index.type';
-import styles from './LoadingText.stories.module.less';
+import styles from './LoadingText.stories.module.scss';
 
 type LoadingTextTone = NonNullable<LoadingTextProps['tone']>;
 type LoadingTextSize = NonNullable<LoadingTextProps['size']>;

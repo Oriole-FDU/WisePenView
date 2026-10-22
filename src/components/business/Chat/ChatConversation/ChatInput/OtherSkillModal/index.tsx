@@ -10,7 +10,7 @@ import { type ChatAgentOption } from '@/domains/Chat';
 import type { ResourceSkillSummary } from '@/domains/Resource';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface SkillSelectionOption {
   skill: ResourceSkillSummary;

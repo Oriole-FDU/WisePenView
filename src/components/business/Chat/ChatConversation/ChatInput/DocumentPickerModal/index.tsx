@@ -13,7 +13,7 @@ import {
 import { usePickerSelection } from '@/hooks/usePickerSelection';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function mapDriveSelectionToDocRef(item: DriveSelectionItem): SelectedResourceReference | null {
   if ((item.kind !== 'resource' && item.kind !== 'link') || !item.resourceId) return null;

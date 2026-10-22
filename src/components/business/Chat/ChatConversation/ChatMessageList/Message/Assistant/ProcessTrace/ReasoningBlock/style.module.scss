@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .reasoning {
   max-height: min(36vh, 260px);
@@ -17,5 +17,5 @@
   word-break: break-word;
   content-visibility: auto;
   contain: layout paint;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }

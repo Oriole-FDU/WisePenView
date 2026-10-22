@@ -15,7 +15,7 @@ import { formatTimestampToDate } from '@/utils/format';
 import { buildRegisterInvitePath } from '@/utils/navigation/appRoute';
 
 import type { UserInviteModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** 弹窗内预览的邀请记录条数，完整记录由后续邀请页承载 */
 const INVITE_RECORD_PREVIEW_SIZE = 5;

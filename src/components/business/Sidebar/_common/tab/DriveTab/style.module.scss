@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .sidebar {
   flex: 1;
@@ -9,7 +9,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   padding: var(--space-xs, var(--space-xs)) var(--sidebar-block-inset, var(--space-md));
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .stateBlock {
@@ -41,8 +41,7 @@
     width: 100%;
     padding: 0;
     padding-left: calc(
-      var(--sidebar-content-inset, var(--space-lg)) -
-        var(--sidebar-block-inset, var(--space-md))
+      var(--sidebar-content-inset, var(--space-lg)) - var(--sidebar-block-inset, var(--space-md))
     );
     color: var(--muted);
     border-radius: var(--app-radius-sidebar-item);
@@ -102,8 +101,7 @@
     color: var(--muted);
   }
 
-  > :global(.wisepen-tree__item):first-child
-    :global(.wisepen-tree__switcher-placeholder) {
+  > :global(.wisepen-tree__item):first-child :global(.wisepen-tree__switcher-placeholder) {
     display: none;
   }
 
@@ -251,7 +249,7 @@
 .scopeList {
   max-height: 260px;
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .scopeHint {

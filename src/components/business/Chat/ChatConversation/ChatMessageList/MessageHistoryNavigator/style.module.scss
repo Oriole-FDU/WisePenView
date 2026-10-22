@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 /* 历史提问导航：只维护锚点展示、浮层交互和滚动定位。 */
 .historyNavigator {
@@ -19,6 +19,14 @@
   --history-nav-bar-gap: var(--space-xs);
   --history-nav-rail-top: 50%;
 
+  --history-nav-panel-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --history-nav-panel-duration: 0.14s;
+  --history-nav-item-duration: 0.12s;
+  --history-nav-item-stagger: 0.016s;
+
+  position: absolute;
+  z-index: var(--app-z-index-elevated);
+
   :global([data-chat-layout='page']) & {
     --history-nav-panel-min-width: 156px;
     --history-nav-panel-max-width: 240px;
@@ -29,14 +37,6 @@
     --history-nav-bar-gap: var(--space-2xs-plus);
     --history-nav-rail-top: 58%;
   }
-
-  --history-nav-panel-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --history-nav-panel-duration: 0.14s;
-  --history-nav-item-duration: 0.12s;
-  --history-nav-item-stagger: 0.016s;
-
-  position: absolute;
-  z-index: var(--app-z-index-elevated);
 }
 
 .historyNavigatorRail {
@@ -86,7 +86,6 @@
   cursor: pointer;
   overflow-x: hidden;
   overflow-y: auto;
-  .appSubtleScrollbar();
   overscroll-behavior: contain;
   opacity: 1;
   transform: translateX(0);
@@ -95,6 +94,7 @@
     opacity var(--motion-duration-mid) var(--history-nav-panel-ease),
     transform var(--motion-duration-slow) var(--history-nav-panel-ease),
     visibility 0s linear 0s;
+  @include scrollbar.appSubtleScrollbar();
 
   &:focus-visible {
     outline: 2px solid var(--focus);
@@ -191,7 +191,6 @@
   -webkit-backdrop-filter: blur(12px);
   overflow-x: hidden;
   overflow-y: auto;
-  .appSubtleScrollbar();
   overscroll-behavior: contain;
   -ms-overflow-style: none;
   transform-origin: right center;
@@ -204,6 +203,7 @@
     transform var(--history-nav-panel-duration) var(--history-nav-panel-ease),
     visibility 0s linear var(--history-nav-panel-duration),
     box-shadow var(--history-nav-panel-duration) var(--motion-ease-standard);
+  @include scrollbar.appSubtleScrollbar();
   &[data-open='true'] {
     opacity: 1;
     visibility: visible;
@@ -263,13 +263,11 @@
   }
 
   /* 从上到下 stagger，避免内联 --history-nav-stagger-index */
-  .history-nav-stagger(@i) when (@i > 0) {
-    .historyNavigatorRailPanel[data-open='true'] &:nth-child(@{i}) {
-      transition-delay: calc((@i - 1) * var(--history-nav-item-stagger));
+  @for $i from 48 through 1 {
+    .historyNavigatorRailPanel[data-open='true'] &:nth-child(#{$i}) {
+      transition-delay: calc((#{$i} - 1) * var(--history-nav-item-stagger));
     }
-    .history-nav-stagger((@i - 1));
   }
-  .history-nav-stagger(48);
 
   @media (prefers-reduced-motion: reduce) {
     opacity: 1;

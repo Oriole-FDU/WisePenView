@@ -4,7 +4,7 @@ import { describeTraceItem, getToolOutputText } from '../../traceModel';
 import ReasoningBlock from '../ReasoningBlock';
 import TraceRow from '../TraceRow';
 import type { TraceStepDetailProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /**
  * 过程组展开后的单个节点：只有一行标签，思考正文需要再展开一次才露出。

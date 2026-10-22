@@ -1,67 +1,67 @@
-.welcomeIconToneAqua() {
+@mixin welcomeIconToneAqua() {
   color: var(--wisepen-aqua-11);
   background: var(--wisepen-aqua-3);
 }
 
-.welcomeIconToneMist() {
+@mixin welcomeIconToneMist() {
   color: var(--wisepen-mist-11);
   background: var(--wisepen-mist-3);
 }
 
-.welcomeIconToneFloral() {
+@mixin welcomeIconToneFloral() {
   color: var(--wisepen-floral-11);
   background: var(--wisepen-floral-3);
 }
 
-.welcomeIconToneSunset() {
+@mixin welcomeIconToneSunset() {
   color: var(--wisepen-sunset-11);
   background: var(--wisepen-sunset-3);
 }
 
-.welcomeIconToneEmerald() {
+@mixin welcomeIconToneEmerald() {
   color: var(--wisepen-emerald-11);
   background: var(--wisepen-emerald-3);
 }
 
-.welcomeIconToneLavender() {
+@mixin welcomeIconToneLavender() {
   color: var(--wisepen-lavender-11);
   background: var(--wisepen-lavender-3);
 }
 
-.welcomeIconToneAccent() {
+@mixin welcomeIconToneAccent() {
   color: var(--palette-accent-11);
   background: var(--palette-accent-3);
 }
 
-.welcomeIconToneVariants() {
+@mixin welcomeIconToneVariants() {
   &[data-tone='teal'] {
-    .welcomeIconToneAqua();
+    @include welcomeIconToneAqua();
   }
 
   &[data-tone='green'] {
-    .welcomeIconToneEmerald();
+    @include welcomeIconToneEmerald();
   }
 
   &[data-tone='sky'] {
-    .welcomeIconToneMist();
+    @include welcomeIconToneMist();
   }
 
   &[data-tone='violet'],
   &[data-tone='indigo'] {
-    .welcomeIconToneLavender();
+    @include welcomeIconToneLavender();
   }
 
   &[data-tone='orange'],
   &[data-tone='amber'] {
-    .welcomeIconToneSunset();
+    @include welcomeIconToneSunset();
   }
 
   &[data-tone='rose'] {
-    .welcomeIconToneFloral();
+    @include welcomeIconToneFloral();
   }
 }
 
-.welcomeTransparentScrollbar() {
+@mixin welcomeTransparentScrollbar() {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 
@@ -133,7 +133,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  .welcomeTransparentScrollbar();
+  @include welcomeTransparentScrollbar();
 }
 
 .root[data-welcome-starters='focused'] .scrollViewport {
@@ -195,11 +195,7 @@
   --welcome-chip-radius: var(--app-radius-menu-item);
   --welcome-elevated-bg: transparent;
   --welcome-hover-bg: var(--accent-soft);
-  --welcome-hover-border: color-mix(
-    in srgb,
-    var(--palette-accent-8) 18%,
-    var(--border-light)
-  );
+  --welcome-hover-border: color-mix(in srgb, var(--palette-accent-8) 18%, var(--border-light));
   --welcome-elevated-hover: var(--welcome-hover-bg);
   --welcome-inset-bg: transparent;
 }
@@ -266,7 +262,7 @@
     padding-block: var(--space-2xs);
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    .welcomeTransparentScrollbar();
+    @include welcomeTransparentScrollbar();
   }
 }
 
@@ -394,8 +390,8 @@
     width: 1.5rem;
     height: 1.5rem;
     border-radius: var(--welcome-icon-radius);
-    .welcomeIconToneAccent();
-    .welcomeIconToneVariants();
+    @include welcomeIconToneAccent();
+    @include welcomeIconToneVariants();
   }
 }
 
@@ -447,8 +443,8 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: var(--welcome-icon-radius);
-  .welcomeIconToneAccent();
-  .welcomeIconToneVariants();
+  @include welcomeIconToneAccent();
+  @include welcomeIconToneVariants();
 
   :global(svg) {
     width: 0.875rem;
@@ -675,8 +671,8 @@
   height: 2rem;
   margin-top: var(--space-2xs);
   border-radius: var(--welcome-icon-radius);
-  .welcomeIconToneAccent();
-  .welcomeIconToneVariants();
+  @include welcomeIconToneAccent();
+  @include welcomeIconToneVariants();
 
   :global(svg) {
     width: 1rem;
@@ -807,8 +803,8 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: var(--welcome-icon-radius);
-  .welcomeIconToneAccent();
-  .welcomeIconToneVariants();
+  @include welcomeIconToneAccent();
+  @include welcomeIconToneVariants();
 
   :global(svg) {
     width: 1rem;

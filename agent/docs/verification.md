@@ -30,6 +30,8 @@ Less → SCSS 每個遷移批次另執行 `pnpm build:app --mode mock`、`pnpm b
 
 Drive／Group／Resource 業務元件另檢查域內無 Less、所有 CSS Module 可編譯、scrollbar 與後續宣告維持同一父規則，以及 640／768／960px 斷點對應的窄版佈局；頁面級樣式與其他業務域仍按其遷移批次處理。
 
+Chat／Sidebar 業務元件另檢查域內無 Less、歷史導覽精確生成 48→1 的延遲規則及其後的 reduced-motion 覆寫、重複選擇器優先級、父宣告與 scrollbar 規則順序、桌面拖拽／禁拖拽區與鍵盤焦點，以及輸入區 container query、640px 窄版和 Sidebar 選取／禁用／收合狀態。編譯輸出比對需逐一記錄等價差異，不得以全域宣告排序或規則合併掩蓋 cascade 變化。
+
 ## 运行态记录
 
 运行 mock 或浏览器时记录：日期、浏览器版本、窗口尺寸、操作步骤、预期结果、实际结果和控制台错误。没有启动服务时，不要声称完成页面行为验证。

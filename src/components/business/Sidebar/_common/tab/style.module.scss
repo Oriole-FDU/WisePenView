@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import '@/styles/mixins/focusRing.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/focusRing' as focusRing;
 
 .menuContainer {
   flex: 1;
@@ -42,8 +42,7 @@
         opacity: 0;
         margin-inline-start: 0;
         transition-delay:
-          var(--sidebar-tab-label-collapse-delay), 0s,
-          var(--sidebar-tab-label-collapse-delay);
+          var(--sidebar-tab-label-collapse-delay), 0s, var(--sidebar-tab-label-collapse-delay);
       }
     }
   }
@@ -133,7 +132,7 @@
   &:focus-visible,
   &:focus-visible:not(:focus),
   &[data-focus-visible] {
-    .appFocusRingInset();
+    @include focusRing.appFocusRingInset();
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -216,7 +215,7 @@
 
   &:focus-visible,
   &:focus-visible:not(:focus) {
-    .appFocusRingInset();
+    @include focusRing.appFocusRingInset();
   }
 }
 
@@ -279,7 +278,7 @@
   overflow-y: auto;
   min-height: 0;
   padding: var(--space-xs) var(--sidebar-block-inset, var(--space-md));
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .drivePanel,

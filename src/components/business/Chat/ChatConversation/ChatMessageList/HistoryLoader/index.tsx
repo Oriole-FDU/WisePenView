@@ -13,7 +13,7 @@ import markerStyles from '@/components/_shadcn/marker.module.scss';
 import { Spin } from '@/components/base/Feedback';
 
 import type { HistoryLoaderProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function HistoryLoader({
   canLoadMoreHistory,

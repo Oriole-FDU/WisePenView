@@ -1,13 +1,13 @@
-@import '@/styles/mixins/focusRing.less';
+@use '@/styles/mixins/focusRing' as focusRing;
 
-@height: 60px;
+$height: 60px;
 
-@font-weight-medium: var(--font-weight-medium);
-@font-weight-semibold: var(--font-weight-semibold);
+$font-weight-medium: var(--font-weight-medium);
+$font-weight-semibold: var(--font-weight-semibold);
 
 .profile {
   width: 100%;
-  height: @height;
+  height: $height;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -74,7 +74,7 @@
   flex-shrink: 0;
   background-color: var(--accent-soft) !important;
   color: var(--foreground);
-  font-weight: @font-weight-semibold;
+  font-weight: $font-weight-semibold;
   font-size: var(--font-size-sm, var(--font-size-xs));
   border: 1px solid var(--border-light);
 
@@ -109,7 +109,7 @@
   &:focus-visible,
   &:focus-visible:not(:focus),
   &[data-focus-visible] {
-    .appFocusRing();
+    @include focusRing.appFocusRing();
   }
 }
 
@@ -154,7 +154,7 @@
   padding-inline: 10px;
   border-radius: var(--app-radius-button);
   font-size: var(--font-size-sm, 13px);
-  font-weight: @font-weight-medium;
+  font-weight: $font-weight-medium;
 }
 
 .info {
@@ -170,7 +170,7 @@
 .username {
   width: 100%;
   font-size: var(--font-size-md, 14px);
-  font-weight: @font-weight-medium;
+  font-weight: $font-weight-medium;
   color: var(--foreground);
   white-space: nowrap;
   text-align: left;

@@ -1,0 +1,9 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.navBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  @include scrollbar.appSubtleScrollbar();
+}

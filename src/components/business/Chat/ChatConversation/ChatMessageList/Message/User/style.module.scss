@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .attachments {
   display: flex;
@@ -18,7 +18,7 @@
 
 .attachment {
   /* 接近 HeroUI Pro horizontal sm：约 160 宽、更透气的高度 */
-  && {
+  &#{&} {
     box-sizing: border-box;
     flex: 0 0 auto;
     width: 160px;
@@ -80,7 +80,7 @@
   padding: 0;
   list-style: none;
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .moreItem {

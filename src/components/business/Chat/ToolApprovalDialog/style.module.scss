@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .body {
   display: flex;
@@ -20,7 +20,6 @@
   padding: var(--space-xs);
   overflow: auto;
   overscroll-behavior: contain;
-  .appSubtleScrollbar();
   border-radius: var(--app-radius-content);
   background-color: var(--surface-secondary);
   color: var(--foreground);
@@ -29,4 +28,5 @@
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  @include scrollbar.appSubtleScrollbar();
 }

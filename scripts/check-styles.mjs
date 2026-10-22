@@ -441,6 +441,271 @@ test('Drive、Group、Resource 保留各斷點的窄版佈局', async () => {
   }
 });
 
+test('Chat、Sidebar 業務樣式不殘留 Less，所有 Module 可編譯', async () => {
+  for (const domain of ['Chat', 'Sidebar']) {
+    const directory = join('src/components/business', domain);
+    const files = await readdir(join(root, directory), { recursive: true });
+    assert.deepEqual(
+      files.filter((file) => file.endsWith('.less')),
+      [],
+      domain
+    );
+    const modules = files.filter((file) => file.endsWith('.module.scss'));
+    assert.ok(modules.length > 0, domain);
+    for (const file of modules)
+      assert.ok((await compileCssModule(join(directory, file))).modules, file);
+  }
+});
+
+test('Chat 歷史導覽精確產生 48→1 的延遲規則，reduced-motion 在其後覆寫', async () => {
+  const { code } = await compileCssModule(
+    'src/components/business/Chat/ChatConversation/ChatMessageList/MessageHistoryNavigator/style.module.scss'
+  );
+  const delays = [
+    ...code.matchAll(
+      /\.historyNavigatorRailPanel\[data-open=['"]?true['"]?\] \.historyNavigatorRailItem:nth-child\((\d+)\)\s*\{\s*transition-delay: calc\(\((\d+) - 1\) \* var\(--history-nav-item-stagger\)\);\s*\}/g
+    ),
+  ];
+  assert.equal(code.match(/:nth-child\(/g)?.length, 48);
+  assert.deepEqual(
+    delays.map(([, child, delay]) => [Number(child), Number(delay)]),
+    Array.from({ length: 48 }, (_, index) => [48 - index, 48 - index])
+  );
+  const reduced =
+    /@media \(prefers-reduced-motion: reduce\) \{\s*\.historyNavigatorRailItem\s*\{\s*opacity: 1;\s*transform: none;\s*transition-duration: var\(--motion-duration-reduced\);\s*transition-delay: 0s !important;/;
+  assert.match(code, reduced);
+  assert.ok(code.search(reduced) > delays.at(-1).index);
+});
+
+test('Chat 重複類別與 hover pseudo-class 保留原本優先級', async () => {
+  for (const [component, patterns] of [
+    ['Message/User', [/\.attachment\.attachment\s*\{[^}]*width: 160px;/]],
+    [
+      '',
+      [
+        /\.scrollToBottomButton\.scrollToBottomButton\s*\{[^}]*width: 32px;/,
+        /\.scrollToBottomButton:hover:not\(:disabled\)\.scrollToBottomButton:hover:not\(:disabled\)\s*\{[^}]*background: var\(--surface-tertiary\);/,
+      ],
+    ],
+    [
+      'Message/Assistant/ProcessTrace/TraceRow',
+      [
+        /\.trigger\.trigger\s*\{[^}]*transform: none;/,
+        /\.trigger\.trigger:hover:not\(:disabled\)\s*\{[^}]*background: transparent;/,
+        /\.trigger\.trigger:active,\s*\.trigger\.trigger\[data-pressed=['"]?true['"]?\]\s*\{\s*transform: none;/,
+      ],
+    ],
+  ]) {
+    const { code } = await compileCssModule(
+      join(
+        'src/components/business/Chat/ChatConversation/ChatMessageList',
+        component,
+        'style.module.scss'
+      )
+    );
+    for (const pattern of patterns) assert.match(code, pattern, component);
+  }
+});
+
+test('Chat 與 Sidebar 的 reduced-motion 規則保留動畫與過渡降級', async () => {
+  for (const [component, count, patterns] of [
+    ['Chat', 1, [/\.composerBottomSpacer\s*\{\s*transition: none;/]],
+    ['Chat/WelcomeConfigurable/Starter', 1, [/\.promptCard\s*\{\s*transition: none;/]],
+    [
+      'Chat/ChatConversation/ChatInput',
+      1,
+      [
+        /\.dropOverlay\s*\{\s*transition-duration: var\(--motion-duration-reduced\);\s*transform: none;/,
+        /\.dropOverlay\[data-visible=['"]?true['"]?\]\s*\{\s*transform: none;/,
+      ],
+    ],
+    [
+      'Chat/ChatConversation/ChatMessageList/MessageHistoryNavigator',
+      5,
+      [
+        /\.historyNavigatorRailPanel\s*\{\s*transition-duration: var\(--motion-duration-reduced\);\s*transform: translateY\(-50%\);/,
+        /\.historyNavigatorRailItem\s*\{[^}]*transition-delay: 0s !important;/,
+      ],
+    ],
+    [
+      'Chat/ChatConversation/ChatMessageList/Message/Assistant/LoadingText',
+      1,
+      [/\.root\[data-animated=['"]?true['"]?\]\s*\{\s*animation: none;/],
+    ],
+    [
+      'Chat/ChatConversation/ChatMessageList/Message/Assistant/ProcessTrace/TraceRow',
+      2,
+      [
+        /\.triggerMain\s*\{\s*animation: none;/,
+        /\.indicator\s*\{\s*transition-duration: var\(--motion-duration-reduced\);/,
+      ],
+    ],
+    [
+      'Sidebar/_common/tab',
+      1,
+      [
+        /\.tab \.tabLabelInner\s*\{\s*transition-duration: var\(--motion-duration-reduced\);\s*transition-delay: 0s;/,
+      ],
+    ],
+    [
+      'Sidebar/_common/footer/UserCheckIn',
+      1,
+      [/\.rewardConfetti span\s*\{\s*animation: none;/, /\.rewardConfetti\s*\{\s*display: none;/],
+    ],
+  ]) {
+    const { code } = await compileCssModule(
+      `src/components/business/${component}/style.module.scss`
+    );
+    const reduced = [
+      ...code.matchAll(/^@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)^\}/gm),
+    ];
+    assert.equal(reduced.length, count, component);
+    for (const pattern of patterns)
+      assert.match(reduced.map(([, body]) => body).join('\n'), pattern, component);
+  }
+});
+
+test('Chat 父宣告維持在 page-layout 巢狀覆寫之前', async () => {
+  for (const [component, selector, declarations] of [
+    ['ChatMessageList', 'container', ['flex: 1;', 'min-height: 0;', 'position: relative;']],
+    [
+      'ChatMessageList/MessageHistoryNavigator',
+      'historyNavigator',
+      [
+        '--history-nav-item-stagger: 0.016s;',
+        'position: absolute;',
+        'z-index: var(--app-z-index-elevated);',
+      ],
+    ],
+  ]) {
+    const { code } = await compileCssModule(
+      `src/components/business/Chat/ChatConversation/${component}/style.module.scss`
+    );
+    const rules = [...code.matchAll(new RegExp(`^\\.${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
+    assert.equal(rules.length, 1, component);
+    for (const declaration of declarations)
+      assert.ok(rules[0][1].includes(declaration), `${component}: ${declaration}`);
+    assert.ok(
+      code.search(new RegExp(`\\[data-chat-layout=['"]?page['"]?\\] \\.${selector}`)) >
+        rules[0].index,
+      component
+    );
+  }
+});
+
+test('Chat scrollbar 與後續宣告保留於同一父規則', async () => {
+  for (const [component, selector, declaration] of [
+    ['', '\\.sessionList', 'padding: var(--space-xs);'],
+    ['ToolApprovalDialog', '\\.payload', 'white-space: pre-wrap;'],
+    [
+      'ChatConversation/ChatInput',
+      '\\.attachmentStripShell \\.attachmentArea',
+      'padding-block: var(--space-2xs) var(--space-xs);',
+    ],
+    ['ChatConversation/ChatInput', '\\.textarea', 'field-sizing: content;'],
+    ['ChatConversation/ChatInput', '\\.agentGroupModalTree', 'background: var(--background);'],
+    [
+      'ChatConversation/ChatInput/DocumentPickerModal',
+      '\\.navTree',
+      'border: 1px solid var(--border);',
+    ],
+    ['ChatConversation/ChatInput/OtherSkillModal', '\\.treeNav', 'padding: var(--space-sm);'],
+    [
+      'ChatConversation/ChatMessageList/MessageHistoryNavigator',
+      '\\.historyNavigatorRailTrigger',
+      'overscroll-behavior: contain;',
+    ],
+    [
+      'ChatConversation/ChatMessageList/MessageHistoryNavigator',
+      '\\.historyNavigatorRailPanel',
+      'overscroll-behavior: contain;',
+    ],
+  ]) {
+    const { code } = await compileCssModule(
+      join('src/components/business/Chat', component, 'style.module.scss')
+    );
+    const rules = [...code.matchAll(new RegExp(`^${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
+    assert.equal(rules.length, 1, `${component}: ${selector}`);
+    assert.ok(rules[0][1].includes(declaration), component);
+    assert.ok(rules[0][1].includes('scrollbar-width: var(--scrollbar-width, thin);'), component);
+  }
+});
+
+test('Chat、Sidebar 保留桌面拖拽區、窗口按鈕留白與鍵盤焦點', async () => {
+  const chat = await compileCssModule('src/components/business/Chat/style.module.scss');
+  assert.match(chat.code, /\.titleBarInsetEnd\s*\{[^}]*-webkit-app-region: drag;/);
+  assert.match(
+    chat.code,
+    /\.titleBarInsetEnd\s*\{[^}]*padding-right: var\(--desktop-window-controls-width, 116px\);[^}]*padding-left: var\(--space-sm\);[^}]*position: relative;/
+  );
+  assert.match(
+    chat.code,
+    /\.titleBarInsetEnd :where\([^{}]+\)\s*\{\s*-webkit-app-region: no-drag;/
+  );
+  assert.match(
+    chat.code,
+    /\.titleBarInsetEnd::after\s*\{[^}]*width: var\(--resource-header-end-reserve, var\(--desktop-window-controls-width, 116px\)\);[^}]*-webkit-app-region: no-drag;[^}]*pointer-events: none;/
+  );
+  const header = await compileCssModule(
+    'src/components/business/Sidebar/_common/header/SidebarHeader/style.module.scss'
+  );
+  assert.match(header.code, /\.desktopHeader \.headerTop\s*\{[^}]*-webkit-app-region: drag;/);
+  assert.match(header.code, /\.desktopHeader \.headerTop > \*\s*\{\s*-webkit-app-region: no-drag;/);
+  const profile = await compileCssModule(
+    'src/components/business/Sidebar/_common/footer/UserProfile/style.module.scss'
+  );
+  assert.match(
+    profile.code,
+    /\.menuTrigger\[data-focus-visible\]\s*\{[^}]*outline: 2px solid var\(--focus, var\(--accent\)\);/
+  );
+  const tab = await compileCssModule(
+    'src/components/business/Sidebar/_common/tab/style.module.scss'
+  );
+  assert.match(
+    tab.code,
+    /\.tab\[data-focus-visible\]\s*\{[^}]*box-shadow: inset 0 0 0 2px var\(--focus, var\(--accent\)\);/
+  );
+});
+
+test('Chat 輸入區與歡迎頁斷點、Sidebar 選取與收合狀態不變', async () => {
+  const input = await compileCssModule(
+    'src/components/business/Chat/ChatConversation/ChatInput/style.module.scss'
+  );
+  assert.match(
+    input.code,
+    /@container chat-input \(max-width: 420px\) \{\s*\.actionToolbar\s*\{\s*column-gap: var\(--space-2xs\);/
+  );
+  assert.match(
+    input.code,
+    /@media \(max-width: 640px\) \{\s*\.container\s*\{\s*padding-inline: var\(--space-sm\);/
+  );
+  const welcome = await compileCssModule(
+    'src/components/business/Chat/WelcomeConfigurable/Starter/style.module.scss'
+  );
+  assert.match(
+    welcome.code,
+    /@media \(max-width: 640px\) \{\s*\.cardGrid\[data-columns=['"]2['"]\],[^{}]*\.featureGrid\[data-columns=['"]3['"]\]\s*\{\s*grid-template-columns: minmax\(0, 1fr\);/
+  );
+  const session = await compileCssModule(
+    'src/components/business/Sidebar/_common/tab/SessionTab/style.module.scss'
+  );
+  assert.match(
+    session.code,
+    /\.sessionItem\[data-selected\]\s*\{\s*color: var\(--accent-text-strong\);\s*background: var\(--item-selected\);/
+  );
+  assert.match(
+    session.code,
+    /\.sessionItem\[data-disabled\]\s*\{\s*color: var\(--text-disabled\);\s*cursor: not-allowed;\s*background: transparent;/
+  );
+  const shell = await compileCssModule(
+    'src/components/business/Sidebar/_common/sidebarShell.module.scss'
+  );
+  assert.match(
+    shell.code,
+    /\.sider\[data-sidebar-phase=['"]?collapsed['"]?\] \.expandedBody\s*\{\s*opacity: 0;\s*visibility: hidden;\s*pointer-events: none;/
+  );
+});
+
 test('全局 scrollbar SCSS 保留页面与显式滚动条规则', async () => {
   const file = 'src/styles/global/scrollbar.scss';
   const css = compileScss(await readFile(join(root, file), 'utf8'), file);

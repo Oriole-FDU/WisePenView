@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .container {
   --chat-message-font-size: 14px;
@@ -13,6 +13,10 @@
   --chat-avatar-size: 24px;
   --chat-model-meta-font-size: var(--font-size-base);
 
+  flex: 1;
+  min-height: 0;
+  position: relative;
+
   :global([data-chat-layout='page']) & {
     --chat-message-font-size: 15px;
     --chat-thinking-font-size: var(--font-size-sm);
@@ -21,17 +25,13 @@
     --chat-user-message-max-width: 520px;
     --chat-avatar-size: 28px;
   }
-
-  flex: 1;
-  min-height: 0;
-  position: relative;
 }
 
 .viewport {
   display: flex;
   flex-direction: column;
   padding: 0;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .scrollColumn {
@@ -89,7 +89,7 @@
     border-color var(--motion-duration-mid) var(--motion-ease-standard),
     box-shadow var(--motion-duration-mid) var(--motion-ease-standard);
 
-  && {
+  &#{&} {
     width: 32px;
     height: 32px;
     min-width: 32px;
@@ -107,7 +107,7 @@
   }
 
   &:hover:not(:disabled) {
-    && {
+    &#{&} {
       color: var(--foreground);
       background: var(--surface-tertiary);
       border-color: var(--border);

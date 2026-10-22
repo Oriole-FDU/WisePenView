@@ -7,7 +7,7 @@ import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import type { ChatHeaderProps } from './index.type';
 
 function ChatHeader({

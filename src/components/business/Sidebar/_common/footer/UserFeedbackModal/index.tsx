@@ -14,7 +14,7 @@ import {
 } from '@/utils/image/uploadLimit';
 
 import type { UserFeedbackModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface FeedbackFormValues {
   types: FeedbackType[];

@@ -1,5 +1,5 @@
 /* 过程提示行的统一排版：折叠主行、展开后的节点行共用一套字重、行高与内缩 */
-.hintRowBase() {
+@mixin hintRowBase() {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -15,8 +15,8 @@
 }
 
 .trigger {
-  && {
-    .hintRowBase();
+  &#{&} {
+    @include hintRowBase();
 
     height: auto;
     border: 0;
@@ -26,19 +26,19 @@
     transform: none;
   }
 
-  &&:hover:not(:disabled) {
+  &#{&}:hover:not(:disabled) {
     color: var(--foreground);
     background: transparent;
   }
 
-  &&:active,
-  &&[data-pressed='true'] {
+  &#{&}:active,
+  &#{&}[data-pressed='true'] {
     transform: none;
   }
 }
 
 .hintRow {
-  .hintRowBase();
+  @include hintRowBase();
 }
 
 @keyframes traceHeadlineIn {

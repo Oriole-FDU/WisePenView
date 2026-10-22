@@ -14,7 +14,7 @@ import { buildChatPath } from '@/utils/navigation/appRoute';
 
 import { useSidebarSessionHistoryStore } from './_store/useSidebarSessionHistoryStore';
 import SessionMenuItem from './SessionMenuItem';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const SESSION_PAGE_SIZE = 20;
 
