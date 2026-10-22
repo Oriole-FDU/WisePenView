@@ -18,7 +18,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const srcDir = join(root, 'src');
 /** 基础设施与 token 层：基础刻度在此定义，允许直接引用。 */
 const infraDir = join(srcDir, 'styles');
-const styleExtensions = new Set(['.less', '.css']);
+const styleExtensions = new Set(['.less', '.scss', '.css']);
 const scriptExtensions = new Set(['.ts', '.tsx']);
 
 /** 样式里的 `z-index` 声明，值允许跨行，直到 `;` 或规则结束。 */

@@ -9,22 +9,24 @@
 
 ## 按变更范围选择
 
-| 变更范围                             | 必需验证                                                       | 条件验证                                                     |
-| ------------------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------ |
-| Markdown、模板、普通配置             | `git diff --check`                                             | `pnpm lint`（若影响 JS 配置）                                |
-| `src/**/*.ts(x)`                     | `pnpm lint`、`pnpm typecheck`                                  | `pnpm build`（跨层或构建配置）                               |
-| `src/**/*.{less,css}`、主题 token    | `pnpm lint`、`pnpm check:radius`、`pnpm check:z-index`         | `pnpm build-storybook`（stories 变更）                       |
-| `src/domains/**`、registry、mock     | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`               | `pnpm build`                                                 |
-| `vite.config.ts`、tsconfig、Electron | `pnpm lint`、`pnpm typecheck`、`pnpm build`                    | 对应打包脚本                                                 |
-| 应用初始化、认证与运行时配置         | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm build` | `pnpm build --mode mock`、配置错误启动检查、浏览器运行态回归 |
-| Storybook 配置或 stories             | `pnpm lint`、`pnpm typecheck`                                  | `pnpm build-storybook`                                       |
-| UI 交互、路由、浮层                  | 上述静态检查                                                   | 用户明确授权后运行 mock 或浏览器回归                         |
+| 变更范围                               | 必需验证                                                                    | 条件验证                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Markdown、模板、普通配置               | `git diff --check`                                                          | `pnpm lint`（若影响 JS 配置）                                |
+| `src/**/*.ts(x)`                       | `pnpm lint`、`pnpm typecheck`                                               | `pnpm build`（跨层或构建配置）                               |
+| `src/**/*.{less,scss,css}`、主题 token | `pnpm lint`、`pnpm check:radius`、`pnpm check:z-index`、`pnpm check:styles` | `pnpm build-storybook`（stories 变更）                       |
+| `src/domains/**`、registry、mock       | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`                            | `pnpm build`                                                 |
+| `vite.config.ts`、tsconfig、Electron   | `pnpm lint`、`pnpm typecheck`、`pnpm build`                                 | 对应打包脚本                                                 |
+| 应用初始化、认证与运行时配置           | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm build`              | `pnpm build --mode mock`、配置错误启动检查、浏览器运行态回归 |
+| Storybook 配置或 stories               | `pnpm lint`、`pnpm typecheck`                                               | `pnpm build-storybook`                                       |
+| UI 交互、路由、浮层                    | 上述静态检查                                                                | 用户明确授权后运行 mock 或浏览器回归                         |
 
 ## CI 契约
 
-PR CI 固定执行 commitlint、lint、build、mock contract、API response contract、圆角 token、z-index 层级、note link 协议和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
+PR CI 固定执行 commitlint、lint、build、mock contract、API response contract、圆角 token、z-index 层级、樣式契約、note link 协议和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
+
+Less → SCSS 每個遷移批次另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對該批編譯 CSS 與使用中的 CSS Modules 匯出鍵。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、試點元件樣式與 SCSS 守衛；後續批次在同一檢查加入 Table、Chat 與 Less 清零契約。建置與靜態比對不能代替已授權的視覺／互動驗收。
 
 ## 运行态记录
 

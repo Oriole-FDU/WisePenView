@@ -23,16 +23,17 @@
     "package:desktop:unsigned:dev": "pnpm build:dev && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "lint": "eslint . --max-warnings 0 --cache --cache-strategy content",
     "lint:fix": "eslint . --fix --max-warnings 0",
-    "format:check": "prettier --check \"**/*.{js,jsx,mjs,cjs,ts,tsx,json,md}\" \".github/**/*.{yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,mjs,cjs,ts,tsx,json,md,scss}\" \".github/**/*.{yml,yaml}\"",
     "typecheck": "tsc -b",
     "check:mock": "node scripts/check-mock.mjs",
     "check:api-contract": "node scripts/check-api-contract.mjs",
     "check:z-index": "node scripts/check-z-index-tokens.mjs",
     "check:radius": "node scripts/check-radius-tokens.mjs",
+    "check:styles": "node --test scripts/check-styles.mjs",
     "check:editor-runtime": "node --test scripts/check-editor-runtime.mjs",
     "check:frontend-state": "node --test scripts/check-frontend-state.mjs",
     "check:note-link": "node --test scripts/check-note-link.mjs",
-    "check:ci": "pnpm check:editor-runtime && pnpm check:mock && pnpm check:api-contract && pnpm check:z-index && pnpm check:radius && pnpm check:note-link",
+    "check:ci": "pnpm check:editor-runtime && pnpm check:mock && pnpm check:api-contract && pnpm check:z-index && pnpm check:radius && pnpm check:styles && pnpm check:note-link",
     "verify:ci": "concurrently --kill-others-on-fail --names format,lint,checks,typecheck,build --prefix-colors blue,green,yellow,magenta,cyan \"pnpm format:check\" \"pnpm lint\" \"pnpm check:ci\" \"pnpm typecheck\" \"pnpm build:app\"",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
@@ -122,6 +123,7 @@
     "less": "^4.4.2",
     "lint-staged": "^16.3.3",
     "prettier": "^3.7.4",
+    "sass-embedded": "^1.105.2",
     "storybook": "^10.5.8",
     "tailwindcss": "^4.3.2",
     "typescript": "~5.9.3",
@@ -165,6 +167,6 @@
       "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
-    "*.{jsx,json,md}": "prettier --write"
+    "*.{jsx,json,md,scss}": "prettier --write"
   }
 }

@@ -16,7 +16,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const srcDir = join(root, 'src');
 /** 基础设施与 token 层：第 1、2 层刻度在此定义，允许直接引用。 */
 const infraDir = join(srcDir, 'styles');
-const styleExtensions = new Set(['.less', '.css']);
+const styleExtensions = new Set(['.less', '.scss', '.css']);
 
 /** 圆角属性，例如 border-radius、border-start-start-radius。 */
 const radiusPropertyPattern = /([a-z-]*radius)\s*:\s*([^;]*)/i;

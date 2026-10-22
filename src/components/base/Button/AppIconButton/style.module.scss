@@ -1,4 +1,4 @@
-@import '@/styles/mixins/focusRing.less';
+@use '@/styles/mixins/focusRing' as focusRing;
 
 .tooltipTrigger {
   display: inline-flex;
@@ -31,7 +31,7 @@
   &:focus-visible,
   &:focus-visible:not(:focus),
   &[data-focus-visible] {
-    .appFocusRing();
+    @include focusRing.appFocusRing();
   }
 
   svg {
@@ -62,7 +62,6 @@
     color: var(--accent-foreground);
     background: var(--accent-hover);
   }
-
 }
 
 .danger {
@@ -73,7 +72,6 @@
     color: var(--danger-text);
     background: var(--danger-soft);
   }
-
 }
 
 .active {
@@ -84,7 +82,6 @@
     color: var(--accent-text);
     background: var(--accent-soft-hover);
   }
-
 }
 
 .danger.active {
@@ -95,7 +92,6 @@
     color: var(--danger-text);
     background: var(--danger-soft-hover);
   }
-
 }
 
 .root[data-selected] {

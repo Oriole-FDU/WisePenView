@@ -5,7 +5,7 @@ import type { ComponentProps, MouseEventHandler } from 'react';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import type { AppIconButtonProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AppIconButton({
   icon,

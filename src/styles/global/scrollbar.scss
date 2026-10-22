@@ -1,11 +1,11 @@
-@import (reference) '../mixins/scrollbar.less';
+@use '../mixins/scrollbar' as scrollbar;
 
 html {
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .scrollbar-thin {
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .scrollbar-none {
