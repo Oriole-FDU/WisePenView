@@ -16,7 +16,7 @@ import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface NoteTitleHandle {
   /** 当前标题编辑区纯文本，空则“未命名笔记”。 */

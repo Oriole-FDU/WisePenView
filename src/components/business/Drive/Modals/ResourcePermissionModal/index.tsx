@@ -31,7 +31,7 @@ import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { ResourcePermissionModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface ResourcePermissionModalData {
   overview: ResourcePermissionOverview;

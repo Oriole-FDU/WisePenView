@@ -34,7 +34,7 @@ import type { DriveTableRow, TableDriveProps } from './index.type';
 import CreateMenu from './parts/CreateMenu';
 import DriveDetailPanel from './parts/DriveDetailPanel';
 import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './parts/DriveDnd';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { buildDriveTableColumns, isDrivePinnedFirstRow } from './tableConfig';
 
 const DRIVE_DRAG_OVERLAY_CURSOR_OFFSET = { x: 12, y: 12 };

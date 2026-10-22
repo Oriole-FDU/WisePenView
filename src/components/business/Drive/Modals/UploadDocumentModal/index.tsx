@@ -13,7 +13,7 @@ import {
 } from '@/components/business/Drive/common/useDriveDocumentUpload';
 
 import type { UploadDocumentModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** 文档上传：MD5 -> init -> OSS PUT；后端注册成功后挂载到指定目录。 */
 function UploadDocumentModal({

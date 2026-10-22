@@ -7,7 +7,7 @@ import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { GROUP_TYPE } from '@/domains/Group';
 
 import type { GroupCardProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function GroupCard({ group, onClick }: GroupCardProps) {
   const { t } = useTranslation('group');

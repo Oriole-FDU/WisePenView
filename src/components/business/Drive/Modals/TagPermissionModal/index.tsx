@@ -20,7 +20,7 @@ import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { TagMountPermissionModalProps, TagPermissionModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import {
   getDisplayInitial,
   isSpecifiedUserScope,

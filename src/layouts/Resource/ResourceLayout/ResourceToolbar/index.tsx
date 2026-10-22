@@ -8,7 +8,7 @@ import { normalizeId } from '@/utils/normalize/normalizeId';
 import type { ResourceToolbarProps } from './index.type';
 import ResourceToolbarActions from './ResourceToolbarActions';
 import ResourceToolbarBreadcrumb from './ResourceToolbarBreadcrumb';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /**
  * 资源工具栏：在布局顶栏内装配面包屑与动作，不负责顶栏外壳。

@@ -36,7 +36,7 @@ import {
 } from './drawioProtocol';
 import { useDrawioEditorSession } from './hooks/useDrawioEditorSession';
 import { useDrawioTheme } from './hooks/useDrawioTheme';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface DrawioViewData {
   noteInfoDisplay: NoteInfoDisplayData;

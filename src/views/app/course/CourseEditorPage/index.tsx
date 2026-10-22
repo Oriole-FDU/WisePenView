@@ -17,7 +17,7 @@ import CourseGoalsSection from './_components/CourseGoalsSection';
 import CoursePermissionSection from './_components/CoursePermissionSection';
 import CourseScheduleSection from './_components/CourseScheduleSection';
 import { useCourseEditorFormController } from './controllers/useCourseEditorFormController';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseEditorPage() {
   const { t } = useTranslation('course');

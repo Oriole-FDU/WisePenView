@@ -8,7 +8,7 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { COLOR_SCHEME_ICON_SRC, useColorScheme } from '@/theme';
 
 import type { NavigationControlsProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function NavigationControls({
   sidebarCollapsed,

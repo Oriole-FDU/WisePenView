@@ -2,7 +2,7 @@
 
 import { clsx } from 'clsx';
 import * as React from 'react';
-import styles from './marker.module.less';
+import styles from './marker.module.scss';
 
 type MarkerVariant = 'default' | 'border' | 'separator';
 

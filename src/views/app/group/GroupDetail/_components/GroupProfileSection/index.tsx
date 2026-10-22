@@ -15,7 +15,7 @@ import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
 import GroupSettingsSection from '../GroupSettingsSection';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface GroupProfileSectionProps {
   group: Group;

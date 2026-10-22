@@ -5,7 +5,7 @@ import { AppButton } from '@/components/base/Button';
 
 import ResourcePermissionPanel from '../ResourcePermissionPanel';
 import type { ResourcePermissionModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function ResourcePermissionModal({
   isOpen,

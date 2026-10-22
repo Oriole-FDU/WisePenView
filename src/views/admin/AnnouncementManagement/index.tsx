@@ -11,9 +11,9 @@ import { useApi } from '@/hooks/useApi';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import AdminPageHeader from '@/views/admin/_common/AdminPageHeader';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import CreateAnnouncementModal from './CreateAnnouncementModal';
-import pageStyles from './style.module.less';
+import pageStyles from './style.module.scss';
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 const EMPTY_TEXT = '-';

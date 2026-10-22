@@ -17,7 +17,7 @@ import {
 } from 'react';
 
 import { Input } from '@/components/base/Input';
-import styles from './command.module.less';
+import styles from './command.module.scss';
 
 const COMMAND_NAVIGATION_KEY_SET = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);
 

@@ -4,7 +4,7 @@ import { isRecord } from '@/utils/type/typeGuards';
 import { renderHighlightedLine } from './highlight';
 import { getCodeBlockLanguageLabel } from './language';
 import { buildCodeLineDiff, type CodeLineDiffEntry } from './lineDiff';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function readLanguage(aiBlock: Record<string, unknown>): string {
   const props = isRecord(aiBlock.props) ? aiBlock.props : {};

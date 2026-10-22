@@ -21,7 +21,7 @@ import {
   createCourseMeeting,
   type UpdateCourseEditorForm,
 } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import { CourseDateRangeField } from '../CourseEditorDateFields';
 
 interface CourseScheduleSectionProps {

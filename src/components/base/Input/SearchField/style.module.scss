@@ -1,0 +1,54 @@
+@use '../_common/field' as field;
+
+.searchField:global(.search-field) {
+  @include field.fieldTokens();
+
+  /* HeroUI SearchField 变量映射 */
+  --search-field-group-bg: var(--app-field-bg);
+  --search-field-group-bg-hover: var(--app-field-bg-hover);
+  --search-field-group-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
+  --field-shadow: none;
+}
+
+.searchField:global(.search-field) :global(.search-field__group) {
+  min-height: var(--control-height, 36px);
+  @include field.fieldSurface();
+}
+
+.searchField:global(.search-field) :global(.search-field__group):hover:not(:focus-within),
+.searchField:global(.search-field)
+  :global(.search-field__group)[data-hovered='true']:not([data-focus-within='true']) {
+  @include field.fieldSurfaceHover();
+}
+
+.searchField:global(.search-field) :global(.search-field__group):focus-within,
+.searchField:global(.search-field) :global(.search-field__group)[data-focus-within='true'] {
+  @include field.fieldSurfaceFocus();
+}
+
+.searchField:global(.search-field)[data-invalid='true'] :global(.search-field__group),
+.searchField:global(.search-field)[aria-invalid='true'] :global(.search-field__group) {
+  @include field.fieldSurfaceInvalid();
+}
+
+.searchField:global(.search-field)[data-invalid='true'] :global(.search-field__group):focus-within,
+.searchField:global(.search-field)[aria-invalid='true'] :global(.search-field__group):focus-within {
+  @include field.fieldSurfaceInvalidFocus();
+}
+
+.searchField:global(.search-field) :global(.search-field__input) {
+  min-width: 0;
+  background-color: transparent;
+  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
+  letter-spacing: 0;
+}
+
+.searchField:global(.search-field) :global(.search-field__input)::placeholder {
+  @include field.fieldPlaceholder();
+}
+
+.searchField:global(.search-field) :global(.search-field__search-icon) {
+  @include field.fieldPlaceholder();
+}

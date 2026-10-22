@@ -8,7 +8,7 @@ import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 
-import styles from './index.module.less';
+import styles from './index.module.scss';
 import type { CreateMenuItem, CreateMenuProps } from './index.type';
 
 function CreateMenuIcon({ id }: { id: CreateMenuItem['id'] }) {

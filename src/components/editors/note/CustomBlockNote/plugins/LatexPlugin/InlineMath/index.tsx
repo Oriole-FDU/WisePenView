@@ -21,7 +21,7 @@ import {
 import { useFocusPopoverTextarea } from '../LatexEditPopover/useFocusPopoverTextarea';
 import { useLatexPopoverAnchorSync } from '../LatexEditPopover/useLatexPopoverAnchorSync';
 import { sanitizeLatexInput } from '../latexInput';
-import popoverStyles from './style.module.less';
+import popoverStyles from './style.module.scss';
 
 const inlineMathConfig = {
   type: 'inlineMath',

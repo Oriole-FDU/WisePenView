@@ -5,7 +5,7 @@ import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
 
 import NavigationControls from '../NavigationControls';
 import type { SidebarHeaderProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function SidebarHeader({
   collapsed,

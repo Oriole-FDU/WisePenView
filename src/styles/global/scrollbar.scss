@@ -1,0 +1,22 @@
+@use '../mixins/scrollbar' as scrollbar;
+
+html {
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.scrollbar-thin {
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar,
+[data-slot='message-scroller-viewport'][data-autoscrolling]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-slot='message-scroller-viewport'][data-autoscrolling] {
+  scrollbar-width: none;
+}

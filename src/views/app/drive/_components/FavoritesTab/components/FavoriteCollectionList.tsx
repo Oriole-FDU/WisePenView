@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { FavoriteCollection } from '@/domains/Interact';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 interface FavoriteCollectionListProps {
   collections: FavoriteCollection[];

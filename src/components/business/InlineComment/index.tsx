@@ -23,7 +23,7 @@ import type {
   InlineCommentReactionPayload,
   InlineCommentThreadView,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const INLINE_THREAD_ESTIMATE_SIZE = 240;
 const INLINE_RESOLVED_THREAD_ESTIMATE_SIZE = 180;

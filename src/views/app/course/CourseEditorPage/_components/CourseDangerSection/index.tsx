@@ -10,7 +10,7 @@ import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 interface CourseDangerSectionProps {
   courseId: string;

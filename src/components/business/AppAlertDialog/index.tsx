@@ -13,7 +13,7 @@ import type {
   AppAlertDialogStatus,
   AppAlertDialogType,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const DEFAULT_TYPE: AppAlertDialogType = 'confirm';
 

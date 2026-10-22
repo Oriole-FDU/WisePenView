@@ -11,7 +11,7 @@ import type { Group } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const PERSONAL_SCOPE_KEY = '__personal__';
 const GROUP_SCOPE_PAGE_SIZE = 20;

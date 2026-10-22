@@ -8,7 +8,7 @@ import { FormField, Input, TextArea } from '@/components/base/Input';
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface CreateCourseModalProps {
   isOpen: boolean;

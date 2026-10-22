@@ -10,7 +10,7 @@ import { useUserService } from '@/domains';
 import type { UserTaskCheckInResult, UserTaskRewardPreview } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const DEFAULT_REWARD_PREVIEW: UserTaskRewardPreview = {
   rewardType: 'TOKEN',

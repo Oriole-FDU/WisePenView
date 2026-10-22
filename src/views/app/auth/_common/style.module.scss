@@ -1,0 +1,133 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+@mixin authTextLink() {
+  color: var(--link);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--accent-text-strong);
+    text-decoration: underline;
+  }
+}
+
+.authContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--layout-auth-form-width);
+  margin-inline: auto;
+
+  :global(button) {
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.title {
+  margin: 0 0 var(--space-lg);
+  color: var(--foreground);
+  font-size: var(--layout-welcome-title-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md-plus);
+  width: 100%;
+  min-width: 0;
+
+  > :global(*) {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.formActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.submitButton {
+  width: 100%;
+  margin-top: var(--space-2xs);
+}
+
+.centerLinks {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+
+  :global(a) {
+    @include authTextLink();
+  }
+}
+
+.rightLinks {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+
+  :global(a) {
+    @include authTextLink();
+  }
+}
+
+// 底部左侧链接，用户协议展示
+.leftBottomLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-top: var(--space-sm);
+  color: var(--foreground);
+
+  :global(.checkbox) {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    width: auto;
+  }
+
+  :global(a) {
+    width: auto;
+    @include authTextLink();
+  }
+}
+
+.authAlert {
+  margin-bottom: var(--space-lg);
+}
+
+.onboardingBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md-plus);
+  width: 100%;
+  min-width: 0;
+}
+
+.onboardingActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+
+  > :global(button) {
+    width: 100%;
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-lg) {
+  .title {
+    margin-bottom: var(--space-lg);
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .authContainer {
+    max-width: none;
+  }
+}

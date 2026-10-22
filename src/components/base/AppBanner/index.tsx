@@ -2,7 +2,7 @@ import { Alert } from '@heroui/react';
 import { clsx } from 'clsx';
 
 import type { AppBannerProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AppBanner({
   title,

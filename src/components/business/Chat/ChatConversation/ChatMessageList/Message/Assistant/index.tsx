@@ -11,7 +11,7 @@ import MessageContent from '../Content';
 import type { AssistantMessageProps } from './index.type';
 import LoadingText from './LoadingText';
 import ProcessTrace from './ProcessTrace';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { buildAssistantSegments } from './traceModel';
 
 function AssistantMessage({ message, model, streaming }: AssistantMessageProps) {

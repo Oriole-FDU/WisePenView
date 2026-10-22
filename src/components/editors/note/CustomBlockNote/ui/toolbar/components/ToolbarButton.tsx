@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import { AppButton, type AppButtonProps } from '@/components/base/Button';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import { stopToolbarMouseDown } from '../utils';
 
 export interface ButtonGroupChildProps {

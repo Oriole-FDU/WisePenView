@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import * as React from 'react';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import styles from './attachment.module.less';
+import styles from './attachment.module.scss';
 
 type AttachmentState = 'idle' | 'uploading' | 'processing' | 'error' | 'done';
 type AttachmentSize = 'default' | 'sm' | 'xs';

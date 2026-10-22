@@ -11,7 +11,7 @@ import { useChatService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import type { SessionMenuItemProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps) {
   const { t } = useTranslation(['chat', 'common']);

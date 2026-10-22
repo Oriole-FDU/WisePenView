@@ -1,0 +1,73 @@
+@use '../_common/field' as field;
+
+.inputGroup:global(.input-group) {
+  @include field.fieldTokens();
+
+  /* HeroUI InputGroup 变量映射 */
+  --input-group-bg: var(--app-field-bg);
+  --input-group-bg-hover: var(--app-field-bg-hover);
+  --input-group-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
+  --field-shadow: none;
+
+  @include field.fieldSurface();
+}
+
+.inputGroup:global(.input-group):hover:not(:focus-within),
+.inputGroup:global(.input-group)[data-hovered='true']:not([data-focus-within='true']) {
+  @include field.fieldSurfaceHover();
+}
+
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:focus)),
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-textarea']:focus)) {
+  @include field.fieldSurfaceFocus();
+}
+
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:-webkit-autofill)),
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:autofill)) {
+  border-color: var(--app-field-border-focus);
+  background-color: var(--app-field-bg-focus);
+}
+
+.inputGroup:global(.input-group)[data-invalid='true'] {
+  @include field.fieldSurfaceInvalid();
+}
+
+.inputGroup:global(.input-group)[data-invalid='true']:has(
+    :global([data-slot='input-group-input']:focus)
+  ),
+.inputGroup:global(.input-group)[data-invalid='true']:has(
+    :global([data-slot='input-group-textarea']:focus)
+  ) {
+  @include field.fieldSurfaceInvalidFocus();
+}
+
+.inputGroup:global(.input-group) :global([data-slot='input-group-input']),
+.inputGroup:global(.input-group) :global([data-slot='input-group-textarea']) {
+  background: transparent;
+  font-weight: var(--field-text-font-weight, var(--font-weight-medium));
+  letter-spacing: 0;
+}
+
+.inputGroup:global(.input-group) :global([data-slot='input-group-prefix']),
+.inputGroup:global(.input-group) :global([data-slot='input-group-suffix']) {
+  border-color: var(--app-field-border);
+  @include field.fieldPlaceholder();
+}
+
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:focus))
+  :global([data-slot='input-group-prefix']),
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-input']:focus))
+  :global([data-slot='input-group-suffix']),
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-textarea']:focus))
+  :global([data-slot='input-group-prefix']),
+.inputGroup:global(.input-group):has(:global([data-slot='input-group-textarea']:focus))
+  :global([data-slot='input-group-suffix']) {
+  border-color: var(--app-field-border-focus);
+}
+
+.inputGroup:global(.input-group) :global([data-slot='input-group-input'])::placeholder,
+.inputGroup:global(.input-group) :global([data-slot='input-group-textarea'])::placeholder {
+  @include field.fieldPlaceholder();
+}

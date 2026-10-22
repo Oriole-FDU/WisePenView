@@ -15,8 +15,8 @@ import {
   useColorScheme,
 } from '@/theme';
 
-import layout from '../style.module.less';
-import styles from './style.module.less';
+import layout from '../style.module.scss';
+import styles from './style.module.scss';
 
 function LanguageSection() {
   const { i18n, t } = useTranslation('profile');

@@ -1,0 +1,46 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.section {
+  padding: var(--space-lg) 0 42px;
+}
+
+.compact {
+  padding: var(--space-md) 0 var(--space-lg);
+
+  .header {
+    margin-bottom: var(--space-md);
+  }
+}
+
+.section + .section {
+  border-top: 1px solid var(--border);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.title {
+  margin: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -1,7 +1,7 @@
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
-import styles from '../../engines/aiDiff/style.module.less';
+import styles from '../../engines/aiDiff/style.module.scss';
 import {
   type AiDiffTextConfig,
   type AiDiffTextHunk,

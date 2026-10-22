@@ -17,7 +17,7 @@ import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/note
 import type { NoteEditorRuntimeCoordinator } from '../registry/useNoteEditorRuntimeCoordinator';
 import { useNoteInteractionStore } from '../runtime/_context';
 import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import FindBar from './findBar';
 import NoteSideMenu from './sideMenu';
 import NoteSlashMenu from './slashMenu';

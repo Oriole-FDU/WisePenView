@@ -7,7 +7,7 @@ import type { Preview, StoryFn } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
 import '../src/styles/global/index.css';
-import '../src/styles/global/scrollbar.less';
+import '../src/styles/global/scrollbar.scss';
 import i18n, { changeAppLanguage } from '../src/i18n';
 import type { SupportedLanguage } from '../src/i18n/resources';
 

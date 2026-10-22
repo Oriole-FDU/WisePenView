@@ -10,7 +10,7 @@ import {
 } from '@/utils/code/codeHighlight';
 
 import type { CodeBlockFrameProps, CodeBlockProps, HighlightedCodeProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function getTokenStyle(token: CodeHighlightToken): CSSProperties {
   const fontStyle = token.fontStyle ?? 0;

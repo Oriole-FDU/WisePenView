@@ -5,7 +5,7 @@ import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
 import type { DriveViewNode } from '../common/driveComponentModel';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface DriveNavigatorNodeTitleProps {
   node: DriveViewNode;

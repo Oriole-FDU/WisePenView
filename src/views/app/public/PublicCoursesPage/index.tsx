@@ -19,7 +19,7 @@ import {
 import PublicListPagination from '../_components/PublicListPagination';
 import { CreateCourseModal, JoinCourseModal } from '../_components/PublicModals';
 import PublicSectionTabs from '../_components/PublicSectionTabs';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 function PublicCoursesPage() {
   const { t } = useTranslation(['course', 'group']);

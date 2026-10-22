@@ -6,7 +6,7 @@ import UserCapsule from '@/components/base/Avatar/UserCapsule';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import type { CourseSummary } from '@/domains/Course';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface CourseCardProps {
   course: CourseSummary;

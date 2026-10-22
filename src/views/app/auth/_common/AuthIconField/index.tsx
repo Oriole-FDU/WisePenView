@@ -3,7 +3,7 @@ import { User } from 'lucide-react';
 import { Input } from '@/components/base/Input';
 
 import type { AuthIconFieldProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** 认证表单左侧图标输入，登录/注册/找回密码共用 */
 function AuthIconField({ icon: Icon = User, ...props }: AuthIconFieldProps) {

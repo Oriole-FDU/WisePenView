@@ -6,7 +6,7 @@ import AppBanner from '@/components/base/AppBanner';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 
 import type { UisOutcomeState } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface AccountVerificationOutcomeDialogProps {
   isOpen: boolean;

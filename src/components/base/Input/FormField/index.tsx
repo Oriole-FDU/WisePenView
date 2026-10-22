@@ -2,7 +2,7 @@ import { Description, ErrorMessage, Label, TextField } from '@heroui/react';
 import { clsx } from 'clsx';
 
 import type { FormFieldProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function FormField({
   label,

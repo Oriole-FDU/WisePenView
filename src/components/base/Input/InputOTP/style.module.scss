@@ -1,0 +1,53 @@
+@use '../_common/field' as field;
+
+.inputOtp:global(.input-otp) {
+  @include field.fieldTokens();
+
+  /* HeroUI InputOTP 变量映射 */
+  --input-otp-slot-bg: var(--app-field-bg);
+  --input-otp-slot-bg-hover: var(--app-field-bg-hover);
+  --input-otp-slot-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
+  --field-shadow: none;
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot) {
+  @include field.fieldSurface();
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot:hover) {
+  @include field.fieldSurfaceHover();
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot[data-active='true']) {
+  @include field.fieldSurfaceFocus();
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot[data-filled='true']) {
+  background-color: var(--app-field-bg-focus);
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot[data-invalid='true']) {
+  @include field.fieldSurfaceInvalid();
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot[data-invalid='true'][data-active='true']) {
+  @include field.fieldSurfaceInvalidFocus();
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot[data-disabled='true']) {
+  @include field.fieldSurfaceDisabled();
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__slot-value) {
+  letter-spacing: 0;
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__caret) {
+  background: var(--accent);
+}
+
+.inputOtp:global(.input-otp) :global(.input-otp__separator) {
+  background: var(--app-field-border-hover);
+}

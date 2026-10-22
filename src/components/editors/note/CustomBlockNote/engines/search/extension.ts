@@ -1,4 +1,4 @@
-import './style.module.less';
+import './style.module.scss';
 
 import { createExtension } from '@blocknote/core';
 import type { Node as PMNode } from '@tiptap/pm/model';

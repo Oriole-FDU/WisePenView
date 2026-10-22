@@ -7,7 +7,7 @@ import { FormField, TextArea } from '@/components/base/Input';
 import type { CourseOutlineContainerNode, CourseOutlineResourceNode } from '@/domains/Course';
 
 import CourseResourceIcon from '../CourseResourceIcon';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useCourseOutlineDescriptionController } from './useCourseOutlineDescriptionController';
 
 interface CourseOutlineOverviewProps {

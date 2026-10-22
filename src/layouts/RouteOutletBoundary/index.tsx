@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { ErrorPage } from '@/components/business/ErrorPage';
 import { reportError } from '@/utils/error';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface RouteOutletBoundaryProps {
   children: ReactNode;

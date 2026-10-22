@@ -4,7 +4,7 @@
 
 ## 项目事实
 
-- 技术栈：Vite、React 19、TypeScript strict、Less CSS Modules、HeroUI、ahooks、zustand；运行版本以 `.nvmrc` 和 `package.json#packageManager` 为准。
+- 技术栈：Vite、React 19、TypeScript strict、SCSS CSS Modules、HeroUI、ahooks、zustand；运行版本以 `.nvmrc` 和 `package.json#packageManager` 为准。
 - 注释使用中文；commit message 使用中文 Conventional Commit。
 
 ## 任务路由

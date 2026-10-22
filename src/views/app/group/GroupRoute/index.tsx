@@ -11,7 +11,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { type GroupCurrentUserRole, GroupProvider } from './_context';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type GroupRouteLoaded = {
   group: Group;

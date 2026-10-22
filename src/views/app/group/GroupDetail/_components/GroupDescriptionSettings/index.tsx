@@ -10,7 +10,7 @@ import { DissolveGroupModal, ExitGroupModal } from '../../../_components/GroupMo
 import GroupPermissionSection from '../GroupPermissionSection';
 import GroupProfileSection from '../GroupProfileSection';
 import GroupSettingsSection from '../GroupSettingsSection';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface GroupDescriptionSettingsProps {
   group: Group;

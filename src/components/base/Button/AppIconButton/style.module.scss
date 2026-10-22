@@ -1,0 +1,127 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+
+.tooltipTrigger {
+  display: inline-flex;
+  vertical-align: middle;
+  border-radius: inherit;
+}
+
+.root {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--app-radius-button);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color var(--motion-duration-mid) var(--motion-ease-standard),
+    background-color var(--motion-duration-mid) var(--motion-ease-standard),
+    opacity var(--motion-duration-mid) var(--motion-ease-standard);
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+  }
+
+  &:focus-visible,
+  &:focus-visible:not(:focus),
+  &[data-focus-visible] {
+    @include focusRing.appFocusRing();
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.xs {
+  width: 20px;
+  height: 20px;
+}
+
+.sm {
+  width: 28px;
+  height: 28px;
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+}
+
+.primary {
+  color: var(--accent-foreground);
+  background: var(--accent);
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--accent-foreground);
+    background: var(--accent-hover);
+  }
+}
+
+.danger {
+  color: var(--danger-text);
+  background: transparent;
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--danger-text);
+    background: var(--danger-soft);
+  }
+}
+
+.active {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--accent-text);
+    background: var(--accent-soft-hover);
+  }
+}
+
+.danger.active {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--danger-text);
+    background: var(--danger-soft-hover);
+  }
+}
+
+.root[data-selected] {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--accent-text);
+    background: var(--accent-soft-hover);
+  }
+}
+
+.root:is(:disabled, [aria-disabled='true'], [data-disabled]) {
+  color: var(--control-disabled-fg);
+  background: transparent;
+  opacity: 1;
+  cursor: not-allowed;
+
+  &:hover {
+    color: var(--control-disabled-fg);
+    background: transparent;
+  }
+}
+
+.root.primary:is(:disabled, [aria-disabled='true'], [data-disabled]) {
+  color: var(--control-disabled-filled-fg);
+  background: var(--control-disabled-filled-bg);
+
+  &:hover {
+    color: var(--control-disabled-filled-fg);
+    background: var(--control-disabled-filled-bg);
+  }
+}

@@ -8,7 +8,7 @@ import {
   type WalletTransactionRecord,
 } from '@/domains/Wallet';
 
-import styles from './ComputeWallet.stories.module.less';
+import styles from './ComputeWallet.stories.module.scss';
 import ComputeWallet from './index';
 import WalletBalanceHeader from './WalletBalanceHeader';
 import WalletTransactionTable from './WalletTransactionTable';

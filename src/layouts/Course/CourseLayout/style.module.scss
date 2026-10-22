@@ -1,0 +1,113 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/layoutMixins' as layout;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.root {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.sidebar {
+  @include layout.flexColumnMin();
+  border-right: 1px solid var(--border-light);
+  background: transparent;
+}
+
+.sidebarHeader {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.backLink {
+  max-width: 100%;
+  justify-content: flex-start;
+  margin-inline-start: var(--space-2xs);
+}
+
+.courseName {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.courseName strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.courseNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding: var(--space-sm);
+}
+
+.navItem {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-sm);
+  border-radius: var(--app-radius-sidebar-item);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.navItem:hover {
+  color: var(--foreground);
+  background: var(--surface-hover);
+}
+
+.navItemActive {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.main {
+  @include layout.flexColumnMin();
+  overflow: hidden;
+  background: transparent;
+}
+
+.content {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  background: transparent;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .root {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .sidebarHeader {
+    display: none;
+  }
+
+  .courseNav {
+    flex-direction: row;
+    overflow-x: auto;
+    @include scrollbar.appSubtleScrollbar();
+  }
+
+  .navItem {
+    flex: 0 0 auto;
+  }
+}

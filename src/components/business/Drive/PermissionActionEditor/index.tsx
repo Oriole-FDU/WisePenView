@@ -19,7 +19,7 @@ import {
   type TagResourceAction,
 } from '@/domains/Tag';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type ActionPresetKey = Exclude<TagPermissionPresetKey, 'custom'>;
 type PresetTabKey = ActionPresetKey | 'custom';

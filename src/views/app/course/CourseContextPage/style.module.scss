@@ -1,0 +1,108 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.root {
+  --course-context-max-width: 1280px;
+  --course-context-gutter: clamp(var(--space-xl), 5vw, 64px);
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.courseHeader {
+  box-sizing: border-box;
+  width: min(100%, var(--course-context-max-width));
+  flex: 0 0 auto;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--course-context-gutter);
+}
+
+.courseKicker {
+  color: var(--accent-text);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.courseTitleRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin: var(--space-sm) 0;
+}
+
+.courseTitleRow h1 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-heading-2);
+  font-weight: 600;
+}
+
+.courseHeader p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.courseMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.contextTabsFrame {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: min(100%, var(--course-context-max-width));
+  margin: 0 auto;
+  padding: 0 var(--course-context-gutter);
+}
+
+.contextTabs {
+  width: max-content;
+  max-width: 100%;
+
+  :global(.tabs__list-container) {
+    max-width: 100%;
+  }
+
+  :global(.tabs__list) {
+    width: auto;
+  }
+
+  :global(.tabs__tab) {
+    flex: 0 0 auto;
+    width: 116px;
+  }
+}
+.tabContent {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.homeTabContent {
+  overflow: hidden;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .root {
+    --course-context-gutter: var(--space-lg);
+  }
+
+  .courseTitleRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

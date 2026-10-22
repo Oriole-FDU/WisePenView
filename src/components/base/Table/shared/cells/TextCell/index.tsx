@@ -5,7 +5,7 @@ import { tableCellStyles } from '../../styles';
 import { useTableColumnAlign } from '../../TableBase/_context';
 import { joinClassNames, resolveColumnAlign } from '../../TableBase/cellAlign';
 import type { TableTextCellProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function resolveTextTitle(children: ReactNode, title?: string): string | undefined {
   if (title !== undefined) {

@@ -1,0 +1,190 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.panel,
+.collapsedPanel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  min-width: 0;
+  min-height: 0;
+  z-index: var(--app-z-index-raised);
+  border: none;
+  outline: none;
+  box-shadow: var(--shadow-none);
+  background: var(--surface);
+}
+
+.panel {
+  width: var(--layout-note-outline-open-width);
+}
+
+.collapsedPanel {
+  width: var(--layout-note-outline-collapsed-width);
+}
+
+.aside {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0 0 0 var(--space-md);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  align-self: stretch;
+  border: none;
+  outline: none;
+  box-shadow: var(--shadow-none);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  color: var(--muted);
+}
+
+.title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+}
+
+.scrollArea {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: none;
+  outline: none;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.collapsedContent {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+  padding: var(--space-sm) 0 var(--space-sm) var(--space-sm);
+}
+
+.toggleButton {
+  --outline-toggle-size: calc(var(--control-height-sm) + var(--space-2xs));
+  width: var(--outline-toggle-size);
+  height: var(--outline-toggle-size);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--muted);
+  line-height: var(--outline-toggle-size);
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-height: 0;
+}
+
+.empty {
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.item {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--app-radius-sidebar-item);
+  cursor: pointer;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  position: relative;
+  transition:
+    background var(--motion-duration-mid) var(--motion-ease-standard),
+    color var(--motion-duration-mid) var(--motion-ease-standard);
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+
+  &:hover {
+    color: var(--foreground);
+    background: var(--item-hover);
+  }
+}
+
+.titleItem {
+  color: var(--foreground);
+  font-weight: var(--font-weight-semibold);
+}
+
+.active {
+  color: var(--accent-text-strong);
+  background: var(--item-selected);
+  font-weight: var(--font-weight-medium);
+
+  &:hover {
+    color: var(--accent-text-strong);
+    background: var(--item-selected-hover);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: var(--space-2xs);
+    bottom: var(--space-2xs);
+    width: calc(2 * var(--line-width));
+    border-radius: var(--app-radius-menu-item);
+    background: var(--accent);
+  }
+}
+
+/* Indentation by heading level */
+.level0 {
+  padding-left: var(--space-2xs);
+}
+.level1 {
+  padding-left: var(--space-xs);
+}
+.level2 {
+  padding-left: calc(var(--space-xs) + var(--space-sm));
+}
+.level3 {
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 2);
+}
+.level4 {
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 3);
+}
+.level5 {
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 4);
+}
+.level6 {
+  padding-left: calc(var(--space-xs) + var(--space-sm) * 5);
+}
+
+/* 极窄画布无法同时容纳目录和正文下限时，目录退化为临时覆盖层。 */
+@container note-content (max-width: 740px) {
+  .panel {
+    border-right: 1px solid var(--border-light);
+    box-shadow: var(--surface-shadow);
+  }
+}

@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 import App from './bootstrap/App';
 import './styles/global/index.css';
-import './styles/global/scrollbar.less';
+import './styles/global/scrollbar.scss';
 import './styles/global/app-shell.css';
 import { syncViewportLayoutScale } from '@/utils/browser/layoutScale';
 import { reportError } from './utils/error';

@@ -1,0 +1,136 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.attachments {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: var(--space-xs);
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: var(--space-xs);
+  margin-inline-start: auto;
+  /* 覆盖 AttachmentGroup 的横向滚动，避免附件被裁成「半截」 */
+  overflow: visible;
+  padding-block: 0;
+  scroll-snap-type: none;
+}
+
+.attachment {
+  /* 接近 HeroUI Pro horizontal sm：约 160 宽、更透气的高度 */
+  &#{&} {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    height: 48px;
+    overflow: hidden;
+  }
+}
+
+.moreTrigger {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--foreground);
+    background: var(--surface-secondary);
+    border-color: var(--border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+.morePopover {
+  width: min(260px, calc(100vw - var(--space-2xl)));
+}
+
+.morePanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  max-height: min(360px, 50vh);
+}
+
+.moreList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.moreItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--app-radius-popover-item);
+  color: var(--foreground);
+
+  &:hover {
+    background: var(--surface-tertiary, var(--surface-secondary));
+  }
+}
+
+.moreItemIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface-secondary);
+  color: var(--muted);
+}
+
+.moreItemText {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.moreItemName {
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreItemMeta {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

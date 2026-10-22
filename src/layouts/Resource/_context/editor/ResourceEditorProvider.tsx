@@ -10,7 +10,7 @@ import type { EditorExitReason } from '@/components/editors/editor.type';
 
 import { useResourceEditorNavigation } from '../../controllers/useResourceEditorNavigation';
 import { ResourceEditorContext } from './ResourceEditorContext';
-import styles from './ResourceEditorProvider.module.less';
+import styles from './ResourceEditorProvider.module.scss';
 
 export function ResourceEditorProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation(['workspace', 'common']);

@@ -1,0 +1,249 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.attachment {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  border: var(--line-width) solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  transition:
+    border-color var(--motion-duration-mid) var(--motion-ease-standard),
+    background var(--motion-duration-mid) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-mid) var(--motion-ease-standard);
+
+  &:focus-within {
+    box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+
+  &[data-state='idle'] {
+    border-style: dashed;
+  }
+
+  &[data-state='error'] {
+    border-color: var(--danger-border);
+  }
+
+  &:has([data-slot='attachment-trigger'], [data-slot='attachment-action']):hover {
+    background: var(--surface-secondary);
+  }
+}
+
+.sizeDefault {
+  gap: var(--space-xs);
+  border-radius: var(--app-radius-content);
+  font-size: var(--font-size-sm);
+
+  &:has([data-slot='attachment-content']) {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  &:has([data-slot='attachment-media']) {
+    padding-left: var(--space-xs);
+  }
+}
+
+.sizeSm {
+  gap: var(--space-xs);
+  border-radius: var(--app-radius-content);
+  font-size: var(--font-size-xs);
+
+  &:has([data-slot='attachment-content']) {
+    padding: var(--space-2xs-plus) var(--space-xs);
+  }
+
+  &:has([data-slot='attachment-media']) {
+    padding-left: var(--space-2xs-plus);
+  }
+}
+
+.sizeXs {
+  gap: var(--space-2xs-plus);
+  border-radius: var(--app-radius-field);
+  font-size: var(--font-size-xs);
+
+  &:has([data-slot='attachment-content']) {
+    padding: var(--space-2xs) var(--space-2xs-plus);
+  }
+
+  &:has([data-slot='attachment-media']) {
+    padding-left: var(--space-2xs);
+  }
+}
+
+.horizontal {
+  min-width: 160px;
+  align-items: center;
+}
+
+.vertical {
+  width: 96px;
+  flex-direction: column;
+}
+
+.media {
+  position: relative;
+  display: flex;
+  width: 40px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+  color: var(--muted);
+
+  .vertical & {
+    width: 100%;
+  }
+
+  .sizeSm & {
+    width: 32px;
+  }
+
+  .sizeXs & {
+    width: 28px;
+    border-radius: var(--app-radius-field);
+  }
+
+  .attachment[data-state='error'] & {
+    background: var(--danger-soft);
+    color: var(--danger-soft-foreground);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .vertical & svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .sizeXs & svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.mediaImage {
+  opacity: 0.68;
+
+  .attachment[data-state='done'] &,
+  .attachment[data-state='idle'] & {
+    opacity: 1;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.content {
+  max-width: 100%;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.2;
+
+  .vertical & {
+    width: 100%;
+    padding-inline: var(--space-2xs);
+  }
+}
+
+.title {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .attachment[data-state='uploading'] &,
+  .attachment[data-state='processing'] & {
+    background:
+      linear-gradient(90deg, currentColor 0, currentColor 40%, transparent 50%), currentColor;
+    background-size: 220% 100%;
+    background-clip: text;
+    color: transparent;
+    animation: var(--animate-skeleton);
+  }
+}
+
+.description {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: var(--space-3xs);
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .attachment[data-state='error'] & {
+    color: var(--danger-soft-foreground);
+  }
+}
+
+.actions {
+  position: relative;
+  z-index: var(--app-z-index-local-overlay);
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+
+  .vertical & {
+    position: absolute;
+    top: var(--space-xs);
+    right: var(--space-xs);
+    gap: var(--space-2xs);
+  }
+}
+
+.action {
+  min-width: 24px !important;
+  width: 24px;
+  height: 24px;
+  padding: 0 !important;
+  color: var(--muted);
+}
+
+.trigger {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-z-index-floating);
+  border: 0;
+  background: transparent;
+  outline: none;
+}
+
+.group {
+  display: flex;
+  min-width: 0;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-block: var(--space-2xs);
+  scroll-padding-inline: 4px;
+  scroll-snap-type: x mandatory;
+  @include scrollbar.appSubtleScrollbar();
+
+  > [data-slot='attachment'] {
+    flex: none;
+    scroll-snap-align: start;
+  }
+}

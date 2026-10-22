@@ -7,7 +7,7 @@ import { useApi } from '@/hooks/useApi';
 import i18n from '@/i18n';
 import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
 
-import styles from './MermaidBlock/style.module.less';
+import styles from './MermaidBlock/style.module.scss';
 import { renderNoteMermaidDiagram } from './mermaidRuntime';
 
 type MermaidDiffView = 'source' | 'graph';

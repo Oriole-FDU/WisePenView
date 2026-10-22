@@ -12,7 +12,7 @@ import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { sanitizeHtml, SEARCH_HIGHLIGHT_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const PAGE_SIZE = 20;
 const RESOURCE_ITEM_ESTIMATE_SIZE = 60;

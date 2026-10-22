@@ -2,7 +2,7 @@ import { Avatar as HeroAvatar } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ComponentProps } from 'react';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type AppAvatarProps = ComponentProps<typeof HeroAvatar>;
 type AppAvatarImageProps = ComponentProps<typeof HeroAvatar.Image>;

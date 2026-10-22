@@ -1,6 +1,6 @@
 import AdminPageHeader from '@/views/admin/_common/AdminPageHeader';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 function SystemSettings() {
   return (

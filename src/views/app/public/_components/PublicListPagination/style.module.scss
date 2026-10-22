@@ -1,0 +1,14 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding: 32px 0;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .wrap {
+    justify-content: flex-start;
+  }
+}

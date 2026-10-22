@@ -19,7 +19,7 @@ import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import { isOfficeReadOnly, prepareOfficeExit, reduceOfficeSession } from './officeSession';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface OfficePresentationBindingProps {
   resourceInfo?: ResourceItem;

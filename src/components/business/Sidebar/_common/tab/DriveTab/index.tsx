@@ -41,7 +41,7 @@ import {
 import type { SidebarDriveCreateAction } from './SidebarDriveNodeTitle';
 import SidebarDriveNodeTitle from './SidebarDriveNodeTitle';
 import SidebarDriveScopeSwitcher from './SidebarDriveScopeSwitcher';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useSidebarDriveTreeController } from './useSidebarDriveTreeController';
 
 interface SidebarDriveCreateTarget {

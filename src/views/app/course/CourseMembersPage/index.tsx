@@ -12,7 +12,7 @@ import { GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/_context';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface CourseMembersViewProps {
   courseId: string;

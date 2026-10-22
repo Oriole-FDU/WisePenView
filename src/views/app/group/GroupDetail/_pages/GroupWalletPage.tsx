@@ -4,7 +4,7 @@ import ComputeWallet from '@/components/business/Wallet/ComputeWallet';
 import { WALLET_TARGET_TYPE } from '@/domains/Wallet';
 import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
-import layout from '../../style.module.less';
+import layout from '../../style.module.scss';
 import type { GroupDetailOutletContextValue } from '..';
 
 function GroupWalletPage() {

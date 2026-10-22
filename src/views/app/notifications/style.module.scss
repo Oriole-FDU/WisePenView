@@ -1,0 +1,254 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.notificationCenter {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+}
+
+.pageBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.pageState {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.messageList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.virtualSpacer {
+  flex: none;
+}
+
+/* 飞书/邮件：连续列表行；行本身不加框，展开只给正文阅读区 */
+.messageItem {
+  flex: none;
+  border-bottom: 1px solid var(--border-light);
+  background: transparent;
+  transition: background-color
+    var(--transition-fast, var(--motion-duration-fast) var(--motion-ease-standard));
+}
+
+.messageItem:hover {
+  background: var(--surface-secondary);
+}
+
+.messageItemSelected {
+  background: transparent;
+}
+
+.messageItemSelected:hover {
+  background: var(--surface-secondary);
+}
+
+.messageSummary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--space-sm);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-md) var(--space-sm);
+  box-sizing: border-box;
+}
+
+.messageOpenButton {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.messageOpenButton:hover .messageTitle {
+  color: var(--accent-text);
+}
+
+.messageStatusLine {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.statusDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--app-radius-pill);
+  background: var(--accent);
+}
+
+.statusDotRead {
+  background: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+.readLabel {
+  color: color-mix(in srgb, var(--muted) 78%, transparent);
+}
+
+.messageTitle {
+  min-width: 0;
+  color: var(--foreground);
+  font-size: 17px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.45;
+}
+
+.messagePreview {
+  min-width: 0;
+  overflow: hidden;
+  /* 收起：更淡的摘要色，和展开正文拉开差 */
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 右栏：时间对齐状态行，箭头对齐标题行 */
+.messageAside {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2xs);
+}
+
+.sentAt {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.toggleDetail {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  margin: 0;
+  /* 与标题行高大致居中；默认隐藏，悬停/聚焦/展开时出现 */
+  margin-block: calc((1.45em - var(--control-height-sm)) / 2);
+  padding: 0;
+  border: 0;
+  border-radius: var(--app-radius-button);
+  outline: none;
+  background: transparent;
+  box-shadow: var(--shadow-none);
+  color: var(--muted);
+  cursor: pointer;
+  appearance: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity
+    var(--transition-fast, var(--motion-duration-fast) var(--motion-ease-standard));
+}
+
+.messageItem:hover .toggleDetail,
+.messageItem:focus-within .toggleDetail,
+.messageItemSelected .toggleDetail,
+.toggleDetail:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toggleDetail:hover {
+  color: var(--foreground);
+  background: var(--surface-tertiary);
+}
+
+.toggleDetail:focus,
+.toggleDetail:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-none);
+}
+
+.toggleDetail:focus-visible {
+  color: var(--foreground);
+  background: var(--surface-tertiary);
+}
+
+/* 仅正文阅读区：白纸面 + 细描边；与行左右内边距对齐并撑满 */
+.messageBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: 0 var(--space-sm) var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+  box-sizing: border-box;
+}
+
+.absoluteSentAt {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}
+
+.messageContent {
+  margin: 0;
+  /* 展开：实色正文，像读信 */
+  color: var(--foreground);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.messageActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.loadMoreBar {
+  display: flex;
+  padding: var(--space-md) var(--space-sm);
+}
+
+.loadMoreButton {
+  width: 100%;
+  min-height: var(--control-height-sm);
+  border-radius: var(--app-radius-content);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.emptyState {
+  width: min(100%, 36rem);
+}

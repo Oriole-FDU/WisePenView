@@ -1,0 +1,51 @@
+@use '../_common/field' as field;
+
+.textarea:global(.textarea) {
+  @include field.fieldTokens();
+
+  /* HeroUI TextArea 变量映射 */
+  --textarea-bg: var(--app-field-bg);
+  --textarea-bg-hover: var(--app-field-bg-hover);
+  --textarea-bg-focus: var(--app-field-bg-focus);
+  --field-background: var(--app-field-bg);
+  --field-focus: var(--app-field-bg-focus);
+  --field-shadow: none;
+
+  @include field.fieldSurface();
+}
+
+.textarea:global(.textarea)::placeholder {
+  @include field.fieldPlaceholder();
+}
+
+.textarea:global(.textarea):hover:not(:focus):not(:focus-visible),
+.textarea:global(.textarea)[data-hovered='true']:not([data-focused='true']):not(
+    [data-focus-visible='true']
+  ) {
+  @include field.fieldSurfaceHover();
+}
+
+.textarea:global(.textarea):focus,
+.textarea:global(.textarea)[data-focused='true'] {
+  @include field.fieldSurfaceFocus();
+}
+
+.textarea:global(.textarea):focus-visible,
+.textarea:global(.textarea)[data-focus-visible='true'] {
+  @include field.fieldSurfaceFocusVisible();
+}
+
+.textarea:global(.textarea)[data-invalid='true'] {
+  @include field.fieldSurfaceInvalid();
+}
+
+.textarea:global(.textarea)[data-invalid='true']:focus,
+.textarea:global(.textarea)[data-invalid='true'][data-focused='true'] {
+  @include field.fieldSurfaceInvalidFocus();
+}
+
+.textarea:global(.textarea):disabled,
+.textarea:global(.textarea)[data-disabled='true'],
+.textarea:global(.textarea)[aria-disabled='true'] {
+  @include field.fieldSurfaceDisabled();
+}

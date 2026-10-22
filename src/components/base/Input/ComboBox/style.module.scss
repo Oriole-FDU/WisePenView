@@ -1,0 +1,33 @@
+@use '../_common/field' as field;
+
+.comboBox:global(.combo-box) {
+  @include field.fieldTokens();
+
+  --field-shadow: none;
+}
+
+.comboBoxInputGroup:global(.combo-box__input-group) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.comboBoxTrigger:global(.combo-box__trigger) {
+  color: var(--field-placeholder, var(--muted));
+}
+
+.comboBox:global(.combo-box) :global(.combo-box__trigger):focus-visible:not(:focus),
+.comboBox:global(.combo-box) :global(.combo-box__trigger)[data-focus-visible='true'] {
+  outline: none;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  box-shadow: 0 0 0 1px var(--app-field-ring-color);
+  border-radius: var(--app-radius-field);
+}
+
+/* ComboBox trigger 使用字段圆角；展开后的选项面板外壳使用浮层圆角。 */
+.comboBoxPopover:global(.combo-box__popover) {
+  border-radius: var(--app-radius-popover);
+}

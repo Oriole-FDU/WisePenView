@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const subscribeMaximized = (listener: () => void): (() => void) =>
   window.desktop?.onMaximizedChange?.(listener) ?? (() => undefined);

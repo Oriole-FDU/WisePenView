@@ -7,7 +7,7 @@ import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 
 import type { CourseEditorForm, UpdateCourseEditorForm } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 interface CourseBasicSectionProps {
   form: CourseEditorForm;

@@ -12,7 +12,7 @@ import { getErrorReportId } from '@/utils/error';
 
 import { buildErrorDetail } from './errorDetail';
 import { buildAppErrorInfo } from './errorInfo';
-import styles from './ErrorPage.module.less';
+import styles from './ErrorPage.module.scss';
 import ErrorPageActions from './ErrorPageActions';
 import type { ErrorPageProps } from './index.type';
 

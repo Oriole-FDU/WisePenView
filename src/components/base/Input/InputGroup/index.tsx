@@ -2,7 +2,7 @@ import { InputGroup as HeroInputGroup } from '@heroui/react';
 import { clsx } from 'clsx';
 
 import type { InputGroupProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function InputGroupRoot({ className, variant = 'secondary', ...props }: InputGroupProps) {
   return (

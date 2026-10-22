@@ -14,7 +14,7 @@ import type {
   WelcomeStarterBlock,
   WelcomeStarterProps,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function normalizeQuestionVariant(
   variant: WelcomeQuestionsVariant | undefined

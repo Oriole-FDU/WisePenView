@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { formatMillionNumber } from '@/utils/format';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface WalletBalanceHeaderProps {
   balance: number;

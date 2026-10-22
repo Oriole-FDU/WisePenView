@@ -1,0 +1,35 @@
+@use '../../../shared/styles/table' as table;
+
+.skeletonRow {
+  @include table.tableSkeletonRowMixin();
+}
+
+.skeletonCell:global(.table__cell) {
+  @include table.tableSkeletonCellMixin();
+}
+
+.skeletonBar {
+  height: 13px;
+  border-radius: table.$table-inner-radius;
+  background: var(--surface-secondary);
+}
+
+.skeletonBar[data-width='sm'] {
+  width: 80px;
+  max-width: 72%;
+}
+
+.skeletonBar[data-width='md'] {
+  width: var(--table-col-sm, 90px);
+  max-width: 80%;
+}
+
+.skeletonBar[data-width='lg'] {
+  width: 140px;
+  max-width: 92%;
+}
+
+.skeletonBar[data-emphasis='true'] {
+  width: 200px;
+  max-width: 95%;
+}

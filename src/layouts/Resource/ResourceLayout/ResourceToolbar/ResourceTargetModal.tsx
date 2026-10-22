@@ -9,7 +9,7 @@ import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import type { DriveNavigatorScopeMode } from '@/components/business/Drive/DriveNavigator/index.type';
 import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
 
-import styles from './ResourceTargetModal.module.less';
+import styles from './ResourceTargetModal.module.scss';
 
 interface ResourceTargetModalProps {
   isOpen: boolean;

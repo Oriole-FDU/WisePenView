@@ -11,7 +11,7 @@ import { useApi } from '@/hooks/useApi';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { RenameNodeModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function getDefaultName(node: DriveActionTarget | null): string {
   if (!node) return '';

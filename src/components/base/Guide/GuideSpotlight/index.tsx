@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { createPortal } from 'react-dom';
 
 import type { GuideSpotlightProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useGuideSpotlightFrame } from './useGuideSpotlightFrame';
 
 const SPOTLIGHT_FEATHER = 1;

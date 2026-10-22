@@ -13,7 +13,7 @@ import { useOpenDriveNode } from '../common/useOpenDriveNode';
 import { useTableDriveNavigationController } from '../TableDrive/controllers';
 import type { DriveTableRow, TableDriveProps } from '../TableDrive/index.type';
 import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/tableConfig';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function getMobileRowMeta(row: DriveTableRow) {
   if (row.entryType === 'loading') return '';

@@ -12,7 +12,7 @@ import AppPopover from '@/components/base/AppPopover';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import type { EmojiPickerContentProps, EmojiPickerProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface EmojiMartSelection {
   native?: string;

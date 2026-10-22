@@ -12,7 +12,7 @@ import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
 import type { ProviderLogoProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const PROVIDER_ICON_MAP: Record<string, string> = {
   anthropic: claudeIcon,

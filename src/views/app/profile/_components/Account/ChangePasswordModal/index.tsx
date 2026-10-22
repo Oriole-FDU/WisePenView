@@ -19,7 +19,7 @@ import {
 } from '@/views/app/auth/_common/passwordValidation';
 
 import type { ChangePasswordModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type ChangePasswordFormValues = ChangePasswordRequest & {
   confirmPassword: string;

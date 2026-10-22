@@ -12,7 +12,7 @@ import type {
   AppDisplayDialogFooterProps,
   AppDisplayDialogProps,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AppDisplayDialogBody({ className, ...props }: AppDisplayDialogBodyProps) {
   return <Modal.Body className={clsx(styles.body, className)} {...props} />;

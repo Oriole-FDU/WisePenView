@@ -6,7 +6,7 @@ import { GuideAnchor } from '@/components/base/Guide';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
 import type { HeaderNavItem, HeaderNavProps, HeaderNavSection } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const DEFAULT_SECTION_KEY = 'default';
 

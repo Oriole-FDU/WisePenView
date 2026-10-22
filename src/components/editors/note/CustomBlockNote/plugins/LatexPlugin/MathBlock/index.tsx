@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useNoteEditorReadOnlyContext } from '../../../engines/editor/_context';
-import popoverStyles from '../InlineMath/style.module.less';
+import popoverStyles from '../InlineMath/style.module.scss';
 import { renderKatexInto } from '../katexRender';
 import { LatexEditPopover } from '../LatexEditPopover';
 import {
@@ -24,7 +24,7 @@ import {
 import { useFocusPopoverTextarea } from '../LatexEditPopover/useFocusPopoverTextarea';
 import { useLatexPopoverAnchorSync } from '../LatexEditPopover/useLatexPopoverAnchorSync';
 import { sanitizeLatexInput } from '../latexInput';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const mathBlockPropSchema = {
   expression: {

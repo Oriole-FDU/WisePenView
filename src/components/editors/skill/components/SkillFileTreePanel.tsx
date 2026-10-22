@@ -9,7 +9,7 @@ import SkillFileTree from '@/components/editors/skill/components/SkillFileTree';
 import type { SkillFileNode } from '@/domains/Skill';
 
 import type { useSkillFileActionsController } from '../controllers/useSkillFileActionsController';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import SkillSaveQueueDock from './SkillSaveQueueDock';
 import type { SkillSaveQueueItem } from './SkillSaveQueueDock/index.type';
 

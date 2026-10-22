@@ -7,7 +7,7 @@ import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtm
 
 import { CodeBlockFrame, HighlightedCode } from '../CodeBlock';
 import { renderMermaidDiagram } from './mermaidRuntime';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type MermaidView = 'code' | 'graph';
 

@@ -5,7 +5,7 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { COURSE_ROLE } from '@/domains/Course';
 import { useCourseContext } from '@/layouts/Course/_context';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseMaterialsPage() {
   const { t } = useTranslation('course');

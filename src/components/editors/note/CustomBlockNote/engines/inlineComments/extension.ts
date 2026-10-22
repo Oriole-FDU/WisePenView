@@ -9,7 +9,7 @@ import type { NoteInlineCommentAnchorReference, NoteInlineCommentSession } from 
 
 import type { NotePluginRegistry } from '../../registry/types';
 import { projectInlineCommentRangeText, resolveInlineCommentAnchor } from './relativePosition';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface InlineCommentExtensionState {
   ranges: readonly InlineCommentAnchorRange[];

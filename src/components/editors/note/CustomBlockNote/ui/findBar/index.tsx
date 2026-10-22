@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
 import type { NoteFindResult } from '../../index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface FindBarProps {
   query: string;

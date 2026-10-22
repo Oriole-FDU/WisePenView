@@ -1,0 +1,46 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.tableView {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  user-select: text;
+}
+
+.tableView,
+.tableView * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.tableView :global(a),
+.tableView :global(button),
+.tableView :global(input),
+.tableView :global(select),
+.tableView :global(textarea),
+.tableView :global([tabindex]) {
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.tableView :global(.table-widgets-container),
+.tableView :global(.bn-table-handle),
+.tableView :global(.bn-table-cell-handle),
+.tableView :global(.column-resize-handle),
+.tableView :global(.bn-table-drop-cursor) {
+  display: none !important;
+}
+
+.tableWrapper {
+  box-sizing: border-box;
+  width: fit-content !important;
+  max-width: 100%;
+  padding: 0 !important;
+  overflow-x: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.table {
+  margin: 0;
+}

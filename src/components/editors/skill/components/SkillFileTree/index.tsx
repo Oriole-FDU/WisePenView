@@ -7,7 +7,7 @@ import Tree from '@/components/base/Tree';
 import type { SkillFileNode } from '@/domains/Skill';
 
 import type { SkillFileTreeProps, SkillPendingCreate } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const PENDING_KEY = '__pending_create__';
 

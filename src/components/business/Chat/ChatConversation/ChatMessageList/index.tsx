@@ -16,7 +16,7 @@ import type { ChatMessageListProps } from './index.type';
 import Message from './Message';
 import MessageHistoryNavigator from './MessageHistoryNavigator';
 import StreamingScrollFollower from './StreamingScrollFollower';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const AUTO_LOAD_EDGE_THRESHOLD = 96;
 const HISTORY_ANCHOR_TOP_RATIO = 1 / 3;

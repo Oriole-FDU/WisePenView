@@ -4,7 +4,7 @@ import { useLatest } from 'ahooks';
 import { Spin } from '@/components/base/Feedback';
 
 import type { SkillEditorProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function fileExtToLanguage(name: string): string {
   const ext = name.split('.').pop()?.toLowerCase();

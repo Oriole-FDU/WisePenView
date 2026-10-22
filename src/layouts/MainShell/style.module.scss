@@ -1,0 +1,137 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+@use '@/styles/mixins/desktopTitleBar' as titleBar;
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.root {
+  --main-sidebar-motion-duration: 220ms;
+  --main-sidebar-motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --main-sidebar-motion-fade-duration: 160ms;
+  --main-sidebar-motion-reveal-delay: 110ms;
+  --main-sidebar-motion-collapse-delay: 55ms;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.rootMobile {
+  display: block;
+}
+
+.rootCollapsed {
+  --sidebar-content-inset: var(--space-sm);
+}
+
+.panelGroup {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sidebarPanel {
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--sidebar-surface);
+}
+
+.mainColumnPanel {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--background);
+  position: relative;
+}
+
+/* 页面未自声明框架时，由主内容区承担滚动 */
+.mainContentScroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.mobileHeader {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 0 0 auto;
+  min-height: var(--main-shell-mobile-header-height, 56px);
+  /* 页面面板会上提铺到顶栏之下，顶栏需显式压在面板之上 */
+  position: relative;
+  z-index: var(--app-z-index-raised);
+  padding: 0 var(--space-sm);
+  background: var(--header-surface, var(--paper));
+  border-bottom: 1px solid var(--border-light);
+}
+
+.titleBarInsetEnd {
+  .mobileHeader {
+    padding-right: var(--desktop-window-controls-width, 116px);
+    @include titleBar.desktopTitleBarEndNoDragHole();
+  }
+}
+
+.drawerBackdrop {
+  z-index: var(--app-z-index-modal);
+}
+
+.drawerContent {
+  /* 宽度与 MAIN_SHELL_DRAWER_WIDTH 同源；极窄视口下留出背影遮罩，避免铺满整屏 */
+  width: min(var(--main-shell-drawer-width, 240px), 86vw);
+  max-width: min(var(--main-shell-drawer-width, 240px), 86vw);
+  background: var(--sidebar-surface);
+}
+
+.drawerDialog {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: var(--sidebar-surface);
+}
+
+.drawerBody {
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.drawerBody :global(.sider) {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    --main-sidebar-motion-duration: var(--motion-duration-reduced);
+    --main-sidebar-motion-fade-duration: var(--motion-duration-reduced);
+    --main-sidebar-motion-reveal-delay: 0ms;
+    --main-sidebar-motion-collapse-delay: 0ms;
+  }
+}

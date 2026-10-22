@@ -16,7 +16,7 @@ import {
   syncGuidedPrompt,
 } from '../../../../guidedPrompt';
 import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 interface Props {
   markdown: string;
   disabled: boolean;

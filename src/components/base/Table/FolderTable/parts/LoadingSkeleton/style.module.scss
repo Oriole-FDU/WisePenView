@@ -1,0 +1,52 @@
+@use '../../../shared/styles/table' as table;
+
+.skeletonRow {
+  @include table.tableSkeletonRowMixin();
+}
+
+.skeletonCell:global(.table__cell) {
+  @include table.tableSkeletonCellMixin();
+}
+
+.nameSkeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.expandSkeleton,
+.iconSkeleton {
+  flex-shrink: 0;
+  width: table.$table-row-entry-icon-size;
+  height: table.$table-row-entry-icon-size;
+  border-radius: table.$table-inner-radius;
+  background: var(--surface-secondary);
+}
+
+.barSkeleton {
+  height: 13px;
+  border-radius: table.$table-inner-radius;
+  background: var(--surface-secondary);
+}
+
+.barSkeleton[data-width='sm'] {
+  width: 43px;
+  max-width: 72%;
+}
+
+.barSkeleton[data-width='md'] {
+  width: 64px;
+  max-width: 80%;
+}
+
+.barSkeleton[data-width='lg'] {
+  width: 140px;
+  max-width: 72%;
+}
+
+.barSkeleton[data-emphasis='true'] {
+  flex: 1;
+  min-width: 0;
+  max-width: 78%;
+}

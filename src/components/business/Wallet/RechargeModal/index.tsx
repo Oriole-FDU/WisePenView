@@ -15,7 +15,7 @@ import AppFormDialog from '@/components/business/AppFormDialog';
 import { useApi } from '@/hooks/useApi';
 
 import type { RechargeModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** 将用户输入规范为 16 位大写字母数字 */
 const normalizeVoucherCode = (raw: string): string =>

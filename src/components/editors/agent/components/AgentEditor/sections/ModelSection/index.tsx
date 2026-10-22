@@ -6,7 +6,7 @@ import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/Chat';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface Props {
   spec: AgentSpec;

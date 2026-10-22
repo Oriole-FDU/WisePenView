@@ -6,7 +6,7 @@ import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import type { NoteInfoDisplayData } from '@/domains/Note';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface NoteInfoBarProps {
   noteInfoDisplay: NoteInfoDisplayData;

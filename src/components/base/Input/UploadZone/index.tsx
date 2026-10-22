@@ -17,7 +17,7 @@ import { AppButton } from '@/components/base/Button';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
 import type { UploadZoneProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function UploadZone({
   file,

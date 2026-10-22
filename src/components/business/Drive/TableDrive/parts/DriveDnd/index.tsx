@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 
 import type { DriveTableRow } from '../../index.type';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 const ROW_DND_IGNORE_TARGET_SELECTOR = [
   'a',

@@ -8,7 +8,7 @@ import Markdown, { type MarkdownResourceResolver } from '@/components/base/Markd
 import SkillEditor from '@/components/editors/skill/components/SkillEditor';
 import type { SkillFileNode } from '@/domains/Skill';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import { canPreviewSkillFile } from '../utils/skillFileTree';
 import { isMarkdownSkillFile } from '../utils/skillMarkdown';
 import SkillConfigPanel from './SkillConfigPanel';

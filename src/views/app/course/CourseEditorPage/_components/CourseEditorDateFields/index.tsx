@@ -9,7 +9,7 @@ import {
 } from '@heroui/react';
 import { parseDate, parseTime } from '@internationalized/date';
 
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 interface CourseDateRangeFieldProps {
   label: string;

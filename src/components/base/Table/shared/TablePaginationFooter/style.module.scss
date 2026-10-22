@@ -1,0 +1,63 @@
+@use '../styles/table' as table;
+
+.footer {
+  padding: table.$table-footer-padding-block table.$table-shell-padding-inline;
+  border-top: 1px solid var(--table-inner-border);
+  background: var(--table-chrome-bg);
+}
+
+.footerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: table.$table-gap;
+  min-height: table.$table-footer-row-height;
+}
+
+.summary {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-family: table.$table-font-family;
+  font-size: table.$table-font-size-xs;
+  font-weight: table.$table-font-weight-regular;
+  line-height: table.$table-line-height-xs;
+  white-space: nowrap;
+}
+
+.summarySpacer {
+  flex-shrink: 0;
+}
+
+.footerControls {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.pagination {
+  flex-shrink: 0;
+  width: auto;
+
+  :global(button) {
+    min-width: table.$table-control-min-height;
+    min-height: table.$table-control-min-height;
+  }
+}
+
+.pageSizeControl {
+  flex-shrink: 0;
+
+  :global(.select__trigger) {
+    min-height: table.$table-control-min-height;
+    font-family: table.$table-font-family;
+    font-size: table.$table-font-size-xs;
+    white-space: nowrap;
+  }
+
+  :global(.select__value) {
+    font-family: table.$table-font-family;
+    font-size: table.$table-font-size-xs;
+    white-space: nowrap;
+  }
+}

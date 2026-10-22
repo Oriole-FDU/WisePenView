@@ -14,7 +14,7 @@ import { formatFileSize } from '@/utils/format/formatFileSize';
 import { isDriveActionTarget } from '../../../common/driveComponentModel';
 import { resolveTagPermissionActionPresetKey } from '../../../common/tagPermissionPreset';
 import type { DriveTableRow } from '../../index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const EMPTY_META = '—';
 const NOTE_RESOURCE_TYPES = new Set(['note', 'drawio']);

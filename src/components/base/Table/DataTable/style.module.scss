@@ -1,0 +1,179 @@
+@use '../shared/styles/table' as table;
+
+.shell {
+  @include table.tableShellTypography();
+  @include table.tableShellBorder();
+  @include table.tableShellStretch();
+  width: 100%;
+  overflow: hidden;
+  @include table.tableShellRadius();
+  background: var(--surface);
+}
+
+.headerBar {
+  @include table.tableHeaderBarLayout();
+  padding: table.$table-shell-padding-block table.$table-shell-padding-inline 0;
+}
+
+.headerBarSpacer {
+  @include table.tableHeaderBarSpacer();
+}
+
+.title {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: table.$table-line-height-body;
+  color: var(--foreground);
+  font-family: table.$table-font-family;
+  font-size: table.$table-font-size-body;
+  font-weight: table.$table-font-weight-medium;
+  line-height: table.$table-line-height-body;
+}
+
+.toolbar {
+  @include table.tableHeaderToolbarEnd();
+
+  :global(button) {
+    min-height: table.$table-control-min-height;
+    padding-inline: table.$table-gap-compact;
+    color: var(--muted);
+    font-family: table.$table-font-family;
+    font-size: table.$table-font-size-body;
+    font-weight: table.$table-font-weight-medium;
+    line-height: table.$table-line-height-body;
+  }
+}
+
+.toolbarDisabled {
+  pointer-events: none;
+  opacity: 0.35;
+
+  :global(button) {
+    color: var(--text-disabled);
+  }
+}
+
+.tabsBar {
+  padding-top: var(--space-xs);
+}
+
+.tableRoot {
+  width: 100%;
+  background: var(--surface);
+  @include table.tableRootNoShadow();
+  @include table.tableRootStretch();
+
+  :global(.table__scroll-container) {
+    width: 100%;
+  }
+
+  :global(.table__content) {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  @include table.tableHeaderBlock();
+
+  :global(.table__cell) {
+    box-sizing: border-box;
+    height: table.$table-row-height;
+    min-height: table.$table-row-height;
+    max-height: table.$table-row-height;
+    padding: table.$row-cell-padding-block table.$row-cell-padding-inline;
+    overflow: hidden;
+    border-bottom: 1px solid var(--table-inner-border);
+    border-inline: 0;
+    background: var(--surface);
+    color: var(--foreground);
+    font-family: table.$table-font-family;
+    font-size: table.$table-font-size-body;
+    font-weight: table.$table-font-weight-regular;
+    line-height: table.$table-line-height-body;
+    vertical-align: middle;
+  }
+
+  :global(.table-root--secondary .table__row) {
+    border-bottom: 0;
+    cursor: default;
+  }
+
+  :global(.table-root--secondary .table__row .table__cell) {
+    border-bottom-color: var(--table-inner-border);
+    background: var(--surface);
+  }
+
+  @media (hover: hover) {
+    :global(.table-root--secondary .table__row:hover .table__cell),
+    :global(.table-root--secondary .table__row[data-hovered='true'] .table__cell) {
+      background: var(--surface);
+    }
+  }
+
+  :global(.table__row:last-child .table__cell) {
+    border-bottom: 1px solid var(--table-inner-border);
+  }
+}
+
+.scrollContainer {
+  width: 100%;
+  @include table.tableSplitBodyScroll();
+}
+
+.tableContent {
+  width: 100%;
+  --table-eq-column-count: 1;
+  @for $i from 1 through 16 {
+    &[data-eq-count='#{$i}'] {
+      --table-eq-column-count: #{$i};
+    }
+  }
+}
+
+.bodyRow {
+  cursor: default;
+}
+
+.virtualSpacerRow {
+  pointer-events: none;
+
+  :global(.table__cell) {
+    padding: 0;
+    border-bottom: 0;
+    background: var(--surface);
+  }
+}
+
+.virtualSpacerCell:global(.table__cell) {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.bodyCell {
+  overflow: hidden;
+}
+
+.cellAlignCenter {
+  text-align: center;
+}
+
+.cellAlignEnd {
+  text-align: right;
+}
+
+.tableFooter {
+  border-top: 0;
+}
+
+.loadMoreTableRow {
+  pointer-events: none;
+}
+
+.loadMoreCell:global(.table__cell) {
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}

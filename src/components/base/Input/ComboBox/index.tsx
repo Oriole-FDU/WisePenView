@@ -9,7 +9,7 @@ import type {
   ComboBoxProps,
   ComboBoxTriggerProps,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function ComboBoxRoot<T extends object = object>({
   className,

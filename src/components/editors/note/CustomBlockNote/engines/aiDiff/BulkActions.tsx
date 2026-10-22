@@ -8,7 +8,7 @@ import { AppButton } from '@/components/base/Button';
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteAiDiffAction, NotePluginRegistry } from '../../registry/types';
 import { applyAllNoteAiDiffActions } from './action';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface AiDiffBulkActionsProps {
   doc: Y.Doc;

@@ -8,7 +8,7 @@ import MainShell from '@/layouts/MainShell';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const APP_LAYOUT_PANEL_GROUP_ID = 'app-layout-panels';
 

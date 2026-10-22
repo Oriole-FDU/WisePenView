@@ -1,7 +1,7 @@
 import { Pagination } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type PaginationPageItem = number | 'ellipsis';
 

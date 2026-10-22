@@ -22,7 +22,7 @@ import {
   getSubjectActionsForDisplay,
   getSubjectRenderKey,
 } from './resourcePermissionPanelModel';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useResourcePermissionPanelController } from './useResourcePermissionPanelController';
 
 interface SubjectPermissionPopoverProps {

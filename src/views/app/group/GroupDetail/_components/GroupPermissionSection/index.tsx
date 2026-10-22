@@ -8,7 +8,7 @@ import type { GroupResConfig } from '@/domains/Group';
 import GroupMountPermissionModal from '@/views/app/group/_components/GroupPermissions/GroupMountPermissionModal';
 
 import GroupSettingsSection from '../GroupSettingsSection';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface GroupPermissionSectionProps {
   groupId: string;

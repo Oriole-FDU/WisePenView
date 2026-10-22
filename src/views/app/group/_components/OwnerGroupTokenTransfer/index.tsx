@@ -13,7 +13,7 @@ import { useApi } from '@/hooks/useApi';
 import { formatMillionNumber } from '@/utils/format';
 
 import type { OwnerGroupTokenTransferProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function OwnerGroupTokenTransfer({ groupId, onTransferSuccess }: OwnerGroupTokenTransferProps) {
   const { i18n, t } = useTranslation('wallet');

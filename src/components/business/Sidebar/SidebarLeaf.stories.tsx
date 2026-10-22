@@ -19,7 +19,7 @@ import SidebarDriveNodeTitle from './_common/tab/DriveTab/SidebarDriveNodeTitle'
 import SidebarDriveScopeSwitcher from './_common/tab/DriveTab/SidebarDriveScopeSwitcher';
 import SessionMenuItem from './_common/tab/SessionTab/SessionMenuItem';
 import AdminHeaderNav from './AdminSidebar/AdminHeaderNav';
-import styles from './Sidebar.stories.module.less';
+import styles from './Sidebar.stories.module.scss';
 
 const session: ChatSession = {
   id: 'storybook-session',

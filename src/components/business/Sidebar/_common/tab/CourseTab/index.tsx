@@ -9,7 +9,7 @@ import type { CourseSummary } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { buildCourseLearningPath } from '@/utils/navigation/appRoute';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function toCourseTreeData(courses: CourseSummary[]): TreeDataNode[] {
   return courses.map((course) => ({

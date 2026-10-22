@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import styles from '../Input.stories.module.less';
+import styles from '../Input.stories.module.scss';
 import SearchField from './index';
 
 function SearchStory() {
