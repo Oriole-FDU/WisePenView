@@ -32,6 +32,8 @@ Drive／Group／Resource 業務元件另檢查域內無 Less、所有 CSS Module
 
 Chat／Sidebar 業務元件另檢查域內無 Less、歷史導覽精確生成 48→1 的延遲規則及其後的 reduced-motion 覆寫、重複選擇器優先級、父宣告與 scrollbar 規則順序、桌面拖拽／禁拖拽區與鍵盤焦點，以及輸入區 container query、640px 窄版和 Sidebar 選取／禁用／收合狀態。編譯輸出比對需逐一記錄等價差異，不得以全域宣告排序或規則合併掩蓋 cascade 變化。
 
+其餘業務元件另檢查整個 `components/business` 無 Less、所有剩餘 Module 可編譯、SelectedMemberList scrollbar 不拆分父規則、桌面窗口按鈕禁拖拽與焦點、UserSearchCombobox／RechargeModal 的 768／640px 斷點、禁用與唯讀狀態、表單與錯誤頁間距、CommandPalette 全域覆寫、Wallet 動畫及 InlineComment 重複規則順序；不藉遷移修補既有業務或樣式缺鍵。
+
 ## 运行态记录
 
 运行 mock 或浏览器时记录：日期、浏览器版本、窗口尺寸、操作步骤、预期结果、实际结果和控制台错误。没有启动服务时，不要声称完成页面行为验证。

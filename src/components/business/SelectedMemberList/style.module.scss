@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .wrapper {
   margin-top: var(--space-md);
@@ -12,9 +12,9 @@
 
 .list {
   overflow-y: auto;
-  .appSubtleScrollbar();
   margin-bottom: var(--space-md);
   max-height: 300px;
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .memberItem {

@@ -706,6 +706,156 @@ test('Chat 輸入區與歡迎頁斷點、Sidebar 選取與收合狀態不變', a
   );
 });
 
+test('所有 business 樣式不殘留 Less，其餘業務 Module 可編譯', async () => {
+  const directory = 'src/components/business';
+  const files = await readdir(join(root, directory), { recursive: true });
+  assert.deepEqual(
+    files.filter((file) => file.endsWith('.less')),
+    []
+  );
+  const modules = files.filter(
+    (file) =>
+      file.endsWith('.module.scss') && !/^(Chat|Sidebar|Drive|Group|Resource)[/\\]/.test(file)
+  );
+  assert.ok(modules.length > 0);
+  for (const file of modules)
+    assert.ok((await compileCssModule(join(directory, file))).modules, file);
+});
+
+test('SelectedMemberList scrollbar 與後續宣告保留於同一父規則', async () => {
+  const { code } = await compileCssModule(
+    'src/components/business/SelectedMemberList/style.module.scss'
+  );
+  const rules = [...code.matchAll(/^\.list\s*\{([^}]+)\}/gm)];
+  assert.equal(rules.length, 1);
+  for (const declaration of [
+    'overflow-y: auto;',
+    'margin-bottom: var(--space-md);',
+    'max-height: 300px;',
+    'scrollbar-width: var(--scrollbar-width, thin);',
+    'scrollbar-color: transparent transparent;',
+  ])
+    assert.ok(rules[0][1].includes(declaration), declaration);
+});
+
+test('DesktopWindowControls 保留固定禁拖拽、焦點與關閉按鈕狀態', async () => {
+  const { code } = await compileCssModule(
+    'src/components/business/DesktopWindowControls/style.module.scss'
+  );
+  assert.match(
+    code,
+    /\.root\s*\{[^}]*position: fixed;[^}]*pointer-events: auto;[^}]*-webkit-app-region: no-drag;/
+  );
+  assert.match(code, /\.button\s*\{[^}]*-webkit-app-region: no-drag;/);
+  assert.equal(code.match(/-webkit-app-region: no-drag;/g)?.length, 2);
+  assert.doesNotMatch(code, /-webkit-app-region: drag;/);
+  assert.match(
+    code,
+    /\.button:focus-visible,\s*\.button:focus-visible:not\(:focus\),\s*\.button\[data-focus-visible\]\s*\{[^}]*--tw-ring-offset-shadow: 0 0 #0000;[^}]*outline: 2px solid var\(--focus, var\(--accent\)\);[^}]*outline-offset: 2px;/
+  );
+  assert.match(
+    code,
+    /\.close:hover\s*\{\s*color: var\(--danger-text\);\s*background: var\(--danger-soft\);/
+  );
+});
+
+test('UserSearchCombobox 與 RechargeModal 保留 768 與 640px 窄版規則', async () => {
+  for (const [component, width, pattern] of [
+    ['UserSearchCombobox', 768, /\.controlRow\s*\{\s*grid-template-columns: 1fr;/],
+    [
+      'Wallet/RechargeModal',
+      640,
+      /\.codeSlot\s*\{\s*width: 30px;\s*min-width: 30px;\s*flex-basis: 30px;\s*height: 40px;/,
+    ],
+  ]) {
+    const { code } = await compileCssModule(
+      `src/components/business/${component}/style.module.scss`
+    );
+    const media = [...code.matchAll(/^@media \(max-width: (\d+)px\) \{([\s\S]*?)^\}/gm)];
+    assert.deepEqual(
+      media.map(([, value]) => Number(value)),
+      [width],
+      component
+    );
+    assert.match(media[0][2], pattern, component);
+  }
+});
+
+test('其餘業務樣式保留禁用、唯讀、表單與錯誤頁間距', async () => {
+  const model = await compileCssModule('src/components/business/ModelSelector/style.module.scss');
+  assert.match(
+    model.code,
+    /\.trigger:disabled\s*\{\s*color: var\(--text-disabled\);\s*cursor: not-allowed;\s*opacity: 1;/
+  );
+  const members = await compileCssModule(
+    'src/components/business/SelectedMemberList/style.module.scss'
+  );
+  assert.match(
+    members.code,
+    /\.memberItemReadOnly\[data-disabled=['"]?true['"]?\]\s*\{\s*opacity: 1;/
+  );
+  assert.match(
+    members.code,
+    /\.memberItemReadOnly\[data-focus-visible=['"]?true['"]?\]\s*\{\s*background: transparent;\s*background-color: transparent;\s*outline: none;/
+  );
+  const form = await compileCssModule('src/components/business/AppFormDialog/style.module.scss');
+  assert.match(form.code, /\.form\s*\{\s*display: contents;/);
+  assert.match(form.code, /\.formCapture\s*\{\s*display: contents;/);
+  const shell = await compileCssModule(
+    'src/components/business/ErrorPage/ErrorPageShell.module.scss'
+  );
+  assert.match(
+    shell.code,
+    /\.main\s*\{[^}]*padding: clamp\(32px, 6vh, 64px\) clamp\(16px, 4vw, 40px\);/
+  );
+  assert.match(
+    shell.code,
+    /\.footerMini\s*\{[^}]*padding: var\(--space-md\) clamp\(16px, 4vw, 40px\) 24px;/
+  );
+  for (const [key, width] of [
+    ['sizeSm', 560],
+    ['sizeMd', 620],
+    ['sizeLg', 680],
+  ]) {
+    assert.equal(shell.modules[key], key);
+    assert.match(shell.code, new RegExp(`\\.${key}\\s*\\{\\s*max-width: ${width}px;`));
+  }
+});
+
+test('CommandPalette 全域覆寫、Wallet 動畫與 InlineComment 重複規則保留', async () => {
+  const palette = await compileCssModule(
+    'src/components/business/CommandPalette/style.module.scss'
+  );
+  assert.match(palette.code, /\.wp-highlight\s*\{\s*color: var\(--accent-text\);/);
+  assert.match(
+    palette.code,
+    /\.resultFooter\.list-box-item\[data-disabled=['"]?true['"]?\]\s*\{\s*opacity: 1;/
+  );
+  assert.match(
+    palette.code,
+    /\.virtualSpacer\.list-box-item\[data-disabled=['"]?true['"]?\]\s*\{[^}]*pointer-events: none;\s*visibility: hidden;/
+  );
+  const wallet = await compileCssModule(
+    'src/components/business/Wallet/ComputeWallet/style.module.scss'
+  );
+  assert.match(
+    wallet.code,
+    /\.rowFlash \.table__cell\s*\{\s*animation: walletRowFlash 1\.2s ease-out 2;/
+  );
+  assert.equal(wallet.code.match(/@keyframes walletRowFlash\s*\{/g)?.length, 1);
+  assert.match(
+    wallet.code,
+    /0%,\s*100%\s*\{\s*background-color: transparent;\s*\}\s*25%\s*\{\s*background-color: var\(--success-soft\);/
+  );
+  const comments = await compileCssModule(
+    'src/components/business/InlineComment/style.module.scss'
+  );
+  const imageRules = [...comments.code.matchAll(/^\.commentImageButton\s*\{([^}]+)\}/gm)];
+  assert.equal(imageRules.length, 2);
+  assert.match(imageRules[0][1], /position: relative;/);
+  assert.match(imageRules[1][1], /^\s*padding: 0;\s*cursor: zoom-in;\s*$/);
+});
+
 test('全局 scrollbar SCSS 保留页面与显式滚动条规则', async () => {
   const file = 'src/styles/global/scrollbar.scss';
   const css = compileScss(await readFile(join(root, file), 'utf8'), file);

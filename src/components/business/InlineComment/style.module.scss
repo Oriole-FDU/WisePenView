@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .panel {
   display: flex;
@@ -13,7 +13,7 @@
   min-height: 0;
   overflow-y: auto;
   padding: var(--space-md);
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .thread {
@@ -52,7 +52,7 @@
   flex-direction: column;
   gap: var(--space-sm);
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .virtualSpacer {

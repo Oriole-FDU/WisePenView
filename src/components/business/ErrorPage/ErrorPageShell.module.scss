@@ -1,4 +1,4 @@
-@landing-inline: clamp(16px, 4vw, 40px);
+$landing-inline: clamp(16px, 4vw, 40px);
 
 .root {
   display: flex;
@@ -20,7 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(32px, 6vh, 64px) @landing-inline;
+  padding: clamp(32px, 6vh, 64px) $landing-inline;
   box-sizing: border-box;
 }
 
@@ -44,7 +44,7 @@
 .footerMini {
   flex-shrink: 0;
   text-align: center;
-  padding: var(--space-md) @landing-inline 24px;
+  padding: var(--space-md) $landing-inline 24px;
   font-size: var(--font-size-xs);
   color: var(--muted);
   line-height: 1.5;

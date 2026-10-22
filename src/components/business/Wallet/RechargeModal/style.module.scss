@@ -1,4 +1,4 @@
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/breakpoints' as breakpoints;
 .field {
   display: flex;
   flex-direction: column;
@@ -57,7 +57,7 @@
   flex: 0 0 6px;
 }
 
-@media (max-width: @breakpoint-sm) {
+@media (max-width: breakpoints.$breakpoint-sm) {
   .codeInput {
     gap: var(--space-2xs);
   }

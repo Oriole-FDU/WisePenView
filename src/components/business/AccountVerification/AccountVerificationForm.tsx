@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FormField, Input, InputGroup } from '@/components/base/Input';
 
 import type { VerifyFormErrors, VerifyModalMode } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface AccountVerificationFormProps {
   formId?: string;

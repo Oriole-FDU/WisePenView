@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .root {
   min-width: 0;
@@ -30,10 +30,10 @@
   border: 1px solid var(--border);
   border-radius: var(--app-radius-popover);
   background: var(--surface);
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .controlRow {
     grid-template-columns: 1fr;
   }

@@ -37,7 +37,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import ResourceSearchResults from './ResourceSearchResults';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type CreateResourceType = 'note' | Exclude<DriveCreateType, 'folder'>;
 

@@ -1,5 +1,5 @@
-@import '@/styles/mixins/focusRing.less';
-@import '@/styles/mixins/desktopTitleBar.less';
+@use '@/styles/mixins/focusRing' as focusRing;
+@use '@/styles/mixins/desktopTitleBar' as titleBar;
 
 /**
  * 固定在窗口右上，不参与 Chat 侧栏宽度动画，避免收起/展开时按钮在两个 Header 间跳转导致卡顿。
@@ -22,7 +22,7 @@
   gap: var(--space-3xs);
   background: transparent;
   pointer-events: auto;
-  .desktopTitleBarNoDrag();
+  @include titleBar.desktopTitleBarNoDrag();
 }
 
 .button {
@@ -42,7 +42,7 @@
   transition:
     color var(--motion-duration-mid) var(--motion-ease-standard),
     background-color var(--motion-duration-mid) var(--motion-ease-standard);
-  .desktopTitleBarNoDrag();
+  @include titleBar.desktopTitleBarNoDrag();
 
   &:hover {
     color: var(--foreground);
@@ -52,7 +52,7 @@
   &:focus-visible,
   &:focus-visible:not(:focus),
   &[data-focus-visible] {
-    .appFocusRing();
+    @include focusRing.appFocusRing();
   }
 
   svg {

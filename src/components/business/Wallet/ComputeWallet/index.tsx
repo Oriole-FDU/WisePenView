@@ -15,7 +15,7 @@ import { useApi } from '@/hooks/useApi';
 
 import RechargeModal from '../RechargeModal';
 import type { ComputeWalletProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import WalletBalanceHeader from './WalletBalanceHeader';
 import { PAGE_SIZE, tabToTransactionTypes, type TxTabKey } from './walletHelpers';
 import WalletTransactionTable from './WalletTransactionTable';

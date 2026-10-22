@@ -13,7 +13,7 @@ import type { UserSearchUser } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 
 import type { UserSearchComboboxProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const DEFAULT_MIN_KEYWORD_LENGTH = 2;
 
