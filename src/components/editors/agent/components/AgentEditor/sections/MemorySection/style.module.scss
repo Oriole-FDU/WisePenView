@@ -1,4 +1,4 @@
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/breakpoints' as breakpoints;
 .moreRow {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -68,7 +68,7 @@
   font-size: 13px;
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .advancedHeader {
     align-items: flex-start;
   }

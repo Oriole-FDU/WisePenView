@@ -34,6 +34,8 @@ Chat／Sidebar 業務元件另檢查域內無 Less、歷史導覽精確生成 48
 
 其餘業務元件另檢查整個 `components/business` 無 Less、所有剩餘 Module 可編譯、SelectedMemberList scrollbar 不拆分父規則、桌面窗口按鈕禁拖拽與焦點、UserSearchCombobox／RechargeModal 的 768／640px 斷點、禁用與唯讀狀態、表單與錯誤頁間距、CommandPalette 全域覆寫、Wallet 動畫及 InlineComment 重複規則順序；不藉遷移修補既有業務或樣式缺鍵。
 
+agent／skill 編輯器另檢查域內無 Less、所有 Module 可編譯、七處 scrollbar 不拆分父規則、三組 768px 佈局、編輯區尺寸與預覽表格／圖片的全域選擇器、兩段 footer 宣告順序，以及資產拖入遮罩、prompt 選取／相容狀態、檔案樹焦點與待儲存佇列 resize／失敗／進度樣式。其他編輯器與共用 runtime 留待後續批次；靜態契約不代表已驗證編輯、拖拽、捲動或 resize 互動。
+
 ## 运行态记录
 
 运行 mock 或浏览器时记录：日期、浏览器版本、窗口尺寸、操作步骤、预期结果、实际结果和控制台错误。没有启动服务时，不要声称完成页面行为验证。

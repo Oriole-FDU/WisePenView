@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .queueDock {
   flex: 0 0 auto;
@@ -145,7 +145,7 @@
 
 .queueBody {
   overflow: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .emptyItem {

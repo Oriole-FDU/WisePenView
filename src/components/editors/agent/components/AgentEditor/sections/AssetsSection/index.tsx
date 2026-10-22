@@ -9,7 +9,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 interface Props {
   assets: AgentAsset[];
   disabled: boolean;

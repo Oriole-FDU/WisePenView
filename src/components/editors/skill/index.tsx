@@ -39,7 +39,7 @@ import {
   getSkillConfigBadge,
   getSkillVersionItems,
 } from './model';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function SkillEditorContent() {
   const {

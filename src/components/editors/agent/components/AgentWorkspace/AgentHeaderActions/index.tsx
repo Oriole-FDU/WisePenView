@@ -5,7 +5,7 @@ import { AppButton } from '@/components/base/Button';
 import VersionDropdown from '@/components/business/VersionDropdown';
 import type { VersionDropdownItem } from '@/components/business/VersionDropdown/index.type';
 
-import styles from '../../../style.module.less';
+import styles from '../../../style.module.scss';
 
 interface AgentHeaderActionsProps {
   disabledVersionKeys: Set<string>;

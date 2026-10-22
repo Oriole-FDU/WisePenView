@@ -856,6 +856,160 @@ test('CommandPalette 全域覆寫、Wallet 動畫與 InlineComment 重複規則�
   assert.match(imageRules[1][1], /^\s*padding: 0;\s*cursor: zoom-in;\s*$/);
 });
 
+test('agent、skill 編輯器不殘留 Less，所有 Module 可編譯', async () => {
+  for (const editor of ['agent', 'skill']) {
+    const directory = join('src/components/editors', editor);
+    const files = await readdir(join(root, directory), { recursive: true });
+    assert.deepEqual(
+      files.filter((file) => file.endsWith('.less')),
+      [],
+      editor
+    );
+    const modules = files.filter((file) => file.endsWith('.module.scss'));
+    assert.ok(modules.length > 0, editor);
+    for (const file of modules)
+      assert.ok((await compileCssModule(join(directory, file))).modules, file);
+  }
+});
+
+test('agent、skill 七處 scrollbar 保留單一父規則與後續宣告', async () => {
+  for (const [component, selectors] of [
+    ['agent', [['content', ['background: var(--surface);', 'scroll-behavior: smooth;']]]],
+    [
+      'agent/components/AgentEditor/sections/CapabilitiesSection/CapabilityPolicyPanel',
+      [['options', ['padding: var(--space-2xs-plus);']]],
+    ],
+    [
+      'skill',
+      [
+        ['treeWrap', ['padding: var(--space-sm);']],
+        ['markdownPreview', ['background: var(--surface);']],
+        ['configForm', ['overflow: auto;']],
+        ['configDescriptionInput', ['field-sizing: content;', 'resize: vertical;']],
+      ],
+    ],
+    ['skill/components/SkillSaveQueueDock', [['queueBody', ['overflow: auto;']]]],
+  ]) {
+    const { code } = await compileCssModule(
+      `src/components/editors/${component}/style.module.scss`
+    );
+    for (const [selector, declarations] of selectors) {
+      const rules = [...code.matchAll(new RegExp(`^\\.${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
+      assert.equal(rules.length, 1, `${component}.${selector}: 不拆分父規則`);
+      for (const declaration of [
+        'scrollbar-width: var(--scrollbar-width, thin);',
+        'scrollbar-color: transparent transparent;',
+        ...declarations,
+      ])
+        assert.ok(rules[0][1].includes(declaration), `${component}.${selector}: ${declaration}`);
+    }
+  }
+});
+
+test('agent 編輯器保留三組 768px 窄版規則', async () => {
+  for (const [component, patterns] of [
+    ['agent', [/\.page\s*\{\s*grid-template-columns: 1fr;/]],
+    [
+      'agent/components/AgentEditor/sections/MemorySection',
+      [
+        /\.advancedHeader\s*\{\s*align-items: flex-start;/,
+        /\.settingGrid\s*\{\s*grid-template-columns: 1fr;\s*gap: 22px;/,
+      ],
+    ],
+    [
+      'agent/components/AgentEditor/sections/CapabilitiesSection/CapabilityPolicyPanel',
+      [
+        /\.header\s*\{\s*align-items: stretch;\s*flex-direction: column;/,
+        /\.heading\s*\{\s*align-items: flex-start;\s*flex-direction: column;\s*gap: 3px;/,
+      ],
+    ],
+  ]) {
+    const { code } = await compileCssModule(
+      `src/components/editors/${component}/style.module.scss`
+    );
+    const media = [...code.matchAll(/^@media \(max-width: (\d+)px\) \{([\s\S]*?)^\}/gm)];
+    assert.deepEqual(
+      media.map(([, width]) => Number(width)),
+      [768],
+      component
+    );
+    for (const pattern of patterns) assert.match(media[0][2], pattern, component);
+  }
+});
+
+test('skill 保留編輯區尺寸、預覽全域規則與兩段 footer 宣告', async () => {
+  const { code } = await compileCssModule('src/components/editors/skill/style.module.scss');
+  for (const pattern of [
+    /\.middlePanelSlot\s*\{\s*flex: 0 0 280px;\s*width: 280px;\s*height: 100%;\s*min-width: 0;\s*min-height: 0;/,
+    /\.rightPanelSlot\s*\{\s*flex: 1 1 auto;\s*height: 100%;\s*min-width: 0;\s*min-height: 0;/,
+    /\.contentRow\s*\{\s*flex: 1;\s*min-height: 0;\s*display: flex;\s*overflow: hidden;/,
+    /\.editorBody\s*\{\s*flex: 1;\s*min-height: 0;/,
+    /\.markdownPreview\s*\{[^}]*height: 100%;[^}]*min-height: 0;[^}]*overflow: auto;/,
+    /\.markdownPreviewContent table\s*\{\s*table-layout: fixed;/,
+    /\.markdownPreviewContent th,\s*\.markdownPreviewContent td\s*\{\s*padding: var\(--space-sm\) var\(--space-md\);\s*vertical-align: top;\s*line-height: 1\.6;\s*overflow-wrap: anywhere;/,
+    /\.markdownPreviewContent table:has\(img\)\s*\{\s*table-layout: auto;/,
+    /\.markdownPreviewContent table:has\(img\) img\s*\{\s*max-width: min\(100%, 600px\);\s*margin: 0 auto;/,
+    /\.configDescriptionInput\s*\{\s*min-height: 160px;\s*max-height: max\(160px, min\(560px, 100dvh - var\(--layout-drive-chrome-height, 240px\) - 200px\)\);/,
+    /\.editorTab\[data-selected=['"]?true['"]?\]\s*\{\s*color: var\(--foreground\);/,
+  ])
+    assert.match(code, pattern);
+  const footer = [...code.matchAll(/^\.configFooterText\s*\{([^}]+)\}/gm)];
+  assert.equal(footer.length, 2);
+  assert.match(footer[0][1], /^\s*color: var\(--muted\);\s*font-size: var\(--font-size-xs\);\s*$/);
+  assert.match(
+    footer[1][1],
+    /^\s*min-width: 0;\s*overflow: hidden;\s*text-overflow: ellipsis;\s*white-space: nowrap;\s*$/
+  );
+});
+
+test('agent 保留資產拖入遮罩與 prompt 選取、相容狀態', async () => {
+  const assets = await compileCssModule(
+    'src/components/editors/agent/components/AgentEditor/sections/AssetsSection/style.module.scss'
+  );
+  assert.match(assets.code, /\.dropZone\s*\{\s*position: relative;/);
+  assert.match(
+    assets.code,
+    /\.dropHint\s*\{\s*position: absolute;\s*inset: 0;\s*z-index: var\(--app-z-index-elevated\);[^}]*pointer-events: none;/
+  );
+  const prompt = await compileCssModule(
+    'src/components/editors/agent/components/AgentEditor/sections/SystemPromptSection/style.module.scss'
+  );
+  assert.match(
+    prompt.code,
+    /\.tab\[data-selected=['"]?true['"]?\]\s*\{\s*color: var\(--accent-soft-foreground\);/
+  );
+  assert.match(
+    prompt.code,
+    /\.editorHead span\[data-compatible=['"]?false['"]?\]\s*\{\s*color: var\(--warning-text\);/
+  );
+  assert.match(prompt.code, /\.markdown\s*\{\s*min-height: 560px;/);
+});
+
+test('skill 保留檔案樹焦點、待儲存佇列 resize 與失敗進度狀態', async () => {
+  const tree = await compileCssModule(
+    'src/components/editors/skill/components/SkillFileTree/style.module.scss'
+  );
+  assert.match(tree.code, /\.nodeLabelDirty\s*\{\s*color: var\(--accent-text\);/);
+  assert.match(tree.code, /\.deleteBtn\s*\{[^}]*opacity: 0;/);
+  assert.match(tree.code, /\.nodeRow:hover \.deleteBtn\s*\{\s*opacity: 1;/);
+  assert.match(tree.code, /\.inlineInputField:focus\s*\{\s*border-color: var\(--accent\);/);
+  const queue = await compileCssModule(
+    'src/components/editors/skill/components/SkillSaveQueueDock/style.module.scss'
+  );
+  for (const pattern of [
+    /\.resizeHandle\s*\{[^}]*z-index: var\(--app-z-index-raised\);\s*height: 6px;\s*cursor: ns-resize;\s*touch-action: none;/,
+    /\.resizeHandle::after\s*\{\s*content: ['"]{2};\s*position: absolute;\s*top: 2px;\s*left: 0;\s*right: 0;\s*height: 1px;\s*background: transparent;/,
+    /\.resizeHandle:hover::after\s*\{\s*background: var\(--border-tertiary, var\(--border-light\)\);/,
+    /\.queueDockExpanded \.queueHeader\s*\{\s*border-bottom-color: var\(--border-light\);/,
+    /\.retryButton:hover\s*\{\s*background: var\(--surface-tertiary\);/,
+    /\.progressFill\s*\{[^}]*transition: width var\(--motion-duration-fast\) var\(--motion-ease-standard\);/,
+    /\.itemIconFailed\s*\{\s*color: var\(--danger-text\);/,
+    /\.itemPhaseFailed\s*\{\s*color: var\(--danger-text\);/,
+    /\.spinningIcon\s*\{\s*animation: var\(--animate-spin-fast\);/,
+  ])
+    assert.match(queue.code, pattern);
+});
+
 test('全局 scrollbar SCSS 保留页面与显式滚动条规则', async () => {
   const file = 'src/styles/global/scrollbar.scss';
   const css = compileScss(await readFile(join(root, file), 'utf8'), file);

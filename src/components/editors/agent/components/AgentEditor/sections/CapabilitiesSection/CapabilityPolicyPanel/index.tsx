@@ -8,7 +8,7 @@ import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Autocomplete, SearchField } from '@/components/base/Input';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export type CapabilityPolicyKind = 'tool' | 'skill';
 

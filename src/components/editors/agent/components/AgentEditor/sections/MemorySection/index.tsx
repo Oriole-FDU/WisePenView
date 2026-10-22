@@ -9,7 +9,7 @@ import type { AgentSpec } from '@/domains/Agent';
 
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';
 import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface Props {
   spec: AgentSpec;

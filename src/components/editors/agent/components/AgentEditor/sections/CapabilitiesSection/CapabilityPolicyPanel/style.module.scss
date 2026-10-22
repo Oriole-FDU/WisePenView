@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .block {
   margin-top: 22px;
@@ -56,8 +56,8 @@
 .options {
   max-height: 320px;
   overflow: auto;
-  .appSubtleScrollbar();
   padding: var(--space-2xs-plus);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .option {
@@ -204,7 +204,7 @@
   background: var(--surface);
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .header {
     align-items: stretch;
     flex-direction: column;

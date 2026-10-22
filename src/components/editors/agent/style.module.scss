@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .pageWrap {
   min-height: 0;
@@ -17,9 +17,9 @@
   min-height: 0;
   height: 100%;
   overflow: auto;
-  .appSubtleScrollbar();
   background: var(--surface);
   scroll-behavior: smooth;
+  @include scrollbar.appSubtleScrollbar();
 }
 .overlay {
   height: 100%;
@@ -38,7 +38,7 @@
   color: var(--warning-text);
   font-size: var(--font-size-xs);
 }
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .page {
     grid-template-columns: 1fr;
   }

@@ -16,7 +16,7 @@ import type {
   SkillSaveQueueItem,
   SkillSaveQueuePhase,
 } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type QueueMode = 'idle' | 'pending' | 'saving' | 'failed';
 
