@@ -20,7 +20,7 @@ import {
   EditPermissionModal,
   InviteUserModal,
 } from './Modals';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;
 const EMPTY_MEMBERS: GroupMember[] = [];

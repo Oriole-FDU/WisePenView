@@ -13,7 +13,7 @@ import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveCreateModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function DriveCreateModal({
   type,

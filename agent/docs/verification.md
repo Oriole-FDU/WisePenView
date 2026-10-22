@@ -28,6 +28,8 @@ PR CI 固定执行 commitlint、lint、build、mock contract、API response cont
 
 Less → SCSS 每個遷移批次另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對該批編譯 CSS 與使用中的 CSS Modules 匯出鍵。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、Input field 狀態、AppBreadcrumb 匯出與通用字體 token、非 Table 基礎元件及 `_shadcn` 的 SCSS 編譯邊界、scrollbar 宣告不拆分父規則，以及試點元件樣式與 SCSS 守衛。Table 契約另涵蓋私有 partial 無輸出、兩種表格各精確生成 1–16 欄規則、共用類別匯出與 composition、Group 行高規則順序，以及 Table／F33 不跨元件預處理器引用私有樣式；後續批次在同一檢查加入 Chat 與 Less 清零契約。建置與靜態比對不能代替已授權的視覺／互動驗收。
 
+Drive／Group／Resource 業務元件另檢查域內無 Less、所有 CSS Module 可編譯、scrollbar 與後續宣告維持同一父規則，以及 640／768／960px 斷點對應的窄版佈局；頁面級樣式與其他業務域仍按其遷移批次處理。
+
 ## 运行态记录
 
 运行 mock 或浏览器时记录：日期、浏览器版本、窗口尺寸、操作步骤、预期结果、实际结果和控制台错误。没有启动服务时，不要声称完成页面行为验证。

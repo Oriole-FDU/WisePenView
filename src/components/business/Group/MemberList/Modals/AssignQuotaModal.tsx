@@ -10,7 +10,7 @@ import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import type { AssignQuotaModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useMemberEditGuard } from './useMemberEditGuard';
 
 const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;

@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .permissionCard {
   display: flex;
@@ -53,10 +53,10 @@
 .permissionTableShell {
   min-width: 0;
   overflow: auto;
-  .appSubtleScrollbar();
   border: 1px solid var(--border-light);
   border-radius: var(--app-radius-content);
   background: var(--surface);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .permissionTable {
@@ -173,7 +173,7 @@
   padding: 0;
 }
 
-@media (max-width: @breakpoint-sm) {
+@media (max-width: breakpoints.$breakpoint-sm) {
   .presetBar {
     align-items: flex-start;
     flex-direction: column;

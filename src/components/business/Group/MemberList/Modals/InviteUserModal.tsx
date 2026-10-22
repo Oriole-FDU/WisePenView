@@ -9,7 +9,7 @@ import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
 import { buildInvitePath } from '@/utils/navigation/appRoute';
 
 import type { InviteUserModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const buildInviteUrl = (inviteCode?: string): string =>
   inviteCode ? buildAbsoluteAppUrl(buildInvitePath(inviteCode)) : '';

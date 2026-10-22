@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .panel {
   width: 100%;
@@ -47,7 +47,7 @@
   min-height: 0;
   overflow: auto;
   padding: var(--space-xs);
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .subjectItem {
@@ -182,7 +182,7 @@
 .actionList {
   max-height: min(360px, calc(100vh - 140px));
   overflow: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .skeletonShell {
@@ -271,7 +271,7 @@
   font-size: var(--font-size-base);
 }
 
-@media (max-width: @breakpoint-md) {
+@media (max-width: breakpoints.$breakpoint-md) {
   .panel {
     height: min(620px, calc(100vh - 220px));
   }

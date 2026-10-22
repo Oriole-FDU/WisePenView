@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .wrapper {
   display: flex;
@@ -55,9 +55,9 @@
   flex: 1;
   min-height: 280px;
   overflow: auto;
-  .appSubtleScrollbar();
   border: 1px solid var(--border);
   border-radius: var(--app-radius-modal);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .footer {

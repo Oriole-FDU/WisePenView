@@ -6,7 +6,7 @@ import AppFormDialog from '@/components/business/AppFormDialog';
 import { useApi } from '@/hooks/useApi';
 
 import type { JoinByInviteCodeModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const INVITE_CODE_LENGTH = 8;
 const OTP_GROUPS = [

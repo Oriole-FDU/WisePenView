@@ -12,7 +12,7 @@ import { useApi } from '@/hooks/useApi';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { EditPermissionModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useMemberEditGuard } from './useMemberEditGuard';
 
 function EditPermissionModal({

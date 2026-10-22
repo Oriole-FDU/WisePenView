@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .detailContent {
   display: flex;
@@ -52,7 +52,7 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .detailMetaSection {

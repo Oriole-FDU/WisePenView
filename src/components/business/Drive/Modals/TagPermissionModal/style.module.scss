@@ -1,5 +1,5 @@
-@import '@/styles/mixins/scrollbar.less';
-@import (reference) '@/styles/mixins/breakpoints.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .modalFormPadding {
   padding: var(--space-lg) 0;
@@ -150,7 +150,7 @@
 
   max-height: 72px;
   overflow: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .memberPickerTrigger :global([data-slot='autocomplete-value']) {
@@ -218,8 +218,8 @@
   flex-direction: column;
   gap: var(--space-2xs-plus);
   overflow: auto;
-  .appSubtleScrollbar();
   padding-right: var(--space-3xs);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .selectedMemberEmpty {
@@ -279,8 +279,8 @@
   min-height: 0;
   max-height: 320px;
   overflow: auto;
-  .appSubtleScrollbar();
   padding: var(--space-2xs-plus);
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .memberListItem {
@@ -349,7 +349,7 @@
   align-items: flex-start;
   gap: var(--space-2xs);
   overflow: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .selectedTag {
@@ -380,7 +380,7 @@
   background: transparent;
 }
 
-@media (max-width: @breakpoint-lg) {
+@media (max-width: breakpoints.$breakpoint-lg) {
   .wrapper {
     flex-direction: column;
   }
@@ -399,7 +399,7 @@
   }
 }
 
-@media (max-width: @breakpoint-sm) {
+@media (max-width: breakpoints.$breakpoint-sm) {
   .scopeTabsList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -343,6 +343,104 @@ test('Table 與 F33 樣式可編譯，不跨元件預處理器引用 Table 私�
   }
 });
 
+test('Drive、Group、Resource 業務樣式不殘留 Less，所有 Module 可編譯', async () => {
+  for (const domain of ['Drive', 'Group', 'Resource']) {
+    const directory = join('src/components/business', domain);
+    const files = await readdir(join(root, directory), { recursive: true });
+    assert.deepEqual(
+      files.filter((file) => file.endsWith('.less')),
+      [],
+      domain
+    );
+    const modules = files.filter((file) => file.endsWith('.module.scss'));
+    assert.ok(modules.length > 0, domain);
+    for (const file of modules)
+      assert.ok((await compileCssModule(join(directory, file))).modules, file);
+  }
+});
+
+test('Drive scrollbar 與後續宣告保留於同一父規則', async () => {
+  for (const [component, selector, declarations] of [
+    [
+      'Modals/DriveFolderPickerModal',
+      'treeWrap',
+      [
+        'padding: var(--space-2xs);',
+        'border: 1px solid var(--border);',
+        'border-radius: var(--app-radius-modal);',
+      ],
+    ],
+    [
+      'Modals/UploadFileToGroupModal',
+      'navTree',
+      ['border: 1px solid var(--border);', 'border-radius: var(--app-radius-modal);'],
+    ],
+    [
+      'PermissionActionEditor',
+      'permissionTableShell',
+      [
+        'border: 1px solid var(--border-light);',
+        'border-radius: var(--app-radius-content);',
+        'background: var(--surface);',
+      ],
+    ],
+    ['Modals/TagPermissionModal', 'selectedMemberList', ['padding-right: var(--space-3xs);']],
+    ['Modals/TagPermissionModal', 'memberList', ['padding: var(--space-2xs-plus);']],
+  ]) {
+    const file = `src/components/business/Drive/${component}/style.module.scss`;
+    assert.ok((await readdir(dirname(join(root, file)))).includes('style.module.scss'), file);
+    const { code } = await compileCssModule(file);
+    const rules = [...code.matchAll(new RegExp(`^\\.${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
+    assert.equal(rules.length, 1, `${component}.${selector}: 不拆分父規則`);
+    for (const declaration of [
+      'scrollbar-width: var(--scrollbar-width, thin);',
+      'scrollbar-color: transparent transparent;',
+      ...declarations,
+    ])
+      assert.ok(rules[0][1].includes(declaration), `${component}.${selector}: ${declaration}`);
+  }
+});
+
+test('Drive、Group、Resource 保留各斷點的窄版佈局', async () => {
+  for (const [component, expected] of [
+    [
+      'Drive/PermissionActionEditor',
+      [[640, /\.presetBar\s*\{\s*align-items: flex-start;\s*flex-direction: column;/]],
+    ],
+    [
+      'Drive/Modals/TagPermissionModal',
+      [
+        [960, /\.advancedAccessGrid\s*\{\s*grid-template-columns: minmax\(0, 1fr\);/],
+        [640, /\.scopeTabsList\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/],
+      ],
+    ],
+    [
+      'Group/DefaultAccessPermissionModal',
+      [
+        [960, /\.advancedAccessGrid\s*\{\s*grid-template-columns: minmax\(0, 1fr\);/],
+        [640, /\.scopeTabsList\s*\{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/],
+      ],
+    ],
+    ['Group/JoinByInviteCodeModal', [[640, /\.codeSlot\s*\{\s*width: auto;\s*flex: 1 1 0;/]]],
+    [
+      'Resource/ResourcePermissionPanel',
+      [[768, /\.skeletonAddRow\s*\{\s*grid-template-columns: 1fr;/]],
+    ],
+  ]) {
+    const file = `src/components/business/${component}/style.module.scss`;
+    assert.ok((await readdir(dirname(join(root, file)))).includes('style.module.scss'), file);
+    const { code } = await compileCssModule(file);
+    const media = [...code.matchAll(/^@media \(max-width: (\d+)px\) \{([\s\S]*?)^\}/gm)];
+    assert.deepEqual(
+      media.map(([, width]) => Number(width)),
+      expected.map(([width]) => width),
+      component
+    );
+    for (const [index, [, pattern]] of expected.entries())
+      assert.match(media[index][2], pattern, component);
+  }
+});
+
 test('全局 scrollbar SCSS 保留页面与显式滚动条规则', async () => {
   const file = 'src/styles/global/scrollbar.scss';
   const css = compileScss(await readFile(join(root, file), 'utf8'), file);

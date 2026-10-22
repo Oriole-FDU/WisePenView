@@ -1,4 +1,4 @@
-@import '@/styles/mixins/scrollbar.less';
+@use '@/styles/mixins/scrollbar' as scrollbar;
 
 .pickerBody {
   display: flex;
@@ -16,7 +16,7 @@
 .collectionList {
   max-height: 240px;
   overflow-y: auto;
-  .appSubtleScrollbar();
+  @include scrollbar.appSubtleScrollbar();
 }
 
 .collectionItem {
