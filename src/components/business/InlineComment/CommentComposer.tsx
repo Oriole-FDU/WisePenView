@@ -8,7 +8,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
 
 import type { InlineCommentProps, InlineCommentSubmitPayload } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const IMAGE_ONLY_CONTENT = '\u200B';
 

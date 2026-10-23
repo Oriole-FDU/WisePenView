@@ -5,7 +5,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import type { VoiceInputProps } from './index.type';
 
 const STATE_LABEL_KEYS: Record<VoiceInputProps['state'], string> = {

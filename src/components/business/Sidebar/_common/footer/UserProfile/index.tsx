@@ -34,7 +34,7 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import UserCheckIn from '../UserCheckIn';
 import UserFeedbackModal from '../UserFeedbackModal';
 import UserInviteModal from '../UserInviteModal';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface UserProfileProps {
   collapsed: boolean;

@@ -18,7 +18,7 @@ import {
 import CourseTab from './CourseTab';
 import DriveTab from './DriveTab';
 import SessionTab from './SessionTab';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface SidebarViewTabProps {
   id: SidebarViewTabKey;

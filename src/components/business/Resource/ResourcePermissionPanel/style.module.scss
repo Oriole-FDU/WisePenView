@@ -1,0 +1,300 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.panel {
+  width: 100%;
+  height: 460px;
+  max-height: calc(100vh - 160px);
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelBody {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.shell {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+}
+
+.subjectPane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.subjectDescription {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subjectList {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-xs);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.subjectItem {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--app-radius-menu-item);
+  outline: none;
+  transition:
+    background-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+
+  & + & {
+    margin-top: var(--space-2xs);
+  }
+}
+
+.inviteDivider {
+  margin: var(--space-xs) 0;
+  border-top: 1px solid var(--border);
+}
+
+.loadMoreGroupsRow {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.loadMoreGroupsButton {
+  min-width: 118px;
+}
+
+.subjectContent {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-width: 0;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.subjectMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.subjectNameRow {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.subjectName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actionIcon {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.sourceChip {
+  flex-shrink: 0;
+}
+
+.subjectActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+
+.permissionButton {
+  width: auto;
+  min-width: 0;
+  max-width: 168px;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  gap: var(--space-2xs);
+  padding-inline: var(--space-xs);
+  color: var(--muted);
+}
+
+.permissionButton:not(:disabled):hover {
+  color: var(--foreground);
+}
+
+.permissionTriggerText {
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.permissionChevron {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.addRow {
+  flex-shrink: 0;
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.permissionPopover {
+  min-width: 220px;
+}
+
+.actionList {
+  max-height: min(360px, calc(100vh - 140px));
+  overflow: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.skeletonShell {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.skeletonList {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-xs);
+}
+
+.skeletonItem {
+  display: grid;
+  min-height: 56px;
+  grid-template-columns: auto minmax(0, 1fr) 148px;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+
+  & + & {
+    margin-top: var(--space-2xs);
+  }
+}
+
+.skeletonAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--app-radius-pill);
+}
+
+.skeletonMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.skeletonName {
+  width: min(180px, 58%);
+  height: 16px;
+  border-radius: var(--app-radius-pill);
+}
+
+.skeletonDescription {
+  width: min(260px, 72%);
+  height: 12px;
+  border-radius: var(--app-radius-pill);
+}
+
+.skeletonAction {
+  width: 148px;
+  height: 32px;
+  border-radius: var(--app-radius-field);
+}
+
+.skeletonAddRow {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 78px;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.skeletonInput {
+  height: 36px;
+  border-radius: var(--app-radius-field);
+}
+
+.skeletonAddButton {
+  height: 36px;
+  border-radius: var(--app-radius-field);
+}
+
+.stateText {
+  display: flex;
+  min-height: 220px;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--muted);
+  font-size: var(--font-size-base);
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .panel {
+    height: min(620px, calc(100vh - 220px));
+  }
+
+  .subjectContent {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .subjectActions {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .skeletonItem {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .skeletonAction {
+    grid-column: 2;
+    width: min(148px, 100%);
+  }
+
+  .skeletonAddRow {
+    grid-template-columns: 1fr;
+  }
+}

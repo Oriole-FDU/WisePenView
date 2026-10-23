@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import type { DropOverlayProps } from './index.type';
 
 function DropOverlay({ visible }: DropOverlayProps) {

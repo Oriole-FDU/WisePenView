@@ -1,0 +1,69 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.stepsRow {
+  padding: 0 var(--space-xs);
+}
+
+.slideViewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.slideTrack {
+  display: flex;
+  width: 200%;
+  transition: transform var(--motion-duration-slow) var(--motion-ease-standard);
+  transform: translateX(0);
+}
+
+.slideTrackShift {
+  transform: translateX(-50%);
+}
+
+.slidePane {
+  box-sizing: border-box;
+  width: 50%;
+  flex-shrink: 0;
+  padding-right: var(--space-2xs);
+}
+
+.slidePane:last-child {
+  padding-right: 0;
+  padding-left: var(--space-2xs);
+}
+
+.treeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-height: 420px;
+  overflow: hidden;
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+}
+
+.navTree {
+  flex: 1;
+  min-height: 280px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-modal);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  width: 100%;
+}

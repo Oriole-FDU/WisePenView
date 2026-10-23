@@ -10,7 +10,7 @@ import { useAppAuth } from '@/layouts/App/_context';
 import AgentPicker from '../AgentPicker';
 import ModelPicker from '../ModelPicker';
 import SkillMenu from '../SkillMenu';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import UploadMenu from '../UploadMenu';
 import VoiceInput from '../VoiceInput';
 import type { InputToolbarProps } from './index.type';

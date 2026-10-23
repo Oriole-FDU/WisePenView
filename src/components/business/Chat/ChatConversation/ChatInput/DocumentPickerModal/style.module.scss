@@ -1,0 +1,29 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+}
+
+.treeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-height: 420px;
+  overflow: hidden;
+}
+
+.navTree {
+  flex: 1;
+  min-height: 280px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-modal);
+  @include scrollbar.appSubtleScrollbar();
+}

@@ -14,7 +14,7 @@ import {
 } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const PRESET_LABEL_KEYS = {
   private: 'permission.preset.private',

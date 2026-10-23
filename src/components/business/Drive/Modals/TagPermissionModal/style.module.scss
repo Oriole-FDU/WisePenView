@@ -1,0 +1,406 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.modalFormPadding {
+  padding: var(--space-lg) 0;
+}
+
+.modalContainer {
+  width: min(1280px, calc(100vw - 24px));
+  max-width: min(1280px, calc(100vw - 24px));
+}
+
+.modalDialog {
+  width: 100%;
+  max-width: min(1280px, calc(100vw - 24px));
+}
+
+.mountModalContainer {
+  width: min(560px, calc(100vw - 24px));
+  max-width: min(560px, calc(100vw - 24px));
+}
+
+.mountModalDialog {
+  width: 100%;
+  max-width: min(560px, calc(100vw - 24px));
+}
+
+.wrapper {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: stretch;
+  min-height: 0;
+}
+
+.leftPane {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+  max-width: 420px;
+  min-height: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.leftTitle {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.rightPane {
+  display: flex;
+  flex: 2 1 0;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.advancedAccessGrid {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+  gap: var(--space-md);
+}
+
+.advancedMountGrid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+.personnelCard {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow: hidden;
+}
+
+.personnelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.personnelTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.personnelCount {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.scopeTabs,
+.scopeTabsListContainer,
+.scopeTabsList {
+  width: 100%;
+}
+
+.scopeTabsList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.scopeTab {
+  min-width: 0;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberState {
+  display: flex;
+  flex: 1;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.memberPicker {
+  width: 100%;
+}
+
+/* 表面、悬浮与焦点样式统一由 Autocomplete.Trigger 提供，这里只保留多选成员所需的尺寸约束 */
+.memberPickerTrigger {
+  --control-height: var(--control-height-lg);
+
+  max-height: 72px;
+  overflow: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.memberPickerTrigger :global([data-slot='autocomplete-value']) {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1;
+  color: var(--foreground);
+}
+
+.memberPickerPlaceholder {
+  display: flex;
+  min-height: 22px;
+  align-items: center;
+  align-self: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  font-weight: var(--font-weight-regular);
+}
+
+.memberPickerTrigger :global([data-slot='autocomplete-clear-button']),
+.memberPickerTrigger :global([data-slot='autocomplete-default-indicator']) {
+  color: var(--muted);
+}
+
+.scopeHintBanner {
+  min-width: 0;
+}
+
+.memberPickerPopover {
+  min-width: min(360px, calc(100vw - 48px));
+}
+
+.selectedMemberPanel {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-xs);
+  overflow: hidden;
+}
+
+.selectedMemberHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.selectedMemberTitle {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedMemberList {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-2xs-plus);
+  overflow: auto;
+  padding-right: var(--space-3xs);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.selectedMemberEmpty {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectedMemberItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: var(--space-xs) 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-field);
+  background: var(--surface);
+}
+
+.selectedMemberAvatar {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+}
+
+.selectedMemberMeta {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.selectedMemberName,
+.selectedMemberDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedMemberName {
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.selectedMemberDescription {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.memberList {
+  min-height: 0;
+  max-height: 320px;
+  overflow: auto;
+  padding: var(--space-2xs-plus);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.memberListItem {
+  border-radius: var(--app-radius-menu-item);
+}
+
+.memberListItem:not(:last-child) {
+  margin-bottom: var(--space-3xs);
+}
+
+.permissionCard {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow: hidden;
+}
+
+.memberItem {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-2xs) 0;
+}
+
+.memberAvatar {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+}
+
+.memberMeta {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.memberName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberDescription {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedTags {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  overflow: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.selectedTag {
+  max-width: 100%;
+}
+
+.selectedTagAvatar {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+}
+
+.selectedTagName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyState {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (max-width: breakpoints.$breakpoint-lg) {
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .leftPane {
+    width: 100%;
+    min-height: 220px;
+  }
+
+  .advancedAccessGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .advancedMountGrid {
+    width: 100%;
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .scopeTabsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

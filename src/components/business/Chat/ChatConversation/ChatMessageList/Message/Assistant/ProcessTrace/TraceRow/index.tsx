@@ -7,7 +7,7 @@ import { AppButton } from '@/components/base/Button';
 import LoadingText from '../../LoadingText';
 import TraceIcon from '../TraceIcon';
 import type { TraceRowProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { useCollapseHeight } from './useCollapseHeight';
 
 /**
