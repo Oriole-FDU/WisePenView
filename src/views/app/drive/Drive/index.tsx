@@ -18,7 +18,7 @@ import {
   DRIVE_TRASH_PATH,
   DRIVE_UPLOAD_QUEUE_PATH,
 } from '@/utils/navigation/driveRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
+import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
 
 import FavoritesTab from '../_components/FavoritesTab';
 import UploadQueueTab from '../_components/UploadQueueTab';

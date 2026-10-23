@@ -14,7 +14,7 @@ import {
   createAssessmentEditorItem,
   type UpdateCourseEditorForm,
 } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import { CourseDateField, CourseTimeField } from '../CourseEditorDateFields';
 
 interface CourseAssessmentSectionProps {

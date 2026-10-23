@@ -4,7 +4,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 
 import GroupPolicyShellCard from '../GroupPolicyShellCard';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 interface GroupMountPermissionModalProps {
   isOpen: boolean;

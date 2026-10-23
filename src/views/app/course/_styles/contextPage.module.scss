@@ -1,0 +1,22 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.page {
+  box-sizing: border-box;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: var(--space-xl);
+}
+
+.state {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  align-content: center;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .page {
+    padding: var(--space-lg);
+  }
+}

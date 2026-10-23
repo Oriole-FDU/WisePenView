@@ -10,8 +10,8 @@ import { useCourseContext } from '@/layouts/Course/_context';
 import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import sharedStyles from '../_styles/contextPage.module.less';
-import styles from './style.module.less';
+import sharedStyles from '../_styles/contextPage.module.scss';
+import styles from './style.module.scss';
 
 function CourseAnnouncementsPage() {
   const { t } = useTranslation('course');

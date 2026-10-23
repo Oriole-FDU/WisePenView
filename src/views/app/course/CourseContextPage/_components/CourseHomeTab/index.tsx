@@ -15,7 +15,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { buildCourseLearningPath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseHomeTab() {
   const { t } = useTranslation('course');

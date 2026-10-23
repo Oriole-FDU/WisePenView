@@ -11,7 +11,7 @@ import { parseErrorMessage } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
 import ResourceCommentItem from './ResourceCommentItem';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import { updateCommentLikeCount } from './utils';
 
 const REPLY_PAGE_SIZE = 10;

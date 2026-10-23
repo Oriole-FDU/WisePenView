@@ -15,7 +15,7 @@ import type { UserAccountProfile } from '@/domains/User';
 import { USER_STATUS } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 
-import auth from '../_common/style.module.less';
+import auth from '../_common/style.module.scss';
 
 function AuthBindingOnboarding() {
   const { t } = useTranslation(['auth', 'common']);

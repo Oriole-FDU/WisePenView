@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 
 import type { ContractModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface AgreementClause {
   text: string;

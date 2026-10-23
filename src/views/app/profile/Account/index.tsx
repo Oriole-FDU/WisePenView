@@ -19,7 +19,7 @@ import {
 } from '../_components/Account';
 import type { ProfileFieldKey } from '../profile.config';
 import { getProfileFieldConfig } from '../profile.config';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function toDisplayValue(raw: string | null | undefined, emptyLabel: string, pending?: boolean) {
   if (pending || raw == null || raw === '') {

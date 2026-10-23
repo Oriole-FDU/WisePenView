@@ -6,7 +6,7 @@ import { AppButton } from '@/components/base/Button';
 import Tree, { type DataNode } from '@/components/base/Tree';
 import type { CourseOutlineNode } from '@/domains/Course';
 
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 interface CourseOutlineMoveModalProps {
   isOpen: boolean;

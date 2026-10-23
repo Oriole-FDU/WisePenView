@@ -11,7 +11,7 @@ import { useChatService } from '@/domains';
 import type { ToolOption } from '@/domains/Chat';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function WebSearchSettingsSection() {
   const { t } = useTranslation('profile');

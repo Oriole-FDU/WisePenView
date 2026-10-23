@@ -1,5 +1,5 @@
 import type { SettingsListProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function SettingsList({ items, className }: SettingsListProps) {
   return (

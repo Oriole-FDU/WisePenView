@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
 
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 interface GroupPolicyShellCardProps {
   title: string;

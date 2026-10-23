@@ -1010,6 +1010,27 @@ test('skill 保留檔案樹焦點、待儲存佇列 resize 與失敗進度狀態
     assert.match(queue.code, pattern);
 });
 
+test('編輯器、版型、頁面與樣式入口不殘留 Less，所有 Module 可編譯', async () => {
+  for (const directory of [
+    'src/components/editors',
+    'src/layouts',
+    'src/views',
+    'src/bootstrap',
+    'src/styles/_stories',
+  ]) {
+    const files = await readdir(join(root, directory), { recursive: true });
+    assert.deepEqual(
+      files.filter((file) => file.endsWith('.less')),
+      [],
+      directory
+    );
+    const modules = files.filter((file) => file.endsWith('.module.scss'));
+    assert.ok(modules.length > 0, directory);
+    for (const file of modules)
+      assert.ok((await compileCssModule(join(directory, file))).modules, file);
+  }
+});
+
 test('Note 五個本地 checklist mixin 保留正文與全域拖拽預覽的輸出', async () => {
   const { code } = await compileCssModule(
     'src/components/editors/note/CustomBlockNote/style.module.scss'
@@ -1031,6 +1052,125 @@ test('Note 五個本地 checklist mixin 保留正文與全域拖拽預覽的輸�
   }
   assert.match(code, /input:focus-visible\s*\{[^}]*box-shadow: var\(--app-checkbox-focus-ring\);/);
   assert.match(code, /input:disabled\s*\{[^}]*cursor: default;/);
+});
+
+test('剩餘 scrollbar mixin 與晚宣告維持單一父規則', async () => {
+  for (const [file, selectors] of [
+    ['components/editors/note/components/NoteOutline/style', ['.scrollArea']],
+    ['components/editors/note/CustomBlockNote/ui/slashMenu/style', ['.menuViewport']],
+    [
+      'components/editors/note/CustomBlockNote/plugins/MermaidPlugin/MermaidBlock/style',
+      ['.source, .externalSource', '.aiDiffSource, .aiDiffPreview'],
+    ],
+    ['layouts/Course/CourseLayout/style', ['.content']],
+    [
+      'layouts/Course/CourseLearningLayout/style',
+      ['.outlineTree', '.outlineMoveTree', '.resourceViewer, .emptyMain'],
+    ],
+    [
+      'layouts/Course/CourseLearningLayout/_components/CourseOutlineSidebar/CourseResourcePickerModal/style',
+      ['.resourcePickerBody'],
+    ],
+    ['layouts/Resource/ResourceLayout/ResourceSidePanel/ResourceCommentPanel/style', ['.content']],
+    ['layouts/Resource/ResourceLayout/ResourceToolbar/ResourceTargetModal', ['.treeWrap']],
+    ['views/app/course/CourseContextPage/_components/CourseHomeTab/style', ['.leftScroll']],
+    ['views/app/course/CourseEditorPage/style', ['.editorScroll', '.courseTextArea']],
+  ]) {
+    const { code } = await compileCssModule(`src/${file}.module.scss`);
+    for (const selector of selectors) {
+      const rules = [...code.matchAll(/^(\.[^{}]+)\{([^{}]*)\}/gm)].filter(
+        ([, name]) => name.replace(/\s+/g, ' ').trim() === selector
+      );
+      assert.equal(rules.length, 1, `${file}: ${selector} 不拆分父規則`);
+      assert.ok(rules[0][2].includes('scrollbar-width: var(--scrollbar-width, thin);'));
+      assert.ok(rules[0][2].includes('scrollbar-color: transparent transparent;'));
+    }
+  }
+});
+
+test('Auth 本地文字連結 mixin 保留三個 caller 的 hover 與鍵盤焦點', async () => {
+  const { code } = await compileCssModule('src/views/app/auth/_common/style.module.scss');
+  for (const name of ['centerLinks', 'rightLinks', 'leftBottomLinks']) {
+    const body = code.match(new RegExp(`\\.${name} a \\{([^}]+)\\}`))?.[1];
+    assert.ok(body?.includes('color: var(--link);\n  text-decoration: none;'));
+    assert.ok(
+      code.includes(
+        `.${name} a:hover, .${name} a:focus-visible {\n  color: var(--accent-text-strong);\n  text-decoration: underline;`
+      )
+    );
+  }
+});
+
+test('layout mixin 保留參數與單次 min-size 宣告', async () => {
+  for (const [file, selectors] of [
+    ['App/AppPageLayout', ['root']],
+    ['Course/CourseLayout/style', ['sidebar', 'main']],
+    ['Course/CourseLearningLayout/style', ['outlineSidebar']],
+  ]) {
+    const { code } = await compileCssModule(`src/layouts/${file}.module.scss`);
+    for (const selector of selectors) {
+      const body = code.match(new RegExp(`^\\.${selector} \\{([^}]+)\\}`, 'm'))?.[1];
+      assert.ok(body, `${file}.${selector}`);
+      assert.equal(body.match(/min-height: 0;/g)?.length, 1, `${file}.${selector}`);
+      if (selector !== 'root') assert.equal(body.match(/min-width: 0;/g)?.length, 1);
+    }
+  }
+  const { code } = await compileCssModule(
+    'src/layouts/Course/CourseLearningLayout/style.module.scss'
+  );
+  assert.match(
+    code,
+    /\.outlineNodeTitle\s*\{\s*display: inline-flex;\s*align-items: center;\s*justify-content: space-between;\s*gap: var\(--space-xs\);/
+  );
+  assert.match(code, /@media \(max-width: 768px\)/);
+});
+
+test('桌面頂欄與共用軟焦點 mixin 保留拖拽邊界及鍵盤樣式', async () => {
+  const { code } = await compileCssModule(
+    'src/layouts/Resource/ResourceLayout/ResourceLayoutHeader/style.module.scss'
+  );
+  assert.match(code, /\.desktopRoot \.bar\s*\{[^}]*-webkit-app-region: drag;/);
+  assert.match(code, /\.desktopRoot \.bar :where\([^{}]+\)\s*\{\s*-webkit-app-region: no-drag;/);
+  assert.match(
+    code,
+    /-webkit-app-region: no-drag;\s*\}\s*\.desktopRoot \.bar\s*\{\s*padding-right: var\(--space-sm\);\s*padding-left: var\(--space-lg\);\s*\}\s*\.desktopRoot \.bar \.toolbar/
+  );
+  assert.match(
+    code,
+    /\.titleBarInsetEnd \.bar::after\s*\{[^}]*-webkit-app-region: no-drag;\s*pointer-events: none;/
+  );
+  const tabs = await compileCssModule('src/views/app/_common/underlineTabs.module.scss');
+  assert.match(
+    tabs.code,
+    /:focus-visible,[^{]*:focus-visible:not\(:focus\),[^{]*\[data-focus-visible\]\s*\{[^}]*--tw-ring-offset-shadow: 0 0 #0000;[^}]*background: var\(--accent-soft\);/
+  );
+});
+
+test('自有樣式及入口不得殘留 Less 檔案、引用或直接相依', async () => {
+  for (const directory of ['src', '.storybook', 'electron']) {
+    const files = await readdir(join(root, directory), { recursive: true });
+    assert.deepEqual(
+      files.filter((file) => file.endsWith('.less')),
+      [],
+      directory
+    );
+    for (const file of files.filter((file) => /\.(?:[cm]?[jt]sx?|s?css|html)$/.test(file))) {
+      assert.doesNotMatch(
+        await readFile(join(root, directory, file), 'utf8'),
+        /['"][^'"\n]+\.less['"]|@(?:import|use)[^;\n]+\.less\b/,
+        file
+      );
+    }
+  }
+  const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+  for (const name of [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+    'peerDependencies',
+  ])
+    assert.equal(pkg[name]?.less, undefined, name);
+  assert.ok(pkg.devDependencies['sass-embedded']);
 });
 
 test('全局 scrollbar SCSS 保留页面与显式滚动条规则', async () => {

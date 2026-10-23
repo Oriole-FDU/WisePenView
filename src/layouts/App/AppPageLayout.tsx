@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 
-import styles from './AppPageLayout.module.less';
+import styles from './AppPageLayout.module.scss';
 
 export function AppScrollablePageLayout() {
   return (

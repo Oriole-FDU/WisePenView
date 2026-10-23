@@ -1,0 +1,9 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.resourcePickerBody {
+  height: min(420px, 58vh);
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-modal);
+  @include scrollbar.appSubtleScrollbar();
+}

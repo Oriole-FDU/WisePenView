@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import type { CourseOutlineNode } from '@/domains/Course';
 
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import CourseResourceIcon from '../CourseResourceIcon';
 import type { CourseOutlineContainerNode, CourseOutlineResourceTarget } from './model';
 

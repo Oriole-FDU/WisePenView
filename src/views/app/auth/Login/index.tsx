@@ -18,7 +18,7 @@ import {
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
 
 import AuthIconField from '../_common/AuthIconField';
-import auth from '../_common/style.module.less';
+import auth from '../_common/style.module.scss';
 
 type LoginField = keyof LoginRequest;
 

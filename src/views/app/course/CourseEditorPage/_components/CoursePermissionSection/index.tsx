@@ -8,7 +8,7 @@ import GroupDefaultAccessPermissionModal from '@/components/business/Group/Defau
 import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 interface CoursePermissionSectionProps {
   courseId: string;

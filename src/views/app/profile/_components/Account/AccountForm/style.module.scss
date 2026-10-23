@@ -1,0 +1,104 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+
+  .sectionTitle {
+    margin-bottom: 0;
+  }
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+.readonlyGroups,
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.formFieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md) var(--space-lg);
+  margin-bottom: 0;
+}
+
+.editableInput {
+  background-color: var(--field-background, var(--surface));
+}
+
+.formField {
+  min-width: 0;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.clearSelectButton {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  line-height: 1;
+  padding: 0;
+
+  :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.cancelBtn {
+  margin-left: 0;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .formFieldsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeader {
+    flex-wrap: wrap;
+  }
+}

@@ -15,7 +15,7 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { type FieldErrors, hasFieldErrors } from '@/utils/validation/formValidation';
 
 import { validateConfirmPasswordField, validatePasswordField } from '../_common/passwordValidation';
-import auth from '../_common/style.module.less';
+import auth from '../_common/style.module.scss';
 
 type NewPasswordFormValues = Pick<NewPasswordRequest, 'newPassword'> & {
   confirmPassword: string;

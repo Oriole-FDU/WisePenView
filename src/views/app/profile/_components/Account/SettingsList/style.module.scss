@@ -1,0 +1,52 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.list {
+  display: grid;
+  /* 标签 | 值 | 标签 | 值，宽屏纵向对齐 */
+  grid-template-columns: 5em minmax(0, 1fr) 5em minmax(0, 1fr);
+  column-gap: var(--space-xs);
+  row-gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.row {
+  display: contents;
+}
+
+/* 左右两对字段之间拉开，格子内标签-值保持紧凑 */
+.row:nth-child(odd) .value {
+  padding-inline-end: var(--space-2xl);
+}
+
+.label {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  font-weight: var(--font-weight-medium);
+}
+
+.value {
+  margin: 0;
+  min-width: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.valueEmpty {
+  color: color-mix(in oklab, var(--muted) 72%, transparent);
+  font-weight: var(--font-weight-regular, 400);
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .list {
+    grid-template-columns: 5em minmax(0, 1fr);
+  }
+
+  .row:nth-child(odd) .value {
+    padding-inline-end: 0;
+  }
+}

@@ -268,9 +268,6 @@ importers:
       husky:
         specifier: ^8.0.0
         version: 8.0.3
-      less:
-        specifier: ^4.4.2
-        version: 4.6.7
       lint-staged:
         specifier: ^16.3.3
         version: 16.4.0
@@ -10380,6 +10377,7 @@ snapshots:
   copy-anything@3.0.5:
     dependencies:
       is-what: 4.1.16
+    optional: true
 
   copy-to@2.0.1: {}
 
@@ -11591,7 +11589,8 @@ snapshots:
       is-class-hotfix: 0.0.6
       isstream: 0.1.2
 
-  is-what@4.1.16: {}
+  is-what@4.1.16:
+    optional: true
 
   is-wsl@3.1.1:
     dependencies:
@@ -11711,6 +11710,7 @@ snapshots:
       mime: 1.6.0
       needle: 3.5.0
       source-map: 0.6.1
+    optional: true
 
   levn@0.4.1:
     dependencies:
@@ -12502,7 +12502,8 @@ snapshots:
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
-  parse-node-version@1.0.1: {}
+  parse-node-version@1.0.1:
+    optional: true
 
   parse5@7.3.0:
     dependencies:
