@@ -10,7 +10,7 @@ import {
   createRichTextBlockAiDiff,
   type NoteRichTextAiDiffConfig,
 } from '../DefaultContentPlugin/aiDiff';
-import styles from './HighlightBlock/style.module.less';
+import styles from './HighlightBlock/style.module.scss';
 import { applyHighlightAppearance, readHighlightBlockProps } from './model';
 
 function isStructuredHighlightAiContent(value: unknown): value is Record<string, unknown> {

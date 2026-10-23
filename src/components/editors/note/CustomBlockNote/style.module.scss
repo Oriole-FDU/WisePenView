@@ -1,36 +1,24 @@
-.noteChecklistVariables() {
+@mixin noteChecklistVariables() {
   --app-checkbox-control-size: 18px;
-  --app-checkbox-control-bg: color-mix(
-    in oklab,
-    var(--surface-tertiary) 35%,
-    var(--surface) 65%
-  );
+  --app-checkbox-control-bg: color-mix(in oklab, var(--surface-tertiary) 35%, var(--surface) 65%);
   --app-checkbox-control-bg-hover: color-mix(
     in oklab,
     var(--surface-tertiary) 70%,
     var(--surface) 30%
   );
-  --app-checkbox-control-border: color-mix(
-    in oklab,
-    var(--border) 82%,
-    var(--surface) 18%
-  );
-  --app-checkbox-control-border-hover: color-mix(
-    in oklab,
-    var(--border) 56%,
-    var(--accent) 44%
-  );
+  --app-checkbox-control-border: color-mix(in oklab, var(--border) 82%, var(--surface) 18%);
+  --app-checkbox-control-border-hover: color-mix(in oklab, var(--border) 56%, var(--accent) 44%);
   --app-checkbox-control-border-focus: var(--focus, var(--accent));
   --app-checkbox-focus-ring: 0 0 0 1px var(--app-checkbox-control-border-focus);
 }
 
-.noteChecklistControlWrapper() {
+@mixin noteChecklistControlWrapper() {
   display: inline-flex;
   align-items: center;
   height: calc(var(--app-checkbox-control-size) + 6px);
 }
 
-.noteChecklistInput() {
+@mixin noteChecklistInput() {
   position: relative;
   flex: 0 0 auto;
   width: var(--app-checkbox-control-size);
@@ -43,12 +31,12 @@
   box-shadow: var(--shadow-none);
 }
 
-.noteChecklistInputChecked() {
+@mixin noteChecklistInputChecked() {
   border-color: var(--accent);
   background-color: var(--accent);
 }
 
-.noteChecklistInputCheckedIndicator() {
+@mixin noteChecklistInputCheckedIndicator() {
   position: absolute;
   top: 2px;
   left: 5px;
@@ -251,7 +239,9 @@
     line-height: 1.68;
   }
 
-  :global(.bn-editor .bn-block-outer:has(> .bn-block > .bn-block-content[data-content-type='heading'])) {
+  :global(
+    .bn-editor .bn-block-outer:has(> .bn-block > .bn-block-content[data-content-type='heading'])
+  ) {
     margin-top: 18px;
     margin-bottom: var(--space-xs);
   }
@@ -279,15 +269,15 @@
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='checkListItem']) {
-    .noteChecklistVariables();
+    @include noteChecklistVariables();
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div:has(> input)) {
-    .noteChecklistControlWrapper();
+    @include noteChecklistControlWrapper();
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input) {
-    .noteChecklistInput();
+    @include noteChecklistInput();
 
     cursor: pointer;
     transition:
@@ -306,20 +296,22 @@
     background-color: var(--app-checkbox-control-bg-hover);
   }
 
-  :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:focus-visible) {
+  :global(
+    .bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:focus-visible
+  ) {
     border-color: var(--app-checkbox-control-border-focus);
     box-shadow: var(--app-checkbox-focus-ring);
     outline: none;
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked) {
-    .noteChecklistInputChecked();
+    @include noteChecklistInputChecked();
   }
 
   :global(
     .bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked::after
   ) {
-    .noteChecklistInputCheckedIndicator();
+    @include noteChecklistInputCheckedIndicator();
   }
 
   :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:disabled) {
@@ -329,7 +321,9 @@
     cursor: default;
   }
 
-  :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked:disabled) {
+  :global(
+    .bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked:disabled
+  ) {
     border-color: color-mix(in oklab, var(--accent) 76%, transparent);
     background-color: color-mix(in oklab, var(--accent) 78%, transparent);
   }
@@ -851,28 +845,27 @@
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='checkListItem']) {
-  .noteChecklistVariables();
+  @include noteChecklistVariables();
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div:has(> input)) {
-  .noteChecklistControlWrapper();
+  @include noteChecklistControlWrapper();
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div > input) {
-  .noteChecklistInput();
-}
-
-:global(.bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div > input:checked) {
-  .noteChecklistInputChecked();
+  @include noteChecklistInput();
 }
 
 :global(
-  .bn-drag-preview
-    .bn-block-content[data-content-type='checkListItem']
-    > div
-    > input:checked::after
+  .bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div > input:checked
 ) {
-  .noteChecklistInputCheckedIndicator();
+  @include noteChecklistInputChecked();
+}
+
+:global(
+  .bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div > input:checked::after
+) {
+  @include noteChecklistInputCheckedIndicator();
 }
 
 :global(.bn-drag-preview .bn-block-content[data-content-type='codeBlock']) {

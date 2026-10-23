@@ -7,7 +7,7 @@ import { GuideAnchor } from '@/components/base/Guide';
 import type { NoteOutlineItem } from '@/components/editors/note/CustomBlockNote/index.type';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export const NOTE_OUTLINE_TITLE_ID = '__note_title__';
 

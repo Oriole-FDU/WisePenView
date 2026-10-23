@@ -7,7 +7,7 @@ import type { ChatModel, ToolOption } from '@/domains/Chat';
 import type { SkillSummary } from '@/domains/Skill';
 
 import type { AgentDraft } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import { useAgentAssetsController } from './controllers/useAgentAssetsController';
 import AssetsSection from './sections/AssetsSection';
 import BasicInfoSection from './sections/BasicInfoSection';

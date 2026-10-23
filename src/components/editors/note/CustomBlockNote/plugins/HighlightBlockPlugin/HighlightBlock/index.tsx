@@ -14,7 +14,7 @@ import {
   readHighlightBlockProps,
   toHighlightBlockStoredProps,
 } from '../model';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type HighlightBlockRenderProps = ReactCustomBlockRenderProps<typeof highlightBlockConfig>;
 
