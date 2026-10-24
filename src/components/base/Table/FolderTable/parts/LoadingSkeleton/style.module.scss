@@ -1,11 +1,11 @@
-@import '../../../shared/styles/table.module.less';
+@use '../../../shared/styles/table' as table;
 
 .skeletonRow {
-  .tableSkeletonRowMixin();
+  @include table.tableSkeletonRowMixin();
 }
 
 .skeletonCell:global(.table__cell) {
-  .tableSkeletonCellMixin();
+  @include table.tableSkeletonCellMixin();
 }
 
 .nameSkeleton {
@@ -18,15 +18,15 @@
 .expandSkeleton,
 .iconSkeleton {
   flex-shrink: 0;
-  width: @table-row-entry-icon-size;
-  height: @table-row-entry-icon-size;
-  border-radius: @table-inner-radius;
+  width: table.$table-row-entry-icon-size;
+  height: table.$table-row-entry-icon-size;
+  border-radius: table.$table-inner-radius;
   background: var(--surface-secondary);
 }
 
 .barSkeleton {
   height: 13px;
-  border-radius: @table-inner-radius;
+  border-radius: table.$table-inner-radius;
   background: var(--surface-secondary);
 }
 

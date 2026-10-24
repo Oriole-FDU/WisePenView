@@ -1,0 +1,115 @@
+@use './table' as table;
+
+.colFill {
+  width: 48%;
+  min-width: var(--table-col-fill-min-width, 180px);
+}
+
+.colSm {
+  @include table.tableColFixedWidth(--table-col-sm);
+}
+
+.colMd {
+  @include table.tableColFixedWidth(--table-col-md);
+}
+
+.colEnum {
+  @include table.tableColFixedWidth(--table-col-enum);
+}
+
+.colLg {
+  @include table.tableColFixedWidth(--table-col-lg);
+}
+
+.colEq {
+  width: calc(100% / var(--table-eq-column-count, 1));
+  min-width: 0;
+}
+
+.colFolderSize {
+  @include table.tableColFixedWidth(--table-col-folder-size);
+}
+
+.colFolderType {
+  @include table.tableColFixedWidth(--table-col-folder-type);
+}
+
+.colFolderAction {
+  @include table.tableColFixedWidth(--table-col-folder-action);
+}
+
+.colAction {
+  @include table.tableColFixedWidth(--table-action-column-width);
+}
+
+.colCheckbox {
+  @include table.tableColFixedWidth(--table-checkbox-column-width);
+}
+
+.toolbarSelect {
+  flex-shrink: 0;
+  min-width: var(--table-select-min-width, 120px);
+  width: auto;
+
+  :global(.select__trigger) {
+    @include table.defineTableSelectTrigger();
+  }
+
+  :global(.select__value) {
+    @include table.defineTableSelectValue();
+  }
+}
+
+.inlineEditSelect {
+  max-width: 100%;
+  min-width: 0;
+
+  :global(.select__trigger) {
+    @include table.defineTableSelectTrigger();
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    flex-wrap: nowrap;
+  }
+
+  :global(.select__value) {
+    @include table.defineTableSelectValue();
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+}
+
+.inlineEditSelectCompact {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  :global(.select__trigger) {
+    @include table.defineTableSelectTrigger();
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    gap: table.$table-gap-compact;
+  }
+
+  :global(.select__value) {
+    @include table.defineTableSelectValue();
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  :global(.select__indicator) {
+    flex-shrink: 0;
+  }
+}
+
+.pageSizeSelect {
+  composes: toolbarSelect;
+  min-width: var(--table-page-size-select-width, 110px);
+  width: var(--table-page-size-select-width, 110px);
+}

@@ -5,7 +5,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { joinClassNames } from '@/components/base/Table/shared/TableBase/cellAlign';
 
 import type { InlineEditErrorProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function InlineEditError({ message, onDismiss, className }: InlineEditErrorProps) {
   const { t } = useTranslation('table');

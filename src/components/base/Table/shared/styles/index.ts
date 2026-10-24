@@ -1,5 +1,5 @@
-import tableCellStylesModule from './cells.module.less';
-import tableStylesModule from './table.module.less';
+import tableCellStylesModule from './cells.module.scss';
+import tableStylesModule from './table.module.scss';
 
 /** Table 共享样式模块（token、列宽） */
 export const tableStyles = tableStylesModule;

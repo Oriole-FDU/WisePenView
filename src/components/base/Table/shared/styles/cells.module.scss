@@ -1,5 +1,4 @@
-@import './table.module.less';
-
+@use './table' as table;
 
 .cellEllipsis {
   display: block;
@@ -19,18 +18,18 @@
 .cellEmphasis {
   composes: cellEllipsis;
   color: var(--foreground);
-  font-weight: @table-font-weight-medium;
+  font-weight: table.$table-font-weight-medium;
 }
 
 .amountInflow {
   font-variant-numeric: tabular-nums;
-  font-weight: @table-font-weight-medium;
+  font-weight: table.$table-font-weight-medium;
   color: var(--success-text);
 }
 
 .amountOutflow {
   font-variant-numeric: tabular-nums;
-  font-weight: @table-font-weight-medium;
+  font-weight: table.$table-font-weight-medium;
   color: var(--danger-text);
 }
 
@@ -98,9 +97,9 @@
 .amountHeader {
   display: inline-flex;
   align-items: center;
-  gap: @table-gap-compact;
+  gap: table.$table-gap-compact;
   color: inherit;
-  font-weight: @table-font-weight-medium;
+  font-weight: table.$table-font-weight-medium;
 }
 
 /* 表内 Chip：按文案自然宽度，避免在窄列中被 stretch 压成竖排 */
@@ -116,16 +115,17 @@
   min-width: var(--table-chip-min-width, 56px);
   min-height: var(--table-chip-min-height, 28px);
   padding: var(--table-chip-padding-block, var(--space-2xs)) var(--table-chip-padding-inline, 14px);
-  border-radius: @table-inner-radius;
+  border-radius: table.$table-inner-radius;
   font-family: inherit;
   font-size: inherit;
-  font-weight: @table-font-weight-medium;
+  font-weight: table.$table-font-weight-medium;
   line-height: inherit;
   white-space: nowrap;
 
   &:global(.chip) {
     min-height: var(--table-chip-min-height, 28px);
-    padding: var(--table-chip-padding-block, var(--space-2xs)) var(--table-chip-padding-inline, 14px);
+    padding: var(--table-chip-padding-block, var(--space-2xs))
+      var(--table-chip-padding-inline, 14px);
   }
 
   :global([data-slot='label']) {

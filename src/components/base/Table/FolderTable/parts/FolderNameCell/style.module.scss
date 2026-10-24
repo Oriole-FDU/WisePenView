@@ -1,10 +1,10 @@
-@import '../../../shared/styles/table.module.less';
+@use '../../../shared/styles/table' as table;
 
 .nameCell {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  height: @row-content-height;
+  height: table.$row-content-height;
   min-width: 0;
   padding-left: var(--folder-table-depth-indent, 0);
 }
@@ -23,18 +23,17 @@
   cursor: pointer;
 
   :global(svg) {
-    width: @table-row-expand-icon-size;
-    height: @table-row-expand-icon-size;
+    width: table.$table-row-expand-icon-size;
+    height: table.$table-row-expand-icon-size;
   }
-
 }
 
 .nameContent {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  height: @table-line-height-body;
-  line-height: @table-line-height-body;
+  height: table.$table-line-height-body;
+  line-height: table.$table-line-height-body;
   min-width: 0;
   transform: translateY(2px);
 }
@@ -44,12 +43,12 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  height: @table-line-height-body;
+  height: table.$table-line-height-body;
   line-height: 0;
 
   :global(svg) {
-    width: @table-row-entry-icon-size;
-    height: @table-row-entry-icon-size;
+    width: table.$table-row-entry-icon-size;
+    height: table.$table-row-entry-icon-size;
   }
 }
 
@@ -63,10 +62,10 @@
 .nameText {
   overflow: hidden;
   color: var(--foreground);
-  font-family: @table-font-family;
-  font-size: @table-font-size-body;
-  font-weight: @table-font-weight-medium;
-  line-height: @table-line-height-body;
+  font-family: table.$table-font-family;
+  font-size: table.$table-font-size-body;
+  font-weight: table.$table-font-weight-medium;
+  line-height: table.$table-line-height-body;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

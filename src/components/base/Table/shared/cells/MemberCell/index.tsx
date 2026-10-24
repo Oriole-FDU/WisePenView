@@ -1,7 +1,7 @@
 import AppAvatar from '@/components/base/Avatar';
 
 import type { TableMemberCellProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function TableMemberCell({ name, subline, avatarSrc }: TableMemberCellProps) {
   const displayName = name.trim() || '?';

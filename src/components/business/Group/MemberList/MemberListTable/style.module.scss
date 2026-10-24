@@ -1,5 +1,3 @@
-@import (reference) '@/components/base/Table/shared/styles/table.module.less';
-
 .management {
   display: flex;
   flex-direction: column;
@@ -19,25 +17,26 @@
   }
 
   :global(.table-root--secondary .table__row .table__cell) {
+    height: var(--table-row-height, 60px);
+    min-height: var(--table-row-height, 60px);
+    max-height: var(--table-row-height, 60px);
+
     :global(.select),
     :global(.text-field) {
       gap: 0;
-      max-height: @row-content-height;
+      max-height: var(--table-row-height, 60px);
     }
     :global(.select__trigger),
     :global(input),
     :global(.input) {
       box-sizing: border-box;
-      height: @action-icon-size;
-      min-height: @action-icon-size;
-      max-height: @action-icon-size;
-      font-family: @table-font-family;
-      font-size: @table-font-size-body;
-      line-height: @table-line-height-body;
+      height: var(--table-action-icon-size, 32px);
+      min-height: var(--table-action-icon-size, 32px);
+      max-height: var(--table-action-icon-size, 32px);
+      font-family: var(--app-font-family);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height-base);
     }
-    height: @table-row-height;
-    min-height: @table-row-height;
-    max-height: @table-row-height;
   }
 
   .selectionColumn,
@@ -101,19 +100,19 @@
 }
 
 .withSelection {
-  --member-selection-offset: @checkbox-column-width;
+  --member-selection-offset: var(--table-checkbox-column-width, 44px);
 }
 
 .inlineEditActions {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: @table-gap-inline;
+  gap: var(--table-gap-inline, 6px);
   :global(button) {
-    width: @action-icon-size;
-    min-width: @action-icon-size;
-    height: @action-icon-size;
-    min-height: @action-icon-size;
+    width: var(--table-action-icon-size, 32px);
+    min-width: var(--table-action-icon-size, 32px);
+    height: var(--table-action-icon-size, 32px);
+    min-height: var(--table-action-icon-size, 32px);
   }
 }
 

@@ -8,7 +8,7 @@ import {
   resolveReadonlySkeletonBarWidth,
 } from '../../../shared/TableBase/columnWidth';
 import type { TableColumnWidth } from '../../../shared/TableBase/index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface DataTableSkeletonColumn {
   id: string;
