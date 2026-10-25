@@ -35,5 +35,6 @@
 - `routing.md`：URL、页面级 Tab、面包屑和导航历史。
 - `store.md`：状态归属、注册、持久化和生命周期。
 - `color-system.md`：颜色阶、语义 token 和主题。
+- `error-reporting.md`：错误数据白名单、构建定位、受控附件与正式启用核对。
 
 跨层任务按 `view/component -> service -> mapper -> api -> entity/enum` 读取；涉及拆分时先读 `architecture-guidelines.md`，涉及业务知识时再读 `business-knowledge.md`。修改完成后删除旧实现和无效兼容层。

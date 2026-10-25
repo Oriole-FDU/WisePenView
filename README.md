@@ -54,6 +54,9 @@ pnpm mock
 `/otel` 或绝对 OTLP HTTP 地址）后启用 trace/log 上报。Jenkins 只提供 `ENABLE_OTEL` 开关，开启后
 入口自动取 `VITE_API_BASE_URL` 下的 `/otel`。未配置时不会注册 provider，也不会产生上报请求。
 
+错误上报的 release、数据白名单、受控 source map 附件、离线还原命令与保留政策核对，见
+[可定位版本的错误上报](agent/docs/error-reporting.md)。
+
 Mock 與正式環境共用 service、mapper、快取和 registry，只在 `@domain-apis` 替換 API 與 OSS I/O。模擬資料存於記憶體，重新整理後重置；API 契約變更時需同步更新 mock API。
 
 Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 service 尚未提供的能力，在 mock 中也維持未開放狀態。Chat 串流、外部協作、Office 編輯與語音辨識不在此模擬範圍。
