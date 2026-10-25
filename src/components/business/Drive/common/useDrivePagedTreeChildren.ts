@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DriveContainerNode, DriveNode } from '@/domains/Drive';
-import { parseErrorMessage } from '@/utils/error';
+import { parseErrorMessage, reportError } from '@/utils/error';
 
 import { buildDriveLoadingNode, type DriveViewNode } from './driveComponentModel';
 
@@ -92,6 +92,7 @@ export function useDrivePagedTreeChildren({
     parent: DriveContainerNode,
     options?: { refresh?: boolean }
   ): Promise<DriveViewNode[]> => {
+    const previousChildren = childrenMap.get(parent.id) ?? [];
     setNodeChildren(parent.id, [buildLoadingPlaceholder(parent, t('node.loading'))]);
     try {
       const result = await loadPage({
@@ -109,9 +110,15 @@ export function useDrivePagedTreeChildren({
       setNodeChildren(parent.id, children);
       return children;
     } catch (err) {
+      reportError(err, {
+        origin: 'handled',
+        flow: 'drive',
+        operation: 'list',
+        pathname: window.location.pathname,
+      });
       toast.danger(parseErrorMessage(err));
-      setNodeChildren(parent.id, []);
-      return [];
+      setNodeChildren(parent.id, previousChildren);
+      return previousChildren;
     }
   };
 
@@ -146,6 +153,12 @@ export function useDrivePagedTreeChildren({
       setNodeChildren(parent.id, nextChildren);
       return nextChildren;
     } catch (err) {
+      reportError(err, {
+        origin: 'handled',
+        flow: 'drive',
+        operation: 'list-more',
+        pathname: window.location.pathname,
+      });
       toast.danger(parseErrorMessage(err));
       setNodeChildren(parent.id, currentChildren);
       return currentChildren;

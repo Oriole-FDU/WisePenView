@@ -20,12 +20,18 @@ import type {
   Service as UseRequestService,
 } from 'ahooks/es/useRequest/src/types';
 
-import { isWisePenError, parseErrorMessage } from '@/utils/error';
+import {
+  type ErrorOperationContext,
+  isWisePenError,
+  parseErrorMessage,
+  reportError,
+} from '@/utils/error';
 
 interface UseApiErrorOptions<TParams extends unknown[]> {
   getErrorMessage?: (error: Error, params: TParams) => string;
   onErrorEffect?: (error: Error, params: TParams) => void;
   showErrorToast?: boolean;
+  errorReportContext?: ErrorOperationContext;
 }
 
 type UseApiOptions<TData, TParams extends unknown[]> = UseRequestOptions<TData, TParams> &
@@ -59,9 +65,26 @@ const isUnauthorizedError = (error: Error): boolean =>
 const notifyApiError = <TParams extends unknown[]>(
   error: Error,
   params: TParams,
-  options: UseApiErrorOptions<TParams>
+  options: UseApiErrorOptions<TParams> & { onError?: (error: Error, params: TParams) => void }
 ): void => {
-  const { getErrorMessage, onErrorEffect, showErrorToast = true } = options;
+  const {
+    getErrorMessage,
+    onErrorEffect,
+    showErrorToast = true,
+    onError,
+    errorReportContext,
+  } = options;
+  if (errorReportContext) {
+    reportError(error, {
+      origin: 'handled',
+      pathname: window.location.pathname,
+      ...errorReportContext,
+    });
+  }
+  if (onError) {
+    onError(error, params);
+    return;
+  }
   if (showErrorToast && !isUnauthorizedError(error)) {
     toast.danger(getErrorMessage ? getErrorMessage(error, params) : parseErrorMessage(error));
   }
@@ -77,14 +100,19 @@ export function useApi<TData, TParams extends unknown[]>(
     onError,
     onErrorEffect,
     showErrorToast = true,
+    errorReportContext,
     ...restOptions
   } = options;
   const request = useRequest<TData, TParams>(service, {
     ...restOptions,
-    onError:
-      onError ??
-      ((error, params) =>
-        notifyApiError(error, params, { getErrorMessage, onErrorEffect, showErrorToast })),
+    onError: (error, params) =>
+      notifyApiError(error, params, {
+        getErrorMessage,
+        onError,
+        onErrorEffect,
+        showErrorToast,
+        errorReportContext,
+      }),
   });
 
   return {
@@ -107,14 +135,19 @@ export function useApiPagination<
     onError,
     onErrorEffect,
     showErrorToast = true,
+    errorReportContext,
     ...restOptions
   } = options;
   return usePagination<TData, TParams>(service, {
     ...restOptions,
-    onError:
-      onError ??
-      ((error, params) =>
-        notifyApiError(error, params, { getErrorMessage, onErrorEffect, showErrorToast })),
+    onError: (error, params) =>
+      notifyApiError(error, params, {
+        getErrorMessage,
+        onError,
+        onErrorEffect,
+        showErrorToast,
+        errorReportContext,
+      }),
   });
 }
 
@@ -127,12 +160,18 @@ export function useApiInfiniteScroll<TData extends UseInfiniteScrollData>(
     onError,
     onErrorEffect,
     showErrorToast = true,
+    errorReportContext,
     ...restOptions
   } = options;
   return useInfiniteScroll<TData>(service, {
     ...restOptions,
-    onError:
-      onError ??
-      ((error) => notifyApiError(error, [], { getErrorMessage, onErrorEffect, showErrorToast })),
+    onError: (error) =>
+      notifyApiError(error, [], {
+        getErrorMessage,
+        onError: onError ? (error) => onError(error) : undefined,
+        onErrorEffect,
+        showErrorToast,
+        errorReportContext,
+      }),
   });
 }

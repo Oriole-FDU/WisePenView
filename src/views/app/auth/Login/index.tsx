@@ -41,6 +41,7 @@ function Login() {
     (values: LoginRequest) => authService.login(values),
     {
       manual: true,
+      errorReportContext: { flow: 'login', operation: 'login' },
       onSuccess: () => {
         navigate(redirectPath, { replace: true });
       },
