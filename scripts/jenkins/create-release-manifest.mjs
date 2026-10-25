@@ -1,4 +1,4 @@
-import { readdir, stat, writeFile } from 'node:fs/promises';
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 // Jenkins 通过命令行参数把构建目录、清单输出位置和发布版本传给本脚本
@@ -53,6 +53,9 @@ if (!distStat.isDirectory()) {
 
 // 排序可以保证同一份产物反复生成时清单内容稳定，方便审阅、归档和排查发布差异
 const files = (await collectFiles(distDir)).sort();
+if (files.some((file) => file.endsWith('.map'))) {
+  throw new Error('dist 含 source map，拒绝生成公开发布清单。');
+}
 
 // index.html 是静态站点的入口。没有入口文件时，即使其它 chunk 上传成功，
 // 访问根路径仍然无法启动应用，因此这里拒绝继续发布
@@ -60,11 +63,20 @@ if (!files.includes('index.html')) {
   throw new Error('dist 中缺少 index.html，拒绝生成发布清单。');
 }
 
-// schemaVersion 为未来扩展清单格式保留版本位
-// release 通常使用 Git short SHA；buildMode 用于区分 production/development 产物
+const build = JSON.parse(await readFile(path.join(distDir, 'build-info.json'), 'utf8'));
+if (
+  typeof build.commit !== 'string' ||
+  !build.commit.startsWith(release) ||
+  build.mode !== buildMode
+) {
+  throw new Error('构建身份与发布参数不一致，拒绝生成发布清单。');
+}
+
+// 同一 commit 的重建也必须使用 bundle 中的唯一 release，不能覆盖旧版定位记录。
 const manifest = {
   schemaVersion: 1,
-  release,
+  release: build.release,
+  build,
   buildMode,
   createdAt: new Date().toISOString(),
   files,

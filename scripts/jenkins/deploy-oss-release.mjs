@@ -29,6 +29,7 @@ function normalizeEndpoint(endpoint) {
 // dist 中的路径最终会直接成为 OSS 根目录对象名
 // 禁止绝对路径、父目录穿越和 Windows 反斜杠，避免清理或上传越界对象
 function assertObjectName(name) {
+  if (name.endsWith('.map')) throw new Error('禁止公开发布 source map。');
   if (!name || name.startsWith('/') || name.includes('..') || name.includes('\\')) {
     throw new Error(`非法 OSS 对象路径：${name}`);
   }

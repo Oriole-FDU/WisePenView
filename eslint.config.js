@@ -351,7 +351,14 @@ const nativeErrorRestrictedSyntaxRules = [
 ];
 
 export default defineConfig([
-  globalIgnores(['dist', 'storybook-static', '.electron', 'release', 'src/components/_shadcn/**']),
+  globalIgnores([
+    'dist',
+    'storybook-static',
+    '.electron',
+    'release',
+    '.wisepen-debug/**',
+    'src/components/_shadcn/**',
+  ]),
   {
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],
     extends: [js.configs.recommended],

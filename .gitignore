@@ -12,6 +12,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.wisepen-debug/
 storybook-static
 .electron
 release

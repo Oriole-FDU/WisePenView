@@ -174,6 +174,8 @@ EOF
                   --build-mode "${BUILD_MODE}"
                 '''
                 archiveArtifacts artifacts: 'dist/**,.wisepen-release-manifest.json', fingerprint: false
+                // 独立附件含源代码；启用前须核对 Jenkins ACL、至少 90 天保留及在用／回退 build 保留。
+                archiveArtifacts artifacts: '.wisepen-debug/**', fingerprint: false
             }
         }
 
