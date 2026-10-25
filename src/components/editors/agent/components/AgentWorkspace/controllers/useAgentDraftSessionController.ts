@@ -79,6 +79,7 @@ export function useAgentDraftSessionController({
     },
     {
       manual: true,
+      errorReportContext: { flow: 'editor', operation: 'agent-save' },
       onSuccess: (savedDraftSnapshot) => {
         if (!savedDraftSnapshot) return;
         setSavedSnapshot(savedDraftSnapshot);

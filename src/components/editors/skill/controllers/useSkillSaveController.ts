@@ -174,6 +174,7 @@ export function useSkillSaveController({
     },
     {
       manual: true,
+      errorReportContext: { flow: 'editor', operation: 'skill-save' },
       onSuccess: (result) => {
         if (result?.options?.showToast !== false) toast.success(t('toast.saveSuccess'));
         if (result?.options?.refresh) refreshSkill();
@@ -200,6 +201,7 @@ export function useSkillSaveController({
     },
     {
       manual: true,
+      errorReportContext: { flow: 'editor', operation: 'skill-config-save' },
       onSuccess: (result) => {
         if (result?.options?.showToast !== false) toast.success(t('toast.configUpdated'));
         if (result?.options?.refresh) refreshSkill();

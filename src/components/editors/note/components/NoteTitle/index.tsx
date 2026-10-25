@@ -14,7 +14,7 @@ import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStor
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
-import { parseErrorMessage } from '@/utils/error';
+import { parseErrorMessage, reportError } from '@/utils/error';
 
 import styles from './style.module.scss';
 
@@ -142,6 +142,12 @@ function NoteTitle({
           }
         },
         (error: unknown) => {
+          reportError(error, {
+            origin: 'handled',
+            flow: 'editor',
+            operation: 'note-title-save',
+            pathname: window.location.pathname,
+          });
           if (saveVersion === saveVersionRef.current) {
             emitSaveStatus('failed');
           }

@@ -11,6 +11,7 @@ interface DrawioSaveSessionOptions {
   exportXml(): void;
   persistXml(xml: string, version: number): Promise<void>;
   createFailure(): unknown;
+  onFailure?(error: unknown): void;
 }
 
 /** 导出与保存属于同一次任务；保存期间的新修改不能被旧响应标记为已保存。 */
@@ -42,6 +43,7 @@ export function createDrawioSaveSession(options: DrawioSaveSessionOptions) {
     clearTimeout(task.timer);
     pending = undefined;
     publish('failed', error);
+    if (!disposed) options.onFailure?.(error);
     task.reject(error);
   };
   const begin = () => {
