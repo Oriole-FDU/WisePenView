@@ -35,13 +35,14 @@
     "check:drive-tree": "node --test scripts/check-drive-tree.mjs",
     "check:html-page": "node --test scripts/check-html-page.mjs",
     "check:note-link": "node --test scripts/check-note-link.mjs",
-    "check:ci": "pnpm check:file-length && pnpm check:editor-runtime && pnpm check:mock && pnpm check:api-contract && pnpm check:z-index && pnpm check:radius && pnpm check:styles && pnpm check:drive-tree && pnpm check:html-page && pnpm check:note-link",
+    "check:ci": "pnpm check:file-length && pnpm check:editor-runtime && pnpm check:mock && pnpm check:api-contract && pnpm check:z-index && pnpm check:radius && pnpm check:styles && pnpm check:drive-tree && pnpm check:html-page && pnpm check:note-link && pnpm check:error-reporting",
     "verify:ci": "concurrently --kill-others-on-fail --names format,lint,checks,typecheck,build --prefix-colors blue,green,yellow,magenta,cyan \"pnpm format:check\" \"pnpm lint\" \"pnpm check:ci\" \"pnpm typecheck\" \"pnpm build:app\"",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky install",
-    "check:styles": "node --test scripts/check-styles.mjs"
+    "check:styles": "node --test scripts/check-styles.mjs",
+    "check:error-reporting": "node scripts/check-error-reporting.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.156",
