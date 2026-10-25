@@ -12,6 +12,7 @@
 - `src/styles/`：全局样式入口、主题 token（按域拆分，如 `theme/radius.css`）和规范示例 story。
 - `src/config/`：公开运行时配置的声明、验证与浏览器入口。
 - `src/apis/`：Axios 与请求基础设施。
+- `src/telemetry/`：应用与 HTTP 遥测入口；状态、聚合和 OTel 实现归入 `_internal`，见 `observability.md`。
 - `scripts/`：构建和离线检查脚本。
 - `.github/workflows/`：CI 和发布工作流。
 

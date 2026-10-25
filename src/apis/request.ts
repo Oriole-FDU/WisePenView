@@ -3,6 +3,7 @@ import type { AxiosRequestConfig } from 'axios';
 import httpClient from '@/apis/_internal/httpClient';
 import type { ApiResponse } from '@/apis/api.type';
 import { isApiResponseEnvelope } from '@/apis/runtimeContract';
+import { recordRequestSuccess, reportApiFailure, RequestTelemetry } from '@/telemetry/http';
 import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
 
 /**
@@ -59,36 +60,59 @@ export function parseTextApiResponse(value: unknown): string {
   }
 }
 
-export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return unwrap<T>(await httpClient.get(url, config));
+/** 每个顶层请求只创建一次现场；响应解包失败仍能关联到发起时的账号与页面。 */
+async function executeRequest<T>(
+  method: 'get' | 'post' | 'put' | 'delete',
+  url: string,
+  config: AxiosRequestConfig | undefined,
+  data: unknown,
+  parse: (response: unknown) => T
+): Promise<T> {
+  const request = new RequestTelemetry(url, method, config);
+  const requestConfig = { ...config, __wisePenTelemetry: request };
+  try {
+    const response =
+      method === 'get' || method === 'delete'
+        ? await httpClient[method](url, requestConfig)
+        : await httpClient[method](url, data, requestConfig);
+    const result = parse(response);
+    recordRequestSuccess(request);
+    return result;
+  } catch (error) {
+    reportApiFailure(error, request);
+    throw error;
+  } finally {
+    request.finish();
+  }
 }
 
-export async function apiPost<T>(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<T> {
-  return unwrap<T>(await httpClient.post(url, data, config));
+export function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  return executeRequest('get', url, config, undefined, unwrap<T>);
+}
+
+export function apiPost<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return executeRequest('post', url, config, data, unwrap<T>);
 }
 
 /** 读取裸文本响应；仅用于后端明确声明非 R<T> 的接口。 */
-export async function apiGetText(url: string, config?: AxiosRequestConfig): Promise<string> {
-  const response = await httpClient.get<unknown>(url, {
-    responseType: 'text',
-    transformResponse: [(data: unknown) => data],
-    ...config,
-  });
-  return parseTextApiResponse(response);
+export function apiGetText(url: string, config?: AxiosRequestConfig): Promise<string> {
+  return executeRequest(
+    'get',
+    url,
+    {
+      responseType: 'text',
+      transformResponse: [(data: unknown) => data],
+      ...config,
+    },
+    undefined,
+    parseTextApiResponse
+  );
 }
 
-export async function apiPut<T>(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<T> {
-  return unwrap<T>(await httpClient.put(url, data, config));
+export function apiPut<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  return executeRequest('put', url, config, data, unwrap<T>);
 }
 
-export async function apiDelete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return unwrap<T>(await httpClient.delete(url, config));
+export function apiDelete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  return executeRequest('delete', url, config, undefined, unwrap<T>);
 }

@@ -4,15 +4,17 @@ import '@fontsource-variable/noto-sans-sc/wght.css';
 import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 import App from './bootstrap/App';
+import router from './bootstrap/router';
 import './styles/global/index.css';
 import './styles/global/scrollbar.scss';
 import './styles/global/app-shell.css';
-import { installOtelErrorReporter } from '@/telemetry/errorReporter';
+import { installTelemetry } from '@/telemetry';
 import { syncViewportLayoutScale } from '@/utils/browser/layoutScale';
 import { reportError } from './utils/error';
 import RootErrorFallback from './views/app/error/RootErrorFallback';
 
-installOtelErrorReporter();
+const stopTelemetry = installTelemetry(router);
+import.meta.hot?.dispose(stopTelemetry);
 syncViewportLayoutScale();
 
 const root = createRoot(document.getElementById('root')!, {

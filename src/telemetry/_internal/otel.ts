@@ -6,12 +6,12 @@ import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 
 import { publicAppConfig } from '@/config/runtimeConfig';
-import { createUuid } from '@/utils/random/createUuid';
 
+import { getClientAttributes, isTelemetryEnabled } from './runtime';
+import { TelemetrySpanProcessor } from './spanProcessor';
 import { applyXhrApiAttributes } from './xhrApiTelemetry';
 
 const SERVICE_NAME = 'wisepen-web';
-const OTEL_SESSION_KEY = 'wisepen.otel.session';
 
 const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -27,20 +27,7 @@ const buildTracePropagationPatterns = (baseUrls: readonly string[]): RegExp[] =>
     (origin) => new RegExp(`^${escapeRegExp(origin)}(?:/|$)`)
   );
 
-const readSessionId = (): string => {
-  try {
-    const current = sessionStorage.getItem(OTEL_SESSION_KEY);
-    if (current) return current;
-    const next = createUuid();
-    sessionStorage.setItem(OTEL_SESSION_KEY, next);
-    return next;
-  } catch {
-    return createUuid();
-  }
-};
-
 const endpoint = publicAppConfig.observability.otelEndpoint;
-export const isTelemetryEnabled = Boolean(endpoint) && publicAppConfig.mode !== 'mock';
 
 const toAbsoluteEndpoint = (value: string): string => {
   const absolute = value.startsWith('/')
@@ -63,14 +50,14 @@ if (isTelemetryEnabled && endpoint) {
       serviceName: SERVICE_NAME,
       serviceVersion: __APP_VERSION__,
       resourceAttributes: {
-        'deployment.environment.name': publicAppConfig.mode,
-        'session.id': readSessionId(),
+        ...getClientAttributes(),
       },
       logs: {
         exportConfig: { url: `${exportBaseUrl}/v1/logs` },
         batchProcessorConfig: { maxQueueSize: 2048, scheduledDelayMillis: 1_000 },
       },
       traces: {
+        processors: [new TelemetrySpanProcessor()],
         contextManager: new ZoneContextManager(),
         exportConfig: { url: `${exportBaseUrl}/v1/traces` },
         batchProcessorConfig: { maxQueueSize: 2048, scheduledDelayMillis: 5_000 },

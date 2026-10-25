@@ -4,12 +4,13 @@ import { buildLoginPathForCurrentLocation } from '@/bootstrap/authContinuation';
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { loadTelemetryUser } from '@/telemetry';
 
 import styles from './style.module.scss';
 
 function AuthenticatedRouteGuard() {
   const userService = useUserService();
-  const { data, error, loading } = useApi(() => userService.getUserInfo());
+  const { data, error, loading } = useApi(() => loadTelemetryUser(() => userService.getUserInfo()));
 
   if (loading || (!data && !error)) {
     return (

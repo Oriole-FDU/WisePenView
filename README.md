@@ -53,6 +53,8 @@ pnpm mock
 前端 OTel 最小试点默认关闭；在对应 `.env.*` 或构建环境中设置 `VITE_OTEL_ENDPOINT`（同源
 `/otel` 或绝对 OTLP HTTP 地址）后启用 trace/log 上报。Jenkins 只提供 `ENABLE_OTEL` 开关，开启后
 入口自动取 `VITE_API_BASE_URL` 下的 `/otel`。未配置时不会注册 provider，也不会产生上报请求。
+用户与客户端上下文、近期事件、请求失败分类和重复聚合说明见
+[前端可观测性](agent/docs/observability.md)。
 
 Mock 與正式環境共用 service、mapper、快取和 registry，只在 `@domain-apis` 替換 API 與 OSS I/O。模擬資料存於記憶體，重新整理後重置；API 契約變更時需同步更新 mock API。
 

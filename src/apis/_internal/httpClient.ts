@@ -4,7 +4,11 @@ import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig }
 import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/_internal/apiServerAddr';
 import { mapAxiosErrorToWisePenError } from '@/apis/_internal/axiosErrorMapper';
 import { applyXDeveloperHeader } from '@/apis/_internal/developmentTraffic';
-import { reportHttpFailure } from '@/telemetry/httpFailure';
+import {
+  captureResponseTelemetry,
+  prepareRequestTelemetry,
+  reportHttpFailure,
+} from '@/telemetry/http';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 
 declare module 'axios' {
@@ -76,6 +80,7 @@ httpClient.interceptors.request.use(async (config) => {
   config.__wisePenAuthSessionVersion ??= authSessionCoordinator.getSessionVersion();
   await awaitAddrReady();
   config.baseURL = getApiBaseUrl();
+  prepareRequestTelemetry(config);
   config.headers = AxiosHeaders.from(config.headers);
   applyXDeveloperHeader(new Headers()).forEach((value, key) => {
     config.headers.set(key, value);
@@ -84,7 +89,10 @@ httpClient.interceptors.request.use(async (config) => {
 });
 
 httpClient.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    captureResponseTelemetry(response);
+    return response.data;
+  },
   async (error: AxiosError) => {
     if (!error.response) {
       notifyAddrFailure();
@@ -94,8 +102,6 @@ httpClient.interceptors.response.use(
       return retryRequest;
     }
 
-    reportHttpFailure(error);
-
     const requestConfig = error.config;
     const authSessionState =
       error.response?.status !== 401 || requestConfig?.skipUnauthorizedHandling
@@ -103,6 +109,8 @@ httpClient.interceptors.response.use(
         : requestConfig?.__wisePenAuthSessionVersion === authSessionCoordinator.getSessionVersion()
           ? 'handled'
           : 'stale';
+    const mappedError = mapAxiosErrorToWisePenError(error, authSessionState);
+    reportHttpFailure(error, mappedError);
     if (
       error.response?.status === 401 &&
       requestConfig &&
@@ -111,7 +119,7 @@ httpClient.interceptors.response.use(
     ) {
       authSessionCoordinator.publish('unauthorized');
     }
-    return Promise.reject(mapAxiosErrorToWisePenError(error, authSessionState));
+    return Promise.reject(mappedError);
   }
 );
 

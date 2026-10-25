@@ -31,6 +31,8 @@
 
 ## 其它领域
 
+- `observability.md`：前端遥测字段、近期事件、请求分类、重复聚合与排查。
+
 - `business-knowledge.md`：业务知识文件的唯一来源、迁移和分批审查。
 - `routing.md`：URL、页面级 Tab、面包屑和导航历史。
 - `store.md`：状态归属、注册、持久化和生命周期。

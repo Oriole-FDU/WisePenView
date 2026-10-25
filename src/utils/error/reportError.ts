@@ -32,7 +32,7 @@ export interface ErrorReport {
   };
 }
 
-export type ErrorReporter = (report: ErrorReport) => void | Promise<void>;
+export type ErrorReporter = (report: ErrorReport, error: unknown) => void | Promise<void>;
 
 const errorIds = new WeakMap<object, string>();
 const reportedAt = new WeakMap<object, number>();
@@ -103,7 +103,9 @@ export const reportError = (error: unknown, context: ErrorReportContext): string
   }
 
   try {
-    void Promise.resolve(currentReporter(buildErrorReport(error, context))).catch(() => undefined);
+    void Promise.resolve(currentReporter(buildErrorReport(error, context), error)).catch(
+      () => undefined
+    );
   } catch {
     // 后端上报接入失败时保持静默，避免形成二次异常。
   }

@@ -11,6 +11,7 @@ import { ServicesProvider } from '@/domains';
 import { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
 import { resetSessionStores } from '@/store/lifecycle';
+import { resetTelemetryIdentity } from '@/telemetry';
 import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';
 import { installGlobalErrorReporting, reportError } from '@/utils/error';
@@ -64,6 +65,7 @@ function App() {
   useViewportLayoutScale();
 
   const handleAuthSessionEvent = (event: AuthSessionEvent): void => {
+    resetTelemetryIdentity(event.type);
     if (event.type === 'login') {
       sessionEndedRef.current = false;
       resetSessionState();
