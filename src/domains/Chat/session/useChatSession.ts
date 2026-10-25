@@ -5,7 +5,7 @@ import { useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
 import { applyXDeveloperHeader, awaitAddrReady, notifyAddrFailure } from '@/apis/runtime';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createClientError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 
 import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
 import { mapChatCompletionRequest } from '../mapper/chatCompletion.mapper';
@@ -92,7 +92,15 @@ export const useChatSession = ({
 }: UseChatSessionOptions) => {
   const chat = useChat<WisePenUIMessage>({
     experimental_throttle: CHAT_STREAM_THROTTLE_MS,
-    onError,
+    onError: (error) => {
+      reportError(error, {
+        origin: 'handled',
+        flow: 'chat',
+        operation: 'chat-stream',
+        pathname: window.location.pathname,
+      });
+      onError?.(error);
+    },
     transport: chatTransport,
   });
   const resumeRequestRef = useRef<{
@@ -156,6 +164,12 @@ export const useChatSession = ({
         ) {
           return;
         }
+        reportError(error, {
+          origin: 'handled',
+          flow: 'chat',
+          operation: 'chat-stream',
+          pathname: window.location.pathname,
+        });
         if (error instanceof Error) {
           latestOnError.current?.(error);
         }
