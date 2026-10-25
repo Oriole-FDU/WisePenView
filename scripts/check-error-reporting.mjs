@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+import { AxiosError } from 'axios';
 import { build } from 'esbuild';
 import { loadConfigFromFile } from 'vite';
 
@@ -23,9 +24,6 @@ const defines = {
 };
 const records = { logs: [], spans: [], options: [] };
 globalThis.__errorReportingCheck = records;
-globalThis.window = {
-  location: { origin: 'https://app.example', pathname: '/chat/private-session' },
-};
 
 try {
   const output = path.join(temp, 'reporting.mjs');
@@ -34,6 +32,9 @@ try {
       contents: `
         export * from '@/utils/error/reportError';
         export { WisePenError } from '@/utils/error/WisePenError';
+        export * from '@/utils/error/codes';
+        export { parseErrorMessage } from '@/utils/error/parseErrorMessage';
+        export { default as i18n } from '@/i18n';
         export * from '@/telemetry/privacy';
         export { allowErrorReport, installOtelErrorReporter } from '@/telemetry/errorReporter';
         export { reportHttpFailure } from '@/telemetry/httpFailure';
@@ -53,7 +54,7 @@ try {
         name: 'existing-runtime-seams',
         setup(builder) {
           builder.onResolve(
-            { filter: /^\.\/(otel|parseErrorMessage)$|^@heroui\/react$|^ahooks\/es\// },
+            { filter: /^\.\/otel$|^@heroui\/react$|^ahooks\/es\// },
             ({ path }) => ({ path, namespace: 'check' })
           );
           builder.onLoad({ filter: /.*/, namespace: 'check' }, ({ path: module }) => ({
@@ -67,7 +68,6 @@ try {
                   globalThis.__errorReportingCheck.spans.push(span); return span;
                 } };
               `,
-                './parseErrorMessage': `export const parseErrorMessage = () => 'safe message';`,
                 '@heroui/react': `export const toast = { danger() {} };`,
               }[module] ??
               `export default function(service, options) {
@@ -79,6 +79,33 @@ try {
     ],
   });
   const api = await import(pathToFileURL(output).href);
+  globalThis.window = {
+    location: { origin: 'https://app.example', pathname: '/chat/private-session' },
+  };
+  for (const language of ['zh-CN', 'en-US']) {
+    await api.i18n.changeLanguage(language);
+    const unknownMessage = api.i18n.t('common.unknown', { ns: 'errors' });
+    for (const [source, codes] of [
+      ['http', api.FRONTEND_NETWORK_ERROR],
+      ['client', api.FRONTEND_CLIENT_ERROR],
+    ]) {
+      for (const code of Object.values(codes)) {
+        const error = new api.WisePenError({ code, source });
+        assert.notEqual(
+          api.parseErrorMessage(error),
+          unknownMessage,
+          `${language}: 已定义的 ${source} 错误码 ${code} 不应显示未知错误`
+        );
+      }
+    }
+    const serverError = new api.WisePenError({
+      code: 999999,
+      source: 'api',
+      serverMsg: 'server fallback',
+    });
+    assert.equal(api.parseErrorMessage(serverError), 'server fallback');
+    assert.equal(api.parseErrorMessage(null), unknownMessage);
+  }
   const observed = [];
   api.configureErrorReporter((report) => observed.push(report));
   const primitiveId = api.reportError('private-document-body', { origin: 'unhandled-rejection' });
@@ -243,7 +270,7 @@ try {
   api.reportError({ body: 'private-document-body' }, { origin: 'unhandled-rejection' });
   assert.equal(records.logs.at(-1).attributes['error.location_available'], false);
   assert(!Object.hasOwn(records.logs.at(-1).attributes, 'error.stack'));
-  const httpFailure = Object.assign(new Error('private server body'), {
+  const httpFailure = Object.assign(new AxiosError('private server body'), {
     config: {
       url: '/auth/login?token=password-secret',
       baseURL: 'https://api.example',
@@ -257,6 +284,7 @@ try {
   });
   api.reportHttpFailure(httpFailure);
   const httpEvent = records.logs.at(-1);
+  assert.equal(httpEvent.attributes['error.type'], 'AxiosError');
   assert.equal(httpEvent.attributes['api.endpoint'], '/auth/login');
   assert.equal(httpEvent.attributes['api.business_code'], 5100);
   assert.equal(httpEvent.attributes['wisepen.request_id'], 'a'.repeat(32));
@@ -408,7 +436,7 @@ try {
   await writeFile(path.join(artifacts, 'assets/probe.mjs.map'), '{}');
   assert.equal(spawnSync(process.execPath, command, { encoding: 'utf8' }).status, 1);
   console.log(
-    '错误上报检查通过：编号／SDK 隐私边界／白名单／回调／限流／保存失败／构建身份／附件隔离／行号还原'
+    '错误上报检查通过：错误码文案／Axios 分类／编号／SDK 隐私边界／白名单／回调／限流／保存失败／构建身份／附件隔离／行号还原'
   );
 } finally {
   delete globalThis.__errorReportingCheck;

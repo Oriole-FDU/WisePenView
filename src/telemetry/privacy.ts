@@ -15,6 +15,7 @@ const errorNames = new Set([
   'EvalError',
   'AggregateError',
   'WisePenError',
+  'AxiosError',
 ]);
 const requestIdPattern = /^(?:[\da-f]{32}|[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12})$/i;
 // 只保留本次试点需要的固定端点；其他路径不进入遥测。

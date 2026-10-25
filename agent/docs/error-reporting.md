@@ -27,6 +27,8 @@ Jenkins 的 `ENABLE_OTEL` 维持默认关闭；手动开启后，OTLP 入口使�
 
 HTTP 5xx 在重试结束后进入同一出口；后续 `WisePenError.cause` 共用编号与短时间去重，避免再制造一条应用错误。一般 toast 不新增编号；既有错误页复制详情包含版本、commit、release 与 dirty 标记。
 
+HTTP 原始异常保留固定的 `AxiosError` 分类；API 响应契约无效（错误码 16）显示对应的中英文提示，不降级为未知错误。没有明确分类或信息的异常仍保留通用提示，不猜测原因或上传原始内容。
+
 ## 构建附件与还原
 
 每次 build 使用同一份构建信息写入 bundle、`dist/build-info.json`、发布 manifest 及 `.wisepen-debug/<release>/manifest.json`。本地未提交修改以 `dirty: true` 明示，不能把此产物视为纯 commit 的内容。
@@ -56,7 +58,9 @@ node scripts/symbolicate-error.mjs \
 
 ## 验证与限制
 
-`pnpm check:error-reporting` 使用 Node assert 和既有 esbuild，检查编号、白名单、callback、限流、保存失败、附件隔离与 minified fixture 行号还原。构建检查直接读取 Vite 配置；SDK 装配的 API origin、URL 去敏及临时 session 检查使用受控替身，UI hooks 也使用替身。真实 SDK 初始化、网络采集和 OTLP 接收尚未验证。
+`pnpm check:error-reporting` 使用 Node assert 和既有 esbuild，检查所有已定义前端错误码的中英文文案、真实 AxiosError 分类、编号、白名单、callback、限流、保存失败、附件隔离与 minified fixture 行号还原。构建检查直接读取 Vite 配置；SDK 装配的 API origin、URL 去敏及临时 session 检查使用受控替身，UI hooks 也使用替身。
+
+补充验证已在 Node 隔离环境使用真实 SDK 和本机 OTLP/HTTP 接收器，核对 logs／traces 导出、错误编号、trace 关联及敏感内容排除；只替换运行配置并提供最小浏览器 API 注册入口。这不证明浏览器 fetch／XHR、CORS 或正式接收端行为，它们仍待运行态验收。
 
 没有原始堆栈或有效位置时，只回报可用的版本及事件信息。非对象异常的身份缓存只保留最近 128 个值，同值可共用编号。去重、限流或发送失败时，个别编号可能没有远端事件，须搭配 release 与时间追查。
 
