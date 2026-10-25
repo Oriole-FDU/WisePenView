@@ -1,6 +1,8 @@
 import { isRouteErrorResponse } from 'react-router-dom';
 
+import { buildInfo } from '@/config/buildInfo';
 import i18n from '@/i18n';
+import { safePagePath } from '@/telemetry/privacy';
 import { isWisePenError } from '@/utils/error';
 
 const detailLabel = (key: string): string => i18n.t(`detail.${key}`, { ns: 'errors' });
@@ -110,7 +112,14 @@ const appendError = (
 };
 
 export const buildErrorDetail = (error: unknown, pathname: string, errorId: string): string => {
-  const lines = [`${detailLabel('errorId')}: ${errorId}`, `${detailLabel('page')}: ${pathname}`];
+  const lines = [
+    `${detailLabel('errorId')}: ${errorId}`,
+    `${detailLabel('page')}: ${import.meta.env.DEV ? pathname : safePagePath(pathname)}`,
+    `Version: ${buildInfo.version}`,
+    `Commit: ${buildInfo.commit}`,
+    `Release: ${buildInfo.release}`,
+    `Dirty: ${buildInfo.dirty}`,
+  ];
 
   if (isRouteErrorResponse(error)) {
     lines.push(

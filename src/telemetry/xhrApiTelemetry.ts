@@ -2,13 +2,9 @@ import type { Attributes, Span } from '@opentelemetry/api';
 
 import { isApiResponseEnvelope } from '@/apis/runtimeContract';
 
+import { safeApiPath } from './privacy';
+
 const MAX_ENVELOPE_LENGTH = 256 * 1024;
-const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/gi;
-const NUMERIC_SEGMENT_PATTERN = /\/\d+(?=\/|$)/g;
-
-const normalizeApiEndpoint = (path: string): string =>
-  path.replace(UUID_PATTERN, ':id').replace(NUMERIC_SEGMENT_PATTERN, '/:id');
-
 const readApiEnvelope = (xhr: XMLHttpRequest) => {
   const contentType = xhr.getResponseHeader('content-type') ?? '';
   if (!contentType.includes('json')) return undefined;
@@ -42,7 +38,7 @@ export const applyXhrApiAttributes = (
 
     const envelope = readApiEnvelope(xhr);
     const attributes: Attributes = {
-      'api.endpoint': normalizeApiEndpoint(url.pathname),
+      'api.endpoint': safeApiPath(url.pathname),
       'api.outcome':
         xhr.status >= 200 && xhr.status < 300 && (envelope?.code ?? 200) === 200
           ? 'success'

@@ -8,11 +8,13 @@ export { createClientError } from './createClientError';
 export { parseErrorMessage } from './parseErrorMessage';
 export {
   configureErrorReporter,
+  type ErrorOperationContext,
   type ErrorReport,
   type ErrorReportContext,
   type ErrorReporter,
   getErrorReportId,
   installGlobalErrorReporting,
+  isExpectedError,
   reportError,
 } from './reportError';
 export {
