@@ -6,10 +6,10 @@ API 层是后端协议的薄封装，位于 `src/domains/<Domain>/apis`。它只
 
 API 层只负责：
 
-- 定义后端 URL、method、query/body 位置。
-- 调用 `apiGet`、`apiPost`、`apiPut`、`apiDelete`。
-- 使用请求/响应 DTO 类型。
-- 返回已经由 `src/apis/request.ts` 解包后的 `data`。
+- 通过 `ApiContract` 定义后端 `name`、`endpoint`、请求 Schema 和响应 Schema。
+- 调用传输层 API，并把 query/body 放入正确位置。
+- 在发送前和响应解包后执行 Contract 校验。
+- 只向 service 返回已经解包、校验并完成类型推导的响应。
 - 做极轻协议适配，例如 GET 参数放入 `params`、POST 空 body 使用 `null` 或 `undefined`。
 
 `src/apis/request.ts` 在解包前会运行期校验统一 response envelope：`code` 必须是有限数字，必须存在 `data`；Python response 的 `msg` 必须是字符串，带 `key` 的 Java response 允许 `msg` 为字符串或 `null`，`key` 只能是字符串或 `null`。envelope 不符合契约时抛出传输层 `WisePenError`，不会把未验证的响应继续交给领域 API。
@@ -53,6 +53,76 @@ src/domains/<Domain>/apis/
 - 请求/响应类型：由对应 `XxxApiContract` 使用 `ApiContractRequest`、`ApiContractResponse` 推导
 - API 对象：`XxxApi`、`XxxMemberApi`、`XxxConfigApi`
 
+### POST 标准写法
+
+Schema 文件只声明 wire shape，不声明 endpoint：
+
+```ts
+// ExampleApi.schema.ts
+export const GetExampleApiRequestSchema = z.object({
+  exampleId: z.string(),
+});
+
+export const GetExampleApiResponseSchema = z.object({
+  exampleId: z.string(),
+  description: z.string().nullable(),
+});
+
+export const EmptyApiRequestSchema = z.undefined();
+export const EmptyApiResponseSchema = z.null();
+```
+
+Contract 文件绑定接口身份和两侧 Schema，并导出 API 层使用的类型：
+
+```ts
+// ExampleApi.contract.ts
+export const GetExampleApiContract = defineApiContract({
+  name: 'GetExampleApi',
+  endpoint: '/example/getExample',
+  request: GetExampleApiRequestSchema,
+  response: GetExampleApiResponseSchema,
+});
+
+export type GetExampleApiRequest = ApiContractRequest<typeof GetExampleApiContract>;
+export type GetExampleApiResponse = ApiContractResponse<typeof GetExampleApiContract>;
+```
+
+API 方法只执行固定四步，不读取 `data.xxx`：
+
+```ts
+// ExampleApi.ts
+async function getExample(req: GetExampleApiRequest): Promise<GetExampleApiResponse> {
+  const request = parseApiRequest(GetExampleApiContract, req);
+  const data = await apiPost(GetExampleApiContract.endpoint, request);
+  return parseApiResponse(GetExampleApiContract, data);
+}
+```
+
+没有请求或响应体时也必须显式声明和解析：
+
+```ts
+export const RemoveExampleApiContract = defineApiContract({
+  name: 'RemoveExampleApi',
+  endpoint: '/example/removeExample',
+  request: EmptyApiRequestSchema,
+  response: EmptyApiResponseSchema,
+});
+
+export type RemoveExampleApiResponse = ApiContractResponse<typeof RemoveExampleApiContract>;
+
+async function removeExample(): Promise<RemoveExampleApiResponse> {
+  const request = parseApiRequest(RemoveExampleApiContract, undefined);
+  const data = await apiPost(RemoveExampleApiContract.endpoint, request);
+  return parseApiResponse(RemoveExampleApiContract, data);
+}
+```
+
+稳定依赖方向为：
+
+```text
+ExampleApi.schema -> ExampleApi.contract -> ExampleApi
+```
+
 ## 三、依赖方向
 
 允许：
@@ -90,9 +160,11 @@ api -> views/components
 ## 五、检查清单
 
 - [ ] API 文件只做请求薄封装。
-- [ ] 新增 API 契约优先使用同域 Zod Schema，DTO 由 Schema 推导。
+- [ ] 新增 API 契约使用同域 Zod Schema，Req/Res 类型由 Contract 推导。
 - [ ] 响应契约未使用 optional；真实空值使用 nullable。
-- [ ] API 请求发送前和响应解包后均执行契约解析。
+- [ ] 每个 API 的 Contract 都显式包含 name、endpoint、request 和 response。
+- [ ] API 请求发送前和响应解包后均通过同一个 Contract 执行解析。
+- [ ] 新接口未使用 `apiPostUnchecked<T>`。
 - [ ] API DTO 未泄漏到组件展示层。
 - [ ] API 方法返回明确 DTO，不以 `unknown` 作为未分层的响应出口。
 - [ ] 未新增 `any`。
