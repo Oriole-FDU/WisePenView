@@ -12,6 +12,10 @@ on:
         'refactor/scss-table-boundary',
         'refactor/scss-business',
         'refactor/scss-editors',
+        'feat/otel-observability',
+        'bg/telemetry-base-fixes',
+        'bg/telemetry-build-identity',
+        'bg/telemetry-chat-handled-errors',
       ]
   # 支持手动重跑完整检查。
   workflow_dispatch:
