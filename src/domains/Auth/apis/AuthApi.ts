@@ -3,7 +3,9 @@ import { apiPost } from '@/apis/request';
 
 import type {
   ChangePasswordApiRequest,
+  EmptyAuthApiResponse,
   LoginApiRequest,
+  LoginApiResponse,
   NewPasswordApiRequest,
   RegisterApiRequest,
   ResetPasswordApiRequest,
@@ -27,7 +29,7 @@ const AUTH_ENDPOINTS = {
   changePassword: '/auth/changePassword',
 } as const;
 
-async function login(req: LoginApiRequest): Promise<string> {
+async function login(req: LoginApiRequest): Promise<LoginApiResponse> {
   const request = parseApiRequest(LoginApiRequestSchema, req, {
     contract: 'LoginApiRequest',
     endpoint: AUTH_ENDPOINTS.login,
@@ -41,57 +43,57 @@ async function login(req: LoginApiRequest): Promise<string> {
   });
 }
 
-async function logout(): Promise<void> {
+async function logout(): Promise<EmptyAuthApiResponse> {
   const data = await apiPost<unknown>(AUTH_ENDPOINTS.logout);
-  parseApiResponse(EmptyAuthApiResponseSchema, data, {
+  return parseApiResponse(EmptyAuthApiResponseSchema, data, {
     contract: 'EmptyAuthApiResponse',
     endpoint: AUTH_ENDPOINTS.logout,
   });
 }
 
-async function register(req: RegisterApiRequest): Promise<void> {
+async function register(req: RegisterApiRequest): Promise<EmptyAuthApiResponse> {
   const request = parseApiRequest(RegisterApiRequestSchema, req, {
     contract: 'RegisterApiRequest',
     endpoint: AUTH_ENDPOINTS.register,
   });
   const data = await apiPost<unknown>(AUTH_ENDPOINTS.register, request);
-  parseApiResponse(EmptyAuthApiResponseSchema, data, {
+  return parseApiResponse(EmptyAuthApiResponseSchema, data, {
     contract: 'EmptyAuthApiResponse',
     endpoint: AUTH_ENDPOINTS.register,
   });
 }
 
-async function forgotPasswordEmail(req: ResetPasswordApiRequest): Promise<void> {
+async function forgotPasswordEmail(req: ResetPasswordApiRequest): Promise<EmptyAuthApiResponse> {
   const request = parseApiRequest(ResetPasswordApiRequestSchema, req, {
     contract: 'ResetPasswordApiRequest',
     endpoint: AUTH_ENDPOINTS.resetPasswordEmail,
   });
   const data = await apiPost<unknown>(AUTH_ENDPOINTS.resetPasswordEmail, request);
-  parseApiResponse(EmptyAuthApiResponseSchema, data, {
+  return parseApiResponse(EmptyAuthApiResponseSchema, data, {
     contract: 'EmptyAuthApiResponse',
     endpoint: AUTH_ENDPOINTS.resetPasswordEmail,
   });
 }
 
-async function forgotPasswordReset(req: NewPasswordApiRequest): Promise<void> {
+async function forgotPasswordReset(req: NewPasswordApiRequest): Promise<EmptyAuthApiResponse> {
   const request = parseApiRequest(NewPasswordApiRequestSchema, req, {
     contract: 'NewPasswordApiRequest',
     endpoint: AUTH_ENDPOINTS.resetPassword,
   });
   const data = await apiPost<unknown>(AUTH_ENDPOINTS.resetPassword, request);
-  parseApiResponse(EmptyAuthApiResponseSchema, data, {
+  return parseApiResponse(EmptyAuthApiResponseSchema, data, {
     contract: 'EmptyAuthApiResponse',
     endpoint: AUTH_ENDPOINTS.resetPassword,
   });
 }
 
-async function changePassword(req: ChangePasswordApiRequest): Promise<void> {
+async function changePassword(req: ChangePasswordApiRequest): Promise<EmptyAuthApiResponse> {
   const request = parseApiRequest(ChangePasswordApiRequestSchema, req, {
     contract: 'ChangePasswordApiRequest',
     endpoint: AUTH_ENDPOINTS.changePassword,
   });
   const data = await apiPost<unknown>(AUTH_ENDPOINTS.changePassword, request);
-  parseApiResponse(EmptyAuthApiResponseSchema, data, {
+  return parseApiResponse(EmptyAuthApiResponseSchema, data, {
     contract: 'EmptyAuthApiResponse',
     endpoint: AUTH_ENDPOINTS.changePassword,
   });
