@@ -7,7 +7,7 @@ Service 层位于 `src/domains/<Domain>/service`，负责业务编排和错误�
 Service 应负责：
 
 - 编排一个或多个 API 调用。
-- 调用 mapper 完成请求参数和响应数据转换。
+- 在 API 契约与业务语义不一致时调用 mapper 完成转换；语义一致时直接使用已校验的 API 数据。
 - 做必要的客户端业务校验。
 - 抛出 `WisePenError`；客户端校验使用 `createClientError` 创建。
 - 管理领域内缓存、session 或跨请求状态，前提是职责清晰。
@@ -73,7 +73,7 @@ export const createXxxServices = (deps?: XxxServiceDeps): IXxxService => ({
 src/domains/<Domain>/
 ├── index.ts
 ├── apis/
-├── mapper/
+├── mapper/（按需）
 ├── entity/
 ├── enum/
 ├── mock/
@@ -95,6 +95,6 @@ src/domains/<Domain>/
 - [ ] 跨 service 依赖通过 registry 注入。
 - [ ] service 不做 UI 提示。
 - [ ] service 不直接 import Axios。
-- [ ] 字段转换交给 mapper。
+- [ ] 没有为字段同名且语义一致的请求或响应保留机械 mapper。
 - [ ] 错误向上抛出。
 - [ ] 未新增 `any`。

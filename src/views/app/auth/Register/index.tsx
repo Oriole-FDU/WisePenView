@@ -13,7 +13,7 @@ import { AppButton } from '@/components/base/Button';
 import { Checkbox, FormField, PasswordInput } from '@/components/base/Input';
 import { useAuthService } from '@/domains';
 import type { RegisterRequest } from '@/domains/Auth';
-import { normalizeInviteCode } from '@/domains/Auth/utils/normalizeInviteCode';
+import { normalizeInviteCode } from '@/domains/Auth/utils/normalizeRegisterRequest';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH, readRegisterInviteCode } from '@/utils/navigation/appRoute';
 import {

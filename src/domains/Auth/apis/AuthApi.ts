@@ -1,3 +1,4 @@
+import { parseApiRequest, parseApiResponse } from '@/apis/contract';
 import { apiPost } from '@/apis/request';
 
 import type {
@@ -6,36 +7,62 @@ import type {
   LoginApiRequest,
   LoginApiResponse,
   LogoutApiResponse,
-  NewPasswordApiRequest,
-  NewPasswordApiResponse,
   RegisterApiRequest,
   RegisterApiResponse,
   ResetPasswordApiRequest,
   ResetPasswordApiResponse,
-} from './AuthApi.type';
+  ResetPasswordEmailApiRequest,
+  ResetPasswordEmailApiResponse,
+} from './AuthApi.contract';
+import {
+  ChangePasswordApiContract,
+  LoginApiContract,
+  LogoutApiContract,
+  RegisterApiContract,
+  ResetPasswordApiContract,
+  ResetPasswordEmailApiContract,
+} from './AuthApi.contract';
 
-function login(req: LoginApiRequest): Promise<LoginApiResponse> {
-  return apiPost('/auth/login', req, { skipUnauthorizedHandling: true });
+async function login(req: LoginApiRequest): Promise<LoginApiResponse> {
+  const request = parseApiRequest(LoginApiContract, req);
+  const data = await apiPost(LoginApiContract.endpoint, request, {
+    skipUnauthorizedHandling: true,
+  });
+  return parseApiResponse(LoginApiContract, data);
 }
 
-function logout(): Promise<LogoutApiResponse> {
-  return apiPost('/auth/logout');
+async function logout(): Promise<LogoutApiResponse> {
+  const request = parseApiRequest(LogoutApiContract, undefined);
+  const data = await apiPost(LogoutApiContract.endpoint, request);
+  return parseApiResponse(LogoutApiContract, data);
 }
 
-function register(req: RegisterApiRequest): Promise<RegisterApiResponse> {
-  return apiPost('/auth/register', req);
+async function register(req: RegisterApiRequest): Promise<RegisterApiResponse> {
+  const request = parseApiRequest(RegisterApiContract, req);
+  const data = await apiPost(RegisterApiContract.endpoint, request);
+  return parseApiResponse(RegisterApiContract, data);
 }
 
-function forgotPasswordEmail(req: ResetPasswordApiRequest): Promise<ResetPasswordApiResponse> {
-  return apiPost('/auth/sendResetMail', req);
+async function forgotPasswordEmail(
+  req: ResetPasswordEmailApiRequest
+): Promise<ResetPasswordEmailApiResponse> {
+  const request = parseApiRequest(ResetPasswordEmailApiContract, req);
+  const data = await apiPost(ResetPasswordEmailApiContract.endpoint, request);
+  return parseApiResponse(ResetPasswordEmailApiContract, data);
 }
 
-function forgotPasswordReset(req: NewPasswordApiRequest): Promise<NewPasswordApiResponse> {
-  return apiPost('/auth/resetPassword', req);
+async function forgotPasswordReset(
+  req: ResetPasswordApiRequest
+): Promise<ResetPasswordApiResponse> {
+  const request = parseApiRequest(ResetPasswordApiContract, req);
+  const data = await apiPost(ResetPasswordApiContract.endpoint, request);
+  return parseApiResponse(ResetPasswordApiContract, data);
 }
 
-function changePassword(req: ChangePasswordApiRequest): Promise<ChangePasswordApiResponse> {
-  return apiPost('/auth/changePassword', req);
+async function changePassword(req: ChangePasswordApiRequest): Promise<ChangePasswordApiResponse> {
+  const request = parseApiRequest(ChangePasswordApiContract, req);
+  const data = await apiPost(ChangePasswordApiContract.endpoint, request);
+  return parseApiResponse(ChangePasswordApiContract, data);
 }
 
 export const AuthApi = {

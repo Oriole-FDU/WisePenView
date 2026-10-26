@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   GetUserWalletInfoApiResponse,
@@ -32,7 +32,7 @@ function getUserWalletInfo(): Promise<GetUserWalletInfoApiResponse> {
 }
 
 function redeemVoucher(req: RedeemVoucherApiRequest): Promise<void> {
-  return apiPost('/user/wallet/redeemVoucher', req);
+  return apiPostUnchecked('/user/wallet/redeemVoucher', req);
 }
 
 function listTransactions(req: ListTransactionsApiRequest): Promise<ListTransactionsApiResponse> {
@@ -45,7 +45,7 @@ function listTransactions(req: ListTransactionsApiRequest): Promise<ListTransact
 function transferTokenBetweenGroupAndUser(
   req: TransferTokenBetweenGroupAndUserApiRequest
 ): Promise<void> {
-  return apiPost('/user/wallet/transferTokenBetweenGroupAndUser', req);
+  return apiPostUnchecked('/user/wallet/transferTokenBetweenGroupAndUser', req);
 }
 
 export const WalletApi = {

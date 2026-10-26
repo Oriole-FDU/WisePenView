@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ListUserMessagesApiRequest,
@@ -11,7 +11,7 @@ function listUserMessages(req: ListUserMessagesApiRequest): Promise<ListUserMess
 }
 
 function readMessage(req: ReadMessageApiRequest): Promise<void> {
-  return apiPost('/user/message/readMessage', req);
+  return apiPostUnchecked('/user/message/readMessage', req);
 }
 
 export const MessageApi = {

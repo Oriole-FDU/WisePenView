@@ -2,7 +2,7 @@ import { AuthApi } from '@domain-apis';
 
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 
-import { AuthServicesMap } from '../mapper/AuthServices.map';
+import { normalizeRegisterRequest } from '../utils/normalizeRegisterRequest';
 import type {
   ChangePasswordRequest,
   LoginRequest,
@@ -13,8 +13,7 @@ import type {
 import type { IAuthService } from './index.type';
 
 const login = async (params: LoginRequest) => {
-  const apiParams = AuthServicesMap.mapLoginRequest(params);
-  await AuthApi.login(apiParams);
+  await AuthApi.login(params);
   authSessionCoordinator.publish('login');
 };
 
@@ -24,23 +23,21 @@ const logout = async () => {
 };
 
 const register = async (params: RegisterRequest) => {
-  const apiParams = AuthServicesMap.mapRegisterRequest(params);
-  await AuthApi.register(apiParams);
+  // 归一化注册请求，去除首尾空白并统一邀请码为大写
+  const registerRequest = normalizeRegisterRequest(params);
+  await AuthApi.register(registerRequest);
 };
 
 const resetPassword = async (params: ResetPasswordRequest) => {
-  const apiParams = AuthServicesMap.mapResetPasswordRequest(params);
-  await AuthApi.forgotPasswordEmail(apiParams);
+  await AuthApi.forgotPasswordEmail(params);
 };
 
 const newPassword = async (params: NewPasswordRequest) => {
-  const apiParams = AuthServicesMap.mapNewPasswordRequest(params);
-  await AuthApi.forgotPasswordReset(apiParams);
+  await AuthApi.forgotPasswordReset(params);
 };
 
 const changePassword = async (params: ChangePasswordRequest) => {
-  const apiParams = AuthServicesMap.mapChangePasswordRequest(params);
-  await AuthApi.changePassword(apiParams);
+  await AuthApi.changePassword(params);
 };
 
 export const createAuthServices = (): IAuthService => ({

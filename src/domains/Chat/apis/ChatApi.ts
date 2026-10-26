@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ActiveChatTurnApiRequest,
@@ -62,7 +62,7 @@ function listTools(): Promise<ListToolsApiResponse> {
 function initTemporaryAttachmentUpload(
   req: InitTemporaryAttachmentUploadApiRequest
 ): Promise<InitTemporaryAttachmentUploadApiResponse> {
-  return apiPost('/chat/attachment/initUploadTemporaryAttachment', req);
+  return apiPostUnchecked('/chat/attachment/initUploadTemporaryAttachment', req);
 }
 
 function listUserProviders(): Promise<ListUserProvidersApiResponse> {
@@ -70,55 +70,55 @@ function listUserProviders(): Promise<ListUserProvidersApiResponse> {
 }
 
 function createUserProvider(req: CreateUserProviderApiRequest): Promise<null> {
-  return apiPost('/chat/model/createUserProvider', req);
+  return apiPostUnchecked('/chat/model/createUserProvider', req);
 }
 
 function updateUserProvider(
   req: UpdateUserProviderApiRequest
 ): Promise<UpdateUserProviderApiResponse> {
-  return apiPost('/chat/model/updateUserProvider', req);
+  return apiPostUnchecked('/chat/model/updateUserProvider', req);
 }
 
 function deleteUserProvider(
   req: DeleteUserProviderApiRequest
 ): Promise<DeleteUserProviderApiResponse> {
-  return apiPost('/chat/model/deleteUserProvider', req);
+  return apiPostUnchecked('/chat/model/deleteUserProvider', req);
 }
 
 function createUserModel(req: CreateUserModelApiRequest): Promise<CreateUserModelApiResponse> {
-  return apiPost('/chat/model/createUserModel', req);
+  return apiPostUnchecked('/chat/model/createUserModel', req);
 }
 
 function updateUserModel(req: UpdateUserModelApiRequest): Promise<UpdateUserModelApiResponse> {
-  return apiPost('/chat/model/updateUserModel', req);
+  return apiPostUnchecked('/chat/model/updateUserModel', req);
 }
 
 function deleteUserModel(req: DeleteUserModelApiRequest): Promise<DeleteUserModelApiResponse> {
-  return apiPost('/chat/model/deleteUserModel', req);
+  return apiPostUnchecked('/chat/model/deleteUserModel', req);
 }
 
 function bindModelProvider(
   req: BindModelProviderApiRequest
 ): Promise<BindModelProviderApiResponse> {
-  return apiPost('/chat/model/bindModelProvider', req);
+  return apiPostUnchecked('/chat/model/bindModelProvider', req);
 }
 
 function unbindModelProvider(
   req: UnbindModelProviderApiRequest
 ): Promise<UnbindModelProviderApiResponse> {
-  return apiPost('/chat/model/unbindModelProvider', req);
+  return apiPostUnchecked('/chat/model/unbindModelProvider', req);
 }
 
 function updateUserToolConfig(
   req: UpdateUserToolConfigApiRequest
 ): Promise<UpdateUserToolConfigApiResponse> {
-  return apiPost('/chat/tool/updateUserToolConfig', req);
+  return apiPostUnchecked('/chat/tool/updateUserToolConfig', req);
 }
 
 function deleteUserToolConfig(
   req: DeleteUserToolConfigApiRequest
 ): Promise<DeleteUserToolConfigApiResponse> {
-  return apiPost('/chat/tool/deleteUserToolConfig', req);
+  return apiPostUnchecked('/chat/tool/deleteUserToolConfig', req);
 }
 
 export const ChatApi = {
@@ -146,7 +146,7 @@ function getActiveTurn(req: ActiveChatTurnApiRequest): Promise<ActiveChatTurnApi
 }
 
 function cancelTurn(req: CancelChatTurnApiRequest): Promise<CancelChatTurnApiResponse> {
-  return apiPost('/chat/completions/cancel', req);
+  return apiPostUnchecked('/chat/completions/cancel', req);
 }
 
 export const ChatCompletionApi = {
@@ -157,11 +157,11 @@ export const ChatCompletionApi = {
 /** Chat Session API: /chat/session/* */
 
 function createSession(req: CreateSessionApiRequest): Promise<CreateSessionApiResponse> {
-  return apiPost('/chat/session/createSession', req);
+  return apiPostUnchecked('/chat/session/createSession', req);
 }
 
 function setSessionAgent(req: SetSessionAgentApiRequest): Promise<SetSessionAgentApiResponse> {
-  return apiPost(
+  return apiPostUnchecked(
     '/chat/session/setSessionAgent',
     {
       agent_id: req.agent_id,
@@ -174,7 +174,7 @@ function setSessionAgent(req: SetSessionAgentApiRequest): Promise<SetSessionAgen
 }
 
 function renameSession(req: RenameSessionApiRequest): Promise<RenameSessionApiResponse> {
-  return apiPost(
+  return apiPostUnchecked(
     '/chat/session/renameSession',
     { new_title: req.new_title },
     {
@@ -184,7 +184,7 @@ function renameSession(req: RenameSessionApiRequest): Promise<RenameSessionApiRe
 }
 
 function deleteSession(req: DeleteSessionApiRequest): Promise<DeleteSessionApiResponse> {
-  return apiPost('/chat/session/deleteSession', undefined, {
+  return apiPostUnchecked('/chat/session/deleteSession', undefined, {
     params: { session_id: req.session_id },
   });
 }

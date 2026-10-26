@@ -1,4 +1,4 @@
-import { apiPost } from '@/apis/request';
+import { apiPostUnchecked } from '@/apis/request';
 import type {
   CancelUploadAssetsApiRequest,
   InitUploadAssetsApiResponse,
@@ -15,36 +15,36 @@ import type {
 } from './AgentApi.type';
 
 const createAgent = (body: CreateAgentApiRequest): Promise<string | undefined> =>
-  apiPost('/agent/createAgent', body);
+  apiPostUnchecked('/agent/createAgent', body);
 
 const getAgentInfo = (resourceId: string): Promise<AgentInfoApiResponse | undefined> =>
-  apiPost('/agent/getAgentInfo', null, { params: { resourceId } });
+  apiPostUnchecked('/agent/getAgentInfo', null, { params: { resourceId } });
 
 const getAgentVersionBundleInfo = (
   resourceId: string,
   version: number
 ): Promise<AgentVersionBundleApiResponse | undefined> =>
-  apiPost('/agent/getAgentVersionBundleInfo', null, { params: { resourceId, version } });
+  apiPostUnchecked('/agent/getAgentVersionBundleInfo', null, { params: { resourceId, version } });
 
 const changeAgentInfo = (body: UpdateAgentInfoApiRequest): Promise<void> =>
-  apiPost('/agent/changeAgentInfo', body);
+  apiPostUnchecked('/agent/changeAgentInfo', body);
 
 const updateAgentSpec = (body: UpdateAgentSpecApiRequest): Promise<void> =>
-  apiPost('/agent/updateAgentSpec', body);
+  apiPostUnchecked('/agent/updateAgentSpec', body);
 
 const publishAgentVersion = (resourceId: string): Promise<void> =>
-  apiPost('/agent/publishAgentVersion', { resourceId });
+  apiPostUnchecked('/agent/publishAgentVersion', { resourceId });
 
 const initUploadAgentAssets = (
   body: InitUploadAgentAssetsApiRequest
 ): Promise<InitUploadAssetsApiResponse | undefined> =>
-  apiPost('/agent/initUploadAgentAssets', body);
+  apiPostUnchecked('/agent/initUploadAgentAssets', body);
 
 const deleteAgentAssets = (body: DeleteAgentAssetsApiRequest): Promise<void> =>
-  apiPost('/agent/deleteAgentAssets', body);
+  apiPostUnchecked('/agent/deleteAgentAssets', body);
 
 const cancelUploadAgentAssets = (body: CancelUploadAssetsApiRequest): Promise<void> =>
-  apiPost('/agent/cancelUploadAgentAssets', body);
+  apiPostUnchecked('/agent/cancelUploadAgentAssets', body);
 
 export const AgentApi = {
   createAgent,

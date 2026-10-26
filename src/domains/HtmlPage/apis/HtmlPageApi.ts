@@ -1,4 +1,4 @@
-import { apiGetText, apiPost } from '@/apis/request';
+import { apiGetText, apiPostUnchecked } from '@/apis/request';
 
 import type {
   GetSingleHtmlPageContentApiRequest,
@@ -9,7 +9,7 @@ import type {
 function getSingleHtmlPageInfo(
   req: GetSingleHtmlPageInfoApiRequest
 ): Promise<SingleHtmlPageInfoApiResponse> {
-  return apiPost('/singleHtmlPage/getSingleHtmlPageInfo', undefined, { params: req });
+  return apiPostUnchecked('/singleHtmlPage/getSingleHtmlPageInfo', undefined, { params: req });
 }
 
 function getSingleHtmlPageContent(req: GetSingleHtmlPageContentApiRequest): Promise<string> {

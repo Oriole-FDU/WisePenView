@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddTagApiRequest,
@@ -14,19 +14,19 @@ function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> 
 }
 
 function addTag(req: AddTagApiRequest): Promise<string> {
-  return apiPost('/resource/tag/addTag', req);
+  return apiPostUnchecked('/resource/tag/addTag', req);
 }
 
 function changeTag(req: ChangeTagApiRequest): Promise<void> {
-  return apiPost('/resource/tag/changeTag', req);
+  return apiPostUnchecked('/resource/tag/changeTag', req);
 }
 
 function removeTags(req: RemoveTagsApiRequest): Promise<void> {
-  return apiPost('/resource/tag/removeTags', req);
+  return apiPostUnchecked('/resource/tag/removeTags', req);
 }
 
 function moveTags(req: MoveTagsApiRequest): Promise<void> {
-  return apiPost('/resource/tag/moveTags', req);
+  return apiPostUnchecked('/resource/tag/moveTags', req);
 }
 
 export const TagApi = {

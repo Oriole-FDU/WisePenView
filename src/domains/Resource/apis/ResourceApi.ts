@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ChangeResourceActionPermissionApiRequest,
@@ -37,17 +37,17 @@ function listResources(req: ListResourceItemsApiRequest): Promise<ResourceListPa
 }
 
 function renameResource(req: RenameResourceApiRequest): Promise<void> {
-  return apiPost('/resource/item/renameResource', req);
+  return apiPostUnchecked('/resource/item/renameResource', req);
 }
 
 function changeResourceActionPermission(
   req: ChangeResourceActionPermissionApiRequest
 ): Promise<void> {
-  return apiPost('/resource/item/changeResourceActionPermission', req);
+  return apiPostUnchecked('/resource/item/changeResourceActionPermission', req);
 }
 
 function removeResources(req: RemoveResourcesApiRequest): Promise<void> {
-  return apiPost('/resource/item/removeResources', req);
+  return apiPostUnchecked('/resource/item/removeResources', req);
 }
 
 function globalSearch(req: GlobalSearchApiRequest): Promise<GlobalSearchApiResponse> {

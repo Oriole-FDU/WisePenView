@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddInlineCommentItemApiRequest,
@@ -18,27 +18,29 @@ const listInlineComments = (
   apiGet(`/resource/inlineComment/listInlineComments`, { params: req });
 
 const createInlineComment = (req: CreateInlineCommentApiRequest): Promise<string> =>
-  apiPost(`/resource/inlineComment/createInlineComment`, req);
+  apiPostUnchecked(`/resource/inlineComment/createInlineComment`, req);
 
 const addInlineCommentItem = (req: AddInlineCommentItemApiRequest): Promise<string> =>
-  apiPost(`/resource/inlineComment/addInlineCommentItem`, req);
+  apiPostUnchecked(`/resource/inlineComment/addInlineCommentItem`, req);
 
 const updateInlineCommentItem = (req: UpdateInlineCommentItemApiRequest): Promise<void> =>
-  apiPost(`/resource/inlineComment/updateInlineCommentItem`, req);
+  apiPostUnchecked(`/resource/inlineComment/updateInlineCommentItem`, req);
 
 const setInlineCommentItemReaction = (req: SetInlineCommentItemReactionApiRequest): Promise<void> =>
-  apiPost(`/resource/inlineComment/setInlineCommentItemReaction`, req);
+  apiPostUnchecked(`/resource/inlineComment/setInlineCommentItemReaction`, req);
 
 const deleteInlineCommentItemReaction = (
   req: DeleteInlineCommentItemReactionApiRequest
-): Promise<void> => apiPost(`/resource/inlineComment/deleteInlineCommentItemReaction`, req);
+): Promise<void> =>
+  apiPostUnchecked(`/resource/inlineComment/deleteInlineCommentItemReaction`, req);
 
 const deleteInlineCommentItem = (req: DeleteInlineCommentItemApiRequest): Promise<void> =>
-  apiPost(`/resource/inlineComment/deleteInlineCommentItem`, req);
+  apiPostUnchecked(`/resource/inlineComment/deleteInlineCommentItem`, req);
 
 const changeInlineCommentResolveStatus = (
   req: ChangeInlineCommentResolveStatusApiRequest
-): Promise<void> => apiPost(`/resource/inlineComment/changeInlineCommentResolveStatus`, req);
+): Promise<void> =>
+  apiPostUnchecked(`/resource/inlineComment/changeInlineCommentResolveStatus`, req);
 
 export const InlineCommentApi = {
   listInlineComments,

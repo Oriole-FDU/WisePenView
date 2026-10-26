@@ -13,7 +13,7 @@
 ## Domain 任务
 
 - `domain-api.md`：API 薄层、DTO 和请求边界。
-- `domain-mapper.md`：字段转换、fallback、协议兼容和归一化。
+- `domain-mapper.md`：按需映射、fallback、协议兼容和归一化。
 - `domain-service.md`：Service 编排、依赖注入和错误处理。
 - `domain-entity.md`：Entity、Enum、常量和类型边界。
 
@@ -37,4 +37,4 @@
 - `store.md`：状态归属、注册、持久化和生命周期。
 - `color-system.md`：颜色阶、语义 token 和主题。
 
-跨层任务按 `view/component -> service -> mapper -> api -> entity/enum` 读取；涉及拆分时先读 `architecture-guidelines.md`，涉及业务知识时再读 `business-knowledge.md`。修改完成后删除旧实现和无效兼容层。
+跨层任务按 `view/component -> service -> api -> entity/enum` 读取，存在字段转换时再读 `domain-mapper.md`；涉及拆分时先读 `architecture-guidelines.md`，涉及业务知识时再读 `business-knowledge.md`。修改完成后删除旧实现和无效兼容层。

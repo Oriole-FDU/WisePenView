@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 
-import { apiGet, apiPost, apiPut } from '@/apis/request';
+import { apiGet, apiPostUnchecked, apiPut } from '@/apis/request';
 
 import type {
   AddFeedbackApiRequest,
@@ -35,11 +35,11 @@ function listUserSearchSuggestions(
 }
 
 function initiateEmailVerify(req: InitiateEmailVerifyApiRequest): Promise<void> {
-  return apiPost('/user/verify/initiateEmailVerify', null, { params: req });
+  return apiPostUnchecked('/user/verify/initiateEmailVerify', null, { params: req });
 }
 
 function initiateFudanUISVerify(req: InitiateFudanUISVerifyApiRequest): Promise<void> {
-  return apiPost('/user/verify/initiateFudanUISVerify', null, { params: req });
+  return apiPostUnchecked('/user/verify/initiateFudanUISVerify', null, { params: req });
 }
 
 function checkFudanUISVerify(): Promise<CheckFudanUISVerifyApiResponse> {
@@ -59,7 +59,7 @@ function changeUserProfile(req: ChangeUserProfileApiRequest): Promise<void> {
 }
 
 function addFeedback(req: AddFeedbackApiRequest): Promise<void> {
-  return apiPost('/system/feedback/addFeedback', req);
+  return apiPostUnchecked('/system/feedback/addFeedback', req);
 }
 
 function listInviteRecords(

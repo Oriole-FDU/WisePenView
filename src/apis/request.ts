@@ -63,7 +63,20 @@ export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promi
   return unwrap<T>(await httpClient.get(url, config));
 }
 
-export async function apiPost<T>(
+/** POST 并解包 envelope；payload 在契约解析前保持 unknown。 */
+export async function apiPost(
+  url: string,
+  data?: unknown,
+  config?: AxiosRequestConfig
+): Promise<unknown> {
+  return unwrap<unknown>(await httpClient.post(url, data, config));
+}
+
+/**
+ * 未迁移契约的 POST 兼容入口。
+ * 该泛型不会执行运行期校验，新接口应使用 apiPost + ApiContract。
+ */
+export async function apiPostUnchecked<T>(
   url: string,
   data?: unknown,
   config?: AxiosRequestConfig

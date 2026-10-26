@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   CommentItemActionApiRequest,
@@ -10,16 +10,16 @@ import type {
 } from './CommentApi.type';
 
 const createComment = (req: CreateCommentApiRequest): Promise<string> =>
-  apiPost('/resource/comment/createComment', req);
+  apiPostUnchecked('/resource/comment/createComment', req);
 
 const createReply = (req: CreateReplyApiRequest): Promise<string> =>
-  apiPost('/resource/comment/createReply', req);
+  apiPostUnchecked('/resource/comment/createReply', req);
 
 const deleteCommentItem = (req: CommentItemActionApiRequest): Promise<void> =>
-  apiPost('/resource/comment/deleteCommentItem', req);
+  apiPostUnchecked('/resource/comment/deleteCommentItem', req);
 
 const toggleLike = (req: CommentItemActionApiRequest): Promise<boolean> =>
-  apiPost('/resource/comment/toggleLike', req);
+  apiPostUnchecked('/resource/comment/toggleLike', req);
 
 const listComments = (req: ListCommentsApiRequest): Promise<CommentPageApiResponse> =>
   apiGet('/resource/comment/listComments', { params: req });

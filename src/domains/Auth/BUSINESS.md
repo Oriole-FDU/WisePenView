@@ -8,7 +8,7 @@
 
 ## 注册与密码
 
-- 邀请码在链接参数、注册输入与注册请求之间统一去除首尾空格并转为大写；空值不写入注册请求。邀请码仅属于注册参数，登录只发送账号与密码。依据：[normalizeInviteCode](utils/normalizeInviteCode.ts)、[AuthServicesMap](mapper/AuthServices.map.ts)。
+- 邀请码在链接参数、注册输入与注册请求之间统一去除首尾空格并转为大写；空值不写入注册请求。邀请码仅属于注册参数，登录只发送账号与密码。依据：[normalizeRegisterRequest](utils/normalizeRegisterRequest.ts)、[AuthServices](service/AuthServices.impl.ts)。
 - 注册与登录是两个独立请求；注册成功后自动登录属于注册页面的流程编排，不由 Auth service 合并成一个请求。依据：[Register](../../views/app/auth/Register/index.tsx)、[AuthServices](service/AuthServices.impl.ts)。
 - 忘记密码按用户名发送重置邮件；重置密码使用邮件 token 和新密码。已登录用户修改密码另需旧密码与新密码。前端表单校验不代表后端校验或邮件送达结果。依据：[Auth API](apis/AuthApi.ts)、[密码请求类型](service/AuthService.type.ts)。
 
