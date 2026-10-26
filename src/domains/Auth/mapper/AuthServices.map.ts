@@ -6,7 +6,7 @@ import type {
   NewPasswordApiRequest,
   RegisterApiRequest,
   ResetPasswordApiRequest,
-} from '../apis/AuthApi.type';
+} from '../apis/AuthApi.schema';
 import type {
   ChangePasswordRequest,
   LoginRequest,

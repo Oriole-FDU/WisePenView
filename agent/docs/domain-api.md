@@ -23,11 +23,17 @@ API 层禁止：
 - 直接处理 React 生命周期或组件状态。
 - 直接 import service、mapper、view、component。
 
-## 二、手写 DTO
+## 二、API DTO 与前端消费契约
 
-- 新增或改造 API 类型时，在同域 `apis/*Api.type.ts` 手写 request/response DTO。
-- DTO 字段必须与后端接口文档对齐，不做字段重命名或展示语义加工。
-- 如果接口字段、枚举或响应结构不确定，先向用户确认接口文档，不要盲猜。
+- 新增或改造 API 契约时，优先在同域 `apis/*Api.schema.ts` 使用 Zod 定义 request/response Schema，并通过 `z.infer` 推导 DTO。
+- API Schema 是前端消费契约，只声明前端实际发送和消费的字段；不得 import 后端 Entity、共享 Base 或 Swagger 生成类型。
+- 响应字段必须存在时不要使用 `.optional()`；值可为 `null` 时使用 `.nullable()`。请求字段的 `.optional()` 只表示允许省略，`.nullable()` 表示允许显式传 `null`，两者不能混用。
+- Zod 只约束 wire 结构与 primitive 类型。ID、时间、枚举和数值范围按后端真实序列化规则声明，不使用 `z.coerce()` 掩盖类型漂移。
+- 不使用 `.catch()`、`.default()` 或 `z.strictObject()` 静默兼容违约或拒绝后端新增字段；默认 `z.object()` 丢弃未声明字段。
+- API 层发送前调用 `parseApiRequest`，响应解包后调用 `parseApiResponse`。解析失败必须 fail-fast，不把缺失字段、错误类型或意外 `null` 继续传给 mapper。
+- 契约违约诊断只记录 endpoint、contract、字段路径和 issue code，不记录原始请求或响应正文。
+- 未迁移的领域可以继续使用手写 `apis/*Api.type.ts`，但同一声明只能有一个事实源。
+- 接口字段、枚举或响应结构需要结合 Java 实现、mapper 与业务语义确认；无法从代码得到稳定结论时，先向用户确认，不要盲猜。
 - API DTO 只作为后端协议类型，不允许泄漏到组件展示层。
 - API 方法必须返回明确的 DTO 类型；禁止使用 `Promise<unknown>` 或 `Promise<Record<string, unknown>>` 作为领域 API 的返回契约。协议中确实开放的 JSON 字段可以在 DTO 内显式使用 `Record<string, unknown>`，并由 mapper 决定如何消费。
 
@@ -35,12 +41,13 @@ API 层禁止：
 
 ```text
 src/domains/<Domain>/apis/
-├── <Domain>Api.ts
-└── <Domain>Api.type.ts
+├── <Domain>Api.schema.ts
+└── <Domain>Api.ts
 ```
 
-- 请求类型：`XxxApiRequest`
-- 响应类型：`XxxApiResponse`
+- 请求 Schema：`XxxApiRequestSchema`
+- 响应 Schema：`XxxApiResponseSchema`
+- DTO 类型：由对应 Schema 使用 `z.infer` 推导
 - API 对象：`XxxApi`、`XxxMemberApi`、`XxxConfigApi`
 
 ## 三、依赖方向
@@ -80,7 +87,9 @@ api -> views/components
 ## 五、检查清单
 
 - [ ] API 文件只做请求薄封装。
-- [ ] API DTO 手写在同域 `apis/*Api.type.ts`，字段与后端接口文档对齐。
+- [ ] 新增 API 契约优先使用同域 Zod Schema，DTO 由 Schema 推导。
+- [ ] 响应契约未使用 optional；真实空值使用 nullable。
+- [ ] API 请求发送前和响应解包后均执行契约解析。
 - [ ] API DTO 未泄漏到组件展示层。
 - [ ] API 方法返回明确 DTO，不以 `unknown` 作为未分层的响应出口。
 - [ ] 未新增 `any`。
