@@ -36,11 +36,13 @@ export function ResourceChatPanel({
   context,
   clearContext,
   showCollapseButton,
+  onCollapsePanel,
 }: {
   target?: ResourceTarget;
   context?: ResourceChatContext;
   clearContext: (context?: ResourceChatContext) => void;
   showCollapseButton: boolean;
+  onCollapsePanel?: () => void;
 }) {
   const store = useResourceChatBinding();
   const registered = useStore(store, (state) => state.binding);
@@ -61,6 +63,7 @@ export function ResourceChatPanel({
       showCollapseButton={showCollapseButton}
       resourceChat={{ provider, context, clearContext }}
       hostAgentPort={binding?.hostAgentPort}
+      onCollapsePanel={onCollapsePanel}
     />
   );
 }

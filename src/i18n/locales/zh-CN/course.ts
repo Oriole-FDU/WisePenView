@@ -98,6 +98,7 @@ const zhCNCourse = {
     chat: '课程对话',
     openChat: '展开课程对话',
     closeChat: '收起课程对话',
+    resizeChat: '调整课程对话宽度',
     resource: '学习资源',
   },
   assignments: {

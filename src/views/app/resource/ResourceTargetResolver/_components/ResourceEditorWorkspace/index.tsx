@@ -1,11 +1,10 @@
 import { useState } from 'react';
 
 import { ResourceEditor } from '@/components/editors';
-import { chatDockActions } from '@/layouts/ChatDockLayout';
 import { resourceChatContextActions } from '@/layouts/Resource/_context/chatBinding';
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
-import { resourceSidePanelActions } from '@/layouts/Resource/ResourceLayout';
+import { workspaceRightPanelActions } from '@/layouts/WorkspaceRightPanelLayout';
 
 import ResourceWorkspacePresentation from './_components/ResourceWorkspacePresentation';
 import type { ResourceEditorWorkspaceProps } from './index.type';
@@ -25,10 +24,10 @@ export default function ResourceEditorWorkspace({ target }: ResourceEditorWorksp
         onPresentationChange={store.getState().onPresentationChange}
         host={{
           hostId: host.hostId,
-          openChatPanel: chatDockActions.open,
+          openChatPanel: () => workspaceRightPanelActions.openPanel('chat'),
           setChatContext: resourceChatContextActions.setContext,
           navigateResourceHash: host.navigateResourceHash,
-          openInlineComments: resourceSidePanelActions.openInlineComments,
+          openInlineComments: () => workspaceRightPanelActions.openPanel('inlineComment'),
         }}
       />
     </ResourceWorkspacePresentation>

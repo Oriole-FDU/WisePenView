@@ -6,7 +6,6 @@ import { useFrontendStateValue } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 
-import { useChatLayout } from './_controllers/useChatLayout';
 import { useChatSessionController } from './_controllers/useChatSessionController';
 import { useChatTurnController } from './_controllers/useChatTurnController';
 import ChatConversation from './ChatConversation';
@@ -22,11 +21,11 @@ function Chat({
   resourceId,
   hostAgentPort,
   showCollapseButton = true,
+  onCollapsePanel,
 }: ChatProps) {
   const { isAuthenticated, requireLogin } = useAppAuth();
   const { locationKey } = useChatSessionRoute();
   const locationKeyLatest = useLatest(locationKey);
-  const layout = useChatLayout();
   const selectedText = useFrontendStateValue('selected_text');
   const session = useChatSessionController({ resourceChat });
   const turn = useChatTurnController({
@@ -69,7 +68,7 @@ function Chat({
 
   const handleCollapsePanel = () => {
     session.closeSessionBar();
-    layout.collapsePanel();
+    onCollapsePanel?.();
   };
 
   /** 子组件仍以布尔消费宽度差异，只在面板边界把布局模式收敛成一次判断。 */

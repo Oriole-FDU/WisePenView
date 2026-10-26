@@ -11,8 +11,8 @@ export interface ResourceLayoutHeaderProps {
   inlineTitle?: ReactNode;
   /** 右侧操作区（分享等） */
   extra?: ReactNode;
-  /** 资源内容区右侧栏操作，不控制聊天栏。 */
-  sidePanelActions?: ReactNode;
+  /** 工具条右侧的页面级扩展动作。 */
+  trailingActions?: ReactNode;
   /** 工具条下方整块区域，如笔记可编辑标题 */
   titleBlock?: ReactNode;
   className?: string;

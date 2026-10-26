@@ -1,3 +1,4 @@
+import { useMount, useUnmount } from 'ahooks';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -15,8 +16,6 @@ import {
   type ResourceViewer,
 } from '@/domains/Resource/model/resourceTarget';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { ChatDockLayout } from '@/layouts/ChatDockLayout';
-import { useMainShell } from '@/layouts/MainShell/_context';
 import {
   ResourceChatBindingProvider,
   resourceChatContextActions,
@@ -25,6 +24,12 @@ import {
 import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
 import ResourceHost from '@/layouts/Resource/ResourceHost';
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
+import {
+  createWorkspacePanelSlots,
+  useWorkspaceRightPanel,
+  WorkspacePanelPortal,
+  WorkspaceRightPanelLayout,
+} from '@/layouts/WorkspaceRightPanelLayout';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
 import {
@@ -36,7 +41,9 @@ import ResourceTargetResolver from '../ResourceTargetResolver';
 
 function ResourceRouteBoundary() {
   const { t } = useTranslation('workspace');
-  const { isMobileLayout } = useMainShell();
+  const { t: tResource } = useTranslation('resource');
+  const { activePanelId, panelWidths, openPanel, closePanel, setPanelWidth } =
+    useWorkspaceRightPanel();
   const location = useLocation();
   const navigate = useNavigate();
   const openResource = useOpenResource();
@@ -98,6 +105,8 @@ function ResourceRouteBoundary() {
   };
 
   const chatContext = useResourceChatContextStore((state) => state.context);
+  useMount(() => openPanel('chat'));
+  useUnmount(closePanel);
   /**
    * @wisepen-manual-effect
    * 执行时机：离开资源视图时结束未发送的选区。
@@ -112,6 +121,11 @@ function ResourceRouteBoundary() {
       { preventScrollReset: true }
     );
   };
+  const panelSlots = createWorkspacePanelSlots({
+    chat: t('shell.chatPanel'),
+    inlineComment: tResource('sidePanel.annotation'),
+    interact: tResource('sidePanel.interaction'),
+  });
 
   return (
     <GuideScope
@@ -119,36 +133,43 @@ function ResourceRouteBoundary() {
       readyToolId={isNoteResource ? GUIDE_TOOL_ID.noteTitle : undefined}
     >
       <ResourceChatBindingProvider>
-        <ChatDockLayout
-          leftMinWidth={RESOURCE_MAIN_MIN_WIDTH}
-          panelId="app-resource-chat"
-          chatLabel={t('shell.chatPanel')}
-          left={
-            <ResourceHost
-              routeContext={routeContext}
-              openResource={openResource}
-              navigateToDrive={navigateToDrive}
-              switchResourceViewer={switchResourceViewer}
-              navigateResourceHash={navigateResourceHash}
-            >
-              <RouteOutletBoundary>
-                <ResourceTargetResolver
-                  target={target}
-                  onTargetChange={handleTargetChange}
-                  onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
-                />
-              </RouteOutletBoundary>
-            </ResourceHost>
-          }
-          right={
-            <GuideAnchor id={GUIDE_TOOL_ID.noteAiPanel} layout="fill">
-              <ResourceChatPanel
-                target={routeContext}
-                showCollapseButton={isMobileLayout}
-                context={chatContext}
-                clearContext={resourceChatContextActions.clearContext}
-              />
-            </GuideAnchor>
+        <WorkspaceRightPanelLayout
+          mainMinWidth={RESOURCE_MAIN_MIN_WIDTH}
+          panelGroupId="app-resource-right-panel"
+          panelSlots={panelSlots}
+          activePanelId={activePanelId}
+          panelWidths={panelWidths}
+          resizeLabel={tResource('sidePanel.resize')}
+          onPanelResize={setPanelWidth}
+          main={
+            <>
+              <WorkspacePanelPortal panelId="chat">
+                <GuideAnchor id={GUIDE_TOOL_ID.noteAiPanel} layout="fill">
+                  <ResourceChatPanel
+                    target={routeContext}
+                    showCollapseButton
+                    onCollapsePanel={closePanel}
+                    context={chatContext}
+                    clearContext={resourceChatContextActions.clearContext}
+                  />
+                </GuideAnchor>
+              </WorkspacePanelPortal>
+              <ResourceHost
+                routeContext={routeContext}
+                openResource={openResource}
+                navigateToDrive={navigateToDrive}
+                switchResourceViewer={switchResourceViewer}
+                navigateResourceHash={navigateResourceHash}
+              >
+                <RouteOutletBoundary>
+                  <ResourceTargetResolver
+                    target={target}
+                    onTargetChange={handleTargetChange}
+                    onClose={() => void navigate(APP_ROUTE_PATH.DRIVE_PERSONAL)}
+                  />
+                </RouteOutletBoundary>
+              </ResourceHost>
+            </>
           }
         />
       </ResourceChatBindingProvider>

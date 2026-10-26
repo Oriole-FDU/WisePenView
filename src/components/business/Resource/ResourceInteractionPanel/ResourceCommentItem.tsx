@@ -16,6 +16,7 @@ import {
 import styles from './style.module.scss';
 import { getAuthorInitial, hasVisibleCommentContent } from './utils';
 
+/** 资源互动面板中的单条评论。 */
 interface ResourceCommentItemProps {
   comment: ResourceComment;
   currentUserId?: string;

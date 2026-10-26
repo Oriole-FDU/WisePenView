@@ -1,9 +1,10 @@
 import { clsx } from 'clsx';
-import { History, PanelRightClose, Plus } from 'lucide-react';
+import { History, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { GuideAnchor } from '@/components/base/Guide';
+import { WorkspacePanelHeader } from '@/components/business/WorkspacePanel';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
@@ -31,38 +32,31 @@ function ChatHeader({
     desktopWindow.titleBarInsetSide === 'end';
 
   return (
-    <div className={clsx(styles.header, titleBarInsetEnd && styles.titleBarInsetEnd)}>
-      <div className={styles.headerLeft}>
-        {showCollapseButton ? (
-          <AppIconButton
-            icon={<PanelRightClose size={18} aria-hidden="true" />}
-            label={t('panel.collapse')}
-            onPress={onCollapsePanel}
-          />
-        ) : null}
-        <div className={styles.titleWrap}>
-          <div className={styles.title}>{panelTitle}</div>
-        </div>
-      </div>
-
-      <div className={styles.headerRight}>
-        <GuideAnchor id={GUIDE_TOOL_ID.noteNewChat}>
-          <AppIconButton
-            icon={<Plus size={18} aria-hidden="true" />}
-            label={t('panel.create')}
-            onPress={onNewChat}
-          />
-        </GuideAnchor>
-        <GuideAnchor id={GUIDE_TOOL_ID.noteHistory}>
-          <AppIconButton
-            icon={<History size={18} aria-hidden="true" />}
-            label={sessionBarLabel}
-            isActive={sessionBarOpen}
-            onPress={onToggleSessionBar}
-          />
-        </GuideAnchor>
-      </div>
-    </div>
+    <WorkspacePanelHeader
+      title={panelTitle}
+      closeLabel={t('panel.collapse')}
+      onClose={showCollapseButton ? onCollapsePanel : undefined}
+      className={clsx(titleBarInsetEnd && styles.titleBarInsetEnd)}
+      actions={
+        <>
+          <GuideAnchor id={GUIDE_TOOL_ID.noteNewChat}>
+            <AppIconButton
+              icon={<Plus size={18} aria-hidden="true" />}
+              label={t('panel.create')}
+              onPress={onNewChat}
+            />
+          </GuideAnchor>
+          <GuideAnchor id={GUIDE_TOOL_ID.noteHistory}>
+            <AppIconButton
+              icon={<History size={18} aria-hidden="true" />}
+              label={sessionBarLabel}
+              isActive={sessionBarOpen}
+              onPress={onToggleSessionBar}
+            />
+          </GuideAnchor>
+        </>
+      }
+    />
   );
 }
 

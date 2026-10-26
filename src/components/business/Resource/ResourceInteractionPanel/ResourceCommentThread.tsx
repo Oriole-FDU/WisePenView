@@ -18,6 +18,7 @@ const REPLY_PAGE_SIZE = 10;
 const REPLY_ITEM_ESTIMATE_SIZE = 132;
 const REPLY_ITEM_OVERSCAN = 6;
 
+/** 资源互动面板中的根评论与延迟加载回复。 */
 interface ReplyListPage {
   list: ResourceComment[];
   total: number;

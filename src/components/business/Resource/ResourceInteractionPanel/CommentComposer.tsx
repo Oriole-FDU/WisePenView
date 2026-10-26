@@ -9,6 +9,7 @@ import { createUuid } from '@/utils/random/createUuid';
 
 import styles from './style.module.scss';
 
+/** 资源互动面板的一般评论输入框。 */
 const IMAGE_ONLY_CONTENT = '\u200B';
 
 interface CommentComposerProps {

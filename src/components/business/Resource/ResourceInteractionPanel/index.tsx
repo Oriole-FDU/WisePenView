@@ -8,6 +8,7 @@ import { AppButton } from '@/components/base/Button';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import ResourceFavoriteAction from '@/components/business/Resource/ResourceFavoriteAction';
+import { WorkspacePanel } from '@/components/business/WorkspacePanel';
 import { useInteractService, useUserService } from '@/domains';
 import type { CommentSortBy, ResourceComment } from '@/domains/Interact';
 import type { ResourceItem } from '@/domains/Resource';
@@ -31,9 +32,11 @@ interface CommentListPage {
   totalPage: number;
 }
 
-interface ResourceCommentPanelProps {
+/** 资源点赞、收藏、阅读与一般评论的统一互动面板。 */
+interface ResourceInteractionPanelProps {
   resource: ResourceItem;
   onResourceChanged?: () => unknown | Promise<unknown>;
+  onClose?: () => void;
 }
 
 interface OptimisticLikeState {
@@ -48,7 +51,11 @@ interface PendingDeletion {
   onDeleted?: () => void | Promise<void>;
 }
 
-function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPanelProps) {
+function ResourceInteractionPanel({
+  resource,
+  onResourceChanged,
+  onClose,
+}: ResourceInteractionPanelProps) {
   const { t } = useTranslation(['resource', 'common']);
   const interactService = useInteractService();
   const userService = useUserService();
@@ -243,15 +250,16 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
   };
 
   return (
-    <div className={styles.panel}>
-      <header className={styles.panelHeader}>
-        <h2 className={styles.panelTitle}>{t('resource:sidePanel.comments')}</h2>
-      </header>
-
+    <WorkspacePanel
+      className={styles.panel}
+      title={t('resource:sidePanel.interaction')}
+      closeLabel={t('resource:sidePanel.collapseInteraction')}
+      onClose={onClose}
+    >
       <div className={styles.content} ref={contentRef}>
         <section
           className={styles.commentsSection}
-          aria-label={t('resource:sidePanel.commentsAria')}
+          aria-label={t('resource:sidePanel.interactionAria')}
         >
           <div className={styles.commentsHeader}>
             <Tabs
@@ -394,8 +402,8 @@ function ResourceCommentPanel({ resource, onResourceChanged }: ResourceCommentPa
           />
         ) : null}
       </AppDisplayDialog>
-    </div>
+    </WorkspacePanel>
   );
 }
 
-export default ResourceCommentPanel;
+export default ResourceInteractionPanel;

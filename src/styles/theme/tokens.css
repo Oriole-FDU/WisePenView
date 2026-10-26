@@ -54,7 +54,7 @@
   --space-xl: 32px;
   --space-2xl: 40px;
   /* 运行时由 syncViewportLayoutScale 覆盖，此处为同源兜底 */
-  --chat-panel-min-width: 480px;
+  --chat-panel-min-width: 380px;
   --chat-full-width-min-width: 720px;
   --layout-sidebar-min-width: 240px;
   --layout-sidebar-max-width: 420px;
@@ -65,9 +65,8 @@
   --layout-app-main-min-width: 720px;
   --layout-main-scroll-min-width: 400px;
   --layout-note-editor-min-width: 560px;
-  --layout-resource-side-panel-min-width: 280px;
-  --layout-note-with-side-panel-min-width: 864px;
-  --layout-workspace-inner-chat-min-width: 1064px;
+  --layout-workspace-context-panel-min-width: 320px;
+  --layout-workspace-split-header-height: 56px;
   --layout-resize-handle-reserve: 24px;
   --layout-note-outline-open-width: 215px;
   --layout-note-outline-collapsed-width: 40px;

@@ -40,4 +40,5 @@ export interface ChatProps {
   /** 宿主注入的 Agent 端口，面板只做转发 */
   hostAgentPort?: ChatHostAgentPort;
   showCollapseButton?: boolean;
+  onCollapsePanel?: () => void;
 }

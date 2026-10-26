@@ -1,4 +1,3 @@
-/** 调用点：ResourceEditorWorkspace 与 ResourceTargetResolver 装配，ResourceEditorWorkspace 取侧栏动作；提供资源外壳与侧栏切换能力。 */
-export type { ResourceLayoutProps, ResourceSidePanelContent } from './index.type';
+/** 调用点：资源编辑器工作区；提供资源页头与正文外壳。 */
+export type { ResourceLayoutProps } from './index.type';
 export { default as ResourceLayout } from './ResourceLayout';
-export { resourceSidePanelActions } from './resourceSidePanelModel';

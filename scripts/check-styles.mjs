@@ -1083,7 +1083,7 @@ test('剩餘 scrollbar mixin 與晚宣告維持單一父規則', async () => {
       'layouts/Course/CourseLearningLayout/_components/CourseOutlineSidebar/CourseResourcePickerModal/style',
       ['.resourcePickerBody'],
     ],
-    ['layouts/Resource/ResourceLayout/ResourceSidePanel/ResourceCommentPanel/style', ['.content']],
+    ['components/business/Resource/ResourceInteractionPanel/style', ['.content']],
     ['layouts/Resource/ResourceLayout/ResourceToolbar/ResourceTargetModal', ['.treeWrap']],
     ['views/app/course/CourseContextPage/_components/CourseHomeTab/style', ['.leftScroll']],
     ['views/app/course/CourseEditorPage/style', ['.editorScroll', '.courseTextArea']],

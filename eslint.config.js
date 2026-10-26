@@ -118,6 +118,21 @@ const domainApiFunctionImportPattern = {
     '真实领域 API 只允许在 apis.impl.ts 导出；service 通过 @domain-apis 调用，其他层只能引用 API 类型。',
 };
 
+const workspaceLayoutBusinessImportPattern = {
+  group: [
+    '@/components/business/**',
+    '@/components/editors/**',
+    '@/domains/**',
+    '@/views/**',
+    '**/components/business/**',
+    '**/components/editors/**',
+    '**/domains/**',
+    '**/views/**',
+  ],
+  message:
+    'Layout 只维护槽位、尺寸、显隐、滚动、断点和焦点；业务内容、领域能力与页面编排必须由 view 通过 ReactNode 槽位传入。',
+};
+
 const buildRestrictedImportsRule = ({
   allowApiRequest = false,
   allowButtonPrimitive = false,
@@ -129,6 +144,7 @@ const buildRestrictedImportsRule = ({
   allowServiceFactory = false,
   allowDomainApiPort = false,
   allowDomainMock = false,
+  forbidLayoutBusinessImports = false,
 } = {}) => {
   const paths = [
     ahooksUpdateEffectImportRule,
@@ -149,6 +165,7 @@ const buildRestrictedImportsRule = ({
     ...(allowDomainMock ? [] : [domainMockImportPattern]),
     ...(allowApiRequest ? [] : [apiRequestImportPattern]),
     ...(allowDomainApiFunction ? [] : [domainApiFunctionImportPattern]),
+    ...(forbidLayoutBusinessImports ? [workspaceLayoutBusinessImportPattern] : []),
   ];
 
   return ['error', { paths, patterns }];
@@ -475,6 +492,15 @@ export default defineConfig([
     ignores: ['src/views/admin/AnnouncementManagement/**/*.{ts,tsx}'],
     rules: {
       'wisepen/no-hardcoded-frontend-route': 'error',
+    },
+  },
+  {
+    // 新右栏布局必须保持为纯布局，由调用方通过槽位注入业务内容。
+    files: ['src/layouts/WorkspaceRightPanelLayout/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': buildRestrictedImportsRule({
+        forbidLayoutBusinessImports: true,
+      }),
     },
   },
   {

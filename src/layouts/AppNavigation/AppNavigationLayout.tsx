@@ -6,7 +6,7 @@ import { createGuideActions, GuideHost } from '@/components/base/Guide';
 import CommandPalette from '@/components/business/CommandPalette';
 import { GUIDE_SHELL_TOUR_ID } from '@/constants/tour';
 import { useAppAuth } from '@/layouts/App/_context';
-import { chatDockActions } from '@/layouts/ChatDockLayout';
+import { workspaceRightPanelActions } from '@/layouts/WorkspaceRightPanelLayout';
 
 import { type AppNavigationContextValue, AppNavigationProvider } from './_context';
 
@@ -32,7 +32,10 @@ function AppNavigationLayout() {
    * 收益：整个登录会话复用同一份 Guide 动作实例。
    * 失效条件：注入的 openChat 来源变化时需要重新创建。
    */
-  const appGuideActions = useMemo(() => createGuideActions({ openChat: chatDockActions.open }), []);
+  const appGuideActions = useMemo(
+    () => createGuideActions({ openChat: () => workspaceRightPanelActions.openPanel('chat') }),
+    []
+  );
 
   useKeyPress(
     ['ctrl.k', 'meta.k'],

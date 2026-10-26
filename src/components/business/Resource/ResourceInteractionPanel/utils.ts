@@ -1,5 +1,6 @@
 import type { ResourceComment } from '@/domains/Interact';
 
+/** 资源互动评论的展示与乐观计数工具。 */
 const IMAGE_ONLY_CONTENT = '\u200B';
 
 export function getAuthorInitial(name: string): string {

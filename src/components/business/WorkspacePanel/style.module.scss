@@ -1,0 +1,64 @@
+.root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.header {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: var(--layout-workspace-split-header-height);
+  min-height: var(--layout-workspace-split-header-height);
+  flex: 0 0 var(--layout-workspace-split-header-height);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-xl) var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--header-surface, var(--paper));
+}
+
+.titleWrap {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.content {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+
+  > * {
+    min-width: 0;
+    min-height: 0;
+    flex: 1;
+  }
+}

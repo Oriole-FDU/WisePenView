@@ -96,75 +96,12 @@
   }
 }
 
-.header {
-  box-sizing: border-box;
-  width: 100%;
-  flex-shrink: 0;
-  padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-sm);
-  border-bottom: 1px solid var(--border-light);
-  background: var(--header-surface, var(--paper));
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
 /* 与 Workspace 顶栏同高、同垂直居中；右侧留白给固定窗口按钮 */
 .titleBarInsetEnd {
   @include titleBar.desktopTitleBarChrome();
   padding-right: var(--desktop-window-controls-width, 116px);
   padding-left: var(--space-sm);
   @include titleBar.desktopTitleBarEndNoDragHole();
-
-  .headerLeft,
-  .headerRight {
-    min-height: 0;
-    height: 100%;
-  }
-}
-
-:global(html[data-layout-height='short']) {
-  .header {
-    padding-block: var(--space-xs);
-  }
-
-  .headerLeft,
-  .headerRight {
-    min-height: 32px;
-  }
-}
-
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  min-width: 0;
-  flex: 1;
-  min-height: 40px;
-}
-
-.headerRight {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  flex-shrink: 0;
-  min-width: 0;
-  min-height: 40px;
-}
-
-.titleWrap {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  gap: var(--space-3xs);
-}
-
-.title {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
-  color: var(--foreground);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .panelBody {

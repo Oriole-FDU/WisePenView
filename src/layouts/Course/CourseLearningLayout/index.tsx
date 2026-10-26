@@ -1,5 +1,4 @@
-import { useMount } from 'ahooks';
-import { clsx } from 'clsx';
+import { useMount, useUnmount } from 'ahooks';
 import { PanelRightClose, PanelRightOpen, Video } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { COURSE_ROLE } from '@/domains/Course';
 import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
-import { chatDockActions, ChatDockLayout, useChatDockState } from '@/layouts/ChatDockLayout';
 import {
   ResourceChatBindingProvider,
   resourceChatContextActions,
@@ -17,6 +15,12 @@ import { buildResourceOpenState } from '@/layouts/Resource/_context/chatBinding/
 import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceChatContextStore } from '@/layouts/Resource/_store/useResourceChatContextStore';
 import ResourceLayoutHeader from '@/layouts/Resource/ResourceLayout/ResourceLayoutHeader';
+import {
+  createWorkspacePanelSlots,
+  useWorkspaceRightPanel,
+  WorkspacePanelPortal,
+  WorkspaceRightPanelLayout,
+} from '@/layouts/WorkspaceRightPanelLayout';
 
 import { useCourseContext } from '../_context';
 import CourseResourceHost from '../CourseResourceHost';
@@ -30,11 +34,14 @@ const COURSE_LEARNING_MAIN_MIN_WIDTH = 700;
 
 function CourseLearningLayoutContent() {
   const { t } = useTranslation('course');
+  const { t: tResource } = useTranslation('resource');
   const { course } = useCourseContext();
   const navigation = useCourseLearningNavigationController(course.courseId);
-  const chatDock = useChatDockState();
-  // 课程学习页进入时收起对话面板，宽度与折叠态仍由应用壳 store 持久化。
-  useMount(() => chatDockActions.collapse());
+  const { activePanelId, panelWidths, closePanel, togglePanel, setPanelWidth } =
+    useWorkspaceRightPanel();
+  // 课程学习页进入时收起右侧对话面板，宽度偏好仍由统一右栏 store 持久化。
+  useMount(closePanel);
+  useUnmount(closePanel);
   const resourceChatContext = useResourceChatContextStore((state) => state.context);
   const selectedNode = navigation.selectedNode;
   const openResource = selectedNode?.nodeType === 'RESOURCE' ? selectedNode : undefined;
@@ -74,6 +81,20 @@ function CourseLearningLayoutContent() {
    * cleanup：移除该课程的选区。
    */
   useEffect(() => () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION }), []);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：课程离开可承载资源面板的节点时。
+   * 不可替代原因：大纲首页或视频节点没有资源编辑器上报可用性，需要课程工作区主动清理槽位。
+   * cleanup：没有订阅或延迟任务，无需清理。
+   */
+  useEffect(() => {
+    if (
+      activePanelId !== 'chat' &&
+      (selectedNode?.nodeType !== 'RESOURCE' || selectedNode.viewer === 'video')
+    ) {
+      closePanel();
+    }
+  }, [activePanelId, closePanel, selectedNode]);
 
   const workspaceHeader = (
     <ResourceLayoutHeader
@@ -86,15 +107,15 @@ function CourseLearningLayoutContent() {
       extra={
         <AppIconButton
           icon={
-            chatDock.collapsed ? (
+            activePanelId !== 'chat' ? (
               <PanelRightOpen size={18} aria-hidden />
             ) : (
               <PanelRightClose size={18} aria-hidden />
             )
           }
-          label={chatDock.collapsed ? t('learning.openChat') : t('learning.closeChat')}
-          isActive={!chatDock.collapsed}
-          onPress={chatDock.toggle}
+          label={activePanelId !== 'chat' ? t('learning.openChat') : t('learning.closeChat')}
+          isActive={activePanelId === 'chat'}
+          onPress={() => togglePanel('chat')}
         />
       }
     />
@@ -171,30 +192,43 @@ function CourseLearningLayoutContent() {
       </div>
     </section>
   );
+  const panelSlots = createWorkspacePanelSlots({
+    chat: t('learning.chat'),
+    inlineComment: tResource('sidePanel.annotation'),
+    interact: tResource('sidePanel.interaction'),
+  });
 
   return (
     <ResourceChatBindingProvider>
-      <ChatDockLayout
-        leftMinWidth={COURSE_LEARNING_MAIN_MIN_WIDTH}
-        panelId="course-learning-chat"
-        chatLabel={t('learning.chat')}
-        className={clsx(styles.root, chatDock.open && styles.rootChatOpen)}
-        left={studyArea}
-        right={
-          <ResourceChatPanel
-            target={
-              selectedNode?.nodeType === 'RESOURCE'
-                ? {
-                    resourceId: selectedNode.resourceId,
-                    resourceType: selectedNode.resourceType,
-                    viewer: selectedNode.viewer,
-                  }
-                : undefined
-            }
-            showCollapseButton={false}
-            context={resourceChatContext}
-            clearContext={resourceChatContextActions.clearContext}
-          />
+      <WorkspaceRightPanelLayout
+        mainMinWidth={COURSE_LEARNING_MAIN_MIN_WIDTH}
+        panelGroupId="course-learning-right-panel"
+        panelSlots={panelSlots}
+        activePanelId={activePanelId}
+        panelWidths={panelWidths}
+        resizeLabel={t('learning.resizeChat')}
+        onPanelResize={setPanelWidth}
+        main={
+          <>
+            <WorkspacePanelPortal panelId="chat">
+              <ResourceChatPanel
+                target={
+                  selectedNode?.nodeType === 'RESOURCE'
+                    ? {
+                        resourceId: selectedNode.resourceId,
+                        resourceType: selectedNode.resourceType,
+                        viewer: selectedNode.viewer,
+                      }
+                    : undefined
+                }
+                showCollapseButton
+                onCollapsePanel={closePanel}
+                context={resourceChatContext}
+                clearContext={resourceChatContextActions.clearContext}
+              />
+            </WorkspacePanelPortal>
+            {studyArea}
+          </>
         }
       />
     </ResourceChatBindingProvider>

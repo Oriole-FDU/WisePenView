@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文件拥有收藏归属、收藏条目与一般评论的共用语义；私有互动分别由 [收藏集合页](../../views/app/drive/_components/FavoritesTab/BUSINESS.md)、[共享收藏流程](../../components/business/Resource/BUSINESS.md) 与 [一般评论面板](../../layouts/Resource/ResourceLayout/ResourceSidePanel/ResourceCommentPanel/BUSINESS.md) 拥有。
+本文件拥有收藏归属、收藏条目与一般评论的共用语义；私有互动分别由 [收藏集合页](../../views/app/drive/_components/FavoritesTab/BUSINESS.md)、[共享收藏流程](../../components/business/Resource/BUSINESS.md) 与 [资源互动面板](../../components/business/Resource/ResourceInteractionPanel/BUSINESS.md) 拥有。
 
 锚点批注的资料与 resolved 状态由 [InlineComment](../InlineComment/BUSINESS.md) 拥有。
 

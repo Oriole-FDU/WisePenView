@@ -64,28 +64,11 @@ export const APP_TWO_COLUMN_MIN_WIDTH =
 export const WORKSPACE_TWO_COLUMN_MIN_WIDTH =
   SIDEBAR_MIN_WIDTH + MAIN_MIN_WIDTH + LAYOUT_RESIZE_HANDLE_RESERVE;
 
-/**
- * Workspace 内层（笔记编辑区 + Chat）下限。
- */
-export const WORKSPACE_INNER_WITH_CHAT_MIN_WIDTH =
-  RESOURCE_MAIN_MIN_WIDTH + CHAT_PANEL_MIN_WIDTH + LAYOUT_RESIZE_HANDLE_RESERVE;
-
-/** 评论/批注栏默认最小宽（过窄时线程/排序条易挤坏） */
-export const RESOURCE_SIDE_PANEL_MIN_WIDTH = 320;
-export const RESOURCE_SIDE_PANEL_MAX_WIDTH = 560;
-
-/**
- * 笔记 + 评论/批注同时打开时的下限。
- */
-export const NOTE_WITH_SIDE_PANEL_MIN_WIDTH =
-  NOTE_EDITOR_MIN_WIDTH + RESOURCE_SIDE_PANEL_MIN_WIDTH + LAYOUT_RESIZE_HANDLE_RESERVE;
-
-/**
- * 笔记+批注/评论 + 右侧 Chat 同时打开时的内层下限。
- * 不够时由 workspaceArea 横向滚动，禁止互相遮挡。
- */
-export const WORKSPACE_INNER_WITH_CHAT_AND_SIDE_MIN_WIDTH =
-  NOTE_WITH_SIDE_PANEL_MIN_WIDTH + CHAT_PANEL_MIN_WIDTH + LAYOUT_RESIZE_HANDLE_RESERVE;
+/** 笔记批注与资源互动等上下文面板的统一宽度边界。 */
+export const WORKSPACE_CONTEXT_PANEL_MIN_WIDTH = 320;
+export const WORKSPACE_CONTEXT_PANEL_MAX_WIDTH = 560;
+export const WORKSPACE_CONTEXT_PANEL_DEFAULT_WIDTH = 360;
+export const WORKSPACE_SPLIT_HEADER_HEIGHT = 56;
 
 export const LAYOUT_COMPACT_MAX_WIDTH = MAIN_SHELL_DRAWER_MAX_WIDTH;
 
@@ -208,10 +191,10 @@ export const clampSidebarWidth = (width: number): number =>
 export const clampChatPanelWidth = (width: number): number =>
   Math.min(Math.max(Math.round(width), CHAT_PANEL_MIN_WIDTH), CHAT_PANEL_MAX_WIDTH);
 
-export const clampResourceSidePanelWidth = (width: number): number =>
+export const clampWorkspaceContextPanelWidth = (width: number): number =>
   Math.min(
-    Math.max(Math.round(width), RESOURCE_SIDE_PANEL_MIN_WIDTH),
-    RESOURCE_SIDE_PANEL_MAX_WIDTH
+    Math.max(Math.round(width), WORKSPACE_CONTEXT_PANEL_MIN_WIDTH),
+    WORKSPACE_CONTEXT_PANEL_MAX_WIDTH
   );
 
 export interface LayoutScaleCssVarOptions {
@@ -253,10 +236,8 @@ export const getLayoutScaleCssVars = (
     '--layout-main-scroll-min-width': `${MAIN_SCROLL_MIN_WIDTH}px`,
     '--layout-note-editor-min-width': `${NOTE_EDITOR_MIN_WIDTH}px`,
     '--layout-resource-main-min-width': `${RESOURCE_MAIN_MIN_WIDTH}px`,
-    '--layout-resource-side-panel-min-width': `${RESOURCE_SIDE_PANEL_MIN_WIDTH}px`,
-    '--layout-note-with-side-panel-min-width': `${NOTE_WITH_SIDE_PANEL_MIN_WIDTH}px`,
-    '--layout-workspace-inner-chat-min-width': `${WORKSPACE_INNER_WITH_CHAT_MIN_WIDTH}px`,
-    '--layout-workspace-inner-chat-side-min-width': `${WORKSPACE_INNER_WITH_CHAT_AND_SIDE_MIN_WIDTH}px`,
+    '--layout-workspace-context-panel-min-width': `${WORKSPACE_CONTEXT_PANEL_MIN_WIDTH}px`,
+    '--layout-workspace-split-header-height': `${WORKSPACE_SPLIT_HEADER_HEIGHT}px`,
     '--layout-resize-handle-reserve': `${LAYOUT_RESIZE_HANDLE_RESERVE}px`,
     '--layout-note-outline-open-width': `${NOTE_OUTLINE_OPEN_WIDTH}px`,
     '--layout-note-outline-collapsed-width': `${NOTE_OUTLINE_COLLAPSED_WIDTH}px`,

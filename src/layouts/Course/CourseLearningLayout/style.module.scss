@@ -2,27 +2,6 @@
 @use '@/styles/mixins/layoutMixins' as layout;
 @use '@/styles/mixins/breakpoints' as breakpoints;
 
-.root {
-  position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-  background: var(--background);
-}
-
-.rootChatOpen {
-  width: max(100%, calc(700px + var(--chat-panel-min-width) + var(--layout-resize-handle-reserve)));
-  min-width: max(
-    100%,
-    calc(700px + var(--chat-panel-min-width) + var(--layout-resize-handle-reserve))
-  );
-}
-
 .studyShell {
   display: grid;
   grid-template-columns: 280px minmax(420px, 1fr);

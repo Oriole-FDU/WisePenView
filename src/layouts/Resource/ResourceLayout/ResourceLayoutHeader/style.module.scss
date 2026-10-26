@@ -11,8 +11,10 @@
 .bar {
   box-sizing: border-box;
   width: 100%;
-  flex-shrink: 0;
-  padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-lg);
+  height: var(--layout-workspace-split-header-height);
+  min-height: var(--layout-workspace-split-header-height);
+  flex: 0 0 var(--layout-workspace-split-header-height);
+  padding: var(--space-xs) var(--space-xl) var(--space-xs) var(--space-lg);
   /* 与具体 layout 的 middleContent、正文区一致 */
   background: var(--header-surface, var(--paper));
   /* 与左右栏的布局分隔线使用同一边框色 */
@@ -78,12 +80,13 @@
 
 .toolbar {
   display: flex;
+  height: 100%;
   align-items: center;
   gap: var(--space-sm);
   flex: 1;
   min-width: 0;
   width: 100%;
-  min-height: 40px;
+  min-height: 0;
 }
 
 .toolbarMiddle {
