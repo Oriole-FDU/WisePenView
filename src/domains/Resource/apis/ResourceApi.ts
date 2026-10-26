@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ChangeResourceActionPermissionApiRequest,
@@ -30,7 +30,7 @@ const serializeListResourcesQuery = (params: Record<string, unknown>): string =>
 };
 
 function listResources(req: ListResourceItemsApiRequest): Promise<ResourceListPageApiResponse> {
-  return apiGet('/resource/item/listResources', {
+  return apiGetUnchecked('/resource/item/listResources', {
     params: req,
     paramsSerializer: serializeListResourcesQuery,
   });
@@ -51,7 +51,7 @@ function removeResources(req: RemoveResourcesApiRequest): Promise<void> {
 }
 
 function globalSearch(req: GlobalSearchApiRequest): Promise<GlobalSearchApiResponse> {
-  return apiGet('/resource/search/globalSearchResources', { params: req });
+  return apiGetUnchecked('/resource/search/globalSearchResources', { params: req });
 }
 
 export const ResourceItemApi = {

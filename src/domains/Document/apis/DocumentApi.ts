@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   DocumentIdApiRequest,
@@ -18,7 +18,7 @@ function uploadDoc(req: UploadDocApiRequest): Promise<UploadDocApiResponse> {
 }
 
 function listPendingDocs(): Promise<ListPendingDocsApiResponse> {
-  return apiGet('/document/listPendingDocs');
+  return apiGetUnchecked('/document/listPendingDocs');
 }
 
 function syncDocStatus(req: DocumentIdApiRequest): Promise<PendingDocumentStatusApiResponse> {
@@ -34,7 +34,7 @@ function cancelDocProcess(req: DocumentIdApiRequest): Promise<void> {
 }
 
 function getDocInfo(req: GetDocInfoApiRequest): Promise<GetDocInfoApiResponse> {
-  return apiGet('/document/getDocInfo', { params: req });
+  return apiGetUnchecked('/document/getDocInfo', { params: req });
 }
 
 function forkDocument(req: ForkDocumentApiRequest): Promise<string> {
@@ -44,7 +44,7 @@ function forkDocument(req: ForkDocumentApiRequest): Promise<string> {
 function getOnlyOfficeEditorConfig(
   req: GetOnlyOfficeEditorConfigApiRequest
 ): Promise<OnlyOfficeEditorConfigApiResponse> {
-  return apiGet('/document/onlyoffice/editorConfig', { params: req });
+  return apiGetUnchecked('/document/onlyoffice/editorConfig', { params: req });
 }
 
 export const DocumentApi = {

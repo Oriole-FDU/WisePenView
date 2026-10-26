@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddTagApiRequest,
@@ -10,7 +10,7 @@ import type {
 } from './TagApi.type';
 
 function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> {
-  return apiGet('/resource/tag/getTagTree', { params: req });
+  return apiGetUnchecked('/resource/tag/getTagTree', { params: req });
 }
 
 function addTag(req: AddTagApiRequest): Promise<string> {

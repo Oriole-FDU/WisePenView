@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 
-import { apiGet, apiPostUnchecked, apiPut } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked, apiPutUnchecked } from '@/apis/request';
 
 import type {
   AddFeedbackApiRequest,
@@ -21,17 +21,17 @@ import type {
 /** User API: /user/* */
 
 function getUserInfo(config?: AxiosRequestConfig): Promise<GetUserInfoApiResponse> {
-  return apiGet('/user/getUserInfo', config);
+  return apiGetUnchecked('/user/getUserInfo', config);
 }
 
 function searchUser(req: SearchUserApiRequest): Promise<UserSearchUserApiResponse[]> {
-  return apiGet('/user/searchUser', { params: req });
+  return apiGetUnchecked('/user/searchUser', { params: req });
 }
 
 function listUserSearchSuggestions(
   req: ListUserSearchSuggestionsApiRequest
 ): Promise<UserSearchUserApiResponse[]> {
-  return apiGet('/user/listUserSearchSuggestions', { params: req });
+  return apiGetUnchecked('/user/listUserSearchSuggestions', { params: req });
 }
 
 function initiateEmailVerify(req: InitiateEmailVerifyApiRequest): Promise<void> {
@@ -43,19 +43,19 @@ function initiateFudanUISVerify(req: InitiateFudanUISVerifyApiRequest): Promise<
 }
 
 function checkFudanUISVerify(): Promise<CheckFudanUISVerifyApiResponse> {
-  return apiGet('/user/verify/checkFudanUISVerify');
+  return apiGetUnchecked('/user/verify/checkFudanUISVerify');
 }
 
 function checkEmailVerify(req: CheckEmailVerifyApiRequest): Promise<void> {
-  return apiGet('/user/verify/checkEmailVerify', { params: req });
+  return apiGetUnchecked('/user/verify/checkEmailVerify', { params: req });
 }
 
 function changeUserInfo(req: ChangeUserInfoApiRequest): Promise<void> {
-  return apiPut('/user/changeUserInfo', req);
+  return apiPutUnchecked('/user/changeUserInfo', req);
 }
 
 function changeUserProfile(req: ChangeUserProfileApiRequest): Promise<void> {
-  return apiPut('/user/changeUserProfile', req);
+  return apiPutUnchecked('/user/changeUserProfile', req);
 }
 
 function addFeedback(req: AddFeedbackApiRequest): Promise<void> {
@@ -65,7 +65,7 @@ function addFeedback(req: AddFeedbackApiRequest): Promise<void> {
 function listInviteRecords(
   req: ListUserInviteRecordsApiRequest
 ): Promise<ListUserInviteRecordsApiResponse> {
-  return apiGet('/user/invite/listRecords', { params: req });
+  return apiGetUnchecked('/user/invite/listRecords', { params: req });
 }
 
 export const UserApi = {

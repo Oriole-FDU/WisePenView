@@ -59,7 +59,16 @@ export function parseTextApiResponse(value: unknown): string {
   }
 }
 
-export async function apiGet<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+/** GET 并解包 envelope；payload 在契约解析前保持 unknown。 */
+export async function apiGet(url: string, config?: AxiosRequestConfig): Promise<unknown> {
+  return unwrap<unknown>(await httpClient.get(url, config));
+}
+
+/**
+ * 未迁移契约的 GET 兼容入口。
+ * 该泛型不会执行运行期校验，新接口应使用 apiGet + ApiContract。
+ */
+export async function apiGetUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   return unwrap<T>(await httpClient.get(url, config));
 }
 
@@ -94,7 +103,20 @@ export async function apiGetText(url: string, config?: AxiosRequestConfig): Prom
   return parseTextApiResponse(response);
 }
 
-export async function apiPut<T>(
+/** PUT 并解包 envelope；payload 在契约解析前保持 unknown。 */
+export async function apiPut(
+  url: string,
+  data?: unknown,
+  config?: AxiosRequestConfig
+): Promise<unknown> {
+  return unwrap<unknown>(await httpClient.put(url, data, config));
+}
+
+/**
+ * 未迁移契约的 PUT 兼容入口。
+ * 该泛型不会执行运行期校验，新接口应使用 apiPut + ApiContract。
+ */
+export async function apiPutUnchecked<T>(
   url: string,
   data?: unknown,
   config?: AxiosRequestConfig
@@ -102,6 +124,15 @@ export async function apiPut<T>(
   return unwrap<T>(await httpClient.put(url, data, config));
 }
 
-export async function apiDelete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+/** DELETE 并解包 envelope；payload 在契约解析前保持 unknown。 */
+export async function apiDelete(url: string, config?: AxiosRequestConfig): Promise<unknown> {
+  return unwrap<unknown>(await httpClient.delete(url, config));
+}
+
+/**
+ * 未迁移契约的 DELETE 兼容入口。
+ * 该泛型不会执行运行期校验，新接口应使用 apiDelete + ApiContract。
+ */
+export async function apiDeleteUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   return unwrap<T>(await httpClient.delete(url, config));
 }

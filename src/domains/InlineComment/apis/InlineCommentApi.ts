@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddInlineCommentItemApiRequest,
@@ -15,7 +15,7 @@ import type {
 const listInlineComments = (
   req: ListInlineCommentsApiRequest
 ): Promise<ListInlineCommentsApiResponse> =>
-  apiGet(`/resource/inlineComment/listInlineComments`, { params: req });
+  apiGetUnchecked(`/resource/inlineComment/listInlineComments`, { params: req });
 
 const createInlineComment = (req: CreateInlineCommentApiRequest): Promise<string> =>
   apiPostUnchecked(`/resource/inlineComment/createInlineComment`, req);

@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ChangeFavoriteStatusApiRequest,
@@ -12,13 +12,15 @@ import type {
 } from './FavoriteApi.type';
 
 const getFavoriteStatus = (resourceId: string): Promise<GetFavoriteStatusApiResponse> =>
-  apiGet('/resource/favorite/getResourceFavoriteStatus', { params: { resourceId } });
+  apiGetUnchecked('/resource/favorite/getResourceFavoriteStatus', {
+    params: { resourceId },
+  });
 
 const changeFavoriteStatus = (request: ChangeFavoriteStatusApiRequest): Promise<void> =>
   apiPostUnchecked('/resource/favorite/changeResourceFavoriteStatus', request);
 
 const listCollections = (): Promise<FavoriteCollectionApiResponse[]> =>
-  apiGet('/resource/favorite/listCollections');
+  apiGetUnchecked('/resource/favorite/listCollections');
 
 const createCollection = (request: CreateCollectionApiRequest): Promise<string | number> =>
   apiPostUnchecked('/resource/favorite/createCollection', request);
@@ -32,7 +34,7 @@ const deleteCollection = (request: DeleteCollectionApiRequest): Promise<void> =>
 const listFavoritedResources = (
   request: ListFavoritedResourcesApiRequest
 ): Promise<ListFavoritedResourcesApiResponse> =>
-  apiGet('/resource/favorite/listFavoritedResources', { params: request });
+  apiGetUnchecked('/resource/favorite/listFavoritedResources', { params: request });
 
 export const FavoriteApi = {
   getFavoriteStatus,

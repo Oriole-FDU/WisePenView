@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   GetUserInteractionRecordApiResponse,
@@ -23,7 +23,7 @@ function read(req: ResourceInteractionApiRequest): Promise<void> {
 function getUserInteractionRecord(
   req: ResourceInteractionApiRequest
 ): Promise<GetUserInteractionRecordApiResponse> {
-  return apiGet('/resource/interaction/getResourceUserInteractionRecord', { params: req });
+  return apiGetUnchecked('/resource/interaction/getResourceUserInteractionRecord', { params: req });
 }
 
 export const InteractApi = { setLike, rate, read, getUserInteractionRecord };

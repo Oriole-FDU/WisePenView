@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   GetUserWalletInfoApiResponse,
@@ -28,7 +28,7 @@ const serializeWalletTransactionsQuery = (params: ListTransactionsApiRequest): s
 };
 
 function getUserWalletInfo(): Promise<GetUserWalletInfoApiResponse> {
-  return apiGet('/user/wallet/getUserWalletInfo');
+  return apiGetUnchecked('/user/wallet/getUserWalletInfo');
 }
 
 function redeemVoucher(req: RedeemVoucherApiRequest): Promise<void> {
@@ -36,7 +36,7 @@ function redeemVoucher(req: RedeemVoucherApiRequest): Promise<void> {
 }
 
 function listTransactions(req: ListTransactionsApiRequest): Promise<ListTransactionsApiResponse> {
-  return apiGet('/user/wallet/listTransactions', {
+  return apiGetUnchecked('/user/wallet/listTransactions', {
     params: req,
     paramsSerializer: serializeWalletTransactionsQuery,
   });
