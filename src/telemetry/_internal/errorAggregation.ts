@@ -100,18 +100,17 @@ export class ErrorAggregation {
   }
 
   private reportDropped(): void {
+    if (this.dropped === 0 || this.emitted >= MAX_EVENTS_PER_WINDOW) return;
     const dropped = this.dropped;
     this.dropped = 0;
-    if (dropped > 0) {
-      this.emitted++;
-      this.send({
-        name: 'telemetry.events_dropped',
-        severity: 'WARN',
-        message: 'Telemetry event limit reached',
-        timestamp: this.now(),
-        attributes: { 'telemetry.dropped_count': dropped },
-      });
-    }
+    this.emitted++;
+    this.send({
+      name: 'telemetry.events_dropped',
+      severity: 'WARN',
+      message: 'Telemetry event limit reached',
+      timestamp: this.now(),
+      attributes: { 'telemetry.dropped_count': dropped },
+    });
   }
 
   private send(event: TelemetryEvent): void {

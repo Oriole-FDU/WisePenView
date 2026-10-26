@@ -107,11 +107,12 @@ test('聚合缓存及发送速率有上限，丢弃数量可见，出口失败�
   );
 });
 
-test('聚合满额时发送被淘汰分组的摘要，页面结束时也报告预算丢弃数', () => {
+test('聚合满额时发送淘汰摘要；强制刷新不突破预算，丢弃摘要等下一窗口', () => {
+  let now = 0;
   const events = [];
   const aggregation = new telemetry.ErrorAggregation(
     (event) => events.push(event),
-    () => 0
+    () => now
   );
   const event = {
     name: 'frontend.error',
@@ -128,9 +129,22 @@ test('聚合满额时发送被淘汰分组的摘要，页面结束时也报告�
   const summary = events.find(({ name }) => name === 'frontend.error_summary');
   assert.equal(summary.attributes['error.occurrence_count'], 1);
   for (let i = 0; i < 200; i++) aggregation.emit(event);
+  for (let i = 0; i < 20; i++) {
+    aggregation.emit(event);
+    aggregation.flush(true);
+  }
+  assert.equal(events.length, 200);
+  now = 60_000;
   aggregation.flush(true);
+  assert.equal(events.length, 201);
   assert.equal(events.at(-1).name, 'telemetry.events_dropped');
   assert.ok(events.at(-1).attributes['telemetry.dropped_count'] > 0);
+  for (let i = 0; i < 200; i++) aggregation.emit(event);
+  aggregation.flush(true);
+  assert.equal(events.length, 400);
+  now = 120_000;
+  aggregation.emit(event);
+  assert.equal(events.length, 402);
 });
 
 test('URL 参数、认证令牌和邮箱不进入诊断文本', () => {
