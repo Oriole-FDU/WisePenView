@@ -1,6 +1,14 @@
 import { parseApiRequest, parseApiResponse } from '@/apis/contract';
 import { apiPost } from '@/apis/request';
 
+import {
+  ChangePasswordApiContract,
+  LoginApiContract,
+  LogoutApiContract,
+  RegisterApiContract,
+  ResetPasswordApiContract,
+  ResetPasswordEmailApiContract,
+} from './AuthApi.contract';
 import type {
   ChangePasswordApiRequest,
   EmptyAuthApiResponse,
@@ -9,14 +17,6 @@ import type {
   NewPasswordApiRequest,
   RegisterApiRequest,
   ResetPasswordApiRequest,
-} from './AuthApi.schema';
-import {
-  ChangePasswordApiContract,
-  LoginApiContract,
-  LogoutApiContract,
-  RegisterApiContract,
-  ResetPasswordApiContract,
-  ResetPasswordEmailApiContract,
 } from './AuthApi.schema';
 
 async function login(req: LoginApiRequest): Promise<LoginApiResponse> {

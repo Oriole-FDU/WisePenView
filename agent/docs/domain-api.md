@@ -42,6 +42,7 @@ API 层禁止：
 ```text
 src/domains/<Domain>/apis/
 ├── <Domain>Api.schema.ts
+├── <Domain>Api.contract.ts
 └── <Domain>Api.ts
 ```
 

@@ -22,7 +22,7 @@ try {
           LoginApiContract,
           LogoutApiContract,
           RegisterApiContract,
-        } from '@/domains/Auth/apis/AuthApi.schema';
+        } from '@/domains/Auth/apis/AuthApi.contract';
       `,
       resolveDir: root,
     },
