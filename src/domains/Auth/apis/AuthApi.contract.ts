@@ -59,9 +59,15 @@ export const ChangePasswordApiContract = defineApiContract({
 
 export type LoginApiRequest = ApiContractRequest<typeof LoginApiContract>;
 export type LoginApiResponse = ApiContractResponse<typeof LoginApiContract>;
-export type EmptyAuthApiRequest = ApiContractRequest<typeof LogoutApiContract>;
-export type EmptyAuthApiResponse = ApiContractResponse<typeof LogoutApiContract>;
+export type LogoutApiRequest = ApiContractRequest<typeof LogoutApiContract>;
+export type LogoutApiResponse = ApiContractResponse<typeof LogoutApiContract>;
 export type RegisterApiRequest = ApiContractRequest<typeof RegisterApiContract>;
-export type ResetPasswordApiRequest = ApiContractRequest<typeof ResetPasswordEmailApiContract>;
-export type NewPasswordApiRequest = ApiContractRequest<typeof ResetPasswordApiContract>;
+export type RegisterApiResponse = ApiContractResponse<typeof RegisterApiContract>;
+export type ResetPasswordEmailApiRequest = ApiContractRequest<typeof ResetPasswordEmailApiContract>;
+export type ResetPasswordEmailApiResponse = ApiContractResponse<
+  typeof ResetPasswordEmailApiContract
+>;
+export type ResetPasswordApiRequest = ApiContractRequest<typeof ResetPasswordApiContract>;
+export type ResetPasswordApiResponse = ApiContractResponse<typeof ResetPasswordApiContract>;
 export type ChangePasswordApiRequest = ApiContractRequest<typeof ChangePasswordApiContract>;
+export type ChangePasswordApiResponse = ApiContractResponse<typeof ChangePasswordApiContract>;

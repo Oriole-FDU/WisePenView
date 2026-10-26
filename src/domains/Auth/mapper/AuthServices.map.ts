@@ -3,9 +3,9 @@ import { normalizeInviteCode } from '@/domains/Auth/utils/normalizeInviteCode';
 import type {
   ChangePasswordApiRequest,
   LoginApiRequest,
-  NewPasswordApiRequest,
   RegisterApiRequest,
   ResetPasswordApiRequest,
+  ResetPasswordEmailApiRequest,
 } from '../apis/AuthApi.contract';
 import type {
   ChangePasswordRequest,
@@ -29,11 +29,11 @@ const mapRegisterRequest = (params: RegisterRequest): RegisterApiRequest => {
   };
 };
 
-const mapResetPasswordRequest = (params: ResetPasswordRequest): ResetPasswordApiRequest => ({
+const mapResetPasswordRequest = (params: ResetPasswordRequest): ResetPasswordEmailApiRequest => ({
   username: params.username,
 });
 
-const mapNewPasswordRequest = (params: NewPasswordRequest): NewPasswordApiRequest => ({
+const mapNewPasswordRequest = (params: NewPasswordRequest): ResetPasswordApiRequest => ({
   newPassword: params.newPassword,
   token: params.token,
 });
