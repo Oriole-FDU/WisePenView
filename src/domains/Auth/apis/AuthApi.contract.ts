@@ -1,15 +1,9 @@
-import type { ApiContract } from '@/apis/contract';
+import {
+  type ApiContractRequest,
+  type ApiContractResponse,
+  defineApiContract,
+} from '@/apis/contract';
 
-import type {
-  ChangePasswordApiRequest,
-  EmptyAuthApiRequest,
-  EmptyAuthApiResponse,
-  LoginApiRequest,
-  LoginApiResponse,
-  NewPasswordApiRequest,
-  RegisterApiRequest,
-  ResetPasswordApiRequest,
-} from './AuthApi.schema';
 import {
   ChangePasswordApiRequestSchema,
   EmptyAuthApiRequestSchema,
@@ -21,44 +15,53 @@ import {
   ResetPasswordApiRequestSchema,
 } from './AuthApi.schema';
 
-export const LoginApiContract = {
+export const LoginApiContract = defineApiContract({
   name: 'LoginApi',
   endpoint: '/auth/login',
   request: LoginApiRequestSchema,
   response: LoginApiResponseSchema,
-} as const satisfies ApiContract<LoginApiRequest, LoginApiResponse>;
+});
 
-export const LogoutApiContract = {
+export const LogoutApiContract = defineApiContract({
   name: 'LogoutApi',
   endpoint: '/auth/logout',
   request: EmptyAuthApiRequestSchema,
   response: EmptyAuthApiResponseSchema,
-} as const satisfies ApiContract<EmptyAuthApiRequest, EmptyAuthApiResponse>;
+});
 
-export const RegisterApiContract = {
+export const RegisterApiContract = defineApiContract({
   name: 'RegisterApi',
   endpoint: '/auth/register',
   request: RegisterApiRequestSchema,
   response: EmptyAuthApiResponseSchema,
-} as const satisfies ApiContract<RegisterApiRequest, EmptyAuthApiResponse>;
+});
 
-export const ResetPasswordEmailApiContract = {
+export const ResetPasswordEmailApiContract = defineApiContract({
   name: 'ResetPasswordEmailApi',
   endpoint: '/auth/sendResetMail',
   request: ResetPasswordApiRequestSchema,
   response: EmptyAuthApiResponseSchema,
-} as const satisfies ApiContract<ResetPasswordApiRequest, EmptyAuthApiResponse>;
+});
 
-export const ResetPasswordApiContract = {
+export const ResetPasswordApiContract = defineApiContract({
   name: 'ResetPasswordApi',
   endpoint: '/auth/resetPassword',
   request: NewPasswordApiRequestSchema,
   response: EmptyAuthApiResponseSchema,
-} as const satisfies ApiContract<NewPasswordApiRequest, EmptyAuthApiResponse>;
+});
 
-export const ChangePasswordApiContract = {
+export const ChangePasswordApiContract = defineApiContract({
   name: 'ChangePasswordApi',
   endpoint: '/auth/changePassword',
   request: ChangePasswordApiRequestSchema,
   response: EmptyAuthApiResponseSchema,
-} as const satisfies ApiContract<ChangePasswordApiRequest, EmptyAuthApiResponse>;
+});
+
+export type LoginApiRequest = ApiContractRequest<typeof LoginApiContract>;
+export type LoginApiResponse = ApiContractResponse<typeof LoginApiContract>;
+export type EmptyAuthApiRequest = ApiContractRequest<typeof LogoutApiContract>;
+export type EmptyAuthApiResponse = ApiContractResponse<typeof LogoutApiContract>;
+export type RegisterApiRequest = ApiContractRequest<typeof RegisterApiContract>;
+export type ResetPasswordApiRequest = ApiContractRequest<typeof ResetPasswordEmailApiContract>;
+export type NewPasswordApiRequest = ApiContractRequest<typeof ResetPasswordApiContract>;
+export type ChangePasswordApiRequest = ApiContractRequest<typeof ChangePasswordApiContract>;

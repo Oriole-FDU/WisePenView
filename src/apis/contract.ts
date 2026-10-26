@@ -14,6 +14,17 @@ export interface ApiContract<Request, Response> {
   response: ZodType<Response>;
 }
 
+export type ApiContractRequest<Contract> =
+  Contract extends ApiContract<infer Request, unknown> ? Request : never;
+
+export type ApiContractResponse<Contract> =
+  Contract extends ApiContract<unknown, infer Response> ? Response : never;
+
+/** 由 Schema 建立 Contract，并为 API 层保留推导后的请求/响应类型。 */
+export const defineApiContract = <Request, Response>(
+  contract: ApiContract<Request, Response>
+): ApiContract<Request, Response> => contract;
+
 const summarizeIssues = (issues: { path: PropertyKey[]; code: string }[]) =>
   issues.map((issue) => ({
     path: issue.path.length > 0 ? issue.path.join('.') : '$',

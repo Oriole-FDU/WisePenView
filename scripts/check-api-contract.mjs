@@ -19,9 +19,12 @@ try {
         export { parseApiRequest, parseApiResponse } from '@/apis/contract';
         export { isApiResponseEnvelope } from '@/apis/runtimeContract';
         export {
+          ChangePasswordApiContract,
           LoginApiContract,
           LogoutApiContract,
           RegisterApiContract,
+          ResetPasswordApiContract,
+          ResetPasswordEmailApiContract,
         } from '@/domains/Auth/apis/AuthApi.contract';
       `,
       resolveDir: root,
@@ -34,12 +37,15 @@ try {
   });
 
   const {
+    ChangePasswordApiContract,
     isApiResponseEnvelope,
     LoginApiContract,
     LogoutApiContract,
     parseApiRequest,
     parseApiResponse,
     RegisterApiContract,
+    ResetPasswordApiContract,
+    ResetPasswordEmailApiContract,
   } = await import(pathToFileURL(outfile).href);
   assert(isApiResponseEnvelope({ code: 200, key: null, msg: null, data: null }));
   assert(isApiResponseEnvelope({ code: 200, msg: 'ok', data: { id: 'resource' } }));
@@ -51,6 +57,20 @@ try {
   assert(!isApiResponseEnvelope({ code: 200, msg: null, data: null }));
   assert(!isApiResponseEnvelope({ code: 200, key: 'java', msg: 0, data: null }));
   assert(!isApiResponseEnvelope([]));
+
+  for (const contract of [
+    LoginApiContract,
+    LogoutApiContract,
+    RegisterApiContract,
+    ResetPasswordEmailApiContract,
+    ResetPasswordApiContract,
+    ChangePasswordApiContract,
+  ]) {
+    assert(Object.hasOwn(contract, 'request'), `${contract.name} 缺少 request`);
+    assert(Object.hasOwn(contract, 'response'), `${contract.name} 缺少 response`);
+  }
+  assert(LogoutApiContract.request.safeParse(undefined).success);
+  assert(LogoutApiContract.response.safeParse(null).success);
 
   assert.equal(LoginApiContract.name, 'LoginApi');
   assert.equal(LoginApiContract.endpoint, '/auth/login');

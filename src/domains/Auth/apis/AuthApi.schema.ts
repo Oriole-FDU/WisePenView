@@ -35,12 +35,3 @@ export const LoginApiResponseSchema = requiredText;
 
 /** Java R.ok() 的 wire payload 为 null，而不是缺失值或空字符串。 */
 export const EmptyAuthApiResponseSchema = z.null();
-
-export type LoginApiRequest = z.infer<typeof LoginApiRequestSchema>;
-export type RegisterApiRequest = z.infer<typeof RegisterApiRequestSchema>;
-export type ResetPasswordApiRequest = z.infer<typeof ResetPasswordApiRequestSchema>;
-export type NewPasswordApiRequest = z.infer<typeof NewPasswordApiRequestSchema>;
-export type ChangePasswordApiRequest = z.infer<typeof ChangePasswordApiRequestSchema>;
-export type LoginApiResponse = z.infer<typeof LoginApiResponseSchema>;
-export type EmptyAuthApiResponse = z.infer<typeof EmptyAuthApiResponseSchema>;
-export type EmptyAuthApiRequest = z.infer<typeof EmptyAuthApiRequestSchema>;
