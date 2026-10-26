@@ -53,7 +53,11 @@ export const getErrorReportId = (error: unknown): string => {
   return next;
 };
 
-const buildErrorReport = (error: unknown, context: ErrorReportContext): ErrorReport => {
+const buildErrorReport = (
+  error: unknown,
+  context: ErrorReportContext,
+  errorId: string
+): ErrorReport => {
   const errorInfo =
     error instanceof Error
       ? {
@@ -67,7 +71,7 @@ const buildErrorReport = (error: unknown, context: ErrorReportContext): ErrorRep
         };
 
   return {
-    id: getErrorReportId(error),
+    id: errorId,
     occurredAt: new Date().toISOString(),
     origin: context.origin,
     pathname: context.pathname,
@@ -103,7 +107,7 @@ export const reportError = (error: unknown, context: ErrorReportContext): string
   }
 
   try {
-    void Promise.resolve(currentReporter(buildErrorReport(error, context), error)).catch(
+    void Promise.resolve(currentReporter(buildErrorReport(error, context, errorId), error)).catch(
       () => undefined
     );
   } catch {

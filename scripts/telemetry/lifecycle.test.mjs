@@ -7,6 +7,19 @@ const telemetry = await loadTelemetry();
 const mockTelemetry = await loadTelemetry('mock');
 const disabledTelemetry = await loadTelemetry('development', '');
 
+test('primitive 单次上报返回编号与真实 OTel 事件编号一致', async (context) => {
+  installBrowser(context);
+  const telemetry = await loadTelemetry();
+  context.after(telemetry.installOtelErrorReporter());
+  for (const error of ['primitive failure', 42, null, undefined]) {
+    telemetry.flushTelemetryEvents(true);
+    telemetry.records.length = 0;
+    const id = telemetry.reportError(error, { origin: 'unhandled-rejection' });
+    assert.equal(telemetry.records.length, 1);
+    assert.equal(telemetry.records[0].attributes['error.id'], id);
+  }
+});
+
 const route = (key, resourceId = 'note-123', state = 'idle') => ({
   matches: [
     {
