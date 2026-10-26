@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ActiveChatTurnApiRequest,
@@ -48,15 +48,15 @@ import type {
 /** Chat API: /chat/* */
 
 function listAvailableModels(): Promise<ListAvailableModelsApiResponse> {
-  return apiGet('/chat/model/listAvailableModels');
+  return apiGetUnchecked('/chat/model/listAvailableModels');
 }
 
 function listModels(req: ListModelsApiRequest): Promise<ListModelsApiResponse> {
-  return apiGet('/chat/model/listModels', { params: req });
+  return apiGetUnchecked('/chat/model/listModels', { params: req });
 }
 
 function listTools(): Promise<ListToolsApiResponse> {
-  return apiGet('/chat/tool/listUserTools');
+  return apiGetUnchecked('/chat/tool/listUserTools');
 }
 
 function initTemporaryAttachmentUpload(
@@ -66,7 +66,7 @@ function initTemporaryAttachmentUpload(
 }
 
 function listUserProviders(): Promise<ListUserProvidersApiResponse> {
-  return apiGet('/chat/model/listUserProviders');
+  return apiGetUnchecked('/chat/model/listUserProviders');
 }
 
 function createUserProvider(req: CreateUserProviderApiRequest): Promise<null> {
@@ -142,7 +142,7 @@ export const ChatApi = {
 /** Chat Completion API: /chat/completions/* */
 
 function getActiveTurn(req: ActiveChatTurnApiRequest): Promise<ActiveChatTurnApiResponse> {
-  return apiGet('/chat/completions/active', { params: req });
+  return apiGetUnchecked('/chat/completions/active', { params: req });
 }
 
 function cancelTurn(req: CancelChatTurnApiRequest): Promise<CancelChatTurnApiResponse> {
@@ -190,13 +190,13 @@ function deleteSession(req: DeleteSessionApiRequest): Promise<DeleteSessionApiRe
 }
 
 function listSessions(req: ListSessionsApiRequest): Promise<ListSessionsApiResponse> {
-  return apiGet('/chat/session/listSessions', { params: req });
+  return apiGetUnchecked('/chat/session/listSessions', { params: req });
 }
 
 function listHistoryMessages(
   req: ListHistoryMessagesApiRequest
 ): Promise<ListHistoryMessagesApiResponse> {
-  return apiGet('/chat/session/listHistoryMessages', {
+  return apiGetUnchecked('/chat/session/listHistoryMessages', {
     params: req,
   });
 }

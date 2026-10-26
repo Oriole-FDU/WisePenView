@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddGroupApiRequest,
@@ -30,15 +30,15 @@ import type {
 
 /** Group API: /group/* */
 function listGroups(req: ListGroupApiRequest): Promise<ListGroupApiResponse> {
-  return apiGet('/group/list', { params: req });
+  return apiGetUnchecked('/group/list', { params: req });
 }
 
 function getGroupDetailInfo(req: GetGroupInfoApiRequest): Promise<GetGroupInfoApiResponse> {
-  return apiGet('/group/getGroupDetailInfo', { params: req });
+  return apiGetUnchecked('/group/getGroupDetailInfo', { params: req });
 }
 
 function getGroupBaseInfo(req: GetGroupBaseInfoApiRequest): Promise<GetGroupBaseInfoApiResponse> {
-  return apiGet('/group/getGroupBaseInfo', { params: req });
+  return apiGetUnchecked('/group/getGroupBaseInfo', { params: req });
 }
 
 function addGroup(req: AddGroupApiRequest): Promise<AddGroupApiResponse> {
@@ -70,7 +70,7 @@ export const GroupApi = {
 /** Group Config API: /resource/groupConfig/* */
 
 function getConfig(req: GetGroupConfigApiRequest): Promise<GetGroupConfigApiResponse> {
-  return apiGet('/resource/groupConfig/getConfig', { params: req });
+  return apiGetUnchecked('/resource/groupConfig/getConfig', { params: req });
 }
 
 function changeConfig(req: ChangeGroupConfigApiRequest): Promise<void> {
@@ -85,11 +85,11 @@ export const GroupResConfigApi = {
 /** Group Member API: /group/member/* */
 
 function listMembers(req: ListMemberApiRequest): Promise<FetchGroupMembersApiResponse> {
-  return apiGet('/group/member/list', { params: req });
+  return apiGetUnchecked('/group/member/list', { params: req });
 }
 
 function getMyRole(groupId: string): Promise<GroupRoleApiResponse> {
-  return apiGet('/group/member/getMyRole', { params: { groupId } });
+  return apiGetUnchecked('/group/member/getMyRole', { params: { groupId } });
 }
 
 function quit(req: QuitGroupApiRequest): Promise<void> {
@@ -107,7 +107,7 @@ function kick(req: KickMemberApiRequest): Promise<void> {
 function getMyGroupMemberInfo(
   req: GetMyGroupMemberInfoApiRequest
 ): Promise<GetMyGroupMemberInfoApiResponse> {
-  return apiGet('/group/member/getMyGroupMemberInfo', { params: req });
+  return apiGetUnchecked('/group/member/getMyGroupMemberInfo', { params: req });
 }
 
 function changeTokenLimit(req: ChangeTokenLimitApiRequest): Promise<void> {
@@ -117,7 +117,7 @@ function changeTokenLimit(req: ChangeTokenLimitApiRequest): Promise<void> {
 function getAllMyGroupTokenInfo(
   req: GetAllMyGroupTokenInfoApiRequest
 ): Promise<GetAllMyGroupTokenInfoApiResponse> {
-  return apiGet('/group/member/getAllMyGroupTokenInfo', { params: req });
+  return apiGetUnchecked('/group/member/getAllMyGroupTokenInfo', { params: req });
 }
 
 export const GroupMemberApi = {

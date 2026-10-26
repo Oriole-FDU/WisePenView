@@ -31,7 +31,7 @@ API 层禁止：
 - Zod 只约束 wire 结构与 primitive 类型。ID、时间、枚举和数值范围按后端真实序列化规则声明，不使用 `z.coerce()` 掩盖类型漂移。
 - 不使用 `.catch()`、`.default()` 或 `z.strictObject()` 静默兼容违约或拒绝后端新增字段；默认 `z.object()` 丢弃未声明字段。
 - 每个 API 使用一个 `ApiContract` 描述 `name`、`endpoint`、`request` 和 `response`；即使没有请求体或返回数据，也必须显式绑定 `z.undefined()`、`z.null()` 等空 Schema。请求发送前与响应解包后分别调用 `parseApiRequest`、`parseApiResponse`，两者直接复用该 Contract。解析失败必须 fail-fast，不把缺失字段、错误类型或意外 `null` 继续传给 mapper 或 service。
-- 非泛型 `apiPost` 只解包 envelope，payload 在 Contract 解析前保持 `unknown`；未迁移契约的旧接口只能使用显式标注的 `apiPostUnchecked<T>` 兼容入口，不得在新接口中新增该调用。
+- 非泛型 `apiGet`、`apiPost`、`apiPut`、`apiDelete` 只解包 envelope，payload 在 Contract 解析前保持 `unknown`；未迁移契约的旧接口只能使用显式标注的 `apiGetUnchecked<T>`、`apiPostUnchecked<T>`、`apiPutUnchecked<T>`、`apiDeleteUnchecked<T>` 兼容入口，不得在新接口中新增这些调用。
 - 契约违约诊断只记录 endpoint、contract、字段路径和 issue code，不记录原始请求或响应正文。
 - 未迁移的领域可以继续使用手写 `apis/*Api.type.ts`，但同一声明只能有一个事实源。
 - 接口字段、枚举或响应结构需要结合 Java 实现、mapper 与业务语义确认；无法从代码得到稳定结论时，先向用户确认，不要盲猜。
@@ -95,6 +95,29 @@ async function getExample(req: GetExampleApiRequest): Promise<GetExampleApiRespo
   const request = parseApiRequest(GetExampleApiContract, req);
   const data = await apiPost(GetExampleApiContract.endpoint, request);
   return parseApiResponse(GetExampleApiContract, data);
+}
+```
+
+GET、PUT、DELETE 使用同一模式，只在放置 query/body 时不同：
+
+```ts
+// 以下示例省略 UpdateExample、RemoveExample 的 Schema 与 Contract 声明。
+async function getExample(req: GetExampleApiRequest): Promise<GetExampleApiResponse> {
+  const request = parseApiRequest(GetExampleApiContract, req);
+  const data = await apiGet(GetExampleApiContract.endpoint, { params: request });
+  return parseApiResponse(GetExampleApiContract, data);
+}
+
+async function updateExample(req: UpdateExampleApiRequest): Promise<UpdateExampleApiResponse> {
+  const request = parseApiRequest(UpdateExampleApiContract, req);
+  const data = await apiPut(UpdateExampleApiContract.endpoint, request);
+  return parseApiResponse(UpdateExampleApiContract, data);
+}
+
+async function removeExample(req: RemoveExampleApiRequest): Promise<RemoveExampleApiResponse> {
+  const request = parseApiRequest(RemoveExampleApiContract, req);
+  const data = await apiDelete(RemoveExampleApiContract.endpoint, { params: request });
+  return parseApiResponse(RemoveExampleApiContract, data);
 }
 ```
 
@@ -164,7 +187,8 @@ api -> views/components
 - [ ] 响应契约未使用 optional；真实空值使用 nullable。
 - [ ] 每个 API 的 Contract 都显式包含 name、endpoint、request 和 response。
 - [ ] API 请求发送前和响应解包后均通过同一个 Contract 执行解析。
-- [ ] 新接口未使用 `apiPostUnchecked<T>`。
+- [ ] 新接口未使用 `apiGetUnchecked<T>`、`apiPostUnchecked<T>`、`apiPutUnchecked<T>` 或
+      `apiDeleteUnchecked<T>`。
 - [ ] API DTO 未泄漏到组件展示层。
 - [ ] API 方法返回明确 DTO，不以 `unknown` 作为未分层的响应出口。
 - [ ] 未新增 `any`。

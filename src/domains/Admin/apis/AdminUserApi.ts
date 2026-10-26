@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ChangeAdminUserInfoApiRequest,
@@ -13,11 +13,11 @@ import type {
 /** Admin User API: /admin/user/* */
 
 function getUserList(req: FetchAdminUserListApiRequest): Promise<FetchAdminUserListApiResponse> {
-  return apiGet('/admin/user/getUserList', { params: req });
+  return apiGetUnchecked('/admin/user/getUserList', { params: req });
 }
 
 function getUserInfo(req: GetAdminUserInfoApiRequest): Promise<GetAdminUserInfoApiResponse> {
-  return apiGet('/admin/user/getUserInfo', { params: req });
+  return apiGetUnchecked('/admin/user/getUserInfo', { params: req });
 }
 
 function changeUserInfo(req: ChangeAdminUserInfoApiRequest): Promise<void> {

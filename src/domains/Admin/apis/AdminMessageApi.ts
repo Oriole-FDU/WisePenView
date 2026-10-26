@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ListAdminMessagesApiRequest,
@@ -9,7 +9,7 @@ import type {
 function listAdminMessages(
   req: ListAdminMessagesApiRequest
 ): Promise<ListAdminMessagesApiResponse> {
-  return apiGet('/admin/message/listMessages', { params: req });
+  return apiGetUnchecked('/admin/message/listMessages', { params: req });
 }
 
 function publishMessage(req: PublishMessageApiRequest): Promise<void> {

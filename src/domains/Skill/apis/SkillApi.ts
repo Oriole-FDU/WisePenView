@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
 import type {
   CancelUploadAssetsApiRequest,
@@ -40,7 +40,7 @@ function getSkillVersionBundleInfo(
 function getSkillAssetStsToken(
   query: GetSkillAssetStsTokenApiRequest
 ): Promise<OssStsTokenApiResponse | undefined> {
-  return apiGet('/skill/getSkillAssetStsToken', { params: query });
+  return apiGetUnchecked('/skill/getSkillAssetStsToken', { params: query });
 }
 
 function changeSkillInfo(body: UpdateSkillInfoApiRequest): Promise<void> {

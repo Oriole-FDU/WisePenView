@@ -1,4 +1,4 @@
-import { apiGet, apiPostUnchecked } from '@/apis/request';
+import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
   CommentItemActionApiRequest,
@@ -22,10 +22,10 @@ const toggleLike = (req: CommentItemActionApiRequest): Promise<boolean> =>
   apiPostUnchecked('/resource/comment/toggleLike', req);
 
 const listComments = (req: ListCommentsApiRequest): Promise<CommentPageApiResponse> =>
-  apiGet('/resource/comment/listComments', { params: req });
+  apiGetUnchecked('/resource/comment/listComments', { params: req });
 
 const listReplies = (req: ListRepliesApiRequest): Promise<CommentPageApiResponse> =>
-  apiGet('/resource/comment/listReplies', { params: req });
+  apiGetUnchecked('/resource/comment/listReplies', { params: req });
 
 export const CommentApi = {
   createComment,
