@@ -30,7 +30,7 @@ API 层禁止：
 - 响应字段必须存在时不要使用 `.optional()`；值可为 `null` 时使用 `.nullable()`。请求字段的 `.optional()` 只表示允许省略，`.nullable()` 表示允许显式传 `null`，两者不能混用。
 - Zod 只约束 wire 结构与 primitive 类型。ID、时间、枚举和数值范围按后端真实序列化规则声明，不使用 `z.coerce()` 掩盖类型漂移。
 - 不使用 `.catch()`、`.default()` 或 `z.strictObject()` 静默兼容违约或拒绝后端新增字段；默认 `z.object()` 丢弃未声明字段。
-- 每个 API 使用一个 `ApiContract` 描述 `name`、`endpoint`、`request` 和 `response`；即使没有请求体或返回数据，也必须显式绑定 `z.undefined()`、`z.null()` 等空 Schema。请求发送前与响应解包后分别调用 `parseApiRequest`、`parseApiResponse`，两者直接复用该 Contract。解析失败必须 fail-fast，不把缺失字段、错误类型或意外 `null` 继续传给 mapper。
+- 每个 API 使用一个 `ApiContract` 描述 `name`、`endpoint`、`request` 和 `response`；即使没有请求体或返回数据，也必须显式绑定 `z.undefined()`、`z.null()` 等空 Schema。请求发送前与响应解包后分别调用 `parseApiRequest`、`parseApiResponse`，两者直接复用该 Contract。解析失败必须 fail-fast，不把缺失字段、错误类型或意外 `null` 继续传给 mapper 或 service。
 - 非泛型 `apiPost` 只解包 envelope，payload 在 Contract 解析前保持 `unknown`；未迁移契约的旧接口只能使用显式标注的 `apiPostUnchecked<T>` 兼容入口，不得在新接口中新增该调用。
 - 契约违约诊断只记录 endpoint、contract、字段路径和 issue code，不记录原始请求或响应正文。
 - 未迁移的领域可以继续使用手写 `apis/*Api.type.ts`，但同一声明只能有一个事实源。

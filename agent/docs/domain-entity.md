@@ -7,7 +7,7 @@ Entity 定义前端展示和业务编排会长期使用的复杂类型。Enum �
 Entity 应定义：
 
 - 展示会用到的复杂业务类型，例如组、人、资源、笔记、钱包记录。
-- 已经过 mapper 归一化后的前端类型。
+- 已经过 mapper 或 service 边界归一化后的前端类型。
 - 多个 view/component/service 共享的领域类型。
 
 Entity 不应定义：
@@ -43,7 +43,7 @@ src/domains/<Domain>/enum/index.ts
 ## 三、类型来源边界
 
 - 后端协议类型手写在同域 `apis/*Api.type.ts`，属于 API 层输入。
-- mapper 输出的稳定展示类型放入 entity。
+- mapper 或 service 输出的稳定展示类型放入 entity。
 - 组件 Props 只描述组件契约，不重复发明领域实体。
 - service 的请求/响应类型放在 `service/index.type.ts`，表达业务能力语义。
 
