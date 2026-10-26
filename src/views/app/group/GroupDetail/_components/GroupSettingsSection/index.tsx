@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface GroupSettingsSectionProps {
   title: string;

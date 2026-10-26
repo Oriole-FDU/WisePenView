@@ -28,7 +28,7 @@ import type {
   MemberListTableProps,
 } from './index.type';
 import InlineEditError from './InlineEditError';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type MemberRecord = GroupMember & { key: string };
 type ReadonlyColumn = DataTableColumn<MemberRecord>;

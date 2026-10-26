@@ -20,7 +20,7 @@ import {
   type MermaidTemplateKey,
   readMermaidSource,
 } from '../source';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const mermaidBlockConfig = {
   type: 'mermaid',

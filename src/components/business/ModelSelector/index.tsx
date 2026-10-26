@@ -9,7 +9,7 @@ import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import type { ChatModel } from '@/domains/Chat';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export type ModelSelectorTriggerVariant = 'default' | 'icon';
 

@@ -15,7 +15,7 @@ import { useChatService } from '@/domains';
 import { buildDefaultPersonalAgent, type ChatAgentOption, type PageResult } from '@/domains/Chat';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 
 interface AgentPickerProps {
   injectedAgents?: ChatAgentOption[];

@@ -1,0 +1,104 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.root {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.controlRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.submitButton {
+  align-self: center;
+  min-height: var(--control-height, 36px);
+}
+
+.listbox {
+  display: flex;
+  max-height: min(196px, 32vh);
+  flex-direction: column;
+  gap: var(--space-2xs);
+  overflow: auto;
+  padding: var(--space-2xs);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-popover);
+  background: var(--surface);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .controlRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.option {
+  display: grid;
+  width: 100%;
+  min-height: 44px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+  border: 0;
+  border-radius: var(--app-radius-menu-item);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--surface-hover);
+    outline: none;
+  }
+}
+
+.optionActive {
+  background: var(--surface-hover);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.optionMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.optionName,
+.optionDescription {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionName {
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.optionDescription,
+.state {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.state {
+  padding: var(--space-sm);
+  text-align: center;
+}

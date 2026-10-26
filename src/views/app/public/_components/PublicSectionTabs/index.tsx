@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.less';
+import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
 
 import styles from './style.module.scss';
 

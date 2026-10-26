@@ -7,7 +7,7 @@ import { usePickerSelection } from '@/hooks/usePickerSelection';
 
 import DriveNavigator from '../../DriveNavigator';
 import type { DriveFolderPickerModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function DriveFolderPickerDialog({
   isOpen,

@@ -1,0 +1,71 @@
+@use '../../../shared/styles/table' as table;
+
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  height: table.$row-content-height;
+  min-width: 0;
+  padding-left: var(--folder-table-depth-indent, 0);
+}
+
+.expandBtn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+
+  :global(svg) {
+    width: table.$table-row-expand-icon-size;
+    height: table.$table-row-expand-icon-size;
+  }
+}
+
+.nameContent {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  height: table.$table-line-height-body;
+  line-height: table.$table-line-height-body;
+  min-width: 0;
+  transform: translateY(2px);
+}
+
+.entryIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: table.$table-line-height-body;
+  line-height: 0;
+
+  :global(svg) {
+    width: table.$table-row-entry-icon-size;
+    height: table.$table-row-entry-icon-size;
+  }
+}
+
+.expandPlaceholder {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.nameText {
+  overflow: hidden;
+  color: var(--foreground);
+  font-family: table.$table-font-family;
+  font-size: table.$table-font-size-body;
+  font-weight: table.$table-font-weight-medium;
+  line-height: table.$table-line-height-body;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

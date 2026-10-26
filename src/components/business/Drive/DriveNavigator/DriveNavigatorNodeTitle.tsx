@@ -9,7 +9,7 @@ import {
   getDriveNodeLabel,
   resolveDriveFolderVariant,
 } from '../common/driveComponentModel';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface DriveNavigatorNodeTitleProps {
   node: DriveViewNode;

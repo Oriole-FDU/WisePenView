@@ -17,7 +17,7 @@ import SettingsList from '../SettingsList';
 import { buildProfileFormValues } from './buildProfileFormValues';
 import type { AccountFormProps } from './index.type';
 import { getProfileFieldDisplay } from './profileDisplay';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type FormDraft = {
   user: AccountFormProps['user'];

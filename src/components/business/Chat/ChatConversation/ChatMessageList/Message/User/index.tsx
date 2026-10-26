@@ -17,7 +17,7 @@ import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/Chat
 
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** fullWidth 默认展示数；侧栏 panel 收窄时最多 1 个 */
 const VISIBLE_ATTACHMENT_COUNT_FULL_WIDTH = 2;

@@ -5,7 +5,7 @@ import { AppButton } from '@/components/base/Button';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
 import type { ToolApprovalDialogProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function formatToolPayload(value: unknown): string {
   if (typeof value === 'string') return value;

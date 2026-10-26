@@ -1,7 +1,7 @@
 {
   "name": "wise-pen-view",
   "private": true,
-  "version": "1.1.26",
+  "version": "1.1.30",
   "type": "module",
   "main": ".electron/main/index.js",
   "packageManager": "pnpm@11.13.1",
@@ -31,6 +31,7 @@
     "check:file-length": "node scripts/check-file-length.mjs",
     "check:z-index": "node scripts/check-z-index-tokens.mjs",
     "check:radius": "node scripts/check-radius-tokens.mjs",
+    "check:styles": "node --test scripts/check-styles.mjs",
     "check:editor-runtime": "node --test scripts/check-editor-runtime.mjs",
     "check:frontend-state": "node --test scripts/check-frontend-state.mjs",
     "check:drive-tree": "node --test scripts/check-drive-tree.mjs",
@@ -41,8 +42,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky install",
-    "check:styles": "node --test scripts/check-styles.mjs"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.156",
@@ -133,7 +133,6 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^16.5.0",
     "husky": "^8.0.0",
-    "less": "^4.4.2",
     "lint-staged": "^16.3.3",
     "prettier": "^3.7.4",
     "sass-embedded": "^1.105.2",

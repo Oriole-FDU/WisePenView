@@ -1,0 +1,125 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.page {
+  box-sizing: border-box;
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: var(--space-xl);
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  /* 与详情页返回一致：略向右收，避免贴左缘 */
+  margin-inline-start: var(--space-2xs);
+  padding-block: var(--space-2xs);
+  padding-inline: var(--space-xs);
+  border: 0;
+  border-radius: var(--app-radius-button);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.backButton:hover {
+  color: var(--foreground);
+  background: var(--surface-secondary);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.scope {
+  color: var(--accent-text);
+  font-size: var(--font-size-sm);
+}
+
+.header h1 {
+  margin: var(--space-xs) 0;
+  font-size: var(--font-size-heading-2);
+  font-weight: 600;
+}
+
+.header p {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+  color: var(--muted);
+}
+
+.status {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 5px 10px;
+  border-radius: var(--app-radius-menu-item);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-size: var(--font-size-sm);
+}
+
+.status[data-submitted='true'] {
+  color: var(--success-text);
+  background: var(--success-soft);
+}
+
+.section {
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.section h2 {
+  margin: 0 0 var(--space-md);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.section > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.submittedFiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.submittedFiles span {
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.submitActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-lg);
+}
+
+.state {
+  display: flex;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--muted);
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .header {
+    flex-direction: column;
+  }
+}

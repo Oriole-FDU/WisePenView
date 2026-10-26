@@ -1,0 +1,34 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.modalContent {
+  max-height: 70vh;
+  overflow-y: scroll;
+  padding-right: var(--space-xs);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.section + .section {
+  margin-top: var(--space-lg);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-heading-2);
+  font-weight: var(--font-weight-bold);
+}
+
+.clauseList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin: var(--space-md) 0 0;
+  padding-left: var(--space-lg);
+}
+
+.subclauseList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-top: var(--space-xs);
+  padding-left: calc(var(--space-lg) + var(--space-2xs));
+}

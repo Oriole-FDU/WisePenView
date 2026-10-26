@@ -7,7 +7,7 @@ import { buildGroupFilesPath } from '@/utils/navigation/appRoute';
 import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
 
 import layout from '../../style.module.scss';
-import page from '../style.module.less';
+import page from '../style.module.scss';
 
 function GroupFilesPage() {
   const { group, currentUserRole } = useGroupContext();

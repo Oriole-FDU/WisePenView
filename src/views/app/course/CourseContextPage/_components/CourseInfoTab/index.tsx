@@ -13,7 +13,7 @@ import { formatCoursePeriodRange, getCoursePeriodTimeRange } from '@/domains/Cou
 import { useCourseContext } from '@/layouts/Course/_context';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function CourseInfoTab() {
   const { t } = useTranslation('course');

@@ -20,7 +20,7 @@ import ResourceLayoutHeader from '@/layouts/Resource/ResourceLayout/ResourceLayo
 import { parseErrorMessage } from '@/utils/error';
 
 import { type CourseOutlineResourcePageState, findOutlineNode } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import CourseOutlineMoveModal from './CourseOutlineMoveModal';
 import CourseOutlineNodeTitle from './CourseOutlineNodeTitle';
 import CourseResourcePickerModal from './CourseResourcePickerModal';

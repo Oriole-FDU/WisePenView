@@ -3,7 +3,7 @@ import { isRecord } from '@/utils/type/typeGuards';
 
 import { addAiDiffDomListener } from '../../engines/aiDiff/domCleanup';
 import type { NotePluginRegistry } from '../../registry/types';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 interface TableCellLike {
   content: unknown[];

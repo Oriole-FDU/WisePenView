@@ -15,7 +15,7 @@ import type { ConfirmEmailVerifyRequest } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import auth from '../_common/style.module.less';
+import auth from '../_common/style.module.scss';
 
 function VerifyEmail() {
   const userService = useUserService();

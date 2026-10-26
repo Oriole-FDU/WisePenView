@@ -4,7 +4,7 @@ import PageHeader from '@/components/base/PageHeader';
 
 import ModelSettingsSection from './ModelSettingsSection';
 import ProviderSettingsSection from './ProviderSettingsSection';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 import WebSearchSettingsSection from './WebSearchSettingsSection';
 
 function AISettings() {

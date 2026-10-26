@@ -26,7 +26,7 @@ import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { FolderNode, RootNode } from '@/domains/Drive';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export type SidebarDriveCreateAction =
   'folder' | 'note' | 'importNote' | 'drawio' | 'skill' | 'agent' | 'upload';

@@ -1,0 +1,218 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.block {
+  margin-top: 22px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 10px var(--space-sm);
+  border-bottom: 1px solid var(--separator);
+  border-radius: var(--app-radius-content) var(--app-radius-content) 0 0;
+  background: var(--surface-secondary);
+}
+
+.heading {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.header strong,
+.header span {
+  min-width: 0;
+}
+
+.header strong {
+  flex: 0 0 auto;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}
+
+.header span {
+  flex: 1 1 auto;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.options {
+  max-height: 320px;
+  overflow: auto;
+  padding: var(--space-2xs-plus);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.option {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.optionIcon,
+.selectedIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  border: 1px solid var(--separator);
+  background: var(--surface-secondary);
+}
+
+.optionIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--app-radius-content);
+}
+
+.optionCopy {
+  min-width: 0;
+}
+
+.optionCopy strong,
+.optionCopy small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionCopy strong {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+}
+
+.optionCopy small {
+  margin-top: var(--space-3xs);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.option em {
+  color: var(--muted);
+  font-size: var(--font-size-2xs);
+  font-style: normal;
+}
+
+.selectedList {
+  border-radius: 0 0 var(--app-radius-content) var(--app-radius-content);
+  background: var(--surface);
+}
+
+.selectedEmpty {
+  padding: 18px var(--space-md);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.selectedRow {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--space-sm);
+  border-top: 1px solid var(--separator);
+}
+
+.selectedRow:first-child {
+  border-top: 0;
+}
+
+.selectedIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--app-radius-content);
+}
+
+.selectedCopy {
+  min-width: 0;
+}
+
+.selectedTitle {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.selectedTitle strong,
+.selectedTitle small,
+.selectedDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedTitle strong {
+  min-width: 0;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+}
+
+.selectedTitle small {
+  flex: 0 1 auto;
+  min-width: 36px;
+  color: var(--muted);
+  font-size: var(--font-size-2xs);
+}
+
+.selectedDescription {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.modalPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalPicker .options {
+  min-height: 320px;
+  max-height: 460px;
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-popover);
+  background: var(--surface);
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+}

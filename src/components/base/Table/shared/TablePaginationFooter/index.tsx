@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { joinClassNames } from '../TableBase/cellAlign';
 import type { TablePaginationFooterProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 type PaginationItem = number | 'ellipsis';
 

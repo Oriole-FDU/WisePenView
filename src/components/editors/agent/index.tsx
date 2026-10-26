@@ -12,7 +12,7 @@ import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import AgentWorkspace from './components/AgentWorkspace';
 import { useAgentVersionController } from './controllers/useAgentVersionController';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AgentEditorContent() {
   const {

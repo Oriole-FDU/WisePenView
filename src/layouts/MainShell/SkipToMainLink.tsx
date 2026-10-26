@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import styles from './SkipToMainLink.module.less';
+import styles from './SkipToMainLink.module.scss';
 
 export const MAIN_CONTENT_ID = 'app-main-content';
 

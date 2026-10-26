@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FormField, TextArea } from '@/components/base/Input';
 
 import type { UpdateCourseEditorForm } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 
 interface CourseGoalsSectionProps {
   value: string;

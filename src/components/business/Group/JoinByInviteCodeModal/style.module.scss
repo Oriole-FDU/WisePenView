@@ -1,0 +1,79 @@
+@use '@/styles/mixins/breakpoints' as breakpoints;
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.fieldLabel {
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
+.codeInput {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  gap: var(--space-xs);
+  letter-spacing: 0;
+}
+
+.codeInputHidden {
+  cursor: text;
+}
+
+.codeGroup {
+  min-width: 0;
+  flex: 0 1 auto;
+  gap: var(--space-2xs-plus);
+}
+
+.codeSlot {
+  width: 38px;
+  min-width: 0;
+  height: 44px;
+  flex: 0 1 38px;
+  font-size: 15px;
+}
+
+.codeSeparator {
+  width: 6px;
+  flex: 0 0 6px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.fieldError {
+  margin: 0;
+  color: var(--danger-text);
+  font-size: var(--font-size-sm, 14px);
+  line-height: 1.4;
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .codeInput {
+    gap: var(--space-2xs);
+  }
+
+  .codeGroup {
+    flex: 1 1 0;
+    gap: 3px;
+  }
+
+  .codeSlot {
+    width: auto;
+    flex: 1 1 0;
+  }
+
+  .codeSeparator {
+    width: 4px;
+    flex-basis: 4px;
+  }
+}

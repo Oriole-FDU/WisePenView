@@ -13,7 +13,7 @@ import { useApi } from '@/hooks/useApi';
 
 import type { DriveSelectionItem } from '../../common/driveComponentModel';
 import type { UploadFileToGroupModalProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function UploadFileToGroupModal({
   isOpen,

@@ -1,0 +1,141 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 80px;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.stateBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  padding: var(--space-sm);
+}
+
+.tree {
+  width: max-content;
+  min-width: 100%;
+  gap: var(--space-3xs);
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--foreground);
+  font-size: var(--font-size-base);
+
+  :global(.wisepen-tree__item) {
+    width: max-content;
+    min-width: 100%;
+    min-height: 32px;
+    padding: var(--space-3xs) 0;
+    box-sizing: border-box;
+    border-radius: var(--app-radius-menu-item);
+    transition:
+      background var(--motion-duration-mid) var(--motion-ease-standard),
+      color var(--motion-duration-mid) var(--motion-ease-standard);
+
+    &:hover:not([aria-selected='true']),
+    &:focus-within:not([aria-selected='true']) {
+      color: var(--foreground);
+      background: var(--item-hover);
+    }
+  }
+
+  :global(.wisepen-tree__item[data-selectable='true']) {
+    color: var(--foreground);
+  }
+
+  :global(.wisepen-tree__item[aria-disabled='true']) {
+    color: var(--text-disabled);
+  }
+
+  :global(.wisepen-tree__switcher),
+  :global(.wisepen-tree__switcher-placeholder) {
+    display: inline-flex;
+    flex: 0 0 20px;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    min-height: 20px;
+    padding: 0;
+  }
+
+  :global(.wisepen-tree__content) {
+    min-height: 28px;
+    padding: 0 var(--space-2xs);
+    background: transparent;
+  }
+
+  :global(.wisepen-tree__item[aria-selected='true']) {
+    color: var(--accent-text-strong);
+    background: var(--item-selected);
+    font-weight: var(--font-weight-semibold);
+
+    &:hover,
+    &:focus-within {
+      color: var(--accent-text-strong);
+      background: var(--item-selected-hover);
+    }
+  }
+
+  :global(.wisepen-tree__item[aria-disabled='true']) {
+    color: var(--text-disabled);
+    background: transparent;
+  }
+
+  :global(.wisepen-tree__title) {
+    width: max-content;
+    min-width: 100%;
+    line-height: 24px;
+  }
+}
+
+.nodeTitle {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+  gap: var(--space-2xs);
+}
+
+.nodeIcon {
+  display: inline-flex;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.nodeLabel {
+  white-space: nowrap;
+}
+
+.loadMoreNode {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+  min-height: 28px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: var(--blue-11);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--blue-12);
+  }
+}

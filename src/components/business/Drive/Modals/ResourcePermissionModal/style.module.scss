@@ -1,0 +1,108 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.presetTabs {
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  align-self: flex-start;
+}
+
+.presetTabsListContainer {
+  max-width: 100%;
+}
+
+.presetTabsList {
+  width: auto;
+}
+
+.presetTab {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 var(--space-xs);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.state {
+  display: flex;
+  min-height: 180px;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
+  text-align: center;
+}
+
+.warning,
+.inheritHint {
+  padding: var(--space-sm);
+  border-radius: var(--app-radius-content);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
+}
+
+.warning {
+  border: 1px solid var(--warning-border);
+  background: var(--warning-soft);
+  color: var(--foreground);
+}
+
+.inheritHint {
+  border: 1px solid var(--border-light);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.actionList {
+  display: flex;
+  max-height: min(420px, calc(100vh - 260px));
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+  overflow: auto;
+  padding: var(--space-2xs);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover);
+  background: var(--surface);
+  @include scrollbar.appSubtleScrollbar();
+
+  :global(.list-box-item) {
+    border-radius: var(--app-radius-menu-item);
+  }
+}
+
+.actionLabel {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-xs);
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.actionIcon {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.actionText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 import type { AppBreadcrumbProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AppBreadcrumb({ items, ariaLabel, className, separator, renderItem }: AppBreadcrumbProps) {
   return (

@@ -64,11 +64,11 @@ components/
 ├── base/ComponentName/
 │   ├── index.tsx
 │   ├── index.type.ts
-│   └── style.module.less
+│   └── style.module.scss
 └── business/ComponentName/
     ├── index.tsx
     ├── index.type.ts
-    └── style.module.less
+    └── style.module.scss
 ```
 
 页面私有组件推荐：
@@ -76,7 +76,7 @@ components/
 ```text
 PageName/
 ├── index.tsx
-├── style.module.less
+├── style.module.scss
 ├── components/
 ├── hooks/
 └── config/

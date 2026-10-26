@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { joinClassNames } from '../../../shared/TableBase/cellAlign';
 import type { TableBatchFooterProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function TableBatchFooter({ selectedCount, summary, children, className }: TableBatchFooterProps) {
   const { t } = useTranslation('table');

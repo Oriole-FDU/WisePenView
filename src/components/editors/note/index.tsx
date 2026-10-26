@@ -15,7 +15,7 @@ import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
 import NoteWorkspace from './components/NoteWorkspace';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
   const { t } = useTranslation('note');

@@ -4,7 +4,7 @@ import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
 import ResourceToolbar from '../ResourceToolbar';
 import type { ResourceLayoutHeaderProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 /** 布局顶栏外壳：装配宿主导航、资源工具栏与标题区，并处理桌面窗口留白。 */
 function ResourceLayoutHeader({

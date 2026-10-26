@@ -11,7 +11,7 @@ import { useEditorSurface } from '../../../_context';
 import { prepareDraftExit } from '../../../_runtime/draftExit';
 import { useEditorRuntime } from '../../../_runtime/useEditorRuntime';
 import type { AgentVersionItem, AgentWorkspaceData } from '../../model';
-import styles from '../../style.module.less';
+import styles from '../../style.module.scss';
 import AgentEditor from '../AgentEditor';
 import AgentHeaderActions from './AgentHeaderActions';
 import { useAgentDebugSendGuardController } from './controllers/useAgentDebugSendGuardController';

@@ -29,7 +29,7 @@ import {
 import { useDrivePagedTreeChildren } from '../common/useDrivePagedTreeChildren';
 import DriveNavigatorNodeTitle from './DriveNavigatorNodeTitle';
 import type { DriveNavigatorProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const DEFAULT_RENDERABLE_TYPES: DriveItemKind[] = ['root', 'folder', 'resource', 'link'];
 const DEFAULT_SELECTABLE_TYPES: DriveItemKind[] = ['folder'];

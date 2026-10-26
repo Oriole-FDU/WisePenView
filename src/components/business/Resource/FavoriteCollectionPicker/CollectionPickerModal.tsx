@@ -8,7 +8,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/Interact';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 export interface CollectionPickerModalProps {
   collections: FavoriteCollection[];

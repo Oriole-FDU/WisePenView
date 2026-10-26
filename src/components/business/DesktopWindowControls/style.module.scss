@@ -1,0 +1,66 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+@use '@/styles/mixins/desktopTitleBar' as titleBar;
+
+/**
+ * 固定在窗口右上，不参与 Chat 侧栏宽度动画，避免收起/展开时按钮在两个 Header 间跳转导致卡顿。
+ */
+.root {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: var(--app-z-index-modal);
+  box-sizing: border-box;
+  width: var(--desktop-window-controls-width, 116px);
+  /* 与 desktopTitleBarChrome 同一垂直节奏：上拖拽带 + 内容区居中 */
+  height: var(--desktop-title-bar-height, 56px);
+  padding-top: var(--desktop-title-bar-drag-strip, 10px);
+  padding-right: var(--space-sm);
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3xs);
+  background: transparent;
+  pointer-events: auto;
+  @include titleBar.desktopTitleBarNoDrag();
+}
+
+.button {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--app-radius-button);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color var(--motion-duration-mid) var(--motion-ease-standard),
+    background-color var(--motion-duration-mid) var(--motion-ease-standard);
+  @include titleBar.desktopTitleBarNoDrag();
+
+  &:hover {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+  }
+
+  &:focus-visible,
+  &:focus-visible:not(:focus),
+  &[data-focus-visible] {
+    @include focusRing.appFocusRing();
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.close:hover {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+}

@@ -6,7 +6,7 @@ import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { COLOR_SCHEME_LOGO_SRC, useAppTheme, useColorScheme } from '@/theme';
 
 import AuthBackground from './AuthBackground';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function AuthLayout() {
   const { t } = useTranslation('auth');

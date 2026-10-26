@@ -1,0 +1,454 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.container {
+  flex-shrink: 0;
+  padding: var(--chat-input-container-padding-block, var(--space-sm)) 0 var(--space-2xs);
+  background: transparent;
+}
+
+.inputCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--chat-input-card-padding-block, var(--space-sm)) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  container-type: inline-size;
+  container-name: chat-input;
+  transition:
+    border-color var(--motion-duration-mid),
+    box-shadow var(--motion-duration-mid);
+
+  &:focus-within {
+    border-color: var(--accent-softer);
+    box-shadow: var(--card-shadow);
+  }
+
+  &.inputCardDragOver {
+    [data-slot='attachment-actions'],
+    .contextAttachmentClear {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+
+.attachmentStripShell {
+  width: 100%;
+  min-width: 0;
+
+  .attachmentArea {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-block: var(--space-2xs) var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+    @include scrollbar.appSubtleScrollbar();
+  }
+}
+
+.contextAttachment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  padding: var(--space-xs) var(--space-sm);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+}
+
+.contextAttachmentPreview {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.contextAttachmentClear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chatAttachment {
+  max-width: min(260px, 78vw);
+}
+
+.textarea {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: calc(1.6em + 16px);
+  max-height: var(--chat-input-textarea-max-height, calc(16em + 16px));
+  overflow-y: auto;
+  resize: none !important;
+  field-sizing: content;
+  border: none !important;
+  box-shadow: var(--shadow-none) !important;
+  background: transparent !important;
+  padding: var(--space-xs) 0 !important;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--foreground);
+  @include scrollbar.appSubtleScrollbar();
+
+  &::placeholder {
+    color: var(--field-placeholder);
+  }
+}
+
+.actionToolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-sm);
+  width: 100%;
+  min-height: 36px;
+  min-width: 0;
+}
+
+.toolbarLeft,
+.toolsRight {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.toolbarLeft {
+  grid-column: 1;
+  justify-self: start;
+
+  > :global(*) {
+    flex: 0 0 auto;
+  }
+}
+
+.toolsRight {
+  grid-column: 3;
+  justify-self: end;
+  gap: var(--space-xs);
+
+  > :global(*) {
+    flex: 0 0 auto;
+  }
+}
+
+.toolbarCircleBtn {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: var(--app-radius-pill);
+  padding: 0 !important;
+  line-height: 1;
+
+  :global(svg) {
+    flex-shrink: 0;
+  }
+}
+
+.voiceButtonActive {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+}
+
+.stopButtonActive {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent-soft-hover);
+  }
+}
+
+.toolbarPopover {
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover);
+  background: var(--overlay);
+  box-shadow: var(--card-shadow);
+}
+
+.modelMenu {
+  min-width: 220px;
+  max-width: 340px;
+  padding: var(--space-xs);
+}
+
+.popoverPanelScrollable {
+  width: min(320px, calc(100vw - var(--space-xl, 32px)));
+  max-height: min(360px, 70vh);
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.modelMenu {
+  width: 320px;
+}
+
+.popoverPanelAgent {
+  width: 240px;
+  max-height: 280px;
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.popoverPanelAgentSkeleton {
+  min-height: 96px;
+}
+
+.listItemText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.popoverSkeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+  min-height: 100%;
+}
+
+.popoverSkeletonSection {
+  width: 56px;
+  height: 12px;
+  margin: var(--space-xs) var(--space-xs) var(--space-2xs);
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding: var(--space-2xs) var(--space-xs);
+}
+
+.popoverSkeletonIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabel {
+  flex: 1;
+  min-width: 0;
+  height: 12px;
+  max-width: 72%;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabelWide {
+  max-width: 88%;
+}
+
+.popoverLoadMore {
+  width: 100%;
+  margin-top: var(--space-2xs);
+  color: var(--muted);
+}
+
+.toolButtonWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.skillMenuBadge {
+  position: absolute;
+  top: -5px;
+  right: -4px;
+  z-index: var(--app-z-index-raised);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--space-2xs);
+  border-radius: var(--app-radius-pill);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.agentGroupTreeWrap {
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--border-light);
+}
+
+.agentGroupTree {
+  font-size: var(--font-size-sm);
+
+  :global(.wisepen-tree__item) {
+    padding: 1px 0;
+  }
+
+  :global(.wisepen-tree__switcher) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+  }
+
+  :global(.wisepen-tree__content) {
+    min-height: 24px;
+    border-radius: var(--app-radius-menu-item);
+  }
+}
+
+.agentGroupModalBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.agentGroupModalHint {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.agentGroupModalTree {
+  min-height: 240px;
+  max-height: min(52vh, 460px);
+  overflow: auto;
+  padding: var(--space-xs);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover);
+  background: var(--background);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.modelSelectorShell {
+  flex: 0 1 auto;
+  width: max-content;
+  min-width: 32px;
+  max-width: var(--layout-model-selector-max-width, 240px);
+  overflow: hidden;
+  margin-inline-end: 0;
+}
+
+.modelSelectorShellIcon {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  min-width: 32px;
+  overflow: visible;
+  margin-inline-end: 0;
+}
+
+@container chat-input (max-width: 420px) {
+  .actionToolbar {
+    column-gap: var(--space-2xs);
+  }
+
+  .toolbarLeft {
+    gap: var(--space-3xs);
+  }
+
+  .toolsRight {
+    gap: var(--space-xs);
+  }
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-z-index-dock);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--accent);
+  border-radius: calc(var(--app-radius-content) - var(--space-2xs));
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent-soft));
+  color: var(--accent-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.98);
+  transition:
+    opacity var(--motion-duration-mid) var(--motion-ease-fluid),
+    transform var(--motion-duration-mid) var(--motion-ease-fluid),
+    visibility 0s linear var(--motion-duration-mid),
+    background-color var(--motion-duration-mid) var(--motion-ease-standard);
+
+  &[data-visible='true'] {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition:
+      opacity var(--motion-duration-mid) var(--motion-ease-fluid),
+      transform var(--motion-duration-mid) var(--motion-ease-fluid),
+      visibility 0s linear 0s,
+      background-color var(--motion-duration-mid) var(--motion-ease-standard);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: var(--motion-duration-reduced);
+    transform: none;
+
+    &[data-visible='true'] {
+      transform: none;
+    }
+  }
+}
+
+.dropOverlayLabel {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--app-radius-menu-item);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.spinIcon {
+  animation: var(--animate-spin-fast);
+}
+
+.footerTip {
+  text-align: center;
+  margin-top: var(--space-xs);
+  color: var(--text-disabled);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .container {
+    padding-inline: var(--space-sm);
+  }
+}

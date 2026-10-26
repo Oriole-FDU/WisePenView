@@ -5,7 +5,7 @@ import AppAvatar from '@/components/base/Avatar';
 import type { GroupMember } from '@/domains/Group';
 
 import type { SelectedMemberListProps } from './index.type';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function SelectedMemberList({ members, isReadOnly = true }: SelectedMemberListProps) {
   const { t } = useTranslation('group');

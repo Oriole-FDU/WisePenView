@@ -1,0 +1,141 @@
+@use './table' as table;
+
+.cellEllipsis {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  font-family: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellMuted {
+  composes: cellEllipsis;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cellEmphasis {
+  composes: cellEllipsis;
+  color: var(--foreground);
+  font-weight: table.$table-font-weight-medium;
+}
+
+.amountInflow {
+  font-variant-numeric: tabular-nums;
+  font-weight: table.$table-font-weight-medium;
+  color: var(--success-text);
+}
+
+.amountOutflow {
+  font-variant-numeric: tabular-nums;
+  font-weight: table.$table-font-weight-medium;
+  color: var(--danger-text);
+}
+
+/* 单元格内容 flex host：Chip / Badge / 进度条 / 数字列 */
+.cellContentHost {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.cellContentHostStart {
+  composes: cellContentHost;
+  justify-content: flex-start;
+}
+
+.cellContentHostCenter {
+  composes: cellContentHost;
+  justify-content: center;
+}
+
+.cellContentHostEnd {
+  composes: cellContentHost;
+  justify-content: flex-end;
+}
+
+/* 子组件占满 host 宽度（QuotaBar、行内 Select 等） */
+.cellContentHostStretch {
+  > * {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+.cellTextAlignEnd {
+  width: 100%;
+  text-align: right;
+}
+
+.cellTextAlignCenter {
+  width: 100%;
+  text-align: center;
+}
+
+/* 别名：与 cellContentHost* 相同 */
+.cellChipHost {
+  composes: cellContentHost;
+}
+
+.cellChipHostStart {
+  composes: cellContentHostStart;
+}
+
+.cellChipHostCenter {
+  composes: cellContentHostCenter;
+}
+
+.cellChipHostEnd {
+  composes: cellContentHostEnd;
+}
+
+.amountHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: table.$table-gap-compact;
+  color: inherit;
+  font-weight: table.$table-font-weight-medium;
+}
+
+/* 表内 Chip：按文案自然宽度，避免在窄列中被 stretch 压成竖排 */
+.tableCellChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 100%;
+  min-width: var(--table-chip-min-width, 56px);
+  min-height: var(--table-chip-min-height, 28px);
+  padding: var(--table-chip-padding-block, var(--space-2xs)) var(--table-chip-padding-inline, 14px);
+  border-radius: table.$table-inner-radius;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: table.$table-font-weight-medium;
+  line-height: inherit;
+  white-space: nowrap;
+
+  &:global(.chip) {
+    min-height: var(--table-chip-min-height, 28px);
+    padding: var(--table-chip-padding-block, var(--space-2xs))
+      var(--table-chip-padding-inline, 14px);
+  }
+
+  :global([data-slot='label']) {
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+    white-space: nowrap;
+  }
+}
+
+.statusChip {
+  composes: tableCellChip;
+}

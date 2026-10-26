@@ -1,0 +1,322 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.panel {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.threadList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-md);
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.thread {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+  transition:
+    border-color var(--motion-duration-fast) var(--motion-ease-standard),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.threadActive {
+  border-top: 4px solid var(--warning);
+  border-right-color: color-mix(in srgb, var(--warning) 22%, var(--border-light));
+  border-bottom-color: color-mix(in srgb, var(--warning) 22%, var(--border-light));
+  border-left-color: color-mix(in srgb, var(--warning) 22%, var(--border-light));
+  box-shadow: var(--card-shadow);
+}
+
+.historyBody {
+  max-height: min(70vh, 560px);
+  overflow: hidden;
+}
+
+.resolvedList {
+  display: flex;
+  min-width: 0;
+  max-height: min(70vh, 560px);
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.virtualSpacer {
+  flex: none;
+}
+
+.resolvedThread {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+}
+
+.threadHeader {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--space-xs);
+}
+
+.quoteButton {
+  display: block;
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  padding: var(--space-2xs) 0 var(--space-2xs) var(--space-sm);
+  overflow: hidden;
+  border: 0;
+  border-left: 3px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.draftQuote {
+  cursor: default;
+}
+
+.resolvedQuote {
+  flex: none;
+  padding: var(--space-xs) var(--space-sm);
+  border: 0;
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+  cursor: default;
+}
+
+.quoteText {
+  display: -webkit-box;
+  overflow: hidden;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.resolveButton,
+.iconButton {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  padding: 0;
+  color: var(--muted);
+}
+
+.resolveButton {
+  color: var(--success-text);
+}
+
+.commentList {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.resolvedActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+}
+
+.reopenButton {
+  color: var(--accent-text);
+}
+
+.comment {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+}
+
+.commentBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.commentHeader,
+.authorMeta,
+.commentActions,
+.composerToolbar,
+.reactions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.commentHeader {
+  min-height: 28px;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.authorMeta {
+  overflow: hidden;
+  gap: var(--space-xs);
+
+  strong {
+    overflow: hidden;
+    color: var(--foreground);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  time {
+    flex: 0 0 auto;
+    color: var(--muted);
+    font-size: var(--font-size-xs);
+  }
+}
+
+.commentActions {
+  flex: 0 0 auto;
+  gap: 1px;
+}
+
+.commentContent {
+  margin: var(--space-2xs) 0 0;
+  color: var(--foreground);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.commentImages {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.commentImageButton {
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+}
+
+.commentImageButton {
+  padding: 0;
+  cursor: zoom-in;
+}
+
+.commentImageButton img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reactions {
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.reaction {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.reaction:disabled {
+  cursor: default;
+}
+
+.reactionChip {
+  min-height: 28px;
+  max-width: 100%;
+  padding: 0 var(--space-sm);
+  border-radius: var(--app-radius-pill);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.reactionUser {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reactionChipSelected {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--border-light));
+  background: var(--accent-soft);
+  color: var(--accent-soft-foreground);
+}
+
+.composer {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.stateText,
+.errorText {
+  margin: var(--space-lg) 0;
+  color: var(--muted);
+  text-align: center;
+}
+
+.composer .errorText {
+  margin: var(--space-xs) var(--space-xs) 0;
+  text-align: left;
+}
+
+.errorText {
+  color: var(--danger-text);
+}
+
+.previewImage {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0 auto;
+  object-fit: contain;
+}

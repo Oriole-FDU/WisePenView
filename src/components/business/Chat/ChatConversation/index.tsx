@@ -1,4 +1,4 @@
-import styles from '../style.module.less';
+import styles from '../style.module.scss';
 import { NEW_CHAT_WELCOME_CONFIG } from '../welcome';
 import { useWelcomeScreenStore, WelcomeScreenHost } from '../WelcomeConfigurable';
 import ChatInput from './ChatInput';

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useMessageScroller, useMessageScrollerVisibility } from '@/components/_shadcn';
 import type { WisePenUIMessage } from '@/domains/Chat';
 
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 const PREVIEW_LENGTH = 28;
 const OPEN_DELAY_MS = 24;

@@ -1,0 +1,27 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 37px;
+  padding: var(--space-xs) var(--table-shell-padding-inline, 14px);
+  border-bottom: 1px solid var(--danger-border);
+  background: var(--danger-soft);
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  color: var(--danger-soft-foreground);
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.dismissButton {
+  flex-shrink: 0;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--muted);
+}

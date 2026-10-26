@@ -1,0 +1,9 @@
+@use '../styles/table' as table;
+
+.trigger {
+  width: table.$action-icon-size;
+  min-width: table.$action-icon-size;
+  height: table.$action-icon-size;
+  min-height: table.$action-icon-size;
+  color: var(--muted);
+}

@@ -1,0 +1,28 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/layoutMixins' as layout;
+
+.root {
+  @include layout.flexColumnFill();
+
+  position: relative;
+  width: 100%;
+  max-width: var(--app-page-max-width);
+  margin: 0 auto;
+  padding: var(--app-page-padding-block-start) var(--app-page-padding-inline)
+    var(--app-page-padding-block-end);
+  box-sizing: border-box;
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.fixed {
+  min-width: var(--layout-drive-page-min-width, 956px);
+  overflow-y: hidden;
+}
+
+@media (max-width: 959.98px) {
+  .fixed {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+}

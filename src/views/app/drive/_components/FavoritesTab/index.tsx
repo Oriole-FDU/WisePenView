@@ -9,7 +9,7 @@ import FavoriteResourceTable from './components/FavoriteResourceTable';
 import DeleteCollectionModal from './DeleteCollectionModal';
 import EditCollectionModal from './EditCollectionModal';
 import { useFavoriteCollections } from './hooks/useFavoriteCollections';
-import styles from './style.module.less';
+import styles from './style.module.scss';
 
 function resolveDefaultCollection(
   collections: FavoriteCollection[]

@@ -1,0 +1,189 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.host {
+  display: contents;
+}
+
+.floatingLayer {
+  z-index: var(--app-z-index-editor-menu);
+}
+
+.menuShell,
+.menuState {
+  --note-slash-menu-width: 17.5rem;
+  --note-slash-menu-max-height: min(34rem, calc(100vh - var(--space-2xl) - var(--space-xl)));
+
+  width: var(--note-slash-menu-width);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover);
+  background: var(--overlay);
+  box-shadow: var(--overlay-shadow);
+}
+
+.menuShell {
+  --note-slash-menu-effective-max-height: min(
+    var(--note-slash-menu-max-height),
+    var(--note-slash-menu-available-height, 100vh)
+  );
+
+  position: relative;
+  max-height: var(--note-slash-menu-effective-max-height);
+  overflow: hidden;
+}
+
+.menuState {
+  max-height: var(--note-slash-menu-max-height);
+}
+
+.menuShell::before,
+.menuShell::after {
+  position: absolute;
+  z-index: var(--app-z-index-sticky);
+  right: 0;
+  left: 0;
+  height: calc(var(--control-height) * 1.5);
+  opacity: 0;
+  pointer-events: none;
+  content: '';
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.menuShell::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--overlay), transparent);
+}
+
+.menuShell::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--overlay), transparent);
+}
+
+.menuShell[data-can-scroll-up]::before,
+.menuShell[data-can-scroll-down]::after {
+  opacity: 1;
+}
+
+.keyboardFrame {
+  position: absolute;
+  z-index: var(--app-z-index-raised);
+  top: 0;
+  left: 0;
+  width: var(--note-slash-menu-frame-width, 0);
+  height: var(--note-slash-menu-frame-height, 0);
+  border-radius: var(--app-radius-popover-item);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent-border);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(
+    var(--note-slash-menu-frame-left, 0),
+    var(--note-slash-menu-frame-top, 0),
+    0
+  );
+}
+
+.menuShell[data-keyboard-navigation] .keyboardFrame {
+  opacity: 1;
+}
+
+.menuViewport {
+  position: relative;
+  z-index: var(--app-z-index-elevated);
+  max-height: var(--note-slash-menu-effective-max-height);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.menu,
+.menuState {
+  padding: var(--app-popover-content-padding, var(--space-xs));
+}
+
+.section + .section {
+  margin-top: var(--space-2xs);
+}
+
+.sectionTitle {
+  display: block;
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.item {
+  min-height: var(--control-height);
+  display: grid;
+  grid-template-columns: var(--control-height) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-xs);
+  border-radius: var(--app-radius-popover-item);
+  color: var(--overlay-foreground);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.menuShell[data-mouse-navigation]:not([data-keyboard-navigation]) .item:hover,
+.menuShell[data-mouse-navigation]:not([data-keyboard-navigation]) .item[data-hovered],
+.item[data-menu-hovered] {
+  background: var(--accent-soft);
+  color: var(--foreground);
+}
+
+.menuShell[data-keyboard-navigation] .item:hover,
+.menuShell[data-keyboard-navigation] .item[data-hovered] {
+  background: transparent;
+}
+
+.item[data-focus-visible] {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.icon {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.iconTheme {
+  color: var(--accent-text);
+}
+
+.iconAccent {
+  color: var(--accent-text);
+}
+
+.iconSuccess {
+  color: var(--success-text);
+}
+
+.iconWarning {
+  color: var(--warning-text);
+}
+
+.iconMuted {
+  color: var(--muted);
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyItem {
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
