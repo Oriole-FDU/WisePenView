@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddNoteApiRequest,
@@ -14,7 +14,7 @@ import type {
 } from './NoteApi.type';
 
 function addNote(req: AddNoteApiRequest): Promise<AddNoteApiResponse> {
-  return apiPost('/note/addNote', req);
+  return apiPostUnchecked('/note/addNote', req);
 }
 
 function getNoteInfo(req: GetNoteInfoApiRequest): Promise<GetNoteInfoApiResponse> {
@@ -28,11 +28,11 @@ function getDrawIoLatestSnapshot(
 }
 
 function saveDrawIoSnapshot(req: SaveDrawIoSnapshotApiRequest): Promise<void> {
-  return apiPost('/note/saveDrawIOSnapshot', req);
+  return apiPostUnchecked('/note/saveDrawIOSnapshot', req);
 }
 
 function forkNote(req: ForkNoteApiRequest): Promise<string> {
-  return apiPost('/note/forkNote', req);
+  return apiPostUnchecked('/note/forkNote', req);
 }
 
 function listNoteVersions(req: ListNoteVersionsApiRequest): Promise<ListNoteVersionsApiResponse> {

@@ -1,4 +1,4 @@
-import { apiPost } from '@/apis/request';
+import { apiPostUnchecked } from '@/apis/request';
 
 import type {
   IssueRecognitionCredentialApiRequest,
@@ -8,7 +8,7 @@ import type {
 function issueRecognitionCredential(
   body: IssueRecognitionCredentialApiRequest
 ): Promise<IssueRecognitionCredentialApiResponse> {
-  return apiPost('/chat/speech/getCredential', body);
+  return apiPostUnchecked('/chat/speech/getCredential', body);
 }
 
 export const SpeechApi = {

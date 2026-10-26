@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type { TourCodeApiValue, UserTourStatusApiResponse } from './UserTourApi.type';
 
@@ -7,7 +7,7 @@ function listTourStatus(): Promise<UserTourStatusApiResponse[]> {
 }
 
 function completeTour(tourCode: TourCodeApiValue): Promise<void> {
-  return apiPost('/user/tour/completeTour', null, { params: { tourCode } });
+  return apiPostUnchecked('/user/tour/completeTour', null, { params: { tourCode } });
 }
 
 export const UserTourApi = {

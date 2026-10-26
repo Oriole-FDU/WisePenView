@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
 import type {
   CancelUploadAssetsApiRequest,
@@ -20,21 +20,21 @@ import type {
 } from './SkillApi.type';
 
 function createSkill(body: CreateSkillApiRequest): Promise<string | undefined> {
-  return apiPost('/skill/createSkill', body);
+  return apiPostUnchecked('/skill/createSkill', body);
 }
 
 function forkSkill(body: ForkSkillApiRequest): Promise<string | undefined> {
-  return apiPost('/skill/forkSkill', body);
+  return apiPostUnchecked('/skill/forkSkill', body);
 }
 
 function getSkillInfo(query: GetSkillInfoApiRequest): Promise<SkillInfoApiResponse | undefined> {
-  return apiPost('/skill/getSkillInfo', null, { params: query });
+  return apiPostUnchecked('/skill/getSkillInfo', null, { params: query });
 }
 
 function getSkillVersionBundleInfo(
   query: GetSkillVersionBundleInfoApiRequest
 ): Promise<SkillVersionBundleApiResponse | undefined> {
-  return apiPost('/skill/getSkillVersionBundleInfo', null, { params: query });
+  return apiPostUnchecked('/skill/getSkillVersionBundleInfo', null, { params: query });
 }
 
 function getSkillAssetStsToken(
@@ -44,25 +44,25 @@ function getSkillAssetStsToken(
 }
 
 function changeSkillInfo(body: UpdateSkillInfoApiRequest): Promise<void> {
-  return apiPost('/skill/changeSkillInfo', body);
+  return apiPostUnchecked('/skill/changeSkillInfo', body);
 }
 
 function initUploadSkillAssets(
   body: InitUploadSkillAssetsApiRequest
 ): Promise<InitUploadAssetsApiResponse | undefined> {
-  return apiPost('/skill/initUploadSkillAssets', body);
+  return apiPostUnchecked('/skill/initUploadSkillAssets', body);
 }
 
 function deleteSkillAssets(body: DeleteSkillAssetsApiRequest): Promise<void> {
-  return apiPost('/skill/deleteSkillAssets', body);
+  return apiPostUnchecked('/skill/deleteSkillAssets', body);
 }
 
 function cancelUploadSkillAssets(body: CancelUploadAssetsApiRequest): Promise<void> {
-  return apiPost('/skill/cancelUploadSkillAssets', body);
+  return apiPostUnchecked('/skill/cancelUploadSkillAssets', body);
 }
 
 function publishSkillVersion(body: PublishSkillVersionApiRequest): Promise<void> {
-  return apiPost('/skill/publishSkillVersion', body);
+  return apiPostUnchecked('/skill/publishSkillVersion', body);
 }
 
 export const SkillApi = {

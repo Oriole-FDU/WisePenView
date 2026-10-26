@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   DocumentIdApiRequest,
@@ -14,7 +14,7 @@ import type {
 } from './DocumentApi.type';
 
 function uploadDoc(req: UploadDocApiRequest): Promise<UploadDocApiResponse> {
-  return apiPost('/document/uploadDoc', req, { timeout: 30_000 });
+  return apiPostUnchecked('/document/uploadDoc', req, { timeout: 30_000 });
 }
 
 function listPendingDocs(): Promise<ListPendingDocsApiResponse> {
@@ -22,15 +22,15 @@ function listPendingDocs(): Promise<ListPendingDocsApiResponse> {
 }
 
 function syncDocStatus(req: DocumentIdApiRequest): Promise<PendingDocumentStatusApiResponse> {
-  return apiPost('/document/syncDocStatus', null, { params: req });
+  return apiPostUnchecked('/document/syncDocStatus', null, { params: req });
 }
 
 function retryDocProcess(req: DocumentIdApiRequest): Promise<void> {
-  return apiPost('/document/retryDocProcess', null, { params: req });
+  return apiPostUnchecked('/document/retryDocProcess', null, { params: req });
 }
 
 function cancelDocProcess(req: DocumentIdApiRequest): Promise<void> {
-  return apiPost('/document/cancelDocProcess', null, { params: req });
+  return apiPostUnchecked('/document/cancelDocProcess', null, { params: req });
 }
 
 function getDocInfo(req: GetDocInfoApiRequest): Promise<GetDocInfoApiResponse> {
@@ -38,7 +38,7 @@ function getDocInfo(req: GetDocInfoApiRequest): Promise<GetDocInfoApiResponse> {
 }
 
 function forkDocument(req: ForkDocumentApiRequest): Promise<string> {
-  return apiPost('/document/forkDocument', req);
+  return apiPostUnchecked('/document/forkDocument', req);
 }
 
 function getOnlyOfficeEditorConfig(

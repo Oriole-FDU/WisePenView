@@ -1,4 +1,4 @@
-import { apiPost } from '@/apis/request';
+import { apiPostUnchecked } from '@/apis/request';
 
 import type {
   MountResourcesToGroupApiRequest,
@@ -15,37 +15,37 @@ const BASE_URL = '/resource/placement';
 function setPersonalResourcesPathTag(
   req: SetPersonalResourcesPathTagApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPost(`${BASE_URL}/setPersonalResourcesPathTag`, req);
+  return apiPostUnchecked(`${BASE_URL}/setPersonalResourcesPathTag`, req);
 }
 
 function movePersonalResourcesToTrash(
   req: MovePersonalResourcesToTrashApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPost(`${BASE_URL}/movePersonalResourcesToTrash`, req);
+  return apiPostUnchecked(`${BASE_URL}/movePersonalResourcesToTrash`, req);
 }
 
 function replacePersonalNormalTags(
   req: ReplacePersonalNormalTagsApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPost(`${BASE_URL}/replacePersonalNormalTags`, req);
+  return apiPostUnchecked(`${BASE_URL}/replacePersonalNormalTags`, req);
 }
 
 function mountResourcesToGroup(
   req: MountResourcesToGroupApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPost(`${BASE_URL}/mountResourcesToGroup`, req);
+  return apiPostUnchecked(`${BASE_URL}/mountResourcesToGroup`, req);
 }
 
 function unmountResourcesToGroup(
   req: UnmountResourcesToGroupApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPost(`${BASE_URL}/unmountResourcesToGroup`, req);
+  return apiPostUnchecked(`${BASE_URL}/unmountResourcesToGroup`, req);
 }
 
 function moveResourcesInGroup(
   req: MoveResourcesInGroupApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPost(`${BASE_URL}/moveResourcesInGroup`, req);
+  return apiPostUnchecked(`${BASE_URL}/moveResourcesInGroup`, req);
 }
 
 export const ResourcePlacementApi = {

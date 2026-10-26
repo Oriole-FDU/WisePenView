@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   AddGroupApiRequest,
@@ -42,19 +42,19 @@ function getGroupBaseInfo(req: GetGroupBaseInfoApiRequest): Promise<GetGroupBase
 }
 
 function addGroup(req: AddGroupApiRequest): Promise<AddGroupApiResponse> {
-  return apiPost('/group/addGroup', req);
+  return apiPostUnchecked('/group/addGroup', req);
 }
 
 function changeGroup(req: ChangeGroupApiRequest): Promise<void> {
-  return apiPost('/group/changeGroup', req);
+  return apiPostUnchecked('/group/changeGroup', req);
 }
 
 function removeGroup(req: RemoveGroupApiRequest): Promise<void> {
-  return apiPost('/group/removeGroup', req);
+  return apiPostUnchecked('/group/removeGroup', req);
 }
 
 function joinGroup(req: JoinGroupApiRequest): Promise<void> {
-  return apiPost('/group/joinGroup', req);
+  return apiPostUnchecked('/group/joinGroup', req);
 }
 
 export const GroupApi = {
@@ -74,7 +74,7 @@ function getConfig(req: GetGroupConfigApiRequest): Promise<GetGroupConfigApiResp
 }
 
 function changeConfig(req: ChangeGroupConfigApiRequest): Promise<void> {
-  return apiPost('/resource/groupConfig/changeConfig', req);
+  return apiPostUnchecked('/resource/groupConfig/changeConfig', req);
 }
 
 export const GroupResConfigApi = {
@@ -93,15 +93,15 @@ function getMyRole(groupId: string): Promise<GroupRoleApiResponse> {
 }
 
 function quit(req: QuitGroupApiRequest): Promise<void> {
-  return apiPost('/group/member/quit', req);
+  return apiPostUnchecked('/group/member/quit', req);
 }
 
 function changeRole(req: ChangeRoleApiRequest): Promise<void> {
-  return apiPost('/group/member/changeRole', req);
+  return apiPostUnchecked('/group/member/changeRole', req);
 }
 
 function kick(req: KickMemberApiRequest): Promise<void> {
-  return apiPost('/group/member/kick', req);
+  return apiPostUnchecked('/group/member/kick', req);
 }
 
 function getMyGroupMemberInfo(
@@ -111,7 +111,7 @@ function getMyGroupMemberInfo(
 }
 
 function changeTokenLimit(req: ChangeTokenLimitApiRequest): Promise<void> {
-  return apiPost('/group/member/changeTokenLimit', req);
+  return apiPostUnchecked('/group/member/changeTokenLimit', req);
 }
 
 function getAllMyGroupTokenInfo(

@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ChangeFavoriteStatusApiRequest,
@@ -15,19 +15,19 @@ const getFavoriteStatus = (resourceId: string): Promise<GetFavoriteStatusApiResp
   apiGet('/resource/favorite/getResourceFavoriteStatus', { params: { resourceId } });
 
 const changeFavoriteStatus = (request: ChangeFavoriteStatusApiRequest): Promise<void> =>
-  apiPost('/resource/favorite/changeResourceFavoriteStatus', request);
+  apiPostUnchecked('/resource/favorite/changeResourceFavoriteStatus', request);
 
 const listCollections = (): Promise<FavoriteCollectionApiResponse[]> =>
   apiGet('/resource/favorite/listCollections');
 
 const createCollection = (request: CreateCollectionApiRequest): Promise<string | number> =>
-  apiPost('/resource/favorite/createCollection', request);
+  apiPostUnchecked('/resource/favorite/createCollection', request);
 
 const updateCollectionInfo = (request: UpdateCollectionInfoApiRequest): Promise<void> =>
-  apiPost('/resource/favorite/updateCollectionInfo', request);
+  apiPostUnchecked('/resource/favorite/updateCollectionInfo', request);
 
 const deleteCollection = (request: DeleteCollectionApiRequest): Promise<void> =>
-  apiPost('/resource/favorite/deleteCollection', request);
+  apiPostUnchecked('/resource/favorite/deleteCollection', request);
 
 const listFavoritedResources = (
   request: ListFavoritedResourcesApiRequest

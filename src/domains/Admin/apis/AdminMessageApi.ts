@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from '@/apis/request';
+import { apiGet, apiPostUnchecked } from '@/apis/request';
 
 import type {
   ListAdminMessagesApiRequest,
@@ -13,7 +13,7 @@ function listAdminMessages(
 }
 
 function publishMessage(req: PublishMessageApiRequest): Promise<void> {
-  return apiPost('/admin/message/publishMessage', req);
+  return apiPostUnchecked('/admin/message/publishMessage', req);
 }
 
 export const AdminMessageApi = { listAdminMessages, publishMessage };
