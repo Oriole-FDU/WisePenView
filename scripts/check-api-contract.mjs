@@ -19,10 +19,9 @@ try {
         export { parseApiRequest, parseApiResponse } from '@/apis/contract';
         export { isApiResponseEnvelope } from '@/apis/runtimeContract';
         export {
-          EmptyAuthApiResponseSchema,
-          LoginApiRequestSchema,
-          LoginApiResponseSchema,
-          RegisterApiRequestSchema,
+          LoginApiContract,
+          LogoutApiContract,
+          RegisterApiContract,
         } from '@/domains/Auth/apis/AuthApi.schema';
       `,
       resolveDir: root,
@@ -35,13 +34,12 @@ try {
   });
 
   const {
-    EmptyAuthApiResponseSchema,
     isApiResponseEnvelope,
-    LoginApiRequestSchema,
-    LoginApiResponseSchema,
+    LoginApiContract,
+    LogoutApiContract,
     parseApiRequest,
     parseApiResponse,
-    RegisterApiRequestSchema,
+    RegisterApiContract,
   } = await import(pathToFileURL(outfile).href);
   assert(isApiResponseEnvelope({ code: 200, key: null, msg: null, data: null }));
   assert(isApiResponseEnvelope({ code: 200, msg: 'ok', data: { id: 'resource' } }));
@@ -54,35 +52,13 @@ try {
   assert(!isApiResponseEnvelope({ code: 200, key: 'java', msg: 0, data: null }));
   assert(!isApiResponseEnvelope([]));
 
-  const loginRequestContext = {
-    contract: 'LoginApiRequest',
-    endpoint: '/auth/login',
-  };
-  const loginResponseContext = {
-    contract: 'LoginApiResponse',
-    endpoint: '/auth/login',
-  };
-  const registerRequestContext = {
-    contract: 'RegisterApiRequest',
-    endpoint: '/auth/register',
-  };
-  const emptyResponseContext = {
-    contract: 'EmptyAuthApiResponse',
-    endpoint: '/auth/logout',
-  };
-
+  assert.equal(LoginApiContract.name, 'LoginApi');
+  assert.equal(LoginApiContract.endpoint, '/auth/login');
   assert.deepEqual(
-    parseApiRequest(
-      LoginApiRequestSchema,
-      { account: 'alice', password: 'secret', ignored: true },
-      loginRequestContext
-    ),
+    parseApiRequest(LoginApiContract, { account: 'alice', password: 'secret', ignored: true }),
     { account: 'alice', password: 'secret' }
   );
-  assert.equal(
-    parseApiResponse(LoginApiResponseSchema, 'session-id', loginResponseContext),
-    'session-id'
-  );
+  assert.equal(parseApiResponse(LoginApiContract, 'session-id'), 'session-id');
 
   const expectContractError = (run, expected) => {
     let thrown;
@@ -104,77 +80,67 @@ try {
     );
   };
 
-  expectContractError(
-    () => parseApiRequest(LoginApiRequestSchema, { password: 'secret' }, loginRequestContext),
-    {
-      code: 100,
-      source: 'client',
-      direction: 'request',
-      endpoint: '/auth/login',
-      contract: 'LoginApiRequest',
-      path: 'account',
-      issueCode: 'invalid_type',
-    }
-  );
-  expectContractError(() => parseApiResponse(LoginApiResponseSchema, '', loginResponseContext), {
+  expectContractError(() => parseApiRequest(LoginApiContract, { password: 'secret' }), {
+    code: 100,
+    source: 'client',
+    direction: 'request',
+    endpoint: '/auth/login',
+    contract: 'LoginApi',
+    path: 'account',
+    issueCode: 'invalid_type',
+  });
+  expectContractError(() => parseApiResponse(LoginApiContract, ''), {
     code: 16,
     source: 'http',
     direction: 'response',
     endpoint: '/auth/login',
-    contract: 'LoginApiResponse',
+    contract: 'LoginApi',
     path: '$',
     issueCode: 'too_small',
   });
-  expectContractError(() => parseApiResponse(LoginApiResponseSchema, 123, loginResponseContext), {
+  expectContractError(() => parseApiResponse(LoginApiContract, 123), {
     code: 16,
     source: 'http',
     direction: 'response',
     endpoint: '/auth/login',
-    contract: 'LoginApiResponse',
+    contract: 'LoginApi',
     path: '$',
     issueCode: 'invalid_type',
   });
 
   assert.deepEqual(
-    parseApiRequest(
-      RegisterApiRequestSchema,
-      { username: 'alice', password: 'secret' },
-      registerRequestContext
-    ),
+    parseApiRequest(RegisterApiContract, { username: 'alice', password: 'secret' }),
     { username: 'alice', password: 'secret' }
   );
   expectContractError(
     () =>
-      parseApiRequest(
-        RegisterApiRequestSchema,
-        { username: 'alice', password: 'secret', inviteCode: null },
-        registerRequestContext
-      ),
+      parseApiRequest(RegisterApiContract, {
+        username: 'alice',
+        password: 'secret',
+        inviteCode: null,
+      }),
     {
       code: 100,
       source: 'client',
       direction: 'request',
       endpoint: '/auth/register',
-      contract: 'RegisterApiRequest',
+      contract: 'RegisterApi',
       path: 'inviteCode',
       issueCode: 'invalid_type',
     }
   );
 
-  assert.equal(parseApiResponse(EmptyAuthApiResponseSchema, null, emptyResponseContext), null);
+  assert.equal(parseApiResponse(LogoutApiContract, null), null);
   for (const invalidResponse of [undefined, '', {}, 0]) {
-    expectContractError(
-      () => parseApiResponse(EmptyAuthApiResponseSchema, invalidResponse, emptyResponseContext),
-      {
-        code: 16,
-        source: 'http',
-        direction: 'response',
-        endpoint: '/auth/logout',
-        contract: 'EmptyAuthApiResponse',
-        path: '$',
-        issueCode: 'invalid_type',
-      }
-    );
+    expectContractError(() => parseApiResponse(LogoutApiContract, invalidResponse), {
+      code: 16,
+      source: 'http',
+      direction: 'response',
+      endpoint: '/auth/logout',
+      contract: 'LogoutApi',
+      path: '$',
+      issueCode: 'invalid_type',
+    });
   }
 
   console.log('API response envelope 契约离线检查通过');
