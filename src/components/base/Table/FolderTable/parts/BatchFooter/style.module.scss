@@ -1,7 +1,7 @@
 @use '../../../shared/styles/table' as table;
 
 .footer {
-  padding: table.$table-footer-padding-block table.$table-shell-padding-inline;
+  padding: var(--table-footer-padding-block) var(--table-shell-padding-inline);
   border-top: 1px solid var(--table-inner-border);
   background: var(--table-chrome-bg);
 }
@@ -12,16 +12,16 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: table.$table-gap-compact;
-  min-height: table.$table-footer-row-height;
+  gap: var(--table-gap-compact);
+  min-height: var(--table-footer-row-height);
 }
 
 .summary {
   flex-shrink: 0;
   color: var(--muted);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-xs;
-  line-height: table.$table-line-height-xs;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
 }
 
 .actions {
@@ -37,5 +37,5 @@
 .confirmGroup {
   display: inline-flex;
   align-items: center;
-  gap: table.$table-gap-inline;
+  gap: var(--table-gap-inline);
 }

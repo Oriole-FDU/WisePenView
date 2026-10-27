@@ -1,10 +1,8 @@
-@use '../../../shared/styles/table' as table;
-
 .nameCell {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  height: table.$row-content-height;
+  height: var(--table-row-height);
   min-width: 0;
   padding-left: var(--folder-table-depth-indent, 0);
 }
@@ -23,8 +21,8 @@
   cursor: pointer;
 
   :global(svg) {
-    width: table.$table-row-expand-icon-size;
-    height: table.$table-row-expand-icon-size;
+    width: var(--table-row-expand-icon-size);
+    height: var(--table-row-expand-icon-size);
   }
 }
 
@@ -32,8 +30,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  height: table.$table-line-height-body;
-  line-height: table.$table-line-height-body;
+  height: var(--line-height-base);
+  line-height: var(--line-height-base);
   min-width: 0;
   transform: translateY(2px);
 }
@@ -43,12 +41,12 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  height: table.$table-line-height-body;
+  height: var(--line-height-base);
   line-height: 0;
 
   :global(svg) {
-    width: table.$table-row-entry-icon-size;
-    height: table.$table-row-entry-icon-size;
+    width: var(--table-row-entry-icon-size);
+    height: var(--table-row-entry-icon-size);
   }
 }
 
@@ -62,10 +60,10 @@
 .nameText {
   overflow: hidden;
   color: var(--foreground);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-body;
-  font-weight: table.$table-font-weight-medium;
-  line-height: table.$table-line-height-body;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

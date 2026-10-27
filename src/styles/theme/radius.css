@@ -59,7 +59,5 @@
 
   /* 表格域别名：表格样式经此转接，不直接读取应用语义之外的刻度。 */
   --table-shell-radius: var(--app-radius-content);
-  --table-control-radius: var(--app-radius-field);
-  --table-overlay-radius: var(--app-radius-popover);
   --table-inner-radius: var(--app-radius-menu-item);
 }

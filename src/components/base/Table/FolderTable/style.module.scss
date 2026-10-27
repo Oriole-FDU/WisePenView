@@ -17,10 +17,10 @@
   box-sizing: border-box;
   flex: 0 0 auto;
   min-height: calc(
-    table.$table-control-min-height + table.$table-toolbar-padding-block +
-      table.$table-toolbar-padding-block
+    var(--table-control-min-height) + var(--table-toolbar-padding-block) +
+      var(--table-toolbar-padding-block)
   );
-  padding: table.$table-toolbar-padding-block table.$table-shell-padding-inline;
+  padding: var(--table-toolbar-padding-block) var(--table-shell-padding-inline);
   border-bottom: 1px solid var(--table-inner-border);
   background: var(--surface);
 }
@@ -33,7 +33,7 @@
   display: flex;
   flex: 1;
   align-items: center;
-  gap: table.$table-gap-tight;
+  gap: var(--table-gap-tight);
   min-width: 0;
   overflow: hidden;
 }
@@ -42,18 +42,17 @@
   @include table.tableHeaderToolbarEnd();
 
   :global(button) {
-    min-height: table.$table-control-min-height;
-    font-family: table.$table-font-family;
-    font-size: table.$table-font-size-body;
-    font-weight: table.$table-font-weight-medium;
-    line-height: table.$table-line-height-body;
+    min-height: var(--table-control-min-height);
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-base);
   }
 }
 
 .tableRoot {
   width: 100%;
   background: var(--surface);
-  @include table.tableRootNoShadow();
   @include table.tableRootStretch();
 
   :global(.table__scroll-container) {
@@ -69,19 +68,19 @@
 
   :global(.table__cell) {
     box-sizing: border-box;
-    height: table.$table-row-height;
-    min-height: table.$table-row-height;
-    max-height: table.$table-row-height;
-    padding: table.$row-cell-padding-block table.$row-cell-padding-inline;
+    height: var(--table-row-height);
+    min-height: var(--table-row-height);
+    max-height: var(--table-row-height);
+    padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
     overflow: hidden;
     border-bottom: 1px solid var(--table-inner-border);
     border-inline: 0;
     background: var(--surface);
     color: var(--foreground);
-    font-family: table.$table-font-family;
-    font-size: table.$table-font-size-body;
-    font-weight: table.$table-font-weight-regular;
-    line-height: table.$table-line-height-body;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-base);
     vertical-align: middle;
   }
 
@@ -132,7 +131,7 @@
 
 .checkboxColumnInner {
   box-sizing: border-box;
-  height: table.$header-row-height;
+  height: var(--table-header-row-height);
 }
 
 .checkboxCell:global(.table__cell) {
@@ -143,7 +142,7 @@
 
 .checkboxCellInner {
   box-sizing: border-box;
-  height: table.$row-content-height;
+  height: var(--table-row-height);
 
   :global(.wisepen-table-selection-checkbox) {
     opacity: 0;
@@ -164,7 +163,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  height: table.$row-content-height;
+  height: var(--table-row-height);
   min-width: 0;
   user-select: none;
 }
@@ -224,10 +223,10 @@
   border: none;
   background: transparent;
   color: var(--blue-11);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-body;
-  font-weight: table.$table-font-weight-medium;
-  line-height: table.$table-line-height-body;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -289,7 +288,7 @@
 .emptyStateOverlay {
   position: absolute;
   z-index: var(--app-z-index-raised);
-  inset: table.$table-header-row-height 0 0 0;
+  inset: var(--table-header-row-height) 0 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,7 +298,7 @@
 .bodyOverlay {
   position: absolute;
   z-index: var(--app-z-index-elevated);
-  inset: table.$table-header-row-height 0 0 0;
+  inset: var(--table-header-row-height) 0 0 0;
   pointer-events: none;
 }
 
@@ -315,12 +314,4 @@
 
 .bodyCell {
   overflow: hidden;
-}
-
-.cellAlignCenter {
-  text-align: center;
-}
-
-.cellAlignEnd {
-  text-align: right;
 }

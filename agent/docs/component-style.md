@@ -83,7 +83,7 @@ ComponentName/
 | Modal        | `--app-radius-modal`                                         | 12px        | Modal、AlertDialog、FormDialog、DisplayDialog；`size="cover"` 仍是 12px 圆角，`size="full"` 保持直角 |
 | 圆形语义     | `--app-radius-pill` / `--app-radius-scrollbar`               | 999px       | 头像、状态点、胶囊标签与滚动条滑块                                                                   |
 
-表格域另有别名：`--table-shell-radius`、`--table-control-radius`、`--table-overlay-radius`、`--table-inner-radius` 分别指向内容容器、字段控件、浮层和菜单项，只做转接，不引入新数值。
+表格域另有两个覆盖点：`--table-shell-radius` 指向内容容器圆角，`--table-inner-radius` 指向菜单项圆角，只做转接，不引入新数值。
 
 规则：
 

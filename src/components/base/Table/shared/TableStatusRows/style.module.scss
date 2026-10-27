@@ -1,17 +1,15 @@
-@use '../styles/table' as table;
-
 .indicator {
   display: flex;
   align-items: center;
-  gap: table.$table-gap-inline;
+  gap: var(--table-gap-inline);
   box-sizing: border-box;
-  min-height: calc(table.$table-control-min-height - table.$table-gap-tight);
-  padding: table.$table-gap-inline var(--space-md);
+  min-height: calc(var(--table-control-min-height) - var(--table-gap-tight));
+  padding: var(--table-gap-inline) var(--space-md);
   background: var(--accent-soft);
   color: var(--accent-text);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-xs;
-  line-height: table.$table-line-height-xs;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
 }
 
 .loadMoreRow {
@@ -20,11 +18,11 @@
   justify-content: center;
   gap: var(--space-xs);
   width: 100%;
-  min-height: table.$table-row-height;
+  min-height: var(--table-row-height);
   color: var(--muted);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-xs;
-  line-height: table.$table-line-height-xs;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
 }
 
 .spinner {
@@ -33,9 +31,9 @@
 }
 
 .label {
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-xs;
-  line-height: table.$table-line-height-xs;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
 }
 
 .indicator .label {

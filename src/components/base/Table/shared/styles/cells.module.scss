@@ -1,5 +1,3 @@
-@use './table' as table;
-
 .cellEllipsis {
   display: block;
   width: 100%;
@@ -18,18 +16,18 @@
 .cellEmphasis {
   composes: cellEllipsis;
   color: var(--foreground);
-  font-weight: table.$table-font-weight-medium;
+  font-weight: var(--font-weight-medium);
 }
 
 .amountInflow {
   font-variant-numeric: tabular-nums;
-  font-weight: table.$table-font-weight-medium;
+  font-weight: var(--font-weight-medium);
   color: var(--success-text);
 }
 
 .amountOutflow {
   font-variant-numeric: tabular-nums;
-  font-weight: table.$table-font-weight-medium;
+  font-weight: var(--font-weight-medium);
   color: var(--danger-text);
 }
 
@@ -97,9 +95,9 @@
 .amountHeader {
   display: inline-flex;
   align-items: center;
-  gap: table.$table-gap-compact;
+  gap: var(--table-gap-compact);
   color: inherit;
-  font-weight: table.$table-font-weight-medium;
+  font-weight: var(--font-weight-medium);
 }
 
 /* 表内 Chip：按文案自然宽度，避免在窄列中被 stretch 压成竖排 */
@@ -112,20 +110,19 @@
   box-sizing: border-box;
   width: max-content;
   max-width: 100%;
-  min-width: var(--table-chip-min-width, 56px);
-  min-height: var(--table-chip-min-height, 28px);
-  padding: var(--table-chip-padding-block, var(--space-2xs)) var(--table-chip-padding-inline, 14px);
-  border-radius: table.$table-inner-radius;
+  min-width: var(--table-chip-min-width);
+  min-height: var(--table-chip-min-height);
+  padding: var(--table-chip-padding-block) var(--table-chip-padding-inline);
+  border-radius: var(--table-inner-radius);
   font-family: inherit;
   font-size: inherit;
-  font-weight: table.$table-font-weight-medium;
+  font-weight: var(--font-weight-medium);
   line-height: inherit;
   white-space: nowrap;
 
   &:global(.chip) {
-    min-height: var(--table-chip-min-height, 28px);
-    padding: var(--table-chip-padding-block, var(--space-2xs))
-      var(--table-chip-padding-inline, 14px);
+    min-height: var(--table-chip-min-height);
+    padding: var(--table-chip-padding-block) var(--table-chip-padding-inline);
   }
 
   :global([data-slot='label']) {
