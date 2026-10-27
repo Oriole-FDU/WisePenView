@@ -5,6 +5,7 @@ import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/_intern
 import { mapAxiosErrorToWisePenError } from '@/apis/_internal/axiosErrorMapper';
 import { applyXDeveloperHeader } from '@/apis/_internal/developmentTraffic';
 import { reportHttpFailure } from '@/apis/_internal/httpFailureTelemetry';
+import { markHttpExceptionObserved } from '@/observability/http';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 
 declare module 'axios' {
@@ -94,7 +95,7 @@ httpClient.interceptors.response.use(
       return retryRequest;
     }
 
-    reportHttpFailure(error);
+    const failureRecorded = reportHttpFailure(error);
 
     const requestConfig = error.config;
     const authSessionState =
@@ -103,6 +104,8 @@ httpClient.interceptors.response.use(
         : requestConfig?.__wisePenAuthSessionVersion === authSessionCoordinator.getSessionVersion()
           ? 'handled'
           : 'stale';
+    const mappedError = mapAxiosErrorToWisePenError(error, authSessionState);
+    if (failureRecorded) markHttpExceptionObserved(mappedError);
     if (
       error.response?.status === 401 &&
       requestConfig &&
@@ -111,7 +114,7 @@ httpClient.interceptors.response.use(
     ) {
       authSessionCoordinator.publish('unauthorized');
     }
-    return Promise.reject(mapAxiosErrorToWisePenError(error, authSessionState));
+    return Promise.reject(mappedError);
   }
 );
 

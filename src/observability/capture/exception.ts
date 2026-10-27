@@ -52,6 +52,10 @@ const createCaptureId = (error: unknown): string => {
   return id;
 };
 
+export const markExceptionObserved = (error: unknown): void => {
+  if (isObjectKey(error)) capturedErrors.add(error);
+};
+
 const readErrorDetails = (
   error: unknown
 ): {

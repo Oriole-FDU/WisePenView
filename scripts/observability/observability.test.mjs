@@ -369,6 +369,13 @@ test('HTTP 5xx 保持原事件语义，404 不记录，XHR API 属性仍可补�
   assert.equal(telemetry.records[0].attributes['wisepen.request_id'], 'request-123');
   assert.equal(telemetry.records[0].attributes['url.path'], '/failure');
   assert.equal(telemetry.spans.filter((span) => span.name === 'frontend.http_failure').length, 1);
+  const mappedRequestError = new telemetry.WisePenError({ source: 'http', code: 500 });
+  telemetry.markHttpExceptionObserved(mappedRequestError);
+  telemetry.captureException(mappedRequestError, {
+    detector: 'application-handled',
+    operation: 'chat.recover',
+  });
+  assert.equal(telemetry.records.length, 1);
 
   const attributes = {};
   const span = {

@@ -208,7 +208,10 @@ export const loadObservability = async (
           export { installObservability } from '@/observability/_internal/install';
           export { ErrorAggregation } from '@/observability/_internal/aggregation';
           export { sanitizeDiagnosticText } from '@/observability/_internal/privacy';
-          export { recordHttpFailure } from '@/observability/http';
+          export {
+            markHttpExceptionObserved,
+            recordHttpFailure,
+          } from '@/observability/http';
           export { reportHttpFailure } from '@/apis/_internal/httpFailureTelemetry';
           export { applyXhrApiAttributes } from '@/apis/_internal/xhrApiTelemetry';
           export { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';

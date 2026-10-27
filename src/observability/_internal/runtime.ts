@@ -147,9 +147,9 @@ export const recordExceptionObservation = (observation: ExceptionObservation): v
 };
 
 /** 保留既有 HTTP 5xx 事件语义，由 API 层提供已解析的协议字段。 */
-export const recordHttpFailure = (observation: HttpFailureObservation): void => {
+export const recordHttpFailure = (observation: HttpFailureObservation): boolean => {
   const runtime = activeRuntime;
-  if (!runtime) return;
+  if (!runtime) return false;
 
   try {
     const snapshot = runtime.context.capture();
@@ -200,7 +200,9 @@ export const recordHttpFailure = (observation: HttpFailureObservation): void => 
     } finally {
       if (!activeSpan) span.end();
     }
+    return true;
   } catch {
     // 观测链路失败不得改变原 HTTP 错误处理。
+    return false;
   }
 };
