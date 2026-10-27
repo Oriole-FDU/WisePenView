@@ -219,8 +219,6 @@ export const getLayoutScaleCssVars = (
     '--layout-note-outline-collapsed-width': `${NOTE_OUTLINE_COLLAPSED_WIDTH}px`,
     '--layout-model-selector-max-width': `${MODEL_SELECTOR_LABEL_MAX_WIDTH}px`,
     '--layout-drive-chrome-height': `${driveChrome}px`,
-    '--table-drive-layout-max-height': `calc(100dvh - ${driveChrome}px)`,
-    '--table-drive-detail-panel-width': `${DRIVE_DETAIL_PANEL_WIDTH}px`,
     '--layout-drive-table-min-width': `${DRIVE_TABLE_MIN_WIDTH}px`,
     '--layout-drive-layout-min-width': `${DRIVE_LAYOUT_MIN_WIDTH}px`,
     '--layout-drive-page-min-width': `${DRIVE_PAGE_MIN_WIDTH}px`,

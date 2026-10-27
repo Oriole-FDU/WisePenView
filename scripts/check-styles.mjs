@@ -530,6 +530,20 @@ test('Drive、Group、Resource 保留各斷點的窄版佈局', async () => {
   }
 });
 
+test('TableDrive 在业务组件内生成专属布局 token', async () => {
+  const source = await readFile(
+    join(root, 'src/components/business/Drive/TableDrive/index.tsx'),
+    'utf8'
+  );
+  assert.match(source, /useViewportLayoutScale\(\)/);
+  assert.match(source, /'--table-drive-layout-max-height'\s*:/);
+  assert.match(source, /'--table-drive-detail-panel-width'\s*:/);
+  assert.match(source, /className=\{styles\.driveFrame\}\s+style=\{driveFrameCssVars\}/);
+
+  const layoutScale = await readFile(join(root, 'src/constants/layoutScale.ts'), 'utf8');
+  assert.doesNotMatch(layoutScale, /--table-drive-/);
+});
+
 test('Chat、Sidebar 業務樣式不殘留 Less，所有 Module 可編譯', async () => {
   for (const domain of ['Chat', 'Sidebar']) {
     const directory = join('src/components/business', domain);

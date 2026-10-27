@@ -6,7 +6,7 @@ import {
   pointerWithin,
 } from '@dnd-kit/core';
 import { PanelRightClose, PanelRightOpen, Trash2 } from 'lucide-react';
-import { type ReactNode, useEffect } from 'react';
+import { type CSSProperties, type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppBreadcrumb from '@/components/base/AppBreadcrumb';
@@ -15,8 +15,15 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
 import { FolderTable } from '@/components/base/Table';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
+import {
+  DRIVE_DETAIL_PANEL_WIDTH,
+  DRIVE_LAYOUT_CHROME_HEIGHT_NORMAL,
+  DRIVE_LAYOUT_CHROME_HEIGHT_SHORT,
+  LAYOUT_HEIGHT_DENSITY,
+} from '@/constants/layoutScale';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
+import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
 import {
@@ -42,6 +49,17 @@ import styles from './style.module.scss';
 import { buildDriveTableColumns, isDrivePinnedFirstRow } from './tableConfig';
 
 const DRIVE_DRAG_OVERLAY_CURSOR_OFFSET = { x: 12, y: 12 };
+
+const getDriveFrameCssVars = (isShort: boolean): CSSProperties => {
+  const chromeHeight = isShort
+    ? DRIVE_LAYOUT_CHROME_HEIGHT_SHORT
+    : DRIVE_LAYOUT_CHROME_HEIGHT_NORMAL;
+
+  return {
+    '--table-drive-layout-max-height': `calc(100dvh - ${chromeHeight}px)`,
+    '--table-drive-detail-panel-width': `${DRIVE_DETAIL_PANEL_WIDTH}px`,
+  } as CSSProperties;
+};
 
 function getDragActivatorCoordinates(event: Event | null): { x: number; y: number } | null {
   if (
@@ -95,6 +113,8 @@ function TableDrive({
   actions,
 }: TableDriveProps) {
   const { t } = useTranslation(['drive', 'resource', 'common']);
+  const { heightDensity } = useViewportLayoutScale();
+  const driveFrameCssVars = getDriveFrameCssVars(heightDensity === LAYOUT_HEIGHT_DENSITY.SHORT);
 
   // 解析作用域，派生 groupId / rootId / scope
   const resolvedScope = resolveDriveScope(scope, groupId, rootId);
@@ -337,7 +357,7 @@ function TableDrive({
       onDragCancel={dnd.clearDragState}
     >
       <main className={styles.listArea}>
-        <div className={styles.driveFrame}>
+        <div className={styles.driveFrame} style={driveFrameCssVars}>
           <div className={styles.driveBody}>
             <div className={styles.tablePanel}>
               <GuideAnchor id={GUIDE_TOOL_ID.driveFiles} layout="fill">
