@@ -782,6 +782,13 @@ test('Chat 輸入區與歡迎頁斷點、Sidebar 選取與收合狀態不變', a
     input.code,
     /@media \(max-width: 640px\) \{\s*\.container\s*\{\s*padding-inline: var\(--space-sm\);/
   );
+
+  const welcomeStarter = await readFile(
+    join(root, 'src/components/business/Chat/WelcomeConfigurable/Starter/style.module.scss'),
+    'utf8'
+  );
+  assert.doesNotMatch(welcomeStarter, /--table-control-min-height/);
+  assert.match(welcomeStarter, /min-height:\s*var\(--control-height\);/);
   const welcome = await compileCssModule(
     'src/components/business/Chat/WelcomeConfigurable/Starter/style.module.scss'
   );
