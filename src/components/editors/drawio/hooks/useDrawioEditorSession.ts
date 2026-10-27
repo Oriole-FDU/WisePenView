@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { INoteService } from '@/domains/Note';
+import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import {
@@ -118,6 +119,10 @@ export function useDrawioEditorSession({
     if (message.event === 'error') {
       const error = createClientError(FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED, {
         detail: message.message,
+      });
+      captureException(error, {
+        detector: 'application-handled',
+        operation: 'drawio.save',
       });
       setEditorError(error);
       session.fail(error);

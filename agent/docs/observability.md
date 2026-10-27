@@ -68,6 +68,10 @@ captureException(error, {
 Office 使用 `office.sdk` 记录 `events_onError` 与 `onLoadComponentError`。同一错误码和 operation
 使用稳定指纹归并；ready、modified 或离开状态不会被推断为保存成功／失败。
 
+Draw.io 使用 `drawio.save` 记录共用保存任务、10 秒导出超时和通过 origin/source 校验的 iframe
+错误。工具栏与 iframe 双入口传递同一错误时只形成一次 occurrence；dispose、无权限和未 ready
+的前置拒绝不上报，也不采集 XML 或 iframe 原始正文。
+
 ## 异常管线
 
 ```text

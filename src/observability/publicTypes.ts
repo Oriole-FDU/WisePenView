@@ -9,7 +9,7 @@ export type ExceptionDetector =
   | 'application-handled';
 
 export type ExceptionOperation =
-  'chat.send' | 'chat.stream' | 'chat.recover' | 'chat.resume' | 'office.sdk';
+  'chat.send' | 'chat.stream' | 'chat.recover' | 'chat.resume' | 'office.sdk' | 'drawio.save';
 
 export interface ExceptionLocation {
   filename: string;

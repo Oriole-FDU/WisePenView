@@ -234,3 +234,56 @@ export const loadOffice = async (testContext) => {
   });
   return { ...telemetry, browser };
 };
+
+export const loadDrawio = async (testContext) => {
+  const browser = installBrowser(testContext);
+  const telemetry = await loadObservability(testContext, {
+    entry: `
+      export { useDrawioEditorSession } from '@/components/editors/drawio/hooks/useDrawioEditorSession';
+      export { createDrawioSaveSession } from '@/components/editors/drawio/drawioSaveSession';
+      export { hooks } from 'react';
+      export { listeners } from 'ahooks';
+      export { notices } from '@heroui/react';
+    `,
+    stubs: {
+      react: `${reactStub}
+        const cleanups = [];
+        export function useEffect(fn, deps) {
+          const slot = useRef({ deps: null });
+          if (!slot.current.deps || deps.some((value, index) => value !== slot.current.deps[index])) {
+            slot.cleanup?.();
+            slot.cleanup = fn();
+            slot.current.deps = deps;
+            cleanups.push(() => slot.cleanup?.());
+          }
+        }
+        hooks.dispose = () => { for (const cleanup of cleanups.reverse()) cleanup(); };
+        export const useSyncExternalStore = (_subscribe, snapshot) => snapshot();
+      `,
+      'react/jsx-runtime': `
+        export const Fragment = Symbol('fragment');
+        export const jsx = (type, props) => typeof type === 'function' ? type(props) : ({ type, props });
+        export const jsxs = jsx;
+      `,
+      'react-i18next': `
+        export const useTranslation = () => ({ t: key => key });
+        export const initReactI18next = { type: '3rdParty', init() {} };
+      `,
+      'react-error-boundary': `
+        export const ErrorBoundary = () => null;
+      `,
+      ahooks: `${ahooksStub}
+        export const listeners = new Map();
+        export function useMemoizedFn(fn) { const ref = useLatest(fn); return useRef((...args) => ref.current(...args)).current; }
+        export function useEventListener(type, listener) { listeners.set(type, listener); }
+      `,
+      '@heroui/react': `
+        export const notices = [];
+        export const toast = Object.fromEntries(
+          ['danger', 'warning', 'success'].map(type => [type, value => notices.push({ type, value })])
+        );
+      `,
+    },
+  });
+  return { ...telemetry, browser };
+};
