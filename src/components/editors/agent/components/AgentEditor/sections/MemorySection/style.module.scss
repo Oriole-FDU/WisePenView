@@ -16,7 +16,7 @@
   height: 28px;
   padding-inline: var(--space-xs);
   color: var(--muted);
-  font-family: var(--font-sans);
+  font-family: var(--app-font-family);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-xs);
@@ -34,13 +34,13 @@
 }
 .advancedHeader > span {
   color: var(--muted);
-  font-family: var(--font-sans);
+  font-family: var(--app-font-family);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-xs);
 }
 .presetButton {
-  font-family: var(--font-sans);
+  font-family: var(--app-font-family);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);

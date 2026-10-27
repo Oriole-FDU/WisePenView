@@ -8,7 +8,7 @@
   width: auto;
   min-width: 88px;
   color: var(--muted);
-  font-family: var(--font-sans);
+  font-family: var(--app-font-family);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
@@ -17,7 +17,7 @@
   color: var(--accent-soft-foreground);
 }
 .presetButton {
-  font-family: var(--font-sans);
+  font-family: var(--app-font-family);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);

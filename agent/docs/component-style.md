@@ -14,6 +14,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題
 - 动画时长、缓动曲线和 reduced-motion 基准集中在 `src/styles/theme/motion.css`，组件只消费 `--motion-*` token。
 - 间距单位、`--space-*` 刻度和页面／输入区／表格间距集中在 `src/styles/theme/spacing.css`；`gap`、`margin`、`padding` 在数值命中公共刻度时必须消费对应 token。
 - 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则仍由 `src/styles/global/index.css` 消费这些变量。
+- Tailwind/HeroUI 的 `--font-sans`、`--font-mono` 只在 `@theme inline` 中做名称桥接；项目自有样式直接使用 `--app-font-family`、`--app-font-mono`，不得绕经第三方别名。
 - 布局尺寸、控件规格和阴影／滚动条效果分别集中在 `src/styles/theme/layout.css`、`controls.css` 和 `effects.css`；不再维护通用 `tokens.css` 杂项文件。
 - 通用 Table 的尺寸、间距和圆角别名集中在 `src/components/base/Table/shared/styles/tokens.css`；表格颜色继续由 `palette.css` 管理，Drive 专属布局 token 由 `TableDrive` 自己维护。
 
@@ -114,6 +115,7 @@ ComponentName/
 - 新增圆角先选择语义 token；语义 token 缺失时在 `src/styles/theme/radius.css` 的应用语义层补一个，再让组件引用。
 - 组件样式不得直接引用 `--radius-*`，也不得硬编码圆角数值；需要更大或更小的几何值时报给应用语义层处理。新增语义 token 时同步更新本节表格。
 - 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
+- HeroUI 字段圆角通过 `radius.css` 中的 `--field-radius: var(--app-radius-field)` 单向桥接，不得在组件侧重新建立第二套字段圆角来源。
 - `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.scss`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。守衛亦能辨識誤加的 Less，但 `check:styles` 會直接拒絕該來源。
 
 ## 七、层级（z-index）

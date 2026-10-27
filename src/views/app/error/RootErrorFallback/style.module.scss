@@ -8,7 +8,7 @@
   box-sizing: border-box;
   background: var(--surface);
   color: var(--foreground);
-  font-family: var(--font-sans, var(--app-font-family));
+  font-family: var(--app-font-family);
 }
 
 .content {

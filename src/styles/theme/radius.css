@@ -44,6 +44,9 @@
   /* 具有明确圆形语义的元素。 */
   --app-radius-pill: var(--radius-full);
 
+  /* HeroUI 字段圆角桥接：第三方组件通过 --field-radius 消费应用语义。 */
+  --field-radius: var(--app-radius-field);
+
   /* 派生：嵌套浮层按外壳半径与内容 inset 计算内层半径，保持同心。 */
   --app-popover-item-inset: var(--app-radius-menu-item);
   --app-radius-popover-item: max(

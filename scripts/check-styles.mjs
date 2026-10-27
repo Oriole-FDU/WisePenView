@@ -270,6 +270,21 @@ test('主题 token 按职责拆分，不再维护通用 tokens 文件', async ()
   assert.match(effects, /--scrollbar-size\s*:/);
 });
 
+test('字体 token 只保留应用来源与 Tailwind 桥接', async () => {
+  const fonts = await readFile(join(root, 'src/styles/theme/fonts.css'), 'utf8');
+  assert.doesNotMatch(fonts, /--font-(?:sans|mono)\s*:/);
+
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  assert.match(globalIndex, /--font-sans:\s*var\(--app-font-family\);/);
+  assert.match(globalIndex, /--font-mono:\s*var\(--app-font-mono\);/);
+
+  for (const file of await readdir(join(root, 'src'), { recursive: true })) {
+    if (!/\.(css|scss)$/.test(file)) continue;
+    const source = await readFile(join(root, 'src', file), 'utf8');
+    assert.doesNotMatch(source, /var\(--font-(?:sans|mono)\b/, file);
+  }
+});
+
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {
   const { code, modules } = await compileCssModule(
     'src/components/base/Table/DataTable/style.module.scss'
@@ -1338,6 +1353,14 @@ for (const [script, valid, invalid] of [
       await mkdir(dirname(scriptPath), { recursive: true });
       await mkdir(dirname(stylePath), { recursive: true });
       await writeFile(scriptPath, await readFile(join(root, 'scripts', script)));
+      if (script === 'check-radius-tokens.mjs') {
+        const radiusTokenPath = join(workspace, 'src/styles/theme/radius.css');
+        await mkdir(dirname(radiusTokenPath), { recursive: true });
+        await writeFile(
+          radiusTokenPath,
+          ':root { --app-radius-field: 8px; --field-radius: var(--app-radius-field); }'
+        );
+      }
 
       for (const [declaration, status] of [
         [valid, 0],

@@ -18,6 +18,7 @@
 @import './heroui-overrides.css' layer(components);
 
 @theme inline {
+  /* Tailwind/HeroUI 字体名称桥接；项目样式直接使用 --app-font-*。 */
   --font-sans: var(--app-font-family);
   --font-mono: var(--app-font-mono);
 

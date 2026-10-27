@@ -16,6 +16,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const srcDir = join(root, 'src');
 /** 基础设施与 token 层：第 1、2 层刻度在此定义，允许直接引用。 */
 const infraDir = join(srcDir, 'styles');
+const radiusTokenSource = await readFile(join(infraDir, 'theme/radius.css'), 'utf8');
 const styleExtensions = new Set(['.less', '.scss', '.css']);
 
 /** 圆角属性，例如 border-radius、border-start-start-radius。 */
@@ -47,6 +48,11 @@ async function collectStyleFiles(dir) {
 }
 
 const violations = [];
+
+if (!/--field-radius\s*:\s*var\(--app-radius-field\)/.test(radiusTokenSource)) {
+  violations.push('src/styles/theme/radius.css 缺少 --field-radius 到 --app-radius-field 的桥接');
+}
+
 const files = await collectStyleFiles(srcDir);
 
 for (const file of files) {

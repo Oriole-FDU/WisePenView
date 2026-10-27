@@ -30,8 +30,6 @@
   --line-height-md: 22px;
   --line-height-xs: 18px;
   --line-height-2xs: 16px;
-  --font-sans: var(--app-font-family);
-  --font-mono: var(--app-font-mono);
 }
 
 :root {
