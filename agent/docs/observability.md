@@ -91,6 +91,11 @@ AI SDK onError、恢复 catch 和重连 catch。原 callback、提示、异常�
 AbortError、CanceledError 及既有网络取消码不生成 handled 错误事件；已记录的 API 原异常交回
 既有请求出口识别，不根据状态或业务文案再做一套分类。新接入不附加对话、请求/响应正文或附件内容。
 
+Skill 文件保存使用 `skill-save`，只在真实结果边界交回 OSS 原异常、已有的缺票错误及缺结果的
+本地错误。初始化 API 原异常仍由请求出口识别，批次失败错误只保留原 UI/Promise 用途，不额外
+上报。外层失败保留原错误、队列和草稿；混合结果保持成功项、失败项顺序、进度、revision 与重试。
+不增加文件名/路径字段、文件内容或签名 URL；配置保存不增加逐点遥测。
+
 ## Trace 与日志关联
 
 每次经过 `request.ts` 的逻辑请求创建一个 `api.request METHOD /path` span，覆盖地址等待、
@@ -157,3 +162,6 @@ Collector／Loki 的映射配置不在本仓库，本次没有修改。
 
 Chat 回归执行真实 controller catch 和 session callback，受控替身仅替代 React、AI SDK 与外部
 环境，出口仍为真实 reporter、聚合及 OTel SDK 内存 processor；不把它等同于浏览器或真实模型验收。
+Skill 回归执行真实 controller、service、草稿结果更新与 useApi，受控替身仅替代 React/请求 hook
+运行环境、API adapter 和 OSS I/O；验证混合结果、缺票/缺结果、原错误去重、共享请求、进度和
+新 revision 保留，出口仍为真实 OTel SDK 内存 processor，不代表真实 OSS 或浏览器验收。
