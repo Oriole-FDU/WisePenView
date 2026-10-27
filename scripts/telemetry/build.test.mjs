@@ -173,3 +173,19 @@ test('错误码 16 经实际中英文解析器显示文案，未知错误仍使�
   }
   await telemetry.i18n.changeLanguage('zh-CN');
 });
+
+test('出口自行生成的 dropped 摘要也携带同一构建身份', async (context) => {
+  const browser = installBrowser(context);
+  context.mock.timers.enable({ apis: ['Date'], now: 1_000 });
+  const telemetry = await loadTelemetry();
+  browser.cleanup(telemetry.installOtelErrorReporter());
+  for (let count = 0; count < 201; count++) {
+    telemetry.recordTelemetryEvent('test.event', 'INFO', 'budget');
+  }
+  context.mock.timers.tick(60_000);
+  telemetry.flushTelemetryEvents(true);
+  const attributes = telemetry.records.at(-1).attributes;
+  assert.equal(attributes['event.name'], 'telemetry.events_dropped');
+  assert.equal(attributes['service.release'], telemetry.buildInfo.release);
+  assert.equal(attributes['service.commit'], telemetry.buildInfo.commit);
+});

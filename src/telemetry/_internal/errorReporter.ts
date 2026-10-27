@@ -1,6 +1,7 @@
 import { context, isSpanContextValid, SpanStatusCode, trace } from '@opentelemetry/api';
 import { SeverityNumber } from '@opentelemetry/api-logs';
 
+import { buildTelemetryAttributes } from '@/config/buildInfo';
 import { configureErrorReporter } from '@/utils/error';
 import { isWisePenError } from '@/utils/error/WisePenError';
 
@@ -24,7 +25,11 @@ const SEVERITY = {
 export const installOtelErrorReporter = (): (() => void) => {
   if (!isTelemetryEnabled) return () => undefined;
   const stopSink = installTelemetrySink((event) => {
-    const attributes = { ...event.attributes, 'event.name': event.name };
+    const attributes = {
+      ...event.attributes,
+      ...buildTelemetryAttributes,
+      'event.name': event.name,
+    };
     const eventContext = event.context ?? context.active();
     const parent = trace.getSpanContext(eventContext);
     const span =
