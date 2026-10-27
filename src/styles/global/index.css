@@ -6,7 +6,9 @@
 @import '../theme/custom-accents.css' layer(base);
 @import '../theme/palette.css' layer(base);
 /* 与 HeroUI token 位于同一层，通过选择器明确覆盖主题。 */
-@import '../theme/tokens.css' layer(base);
+@import '../theme/layout.css' layer(base);
+@import '../theme/controls.css' layer(base);
+@import '../theme/effects.css' layer(base);
 @import '../theme/fonts.css' layer(base);
 @import '../theme/spacing.css' layer(base);
 @import '../theme/motion.css' layer(base);

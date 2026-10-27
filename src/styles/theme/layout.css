@@ -1,0 +1,26 @@
+/**
+ * 布局 token 集中在此文件，负责应用、侧栏、窗口与内容区的尺寸边界。
+ * 通用间距见 spacing.css，Drive 表格专属布局由 TableDrive 维护。
+ */
+:root,
+.light,
+.dark,
+[data-theme='light'],
+[data-theme='dark'] {
+  /* 运行时由 syncViewportLayoutScale 覆盖，此处为同源兜底 */
+  --layout-sidebar-session-list-min-height: 120px;
+  --layout-note-editor-min-width: 560px;
+  --layout-workspace-split-header-height: 56px;
+  --layout-note-outline-open-width: 215px;
+  --layout-note-outline-collapsed-width: 40px;
+  --layout-model-selector-max-width: 240px;
+  --layout-auth-sheet-width: 48rem;
+  --layout-auth-form-width: 40rem;
+  --layout-drive-chrome-height: 240px;
+  --layout-drive-table-min-width: 560px;
+  --layout-drive-layout-min-width: 860px;
+  --layout-drive-page-min-width: 956px;
+  --chat-input-textarea-max-height: calc(16em + 16px);
+  --layout-welcome-title-size: 2rem;
+  --layout-welcome-icon-size: 3.75rem;
+}

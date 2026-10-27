@@ -229,7 +229,7 @@ test('Table token 集中于 shared，主题文件只保留颜色与通用 token'
     /@import '\.\.\/\.\.\/components\/base\/Table\/shared\/styles\/tokens\.css' layer\(base\);/
   );
 
-  for (const file of ['tokens.css', 'spacing.css', 'radius.css']) {
+  for (const file of ['layout.css', 'controls.css', 'effects.css', 'spacing.css', 'radius.css']) {
     const source = await readFile(join(root, 'src/styles/theme', file), 'utf8');
     assert.doesNotMatch(source, /--table-[\w-]+\s*:/, file);
   }
@@ -245,6 +245,29 @@ test('Table token 集中于 shared，主题文件只保留颜色与通用 token'
     assert.match(palette, new RegExp(`${token}\\s*:`), token);
     assert.doesNotMatch(tableTokens, new RegExp(`${token}\\s*:`), token);
   }
+});
+
+test('主题 token 按职责拆分，不再维护通用 tokens 文件', async () => {
+  const themeFiles = await readdir(join(root, 'src/styles/theme'));
+  assert.equal(themeFiles.includes('tokens.css'), false);
+
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  assert.doesNotMatch(globalIndex, /theme\/tokens\.css/);
+  for (const file of ['layout.css', 'controls.css', 'effects.css']) {
+    assert.match(globalIndex, new RegExp(`@import '\\.\\./theme/${file}' layer\\(base\\);`));
+  }
+
+  const [layout, controls, effects] = await Promise.all(
+    ['layout.css', 'controls.css', 'effects.css'].map((file) =>
+      readFile(join(root, 'src/styles/theme', file), 'utf8')
+    )
+  );
+  assert.match(layout, /--layout-workspace-split-header-height\s*:/);
+  assert.match(layout, /--chat-input-textarea-max-height\s*:/);
+  assert.match(controls, /--control-height\s*:/);
+  assert.match(controls, /--border-width\s*:/);
+  assert.match(effects, /--shadow-none\s*:/);
+  assert.match(effects, /--scrollbar-size\s*:/);
 });
 
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {

@@ -1,7 +1,7 @@
 @use '@/styles/mixins/scrollbar' as scrollbar;
 
 // Table 共享 mixin；输出类保留在 table.module.scss / cells.module.scss。
-// 样式直接消费 tokens.css 中的全局排版与 --table-* 运行时变量。
+// 样式直接消费全局排版与 --table-* 运行时变量。
 // 圆角：--table-shell-radius 用于外框，--table-inner-radius 用于 Chip / 小按钮 / 骨架屏
 
 // headerBar：title/面包屑在左，toolbar 靠右；仅 toolbar 时用 spacer 顶到右侧
