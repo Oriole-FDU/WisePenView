@@ -198,6 +198,10 @@ test('Table partial 不輸出 CSS，固定欄寬與直接 CSS token 可展開', 
     .fixed { @include table.tableColFixedWidth(--table-col-sm); }
     .shell { @include table.tableShellRadius(); }
     .footer { min-height: var(--table-footer-row-height); }
+    .tableRoot {
+      @include table.tableFocusReset();
+      @include table.tableInheritedTypography();
+    }
   `);
   assert.match(
     css,
@@ -205,6 +209,9 @@ test('Table partial 不輸出 CSS，固定欄寬與直接 CSS token 可展開', 
   );
   assert.match(css, /\.shell\s*\{\s*border-radius: var\(--table-shell-radius\);/);
   assert.match(css, /\.footer\s*\{\s*min-height: var\(--table-footer-row-height\);/);
+  assert.match(css, /\.tableRoot :global\(\.table__column:focus-visible\)/);
+  assert.match(css, /\.tableRoot :global\(\.table__cell\),/);
+  assert.match(css, /font: inherit;/);
 });
 
 test('Table token 集中于 shared，主题文件只保留颜色与通用 token', async () => {
@@ -299,12 +306,13 @@ test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
   assert.doesNotMatch(globalIndex, /\.modal__backdrop/);
   assert.doesNotMatch(heroOverrides, /--app-radius-popover-(?:item|control)\s*:/);
   assert.doesNotMatch(heroOverrides, /--app-popover-item-inset\s*:/);
+  assert.doesNotMatch(heroOverrides, /\.modal__backdrop/);
+  assert.doesNotMatch(heroOverrides, /\.table-root/);
 
   for (const selector of [
     /\.button:is\(:disabled/,
     /\.tabs:not\(\.tabs--secondary\)/,
     /\.popover__dialog/,
-    /\.modal__backdrop/,
   ]) {
     assert.match(heroOverrides, selector);
   }
@@ -313,6 +321,19 @@ test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
   const buttonDisabled = heroOverrides.indexOf('.button:is(:disabled, [aria-disabled=');
   const buttonGroup = heroOverrides.indexOf(':is(.button-group, .toggle-button-group)');
   assert.ok(buttonBase >= 0 && buttonBase < buttonDisabled && buttonDisabled < buttonGroup);
+});
+
+test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {
+  const { code } = await compileCssModule('src/components/base/Modal/style.module.scss');
+  const modalSource = await readFile(join(root, 'src/components/base/Modal/index.tsx'), 'utf8');
+
+  assert.match(code, /\.backdrop\s*\{\s*z-index: var\(--app-z-index-modal\);/);
+  assert.match(
+    code,
+    /\.dialog:not\(\.modal__dialog--full\):not\(\.alert-dialog__dialog--full\)\s*\{\s*border-radius: var\(--app-radius-modal\) !important;\s*overflow: clip;/
+  );
+  assert.match(modalSource, /className=\{clsx\(styles\.backdrop, props\.className\)\}/);
+  assert.match(modalSource, /className=\{clsx\(styles\.dialog, className\)\}/);
 });
 
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {
