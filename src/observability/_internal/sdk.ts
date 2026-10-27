@@ -6,6 +6,7 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 
+import { buildInfo } from '@/config/buildInfo';
 import { publicAppConfig } from '@/config/runtimeConfig';
 
 const SERVICE_NAME = 'wisepen-web';
@@ -55,7 +56,7 @@ export const startObservabilitySdk = ({
   const telemetryUrlPattern = buildTelemetryUrlPattern(exportBaseUrl);
   const sdk = startBrowserSdk({
     serviceName: SERVICE_NAME,
-    serviceVersion: __APP_VERSION__,
+    serviceVersion: buildInfo.version,
     resourceAttributes,
     logs: {
       exportConfig: { url: `${exportBaseUrl}/v1/logs` },

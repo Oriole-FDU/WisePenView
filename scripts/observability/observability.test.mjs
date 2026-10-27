@@ -46,6 +46,24 @@ const errorEvent = (fingerprint, now = 0) => ({
   },
 });
 
+test('错误详情与请求契约文案使用构建身份和统一错误码', async (context) => {
+  installBrowser(context);
+  const telemetry = await loadObservability(context);
+  const detail = telemetry.buildErrorDetail(new Error('detail'), '/chat', 'WPE-TEST');
+  for (const value of Object.values(telemetry.buildInfo)) assert(detail.includes(String(value)));
+  for (const [language, expected] of [
+    ['zh-CN', '服务器响应格式异常，请稍后重试'],
+    ['en-US', 'The server returned an invalid response. Please try again later.'],
+  ]) {
+    await telemetry.i18n.changeLanguage(language);
+    assert.equal(
+      telemetry.parseErrorMessage(new telemetry.WisePenError({ source: 'http', code: 16 })),
+      expected
+    );
+  }
+  await telemetry.i18n.changeLanguage('zh-CN');
+});
+
 test('关闭时没有监听、定时器、存储标识或 OTel 事件，但 support ID 仍可用', async (context) => {
   const browser = installBrowser(context);
   const telemetry = await loadObservability(context, { enabled: false });

@@ -170,9 +170,11 @@ EOF
                 node scripts/jenkins/create-release-manifest.mjs \
                   --dist dist \
                   --out "${RELEASE_MANIFEST}" \
-                  --release "${IMAGE_TAG}" \
                   --build-mode "${BUILD_MODE}"
                 '''
+                script {
+                    env.IMAGE_TAG = sh(script: 'node -p "JSON.parse(require(\'fs\').readFileSync(\'dist/build-info.json\', \'utf8\')).release"', returnStdout: true).trim()
+                }
                 archiveArtifacts artifacts: 'dist/**,.wisepen-release-manifest.json', fingerprint: false
             }
         }

@@ -82,9 +82,14 @@ captureException
 
 ## 基础上下文
 
+每次构建生成一次身份，并同时注入 bundle、`dist/build-info.json`、OTel resource/logs、错误详情和
+Jenkins 发布清单。构建身份包含版本、完整 commit、build ID、mode、唯一 release 和 dirty；
+同一 commit 重建会得到不同 release。
+
 每次安装会建立以下上下文字段：
 
-- `service.version`、`deployment.environment.name`
+- `service.version`、`service.commit`、`service.release`、`service.build_id`
+- `service.build_mode`、`service.dirty`、`deployment.environment.name`
 - `client.id`、`client.type`
 - `browser.name`、`browser.version`、`os.type`
 - `session.id`、`page.instance.id`

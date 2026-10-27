@@ -1,5 +1,6 @@
 import { isRouteErrorResponse } from 'react-router-dom';
 
+import { buildInfo } from '@/config/buildInfo';
 import i18n from '@/i18n';
 import { isWisePenError } from '@/utils/error';
 
@@ -110,7 +111,16 @@ const appendError = (
 };
 
 export const buildErrorDetail = (error: unknown, pathname: string, errorId: string): string => {
-  const lines = [`${detailLabel('errorId')}: ${errorId}`, `${detailLabel('page')}: ${pathname}`];
+  const lines = [
+    `${detailLabel('errorId')}: ${errorId}`,
+    `${detailLabel('page')}: ${pathname}`,
+    `Version: ${buildInfo.version}`,
+    `Commit: ${buildInfo.commit}`,
+    `Release: ${buildInfo.release}`,
+    `Build ID: ${buildInfo.buildId}`,
+    `Build mode: ${buildInfo.mode}`,
+    `Dirty: ${buildInfo.dirty}`,
+  ];
 
   if (isRouteErrorResponse(error)) {
     lines.push(

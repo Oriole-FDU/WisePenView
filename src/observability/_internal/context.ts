@@ -1,5 +1,6 @@
 import type { Attributes } from '@opentelemetry/api';
 
+import { buildTelemetryAttributes } from '@/config/buildInfo';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { getDesktopOs, isDesktop } from '@/utils/platform';
 import { createUuid } from '@/utils/random/createUuid';
@@ -116,7 +117,7 @@ export const createInitialContextAttributes = (
   const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
   const browser = readBrowser(userAgent);
   return {
-    'service.version': __APP_VERSION__,
+    ...buildTelemetryAttributes,
     'deployment.environment.name': mode,
     'client.id': readClientId(createId, now),
     'client.type': isDesktop() ? 'electron' : 'web',

@@ -10,6 +10,14 @@ import { build } from 'esbuild';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const cacheRoot = path.join(root, 'node_modules/.cache');
 const activeContext = new AsyncLocalStorage();
+const fakeBuildInfo = {
+  version: 'test-version',
+  commit: 'a'.repeat(40),
+  buildId: 'test-build',
+  mode: 'development',
+  release: `test-version-${'a'.repeat(12)}-test-build`,
+  dirty: false,
+};
 
 context.setGlobalContextManager({
   active: () => activeContext.getStore() ?? ROOT_CONTEXT,
@@ -99,11 +107,13 @@ export const installBrowser = (testContext) => {
   });
   const document = {
     ...target('document'),
+    documentElement: {},
     visibilityState: 'visible',
   };
   const localStorage = memoryStorage();
   const sessionStorage = memoryStorage();
   const navigator = {
+    languages: ['zh-CN'],
     onLine: true,
     userAgent: 'Mozilla/5.0 Chrome/130.0.0.0 Safari/537.36',
   };
@@ -202,7 +212,10 @@ export const loadObservability = async (
           export { reportHttpFailure } from '@/apis/_internal/httpFailureTelemetry';
           export { applyXhrApiAttributes } from '@/apis/_internal/xhrApiTelemetry';
           export { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
-          export { WisePenError } from '@/utils/error/WisePenError';
+          export { parseErrorMessage, WisePenError } from '@/utils/error';
+          export { buildErrorDetail } from '@/components/business/ErrorPage/errorDetail';
+          export { buildInfo } from '@/config/buildInfo';
+          export { default as i18n } from '@/i18n';
           export { context as otelContext, trace } from '@opentelemetry/api';
           export { records, spans, tracer } from 'observability-test-memory';
         `,
@@ -213,7 +226,11 @@ export const loadObservability = async (
       packages: 'external',
       tsconfig: path.join(root, 'tsconfig.app.json'),
       write: false,
-      define: { __APP_VERSION__: '"test-version"' },
+      define: {
+        __APP_VERSION__: '"test-version"',
+        __APP_BUILD_INFO__: JSON.stringify(fakeBuildInfo),
+        'import.meta.env.DEV': 'true',
+      },
       alias: {
         '@': path.join(root, 'src'),
         '@domain-apis': path.join(root, 'src/domains/_registry/apis.impl.ts'),
