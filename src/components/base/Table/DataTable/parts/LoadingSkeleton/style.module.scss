@@ -10,7 +10,7 @@
 
 .skeletonBar {
   height: 13px;
-  border-radius: table.$table-inner-radius;
+  border-radius: var(--table-inner-radius);
   background: var(--surface-secondary);
 }
 
@@ -20,7 +20,7 @@
 }
 
 .skeletonBar[data-width='md'] {
-  width: var(--table-col-sm, 90px);
+  width: var(--table-col-sm);
   max-width: 80%;
 }
 

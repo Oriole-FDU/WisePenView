@@ -18,15 +18,15 @@
 .expandSkeleton,
 .iconSkeleton {
   flex-shrink: 0;
-  width: table.$table-row-entry-icon-size;
-  height: table.$table-row-entry-icon-size;
-  border-radius: table.$table-inner-radius;
+  width: var(--table-row-entry-icon-size);
+  height: var(--table-row-entry-icon-size);
+  border-radius: var(--table-inner-radius);
   background: var(--surface-secondary);
 }
 
 .barSkeleton {
   height: 13px;
-  border-radius: table.$table-inner-radius;
+  border-radius: var(--table-inner-radius);
   background: var(--surface-secondary);
 }
 

@@ -1,72 +1,8 @@
 @use '@/styles/mixins/scrollbar' as scrollbar;
 
-// Table 私有变量与 mixin；输出类保留在 table.module.scss / cells.module.scss。
-// 链路：CSS --table-* → 本文件 $table-* → Table variant / cell SCSS
-// 圆角：--table-shell/control-radius 统一外框与行内控件；--table-inner-radius 用于 Chip / 小按钮 / 骨架屏
-
-// 行高 / 帧宽
-
-$table-row-height: var(--table-row-height, 60px);
-$table-header-row-height: var(--table-header-row-height, var(--table-row-height));
-$table-frame-width: var(--table-frame-width, 900px);
-$row-content-height: $table-row-height;
-$row-height-editable: $table-row-height;
-$toolbar-height: var(--table-toolbar-height, 57px);
-$header-row-height: $table-header-row-height;
-$action-column-width: var(--table-action-column-width, 88px);
-$checkbox-column-width: var(--table-checkbox-column-width, 44px);
-$action-icon-size: var(--table-action-icon-size, 32px);
-$table-row-expand-icon-size: var(--table-row-expand-icon-size, 16px);
-$table-row-entry-icon-size: var(--table-row-entry-icon-size, 22px);
-$table-row-avatar-size: var(--table-row-avatar-size, 36px);
-$row-cell-padding-block: var(--table-cell-padding-block, 0);
-$row-cell-padding-inline: var(--table-cell-padding-inline, var(--space-sm));
-$header-cell-padding-inline: $row-cell-padding-inline;
-$table-gap: var(--table-gap, var(--space-sm));
-$table-gap-compact: var(--table-gap-compact, var(--space-xs));
-$table-gap-tight: var(--table-gap-tight, 4px);
-$table-gap-inline: var(--table-gap-inline, 6px);
-$table-control-min-height: var(--table-control-min-height, 32px);
-$table-footer-row-height: var(--table-footer-row-height, $table-control-min-height);
-$table-header-bar-min-height: var(--table-header-bar-min-height, 44px);
-$table-shell-padding-block: var(--table-shell-padding-block, var(--space-sm));
-$table-shell-padding-inline: var(--table-shell-padding-inline, 14px);
-$table-toolbar-padding-block: var(--table-toolbar-padding-block, 10px);
-$table-footer-padding-block: var(--table-footer-padding-block, var(--space-2xs));
-
-// 圆角：tokens.css --table-*-radius → 本文件 @table-*-radius → shell / 控件
-
-$table-shell-radius: var(--table-shell-radius, var(--app-radius-content));
-$table-control-radius: var(--table-control-radius, var(--app-radius-field));
-$table-inner-radius: var(--table-inner-radius, var(--app-radius-menu-item));
-
-// 排版 token
-
-$table-font-family: var(--app-font-family);
-$table-font-size-ui: var(--font-size-base);
-$table-font-size-body: var(--font-size-base);
-$table-font-size-header: $table-font-size-body;
-$table-font-size-meta: var(--font-size-sm);
-$table-font-size-sm: var(--font-size-sm);
-$table-font-size-xs: var(--font-size-xs);
-$table-font-size-2xs: var(--font-size-2xs);
-$table-font-weight-regular: var(--font-weight-regular);
-$table-font-weight-medium: var(--font-weight-medium);
-$table-line-height-ui: var(--line-height-base);
-$table-line-height-body: var(--line-height-base);
-$table-line-height-header: $table-line-height-body;
-$table-line-height-meta: var(--line-height-md);
-$table-line-height-md: var(--line-height-md);
-$table-line-height-xs: var(--line-height-xs);
-$table-line-height-2xs: var(--line-height-2xs);
-$table-header-bar-font-size: $table-font-size-ui;
-$table-header-bar-line-height: $table-line-height-ui;
-
-@mixin tableHeaderBarText() {
-  font-family: $table-font-family;
-  font-size: $table-header-bar-font-size;
-  line-height: $table-header-bar-line-height;
-}
+// Table 共享 mixin；输出类保留在 table.module.scss / cells.module.scss。
+// 样式直接消费 tokens.css 中的全局排版与 --table-* 运行时变量。
+// 圆角：--table-shell-radius 用于外框，--table-inner-radius 用于 Chip / 小按钮 / 骨架屏
 
 // headerBar：title/面包屑在左，toolbar 靠右；仅 toolbar 时用 spacer 顶到右侧
 
@@ -74,7 +10,7 @@ $table-header-bar-line-height: $table-line-height-ui;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $table-gap;
+  gap: var(--table-gap);
 }
 
 @mixin tableHeaderBarSpacer() {
@@ -85,7 +21,7 @@ $table-header-bar-line-height: $table-line-height-ui;
 @mixin tableHeaderToolbarBase() {
   display: flex;
   align-items: center;
-  gap: $table-gap-compact;
+  gap: var(--table-gap-compact);
   min-width: 0;
 }
 
@@ -93,26 +29,6 @@ $table-header-bar-line-height: $table-line-height-ui;
   @include tableHeaderToolbarBase();
   flex-shrink: 0;
   justify-content: flex-end;
-}
-
-@mixin tableHeaderToolbarGrow() {
-  @include tableHeaderToolbarBase();
-  flex: 1;
-
-  > * {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-@mixin tableDetailPanelHeaderHeight() {
-  box-sizing: border-box;
-  flex-shrink: 0;
-  height: calc($table-header-bar-min-height + $table-gap-compact + $table-header-row-height);
-  min-height: calc($table-header-bar-min-height + $table-gap-compact + $table-header-row-height);
-}
-
-@mixin tableRootNoShadow() {
 }
 
 @mixin tableHeaderBlock() {
@@ -124,19 +40,19 @@ $table-header-bar-line-height: $table-line-height-ui;
   :global(.table__column) {
     position: relative;
     box-sizing: border-box;
-    height: $table-header-row-height;
-    min-height: $table-header-row-height;
-    max-height: $table-header-row-height;
+    height: var(--table-header-row-height);
+    min-height: var(--table-header-row-height);
+    max-height: var(--table-header-row-height);
     padding-block: 0;
-    padding-inline: $header-cell-padding-inline;
+    padding-inline: var(--table-cell-padding-inline);
     border-bottom: 0;
     background: var(--table-chrome-bg);
     color: var(--muted);
-    font-family: $table-font-family;
-    font-size: $table-font-size-header;
-    font-weight: $table-font-weight-medium;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
     letter-spacing: normal;
-    line-height: $table-line-height-header;
+    line-height: var(--line-height-base);
     text-transform: none;
     vertical-align: middle;
     white-space: nowrap;
@@ -144,14 +60,14 @@ $table-header-bar-line-height: $table-line-height-ui;
 
   :global(th.table__column:first-child),
   :global([role='row'] > [role='presentation']:first-of-type > .table__column) {
-    border-start-start-radius: $table-inner-radius;
-    border-end-start-radius: $table-inner-radius;
+    border-start-start-radius: var(--table-inner-radius);
+    border-end-start-radius: var(--table-inner-radius);
   }
 
   :global(th.table__column:last-child),
   :global([role='row'] > [role='presentation']:last-of-type > .table__column) {
-    border-start-end-radius: $table-inner-radius;
-    border-end-end-radius: $table-inner-radius;
+    border-start-end-radius: var(--table-inner-radius);
+    border-end-end-radius: var(--table-inner-radius);
   }
 
   :global(.table__column[data-allows-sorting='true']) {
@@ -168,7 +84,7 @@ $table-header-bar-line-height: $table-line-height-ui;
   :global(.table__sortable-column-header) {
     display: inline-flex;
     align-items: center;
-    gap: $table-gap-tight;
+    gap: var(--table-gap-tight);
     min-width: 0;
     color: inherit;
   }
@@ -196,9 +112,9 @@ $table-header-bar-line-height: $table-line-height-ui;
 }
 
 @mixin tableShellTypography() {
-  font-family: $table-font-family;
-  font-size: $table-font-size-ui;
-  line-height: $table-line-height-ui;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -208,7 +124,7 @@ $table-header-bar-line-height: $table-line-height-ui;
 }
 
 @mixin tableShellRadius() {
-  border-radius: $table-shell-radius;
+  border-radius: var(--table-shell-radius);
 }
 
 @mixin tableSubtleScrollbar() {
@@ -243,7 +159,7 @@ $table-header-bar-line-height: $table-line-height-ui;
   :global(.table__body) {
     display: block;
     width: 100%;
-    max-height: calc(100% - $table-header-row-height);
+    max-height: calc(100% - var(--table-header-row-height));
     overflow-x: hidden;
     overflow-y: auto;
     @include tableSubtleScrollbar();
@@ -260,8 +176,8 @@ $table-header-bar-line-height: $table-line-height-ui;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    min-height: calc(100% - $table-header-row-height);
-    height: calc(100% - $table-header-row-height);
+    min-height: calc(100% - var(--table-header-row-height));
+    height: calc(100% - var(--table-header-row-height));
     max-height: none;
   }
 
@@ -317,24 +233,24 @@ $table-header-bar-line-height: $table-line-height-ui;
 }
 
 @mixin defineTableSelectTrigger() {
-  min-height: $table-control-min-height;
-  font-family: $table-font-family;
-  font-size: $table-font-size-ui;
-  line-height: $table-line-height-ui;
+  min-height: var(--table-control-min-height);
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   white-space: nowrap;
 }
 
 @mixin defineTableSelectValue() {
-  font-family: $table-font-family;
-  font-size: $table-font-size-ui;
-  line-height: $table-line-height-ui;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   white-space: nowrap;
 }
 
 @mixin toolbarSelectHost() {
   > :global(.select) {
     flex-shrink: 0;
-    min-width: var(--table-select-min-width, 120px);
+    min-width: var(--table-select-min-width);
     width: auto;
 
     :global(.select__trigger) {
@@ -375,8 +291,8 @@ $table-header-bar-line-height: $table-line-height-ui;
 }
 
 @mixin tableSkeletonCellMixin() {
-  height: $table-row-height;
-  min-height: $table-row-height;
-  max-height: $table-row-height;
+  height: var(--table-row-height);
+  min-height: var(--table-row-height);
+  max-height: var(--table-row-height);
   vertical-align: middle;
 }

@@ -97,13 +97,11 @@
   --row-height-comfortable: var(--table-row-height);
   --row-height-compact: var(--table-row-height);
 
-  /* Table 布局 / 列宽（Less @table-* 供 table.module.less 引用） */
+  /* Table 布局 / 列宽；组件样式直接消费 --table-* 变量。 */
   /* 表头比正文行更紧凑，避免列名行过高占位。 */
   --table-header-row-height: 40px;
   --table-footer-row-height: 30px;
   --table-footer-padding-block: 4px;
-  --table-frame-width: 900px;
-  --table-toolbar-height: 57px;
   --table-cell-padding-inline: var(--space-sm);
   --table-cell-padding-block: 0;
   --table-shell-padding-block: var(--space-sm);

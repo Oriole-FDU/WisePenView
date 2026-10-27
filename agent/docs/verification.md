@@ -26,7 +26,7 @@ PR CI 固定执行 commitlint、格式检查、lint、文件长度规则、edito
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
 
-全量 Less → SCSS 遷移另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對遷移前後的有序編譯 CSS、完整 CSS Modules 匯出鍵與 composition。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、Input field 狀態、AppBreadcrumb 匯出與通用字體 token、非 Table 基礎元件及 `_shadcn` 的 SCSS 編譯邊界、scrollbar 宣告不拆分父規則，以及試點元件樣式與 SCSS 守衛。Table 契約另涵蓋私有 partial 無輸出、兩種表格各精確生成 1–16 欄規則、共用類別匯出與 composition、Group 行高規則順序，以及 Table／F33 不跨元件預處理器引用私有樣式。建置與靜態比對不能代替已授權的視覺／互動驗收。
+全量 Less → SCSS 遷移另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對遷移前後的有序編譯 CSS、完整 CSS Modules 匯出鍵與 composition。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、Input field 狀態、AppBreadcrumb 匯出與通用字體 token、非 Table 基礎元件及 `_shadcn` 的 SCSS 編譯邊界、scrollbar 宣告不拆分父規則，以及試點元件樣式與 SCSS 守衛。Table 契約另涵蓋私有 partial 無輸出、直接消費全局排版與 `--table-*` token、兩種表格各精確生成 1–16 欄規則、共用類別匯出與 composition、Group 行高規則順序，以及 Table／F33 不跨元件預處理器引用私有樣式。建置與靜態比對不能代替已授權的視覺／互動驗收。
 
 Drive／Group／Resource 業務元件另檢查域內無 Less、所有 CSS Module 可編譯、scrollbar 與後續宣告維持同一父規則，以及 640／768／960px 斷點對應的窄版佈局。
 

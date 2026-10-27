@@ -189,7 +189,7 @@ test('scrollbar mixin 後的宣告不拆成重複父規則', async () => {
   }
 });
 
-test('Table partial 不輸出 CSS，固定欄寬與 token fallback 可展開', () => {
+test('Table partial 不輸出 CSS，固定欄寬與直接 CSS token 可展開', () => {
   const module = '@/components/base/Table/shared/styles/table';
   assert.equal(compileScss(`@use '${module}' as table;`), '');
 
@@ -197,20 +197,14 @@ test('Table partial 不輸出 CSS，固定欄寬與 token fallback 可展開', (
     @use '${module}' as table;
     .fixed { @include table.tableColFixedWidth(--table-col-sm); }
     .shell { @include table.tableShellRadius(); }
-    .footer { min-height: table.$table-footer-row-height; }
+    .footer { min-height: var(--table-footer-row-height); }
   `);
   assert.match(
     css,
     /\.fixed\s*\{\s*width: var\(--table-col-sm\);\s*min-width: var\(--table-col-sm\);\s*max-width: var\(--table-col-sm\);\s*\}/
   );
-  assert.match(
-    css,
-    /\.shell\s*\{\s*border-radius: var\(--table-shell-radius, var\(--app-radius-content\)\);/
-  );
-  assert.match(
-    css,
-    /\.footer\s*\{\s*min-height: var\(--table-footer-row-height, var\(--table-control-min-height, 32px\)\);/
-  );
+  assert.match(css, /\.shell\s*\{\s*border-radius: var\(--table-shell-radius\);/);
+  assert.match(css, /\.footer\s*\{\s*min-height: var\(--table-footer-row-height\);/);
 });
 
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {
@@ -223,6 +217,47 @@ test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async (
   assert.match(code, /\.toolbar button:not\(\.button\)\s*\{\s*color: var\(--muted\);\s*\}/);
   assert.match(code, /\.toolbarDisabled button\s*\{\s*color: var\(--text-disabled\);\s*\}/);
   assert.equal(Object.hasOwn(modules, 'button'), false);
+});
+
+test('FolderTable 直接消费全局排版与 Table CSS token', async () => {
+  const { code, modules } = await compileCssModule(
+    'src/components/base/Table/FolderTable/style.module.scss'
+  );
+
+  assert.deepEqual(Object.keys(modules).sort(), [
+    'actionCell',
+    'actionColumnHeader',
+    'bodyCell',
+    'bodyOverlay',
+    'bodyRow',
+    'breadcrumb',
+    'cellSurface',
+    'checkboxCell',
+    'checkboxCellInner',
+    'checkboxColumn',
+    'checkboxColumnInner',
+    'emptyStateOverlay',
+    'headerBar',
+    'headerBarSpacer',
+    'inlineLoadMoreButton',
+    'inlineLoadMoreRow',
+    'loadMoreCell',
+    'loadMoreTableRow',
+    'mutedCell',
+    'nameCell',
+    'nameColumnHeader',
+    'scrollContainer',
+    'selectedRow',
+    'shell',
+    'tableContent',
+    'tableRoot',
+    'toolbar',
+    'virtualSpacerCell',
+    'virtualSpacerRow',
+  ]);
+  assert.equal(code.match(/font-family: var\(--app-font-family\);/g)?.length, 5);
+  assert.equal(code.match(/font-size: var\(--font-size-base\);/g)?.length, 5);
+  assert.doesNotMatch(code, /var\(--table-[\w-]+,\s*/);
 });
 
 test('DataTable 與 FolderTable 各依序產生精確 16 組等寬欄規則', async () => {
@@ -279,10 +314,7 @@ test('Table 共用類別與 cellStyles 保留使用中的匯出和 composition',
   ]);
   assert.equal(table.modules.pageSizeSelect, 'pageSizeSelect toolbarSelect');
   assert.match(table.code, /\.colCheckbox\s*\{\s*width: var\(--table-checkbox-column-width\);/);
-  assert.match(
-    table.code,
-    /\.colEq\s*\{\s*width: calc\(100% \/ var\(--table-eq-column-count, 1\)\);/
-  );
+  assert.match(table.code, /\.colEq\s*\{\s*width: calc\(100% \/ var\(--table-eq-column-count\)\);/);
 
   const cells = await compileCssModule('src/components/base/Table/shared/styles/cells.module.scss');
   assert.deepEqual(Object.keys(cells.modules).sort(), [
@@ -328,6 +360,11 @@ test('Table 與 F33 樣式可編譯，不跨元件預處理器引用 Table 私�
     tableFiles.filter((file) => file.endsWith('.less')),
     []
   );
+  for (const file of tableFiles.filter((file) => file.endsWith('.scss'))) {
+    const source = await readFile(join(tableRoot, file), 'utf8');
+    assert.doesNotMatch(source, /\$table-/, file);
+    assert.doesNotMatch(source, /var\(--table-[\w-]+,\s*/, file);
+  }
   const modules = tableFiles
     .filter((file) => file.endsWith('.module.scss'))
     .map((file) => join('src/components/base/Table', file));

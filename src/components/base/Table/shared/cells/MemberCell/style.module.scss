@@ -1,21 +1,19 @@
-@use '../../styles/table' as table;
-
 .memberCell {
   display: flex;
   align-items: center;
-  gap: table.$table-gap;
-  height: table.$row-content-height;
-  max-height: table.$row-content-height;
+  gap: var(--table-gap);
+  height: var(--table-row-height);
+  max-height: var(--table-row-height);
   min-width: 0;
   overflow: hidden;
 }
 
 .avatar {
   flex-shrink: 0;
-  width: table.$table-row-avatar-size;
-  height: table.$table-row-avatar-size;
-  min-height: table.$table-row-avatar-size;
-  max-height: table.$table-row-avatar-size;
+  width: var(--table-row-avatar-size);
+  height: var(--table-row-avatar-size);
+  min-height: var(--table-row-avatar-size);
+  max-height: var(--table-row-avatar-size);
 }
 
 .meta {
@@ -29,10 +27,10 @@
 .name {
   overflow: hidden;
   color: var(--surface-foreground);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-body;
-  font-weight: table.$table-font-weight-medium;
-  line-height: table.$table-line-height-body;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -40,9 +38,9 @@
 .subline {
   overflow: hidden;
   color: var(--muted);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-xs;
-  line-height: table.$table-line-height-xs;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

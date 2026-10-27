@@ -12,7 +12,7 @@
 
 .headerBar {
   @include table.tableHeaderBarLayout();
-  padding: table.$table-shell-padding-block table.$table-shell-padding-inline 0;
+  padding: var(--table-shell-padding-block) var(--table-shell-padding-inline) 0;
 }
 
 .headerBarSpacer {
@@ -23,24 +23,24 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  min-height: table.$table-line-height-body;
+  min-height: var(--line-height-base);
   color: var(--foreground);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-body;
-  font-weight: table.$table-font-weight-medium;
-  line-height: table.$table-line-height-body;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
 }
 
 .toolbar {
   @include table.tableHeaderToolbarEnd();
 
   :global(button) {
-    min-height: table.$table-control-min-height;
-    padding-inline: table.$table-gap-compact;
-    font-family: table.$table-font-family;
-    font-size: table.$table-font-size-body;
-    font-weight: table.$table-font-weight-medium;
-    line-height: table.$table-line-height-body;
+    min-height: var(--table-control-min-height);
+    padding-inline: var(--table-gap-compact);
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-base);
   }
 
   :global(button:not(.button)) {
@@ -64,7 +64,6 @@
 .tableRoot {
   width: 100%;
   background: var(--surface);
-  @include table.tableRootNoShadow();
   @include table.tableRootStretch();
 
   :global(.table__scroll-container) {
@@ -80,19 +79,19 @@
 
   :global(.table__cell) {
     box-sizing: border-box;
-    height: table.$table-row-height;
-    min-height: table.$table-row-height;
-    max-height: table.$table-row-height;
-    padding: table.$row-cell-padding-block table.$row-cell-padding-inline;
+    height: var(--table-row-height);
+    min-height: var(--table-row-height);
+    max-height: var(--table-row-height);
+    padding: var(--table-cell-padding-block) var(--table-cell-padding-inline);
     overflow: hidden;
     border-bottom: 1px solid var(--table-inner-border);
     border-inline: 0;
     background: var(--surface);
     color: var(--foreground);
-    font-family: table.$table-font-family;
-    font-size: table.$table-font-size-body;
-    font-weight: table.$table-font-weight-regular;
-    line-height: table.$table-line-height-body;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-base);
     vertical-align: middle;
   }
 

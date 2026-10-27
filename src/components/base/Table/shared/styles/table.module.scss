@@ -2,7 +2,7 @@
 
 .colFill {
   width: 48%;
-  min-width: var(--table-col-fill-min-width, 180px);
+  min-width: var(--table-col-fill-min-width);
 }
 
 .colSm {
@@ -22,7 +22,7 @@
 }
 
 .colEq {
-  width: calc(100% / var(--table-eq-column-count, 1));
+  width: calc(100% / var(--table-eq-column-count));
   min-width: 0;
 }
 
@@ -48,7 +48,7 @@
 
 .toolbarSelect {
   flex-shrink: 0;
-  min-width: var(--table-select-min-width, 120px);
+  min-width: var(--table-select-min-width);
   width: auto;
 
   :global(.select__trigger) {
@@ -92,7 +92,7 @@
     width: 100%;
     max-width: 100%;
     flex-wrap: nowrap;
-    gap: table.$table-gap-compact;
+    gap: var(--table-gap-compact);
   }
 
   :global(.select__value) {
@@ -110,6 +110,6 @@
 
 .pageSizeSelect {
   composes: toolbarSelect;
-  min-width: var(--table-page-size-select-width, 110px);
-  width: var(--table-page-size-select-width, 110px);
+  min-width: var(--table-page-size-select-width);
+  width: var(--table-page-size-select-width);
 }

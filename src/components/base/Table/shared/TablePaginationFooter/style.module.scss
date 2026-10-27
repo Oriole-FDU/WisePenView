@@ -1,7 +1,5 @@
-@use '../styles/table' as table;
-
 .footer {
-  padding: table.$table-footer-padding-block table.$table-shell-padding-inline;
+  padding: var(--table-footer-padding-block) var(--table-shell-padding-inline);
   border-top: 1px solid var(--table-inner-border);
   background: var(--table-chrome-bg);
 }
@@ -10,17 +8,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: table.$table-gap;
-  min-height: table.$table-footer-row-height;
+  gap: var(--table-gap);
+  min-height: var(--table-footer-row-height);
 }
 
 .summary {
   flex-shrink: 0;
   color: var(--muted);
-  font-family: table.$table-font-family;
-  font-size: table.$table-font-size-xs;
-  font-weight: table.$table-font-weight-regular;
-  line-height: table.$table-line-height-xs;
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xs);
   white-space: nowrap;
 }
 
@@ -40,8 +38,8 @@
   width: auto;
 
   :global(button) {
-    min-width: table.$table-control-min-height;
-    min-height: table.$table-control-min-height;
+    min-width: var(--table-control-min-height);
+    min-height: var(--table-control-min-height);
   }
 }
 
@@ -49,15 +47,15 @@
   flex-shrink: 0;
 
   :global(.select__trigger) {
-    min-height: table.$table-control-min-height;
-    font-family: table.$table-font-family;
-    font-size: table.$table-font-size-xs;
+    min-height: var(--table-control-min-height);
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
     white-space: nowrap;
   }
 
   :global(.select__value) {
-    font-family: table.$table-font-family;
-    font-size: table.$table-font-size-xs;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
     white-space: nowrap;
   }
 }
