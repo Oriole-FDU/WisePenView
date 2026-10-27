@@ -1,4 +1,4 @@
-import { Dropdown, Label, Separator, Tooltip } from '@heroui/react';
+import { Dropdown, Label, Separator } from '@heroui/react';
 import { useMount } from 'ahooks';
 import { clsx } from 'clsx';
 import {
@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
+import { Tooltip } from '@/components/base/Tooltip';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 import { useAuthService, useUserService } from '@/domains';

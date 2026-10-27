@@ -1,8 +1,9 @@
-import { ToggleButton, Tooltip } from '@heroui/react';
+import { ToggleButton } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import { AppButton, type AppButtonProps } from '@/components/base/Button';
+import { Tooltip } from '@/components/base/Tooltip';
 
 import styles from '../style.module.scss';
 import { stopToolbarMouseDown } from '../utils';

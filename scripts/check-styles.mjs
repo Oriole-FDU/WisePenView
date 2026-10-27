@@ -307,6 +307,7 @@ test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
   assert.doesNotMatch(heroOverrides, /--app-radius-popover-(?:item|control)\s*:/);
   assert.doesNotMatch(heroOverrides, /--app-popover-item-inset\s*:/);
   assert.doesNotMatch(heroOverrides, /\.modal__backdrop/);
+  assert.doesNotMatch(heroOverrides, /\.tooltip\s*\{/);
   assert.doesNotMatch(heroOverrides, /\.table-root/);
 
   for (const selector of [
@@ -334,6 +335,15 @@ test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {
   );
   assert.match(modalSource, /className=\{clsx\(styles\.backdrop, props\.className\)\}/);
   assert.match(modalSource, /className=\{clsx\(styles\.dialog, className\)\}/);
+});
+
+test('Tooltip 基础封装持有气泡圆角与层级', async () => {
+  const { code } = await compileCssModule('src/components/base/Tooltip/style.module.scss');
+  const tooltipSource = await readFile(join(root, 'src/components/base/Tooltip/index.tsx'), 'utf8');
+
+  assert.match(code, /\.content\s*\{\s*border-radius: var\(--app-radius-tooltip\);/);
+  assert.match(code, /\.content\s*\{[^}]*z-index: var\(--app-z-index-tooltip\);/);
+  assert.match(tooltipSource, /className=\{clsx\(styles\.content, className\)\}/);
 });
 
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {

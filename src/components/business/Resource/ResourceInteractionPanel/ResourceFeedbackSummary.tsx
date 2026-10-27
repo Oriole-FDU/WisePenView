@@ -1,8 +1,9 @@
-import { ToggleButton, Tooltip } from '@heroui/react';
+import { ToggleButton } from '@heroui/react';
 import { Eye, ThumbsUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Tooltip } from '@/components/base/Tooltip';
 import { formatReadCount } from '@/utils/format/formatNumber';
 
 import styles from './style.module.scss';

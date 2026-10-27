@@ -1,4 +1,3 @@
-import { Tooltip } from '@heroui/react';
 import { clsx } from 'clsx';
 import { Heart, MessageCircle, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { Tooltip } from '@/components/base/Tooltip';
 import type { ResourceComment } from '@/domains/Interact';
 import {
   formatRelativeTimestamp,
