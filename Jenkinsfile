@@ -179,6 +179,17 @@ EOF
             }
         }
 
+        stage('8.5 归档私有调试附件 (Archive Debug Artifacts)') {
+            steps {
+                sh '''
+                set -eu
+                test -s ".wisepen-debug/${IMAGE_TAG}/manifest.json"
+                tar -czf .wisepen-debug-artifacts.tar.gz -C .wisepen-debug "${IMAGE_TAG}"
+                '''
+                archiveArtifacts artifacts: '.wisepen-debug-artifacts.tar.gz', fingerprint: true
+            }
+        }
+
         stage('9A. 构建前端容器镜像 (Docker Build)') {
             when {
                 expression { return params.DEPLOY_AFTER_BUILD && params.DEPLOY_TARGET == 'container' }

@@ -111,6 +111,12 @@ test('同 commit 两次构建身份不同；bundle、公开文件、事件、详
   }
   assert.equal(identities[0].commit, identities[1].commit);
   assert.notEqual(identities[0].release, identities[1].release);
+  for (const identity of identities) {
+    const manifest = JSON.parse(
+      await readFile(path.join(root, '.wisepen-debug', identity.release, 'manifest.json'), 'utf8')
+    );
+    assert.deepEqual(manifest.build, identity);
+  }
 });
 
 test('真实 ErrorEvent 接线仅使用有效坐标备援，保留 stack，缺位置明确不可还原', async (context) => {

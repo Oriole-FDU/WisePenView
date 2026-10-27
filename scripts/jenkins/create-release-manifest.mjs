@@ -1,5 +1,7 @@
-import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
+import { collectPublicFiles } from './public-artifacts.mjs';
 
 // Jenkins 通过命令行参数把构建目录、清单输出位置和发布版本传给本脚本
 function parseArgs(argv) {
@@ -13,26 +15,6 @@ function parseArgs(argv) {
     args.set(key.slice(2), value);
   }
   return args;
-}
-
-// 递归收集 dist 下的普通文件，并统一转换成 POSIX 风格路径
-async function collectFiles(rootDir, currentDir = rootDir) {
-  const entries = await readdir(currentDir, { withFileTypes: true });
-  const files = [];
-
-  for (const entry of entries) {
-    const fullPath = path.join(currentDir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...(await collectFiles(rootDir, fullPath)));
-      continue;
-    }
-    if (!entry.isFile()) continue;
-
-    const relativePath = path.relative(rootDir, fullPath).split(path.sep).join('/');
-    files.push(relativePath);
-  }
-
-  return files;
 }
 
 // manifest 是后续 OSS 发布和清理的唯一文件清单来源
@@ -51,7 +33,7 @@ if (!distStat.isDirectory()) {
 }
 
 // 排序可以保证同一份产物反复生成时清单内容稳定，方便审阅、归档和排查发布差异
-const files = (await collectFiles(distDir)).sort();
+const files = await collectPublicFiles(distDir);
 
 // index.html 是静态站点的入口。没有入口文件时，即使其它 chunk 上传成功，
 // 访问根路径仍然无法启动应用，因此这里拒绝继续发布

@@ -123,7 +123,7 @@ API 错误日志不复制服务端文案；运行时诊断文本会清理 URL �
 遥测出口异常只累计丢弃数，不抛回业务，也不递归记录错误。
 
 摘要进入 SDK 队列不代表立即送达服务端；页面被强制终止、网络中断等情况下可能丢失尾部数据。
-当前未增加持久化离线队列、成功率分母、性能指标、业务操作 trace 和 source map 还原。
+当前未增加持久化离线队列、成功率分母、性能指标或业务操作 trace。
 
 ## 日志后台使用
 
@@ -137,10 +137,34 @@ Jenkins 容器标签也读取该 release；`build-info.json` 使用 no-cache，�
 HTTP 仍以构建身份、端点、request ID 和 trace 定位，不额外捕获业务调用 stack。
 运行时保留有效 stack；缺少 stack 坐标时，只有 ErrorEvent 提供文件名及正整数行列，才携带
 `code.file.path/line.number/column.number` 备援。`error.location_status` 为 `stack`、`event` 或
-`unavailable`；最后一种表示没有可用位置，不能承诺源码行列。本增量不生成 source map。
+`unavailable`；最后一种表示没有可用位置，不能承诺源码行列。
 
 构建身份是公开诊断信息，不含凭据、业务正文或本机路径。dirty 表示构建时 Git 工作区状态，
 不代表运行时修改；不能仅凭 commit 相同选用另一次重建的附件。
+
+### 私有 source map 与离线还原
+
+构建生成 hidden map，并在构建结束时移到 dist 同级的 `.wisepen-debug/<release>/`，不生成
+公开 sourceMappingURL。该目录保存 JS 副本、map 和含 SHA-256 的 manifest；不同 release 的
+历史附件不会被新构建删除。附件含源码，仅可供授权维护者使用，不能上传公开 OSS 或进入容器。
+发布清单生成、OSS 发布前检查及 Docker 构建均拒绝公开 map；OSS 同时核对实际文件列表。
+Jenkins 独立归档当前 release 的私有压缩包，不把它加入公开发布清单；管理员必须配置归档
+访问权限、加密及保留政策，覆盖所有仍在运行或可回退的版本，不能依赖默认公开归档权限。
+
+维护者先以事件的完整 release 找到对应附件，解压后明确指定附件目录及生成位置（行列均从 1 开始）：
+
+```sh
+node scripts/symbolicate-error.mjs \
+  --artifacts .wisepen-debug/<release> \
+  --release <release> \
+  --frame assets/example.js:1:120
+```
+
+CLI 不访问网络、不查 latest，也不从 commit 猜版本。release 错配、缺文件、JS/map 哈希不符、
+路径或符号链接越界、非法/越界位置及无映射时以非零退出并说明无法还原。成功输出原始文件和
+行列；没有有效 stack 或 ErrorEvent 坐标时不要运行还原或承诺行号。附件缺失时只能使用版本、
+端点、request ID 与 trace 排查。Jenkins/OSS 的真实部署、附件 ACL 和保留策略尚未验收，
+正式验收之前保持 OTel 未启用。
 
 按环境、版本确定发布范围，再用 `user.id`、`session.id`、`page.instance.id` 缩小会话。
 先看 `frontend.request_failure` 的 `error.kind`、`api.endpoint`、状态码和业务码，

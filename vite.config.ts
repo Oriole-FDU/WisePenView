@@ -7,6 +7,7 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 
 import packageJson from './package.json' with { type: 'json' };
+import { privateSourceMaps } from './scripts/privateSourceMaps';
 import { createPublicAppConfig } from './src/config/publicConfig';
 
 export default defineConfig(({ mode }) => {
@@ -34,6 +35,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tailwindcss(),
+      privateSourceMaps(buildInfo),
       {
         name: 'wisepen-build-identity',
         apply: 'build',
@@ -65,6 +67,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      sourcemap: 'hidden',
       // CI 不需要 gzip 体积报告，跳过逐 chunk 压缩统计以缩短构建时间。
       reportCompressedSize: !process.env.CI,
       // PDF、BlockNote 和代码高亮均已按路由/语言按需加载，允许其运行时 chunk 保持较大体积。

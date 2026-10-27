@@ -12,6 +12,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.wisepen-debug/
+.wisepen-debug-artifacts.tar.gz
 storybook-static
 .electron
 release
