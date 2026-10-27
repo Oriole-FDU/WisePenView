@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { EmptyState, ResultState, Spin } from '@/components/base/Feedback';
 import PageHeader from '@/components/base/PageHeader';
 import { useMessageService } from '@/domains';
@@ -260,8 +260,7 @@ function NotificationsPage() {
                   className={clsx(styles.messageItem, isSelected && styles.messageItemSelected)}
                 >
                   <div className={styles.messageSummary}>
-                    <button
-                      type="button"
+                    <AppPressable
                       className={styles.messageOpenButton}
                       aria-expanded={isSelected}
                       onClick={() => void handleToggleMessage(message)}
@@ -280,7 +279,7 @@ function NotificationsPage() {
                       {!isSelected && preview ? (
                         <span className={styles.messagePreview}>{preview}</span>
                       ) : null}
-                    </button>
+                    </AppPressable>
 
                     <div className={styles.messageAside}>
                       <time
@@ -290,8 +289,7 @@ function NotificationsPage() {
                       >
                         {relativeTime}
                       </time>
-                      <button
-                        type="button"
+                      <AppPressable
                         className={styles.toggleDetail}
                         aria-expanded={isSelected}
                         aria-label={isSelected ? t('page.hideMessage') : t('page.showMessage')}
@@ -302,7 +300,7 @@ function NotificationsPage() {
                         ) : (
                           <ChevronDown size={16} aria-hidden />
                         )}
-                      </button>
+                      </AppPressable>
                     </div>
                   </div>
 

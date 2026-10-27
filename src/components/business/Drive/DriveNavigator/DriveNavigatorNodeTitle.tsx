@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
@@ -47,8 +48,7 @@ function DriveNavigatorNodeTitle({ node, displayName, onLoadMore }: DriveNavigat
 
   if (node.type === 'loading') {
     return (
-      <button
-        type="button"
+      <AppPressable
         className={styles.loadMoreNode}
         onClick={(event) => {
           event.stopPropagation();
@@ -56,7 +56,7 @@ function DriveNavigatorNodeTitle({ node, displayName, onLoadMore }: DriveNavigat
         }}
       >
         {label}
-      </button>
+      </AppPressable>
     );
   }
 

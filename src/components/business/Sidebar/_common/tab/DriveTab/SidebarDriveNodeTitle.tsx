@@ -13,6 +13,7 @@ import type { ReactNode } from 'react';
 import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import type {
@@ -110,8 +111,7 @@ function SidebarDriveNodeTitle({
 
   if (node.type === 'loading') {
     return (
-      <button
-        type="button"
+      <AppPressable
         className={styles.loadMoreNode}
         onClick={(event) => {
           stopTreeAction(event);
@@ -119,7 +119,7 @@ function SidebarDriveNodeTitle({
         }}
       >
         {label}
-      </button>
+      </AppPressable>
     );
   }
 

@@ -2,6 +2,8 @@ import { CornerDownLeft } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { ArrowRenderProps } from 'react-joyride';
 
+import { AppPressable } from '@/components/base/Button';
+
 import type { GuideTooltipProps } from './index.type';
 import styles from './style.module.scss';
 
@@ -85,12 +87,11 @@ function GuideTooltip({
       {step.title ? <h2 className={styles.title}>{step.title}</h2> : null}
       <div className={styles.content}>{step.content}</div>
       <div className={styles.footer}>
-        {showSkip ? <button type="button" className={styles.skip} {...skipProps} /> : <span />}
+        {showSkip ? <AppPressable className={styles.skip} {...skipProps} /> : <span />}
         <div className={styles.nav}>
-          {showBack ? <button type="button" className={styles.back} {...backProps} /> : null}
+          {showBack ? <AppPressable className={styles.back} {...backProps} /> : null}
           {showPrimary ? (
-            <button
-              type="button"
+            <AppPressable
               className={styles.primary}
               aria-keyshortcuts={isLastStep ? undefined : 'Enter'}
               {...primaryButtonProps}
@@ -99,7 +100,7 @@ function GuideTooltip({
               {isLastStep ? null : (
                 <CornerDownLeft className={styles.enterIcon} size={14} aria-hidden="true" />
               )}
-            </button>
+            </AppPressable>
           ) : null}
         </div>
       </div>

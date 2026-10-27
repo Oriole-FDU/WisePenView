@@ -2,6 +2,8 @@ import { clsx } from 'clsx';
 import { type KeyboardEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
+
 import type { RatingProps } from './index.type';
 import styles from './style.module.scss';
 
@@ -61,12 +63,11 @@ function Rating({
         const isPressed = pressedValue === itemValue;
 
         return (
-          <button
+          <AppPressable
             key={itemValue}
             ref={(element) => {
               buttonRefs.current[itemValue - 1] = element;
             }}
-            type="button"
             className={clsx(
               styles.item,
               isActive && styles.itemActive,
@@ -86,7 +87,7 @@ function Rating({
             <svg className={styles.star} viewBox="0 0 24 24" aria-hidden>
               <path d="M12 2.25c.39 0 .74.22.92.57l2.65 5.28 5.85.84c.38.06.7.32.82.68.12.37.02.77-.25 1.04l-4.24 4.1 1 5.79c.06.38-.09.76-.4.99-.31.22-.72.25-1.06.07L12 18.88l-5.29 2.73c-.34.18-.75.15-1.06-.07-.31-.23-.46-.61-.4-.99l1-5.79-4.24-4.1a1.03 1.03 0 0 1-.25-1.04c.12-.36.44-.62.82-.68l5.85-.84 2.65-5.28c.18-.35.53-.57.92-.57Z" />
             </svg>
-          </button>
+          </AppPressable>
         );
       })}
     </div>

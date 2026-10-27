@@ -3,6 +3,7 @@ import { BookOpen, FolderOpen, type LucideIcon, MessageSquare } from 'lucide-rea
 import { type ComponentPropsWithRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import { GuideAnchor, registerGuideActionHandlers } from '@/components/base/Guide';
 import { Tabs } from '@/components/base/Tabs';
 import { Tooltip } from '@/components/base/Tooltip';
@@ -130,10 +131,10 @@ function AppSidebarTabs() {
             </div>
           </Tabs.ListContainer>
 
-          <button type="button" className={styles.anonymousPanel} onClick={appAuth.requireLogin}>
+          <AppPressable className={styles.anonymousPanel} onClick={appAuth.requireLogin}>
             <div className={styles.anonymousTitle}>{t('anonymous.sidebarTitle')}</div>
             <div className={styles.anonymousHint}>{t('anonymous.sidebarHint')}</div>
-          </button>
+          </AppPressable>
         </Tabs>
       </div>
     );

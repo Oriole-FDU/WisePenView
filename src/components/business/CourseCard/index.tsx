@@ -1,8 +1,9 @@
 import { Card } from '@heroui/react';
-import type { KeyboardEvent, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import UserCapsule from '@/components/base/Avatar/UserCapsule';
+import { AppPressable } from '@/components/base/Button';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import type { CourseSummary } from '@/domains/Course';
 
@@ -29,13 +30,6 @@ function CourseCard({ course, onClick }: CourseCardProps) {
     onClick(course);
   };
 
-  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleCardClick();
-    }
-  };
-
   const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     if (event.currentTarget.src !== PLACEHOLDER_IMAGE) {
       event.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -43,13 +37,12 @@ function CourseCard({ course, onClick }: CourseCardProps) {
   };
 
   return (
-    <Card
-      className={styles.card}
-      role="button"
-      tabIndex={0}
-      onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
-    >
+    <Card className={styles.card}>
+      <AppPressable
+        className={styles.cardAction}
+        aria-label={course.name}
+        onClick={handleCardClick}
+      />
       <div className={styles.cover}>
         <img
           src={course.coverUrl || PLACEHOLDER_IMAGE}

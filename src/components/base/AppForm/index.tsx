@@ -3,6 +3,8 @@ import { clsx } from 'clsx';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { AppPressable } from '@/components/base/Button';
+
 import styles from './style.module.scss';
 
 interface AppFormSectionProps {
@@ -324,29 +326,27 @@ function AppFormAnchorNav({
             <div key={groupKey} className={clsx(styles.anchorGroup, groupClassName)}>
               {entry.title ? <h2>{entry.title}</h2> : null}
               {entry.items.map((item) => (
-                <button
+                <AppPressable
                   key={item.id}
-                  type="button"
                   className={activeId === item.id ? styles.active : undefined}
                   aria-current={activeId === item.id ? 'location' : undefined}
                   onClick={() => handleNavigate(item.id)}
                 >
                   {item.label}
-                </button>
+                </AppPressable>
               ))}
             </div>
           );
         }
         return (
-          <button
+          <AppPressable
             key={entry.id}
-            type="button"
             className={activeId === entry.id ? styles.active : undefined}
             aria-current={activeId === entry.id ? 'location' : undefined}
             onClick={() => handleNavigate(entry.id)}
           >
             {entry.label}
-          </button>
+          </AppPressable>
         );
       })}
     </nav>

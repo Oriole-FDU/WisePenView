@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
+
 import type { DataTableTabsProps } from './index.type';
 import styles from './style.module.scss';
 
@@ -58,17 +60,16 @@ function DataTableTabs<T extends string>({
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
         return (
-          <button
+          <AppPressable
             key={tab.key}
             ref={setTabRef(tab.key)}
-            type="button"
             role="tab"
             aria-selected={isActive}
             className={isActive ? styles.tabActive : styles.tabItem}
             onClick={() => onChange(tab.key)}
           >
             {tab.label}
-          </button>
+          </AppPressable>
         );
       })}
     </div>

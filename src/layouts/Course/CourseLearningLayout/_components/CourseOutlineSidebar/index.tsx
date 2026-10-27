@@ -3,7 +3,7 @@ import type { Key, KeyboardEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
 import { FormField, Input } from '@/components/base/Input';
@@ -76,8 +76,7 @@ function CourseOutlineResourcePageTitle({
 }: CourseOutlineResourcePageTitleProps) {
   const { t } = useTranslation('course');
   return (
-    <button
-      type="button"
+    <AppPressable
       className={styles.outlineLoadMore}
       disabled={state.loading}
       onClick={(event) => {
@@ -94,7 +93,7 @@ function CourseOutlineResourcePageTitle({
               total: state.total,
             })}
       </span>
-    </button>
+    </AppPressable>
   );
 }
 
@@ -270,15 +269,14 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
           />
         </div>
       ) : (
-        <button
-          type="button"
+        <AppPressable
           className={styles.outlineCreateTreeRow}
           onClick={() => setIsCreatingChapter(true)}
         >
           <span className={styles.outlineCreateIndent} aria-hidden />
           <Plus size={16} className={styles.outlineCreateIcon} aria-hidden />
           <span className={styles.outlineCreateLabel}>{t('editor.outline.createChapter')}</span>
-        </button>
+        </AppPressable>
       )}
     </div>
   ) : null;

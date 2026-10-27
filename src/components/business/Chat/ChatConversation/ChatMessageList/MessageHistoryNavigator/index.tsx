@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMessageScroller, useMessageScrollerVisibility } from '@/components/_shadcn';
+import { AppPressable } from '@/components/base/Button';
 import type { WisePenUIMessage } from '@/domains/Chat';
 
 import styles from './style.module.scss';
@@ -191,9 +192,8 @@ function MessageHistoryNavigator({
       }}
     >
       <div className={styles.historyNavigatorRailTriggerWrap}>
-        <button
+        <AppPressable
           ref={railRef}
-          type="button"
           className={styles.historyNavigatorRailTrigger}
           aria-label={t('message.history.aria')}
           aria-expanded={open}
@@ -211,7 +211,7 @@ function MessageHistoryNavigator({
               active={anchor.id === activeAnchorId}
             />
           ))}
-        </button>
+        </AppPressable>
       </div>
 
       <div
@@ -227,9 +227,8 @@ function MessageHistoryNavigator({
         {anchors.map((anchor) => {
           const isActive = anchor.id === activeAnchorId;
           return (
-            <button
+            <AppPressable
               key={anchor.id}
-              type="button"
               role="option"
               data-anchor-id={anchor.id}
               aria-selected={isActive}
@@ -240,7 +239,7 @@ function MessageHistoryNavigator({
             >
               <span className={styles.historyNavigatorRailPreview}>{anchor.preview}</span>
               <HistoryBar active={isActive} />
-            </button>
+            </AppPressable>
           );
         })}
       </div>

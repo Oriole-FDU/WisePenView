@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { EmojiPicker } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
@@ -139,15 +139,14 @@ function CommentItem({
         {item.imageUrls.length > 0 ? (
           <div className={styles.commentImages}>
             {item.imageUrls.map((url, index) => (
-              <button
+              <AppPressable
                 key={`${url}-${index}`}
-                type="button"
                 className={styles.commentImageButton}
                 aria-label={t('inlineComment.previewImageAria')}
                 onClick={() => onPreviewImage(url)}
               >
                 <img src={url} alt={t('inlineComment.imageAlt')} loading="lazy" />
-              </button>
+              </AppPressable>
             ))}
           </div>
         ) : null}
@@ -168,9 +167,8 @@ function CommentItem({
                   : [{ key: group.emojiId, label: String(group.count) }];
 
               return reactionItems.map((reactionItem) => (
-                <button
+                <AppPressable
                   key={reactionItem.key}
-                  type="button"
                   disabled={changingReaction}
                   className={`${styles.reaction} ${
                     group.reactedByCurrentUser ? styles.reactionSelected : ''
@@ -195,7 +193,7 @@ function CommentItem({
                     <span aria-hidden>{group.emojiId}</span>
                     <Chip.Label className={styles.reactionUser}>{reactionItem.label}</Chip.Label>
                   </Chip>
-                </button>
+                </AppPressable>
               ));
             })}
           </div>
@@ -323,14 +321,13 @@ function CommentThread({
   return (
     <article className={`${styles.thread} ${active ? styles.threadActive : ''}`}>
       <div className={styles.threadHeader}>
-        <button
-          type="button"
+        <AppPressable
           className={styles.quoteButton}
           aria-pressed={active}
           onClick={() => onThreadSelect(thread.threadId)}
         >
           <span className={styles.quoteText}>{thread.quoteText}</span>
-        </button>
+        </AppPressable>
         {active ? (
           <AppIconButton
             icon={<Check size={16} aria-hidden />}
