@@ -3,6 +3,8 @@ import path from 'node:path';
 
 import OSS from 'ali-oss';
 
+import { assertPublicPath, collectPublicFiles } from './public-artifacts.mjs';
+
 // 发布元数据和业务静态文件放在同一个 bucket 根目录下
 // 元数据目录必须受到保护：它不属于 dist，也不能被旧文件清理逻辑删除
 const DEPLOY_META_PREFIX = '.wisepen-deploy';
@@ -29,6 +31,7 @@ function normalizeEndpoint(endpoint) {
 // dist 中的路径最终会直接成为 OSS 根目录对象名
 // 禁止绝对路径、父目录穿越和 Windows 反斜杠，避免清理或上传越界对象
 function assertObjectName(name) {
+  assertPublicPath(name);
   if (!name || name.startsWith('/') || name.includes('..') || name.includes('\\')) {
     throw new Error(`非法 OSS 对象路径：${name}`);
   }
@@ -157,6 +160,10 @@ if (!Array.isArray(nextManifest.files) || !nextManifest.files.includes('index.ht
 
 for (const file of nextManifest.files) {
   assertObjectName(file);
+}
+const publicFiles = await collectPublicFiles(distDir);
+if (JSON.stringify([...new Set(nextManifest.files)].sort()) !== JSON.stringify(publicFiles)) {
+  throw new Error('发布清单与实际公开产物不一致，拒绝部署。');
 }
 
 // oldCurrentManifest 存在时使用脚本维护的历史集合

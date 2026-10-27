@@ -79,4 +79,8 @@ test('同 commit 的不同构建共享 bundle、公开文件与发布清单身�
   assert.equal(identities[0].commit, identities[1].commit);
   assert.notEqual(identities[0].release, identities[1].release);
   assert.notEqual(identities[0].buildId, identities[1].buildId);
+  assert.deepEqual(
+    new Set(await readdir(path.join(root, '.wisepen-debug'))),
+    new Set(identities.map(({ release }) => release))
+  );
 });

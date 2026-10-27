@@ -102,6 +102,25 @@ client ID 在本地保存 90 天；session ID 在标签页存储中保存，并�
 路由只记录模板路径与允许的资源参数。页面可见性、联网状态和导航只作为错误现场，不生成独立
 导航 span。
 
+## 私有 source map
+
+- Vite 生成 hidden map，构建插件把 map 和对应 JS 副本移到 `dist` 同级的
+  `.wisepen-debug/<release>/`。
+- 每个附件包含构建身份、文件列表、JS SHA-256 和 map SHA-256；不同 release 的历史附件不会
+  被新构建删除。
+- 公开 dist、发布清单、OSS 和 Docker 均拒绝 map、sourceMappingURL 和符号链接。
+- 维护者按事件的完整 release 指定附件和压缩位置进行离线还原：
+
+```sh
+node scripts/symbolicate-error.mjs \
+  --artifacts .wisepen-debug/<release> \
+  --release <release> \
+  --frame assets/example.js:1:120
+```
+
+附件包含源码。Jenkins 默认归档权限不能视为私有；正式启用前必须完成 ACL、加密、保留和回退
+版本覆盖验收。
+
 ## 现有 HTTP 行为
 
 HTTP 5xx 仍由 Axios 最终失败拦截器触发：
