@@ -16,7 +16,7 @@ export interface ErrorReportContext {
   origin: ErrorReportOrigin;
   pathname?: string;
   componentStack?: string;
-  operation?: 'chat-send' | 'chat-stream' | 'chat-recover' | 'chat-resume';
+  operation?: 'chat-send' | 'chat-stream' | 'chat-recover' | 'chat-resume' | 'drawio-save';
 }
 
 export interface ErrorReport {

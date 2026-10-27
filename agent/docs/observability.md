@@ -91,6 +91,12 @@ AI SDK onError、恢复 catch 和重连 catch。原 callback、提示、异常�
 AbortError、CanceledError 及既有网络取消码不生成 handled 错误事件；已记录的 API 原异常交回
 既有请求出口识别，不根据状态或业务文案再做一套分类。新接入不附加对话、请求/响应正文或附件内容。
 
+Draw.io 的 `drawio-save` 接在共用保存 session 的明确失败与原有 10 秒导出 timeout，同时在
+通过 origin/source 校验的 iframe error 入口记录错误，因此没有 pending 保存时也可见。
+有 pending 时两个入口传同一错误对象，沿用既有去重；dispose、无权限和未 ready 前置拒绝不报错。
+工具栏导出和 iframe save 仍共用原 session、Promise、revision/dirty、重试、提示及离开协议；
+不附加 XML、plain text 或 iframe 原 message，API 原异常由既有请求出口识别。
+
 ## Trace 与日志关联
 
 每次经过 `request.ts` 的逻辑请求创建一个 `api.request METHOD /path` span，覆盖地址等待、
