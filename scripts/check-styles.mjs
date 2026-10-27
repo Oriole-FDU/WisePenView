@@ -292,28 +292,44 @@ test('字体 token 只保留应用来源与 Tailwind 桥接', async () => {
   }
 });
 
-test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
+test('HeroUI 组件覆盖由基础封装持有', async () => {
   const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
-  const heroOverrides = await readFile(
-    join(root, 'src/styles/global/heroui-overrides.css'),
-    'utf8'
+  const { code } = await compileCssModule('src/components/base/Popover/shared/styles.module.scss');
+  const [popoverSource, dropdownSource, listBoxSource] = await Promise.all(
+    [
+      'src/components/base/Popover/index.tsx',
+      'src/components/base/Dropdown/index.tsx',
+      'src/components/base/ListBox/index.tsx',
+    ].map((file) => readFile(join(root, file), 'utf8'))
   );
 
-  assert.match(globalIndex, /@import '\.\/heroui-overrides\.css' layer\(components\);/);
-  assert.doesNotMatch(globalIndex, /@layer components\s*\{/);
-  assert.doesNotMatch(globalIndex, /\.tabs:not\(\.tabs--secondary\)/);
-  assert.doesNotMatch(globalIndex, /\.modal__backdrop/);
-  assert.doesNotMatch(heroOverrides, /--app-radius-popover-(?:item|control)\s*:/);
-  assert.doesNotMatch(heroOverrides, /--app-popover-item-inset\s*:/);
-  assert.doesNotMatch(heroOverrides, /\.button:is\(:disabled/);
-  assert.doesNotMatch(heroOverrides, /\.button-group/);
-  assert.doesNotMatch(heroOverrides, /\.modal__backdrop/);
-  assert.doesNotMatch(heroOverrides, /\.tooltip\s*\{/);
-  assert.doesNotMatch(heroOverrides, /\.table-root/);
-  assert.doesNotMatch(heroOverrides, /\.tabs/);
+  assert.doesNotMatch(globalIndex, /heroui-overrides/);
+  await assert.rejects(readFile(join(root, 'src/styles/global/heroui-overrides.css'), 'utf8'), {
+    code: 'ENOENT',
+  });
+  assert.match(code, /\.surface\s*\{\s*z-index: var\(--app-z-index-popover\);/);
+  assert.match(code, /border-radius: var\(--app-radius-popover\)/);
+  assert.match(code, /\.choiceSurface\s*\{/);
+  assert.match(code, /\.dialog\s*\{\s*padding: 0;/);
+  assert.match(code, /\.item\s*\{\s*border-radius: var\(--app-radius-menu-item\);/);
+  assert.match(code, /\.surface \.item\s*\{\s*border-radius: var\(--app-radius-popover-item\);/);
+  assert.match(code, /\.surface \.item:not\(\.menu-item--danger\)\[data-selected=/);
+  assert.match(code, /\.surface \.menu-item--danger:hover/);
+  assert.match(popoverSource, /overlayStyles\.surface/);
+  assert.match(popoverSource, /overlayStyles\.dialog/);
+  assert.match(dropdownSource, /overlayStyles\.choiceSurface/);
+  assert.match(dropdownSource, /overlayStyles\.item/);
+  assert.match(listBoxSource, /overlayStyles\.item/);
 
-  for (const selector of [/\.popover__dialog/]) {
-    assert.match(heroOverrides, selector);
+  for (const file of await readdir(join(root, 'src'), { recursive: true })) {
+    if (!/\.(ts|tsx)$/.test(file)) continue;
+    if (/^components\/base\/(?:Dropdown|ListBox|Popover|Tabs)\//.test(file)) continue;
+    const source = await readFile(join(root, 'src', file), 'utf8');
+    assert.doesNotMatch(
+      source,
+      /import \{[^}]*\b(?:Dropdown|ListBox|ListBoxItem|Popover|Tabs)\b[^}]*\} from '@heroui\/react'/,
+      file
+    );
   }
 });
 

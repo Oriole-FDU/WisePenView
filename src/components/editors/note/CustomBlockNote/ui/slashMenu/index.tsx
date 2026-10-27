@@ -1,9 +1,9 @@
 import { filterSuggestionItems } from '@blocknote/core/extensions';
 import type { DefaultReactSuggestionItem, SuggestionMenuProps } from '@blocknote/react';
 import { SuggestionMenuController, useBlockNoteEditor } from '@blocknote/react';
-import { ListBox, ListBoxItem } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { useNoteEditorReadOnlyContext } from '@/components/editors/note/CustomBlockNote/engines/editor/_context';
 
 import { blockNoteSchema, type CustomBlockNoteEditor } from '../../registry/noteEditorComposition';

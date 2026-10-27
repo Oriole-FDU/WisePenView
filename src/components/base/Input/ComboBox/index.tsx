@@ -2,6 +2,8 @@ import { ComboBox as HeroComboBox, Label } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
+import overlayStyles from '@/components/base/Popover/shared/styles.module.scss';
+
 import Input from '../Input';
 import type {
   ComboBoxInputGroupProps,
@@ -48,7 +50,12 @@ function ComboBoxTrigger({ className, ...props }: ComboBoxTriggerProps) {
 }
 
 function ComboBoxPopover({ className, ...props }: ComboBoxPopoverProps) {
-  return <HeroComboBox.Popover className={clsx(styles.comboBoxPopover, className)} {...props} />;
+  return (
+    <HeroComboBox.Popover
+      className={clsx(overlayStyles.surface, overlayStyles.choiceSurface, className)}
+      {...props}
+    />
+  );
 }
 
 const ComboBox = Object.assign(ComboBoxRoot, {

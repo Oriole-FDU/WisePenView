@@ -1,9 +1,10 @@
-import { Chip, ListBox } from '@heroui/react';
+import { Chip } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { useAdminService } from '@/domains';
 import type { AdminMessage } from '@/domains/Admin';

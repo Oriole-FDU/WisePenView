@@ -49,13 +49,14 @@ ComponentName/
 
 ## 四、Popover 约定
 
-- 操作菜单、单选和多选 Picker 使用 `@heroui/react` 的 `Dropdown`，复用其原生分组、标题、描述、选择指示器、危险态和子菜单能力。
+- 操作菜单、单选和多选 Picker 使用 `src/components/base/Dropdown` 与 `src/components/base/ListBox`，复用 HeroUI 的分组、标题、描述、选择指示器、危险态和子菜单能力。
+- 浮层外壳、菜单项、选中态与层级集中在 `src/components/base/Popover/shared/styles.module.scss`，由基础封装通过 `className` 注入 Portal 内容；业务代码不得直接导入 HeroUI 的 `Popover`、`Dropdown`、`ListBox` 或 `Tabs`。
 - 业务 Popover 使用 `src/components/base/AppPopover`，不要直接组合底层 `Popover.Content` / `Popover.Dialog`。
 - 标准标题通过 `AppPopover.Content` 的 `title` 传入；无标题轻浮层省略 `title`，两者共用同一内容间距。
 - 危险提示型 Popover 使用 `variant="danger"`；菜单中的删除、退出等危险操作使用 `Dropdown.Item variant="danger"`。
 - 宽度、最大高度等业务布局通过 `className` 保留在调用方，不重复设置边框、圆角、背景或阴影。
 - 内容已有完整内边距或为第三方面板时使用 `bodyPadding="none"`，避免双层间距。
-- 菜单标题和分组使用 `Header`、`Dropdown.Section`，分割线使用 `Separator`；不要为这些原生能力再创建业务 wrapper。
+- 菜单标题和分组使用 `Header`、`Dropdown.Section`，分割线使用 `Separator`；这些内容结构保持 HeroUI 原语，样式由基础封装统一承接。
 
 ## 五、布局与可读性
 

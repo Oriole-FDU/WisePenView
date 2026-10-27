@@ -1,4 +1,4 @@
-import { EmptyState, type Key, ListBox, useFilter } from '@heroui/react';
+import { EmptyState, type Key, useFilter } from '@heroui/react';
 import { Plus, Sparkles, Trash2, Wrench } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Autocomplete, SearchField } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 
 import styles from './style.module.scss';
 

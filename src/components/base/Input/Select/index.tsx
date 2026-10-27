@@ -2,6 +2,8 @@ import { Label, Select as HeroSelect } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
+import overlayStyles from '@/components/base/Popover/shared/styles.module.scss';
+
 import type {
   SelectIndicatorProps,
   SelectPopoverProps,
@@ -61,7 +63,12 @@ function SelectIndicator({ className, ...props }: SelectIndicatorProps) {
 }
 
 function SelectPopover({ className, ...props }: SelectPopoverProps) {
-  return <HeroSelect.Popover className={clsx(styles.selectPopover, className)} {...props} />;
+  return (
+    <HeroSelect.Popover
+      className={clsx(overlayStyles.surface, overlayStyles.choiceSurface, className)}
+      {...props}
+    />
+  );
 }
 
 const Select = Object.assign(SelectRoot, {

@@ -1,5 +1,5 @@
 import type { DefaultReactSuggestionItem } from '@blocknote/react';
-import { Dropdown, Header, Label, ListBoxItem, ListBoxSection } from '@heroui/react';
+import { Header, Label, ListBoxSection } from '@heroui/react';
 import { clsx } from 'clsx';
 import {
   Braces,
@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import { createElement } from 'react';
 
+import Dropdown from '@/components/base/Dropdown';
+import { ListBoxItem } from '@/components/base/ListBox';
 import i18n from '@/i18n';
 
 import { getSlashMenuItemKey } from './buildSlashMenuItems';

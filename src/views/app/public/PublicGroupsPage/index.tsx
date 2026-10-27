@@ -1,4 +1,3 @@
-import { ListBox } from '@heroui/react';
 import { Plus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +6,7 @@ import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-route
 import { AppButton } from '@/components/base/Button';
 import { Empty, Spin } from '@/components/base/Feedback';
 import { Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import PageHeader from '@/components/base/PageHeader';
 import { useGroupService } from '@/domains';
 import { GROUP_ROLE_FILTER_MAP, GROUP_TYPE } from '@/domains/Group';

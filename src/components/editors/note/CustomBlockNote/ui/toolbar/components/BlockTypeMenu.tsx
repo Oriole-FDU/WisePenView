@@ -1,8 +1,9 @@
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { Heading } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import Dropdown from '@/components/base/Dropdown';
 import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
 import {
   applyBlockTypeToBlocks,

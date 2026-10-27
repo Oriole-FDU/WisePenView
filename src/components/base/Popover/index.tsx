@@ -1,9 +1,11 @@
 import { Popover as HeroPopover } from '@heroui/react';
-import { useState } from 'react';
+import { clsx } from 'clsx';
+import { type ComponentProps, useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
 import type { PopoverRootProps } from './index.type';
+import overlayStyles from './shared/styles.module.scss';
 
 const DEFAULT_POPOVER_CONTENT_DELAY = 90;
 
@@ -39,11 +41,19 @@ function PopoverRoot({
   );
 }
 
+function PopoverContent({ className, ...props }: ComponentProps<typeof HeroPopover.Content>) {
+  return <HeroPopover.Content className={clsx(overlayStyles.surface, className)} {...props} />;
+}
+
+function PopoverDialog({ className, ...props }: ComponentProps<typeof HeroPopover.Dialog>) {
+  return <HeroPopover.Dialog className={clsx(overlayStyles.dialog, className)} {...props} />;
+}
+
 export const Popover = Object.assign(PopoverRoot, {
   Arrow: HeroPopover.Arrow,
-  Content: HeroPopover.Content,
+  Content: PopoverContent,
   DeferredContent,
-  Dialog: HeroPopover.Dialog,
+  Dialog: PopoverDialog,
   Heading: HeroPopover.Heading,
   Root: PopoverRoot,
   Trigger: HeroPopover.Trigger,

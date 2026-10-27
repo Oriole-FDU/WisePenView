@@ -1,10 +1,11 @@
-import { Description, Dropdown, Header, Label, Separator, Skeleton } from '@heroui/react';
+import { Description, Header, Label, Separator, Skeleton } from '@heroui/react';
 import { Settings, Sparkles, Wrench } from 'lucide-react';
 import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/Chat';

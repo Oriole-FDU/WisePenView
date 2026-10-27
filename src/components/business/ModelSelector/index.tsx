@@ -1,9 +1,10 @@
-import { Chip, Description, Dropdown, Header, Label } from '@heroui/react';
+import { Chip, Description, Header, Label } from '@heroui/react';
 import { ChevronDown, LoaderCircle } from 'lucide-react';
 import type { Key } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 import { GUIDE_TOOL_ID } from '@/constants/tour';

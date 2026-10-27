@@ -1,10 +1,10 @@
-import { ListBox } from '@heroui/react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Input, Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import {
   type CourseMeeting,
   type CoursePeriod,

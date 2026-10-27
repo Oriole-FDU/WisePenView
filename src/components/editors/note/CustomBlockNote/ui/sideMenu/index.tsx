@@ -7,7 +7,7 @@ import {
   useExtension,
   useExtensionState,
 } from '@blocknote/react';
-import { Dropdown, Label, Separator } from '@heroui/react';
+import { Label, Separator } from '@heroui/react';
 import { useEventListener } from 'ahooks';
 import { clsx } from 'clsx';
 import {
@@ -31,6 +31,7 @@ import { type DragEvent, type ReactNode, useEffect, useRef, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import { useNoteEditorReadOnlyContext } from '@/components/editors/note/CustomBlockNote/engines/editor/_context';
 import {
   exportNoteFullHtml,

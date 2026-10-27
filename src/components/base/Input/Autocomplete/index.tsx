@@ -2,6 +2,8 @@ import { Autocomplete as HeroAutocomplete, Label } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
+import overlayStyles from '@/components/base/Popover/shared/styles.module.scss';
+
 import type {
   AutocompleteClearButtonProps,
   AutocompleteFilterProps,
@@ -59,7 +61,10 @@ function AutocompleteClearButton({ className, ...props }: AutocompleteClearButto
 
 function AutocompletePopover({ className, ...props }: AutocompletePopoverProps) {
   return (
-    <HeroAutocomplete.Popover className={clsx(styles.autocompletePopover, className)} {...props} />
+    <HeroAutocomplete.Popover
+      className={clsx(overlayStyles.surface, overlayStyles.choiceSurface, className)}
+      {...props}
+    />
   );
 }
 

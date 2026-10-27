@@ -26,8 +26,3 @@
   box-shadow: 0 0 0 1px var(--app-field-ring-color);
   border-radius: var(--app-radius-field);
 }
-
-/* ComboBox trigger 使用字段圆角；展开后的选项面板外壳使用浮层圆角。 */
-.comboBoxPopover:global(.combo-box__popover) {
-  border-radius: var(--app-radius-popover);
-}

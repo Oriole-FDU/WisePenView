@@ -1,0 +1,98 @@
+.surface {
+  z-index: var(--app-z-index-popover);
+  overflow: clip;
+  border: 1px solid var(--border-light, var(--border));
+  border-radius: var(--app-radius-popover);
+  background: var(--app-popover-surface, var(--overlay));
+  box-shadow: var(--overlay-shadow, var(--card-shadow));
+}
+
+.choiceSurface {
+  /* 选择面板使用页面背景，避免与宿主浮层或表单表面叠加后失去层次。 */
+  --app-popover-surface: var(--background);
+
+  border-radius: var(--app-radius-popover) !important;
+  color: var(--muted);
+  font-family: var(--app-font-family);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.dialog {
+  padding: 0;
+}
+
+.item {
+  border-radius: var(--app-radius-menu-item);
+}
+
+.surface .item {
+  border-radius: var(--app-radius-popover-item);
+}
+
+.surface .item:not(:global(.menu-item--danger)) {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+}
+
+.surface [data-slot='label'] {
+  color: inherit;
+  font: inherit;
+}
+
+.surface [data-slot='description'] {
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xs);
+}
+
+@media (hover: hover) {
+  .surface .item:not(:global(.menu-item--danger)):is(:hover, [data-hovered='true']) {
+    background-color: var(--accent-soft);
+  }
+}
+
+.surface
+  .item:not(:global(.menu-item--danger)):is(:active, [data-pressed='true'], [data-focus='true']) {
+  background-color: var(--accent-soft-hover);
+}
+
+.surface .item:not(:global(.menu-item--danger))[data-selected='true'] {
+  color: var(--accent-text);
+  background-color: var(--accent-soft);
+}
+
+@media (hover: hover) {
+  .surface
+    .item:not(:global(.menu-item--danger))[data-selected='true']:is(:hover, [data-hovered='true']) {
+    background-color: var(--accent-soft-hover);
+  }
+}
+
+.surface :global(.menu-item--danger) {
+  color: var(--danger-text);
+}
+
+.surface :global(.menu-item--danger):hover,
+.surface :global(.menu-item--danger)[data-hovered],
+.surface :global(.menu-item--danger)[data-focus-visible],
+.surface :global(.menu-item--danger)[data-focus-visible='true'],
+.surface :global(.menu-item--danger)[data-pressed] {
+  color: var(--danger-text);
+  background: var(--danger-soft);
+}
+
+/* 选中标记统一放在行尾，并将 HeroUI 默认的行首预留同步移到行尾。 */
+.surface .item:has([data-slot$='item-indicator']) {
+  padding-inline-start: var(--space-xs);
+  padding-inline-end: calc(var(--space-sm) + var(--space-md));
+}
+
+.surface [data-slot$='item-indicator'] {
+  inset-inline-start: auto;
+  inset-inline-end: var(--space-xs);
+}

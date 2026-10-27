@@ -1,4 +1,4 @@
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import {
   Copy,
   Download,
@@ -20,6 +20,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
 import type { EditorResourcePresentation } from '@/components/editors/editor.type';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';

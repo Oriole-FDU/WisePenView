@@ -1,4 +1,4 @@
-import { Description, Dropdown, Header, Label, Separator, Skeleton } from '@heroui/react';
+import { Description, Header, Label, Separator, Skeleton } from '@heroui/react';
 import { useInfiniteScroll, useLatest } from 'ahooks';
 import { Bot, BotOff, ChevronDown, Folder } from 'lucide-react';
 import type { Key } from 'react';
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';

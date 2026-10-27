@@ -1,6 +1,8 @@
-import { EmptyState, ListBox, useFilter } from '@heroui/react';
+import { EmptyState, useFilter } from '@heroui/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+
+import ListBox from '@/components/base/ListBox';
 
 import styles from '../Input.stories.module.scss';
 import SearchField from '../SearchField';

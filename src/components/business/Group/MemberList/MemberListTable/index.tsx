@@ -1,4 +1,3 @@
-import { ListBox } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { TFunction } from 'i18next';
 import { Check, X } from 'lucide-react';
@@ -8,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
 import { FormField, Input, Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import QuotaBar from '@/components/base/QuotaBar';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { tableStyles } from '@/components/base/Table/shared/styles';

@@ -1,4 +1,4 @@
-import { Chip, Dropdown, Label, Skeleton } from '@heroui/react';
+import { Chip, Label, Skeleton } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import { ChevronDown, Trash2, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
 import { buildResourcePermissionActionKeySet } from '@/components/business/Drive/common/resourcePermissionPolicy';
 import UserSearchCombobox from '@/components/business/UserSearchCombobox';

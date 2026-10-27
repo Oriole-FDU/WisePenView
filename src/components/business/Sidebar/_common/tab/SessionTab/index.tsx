@@ -1,4 +1,4 @@
-import { ListBox, ListBoxItem, ListBoxSection } from '@heroui/react';
+import { ListBoxSection } from '@heroui/react';
 import { useInfiniteScroll, useMemoizedFn } from 'ahooks';
 import { clsx } from 'clsx';
 import { useEffect } from 'react';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
+import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';

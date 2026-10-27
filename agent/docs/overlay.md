@@ -21,7 +21,7 @@
 
 - Modal 和 Popover 共用同一档外壳圆角，但语义不同的内部控件不跟随外壳机械放大：按钮和字段取自身语义 token，浮层内选中项取 `--app-radius-popover-item`。外壳、内容 inset 和内部控件需要保持同心关系，不要在业务调用方重新覆盖圆角。
 - Select 的 trigger 是收起状态下用户看到的字段控件，展开后的面板是独立浮层外壳，面板内部选项按浮层内选中项处理。ComboBox、Autocomplete trigger 遵循相同拆分。
-- HeroUI 对 dialog 的默认圆角由 `src/styles/global/heroui-overrides.css` 统一覆盖，不要在组件或业务侧重新启用；`size="full"` 保持直角以便贴合窗口边缘，`size="cover"` 保留外壳圆角。
+- HeroUI 对 dialog 的默认圆角由 `src/components/base/Modal/style.module.scss` 覆盖，不要在组件或业务侧重新启用；`size="full"` 保持直角以便贴合窗口边缘，`size="cover"` 保留外壳圆角。
 
 ### 层级
 
@@ -29,7 +29,8 @@
 
 Overlay 组件按复用范围分开放：
 
-- `src/components/base/Modal`、`src/components/base/Popover`：底层原子层，统一 HeroUI 浮层的挂载时机与延迟渲染。
+- `src/components/base/Modal`、`src/components/base/Popover`、`src/components/base/Dropdown`、`src/components/base/ListBox`：底层原子层，统一 HeroUI 浮层的挂载时机、表面、菜单项与延迟渲染。
+- `src/components/base/Popover/shared/styles.module.scss`：Popover、Dropdown 与选择类组件共用的浮层表面、菜单项和选中态契约。
 - `src/components/base/DeferredContent`：Modal 与 Popover 共用的延迟挂载能力。
 - `src/components/base/AppModal`、`src/components/base/AppPopover`：通用 App 级外壳，只提供结构，不带确认、表单、展示等业务语义。
 - `src/components/business/AppAlertDialog`、`src/components/business/AppFormDialog`、`src/components/business/AppDisplayDialog`、`src/components/business/UnsavedChangesDialog`：带语义的业务弹窗。
@@ -43,14 +44,16 @@ base/Modal
 ├─ business/AppFormDialog
 └─ business/AppDisplayDialog
 
-base/Popover
-└─ base/AppPopover
+base/Popover ─ base/AppPopover
+base/Dropdown
+base/ListBox
 ```
 
 - `Modal` 是底层 Overlay 原子组件。
 - `AppModal`、`AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog` 都直接组合 `Modal`。
 - 四个 App 级组件之间不应互相继承，也不应让 `AppAlertDialog` / `AppFormDialog` / `AppDisplayDialog` 基于 `AppModal` 实现；`UnsavedChangesDialog` 只作为 `AppAlertDialog` 的语义预设存在。
-- `Popover` 是延迟挂载原子层，`AppPopover` 统一业务 Popover 的 Content、Dialog、header、无 header body 和 danger 视觉。
+- `Popover` 是延迟挂载原子层，统一浮层表面与 dialog 内边距；`AppPopover` 统一业务 Popover 的 Content、Dialog、header、无 header body 和 danger 视觉。
+- `Dropdown`、`ListBox` 在基础封装中消费共用浮层契约；业务代码不直接导入 HeroUI 对应组件。
 
 原因是 `AppModal` 现在只表示“复杂业务浮层的可定制起点”。如果其他语义组件基于它实现，`AppModal` 很容易重新变成承载 confirm、form、display、danger、banner 等语义的超级组件。
 
@@ -150,5 +153,5 @@ LaTeX 编辑浮层因依赖编辑器选区和手工测量位置，不迁移 Hero
 2. 轻量表单提交，使用 `AppFormDialog`。
 3. 只读或展示型内容，只需要关闭、复制、打开等轻动作，使用 `AppDisplayDialog`。
 4. 复杂业务流程、树选择、上传队列、多步骤配置，使用 `AppModal`，并显式提供 `actions` 或 `footer`。
-5. 操作菜单、单选和多选 Picker 使用 HeroUI `Dropdown`。
+5. 操作菜单、单选和多选 Picker 使用 `src/components/base/Dropdown` 与 `src/components/base/ListBox`。
 6. 完全特殊的容器结构或 command palette 体验，才直接使用底层 `Modal`。
