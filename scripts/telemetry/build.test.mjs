@@ -139,6 +139,24 @@ test('真实 ErrorEvent 接线仅使用有效坐标备援，保留 stack，缺�
   assert.equal(stacked['error.location_status'], 'stack');
   assert.equal(stacked['error.stack'], error.stack);
   assert.equal(stacked['code.file.path'], undefined);
+  for (const stack of [
+    'Error: input assets/main.js:1:2',
+    'Error: input\nuser text assets/main.js:1:2',
+    'Error: input\n    at runtime (https://app.example.test/assets/main.js:9007199254740992:2)',
+  ]) {
+    const fallback = emit({ ...location, error: Object.assign(new Error('input'), { stack }) });
+    assert.equal(fallback['error.location_status'], 'event');
+    assert.equal(fallback['code.line.number'], 2);
+    const unavailable = emit({ error: Object.assign(new Error('input'), { stack }) });
+    assert.equal(unavailable['error.location_status'], 'unavailable');
+  }
+  for (const stack of [
+    'Error: input\n    at https://app.example.test/assets/main.js:4:5',
+    'runtime@https://app.example.test/assets/main.js:4:5',
+  ]) {
+    const valid = emit({ ...location, error: Object.assign(new Error('input'), { stack }) });
+    assert.equal(valid['error.location_status'], 'stack');
+  }
   for (const invalid of [
     {},
     { ...location, lineno: 0 },

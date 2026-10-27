@@ -135,7 +135,8 @@ Vite 在一次配置求值中生成唯一构建身份：版本、完整 commit�
 Jenkins 容器标签也读取该 release；`build-info.json` 使用 no-cache，避免缓存旧身份。
 
 HTTP 仍以构建身份、端点、request ID 和 trace 定位，不额外捕获业务调用 stack。
-运行时保留有效 stack；缺少 stack 坐标时，只有 ErrorEvent 提供文件名及正整数行列，才携带
+运行时只识别 V8/Firefox 格式且行列为正安全整数的 stack 帧，不把消息中的文件位置当作帧；
+缺少有效 stack 坐标时，只有 ErrorEvent 提供文件名及正整数行列，才携带
 `code.file.path/line.number/column.number` 备援。`error.location_status` 为 `stack`、`event` 或
 `unavailable`；最后一种表示没有可用位置，不能承诺源码行列。本增量不生成 source map。
 
