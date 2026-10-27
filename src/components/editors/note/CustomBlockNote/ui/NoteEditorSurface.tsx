@@ -17,8 +17,9 @@ import { type CustomBlockNoteEditor, notePluginRegistry } from '../registry/note
 import type { NoteEditorRuntimeCoordinator } from '../registry/useNoteEditorRuntimeCoordinator';
 import { useNoteInteractionStore } from '../runtime/_context';
 import type { NoteEditorRuntimeProps } from '../runtime/runtime.type';
-import styles from '../style.module.scss';
+import editorStyles from '../style.module.scss';
 import FindBar from './findBar';
+import styles from './NoteEditorSurface.module.scss';
 import NoteSideMenu from './sideMenu';
 import NoteSlashMenu from './slashMenu';
 import NoteToolbar from './toolbar';
@@ -164,7 +165,7 @@ export function NoteEditorSurface({
   return (
     <GuideAnchor id={GUIDE_TOOL_ID.noteBody} layout="fill">
       <div
-        className={styles.editorShell}
+        className={editorStyles.editorShell}
         onKeyDownCapture={runtimeCoordinator.collaboration.onKeyDownCapture}
       >
         <AiDiffBulkActions

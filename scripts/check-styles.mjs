@@ -1375,7 +1375,41 @@ test('編輯器、版型、頁面與樣式入口不殘留 Less，所有 Module �
   }
 });
 
-test('Note 五個本地 checklist mixin 保留正文與全域拖拽預覽的輸出', async () => {
+test('CustomBlockNote 样式按编辑器所有权拆分', async () => {
+  const [main, checklist, content, drag, integration, surface, surfaceSource, checkbox] =
+    await Promise.all(
+      [
+        'style.module.scss',
+        'styles/_checklist.scss',
+        'styles/_content-typography.scss',
+        'styles/_drag-preview.scss',
+        'plugins/CodeBlockPlugin/styles/_integration.scss',
+        'ui/NoteEditorSurface.module.scss',
+        'ui/NoteEditorSurface.tsx',
+        '../../../base/Input/Checkbox/style.module.scss',
+      ].map((file) =>
+        readFile(join(root, 'src/components/editors/note/CustomBlockNote', file), 'utf8')
+      )
+    );
+
+  assert.match(main, /@use '\.\/styles\/editor-canvas' as editorCanvas;/);
+  assert.match(main, /@use '\.\/styles\/content-typography' as contentTypography;/);
+  assert.match(main, /@use '\.\/styles\/drag-preview' as dragPreview;/);
+  assert.doesNotMatch(main, /data-content-type|bn-drag-preview|aiDiffDisplayMode/);
+  assert.match(checklist, /Checkbox\/shared\/tokens/);
+  assert.match(checklist, /@include checkboxTokens\.tokens\(18px\);/);
+  assert.match(checkbox, /@use '\.\/shared\/tokens' as checkboxTokens;/);
+  assert.match(checkbox, /@include checkboxTokens\.tokens\(16px\);/);
+  assert.match(content, /@include checklist\.editorStyles\(\);/);
+  assert.match(drag, /@include checklist\.dragPreviewStyles\(\);/);
+  assert.match(drag, /@include codeBlock\.styles\('\.bn-drag-preview'\);/);
+  assert.match(integration, /@mixin styles\(\$root\)/);
+  assert.doesNotMatch(integration, /\.bn-(?:drag-preview|editor)/);
+  assert.match(surface, /\.aiDiffDisplayModeSwitch/);
+  assert.match(surfaceSource, /import styles from '\.\/NoteEditorSurface\.module\.scss';/);
+});
+
+test('BlockNote checklist 保留正文與全域拖拽預覽的輸出', async () => {
   const { code } = await compileCssModule(
     'src/components/editors/note/CustomBlockNote/style.module.scss'
   );

@@ -1,0 +1,17 @@
+.aiDiffDisplayModeSwitch {
+  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.aiDiffDisplayModeList {
+  width: auto;
+}
+
+.aiDiffDisplayModeTab {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 30px;
+  padding: 0 var(--space-sm);
+  white-space: nowrap;
+}

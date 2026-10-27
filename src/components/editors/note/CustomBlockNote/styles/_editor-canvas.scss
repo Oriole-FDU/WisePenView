@@ -1,0 +1,176 @@
+/**
+ * BlockNote 编辑器画布契约：主题变量、选区、协同光标、表格控件与侧边菜单定位。
+ */
+@mixin styles() {
+  /* 正文批注原文高亮 */
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark:not([data-orphan='true'])) {
+    background: var(--warning-soft);
+    border-radius: var(--app-radius-detail);
+  }
+
+  :global(
+    .bodyBlockNoteView .bn-editor .bn-thread-mark.bn-thread-mark-selected:not([data-orphan='true'])
+  ),
+  :global(.bodyBlockNoteView .bn-editor .bn-thread-mark .bn-thread-mark-selected) {
+    background: var(--warning-soft-hover);
+  }
+
+  /* BlockNote 默认会有自己的字体变量，这里统一到应用字体栈（仅作用正文编辑区） */
+  :global(.bn-container),
+  :global(.bn-editor),
+  :global(.bn-mantine),
+  :global(.bn-mantine-root) {
+    --bn-font-family: var(--app-font-family);
+    font-family: var(--app-font-family);
+  }
+
+  :global(.bn-container) {
+    --bn-colors-editor-text: var(--foreground);
+    --bn-colors-editor-background: transparent;
+    --bn-colors-menu-text: var(--overlay-foreground);
+    --bn-colors-menu-background: var(--overlay);
+    --bn-colors-tooltip-text: var(--overlay-foreground);
+    --bn-colors-tooltip-background: var(--overlay);
+    --bn-colors-hovered-text: var(--foreground);
+    --bn-colors-hovered-background: var(--accent-soft);
+    --bn-colors-selected-text: var(--foreground);
+    --bn-colors-selected-background: var(--accent-soft);
+    --bn-colors-disabled-text: var(--text-disabled);
+    --bn-colors-disabled-background: var(--default-soft);
+    --bn-colors-shadow: transparent;
+    --bn-colors-border: var(--border-light);
+    --bn-colors-side-menu: var(--muted);
+    --bn-shadow-medium: var(--overlay-shadow);
+    --bn-shadow-light: var(--surface-shadow);
+    --bn-border: 1px solid var(--border-light);
+    --bn-border-radius: var(--app-radius-menu-item);
+    --bn-ui-base-z-index: var(--app-z-index-editor-menu);
+    --prosemirror-highlight: var(--foreground);
+    --prosemirror-highlight-bg: var(--surface);
+
+    --mantine-primary-color-filled: var(--accent);
+    --mantine-primary-color-filled-hover: var(--accent-hover);
+    --mantine-primary-color-light: var(--accent-soft);
+    --mantine-primary-color-light-hover: var(--accent-soft-hover);
+    --mantine-primary-color-light-color: var(--accent);
+  }
+
+  /* 文本选区使用主题柔和色，不跟随浏览器默认蓝色。 */
+  :global(.bn-editor .ProseMirror::selection),
+  :global(.bn-editor .ProseMirror *::selection),
+  :global(.bn-editor .ProseMirror::-moz-selection),
+  :global(.bn-editor .ProseMirror *::-moz-selection) {
+    background-color: var(--selection);
+  }
+
+  :global(.bn-editor .wise-note-collaboration-cursor) {
+    position: relative;
+    word-break: normal;
+    pointer-events: none;
+  }
+
+  :global(.bn-editor .wise-note-collaboration-cursor__caret) {
+    position: absolute;
+    top: 1px;
+    bottom: -2px;
+    left: -1px;
+    width: 2px;
+  }
+
+  :global(.bn-editor .wise-note-collaboration-cursor__label) {
+    position: absolute;
+    top: -18px;
+    left: 0;
+    display: inline-block;
+    min-height: 18px;
+    padding: 1px var(--space-2xs) var(--space-3xs);
+    border-radius: var(--app-radius-detail);
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
+    font-style: normal;
+    font-weight: 600;
+    line-height: 15px;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  :global(.bn-block-content.ProseMirror-selectednode > *),
+  :global(.ProseMirror-selectednode > .bn-block-content > *) {
+    outline: none !important;
+  }
+
+  /* 移除 BlockNote 缩进引导线（选中文本时左侧出现的竖线） */
+  /* BlockNote 在嵌套块的 ::before 伪元素上画了 border-left 作为缩进引导线，
+     这里直接隐藏整个伪元素，彻底消除竖线 */
+  :global(.bn-editor .bn-block-outer::before) {
+    display: none !important;
+  }
+
+  :global(.ProseMirror .selectedCell::after) {
+    background: var(--accent-soft);
+  }
+
+  /* 行列选择与悬停高亮通过门户渲染，单元格内容需位于高亮层之上。 */
+  :global(.ProseMirror td > *),
+  :global(.ProseMirror th > *) {
+    position: relative;
+    z-index: calc(var(--app-z-index-editor-block-overlay) + 1);
+  }
+
+  :global(.ProseMirror .column-resize-handle) {
+    background-color: var(--accent);
+  }
+
+  :global(.bn-table-drop-cursor) {
+    background-color: var(--accent);
+  }
+
+  :global([data-show-selection]) {
+    background-color: var(--accent-soft);
+  }
+
+  /* 修改侧边栏把手居中对齐 */
+  :global(.bn-container .bn-side-menu) {
+    height: auto !important;
+    align-items: center;
+  }
+
+  :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='1']) {
+    min-height: calc(25px * 1.4 + 6px);
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='2']) {
+    min-height: calc(22px * 1.4 + 6px);
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='3']) {
+    min-height: calc(20px * 1.4 + 6px);
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='4']) {
+    min-height: calc(18px * 1.4 + 6px);
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='5']),
+  :global(.bn-container .bn-side-menu[data-block-type='heading'][data-level='6']) {
+    min-height: calc(16px * 1.4 + 6px);
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='paragraph']) {
+    min-height: calc(16px * 1.68 + 6px);
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='math']) {
+    min-height: 48px;
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='codeBlock']) {
+    min-height: 92px;
+  }
+  /* 其他块微调 */
+  :global(.bn-container .bn-side-menu[data-block-type='file']) {
+    min-height: 38px;
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='audio']) {
+    min-height: 60px;
+  }
+  :global(.bn-container .bn-side-menu[data-block-type='quote']) {
+    min-height: calc(20px * 1.4 + 6px);
+  }
+  :global(.bn-container .bn-side-menu) {
+    min-height: calc(16px * 1.4 + 6px);
+  }
+}
