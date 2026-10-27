@@ -287,3 +287,66 @@ export const loadDrawio = async (testContext) => {
   });
   return { ...telemetry, browser };
 };
+
+export const loadSkill = async (testContext) => {
+  const browser = installBrowser(testContext);
+  const telemetry = await loadObservability(testContext, {
+    entry: `
+      export { useSkillSaveController } from '@/components/editors/skill/controllers/useSkillSaveController';
+      export { hooks } from 'react';
+      export { state } from 'controlled-state';
+      export { notices } from '@heroui/react';
+    `,
+    stubs: {
+      react: reactStub,
+      'react/jsx-runtime': `
+        export const Fragment = Symbol('fragment');
+        export const jsx = (type, props) => typeof type === 'function' ? type(props) : ({ type, props });
+        export const jsxs = jsx;
+      `,
+      'react-i18next': `
+        export const useTranslation = () => ({ t: key => key });
+        export const initReactI18next = { type: '3rdParty', init() {} };
+      `,
+      'react-error-boundary': `
+        export const ErrorBoundary = () => null;
+      `,
+      'controlled-state': `
+        export const state = { service: null };
+      `,
+      '@/domains': `
+        import { state } from 'controlled-state';
+        export const useSkillService = () => state.service;
+      `,
+      '@/hooks/useApi': `
+        import { useState } from 'react';
+        export function useApi(service, options = {}) {
+          const [loading, setLoading] = useState(false);
+          return {
+            loading,
+            runAsync: async (...args) => {
+              setLoading(true);
+              try {
+                const data = await service(...args);
+                options.onSuccess?.(data, args);
+                return data;
+              } catch (error) {
+                options.onErrorEffect?.(error, args);
+                throw error;
+              } finally {
+                setLoading(false);
+              }
+            },
+          };
+        }
+      `,
+      '@heroui/react': `
+        export const notices = [];
+        export const toast = Object.fromEntries(
+          ['danger', 'warning', 'success'].map(type => [type, value => notices.push({ type, value })])
+        );
+      `,
+    },
+  });
+  return { ...telemetry, browser };
+};

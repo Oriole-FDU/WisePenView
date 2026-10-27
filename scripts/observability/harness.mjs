@@ -216,6 +216,7 @@ export const loadObservability = async (
           export { applyXhrApiAttributes } from '@/apis/_internal/xhrApiTelemetry';
           export { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
           export {
+            FRONTEND_CLIENT_ERROR,
             FRONTEND_NETWORK_ERROR,
             parseErrorMessage,
             WisePenError,

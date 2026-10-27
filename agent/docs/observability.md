@@ -72,6 +72,11 @@ Draw.io 使用 `drawio.save` 记录共用保存任务、10 秒导出超时和通
 错误。工具栏与 iframe 双入口传递同一错误时只形成一次 occurrence；dispose、无权限和未 ready
 的前置拒绝不上报，也不采集 XML 或 iframe 原始正文。
 
+Skill 使用 `skill.save` 读取批量上传结果，而不是只观察 Promise 是否 reject。API、OSS、缺票据、
+缺客户端结果和混合结果在真实结果边界进入统一出口；已由请求层记录的 API 原异常和重复结果对象
+不再次产生事件。用于维持 UI／Promise 的最终批次汇总错误不额外上报，也不采集文件名、路径、
+文件内容、签名 URL 或 OSS 原始响应。
+
 ## 异常管线
 
 ```text
