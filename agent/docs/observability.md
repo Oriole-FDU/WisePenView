@@ -44,6 +44,27 @@ observeUserLoad(() => userService.getUserInfo());
 不再输出 `error.origin`、`error.boundary` 或 `error.disposition`。`error.source` 只保留给
 `WisePenError` 的 `api/http/network/client` 来源。
 
+## 业务 handled 故障
+
+业务已处理但没有继续抛给框架边界的故障使用：
+
+```ts
+captureException(error, {
+  detector: 'application-handled',
+  operation: 'chat.send',
+});
+```
+
+`operation` 使用固定低基数名称，不包含资源 ID、会话 ID 或自由文本。Chat 首期接入：
+
+- `chat.send`：用户发送消息的业务 catch。
+- `chat.stream`：AI SDK `onError`。
+- `chat.recover`：恢复会话 catch。
+- `chat.resume`：重连 catch。
+
+主动取消不生成错误事件。业务原异常继续交给原 callback、提示和 Promise；可观测性不改变这些
+行为，也不附加对话、请求正文或附件内容。
+
 ## 异常管线
 
 ```text

@@ -5,7 +5,10 @@ export type ExceptionDetector =
   | 'route-fallback'
   | 'router-error'
   | 'window-error'
-  | 'window-unhandled-rejection';
+  | 'window-unhandled-rejection'
+  | 'application-handled';
+
+export type ExceptionOperation = 'chat.send' | 'chat.stream' | 'chat.recover' | 'chat.resume';
 
 export interface ExceptionLocation {
   filename: string;
@@ -15,6 +18,7 @@ export interface ExceptionLocation {
 
 export interface CaptureExceptionContext {
   detector: ExceptionDetector;
+  operation?: ExceptionOperation;
   componentStack?: string;
   location?: ExceptionLocation;
 }

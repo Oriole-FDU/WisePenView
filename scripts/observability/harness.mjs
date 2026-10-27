@@ -167,11 +167,11 @@ export const installBrowser = (testContext) => {
 
 export const loadObservability = async (
   testContext,
-  { enabled = true, mode = 'development' } = {}
+  { enabled = true, mode = 'development', entry = '', stubs = {} } = {}
 ) => {
   await mkdir(cacheRoot, { recursive: true });
   const directory = await mkdtemp(path.join(cacheRoot, 'observability-check-'));
-  const entry = path.join(directory, 'observability.mjs');
+  const moduleFile = path.join(directory, 'observability.mjs');
   const oTelSource = `
     import { createTestOtel } from ${JSON.stringify(import.meta.url)};
     const memory = createTestOtel();
@@ -212,12 +212,17 @@ export const loadObservability = async (
           export { reportHttpFailure } from '@/apis/_internal/httpFailureTelemetry';
           export { applyXhrApiAttributes } from '@/apis/_internal/xhrApiTelemetry';
           export { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
-          export { parseErrorMessage, WisePenError } from '@/utils/error';
+          export {
+            FRONTEND_NETWORK_ERROR,
+            parseErrorMessage,
+            WisePenError,
+          } from '@/utils/error';
           export { buildErrorDetail } from '@/components/business/ErrorPage/errorDetail';
           export { buildInfo } from '@/config/buildInfo';
           export { default as i18n } from '@/i18n';
           export { context as otelContext, trace } from '@opentelemetry/api';
           export { records, spans, tracer } from 'observability-test-memory';
+          ${entry}
         `,
       },
       bundle: true,
@@ -239,6 +244,14 @@ export const loadObservability = async (
         {
           name: 'observability-test-boundaries',
           setup(builder) {
+            builder.onResolve({ filter: /.*/ }, ({ path }) =>
+              Object.hasOwn(stubs, path) ? { path, namespace: 'controlled' } : undefined
+            );
+            builder.onLoad({ filter: /.*/, namespace: 'controlled' }, ({ path }) => ({
+              contents: stubs[path],
+              resolveDir: root,
+              loader: 'tsx',
+            }));
             builder.onResolve({ filter: /^observability-test-memory$/ }, () => ({
               path: 'memory',
               namespace: 'observability-test',
@@ -260,8 +273,8 @@ export const loadObservability = async (
         },
       ],
     });
-    await writeFile(entry, result.outputFiles[0].text);
-    const loaded = await import(pathToFileURL(entry).href);
+    await writeFile(moduleFile, result.outputFiles[0].text);
+    const loaded = await import(pathToFileURL(moduleFile).href);
     testContext.after(() => rm(directory, { recursive: true, force: true }));
     return loaded;
   } catch (error) {

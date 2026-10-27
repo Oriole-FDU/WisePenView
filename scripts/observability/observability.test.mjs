@@ -168,6 +168,7 @@ test('每个框架入口写入独立 detector，primitive capture ID 与日志�
     'router-error',
     'window-error',
     'window-unhandled-rejection',
+    'application-handled',
   ];
   for (const detector of detectors) {
     telemetry.captureException(new Error(detector), { detector });

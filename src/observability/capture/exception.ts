@@ -1,3 +1,4 @@
+import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
 import { isWisePenError } from '@/utils/error/WisePenError';
 import { createUuid } from '@/utils/random/createUuid';
 
@@ -79,10 +80,17 @@ const normalizeLocation = (
   location: ExceptionLocation | undefined
 ): ExceptionLocation | undefined => (isValidExceptionLocation(location) ? location : undefined);
 
+const isCanceled = (error: unknown): boolean =>
+  (error instanceof Error && ['AbortError', 'CanceledError'].includes(error.name)) ||
+  (isWisePenError(error) &&
+    error.source === 'network' &&
+    error.code === FRONTEND_NETWORK_ERROR.CANCELED);
+
 /** 记录捕获到的异常；本函数不负责 Exporter、UI 文案或业务恢复。 */
 export const captureException = (error: unknown, context: CaptureExceptionContext): string => {
   const id = createCaptureId(error);
   if (!isObservabilityActive()) return id;
+  if (isCanceled(error)) return id;
 
   if (isObjectKey(error)) {
     if (capturedErrors.has(error)) return id;
@@ -94,6 +102,7 @@ export const captureException = (error: unknown, context: CaptureExceptionContex
     recordExceptionObservation({
       id,
       detector: context.detector,
+      operation: context.operation,
       occurredAt: Date.now(),
       errorType: details.type,
       message: details.message,

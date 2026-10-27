@@ -8,6 +8,7 @@ import { type ChatModel, type CreateSessionRequest, useChatSession } from '@/dom
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
+import { captureException } from '@/observability';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { ChatProps } from '../index.type';
@@ -157,6 +158,10 @@ export function useChatTurnController({
       toolSelectionOverrides: opts?.toolSelectionOverrides,
       onDemandSkillIds,
     }).catch((error) => {
+      captureException(error, {
+        detector: 'application-handled',
+        operation: 'chat.send',
+      });
       toast.danger(parseErrorMessage(error));
     });
 

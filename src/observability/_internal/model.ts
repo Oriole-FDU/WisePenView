@@ -1,6 +1,6 @@
 import type { Attributes, Context } from '@opentelemetry/api';
 
-import type { ExceptionDetector, ExceptionLocation } from '../publicTypes';
+import type { ExceptionDetector, ExceptionLocation, ExceptionOperation } from '../publicTypes';
 
 export type ObservationSeverity = 'INFO' | 'WARN' | 'ERROR';
 
@@ -19,6 +19,7 @@ export interface ContextSnapshot {
 export interface ExceptionObservation {
   id: string;
   detector: ExceptionDetector;
+  operation?: ExceptionOperation;
   occurredAt: number;
   errorType: string;
   message: string;

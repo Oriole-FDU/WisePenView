@@ -71,7 +71,10 @@ const buildBreadcrumbAttribute = (snapshot: ContextSnapshot): string =>
   ).slice(0, 8_000);
 
 const getSeverity = (observation: ExceptionObservation): 'WARN' | 'ERROR' =>
-  observation.detector === 'react-root-recoverable' ? 'WARN' : 'ERROR';
+  observation.detector === 'react-root-recoverable' ||
+  observation.detector === 'application-handled'
+    ? 'WARN'
+    : 'ERROR';
 
 /** 将应用异常转换成统一事件，所有字段在进入 OTel 前完成脱敏和限长。 */
 export const recordExceptionObservation = (observation: ExceptionObservation): void => {
@@ -102,6 +105,7 @@ export const recordExceptionObservation = (observation: ExceptionObservation): v
       ...snapshot.attributes,
       'error.id': observation.id,
       'error.detector': observation.detector,
+      'operation.name': observation.operation,
       'error.fingerprint': buildErrorFingerprint(observation.errorType, message, stack),
       'exception.type': observation.errorType,
       'exception.message': message,

@@ -5,6 +5,7 @@ import { useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
 import { applyXDeveloperHeader, awaitAddrReady, notifyAddrFailure } from '@/apis/runtime';
+import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
@@ -92,7 +93,13 @@ export const useChatSession = ({
 }: UseChatSessionOptions) => {
   const chat = useChat<WisePenUIMessage>({
     experimental_throttle: CHAT_STREAM_THROTTLE_MS,
-    onError,
+    onError: (error) => {
+      captureException(error, {
+        detector: 'application-handled',
+        operation: 'chat.stream',
+      });
+      onError?.(error);
+    },
     transport: chatTransport,
   });
   const resumeRequestRef = useRef<{
@@ -156,6 +163,10 @@ export const useChatSession = ({
         ) {
           return;
         }
+        captureException(error, {
+          detector: 'application-handled',
+          operation: 'chat.resume',
+        });
         if (error instanceof Error) {
           latestOnError.current?.(error);
         }
@@ -204,17 +215,25 @@ export const useChatSession = ({
   };
 
   const recoverSession = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
-    if (!sessionId) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: '恢复聊天时缺少 session_id',
+    try {
+      if (!sessionId) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+          reason: '恢复聊天时缺少 session_id',
+        });
+      }
+      const requestBody: ChatRecoverRequest = {
+        session_id: sessionId,
+        client_tool_results: [],
+        tool_approval_status: toolApprovalStatus,
+      };
+      await chat.sendMessage(undefined, { body: requestBody });
+    } catch (error) {
+      captureException(error, {
+        detector: 'application-handled',
+        operation: 'chat.recover',
       });
+      throw error;
     }
-    const requestBody: ChatRecoverRequest = {
-      session_id: sessionId,
-      client_tool_results: [],
-      tool_approval_status: toolApprovalStatus,
-    };
-    await chat.sendMessage(undefined, { body: requestBody });
   };
 
   return {

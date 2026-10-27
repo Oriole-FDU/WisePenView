@@ -33,6 +33,7 @@ export class ErrorAggregation {
       attributes['service.version'],
       attributes['page.route'],
       attributes['error.detector'],
+      attributes['operation.name'],
       attributes['resource.id'],
       attributes['user.id'],
       attributes['session.id'],

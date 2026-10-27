@@ -12,6 +12,7 @@ const SEVERITY_NUMBER: Record<ObservationSeverity, SeverityNumber> = {
 /** 将统一事件映射到 OTel 日志；普通异常优先附着在当前 span 上。 */
 export const createOtelEventSink = (tracer: Tracer, logger: Logger): TelemetrySink => {
   return (event) => {
+    event.attributes = { ...event.attributes, 'event.name': event.name };
     const originalContext = event.context ?? otelContext.active();
     let span = trace.getSpan(originalContext);
     let spanContext = originalContext;
