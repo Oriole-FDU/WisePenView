@@ -1,10 +1,10 @@
-import { Chip, Switch } from '@heroui/react';
+import { Chip } from '@heroui/react';
 import { Link, Link2, Plus, Settings2, Trash2, Unlink } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton, AppIconButton } from '@/components/base/Button';
-import { FormField, Input, PasswordInput, Select } from '@/components/base/Input';
+import { FormField, Input, PasswordInput, Select, Switch } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
@@ -233,13 +233,7 @@ function ProviderSettingsSection() {
                   isDisabled={toggling}
                   aria-label={t('ai.byok.enableAria', { name: provider.name })}
                   onChange={(isActive) => void toggle(provider, isActive)}
-                >
-                  <Switch.Content>
-                    <Switch.Control>
-                      <Switch.Thumb />
-                    </Switch.Control>
-                  </Switch.Content>
-                </Switch>
+                />
                 <AppButton size="sm" variant="ghost" onPress={() => openEdit(provider)}>
                   <Settings2 size={15} aria-hidden="true" />
                   {t('ai.actions.edit')}

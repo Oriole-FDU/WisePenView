@@ -6,6 +6,8 @@ export type { ComboBoxProps } from './ComboBox';
 export { default as ComboBox } from './ComboBox';
 export type { CommentInputImage, CommentInputProps } from './CommentInput';
 export { default as CommentInput } from './CommentInput';
+export type { DatePickerFieldProps, DateRangeFieldProps, TimeFieldProps } from './DatePicker';
+export { DatePickerField, DateRangeField, TimeField } from './DatePicker';
 export type { EmojiPickerContentProps, EmojiPickerProps } from './EmojiPicker';
 export { default as EmojiPicker, EmojiPickerContent } from './EmojiPicker';
 export type {
@@ -54,6 +56,10 @@ export type {
   SelectValueProps,
 } from './Select';
 export { default as Select } from './Select';
+export type { SliderProps } from './Slider';
+export { default as Slider } from './Slider';
+export type { SwitchProps } from './Switch';
+export { default as Switch } from './Switch';
 export type { TextAreaProps } from './TextArea';
 export { default as TextArea } from './TextArea';
 export type { UploadZoneProps } from './UploadZone';

@@ -1,10 +1,9 @@
-import { Switch } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
-import { FormField, TextArea } from '@/components/base/Input';
+import { FormField, Switch, TextArea } from '@/components/base/Input';
 import { Tabs } from '@/components/base/Tabs';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
@@ -154,13 +153,7 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
                 onChange={(selected) =>
                   onMarkdownChange(setSoulEnabled(markdown, fields, selected))
                 }
-              >
-                <Switch.Content className={styles.switchContent}>
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                </Switch.Content>
-              </Switch>
+              />
             </div>
             {parsed.soulEnabled ? (
               <>

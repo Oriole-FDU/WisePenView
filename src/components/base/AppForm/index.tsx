@@ -1,9 +1,9 @@
-import { Switch } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { AppPressable } from '@/components/base/Button';
+import { Switch } from '@/components/base/Input';
 
 import styles from './style.module.scss';
 
@@ -168,13 +168,7 @@ function AppFormRow({
         isSelected={selected}
         isDisabled={disabled}
         onChange={onChange}
-      >
-        <Switch.Content className={styles.switchContent}>
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch.Content>
-      </Switch>
+      />
     ) : null);
 
   return (

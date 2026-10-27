@@ -1,4 +1,3 @@
-import { ButtonGroup, ToggleButtonGroup } from '@heroui/react';
 import { useUnmount } from 'ahooks';
 import {
   Paintbrush,
@@ -12,6 +11,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppPopover from '@/components/base/AppPopover';
+import { AppButtonGroup, AppToggleButtonGroup } from '@/components/base/Button';
 import { ColorPaletteContent } from '@/components/editors/note/CustomBlockNote/ui/editorMenus/colorPalette';
 import {
   type ButtonGroupChildProps,
@@ -41,7 +41,7 @@ export function TableStructureActions() {
   if (!actions.length) return null;
 
   return (
-    <ToggleButtonGroup
+    <AppToggleButtonGroup
       aria-label={t('table.cells')}
       selectionMode="multiple"
       selectedKeys={selectedKeys}
@@ -81,7 +81,7 @@ export function TableStructureActions() {
           />
         );
       })}
-    </ToggleButtonGroup>
+    </AppToggleButtonGroup>
   );
 }
 
@@ -124,7 +124,7 @@ export function TableDeleteAction() {
   const label = t(orientation === 'row' ? 'table.deleteRow' : 'table.deleteColumn');
 
   return (
-    <ButtonGroup size="sm" variant="ghost" aria-label={label}>
+    <AppButtonGroup size="sm" variant="ghost" aria-label={label}>
       <ToolbarButton
         className={styles.deleteButton}
         icon={<Trash2 size={20} aria-hidden="true" />}
@@ -132,6 +132,6 @@ export function TableDeleteAction() {
         onHoverChange={setDeletePreview}
         onPress={deleteRailSelection}
       />
-    </ButtonGroup>
+    </AppButtonGroup>
   );
 }

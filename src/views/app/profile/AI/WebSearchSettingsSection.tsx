@@ -1,10 +1,9 @@
-import { Switch } from '@heroui/react';
 import { KeyRound, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { FormField, PasswordInput } from '@/components/base/Input';
+import { FormField, PasswordInput, Switch } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useChatService } from '@/domains';
@@ -110,13 +109,7 @@ function WebSearchSettingsSection() {
                       isDisabled={toggling || !tool.configured}
                       aria-label={tool.displayName}
                       onChange={(enabled) => void toggle(tool, enabled)}
-                    >
-                      <Switch.Content>
-                        <Switch.Control>
-                          <Switch.Thumb />
-                        </Switch.Control>
-                      </Switch.Content>
-                    </Switch>
+                    />
                     <AppButton size="sm" variant="ghost" onPress={() => openEditor(tool)}>
                       <KeyRound size={15} aria-hidden="true" />
                       {t('ai.actions.configure')}

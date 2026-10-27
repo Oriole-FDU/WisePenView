@@ -1,10 +1,10 @@
-import { Label, Slider } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
-import { FormField, NumberField, TextArea } from '@/components/base/Input';
+import { FormField, NumberField, Slider, TextArea } from '@/components/base/Input';
 import type { AgentSpec } from '@/domains/Agent';
 
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';
@@ -116,12 +116,7 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
                   value={policy.highWatermarkRatio}
                   isDisabled={disabled || !policy.enableChatMemorySummary}
                   onChange={(value) => updatePolicy({ highWatermarkRatio: toScalar(value) })}
-                >
-                  <Slider.Track>
-                    <Slider.Fill />
-                    <Slider.Thumb />
-                  </Slider.Track>
-                </Slider>
+                />
               </div>
               <div>
                 <Label>
@@ -136,12 +131,7 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
                   value={policy.lowWatermarkRatio}
                   isDisabled={disabled || !policy.enableChatMemorySummary}
                   onChange={(value) => updatePolicy({ lowWatermarkRatio: toScalar(value) })}
-                >
-                  <Slider.Track>
-                    <Slider.Fill />
-                    <Slider.Thumb />
-                  </Slider.Track>
-                </Slider>
+                />
               </div>
             </div>
             <div className={styles.settingGrid}>
@@ -178,12 +168,7 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
                     onChange={(value) =>
                       updatePolicy({ longTermMemoryScoreThreshold: toScalar(value) })
                     }
-                  >
-                    <Slider.Track>
-                      <Slider.Fill />
-                      <Slider.Thumb />
-                    </Slider.Track>
-                  </Slider>
+                  />
                 </div>
               </div>
             </div>

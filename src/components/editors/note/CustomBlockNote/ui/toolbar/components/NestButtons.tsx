@@ -1,9 +1,9 @@
 import { blockHasType } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { ToggleButtonGroup } from '@heroui/react';
 import { IndentDecrease, IndentIncrease } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { AppToggleButtonGroup } from '@/components/base/Button';
 import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
 
 import { blockHasInlineContent, getSelectedBlocks } from '../utils';
@@ -71,7 +71,7 @@ export function NestButtons() {
   }
 
   return (
-    <ToggleButtonGroup
+    <AppToggleButtonGroup
       aria-label={t('editor.indent.label')}
       selectionMode="multiple"
       selectedKeys={new Set()}
@@ -80,6 +80,6 @@ export function NestButtons() {
     >
       <NestButton type="nest" />
       <NestButton type="unnest" />
-    </ToggleButtonGroup>
+    </AppToggleButtonGroup>
   );
 }

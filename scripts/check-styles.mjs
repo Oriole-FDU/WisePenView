@@ -441,6 +441,31 @@ test('Button 基础封装持有圆角、禁用态与按钮组边界', async () =
   }
 });
 
+test('复合交互控件由基础封装提供默认结构', async () => {
+  const [switchSource, sliderSource, dateSource, buttonIndex, inputIndex] = await Promise.all(
+    [
+      'src/components/base/Input/Switch/index.tsx',
+      'src/components/base/Input/Slider/index.tsx',
+      'src/components/base/Input/DatePicker/index.tsx',
+      'src/components/base/Button/index.ts',
+      'src/components/base/Input/index.ts',
+    ].map((file) => readFile(join(root, file), 'utf8'))
+  );
+
+  assert.match(switchSource, /<HeroSwitch\.Control>/);
+  assert.match(switchSource, /<HeroSwitch\.Thumb \/>/);
+  assert.match(sliderSource, /<HeroSlider\.Track>/);
+  assert.match(sliderSource, /<HeroSlider\.Fill \/>/);
+  assert.match(dateSource, /<HeroDatePicker\.Trigger>/);
+  assert.match(dateSource, /<HeroDateRangePicker\.RangeSeparator \/>/);
+  assert.match(dateSource, /<HeroTimeField\.Segment segment=\{segment\} \/>/);
+  assert.match(buttonIndex, /AppButtonGroup/);
+  assert.match(buttonIndex, /AppToggleButtonGroup/);
+  assert.match(inputIndex, /DatePickerField/);
+  assert.match(inputIndex, /SwitchProps/);
+  assert.match(inputIndex, /SliderProps/);
+});
+
 test('Tabs 基础封装持有默认表面与指示器样式', async () => {
   const { code } = await compileCssModule('src/components/base/Tabs/style.module.scss');
   const tabsSource = await readFile(join(root, 'src/components/base/Tabs/index.tsx'), 'utf8');
@@ -515,17 +540,27 @@ test('已有基础封装的 HeroUI 控件不得从业务层直接导入', async 
   const wrappedControls = new Set([
     'Autocomplete',
     'Button',
+    'ButtonGroup',
+    'Calendar',
     'Checkbox',
     'ComboBox',
+    'DateField',
+    'DatePicker',
+    'DateRangePicker',
     'Fieldset',
     'Input',
     'InputGroup',
     'InputOTP',
     'NumberField',
+    'RangeCalendar',
     'SearchField',
     'Select',
+    'Slider',
+    'Switch',
     'TextArea',
+    'TimeField',
     'ToggleButton',
+    'ToggleButtonGroup',
   ]);
 
   for (const file of await readdir(join(root, 'src'), { recursive: true })) {

@@ -1,9 +1,8 @@
-import { ButtonGroup } from '@heroui/react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type * as Y from 'yjs';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppButtonGroup } from '@/components/base/Button';
 
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
 import type { NoteAiDiffAction, NotePluginRegistry } from '../../registry/types';
@@ -42,7 +41,7 @@ export function AiDiffBulkActions({
 
   return createPortal(
     <div className={styles.bulkActions} contentEditable={false}>
-      <ButtonGroup size="sm" aria-label={t('aiDiff.actions')}>
+      <AppButtonGroup size="sm" aria-label={t('aiDiff.actions')}>
         <AppButton
           variant="secondary"
           aria-label={t('aiDiff.rejectAllLabel')}
@@ -59,7 +58,7 @@ export function AiDiffBulkActions({
         >
           {t('aiDiff.acceptAll')}
         </AppButton>
-      </ButtonGroup>
+      </AppButtonGroup>
     </div>,
     portalContainer
   );

@@ -1,8 +1,8 @@
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { ToggleButtonGroup } from '@heroui/react';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { AppToggleButtonGroup } from '@/components/base/Button';
 import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
 
 import {
@@ -56,7 +56,7 @@ export function TextStyleButtons() {
   };
 
   return (
-    <ToggleButtonGroup
+    <AppToggleButtonGroup
       aria-label={t('editor.textStyle.label')}
       selectionMode="multiple"
       selectedKeys={state.selectedKeys}
@@ -85,6 +85,6 @@ export function TextStyleButtons() {
           />
         );
       })}
-    </ToggleButtonGroup>
+    </AppToggleButtonGroup>
   );
 }
