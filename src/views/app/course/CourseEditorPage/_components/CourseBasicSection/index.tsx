@@ -2,7 +2,7 @@ import { Pencil, Save } from 'lucide-react';
 import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import { Tooltip } from '@/components/base/Tooltip';
 
@@ -77,7 +77,7 @@ function CourseBasicSection({
           <span className={styles.coverLabel}>{t('editor.fields.cover')}</span>
           <Tooltip>
             <Tooltip.Trigger<'button'>
-              render={(props) => <button {...props} />}
+              render={(props) => <AppPressable {...props} />}
               type="button"
               className={styles.coverButton}
               aria-label={t('editor.actions.changeCover')}

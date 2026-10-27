@@ -1,6 +1,7 @@
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import { getSupportErrorId } from '@/observability';
 
 import styles from './style.module.scss';
@@ -17,20 +18,20 @@ function RootErrorFallback({ error }: FallbackProps) {
         <p className={styles.description}>{t('page.reloadDescription')}</p>
         <p className={styles.errorId}>{t('page.errorId', { errorId })}</p>
         <div className={styles.actions}>
-          <button
+          <AppPressable
             className={styles.primaryButton}
             type="button"
             onClick={() => window.location.reload()}
           >
             {t('page.reload')}
-          </button>
-          <button
+          </AppPressable>
+          <AppPressable
             className={styles.secondaryButton}
             type="button"
             onClick={() => window.location.assign('/')}
           >
             {t('page.backHome')}
-          </button>
+          </AppPressable>
         </div>
       </div>
     </main>

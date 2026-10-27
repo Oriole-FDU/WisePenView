@@ -14,6 +14,7 @@ import {
   AttachmentTitle,
 } from '@/components/_shadcn';
 import { AppButton } from '@/components/base/Button';
+import { HiddenFileInput } from '@/components/base/Input';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
 import type { UploadZoneProps } from './index.type';
@@ -104,10 +105,9 @@ function UploadZone({
 
   return (
     <div className={styles.dropZone}>
-      <input
+      <HiddenFileInput
         ref={inputRef}
         className={styles.nativeInput}
-        type="file"
         accept={accept}
         multiple={multiple}
         onChange={handleInputChange}

@@ -17,6 +17,12 @@ export type {
 export { default as Fieldset } from './Fieldset';
 export type { FormFieldProps } from './FormField';
 export { default as FormField } from './FormField';
+export type { HiddenFileInputProps } from './HiddenFileInput';
+export { default as HiddenFileInput } from './HiddenFileInput';
+export type { InlineInputProps } from './InlineInput';
+export { default as InlineInput } from './InlineInput';
+export type { InlineTextAreaProps } from './InlineTextArea';
+export { default as InlineTextArea } from './InlineTextArea';
 export type { InputProps } from './Input';
 export { default, default as Input } from './Input';
 export type {

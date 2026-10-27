@@ -2,6 +2,7 @@ import { FileCode2, FileText, Folder, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { InlineInput } from '@/components/base/Input';
 import type { DataNode, TreeDropPosition } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
 import type { SkillFileNode } from '@/domains/Skill';
@@ -100,7 +101,7 @@ function buildPendingNode(
         ) : (
           <FileText size={14} color="var(--resource-icon-file)" />
         )}
-        <input
+        <InlineInput
           className={styles.inlineInputField}
           autoFocus
           onBlur={(event) => {

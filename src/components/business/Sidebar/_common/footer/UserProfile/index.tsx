@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import AppAvatar from '@/components/base/Avatar';
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
 import { Tooltip } from '@/components/base/Tooltip';
@@ -103,7 +103,7 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
           <Tooltip>
             <span className={styles.avatarTooltipTrigger}>
               <Tooltip.Trigger<'button'>
-                render={(props) => <button {...props} />}
+                render={(props) => <AppPressable {...props} />}
                 type="button"
                 className={styles.avatarTrigger}
                 aria-label={t('anonymous.login')}

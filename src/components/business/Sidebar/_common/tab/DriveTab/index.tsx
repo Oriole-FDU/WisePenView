@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Empty, Spin } from '@/components/base/Feedback';
+import { HiddenFileInput } from '@/components/base/Input';
 import type { DataNode } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
 import { buildDriveTreeData } from '@/components/business/Drive/common/buildDriveTreeData';
@@ -263,9 +264,8 @@ function DriveTab() {
 
   return (
     <div className={styles.sidebar}>
-      <input
+      <HiddenFileInput
         ref={markdownFileInputRef}
-        type="file"
         accept={MARKDOWN_NOTE_FILE_ACCEPT}
         onChange={handleMarkdownFileChange}
         hidden

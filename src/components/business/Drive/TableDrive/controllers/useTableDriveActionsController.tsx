@@ -2,6 +2,7 @@ import { toast } from '@heroui/react';
 import { type ChangeEvent, type ReactElement, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { HiddenFileInput } from '@/components/base/Input';
 import {
   DRIVE_DOCUMENT_FILE_ACCEPT,
   getSupportedDriveDocumentFiles,
@@ -217,9 +218,8 @@ export function useTableDriveActionsController({
 
   const ModalHost = (
     <>
-      <input
+      <HiddenFileInput
         ref={documentFileInputRef}
-        type="file"
         accept={DRIVE_DOCUMENT_FILE_ACCEPT}
         multiple
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -236,9 +236,8 @@ export function useTableDriveActionsController({
         }}
         hidden
       />
-      <input
+      <HiddenFileInput
         ref={markdownFileInputRef}
-        type="file"
         accept={MARKDOWN_NOTE_FILE_ACCEPT}
         onChange={handleMarkdownFileChange}
         hidden

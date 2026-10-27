@@ -368,6 +368,41 @@ test('Tabs 基础封装持有默认表面与指示器样式', async () => {
   );
 });
 
+test('优先交互控件的原生元素由基础封装承接', async () => {
+  const inlineFieldFiles = new Set([
+    'components/base/Input/HiddenFileInput/index.tsx',
+    'components/base/Input/InlineInput/index.tsx',
+    'components/base/Input/InlineTextArea/index.tsx',
+  ]);
+  const priorityButtonFiles = [
+    'components/business/Chat/ChatConversation/ChatInput/index.tsx',
+    'components/business/Chat/ChatConversation/ChatMessageList/Message/User/index.tsx',
+    'components/business/ErrorPage/ErrorPage.tsx',
+    'components/business/Sidebar/_common/footer/UserProfile/index.tsx',
+    'components/business/UserSearchCombobox/index.tsx',
+    'components/editors/note/CustomBlockNote/plugins/CodeBlockPlugin/CodeBlockToolbar.tsx',
+    'components/editors/skill/components/SkillSaveQueueDock/index.tsx',
+    'views/app/course/CourseAssignmentDetailPage/index.tsx',
+    'views/app/course/CourseEditorPage/_components/CourseBasicSection/index.tsx',
+    'views/app/error/RootErrorFallback/index.tsx',
+    'views/app/group/GroupDetail/_components/GroupProfileSection/index.tsx',
+    'views/app/profile/_components/Account/AccountHeader/index.tsx',
+  ];
+
+  for (const file of await readdir(join(root, 'src'), { recursive: true })) {
+    if (!/\.(tsx|jsx)$/.test(file)) continue;
+    const source = await readFile(join(root, 'src', file), 'utf8');
+    if (!inlineFieldFiles.has(file)) {
+      assert.doesNotMatch(source, /<(?:input|textarea)\b/, file);
+    }
+  }
+
+  for (const file of priorityButtonFiles) {
+    const source = await readFile(join(root, 'src', file), 'utf8');
+    assert.doesNotMatch(source, /<button\b/, file);
+  }
+});
+
 test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {
   const { code } = await compileCssModule('src/components/base/Modal/style.module.scss');
   const modalSource = await readFile(join(root, 'src/components/base/Modal/index.tsx'), 'utf8');

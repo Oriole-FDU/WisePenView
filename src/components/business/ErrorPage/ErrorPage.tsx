@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { ResultState } from '@/components/base/Feedback';
 import { getSupportErrorId } from '@/observability';
@@ -70,14 +70,14 @@ function ErrorPage({
       {showDetail ? (
         <div className={styles.errorCollapse}>
           <div className={styles.errorCollapseHeader}>
-            <button
+            <AppPressable
               type="button"
               className={styles.errorCollapseToggle}
               aria-expanded={detailOpen}
               onClick={() => setDetailOpen((open) => !open)}
             >
               {t('page.detail')}
-            </button>
+            </AppPressable>
             <AppIconButton
               icon={<Copy aria-hidden="true" />}
               label={t('page.copyDetail')}

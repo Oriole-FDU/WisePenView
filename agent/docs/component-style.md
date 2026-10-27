@@ -151,6 +151,8 @@ z-index 按“基准 → 基础刻度 → 应用语义”单向定义，三层�
 
 ## 八、组件库使用
 
+- 业务与编辑器代码不得直接写原生 `input`、`textarea` 或隐藏文件输入；可见内联字段使用 `InlineInput` / `InlineTextArea`，文件选择使用 `HiddenFileInput`，标准字段继续使用 `Input` / `TextArea` / `SearchField` 等基础封装。
+- 需要保留业务级外观或复合内容的自定义交互面使用 `AppPressable`，由其统一承接原生 button 的类型与 DOM 契约；普通文字按钮仍使用 `AppButton`，纯图标按钮仍使用 `AppIconButton`。
 - 图标按钮优先使用已有图标库，例如 `lucide-react`。
 - 有明确图标语义时，不要用文字按钮代替图标按钮。
 - 纯图标按钮统一使用 `AppIconButton`，必须同时提供 hover/focus tooltip 和可访问名称；不要用 `title` 代替 tooltip。
@@ -168,7 +170,7 @@ z-index 按“基准 → 基础刻度 → 应用语义”单向定义，三层�
 
 - [ ] 元件樣式使用 SCSS + CSS Modules，共用 partial 單獨載入不輸出 CSS，無 Less 來源與引用。
 - [ ] 没有非必要内联样式。
-- [ ] 交互控件使用 HeroUI 或项目已有封装。
+- [ ] 交互控件使用 HeroUI 或项目已有封装，没有在业务层直接声明原生表单控件。
 - [ ] 文本和控件在常见宽度下不会重叠或溢出。
 - [ ] 层级使用应用语义 token，没有数字 z-index 和回退数值。
 - [ ] 没有无意义装饰和卡片套卡片。

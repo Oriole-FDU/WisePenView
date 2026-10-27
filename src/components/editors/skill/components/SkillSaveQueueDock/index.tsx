@@ -11,6 +11,8 @@ import {
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
+
 import type {
   SkillSaveQueueDockProps,
   SkillSaveQueueItem,
@@ -176,7 +178,7 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
         onKeyDown={handleResizeKeyDown}
       />
       <div className={styles.queueHeader}>
-        <button
+        <AppPressable
           type="button"
           className={styles.queueToggle}
           aria-expanded={expanded}
@@ -191,14 +193,14 @@ function SkillSaveQueueDock({ items, onRetry }: SkillSaveQueueDockProps) {
             <strong>{resolveQueueTitle(mode, items, t)}</strong>
             <span>{resolveQueueHint(mode, t)}</span>
           </span>
-        </button>
+        </AppPressable>
         <span className={styles.queueMeta}>
           {mode === 'saving' ? `${progress}%` : null}
           {canRetry ? (
-            <button type="button" className={styles.retryButton} onClick={() => onRetry?.()}>
+            <AppPressable type="button" className={styles.retryButton} onClick={() => onRetry?.()}>
               <RefreshCw size={12} />
               <span>{t('queue.retry')}</span>
-            </button>
+            </AppPressable>
           ) : null}
         </span>
       </div>
