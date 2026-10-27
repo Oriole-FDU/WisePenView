@@ -15,6 +15,10 @@ export const reactStub = `
     if (!(index in slots)) slots[index] = typeof initial === 'function' ? initial() : initial;
     return [slots[index], next => { slots[index] = typeof next === 'function' ? next(slots[index]) : next; }];
   }
+  export function useReducer(reducer, initial) {
+    const [value, setValue] = useState(initial);
+    return [value, action => setValue(current => reducer(current, action))];
+  }
 `;
 
 export const ahooksStub = `
@@ -122,6 +126,111 @@ export const loadChat = async (testContext) => {
       export { notices } from '@heroui/react';
     `,
     stubs: chatStubs,
+  });
+  return { ...telemetry, browser };
+};
+
+const officeState = {
+  snapshot: null,
+  exit: null,
+};
+
+export const loadOffice = async (testContext) => {
+  const browser = installBrowser(testContext);
+  const telemetry = await loadObservability(testContext, {
+    entry: `
+      export { default as OfficeEditor } from '@/components/editors/office';
+      export { hooks } from 'react';
+      export { sdk } from '@onlyoffice/document-editor-react';
+      export { officeState } from 'office-state';
+    `,
+    stubs: {
+      react: reactStub,
+      'react/jsx-runtime': `
+        export const Fragment = Symbol('fragment');
+        export const jsx = (type, props) => typeof type === 'function' ? type(props) : ({ type, props });
+        export const jsxs = jsx;
+      `,
+      'react-i18next': `
+        export const useTranslation = () => ({ t: key => key });
+        export const initReactI18next = { type: '3rdParty', init() {} };
+      `,
+      'react-error-boundary': `
+        export const ErrorBoundary = () => null;
+      `,
+      ahooks: `${ahooksStub}
+        export function useMemoizedFn(fn) { const ref = useLatest(fn); return useRef((...args) => ref.current(...args)).current; }
+      `,
+      '@onlyoffice/document-editor-react': `
+        export const sdk = {};
+        export function DocumentEditor(props) { sdk.props = props; return null; }
+      `,
+      'office-state': `
+        export const officeState = ${JSON.stringify(officeState)};
+      `,
+      '../_context': `
+        export const useEditorSurface = () => ({
+          instanceId: 'office-one',
+          target: { resourceId: 'office-one', resourceType: 'document' },
+        });
+        export const EditorSurfaceProvider = props => props.children;
+      `,
+      '../_runtime/useEditorRuntime': `
+        import { officeState } from 'office-state';
+        export const useEditorRuntime = (snapshot, exit) => {
+          officeState.snapshot = snapshot;
+          officeState.exit = exit;
+        };
+        export const useEditorLoadState = () => {};
+      `,
+      '@/components/editors/_runtime/EditorPresentationBinding': `export default () => null;`,
+      '@/components/base/Button': `export const AppButton = () => null;`,
+      '@/components/base/Feedback': `
+        export const ResultState = () => null;
+        export const Spin = () => null;
+      `,
+      '@/config/runtimeConfig': `
+        export const publicAppConfig = {
+          mode: 'development',
+          observability: { otelEndpoint: '/otel' },
+          api: { baseUrl: 'https://api.example.test' },
+          office: { documentServerUrl: 'https://office.example.test' },
+        };
+      `,
+      '@/domains': `
+        export const useDocumentService = () => ({});
+        export const useInteractService = () => ({});
+      `,
+      '@/hooks/useApi': `
+        export const useApi = () => ({
+          data: {
+            docInfo: {
+              resourceInfo: { resourceName: 'private document' },
+              docMetaInfo: { uploadMeta: { fileType: 'docx' } },
+            },
+            editorConfig: {
+              sessionId: 'session-one',
+              config: {
+                document: { permissions: { edit: true } },
+                editorConfig: { mode: 'edit' },
+              },
+            },
+          },
+          mutate() {},
+          refresh() {},
+          loading: false,
+          error: null,
+        });
+      `,
+      '@/utils/navigation/appRoute': `
+        export const APP_ROUTE_PATH = { DRIVE_PERSONAL: '/drive/personal' };
+      `,
+      'react-router-dom': `
+        export const Link = props => props.children;
+        export const isRouteErrorResponse = () => false;
+      `,
+      './style.module.scss': `export default {};`,
+    },
   });
   return { ...telemetry, browser };
 };

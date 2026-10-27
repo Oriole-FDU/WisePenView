@@ -101,12 +101,19 @@ export const recordExceptionObservation = (observation: ExceptionObservation): v
           filename: sanitizeDiagnosticText(observation.location.filename, 512),
         }
       : undefined;
+    const fingerprint =
+      observation.source && observation.code !== undefined
+        ? `${observation.errorType}:${observation.source}:${observation.code}:${observation.operation ?? ''}`.slice(
+            0,
+            512
+          )
+        : buildErrorFingerprint(observation.errorType, message, stack);
     const attributes: Attributes = {
       ...snapshot.attributes,
       'error.id': observation.id,
       'error.detector': observation.detector,
       'operation.name': observation.operation,
-      'error.fingerprint': buildErrorFingerprint(observation.errorType, message, stack),
+      'error.fingerprint': fingerprint,
       'exception.type': observation.errorType,
       'exception.message': message,
       'exception.stacktrace': stack,

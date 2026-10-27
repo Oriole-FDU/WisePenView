@@ -8,7 +8,8 @@ export type ExceptionDetector =
   | 'window-unhandled-rejection'
   | 'application-handled';
 
-export type ExceptionOperation = 'chat.send' | 'chat.stream' | 'chat.recover' | 'chat.resume';
+export type ExceptionOperation =
+  'chat.send' | 'chat.stream' | 'chat.recover' | 'chat.resume' | 'office.sdk';
 
 export interface ExceptionLocation {
   filename: string;

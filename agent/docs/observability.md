@@ -65,6 +65,9 @@ captureException(error, {
 主动取消不生成错误事件。业务原异常继续交给原 callback、提示和 Promise；可观测性不改变这些
 行为，也不附加对话、请求正文或附件内容。
 
+Office 使用 `office.sdk` 记录 `events_onError` 与 `onLoadComponentError`。同一错误码和 operation
+使用稳定指纹归并；ready、modified 或离开状态不会被推断为保存成功／失败。
+
 ## 异常管线
 
 ```text
