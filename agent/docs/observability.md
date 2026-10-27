@@ -91,6 +91,10 @@ AI SDK onError、恢复 catch 和重连 catch。原 callback、提示、异常�
 AbortError、CanceledError 及既有网络取消码不生成 handled 错误事件；已记录的 API 原异常交回
 既有请求出口识别，不根据状态或业务文案再做一套分类。新接入不附加对话、请求/响应正文或附件内容。
 
+Office 只在 SDK 的 `events_onError` 与 `onLoadComponentError` 明确错误 callback 记录
+`office-sdk`。保留原 dispatch、onError、草稿、modified 与退出协议；ready、modified=false、
+等待或离开均不被当作业务存储回写完成，也不会由这些状态推导新的错误事件。
+
 ## Trace 与日志关联
 
 每次经过 `request.ts` 的逻辑请求创建一个 `api.request METHOD /path` span，覆盖地址等待、
