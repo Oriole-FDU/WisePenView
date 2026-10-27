@@ -9,6 +9,9 @@ import { build } from 'vite';
 
 import { collectPublicFiles } from '../jenkins/public-artifacts.mjs';
 
+process.env.VITE_API_BASE_URL = 'https://api.example.test';
+process.env.VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL = 'https://office.example.test';
+
 test('hidden source map 移出公开目录，并按 release 与哈希精确还原', async (context) => {
   const root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'wisepen-maps-check-')));
   context.after(() => rm(root, { recursive: true, force: true }));

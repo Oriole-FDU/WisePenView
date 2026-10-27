@@ -8,6 +8,9 @@ import vm from 'node:vm';
 
 import { build } from 'vite';
 
+process.env.VITE_API_BASE_URL = 'https://api.example.test';
+process.env.VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL = 'https://office.example.test';
+
 const root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'wisepen-build-check-')));
 
 test.after(() => rm(root, { recursive: true, force: true }));
