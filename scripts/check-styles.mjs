@@ -421,6 +421,18 @@ test('内联字段从基础封装消费字重，全局不重置原生表单字�
   );
 });
 
+test('MessageScroller 使用 Tailwind 标准 utility 与私有渐隐样式', async () => {
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const { code } = await compileCssModule('src/components/_shadcn/message-scroller.module.scss');
+  const source = await readFile(join(root, 'src/components/_shadcn/message-scroller.tsx'), 'utf8');
+
+  assert.doesNotMatch(globalIndex, /scrollbar-gutter-stable|contain-content|scroll-fade-b/);
+  assert.match(code, /\.viewportFade\s*\{\s*mask-image: linear-gradient\(\s*to bottom,/);
+  assert.match(source, /scrollbar-gutter-stable/);
+  assert.match(source, /contain-content/);
+  assert.match(source, /styles\.viewportFade/);
+});
+
 test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {
   const { code } = await compileCssModule('src/components/base/Modal/style.module.scss');
   const modalSource = await readFile(join(root, 'src/components/base/Modal/index.tsx'), 'utf8');

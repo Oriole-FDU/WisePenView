@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
+import styles from './message-scroller.module.scss';
 import {
   MessageScroller as MessageScrollerPrimitive,
   useMessageScroller,
@@ -44,7 +45,8 @@ function MessageScrollerViewport({
     <MessageScrollerPrimitive.Viewport
       data-slot="message-scroller-viewport"
       className={clsx(
-        'size-full min-h-0 min-w-0 scroll-fade-b scrollbar-thin scrollbar-gutter-stable overflow-y-auto overscroll-contain contain-content',
+        'size-full min-h-0 min-w-0 scrollbar-thin scrollbar-gutter-stable overflow-y-auto overscroll-contain contain-content',
+        styles.viewportFade,
         className
       )}
       {...props}

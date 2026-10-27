@@ -220,17 +220,3 @@ body {
     transition-duration: var(--motion-duration-reduced) !important;
   }
 }
-
-@layer utilities {
-  .scrollbar-gutter-stable {
-    scrollbar-gutter: stable;
-  }
-
-  .contain-content {
-    contain: content;
-  }
-
-  .scroll-fade-b {
-    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 1.5rem), transparent 100%);
-  }
-}
