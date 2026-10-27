@@ -210,18 +210,6 @@ body {
   background-color: var(--selection);
 }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-input,
-textarea {
-  font-weight: var(--field-text-font-weight, var(--font-weight-medium, 500));
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

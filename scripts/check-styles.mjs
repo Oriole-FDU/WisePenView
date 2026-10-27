@@ -403,6 +403,24 @@ test('优先交互控件的原生元素由基础封装承接', async () => {
   }
 });
 
+test('内联字段从基础封装消费字重，全局不重置原生表单字体', async () => {
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const [inlineInput, inlineTextArea] = await Promise.all(
+    [
+      'src/components/base/Input/InlineInput/style.module.scss',
+      'src/components/base/Input/InlineTextArea/style.module.scss',
+    ].map((file) => compileCssModule(file))
+  );
+
+  assert.doesNotMatch(globalIndex, /button,\s*input,\s*textarea,\s*select\s*\{/);
+  assert.doesNotMatch(globalIndex, /input,\s*textarea\s*\{/);
+  assert.match(inlineInput.code, /font: inherit;\s*font-weight: var\(--field-text-font-weight\);/);
+  assert.match(
+    inlineTextArea.code,
+    /font: inherit;\s*font-weight: var\(--field-text-font-weight\);/
+  );
+});
+
 test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {
   const { code } = await compileCssModule('src/components/base/Modal/style.module.scss');
   const modalSource = await readFile(join(root, 'src/components/base/Modal/index.tsx'), 'utf8');
