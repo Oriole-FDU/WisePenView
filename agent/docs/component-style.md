@@ -11,6 +11,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題
 - 避免非必要内联样式。
 - 动态样式优先通过 className、CSS 变量或组件受控属性表达。
 - 全局样式分两份：`src/styles/global/index.css` 提供 token、排版与基础重置，应用和 Storybook 预览共用；桌面端外壳约束（`html`/`body` 占满视口、整页不滚动、`#root` 接管滚动与选区）放在 `src/styles/global/app-shell.css`，只有应用入口引入，否则 Storybook 预览与 Docs 页面会被裁掉且无法滚动。
+- 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则仍由 `src/styles/global/index.css` 消费这些变量。
 
 推荐结构：
 

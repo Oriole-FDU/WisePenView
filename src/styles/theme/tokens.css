@@ -9,40 +9,16 @@
   --scrollbar-gutter: auto;
   --scrollbar-width: thin;
   --scrollbar-size: 8px;
+  /* 字体与排版变量集中在 theme/fonts.css。 */
   /* 圆角变量集中在 theme/radius.css，按基准、基础刻度、应用语义三层组织。 */
   /* z-index 层级集中在 theme/z-index.css，按基准、基础刻度、应用语义三层组织。 */
 }
 
-/* WisePen 桌面端排版：正文 14px、辅助文本 12px，重点层级使用 16px 以上字号。 */
-/* 字重只通过 Regular、Medium、Semibold、Bold 四档表达层级，避免同层级出现多套数值。 */
 :root,
 .light,
 .dark,
 [data-theme='light'],
 [data-theme='dark'] {
-  --font-size-base: 14px;
-  --font-size-sm: 14px;
-  --font-size-xs: 12px;
-  --font-size-2xs: 11px;
-  --font-size-md: var(--font-size-base);
-  --font-size-lg: 18px;
-  --font-size-heading-1: 26px;
-  --font-size-heading-2: 20px;
-  --font-size-heading-3: 24px;
-  --font-size-heading-4: 22px;
-  --font-size-heading-5: 16px;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --field-text-font-weight: var(--font-weight-medium);
-  --line-height-base: 22px;
-  --line-height-sm: 20px;
-  --line-height-md: 22px;
-  --line-height-xs: 18px;
-  --line-height-2xs: 16px;
-  --font-sans: var(--app-font-family);
-  --font-mono: var(--app-font-mono);
   --space-3xs: 2px;
   --space-2xs: 4px;
   --space-2xs-plus: 6px;
