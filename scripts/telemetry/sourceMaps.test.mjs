@@ -6,9 +6,17 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
+import { ESLint } from 'eslint';
+import { getFileInfo } from 'prettier';
 import { build } from 'vite';
 
 import { collectPublicFiles } from '../jenkins/public-artifacts.mjs';
+
+test('私有生成附件不进入源码 lint 或格式化，避免重复构建后门禁扫描压缩产物', async () => {
+  const file = '.wisepen-debug/example/assets/main.js';
+  assert.equal(await new ESLint().isPathIgnored(file), true);
+  assert.equal((await getFileInfo(file, { ignorePath: '.prettierignore' })).ignored, true);
+});
 
 test('真实压缩产物及私有附件按 release 精确还原，异常输入全部明确失败', async (context) => {
   const root = await realpath(await mkdtemp(path.join(os.tmpdir(), 'wisepen-maps-')));
