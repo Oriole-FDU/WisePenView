@@ -1,7 +1,7 @@
-import { Tabs } from '@heroui/react';
 import { Check, X } from 'lucide-react';
 
 import { Checkbox } from '@/components/base/Input';
+import { Tabs } from '@/components/base/Tabs';
 import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
 import {
   resolveTagPermissionActionPresetKey,

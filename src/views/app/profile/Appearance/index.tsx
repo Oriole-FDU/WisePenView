@@ -1,8 +1,9 @@
-import { Heading, Separator, Tabs, ToggleButtonGroup } from '@heroui/react';
+import { Heading, Separator, ToggleButtonGroup } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import { AppToggleButton } from '@/components/base/Button';
 import PageHeader from '@/components/base/PageHeader';
+import { Tabs } from '@/components/base/Tabs';
 import { changeAppLanguage } from '@/i18n';
 import { LANGUAGE_OPTIONS } from '@/i18n/language';
 import type { SupportedLanguage } from '@/i18n/resources';

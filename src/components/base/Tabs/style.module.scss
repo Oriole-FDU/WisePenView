@@ -1,0 +1,7 @@
+.list {
+  background: color-mix(in oklab, var(--accent-soft) 33%, var(--accent-softer));
+}
+
+.indicator {
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--black) 8%, transparent);
+}

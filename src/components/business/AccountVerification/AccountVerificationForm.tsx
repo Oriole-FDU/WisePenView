@@ -1,9 +1,10 @@
-import { Form, Tabs } from '@heroui/react';
+import { Form } from '@heroui/react';
 import { Mail, ShieldUser } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FormField, Input, InputGroup } from '@/components/base/Input';
+import { Tabs } from '@/components/base/Tabs';
 
 import type { VerifyFormErrors, VerifyModalMode } from './index.type';
 import styles from './style.module.scss';

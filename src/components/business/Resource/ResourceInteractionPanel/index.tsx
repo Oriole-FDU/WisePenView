@@ -1,10 +1,11 @@
-import { Tabs, toast } from '@heroui/react';
+import { toast } from '@heroui/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useInfiniteScroll } from 'ahooks';
 import { type Key, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
+import { Tabs } from '@/components/base/Tabs';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import ResourceFavoriteAction from '@/components/business/Resource/ResourceFavoriteAction';

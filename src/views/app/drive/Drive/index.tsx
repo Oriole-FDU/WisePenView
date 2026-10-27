@@ -1,10 +1,11 @@
-import { Tabs, toast } from '@heroui/react';
+import { toast } from '@heroui/react';
 import { type Key, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { GuideAnchor, GuideScope, registerGuideActionHandlers } from '@/components/base/Guide';
 import PageHeader from '@/components/base/PageHeader';
+import { Tabs } from '@/components/base/Tabs';
 import DriveBrowser from '@/components/business/Drive/DriveBrowser';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID, GUIDE_TOUR_ID } from '@/constants/tour';
 import { useDriveService } from '@/domains';

@@ -1,4 +1,4 @@
-import { Link, Tabs } from '@heroui/react';
+import { Link } from '@heroui/react';
 import { linkVariants } from '@heroui/styles';
 import { ArrowLeft, BookOpen, UserPlus } from 'lucide-react';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { Link as RouterLink, Outlet, useMatch, useNavigate } from 'react-router-
 
 import { AppButton, AppIconButton } from '@/components/base/Button';
 import PageHeader from '@/components/base/PageHeader';
+import { Tabs } from '@/components/base/Tabs';
 import { getGroupDisplayConfig } from '@/components/business/Group/GroupDisplayConfig';
 import InviteUserModal from '@/components/business/Group/MemberList/Modals/InviteUserModal';
 import { GROUP_TYPE } from '@/domains/Group';

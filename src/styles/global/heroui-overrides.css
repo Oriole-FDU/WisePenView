@@ -1,14 +1,5 @@
 /* HeroUI 的跨组件覆盖集中在此文件，业务样式只保留上下文差异。 */
 
-/* Tabs */
-.tabs:not(.tabs--secondary) > .tabs__list-container > .tabs__list {
-  background: color-mix(in oklab, var(--accent-soft) 33%, var(--accent-softer));
-}
-
-.tabs:not(.tabs--secondary) > .tabs__list-container .tabs__indicator {
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--black) 8%, transparent);
-}
-
 /* Popover、Select、ComboBox、Autocomplete 外壳 */
 .popover,
 .dropdown__popover,

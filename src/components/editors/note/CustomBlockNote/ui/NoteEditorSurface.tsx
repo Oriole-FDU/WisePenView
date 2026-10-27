@@ -1,10 +1,10 @@
 import { BlockNoteView } from '@blocknote/mantine';
-import { Tabs } from '@heroui/react';
 import { useEventListener } from 'ahooks';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import { GuideAnchor } from '@/components/base/Guide';
+import { Tabs } from '@/components/base/Tabs';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
 import { useAppTheme } from '@/theme';

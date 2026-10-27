@@ -310,8 +310,9 @@ test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
   assert.doesNotMatch(heroOverrides, /\.modal__backdrop/);
   assert.doesNotMatch(heroOverrides, /\.tooltip\s*\{/);
   assert.doesNotMatch(heroOverrides, /\.table-root/);
+  assert.doesNotMatch(heroOverrides, /\.tabs/);
 
-  for (const selector of [/\.tabs:not\(\.tabs--secondary\)/, /\.popover__dialog/]) {
+  for (const selector of [/\.popover__dialog/]) {
     assert.match(heroOverrides, selector);
   }
 });
@@ -332,6 +333,23 @@ test('Button 基础封装持有圆角、禁用态与按钮组边界', async () =
   for (const source of [appButton, toggleButton, iconButton]) {
     assert.match(source, /buttonStyles\.root/);
   }
+});
+
+test('Tabs 基础封装持有默认表面与指示器样式', async () => {
+  const { code } = await compileCssModule('src/components/base/Tabs/style.module.scss');
+  const tabsSource = await readFile(join(root, 'src/components/base/Tabs/index.tsx'), 'utf8');
+
+  assert.match(
+    code,
+    /\.list\s*\{\s*background: color-mix\(in oklab, var\(--accent-soft\) 33%, var\(--accent-softer\)\);/
+  );
+  assert.match(code, /\.indicator\s*\{\s*box-shadow: 0 1px 3px color-mix\(/);
+  assert.match(tabsSource, /variant !== 'secondary'/);
+  assert.match(tabsSource, /className=\{clsx\(hasDefaultSurface && styles\.list, className\)\}/);
+  assert.match(
+    tabsSource,
+    /className=\{clsx\(hasDefaultSurface && styles\.indicator, className\)\}/
+  );
 });
 
 test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {
