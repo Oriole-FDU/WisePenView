@@ -36,5 +36,7 @@
 - `routing.md`：URL、页面级 Tab、面包屑和导航历史。
 - `store.md`：状态归属、注册、持久化和生命周期。
 - `color-system.md`：颜色阶、语义 token 和主题。
+- `observability.md`：当前前端 OTel、异常捕获、上下文、聚合和隐私实现。
+- `observability-target.md`：前端可观测性的目标能力、错误捕获边界、模块职责和重实现顺序。
 
 跨层任务按 `view/component -> service -> api -> entity/enum` 读取，存在字段转换时再读 `domain-mapper.md`；涉及拆分时先读 `architecture-guidelines.md`，涉及业务知识时再读 `business-knowledge.md`。修改完成后删除旧实现和无效兼容层。

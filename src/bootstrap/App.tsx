@@ -10,10 +10,10 @@ import { INDEXED_DB_NAMES, STORAGE_PREFIXES } from '@/constants/storageKeys';
 import { ServicesProvider } from '@/domains';
 import { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
+import { captureException } from '@/observability';
 import { resetSessionStores } from '@/store/lifecycle';
 import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';
-import { installGlobalErrorReporting, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { clearIndexedDbDatabases } from '@/utils/storage/localData';
 
@@ -41,10 +41,9 @@ const redirectToLogin = (): void => {
   }
 };
 
-const handleRouterError: ClientOnErrorFunction = (error, { errorInfo, location }) => {
-  reportError(error, {
-    origin: 'route',
-    pathname: location.pathname,
+const handleRouterError: ClientOnErrorFunction = (error, { errorInfo }) => {
+  captureException(error, {
+    detector: 'router-error',
     componentStack: errorInfo?.componentStack ?? undefined,
   });
 };
@@ -59,7 +58,6 @@ function PageLoadingFallback() {
 
 function App() {
   const unsubscribeAuthSessionRef = useRef<(() => void) | null>(null);
-  const stopGlobalErrorReportingRef = useRef<(() => void) | null>(null);
   const sessionEndedRef = useRef(false);
   useViewportLayoutScale();
 
@@ -85,14 +83,11 @@ function App() {
 
   useMount(() => {
     unsubscribeAuthSessionRef.current = authSessionCoordinator.subscribe(handleAuthSessionEvent);
-    stopGlobalErrorReportingRef.current = installGlobalErrorReporting();
     startApiServerAddressMonitoring();
   });
 
   useUnmount(() => {
     stopApiServerAddressMonitoring();
-    stopGlobalErrorReportingRef.current?.();
-    stopGlobalErrorReportingRef.current = null;
     unsubscribeAuthSessionRef.current?.();
     unsubscribeAuthSessionRef.current = null;
   });

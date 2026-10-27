@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { observeUserLoad } from '@/observability';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import styles from '../AuthenticatedRouteGuard/style.module.scss';
@@ -10,7 +11,10 @@ import styles from '../AuthenticatedRouteGuard/style.module.scss';
 function RootRouteGuard() {
   const userService = useUserService();
   const { data, error, loading } = useApi(
-    () => userService.getUserInfo({ forceRefresh: true, silentUnauthorized: true }),
+    () =>
+      observeUserLoad(() =>
+        userService.getUserInfo({ forceRefresh: true, silentUnauthorized: true })
+      ),
     { showErrorToast: false }
   );
 

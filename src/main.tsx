@@ -2,47 +2,36 @@
 import '@/i18n';
 import '@fontsource-variable/noto-sans-sc/wght.css';
 import { createRoot } from 'react-dom/client';
-import { ErrorBoundary } from 'react-error-boundary';
+import { captureException, ObservedErrorBoundary } from '@/observability';
 import App from './bootstrap/App';
+import { startAppObservability } from './bootstrap/observability';
 import './styles/global/index.css';
 import './styles/global/scrollbar.scss';
 import './styles/global/app-shell.css';
-import { installOtelErrorReporter } from '@/telemetry/errorReporter';
 import { syncViewportLayoutScale } from '@/utils/browser/layoutScale';
-import { reportError } from './utils/error';
 import RootErrorFallback from './views/app/error/RootErrorFallback';
 
-installOtelErrorReporter();
+const stopObservability = startAppObservability();
+import.meta.hot?.dispose(stopObservability);
 syncViewportLayoutScale();
 
 const root = createRoot(document.getElementById('root')!, {
   onUncaughtError: (error, errorInfo) => {
-    reportError(error, {
-      origin: 'react-uncaught',
-      pathname: window.location.pathname,
+    captureException(error, {
+      detector: 'react-root-uncaught',
       componentStack: errorInfo.componentStack ?? undefined,
     });
   },
   onRecoverableError: (error, errorInfo) => {
-    reportError(error, {
-      origin: 'react-recoverable',
-      pathname: window.location.pathname,
+    captureException(error, {
+      detector: 'react-root-recoverable',
       componentStack: errorInfo.componentStack ?? undefined,
     });
   },
 });
 
 root.render(
-  <ErrorBoundary
-    FallbackComponent={RootErrorFallback}
-    onError={(error, errorInfo) => {
-      reportError(error, {
-        origin: 'root-boundary',
-        pathname: window.location.pathname,
-        componentStack: errorInfo.componentStack ?? undefined,
-      });
-    }}
-  >
+  <ObservedErrorBoundary detector="root-fallback" FallbackComponent={RootErrorFallback}>
     <App />
-  </ErrorBoundary>
+  </ObservedErrorBoundary>
 );

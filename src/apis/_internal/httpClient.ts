@@ -4,7 +4,7 @@ import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig }
 import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/_internal/apiServerAddr';
 import { mapAxiosErrorToWisePenError } from '@/apis/_internal/axiosErrorMapper';
 import { applyXDeveloperHeader } from '@/apis/_internal/developmentTraffic';
-import { reportHttpFailure } from '@/telemetry/httpFailure';
+import { reportHttpFailure } from '@/apis/_internal/httpFailureTelemetry';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 
 declare module 'axios' {

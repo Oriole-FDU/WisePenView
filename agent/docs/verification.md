@@ -17,12 +17,13 @@
 | `src/domains/**`、registry、mock       | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`                            | `pnpm build`                                                 |
 | `vite.config.ts`、tsconfig、Electron   | `pnpm lint`、`pnpm typecheck`、`pnpm build`                                 | 对应打包脚本                                                 |
 | 应用初始化、认证与运行时配置           | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm build`              | `pnpm build --mode mock`、配置错误启动检查、浏览器运行态回归 |
+| 前端可观测性与异常捕获                 | `pnpm lint`、`pnpm typecheck`、`pnpm check:observability`、`pnpm build`     | `pnpm build:app --mode mock`、Collector 与浏览器运行态       |
 | Storybook 配置或 stories               | `pnpm lint`、`pnpm typecheck`                                               | `pnpm build-storybook`                                       |
 | UI 交互、路由、浮层                    | 上述静态检查                                                                | 用户明确授权后运行 mock 或浏览器回归                         |
 
 ## CI 契约
 
-PR CI 固定执行 commitlint、格式检查、lint、文件长度规则、editor runtime、Auth 注册请求、build、mock contract、API response contract、z-index 层级、圆角 token、样式契约、note link 协议和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
+PR CI 固定执行 commitlint、格式检查、lint、文件长度规则、editor runtime、Auth 注册请求、build、mock contract、API response contract、observability、z-index 层级、圆角 token、样式契约、note link 协议和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
 
