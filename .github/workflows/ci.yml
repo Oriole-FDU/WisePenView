@@ -4,15 +4,7 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches:
-      [
-        'main',
-        'refactor/scss-native-css',
-        'refactor/scss-shared-base',
-        'refactor/scss-table-boundary',
-        'refactor/scss-business',
-        'refactor/scss-editors',
-      ]
+    # Stack PR 的 base 可能是另一条 refactor/* 分支，所有 PR 目标分支都应执行检查。
   # 支持手动重跑完整检查。
   workflow_dispatch:
 
