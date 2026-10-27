@@ -10,7 +10,7 @@ import { compileString } from 'sass-embedded';
 import { preprocessCSS, resolveConfig } from 'vite';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const sharedModules = ['breakpoints', 'desktopTitleBar', 'focusRing', 'layoutMixins', 'scrollbar'];
+const sharedModules = ['breakpoints', 'desktopTitleBar', 'focusRing', 'scrollbar'];
 
 function compileScss(source, file = 'scripts/style-contract.scss') {
   return compileString(source, {
@@ -46,33 +46,42 @@ test('共用 SCSS partial 只提供定义，不输出 CSS', () => {
   }
 });
 
-test('共用 mixin 保留焦点、间距、拖拽、滚动条与断点', () => {
+test('共用 mixin 只保留焦点、拖拽、滚动条与断点契约', () => {
   const css = compileScss(`
     @use '@/styles/mixins/breakpoints' as breakpoints;
     @use '@/styles/mixins/desktopTitleBar' as titleBar;
     @use '@/styles/mixins/focusRing' as focusRing;
-    @use '@/styles/mixins/layoutMixins' as layout;
     @use '@/styles/mixins/scrollbar' as scrollbar;
 
     .focus { @include focusRing.appFocusRing(); }
-    .layout { @include layout.flexBetween(); }
-    .customLayout { @include layout.inlineFlexBetween(24px); }
     .titleBar { @include titleBar.desktopTitleBarChrome(); }
-    .scroll { @include scrollbar.appSubtleScrollbarStable(); }
+    .scroll { @include scrollbar.appSubtleScrollbar(); }
     @media (max-width: breakpoints.$breakpoint-md) { .compact { display: block; } }
   `);
 
-  assert.match(css, /\.focus\s*\{[^}]*outline: 2px solid var\(--focus, var\(--accent\)\);/);
-  assert.match(css, /\.layout\s*\{[^}]*gap: var\(--space-sm\);/);
-  assert.match(css, /\.customLayout\s*\{[^}]*gap: 24px;/);
+  assert.match(css, /\.focus\s*\{[^}]*outline: var\(--focus-ring-width\) solid var\(--focus\);/);
   assert.match(css, /\.titleBar\s*\{[^}]*-webkit-app-region: drag;/);
   assert.match(css, /\[data-no-drag\]\)\s*\{\s*-webkit-app-region: no-drag;/);
-  assert.match(css, /\.scroll\s*\{[^}]*scrollbar-gutter: stable;/);
+  assert.match(css, /\.scroll\s*\{[^}]*scrollbar-color: transparent transparent;/);
   assert.match(
     css,
-    /\.scroll:hover::-webkit-scrollbar-thumb\s*\{[^}]*background-clip: content-box;/
+    /\.scroll:is\(:hover, :focus-visible\)::-webkit-scrollbar-thumb\s*\{[^}]*background-color: var\(--scrollbar-thumb\);/
   );
   assert.match(css, /@media \(max-width: 768px\)/);
+});
+
+test('共用 mixin 不暴露只清焦点或通用布局的逃生口', async () => {
+  const [focusSource, scrollbarSource, sessionTab] = await Promise.all(
+    [
+      'src/styles/mixins/_focusRing.scss',
+      'src/styles/mixins/_scrollbar.scss',
+      'src/components/business/Sidebar/_common/tab/SessionTab/style.module.scss',
+    ].map((file) => readFile(join(root, file), 'utf8'))
+  );
+
+  assert.doesNotMatch(focusSource, /@mixin clearHeroFocusRing/);
+  assert.doesNotMatch(scrollbarSource, /appSubtleScrollbarStable/);
+  assert.match(sessionTab, /@include focusRing\.appFocusRingInset\(\);/);
 });
 
 test('AppIconButton SCSS 保留 CSS Module 类名与交互状态样式', async () => {
@@ -96,7 +105,7 @@ test('AppIconButton SCSS 保留 CSS Module 类名与交互状态样式', async (
   );
   assert.match(
     result.code,
-    /\.root:focus-visible[^{]*\{[^}]*outline: 2px solid var\(--focus, var\(--accent\)\);/
+    /\.root:focus-visible[^{]*\{[^}]*outline: var\(--focus-ring-width\) solid var\(--focus\);/
   );
   assert.match(result.code, /\.root:is\([^{}]+\)\s*\{[^}]*cursor: not-allowed;/);
   assert.match(
@@ -185,7 +194,7 @@ test('scrollbar mixin 後的宣告不拆成重複父規則', async () => {
     const rules = code.match(new RegExp(`^${selector}\\s*\\{[^}]*\\}`, 'gm')) ?? [];
     assert.equal(rules.length, 1, file);
     assert.ok(rules[0].includes(declaration), file);
-    assert.ok(rules[0].includes('scrollbar-width: var(--scrollbar-width, thin);'), file);
+    assert.ok(rules[0].includes('scrollbar-width: var(--scrollbar-width);'), file);
   }
 });
 
@@ -716,7 +725,7 @@ test('Drive scrollbar 與後續宣告保留於同一父規則', async () => {
     const rules = [...code.matchAll(new RegExp(`^\\.${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
     assert.equal(rules.length, 1, `${component}.${selector}: 不拆分父規則`);
     for (const declaration of [
-      'scrollbar-width: var(--scrollbar-width, thin);',
+      'scrollbar-width: var(--scrollbar-width);',
       'scrollbar-color: transparent transparent;',
       ...declarations,
     ])
@@ -964,7 +973,7 @@ test('Chat scrollbar 與後續宣告保留於同一父規則', async () => {
     const rules = [...code.matchAll(new RegExp(`^${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
     assert.equal(rules.length, 1, `${component}: ${selector}`);
     assert.ok(rules[0][1].includes(declaration), component);
-    assert.ok(rules[0][1].includes('scrollbar-width: var(--scrollbar-width, thin);'), component);
+    assert.ok(rules[0][1].includes('scrollbar-width: var(--scrollbar-width);'), component);
   }
 });
 
@@ -993,14 +1002,14 @@ test('Chat、Sidebar 保留桌面拖拽區、窗口按鈕留白與鍵盤焦點',
   );
   assert.match(
     profile.code,
-    /\.menuTrigger\[data-focus-visible\]\s*\{[^}]*outline: 2px solid var\(--focus, var\(--accent\)\);/
+    /\.menuTrigger\[data-focus-visible\]\s*\{[^}]*outline: var\(--focus-ring-width\) solid var\(--focus\);/
   );
   const tab = await compileCssModule(
     'src/components/business/Sidebar/_common/tab/style.module.scss'
   );
   assert.match(
     tab.code,
-    /\.tab\[data-focus-visible\]\s*\{[^}]*box-shadow: inset 0 0 0 2px var\(--focus, var\(--accent\)\);/
+    /\.tab\[data-focus-visible\]\s*\{[^}]*box-shadow: inset 0 0 0 var\(--focus-ring-width\) var\(--focus\);/
   );
 });
 
@@ -1076,7 +1085,7 @@ test('SelectedMemberList scrollbar 與後續宣告保留於同一父規則', asy
     'overflow-y: auto;',
     'margin-bottom: var(--space-md);',
     'max-height: 300px;',
-    'scrollbar-width: var(--scrollbar-width, thin);',
+    'scrollbar-width: var(--scrollbar-width);',
     'scrollbar-color: transparent transparent;',
   ])
     assert.ok(rules[0][1].includes(declaration), declaration);
@@ -1095,7 +1104,7 @@ test('DesktopWindowControls 保留固定禁拖拽、焦點與關閉按鈕狀態'
   assert.doesNotMatch(code, /-webkit-app-region: drag;/);
   assert.match(
     code,
-    /\.button:focus-visible,\s*\.button:focus-visible:not\(:focus\),\s*\.button\[data-focus-visible\]\s*\{[^}]*--tw-ring-offset-shadow: 0 0 #0000;[^}]*outline: 2px solid var\(--focus, var\(--accent\)\);[^}]*outline-offset: 2px;/
+    /\.button:focus-visible,\s*\.button:focus-visible:not\(:focus\),\s*\.button\[data-focus-visible\]\s*\{[^}]*--tw-ring-offset-shadow: 0 0 #0000;[^}]*outline: var\(--focus-ring-width\) solid var\(--focus\);[^}]*outline-offset: var\(--focus-ring-offset\);/
   );
   assert.match(
     code,
@@ -1241,7 +1250,7 @@ test('agent、skill 七處 scrollbar 保留單一父規則與後續宣告', asyn
       const rules = [...code.matchAll(new RegExp(`^\\.${selector}\\s*\\{([^}]+)\\}`, 'gm'))];
       assert.equal(rules.length, 1, `${component}.${selector}: 不拆分父規則`);
       for (const declaration of [
-        'scrollbar-width: var(--scrollbar-width, thin);',
+        'scrollbar-width: var(--scrollbar-width);',
         'scrollbar-color: transparent transparent;',
         ...declarations,
       ])
@@ -1460,7 +1469,7 @@ test('剩餘 scrollbar mixin 與晚宣告維持單一父規則', async () => {
         ([, name]) => name.replace(/\s+/g, ' ').trim() === selector
       );
       assert.equal(rules.length, 1, `${file}: ${selector} 不拆分父規則`);
-      assert.ok(rules[0][2].includes('scrollbar-width: var(--scrollbar-width, thin);'));
+      assert.ok(rules[0][2].includes('scrollbar-width: var(--scrollbar-width);'));
       assert.ok(rules[0][2].includes('scrollbar-color: transparent transparent;'));
     }
   }
@@ -1479,7 +1488,7 @@ test('Auth 本地文字連結 mixin 保留三個 caller 的 hover 與鍵盤焦�
   }
 });
 
-test('layout mixin 保留參數與單次 min-size 宣告', async () => {
+test('布局声明保留原参数与单次 min-size 宣告', async () => {
   for (const [file, selectors] of [
     ['App/AppPageLayout', ['root']],
     ['Course/CourseLayout/style', ['sidebar', 'main']],
@@ -1555,14 +1564,14 @@ test('全局 scrollbar SCSS 保留页面与显式滚动条规则', async () => {
   const file = 'src/styles/global/scrollbar.scss';
   const css = compileScss(await readFile(join(root, file), 'utf8'), file);
 
-  assert.equal(css.match(/scrollbar-width: var\(--scrollbar-width, thin\);/g)?.length, 2);
+  assert.equal(css.match(/scrollbar-width: var\(--scrollbar-width\);/g)?.length, 2);
   assert.match(
     css,
-    /html:hover\s*\{[^}]*scrollbar-color: var\(--scrollbar-thumb\) var\(--scrollbar-track\);/
+    /html:is\(:hover, :focus-visible\)\s*\{[^}]*scrollbar-color: var\(--scrollbar-color\);/
   );
   assert.match(
     css,
-    /\.scrollbar-thin:hover::-webkit-scrollbar-thumb\s*\{[^}]*background-clip: content-box;/
+    /\.scrollbar-thin:is\(:hover, :focus-visible\)::-webkit-scrollbar-thumb\s*\{[^}]*background-color: var\(--scrollbar-thumb\);/
   );
   assert.match(
     css,

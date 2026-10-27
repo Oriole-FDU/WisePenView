@@ -39,7 +39,7 @@
   &:focus-visible,
   &:focus-visible:not(:focus),
   &[data-focus-visible] {
-    @include focusRing.clearHeroFocusRing();
+    @include focusRing.appFocusRingInset();
   }
 
   &:hover,

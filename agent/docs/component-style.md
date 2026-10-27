@@ -15,8 +15,17 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題
 - 间距单位、`--space-*` 刻度和页面／输入区／表格间距集中在 `src/styles/theme/spacing.css`；`gap`、`margin`、`padding` 在数值命中公共刻度时必须消费对应 token。
 - 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则由 `src/styles/global/base.css` 消费这些变量。
 - Tailwind/HeroUI 的 `--font-sans`、`--font-mono` 只在 `@theme inline` 中做名称桥接；项目自有样式直接使用 `--app-font-family`、`--app-font-mono`，不得绕经第三方别名。
-- 布局尺寸、控件规格和阴影／滚动条效果分别集中在 `src/styles/theme/layout.css`、`controls.css` 和 `effects.css`；不再维护通用 `tokens.css` 杂项文件。
+- 布局尺寸、控件规格（含焦点环）和阴影／滚动条效果分别集中在 `src/styles/theme/layout.css`、`controls.css` 和 `effects.css`；不再维护通用 `tokens.css` 杂项文件。
 - 通用 Table 的尺寸、间距和圆角别名集中在 `src/components/base/Table/shared/styles/tokens.css`；表格颜色继续由 `palette.css` 管理，Drive 专属布局 token 由 `TableDrive` 自己维护。
+
+共享 SCSS mixin 只保留“跨组件且无法由 token 单独表达”的契约：
+
+- `breakpoints`：统一响应式断点，避免各业务文件维护不同像素值。
+- `scrollbar`：统一标准 `scrollbar-*` 与 WebKit 滚动条外观；80 多个滚动容器依赖同一套显隐、尺寸和圆角行为。
+- `focusRing`：成组清空 HeroUI/Tailwind 的焦点通道，再提供外环、内环或 Tabs 软底高亮；不允许调用方只清除焦点而不提供可见反馈。
+- `desktopTitleBar`：封装 Electron 的 `-webkit-app-region`、可拖拽带和窗口按钮禁拖区，这些不属于普通视觉 token。
+
+普通 flex 布局声明直接写在所属容器中，不再维护通用布局 mixin；单次使用的全局抽象会增加跳转成本而不形成稳定契约。
 
 推荐结构：
 

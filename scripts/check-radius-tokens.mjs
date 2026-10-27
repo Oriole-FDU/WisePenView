@@ -2,7 +2,7 @@
  * 圆角 token 守卫。
  *
  * 组件与业务样式只能引用应用语义圆角（`--app-radius-*`）：
- * 1. 禁止直接引用基础刻度（`--radius`、`--radius-*`、`--scrollbar-radius`），它们只把数值参数化，不表达业务含义；
+ * 1. 禁止直接引用基础刻度（`--radius`、`--radius-*`），它们只把数值参数化，不表达业务含义；
  * 2. 圆角属性的值只允许 `0`、百分比整圆或 `var(--app-radius-*)`，禁止硬编码数值。
  *
  * `src/styles/**` 是 token 定义与基础设施层，不在检查范围内。
@@ -21,8 +21,8 @@ const styleExtensions = new Set(['.less', '.scss', '.css']);
 
 /** 圆角属性，例如 border-radius、border-start-start-radius。 */
 const radiusPropertyPattern = /([a-z-]*radius)\s*:\s*([^;]*)/i;
-/** 基础刻度引用，例如 var(--radius-lg)、var(--scrollbar-radius)。 */
-const baseScalePattern = /var\(\s*--(?:radius(?:-[a-z0-9]+)?|scrollbar-radius)\b/;
+/** 基础刻度引用，例如 var(--radius-lg)。 */
+const baseScalePattern = /var\(\s*--radius(?:-[a-z0-9]+)?\b/;
 /** 数值字面量，例如 16px、10px、999px。 */
 const numericPattern = /(?<![\w-])(\d*\.?\d+)(px|rem|em|%|vh|vw)\b/g;
 /** 百分比整圆与重置值可以保留字面量。 */

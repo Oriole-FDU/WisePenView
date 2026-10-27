@@ -1,6 +1,5 @@
 @use '@/styles/mixins/scrollbar' as scrollbar;
 @use '@/styles/mixins/breakpoints' as breakpoints;
-@use '@/styles/mixins/layoutMixins' as layout;
 
 .container {
   display: flex;
@@ -151,7 +150,10 @@
 }
 
 .resourcePanelHeader {
-  @include layout.flexBetween(var(--table-gap, var(--space-sm)));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--table-gap, var(--space-sm));
   flex: 0 0 auto;
   min-height: var(--table-header-bar-min-height, 44px);
   padding: var(--table-shell-padding-block, var(--space-sm)) var(--table-shell-padding-inline, 14px)
