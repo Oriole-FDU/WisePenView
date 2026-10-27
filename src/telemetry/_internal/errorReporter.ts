@@ -76,7 +76,14 @@ export const installOtelErrorReporter = (): (() => void) => {
       : sanitizeDiagnosticText(report.error.message);
     const stack = sanitizeDiagnosticText(report.error.stack ?? '', 32_000);
     const topFrame = stack.split('\n')[1]?.trim() ?? '';
-    const hasStackLocation = /:[1-9]\d*:[1-9]\d*(?:\)|$)/m.test(stack);
+    const hasStackLocation = stack.split('\n').some((frame) => {
+      const coordinates = /^(?:\s*at\s+.+|[^@:\n]*@\S+):([1-9]\d*):([1-9]\d*)\)?\s*$/.exec(frame);
+      return (
+        coordinates !== null &&
+        Number.isSafeInteger(Number(coordinates[1])) &&
+        Number.isSafeInteger(Number(coordinates[2]))
+      );
+    });
     const location = hasStackLocation ? undefined : report.location;
     recordBreadcrumb('runtime.error', { 'error.kind': report.origin }, request?.snapshot);
     recordTelemetryEvent(
