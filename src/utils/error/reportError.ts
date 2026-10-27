@@ -15,6 +15,7 @@ export interface ErrorReportContext {
   origin: ErrorReportOrigin;
   pathname?: string;
   componentStack?: string;
+  location?: { filename: string; line: number; column: number };
 }
 
 export interface ErrorReport {
@@ -23,6 +24,7 @@ export interface ErrorReport {
   origin: ErrorReportOrigin;
   pathname?: string;
   componentStack?: string;
+  location?: ErrorReportContext['location'];
   error: {
     name: string;
     message: string;
@@ -76,6 +78,7 @@ const buildErrorReport = (
     origin: context.origin,
     pathname: context.pathname,
     componentStack: context.componentStack,
+    location: context.location,
     error: {
       ...errorInfo,
       ...(isWisePenError(error) ? { code: error.code, source: error.source } : {}),
@@ -122,6 +125,14 @@ export const installGlobalErrorReporting = (): (() => void) => {
     reportError(event.error ?? event.message, {
       origin: 'window-error',
       pathname: window.location.pathname,
+      location:
+        event.filename?.trim() &&
+        Number.isSafeInteger(event.lineno) &&
+        event.lineno > 0 &&
+        Number.isSafeInteger(event.colno) &&
+        event.colno > 0
+          ? { filename: event.filename, line: event.lineno, column: event.colno }
+          : undefined,
     });
   };
   const handleUnhandledRejection = (event: PromiseRejectionEvent) => {

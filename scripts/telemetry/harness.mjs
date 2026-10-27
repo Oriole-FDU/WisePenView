@@ -82,7 +82,16 @@ const otelSource = `
   export const isTelemetryEnabled = true;
 `;
 
-export async function loadTelemetry(mode = 'development', endpoint = '/otel') {
+export const testBuildInfo = {
+  version: 'test-version',
+  commit: 'a'.repeat(40),
+  buildId: 'test-build',
+  mode: 'development',
+  release: `test-version-${'a'.repeat(12)}-test-build`,
+  dirty: false,
+};
+
+export async function loadTelemetry(mode = 'development', endpoint = '/otel', options = {}) {
   const configSource = `export const publicAppConfig = ${JSON.stringify({
     mode,
     observability: { otelEndpoint: endpoint },
@@ -99,6 +108,11 @@ export async function loadTelemetry(mode = 'development', endpoint = '/otel') {
       export { sanitizeDiagnosticText, readRequestPath } from '@/telemetry/_internal/sanitize';
       export { installOtelErrorReporter } from '@/telemetry/_internal/errorReporter';
       export { reportError } from '@/utils/error/reportError';
+      export { installGlobalErrorReporting } from '@/utils/error/reportError';
+      export { buildInfo } from '@/config/buildInfo';
+      export { buildErrorDetail } from '@/components/business/ErrorPage/errorDetail';
+      export { default as i18n } from '@/i18n';
+      export { parseErrorMessage, WisePenError } from '@/utils/error';
       export { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
       export { installAppTelemetry, getTelemetryPage, loadTelemetryUser } from '@/telemetry/_internal/lifecycle';
       export { default as httpClient } from '@/apis/_internal/httpClient';
@@ -113,7 +127,11 @@ export async function loadTelemetry(mode = 'development', endpoint = '/otel') {
     packages: 'external',
     tsconfig: 'tsconfig.app.json',
     write: false,
-    define: { __APP_VERSION__: '"test-version"' },
+    define: {
+      __APP_VERSION__: '"test-version"',
+      __APP_BUILD_INFO__: JSON.stringify(options.buildInfo ?? testBuildInfo),
+      'import.meta.env.DEV': JSON.stringify(mode === 'development'),
+    },
     plugins: [
       {
         name: 'telemetry-test-boundaries',
@@ -184,7 +202,7 @@ export function installBrowser(context) {
       listeners.delete(`${name}:${type}`);
     },
   });
-  const document = { ...surface('document'), visibilityState: 'visible' };
+  const document = { ...surface('document'), visibilityState: 'visible', documentElement: {} };
   const window = {
     ...surface('window'),
     location: { pathname: '/', origin: 'https://app.example.test' },
@@ -199,11 +217,14 @@ export function installBrowser(context) {
     },
   };
   const navigator = { onLine: true, userAgent: 'Mozilla/5.0 Chrome/130.0.0.0 Safari/537.36' };
+  navigator.languages = ['zh-CN'];
+  window.navigator = navigator;
+  window.localStorage = memoryStorage();
   for (const [key, value] of Object.entries({
     window,
     document,
     navigator,
-    localStorage: memoryStorage(),
+    localStorage: window.localStorage,
     sessionStorage: memoryStorage(),
   })) {
     const previous = Object.getOwnPropertyDescriptor(globalThis, key);

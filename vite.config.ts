@@ -1,3 +1,6 @@
+import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -7,6 +10,16 @@ import packageJson from './package.json' with { type: 'json' };
 import { createPublicAppConfig } from './src/config/publicConfig';
 
 export default defineConfig(({ mode }) => {
+  const commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  const buildId = randomUUID();
+  const buildInfo = {
+    version: packageJson.version,
+    commit,
+    buildId,
+    mode,
+    release: `${packageJson.version}-${commit.slice(0, 12)}-${buildId}`,
+    dirty: Boolean(execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim()),
+  };
   // 无前缀：仅构建期使用，不会注入 import.meta.env 到浏览器
   const env = loadEnv(mode, process.cwd(), '');
 
@@ -18,9 +31,24 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      {
+        name: 'wisepen-build-identity',
+        apply: 'build',
+        generateBundle() {
+          this.emitFile({
+            type: 'asset',
+            fileName: 'build-info.json',
+            source: `${JSON.stringify(buildInfo, null, 2)}\n`,
+          });
+        },
+      },
+    ],
     define: {
       __APP_VERSION__: JSON.stringify(packageJson.version),
+      __APP_BUILD_INFO__: JSON.stringify(buildInfo),
     },
     server: {
       port: 5173,

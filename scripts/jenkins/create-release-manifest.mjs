@@ -1,4 +1,4 @@
-import { readdir, stat, writeFile } from 'node:fs/promises';
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 // Jenkins 通过命令行参数把构建目录、清单输出位置和发布版本传给本脚本
@@ -39,11 +39,10 @@ async function collectFiles(rootDir, currentDir = rootDir) {
 const args = parseArgs(process.argv.slice(2));
 const distDir = args.get('dist');
 const outFile = args.get('out');
-const release = args.get('release');
 const buildMode = args.get('build-mode');
 
-if (!distDir || !outFile || !release || !buildMode) {
-  throw new Error('缺少必要参数：--dist --out --release --build-mode');
+if (!distDir || !outFile || !buildMode) {
+  throw new Error('缺少必要参数：--dist --out --build-mode');
 }
 
 const distStat = await stat(distDir);
@@ -60,11 +59,25 @@ if (!files.includes('index.html')) {
   throw new Error('dist 中缺少 index.html，拒绝生成发布清单。');
 }
 
-// schemaVersion 为未来扩展清单格式保留版本位
-// release 通常使用 Git short SHA；buildMode 用于区分 production/development 产物
+const build = JSON.parse(await readFile(path.join(distDir, 'build-info.json'), 'utf8'));
+if (
+  typeof build.version !== 'string' ||
+  !build.version ||
+  !/^[a-f0-9]{40}$/.test(build.commit) ||
+  typeof build.buildId !== 'string' ||
+  !build.buildId ||
+  build.mode !== buildMode ||
+  build.release !== `${build.version}-${build.commit.slice(0, 12)}-${build.buildId}` ||
+  typeof build.dirty !== 'boolean'
+) {
+  throw new Error('构建身份无效或构建模式不匹配，拒绝生成发布清单。');
+}
+
+// 发布只读取构建时的身份，不能在此重新生成 release。
 const manifest = {
   schemaVersion: 1,
-  release,
+  release: build.release,
+  build,
   buildMode,
   createdAt: new Date().toISOString(),
   files,

@@ -71,6 +71,8 @@ export const installOtelErrorReporter = (): (() => void) => {
       : sanitizeDiagnosticText(report.error.message);
     const stack = sanitizeDiagnosticText(report.error.stack ?? '', 32_000);
     const topFrame = stack.split('\n')[1]?.trim() ?? '';
+    const hasStackLocation = /:[1-9]\d*:[1-9]\d*(?:\)|$)/m.test(stack);
+    const location = hasStackLocation ? undefined : report.location;
     recordBreadcrumb('runtime.error', { 'error.kind': report.origin }, request?.snapshot);
     recordTelemetryEvent(
       'frontend.error',
@@ -85,6 +87,10 @@ export const installOtelErrorReporter = (): (() => void) => {
         'error.origin': report.origin,
         'error.code': report.error.code,
         'error.source': report.error.source,
+        'error.location_status': hasStackLocation ? 'stack' : location ? 'event' : 'unavailable',
+        'code.file.path': location ? sanitizeDiagnosticText(location.filename) : undefined,
+        'code.line.number': location?.line,
+        'code.column.number': location?.column,
         'react.component_stack': sanitizeDiagnosticText(report.componentStack ?? '', 32_000),
       },
       { owner: request?.snapshot, aggregate: true }

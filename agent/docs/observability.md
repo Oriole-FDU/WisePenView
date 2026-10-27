@@ -127,6 +127,21 @@ API 错误日志不复制服务端文案；运行时诊断文本会清理 URL �
 
 ## 日志后台使用
 
+### 构建与源码定位
+
+Vite 在一次配置求值中生成唯一构建身份：版本、完整 commit、UUID build ID、模式、release 和 dirty。
+同一 commit 重建产生不同 release。bundle、事件的 `service.version/commit/release/build_id/build_mode/dirty`、
+复制的错误详情、公开 `build-info.json` 和发布 manifest 使用这一份身份；发布阶段不重新生成。
+Jenkins 容器标签也读取该 release；`build-info.json` 使用 no-cache，避免缓存旧身份。
+
+HTTP 仍以构建身份、端点、request ID 和 trace 定位，不额外捕获业务调用 stack。
+运行时保留有效 stack；缺少 stack 坐标时，只有 ErrorEvent 提供文件名及正整数行列，才携带
+`code.file.path/line.number/column.number` 备援。`error.location_status` 为 `stack`、`event` 或
+`unavailable`；最后一种表示没有可用位置，不能承诺源码行列。本增量不生成 source map。
+
+构建身份是公开诊断信息，不含凭据、业务正文或本机路径。dirty 表示构建时 Git 工作区状态，
+不代表运行时修改；不能仅凭 commit 相同选用另一次重建的附件。
+
 按环境、版本确定发布范围，再用 `user.id`、`session.id`、`page.instance.id` 缩小会话。
 先看 `frontend.request_failure` 的 `error.kind`、`api.endpoint`、状态码和业务码，
 再查看同一现场的 `telemetry.breadcrumbs` 及后端 `wisepen.request_id`。

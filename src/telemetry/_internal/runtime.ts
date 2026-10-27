@@ -1,5 +1,6 @@
 import { type Attributes, type Context, context } from '@opentelemetry/api';
 
+import { buildInfo } from '@/config/buildInfo';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
@@ -91,7 +92,12 @@ export const getClientAttributes = (): Attributes => {
           ? 'Safari'
           : 'unknown';
   clientAttributes = {
-    'service.version': __APP_VERSION__,
+    'service.version': buildInfo.version,
+    'service.commit': buildInfo.commit,
+    'service.release': buildInfo.release,
+    'service.build_id': buildInfo.buildId,
+    'service.build_mode': buildInfo.mode,
+    'service.dirty': buildInfo.dirty,
     'deployment.environment.name': publicAppConfig.mode,
     'client.id': readClientId(),
     'client.type': isDesktop() ? 'electron' : 'web',
