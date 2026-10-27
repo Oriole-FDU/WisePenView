@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSkillService } from '@/domains';
 import type { SkillDetail, UploadSkillAssetResult } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
-import { captureException } from '@/observability';
+import { captureException } from '@/observability/capture';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { SkillSaveQueueItem } from '../components/SkillSaveQueueDock/index.type';

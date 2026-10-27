@@ -1,4 +1,4 @@
-import { captureException } from '@/observability';
+import { captureException } from '@/observability/capture';
 
 import type { DrawioSaveState } from './drawioProtocol';
 

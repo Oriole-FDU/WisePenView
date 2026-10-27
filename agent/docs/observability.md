@@ -12,7 +12,8 @@
 
 ## 公共入口
 
-业务和框架边界只从 `@/observability` 使用：
+业务和框架错误调用点从无 SDK 副作用的 `@/observability/capture` 使用；应用安装与 React 适配器
+从 `@/observability` 使用：
 
 ```ts
 captureException(error, {

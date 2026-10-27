@@ -12,7 +12,7 @@ import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useInteractService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
-import { captureException } from '@/observability';
+import { captureException } from '@/observability/capture';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 

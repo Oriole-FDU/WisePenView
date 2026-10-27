@@ -1,7 +1,7 @@
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
-import { getSupportErrorId } from '@/observability';
+import { getSupportErrorId } from '@/observability/capture';
 
 import styles from './style.module.scss';
 

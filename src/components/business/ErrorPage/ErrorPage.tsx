@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { ResultState } from '@/components/base/Feedback';
-import { getSupportErrorId } from '@/observability';
+import { getSupportErrorId } from '@/observability/capture';
 import { copyText } from '@/utils/browser/copyText';
 
 import { buildErrorDetail } from './errorDetail';

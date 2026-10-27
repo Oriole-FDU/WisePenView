@@ -10,7 +10,7 @@ import { INDEXED_DB_NAMES, STORAGE_PREFIXES } from '@/constants/storageKeys';
 import { ServicesProvider } from '@/domains';
 import { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
-import { captureException } from '@/observability';
+import { captureException } from '@/observability/capture';
 import { resetSessionStores } from '@/store/lifecycle';
 import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';

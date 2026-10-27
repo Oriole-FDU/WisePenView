@@ -8,7 +8,7 @@ import { type ChatModel, type CreateSessionRequest, useChatSession } from '@/dom
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
-import { captureException } from '@/observability';
+import { captureException } from '@/observability/capture';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { ChatProps } from '../index.type';
