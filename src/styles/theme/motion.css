@@ -1,0 +1,20 @@
+/**
+ * 动效 token 集中在此文件，统一维护动画时长与缓动曲线。
+ * 全局 reduced-motion 降级规则位于 global/index.css。
+ */
+:root,
+.light,
+.dark,
+[data-theme='light'],
+[data-theme='dark'] {
+  --motion-duration-fast: 0.1s;
+  --motion-duration-mid: 0.2s;
+  --motion-duration-slow: 0.3s;
+  --motion-duration-emphasis: 0.52s;
+  --motion-duration-reduced: 0.01ms;
+  --motion-ease-standard: ease;
+  --motion-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --motion-ease-in-out: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --motion-ease-emphasized: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+}

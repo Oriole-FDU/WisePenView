@@ -2,12 +2,10 @@
   --border-width: 1px;
   --field-border-width: 0px;
   --disabled-opacity: 0.5;
-  --ring-offset-width: 2px;
   --cursor-interactive: pointer;
-  --cursor-disabled: not-allowed;
-  --scrollbar-gutter: auto;
   --scrollbar-width: thin;
   --scrollbar-size: 8px;
+  /* 动效变量集中在 theme/motion.css。 */
   /* 间距变量集中在 theme/spacing.css。 */
   /* 字体与排版变量集中在 theme/fonts.css。 */
   /* 圆角变量集中在 theme/radius.css，按基准、基础刻度、应用语义三层组织。 */
@@ -20,42 +18,23 @@
 [data-theme='light'],
 [data-theme='dark'] {
   /* 运行时由 syncViewportLayoutScale 覆盖，此处为同源兜底 */
-  --chat-panel-min-width: 380px;
-  --chat-full-width-min-width: 720px;
-  --layout-sidebar-min-width: 240px;
-  --layout-sidebar-max-width: 420px;
-  --layout-sidebar-min-height: 424px;
   --layout-sidebar-session-list-min-height: 120px;
-  --layout-window-min-height: 720px;
-  --layout-main-min-width: 560px;
-  --layout-app-main-min-width: 720px;
-  --layout-main-scroll-min-width: 400px;
   --layout-note-editor-min-width: 560px;
-  --layout-workspace-context-panel-min-width: 320px;
   --layout-workspace-split-header-height: 56px;
-  --layout-resize-handle-reserve: 24px;
   --layout-note-outline-open-width: 215px;
   --layout-note-outline-collapsed-width: 40px;
-  --layout-chat-panel-max-width: 1020px;
   --layout-model-selector-max-width: 240px;
-  --layout-compact-max-width: 1280px;
   --layout-auth-sheet-width: 48rem;
-  --layout-auth-sheet-height: auto;
   --layout-auth-form-width: 40rem;
-  --layout-short-max-height: 720px;
   --layout-drive-chrome-height: 240px;
   --table-drive-detail-panel-width: 300px;
   --layout-drive-table-min-width: 560px;
   --layout-drive-layout-min-width: 860px;
   --layout-drive-page-min-width: 956px;
-  --layout-chat-footer-scroll-offset: 132px;
-  --note-editor-max-width: 900px;
   --chat-input-textarea-max-height: calc(16em + 16px);
   --layout-welcome-title-size: 2rem;
   --layout-welcome-icon-size: 3.75rem;
   --table-row-height: 52px;
-  --row-height-comfortable: var(--table-row-height);
-  --row-height-compact: var(--table-row-height);
 
   /* Table 布局 / 列宽；组件样式直接消费 --table-* 变量。 */
   /* 表头比正文行更紧凑，避免列名行过高占位。 */
@@ -81,32 +60,14 @@
   --table-page-size-select-width: 110px;
   --table-chip-min-width: 56px;
   --table-chip-min-height: 28px;
-  /* 延迟显示 Tooltip，减少鼠标经密集图标区时的视觉干扰。 */
-  --tooltip-delay: 400ms;
-  --tooltip-close-delay: 100ms;
   --table-drive-layout-max-height: calc(100dvh - var(--layout-drive-chrome-height, 240px));
   --shadow-sm: 0 1px 2px 0 color-mix(in srgb, var(--black) 3%, transparent);
   --shadow-none: none;
   --shadow-md: var(--card-shadow);
   --shadow-lg: 0 8px 24px color-mix(in srgb, var(--foreground) 12%, transparent);
-  --scrollbar-size: 8px;
   --control-height-sm: 28px;
   --control-height-md: 36px;
   --control-height: 36px;
   --control-height-lg: 40px;
   --line-width: 1px;
-  --motion-duration-fast: 0.1s;
-  --motion-duration-mid: 0.2s;
-  --motion-duration-slow: 0.3s;
-  --motion-duration-emphasis: 0.52s;
-  --motion-duration-reduced: 0.01ms;
-  --motion-ease-standard: ease;
-  --motion-ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
-  --motion-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --motion-ease-in-out: cubic-bezier(0.455, 0.03, 0.515, 0.955);
-  --motion-ease-emphasized: cubic-bezier(0.4, 0, 0.2, 1);
-  --motion-ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
-  --transition-fast: var(--motion-duration-fast);
-  --transition-mid: var(--motion-duration-mid);
-  --transition-slow: var(--motion-duration-slow);
 }
