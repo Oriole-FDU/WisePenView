@@ -230,7 +230,7 @@ test('Table token 集中于 shared，主题文件只保留颜色与通用 token'
     assert.match(tableTokens, new RegExp(`${token}\\s*:`), token);
   }
 
-  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const globalIndex = await readFile(join(root, 'src/styles/global/tailwind.css'), 'utf8');
   assert.match(
     globalIndex,
     /@import '\.\.\/\.\.\/components\/base\/Table\/shared\/styles\/tokens\.css' layer\(base\);/
@@ -258,10 +258,10 @@ test('主题 token 按职责拆分，不再维护通用 tokens 文件', async ()
   const themeFiles = await readdir(join(root, 'src/styles/theme'));
   assert.equal(themeFiles.includes('tokens.css'), false);
 
-  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
-  assert.doesNotMatch(globalIndex, /theme\/tokens\.css/);
+  const tailwind = await readFile(join(root, 'src/styles/global/tailwind.css'), 'utf8');
+  assert.doesNotMatch(tailwind, /theme\/tokens\.css/);
   for (const file of ['layout.css', 'controls.css', 'effects.css']) {
-    assert.match(globalIndex, new RegExp(`@import '\\.\\./theme/${file}' layer\\(base\\);`));
+    assert.match(tailwind, new RegExp(`@import '\\.\\./theme/${file}' layer\\(base\\);`));
   }
 
   const [layout, controls, effects] = await Promise.all(
@@ -277,13 +277,37 @@ test('主题 token 按职责拆分，不再维护通用 tokens 文件', async ()
   assert.match(effects, /--scrollbar-size\s*:/);
 });
 
+test('全局入口分离框架桥接与文档基础样式', async () => {
+  const [index, tailwind, base] = await Promise.all(
+    ['index.css', 'tailwind.css', 'base.css'].map((file) =>
+      readFile(join(root, 'src/styles/global', file), 'utf8')
+    )
+  );
+
+  assert.match(index, /@import '\.\/tailwind\.css';/);
+  assert.match(index, /@import '\.\/base\.css';/);
+  assert.doesNotMatch(index, /@theme|:root|body|prefers-reduced-motion/);
+  assert.match(tailwind, /@layer theme, base, components, utilities;/);
+  assert.match(tailwind, /@import 'tailwindcss';/);
+  assert.match(tailwind, /@import '@heroui\/styles';/);
+  assert.match(tailwind, /@theme inline \{/);
+  assert.doesNotMatch(tailwind, /:root|body\s*\{|prefers-reduced-motion/);
+  assert.match(base, /:root\s*\{/);
+  assert.match(base, /body\s*\{/);
+  assert.match(base, /::selection\s*\{/);
+  assert.match(base, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.doesNotMatch(base, /body\s*\{[^}]*margin:/s);
+  assert.doesNotMatch(base, /body\s*\{[^}]*font-family:/s);
+  assert.doesNotMatch(base, /@import|@theme/);
+});
+
 test('字体 token 只保留应用来源与 Tailwind 桥接', async () => {
   const fonts = await readFile(join(root, 'src/styles/theme/fonts.css'), 'utf8');
   assert.doesNotMatch(fonts, /--font-(?:sans|mono)\s*:/);
 
-  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
-  assert.match(globalIndex, /--font-sans:\s*var\(--app-font-family\);/);
-  assert.match(globalIndex, /--font-mono:\s*var\(--app-font-mono\);/);
+  const tailwind = await readFile(join(root, 'src/styles/global/tailwind.css'), 'utf8');
+  assert.match(tailwind, /--font-sans:\s*var\(--app-font-family\);/);
+  assert.match(tailwind, /--font-mono:\s*var\(--app-font-mono\);/);
 
   for (const file of await readdir(join(root, 'src'), { recursive: true })) {
     if (!/\.(css|scss)$/.test(file)) continue;
@@ -294,6 +318,7 @@ test('字体 token 只保留应用来源与 Tailwind 桥接', async () => {
 
 test('HeroUI 组件覆盖由基础封装持有', async () => {
   const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const tailwind = await readFile(join(root, 'src/styles/global/tailwind.css'), 'utf8');
   const { code } = await compileCssModule('src/components/base/Popover/shared/styles.module.scss');
   const [popoverSource, dropdownSource, listBoxSource] = await Promise.all(
     [
@@ -304,6 +329,7 @@ test('HeroUI 组件覆盖由基础封装持有', async () => {
   );
 
   assert.doesNotMatch(globalIndex, /heroui-overrides/);
+  assert.doesNotMatch(tailwind, /heroui-overrides/);
   await assert.rejects(readFile(join(root, 'src/styles/global/heroui-overrides.css'), 'utf8'), {
     code: 'ENOENT',
   });
@@ -404,7 +430,7 @@ test('优先交互控件的原生元素由基础封装承接', async () => {
 });
 
 test('内联字段从基础封装消费字重，全局不重置原生表单字体', async () => {
-  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const globalBase = await readFile(join(root, 'src/styles/global/base.css'), 'utf8');
   const [inlineInput, inlineTextArea] = await Promise.all(
     [
       'src/components/base/Input/InlineInput/style.module.scss',
@@ -412,8 +438,8 @@ test('内联字段从基础封装消费字重，全局不重置原生表单字�
     ].map((file) => compileCssModule(file))
   );
 
-  assert.doesNotMatch(globalIndex, /button,\s*input,\s*textarea,\s*select\s*\{/);
-  assert.doesNotMatch(globalIndex, /input,\s*textarea\s*\{/);
+  assert.doesNotMatch(globalBase, /button,\s*input,\s*textarea,\s*select\s*\{/);
+  assert.doesNotMatch(globalBase, /input,\s*textarea\s*\{/);
   assert.match(inlineInput.code, /font: inherit;\s*font-weight: var\(--field-text-font-weight\);/);
   assert.match(
     inlineTextArea.code,
@@ -422,11 +448,11 @@ test('内联字段从基础封装消费字重，全局不重置原生表单字�
 });
 
 test('MessageScroller 使用 Tailwind 标准 utility 与私有渐隐样式', async () => {
-  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const globalBase = await readFile(join(root, 'src/styles/global/base.css'), 'utf8');
   const { code } = await compileCssModule('src/components/_shadcn/message-scroller.module.scss');
   const source = await readFile(join(root, 'src/components/_shadcn/message-scroller.tsx'), 'utf8');
 
-  assert.doesNotMatch(globalIndex, /scrollbar-gutter-stable|contain-content|scroll-fade-b/);
+  assert.doesNotMatch(globalBase, /scrollbar-gutter-stable|contain-content|scroll-fade-b/);
   assert.match(code, /\.viewportFade\s*\{\s*mask-image: linear-gradient\(\s*to bottom,/);
   assert.match(source, /scrollbar-gutter-stable/);
   assert.match(source, /contain-content/);
