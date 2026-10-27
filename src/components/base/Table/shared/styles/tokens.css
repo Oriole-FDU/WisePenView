@@ -1,0 +1,48 @@
+/**
+ * 通用 Table token 集中在此文件，负责表格尺寸、间距和圆角别名。
+ * 表格颜色仍由 theme/palette.css 按 light/dark 统一维护。
+ */
+:root {
+  /* 行与列 */
+  --table-row-height: 52px;
+  --table-header-row-height: 40px;
+  --table-footer-row-height: 30px;
+  --table-control-min-height: 32px;
+  --table-header-bar-min-height: 44px;
+  --table-action-column-width: 88px;
+  --table-checkbox-column-width: 44px;
+  --table-action-icon-size: 32px;
+  --table-row-expand-icon-size: 16px;
+  --table-row-entry-icon-size: 22px;
+  --table-row-avatar-size: 36px;
+  --table-col-fill-min-width: 180px;
+  --table-col-sm: 90px;
+  --table-col-md: 110px;
+  --table-col-lg: 180px;
+  --table-col-enum: 128px;
+  --table-col-folder-size: 100px;
+  --table-col-folder-type: 120px;
+  --table-col-folder-action: 48px;
+  --table-select-min-width: 120px;
+  --table-page-size-select-width: 110px;
+  --table-chip-min-width: 56px;
+  --table-chip-min-height: 28px;
+
+  /* 间距 */
+  --table-footer-padding-block: var(--space-2xs);
+  --table-cell-padding-inline: var(--space-sm);
+  --table-cell-padding-block: 0;
+  --table-shell-padding-block: var(--space-sm);
+  --table-shell-padding-inline: calc(var(--space-sm) + var(--space-3xs));
+  --table-toolbar-padding-block: calc(var(--space-xs) + var(--space-3xs));
+  --table-gap: var(--space-sm);
+  --table-gap-compact: var(--space-xs);
+  --table-gap-tight: var(--space-2xs);
+  --table-gap-inline: var(--space-2xs-plus);
+  --table-chip-padding-block: var(--space-2xs);
+  --table-chip-padding-inline: calc(var(--space-sm) + var(--space-3xs));
+
+  /* 圆角域别名 */
+  --table-shell-radius: var(--app-radius-content);
+  --table-inner-radius: var(--app-radius-menu-item);
+}

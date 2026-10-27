@@ -207,6 +207,46 @@ test('Table partial 不輸出 CSS，固定欄寬與直接 CSS token 可展開', 
   assert.match(css, /\.footer\s*\{\s*min-height: var\(--table-footer-row-height\);/);
 });
 
+test('Table token 集中于 shared，主题文件只保留颜色与通用 token', async () => {
+  const tableTokens = await readFile(
+    join(root, 'src/components/base/Table/shared/styles/tokens.css'),
+    'utf8'
+  );
+  for (const token of [
+    '--table-row-height',
+    '--table-footer-row-height',
+    '--table-gap',
+    '--table-shell-padding-inline',
+    '--table-shell-radius',
+    '--table-inner-radius',
+  ]) {
+    assert.match(tableTokens, new RegExp(`${token}\\s*:`), token);
+  }
+
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  assert.match(
+    globalIndex,
+    /@import '\.\.\/\.\.\/components\/base\/Table\/shared\/styles\/tokens\.css' layer\(base\);/
+  );
+
+  for (const file of ['tokens.css', 'spacing.css', 'radius.css']) {
+    const source = await readFile(join(root, 'src/styles/theme', file), 'utf8');
+    assert.doesNotMatch(source, /--table-[\w-]+\s*:/, file);
+  }
+
+  const palette = await readFile(join(root, 'src/styles/theme/palette.css'), 'utf8');
+  for (const token of [
+    '--table-chrome-bg',
+    '--table-inner-border',
+    '--table-row-hover-bg',
+    '--table-row-selected-bg',
+    '--table-row-selected-hover-bg',
+  ]) {
+    assert.match(palette, new RegExp(`${token}\\s*:`), token);
+    assert.doesNotMatch(tableTokens, new RegExp(`${token}\\s*:`), token);
+  }
+});
+
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {
   const { code, modules } = await compileCssModule(
     'src/components/base/Table/DataTable/style.module.scss'

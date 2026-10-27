@@ -14,6 +14,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題
 - 动画时长、缓动曲线和 reduced-motion 基准集中在 `src/styles/theme/motion.css`，组件只消费 `--motion-*` token。
 - 间距单位、`--space-*` 刻度和页面／输入区／表格间距集中在 `src/styles/theme/spacing.css`；`gap`、`margin`、`padding` 在数值命中公共刻度时必须消费对应 token。
 - 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则仍由 `src/styles/global/index.css` 消费这些变量。
+- 通用 Table 的尺寸、间距和圆角别名集中在 `src/components/base/Table/shared/styles/tokens.css`；表格颜色继续由 `palette.css` 管理，Drive 专属布局 token 由 `TableDrive` 自己维护。
 
 推荐结构：
 
@@ -65,11 +66,11 @@ ComponentName/
 
 间距按“基础单位 → 公共刻度 → 应用语义”组织，统一定义在 `src/styles/theme/spacing.css`：
 
-| 层级     | Token                                                                                       | 使用范围                              |
-| -------- | ------------------------------------------------------------------------------------------- | ------------------------------------- |
-| 基础单位 | `--spacing`                                                                                 | Tailwind 与 HeroUI 的间距计算基准     |
-| 公共刻度 | `--space-3xs` 至 `--space-3xl`                                                              | `gap`、`margin`、`padding` 的通用间距 |
-| 应用语义 | `--app-page-padding-*`、`--chat-input-*-padding-*`、`--table-*-gap` / `--table-*-padding-*` | 页面、输入区、表格和浮层的统一间距    |
+| 层级     | Token                                              | 使用范围                              |
+| -------- | -------------------------------------------------- | ------------------------------------- |
+| 基础单位 | `--spacing`                                        | Tailwind 与 HeroUI 的间距计算基准     |
+| 公共刻度 | `--space-3xs` 至 `--space-3xl`                     | `gap`、`margin`、`padding` 的通用间距 |
+| 应用语义 | `--app-page-padding-*`、`--chat-input-*-padding-*` | 页面、输入区和浮层的统一间距          |
 
 - `gap`、`margin`、`padding` 的数值命中公共刻度时必须引用 `var(--space-*)`，不得重复写 `2px`、`4px`、`8px`、`12px`、`16px`、`24px`、`32px` 等刻度值。
 - 局部光学修正、字符对齐或无法由公共刻度表达的组件布局常量可以保留字面量；同类场景重复出现时，应在 `spacing.css` 补充应用语义 token。
@@ -99,7 +100,7 @@ ComponentName/
 | Modal        | `--app-radius-modal`                                         | 12px        | Modal、AlertDialog、FormDialog、DisplayDialog；`size="cover"` 仍是 12px 圆角，`size="full"` 保持直角 |
 | 圆形语义     | `--app-radius-pill` / `--app-radius-scrollbar`               | 999px       | 头像、状态点、胶囊标签与滚动条滑块                                                                   |
 
-表格域另有两个覆盖点：`--table-shell-radius` 指向内容容器圆角，`--table-inner-radius` 指向菜单项圆角，只做转接，不引入新数值。
+表格域的尺寸、间距和圆角别名位于 `src/components/base/Table/shared/styles/tokens.css`，其中 `--table-shell-radius` 指向内容容器圆角，`--table-inner-radius` 指向菜单项圆角。表格颜色 token 仍留在 `palette.css`，避免拆散 light/dark 色板。
 
 规则：
 

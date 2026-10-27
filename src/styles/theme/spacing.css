@@ -41,18 +41,4 @@
   --app-popover-content-padding: var(--space-xs);
   --chat-input-card-padding-block: var(--space-sm);
   --chat-input-container-padding-block: var(--space-xs);
-
-  /* Table 间距；组件样式直接消费 --table-* 变量。 */
-  --table-footer-padding-block: var(--space-2xs);
-  --table-cell-padding-inline: var(--space-sm);
-  --table-cell-padding-block: 0;
-  --table-shell-padding-block: var(--space-sm);
-  --table-shell-padding-inline: calc(var(--space-sm) + var(--space-3xs));
-  --table-toolbar-padding-block: calc(var(--space-xs) + var(--space-3xs));
-  --table-gap: var(--space-sm);
-  --table-gap-compact: var(--space-xs);
-  --table-gap-tight: var(--space-2xs);
-  --table-gap-inline: var(--space-2xs-plus);
-  --table-chip-padding-block: var(--space-2xs);
-  --table-chip-padding-inline: calc(var(--space-sm) + var(--space-3xs));
 }

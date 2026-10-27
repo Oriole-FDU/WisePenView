@@ -55,8 +55,4 @@
     calc(var(--app-radius-popover) - var(--app-popover-content-padding))
   );
   --app-radius-scrollbar: var(--scrollbar-radius);
-
-  /* 表格域别名：表格样式经此转接，不直接读取应用语义之外的刻度。 */
-  --table-shell-radius: var(--app-radius-content);
-  --table-inner-radius: var(--app-radius-menu-item);
 }

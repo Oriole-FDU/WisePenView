@@ -12,6 +12,7 @@
 @import '../theme/motion.css' layer(base);
 @import '../theme/z-index.css' layer(base);
 @import '../theme/radius.css' layer(base);
+@import '../../components/base/Table/shared/styles/tokens.css' layer(base);
 @import './heroui-overrides.css' layer(components);
 
 @theme inline {
