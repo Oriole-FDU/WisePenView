@@ -285,6 +285,36 @@ test('字体 token 只保留应用来源与 Tailwind 桥接', async () => {
   }
 });
 
+test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  const heroOverrides = await readFile(
+    join(root, 'src/styles/global/heroui-overrides.css'),
+    'utf8'
+  );
+
+  assert.match(globalIndex, /@import '\.\/heroui-overrides\.css' layer\(components\);/);
+  assert.doesNotMatch(globalIndex, /@layer components\s*\{/);
+  assert.doesNotMatch(globalIndex, /\.button:is\(:disabled/);
+  assert.doesNotMatch(globalIndex, /\.tabs:not\(\.tabs--secondary\)/);
+  assert.doesNotMatch(globalIndex, /\.modal__backdrop/);
+  assert.doesNotMatch(heroOverrides, /--app-radius-popover-(?:item|control)\s*:/);
+  assert.doesNotMatch(heroOverrides, /--app-popover-item-inset\s*:/);
+
+  for (const selector of [
+    /\.button:is\(:disabled/,
+    /\.tabs:not\(\.tabs--secondary\)/,
+    /\.popover__dialog/,
+    /\.modal__backdrop/,
+  ]) {
+    assert.match(heroOverrides, selector);
+  }
+
+  const buttonBase = heroOverrides.indexOf(':is(.button, .toggle-button)');
+  const buttonDisabled = heroOverrides.indexOf('.button:is(:disabled, [aria-disabled=');
+  const buttonGroup = heroOverrides.indexOf(':is(.button-group, .toggle-button-group)');
+  assert.ok(buttonBase >= 0 && buttonBase < buttonDisabled && buttonDisabled < buttonGroup);
+});
+
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {
   const { code, modules } = await compileCssModule(
     'src/components/base/Table/DataTable/style.module.scss'
