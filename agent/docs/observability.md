@@ -82,6 +82,15 @@ scripts/telemetry/
 传输失败在 Axios 最终失败处记录，业务与契约失败在 `request.ts` 解包处记录。
 异常继续按原协议抛给业务；已上报异常再次进入全局监听时不会重复产生错误日志。
 
+### 已处理的非 HTTP 故障
+
+`reportError(error, { origin: 'handled', operation })` 沿用既有字符串返回值和
+`(report, error)` reporter 契约，映射到 `error.origin` 与 `operation.name`，不增加 flow 或第二套出口。
+当前固定操作为 `chat-send`、`chat-stream`、`chat-recover`、`chat-resume`，分别接在发送 catch、
+AI SDK onError、恢复 catch 和重连 catch。原 callback、提示、异常返回与会话切换/恢复去重保持不变。
+AbortError、CanceledError 及既有网络取消码不生成 handled 错误事件；已记录的 API 原异常交回
+既有请求出口识别，不根据状态或业务文案再做一套分类。新接入不附加对话、请求/响应正文或附件内容。
+
 ## Trace 与日志关联
 
 每次经过 `request.ts` 的逻辑请求创建一个 `api.request METHOD /path` span，覆盖地址等待、
@@ -145,3 +154,6 @@ Collector／Loki 的映射配置不在本仓库，本次没有修改。
 内存 processor 和浏览器替身代替网络与页面；验证分类、重试、取消、去重、账号竞态、聚合、字段
 过滤和监听清理，以及父子 span、W3C traceparent、失败日志和延迟摘要的 trace 归属，不发网络请求。
 运行态回归仍需用户明确授权；发布后应验证 collector 入库和查询结果。
+
+Chat 回归执行真实 controller catch 和 session callback，受控替身仅替代 React、AI SDK 与外部
+环境，出口仍为真实 reporter、聚合及 OTel SDK 内存 processor；不把它等同于浏览器或真实模型验收。

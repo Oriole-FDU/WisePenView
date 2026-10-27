@@ -82,7 +82,7 @@ const otelSource = `
   export const isTelemetryEnabled = true;
 `;
 
-export async function loadTelemetry(mode = 'development', endpoint = '/otel') {
+export async function loadTelemetry(mode = 'development', endpoint = '/otel', options = {}) {
   const configSource = `export const publicAppConfig = ${JSON.stringify({
     mode,
     observability: { otelEndpoint: endpoint },
@@ -99,12 +99,15 @@ export async function loadTelemetry(mode = 'development', endpoint = '/otel') {
       export { sanitizeDiagnosticText, readRequestPath } from '@/telemetry/_internal/sanitize';
       export { installOtelErrorReporter } from '@/telemetry/_internal/errorReporter';
       export { reportError } from '@/utils/error/reportError';
+      export { configureErrorReporter } from '@/utils/error/reportError';
+      export { createClientError, FRONTEND_CLIENT_ERROR, FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
       export { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
       export { installAppTelemetry, getTelemetryPage, loadTelemetryUser } from '@/telemetry/_internal/lifecycle';
       export { default as httpClient } from '@/apis/_internal/httpClient';
       export { apiGet, apiGetText, apiPost, apiPut, apiDelete } from '@/apis/request';
       export { records, spans, tracer } from '@/telemetry/_internal/otel';
       export { installTelemetry } from '@/telemetry';
+      ${options.entry ?? ''}
     `,
     },
     bundle: true,
@@ -118,6 +121,14 @@ export async function loadTelemetry(mode = 'development', endpoint = '/otel') {
       {
         name: 'telemetry-test-boundaries',
         setup(builder) {
+          builder.onResolve({ filter: /.*/ }, ({ path }) =>
+            Object.hasOwn(options.stubs ?? {}, path) ? { path, namespace: 'controlled' } : undefined
+          );
+          builder.onLoad({ filter: /.*/, namespace: 'controlled' }, ({ path }) => ({
+            contents: options.stubs[path],
+            resolveDir: process.cwd(),
+            loader: 'tsx',
+          }));
           builder.onResolve(
             {
               filter: /runtimeConfig$|(?:^|\/)otel$|apiServerAddr$/,

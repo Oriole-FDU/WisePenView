@@ -9,12 +9,14 @@ export type ErrorReportOrigin =
   | 'react-uncaught'
   | 'react-recoverable'
   | 'window-error'
-  | 'unhandled-rejection';
+  | 'unhandled-rejection'
+  | 'handled';
 
 export interface ErrorReportContext {
   origin: ErrorReportOrigin;
   pathname?: string;
   componentStack?: string;
+  operation?: 'chat-send' | 'chat-stream' | 'chat-recover' | 'chat-resume';
 }
 
 export interface ErrorReport {
@@ -23,6 +25,7 @@ export interface ErrorReport {
   origin: ErrorReportOrigin;
   pathname?: string;
   componentStack?: string;
+  operation?: ErrorReportContext['operation'];
   error: {
     name: string;
     message: string;
@@ -76,6 +79,7 @@ const buildErrorReport = (
     origin: context.origin,
     pathname: context.pathname,
     componentStack: context.componentStack,
+    operation: context.operation,
     error: {
       ...errorInfo,
       ...(isWisePenError(error) ? { code: error.code, source: error.source } : {}),
