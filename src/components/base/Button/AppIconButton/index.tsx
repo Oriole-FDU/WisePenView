@@ -5,6 +5,7 @@ import type { ComponentProps, MouseEventHandler } from 'react';
 import { Tooltip } from '@/components/base/Tooltip';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
+import buttonStyles from '../shared/styles.module.scss';
 import type { AppIconButtonProps } from './index.type';
 import styles from './style.module.scss';
 
@@ -24,6 +25,7 @@ function AppIconButton({
   ...buttonProps
 }: AppIconButtonProps) {
   const classNames = clsx(
+    buttonStyles.root,
     styles.root,
     styles[size],
     styles[variant],

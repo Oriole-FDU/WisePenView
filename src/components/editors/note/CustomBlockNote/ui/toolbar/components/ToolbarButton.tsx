@@ -1,8 +1,7 @@
-import { ToggleButton } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
-import { AppButton, type AppButtonProps } from '@/components/base/Button';
+import { AppButton, type AppButtonProps, AppToggleButton } from '@/components/base/Button';
 import { Tooltip } from '@/components/base/Tooltip';
 
 import styles from '../style.module.scss';
@@ -82,7 +81,7 @@ export function ToolbarToggleButton({
   onPress,
 }: ToolbarToggleButtonProps) {
   const button = (
-    <ToggleButton
+    <AppToggleButton
       aria-label={label}
       id={id}
       isDisabled={isDisabled}
@@ -93,7 +92,7 @@ export function ToolbarToggleButton({
       onPress={onPress}
     >
       {icon}
-    </ToggleButton>
+    </AppToggleButton>
   );
 
   return (

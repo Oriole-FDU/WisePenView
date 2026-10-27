@@ -301,27 +301,37 @@ test('HeroUI 跨组件覆盖集中在 heroui-overrides', async () => {
 
   assert.match(globalIndex, /@import '\.\/heroui-overrides\.css' layer\(components\);/);
   assert.doesNotMatch(globalIndex, /@layer components\s*\{/);
-  assert.doesNotMatch(globalIndex, /\.button:is\(:disabled/);
   assert.doesNotMatch(globalIndex, /\.tabs:not\(\.tabs--secondary\)/);
   assert.doesNotMatch(globalIndex, /\.modal__backdrop/);
   assert.doesNotMatch(heroOverrides, /--app-radius-popover-(?:item|control)\s*:/);
   assert.doesNotMatch(heroOverrides, /--app-popover-item-inset\s*:/);
+  assert.doesNotMatch(heroOverrides, /\.button:is\(:disabled/);
+  assert.doesNotMatch(heroOverrides, /\.button-group/);
   assert.doesNotMatch(heroOverrides, /\.modal__backdrop/);
   assert.doesNotMatch(heroOverrides, /\.tooltip\s*\{/);
   assert.doesNotMatch(heroOverrides, /\.table-root/);
 
-  for (const selector of [
-    /\.button:is\(:disabled/,
-    /\.tabs:not\(\.tabs--secondary\)/,
-    /\.popover__dialog/,
-  ]) {
+  for (const selector of [/\.tabs:not\(\.tabs--secondary\)/, /\.popover__dialog/]) {
     assert.match(heroOverrides, selector);
   }
+});
 
-  const buttonBase = heroOverrides.indexOf(':is(.button, .toggle-button)');
-  const buttonDisabled = heroOverrides.indexOf('.button:is(:disabled, [aria-disabled=');
-  const buttonGroup = heroOverrides.indexOf(':is(.button-group, .toggle-button-group)');
-  assert.ok(buttonBase >= 0 && buttonBase < buttonDisabled && buttonDisabled < buttonGroup);
+test('Button 基础封装持有圆角、禁用态与按钮组边界', async () => {
+  const { code } = await compileCssModule('src/components/base/Button/shared/styles.module.scss');
+  const [appButton, toggleButton, iconButton] = await Promise.all(
+    [
+      'src/components/base/Button/AppButton/index.tsx',
+      'src/components/base/Button/AppToggleButton/index.tsx',
+      'src/components/base/Button/AppIconButton/index.tsx',
+    ].map((file) => readFile(join(root, file), 'utf8'))
+  );
+
+  assert.match(code, /\.root\s*\{\s*border-radius: var\(--app-radius-button\);/);
+  assert.match(code, /\.root\.button:is\(:disabled, \[aria-disabled=(?:'true'|true)\]\)/);
+  assert.match(code, /\.button-group > \.root,/);
+  for (const source of [appButton, toggleButton, iconButton]) {
+    assert.match(source, /buttonStyles\.root/);
+  }
 });
 
 test('Modal 基础封装持有弹窗与遮罩覆盖', async () => {

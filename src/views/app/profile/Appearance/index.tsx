@@ -1,6 +1,7 @@
-import { Heading, Separator, Tabs, ToggleButton, ToggleButtonGroup } from '@heroui/react';
+import { Heading, Separator, Tabs, ToggleButtonGroup } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import { AppToggleButton } from '@/components/base/Button';
 import PageHeader from '@/components/base/PageHeader';
 import { changeAppLanguage } from '@/i18n';
 import { LANGUAGE_OPTIONS } from '@/i18n/language';
@@ -123,7 +124,7 @@ function SchemeOption({ option }: SchemeOptionProps) {
   const { t } = useTranslation('profile');
 
   return (
-    <ToggleButton id={option.id} data-scheme-preview={option.id} className={styles.schemeOption}>
+    <AppToggleButton id={option.id} data-scheme-preview={option.id} className={styles.schemeOption}>
       <span className={styles.schemePreview}>
         <span className={styles.schemeSwatch} />
         <span className={styles.schemeSwatch} />
@@ -131,7 +132,7 @@ function SchemeOption({ option }: SchemeOptionProps) {
       </span>
       <span className={styles.schemeLabel}>{t(option.labelKey)}</span>
       <span className={styles.schemeDescription}>{t(option.descriptionKey)}</span>
-    </ToggleButton>
+    </AppToggleButton>
   );
 }
 

@@ -1,0 +1,71 @@
+.root {
+  border-radius: var(--app-radius-button);
+}
+
+.root:global(.button):is(:disabled, [aria-disabled='true']) {
+  opacity: 1;
+  transform: none;
+  box-shadow: var(--shadow-none);
+}
+
+.root:global(.button.button--primary):is(:disabled, [aria-disabled='true']),
+.root:global(.button.button--danger):is(:disabled, [aria-disabled='true']) {
+  --button-bg: var(--control-disabled-filled-bg);
+  --button-bg-hover: var(--control-disabled-filled-bg);
+  --button-bg-pressed: var(--control-disabled-filled-bg);
+  --button-fg: var(--control-disabled-filled-fg);
+}
+
+.root:global(.button.button--secondary):is(:disabled, [aria-disabled='true']),
+.root:global(.button.button--tertiary):is(:disabled, [aria-disabled='true']),
+.root:global(.button.button--danger-soft):is(:disabled, [aria-disabled='true']) {
+  --button-bg: var(--control-disabled-soft-bg);
+  --button-bg-hover: var(--control-disabled-soft-bg);
+  --button-bg-pressed: var(--control-disabled-soft-bg);
+  --button-fg: var(--control-disabled-soft-fg);
+}
+
+.root:global(.button.button--ghost):is(:disabled, [aria-disabled='true']),
+.root:global(.button.button--outline):is(:disabled, [aria-disabled='true']) {
+  --button-bg: transparent;
+  --button-bg-hover: transparent;
+  --button-bg-pressed: transparent;
+  --button-fg: var(--control-disabled-fg);
+}
+
+.root:global(.button.button--outline):is(:disabled, [aria-disabled='true']) {
+  border-color: var(--control-disabled-border);
+}
+
+:global(.button-group) > .root,
+:global(.toggle-button-group) > .root {
+  border-radius: 0;
+}
+
+:global(.button-group.button-group--horizontal) > .root:first-child,
+:global(.toggle-button-group.toggle-button-group--horizontal) > .root:first-child {
+  border-start-start-radius: var(--app-radius-button);
+  border-end-start-radius: var(--app-radius-button);
+}
+
+:global(.button-group.button-group--horizontal) > .root:last-child,
+:global(.toggle-button-group.toggle-button-group--horizontal) > .root:last-child {
+  border-start-end-radius: var(--app-radius-button);
+  border-end-end-radius: var(--app-radius-button);
+}
+
+:global(.button-group.button-group--vertical) > .root:first-child,
+:global(.toggle-button-group.toggle-button-group--vertical) > .root:first-child {
+  border-start-start-radius: var(--app-radius-button);
+  border-start-end-radius: var(--app-radius-button);
+}
+
+:global(.button-group.button-group--vertical) > .root:last-child,
+:global(.toggle-button-group.toggle-button-group--vertical) > .root:last-child {
+  border-end-start-radius: var(--app-radius-button);
+  border-end-end-radius: var(--app-radius-button);
+}
+
+:global(.toggle-button-group--detached) > .root {
+  border-radius: var(--app-radius-button);
+}
