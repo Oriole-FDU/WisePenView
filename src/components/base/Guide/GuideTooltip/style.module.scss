@@ -79,11 +79,11 @@
 }
 
 .top {
-  margin-top: -2px;
+  margin-top: calc(0px - var(--space-3xs));
 }
 
 .left {
-  margin-left: -2px;
+  margin-left: calc(0px - var(--space-3xs));
 }
 
 .skip,

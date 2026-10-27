@@ -45,7 +45,6 @@
   --app-radius-pill: var(--radius-full);
 
   /* 派生：嵌套浮层按外壳半径与内容 inset 计算内层半径，保持同心。 */
-  --app-popover-content-padding: var(--space-xs);
   --app-popover-item-inset: var(--app-radius-menu-item);
   --app-radius-popover-item: max(
     0px,

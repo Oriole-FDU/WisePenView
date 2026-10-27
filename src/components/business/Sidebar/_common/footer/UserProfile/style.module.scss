@@ -180,6 +180,6 @@ $font-weight-semibold: var(--font-weight-semibold);
   width: 100%;
   font-size: 10px;
   color: var(--muted);
-  margin-top: -2px;
+  margin-top: calc(0px - var(--space-3xs));
   text-align: left;
 }

@@ -1,8 +1,8 @@
 // 通用钱包：资产区 + 流水表格，流水方向通过图标、文案和金额正负号表达
 
 .card {
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--app-radius-content);

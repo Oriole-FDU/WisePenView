@@ -5,8 +5,8 @@
   z-index: var(--app-z-index-dock);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   border-radius: var(--app-radius-popover);
   background: var(--color-background);
   box-shadow: 0 4px 20px rgb(0 0 0 / 15%);

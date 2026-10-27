@@ -855,11 +855,11 @@ test('其餘業務樣式保留禁用、唯讀、表單與錯誤頁間距', async
   );
   assert.match(
     shell.code,
-    /\.main\s*\{[^}]*padding: clamp\(32px, 6vh, 64px\) clamp\(16px, 4vw, 40px\);/
+    /\.main\s*\{[^}]*padding: clamp\(var\(--space-xl\), 6vh, 64px\) clamp\(16px, 4vw, 40px\);/
   );
   assert.match(
     shell.code,
-    /\.footerMini\s*\{[^}]*padding: var\(--space-md\) clamp\(16px, 4vw, 40px\) 24px;/
+    /\.footerMini\s*\{[^}]*padding: var\(--space-md\) clamp\(16px, 4vw, 40px\) var\(--space-lg\);/
   );
   for (const [key, width] of [
     ['sizeSm', 560],

@@ -1,0 +1,58 @@
+/**
+ * 间距 token 集中在此文件，按三层组织，其他 token 文件不再定义间距刻度。
+ *
+ * 第 1 层 基础：Tailwind 与 HeroUI 共用的间距单位。
+ * 第 2 层 基础刻度：把基础单位参数化为通用间距刻度，组件与业务样式可直接引用。
+ * 第 3 层 应用语义：表达页面、输入区、表格和浮层等具体场景的间距。
+ *
+ * gap、margin 与 padding 优先消费 --space-*。仅当数值属于组件局部光学修正或
+ * 不可由公共刻度表达的布局常量时，才允许在组件内保留字面量。
+ */
+:root {
+  /* 第 1 层：基础 */
+  --spacing: 0.25rem;
+}
+
+:root,
+.light,
+.dark,
+[data-theme='light'],
+[data-theme='dark'] {
+  /* 第 2 层：基础刻度 */
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-2xs-plus: 6px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-md-plus: 20px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 40px;
+  --space-3xl: 48px;
+}
+
+:root {
+  /* 第 3 层：应用语义 */
+  /* 业务页统一内边距；运行时会按窗口尺寸覆盖，兜底值与“我的小组”常规窗口一致。 */
+  --app-page-padding-block-start: var(--space-lg);
+  --app-page-padding-block-end: var(--space-lg);
+  --app-page-padding-inline: var(--space-xl);
+  --app-popover-content-padding: var(--space-xs);
+  --chat-input-card-padding-block: var(--space-sm);
+  --chat-input-container-padding-block: var(--space-xs);
+
+  /* Table 间距；组件样式直接消费 --table-* 变量。 */
+  --table-footer-padding-block: var(--space-2xs);
+  --table-cell-padding-inline: var(--space-sm);
+  --table-cell-padding-block: 0;
+  --table-shell-padding-block: var(--space-sm);
+  --table-shell-padding-inline: calc(var(--space-sm) + var(--space-3xs));
+  --table-toolbar-padding-block: calc(var(--space-xs) + var(--space-3xs));
+  --table-gap: var(--space-sm);
+  --table-gap-compact: var(--space-xs);
+  --table-gap-tight: var(--space-2xs);
+  --table-gap-inline: var(--space-2xs-plus);
+  --table-chip-padding-block: var(--space-2xs);
+  --table-chip-padding-inline: calc(var(--space-sm) + var(--space-3xs));
+}

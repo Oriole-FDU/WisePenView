@@ -121,7 +121,7 @@
 
 .recordStatus {
   flex-shrink: 0;
-  padding: 2px var(--space-xs);
+  padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--app-radius-menu-item);
   background-color: var(--surface-tertiary);
   color: var(--muted);

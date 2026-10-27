@@ -36,7 +36,7 @@
 }
 
 .headerWithCloseTrigger {
-  padding-right: calc(var(--space-lg, 24px) + 24px);
+  padding-right: calc(var(--space-lg) + var(--space-lg));
 }
 
 .heading {

@@ -6,7 +6,7 @@
 }
 
 .section[data-variant='editor'] {
-  padding: 0 clamp(32px, 6%, 96px);
+  padding: 0 clamp(var(--space-xl), 6%, 96px);
   scroll-margin-top: var(--space-sm);
 }
 
@@ -31,7 +31,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-md-plus);
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
 }
 
 .sectionCopy {
@@ -71,7 +71,7 @@
   min-height: 68px;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--space-lg);
   border-top: 1px solid var(--separator);
 }
 
@@ -188,7 +188,7 @@
   }
 
   .section[data-variant='editor'] .sectionInner {
-    padding-block: 24px 34px;
+    padding-block: var(--space-lg) 34px;
   }
 
   .sectionHeader {

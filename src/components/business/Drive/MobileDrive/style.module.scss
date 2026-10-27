@@ -85,7 +85,7 @@
   min-width: 0;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: var(--space-3xs);
 }
 
 .mobileNameText {

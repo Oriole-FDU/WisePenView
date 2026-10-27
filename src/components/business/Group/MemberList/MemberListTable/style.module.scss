@@ -107,7 +107,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--table-gap-inline, 6px);
+  gap: var(--table-gap-inline, var(--space-2xs-plus));
   :global(button) {
     width: var(--table-action-icon-size, 32px);
     min-width: var(--table-action-icon-size, 32px);

@@ -1,5 +1,4 @@
 :root {
-  --spacing: 0.25rem;
   --border-width: 1px;
   --field-border-width: 0px;
   --disabled-opacity: 0.5;
@@ -9,6 +8,7 @@
   --scrollbar-gutter: auto;
   --scrollbar-width: thin;
   --scrollbar-size: 8px;
+  /* 间距变量集中在 theme/spacing.css。 */
   /* 字体与排版变量集中在 theme/fonts.css。 */
   /* 圆角变量集中在 theme/radius.css，按基准、基础刻度、应用语义三层组织。 */
   /* z-index 层级集中在 theme/z-index.css，按基准、基础刻度、应用语义三层组织。 */
@@ -19,16 +19,6 @@
 .dark,
 [data-theme='light'],
 [data-theme='dark'] {
-  --space-3xs: 2px;
-  --space-2xs: 4px;
-  --space-2xs-plus: 6px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-md-plus: 20px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 40px;
   /* 运行时由 syncViewportLayoutScale 覆盖，此处为同源兜底 */
   --chat-panel-min-width: 380px;
   --chat-full-width-min-width: 720px;
@@ -61,14 +51,8 @@
   --layout-chat-footer-scroll-offset: 132px;
   --note-editor-max-width: 900px;
   --chat-input-textarea-max-height: calc(16em + 16px);
-  --chat-input-card-padding-block: 12px;
-  --chat-input-container-padding-block: 8px;
   --layout-welcome-title-size: 2rem;
   --layout-welcome-icon-size: 3.75rem;
-  /* 业务页统一内边距；运行时会按窗口尺寸覆盖，兜底值与“我的小组”常规窗口一致。 */
-  --app-page-padding-block-start: var(--space-lg);
-  --app-page-padding-block-end: var(--space-lg);
-  --app-page-padding-inline: var(--space-xl);
   --table-row-height: 52px;
   --row-height-comfortable: var(--table-row-height);
   --row-height-compact: var(--table-row-height);
@@ -77,16 +61,6 @@
   /* 表头比正文行更紧凑，避免列名行过高占位。 */
   --table-header-row-height: 40px;
   --table-footer-row-height: 30px;
-  --table-footer-padding-block: 4px;
-  --table-cell-padding-inline: var(--space-sm);
-  --table-cell-padding-block: 0;
-  --table-shell-padding-block: var(--space-sm);
-  --table-shell-padding-inline: 14px;
-  --table-toolbar-padding-block: 10px;
-  --table-gap: var(--space-sm);
-  --table-gap-compact: var(--space-xs);
-  --table-gap-tight: 4px;
-  --table-gap-inline: 6px;
   --table-control-min-height: 32px;
   --table-header-bar-min-height: 44px;
   --table-action-column-width: 88px;
@@ -107,8 +81,6 @@
   --table-page-size-select-width: 110px;
   --table-chip-min-width: 56px;
   --table-chip-min-height: 28px;
-  --table-chip-padding-block: 4px;
-  --table-chip-padding-inline: 14px;
   /* 延迟显示 Tooltip，减少鼠标经密集图标区时的视觉干扰。 */
   --tooltip-delay: 400ms;
   --tooltip-close-delay: 100ms;

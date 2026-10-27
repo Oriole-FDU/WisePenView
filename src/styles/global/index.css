@@ -8,6 +8,7 @@
 /* 与 HeroUI token 位于同一层，通过选择器明确覆盖主题。 */
 @import '../theme/tokens.css' layer(base);
 @import '../theme/fonts.css' layer(base);
+@import '../theme/spacing.css' layer(base);
 @import '../theme/z-index.css' layer(base);
 @import '../theme/radius.css' layer(base);
 @import './heroui-overrides.css' layer(components);

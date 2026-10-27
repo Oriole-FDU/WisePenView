@@ -11,6 +11,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題
 - 避免非必要内联样式。
 - 动态样式优先通过 className、CSS 变量或组件受控属性表达。
 - 全局样式分两份：`src/styles/global/index.css` 提供 token、排版与基础重置，应用和 Storybook 预览共用；桌面端外壳约束（`html`/`body` 占满视口、整页不滚动、`#root` 接管滚动与选区）放在 `src/styles/global/app-shell.css`，只有应用入口引入，否则 Storybook 预览与 Docs 页面会被裁掉且无法滚动。
+- 间距单位、`--space-*` 刻度和页面／输入区／表格间距集中在 `src/styles/theme/spacing.css`；`gap`、`margin`、`padding` 在数值命中公共刻度时必须消费对应 token。
 - 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则仍由 `src/styles/global/index.css` 消费这些变量。
 
 推荐结构：
@@ -60,6 +61,19 @@ ComponentName/
 - 文本不能溢出容器或互相遮挡。
 - 不要使用纯装饰性渐变球、光斑、无意义背景图。
 - 不要用 viewport 宽度直接缩放字体。
+
+间距按“基础单位 → 公共刻度 → 应用语义”组织，统一定义在 `src/styles/theme/spacing.css`：
+
+| 层级     | Token                                                                                       | 使用范围                              |
+| -------- | ------------------------------------------------------------------------------------------- | ------------------------------------- |
+| 基础单位 | `--spacing`                                                                                 | Tailwind 与 HeroUI 的间距计算基准     |
+| 公共刻度 | `--space-3xs` 至 `--space-3xl`                                                              | `gap`、`margin`、`padding` 的通用间距 |
+| 应用语义 | `--app-page-padding-*`、`--chat-input-*-padding-*`、`--table-*-gap` / `--table-*-padding-*` | 页面、输入区、表格和浮层的统一间距    |
+
+- `gap`、`margin`、`padding` 的数值命中公共刻度时必须引用 `var(--space-*)`，不得重复写 `2px`、`4px`、`8px`、`12px`、`16px`、`24px`、`32px` 等刻度值。
+- 局部光学修正、字符对齐或无法由公共刻度表达的组件布局常量可以保留字面量；同类场景重复出现时，应在 `spacing.css` 补充应用语义 token。
+- 运行时会覆盖的响应式间距应写入 token 引用，不直接写入 `8px`、`24px` 等固定值。
+- `pnpm check:spacing` 在 CI 拦截未定义的 `--space-*` 引用、错误的刻度定义位置，以及组件中硬编码公共刻度的间距声明。
 
 ## 六、圆角层级
 

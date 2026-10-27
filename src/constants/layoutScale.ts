@@ -125,14 +125,6 @@ export const DRIVE_PAGE_MIN_WIDTH = DRIVE_LAYOUT_MIN_WIDTH + 96;
 export const CHAT_FOOTER_SCROLL_OFFSET_NORMAL = 132;
 export const CHAT_FOOTER_SCROLL_OFFSET_SHORT = 100;
 
-/** App 业务页外边距：常规窗口对齐“我的小组”，短窗口收紧以保留内容区。 */
-export const APP_PAGE_PADDING_BLOCK_START_NORMAL = 24;
-export const APP_PAGE_PADDING_BLOCK_START_SHORT = 16;
-export const APP_PAGE_PADDING_BLOCK_END_NORMAL = 24;
-export const APP_PAGE_PADDING_BLOCK_END_SHORT = 16;
-export const APP_PAGE_PADDING_INLINE_NORMAL = 32;
-export const APP_PAGE_PADDING_INLINE_COMPACT = 24;
-
 /**
  * Electron 窗口最小宽
  */
@@ -252,18 +244,12 @@ export const getLayoutScaleCssVars = (
     '--layout-drive-layout-min-width': `${DRIVE_LAYOUT_MIN_WIDTH}px`,
     '--layout-drive-page-min-width': `${DRIVE_PAGE_MIN_WIDTH}px`,
     '--layout-chat-footer-scroll-offset': `${footerOffset}px`,
-    '--app-page-padding-block-start': `${
-      isShort ? APP_PAGE_PADDING_BLOCK_START_SHORT : APP_PAGE_PADDING_BLOCK_START_NORMAL
-    }px`,
-    '--app-page-padding-block-end': `${
-      isShort ? APP_PAGE_PADDING_BLOCK_END_SHORT : APP_PAGE_PADDING_BLOCK_END_NORMAL
-    }px`,
-    '--app-page-padding-inline': `${
-      isCompact ? APP_PAGE_PADDING_INLINE_COMPACT : APP_PAGE_PADDING_INLINE_NORMAL
-    }px`,
+    '--app-page-padding-block-start': isShort ? 'var(--space-md)' : 'var(--space-lg)',
+    '--app-page-padding-block-end': isShort ? 'var(--space-md)' : 'var(--space-lg)',
+    '--app-page-padding-inline': isCompact ? 'var(--space-lg)' : 'var(--space-xl)',
     '--chat-input-textarea-max-height': isShort ? 'calc(6em + 16px)' : 'calc(16em + 16px)',
-    '--chat-input-card-padding-block': isShort ? '8px' : '12px',
-    '--chat-input-container-padding-block': isShort ? '4px' : '8px',
+    '--chat-input-card-padding-block': isShort ? 'var(--space-xs)' : 'var(--space-sm)',
+    '--chat-input-container-padding-block': isShort ? 'var(--space-2xs)' : 'var(--space-xs)',
     '--layout-welcome-title-size': isShort ? '1.5rem' : '2rem',
     '--layout-welcome-icon-size': isShort ? '2.75rem' : '3.75rem',
   };
