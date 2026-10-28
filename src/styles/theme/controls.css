@@ -1,5 +1,5 @@
 /**
- * 控件 token 集中在此文件，负责交互控件的高度、边框与禁用状态。
+ * 控件 token 集中在此文件，负责交互控件的高度、边框、焦点环与禁用状态。
  * 通用间距见 spacing.css，控件圆角见 radius.css。
  */
 :root,
@@ -16,4 +16,6 @@
   --control-height-md: 36px;
   --control-height: 36px;
   --control-height-lg: 40px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
 }

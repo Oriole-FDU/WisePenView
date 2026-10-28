@@ -1,0 +1,24 @@
+@mixin tokens($size) {
+  --app-checkbox-control-size: #{$size};
+  --app-checkbox-control-bg: color-mix(in oklab, var(--surface-tertiary) 35%, var(--surface) 65%);
+  --app-checkbox-control-bg-hover: color-mix(
+    in oklab,
+    var(--surface-tertiary) 70%,
+    var(--surface) 30%
+  );
+  --app-checkbox-control-border: color-mix(in oklab, var(--border) 82%, var(--surface) 18%);
+  --app-checkbox-control-border-hover: color-mix(in oklab, var(--border) 56%, var(--accent) 44%);
+  --app-checkbox-control-border-focus: var(--focus, var(--accent));
+  --app-checkbox-focus-ring: 0 0 0 1px var(--app-checkbox-control-border-focus);
+}
+
+@mixin checked() {
+  border-color: var(--accent);
+  background-color: var(--accent);
+}
+
+@mixin disabled() {
+  border-color: color-mix(in oklab, var(--app-checkbox-control-border) 76%, transparent);
+  background-color: color-mix(in oklab, var(--app-checkbox-control-bg) 78%, transparent);
+  box-shadow: var(--shadow-none);
+}

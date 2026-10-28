@@ -1,25 +1,28 @@
-// 清掉 HeroUI status-focused，避免与自绘焦点叠成双环。
-@mixin clearHeroFocusRing() {
+// HeroUI 同时使用 outline、box-shadow 和 Tailwind ring 表达焦点。
+// 自绘焦点前统一清空三者，避免叠成双环；此 mixin 仅供本模块组合。
+@mixin _resetHeroFocusRing() {
   outline: none;
   box-shadow: var(--shadow-none);
   --tw-ring-shadow: 0 0 #0000;
   --tw-ring-offset-shadow: 0 0 #0000;
 }
 
+// 默认焦点样式：用于不会被 overflow 裁切、且能容纳外侧留白的可交互元素。
 @mixin appFocusRing() {
-  @include clearHeroFocusRing();
-  outline: 2px solid var(--focus, var(--accent));
-  outline-offset: 2px;
+  @include _resetHeroFocusRing();
+  outline: var(--focus-ring-width) solid var(--focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
+// 内嵌焦点样式：用于侧边栏等紧贴容器的整行控件，避免外环被裁切。
 @mixin appFocusRingInset() {
-  @include clearHeroFocusRing();
-  box-shadow: inset 0 0 0 2px var(--focus, var(--accent));
+  @include _resetHeroFocusRing();
+  box-shadow: inset 0 0 0 var(--focus-ring-width) var(--focus);
 }
 
-// 下划线 Tabs 使用软底高亮，避免 outline 与指示线叠成 L 形。
+// 软底焦点样式：用于下划线 Tabs，避免 outline 与底部指示线叠成 L 形。
 @mixin appFocusSoft() {
-  @include clearHeroFocusRing();
+  @include _resetHeroFocusRing();
   color: var(--foreground);
   background: var(--accent-soft);
   border-radius: var(--app-radius-menu-item);

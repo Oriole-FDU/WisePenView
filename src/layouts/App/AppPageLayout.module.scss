@@ -1,9 +1,10 @@
 @use '@/styles/mixins/scrollbar' as scrollbar;
-@use '@/styles/mixins/layoutMixins' as layout;
 
 .root {
-  @include layout.flexColumnFill();
-
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
   position: relative;
   width: 100%;
   max-width: var(--app-page-max-width);

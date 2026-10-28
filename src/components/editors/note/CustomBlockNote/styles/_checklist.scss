@@ -1,0 +1,124 @@
+@use '@/components/base/Input/Checkbox/shared/tokens' as checkboxTokens;
+
+@mixin controlWrapper() {
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--app-checkbox-control-size) + 6px);
+}
+
+@mixin input() {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--app-checkbox-control-size);
+  height: var(--app-checkbox-control-size);
+  margin: 3px var(--space-xs) 0 1px;
+  border: 1px solid var(--app-checkbox-control-border);
+  border-radius: var(--app-radius-checkbox);
+  appearance: none;
+  background-color: var(--app-checkbox-control-bg);
+  box-shadow: var(--shadow-none);
+}
+
+@mixin checkedIndicator() {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 5px;
+  height: 9px;
+  border: solid var(--surface);
+  border-width: 0 2px 2px 0;
+  content: '';
+  transform: rotate(45deg);
+}
+
+@mixin editorStyles() {
+  :global(.bn-editor .bn-block-content[data-content-type='checkListItem']) {
+    @include checkboxTokens.tokens(18px);
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div:has(> input)) {
+    @include controlWrapper();
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input) {
+    @include input();
+
+    cursor: pointer;
+    transition:
+      border-color var(--motion-duration-fast) var(--motion-ease-standard),
+      background-color var(--motion-duration-fast) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+
+  :global(
+    .bn-editor
+      .bn-block-content[data-content-type='checkListItem']
+      > div
+      > input:hover:not(:disabled):not(:checked)
+  ) {
+    border-color: var(--app-checkbox-control-border-hover);
+    background-color: var(--app-checkbox-control-bg-hover);
+  }
+
+  :global(
+    .bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:focus-visible
+  ) {
+    border-color: var(--app-checkbox-control-border-focus);
+    box-shadow: var(--app-checkbox-focus-ring);
+    outline: none;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked) {
+    @include checkboxTokens.checked();
+  }
+
+  :global(
+    .bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked::after
+  ) {
+    @include checkedIndicator();
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:disabled) {
+    @include checkboxTokens.disabled();
+
+    cursor: default;
+  }
+
+  :global(
+    .bn-editor .bn-block-content[data-content-type='checkListItem'] > div > input:checked:disabled
+  ) {
+    border-color: color-mix(in oklab, var(--accent) 76%, transparent);
+    background-color: color-mix(in oklab, var(--accent) 78%, transparent);
+  }
+}
+
+@mixin dragPreviewStyles() {
+  :global(.bn-drag-preview .bn-block-content[data-content-type='checkListItem']) {
+    @include checkboxTokens.tokens(18px);
+  }
+
+  :global(
+    .bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div:has(> input)
+  ) {
+    @include controlWrapper();
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div > input) {
+    @include input();
+  }
+
+  :global(
+    .bn-drag-preview .bn-block-content[data-content-type='checkListItem'] > div > input:checked
+  ) {
+    @include checkboxTokens.checked();
+  }
+
+  :global(
+    .bn-drag-preview
+      .bn-block-content[data-content-type='checkListItem']
+      > div
+      > input:checked::after
+  ) {
+    @include checkedIndicator();
+  }
+}

@@ -1,0 +1,80 @@
+@use '../plugins/CodeBlockPlugin/styles/integration' as codeBlock;
+@use './checklist' as checklist;
+
+/**
+ * BlockNote 拖拽预览会脱离 editorShell 挂到 body，需要显式补齐编辑区契约。
+ */
+@mixin styles() {
+  :global(.bn-drag-preview) {
+    --bn-font-family: var(--app-font-family);
+    box-sizing: border-box;
+    width: min(var(--note-editor-content-width, 820px), calc(100vw - 108px));
+    max-width: min(var(--note-editor-content-width, 820px), calc(100vw - 108px));
+    font-family: var(--app-font-family);
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  :global(.bn-drag-preview .bn-block-outer) {
+    line-height: 1.8;
+  }
+
+  :global(.bn-drag-preview .bn-block-content) {
+    font-size: 16px !important;
+    font-weight: var(--font-weight-regular) !important;
+    line-height: 1.8;
+    margin-top: 0;
+    transition: none !important;
+  }
+
+  :global(.bn-drag-preview .bn-block-content:not([data-content-type='heading']) .bn-inline-content),
+  :global(
+    .bn-drag-preview .bn-block-content:not([data-content-type='heading']) .bn-inline-content *
+  ) {
+    line-height: 1.8 !important;
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading']) {
+    max-width: 100%;
+    font-size: var(--font-size-heading-1) !important;
+    font-weight: var(--font-weight-medium) !important;
+    line-height: 1.8;
+    margin-left: calc(0px - var(--space-3xs));
+    margin-right: calc(0px - var(--space-3xs));
+    padding-left: var(--space-3xs);
+    padding-right: var(--space-3xs);
+    margin-bottom: 10px;
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'] .bn-inline-content),
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'] .bn-inline-content *) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-weight: var(--font-weight-medium) !important;
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='2']) {
+    font-size: var(--font-size-heading-4) !important;
+    line-height: 1.4;
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='3']) {
+    font-size: var(--font-size-heading-2) !important;
+    line-height: 1.4;
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='4']) {
+    font-size: var(--font-size-lg) !important;
+    line-height: 1.4;
+  }
+
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='5']),
+  :global(.bn-drag-preview .bn-block-content[data-content-type='heading'][data-level='6']) {
+    font-size: 16px !important;
+    line-height: 1.4;
+  }
+
+  @include checklist.dragPreviewStyles();
+  @include codeBlock.styles('.bn-drag-preview');
+}

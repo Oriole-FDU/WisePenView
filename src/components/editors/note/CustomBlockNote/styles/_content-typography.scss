@@ -1,0 +1,106 @@
+@use './checklist' as checklist;
+
+/**
+ * BlockNote 正文、列表、链接与标题排版；Checklist 在两个列表类型之间保持原有顺序。
+ */
+@mixin styles() {
+  /* 贴近飞书文档的正文与标题字阶（仅作用正文编辑区） */
+  :global(.bodyBlockNoteView .bn-editor) {
+    font-size: 16px;
+    line-height: 1.68;
+    padding-inline: var(--note-editor-gutter, 54px) !important;
+    /* 保留接近 Notion 的文末留白，让最后一段内容可以滚离窗口底部 */
+    padding-bottom: 50vh;
+  }
+
+  :global(.bn-editor .bn-block-outer) {
+    line-height: 1.68;
+  }
+
+  :global(
+    .bn-editor .bn-block-outer:has(> .bn-block > .bn-block-content[data-content-type='heading'])
+  ) {
+    margin-top: 18px;
+    margin-bottom: var(--space-xs);
+  }
+
+  :global(.bn-editor .bn-block-content) {
+    /* 块类型切换时 BlockNote 会短暂挂载上一类型属性，必须持续压住其原生排版与字号动画。 */
+    font-size: 16px !important;
+    font-weight: var(--font-weight-regular) !important;
+    line-height: 1.68;
+    margin-top: 0;
+    margin-bottom: var(--space-2xs);
+    transition: none !important;
+  }
+
+  :global(.bn-editor .bn-block-content:not([data-content-type='heading']) .bn-inline-content),
+  :global(.bn-editor .bn-block-content:not([data-content-type='heading']) .bn-inline-content *) {
+    line-height: 1.68 !important;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='bulletListItem']::before) {
+    color: var(--foreground);
+    font-size: 1.25em;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.34;
+  }
+
+  @include checklist.editorStyles();
+
+  :global(.bn-editor .bn-block-content[data-content-type='numberedListItem']::before) {
+    color: var(--accent-text);
+    font-weight: var(--font-weight-bold);
+  }
+
+  :global(.bn-editor .bn-inline-content a),
+  :global(.bn-editor .bn-inline-content [data-inline-content-type='link']) {
+    color: var(--link, var(--accent)) !important;
+    cursor: pointer;
+    text-decoration: underline !important;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: var(--accent-hover) !important;
+    }
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='heading']) {
+    font-size: 25px !important;
+    font-weight: var(--font-weight-medium) !important;
+    line-height: 1.4;
+    margin-top: 0;
+    margin-left: calc(0px - var(--space-3xs));
+    margin-right: calc(0px - var(--space-3xs));
+    padding-left: var(--space-3xs);
+    padding-right: var(--space-3xs);
+    margin-bottom: 0;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='heading'] .bn-inline-content),
+  :global(.bn-editor .bn-block-content[data-content-type='heading'] .bn-inline-content *) {
+    font-weight: var(--font-weight-medium) !important;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='2']) {
+    font-size: var(--font-size-heading-4) !important;
+    line-height: 1.4;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='3']) {
+    font-size: var(--font-size-heading-2) !important;
+    line-height: 1.4;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='4']) {
+    font-size: var(--font-size-lg) !important;
+    line-height: 1.4;
+  }
+
+  :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='5']),
+  :global(.bn-editor .bn-block-content[data-content-type='heading'][data-level='6']) {
+    font-size: 16px !important;
+    line-height: 1.4;
+  }
+}

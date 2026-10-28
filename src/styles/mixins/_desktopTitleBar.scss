@@ -1,17 +1,7 @@
 // 桌面自定义顶栏：start 为 Mac 红绿灯让位，end 为 Win/Linux 窗口按钮让位。
 // 整条 header 可拖拽，可交互控件和窗口按钮占位区禁用拖拽。
-@mixin desktopTitleBarDrag() {
-  -webkit-app-region: drag;
-}
-
 @mixin desktopTitleBarNoDrag() {
   -webkit-app-region: no-drag;
-}
-
-@mixin desktopTitleBarInteractiveNoDrag() {
-  :where(button, a, input, textarea, select, [role='button'], [data-no-drag]) {
-    -webkit-app-region: no-drag;
-  }
 }
 
 // Resource、Chat 与窗口按钮共用顶栏高度和上方拖拽带，保持垂直节奏一致。
@@ -23,8 +13,11 @@
   padding-bottom: 0;
   display: flex;
   align-items: center;
-  @include desktopTitleBarDrag();
-  @include desktopTitleBarInteractiveNoDrag();
+  -webkit-app-region: drag;
+
+  :where(button, a, input, textarea, select, [role='button'], [data-no-drag]) {
+    @include desktopTitleBarNoDrag();
+  }
 }
 
 // 从拖拽区域挖出右侧窗口按钮占位，Workspace 可按 dock 宽度动态收窄。

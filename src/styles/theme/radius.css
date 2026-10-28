@@ -19,7 +19,6 @@
   --radius-3xl: calc(var(--radius) * 3);
   --radius-4xl: calc(var(--radius) * 4);
   --radius-full: 999px;
-  --scrollbar-radius: 999px;
 
   /* 第 3 层：应用语义 */
   /* 装饰性微元素：图表图例色块、Tab 指示线、行内文本高亮、分隔块。 */
@@ -57,5 +56,5 @@
     0px,
     calc(var(--app-radius-popover) - var(--app-popover-content-padding))
   );
-  --app-radius-scrollbar: var(--scrollbar-radius);
+  --app-radius-scrollbar: var(--radius-full);
 }

@@ -1,0 +1,365 @@
+/**
+ * BlockNote Code Block 的编辑态与拖拽预览共用一个根节点参数，避免两套选择器重复维护。
+ * 仅传根选择器，不传完整后代选择器。
+ */
+@mixin styles($root) {
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock']) {
+    position: relative;
+    z-index: var(--app-z-index-base);
+    margin: var(--space-xs) 0 10px;
+    overflow: visible;
+    border: 1px solid var(--border-light);
+    border-radius: var(--app-radius-content);
+    background-color: var(--surface-secondary) !important;
+    color: var(--foreground);
+    box-shadow: var(--shadow-none);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] > pre) {
+    overflow-x: auto;
+    margin: 0;
+    padding: var(--space-sm);
+    padding-top: calc(var(--space-xs) + var(--space-xl) + var(--space-2xs));
+    border-radius: inherit;
+    background: transparent !important;
+    color: inherit;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: var(--font-size-xs);
+    line-height: 1.6;
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] > pre > code) {
+    caret-color: var(--accent);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] > pre[data-collapsed='true']) {
+    max-height: 50px;
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] > pre[data-collapsed='true'] > code
+  ) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] > div.wise-code-block-toolbarWrapper
+  ) {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    left: 12px;
+    z-index: var(--app-z-index-local-overlay);
+    outline: none;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock']:has(.wise-code-block-toolbarOpen)
+  ) {
+    z-index: var(--app-z-index-editor-toolbar);
+  }
+
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']:has(.wise-code-block-toolbarOpen)
+      > div.wise-code-block-toolbarWrapper
+  ) {
+    z-index: calc(var(--app-z-index-editor-toolbar) + 1);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-toolbar) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-height: 30px;
+    color: color-mix(in srgb, var(--prosemirror-highlight) 72%, transparent);
+    font-family: var(--app-font-family);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-language) {
+    position: relative;
+    width: 168px;
+    max-width: min(48vw, 220px);
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageButton
+  ) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    width: 100%;
+    box-sizing: border-box;
+    height: 30px;
+    padding: 0 var(--space-xs);
+    border: 1px solid transparent;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    transition:
+      border-color var(--motion-duration-fast) var(--motion-ease-standard),
+      background-color var(--motion-duration-fast) var(--motion-ease-standard),
+      color var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageButton:disabled
+  ) {
+    cursor: default;
+    opacity: 0.65;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock']:hover .wise-code-block-languageButton
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageButton:focus-visible
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageButton[aria-expanded='true']
+  ) {
+    border-color: var(--border-light);
+    background: var(--surface-tertiary);
+    color: var(--foreground);
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageLabel
+  ) {
+    overflow: hidden;
+    min-width: 0;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageChevron
+  ) {
+    flex: 0 0 auto;
+    opacity: 0;
+    transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock']:hover .wise-code-block-languageChevron
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageButton:focus-visible
+      .wise-code-block-languageChevron
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageButton[aria-expanded='true']
+      .wise-code-block-languageChevron
+  ) {
+    opacity: 0.72;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languagePopover
+  ) {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: calc(var(--app-z-index-editor-toolbar) + 2);
+    box-sizing: border-box;
+    width: 220px;
+    padding: var(--space-2xs-plus);
+    border: 1px solid color-mix(in srgb, var(--prosemirror-highlight) 9%, var(--border));
+    border-radius: var(--app-radius-popover);
+    background: var(--surface);
+    box-shadow: var(--overlay-shadow);
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageInput
+  ) {
+    box-sizing: border-box;
+    width: 100%;
+    height: 30px;
+    margin-bottom: var(--space-2xs-plus);
+    padding: 0 var(--space-xs);
+    border: 1px solid var(--border);
+    border-radius: var(--app-radius-field);
+    background: var(--surface);
+    color: var(--foreground);
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    outline: none;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageInput:focus
+  ) {
+    border-color: var(--accent);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageList) {
+    max-height: 240px;
+    overflow: auto;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageOption
+  ) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    width: 100%;
+    box-sizing: border-box;
+    height: 28px;
+    padding: 0 var(--space-xs);
+    border: 0;
+    border-radius: var(--app-radius-menu-item);
+    background: transparent;
+    color: var(--foreground);
+    cursor: pointer;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    text-align: left;
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageOption:hover
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageOption:focus-visible
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageOption[data-active='true']
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-languageOption[aria-selected='true']
+  ) {
+    background: var(--surface-tertiary);
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-languageCheck
+  ) {
+    flex: 0 0 auto;
+    color: var(--accent-text);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-actions) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-iconButton) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--app-radius-menu-item);
+    background: transparent;
+    color: color-mix(in srgb, var(--prosemirror-highlight) 64%, transparent);
+    cursor: pointer;
+    font-family: var(--app-font-family);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      border-color var(--motion-duration-fast) var(--motion-ease-standard),
+      background-color var(--motion-duration-fast) var(--motion-ease-standard),
+      color var(--motion-duration-fast) var(--motion-ease-standard),
+      opacity var(--motion-duration-fast) var(--motion-ease-standard);
+  }
+
+  :global(
+    #{$root} .bn-block-content[data-content-type='codeBlock']:hover .wise-code-block-iconButton
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']:focus-within
+      .wise-code-block-iconButton
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-toolbarOpen
+      .wise-code-block-iconButton
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-iconButton[data-copied='true']
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-iconButton[data-collapsed='true']
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-iconButton[data-hovered]
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-iconButton[data-focus-visible]
+  ) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']:hover
+      .wise-code-block-iconButton:hover
+  ),
+  :global(
+    #{$root}
+      .bn-block-content[data-content-type='codeBlock']
+      .wise-code-block-iconButton:focus-visible
+  ) {
+    border-color: var(--border-light);
+    background: var(--surface-tertiary);
+    color: var(--foreground);
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .wise-code-block-actionIcon) {
+    flex: 0 0 auto;
+  }
+
+  :global(#{$root} .bn-block-content[data-content-type='codeBlock'] .shiki) {
+    background: transparent !important;
+  }
+}

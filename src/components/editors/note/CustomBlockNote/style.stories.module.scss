@@ -1,0 +1,25 @@
+.frame {
+  padding: var(--space-xl);
+  background: var(--background);
+}
+
+.editorFrame {
+  width: 520px;
+  min-height: 220px;
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+}
+
+.checklistRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+}
+
+.checklistText {
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.68;
+}
