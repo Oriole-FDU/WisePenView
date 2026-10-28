@@ -1,0 +1,20 @@
+.frame {
+  width: 360px;
+  height: 320px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+}
+
+.item {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-menu-item);
+  background: var(--surface-secondary);
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+}

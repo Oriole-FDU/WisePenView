@@ -1,6 +1,6 @@
 /**
  * 动效 token 集中在此文件，统一维护动画时长与缓动曲线。
- * 全局 reduced-motion 降级规则位于 global/index.css。
+ * 全局 reduced-motion 降级规则位于 global/base.css。
  */
 :root,
 .light,
