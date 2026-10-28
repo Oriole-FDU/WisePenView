@@ -70,7 +70,7 @@ export interface TagPermissionListAction {
   action: TagResourceAction;
 }
 
-/** 标签内资源默认访问策略默认的领域值；UI 文案由调用方自行组合。 */
+/** 标签内资源默认访问策略对应的预设领域值；UI 文案由调用方自行组合。 */
 export const TAG_PERMISSION_PRESET_VALUES: Record<
   TagPermissionConcretePresetKey,
   TagPermissionPresetValues
@@ -100,7 +100,7 @@ export const getTagPermissionPresetValues = (
 ): TagPermissionPresetValues | undefined =>
   key === 'custom' ? undefined : TAG_PERMISSION_PRESET_VALUES[key];
 
-/** 文件夹自身挂载策略默认的领域值；高级模式由黑/白名单与指定成员表达。 */
+/** 文件夹自身挂载策略对应的预设领域值；高级模式由黑/白名单与指定成员表达。 */
 export const TAG_MOUNT_PERMISSION_PRESET_VALUES: Record<
   TagMountPermissionConcretePresetKey,
   TagMountPermissionPresetValues

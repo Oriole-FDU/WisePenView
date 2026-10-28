@@ -4,7 +4,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作为主题
 
 ## 一、样式组织
 
-- 组件使用 SCSS + CSS Modules，档名为 `style.module.scss`；不得新增 Less 来源、导入或直接编译依赖。
+- 组件使用 SCSS + CSS Modules，文件名为 `style.module.scss`；不得新增 Less 来源、导入或直接编译依赖。
 - 使用 Vite 原生支持的 `sass-embedded`，以具名 namespace 的 `@use` 引用共用定义，不使用 Sass `@import`、`@extend` 或 `additionalData` 隐式注入。
 - 共用 `_*.scss` partial 只包含变量、函数与 mixin，单独加载不得输出 CSS；实际类名保留在所属 CSS Module，不跨组件导入私有样式，不以 `@extend` 取代 mixin 或 CSS Modules composition。
 - 样式类名使用 camelCase。
