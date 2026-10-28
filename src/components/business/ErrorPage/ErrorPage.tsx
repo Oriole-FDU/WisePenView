@@ -7,8 +7,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { ResultState } from '@/components/base/Feedback';
+import { getSupportErrorId } from '@/observability';
 import { copyText } from '@/utils/browser/copyText';
-import { getErrorReportId } from '@/utils/error';
 
 import { buildErrorDetail } from './errorDetail';
 import { buildAppErrorInfo } from './errorInfo';
@@ -32,7 +32,7 @@ function ErrorPage({
   const location = useLocation();
   const [detailOpen, setDetailOpen] = useState(false);
   const errorInfo = buildAppErrorInfo(error);
-  const errorId = getErrorReportId(error);
+  const errorId = getSupportErrorId(error);
 
   const handleRetry = onRetry ?? (() => window.location.reload());
 

@@ -50,9 +50,12 @@ pnpm mock
 生产模式额外需要校内 API、探测路径和超时；开发与 mock 模式不会启动内外网探测。浏览器网络监听与轮询由
 `App` 挂载时启动、卸载时停止，HTTP 层只发布会话失效事件，未授权提示与登录跳转由 `App` 统一处理。
 
-前端 OTel 最小试点默认关闭；在对应 `.env.*` 或构建环境中设置 `VITE_OTEL_ENDPOINT`（同源
-`/otel` 或绝对 OTLP HTTP 地址）后启用 trace/log 上报。Jenkins 只提供 `ENABLE_OTEL` 开关，开启后
-入口自动取 `VITE_API_BASE_URL` 下的 `/otel`。未配置时不会注册 provider，也不会产生上报请求。
+前端 OTel 默认关闭；设置 `VITE_OTEL_ENDPOINT`（同源 `/otel` 或绝对 OTLP HTTP 地址）
+后启用 logs/traces，mock 模式始终禁用。当前支持统一异常捕获、逻辑请求 span、
+请求失败分类、自动 Fetch/XHR span、隐私清洗、聚合预算、构建身份和私有源码映射。
+Jenkins 开启 `ENABLE_OTEL` 时会使用
+API origin 下的 `/otel`。实现、能力边界和验证方式见
+[`agent/docs/observability.md`](agent/docs/observability.md)。
 
 Mock 與正式環境共用 service、mapper、快取和 registry，只在 `@domain-apis` 替換 API 與 OSS I/O。模擬資料存於記憶體，重新整理後重置；API 契約變更時需同步更新 mock API。
 
@@ -69,6 +72,7 @@ Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 s
 - `pnpm typecheck`：执行 TypeScript 类型检查
 - `pnpm check:mock`：離線檢查 mock API 與正式 service 的跨領域讀寫，不啟動伺服器
 - `pnpm check:api-contract`：离线检查统一 API response envelope 的运行期契约
+- `pnpm check:observability`：检查异常/HTTP 管线、隐私、预算和私有 source map 还原
 
 提交前由 lint-staged 对暂存的 JS、MJS、CJS、TS、TSX 文件执行 ESLint 自动修复，再交给
 Prettier 格式化。全量 lint、提交钩子与 CI 共用同一份 ESLint 规则。

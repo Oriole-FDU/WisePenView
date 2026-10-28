@@ -4,7 +4,11 @@ import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig }
 import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/_internal/apiServerAddr';
 import { mapAxiosErrorToWisePenError } from '@/apis/_internal/axiosErrorMapper';
 import { applyXDeveloperHeader } from '@/apis/_internal/developmentTraffic';
-import { reportHttpFailure } from '@/telemetry/httpFailure';
+import {
+  captureRequestErrorResponse,
+  captureRequestResponse,
+  prepareRequestObservation,
+} from '@/observability/request';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 
 declare module 'axios' {
@@ -33,7 +37,7 @@ type RetryableAxiosConfig = InternalAxiosRequestConfig & {
 
 const delay = (ms: number): Promise<void> =>
   new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
+    globalThis.setTimeout(resolve, ms);
   });
 
 const getRetryLimit = (config: RetryableAxiosConfig): number => {
@@ -76,6 +80,7 @@ httpClient.interceptors.request.use(async (config) => {
   config.__wisePenAuthSessionVersion ??= authSessionCoordinator.getSessionVersion();
   await awaitAddrReady();
   config.baseURL = getApiBaseUrl();
+  prepareRequestObservation(config);
   config.headers = AxiosHeaders.from(config.headers);
   applyXDeveloperHeader(new Headers()).forEach((value, key) => {
     config.headers.set(key, value);
@@ -84,7 +89,10 @@ httpClient.interceptors.request.use(async (config) => {
 });
 
 httpClient.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    captureRequestResponse(response);
+    return response.data;
+  },
   async (error: AxiosError) => {
     if (!error.response) {
       notifyAddrFailure();
@@ -94,7 +102,7 @@ httpClient.interceptors.response.use(
       return retryRequest;
     }
 
-    reportHttpFailure(error);
+    captureRequestErrorResponse(error);
 
     const requestConfig = error.config;
     const authSessionState =

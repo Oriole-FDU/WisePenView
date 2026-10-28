@@ -1,5 +1,7 @@
 export const STORAGE_KEYS = {
   language: 'wisepen:language',
+  telemetryClient: 'wisepen:telemetry:client',
+  telemetrySession: 'wisepen.otel.session',
   authSessionEvent: 'wisepen:auth-session-event',
   authContinuationActive: 'wisepen:auth-continuation:active',
   colorScheme: 'heroui-color-scheme',

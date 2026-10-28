@@ -4,12 +4,13 @@ import { buildLoginPathForCurrentLocation } from '@/bootstrap/authContinuation';
 import { Spin } from '@/components/base/Feedback';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { observeUserLoad } from '@/observability/context';
 
 import styles from './style.module.scss';
 
 function AuthenticatedRouteGuard() {
   const userService = useUserService();
-  const { data, error, loading } = useApi(() => userService.getUserInfo());
+  const { data, error, loading } = useApi(() => observeUserLoad(() => userService.getUserInfo()));
 
   if (loading || (!data && !error)) {
     return (

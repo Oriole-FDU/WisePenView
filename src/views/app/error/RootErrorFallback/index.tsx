@@ -1,13 +1,13 @@
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
-import { getErrorReportId } from '@/utils/error';
+import { getSupportErrorId } from '@/observability';
 
 import styles from './style.module.scss';
 
 function RootErrorFallback({ error }: FallbackProps) {
   const { t } = useTranslation('errors');
-  const errorId = getErrorReportId(error);
+  const errorId = getSupportErrorId(error);
 
   return (
     <main className={styles.root}>
