@@ -33,6 +33,7 @@
 ## 其它领域
 
 - `business-knowledge.md`：业务知识文件的唯一来源、迁移和分批审查。
+- `observability.md`：前端遥测入口、事件管线、隐私、构建身份和源码映射。
 - `routing.md`：URL、页面级 Tab、面包屑和导航历史。
 - `store.md`：状态归属、注册、持久化和生命周期。
 - `color-system.md`：颜色阶、语义 token 和主题。
