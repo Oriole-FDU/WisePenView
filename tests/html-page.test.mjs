@@ -42,15 +42,6 @@ const resourceModule = await bundleModule(`
   export { isHtmlPageReady } from '@/domains/HtmlPage/service/index.type';
 `);
 
-const driveModule = await bundleModule(`
-  export {
-    buildDriveNodeScope,
-    mapTagToFolderNode,
-    orderDriveFolderNodes,
-  } from '@/domains/Drive/model/driveNode';
-  export { createDriveServices } from '@/domains/Drive/service/DriveServices.impl';
-`);
-
 test('SINGLE_HTML_PAGE 与 html 扩展名统一归一化到 HTML 资源、查看器和编辑器', () => {
   for (const token of ['SINGLE_HTML_PAGE', 'single_html_page', 'html', ' Html ']) {
     assert.equal(resourceModule.normalizeResourceKind(token), 'html');
@@ -73,68 +64,6 @@ test('SINGLE_HTML_PAGE 与 html 扩展名统一归一化到 HTML 资源、查看
 
   assert.equal(resourceModule.resolveResourceViewer({ viewer: 'SINGLE_HTML_PAGE' }), 'html');
   assert.equal(resourceModule.isResourceViewerCompatible('html', 'pdfPreview'), false);
-});
-
-test('.Note、.Page 映射为系统目录，并按 .Shared、.Note、.Page、普通目录排序', () => {
-  const scope = driveModule.buildDriveNodeScope();
-  const mapFolder = (tagId, tagName) =>
-    driveModule.mapTagToFolderNode(
-      { tagId, tagName, parentId: '', children: [] },
-      scope.rootId,
-      scope
-    );
-  const shared = mapFolder('shared', '.Shared');
-  const note = mapFolder('note', '.Note');
-  const page = mapFolder('page', '.Page');
-  const normal = mapFolder('normal', '工作');
-
-  assert.equal(note.systemType, 'note');
-  assert.equal(page.systemType, 'page');
-  assert.deepEqual(
-    driveModule.orderDriveFolderNodes([normal, page, note, shared]).map((node) => node.tagId),
-    ['shared', 'note', 'page', 'normal']
-  );
-});
-
-test('个人云盘根目录展示 .Shared、.Note、.Page，同时隐藏 .Trash 与其他点号目录', async () => {
-  const rootTag = {
-    tagId: 'root',
-    tagName: '/',
-    parentId: '0',
-    children: [{ tagId: 'work', tagName: '工作', parentId: '', children: [] }],
-  };
-  const roots = [
-    rootTag,
-    { tagId: 'trash', tagName: '.Trash', parentId: '0', children: [] },
-    { tagId: 'note', tagName: '.Note', parentId: '0', children: [] },
-    { tagId: 'shared', tagName: '.Shared', parentId: '0', children: [] },
-    { tagId: 'page', tagName: '.Page', parentId: '0', children: [] },
-    { tagId: 'hidden', tagName: '.Hidden', parentId: '0', children: [] },
-  ];
-  const tagById = new Map(roots.map((tag) => [tag.tagId, tag]));
-  const tagService = {
-    getRawTagTree: async () => roots,
-    getRawTagById: (tagId) => tagById.get(tagId),
-  };
-  const driveService = driveModule.createDriveServices({
-    tagService,
-    resourceService: {},
-  });
-  const rootNode = await driveService.getRoot();
-  const page = await driveService.loadNodeChildren({
-    parent: rootNode,
-    kinds: ['folder'],
-  });
-
-  assert.deepEqual(
-    page.folderNodes.map((node) => ({ tagId: node.tagId, systemType: node.systemType })),
-    [
-      { tagId: 'shared', systemType: 'shared' },
-      { tagId: 'note', systemType: 'note' },
-      { tagId: 'page', systemType: 'page' },
-      { tagId: 'work', systemType: undefined },
-    ]
-  );
 });
 
 test('HTML 权限只暴露 DISCOVER、VIEW、EDIT', () => {

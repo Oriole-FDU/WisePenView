@@ -414,6 +414,7 @@ export default defineConfig([
     files: [
       '*.{js,mjs,cjs,ts}',
       'scripts/**/*.{js,mjs,cjs}',
+      'tests/**/*.{js,mjs,cjs}',
       'electron/**/*.{ts,tsx}',
       '.storybook/main.ts',
     ],
