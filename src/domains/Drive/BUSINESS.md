@@ -16,6 +16,6 @@
 ## 操作与分页
 
 - 批次操作先去重并移除已选文件夹的后代，同一操作必须同 scope；移动不可指向自己或后代，小组同一资源多挂载的移动会拒绝。这些前端限制不代替 Resource／Tag 的后端授权。依据：[normalizeActionNodes](service/DriveServices.impl.ts)、[assertActionScope](service/DriveServices.impl.ts)、[assertValidMoveTarget](service/DriveServices.impl.ts)、[assertSingleMountPerResource](service/DriveServices.impl.ts)。
-- 个人回收站、小组移除与回收站永久删除是不同命令，依 scope 与选取位置调用 Resource／Tag；同一资源的小组卸载可能分轮送出。请求不构成跨资源／标签交易。依据：[moveNodesToTrash](service/DriveServices.impl.ts)、[removeNodesFromGroup](service/DriveServices.impl.ts)、[deleteTrashedNodes](service/DriveServices.impl.ts)、[Resource](../Resource/BUSINESS.md)。
+- 个人回收站、小组移除与回收站永久删除是不同命令，依 scope 与选取位置调用 Resource／Tag；同一资源的小组卸载可能分轮送出。请求不构成跨资源／标签事务。依据：[moveNodesToTrash](service/DriveServices.impl.ts)、[removeNodesFromGroup](service/DriveServices.impl.ts)、[deleteTrashedNodes](service/DriveServices.impl.ts)、[Resource](../Resource/BUSINESS.md)。
 - service 操作不更新界面数据；TableDrive 在成功回调刷新相关清单，其他 consumer 也需处理刷新，而不是把成功结果当完整新树。依据：[createDriveServices](service/DriveServices.impl.ts)、[useTableDriveActionsController](../../components/business/Drive/TableDrive/controllers/useTableDriveActionsController.tsx)。
 - cursor 编码 parentId、page 与 pageSize；目前验证可解析结构、整数字段及 parentId 相同，不绑定资源筛选条件，也不承诺验证所有页码范围。文件夹只在无 cursor 时加载，小组虚拟 root 不直接载资源。依据：[decodeResourceCursor](service/DriveServices.impl.ts)、[loadNodeChildren](service/DriveServices.impl.ts)。

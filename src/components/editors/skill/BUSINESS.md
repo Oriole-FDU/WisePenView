@@ -16,6 +16,6 @@
 
 - 文件与 Config 分别建立 revision snapshot；旧保存结果只清除相同 revision 的 draft，新编辑保留。多档保存可部分成功，成功者更新基线，失败者仍需处理。依据：[applySavedSkillFiles](models/workspaceDraft.ts)、[applyConfigSave](controllers/useSkillWorkspaceDraftController.ts)。
 - 队列显示 pending／preparing／uploading／failed，成功任务移除；再次保存使用当前待存 snapshot，不保证重送先前失败的原始内容。同类别并行保存会等待既有 Promise；saveAll 先文件后 Config，不是原子保存。依据：[useSkillSaveController](controllers/useSkillSaveController.ts)。
-- 发布需 owner、有根 SKILL.md 且 Config 完整；保存中不发布或切换版本。有修改的发布、切换版本、取消编辑进入 pending intent；储存后仍 dirty 不继续，取消意图保留草稿，舍弃后按原意图执行。依据：[useSkillNavigationController](controllers/useSkillNavigationController.ts)。
+- 发布需 owner、有根 SKILL.md 且 Config 完整；保存中不发布或切换版本。有修改的发布、切换版本、取消编辑进入 pending intent；保存后仍 dirty 不继续，取消意图保留草稿，舍弃后按原意图执行。依据：[useSkillNavigationController](controllers/useSkillNavigationController.ts)。
 - 离开／切换资源通过 runtime 的退出协商，不是 navigation controller 的 pending intent；Save 等保存与状态提交，Discard 丢弃工作区并清本地 cache。未完成文件移动／删除也列入 pendingWork，不承诺正式 OSS 持久化。依据：[SkillEditorContent](index.tsx)、[prepareDraftExit](../_runtime/draftExit.ts)。
 - 远程文件读取带目前 viewingVersion；文件树的建立／删除／移动由 file actions 编排，通过公开 callback 更新工作区，asset 的候选清理及身份规则不在此重订。依据：[useSkillFileActionsController](controllers/useSkillFileActionsController.ts)、[Skill domain](../../../domains/Skill/BUSINESS.md)。

@@ -8,9 +8,9 @@
 
 ## 编辑、标题与退出
 
-- connecting 或没有 EDIT 时 editor 唯读；本地 Yjs 写保护等同步完成且没有 EDIT 时才启用，避免拦截 BlockNote 初始化。具 EDIT 的 disconnected 并非一律唯读，不能将此例外扩大成完整离线能力保证。依据：[NoteEditorSession](CustomBlockNote/NoteEditorSession.tsx)。
-- 标题与正文分开储存；标题以 500ms 防抖送出，trim 后空值使用未命名标题，旧请求不覆盖较新编辑的储存提示。标头状态优先顺序为标题 failed、正文 waiting、任一 saving、最后才 saved。依据：[NoteTitle](components/NoteTitle/index.tsx)、[resolveNoteHeaderSaveStatus](components/NoteWorkspace/noteWorkspaceModel.ts)。
-- Note 自订退出策略只协商尚未完成的图片工作，不承诺退出时 flush 标题或等待正文持久化；`hasUnsavedChanges` 与图片 `pendingWork` 不是同一状态。依据：[NoteWorkspace](components/NoteWorkspace/index.tsx)。
+- connecting 或没有 EDIT 时 editor 只读；本地 Yjs 写保护等同步完成且没有 EDIT 时才启用，避免拦截 BlockNote 初始化。具 EDIT 的 disconnected 并非一律只读，不能将此例外扩大成完整离线能力保证。依据：[NoteEditorSession](CustomBlockNote/NoteEditorSession.tsx)。
+- 标题与正文分别保存；标题以 500ms 防抖送出，trim 后空值使用未命名标题，旧请求不覆盖较新编辑的保存提示。头部状态优先顺序为标题 failed、正文 waiting、任一 saving、最后才 saved。依据：[NoteTitle](components/NoteTitle/index.tsx)、[resolveNoteHeaderSaveStatus](components/NoteWorkspace/noteWorkspaceModel.ts)。
+- Note 自定义退出策略只协商尚未完成的图片工作，不承诺退出时 flush 标题或等待正文持久化；`hasUnsavedChanges` 与图片 `pendingWork` 不是同一状态。依据：[NoteWorkspace](components/NoteWorkspace/index.tsx)。
 
 ## 导入与 AI Diff
 
@@ -21,7 +21,7 @@
 ## Chat 与原文定位
 
 - Note Chat provider 只在协同 connected 且正文 signature 不再 pending 时解除阻挡；选区以文字及 scope 写入 frontend state，不能把选区展示或前端可送出状态当成后端已消费的证据。依据：[createNoteChatStateProvider](NoteChatProtocol.ts)、[createNoteSelectionChatContext](NoteChatProtocol.ts)。
-- 原文链接由 `wisepen://note/<id>#p_<blockId>` 协定解析；同一笔记只卷动，其他笔记先开启再定位。定位请求有 TTL 与重试期限，新请求会让旧定位停止；送出导航意图不保证目标 block 仍存在或一定能定位。依据：[parseNoteLinkUrl](noteLinkProtocol.ts)、[resolveNoteLinkAction](noteLinkProtocol.ts)、[createNoteExternalNavigationRequest](noteExternalNavigationModel.ts)、[useNoteExternalNavigationController](components/NoteWorkspace/useNoteExternalNavigationController.ts)。
+- 原文链接由 `wisepen://note/<id>#p_<blockId>` 协议解析；同一笔记只滚动，其他笔记先开启再定位。定位请求有 TTL 与重试期限，新请求会让旧定位停止；送出导航意图不保证目标 block 仍存在或一定能定位。依据：[parseNoteLinkUrl](noteLinkProtocol.ts)、[resolveNoteLinkAction](noteLinkProtocol.ts)、[createNoteExternalNavigationRequest](noteExternalNavigationModel.ts)、[useNoteExternalNavigationController](components/NoteWorkspace/useNoteExternalNavigationController.ts)。
 
 ## Note 专用批注桥接
 
@@ -30,9 +30,9 @@
 - session 并行查询 active／resolved 两组数据，共用正在进行的 refresh；mutation 等既有 refresh 结束再刷新，建立结果未读到时再读一次，仍缺失才报错。只有首次加载显示 loading，后续刷新失败保留现有数据并显示 error。依据：[NoteInlineCommentSession](../../../domains/Note/session/NoteInlineCommentSession.ts)。
 - 建立重试会先刷新，在目前 active 列表中找相同 externalAnchorId；回复重试只记录同一 session 已收到的 item ID，再刷新确认。回复请求未送 retry key，遗失建立响应、跨 session 或已移出 active 列表都不享有完整去重，不能宣称 exactly-once。依据：[NoteInlineCommentSession](../../../domains/Note/session/NoteInlineCommentSession.ts)、[mapAddItemRequest](../../../domains/Note/mapper/NoteInlineCommentServices.map.ts)。
 - 装饰范围只来自 active threads；active 与 resolved 都可重新计算当前引文与位置。能解析的依文件位置排序，其余依更新／建立时间倒序；无法解析时保留原引文，不自行删除远程 thread。依据：[createInlineCommentExtension](CustomBlockNote/engines/inlineComments/extension.ts)、[NoteInlineCommentSession](../../../domains/Note/session/NoteInlineCommentSession.ts)。
-- controller 每 8 秒轮询，选取 thread 会开侧栏并设置卷动目标；resolve 后清除对应 active ID，卸载销毁 session。这不是即时推播或跨用户一致性的保证。依据：[useNoteCommentsController](components/NoteWorkspace/useNoteCommentsController.ts)。
+- controller 每 8 秒轮询，选取 thread 会开侧栏并设置滚动目标；resolve 后清除对应 active ID，卸载销毁 session。这不是实时推送或跨用户一致性的保证。依据：[useNoteCommentsController](components/NoteWorkspace/useNoteCommentsController.ts)。
 - Note 将共享面板的图片场景设为私有 Note 图片；面板操作与提交保留规则由 [共享批注面板](../../business/InlineComment/BUSINESS.md) 拥有，URL／私有读取限制只由 [Image](../../../domains/Image/BUSINESS.md) 拥有。依据：[NoteWorkspace](components/NoteWorkspace/index.tsx)。
 
 ## 尚未由前端证明的事项
 
-储存文案、唯读 UI、Yjs transaction 与 frontend state 不证明后端授权、正文持久化或跨请求原子性。图片的共用生命周期由 [Image](../../../domains/Image/BUSINESS.md) 拥有。
+保存提示文案、只读 UI、Yjs transaction 与 frontend state 不证明后端授权、正文持久化或跨请求原子性。图片的共用生命周期由 [Image](../../../domains/Image/BUSINESS.md) 拥有。

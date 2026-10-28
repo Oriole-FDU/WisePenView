@@ -19,5 +19,5 @@
 
 - 一般评论 composer 使用公开图片场景；全部待上传图片失败时不提交评论，部分成功时可用成功图片提交。提交 callback 完成后清空文字，将失败图片留在本地状态；此保留只适用于仍挂载的 composer。纯图片使用 U+200B 作正文，与共享批注面板的全数图片成功才提交策略不同。依据：[CommentComposer](CommentComposer.tsx)。
 - 上传或向 composer 传递的提交错误会保留仍挂载的输入。根评论等待建立与根清单刷新；资源信息的非同步刷新由 `notifyResourceChanged` 自行捕捉错误，不会因此让 composer 保留已成功提交的内容。依据：[CommentComposer](CommentComposer.tsx)、[ResourceInteractionPanel](index.tsx) 的 `refreshComments`、`notifyResourceChanged`。
-- 回复 API 成功后立即清除 replyTarget、卸载 composer，再刷新回复与根清单；因此部分上传失败的图片及后续刷新失败都不保证恢复输入。图片上传、评论建立与刷新不是交易，也没有跨重试的评论幂等保证。依据：[ResourceCommentThread](ResourceCommentThread.tsx) 的 `handleReplySubmit`。
+- 回复 API 成功后立即清除 replyTarget、卸载 composer，再刷新回复与根清单；因此部分上传失败的图片及后续刷新失败都不保证恢复输入。图片上传、评论建立与刷新不是事务，也没有跨重试的评论幂等保证。依据：[ResourceCommentThread](ResourceCommentThread.tsx) 的 `handleReplySubmit`。
 - 图片场景、链接与私有图片读取规则由 [Image](../../../../domains/Image/BUSINESS.md) 拥有，不从 `<img>` 或 URL 存在推论可读性。

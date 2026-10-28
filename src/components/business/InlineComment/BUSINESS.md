@@ -16,4 +16,4 @@
 ## 图片与重试
 
 - 文字 trim 后为空且有图片时，用 U+200B 作正文；图片先全部上传成功才调用 consumer。imageUpload 可禁用或指定场景，默认为公开用户图片。场景、地址及私有读取限制由 [Image](../../../domains/Image/BUSINESS.md) 拥有。依据：[CommentComposer](CommentComposer.tsx)、[InlineCommentProps](index.type.ts)。
-- 上传或 consumer 提交失败会保留内容、待上传图片及同一 idempotencyKey；整次成功才清空并换 key。这个 key 是 consumer 的重试线索，不是通用后端幂等契约。重试仍会重新上传图片，没有跨图片／评论的交易或上传补偿保证。依据：[CommentComposer](CommentComposer.tsx)、[InlineCommentSubmitPayload](index.type.ts)。
+- 上传或 consumer 提交失败会保留内容、待上传图片及同一 idempotencyKey；整次成功才清空并换 key。这个 key 是 consumer 的重试线索，不是通用后端幂等契约。重试仍会重新上传图片，没有跨图片／评论的事务或上传补偿保证。依据：[CommentComposer](CommentComposer.tsx)、[InlineCommentSubmitPayload](index.type.ts)。

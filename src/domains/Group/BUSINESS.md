@@ -14,7 +14,7 @@
 
 ## 建组、资源配置与配额
 
-- 创建小组是两阶段调用：先添加小组取得 `groupId`，再为其写入默认成员资源动作。第二步失败时，前端不会撤销第一步创建；不要将其描述成原子交易或自动回滚。依据：[createGroup](service/GroupServices.impl.ts)、[GroupApi](apis/GroupApi.ts)。
+- 创建小组是两阶段调用：先添加小组取得 `groupId`，再为其写入默认成员资源动作。第二步失败时，前端不会撤销第一步创建；不要将其描述成原子事务或自动回滚。依据：[createGroup](service/GroupServices.impl.ts)、[GroupApi](apis/GroupApi.ts)。
 - 小组资源配置通过独立配置 API 读取与更新；Group 负责请求编排，标签动作的归一化与资源权限语义分别以 Tag、Resource 文档为准。依据：[GroupServices](service/GroupServices.impl.ts)、[GroupServicesMap](mapper/GroupServices.map.ts)。
 - 高级组配额列表先按页读取，再由前端筛选 `ADVANCED` 类型；返回的 `total` 仍是接口映射的总数，不是筛选后当前页记录数，也不保证等于所有高级组数量。页码与页大小在 service 内钳制为至少 1。依据：[fetchUserGroupQuotas](service/GroupServices.impl.ts)、[GroupQuotaMap](mapper/groupQuota.mapper.ts)。
 - 单组配额读取 `tokenUsed` 与 `tokenLimit`；分配或调整成员配额使用独立请求。角色相关的输入限制由前端配置控制，后端是否拒绝越权请求不能由该配置推断。依据：[GroupQuotaMap](mapper/groupQuota.mapper.ts)、[GroupApi](apis/GroupApi.ts)、[GroupDisplayConfig](../../components/business/Group/GroupDisplayConfig.ts)。
