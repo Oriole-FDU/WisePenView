@@ -5,7 +5,13 @@
 ## 项目事实
 
 - 技术栈：Vite、React 19、TypeScript strict、SCSS CSS Modules、HeroUI、ahooks、zustand；运行版本以 `.nvmrc` 和 `package.json#packageManager` 为准。
-- 注释使用中文；commit message 使用中文 Conventional Commit。
+- 注释和 commit message 使用简体中文，commit message 遵循中文 Conventional Commit。
+
+## 贡献约定
+
+- 新写文档、注释和提交信息使用简体中文；外部原文引用保持原貌。
+- 代码标识符、接口字段和 URL 不参与字形转换。
+- 既有繁体内容在触及对应文件时顺手规范，不再发起无边界的批量替换。
 
 ## 任务路由
 

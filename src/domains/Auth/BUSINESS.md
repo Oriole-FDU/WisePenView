@@ -14,7 +14,7 @@
 
 ## 会话失效与清理
 
-- Auth service 只在登录或登出 API 成功后发布对应事件。应用收到登录事件时清理 service cache 与 session store；收到登出或 unauthorized 时，另清理指定的 Skill 草稿与 Note 协作 IndexedDB，并导回登录页。依据：[AuthServices](service/AuthServices.impl.ts)、[App](../../bootstrap/App.tsx)。
+- Auth service 只在登录或退出登录 API 成功后发布对应事件。应用收到登录事件时清理 service cache 与 session store；收到退出登录或 unauthorized 时，另清理指定的 Skill 草稿与 Note 协作 IndexedDB，并导回登录页。依据：[AuthServices](service/AuthServices.impl.ts)、[App](../../bootstrap/App.tsx)。
 - HTTP client 只对请求发出时与当前版本相同的 401 发布 unauthorized；登录请求跳过此处理。较旧会话发出的请求即使后来返回 401，也不会结束新会话。依据：[httpClient](../../apis/_internal/httpClient.ts)、[authSessionCoordinator](../../utils/auth/authSessionCoordinator.ts)。
 - coordinator 通过 localStorage 事件通知其他标签页；当前标签直接收到本地事件，其他标签递增会话版本并运行同一清理处理。浏览器不提供 storage 时，广播失败不会阻断认证请求。事件同步不承担业务数据存储。依据：[authSessionCoordinator](../../utils/auth/authSessionCoordinator.ts)、[App](../../bootstrap/App.tsx)。
 - 前端事件负责清理与导航，不证明服务端凭证、会话撤销或其他标签页的后端状态；这些行为仍由认证 API 与部署环境决定。
