@@ -33,6 +33,9 @@ import type {
 const MAX_MESSAGE_LENGTH = 512;
 const MAX_STACK_LENGTH = 32_000;
 
+const compactAttributes = (attributes: Attributes): Attributes =>
+  Object.fromEntries(Object.entries(attributes).filter(([, value]) => value !== undefined));
+
 const SEVERITY_NUMBER: Record<ObservationSeverity, SeverityNumber> = {
   INFO: SeverityNumber.INFO,
   WARN: SeverityNumber.WARN,
@@ -167,7 +170,7 @@ export const recordExceptionObservation = (observation: ExceptionObservation): v
             512
           )
         : buildErrorFingerprint(observation.errorType, message, stack);
-    const attributes: Attributes = {
+    const attributes = compactAttributes({
       ...snapshot.attributes,
       'error.id': observation.id,
       'error.detector': observation.detector,
@@ -182,7 +185,7 @@ export const recordExceptionObservation = (observation: ExceptionObservation): v
       'code.column.number': location?.column,
       'telemetry.breadcrumbs': serializeBreadcrumbs(snapshot),
       'telemetry.breadcrumbs_dropped': snapshot.breadcrumbsDropped,
-    };
+    });
     if (observation.code !== undefined) attributes['error.code'] = observation.code;
     if (observation.source) attributes['error.source'] = observation.source;
 
@@ -213,7 +216,7 @@ export const recordHttpFailure = (observation: HttpFailureObservation): boolean 
     const snapshot = pipeline.context.capture();
     const method = sanitizeDiagnosticText(observation.method, 16).toUpperCase();
     const path = sanitizePath(observation.path);
-    const attributes: Attributes = {
+    const attributes = compactAttributes({
       ...snapshot.attributes,
       'error.type': `HTTP_${observation.status}`,
       'error.source': 'http',
@@ -226,7 +229,7 @@ export const recordHttpFailure = (observation: HttpFailureObservation): boolean 
       'url.path': path,
       'telemetry.breadcrumbs': serializeBreadcrumbs(snapshot),
       'telemetry.breadcrumbs_dropped': snapshot.breadcrumbsDropped,
-    };
+    });
     if (observation.host) attributes['server.address'] = observation.host;
     if (observation.port) attributes['server.port'] = observation.port;
     if (observation.requestId && isValidRequestId(observation.requestId)) {

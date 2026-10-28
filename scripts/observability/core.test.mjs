@@ -143,6 +143,12 @@ test('异常和 HTTP 失败进入同一聚合管线', async (context) => {
   const logs = [];
   const attributes = telemetry.createInitialContextAttributes('test');
   const observabilityContext = new telemetry.ObservabilityContext(attributes, 0);
+  observabilityContext.setRoute({
+    'page.path': '/chat',
+    'page.route': '/chat',
+    'resource.id': undefined,
+    'editor.type': undefined,
+  });
   const fakeSpan = {
     end() {},
     recordException() {},
@@ -164,6 +170,12 @@ test('异常和 HTTP 失败进入同一聚合管线', async (context) => {
   assert.equal(logs.length, 1);
   assert.equal(logs[0].attributes['error.operation'], undefined);
   assert.equal(logs[0].attributes['operation.name'], 'chat.send');
+  assert.equal('resource.id' in logs[0].attributes, false);
+  assert.equal('editor.type' in logs[0].attributes, false);
+  assert.equal('react.component_stack' in logs[0].attributes, false);
+  assert.equal('code.file.path' in logs[0].attributes, false);
+  assert.equal('code.line.number' in logs[0].attributes, false);
+  assert.equal('code.column.number' in logs[0].attributes, false);
 
   telemetry.captureException(error, {
     detector: 'window-error',
