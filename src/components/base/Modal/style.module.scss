@@ -1,0 +1,8 @@
+.backdrop {
+  z-index: var(--app-z-index-modal);
+}
+
+.dialog:not(:global(.modal__dialog--full)):not(:global(.alert-dialog__dialog--full)) {
+  border-radius: var(--app-radius-modal) !important;
+  overflow: clip;
+}

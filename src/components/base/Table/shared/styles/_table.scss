@@ -296,3 +296,38 @@
   max-height: var(--table-row-height);
   vertical-align: middle;
 }
+
+@mixin tableFocusReset() {
+  :global(.table__column:focus-visible),
+  :global(.table__column[data-focus-visible='true']),
+  :global(.table__cell:focus-visible),
+  :global(.table__cell[data-focus-visible='true']),
+  :global(.table__row:is(:focus-visible, [data-focus-visible='true'])) :global(.table__cell),
+  :global(.table__row:is(:focus-visible, [data-focus-visible='true'])) :global(.table__column),
+  :global(.table__row:is(:focus-visible, [data-focus-visible='true'])) > * :global(.table__cell),
+  :global(.table__row:is(:focus-visible, [data-focus-visible='true'])) > * :global(.table__column) {
+    outline: none;
+    box-shadow: var(--shadow-none);
+  }
+}
+
+@mixin tableInheritedTypography() {
+  :global(.table__content),
+  :global(.table__column),
+  :global(.table__cell),
+  :global(.table__footer),
+  :global(.table__load-more),
+  :global(.pagination),
+  :global(.pagination__link),
+  :global(.pagination__ellipsis),
+  :global(.select__trigger),
+  :global(.select__value),
+  :global(.listbox),
+  :global(.listbox-item),
+  :global(.chip),
+  [data-slot='label'],
+  :global(.button),
+  button {
+    font: inherit;
+  }
+}

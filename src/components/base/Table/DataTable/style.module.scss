@@ -65,6 +65,8 @@
   width: 100%;
   background: var(--surface);
   @include table.tableRootStretch();
+  @include table.tableFocusReset();
+  @include table.tableInheritedTypography();
 
   :global(.table__scroll-container) {
     width: 100%;

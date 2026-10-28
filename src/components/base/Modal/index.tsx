@@ -1,5 +1,6 @@
 import { Modal as HeroModal } from '@heroui/react';
-import { useState } from 'react';
+import { clsx } from 'clsx';
+import { type ComponentProps, useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
@@ -9,6 +10,7 @@ import type {
   ModalRootControlContextValue,
   ModalRootProps,
 } from './index.type';
+import styles from './style.module.scss';
 
 const DEFAULT_MODAL_CONTENT_DELAY = 120;
 
@@ -103,11 +105,19 @@ function ModalBackdrop({
       enabled={resolvedDeferContent}
       isOpen={hasBackdropControl ? trackedOpen : true}
     >
-      <HeroModal.Backdrop {...props} {...overlayControlProps}>
+      <HeroModal.Backdrop
+        {...props}
+        {...overlayControlProps}
+        className={clsx(styles.backdrop, props.className)}
+      >
         {children}
       </HeroModal.Backdrop>
     </DeferredOverlayProvider>
   );
+}
+
+function ModalDialog({ className, ...props }: ComponentProps<typeof HeroModal.Dialog>) {
+  return <HeroModal.Dialog className={clsx(styles.dialog, className)} {...props} />;
 }
 
 export const Modal = Object.assign(ModalRoot, {
@@ -116,7 +126,7 @@ export const Modal = Object.assign(ModalRoot, {
   CloseTrigger: HeroModal.CloseTrigger,
   Container: HeroModal.Container,
   DeferredContent,
-  Dialog: HeroModal.Dialog,
+  Dialog: ModalDialog,
   Footer: HeroModal.Footer,
   Header: HeroModal.Header,
   Heading: HeroModal.Heading,
