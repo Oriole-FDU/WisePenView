@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
+import type { FallbackProps } from 'react-error-boundary';
 import { useLocation } from 'react-router-dom';
 
 import { ErrorPage } from '@/components/business/ErrorPage';
-import { reportError } from '@/utils/error';
+import { ObservedErrorBoundary } from '@/observability/react';
 
 import styles from './style.module.scss';
 
@@ -24,19 +24,13 @@ function RouteOutletBoundary({ children }: RouteOutletBoundaryProps) {
   const location = useLocation();
 
   return (
-    <ErrorBoundary
+    <ObservedErrorBoundary
+      detector="route-fallback"
       FallbackComponent={RouteOutletFallback}
       resetKeys={[location.key, location.pathname, location.search]}
-      onError={(error, errorInfo) => {
-        reportError(error, {
-          origin: 'layout-boundary',
-          pathname: location.pathname,
-          componentStack: errorInfo.componentStack ?? undefined,
-        });
-      }}
     >
       {children}
-    </ErrorBoundary>
+    </ObservedErrorBoundary>
   );
 }
 

@@ -10,6 +10,7 @@ const enUSErrors = {
     '13': 'Bad request.',
     '14': 'Server error.',
     '15': 'Request failed. Please try again later.',
+    '16': 'The server returned an invalid response. Please try again later.',
     '99': 'Network error. Please try again later.',
     '100': 'Validation failed.',
     '101': 'Image size cannot exceed {{maxSize}}.',

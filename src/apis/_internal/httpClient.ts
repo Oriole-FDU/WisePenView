@@ -4,7 +4,7 @@ import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig }
 import { awaitAddrReady, getApiBaseUrl, notifyAddrFailure } from '@/apis/_internal/apiServerAddr';
 import { mapAxiosErrorToWisePenError } from '@/apis/_internal/axiosErrorMapper';
 import { applyXDeveloperHeader } from '@/apis/_internal/developmentTraffic';
-import { reportHttpFailure } from '@/telemetry/httpFailure';
+import { markHttpExceptionObserved, reportHttpFailure } from '@/observability/httpFailure';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 
 declare module 'axios' {
@@ -94,7 +94,7 @@ httpClient.interceptors.response.use(
       return retryRequest;
     }
 
-    reportHttpFailure(error);
+    const failureRecorded = reportHttpFailure(error);
 
     const requestConfig = error.config;
     const authSessionState =
@@ -111,7 +111,9 @@ httpClient.interceptors.response.use(
     ) {
       authSessionCoordinator.publish('unauthorized');
     }
-    return Promise.reject(mapAxiosErrorToWisePenError(error, authSessionState));
+    const mappedError = mapAxiosErrorToWisePenError(error, authSessionState);
+    if (failureRecorded) markHttpExceptionObserved(mappedError);
+    return Promise.reject(mappedError);
   }
 );
 
