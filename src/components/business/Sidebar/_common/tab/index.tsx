@@ -1,10 +1,11 @@
-import { Tabs, Tooltip } from '@heroui/react';
+import { Tabs } from '@heroui/react';
 import { clsx } from 'clsx';
 import { BookOpen, FolderOpen, type LucideIcon, MessageSquare } from 'lucide-react';
 import { type ComponentPropsWithRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { GuideAnchor, registerGuideActionHandlers } from '@/components/base/Guide';
+import { Tooltip } from '@/components/base/Tooltip';
 import CommandPaletteTrigger from '@/components/business/CommandPalette/Trigger';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID, type GuideToolId } from '@/constants/tour';
 import { useAppAuth } from '@/layouts/App/_context';

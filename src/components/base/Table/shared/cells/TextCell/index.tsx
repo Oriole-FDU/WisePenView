@@ -1,5 +1,6 @@
-import { Tooltip } from '@heroui/react';
 import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
+
+import { Tooltip } from '@/components/base/Tooltip';
 
 import { tableCellStyles } from '../../styles';
 import { useTableColumnAlign } from '../../TableBase/_context';

@@ -1,10 +1,10 @@
-import { Tooltip } from '@heroui/react';
 import { Pencil, Save } from 'lucide-react';
 import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
+import { Tooltip } from '@/components/base/Tooltip';
 
 import type { CourseEditorForm, UpdateCourseEditorForm } from '../../model';
 import styles from '../../style.module.scss';

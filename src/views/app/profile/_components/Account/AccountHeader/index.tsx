@@ -1,4 +1,4 @@
-import { toast, Tooltip } from '@heroui/react';
+import { toast } from '@heroui/react';
 import { Camera, Check, TriangleAlert, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import { UploadZone } from '@/components/base/Input';
+import { Tooltip } from '@/components/base/Tooltip';
 import { useImageService, useUserService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
 import { IDENTITY, USER_STATUS } from '@/domains/User';

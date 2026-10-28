@@ -1,8 +1,9 @@
-import { ToggleButton, Tooltip } from '@heroui/react';
 import { Eye, ThumbsUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppToggleButton } from '@/components/base/Button';
+import { Tooltip } from '@/components/base/Tooltip';
 import { formatReadCount } from '@/utils/format/formatNumber';
 
 import styles from './style.module.scss';
@@ -31,7 +32,7 @@ function ResourceFeedbackSummary({
   const likeTooltip = liked ? t('comment.unlike') : t('comment.feedback.likeLabel');
 
   const likeButton = (
-    <ToggleButton
+    <AppToggleButton
       variant="ghost"
       size="sm"
       isSelected={liked}
@@ -41,7 +42,7 @@ function ResourceFeedbackSummary({
       onChange={onLikeChange}
     >
       <ThumbsUp size={15} aria-hidden fill={liked ? 'currentColor' : 'none'} />
-    </ToggleButton>
+    </AppToggleButton>
   );
 
   return (

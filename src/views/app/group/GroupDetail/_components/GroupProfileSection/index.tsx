@@ -1,4 +1,4 @@
-import { toast, Tooltip } from '@heroui/react';
+import { toast } from '@heroui/react';
 import { Pencil } from 'lucide-react';
 import { type SyntheticEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea, UploadZone } from '@/components/base/Input';
+import { Tooltip } from '@/components/base/Tooltip';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { useGroupService, useImageService } from '@/domains';
 import { type EditGroupRequest, type Group, GROUP_TYPE } from '@/domains/Group';

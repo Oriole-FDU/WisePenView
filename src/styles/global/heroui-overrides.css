@@ -1,89 +1,5 @@
 /* HeroUI 的跨组件覆盖集中在此文件，业务样式只保留上下文差异。 */
 
-/* Button 与按钮组 */
-:is(.button, .toggle-button) {
-  border-radius: var(--app-radius-button);
-}
-
-.button:is(:disabled, [aria-disabled='true']) {
-  opacity: 1;
-  transform: none;
-  box-shadow: var(--shadow-none);
-}
-
-.button:is(:disabled, [aria-disabled='true']).button--primary,
-.button:is(:disabled, [aria-disabled='true']).button--danger {
-  --button-bg: var(--control-disabled-filled-bg);
-  --button-bg-hover: var(--control-disabled-filled-bg);
-  --button-bg-pressed: var(--control-disabled-filled-bg);
-  --button-fg: var(--control-disabled-filled-fg);
-}
-
-.button:is(:disabled, [aria-disabled='true']).button--secondary,
-.button:is(:disabled, [aria-disabled='true']).button--tertiary,
-.button:is(:disabled, [aria-disabled='true']).button--danger-soft {
-  --button-bg: var(--control-disabled-soft-bg);
-  --button-bg-hover: var(--control-disabled-soft-bg);
-  --button-bg-pressed: var(--control-disabled-soft-bg);
-  --button-fg: var(--control-disabled-soft-fg);
-}
-
-.button:is(:disabled, [aria-disabled='true']).button--ghost,
-.button:is(:disabled, [aria-disabled='true']).button--outline {
-  --button-bg: transparent;
-  --button-bg-hover: transparent;
-  --button-bg-pressed: transparent;
-  --button-fg: var(--control-disabled-fg);
-}
-
-.button.button--outline:is(:disabled, [aria-disabled='true']) {
-  border-color: var(--control-disabled-border);
-}
-
-:is(.button-group, .toggle-button-group) > :is(.button, .toggle-button) {
-  border-radius: 0;
-}
-
-:is(.button-group, .toggle-button-group):is(
-    .button-group--horizontal,
-    .toggle-button-group--horizontal
-  )
-  > :is(.button, .toggle-button):first-child {
-  border-start-start-radius: var(--app-radius-button);
-  border-end-start-radius: var(--app-radius-button);
-}
-
-:is(.button-group, .toggle-button-group):is(
-    .button-group--horizontal,
-    .toggle-button-group--horizontal
-  )
-  > :is(.button, .toggle-button):last-child {
-  border-start-end-radius: var(--app-radius-button);
-  border-end-end-radius: var(--app-radius-button);
-}
-
-:is(.button-group, .toggle-button-group):is(
-    .button-group--vertical,
-    .toggle-button-group--vertical
-  )
-  > :is(.button, .toggle-button):first-child {
-  border-start-start-radius: var(--app-radius-button);
-  border-start-end-radius: var(--app-radius-button);
-}
-
-:is(.button-group, .toggle-button-group):is(
-    .button-group--vertical,
-    .toggle-button-group--vertical
-  )
-  > :is(.button, .toggle-button):last-child {
-  border-end-start-radius: var(--app-radius-button);
-  border-end-end-radius: var(--app-radius-button);
-}
-
-:is(.toggle-button-group--detached) > .toggle-button {
-  border-radius: var(--app-radius-button);
-}
-
 /* Tabs */
 .tabs:not(.tabs--secondary) > .tabs__list-container > .tabs__list {
   background: color-mix(in oklab, var(--accent-soft) 33%, var(--accent-softer));
@@ -107,12 +23,7 @@
   overflow: clip;
 }
 
-:is(
-  .dropdown__popover,
-  .select__popover,
-  .combo-box__popover,
-  .autocomplete__popover
-) {
+:is(.dropdown__popover, .select__popover, .combo-box__popover, .autocomplete__popover) {
   --app-popover-surface: var(--background);
 
   border-radius: var(--app-radius-popover) !important;
@@ -156,22 +67,14 @@
   line-height: var(--line-height-sm);
 }
 
-:is(
-  .dropdown__popover,
-  .select__popover,
-  .combo-box__popover,
-  .autocomplete__popover
-) [data-slot='label'] {
+:is(.dropdown__popover, .select__popover, .combo-box__popover, .autocomplete__popover)
+  [data-slot='label'] {
   color: inherit;
   font: inherit;
 }
 
-:is(
-  .dropdown__popover,
-  .select__popover,
-  .combo-box__popover,
-  .autocomplete__popover
-) [data-slot='description'] {
+:is(.dropdown__popover, .select__popover, .combo-box__popover, .autocomplete__popover)
+  [data-slot='description'] {
   color: var(--text-tertiary);
   font-family: inherit;
   font-size: var(--font-size-xs);
@@ -181,41 +84,41 @@
 
 @media (hover: hover) {
   :is(
-    .dropdown__popover .menu-item,
-    .select__popover .list-box-item,
-    .combo-box__popover .list-box-item,
-    .autocomplete__popover .list-box-item
-  ):not(.menu-item--danger):is(:hover, [data-hovered='true']) {
+      .dropdown__popover .menu-item,
+      .select__popover .list-box-item,
+      .combo-box__popover .list-box-item,
+      .autocomplete__popover .list-box-item
+    ):not(.menu-item--danger):is(:hover, [data-hovered='true']) {
     background-color: var(--accent-soft);
   }
 }
 
 :is(
-  .dropdown__popover .menu-item,
-  .select__popover .list-box-item,
-  .combo-box__popover .list-box-item,
-  .autocomplete__popover .list-box-item
-):not(.menu-item--danger):is(:active, [data-pressed='true'], [data-focus='true']) {
+    .dropdown__popover .menu-item,
+    .select__popover .list-box-item,
+    .combo-box__popover .list-box-item,
+    .autocomplete__popover .list-box-item
+  ):not(.menu-item--danger):is(:active, [data-pressed='true'], [data-focus='true']) {
   background-color: var(--accent-soft-hover);
 }
 
 :is(
-  .dropdown__popover .menu-item,
-  .select__popover .list-box-item,
-  .combo-box__popover .list-box-item,
-  .autocomplete__popover .list-box-item
-):not(.menu-item--danger)[data-selected='true'] {
+    .dropdown__popover .menu-item,
+    .select__popover .list-box-item,
+    .combo-box__popover .list-box-item,
+    .autocomplete__popover .list-box-item
+  ):not(.menu-item--danger)[data-selected='true'] {
   color: var(--accent-text);
   background-color: var(--accent-soft);
 }
 
 @media (hover: hover) {
   :is(
-    .dropdown__popover .menu-item,
-    .select__popover .list-box-item,
-    .combo-box__popover .list-box-item,
-    .autocomplete__popover .list-box-item
-  ):not(.menu-item--danger)[data-selected='true']:is(:hover, [data-hovered='true']) {
+      .dropdown__popover .menu-item,
+      .select__popover .list-box-item,
+      .combo-box__popover .list-box-item,
+      .autocomplete__popover .list-box-item
+    ):not(.menu-item--danger)[data-selected='true']:is(:hover, [data-hovered='true']) {
     background-color: var(--accent-soft-hover);
   }
 }
@@ -244,12 +147,8 @@
   padding-inline-end: calc(var(--space-sm) + var(--space-md));
 }
 
-:is(
-  .dropdown__popover,
-  .select__popover,
-  .combo-box__popover,
-  .autocomplete__popover
-) [data-slot$='item-indicator'] {
+:is(.dropdown__popover, .select__popover, .combo-box__popover, .autocomplete__popover)
+  [data-slot$='item-indicator'] {
   inset-inline-start: auto;
   inset-inline-end: var(--space-xs);
 }
@@ -268,10 +167,4 @@
 .date-range-picker__popover,
 .color-picker__popover {
   z-index: var(--app-z-index-popover);
-}
-
-/* Tooltip */
-.tooltip {
-  border-radius: var(--app-radius-tooltip);
-  z-index: var(--app-z-index-tooltip);
 }

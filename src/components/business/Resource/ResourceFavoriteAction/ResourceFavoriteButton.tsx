@@ -1,7 +1,7 @@
-import { ToggleButton } from '@heroui/react';
 import { Bookmark } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { AppToggleButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
 interface ResourceFavoriteButtonProps {
@@ -25,7 +25,7 @@ function ResourceFavoriteButton({
 
   if (showLabel) {
     return (
-      <ToggleButton
+      <AppToggleButton
         variant="ghost"
         size="sm"
         isSelected={isFavorited}
@@ -34,7 +34,7 @@ function ResourceFavoriteButton({
       >
         {icon}
         <span>{t('comment.feedback.favoriteLabel')}</span>
-      </ToggleButton>
+      </AppToggleButton>
     );
   }
 
