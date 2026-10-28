@@ -1,4 +1,4 @@
-import { Input, ListBox, ListBoxItem, TextField } from '@heroui/react';
+import { Input, TextField } from '@heroui/react';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,6 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
+import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import type { FavoriteCollection } from '@/domains/Interact';
 
 import styles from './style.module.scss';

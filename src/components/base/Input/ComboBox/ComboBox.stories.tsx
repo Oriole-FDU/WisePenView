@@ -1,6 +1,7 @@
-import { ListBox } from '@heroui/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+
+import ListBox from '@/components/base/ListBox';
 
 import styles from '../Input.stories.module.scss';
 import ComboBox from './index';

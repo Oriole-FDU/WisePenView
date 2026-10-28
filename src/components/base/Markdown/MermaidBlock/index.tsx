@@ -1,8 +1,8 @@
-import { Tabs } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Tabs } from '@/components/base/Tabs';
 import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
 
 import { CodeBlockFrame, HighlightedCode } from '../CodeBlock';

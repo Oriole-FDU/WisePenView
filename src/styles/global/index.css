@@ -15,7 +15,6 @@
 @import '../theme/z-index.css' layer(base);
 @import '../theme/radius.css' layer(base);
 @import '../../components/base/Table/shared/styles/tokens.css' layer(base);
-@import './heroui-overrides.css' layer(components);
 
 @theme inline {
   /* Tailwind/HeroUI 字体名称桥接；项目样式直接使用 --app-font-*。 */

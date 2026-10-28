@@ -274,12 +274,14 @@
 }
 
 .dateRangePopover {
+  z-index: var(--app-z-index-popover);
   width: max-content;
   min-width: 0;
   max-width: calc(100vw - 32px);
 }
 
 .datePickerPopover {
+  z-index: var(--app-z-index-popover);
   width: max-content;
   min-width: 0;
   max-width: calc(100vw - 32px);

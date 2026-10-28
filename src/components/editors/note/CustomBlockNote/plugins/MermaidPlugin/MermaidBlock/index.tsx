@@ -1,13 +1,14 @@
 /* eslint-disable react-refresh/only-export-components -- BlockNote block spec 与展示组件同文件 */
 import type { BlockConfig } from '@blocknote/core';
 import { createReactBlockSpec, type ReactCustomBlockRenderProps } from '@blocknote/react';
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { useRequest } from 'ahooks';
 import { Check, Copy, Eye, LayoutTemplate } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import i18n from '@/i18n';
 import { copyText } from '@/utils/browser/copyText';
 import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';

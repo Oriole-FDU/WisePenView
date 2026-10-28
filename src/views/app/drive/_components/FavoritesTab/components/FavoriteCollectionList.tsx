@@ -1,8 +1,10 @@
-import { Dropdown, Label, ListBox, ListBoxItem } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { EllipsisVertical, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
+import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import type { FavoriteCollection } from '@/domains/Interact';
 
 import styles from '../style.module.scss';

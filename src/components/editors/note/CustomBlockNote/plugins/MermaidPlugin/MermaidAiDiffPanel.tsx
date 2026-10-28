@@ -1,8 +1,8 @@
 /* eslint-disable react-refresh/only-export-components -- AI Diff DOM 渲染器需要暴露 React 挂载函数 */
-import { Tabs } from '@heroui/react';
 import { useId, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
+import { Tabs } from '@/components/base/Tabs';
 import { useApi } from '@/hooks/useApi';
 import i18n from '@/i18n';
 import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';

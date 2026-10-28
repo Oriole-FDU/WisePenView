@@ -1,4 +1,4 @@
-import { EmptyState, ListBox, Tabs, Tag, TagGroup, useFilter } from '@heroui/react';
+import { EmptyState, Tag, TagGroup, useFilter } from '@heroui/react';
 import { X } from 'lucide-react';
 import type { Key, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,8 @@ import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Empty, Spin } from '@/components/base/Feedback';
 import { Autocomplete, SearchField } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
+import { Tabs } from '@/components/base/Tabs';
 import {
   TAG_PERMISSION_ACTION_PRESET_OPTIONS,
   type TagPermissionResourceStrategy,

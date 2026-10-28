@@ -1,8 +1,9 @@
-import { ListBox, ListBoxItem, ListBoxSection, Separator } from '@heroui/react';
+import { ListBoxSection, Separator } from '@heroui/react';
 import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, useLayoutEffect, useRef } from 'react';
 
 import { GuideAnchor } from '@/components/base/Guide';
+import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { Tooltip } from '@/components/base/Tooltip';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 

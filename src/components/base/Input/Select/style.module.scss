@@ -67,8 +67,3 @@
 .select:global(.select) :global(.select__indicator) {
   @include field.fieldPlaceholder();
 }
-
-/* Select trigger 使用字段圆角；展开后的选项面板外壳使用浮层圆角。 */
-.selectPopover:global(.select__popover) {
-  border-radius: var(--app-radius-popover);
-}

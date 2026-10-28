@@ -1,4 +1,4 @@
-import { Form, ListBox, toast } from '@heroui/react';
+import { Form, toast } from '@heroui/react';
 import { Pencil, X } from 'lucide-react';
 import { type FormEvent, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FormField, Input, Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import { useUserService } from '@/domains';
 import type { UpdateUserInfoRequest } from '@/domains/User';
 import { DEGREE, SEX } from '@/domains/User';

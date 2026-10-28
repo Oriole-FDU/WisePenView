@@ -1,6 +1,6 @@
-import { Tabs } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import { Tabs } from '@/components/base/Tabs';
 import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
 
 import styles from '../style.module.scss';

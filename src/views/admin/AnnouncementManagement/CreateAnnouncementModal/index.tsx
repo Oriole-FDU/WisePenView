@@ -1,8 +1,9 @@
-import { ListBox, toast } from '@heroui/react';
+import { toast } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FormField, Input, Select, TextArea } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useAdminService } from '@/domains';
 import type { PublishMessageDeliveryScope, PublishMessageType } from '@/domains/Admin';

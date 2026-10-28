@@ -1,10 +1,10 @@
-import { Tabs } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import type { editor as MonacoEditor } from 'monaco-editor';
 import type { RefObject } from 'react';
 
 import { Empty } from '@/components/base/Feedback';
 import Markdown, { type MarkdownResourceResolver } from '@/components/base/Markdown';
+import { Tabs } from '@/components/base/Tabs';
 import SkillEditor from '@/components/editors/skill/components/SkillEditor';
 import type { SkillFileNode } from '@/domains/Skill';
 

@@ -1,4 +1,4 @@
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { clsx } from 'clsx';
 import {
   CloudUpload,
@@ -14,6 +14,7 @@ import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import type {
   DriveActionTarget,
   DriveViewNode,

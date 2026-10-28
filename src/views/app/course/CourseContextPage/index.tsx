@@ -1,7 +1,7 @@
-import { Tabs } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 
+import { Tabs } from '@/components/base/Tabs';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useCourseContext } from '@/layouts/Course/_context';
 import { APP_ROUTE_PATH, buildCoursePath } from '@/utils/navigation/appRoute';

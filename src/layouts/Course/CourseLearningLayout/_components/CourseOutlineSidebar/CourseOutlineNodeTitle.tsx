@@ -1,4 +1,4 @@
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import {
   ArrowDown,
   ArrowUp,
@@ -19,6 +19,7 @@ import { type KeyboardEvent, type MouseEvent, type ReactNode, useState } from 'r
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 import type { CourseOutlineNode } from '@/domains/Course';
 
 import styles from '../../style.module.scss';

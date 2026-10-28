@@ -1,10 +1,12 @@
-import { ListBox, type Selection, Tabs } from '@heroui/react';
+import { type Selection } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
+import ListBox from '@/components/base/ListBox';
+import { Tabs } from '@/components/base/Tabs';
 import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
 import {
   buildResourceOverrideActions,

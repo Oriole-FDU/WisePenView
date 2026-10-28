@@ -21,7 +21,7 @@
 
 `src/components` 内部按“是否绑定业务语义”分为两层：
 
-- `src/components/base`：不带业务语义的通用组件，包含原子层（`Modal`、`Popover`、`DeferredContent`）、基础控件（`Button`、`Input`、`Table`、`Tree`、`Chart`、`Markdown`、`Feedback`、`Icons`、`Avatar`、`Rating`、`StepDots`、`QuotaBar`）和只提供结构的 App 级外壳（`AppModal`、`AppPopover`、`AppBanner`、`AppBreadcrumb`）。
+- `src/components/base`：不带业务语义的通用组件，包含原子层（`Modal`、`Popover`、`Dropdown`、`ListBox`、`Tabs`、`DeferredContent`）、基础控件（`Button`、`Input`、`Table`、`Tree`、`Chart`、`Markdown`、`Feedback`、`Icons`、`Avatar`、`Rating`、`StepDots`、`QuotaBar`）和只提供结构的 App 级外壳（`AppModal`、`AppPopover`、`AppBanner`、`AppBreadcrumb`）。
 - `src/components/business`：绑定业务语义但跨页面复用的组件，包含语义弹窗（`AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog`、`UnsavedChangesDialog`）、工作区面板骨架（`WorkspacePanel`）和领域块（`Chat`、`Drive`、`Group`、`Resource`、`ModelSelector` 等）。
 - `src/components/editors`：资源编辑器层。六种编辑器（`agent`、`drawio`、`note`、`office`、`pdf`、`skill`）通过 `editor.type` 的契约与宿主通信，`_runtime` 负责快照上报、退出协商与展示信息绑定，`ResourceEditor` 按 `EditorTarget` 从 `editorRegistry` 分发并挂载编辑器。资源外壳（`ResourceLayout`、`ResourceLayoutHeader`、`ResourceToolbar`）属于资源布局，位于 `src/layouts/Resource/ResourceLayout/`；资源互动面板属于 `components/business/Resource`。`ResourceEditorWorkspace` 组合资源外壳、互动面板与 `ResourceEditor`，`ResourceWorkspacePresentation` 独立订阅展示信息并通过 `WorkspacePanelPortal` 把划词批注和互动内容送入统一右栏；`ResourceTargetResolver` 按资源和编辑器类型设置 key，隔离工作区生命周期。资源视图的三个平级右栏内容由 `src/views/app/resource/ResourceRouteBoundary` 统一组合，纯布局 `src/layouts/WorkspaceRightPanelLayout` 只负责唯一右侧槽位、宽度和容器结构（课程学习页同样复用该布局）。编辑器只上报领域展示信息，不持有宿主布局，也不判断顶栏／侧栏内容。
   - 加载入口通过 `useEditorLoadState` 只上报请求 loading/error；活动领域会话通过 `useEditorRuntime` 注册完整 `EditorSnapshot` 和退出策略，注销时一起失效并中止等待。入口刷新失败应保留已加载会话和草稿，首次加载失败才进入错误页；旧会话的更新与注销不得覆盖新会话。

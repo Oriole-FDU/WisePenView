@@ -1,8 +1,9 @@
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { EllipsisVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import Dropdown from '@/components/base/Dropdown';
 
 import type { TableRowActionsProps } from './index.type';
 import styles from './style.module.scss';

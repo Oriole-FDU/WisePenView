@@ -1,6 +1,6 @@
 'use client';
 
-import { Header, ListBox, ListBoxItem, ListBoxSection, Separator } from '@heroui/react';
+import { Header, ListBoxSection, Separator } from '@heroui/react';
 import { clsx } from 'clsx';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Search } from 'lucide-react';
@@ -17,6 +17,7 @@ import {
 } from 'react';
 
 import { Input } from '@/components/base/Input';
+import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import styles from './command.module.scss';
 
 const COMMAND_NAVIGATION_KEY_SET = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp']);

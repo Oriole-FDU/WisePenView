@@ -1,10 +1,11 @@
-import { Chip, ListBox, Switch } from '@heroui/react';
+import { Chip, Switch } from '@heroui/react';
 import { Link, Link2, Plus, Settings2, Trash2, Unlink } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton, AppIconButton } from '@/components/base/Button';
 import { FormField, Input, PasswordInput, Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useChatService } from '@/domains';

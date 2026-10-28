@@ -1,9 +1,10 @@
-import { Dropdown, Label } from '@heroui/react';
+import { Label } from '@heroui/react';
 import { CloudUpload, FileInput, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
+import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
