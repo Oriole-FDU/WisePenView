@@ -11,6 +11,7 @@ import {
   AttachmentTitle,
 } from '@/components/_shadcn';
 import AppPopover from '@/components/base/AppPopover';
+import { AppPressable } from '@/components/base/Button';
 import CopyButton from '@/components/base/Button/CopyButton';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/Chat';
@@ -70,7 +71,7 @@ function UserMessageAttachments({
       {overflowCount > 0 ? (
         <AppPopover isOpen={moreOpen} onOpenChange={setMoreOpen} deferContent={false}>
           <AppPopover.Trigger<'button'>
-            render={(props) => <button {...props} />}
+            render={(props) => <AppPressable {...props} />}
             type="button"
             title={t('message.attachments.viewAll', { count: attachments.length })}
             className={styles.moreTrigger}

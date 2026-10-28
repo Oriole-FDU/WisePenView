@@ -7,7 +7,7 @@ import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppAvatar from '@/components/base/Avatar';
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { Input } from '@/components/base/Input';
 import type { UserSearchUser } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
@@ -178,7 +178,7 @@ function UserSearchCombobox({
     const displayName = getUserDisplayName(user, t('userSearch.fallbackName', { id: user.userId }));
     const selected = index === activeIndex;
     return (
-      <button
+      <AppPressable
         key={user.userId}
         ref={(node) => {
           if (selected) {
@@ -202,7 +202,7 @@ function UserSearchCombobox({
           <span className={styles.optionName}>{displayName}</span>
           <span className={styles.optionDescription}>{getUserDescription(user)}</span>
         </span>
-      </button>
+      </AppPressable>
     );
   };
 

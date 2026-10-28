@@ -4,7 +4,7 @@ import { type SyntheticEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { FormField, Input, TextArea, UploadZone } from '@/components/base/Input';
 import { Tooltip } from '@/components/base/Tooltip';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
@@ -303,12 +303,12 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
                   <Tooltip.Trigger<'span'>
                     render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
                   >
-                    <button {...coverButtonProps} />
+                    <AppPressable {...coverButtonProps} />
                   </Tooltip.Trigger>
                 ) : (
                   <Tooltip.Trigger<'button'>
                     {...coverButtonProps}
-                    render={(props) => <button {...props} />}
+                    render={(props) => <AppPressable {...props} />}
                   />
                 )}
                 <Tooltip.Content>{changeCoverShort}</Tooltip.Content>

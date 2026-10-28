@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
+import { HiddenFileInput } from '@/components/base/Input';
 import type { DataNode } from '@/components/base/Tree';
 import VersionDropdown from '@/components/business/VersionDropdown';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
@@ -395,11 +396,9 @@ function SkillEditorContent() {
 
       <SkillActionDialogs fileActions={fileActions} navigation={navigation} t={t} />
 
-      <input
+      <HiddenFileInput
         ref={fileInputRef}
-        type="file"
         multiple
-        hidden
         onChange={(event) => void fileActions.handleFileChange(event)}
       />
     </>

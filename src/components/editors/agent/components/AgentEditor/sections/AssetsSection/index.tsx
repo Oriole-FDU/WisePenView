@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { HiddenFileInput } from '@/components/base/Input';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
@@ -139,11 +140,9 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
         </Table>
         {isDragOver ? <div className={styles.dropHint}>{t('assets.drop')}</div> : null}
       </div>
-      <input
+      <HiddenFileInput
         ref={ref}
-        hidden
         multiple
-        type="file"
         onChange={(e) => {
           onUpload(Array.from(e.target.files ?? []));
           e.target.value = '';

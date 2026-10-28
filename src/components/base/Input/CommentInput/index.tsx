@@ -4,7 +4,7 @@ import { type ClipboardEvent, type KeyboardEvent, useRef, useState } from 'react
 
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { TextArea } from '@/components/base/Input';
+import { HiddenFileInput, TextArea } from '@/components/base/Input';
 import EmojiPicker from '@/components/base/Input/EmojiPicker';
 
 import type { CommentInputImage, CommentInputProps } from './index.type';
@@ -133,10 +133,9 @@ function CommentInput({
       </div>
 
       {imageUploadEnabled ? (
-        <input
+        <HiddenFileInput
           ref={imageInputRef}
           className={styles.imageInput}
-          type="file"
           accept="image/*"
           multiple
           disabled={disabled}

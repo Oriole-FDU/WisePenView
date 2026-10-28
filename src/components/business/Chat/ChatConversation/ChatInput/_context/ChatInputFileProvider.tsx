@@ -2,6 +2,7 @@ import { toast } from '@heroui/react';
 import { type ChangeEvent, type ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { HiddenFileInput } from '@/components/base/Input';
 import { useChatService } from '@/domains';
 import { parseErrorMessage } from '@/utils/error';
 import { generateThumbnail } from '@/utils/file/upload';
@@ -143,13 +144,7 @@ export function ChatInputFileProvider({
   return (
     <ChatInputFileContext.Provider value={value}>
       {children}
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        style={{ display: 'none' }}
-        onChange={handleFileInputChange}
-      />
+      <HiddenFileInput ref={fileInputRef} multiple onChange={handleFileInputChange} />
     </ChatInputFileContext.Provider>
   );
 }

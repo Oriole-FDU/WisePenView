@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { InlineInput } from '@/components/base/Input';
 
 import type { NoteFindResult } from '../../index.type';
 import styles from './style.module.scss';
@@ -63,7 +64,7 @@ function FindBar({
       />
       <div className={styles.fields}>
         <div className={styles.fieldRow}>
-          <input
+          <InlineInput
             ref={inputRef}
             className={styles.input}
             type="text"
@@ -80,7 +81,7 @@ function FindBar({
         </div>
         {replaceOpen ? (
           <div className={styles.fieldRow}>
-            <input
+            <InlineInput
               className={styles.input}
               type="text"
               value={replacement}

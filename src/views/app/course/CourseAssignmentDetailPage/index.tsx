@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import { UploadZone } from '@/components/base/Input';
 import { useCourseService } from '@/domains';
@@ -78,14 +78,14 @@ function CourseAssignmentDetailPage() {
 
   return (
     <div className={styles.page}>
-      <button
+      <AppPressable
         type="button"
         className={styles.backButton}
         onClick={() => navigate(buildCourseAssignmentPath(course.courseId))}
       >
         <ArrowLeft size={16} aria-hidden />
         {t('assignments.title')}
-      </button>
+      </AppPressable>
       <header className={styles.header}>
         <div>
           {data.scopeLabel ? <span className={styles.scope}>{data.scopeLabel}</span> : null}

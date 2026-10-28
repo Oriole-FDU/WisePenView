@@ -10,7 +10,9 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import AppIconButton, { type AppIconButtonProps } from '@/components/base/Button/AppIconButton';
+import { InlineInput } from '@/components/base/Input';
 import { copyText } from '@/utils/browser/copyText';
 
 const COPY_FEEDBACK_DURATION = 1200;
@@ -222,7 +224,7 @@ export function CodeBlockToolbar({
         onBlur={handleLanguageBlur}
         onKeyDown={handleLanguageMenuKeyDown}
       >
-        <button
+        <AppPressable
           type="button"
           className="wise-code-block-languageButton"
           aria-haspopup="listbox"
@@ -234,11 +236,11 @@ export function CodeBlockToolbar({
         >
           <span className="wise-code-block-languageLabel">{selectedLanguageLabel}</span>
           <ChevronDown className="wise-code-block-languageChevron" size={13} aria-hidden="true" />
-        </button>
+        </AppPressable>
 
         {open && (
           <div className="wise-code-block-languagePopover">
-            <input
+            <InlineInput
               className="wise-code-block-languageInput"
               aria-label={t('code.searchLanguage')}
               value={query}
@@ -256,7 +258,7 @@ export function CodeBlockToolbar({
               aria-label={t('code.language')}
             >
               {filteredLanguageOptions.map((option, index) => (
-                <button
+                <AppPressable
                   key={option.id}
                   id={`${languageListId}-option-${index}`}
                   type="button"
@@ -272,7 +274,7 @@ export function CodeBlockToolbar({
                   {option.id === selectedLanguage && (
                     <Check className="wise-code-block-languageCheck" size={13} aria-hidden="true" />
                   )}
-                </button>
+                </AppPressable>
               ))}
             </div>
           </div>

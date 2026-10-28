@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
+import { InlineTextArea } from '@/components/base/Input';
+
 import popoverStyles from '../InlineMath/style.module.scss';
 import { sanitizeLatexInput } from '../latexInput';
 
@@ -124,7 +126,7 @@ export function LatexEditPopover(props: LatexEditPopoverProps) {
     >
       <div className={popoverStyles.inlineEditTitle}>{title}</div>
       <div className={popoverStyles.inlineEditPopoverBody}>
-        <textarea
+        <InlineTextArea
           ref={inputRef}
           className={textareaClassName}
           value={value}

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { UploadZone } from '@/components/base/Input';
 import { Tooltip } from '@/components/base/Tooltip';
 import { useImageService, useUserService } from '@/domains';
@@ -126,7 +126,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
       <header className={styles.accountHeader}>
         <Tooltip>
           <Tooltip.Trigger<'button'>
-            render={(props) => <button {...props} />}
+            render={(props) => <AppPressable {...props} />}
             type="button"
             className={styles.avatarWrap}
             aria-label={t('header.changeAvatar')}

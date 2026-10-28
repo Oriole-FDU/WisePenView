@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import { GuideAnchor, registerGuideActionHandlers } from '@/components/base/Guide';
 import { TextArea } from '@/components/base/Input';
 import { FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH } from '@/constants/layoutScale';
@@ -127,14 +128,14 @@ function ChatInputContent({
           {contextPreview ? (
             <div className={styles.contextAttachment}>
               <span className={styles.contextAttachmentPreview}>{contextPreview}</span>
-              <button
+              <AppPressable
                 type="button"
                 className={styles.contextAttachmentClear}
                 aria-label={t('input.removeContext')}
                 onClick={() => onClearContext?.()}
               >
                 <X size={14} aria-hidden="true" />
-              </button>
+              </AppPressable>
             </div>
           ) : null}
 
