@@ -27,7 +27,7 @@ PR CI 固定执行 commitlint、格式检查、lint、行为回归、build、moc
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
 
-行为回归统一放在 `tests/**/*.test.mjs`，由 `pnpm test` 收集；新增业务回归优先补到对应领域测试，不再为单个场景新增包脚本。`pnpm check:styles` 只保留长期稳定的样式契约：共用 partial 和 mixin 边界、Input 与 Table 基础封装、token 归属、所有 CSS Module 可编译，以及禁止 Less 回流。迁移期的精确规则数量、声明顺序和内部文件拆分快照不作为长期 CI 契约；涉及视觉、布局或交互的风险由 Storybook 或已授权的浏览器回归验证。
+行为回归统一放在 `tests/**/*.test.mjs`，由 `pnpm test` 收集；新增业务回归优先补到对应领域测试，不再为单个场景新增包脚本。`pnpm check:styles` 只保留长期稳定的样式契约：共用 partial 和 mixin 边界、Input 与 Table 基础封装、AppButton 行式触发器的按压缩放开关、token 归属、所有 CSS Module 可编译，以及禁止 Less 回流。迁移期的精确规则数量、声明顺序和内部文件拆分快照不作为长期 CI 契约；涉及视觉、布局或交互的风险由 Storybook 或已授权的浏览器回归验证。
 
 SCSS 迁移系列的依赖 PR 以具名迁移分支为 base 时，仍运行同一 `Code Quality & Build Gate`。系列全部合入后可单独清理临时分支触发配置。
 

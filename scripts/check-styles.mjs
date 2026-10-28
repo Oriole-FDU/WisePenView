@@ -155,6 +155,46 @@ test('Table 尺寸与颜色 token 仍由各自归属层定义', async () => {
   }
 });
 
+test('AppButton 可声明式关闭按压缩放，TraceRow 不覆盖 HeroUI 私有状态', async () => {
+  const { code } = await compileCssModule('src/components/base/Button/shared/styles.module.scss');
+  const traceRowDirectory =
+    'src/components/business/Chat/ChatConversation/ChatMessageList/Message/Assistant/ProcessTrace/TraceRow';
+  const [appButton, appButtonTypes, traceRowSource, traceRowComponent, traceRowCssModule] =
+    await Promise.all([
+      readFile(join(root, 'src/components/base/Button/AppButton/index.tsx'), 'utf8'),
+      readFile(join(root, 'src/components/base/Button/AppButton/index.type.ts'), 'utf8'),
+      readFile(join(root, traceRowDirectory, 'style.module.scss'), 'utf8'),
+      readFile(join(root, traceRowDirectory, 'index.tsx'), 'utf8'),
+      compileCssModule(join(traceRowDirectory, 'style.module.scss')),
+    ]);
+
+  assert.match(
+    code,
+    /\.root\.disablePressScale:active,\s*\.root\.disablePressScale\[data-pressed=['"]?true['"]?\]\s*\{\s*transform: none;/
+  );
+  assert.match(appButton, /disablePressScale = false/);
+  assert.match(appButton, /disablePressScale && buttonStyles\.disablePressScale/);
+  assert.match(appButtonTypes, /disablePressScale\?: boolean;/);
+
+  assert.doesNotMatch(traceRowSource, /&#\{&\}/);
+  assert.doesNotMatch(traceRowSource, /:active|\[data-pressed/);
+  assert.doesNotMatch(traceRowSource, /:global\(\.button|button--/);
+  assert.match(traceRowComponent, /disablePressScale/);
+  assert.match(traceRowComponent, /aria-expanded=\{expanded\}/);
+  assert.match(
+    traceRowCssModule.code,
+    /\.trigger:hover:not\(:disabled\)\s*\{[^}]*background: transparent;/
+  );
+  assert.match(
+    traceRowCssModule.code,
+    /\.trigger:focus-visible,\s*\.trigger\[data-focus-visible\]\s*\{[^}]*outline: var\(--focus-ring-width\) solid var\(--focus\);/
+  );
+  assert.match(
+    traceRowCssModule.code,
+    /\.indicator\[data-expanded=['"]?true['"]?\]\s*\{\s*transform: rotate\(180deg\);/
+  );
+});
+
 test('自有样式和入口不残留 Less，所有 CSS Module 可编译', async () => {
   for (const directory of ['src', '.storybook', 'electron']) {
     const files = await readdir(join(root, directory), { recursive: true });

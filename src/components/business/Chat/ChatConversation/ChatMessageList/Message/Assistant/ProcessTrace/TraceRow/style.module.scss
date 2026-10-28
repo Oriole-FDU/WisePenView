@@ -1,3 +1,5 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+
 /* 过程提示行的统一排版：折叠主行、展开后的节点行共用一套字重、行高与内缩 */
 @mixin hintRowBase() {
   display: flex;
@@ -15,25 +17,21 @@
 }
 
 .trigger {
-  &#{&} {
-    @include hintRowBase();
+  @include hintRowBase();
 
-    height: auto;
-    border: 0;
-    border-radius: var(--app-radius-button);
-    background: transparent;
-    /* 关闭 HeroUI Button 默认按下 scale(0.97) */
-    transform: none;
-  }
+  height: auto;
+  border: 0;
+  border-radius: var(--app-radius-button);
+  background: transparent;
 
-  &#{&}:hover:not(:disabled) {
+  &:hover:not(:disabled) {
     color: var(--foreground);
     background: transparent;
   }
 
-  &#{&}:active,
-  &#{&}[data-pressed='true'] {
-    transform: none;
+  &:focus-visible,
+  &[data-focus-visible] {
+    @include focusRing.appFocusRing();
   }
 }
 

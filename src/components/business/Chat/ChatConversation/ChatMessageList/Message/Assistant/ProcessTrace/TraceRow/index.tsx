@@ -48,6 +48,7 @@ function TraceRow({ children, expanded, headline, item, animated, onToggle }: Tr
           variant="ghost"
           size="sm"
           className={styles.trigger}
+          disablePressScale
           aria-expanded={expanded}
           aria-controls={panelId}
           onPress={onToggle}
