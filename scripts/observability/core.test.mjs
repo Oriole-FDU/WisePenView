@@ -44,7 +44,7 @@ const loadObservability = async (context) => {
       export { captureException, getSupportErrorId } from '@/observability';
       export { TelemetryAggregation } from '@/observability/aggregation';
       export { ObservabilityContext, createInitialContextAttributes, setActiveContext } from '@/observability/context';
-      export { recordHttpFailure, startPipeline } from '@/observability/pipeline';
+      export { startPipeline } from '@/observability/pipeline';
       export { sanitizeDiagnosticText, sanitizeRequestUrl } from '@/observability/privacy';
       export { sanitizeSpanUrl } from '@/observability/otel';
       export { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
@@ -138,7 +138,7 @@ test('存储访问被拒绝时仍能建立匿名上下文', async (context) => {
   assert.match(attributes['page.instance.id'], /^[a-f0-9-]{36}$/i);
 });
 
-test('异常和 HTTP 失败进入同一聚合管线', async (context) => {
+test('异常进入统一聚合管线并过滤未提供的可选属性', async (context) => {
   const telemetry = await loadObservability(context);
   const logs = [];
   const attributes = telemetry.createInitialContextAttributes('test');
@@ -183,19 +183,6 @@ test('异常和 HTTP 失败进入同一聚合管线', async (context) => {
   });
   assert.equal(logs.length, 1);
 
-  assert.equal(
-    telemetry.recordHttpFailure({
-      status: 503,
-      method: 'get',
-      path: '/v1/resources/1?token=secret',
-      resendCount: 2,
-    }),
-    true
-  );
-  assert.equal(logs.length, 2);
-  assert.equal(logs[1].attributes['event.name'], 'frontend.http_failure');
-  assert.equal(logs[1].attributes['url.path'], '/v1/resources/1');
-
   telemetry.captureException(
     new telemetry.WisePenError({
       code: telemetry.FRONTEND_NETWORK_ERROR.CANCELED,
@@ -203,7 +190,19 @@ test('异常和 HTTP 失败进入同一聚合管线', async (context) => {
     }),
     { detector: 'application-handled', operation: 'chat.stream' }
   );
-  assert.equal(logs.length, 2);
+  assert.equal(logs.length, 1);
+
+  class ThrowingNameError extends Error {
+    get name() {
+      throw new Error('name getter failed');
+    }
+  }
+  assert.doesNotThrow(() => {
+    const id = telemetry.captureException(new ThrowingNameError(), {
+      detector: 'window-error',
+    });
+    assert.match(id, /^WPE-[A-Z0-9]{8}$/);
+  });
 });
 
 test('聚合摘要和预算使用同一套 occurrence 计数', async (context) => {

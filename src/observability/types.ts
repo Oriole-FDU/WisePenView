@@ -71,18 +71,6 @@ export interface TelemetryEvent {
 
 export type TelemetrySink = (event: TelemetryEvent) => void;
 
-export interface HttpFailureObservation {
-  status: number;
-  method: string;
-  path: string;
-  host?: string;
-  port?: number;
-  requestId?: string;
-  businessCode?: number;
-  resendCount: number;
-  serverMessage?: string;
-}
-
 export interface ContextSnapshot {
   attributes: Attributes;
   breadcrumbs: readonly Breadcrumb[];

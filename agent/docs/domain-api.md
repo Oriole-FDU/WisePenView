@@ -178,8 +178,9 @@ api -> views/components
 - 网络、HTTP、业务响应解包由 `src/apis/Axios.ts` 与 `src/apis/request.ts` 统一处理。
 - API 层不捕获错误用于改写 UI 文案。
 - API 层不调用 `message.*`。
-- Axios 最终 5xx 由 `@/observability/httpFailure` 记录；API 层不得直接调用 capture 或 OTel。
-- 4xx、无响应网络错误和 HTTP 200 业务失败尚未由请求层统一生成错误遥测。
+- `apiGet/apiPost/apiPut/apiDelete/apiGetText` 在 `src/observability/request.ts` 建立逻辑请求 span；
+  HTTP、network、timeout、business、contract 和 canceled 在最终结果边界统一分类。
+- API 层不得直接调用 telemetry、OTel 或自行维护请求去重。
 - 客户端业务校验错误放到 service 层，通过 `createClientError` 抛出。
 
 ## 五、检查清单

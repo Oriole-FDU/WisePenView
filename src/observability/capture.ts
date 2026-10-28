@@ -16,6 +16,7 @@ const observedErrors = new WeakSet<object>();
 const primitiveIds = new Map<string, { id: string; expiresAt: number }>();
 const PRIMITIVE_ID_TTL_MS = 5 * 60_000;
 const MAX_PRIMITIVE_IDS = 100;
+const FALLBACK_SUPPORT_ID = 'WPE-UNKNOWN';
 
 const isObjectKey = (value: unknown): value is object =>
   (typeof value === 'object' && value !== null) || typeof value === 'function';
@@ -34,19 +35,23 @@ const rememberPrimitiveId = (value: unknown, id: string): void => {
 };
 
 export const getSupportErrorId = (error: unknown): string => {
-  if (!isObjectKey(error)) {
-    const key = getPrimitiveKey(error);
-    const current = primitiveIds.get(key);
-    if (current && current.expiresAt > Date.now()) return current.id;
-  } else {
-    const current = errorIds.get(error);
-    if (current) return current;
-  }
+  try {
+    if (!isObjectKey(error)) {
+      const key = getPrimitiveKey(error);
+      const current = primitiveIds.get(key);
+      if (current && current.expiresAt > Date.now()) return current.id;
+    } else {
+      const current = errorIds.get(error);
+      if (current) return current;
+    }
 
-  const id = createSupportErrorId();
-  if (isObjectKey(error)) errorIds.set(error, id);
-  else rememberPrimitiveId(error, id);
-  return id;
+    const id = createSupportErrorId();
+    if (isObjectKey(error)) errorIds.set(error, id);
+    else rememberPrimitiveId(error, id);
+    return id;
+  } catch {
+    return FALLBACK_SUPPORT_ID;
+  }
 };
 
 const createCaptureId = (error: unknown): string => {
@@ -92,14 +97,16 @@ const readErrorDetails = (
 };
 
 export const captureException = (error: unknown, context: CaptureExceptionContext): string => {
-  const id = createCaptureId(error);
-  if (!isObservabilityActive() || isCanceled(error)) return id;
-  if (isObjectKey(error)) {
-    if (observedErrors.has(error)) return id;
-    observedErrors.add(error);
-  }
+  let id = FALLBACK_SUPPORT_ID;
 
   try {
+    id = createCaptureId(error);
+    if (!isObservabilityActive() || isCanceled(error)) return id;
+    if (isObjectKey(error)) {
+      if (observedErrors.has(error)) return id;
+      observedErrors.add(error);
+    }
+
     const details = readErrorDetails(error);
     const observation: ExceptionObservation = {
       id,

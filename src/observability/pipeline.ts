@@ -1,11 +1,12 @@
 /**
  * 遥测事件管线与 OTel Log/Span 映射。
  *
- * 负责捕获上下文快照、隐私清洗、异常与 HTTP 事件规范化及统一出口；
+ * 负责捕获上下文快照、隐私清洗、异常事件规范化和统一出口；
  * 不负责安装监听器，也不负责业务恢复和用户提示。
  */
 import {
   type Attributes,
+  type Context,
   context as otelContext,
   SpanStatusCode,
   trace,
@@ -15,17 +16,10 @@ import { type Logger, SeverityNumber } from '@opentelemetry/api-logs';
 
 import { TelemetryAggregation } from './aggregation';
 import type { ObservabilityContext } from './context';
-import {
-  buildErrorFingerprint,
-  isValidExceptionLocation,
-  isValidRequestId,
-  sanitizeDiagnosticText,
-  sanitizePath,
-} from './privacy';
+import { buildErrorFingerprint, isValidExceptionLocation, sanitizeDiagnosticText } from './privacy';
 import type {
   ContextSnapshot,
   ExceptionObservation,
-  HttpFailureObservation,
   ObservationSeverity,
   TelemetryEvent,
 } from './types';
@@ -45,6 +39,7 @@ const SEVERITY_NUMBER: Record<ObservationSeverity, SeverityNumber> = {
 interface ActivePipeline {
   aggregation: TelemetryAggregation;
   context: ObservabilityContext;
+  tracer: Tracer;
 }
 
 let activePipeline: ActivePipeline | undefined;
@@ -71,7 +66,7 @@ const createOtelSink =
     let spanContext = originalContext;
     let ownsSpan = false;
 
-    if (!span && ['frontend.error', 'frontend.http_failure'].includes(event.name)) {
+    if (!span && ['frontend.error', 'frontend.request_failure'].includes(event.name)) {
       span = tracer.startSpan(event.name, { attributes }, originalContext);
       spanContext = trace.setSpan(originalContext, span);
       event.context = spanContext;
@@ -88,7 +83,7 @@ const createOtelSink =
         span.setStatus({ code: SpanStatusCode.ERROR, message: event.exception.message });
       }
     }
-    if (span && event.name === 'frontend.http_failure') {
+    if (span && event.name === 'frontend.request_failure') {
       span.setStatus({ code: SpanStatusCode.ERROR, message: event.message });
     }
 
@@ -115,6 +110,7 @@ export const startPipeline = (
   const pipeline: ActivePipeline = {
     context,
     aggregation: new TelemetryAggregation(createOtelSink(tracer, logger)),
+    tracer,
   };
   activePipeline = pipeline;
   return () => {
@@ -130,6 +126,49 @@ export const flushObservabilityEvents = (force = false): void => {
     activePipeline?.aggregation.flush(force);
   } catch {
     // 聚合失败不得影响业务。
+  }
+};
+
+export interface RequestTracingHandles {
+  context: Context;
+  snapshot: ContextSnapshot;
+  tracer: Tracer;
+}
+
+export const getRequestTracingHandles = (): RequestTracingHandles | undefined => {
+  const pipeline = activePipeline;
+  if (!pipeline) return undefined;
+  return {
+    context: otelContext.active(),
+    snapshot: pipeline.context.capture(),
+    tracer: pipeline.tracer,
+  };
+};
+
+export const recordRequestBreadcrumb = (
+  name: string,
+  attributes: Attributes,
+  ownerSessionId: unknown
+): void => {
+  try {
+    const pipeline = activePipeline;
+    if (!pipeline) return;
+    const current = pipeline.context.capture();
+    if (current.attributes['session.id'] !== ownerSessionId) return;
+    pipeline.context.addBreadcrumb(name, attributes);
+  } catch {
+    // 近期事件补充失败不得影响请求。
+  }
+};
+
+export const emitRequestEvent = (event: TelemetryEvent): boolean => {
+  try {
+    if (!activePipeline) return false;
+    activePipeline.aggregation.record(event);
+    return true;
+  } catch {
+    // 请求观测失败不得影响原始请求。
+    return false;
   }
 };
 
@@ -204,58 +243,5 @@ export const recordExceptionObservation = (observation: ExceptionObservation): v
     });
   } catch {
     // 采集失败不得影响原始异常处理。
-  }
-};
-
-/** HTTP 失败与普通错误共享聚合、预算和日志出口。 */
-export const recordHttpFailure = (observation: HttpFailureObservation): boolean => {
-  const pipeline = activePipeline;
-  if (!pipeline) return false;
-
-  try {
-    const snapshot = pipeline.context.capture();
-    const method = sanitizeDiagnosticText(observation.method, 16).toUpperCase();
-    const path = sanitizePath(observation.path);
-    const attributes = compactAttributes({
-      ...snapshot.attributes,
-      'error.type': `HTTP_${observation.status}`,
-      'error.source': 'http',
-      'error.fingerprint': `HTTP_${observation.status}:${method}:${path}:${
-        observation.businessCode ?? ''
-      }`,
-      'http.request.method': method,
-      'http.request.resend_count': observation.resendCount,
-      'http.response.status_code': observation.status,
-      'url.path': path,
-      'telemetry.breadcrumbs': serializeBreadcrumbs(snapshot),
-      'telemetry.breadcrumbs_dropped': snapshot.breadcrumbsDropped,
-    });
-    if (observation.host) attributes['server.address'] = observation.host;
-    if (observation.port) attributes['server.port'] = observation.port;
-    if (observation.requestId && isValidRequestId(observation.requestId)) {
-      attributes['wisepen.request_id'] = observation.requestId;
-    }
-    if (observation.businessCode !== undefined) {
-      attributes['api.business_code'] = observation.businessCode;
-    }
-    if (observation.serverMessage) {
-      attributes['api.server_message'] = sanitizeDiagnosticText(
-        observation.serverMessage,
-        MAX_MESSAGE_LENGTH
-      );
-    }
-
-    pipeline.aggregation.record({
-      name: 'frontend.http_failure',
-      severity: 'ERROR',
-      message: `API ${observation.status}`,
-      timestamp: Date.now(),
-      attributes,
-      context: otelContext.active(),
-    });
-    return true;
-  } catch {
-    // 观测链路失败不得改变原 HTTP 错误处理。
-    return false;
   }
 };

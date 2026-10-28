@@ -24,6 +24,12 @@ const BREADCRUMB_FIELDS = new Set([
   'editor.type',
   'page.visibility',
   'network.online',
+  'http.request.method',
+  'http.response.status_code',
+  'api.endpoint',
+  'api.outcome',
+  'request.duration_ms',
+  'wisepen.request_id',
 ]);
 
 let activeContext: ObservabilityContext | undefined;

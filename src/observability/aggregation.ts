@@ -16,8 +16,8 @@ interface EventGroup {
 }
 
 const getSummaryName = (event: TelemetryEvent): string =>
-  event.name === 'frontend.http_failure'
-    ? 'frontend.http_failure_summary'
+  event.name === 'frontend.request_failure'
+    ? 'frontend.request_failure_summary'
     : 'frontend.error_summary';
 
 /** 所有错误事件共享同一聚合窗口和发送预算。 */

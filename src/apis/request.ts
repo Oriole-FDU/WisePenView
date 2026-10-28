@@ -3,6 +3,7 @@ import type { AxiosRequestConfig } from 'axios';
 import httpClient from '@/apis/_internal/httpClient';
 import type { ApiResponse } from '@/apis/api.type';
 import { isApiResponseEnvelope } from '@/apis/runtimeContract';
+import { type RequestObservation, startRequestObservation } from '@/observability/request';
 import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
 
 /**
@@ -59,80 +60,115 @@ export function parseTextApiResponse(value: unknown): string {
   }
 }
 
+/** 每个顶层请求只创建一个逻辑现场，响应解包失败仍保留发起时的身份与页面。 */
+async function executeRequest<T>(
+  method: 'get' | 'post' | 'put' | 'delete',
+  url: string,
+  config: AxiosRequestConfig | undefined,
+  data: unknown,
+  parse: (value: unknown) => T
+): Promise<T> {
+  let observation: RequestObservation | undefined;
+  try {
+    observation = startRequestObservation(url, method, config);
+  } catch {
+    // 观测初始化失败时继续发送原请求。
+  }
+  const requestConfig = observation
+    ? { ...config, __wisePenRequestObservation: observation }
+    : config;
+
+  try {
+    const response =
+      method === 'get' || method === 'delete'
+        ? await httpClient[method](url, requestConfig)
+        : await httpClient[method](url, data, requestConfig);
+    const result = parse(response);
+    observation?.recordSuccess();
+    return result;
+  } catch (error) {
+    observation?.reportFailure(error);
+    throw error;
+  } finally {
+    observation?.finish();
+  }
+}
+
 /** GET 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export async function apiGet(url: string, config?: AxiosRequestConfig): Promise<unknown> {
-  return unwrap<unknown>(await httpClient.get(url, config));
+export function apiGet(url: string, config?: AxiosRequestConfig): Promise<unknown> {
+  return executeRequest('get', url, config, undefined, unwrap<unknown>);
 }
 
 /**
  * 未迁移契约的 GET 兼容入口。
  * 该泛型不会执行运行期校验，新接口应使用 apiGet + ApiContract。
  */
-export async function apiGetUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return unwrap<T>(await httpClient.get(url, config));
+export function apiGetUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  return executeRequest('get', url, config, undefined, unwrap<T>);
 }
 
 /** POST 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export async function apiPost(
+export function apiPost(
   url: string,
   data?: unknown,
   config?: AxiosRequestConfig
 ): Promise<unknown> {
-  return unwrap<unknown>(await httpClient.post(url, data, config));
+  return executeRequest('post', url, config, data, unwrap<unknown>);
 }
 
 /**
  * 未迁移契约的 POST 兼容入口。
  * 该泛型不会执行运行期校验，新接口应使用 apiPost + ApiContract。
  */
-export async function apiPostUnchecked<T>(
+export function apiPostUnchecked<T>(
   url: string,
   data?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  return unwrap<T>(await httpClient.post(url, data, config));
+  return executeRequest('post', url, config, data, unwrap<T>);
 }
 
 /** 读取裸文本响应；仅用于后端明确声明非 R<T> 的接口。 */
-export async function apiGetText(url: string, config?: AxiosRequestConfig): Promise<string> {
-  const response = await httpClient.get<unknown>(url, {
-    responseType: 'text',
-    transformResponse: [(data: unknown) => data],
-    ...config,
-  });
-  return parseTextApiResponse(response);
+export function apiGetText(url: string, config?: AxiosRequestConfig): Promise<string> {
+  return executeRequest(
+    'get',
+    url,
+    {
+      responseType: 'text',
+      transformResponse: [(data: unknown) => data],
+      ...config,
+    },
+    undefined,
+    parseTextApiResponse
+  );
 }
 
 /** PUT 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export async function apiPut(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<unknown> {
-  return unwrap<unknown>(await httpClient.put(url, data, config));
+export function apiPut(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<unknown> {
+  return executeRequest('put', url, config, data, unwrap<unknown>);
 }
 
 /**
  * 未迁移契约的 PUT 兼容入口。
  * 该泛型不会执行运行期校验，新接口应使用 apiPut + ApiContract。
  */
-export async function apiPutUnchecked<T>(
+export function apiPutUnchecked<T>(
   url: string,
   data?: unknown,
   config?: AxiosRequestConfig
 ): Promise<T> {
-  return unwrap<T>(await httpClient.put(url, data, config));
+  return executeRequest('put', url, config, data, unwrap<T>);
 }
 
 /** DELETE 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export async function apiDelete(url: string, config?: AxiosRequestConfig): Promise<unknown> {
-  return unwrap<unknown>(await httpClient.delete(url, config));
+export function apiDelete(url: string, config?: AxiosRequestConfig): Promise<unknown> {
+  return executeRequest('delete', url, config, undefined, unwrap<unknown>);
 }
 
 /**
  * 未迁移契约的 DELETE 兼容入口。
  * 该泛型不会执行运行期校验，新接口应使用 apiDelete + ApiContract。
  */
-export async function apiDeleteUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return unwrap<T>(await httpClient.delete(url, config));
+export function apiDeleteUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  return executeRequest('delete', url, config, undefined, unwrap<T>);
 }

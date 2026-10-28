@@ -48,6 +48,6 @@ SCSS 迁移系列的依赖 PR 以具名迁移分支为 base 时，仍运行同�
 运行 mock 或浏览器时记录：日期、浏览器版本、窗口尺寸、操作步骤、预期结果、实际结果和控制台错误。没有启动服务时，不要声称完成页面行为验证。
 
 可观测性运行态还需检查 OTLP logs/traces 状态、关键上下文、URL query 和凭据脱敏、
-同对象去重、HTTP 最终失败次数及 source map release 是否一致。
+同对象去重、逻辑请求与重试子 span、最终失败分类及 source map release 是否一致。
 
 运行态涉及初始化、认证或资源路由时，至少覆盖 `/login`、`/chat`、`/drive/personal`、资源 PDF／Note／Office／Draw.io 路由；需要时观察首次探测、online／offline、visibilitychange 及停止后的网络请求。应确认资源使用集中配置，mock 模式不发起校内探测，401 只由 App 提示一次并完成登录回跳。

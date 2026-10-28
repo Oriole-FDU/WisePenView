@@ -9,6 +9,8 @@ const EMAIL_PATTERN = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
 const BEARER_PATTERN = /\bBearer\s+\S+/gi;
 const HTTP_URL_PATTERN = /https?:\/\/[^\s)]+/gi;
 const FILE_URL_PATTERN = /\bfile:\/\/[^\s)]*/gi;
+const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/gi;
+const NUMERIC_SEGMENT_PATTERN = /\/\d+(?=\/|$)/g;
 const LOCAL_PATH_PATTERN =
   /(^|[\s("'=])(?:[A-Za-z]:\\[^\s)]*|\/(?:Users|home|private|var|tmp)\/[^\s)]*)/g;
 
@@ -52,6 +54,9 @@ export const sanitizePath = (value: string, limit = 256): string => {
     return '/invalid-url';
   }
 };
+
+export const normalizeApiEndpoint = (path: string): string =>
+  path.replace(UUID_PATTERN, ':id').replace(NUMERIC_SEGMENT_PATTERN, '/:id');
 
 export const getFirstStackFrame = (stack?: string): string => {
   if (!stack) return '';

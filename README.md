@@ -51,8 +51,9 @@ pnpm mock
 `App` 挂载时启动、卸载时停止，HTTP 层只发布会话失效事件，未授权提示与登录跳转由 `App` 统一处理。
 
 前端 OTel 默认关闭；设置 `VITE_OTEL_ENDPOINT`（同源 `/otel` 或绝对 OTLP HTTP 地址）
-后启用 logs/traces，mock 模式始终禁用。当前支持统一异常捕获、HTTP 5xx、自动 Fetch/XHR
-span、隐私清洗、聚合预算、构建身份和私有源码映射。Jenkins 开启 `ENABLE_OTEL` 时会使用
+后启用 logs/traces，mock 模式始终禁用。当前支持统一异常捕获、逻辑请求 span、
+请求失败分类、自动 Fetch/XHR span、隐私清洗、聚合预算、构建身份和私有源码映射。
+Jenkins 开启 `ENABLE_OTEL` 时会使用
 API origin 下的 `/otel`。实现、能力边界和验证方式见
 [`agent/docs/observability.md`](agent/docs/observability.md)。
 
