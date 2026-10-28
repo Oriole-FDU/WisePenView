@@ -22,4 +22,4 @@
 ## 退出与证据限制
 
 - 自订退出的 Save 等待完整 `requestSave`，再等待一个 animation frame 让状态提交；Discard 只放行当次离开，不取消已发出的保存。编辑器通过 runtime 上报 dirty／saving，不另建宿主储存流程。依据：[DrawioViewConnected](index.tsx)、[prepareDraftExit](../_runtime/draftExit.ts)。
-- 既有 runtime 测试涵盖并行保存、新修改、失败、export 超时与 session 重挂，是本地任务状态的证据，不是正式后端、iframe 端到端或持久化验收。依据：[createDrawioSaveSession](../../../../scripts/check-editor-runtime.mjs)。
+- 既有 runtime 测试涵盖并行保存、新修改、失败、export 超时与 session 重挂，是本地任务状态的证据，不是正式后端、iframe 端到端或持久化验收。依据：[createDrawioSaveSession](../../../../tests/editor-runtime.test.mjs)。

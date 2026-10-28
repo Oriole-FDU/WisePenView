@@ -146,14 +146,14 @@ release，并写入 `dist/build-info.json`、OTel resource、错误详情和发�
 ## 验证
 
 ```bash
-pnpm check:observability
+pnpm test:observability
 pnpm lint
 pnpm typecheck
 pnpm build:app --mode mock
 git diff --check
 ```
 
-`pnpm check:observability` 覆盖隐私、存储拒绝、support ID、异常/请求统一预算、
+`pnpm test:observability` 覆盖隐私、存储拒绝、support ID、异常/请求统一预算、
 逻辑请求 span、最终失败分类、认证切换归属、SDK 初始化边界、Fetch/XHR URL 清洗
 和真实 Vite source map 还原。
 

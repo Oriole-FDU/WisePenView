@@ -16,8 +16,8 @@
 
 - `pnpm lint`：
 - `pnpm typecheck`：
+- `pnpm test`：
 - `pnpm check:mock`：
-- `pnpm check:note-link`：
 - `pnpm build`：
 - 运行态验证：
 
