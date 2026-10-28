@@ -14,6 +14,7 @@
 - 处理 PR Review：读 `agent/workflows/review-to-patch.md` 与 `agent/skills/pr-review-followup/SKILL.md`。
 - CI 失败：读 `agent/skills/ci-failure/SKILL.md`。
 - 发布或版本任务：读 `agent/workflows/release.md` 与 `agent/docs/release.md`。
+- 可观测性、OTel、异常捕获或私有源码映射：读 `agent/docs/observability.md`。
 - 编码与架构：按 `agent/docs/README.md` 定位 Domain、Component、Layout、路由、状态等专题；Layout 任务先读 `agent/docs/layout.md`。
 - Context 的组成、归属和消费：`agent/docs/context.md`。
 - 验证和提交：分别读 `agent/docs/verification.md`、`agent/docs/commit.md`。

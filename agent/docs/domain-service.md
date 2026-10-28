@@ -57,6 +57,9 @@ export const createXxxServices = (deps?: XxxServiceDeps): IXxxService => ({
 - UI 层 catch 后使用 HeroUI `toast` 和 `parseErrorMessage(err)`。
 - `parseErrorMessage` 只接收一个 `unknown` 参数，不传 fallback 文案。
 - 网络、HTTP、API 边界只归一化 `code`、`serverMsg` 和 `cause`，不在传输层查 i18n 或拼接用户文案；文案解析只发生在 `parseErrorMessage`。
+- Domain Service 只创建或抛出错误，不负责遥测。仅在 View/Controller、SDK callback 或批量结果层
+  已经消费故障、且该故障需要排查时调用 `captureException`，并显式提供 operation。
+- `createClientError` 不会自动上报；请求层已记录的最终 HTTP 5xx 映射异常不会在业务 catch 中重复上报。
 
 ## 四、请求触发
 

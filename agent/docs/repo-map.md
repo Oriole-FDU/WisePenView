@@ -12,7 +12,10 @@
 - `src/styles/`：全局样式入口、主题 token（按域拆分，如 `theme/radius.css`）和规范示例 story。
 - `src/config/`：公开运行时配置的声明、验证与浏览器入口。
 - `src/apis/`：Axios 与请求基础设施。
+- `src/observability/`：异常捕获、上下文、隐私、聚合和 OTel 管线。
 - `scripts/`：构建和离线检查脚本。
+- `scripts/privateSourceMaps.ts`：隔离私有 source map；`scripts/symbolicate-error.mjs`
+  离线还原 release 对应源码位置。
 - `.github/workflows/`：CI 和发布工作流。
 
 ## 数据流
