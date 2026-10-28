@@ -3,7 +3,7 @@ import { Heart, MessageCircle, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import AppAvatar from '@/components/base/Avatar';
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Tooltip } from '@/components/base/Tooltip';
 import type { ResourceComment } from '@/domains/Interact';
@@ -100,15 +100,14 @@ function ResourceCommentItem({
             {comment.imageUrls.length > 0 ? (
               <div className={styles.commentImages}>
                 {comment.imageUrls.map((url, index) => (
-                  <button
+                  <AppPressable
                     key={`${url}-${index}`}
-                    type="button"
                     className={styles.commentImageButton}
                     aria-label={t('resource:comment.previewImage')}
                     onClick={() => onPreviewImage(url)}
                   >
                     <img src={url} alt={t('resource:comment.imageAlt')} loading="lazy" />
-                  </button>
+                  </AppPressable>
                 ))}
               </div>
             ) : null}

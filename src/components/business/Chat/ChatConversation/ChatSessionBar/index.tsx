@@ -2,6 +2,7 @@ import { useInfiniteScroll, useKeyPress } from 'ahooks';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import { useChatService } from '@/domains';
 import type { ChatSession, PageResult } from '@/domains/Chat';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
@@ -71,9 +72,8 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
           const active = session.id === activeSessionId;
 
           return (
-            <button
+            <AppPressable
               key={session.id}
-              type="button"
               className={clsx(styles.sessionItem, active && styles.sessionItemActive)}
               onClick={() => onSelectSession(session)}
               aria-current={active ? 'page' : undefined}
@@ -85,14 +85,14 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
                 </span>
                 <span className={styles.sessionItemMeta}>{time}</span>
               </span>
-            </button>
+            </AppPressable>
           );
         })}
 
         {canLoadMore ? (
-          <button type="button" className={styles.sessionLoadMoreButton} onClick={loadMore}>
+          <AppPressable className={styles.sessionLoadMoreButton} onClick={loadMore}>
             {t('session.loadMore')}
-          </button>
+          </AppPressable>
         ) : null}
         {loadingMore ? <div className={styles.sessionStateText}>{t('session.loading')}</div> : null}
       </div>

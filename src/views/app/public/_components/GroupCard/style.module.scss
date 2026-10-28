@@ -1,3 +1,22 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+
+.cardAction {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-z-index-raised);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-none);
+  }
+}
+
 .card {
   position: relative;
   width: 100%;
@@ -14,9 +33,8 @@
     border-color: var(--accent);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
+  &:has(> .cardAction:focus-visible) {
+    @include focusRing.appFocusRing();
   }
 }
 

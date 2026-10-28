@@ -1,7 +1,9 @@
-import { Switch } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
+
+import { AppPressable } from '@/components/base/Button';
+import { Switch } from '@/components/base/Input';
 
 import styles from './style.module.scss';
 
@@ -166,13 +168,7 @@ function AppFormRow({
         isSelected={selected}
         isDisabled={disabled}
         onChange={onChange}
-      >
-        <Switch.Content className={styles.switchContent}>
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-        </Switch.Content>
-      </Switch>
+      />
     ) : null);
 
   return (
@@ -324,29 +320,27 @@ function AppFormAnchorNav({
             <div key={groupKey} className={clsx(styles.anchorGroup, groupClassName)}>
               {entry.title ? <h2>{entry.title}</h2> : null}
               {entry.items.map((item) => (
-                <button
+                <AppPressable
                   key={item.id}
-                  type="button"
                   className={activeId === item.id ? styles.active : undefined}
                   aria-current={activeId === item.id ? 'location' : undefined}
                   onClick={() => handleNavigate(item.id)}
                 >
                   {item.label}
-                </button>
+                </AppPressable>
               ))}
             </div>
           );
         }
         return (
-          <button
+          <AppPressable
             key={entry.id}
-            type="button"
             className={activeId === entry.id ? styles.active : undefined}
             aria-current={activeId === entry.id ? 'location' : undefined}
             onClick={() => handleNavigate(entry.id)}
           >
             {entry.label}
-          </button>
+          </AppPressable>
         );
       })}
     </nav>

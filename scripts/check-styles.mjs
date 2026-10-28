@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { compileString } from 'sass-embedded';
+import ts from 'typescript';
 import { preprocessCSS, resolveConfig } from 'vite';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -38,6 +39,60 @@ const cssModuleConfig = await resolveConfig(
 async function compileCssModule(file) {
   const css = compileScss(await readFile(join(root, file), 'utf8'), file);
   return preprocessCSS(css, join(root, file.replace(/\.scss$/, '.css')), cssModuleConfig);
+}
+
+function hasSyntheticButtonRole(source, file) {
+  const sourceFile = ts.createSourceFile(
+    file,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX
+  );
+  let found = false;
+
+  function visit(node) {
+    if (
+      ts.isJsxAttribute(node) &&
+      node.name.getText(sourceFile) === 'role' &&
+      node.initializer?.getText(sourceFile).includes('button')
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return found;
+}
+
+function getHeroUiImportedNames(source, file) {
+  const sourceFile = ts.createSourceFile(
+    file,
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
+  );
+
+  const importedNames = [];
+  for (const statement of sourceFile.statements) {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      statement.moduleSpecifier.getText(sourceFile).replace(/["']/g, '') !== '@heroui/react' ||
+      !statement.importClause?.namedBindings ||
+      !ts.isNamedImports(statement.importClause.namedBindings)
+    ) {
+      continue;
+    }
+    importedNames.push(
+      ...statement.importClause.namedBindings.elements.map((element) =>
+        (element.propertyName ?? element.name).getText(sourceFile)
+      )
+    );
+  }
+  return importedNames;
 }
 
 test('共用 SCSS partial 只提供定义，不输出 CSS', () => {
@@ -386,6 +441,31 @@ test('Button 基础封装持有圆角、禁用态与按钮组边界', async () =
   }
 });
 
+test('复合交互控件由基础封装提供默认结构', async () => {
+  const [switchSource, sliderSource, dateSource, buttonIndex, inputIndex] = await Promise.all(
+    [
+      'src/components/base/Input/Switch/index.tsx',
+      'src/components/base/Input/Slider/index.tsx',
+      'src/components/base/Input/DatePicker/index.tsx',
+      'src/components/base/Button/index.ts',
+      'src/components/base/Input/index.ts',
+    ].map((file) => readFile(join(root, file), 'utf8'))
+  );
+
+  assert.match(switchSource, /<HeroSwitch\.Control>/);
+  assert.match(switchSource, /<HeroSwitch\.Thumb \/>/);
+  assert.match(sliderSource, /<HeroSlider\.Track>/);
+  assert.match(sliderSource, /<HeroSlider\.Fill \/>/);
+  assert.match(dateSource, /<HeroDatePicker\.Trigger>/);
+  assert.match(dateSource, /<HeroDateRangePicker\.RangeSeparator \/>/);
+  assert.match(dateSource, /<HeroTimeField\.Segment segment=\{segment\} \/>/);
+  assert.match(buttonIndex, /AppButtonGroup/);
+  assert.match(buttonIndex, /AppToggleButtonGroup/);
+  assert.match(inputIndex, /DatePickerField/);
+  assert.match(inputIndex, /SwitchProps/);
+  assert.match(inputIndex, /SliderProps/);
+});
+
 test('Tabs 基础封装持有默认表面与指示器样式', async () => {
   const { code } = await compileCssModule('src/components/base/Tabs/style.module.scss');
   const tabsSource = await readFile(join(root, 'src/components/base/Tabs/index.tsx'), 'utf8');
@@ -403,38 +483,102 @@ test('Tabs 基础封装持有默认表面与指示器样式', async () => {
   );
 });
 
-test('优先交互控件的原生元素由基础封装承接', async () => {
-  const inlineFieldFiles = new Set([
+test('原生交互控件只存在于基础适配器与明确的第三方边界', async () => {
+  const nativeFieldAdapters = new Set([
     'components/base/Input/HiddenFileInput/index.tsx',
     'components/base/Input/InlineInput/index.tsx',
     'components/base/Input/InlineTextArea/index.tsx',
   ]);
-  const priorityButtonFiles = [
-    'components/business/Chat/ChatConversation/ChatInput/index.tsx',
-    'components/business/Chat/ChatConversation/ChatMessageList/Message/User/index.tsx',
-    'components/business/ErrorPage/ErrorPage.tsx',
-    'components/business/Sidebar/_common/footer/UserProfile/index.tsx',
-    'components/business/UserSearchCombobox/index.tsx',
-    'components/editors/note/CustomBlockNote/plugins/CodeBlockPlugin/CodeBlockToolbar.tsx',
-    'components/editors/skill/components/SkillSaveQueueDock/index.tsx',
-    'views/app/course/CourseAssignmentDetailPage/index.tsx',
-    'views/app/course/CourseEditorPage/_components/CourseBasicSection/index.tsx',
-    'views/app/error/RootErrorFallback/index.tsx',
-    'views/app/group/GroupDetail/_components/GroupProfileSection/index.tsx',
-    'views/app/profile/_components/Account/AccountHeader/index.tsx',
-  ];
+  const nativeButtonAdapters = new Set([
+    'components/base/Button/AppIconButton/index.tsx',
+    'components/base/Button/AppPressable/index.tsx',
+  ]);
+  const syntheticButtonExceptions = new Set([
+    'components/base/Input/UploadZone/index.tsx',
+    'components/editors/note/CustomBlockNote/plugins/LatexPlugin/InlineMath/index.tsx',
+    'components/editors/note/CustomBlockNote/plugins/LatexPlugin/MathBlock/index.tsx',
+  ]);
 
   for (const file of await readdir(join(root, 'src'), { recursive: true })) {
     if (!/\.(tsx|jsx)$/.test(file)) continue;
     const source = await readFile(join(root, 'src', file), 'utf8');
-    if (!inlineFieldFiles.has(file)) {
-      assert.doesNotMatch(source, /<(?:input|textarea)\b/, file);
+    const generatedThirdParty = file.startsWith('components/_shadcn/');
+    if (!generatedThirdParty && !nativeFieldAdapters.has(file)) {
+      assert.doesNotMatch(source, /<(?:input|textarea|select)\b/, file);
+    }
+    if (!generatedThirdParty && !nativeButtonAdapters.has(file)) {
+      assert.doesNotMatch(source, /<button\b/, file);
+    }
+    if (!syntheticButtonExceptions.has(file)) {
+      assert.equal(hasSyntheticButtonRole(source, file), false, file);
     }
   }
 
-  for (const file of priorityButtonFiles) {
+  for (const [file, tag] of [
+    ['components/editors/note/CustomBlockNote/engines/aiDiff/reviewWidget.ts', 'button'],
+    ['components/editors/note/CustomBlockNote/style.stories.tsx', 'input'],
+    ['utils/browser/copyText.ts', 'textarea'],
+  ]) {
     const source = await readFile(join(root, 'src', file), 'utf8');
-    assert.doesNotMatch(source, /<button\b/, file);
+    assert.match(
+      source,
+      new RegExp(`createElement\\(\\s*['"]${tag}['"]`),
+      `${file} 的 DOM 控件例外必须显式保留`
+    );
+  }
+
+  const [courseAssignments, noteOutline] = await Promise.all([
+    readFile(join(root, 'src/views/app/course/CourseAssignmentsPage/index.tsx'), 'utf8'),
+    readFile(join(root, 'src/components/editors/note/components/NoteOutline/index.tsx'), 'utf8'),
+  ]);
+  assert.match(courseAssignments, /<Link\b/);
+  assert.match(noteOutline, /<nav\b/);
+  assert.doesNotMatch(noteOutline, /role="listitem"/);
+});
+
+test('已有基础封装的 HeroUI 控件不得从业务层直接导入', async () => {
+  const wrappedControls = new Set([
+    'Autocomplete',
+    'Button',
+    'ButtonGroup',
+    'Calendar',
+    'Checkbox',
+    'ComboBox',
+    'DateField',
+    'DatePicker',
+    'DateRangePicker',
+    'Fieldset',
+    'Input',
+    'InputGroup',
+    'InputOTP',
+    'NumberField',
+    'RangeCalendar',
+    'SearchField',
+    'Select',
+    'Slider',
+    'Switch',
+    'TextArea',
+    'TimeField',
+    'ToggleButton',
+    'ToggleButtonGroup',
+  ]);
+
+  for (const file of await readdir(join(root, 'src'), { recursive: true })) {
+    if (
+      !/\.(tsx|ts)$/.test(file) ||
+      file.startsWith('components/base/') ||
+      file.startsWith('components/_shadcn/') ||
+      file.includes('.stories.')
+    ) {
+      continue;
+    }
+    const source = await readFile(join(root, 'src', file), 'utf8');
+    const imports = getHeroUiImportedNames(source, file);
+    assert.deepEqual(
+      imports.filter((name) => wrappedControls.has(name)),
+      [],
+      file
+    );
   }
 });
 

@@ -1,4 +1,4 @@
-import { Input, TextField } from '@heroui/react';
+import { TextField } from '@heroui/react';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,6 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
+import { InlineInput } from '@/components/base/Input';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import type { FavoriteCollection } from '@/domains/Interact';
 
@@ -116,7 +117,7 @@ function CollectionPickerModal({
             className={styles.createInput}
           >
             <div className={styles.inlineCreateRow}>
-              <Input
+              <InlineInput
                 placeholder={t('favorite.picker.namePlaceholder')}
                 value={newCollectionName}
                 autoFocus

@@ -2,6 +2,7 @@ import { Minus, Square, SquareStack, X } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
 import styles from './style.module.scss';
@@ -30,16 +31,14 @@ function DesktopWindowControls() {
 
   return (
     <div className={styles.root} data-no-drag>
-      <button
-        type="button"
+      <AppPressable
         className={styles.button}
         aria-label={t('windowControls.minimize')}
         onClick={() => void window.desktop?.windowMinimize?.()}
       >
         <Minus size={16} aria-hidden="true" strokeWidth={2} />
-      </button>
-      <button
-        type="button"
+      </AppPressable>
+      <AppPressable
         className={styles.button}
         aria-label={maximized ? t('windowControls.restore') : t('windowControls.maximize')}
         onClick={() => void window.desktop?.windowMaximizeToggle?.()}
@@ -49,15 +48,14 @@ function DesktopWindowControls() {
         ) : (
           <Square size={14} aria-hidden="true" strokeWidth={2} />
         )}
-      </button>
-      <button
-        type="button"
+      </AppPressable>
+      <AppPressable
         className={`${styles.button} ${styles.close}`}
         aria-label={t('windowControls.close')}
         onClick={() => void window.desktop?.windowClose?.()}
       >
         <X size={16} aria-hidden="true" strokeWidth={2} />
-      </button>
+      </AppPressable>
     </div>
   );
 }

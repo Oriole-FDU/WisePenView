@@ -2,6 +2,7 @@ import { clsx } from 'clsx';
 import { ChevronsLeft, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { GuideAnchor } from '@/components/base/Guide';
 import type { NoteOutlineItem } from '@/components/editors/note/CustomBlockNote/index.type';
@@ -66,8 +67,8 @@ function NoteOutline({ items, activeId, onNavigate, title, open, onOpenChange }:
         </div>
         <div className={styles.scrollArea}>
           <GuideAnchor id={GUIDE_TOOL_ID.noteOutlineOpen} layout="area">
-            <div className={styles.root} aria-label={t('outline.document')}>
-              <div className={styles.list} role="list">
+            <nav className={styles.root} aria-label={t('outline.document')}>
+              <div className={styles.list}>
                 {displayItems.length === 0 ? (
                   <div className={styles.empty}>{t('outline.empty')}</div>
                 ) : (
@@ -75,10 +76,8 @@ function NoteOutline({ items, activeId, onNavigate, title, open, onOpenChange }:
                     const text = normalizeText(it.text) || t('outline.untitled');
                     const isActive = activeId === it.id;
                     return (
-                      <button
+                      <AppPressable
                         key={it.id}
-                        type="button"
-                        role="listitem"
                         className={clsx(
                           styles.item,
                           resolveLevelClass(it.level),
@@ -90,12 +89,12 @@ function NoteOutline({ items, activeId, onNavigate, title, open, onOpenChange }:
                         onClick={() => onNavigate(it.id)}
                       >
                         {text}
-                      </button>
+                      </AppPressable>
                     );
                   })
                 )}
               </div>
-            </div>
+            </nav>
           </GuideAnchor>
         </div>
       </aside>

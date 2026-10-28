@@ -1,10 +1,9 @@
-import { Switch } from '@heroui/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { FormField, Input, Select } from '@/components/base/Input';
+import { FormField, Input, Select, Switch } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
@@ -216,12 +215,7 @@ function ModelSettingsSection() {
                 setModelForm((current) => ({ ...current, supportThinking }))
               }
             >
-              <Switch.Content>
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-                <span>{t('ai.models.supportThinking')}</span>
-              </Switch.Content>
+              <span>{t('ai.models.supportThinking')}</span>
             </Switch>
             <Switch
               size="md"
@@ -231,12 +225,7 @@ function ModelSettingsSection() {
                 setModelForm((current) => ({ ...current, supportVision }))
               }
             >
-              <Switch.Content>
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-                <span>{t('ai.models.supportVision')}</span>
-              </Switch.Content>
+              <span>{t('ai.models.supportVision')}</span>
             </Switch>
           </div>
           <FormField

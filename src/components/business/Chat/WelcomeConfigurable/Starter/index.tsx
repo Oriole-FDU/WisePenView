@@ -3,6 +3,8 @@ import { clsx } from 'clsx';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 
+import { AppPressable } from '@/components/base/Button';
+
 import { welcomeModeFromBlockCount } from '../_store/welcomeScreenState';
 import type {
   WelcomeIconTone,
@@ -38,8 +40,7 @@ function QuestionPillButton({
   const showPillIcon = ItemIcon && variant !== 'list';
 
   return (
-    <button
-      type="button"
+    <AppPressable
       className={clsx(
         styles.questionBubble,
         variant === 'bubbles' && styles.questionBubbleStack,
@@ -57,7 +58,7 @@ function QuestionPillButton({
       {variant === 'list' ? (
         <ChevronRight className={styles.questionBubbleChevron} aria-hidden />
       ) : null}
-    </button>
+    </AppPressable>
   );
 }
 
@@ -108,15 +109,14 @@ function PillScrollStrip({
       data-scroll-fade-start={canScrollLeft ? 'true' : 'false'}
       data-scroll-fade-end={canScrollRight ? 'true' : 'false'}
     >
-      <button
-        type="button"
+      <AppPressable
         className={styles.pillScrollPrev}
         aria-label="查看前面的示例"
         disabled={!canScrollLeft}
         onClick={() => scrollByPage(-1)}
       >
         <ChevronLeft aria-hidden />
-      </button>
+      </AppPressable>
       <ul
         ref={scrollRef}
         className={styles.questionBubbleList}
@@ -135,15 +135,14 @@ function PillScrollStrip({
           );
         })}
       </ul>
-      <button
-        type="button"
+      <AppPressable
         className={styles.pillScrollNext}
         aria-label="查看后面的示例"
         disabled={!canScrollRight}
         onClick={() => scrollByPage(1)}
       >
         <ChevronRight aria-hidden />
-      </button>
+      </AppPressable>
     </div>
   );
 }
@@ -272,7 +271,7 @@ function WelcomePromptCardsSection({
           if (appearance === 'feature') {
             return (
               <li key={item.id} className={styles.featureGridItem}>
-                <button type="button" className={styles.featureTile} onClick={pick}>
+                <AppPressable className={styles.featureTile} onClick={pick}>
                   {Icon ? <FeatureIconOrb icon={Icon} tone={item.iconTone} /> : null}
                   <span className={styles.featureTileBody}>
                     <span className={styles.featureTileTitle}>{item.title}</span>
@@ -280,14 +279,14 @@ function WelcomePromptCardsSection({
                       <span className={styles.featureTileDescription}>{item.description}</span>
                     ) : null}
                   </span>
-                </button>
+                </AppPressable>
               </li>
             );
           }
 
           return (
             <li key={item.id} className={styles.cardGridItem}>
-              <button type="button" className={styles.promptCardButton} onClick={pick}>
+              <AppPressable className={styles.promptCardButton} onClick={pick}>
                 <Card className={styles.promptCard}>
                   <Card.Header className={styles.cardHeader}>
                     {Icon ? (
@@ -308,7 +307,7 @@ function WelcomePromptCardsSection({
                     </Card.Content>
                   ) : null}
                 </Card>
-              </button>
+              </AppPressable>
             </li>
           );
         })}

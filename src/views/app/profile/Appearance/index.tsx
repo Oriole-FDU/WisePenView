@@ -1,7 +1,7 @@
-import { Heading, Separator, ToggleButtonGroup } from '@heroui/react';
+import { Heading, Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
-import { AppToggleButton } from '@/components/base/Button';
+import { AppToggleButton, AppToggleButtonGroup } from '@/components/base/Button';
 import PageHeader from '@/components/base/PageHeader';
 import { Tabs } from '@/components/base/Tabs';
 import { changeAppLanguage } from '@/i18n';
@@ -96,7 +96,7 @@ function ColorSchemeSection({ value, onChange }: ColorSchemeSectionProps) {
         {t('appearance.colorScheme')}
       </Heading>
       <div className={styles.schemeGrid}>
-        <ToggleButtonGroup
+        <AppToggleButtonGroup
           aria-label={t('appearance.colorScheme')}
           selectionMode="single"
           selectedKeys={new Set([value])}
@@ -111,7 +111,7 @@ function ColorSchemeSection({ value, onChange }: ColorSchemeSectionProps) {
           {COLOR_SCHEME_OPTIONS.map((option) => (
             <SchemeOption key={option.id} option={option} />
           ))}
-        </ToggleButtonGroup>
+        </AppToggleButtonGroup>
       </div>
     </section>
   );

@@ -30,6 +30,7 @@ import {
 import { type DragEvent, type ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import { useNoteEditorReadOnlyContext } from '@/components/editors/note/CustomBlockNote/engines/editor/_context';
@@ -620,8 +621,7 @@ function CustomSideMenu({
       ) : null}
       {showBlockMenu ? (
         <div className={styles.dragHandleWrapper}>
-          <button
-            type="button"
+          <AppPressable
             className={clsx(styles.sideMenuButton, styles.dragHandleButton)}
             draggable="true"
             aria-label={t('sideMenu.blockMenu')}
@@ -641,7 +641,7 @@ function CustomSideMenu({
               />
             ) : null}
             <GripVertical size={16} aria-hidden="true" />
-          </button>
+          </AppPressable>
           <Dropdown isOpen={open} onOpenChange={handleOpenChange}>
             <Dropdown.Trigger className={styles.dropdownAnchor} isDisabled aria-hidden="true">
               <span />

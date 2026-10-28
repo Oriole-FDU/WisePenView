@@ -1,6 +1,6 @@
 import { CalendarClock, CheckCircle2, ChevronRight, ClipboardCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
@@ -18,7 +18,6 @@ function CourseAssignmentsPage() {
   const { t } = useTranslation('course');
   const { course } = useCourseContext();
   const courseService = useCourseService();
-  const navigate = useNavigate();
   const { data, loading, error, refresh } = useApi(() =>
     courseService.listCourseAssignments(course.courseId)
   );
@@ -52,13 +51,10 @@ function CourseAssignmentsPage() {
           {data.map((assignment) => {
             const pending = assignment.status === COURSE_ASSIGNMENT_STATUS.PENDING;
             return (
-              <button
+              <Link
                 key={assignment.assignmentId}
-                type="button"
                 className={styles.assignmentRow}
-                onClick={() =>
-                  navigate(buildCourseAssignmentPath(course.courseId, assignment.assignmentId))
-                }
+                to={buildCourseAssignmentPath(course.courseId, assignment.assignmentId)}
               >
                 <span className={styles.assignmentIcon} data-pending={pending || undefined}>
                   {pending ? (
@@ -81,7 +77,7 @@ function CourseAssignmentsPage() {
                   {t(`assignments.${assignment.status.toLowerCase()}`)}
                 </span>
                 <ChevronRight size={17} className={styles.chevron} aria-hidden />
-              </button>
+              </Link>
             );
           })}
         </div>

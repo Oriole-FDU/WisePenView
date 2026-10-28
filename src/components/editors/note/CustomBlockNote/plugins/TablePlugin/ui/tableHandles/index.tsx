@@ -27,6 +27,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
+import { AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { useNoteEditorReadOnlyContext } from '@/components/editors/note/CustomBlockNote/engines/editor/_context';
 import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
@@ -546,9 +547,8 @@ function MountedTableInsertHandles() {
         data-inserting={activeTargetKey ? 'true' : undefined}
       >
         {rowRails.map(({ key, target, top, height }) => (
-          <button
+          <AppPressable
             key={key}
-            type="button"
             className={styles.selectionRail}
             data-orientation="row"
             data-selected={selectedRailKeys.has(getSelectionTargetKey(target)) ? 'true' : undefined}
@@ -568,9 +568,8 @@ function MountedTableInsertHandles() {
           />
         ))}
         {columnRails.map(({ key, target, left, width }) => (
-          <button
+          <AppPressable
             key={key}
-            type="button"
             className={styles.selectionRail}
             data-orientation="column"
             data-selected={selectedRailKeys.has(getSelectionTargetKey(target)) ? 'true' : undefined}

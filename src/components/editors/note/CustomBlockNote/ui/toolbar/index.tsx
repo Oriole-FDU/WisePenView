@@ -8,13 +8,14 @@ import {
   useExtension,
   useExtensionState,
 } from '@blocknote/react';
-import { ButtonGroup, Separator, Toolbar } from '@heroui/react';
+import { Separator, Toolbar } from '@heroui/react';
 import { useEventListener } from 'ahooks';
 import { MessageSquarePlus, Search, Sparkles } from 'lucide-react';
 import { type ComponentProps, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
+import { AppButtonGroup } from '@/components/base/Button';
 import { useNoteEditorReadOnlyContext } from '@/components/editors/note/CustomBlockNote/engines/editor/_context';
 import { TableToolbarProvider } from '@/components/editors/note/CustomBlockNote/plugins/TablePlugin/ui/_context';
 import {
@@ -234,14 +235,14 @@ function CustomFormattingToolbar({
             {showBlockTypeFileGroup ? (
               <>
                 <ToolbarSeparator />
-                <ButtonGroup
+                <AppButtonGroup
                   size="sm"
                   variant="ghost"
                   aria-label={t('editor.toolbar.blockAndFile')}
                 >
                   <BlockTypeMenu />
                   <FileCaptionToolbarButton />
-                </ButtonGroup>
+                </AppButtonGroup>
               </>
             ) : null}
             <ToolbarSeparator />
@@ -249,10 +250,10 @@ function CustomFormattingToolbar({
             <ToolbarSeparator />
             <TextAlignButtons />
             <ToolbarSeparator />
-            <ButtonGroup size="sm" variant="ghost" aria-label={t('editor.color.label')}>
+            <AppButtonGroup size="sm" variant="ghost" aria-label={t('editor.color.label')}>
               <ColorMenu />
               <TableCellBackgroundAction />
-            </ButtonGroup>
+            </AppButtonGroup>
             <ToolbarSeparator />
             <NestButtons />
             <ToolbarSeparator />
@@ -261,7 +262,7 @@ function CustomFormattingToolbar({
             <TableDeleteAction />
           </>
         ) : null}
-        <ButtonGroup size="sm" variant="ghost" aria-label={t('editor.toolbar.searchCommentAi')}>
+        <AppButtonGroup size="sm" variant="ghost" aria-label={t('editor.toolbar.searchCommentAi')}>
           <ToolbarButton
             label={t('editor.toolbar.search')}
             icon={<Search size={20} />}
@@ -273,7 +274,7 @@ function CustomFormattingToolbar({
             onPress={onAddComment}
           />
           <ToolbarButton label={t('ai.toolbar')} icon={<Sparkles size={20} />} onPress={onAskAi} />
-        </ButtonGroup>
+        </AppButtonGroup>
       </Toolbar>
     </TableToolbarProvider>
   );

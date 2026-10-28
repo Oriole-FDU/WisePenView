@@ -162,6 +162,8 @@ z-index 按“基准 → 基础刻度 → 应用语义”单向定义，三层�
 
 - 业务与编辑器代码不得直接写原生 `input`、`textarea` 或隐藏文件输入；可见内联字段使用 `InlineInput` / `InlineTextArea`，文件选择使用 `HiddenFileInput`，标准字段继续使用 `Input` / `TextArea` / `SearchField` 等基础封装。
 - 需要保留业务级外观或复合内容的自定义交互面使用 `AppPressable`，由其统一承接原生 button 的类型与 DOM 契约；普通文字按钮仍使用 `AppButton`，纯图标按钮仍使用 `AppIconButton`。
+- 开关、滑块、日期单值/范围和时刻字段使用 base 层 `Switch` / `Slider` / `DatePickerField` / `DateRangeField` / `TimeField`；紧密按钮组使用 `AppButtonGroup` / `AppToggleButtonGroup`，业务层不得直接组合 HeroUI 对应原语。
+- 除基础适配器、`_shadcn` 生成态组件和已注释的 DOM 工具边界外，源码不得直接声明原生 `button`、`input`、`textarea` 或 `select`；路由导航使用 Router `Link`，不以 button 模拟链接。
 - 图标按钮优先使用已有图标库，例如 `lucide-react`。
 - 有明确图标语义时，不要用文字按钮代替图标按钮。
 - 纯图标按钮统一使用 `AppIconButton`，必须同时提供 hover/focus tooltip 和可访问名称；不要用 `title` 代替 tooltip。

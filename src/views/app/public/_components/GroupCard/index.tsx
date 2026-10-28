@@ -1,8 +1,9 @@
 import { Card } from '@heroui/react';
-import type { KeyboardEvent, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import UserCapsule from '@/components/base/Avatar/UserCapsule';
+import { AppPressable } from '@/components/base/Button';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { GROUP_TYPE } from '@/domains/Group';
 
@@ -23,13 +24,6 @@ function GroupCard({ group, onClick }: GroupCardProps) {
     onClick?.(group);
   };
 
-  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleCardClick();
-    }
-  };
-
   const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     if (event.currentTarget.src !== PLACEHOLDER_IMAGE) {
       event.currentTarget.src = PLACEHOLDER_IMAGE;
@@ -48,13 +42,12 @@ function GroupCard({ group, onClick }: GroupCardProps) {
     groupType === GROUP_TYPE.PUBLIC ? `${styles.badge} ${styles.publicBadge}` : styles.badge;
 
   return (
-    <Card
-      className={styles.card}
-      role="button"
-      tabIndex={0}
-      onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
-    >
+    <Card className={styles.card}>
+      <AppPressable
+        className={styles.cardAction}
+        aria-label={groupName}
+        onClick={handleCardClick}
+      />
       <div className={styles.cover}>
         <img
           src={cover || PLACEHOLDER_IMAGE}

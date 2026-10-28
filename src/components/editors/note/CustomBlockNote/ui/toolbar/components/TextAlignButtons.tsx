@@ -7,10 +7,10 @@ import {
   type TableContent,
 } from '@blocknote/core';
 import { useBlockNoteEditor, useEditorState } from '@blocknote/react';
-import { ToggleButtonGroup } from '@heroui/react';
 import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { AppToggleButtonGroup } from '@/components/base/Button';
 import { getSafeTableCellSelection } from '@/components/editors/note/CustomBlockNote/plugins/TablePlugin/ui/tableHandles/safe';
 import { blockNoteSchema } from '@/components/editors/note/CustomBlockNote/registry/noteEditorComposition';
 
@@ -111,7 +111,7 @@ export function TextAlignButtons() {
   };
 
   return (
-    <ToggleButtonGroup
+    <AppToggleButtonGroup
       aria-label={t('editor.align.label')}
       selectionMode="single"
       selectedKeys={new Set([state.textAlignment])}
@@ -136,6 +136,6 @@ export function TextAlignButtons() {
           />
         );
       })}
-    </ToggleButtonGroup>
+    </AppToggleButtonGroup>
   );
 }

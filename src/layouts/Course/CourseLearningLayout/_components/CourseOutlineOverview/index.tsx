@@ -1,7 +1,7 @@
 import { ChevronRight, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { AppButton } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FormField, TextArea } from '@/components/base/Input';
 import type { CourseOutlineContainerNode, CourseOutlineResourceNode } from '@/domains/Course';
@@ -83,13 +83,12 @@ function CourseOutlineOverview({
               </div>
             </div>
           ) : editable && !description.description ? (
-            <button
-              type="button"
+            <AppPressable
               className={styles.emptyDescriptionButton}
               onClick={description.startEditing}
             >
               {t('outline.emptyEditableDescription')}
-            </button>
+            </AppPressable>
           ) : (
             <p className={styles.description} data-empty={!description.description || undefined}>
               {description.description || t('outline.emptyDescription')}
@@ -102,11 +101,7 @@ function CourseOutlineOverview({
         </p>
         <div className={styles.resourceList}>
           {resources.map((resource) => (
-            <button
-              key={resource.nodeId}
-              type="button"
-              onClick={() => onOpenResource(resource.nodeId)}
-            >
+            <AppPressable key={resource.nodeId} onClick={() => onOpenResource(resource.nodeId)}>
               <CourseResourceIcon node={resource} size={18} />
               <span>
                 <strong>{resource.title}</strong>
@@ -116,7 +111,7 @@ function CourseOutlineOverview({
                 </small>
               </span>
               <ChevronRight size={17} aria-hidden />
-            </button>
+            </AppPressable>
           ))}
         </div>
       </div>
