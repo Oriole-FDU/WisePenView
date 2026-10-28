@@ -85,7 +85,7 @@ export interface SubmitFeedbackRequest {
   imageUrl?: string;
 }
 
-/** 更新用户信息请求参数（仅基本档案可编辑；账号栏只读；impl 内按 userInfo / userProfile 拆成两次 PUT） */
+/** 更新用户信息请求参数（仅基本资料可编辑；账号栏只读；impl 内按 userInfo / userProfile 拆成两次 PUT） */
 export interface UpdateUserInfoRequest {
   nickname?: string;
   realName?: string;

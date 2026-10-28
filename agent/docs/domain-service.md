@@ -24,9 +24,9 @@ Service 不应负责：
 
 业务代码通过 `useXxxService()` 获取 service。
 
-正式與 mock 共用 `src/domains/_registry/registry.ts` 的 service 裝配。跨 service 依賴必須由工廠參數注入。
+正式与 mock 共用 `src/domains/_registry/registry.ts` 的 service 装配。跨 service 依赖必须由工厂参数注入。
 
-Service 透過 `@domain-apis` 呼叫 API；Vite mock 模式與 Storybook 選擇 `apis.mock.ts`，其他模式選擇 `apis.impl.ts`。mock 只模擬 API 回應與外部 I/O，不另寫 service、mapper 或前端快取。
+Service 通过 `@domain-apis` 调用 API；Vite mock 模式与 Storybook 选择 `apis.mock.ts`，其他模式选择 `apis.impl.ts`。mock 只模拟 API 响应与外部 I/O，不另写 service、mapper 或前端缓存。
 
 标准实现形态：
 
@@ -87,7 +87,7 @@ src/domains/<Domain>/
 
 - `src/domains/_registry/registry.types.ts`
 - `src/domains/_registry/registry.ts`
-- 有新增 API 時，同步更新 `apis.impl.ts` 與 `apis.mock.ts`
+- 有新增 API 时，同步更新 `apis.impl.ts` 与 `apis.mock.ts`
 - `src/domains/_registry/_context/useServices.ts`
 - `src/domains/index.ts`
 

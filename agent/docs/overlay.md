@@ -51,7 +51,7 @@ base/ListBox
 
 - `Modal` 是底层 Overlay 原子组件。
 - `AppModal`、`AppAlertDialog`、`AppFormDialog`、`AppDisplayDialog` 都直接组合 `Modal`。
-- 四个 App 级组件之间不应互相继承，也不应让 `AppAlertDialog` / `AppFormDialog` / `AppDisplayDialog` 基于 `AppModal` 实现；`UnsavedChangesDialog` 只作为 `AppAlertDialog` 的语义预设存在。
+- 四个 App 级组件之间不应互相继承，也不应让 `AppAlertDialog` / `AppFormDialog` / `AppDisplayDialog` 基于 `AppModal` 实现；`UnsavedChangesDialog` 只作为 `AppAlertDialog` 的语义默认存在。
 - `Popover` 是延迟挂载原子层，统一浮层表面与 dialog 内边距；`AppPopover` 统一业务 Popover 的 Content、Dialog、header、无 header body 和 danger 视觉。
 - `Dropdown`、`ListBox` 在基础封装中消费共用浮层契约；业务代码不直接导入 HeroUI 对应组件。
 

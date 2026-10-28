@@ -4,13 +4,13 @@
 
 ## 范围
 
-本文件拥有收藏页的集合选择、集合管理与资源列操作；完整收藏归属及不可存取条目的资料语义由 [Interact](../../../../../domains/Interact/BUSINESS.md) 拥有，picker 由 [共享收藏流程](../../../../../components/business/Resource/BUSINESS.md) 拥有。
+本文件拥有收藏页的集合选择、集合管理与资源列操作；完整收藏归属及不可访问条目的数据语义由 [Interact](../../../../../domains/Interact/BUSINESS.md) 拥有，picker 由 [共享收藏流程](../../../../../components/business/Resource/BUSINESS.md) 拥有。
 
 ## 集合管理
 
-- 未选取集合或选取项已不存在时，优先选 isDefault 集合，否则用第一个集合；没有集合时显示空状态，不自行建立预设集合。依据：[resolveDefaultCollection](index.tsx)、[FavoritesTab](index.tsx)。
-- 预设集合在清单中不显示编辑／删除选单，这只是 UI 限制，不证明 service 或后端禁止该操作。其他集合可新建／修改，名称须 trim 后非空，空说明送 null；成功后刷新集合。依据：[FavoriteCollectionList](components/FavoriteCollectionList.tsx)、[EditCollectionModal](EditCollectionModal/index.tsx)。
-- 删除集合的「移至预设集合」选项初始为 false，将使用者选择送为 keepResourcesToDefault；不应描述成删除时一律保留收藏或删除 Resource。只有请求成功才关闭并刷新。依据：[DeleteCollectionModal](DeleteCollectionModal/index.tsx)。
+- 未选取集合或选取项已不存在时，优先选 isDefault 集合，否则用第一个集合；没有集合时显示空状态，不自行建立默认集合。依据：[resolveDefaultCollection](index.tsx)、[FavoritesTab](index.tsx)。
+- 默认集合在清单中不显示编辑／删除菜单，这只是 UI 限制，不证明 service 或后端禁止该操作。其他集合可新建／修改，名称须 trim 后非空，空说明送 null；成功后刷新集合。依据：[FavoriteCollectionList](components/FavoriteCollectionList.tsx)、[EditCollectionModal](EditCollectionModal/index.tsx)。
+- 删除集合的「移至默认集合」选项初始为 false，将用户选择送为 keepResourcesToDefault；不应描述成删除时一律保留收藏或删除 Resource。只有请求成功才关闭并刷新。依据：[DeleteCollectionModal](DeleteCollectionModal/index.tsx)。
 
 ## 资源列与移除
 

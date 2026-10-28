@@ -16,7 +16,7 @@
 ## 权限策略
 
 - 标签可见性、标签自身挂载权限和标签内资源的默认授权是三个独立维度。不能用“标签可见”推导“允许挂载”或“资源可编辑”。依据：[TagTreeNode](entity/tag.ts)、[策略枚举](enum/index.ts)。
-- 资源动作复用 Resource 的位定义与隐含动作规则，不维护第二套权限位。标签的 private／readonly／shared 预设作用于标签内资源，all／onlyAdmin／advanced 预设作用于标签自身挂载策略。依据：[预设与动作转换](enum/index.ts)。
+- 资源动作复用 Resource 的位定义与隐含动作规则，不维护第二套权限位。标签的 private／readonly／shared 默认作用于标签内资源，all／onlyAdmin／advanced 默认作用于标签自身挂载策略。依据：[默认与动作转换](enum/index.ts)。
 - mapper 兼容历史动作数字、枚举名与 mask；visibilityMode 和 access scope 分别按其接口类型归一化。兼容逻辑留在 mapper，不能散落到权限面板中。依据：[TagServicesMap](mapper/TagServices.map.ts)。
 
 ## Metadata 与排序

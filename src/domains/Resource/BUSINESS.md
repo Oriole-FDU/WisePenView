@@ -9,7 +9,7 @@
 ## 资源与位置
 
 - 一个资源可以有多个 `tagBinds`。指定小组时，`currentTags` 与 `mainTagId` 优先取该小组的绑定；个人视角优先取 `p_` 开头的绑定，找不到匹配绑定时保留首个绑定。`primaryTagId` 优先于 tags 的首个 key，不能由展示层重新猜测当前位置。依据：[mapResourceItemFromApi](mapper/resource.mapper.ts)。
-- 列表 mapper 省略空字串 `resourceType` 与空阵列 `tagIds`，不把空值当成筛选参数；标签查询逻辑预设 OR。`includeMyInteraction: false` 是有效输入，不能因布林值为 false 而省略。小组查询由 service 注入 `groupId`。依据：[mapListResourceItemsRequest](mapper/resource.mapper.ts)、[ResourceServices](service/ResourceServices.impl.ts)。
+- 列表 mapper 省略空字符串 `resourceType` 与空数组 `tagIds`，不把空值当成筛选参数；标签查询逻辑默认 OR。`includeMyInteraction: false` 是有效输入，不能因布林值为 false 而省略。小组查询由 service 注入 `groupId`。依据：[mapListResourceItemsRequest](mapper/resource.mapper.ts)、[ResourceServices](service/ResourceServices.impl.ts)。
 - 个人路径标签、普通标签与小组挂载是不同操作：`setPersonalResourcesPathTag` 设置个人位置，`replacePersonalNormalTags` 替换普通标签，`mountResourcesToGroup` 建立小组挂载。小组移动／卸载必须保留 `resourceSourceTagMap` 的来源位置；不能用个人移动接口代替。依据：[位置请求契约](service/index.type.ts)、[ResourcePlacementApi](apis/ResourcePlacementApi.ts)。
 - `movePersonalResourcesToTrash`、`unmountResourcesToGroup` 与 `removeResources` 分别对应个人回收站、小组卸载和资源删除接口，调用方必须根据意图选择，不能把所有删除按钮都映射为删除资源。依据：[ResourceServices](service/ResourceServices.impl.ts)。
 - 重命名只在后端请求成功后更新资源名称缓存。缓存属于 session，不充当永久资源数据；会话清理时必须重置。依据：[renameResource](service/ResourceServices.impl.ts)、[resourceDisplayNameCache](session/resourceDisplayNameCache.ts)。

@@ -1,7 +1,7 @@
 import { tableStyles } from '../styles';
 import type { TableColumnWidth } from './index.type';
 
-/** 基础列宽预设 */
+/** 基础列宽默认 */
 const BASE_COLUMN_WIDTH_CLASS: Record<TableColumnWidth, string> = {
   fill: tableStyles.colFill,
   sm: tableStyles.colSm,

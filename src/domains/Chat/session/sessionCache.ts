@@ -9,7 +9,7 @@ interface SessionCache {
   generation: number;
 }
 
-// 只快取伺服器資料；目前選中的 ID 一律從 URL 取得，不持久化或反向導航。
+// 只缓存服务器数据；目前选中的 ID 一律从 URL 取得，不持久化或反向导航。
 export const chatSessionCache = createStore<SessionCache>(() => ({
   sessions: new Map(),
   generation: 0,
@@ -26,7 +26,7 @@ export function cacheSessions(
     if (state.generation !== snapshot.generation) return state;
     const next = new Map(state.sessions);
     for (const session of sessions) {
-      // 列表開始後若已有重新命名／Agent 更新，不讓舊列表覆蓋新資料。
+      // 列表开始后若已有重新命名／Agent 更新，不让旧列表覆盖新数据。
       if (fromList && state.sessions.get(session.id) !== snapshot.sessions.get(session.id))
         continue;
       next.set(session.id, session);

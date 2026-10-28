@@ -15,7 +15,7 @@ export const getChatSessionId = (location: ChatLocation): string | undefined => 
   return chatRoute.params.sessionId;
 };
 
-/** 內嵌聊天只更新 chat query，保留資源／課程位置、檢視參數和錨點。 */
+/** 内嵌聊天只更新 chat query，保留资源／课程位置、查看参数和锚点。 */
 export const buildChatSessionLocation = (location: ChatLocation, sessionId?: string): Path => {
   const isChatPage = matchPath(`${APP_ROUTE_PATH.CHAT}/:sessionId?`, location.pathname) != null;
   const search = new URLSearchParams(location.search);

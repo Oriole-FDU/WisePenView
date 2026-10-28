@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { build } from 'esbuild';
 
-// 離線走正式 registry，確認 mock 只替換 I/O，跨 service 讀寫仍保持一致。
+// 脱机走正式 registry，确认 mock 只替换 I/O，跨 service 读写仍保持一致。
 const root = fileURLToPath(new URL('..', import.meta.url));
 const cacheDir = join(root, 'node_modules/.cache');
 await mkdir(cacheDir, { recursive: true });

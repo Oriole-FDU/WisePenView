@@ -24,7 +24,7 @@ warning 与 error 都应逐项审查。处理方式是创建稳定责任边界�
 4. **parts／组件**：有独立视觉语义、互动责任或稳定 Props 契约时抽出；不要创建只有一次使用的薄 wrapper。
 5. **Controller**：以共同维护的不变量与变化原因为边界，整体移动 state、ref、派生值、请求、事件、错误与 cleanup。
 
-禁止按「所有 state」「所有 handler」「所有 JSX」平均切层，也禁止把原组件完整搬进一个返回几十个栏位的总 Controller。
+禁止按「所有 state」「所有 handler」「所有 JSX」平均切层，也禁止把原组件完整搬进一个返回几十个字段的总 Controller。
 
 ## 三、目录归属与依赖
 
