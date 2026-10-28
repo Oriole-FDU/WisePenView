@@ -40,7 +40,7 @@ function assertObjectName(name) {
 // index.html 必须尽快拿到最新入口，但不能被浏览器长期缓存
 // 带 hash 的 assets 可以长期缓存，其它固定文件使用较短缓存时间
 function cacheControlFor(name) {
-  if (name === 'index.html') {
+  if (name === 'index.html' || name === 'build-info.json') {
     return 'no-cache, no-store, must-revalidate';
   }
   if (name.startsWith('assets/')) {

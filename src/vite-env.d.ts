@@ -2,6 +2,17 @@
 
 declare const __APP_VERSION__: string;
 
+interface AppBuildInfo {
+  version: string;
+  commit: string;
+  buildId: string;
+  mode: string;
+  release: string;
+  dirty: boolean;
+}
+
+declare const __APP_BUILD_INFO__: Readonly<AppBuildInfo>;
+
 interface ImportMetaEnv {
   // API 地址
   readonly VITE_API_BASE_URL: string;

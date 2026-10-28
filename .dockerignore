@@ -4,6 +4,8 @@
 .storybook
 .pnpm-store
 node_modules
+.wisepen-debug
+.wisepen-debug-artifacts.tar.gz
 release
 storybook-static
 .electron
