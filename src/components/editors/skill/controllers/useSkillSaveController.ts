@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSkillService } from '@/domains';
 import type { SkillDetail, UploadSkillAssetResult } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
+import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { SkillSaveQueueItem } from '../components/SkillSaveQueueDock/index.type';
@@ -127,6 +128,10 @@ export function useSkillSaveController({
           }
         );
       } catch (error) {
+        captureException(error, {
+          detector: 'application-handled',
+          operation: 'skill.save',
+        });
         onFileSaveFailed(snapshots);
         const errorMessage = parseErrorMessage(error);
         const snapshotKeys = new Set(snapshots.map((snapshot) => snapshot.editorKey));
@@ -142,6 +147,20 @@ export function useSkillSaveController({
 
       onFilesSaved(snapshots, results);
       const resultByKey = new Map(results.map((result) => [result.clientId, result]));
+      for (const snapshot of snapshots) {
+        const result = resultByKey.get(snapshot.editorKey);
+        if (result && !result.error) continue;
+        captureException(
+          result?.error ??
+            createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+              reason: 'Skill 保存结果缺失',
+            }),
+          {
+            detector: 'application-handled',
+            operation: 'skill.save',
+          }
+        );
+      }
       setExecutionItems((current) =>
         current.flatMap((item) => {
           const snapshot = snapshots.find((candidate) => candidate.editorKey === item.id);
