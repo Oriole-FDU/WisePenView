@@ -24,7 +24,7 @@
   box-sizing: border-box;
   width: min(100%, 1200px);
   max-height: 50vh;
-  margin: calc(var(--space-xs) + 32px + var(--space-2xs)) auto 0;
+  margin: calc(var(--space-xs) + var(--space-xl) + var(--space-2xs)) auto 0;
   padding: 0 var(--space-sm) var(--space-sm);
   overflow-x: scroll;
   overflow-y: auto;

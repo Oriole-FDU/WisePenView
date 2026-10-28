@@ -207,6 +207,84 @@ test('Table partial 不輸出 CSS，固定欄寬與直接 CSS token 可展開', 
   assert.match(css, /\.footer\s*\{\s*min-height: var\(--table-footer-row-height\);/);
 });
 
+test('Table token 集中于 shared，主题文件只保留颜色与通用 token', async () => {
+  const tableTokens = await readFile(
+    join(root, 'src/components/base/Table/shared/styles/tokens.css'),
+    'utf8'
+  );
+  for (const token of [
+    '--table-row-height',
+    '--table-footer-row-height',
+    '--table-gap',
+    '--table-shell-padding-inline',
+    '--table-shell-radius',
+    '--table-inner-radius',
+  ]) {
+    assert.match(tableTokens, new RegExp(`${token}\\s*:`), token);
+  }
+
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  assert.match(
+    globalIndex,
+    /@import '\.\.\/\.\.\/components\/base\/Table\/shared\/styles\/tokens\.css' layer\(base\);/
+  );
+
+  for (const file of ['layout.css', 'controls.css', 'effects.css', 'spacing.css', 'radius.css']) {
+    const source = await readFile(join(root, 'src/styles/theme', file), 'utf8');
+    assert.doesNotMatch(source, /--table-[\w-]+\s*:/, file);
+  }
+
+  const palette = await readFile(join(root, 'src/styles/theme/palette.css'), 'utf8');
+  for (const token of [
+    '--table-chrome-bg',
+    '--table-inner-border',
+    '--table-row-hover-bg',
+    '--table-row-selected-bg',
+    '--table-row-selected-hover-bg',
+  ]) {
+    assert.match(palette, new RegExp(`${token}\\s*:`), token);
+    assert.doesNotMatch(tableTokens, new RegExp(`${token}\\s*:`), token);
+  }
+});
+
+test('主题 token 按职责拆分，不再维护通用 tokens 文件', async () => {
+  const themeFiles = await readdir(join(root, 'src/styles/theme'));
+  assert.equal(themeFiles.includes('tokens.css'), false);
+
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  assert.doesNotMatch(globalIndex, /theme\/tokens\.css/);
+  for (const file of ['layout.css', 'controls.css', 'effects.css']) {
+    assert.match(globalIndex, new RegExp(`@import '\\.\\./theme/${file}' layer\\(base\\);`));
+  }
+
+  const [layout, controls, effects] = await Promise.all(
+    ['layout.css', 'controls.css', 'effects.css'].map((file) =>
+      readFile(join(root, 'src/styles/theme', file), 'utf8')
+    )
+  );
+  assert.match(layout, /--layout-workspace-split-header-height\s*:/);
+  assert.match(layout, /--chat-input-textarea-max-height\s*:/);
+  assert.match(controls, /--control-height\s*:/);
+  assert.match(controls, /--border-width\s*:/);
+  assert.match(effects, /--shadow-none\s*:/);
+  assert.match(effects, /--scrollbar-size\s*:/);
+});
+
+test('字体 token 只保留应用来源与 Tailwind 桥接', async () => {
+  const fonts = await readFile(join(root, 'src/styles/theme/fonts.css'), 'utf8');
+  assert.doesNotMatch(fonts, /--font-(?:sans|mono)\s*:/);
+
+  const globalIndex = await readFile(join(root, 'src/styles/global/index.css'), 'utf8');
+  assert.match(globalIndex, /--font-sans:\s*var\(--app-font-family\);/);
+  assert.match(globalIndex, /--font-mono:\s*var\(--app-font-mono\);/);
+
+  for (const file of await readdir(join(root, 'src'), { recursive: true })) {
+    if (!/\.(css|scss)$/.test(file)) continue;
+    const source = await readFile(join(root, 'src', file), 'utf8');
+    assert.doesNotMatch(source, /var\(--font-(?:sans|mono)\b/, file);
+  }
+});
+
 test('DataTable 工具栏保留主按钮标准配色与禁用态覆盖', async () => {
   const { code, modules } = await compileCssModule(
     'src/components/base/Table/DataTable/style.module.scss'
@@ -490,6 +568,20 @@ test('Drive、Group、Resource 保留各斷點的窄版佈局', async () => {
   }
 });
 
+test('TableDrive 在业务组件内生成专属布局 token', async () => {
+  const source = await readFile(
+    join(root, 'src/components/business/Drive/TableDrive/index.tsx'),
+    'utf8'
+  );
+  assert.match(source, /useViewportLayoutScale\(\)/);
+  assert.match(source, /'--table-drive-layout-max-height'\s*:/);
+  assert.match(source, /'--table-drive-detail-panel-width'\s*:/);
+  assert.match(source, /className=\{styles\.driveFrame\}\s+style=\{driveFrameCssVars\}/);
+
+  const layoutScale = await readFile(join(root, 'src/constants/layoutScale.ts'), 'utf8');
+  assert.doesNotMatch(layoutScale, /--table-drive-/);
+});
+
 test('Chat、Sidebar 業務樣式不殘留 Less，所有 Module 可編譯', async () => {
   for (const domain of ['Chat', 'Sidebar']) {
     const directory = join('src/components/business', domain);
@@ -728,6 +820,13 @@ test('Chat 輸入區與歡迎頁斷點、Sidebar 選取與收合狀態不變', a
     input.code,
     /@media \(max-width: 640px\) \{\s*\.container\s*\{\s*padding-inline: var\(--space-sm\);/
   );
+
+  const welcomeStarter = await readFile(
+    join(root, 'src/components/business/Chat/WelcomeConfigurable/Starter/style.module.scss'),
+    'utf8'
+  );
+  assert.doesNotMatch(welcomeStarter, /--table-control-min-height/);
+  assert.match(welcomeStarter, /min-height:\s*var\(--control-height\);/);
   const welcome = await compileCssModule(
     'src/components/business/Chat/WelcomeConfigurable/Starter/style.module.scss'
   );
@@ -855,11 +954,11 @@ test('其餘業務樣式保留禁用、唯讀、表單與錯誤頁間距', async
   );
   assert.match(
     shell.code,
-    /\.main\s*\{[^}]*padding: clamp\(32px, 6vh, 64px\) clamp\(16px, 4vw, 40px\);/
+    /\.main\s*\{[^}]*padding: clamp\(var\(--space-xl\), 6vh, 64px\) clamp\(16px, 4vw, 40px\);/
   );
   assert.match(
     shell.code,
-    /\.footerMini\s*\{[^}]*padding: var\(--space-md\) clamp\(16px, 4vw, 40px\) 24px;/
+    /\.footerMini\s*\{[^}]*padding: var\(--space-md\) clamp\(16px, 4vw, 40px\) var\(--space-lg\);/
   );
   for (const [key, width] of [
     ['sizeSm', 560],
@@ -1254,6 +1353,14 @@ for (const [script, valid, invalid] of [
       await mkdir(dirname(scriptPath), { recursive: true });
       await mkdir(dirname(stylePath), { recursive: true });
       await writeFile(scriptPath, await readFile(join(root, 'scripts', script)));
+      if (script === 'check-radius-tokens.mjs') {
+        const radiusTokenPath = join(workspace, 'src/styles/theme/radius.css');
+        await mkdir(dirname(radiusTokenPath), { recursive: true });
+        await writeFile(
+          radiusTokenPath,
+          ':root { --app-radius-field: 8px; --field-radius: var(--app-radius-field); }'
+        );
+      }
 
       for (const [declaration, status] of [
         [valid, 0],

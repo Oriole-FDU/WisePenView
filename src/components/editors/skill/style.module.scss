@@ -229,7 +229,7 @@
   min-width: 0;
   padding-inline: 7px;
   color: var(--muted);
-  font-family: var(--font-sans);
+  font-family: var(--app-font-family);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   line-height: 1.3;
@@ -256,7 +256,7 @@
   width: 100%;
   max-width: 1280px;
   margin: 0;
-  padding: 30px clamp(32px, 6%, 96px) 72px;
+  padding: 30px clamp(var(--space-xl), 6%, 96px) 72px;
 
   :global(table) {
     table-layout: fixed;
@@ -294,7 +294,7 @@
   align-content: start;
   gap: var(--space-sm);
   width: min(100%, 800px);
-  padding: 30px clamp(32px, 6%, 96px) 42px;
+  padding: 30px clamp(var(--space-xl), 6%, 96px) 42px;
   overflow: auto;
   @include scrollbar.appSubtleScrollbar();
 }

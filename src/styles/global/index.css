@@ -6,12 +6,19 @@
 @import '../theme/custom-accents.css' layer(base);
 @import '../theme/palette.css' layer(base);
 /* 与 HeroUI token 位于同一层，通过选择器明确覆盖主题。 */
-@import '../theme/tokens.css' layer(base);
+@import '../theme/layout.css' layer(base);
+@import '../theme/controls.css' layer(base);
+@import '../theme/effects.css' layer(base);
+@import '../theme/fonts.css' layer(base);
+@import '../theme/spacing.css' layer(base);
+@import '../theme/motion.css' layer(base);
 @import '../theme/z-index.css' layer(base);
 @import '../theme/radius.css' layer(base);
+@import '../../components/base/Table/shared/styles/tokens.css' layer(base);
 @import './heroui-overrides.css' layer(components);
 
 @theme inline {
+  /* Tailwind/HeroUI 字体名称桥接；项目样式直接使用 --app-font-*。 */
   --font-sans: var(--app-font-family);
   --font-mono: var(--app-font-mono);
 
@@ -325,31 +332,6 @@
 }
 
 :root {
-  --app-font-family:
-    'PingFang SC',
-    'Noto Sans SC Variable',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    Helvetica,
-    Arial,
-    'PingFang SC',
-    'Hiragino Sans GB',
-    'Microsoft YaHei',
-    '微软雅黑',
-    sans-serif,
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol',
-    'Noto Color Emoji';
-  --app-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   font-family: var(--app-font-family);
   font-size: var(--font-size-base, 14px);
   line-height: var(--line-height-base, 22px);

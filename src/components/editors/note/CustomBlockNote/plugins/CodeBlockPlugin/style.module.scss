@@ -23,7 +23,7 @@
   display: block;
   width: calc(100% + 40px);
   min-width: max-content;
-  margin: 0 -20px;
+  margin: 0 calc(0px - var(--space-md-plus));
 }
 
 .diffLine {

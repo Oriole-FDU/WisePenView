@@ -1,0 +1,19 @@
+/**
+ * 控件 token 集中在此文件，负责交互控件的高度、边框与禁用状态。
+ * 通用间距见 spacing.css，控件圆角见 radius.css。
+ */
+:root,
+.light,
+.dark,
+[data-theme='light'],
+[data-theme='dark'] {
+  --border-width: 1px;
+  --field-border-width: 0px;
+  --line-width: 1px;
+  --disabled-opacity: 0.5;
+  --cursor-interactive: pointer;
+  --control-height-sm: 28px;
+  --control-height-md: 36px;
+  --control-height: 36px;
+  --control-height-lg: 40px;
+}

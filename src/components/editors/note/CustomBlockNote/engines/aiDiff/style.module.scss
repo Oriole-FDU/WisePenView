@@ -264,7 +264,7 @@
 }
 
 .styledText code {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--app-font-mono);
 }
 
 /* 行内 hunk：保持 inline 流式（先删后增、长文上下换行），勿用 flex 以免整段变成左右两栏 */

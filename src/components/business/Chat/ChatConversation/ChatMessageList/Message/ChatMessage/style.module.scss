@@ -44,7 +44,7 @@
   max-width: min(100%, var(--chat-user-message-max-width, 520px));
   min-width: 0;
   margin-inline-start: auto;
-  padding-bottom: calc(32px + var(--space-xs));
+  padding-bottom: calc(var(--space-xl) + var(--space-xs));
 }
 
 .meta {
@@ -68,7 +68,7 @@
   flex-direction: column;
   gap: var(--space-xs);
   /* 文档流：正文与模型名左缘对齐（avatar 列之外） */
-  margin-inline-start: calc(var(--chat-avatar-size, 24px) + var(--space-sm));
+  margin-inline-start: calc(var(--chat-avatar-size, var(--space-lg)) + var(--space-sm));
 }
 
 .bubble {

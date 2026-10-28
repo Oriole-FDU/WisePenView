@@ -41,8 +41,7 @@
   flex: none;
   border-bottom: 1px solid var(--border-light);
   background: transparent;
-  transition: background-color
-    var(--transition-fast, var(--motion-duration-fast) var(--motion-ease-standard));
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .messageItem:hover {
@@ -171,8 +170,7 @@
   appearance: none;
   opacity: 0;
   pointer-events: none;
-  transition: opacity
-    var(--transition-fast, var(--motion-duration-fast) var(--motion-ease-standard));
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-standard);
 }
 
 .messageItem:hover .toggleDetail,

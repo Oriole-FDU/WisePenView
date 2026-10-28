@@ -125,14 +125,6 @@ export const DRIVE_PAGE_MIN_WIDTH = DRIVE_LAYOUT_MIN_WIDTH + 96;
 export const CHAT_FOOTER_SCROLL_OFFSET_NORMAL = 132;
 export const CHAT_FOOTER_SCROLL_OFFSET_SHORT = 100;
 
-/** App 业务页外边距：常规窗口对齐“我的小组”，短窗口收紧以保留内容区。 */
-export const APP_PAGE_PADDING_BLOCK_START_NORMAL = 24;
-export const APP_PAGE_PADDING_BLOCK_START_SHORT = 16;
-export const APP_PAGE_PADDING_BLOCK_END_NORMAL = 24;
-export const APP_PAGE_PADDING_BLOCK_END_SHORT = 16;
-export const APP_PAGE_PADDING_INLINE_NORMAL = 32;
-export const APP_PAGE_PADDING_INLINE_COMPACT = 24;
-
 /**
  * Electron 窗口最小宽
  */
@@ -213,57 +205,29 @@ export const getLayoutScaleCssVars = (
   const driveChrome = isShort
     ? DRIVE_LAYOUT_CHROME_HEIGHT_SHORT
     : DRIVE_LAYOUT_CHROME_HEIGHT_NORMAL;
-  const footerOffset = isShort ? CHAT_FOOTER_SCROLL_OFFSET_SHORT : CHAT_FOOTER_SCROLL_OFFSET_NORMAL;
 
   return {
     '--desktop-title-bar-height': `${DESKTOP_TITLE_BAR_HEIGHT}px`,
     '--desktop-title-bar-drag-strip': `${DESKTOP_TITLE_BAR_DRAG_STRIP}px`,
     '--desktop-window-controls-width': `${DESKTOP_WINDOW_CONTROLS_WIDTH}px`,
-    '--chat-panel-min-width': `${CHAT_PANEL_MIN_WIDTH}px`,
-    '--chat-full-width-min-width': `${CHAT_FULL_WIDTH_MIN_WIDTH}px`,
-    '--layout-sidebar-min-width': `${SIDEBAR_MIN_WIDTH}px`,
-    '--layout-sidebar-max-width': `${SIDEBAR_MAX_WIDTH}px`,
-    '--main-shell-drawer-max-width': `${MAIN_SHELL_DRAWER_MAX_WIDTH}px`,
     '--main-shell-drawer-width': `${MAIN_SHELL_DRAWER_WIDTH}px`,
-    '--main-sidebar-expanded-width': `${MAIN_SIDEBAR_EXPANDED_WIDTH}px`,
-    '--main-sidebar-rail-width': `${MAIN_SIDEBAR_RAIL_WIDTH}px`,
     '--main-shell-mobile-header-height': `${MAIN_SHELL_MOBILE_HEADER_MIN_HEIGHT}px`,
-    '--layout-sidebar-min-height': `${SIDEBAR_MIN_HEIGHT}px`,
     '--layout-sidebar-session-list-min-height': `${SIDEBAR_SESSION_LIST_MIN_HEIGHT}px`,
-    '--layout-window-min-height': `${WINDOW_MIN_HEIGHT}px`,
-    '--layout-main-min-width': `${MAIN_MIN_WIDTH}px`,
-    '--layout-app-main-min-width': `${APP_MAIN_MIN_WIDTH}px`,
-    '--layout-main-scroll-min-width': `${MAIN_SCROLL_MIN_WIDTH}px`,
     '--layout-note-editor-min-width': `${NOTE_EDITOR_MIN_WIDTH}px`,
-    '--layout-resource-main-min-width': `${RESOURCE_MAIN_MIN_WIDTH}px`,
-    '--layout-workspace-context-panel-min-width': `${WORKSPACE_CONTEXT_PANEL_MIN_WIDTH}px`,
     '--layout-workspace-split-header-height': `${WORKSPACE_SPLIT_HEADER_HEIGHT}px`,
-    '--layout-resize-handle-reserve': `${LAYOUT_RESIZE_HANDLE_RESERVE}px`,
     '--layout-note-outline-open-width': `${NOTE_OUTLINE_OPEN_WIDTH}px`,
     '--layout-note-outline-collapsed-width': `${NOTE_OUTLINE_COLLAPSED_WIDTH}px`,
-    '--layout-chat-panel-max-width': `${CHAT_PANEL_MAX_WIDTH}px`,
     '--layout-model-selector-max-width': `${MODEL_SELECTOR_LABEL_MAX_WIDTH}px`,
-    '--layout-compact-max-width': `${LAYOUT_COMPACT_MAX_WIDTH}px`,
-    '--layout-short-max-height': `${LAYOUT_SHORT_MAX_HEIGHT}px`,
     '--layout-drive-chrome-height': `${driveChrome}px`,
-    '--table-drive-layout-max-height': `calc(100dvh - ${driveChrome}px)`,
-    '--table-drive-detail-panel-width': `${DRIVE_DETAIL_PANEL_WIDTH}px`,
     '--layout-drive-table-min-width': `${DRIVE_TABLE_MIN_WIDTH}px`,
     '--layout-drive-layout-min-width': `${DRIVE_LAYOUT_MIN_WIDTH}px`,
     '--layout-drive-page-min-width': `${DRIVE_PAGE_MIN_WIDTH}px`,
-    '--layout-chat-footer-scroll-offset': `${footerOffset}px`,
-    '--app-page-padding-block-start': `${
-      isShort ? APP_PAGE_PADDING_BLOCK_START_SHORT : APP_PAGE_PADDING_BLOCK_START_NORMAL
-    }px`,
-    '--app-page-padding-block-end': `${
-      isShort ? APP_PAGE_PADDING_BLOCK_END_SHORT : APP_PAGE_PADDING_BLOCK_END_NORMAL
-    }px`,
-    '--app-page-padding-inline': `${
-      isCompact ? APP_PAGE_PADDING_INLINE_COMPACT : APP_PAGE_PADDING_INLINE_NORMAL
-    }px`,
+    '--app-page-padding-block-start': isShort ? 'var(--space-md)' : 'var(--space-lg)',
+    '--app-page-padding-block-end': isShort ? 'var(--space-md)' : 'var(--space-lg)',
+    '--app-page-padding-inline': isCompact ? 'var(--space-lg)' : 'var(--space-xl)',
     '--chat-input-textarea-max-height': isShort ? 'calc(6em + 16px)' : 'calc(16em + 16px)',
-    '--chat-input-card-padding-block': isShort ? '8px' : '12px',
-    '--chat-input-container-padding-block': isShort ? '4px' : '8px',
+    '--chat-input-card-padding-block': isShort ? 'var(--space-xs)' : 'var(--space-sm)',
+    '--chat-input-container-padding-block': isShort ? 'var(--space-2xs)' : 'var(--space-xs)',
     '--layout-welcome-title-size': isShort ? '1.5rem' : '2rem',
     '--layout-welcome-icon-size': isShort ? '2.75rem' : '3.75rem',
   };

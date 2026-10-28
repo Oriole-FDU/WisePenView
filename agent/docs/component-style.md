@@ -11,6 +11,12 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作為主題
 - 避免非必要内联样式。
 - 动态样式优先通过 className、CSS 变量或组件受控属性表达。
 - 全局样式分两份：`src/styles/global/index.css` 提供 token、排版与基础重置，应用和 Storybook 预览共用；桌面端外壳约束（`html`/`body` 占满视口、整页不滚动、`#root` 接管滚动与选区）放在 `src/styles/global/app-shell.css`，只有应用入口引入，否则 Storybook 预览与 Docs 页面会被裁掉且无法滚动。
+- 动画时长、缓动曲线和 reduced-motion 基准集中在 `src/styles/theme/motion.css`，组件只消费 `--motion-*` token。
+- 间距单位、`--space-*` 刻度和页面／输入区／表格间距集中在 `src/styles/theme/spacing.css`；`gap`、`margin`、`padding` 在数值命中公共刻度时必须消费对应 token。
+- 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则仍由 `src/styles/global/index.css` 消费这些变量。
+- Tailwind/HeroUI 的 `--font-sans`、`--font-mono` 只在 `@theme inline` 中做名称桥接；项目自有样式直接使用 `--app-font-family`、`--app-font-mono`，不得绕经第三方别名。
+- 布局尺寸、控件规格和阴影／滚动条效果分别集中在 `src/styles/theme/layout.css`、`controls.css` 和 `effects.css`；不再维护通用 `tokens.css` 杂项文件。
+- 通用 Table 的尺寸、间距和圆角别名集中在 `src/components/base/Table/shared/styles/tokens.css`；表格颜色继续由 `palette.css` 管理，Drive 专属布局 token 由 `TableDrive` 自己维护。
 
 推荐结构：
 
@@ -60,6 +66,19 @@ ComponentName/
 - 不要使用纯装饰性渐变球、光斑、无意义背景图。
 - 不要用 viewport 宽度直接缩放字体。
 
+间距按“基础单位 → 公共刻度 → 应用语义”组织，统一定义在 `src/styles/theme/spacing.css`：
+
+| 层级     | Token                                              | 使用范围                              |
+| -------- | -------------------------------------------------- | ------------------------------------- |
+| 基础单位 | `--spacing`                                        | Tailwind 与 HeroUI 的间距计算基准     |
+| 公共刻度 | `--space-3xs` 至 `--space-3xl`                     | `gap`、`margin`、`padding` 的通用间距 |
+| 应用语义 | `--app-page-padding-*`、`--chat-input-*-padding-*` | 页面、输入区和浮层的统一间距          |
+
+- `gap`、`margin`、`padding` 的数值命中公共刻度时必须引用 `var(--space-*)`，不得重复写 `2px`、`4px`、`8px`、`12px`、`16px`、`24px`、`32px` 等刻度值。
+- 局部光学修正、字符对齐或无法由公共刻度表达的组件布局常量可以保留字面量；同类场景重复出现时，应在 `spacing.css` 补充应用语义 token。
+- 运行时会覆盖的响应式间距应写入 token 引用，不直接写入 `8px`、`24px` 等固定值。
+- `pnpm check:spacing` 在 CI 拦截未定义的 `--space-*` 引用、错误的刻度定义位置，以及组件中硬编码公共刻度的间距声明。
+
 ## 六、圆角层级
 
 圆角按“8px 基准 → 基础圆角 → 应用圆角”单向定义，三层变量集中在 `src/styles/theme/radius.css`，其他 token 文件不再定义圆角；规范示例 story 放在 `src/styles/_stories/Radius.stories.tsx`。后续新增其他 token 家族时沿用同一形态（基准、刻度、应用语义三层，一处源头）。
@@ -83,7 +102,7 @@ ComponentName/
 | Modal        | `--app-radius-modal`                                         | 12px        | Modal、AlertDialog、FormDialog、DisplayDialog；`size="cover"` 仍是 12px 圆角，`size="full"` 保持直角 |
 | 圆形语义     | `--app-radius-pill` / `--app-radius-scrollbar`               | 999px       | 头像、状态点、胶囊标签与滚动条滑块                                                                   |
 
-表格域另有两个覆盖点：`--table-shell-radius` 指向内容容器圆角，`--table-inner-radius` 指向菜单项圆角，只做转接，不引入新数值。
+表格域的尺寸、间距和圆角别名位于 `src/components/base/Table/shared/styles/tokens.css`，其中 `--table-shell-radius` 指向内容容器圆角，`--table-inner-radius` 指向菜单项圆角。表格颜色 token 仍留在 `palette.css`，避免拆散 light/dark 色板。
 
 规则：
 
@@ -96,6 +115,7 @@ ComponentName/
 - 新增圆角先选择语义 token；语义 token 缺失时在 `src/styles/theme/radius.css` 的应用语义层补一个，再让组件引用。
 - 组件样式不得直接引用 `--radius-*`，也不得硬编码圆角数值；需要更大或更小的几何值时报给应用语义层处理。新增语义 token 时同步更新本节表格。
 - 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
+- HeroUI 字段圆角通过 `radius.css` 中的 `--field-radius: var(--app-radius-field)` 单向桥接，不得在组件侧重新建立第二套字段圆角来源。
 - `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.scss`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。守衛亦能辨識誤加的 Less，但 `check:styles` 會直接拒絕該來源。
 
 ## 七、层级（z-index）

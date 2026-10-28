@@ -336,7 +336,7 @@
   gap: var(--space-sm);
   box-sizing: border-box;
   width: 100%;
-  min-height: var(--table-control-min-height, 36px);
+  min-height: var(--control-height);
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--border-light);
   border-radius: var(--welcome-surface-radius);

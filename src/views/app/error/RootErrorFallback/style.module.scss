@@ -4,11 +4,11 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  padding: var(--space-xl) var(--space-lg);
   box-sizing: border-box;
   background: var(--surface);
   color: var(--foreground);
-  font-family: var(--font-sans, var(--app-font-family));
+  font-family: var(--app-font-family);
 }
 
 .content {

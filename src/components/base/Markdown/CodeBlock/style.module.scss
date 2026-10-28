@@ -53,7 +53,7 @@
 .pre {
   margin: 0;
   padding: var(--space-sm);
-  padding-top: calc(var(--space-xs) + 32px + var(--space-2xs));
+  padding-top: calc(var(--space-xs) + var(--space-xl) + var(--space-2xs));
   overflow: visible;
 
   :global(code) {

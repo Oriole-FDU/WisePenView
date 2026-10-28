@@ -44,8 +44,10 @@
   /* 具有明确圆形语义的元素。 */
   --app-radius-pill: var(--radius-full);
 
+  /* HeroUI 字段圆角桥接：第三方组件通过 --field-radius 消费应用语义。 */
+  --field-radius: var(--app-radius-field);
+
   /* 派生：嵌套浮层按外壳半径与内容 inset 计算内层半径，保持同心。 */
-  --app-popover-content-padding: var(--space-xs);
   --app-popover-item-inset: var(--app-radius-menu-item);
   --app-radius-popover-item: max(
     0px,
@@ -56,8 +58,4 @@
     calc(var(--app-radius-popover) - var(--app-popover-content-padding))
   );
   --app-radius-scrollbar: var(--scrollbar-radius);
-
-  /* 表格域别名：表格样式经此转接，不直接读取应用语义之外的刻度。 */
-  --table-shell-radius: var(--app-radius-content);
-  --table-inner-radius: var(--app-radius-menu-item);
 }
