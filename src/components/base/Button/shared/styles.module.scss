@@ -2,6 +2,12 @@
   border-radius: var(--app-radius-button);
 }
 
+/* 整行触发器承载稳定布局时，按压缩放会造成内容跳动，仅由显式 prop 启用。 */
+.root.disablePressScale:active,
+.root.disablePressScale[data-pressed='true'] {
+  transform: none;
+}
+
 .root:global(.button):is(:disabled, [aria-disabled='true']) {
   opacity: 1;
   transform: none;
