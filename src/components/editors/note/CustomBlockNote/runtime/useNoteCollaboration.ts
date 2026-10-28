@@ -38,7 +38,7 @@ export function useNoteCollaboration({
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：协作者身份或编辑器实例变化时更新远端光标用户信息。
+   * 执行时机：协作者身份或编辑器实例变化时更新远程光标用户信息。
    * 不可替代原因：yCursor 是编辑器扩展维护的外部可变对象，只提供命令式 updateUser。
    * cleanup：没有订阅或异步任务，无需清理。
    */

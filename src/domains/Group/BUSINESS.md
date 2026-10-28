@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文档维护小组类型、成员角色、资料读取、成员配额与建组流程。小组资源权限规则以 [Resource](../Resource/BUSINESS.md) 与 [Tag](../Tag/BUSINESS.md) 为唯一 owner；封面上传规则见 [Image](../Image/BUSINESS.md)。
+本文档维护小组类型、成员角色、数据读取、成员配额与建组流程。小组资源权限规则以 [Resource](../Resource/BUSINESS.md) 与 [Tag](../Tag/BUSINESS.md) 为唯一 owner；封面上传规则见 [Image](../Image/BUSINESS.md)。
 
 ## 类型、角色与读取
 

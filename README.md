@@ -25,7 +25,7 @@ pnpm install
 cp .env.development.example .env.development
 ```
 
-本地前端如需连接正式 API，可在临时 Vite 配置的 `server.proxy` 中增加 `/__production_api` 规则：目标设为 `https://api.wisepen.oriole.cn`，开启 `changeOrigin`、将 `cookieDomainRewrite` 设为空字符串，并移除转发路径中的 `/__production_api` 前缀。启动时将 `VITE_API_BASE_URL` 与 `VITE_API_BASE_URL_INTRANET` 都设为 `http://127.0.0.1:5173/__production_api`，再以 `production` 模式运行 `pnpm dev --config <临时配置文件>`。此代理仅供本机调试，不是仓库内建配置。
+本地前端如需连接正式 API，可在临时 Vite 配置的 `server.proxy` 中增加 `/__production_api` 规则：目标设为 `https://api.wisepen.oriole.cn`，开启 `changeOrigin`、将 `cookieDomainRewrite` 设为空字符串，并移除转发路径中的 `/__production_api` 前缀。启动时将 `VITE_API_BASE_URL` 与 `VITE_API_BASE_URL_INTRANET` 都设为 `http://127.0.0.1:5173/__production_api`，再以 `production` 模式运行 `pnpm dev --config <临时配置文件>`。此代理仅供本机调试，不是仓库内置配置。
 
 Mock 模式使用 `.env.mock`，生产构建使用 `.env.production`。
 
@@ -57,9 +57,9 @@ Jenkins 开启 `ENABLE_OTEL` 时会使用
 API origin 下的 `/otel`。实现、能力边界和验证方式见
 [`agent/docs/observability.md`](agent/docs/observability.md)。
 
-Mock 與正式環境共用 service、mapper、快取和 registry，只在 `@domain-apis` 替換 API 與 OSS I/O。模擬資料存於記憶體，重新整理後重置；API 契約變更時需同步更新 mock API。
+Mock 与正式环境共用 service、mapper、缓存和 registry，只在 `@domain-apis` 替换 API 与 OSS I/O。模拟数据存于内存，重新整理后重置；API 契约变更时需同步更新 mock API。
 
-Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 service 尚未提供的能力，在 mock 中也維持未開放狀態。Chat 串流、外部協作、Office 編輯與語音辨識不在此模擬範圍。
+Note AI Diff 与 PDF 使用本机展示数据。课程公告、作业等正式 service 尚未提供的能力，在 mock 中也维持未开放状态。Chat 流式传输、外部协作、Office 编辑与语音识别不在此模拟范围。
 
 ## 常用命令
 
@@ -70,7 +70,7 @@ Note AI Diff 與 PDF 使用本機展示資料。課程公告、作業等正式 s
 - `pnpm lint:fix`：自动整理导入、移除未使用的导入并修复可自动处理的问题
 - `pnpm format:check`：检查 JS、TS、JSON、Markdown 与 GitHub workflow 的格式
 - `pnpm typecheck`：执行 TypeScript 类型检查
-- `pnpm check:mock`：離線檢查 mock API 與正式 service 的跨領域讀寫，不啟動伺服器
+- `pnpm check:mock`：离线检查 mock API 与正式 service 的跨领域读写，不启动服务器
 - `pnpm check:api-contract`：离线检查统一 API response envelope 的运行期契约
 - `pnpm check:observability`：检查异常/HTTP 管线、隐私、预算和私有 source map 还原
 

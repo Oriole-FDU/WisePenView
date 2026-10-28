@@ -1,6 +1,6 @@
 import { IDENTITY } from '@/domains/User';
 
-/** 基本档案字段显隐配置，按 identityType 计算 */
+/** 基本资料字段显隐配置，按 identityType 计算 */
 export const getProfileFieldConfig = (identityType: number) => {
   const isStudent = identityType === IDENTITY.STUDENT;
   const isTeacher = identityType === IDENTITY.TEACHER;
@@ -26,7 +26,7 @@ export type ProfileFieldKey = keyof Omit<ProfileFieldConfig, 'showProfileSection
 
 export type ProfileFieldGroupKey = 'identity' | 'academic';
 
-/** 基本档案只读/编辑分组：身份信息与学业/任职信息 */
+/** 基本资料只读/编辑分组：身份信息与学业/任职信息 */
 export const PROFILE_FIELD_GROUPS: Array<{
   key: ProfileFieldGroupKey;
   titleKey: string;
@@ -52,7 +52,7 @@ export const PROFILE_FIELD_GROUPS: Array<{
   },
 ];
 
-/** 基本档案字段列表，顺序决定表单 grid 与只读列表展示顺序 */
+/** 基本资料字段列表，顺序决定表单 grid 与只读列表展示顺序 */
 export const PROFILE_FIELDS: Array<{
   key: ProfileFieldKey;
   labelKey: string;

@@ -4,7 +4,7 @@ import type { UserAccountProfile } from '@/domains/User';
 import { DEGREE, SEX } from '@/domains/User';
 import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
 
-/** 从完整用户信息中取出档案字段原始值；昵称/姓名在 userInfo，其余在 userProfile。 */
+/** 从完整用户信息中取出资料字段原始值；昵称/姓名在 userInfo，其余在 userProfile。 */
 function getProfileFieldValue(
   user: UserAccountProfile | null,
   key: ProfileFieldKey
@@ -20,7 +20,7 @@ export type ProfileFieldDisplay = {
 };
 
 /**
- * 基本档案只读展示：空值为「未填写」并标记 empty，性别/学历走枚举文案。
+ * 基本资料只读展示：空值为「未填写」并标记 empty，性别/学历走枚举文案。
  */
 export function getProfileFieldDisplay(
   user: UserAccountProfile | null,

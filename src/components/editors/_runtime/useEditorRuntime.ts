@@ -11,7 +11,7 @@ export function useEditorLoadState(state: EditorLoadState) {
   /**
    * @wisepen-manual-effect
    * 执行时机：入口请求状态提交后更新加载信息。
-   * 不可替代原因：加载入口与宿主位于不同子树，通过运行时订阅通信。
+   * 不可替代原因：加加载口与宿主位于不同子树，通过运行时订阅通信。
    * cleanup：入口与运行时一起卸载，加载信息随实例失效。
    */
   useEffect(() => {

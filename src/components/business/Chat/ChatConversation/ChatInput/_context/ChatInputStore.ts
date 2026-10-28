@@ -51,7 +51,7 @@ interface ChatInputCompletionState {
 }
 
 interface ChatInputState {
-  // 真正切換會話時遞增，讓舊輸入的非同步工作失效；草稿升級保留同一版本。
+  // 真正切换会话时递增，让旧输入的异步工作失效；草稿升级保留同一版本。
   sessionVersion: number;
   activeAttachments: LocalAttachmentPayload[];
   agentOpen: boolean;
@@ -290,7 +290,7 @@ export function createChatInputStore(): ChatInputStoreApi {
             }
 
             return {
-              // 草稿升級為正式會話時保留附件；真正切換會話時丟棄舊輸入與晚到的上傳。
+              // 草稿升级为正式会话时保留附件；真正切换会话时丢弃旧输入与晚到的上传。
               ...(!shouldPromoteDraft && {
                 sessionVersion: state.sessionVersion + 1,
                 value: '',

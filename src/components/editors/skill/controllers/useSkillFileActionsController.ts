@@ -138,7 +138,7 @@ export function useSkillFileActionsController({
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：选中可编辑远端文件且尚未加载正文时请求内容。
+   * 执行时机：选中可编辑远程文件且尚未加载正文时请求内容。
    * 不可替代原因：文件正文来自异步 Skill service，结果需要写回工作区基线。
    * cleanup：请求竞态由 useApi 管理，本层没有额外订阅需要清理。
    */

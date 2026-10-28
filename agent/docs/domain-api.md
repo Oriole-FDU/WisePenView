@@ -168,10 +168,10 @@ api -> views/components
 
 ## Mock API
 
-- `mock/*Api.mock.ts` 使用對應真實 API 的 `typeof` 型別約束方法、參數與回應。
-- fixture 採用 API DTO；前端映射、校驗、快取與跨 service 編排共用正式實作。
-- mock 記憶體資料僅模擬後端讀寫，重新整理頁面後重置。不同 API 操作同一份資源資料，避免各自維護副本。
-- 編輯器內容、PDF 預覽等展示 fixture 放在 view 的 mock 目錄，不塞入後端 DTO。
+- `mock/*Api.mock.ts` 使用对应真实 API 的 `typeof` 类型约束方法、参数与响应。
+- fixture 采用 API DTO；前端映射、校验、缓存与跨 service 编排共用正式实现。
+- mock 内存数据仅模拟后端读写，重新整理页面后重置。不同 API 操作同一份资源数据，避免各自维护副本。
+- 编辑器内容、PDF 预览等展示 fixture 放在 view 的 mock 目录，不塞入后端 DTO。
 
 ## 四、错误边界
 

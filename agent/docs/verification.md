@@ -27,19 +27,19 @@ PR CI 固定执行 commitlint、格式检查、lint、文件长度规则、edito
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
 
-全量 Less → SCSS 遷移另執行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比對遷移前後的有序編譯 CSS、完整 CSS Modules 匯出鍵與 composition。`pnpm check:styles` 使用 `node:test` 驗證共用 partial 無 CSS 輸出、Input field 狀態、AppBreadcrumb 匯出與通用字體 token、非 Table 基礎元件及 `_shadcn` 的 SCSS 編譯邊界、scrollbar 宣告不拆分父規則，以及試點元件樣式與 SCSS 守衛。Table 契約另涵蓋私有 partial 無輸出、直接消費全局排版與 `--table-*` token、兩種表格各精確生成 1–16 欄規則、共用類別匯出與 composition、Group 行高規則順序，以及 Table／F33 不跨元件預處理器引用私有樣式。建置與靜態比對不能代替已授權的視覺／互動驗收。
+全量 Less → SCSS 迁移另执行 `pnpm build:app --mode mock`、`pnpm build-storybook`、`git diff --check`，比对迁移前后的有序编译 CSS、完整 CSS Modules 导出键与 composition。`pnpm check:styles` 使用 `node:test` 验证共用 partial 无 CSS 输出、Input field 状态、AppBreadcrumb 导出与通用字体 token、非 Table 基础组件及 `_shadcn` 的 SCSS 编译边界、scrollbar 声明不拆分父规则，以及试点组件样式与 SCSS 守卫。Table 契约另涵盖私有 partial 无输出、直接消费全局排版与 `--table-*` token、两种表格各精确生成 1–16 栏规则、共用类别导出与 composition、Group 行高规则顺序，以及 Table／F33 不跨组件预处理器引用私有样式。建置与静态比对不能代替已授权的视觉／互动验收。
 
-Drive／Group／Resource 業務元件另檢查域內無 Less、所有 CSS Module 可編譯、scrollbar 與後續宣告維持同一父規則，以及 640／768／960px 斷點對應的窄版佈局。
+Drive／Group／Resource 业务组件另检查域内无 Less、所有 CSS Module 可编译、scrollbar 与后续声明维持同一父规则，以及 640／768／960px 断点对应的窄版布局。
 
-Chat／Sidebar 業務元件另檢查域內無 Less、歷史導覽精確生成 48→1 的延遲規則及其後的 reduced-motion 覆寫、重複選擇器優先級、父宣告與 scrollbar 規則順序、桌面拖拽／禁拖拽區與鍵盤焦點，以及輸入區 container query、640px 窄版和 Sidebar 選取／禁用／收合狀態。編譯輸出比對需逐一記錄等價差異，不得以全域宣告排序或規則合併掩蓋 cascade 變化。
+Chat／Sidebar 业务组件另检查域内无 Less、历史导览精确生成 48→1 的延迟规则及其后的 reduced-motion 覆写、重复选择器优先级、父声明与 scrollbar 规则顺序、桌面拖拽／禁拖拽区与键盘焦点，以及输入区 container query、640px 窄版和 Sidebar 选取／禁用／收合状态。编译输出比对需逐一记录等价差异，不得以全局声明排序或规则合并掩盖 cascade 变化。
 
-其餘業務元件另檢查整個 `components/business` 無 Less、所有剩餘 Module 可編譯、SelectedMemberList scrollbar 不拆分父規則、桌面窗口按鈕禁拖拽與焦點、UserSearchCombobox／RechargeModal 的 768／640px 斷點、禁用與唯讀狀態、表單與錯誤頁間距、CommandPalette 全域覆寫、Wallet 動畫及 InlineComment 重複規則順序；不藉遷移修補既有業務或樣式缺鍵。
+其余业务组件另检查整个 `components/business` 无 Less、所有剩余 Module 可编译、SelectedMemberList scrollbar 不拆分父规则、桌面窗口按钮禁拖拽与焦点、UserSearchCombobox／RechargeModal 的 768／640px 断点、禁用与唯读状态、表单与错误页间距、CommandPalette 全局覆写、Wallet 动画及 InlineComment 重复规则顺序；不藉迁移修补既有业务或样式缺键。
 
-agent／skill 編輯器另檢查域內無 Less、所有 Module 可編譯、七處 scrollbar 不拆分父規則、三組 768px 佈局、編輯區尺寸與預覽表格／圖片的全域選擇器、兩段 footer 宣告順序，以及資產拖入遮罩、prompt 選取／相容狀態、檔案樹焦點與待儲存佇列 resize／失敗／進度樣式。
+agent／skill 编辑器另检查域内无 Less、所有 Module 可编译、七处 scrollbar 不拆分父规则、三组 768px 布局、编辑区尺寸与预览表格／图片的全局选择器、两段 footer 声明顺序，以及资产拖入遮罩、prompt 选取／兼容状态、文件树焦点与待储存队列 resize／失败／进度样式。
 
-note、其餘編輯器／runtime、版型、頁面、bootstrap 與樣式 stories 檢查所有 Module 可編譯；另覆蓋 Note 五個本地 checklist mixin 的正文／拖拽預覽、十四處晚宣告 scrollbar、Auth 文字連結的 hover／鍵盤焦點、layout mixin 參數與宣告去重、桌面拖拽／禁拖拽邊界及 Tabs 軟焦點。Less 專屬語法以編譯輸出驗證；計算簡化、格式與獨立宣告位置的等價差異須逐項限定來源、選擇器、屬性、值、上下文與次數，不可寬泛排序或合併規則。
+note、其余编辑器／runtime、版型、页面、bootstrap 与样式 stories 检查所有 Module 可编译；另覆盖 Note 五个本地 checklist mixin 的正文／拖拽预览、十四处晚声明 scrollbar、Auth 文本链接的 hover／键盘焦点、layout mixin 参数与声明去重、桌面拖拽／禁拖拽边界及 Tabs 软焦点。Less 专属语法以编译输出验证；计算简化、格式与独立声明位置的等价差异须逐项限定来源、选择器、属性、值、上下文与次数，不可宽泛排序或合并规则。
 
-清零契約拒絕 `src`、Storybook 與 Electron 入口的 Less 檔案／樣式引用，以及任何直接 Less 相依；保留上游套件仍宣告的可選相依，不把它當作自有編譯入口。原生 CSS／主題 token 維持原用途。靜態契約不代表已驗證編輯、協作、拖拽、捲動或 resize 互動。
+清零契约拒绝 `src`、Storybook 与 Electron 入口的 Less 文件／样式引用，以及任何直接 Less 依赖；保留上游套件仍声明的可选依赖，不把它当作自有编译入口。原生 CSS／主题 token 维持原用途。静态契约不代表已验证编辑、协作、拖拽、卷动或 resize 互动。
 
 SCSS 迁移系列的依赖 PR 以具名迁移分支为 base 时，仍运行同一 `Code Quality & Build Gate`。系列全部合入后可单独清理临时分支触发配置。
 
