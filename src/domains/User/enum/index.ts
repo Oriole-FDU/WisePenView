@@ -10,10 +10,11 @@ export const IDENTITY = createEnum([
 
 /** 性别 */
 export const SEX = createEnum([
-  { value: 0, key: 'MALE', label: '男' },
-  { value: 1, key: 'FEMALE', label: '女' },
-  { value: 2, key: 'UNKNOWN', label: '未知' },
+  { value: 'MALE', key: 'MALE', label: '男' },
+  { value: 'FEMALE', key: 'FEMALE', label: '女' },
+  { value: 'UNKNOWN', key: 'UNKNOWN', label: '未知' },
 ] as const);
+export type Sex = EnumValue<typeof SEX>;
 
 /** 账号状态 */
 export const USER_STATUS = createEnum([
@@ -48,10 +49,10 @@ export type FeedbackType = EnumValue<typeof FEEDBACK_TYPE>;
 
 /** 学历层次（学生用） */
 export const DEGREE = createEnum([
-  { value: 0, key: 'UNKNOWN', label: '未知' },
-  { value: 1, key: 'UNDERGRADUATE', label: '本科' },
-  { value: 2, key: 'MASTER', label: '硕士' },
-  { value: 3, key: 'DOCTOR', label: '博士' },
+  { value: 'UNKNOWN', key: 'UNKNOWN', label: '未知' },
+  { value: 'UNDERGRADUATE', key: 'UNDERGRADUATE', label: '本科' },
+  { value: 'MASTER', key: 'MASTER', label: '硕士' },
+  { value: 'DOCTOR', key: 'DOCTOR', label: '博士' },
 ] as const);
 
 export type DegreeLevel = EnumValue<typeof DEGREE>;

@@ -29,6 +29,7 @@ try {
           UserSearchApiResponseSchema,
           UserSummaryApiSchema,
         } from '@/domains/User/apis/UserInformationApi.schema';
+        export { UserServicesMap } from '@/domains/User/mapper/UserServices.map';
       `,
       resolveDir: root,
     },
@@ -49,6 +50,7 @@ try {
     SearchUsersApiContract,
     SearchUsersApiRequestSchema,
     UserSearchApiResponseSchema,
+    UserServicesMap,
     UserSummaryApiSchema,
   } = await import(pathToFileURL(outfile).href);
 
@@ -118,6 +120,18 @@ try {
   assert(currentUserResult.success);
   assert.equal(currentUserResult.data.userInfo.identityType, 3);
   assert.equal(currentUserResult.data.readonlyFields, null);
+
+  const accountProfile = UserServicesMap.mapAccountProfileFromApi(currentUserResult.data);
+  assert.equal(accountProfile.userProfile.sex, 'MALE');
+  assert.equal(accountProfile.userProfile.degreeLevel, 'UNDERGRADUATE');
+
+  const { userProfilePayload } = UserServicesMap.mapUpdateUserInfoRequests({
+    sex: 'FEMALE',
+    degreeLevel: 'MASTER',
+  });
+  assert.equal(userProfilePayload.sex, 'FEMALE');
+  assert.equal(userProfilePayload.degreeLevel, 'MASTER');
+
   assert(
     !GetUserInfoApiResponseSchema.safeParse({
       ...mockCurrentUser,

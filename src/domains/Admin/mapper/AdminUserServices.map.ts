@@ -1,12 +1,8 @@
 import type { AdminUser } from '@/domains/Admin';
 import {
-  mapDegreeLevelToApi,
   mapIdentityTypeToApi,
-  mapSexToApi,
   mapUserStatusToApi,
-  normalizeDegreeLevelFromApi,
   normalizeIdentityTypeFromApi,
-  normalizeSexFromApi,
   normalizeUserStatusFromApi,
 } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
@@ -77,10 +73,9 @@ const mapGetAdminUserInfoFromApi = (
 ): GetAdminUserInfoResponse => ({
   userProfile: {
     ...data,
-    sex: data.sex == null ? undefined : normalizeSexFromApi(data.sex),
+    sex: data.sex ?? undefined,
     enrollmentYear: data.enrollmentYear == null ? undefined : String(data.enrollmentYear),
-    degreeLevel:
-      data.degreeLevel == null ? undefined : normalizeDegreeLevelFromApi(data.degreeLevel),
+    degreeLevel: data.degreeLevel ?? undefined,
   },
 });
 
@@ -99,16 +94,13 @@ const mapChangeAdminUserProfileRequest = (
   const payload: ChangeAdminUserProfileApiRequest = {
     userId: params.userId,
   };
-  const sex = mapSexToApi(params.sex);
-  const degreeLevel = mapDegreeLevelToApi(params.degreeLevel);
-
-  if (sex !== undefined) payload.sex = sex;
+  if (params.sex !== undefined) payload.sex = params.sex;
   if (params.university !== undefined) payload.university = params.university;
   if (params.college !== undefined) payload.college = params.college;
   if (params.major !== undefined) payload.major = params.major;
   if (params.className !== undefined) payload.className = params.className;
   if (Number.isInteger(enrollmentYear)) payload.enrollmentYear = enrollmentYear;
-  if (degreeLevel !== undefined) payload.degreeLevel = degreeLevel;
+  if (params.degreeLevel !== undefined) payload.degreeLevel = params.degreeLevel;
   if (params.academicTitle !== undefined) payload.academicTitle = params.academicTitle;
 
   return payload;

@@ -1,4 +1,4 @@
-import type { DegreeLevel, UserVerificationMode } from '../enum';
+import type { DegreeLevel, Sex, UserVerificationMode } from '../enum';
 
 // 只存储需要的用户字段；id 用 string 避免大数精度丢失
 export interface User {
@@ -43,7 +43,7 @@ export interface UserAccountInfo {
 }
 
 export interface UserProfileInfo {
-  sex?: number;
+  sex?: Sex;
   inviteCode?: string;
   university?: string | null;
   college?: string;

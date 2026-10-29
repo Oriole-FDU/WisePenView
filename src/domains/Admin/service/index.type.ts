@@ -1,4 +1,5 @@
 import type { AdminUser } from '@/domains/Admin';
+import type { DegreeLevel, Sex } from '@/domains/User';
 
 import type { AdminMessage } from '../entity/message';
 
@@ -50,13 +51,13 @@ export interface ChangeAdminUserInfoRequest {
 
 export interface ChangeAdminUserProfileRequest {
   userId: string;
-  sex?: number;
+  sex?: Sex;
   university?: string | null;
   college?: string;
   major?: string;
   className?: string;
   enrollmentYear?: string;
-  degreeLevel?: number;
+  degreeLevel?: DegreeLevel;
   academicTitle?: string;
 }
 

@@ -42,12 +42,10 @@ function getReadonlyInputValue(
   const value = getFieldValue(values, key);
   if (value == null || value === '') return '-';
   if (key === 'sex') {
-    const enumKey = SEX.getKey(Number(value));
-    return enumKey ? translateEnum(`enum.sex.${enumKey}`) : String(value);
+    return translateEnum(`enum.sex.${value}`);
   }
   if (key === 'degreeLevel') {
-    const enumKey = DEGREE.getKey(Number(value));
-    return enumKey ? translateEnum(`enum.degreeLevel.${enumKey}`) : String(value);
+    return translateEnum(`enum.degreeLevel.${value}`);
   }
   return String(value);
 }
@@ -108,9 +106,7 @@ function AccountForm({
         degreeLevel:
           fieldConfig.degreeLevel && !rf.has('degreeLevel')
             ? formValues.degreeLevel
-            : typeof user?.userProfile?.degreeLevel === 'number'
-              ? user.userProfile.degreeLevel
-              : undefined,
+            : (user?.userProfile?.degreeLevel ?? undefined),
         academicTitle:
           fieldConfig.academicTitle && !rf.has('academicTitle')
             ? formValues.academicTitle
@@ -132,7 +128,7 @@ function AccountForm({
     }
   );
 
-  const updateFormValue = (key: ProfileFieldKey, value: string | number | undefined) => {
+  const updateFormValue = (key: ProfileFieldKey, value: string | undefined) => {
     setFormDraft((prev) => ({
       user,
       values: { ...(prev?.user === user ? prev.values : userFormValues), [key]: value },
@@ -192,7 +188,7 @@ function AccountForm({
             onChange={(value) =>
               updateFormValue(
                 field.key,
-                value == null || Array.isArray(value) ? undefined : Number(value)
+                value == null || Array.isArray(value) ? undefined : String(value)
               )
             }
             className={styles.editableInput}

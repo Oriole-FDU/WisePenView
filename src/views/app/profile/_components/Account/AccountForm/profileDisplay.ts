@@ -1,14 +1,13 @@
 import type { TFunction } from 'i18next';
 
 import type { UserAccountProfile } from '@/domains/User';
-import { DEGREE, SEX } from '@/domains/User';
 import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
 
 /** 从完整用户信息中取出资料字段原始值；昵称/姓名在 userInfo，其余在 userProfile。 */
 function getProfileFieldValue(
   user: UserAccountProfile | null,
   key: ProfileFieldKey
-): string | number | null | undefined {
+): string | null | undefined {
   if (!user) return undefined;
   if (key === 'nickname' || key === 'realName') return user.userInfo[key] ?? undefined;
   return user.userProfile[key] ?? undefined;
@@ -32,16 +31,14 @@ export function getProfileFieldDisplay(
     return { value: t('form.emptyValue'), empty: true };
   }
   if (key === 'sex') {
-    const enumKey = SEX.getKey(raw as number);
     return {
-      value: enumKey ? t(`enum.sex.${enumKey}`) : String(raw),
+      value: t(`enum.sex.${raw}`),
       empty: false,
     };
   }
   if (key === 'degreeLevel') {
-    const enumKey = DEGREE.getKey(raw as number);
     return {
-      value: enumKey ? t(`enum.degreeLevel.${enumKey}`) : String(raw),
+      value: t(`enum.degreeLevel.${raw}`),
       empty: false,
     };
   }

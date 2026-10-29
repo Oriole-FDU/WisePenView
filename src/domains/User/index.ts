@@ -21,6 +21,7 @@ export type { TourCode, UserTourStatus } from './entity/userTour';
 export type {
   DegreeLevel,
   FeedbackType,
+  Sex,
   UserVerificationMode,
   UserVerificationProvider,
 } from './enum';
