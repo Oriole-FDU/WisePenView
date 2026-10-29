@@ -17,9 +17,6 @@ export function createEnum<const T extends readonly EnumConfigItem[]>(cfg: T) {
   const values = Object.fromEntries(cfg.map((item) => [item.key, item.value])) as {
     [K in T[number]['key']]: Extract<T[number], { key: K }>['value'];
   };
-  const configs = Object.fromEntries(cfg.map((item) => [item.value, item])) as {
-    [V in T[number]['value']]: Extract<T[number], { value: V }>;
-  };
   const optionByValue = new Map<unknown, T[number]>(cfg.map((item) => [item.value, item]));
 
   return {
@@ -33,8 +30,5 @@ export function createEnum<const T extends readonly EnumConfigItem[]>(cfg: T) {
 
     /** 判断值是否为合法枚举值 */
     isValue: (value: unknown): value is T[number]['value'] => optionByValue.has(value),
-
-    /** 完整配置：通过 Value 获取整行对象 */
-    configs,
   };
 }

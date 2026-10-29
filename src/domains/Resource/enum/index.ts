@@ -62,9 +62,7 @@ export type SearchResourceType = EnumValue<typeof SEARCH_RESOURCE_TYPE>;
 /** 后端 resourceType 大小写不敏感，统一归一化为小写枚举值，未知归 'unknown' */
 export const normalizeSearchResourceType = (raw: string): SearchResourceType => {
   const lower = raw.trim().toLowerCase();
-  return lower in SEARCH_RESOURCE_TYPE.configs
-    ? (lower as SearchResourceType)
-    : SEARCH_RESOURCE_TYPE.UNKNOWN;
+  return SEARCH_RESOURCE_TYPE.isValue(lower) ? lower : SEARCH_RESOURCE_TYPE.UNKNOWN;
 };
 
 export type ResourceSortBy = EnumValue<typeof RESOURCE_SORT_BY>;
@@ -136,16 +134,12 @@ export const getResourceActionImpliedActions = (action: ResourceAction): Resourc
 
 /** 将接口可能返回的枚举名（如 VIEW）或数字 code 解析为 ResourceAction */
 const coerceResourceActionItem = (item: unknown): ResourceAction | null => {
-  if (typeof item === 'number' && item in RESOURCE_ACTION.configs) {
-    return item as ResourceAction;
-  }
+  if (RESOURCE_ACTION.isValue(item)) return item;
   if (typeof item === 'string') {
     const byKey = RESOURCE_ACTION.options.find((option) => option.key === item)?.value;
     if (byKey !== undefined) return byKey as ResourceAction;
     const asNumber = Number(item);
-    if (!Number.isNaN(asNumber) && asNumber in RESOURCE_ACTION.configs) {
-      return asNumber as ResourceAction;
-    }
+    if (RESOURCE_ACTION.isValue(asNumber)) return asNumber;
   }
   return null;
 };
