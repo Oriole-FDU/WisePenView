@@ -4,7 +4,7 @@
  */
 
 import type { AccessControlScope, ResourceAction } from '@/domains/_shared/access';
-import type { TagMetaInfo, TagTreeNode, TagVisibilityModeString } from '@/domains/Tag';
+import type { TagMetaInfo, TagTreeNode } from '@/domains/Tag';
 
 /** TagService 接口：供依赖注入使用 */
 export interface ITagService {
@@ -40,9 +40,6 @@ export interface TagCreateRequest {
   tagIcon?: string;
   tagColor?: string;
   tagMetaInfo?: TagMetaInfo;
-  tagCreator?: string;
-  isPath?: boolean;
-  visibilityMode?: TagVisibilityModeString;
   taggedResourceAclGrantScope?: AccessControlScope;
   taggedResourceAclGrantSpecifiedUsers?: string[];
   tagMountPermissionScope?: AccessControlScope;
@@ -58,9 +55,6 @@ export interface TagUpdateRequest {
   tagIcon?: string;
   tagColor?: string;
   tagMetaInfo?: TagMetaInfo;
-  tagCreator?: string;
-  isPath?: boolean;
-  visibilityMode?: TagVisibilityModeString;
   taggedResourceAclGrantScope?: AccessControlScope;
   taggedResourceAclGrantSpecifiedUsers?: string[];
   tagMountPermissionScope?: AccessControlScope;

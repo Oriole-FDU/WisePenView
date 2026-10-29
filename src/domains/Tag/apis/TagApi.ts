@@ -1,35 +1,64 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
 import type {
   AddTagApiRequest,
+  AddTagApiResponse,
   ChangeTagApiRequest,
+  ChangeTagApiResponse,
+  GetGroupTagTreeApiRequest,
+  GetGroupTagTreeApiResponse,
+  GetPersonalTagTreeApiResponse,
   GetTagTreeApiRequest,
   GetTagTreeApiResponse,
   MoveTagsApiRequest,
+  MoveTagsApiResponse,
   RemoveTagsApiRequest,
-} from './TagApi.type';
+  RemoveTagsApiResponse,
+} from './TagApi.contract';
+import {
+  AddTagApiContract,
+  ChangeTagApiContract,
+  GetGroupTagTreeApiContract,
+  GetPersonalTagTreeApiContract,
+  GetTagTreeApiContract,
+  MoveTagsApiContract,
+  RemoveTagsApiContract,
+} from './TagApi.contract';
 
-function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> {
-  return apiGetUnchecked('/resource/tag/getTagTree', { params: req });
+async function getPersonalTagTree(): Promise<GetPersonalTagTreeApiResponse> {
+  return executeApiContract(GetPersonalTagTreeApiContract, undefined);
 }
 
-function addTag(req: AddTagApiRequest): Promise<string> {
-  return apiPostUnchecked('/resource/tag/addTag', req);
+async function getGroupTagTree(
+  req: GetGroupTagTreeApiRequest
+): Promise<GetGroupTagTreeApiResponse> {
+  return executeApiContract(GetGroupTagTreeApiContract, req);
 }
 
-function changeTag(req: ChangeTagApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/tag/changeTag', req);
+/** @deprecated 使用 getPersonalTagTree 或 getGroupTagTree。 */
+async function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> {
+  return executeApiContract(GetTagTreeApiContract, req ?? {});
 }
 
-function removeTags(req: RemoveTagsApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/tag/removeTags', req);
+async function addTag(req: AddTagApiRequest): Promise<AddTagApiResponse> {
+  return executeApiContract(AddTagApiContract, req);
 }
 
-function moveTags(req: MoveTagsApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/tag/moveTags', req);
+async function changeTag(req: ChangeTagApiRequest): Promise<ChangeTagApiResponse> {
+  return executeApiContract(ChangeTagApiContract, req);
+}
+
+async function removeTags(req: RemoveTagsApiRequest): Promise<RemoveTagsApiResponse> {
+  return executeApiContract(RemoveTagsApiContract, req);
+}
+
+async function moveTags(req: MoveTagsApiRequest): Promise<MoveTagsApiResponse> {
+  return executeApiContract(MoveTagsApiContract, req);
 }
 
 export const TagApi = {
+  getPersonalTagTree,
+  getGroupTagTree,
   getTagTree,
   addTag,
   changeTag,

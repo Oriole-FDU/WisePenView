@@ -8,6 +8,9 @@ export const JavaLongStringSchema = z.string().regex(/^-?\d+$/, '必须是 Java 
 /** 平台实体 ID 的 Java Long 形式，不允许前导负号或 0。 */
 export const JavaLongIdSchema = z.string().regex(/^[1-9]\d*$/, '必须是 Java Long 实体 ID 字符串');
 
+/** Java Long 实体 ID 列表，不接受 JavaScript number。 */
+export const JavaLongIdListSchema = z.array(JavaLongIdSchema);
+
 /** MongoDB ObjectId 的十六进制字符串形式。 */
 export const ObjectIdStringSchema = z
   .string()

@@ -7,23 +7,8 @@ import {
   type ResourceAction,
   updateResourceActionSelection,
 } from '@/domains/_shared/access';
-import type { EnumValue } from '@/utils/type/enum';
-import { defineEnum } from '@/utils/type/enum';
 
 export const TAG_META_SCHEMA = 'wisepen.tag-meta.v1';
-
-/** 与 OpenAPI 文档语义对应的别名，值为接口要求的字符串 */
-export const TAG_VISIBILITY_MODE = defineEnum({
-  ALL: '0',
-  ONLY_ADMIN: '1',
-  WHITELIST: '2',
-  BLACKLIST: '3',
-} as const);
-
-/** OpenAPI TagTreeResponse.visibilityMode / TagCreateRequest / TagUpdateRequest */
-export type TagVisibilityModeString = EnumValue<typeof TAG_VISIBILITY_MODE>;
-
-export type TagVisibilityMode = EnumValue<typeof TAG_VISIBILITY_MODE>;
 
 export type TagPermissionPresetKey = 'private' | 'readonly' | 'shared' | 'custom';
 type TagPermissionConcretePresetKey = Exclude<TagPermissionPresetKey, 'custom'>;

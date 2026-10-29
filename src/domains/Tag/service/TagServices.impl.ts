@@ -32,6 +32,18 @@ const buildFlatMap = (roots: TagTreeNode[]): Map<string, TagTreeNode> => {
   return map;
 };
 
+const buildGrantedActionsMap = (
+  roots: TagTreeNode[]
+): ReadonlyMap<string, TagTreeNode['grantedActions']> => {
+  const actionsByTagId = new Map<string, TagTreeNode['grantedActions']>();
+  const walk = (node: TagTreeNode) => {
+    actionsByTagId.set(node.tagId, node.grantedActions);
+    node.children?.forEach(walk);
+  };
+  roots.forEach(walk);
+  return actionsByTagId;
+};
+
 const filterHiddenTags = (nodes: TagTreeNode[]): TagTreeNode[] => {
   const filtered: TagTreeNode[] = [];
   for (const node of nodes) {
@@ -47,14 +59,16 @@ const filterHiddenTags = (nodes: TagTreeNode[]): TagTreeNode[] => {
 };
 
 const fetchTagTree = async (groupId?: string): Promise<TagTreeNode[]> => {
-  const params = TagServicesMap.mapGetTagTreeRequest(groupId);
-  const data = await TagApi.getTagTree(params);
+  const normalizedGroupId = normalizeTagGroupId(groupId);
+  const data = normalizedGroupId
+    ? await TagApi.getGroupTagTree({ groupId: normalizedGroupId })
+    : await TagApi.getPersonalTagTree();
   return TagServicesMap.mapTagTreeFromApi(data);
 };
 
 const getTagGrantedActions: ITagService['getTagGrantedActions'] = async (groupId) => {
   const roots = await fetchTagTree(groupId);
-  return TagServicesMap.mapTagGrantedActions(roots);
+  return buildGrantedActionsMap(roots);
 };
 
 export const createTagServices = (): ITagService => {
@@ -143,7 +157,7 @@ export const createTagServices = (): ITagService => {
     const payload = TagServicesMap.mapAddTagRequest(params);
     const data = await TagApi.addTag(payload);
     clearTagTreeCache(params.groupId);
-    return TagServicesMap.mapAddTagFromApi(data);
+    return data;
   };
 
   const removeTags = async (params: RemoveTagsRequest): Promise<void> => {
