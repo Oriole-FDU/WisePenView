@@ -1,15 +1,15 @@
+import {
+  parseResourceActions,
+  RESOURCE_ACTION,
+  resourceActionsInclude,
+} from '@/domains/_shared/access';
 import type {
   AddNoteApiRequest,
   GetNoteInfoApiResponse,
   ListNoteVersionsApiResponse,
   SaveDrawIoSnapshotApiRequest,
 } from '@/domains/Note/apis/NoteApi.type';
-import {
-  coerceResourceActions,
-  RESOURCE_ACTION,
-  resourceActionsInclude,
-  type ResourcePermissionOverview,
-} from '@/domains/Resource';
+import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
@@ -64,9 +64,7 @@ const mapAuthorDisplay = (
 const mapNoteInfoDisplayFromApi = (data: GetNoteInfoApiResponse): NoteInfoDisplayData => {
   const resourceInfo = ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo);
   const ownerId = normalizeId(resourceInfo.ownerId) || undefined;
-  const currentActions = coerceResourceActions(
-    resourceInfo.currentActions as unknown[] | undefined
-  );
+  const currentActions = parseResourceActions(resourceInfo.currentActions);
   const canCollaborativeEdit = resourceActionsInclude(currentActions, RESOURCE_ACTION.EDIT);
   const authorsDisplay = data.authorsDisplay ?? {};
   const authorIds =

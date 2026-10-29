@@ -2,7 +2,8 @@ import {
   areResourcePermissionActionsEqual,
   filterSupportedResourcePermissionActions,
   type ResourceAction,
-} from '../enum';
+} from '@/domains/_shared/access';
+
 import type {
   ResourcePermissionActionOption,
   ResourcePermissionGroupInfo,

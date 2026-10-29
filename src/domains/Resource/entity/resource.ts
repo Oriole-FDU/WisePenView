@@ -1,6 +1,6 @@
+import type { ResourceAction } from '@/domains/_shared/access';
 import type { UserDisplayBase } from '@/domains/User';
 
-import type { ResourceAction } from '../enum';
 /** Resource 领域模型 */
 
 /** 与后端 ResourceAccessRole 字面值一致 */

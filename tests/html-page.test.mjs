@@ -34,9 +34,9 @@ const resourceModule = await bundleModule(`
     resolveResourceViewer,
   } from '@/domains/Resource/model/resourceTarget';
   export {
-    getSupportedResourcePermissionActions,
     RESOURCE_ACTION,
-  } from '@/domains/Resource/enum';
+  } from '@/domains/_shared/access';
+  export { getSupportedResourcePermissionActions } from '@/domains/Resource';
   export { resolveEditorKind } from '@/components/editors/editorKind';
   export { buildHtmlDocument, buildHtmlPageCsp } from '@/components/editors/html/htmlDocument';
   export { isHtmlPageReady } from '@/domains/HtmlPage/service/index.type';

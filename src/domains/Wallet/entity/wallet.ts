@@ -6,15 +6,15 @@ import { defineEnum } from '@/utils/type/enum';
 
 /** 展示用分类（含小组划拨流水） */
 export const WALLET_TRANSACTION_KIND = defineEnum([
-  { value: 'REFILL', key: 'REFILL' },
-  { value: 'SPEND', key: 'SPEND' },
-  { value: 'TRANSFER_IN', key: 'TRANSFER_IN' },
-  { value: 'TRANSFER_OUT', key: 'TRANSFER_OUT' },
-  { value: 'INCOME', key: 'INCOME' },
-  { value: 'EXCHANGE', key: 'EXCHANGE' },
-  { value: 'REVERSE', key: 'REVERSE' },
-  { value: 'GIFT', key: 'GIFT' },
-  { value: 'ONLY_RECORD_META', key: 'ONLY_RECORD_META' },
+  'REFILL',
+  'SPEND',
+  'TRANSFER_IN',
+  'TRANSFER_OUT',
+  'INCOME',
+  'EXCHANGE',
+  'REVERSE',
+  'GIFT',
+  'ONLY_RECORD_META',
 ] as const);
 
 export type WalletTransactionKind = EnumValue<typeof WALLET_TRANSACTION_KIND>;

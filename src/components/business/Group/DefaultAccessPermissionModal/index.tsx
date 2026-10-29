@@ -7,12 +7,12 @@ import { AppButton } from '@/components/base/Button';
 import { Tabs } from '@/components/base/Tabs';
 import TagPermissionActionEditor from '@/components/business/Drive/PermissionActionEditor';
 import { useGroupService } from '@/domains';
-import type { GroupResConfig } from '@/domains/Group';
 import {
   ACCESS_CONTROL_SCOPE,
   normalizeResourceActions,
-  type TagResourceAction,
-} from '@/domains/Tag';
+  type ResourceAction,
+} from '@/domains/_shared/access';
+import type { GroupResConfig } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.scss';
@@ -40,6 +40,7 @@ const ACTION_LABEL_KEYS = {
   DOWNLOAD_ORIGINAL: 'permission.action.DOWNLOAD_ORIGINAL',
   FORK: 'permission.action.FORK',
   COMMENT: 'permission.action.COMMENT',
+  MARKET_VIEW: 'permission.action.MARKET_VIEW',
 } as const;
 
 const POLICY_SCOPE_OPTIONS = [
@@ -103,12 +104,12 @@ function GroupDefaultAccessPermissionModal({
 }: GroupDefaultAccessPermissionModalProps) {
   const { t } = useTranslation(['group', 'common']);
   const groupService = useGroupService();
-  const [selectedActions, setSelectedActions] = useState<TagResourceAction[]>(() =>
+  const [selectedActions, setSelectedActions] = useState<ResourceAction[]>(() =>
     normalizeResourceActions(groupResConfig.defaultMemberActions)
   );
 
   const { loading: saving, run: runSave } = useApi(
-    async (actions: TagResourceAction[]) => {
+    async (actions: ResourceAction[]) => {
       await groupService.updateGroupResConfig({
         groupId,
         defaultMemberActions: normalizeResourceActions(actions),
@@ -179,7 +180,7 @@ function GroupDefaultAccessPermissionModal({
                   strategy: t(STRATEGY_LABEL_KEYS[strategy.key]),
                   action,
                 }),
-              getActionLabel: (action) => t(ACTION_LABEL_KEYS[action.key]),
+              getActionLabel: (action) => t(ACTION_LABEL_KEYS[action]),
               getPresetLabel: (preset) => t(PRESET_LABEL_KEYS[preset]),
               toggleHeader: t('permission.enabledHeader'),
             }}

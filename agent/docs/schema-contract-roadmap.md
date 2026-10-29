@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核与 U UserInformation 已实施；其余业务接口的逐域迁移尚未开始。
+> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心与前端 `defineEnum` 枚举工具重构已实施；其余业务接口的逐域迁移尚未开始。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -92,16 +92,15 @@ flowchart TD
 
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef next fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-  class W completed
-  class A next
-  class U completed
+  class W,A,U completed
+  class G,T next
 ```
 
 当前 DAG 前沿：
 
-- 已完成：`W Shared Wire Schema`、`U UserInformation`。
-- 已解锁、可作为 Wave 1 并行启动：`A AccessPolicy`。
-- 仍被阻塞：`G Group` 与 `T Tag` 需要 `A + U`；`R ResourceCore` 还需要 `G + T`；其他叶域和聚合域继续沿 DAG 向后等待。
+- 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心。
+- 下一前沿：`G Group` 与 `T Tag`。
+- 仍被阻塞：`R ResourceCore` 还需要 `G + T`；其他叶域和聚合域继续沿 DAG 向后等待。
 
 关键约束：
 
@@ -194,7 +193,7 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 | Speech 请求体形状不一致                                                      | 后端接收 `{ provider, options }`；前端发送顶层 `{ eos_ms }`                                                                                               | 依赖 Pydantic 忽略未知字段与默认值，语义脆弱       | Contract 改为 `{ provider: 'IFLYTEK', options: { eos_ms } }`                                        |
 | Java 时间统一是毫秒数，前端大量声明为 string                                 | Cloud `JacksonConfiguration` 将 `LocalDateTime` 序列化为 epoch milliseconds                                                                               | Zod 一启用就会大面积失败；当前类型无法保护日期解析 | 分开定义 `EpochMillisSchema` 与 Python 的 `IsoDateTimeSchema`                                       |
 | GroupType / GroupRoleType / IdentityType 是数字，AccessControlScope 是字符串 | 后端 `@JsonValue` 不一致；前端类型混用 number/string                                                                                                      | 枚举漂移和 mapper 兼容逻辑长期存在                 | 逐枚举冻结 canonical wire value；不得用 number 或 string 的联合兜底                                 |
-| `ResourceAction` 缺少后端 `MARKET_VIEW`                                      | Cloud enum 有 `MARKET_VIEW(512)`，前端 enum 与解析器没有                                                                                                  | 市场来源权限被静默丢弃                             | 在 AccessPolicy 中补 `MARKET_VIEW`，Schema 严格枚举；mapper 不再丢未知动作                          |
+| `ResourceAction` 缺少后端 `MARKET_VIEW`                                      | Cloud enum 内部使用 `MARKET_VIEW(512)`，JSON 仍返回枚举名称；AccessPolicy 已补齐动作集合、Schema 与隐含动作                                               | 已在核心层修复，前端不再维护动作位掩码             | 后续 Contract 只使用 `ResourceActionSchema`，不接受数字动作或宽泛联合                               |
 | Course 缺少正式后端契约                                                      | 课程元数据塞在 Group JSON 字符串；创建课程由 Group、Tag、Group 更新三次请求完成；公告/作业返回 unavailable                                                | 无事务、无字段校验、无法稳定演进                   | 若课程是正式域，新增 Course API、DTO、Controller 和事务化命令                                       |
 | 查询/删除大量使用 POST                                                       | Agent/Skill/HtmlPage 的 get 使用 POST；多个 delete/remove 使用 POST                                                                                       | 缓存、幂等、可观测性和网关策略无法按 HTTP 语义工作 | 修 Schema 时保留兼容入口，同时新增语义化 v2 接口；不要只在前端把 POST 改名                          |
 
@@ -405,7 +404,7 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 ### 应保留但可显著缩小的 mapper
 
 - `AgentServicesMap.mapSpec`：当前大量 fallback 是因为 response 全 optional；后端保证完整默认 spec 后只保留领域命名差异。
-- `TagServicesMap`：权限 mask、字符串 JSON、枚举双重兼容是历史兼容层；后端稳定后可删掉 `coerceAccessControlScope`、mask fallback、老枚举分支。
+- `TagServicesMap`：只消费 `grantedActions` 集合，不读取 `taggedResourceGrantedActionsMask`；标签 metadata JSON 兼容仍保留。
 - `WalletServicesMap`：当前对 unknown 交易类型、金额、时间做兼容；数据迁移完成后改为枚举/数字直读。
 - `ChatServicesMap`：snake_case 到 camelCase、UI message 投影仍需 mapper；但不能再以 unknown 和静默丢弃承载契约错误。
 - `SkillServicesMap.mapSkillFilesFromApi`：目录树构建是真实领域转换，应保留。
@@ -502,16 +501,36 @@ API 方法最终只负责：
 
 禁止一个 `TimestampSchema` 同时接受 string、number、Date，否则类型漂移会被悄悄吞掉。
 
-### 3. Enum 单一事实源
+### 3. 枚举契约与前端 `defineEnum`
 
-为每个后端枚举建立 `z.enum([...])`，再在其上构建领域 enum 转换：
+前端枚举工具已经由 `createEnum` 统一重构为 [`defineEnum`](../../src/utils/type/enum.ts)。同一个函数按输入区分两种模式：
+
+```ts
+// 身份枚举：key 与 value 相同
+defineEnum(['DRAFT', 'PUBLISHED'] as const);
+
+// 映射枚举：前端 key -> 后端 wire value
+defineEnum({ STUDENT: 1, TEACHER: 2 } as const);
+```
+
+它的职责是收敛前端领域枚举值、有序选项和查询入口，不是替代 API 运行期校验：
+
+- 身份枚举只写一次字符串，不再重复声明 `key/value`；映射枚举才写对象。
+- 枚举结果统一提供只读 `key/value` 选项，不再承载静态展示文案或任意扩展字段。
+- 返回值直接暴露枚举属性（如 `RESOURCE_ACTION.VIEW`），同时提供有序的 `options`。
+- 通过 `getOption(value)` 获取完整枚举项，通过 `isValue(value)` 做收窄判断。
+- `EnumKey`、`EnumValue` 均从 `options` 推导；身份枚举直接使用 `EnumValue`，不再额外维护同义 `*Key` 类型。
+- 只有映射枚举需要区分 `EnumKey` 与 `EnumValue`，例如 `ROLE` 的 `OWNER` 对应数值 `0`。
+- 展示文案属于 i18n 或 view 映射，不再放回枚举定义。`defineEnum.isValue` 只检查当前前端配置中是否存在该值，不能替代带字段路径和错误诊断的 Zod 校验。
+
+每个后端枚举进入 Contract 时仍须建立精确的 `z.enum([...])`：
 
 - 数字 wire enum：IdentityType、GroupType、GroupRoleType。
 - 字符串 wire enum：UserStatus、Gender、DegreeLevel、MessageType、MessageDeliveryScope、AccessControlScope、FileOrganizationLogic。
-- ResourceAction 是字符串数组，必须包含 `MARKET_VIEW`。
+- ResourceAction 的领域值与请求名称统一使用字符串数组并包含 `MARKET_VIEW`；前端不读取或维护后端动作位掩码。
 - ResourceType 保留后端大写值，entity 再归一为小写或 ResourceKind。
 
-不能再用 `NumericEnumApiValue = number | string` 作为公共拖底。
+`defineEnum` 与 wire Schema 的 canonical value 必须保持一致；需要 key/value 转换时由领域 mapper 完成。不能因为 `defineEnum.isValue` 能接受 `unknown`，就重新引入 `NumericEnumApiValue = number | string` 作为接口公共拖底。
 
 ### 4. optional、nullable 与空 response
 
@@ -560,11 +579,22 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - 不在 Wave 0.5 合并或删除 `defineApiContract`、`executeApiContract`、`parseApiRequest/Response`、`isApiResponseEnvelope` 与 `parseApiErrorBody`；它们职责不同。
 - 静态审计确认当前 152 个领域 API 方法均被 service 调用，没有可立即删除的完全未使用方法。
 
+### Wave 0.6：前端枚举工具重构（已完成）
+
+- [x] 将 `createEnum` 重命名为 `defineEnum`，并迁移全部领域调用点。
+- [x] 将枚举项收敛为只读 `{ key, value }`，移除静态标签以及 `labels`、`values`、`configs` 等重复字典。
+- [x] 移除未使用的 `getKey`、`configs` 等重复查询入口，统一使用 `getOption`。
+- [x] 增加 `isValue` 类型守卫，替换可由枚举自身表达的临时判断。
+- [x] 从 `options` 统一推导 `EnumKey` 与 `EnumValue`，保留有序选项供 Select/Radio 消费。
+- [ ] 在后续逐域契约迁移中为对应枚举补精确 Zod Schema，并验证其 canonical value 与 `defineEnum` 一致。
+
 ### Wave 1：UserInformation + AccessPolicy
 
 - [x] UserSummary、UserDetail、UserSearch Schema 与 checked Contract。
 - [ ] AccountProfile CRUD 与 IdentityVerification Schema。
-- ResourceAction 与 AccessControlScope 从 Resource/Tag 提到独立 AccessPolicy。
+- [x] ResourceAction、AccessControlScope、动作依赖和通用权限选择规则从 Resource/Tag 提到独立 AccessPolicy。
+- [x] 补 `MARKET_VIEW`，区分完整动作集合与普通权限编辑器可配置动作。
+- [x] 提供严格的 `ResourceActionSchema` 与 `AccessControlScopeSchema`，前端权限只使用动作集合。
 - 修正 Long/Millis/枚举。
 - 迁移 Campus Identity 通用接口，冻结 deprecated Fudan API。
 
@@ -633,7 +663,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 7. **toggle 不进入新契约。** 点赞、收藏、解决状态等使用 desired-state 命令，保证重试幂等。
 8. **批量命令必须能表达部分失败。** 新批量接口返回每项 status/errorCode，不能只返回请求数量。
 9. **时间与 ID 分后端建型。** Java Long 字符串、Java millis、Python ISO 时间、Mongo ObjectId 不得混为一个 union。
-10. **枚举不做静默降级。** 未知枚举是契约事故；若必须灰度，在 mapper 中记录明确的兼容分支和退场条件。
+10. **枚举不做静默降级。** 未知枚举是契约事故；若必须灰度，在 mapper 中记录明确的兼容分支和退场条件。`defineEnum` 负责前端枚举定义与查询，Zod 仍是 API wire 的唯一运行期校验入口。
 11. **响应新增字段允许忽略，请求未知字段必须拒绝。** Request 严格对象，Response 普通对象。
 12. **SSE、文本、二进制有独立 Contract。** 不得绕过 Observability、错误归一化和安全检查直接使用裸 `fetch` 默认值。
 13. **DTO、entity、view model 三层不能互相穿透。** View/Controller 不读取 wire DTO；API 不读取 entity；mapper 不处理 React/UI。
@@ -662,6 +692,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - 跨域 dependency checker 禁止资源叶域反向 import ResourceAccess/Admin/Course 聚合器。
 - 新增聚合 endpoint 有调用次数、超时、部分失败和权限拒绝测试。
 - Chat SSE 对未知事件、坏 JSON、超限事件和断流有可观测失败，不静默丢弃。
+- 身份枚举不再重复声明 key/value；映射枚举的 value 与对应 wire enum 的 canonical value 一致，展示文案不进入共享枚举工具。
 - 文档同步更新 `domain-api.md`、`domain-mapper.md` 与对应 `BUSINESS.md`。
 
 ## 十二、需要业务确认的边界

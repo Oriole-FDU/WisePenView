@@ -1,15 +1,15 @@
 import type { TFunction } from 'i18next';
 import type { Key } from 'react';
 
-import { mapTagToFolderNode } from '@/domains/Drive';
-import type { GroupMember } from '@/domains/Group';
 import {
   ACCESS_CONTROL_SCOPE,
   type AccessControlScope,
   normalizeResourceActions,
-  type TagResourceAction,
-  type TagTreeNode,
-} from '@/domains/Tag';
+  type ResourceAction,
+} from '@/domains/_shared/access';
+import { mapTagToFolderNode } from '@/domains/Drive';
+import type { GroupMember } from '@/domains/Group';
+import type { TagTreeNode } from '@/domains/Tag';
 
 import {
   type DriveSelectionItem,
@@ -25,7 +25,7 @@ export type TagPermissionFormValues = {
   taggedResourceAclGrantSpecifiedUsers: string[];
   tagMountPermissionScope: AccessControlScope;
   tagMountSpecifiedUsers: string[];
-  grantedActions: TagResourceAction[];
+  grantedActions: ResourceAction[];
 };
 
 export interface PersonnelPolicyConfig {

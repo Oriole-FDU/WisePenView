@@ -1,17 +1,19 @@
 import {
   ACCESS_CONTROL_SCOPE,
   type AccessControlScope,
+  CONFIGURABLE_RESOURCE_ACTIONS,
+  normalizeResourceActions,
+  RESOURCE_ACTION,
+  type ResourceAction,
+} from '@/domains/_shared/access';
+import {
   getTagMountPermissionPresetValues,
   getTagPermissionPresetValues,
-  normalizeResourceActions,
   TAG_PERMISSION_LIST_ACTIONS,
-  TAG_RESOURCE_ACTION,
   type TagMountPermissionPresetKey,
   type TagMountPermissionPresetValues,
-  type TagPermissionListAction,
   type TagPermissionPresetKey,
   type TagPermissionPresetValues,
-  type TagResourceAction,
   type TagTreeNode,
 } from '@/domains/Tag';
 import i18n from '@/i18n';
@@ -37,7 +39,7 @@ export interface TagMountPermissionPresetOption {
 export interface TagPermissionResourceStrategy {
   key: TagPermissionResourceStrategyKey;
   label: string;
-  supportedActions: TagResourceAction[];
+  supportedActions: ResourceAction[];
 }
 
 export interface TagPermissionActionPresetOption {
@@ -47,15 +49,12 @@ export interface TagPermissionActionPresetOption {
 }
 
 export interface TagPermissionActionRow {
-  action: TagPermissionListAction;
-  key: string;
+  action: ResourceAction;
   label: string;
   supportedStrategyKeys: TagPermissionResourceStrategyKey[];
 }
 
-const ALL_RESOURCE_ACTIONS = TAG_RESOURCE_ACTION.options.map(
-  (item) => item.value as TagResourceAction
-);
+const ALL_RESOURCE_ACTIONS = CONFIGURABLE_RESOURCE_ACTIONS;
 
 export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[] = [
   {
@@ -64,12 +63,12 @@ export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[]
       return i18n.t('permission.tag.strategies.note', { ns: 'resource' });
     },
     supportedActions: [
-      TAG_RESOURCE_ACTION.DISCOVER,
-      TAG_RESOURCE_ACTION.VIEW,
-      TAG_RESOURCE_ACTION.EDIT,
-      TAG_RESOURCE_ACTION.INLINE_COMMENT,
-      TAG_RESOURCE_ACTION.FORK,
-      TAG_RESOURCE_ACTION.COMMENT,
+      RESOURCE_ACTION.DISCOVER,
+      RESOURCE_ACTION.VIEW,
+      RESOURCE_ACTION.EDIT,
+      RESOURCE_ACTION.INLINE_COMMENT,
+      RESOURCE_ACTION.FORK,
+      RESOURCE_ACTION.COMMENT,
     ],
   },
   {
@@ -77,7 +76,7 @@ export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[]
     get label() {
       return i18n.t('permission.tag.strategies.file', { ns: 'resource' });
     },
-    supportedActions: ALL_RESOURCE_ACTIONS.filter((action) => action !== TAG_RESOURCE_ACTION.LOAD),
+    supportedActions: ALL_RESOURCE_ACTIONS.filter((action) => action !== RESOURCE_ACTION.LOAD),
   },
   {
     key: 'drawio',
@@ -85,10 +84,10 @@ export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[]
       return i18n.t('permission.tag.strategies.drawio', { ns: 'resource' });
     },
     supportedActions: [
-      TAG_RESOURCE_ACTION.DISCOVER,
-      TAG_RESOURCE_ACTION.VIEW,
-      TAG_RESOURCE_ACTION.EDIT,
-      TAG_RESOURCE_ACTION.FORK,
+      RESOURCE_ACTION.DISCOVER,
+      RESOURCE_ACTION.VIEW,
+      RESOURCE_ACTION.EDIT,
+      RESOURCE_ACTION.FORK,
     ],
   },
   {
@@ -103,12 +102,11 @@ export const TAG_PERMISSION_RESOURCE_STRATEGIES: TagPermissionResourceStrategy[]
 export const TAG_PERMISSION_ACTION_ROWS: TagPermissionActionRow[] = TAG_PERMISSION_LIST_ACTIONS.map(
   (action) => ({
     action,
-    key: action.key,
     get label() {
-      return i18n.t(`permission.actions.${action.key}`, { ns: 'resource' });
+      return i18n.t(`permission.actions.${action}`, { ns: 'resource' });
     },
     supportedStrategyKeys: TAG_PERMISSION_RESOURCE_STRATEGIES.filter((strategy) =>
-      strategy.supportedActions.includes(action.action)
+      strategy.supportedActions.includes(action)
     ).map((strategy) => strategy.key),
   })
 );
@@ -174,12 +172,12 @@ export const TAG_PERMISSION_ACTION_PRESET_OPTIONS: TagPermissionActionPresetOpti
     values: preset.values,
   }));
 
-const createActionSet = (actions: TagResourceAction[] | undefined): Set<TagResourceAction> =>
+const createActionSet = (actions: ResourceAction[] | undefined): Set<ResourceAction> =>
   new Set(normalizeResourceActions(actions));
 
 const isSameActionSet = (
-  left: TagResourceAction[] | undefined,
-  right: TagResourceAction[] | undefined
+  left: ResourceAction[] | undefined,
+  right: ResourceAction[] | undefined
 ): boolean => {
   const leftSet = createActionSet(left);
   const rightSet = createActionSet(right);
@@ -188,7 +186,7 @@ const isSameActionSet = (
 };
 
 export const resolveTagPermissionActionPresetKey = (
-  actions: TagResourceAction[]
+  actions: ResourceAction[]
 ): Exclude<TagPermissionPresetKey, 'custom'> | 'custom' => {
   const matchedPreset = TAG_PERMISSION_ACTION_PRESET_OPTIONS.find((preset) =>
     isSameActionSet(preset.values.grantedActions, actions)

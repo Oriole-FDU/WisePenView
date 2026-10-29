@@ -19,8 +19,8 @@ try {
       contents: `
         export { getContextValue } from '@/domains/_registry/registry';
         export { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
+        export { RESOURCE_ACTION } from '@/domains/_shared/access';
         export { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
-        export { RESOURCE_ACTION } from '@/domains/Resource/enum';
       `,
       resolveDir: root,
     },

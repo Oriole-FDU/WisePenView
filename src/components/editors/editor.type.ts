@@ -2,8 +2,8 @@ import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import type { ChatHostAgentPort } from '@/components/business/Chat/index.type';
+import type { ResourceAction } from '@/domains/_shared/access';
 import type {
-  ResourceAction,
   ResourceIconType,
   ResourceItem,
   ResourcePermissionResourceType,

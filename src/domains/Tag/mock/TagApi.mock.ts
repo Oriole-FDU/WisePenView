@@ -5,10 +5,24 @@ import type { TagApi as TagApiContract } from '../apis/TagApi';
 import type { TagTreeApiResponse } from '../apis/TagApi.type';
 import mockdata from './mockdata.json';
 
-const trees: Record<string, TagTreeApiResponse[]> = structuredClone(mockdata) as Record<
-  string,
-  TagTreeApiResponse[]
->;
+type TagTreeMockNode = Omit<TagTreeApiResponse, 'children' | 'grantedActions'> & {
+  grantedActions?: TagTreeApiResponse['grantedActions'];
+  children?: TagTreeMockNode[];
+};
+
+const normalizeTagTree = (nodes: TagTreeMockNode[]): TagTreeApiResponse[] =>
+  nodes.map(({ children, grantedActions, ...node }) => ({
+    ...node,
+    grantedActions: grantedActions ?? [],
+    children: normalizeTagTree(children ?? []),
+  }));
+
+const trees: Record<string, TagTreeApiResponse[]> = Object.fromEntries(
+  Object.entries(structuredClone(mockdata)).map(([groupId, nodes]) => [
+    groupId,
+    normalizeTagTree(nodes as TagTreeMockNode[]),
+  ])
+);
 const roots = (groupId = '') => (trees[groupId] ??= []);
 const findTag = (nodes: TagTreeApiResponse[], id: string): TagTreeApiResponse | undefined => {
   for (const node of nodes) {
@@ -41,12 +55,16 @@ export const TagApi: typeof TagApiContract = {
       ...params,
       tagId,
       parentId: params.parentId ?? '0',
+      grantedActions: params.grantedActions ?? [],
       children: [],
     });
     return tagId;
   },
   changeTag: async ({ targetTagId, ...params }) => {
-    Object.assign(requireTag(targetTagId, params.groupId), params);
+    const tag = requireTag(targetTagId, params.groupId);
+    const { grantedActions, ...tagInfo } = params;
+    Object.assign(tag, tagInfo);
+    if (grantedActions !== undefined) tag.grantedActions = grantedActions;
   },
   removeTags: async ({ groupId, targetTagIds }) => {
     targetTagIds.forEach((id) => detach(roots(groupId), id));

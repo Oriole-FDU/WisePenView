@@ -7,8 +7,6 @@ export type {
 } from './entity/resource';
 export type { ResourceSkillSummary, SkillScopeType } from './entity/skill';
 export type {
-  ResourceAction,
-  ResourceActionKey,
   ResourceSortBy,
   ResourceSortDir,
   SearchResourceType,
@@ -16,26 +14,12 @@ export type {
   TagQueryLogicMode,
 } from './enum';
 export {
-  actionsToPermissionCode,
-  areResourcePermissionActionsEqual,
-  coerceResourceActions,
-  filterSupportedResourcePermissionActions,
-  getResourceActionImpliedActions,
-  getResourceActionImpliedMask,
   getSupportedResourcePermissionActions,
-  hasResourceAction,
-  normalizeResourceActions,
   normalizeSearchResourceType,
-  permissionCodeToActions,
-  RESOURCE_ACTION,
-  RESOURCE_PERMISSION_ACTION_ORDER,
   RESOURCE_SORT_BY,
   RESOURCE_SORT_DIR,
-  resourceActionsInclude,
-  resourceActionsToApiKeys,
   SEARCH_SCOPE,
   TAG_QUERY_LOGIC_MODE,
-  updateResourceActionSelection,
 } from './enum';
 export type {
   GetGroupResourceRequest,

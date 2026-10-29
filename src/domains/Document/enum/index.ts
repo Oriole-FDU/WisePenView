@@ -2,14 +2,14 @@ import { defineEnum } from '@/utils/type/enum';
 
 /** 文档处理状态（与后端 syncPendingDocStatus 返回的 status 字符串对齐） */
 export const DOCUMENT_PROCESS = defineEnum([
-  { value: 'UPLOADING', key: 'UPLOADING' },
-  { value: 'UPLOADED', key: 'UPLOADED' },
-  { value: 'CONVERTING_AND_PARSING', key: 'CONVERTING_AND_PARSING' },
-  { value: 'REGISTERING_RES', key: 'REGISTERING_RES' },
-  { value: 'READY', key: 'READY' },
-  { value: 'TRANSFER_TIMEOUT', key: 'TRANSFER_TIMEOUT' },
-  { value: 'REGISTERING_RES_TIMEOUT', key: 'REGISTERING_RES_TIMEOUT' },
-  { value: 'FAILED', key: 'FAILED' },
+  'UPLOADING',
+  'UPLOADED',
+  'CONVERTING_AND_PARSING',
+  'REGISTERING_RES',
+  'READY',
+  'TRANSFER_TIMEOUT',
+  'REGISTERING_RES_TIMEOUT',
+  'FAILED',
 ] as const);
 
 // 终态集合

@@ -1,14 +1,9 @@
 import {
   ACCESS_CONTROL_SCOPE,
   type AccessControlScope,
-  coerceResourceActions,
   normalizeResourceActions,
-  permissionCodeToActions,
-  resourceActionsToApiKeys,
-  TAG_VISIBILITY_MODE,
-  type TagResourceAction,
-  type TagVisibilityModeString,
-} from '@/domains/Tag';
+  parseResourceActions,
+} from '@/domains/_shared/access';
 import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 
@@ -19,6 +14,7 @@ import type {
   GetTagTreeApiResponse,
 } from '../apis/TagApi.type';
 import type { TagMetaInfo, TagTreeNode } from '../entity/tag';
+import { TAG_VISIBILITY_MODE, type TagVisibilityModeString } from '../enum';
 import type { TagCreateRequest, TagUpdateRequest } from '../service/index.type';
 
 const mapGetTagTreeRequest = (groupId?: string): GetTagTreeApiRequest | undefined => {
@@ -35,26 +31,6 @@ const isTagVisibilityModeString = (value: unknown): value is TagVisibilityModeSt
 
 const coerceAccessControlScope = (value: unknown): AccessControlScope | undefined =>
   ACCESS_CONTROL_SCOPE.isValue(value) ? value : undefined;
-
-const coercePermissionMask = (mask: unknown): number | undefined => {
-  if (typeof mask === 'number' && Number.isFinite(mask)) return mask;
-  if (typeof mask !== 'string') return undefined;
-  const parsed = Number(mask);
-  return Number.isFinite(parsed) ? parsed : undefined;
-};
-
-const mapGrantedActionsFromApi = (
-  actions: unknown,
-  grantedActionsMask: unknown
-): TagResourceAction[] | undefined => {
-  const mask = coercePermissionMask(grantedActionsMask);
-  if (Array.isArray(actions)) {
-    const resolvedActions = coerceResourceActions(actions);
-    if (resolvedActions.length > 0 || !mask) return resolvedActions;
-  }
-  if (mask === undefined) return undefined;
-  return normalizeResourceActions(permissionCodeToActions(mask));
-};
 
 const parseTagMetaInfo = (value: string | undefined): TagMetaInfo | undefined => {
   if (!value?.trim()) return undefined;
@@ -113,11 +89,7 @@ const mapTagTreeNodeFromApi = (node: GetTagTreeApiResponse[number]): TagTreeNode
     visibilityMode: normalizedVisibilityMode,
     taggedResourceAclGrantScope: coerceAccessControlScope(node.taggedResourceAclGrantScope),
     tagMountPermissionScope: coerceAccessControlScope(node.tagMountPermissionScope),
-    // fallback：兼容后端返回枚举名字符串、历史 number[] 或仅返回 mask 的 grantedActions
-    grantedActions: mapGrantedActionsFromApi(
-      node.grantedActions,
-      node.taggedResourceGrantedActionsMask
-    ),
+    grantedActions: parseResourceActions(node.grantedActions),
     children: node.children?.map(mapTagTreeNodeFromApi),
   };
 };
@@ -127,8 +99,8 @@ const mapTagTreeFromApi = (data: GetTagTreeApiResponse): TagTreeNode[] =>
 
 const mapTagGrantedActions = (
   roots: TagTreeNode[]
-): ReadonlyMap<string, TagResourceAction[] | undefined> => {
-  const actionsByTagId = new Map<string, TagResourceAction[] | undefined>();
+): ReadonlyMap<string, TagTreeNode['grantedActions']> => {
+  const actionsByTagId = new Map<string, TagTreeNode['grantedActions']>();
   const walk = (node: TagTreeNode) => {
     actionsByTagId.set(node.tagId, node.grantedActions);
     node.children?.forEach(walk);
@@ -140,13 +112,17 @@ const mapTagGrantedActions = (
 const mapAddTagRequest = (params: TagCreateRequest): AddTagApiRequest => ({
   ...params,
   tagMetaInfo: serializeTagMetaInfo(params.tagMetaInfo),
-  grantedActions: resourceActionsToApiKeys(params.grantedActions),
+  grantedActions: params.grantedActions
+    ? normalizeResourceActions(params.grantedActions)
+    : undefined,
 });
 
 const mapUpdateTagRequest = (params: TagUpdateRequest): ChangeTagApiRequest => ({
   ...params,
   tagMetaInfo: serializeTagMetaInfo(params.tagMetaInfo),
-  grantedActions: resourceActionsToApiKeys(params.grantedActions),
+  grantedActions: params.grantedActions
+    ? normalizeResourceActions(params.grantedActions)
+    : undefined,
 });
 
 const mapAddTagFromApi = (data: string): string => {

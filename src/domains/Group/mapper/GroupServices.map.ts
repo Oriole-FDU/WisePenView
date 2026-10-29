@@ -1,10 +1,10 @@
+import {
+  normalizeResourceActions,
+  parseResourceActions,
+  type ResourceAction,
+} from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
 import { GROUP_FILE_ORG_LOGIC, GROUP_TYPE, type GroupType, ROLE } from '@/domains/Group';
-import {
-  coerceResourceActions,
-  resourceActionsToApiKeys,
-  type TagResourceAction,
-} from '@/domains/Tag';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
@@ -105,8 +105,8 @@ const mapGroupFromApi = (raw: GroupApiResponse): Group => {
   };
 };
 
-const mapDefaultMemberActionsFromApi = (actions?: unknown[]): TagResourceAction[] =>
-  coerceResourceActions(actions);
+const mapDefaultMemberActionsFromApi = (actions?: unknown[]): ResourceAction[] =>
+  parseResourceActions(actions);
 
 const mapFetchGroupListRequest = (params: FetchGroupListRequest): ListGroupApiRequest => ({
   groupRoleFilter: params.groupRoleFilter,
@@ -167,7 +167,9 @@ const mapUpdateGroupResConfigRequest = (
 ): ChangeGroupConfigApiRequest => ({
   groupId: params.groupId,
   fileOrgLogic: GROUP_FILE_ORG_LOGIC.TAG,
-  defaultMemberActions: resourceActionsToApiKeys(params.defaultMemberActions),
+  defaultMemberActions: params.defaultMemberActions
+    ? normalizeResourceActions(params.defaultMemberActions)
+    : undefined,
 });
 
 const mapCreateGroupFromApi = (data: string | number): string => normalizeId(data);

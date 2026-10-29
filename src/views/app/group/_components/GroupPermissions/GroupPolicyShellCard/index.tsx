@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { Tabs } from '@/components/base/Tabs';
-import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
+import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
 
 import styles from '../style.module.scss';
 

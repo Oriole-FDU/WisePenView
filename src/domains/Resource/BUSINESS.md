@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文档维护资源位置、列表筛选和资源权限的跨页面规则。Drive 节点语义见 [Drive](../Drive/BUSINESS.md)，标签树与标签策略见 [Tag](../Tag/BUSINESS.md)，具体文档处理见 [Document](../Document/BUSINESS.md)。
+本文档维护资源位置、列表筛选和资源权限的跨页面规则。通用资源动作、动作依赖与访问范围以 [AccessPolicy](../_shared/access/BUSINESS.md) 为唯一 owner；Drive 节点语义见 [Drive](../Drive/BUSINESS.md)，标签树与标签策略见 [Tag](../Tag/BUSINESS.md)，具体文档处理见 [Document](../Document/BUSINESS.md)。
 
 ## 资源与位置
 
@@ -17,8 +17,9 @@
 ## 权限主体与继承
 
 - 权限主体分为 owner、标签继承（`tag`）、资源覆盖（`resourceOverride`）和指定用户（`specifiedUser`）。owner 在配置面板只读；`p_` 个人群组不显示为可配置的小组主体。依据：[mapResourcePermissionOverviewFromApi](mapper/resourcePermission.mapper.ts)。
-- 权限动作存在隐含关系，例如 EDIT 包含 VIEW 与 DISCOVER。配置面板还会按资源类型过滤动作；不能把 note、drawio、文档和 AI 资产视为完全相同的权限集合。后端请求发送枚举名称，不能发送前端数字位。依据：[权限动作与类型过滤](enum/index.ts)、[权限请求映射](mapper/resourcePermission.mapper.ts)。
-- `SINGLE_HTML_PAGE`（扩展名 `html`）归一化为 `html` 资源类型，仅支持 `DISCOVER / VIEW / EDIT`；下载、批注、评论、Fork 与 AI 装载动作不展示。其权限概览归 HtmlPage 领域所有，读取正文与保留交互脚本的安全边界见 [HtmlPage](../HtmlPage/BUSINESS.md)。依据：[资源类型归一化](model/resourceTarget.ts)、[权限动作过滤](enum/index.ts)、[权限服务装配](service/ResourcePermissionServices.impl.ts)。
+- 通用权限动作与隐含关系以 [AccessPolicy](../_shared/access/BUSINESS.md) 为准。配置面板按资源类型过滤动作；不能把 note、drawio、文档和 AI 资产视为完全相同的权限集合。后端请求发送枚举名称，不能发送前端数字位。依据：[权限动作与类型过滤](enum/permission.ts)、[权限请求映射](mapper/resourcePermission.mapper.ts)。
+- `MARKET_VIEW` 由市场授予并隐含 `DISCOVER`，参与权限判断，但不能出现在普通资源、标签或小组权限编辑器中。前端按动作名称集合处理，不读取后端位掩码。依据：[ResourceAction](../_shared/access/ResourceAction.ts)、[Tag 权限动作列表](../Tag/enum/index.ts)。
+- `SINGLE_HTML_PAGE`（扩展名 `html`）归一化为 `html` 资源类型，仅支持 `DISCOVER / VIEW / EDIT`；下载、批注、评论、Fork 与 AI 装载动作不展示。其权限概览归 HtmlPage 领域所有，读取正文与保留交互脚本的安全边界见 [HtmlPage](../HtmlPage/BUSINESS.md)。依据：[资源类型归一化](model/resourceTarget.ts)、[权限动作过滤](enum/permission.ts)、[权限服务装配](service/ResourcePermissionServices.impl.ts)。
 - 权限更新必须保留三类值：`undefined` 表示不提供该配置，顶层 `null` 表示清空该组配置，空对象与空动作数组保持原样传递；不能统一转成“空值”。小组覆盖项的 `null` 用于恢复标签继承，`[]` 保留为显式空动作。依据：[mapChangeResourceActionPermissionRequest](mapper/resourcePermission.mapper.ts)、[API 请求类型](apis/ResourceApi.type.ts)。
 - 从主体列表保存时，标签主体发送该小组的 `null` 覆盖项；owner 等只读主体与个人群组跳过。没有指定用户主体时发送 `specifiedUsersGrantedActions: null`，避免旧的指定用户配置残留。依据：[mapChangeResourceActionPermissionRequestFromSubjects](mapper/resourcePermission.mapper.ts)。
 - 权限补全是附加查询。小组资料或继承动作读取失败时，保留原主体与已有展示字段；没有补全结果不代表没有权限。已有资源覆盖与标签动作在当前资源的可支持动作集合内相等时，显示为标签继承。依据：[createResourcePermissionServices](service/ResourcePermissionServices.impl.ts)、[权限补全归并](mapper/resourcePermissionHydration.mapper.ts)。

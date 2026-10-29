@@ -1,5 +1,5 @@
-import type { JavaLongApiValue, NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
-import type { TagResourceActionKey } from '@/domains/Tag';
+import type { JavaLongApiValue, PageApiRequest, PageR } from '@/apis/api.type';
+import type { ResourceAction } from '@/domains/_shared/access';
 import type { UserDisplayBase } from '@/domains/User';
 import type { UserIdentityTypeApiValue } from '@/domains/User/apis/UserApi.type';
 
@@ -7,8 +7,7 @@ type GroupFileOrgLogicApiValue = 'FOLDER' | 'TAG';
 export type GroupTypeApiValue = 1 | 2 | 3;
 type GroupTypeApiRequestValue = 'NORMAL_GROUP' | 'ADVANCED_GROUP' | 'MARKET_GROUP';
 type GroupRoleApiValue = '0' | '1' | '2' | '-1';
-type GroupResourceActionApiValue = TagResourceActionKey | NumericEnumApiValue;
-type GroupResourceActionApiList = GroupResourceActionApiValue[];
+type GroupResourceActionApiList = ResourceAction[];
 
 export interface ListGroupApiRequest extends PageApiRequest {
   groupRoleFilter: 'ALL' | 'JOINED' | 'MANAGED';
@@ -74,7 +73,7 @@ export interface GetGroupConfigApiResponse {
 export interface ChangeGroupConfigApiRequest {
   groupId: string;
   fileOrgLogic: GroupFileOrgLogicApiValue;
-  defaultMemberActions?: TagResourceActionKey[];
+  defaultMemberActions?: ResourceAction[];
 }
 
 export interface JoinGroupApiRequest {

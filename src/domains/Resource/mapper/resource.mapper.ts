@@ -1,3 +1,4 @@
+import { parseResourceActions, type ResourceAction } from '@/domains/_shared/access';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
@@ -20,12 +21,7 @@ import type {
   UnmountResourcesToGroupApiRequest,
 } from '../apis/ResourcePlacementApi.type';
 import type { ResourceItem, ResourceTagBind } from '../entity/resource';
-import {
-  coerceResourceActions,
-  normalizeSearchResourceType,
-  type ResourceAction,
-  TAG_QUERY_LOGIC_MODE,
-} from '../enum';
+import { normalizeSearchResourceType, TAG_QUERY_LOGIC_MODE } from '../enum';
 import type {
   GetUserResourcesRequest,
   MountResourcesToGroupRequest,
@@ -193,7 +189,7 @@ const normalizeResourceActionMap = (
     .filter(isGrantedActionListItem)
     .map((item) => {
       const subjectId = getGrantedActionSubjectId(item);
-      return subjectId ? ([subjectId, coerceResourceActions(item.grantedActions)] as const) : null;
+      return subjectId ? ([subjectId, parseResourceActions(item.grantedActions)] as const) : null;
     })
     .filter((entry): entry is readonly [string, ResourceAction[]] => Boolean(entry));
   return entries.length > 0 ? Object.fromEntries(entries) : null;
@@ -215,7 +211,7 @@ export const mapResourceItemFromApi = (
     // 后端 resourceInfo.size 当前以字符串返回，前端统一归一化为 number。
     size: normalizeNonNegativeNumber(raw.size),
     tagBinds: mapResourceTagBindsFromApi(raw.tagBinds),
-    currentActions: coerceResourceActions(raw.currentActions),
+    currentActions: parseResourceActions(raw.currentActions),
     resourceAccessRole: raw.resourceAccessRole,
     overrideGrantedActions: normalizeResourceActionMap(raw.overrideGrantedActions),
     specifiedUsersGrantedActions: normalizeResourceActionMap(raw.specifiedUsersGrantedActions),

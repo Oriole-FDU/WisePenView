@@ -25,9 +25,11 @@ import { useResourcePermissionService, useResourceService, useTagService } from 
 import {
   areResourcePermissionActionsEqual,
   type ResourceAction,
+  updateResourceActionSelection,
+} from '@/domains/_shared/access';
+import {
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
-  updateResourceActionSelection,
 } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';

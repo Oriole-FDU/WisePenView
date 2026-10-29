@@ -1,18 +1,8 @@
 import type { JavaLongApiValue, NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
+import type { ResourceAction } from '@/domains/_shared/access';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
-export type ResourceActionApiKey =
-  | 'DISCOVER'
-  | 'VIEW'
-  | 'LOAD'
-  | 'EDIT'
-  | 'INLINE_COMMENT'
-  | 'DOWNLOAD_WATERMARK'
-  | 'DOWNLOAD_ORIGINAL'
-  | 'FORK'
-  | 'COMMENT';
-type ResourceActionApiValue = ResourceActionApiKey | NumericEnumApiValue;
-export type ResourceActionApiList = ResourceActionApiValue[];
+export type ResourceActionApiList = ResourceAction[];
 export interface ResourceInteractionInfoApiResponse {
   readCount?: JavaLongApiValue | null;
   likeCount?: JavaLongApiValue | null;
@@ -103,8 +93,8 @@ export interface RenameResourceApiRequest {
 
 export interface ChangeResourceActionPermissionApiRequest {
   resourceId: string;
-  overrideGrantedActions?: Record<string, ResourceActionApiKey[] | null> | null;
-  specifiedUsersGrantedActions?: Record<string, ResourceActionApiKey[]> | null;
+  overrideGrantedActions?: Record<string, ResourceAction[] | null> | null;
+  specifiedUsersGrantedActions?: Record<string, ResourceAction[]> | null;
 }
 
 export interface RemoveResourcesApiRequest {

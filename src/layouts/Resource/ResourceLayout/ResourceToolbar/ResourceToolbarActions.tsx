@@ -24,11 +24,8 @@ import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
 import type { EditorResourcePresentation } from '@/components/editors/editor.type';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
-import type {
-  ResourceAction,
-  ResourceItem,
-  ResourcePermissionResourceType,
-} from '@/domains/Resource';
+import type { ResourceAction } from '@/domains/_shared/access';
+import type { ResourceItem, ResourcePermissionResourceType } from '@/domains/Resource';
 
 import ResourceToolbarOperations, {
   type ResourceToolbarOperationHandlers,
