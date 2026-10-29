@@ -1,5 +1,6 @@
 import type { TagResourceAction } from '@/domains/Tag';
 import { TAG_PERMISSION_PRESET_VALUES } from '@/domains/Tag';
+import type { EnumValue } from '@/utils/type/enum';
 import { createEnum } from '@/utils/type/enum';
 
 /** 小组类型 */
@@ -8,6 +9,7 @@ export const GROUP_TYPE = createEnum([
   { value: 2, key: 'ADVANCED', label: '高级组' },
   { value: 3, key: 'PUBLIC', label: '集市组' },
 ] as const);
+export type GroupType = EnumValue<typeof GROUP_TYPE>;
 
 /** 当前用户与小组的关系筛选 */
 export const GROUP_ROLE_FILTER_MAP: Record<string, 'ALL' | 'JOINED' | 'MANAGED'> = {

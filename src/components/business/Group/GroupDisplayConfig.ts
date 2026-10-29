@@ -3,7 +3,7 @@
 // 注意：组长(OWNER)的权限修改和删除不被允许；配额单独用 editableRolesForQuota，组长可修改自己的配额
 // 注意：资源新建与标签管理是不同能力，不可复用 canCreateTag 作为总开关
 
-import type { ROLE } from '@/domains/Group';
+import type { GroupType, ROLE } from '@/domains/Group';
 import { GROUP_TYPE } from '@/domains/Group';
 import type { EnumKey } from '@/utils/type/enum';
 
@@ -14,7 +14,7 @@ export type EditableRole = Exclude<EnumKey<typeof ROLE>, 'OWNER'>;
 export type EditableRoleForQuota = EnumKey<typeof ROLE>;
 
 export interface GroupDisplayConfig {
-  groupType: number;
+  groupType: GroupType;
   userRole: EnumKey<typeof ROLE>;
   /** 表格列：是否展示姓名 */
   showRealName: boolean;
@@ -46,7 +46,7 @@ export interface GroupDisplayConfig {
   canInviteMember: boolean;
 }
 
-const GroupDisplayConfigs: Record<number, Record<EnumKey<typeof ROLE>, GroupDisplayConfig>> = {
+const GroupDisplayConfigs: Record<GroupType, Record<EnumKey<typeof ROLE>, GroupDisplayConfig>> = {
   [GROUP_TYPE.NORMAL]: {
     MEMBER: {
       groupType: GROUP_TYPE.NORMAL,
@@ -218,7 +218,7 @@ const GroupDisplayConfigs: Record<number, Record<EnumKey<typeof ROLE>, GroupDisp
 };
 
 export const getGroupDisplayConfig = (
-  groupType: number,
+  groupType: GroupType,
   userRole: GroupRole
 ): GroupDisplayConfig => {
   const config = GroupDisplayConfigs[groupType]?.[userRole];

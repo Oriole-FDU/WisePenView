@@ -1,3 +1,5 @@
+import type { GroupType } from '@/domains/Group';
+
 /** 小组配额信息（used/limit） */
 export interface GroupQuotaInfo {
   used: number;
@@ -7,7 +9,7 @@ export interface GroupQuotaInfo {
 export interface UserGroupQuota {
   groupId: string;
   groupName: string;
-  groupType: number;
+  groupType: GroupType;
   quotaLimit: number;
   quotaUsed: number;
 }

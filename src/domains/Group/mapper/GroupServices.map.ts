@@ -1,11 +1,12 @@
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
-import { GROUP_FILE_ORG_LOGIC, ROLE } from '@/domains/Group';
+import { GROUP_FILE_ORG_LOGIC, GROUP_TYPE, type GroupType, ROLE } from '@/domains/Group';
 import {
   coerceResourceActions,
   resourceActionsToApiKeys,
   type TagResourceAction,
 } from '@/domains/Tag';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import {
@@ -27,6 +28,7 @@ import type {
   GetGroupInfoApiRequest,
   GroupApiResponse,
   GroupRoleApiResponse,
+  GroupTypeApiValue,
   ListGroupApiRequest,
   ListGroupApiResponse,
   ListMemberApiRequest,
@@ -41,14 +43,17 @@ import type {
 } from '../service/index.type';
 import { mapGroupMemberFromApi } from './groupMember.mapper';
 
-const mapGroupTypeFromApi = (value: unknown): number => normalizeFiniteNumber(value) ?? 0;
+const mapGroupTypeFromApi = (value: GroupTypeApiValue | undefined): GroupType => {
+  if (value === GROUP_TYPE.NORMAL || value === GROUP_TYPE.ADVANCED || value === GROUP_TYPE.PUBLIC) {
+    return value;
+  }
+  throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+};
 
-const mapGroupTypeToApi = (value: number): string => String(value);
-
-const mapGroupTypeToListApi = (value?: number): ListGroupApiRequest['groupType'] | undefined => {
-  if (value === 1) return 'NORMAL_GROUP';
-  if (value === 2) return 'ADVANCED_GROUP';
-  if (value === 3) return 'MARKET_GROUP';
+const mapGroupTypeToListApi = (value?: GroupType): ListGroupApiRequest['groupType'] | undefined => {
+  if (value === GROUP_TYPE.NORMAL) return 'NORMAL_GROUP';
+  if (value === GROUP_TYPE.ADVANCED) return 'ADVANCED_GROUP';
+  if (value === GROUP_TYPE.PUBLIC) return 'MARKET_GROUP';
   return undefined;
 };
 
@@ -169,13 +174,11 @@ const mapCreateGroupFromApi = (data: string | number): string => normalizeId(dat
 
 const mapCreateGroupRequest = (params: CreateGroupRequest): AddGroupApiRequest => ({
   ...params,
-  groupType: mapGroupTypeToApi(params.groupType),
   groupMetaInfo: serializeGroupMetaInfo(params.groupMetaInfo),
 });
 
 const mapEditGroupRequest = (params: EditGroupRequest): ChangeGroupApiRequest => ({
   ...params,
-  groupType: mapGroupTypeToApi(params.groupType),
   groupMetaInfo: serializeGroupMetaInfo(params.groupMetaInfo),
 });
 

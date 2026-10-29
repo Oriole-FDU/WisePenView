@@ -1,4 +1,10 @@
-import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
+import type {
+  Group,
+  GroupBaseInfo,
+  GroupMemberList,
+  GroupResConfig,
+  GroupType,
+} from '@/domains/Group';
 import type { TagResourceAction } from '@/domains/Tag';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
@@ -48,7 +54,7 @@ export interface GetGroupWalletInfoRequest {
 /** 获取小组列表请求参数 */
 export interface FetchGroupListRequest {
   groupRoleFilter: GroupRoleFilter;
-  groupType?: number;
+  groupType?: GroupType;
   page: number;
   size: number;
 }
@@ -58,7 +64,7 @@ export type GroupRoleFilter = 'ALL' | 'JOINED' | 'MANAGED';
 /** 创建小组请求参数；基础字段与 OpenAPI addGroup 对齐 */
 export interface CreateGroupRequest {
   groupName: string;
-  groupType: number;
+  groupType: GroupType;
   groupDesc: string;
   groupCoverUrl?: string;
   groupMetaInfo?: Record<string, unknown>;
@@ -71,7 +77,7 @@ export interface EditGroupRequest {
   groupDesc: string;
   groupCoverUrl: string;
   groupMetaInfo?: Record<string, unknown>;
-  groupType: number;
+  groupType: GroupType;
 }
 
 /** 解散小组请求参数 */

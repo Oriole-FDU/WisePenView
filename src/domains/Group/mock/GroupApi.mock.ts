@@ -11,6 +11,7 @@ import type {
   GroupApiResponse,
   GroupMemberApiResponse,
   GroupRoleApiResponse,
+  GroupTypeApiValue,
 } from '../apis/GroupApi.type';
 import mockdata from './mockdata.json';
 
@@ -19,9 +20,14 @@ const normalizeLong = (value: string | number | null | undefined): string | unde
   return value.toString();
 };
 
+const normalizeGroupType = (value: number): GroupTypeApiValue => {
+  if (value === 1 || value === 2 || value === 3) return value;
+  throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+};
+
 const normalizeGroup = (group: (typeof mockdata.groups)[number]): GroupApiResponse => ({
   ...group,
-  groupType: Number(group.groupType) as GroupApiResponse['groupType'],
+  groupType: normalizeGroupType(group.groupType),
   ownerInfo: group.ownerInfo
     ? {
         ...group.ownerInfo,
@@ -90,7 +96,7 @@ export const GroupApi: typeof GroupApiContract = {
     groups.set(groupId, {
       ...params,
       groupId,
-      groupType: Number(params.groupType) as 1 | 2 | 3,
+      groupType: params.groupType,
       ownerId: '1',
       ownerInfo: { nickname: '示例用户', identityType: 2 },
       memberCount: '1',

@@ -8,6 +8,7 @@ export type {
   GroupResConfig,
 } from './entity/group';
 export type { GroupQuotaInfo, UserGroupQuota } from './entity/quota';
+export type { GroupType } from './enum';
 export {
   DEFAULT_MEMBER_ACTIONS,
   GROUP_FILE_ORG_LOGIC,
