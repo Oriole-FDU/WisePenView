@@ -1,0 +1,36 @@
+{
+  "checkedContracts": 6,
+  "uncheckedCalls": {
+    "src/domains/Admin/apis/AdminMessageApi.ts": 2,
+    "src/domains/Admin/apis/AdminUserApi.ts": 5,
+    "src/domains/Agent/apis/AgentApi.ts": 9,
+    "src/domains/Chat/apis/ChatApi.ts": 23,
+    "src/domains/Document/apis/DocumentApi.ts": 8,
+    "src/domains/Group/apis/GroupApi.ts": 17,
+    "src/domains/HtmlPage/apis/HtmlPageApi.ts": 1,
+    "src/domains/Image/apis/ImageApi.ts": 1,
+    "src/domains/InlineComment/apis/InlineCommentApi.ts": 8,
+    "src/domains/Interact/apis/CommentApi.ts": 6,
+    "src/domains/Interact/apis/FavoriteApi.ts": 7,
+    "src/domains/Interact/apis/InteractApi.ts": 4,
+    "src/domains/Message/apis/MessageApi.ts": 2,
+    "src/domains/Note/apis/NoteApi.ts": 6,
+    "src/domains/Resource/apis/ResourceApi.ts": 5,
+    "src/domains/Resource/apis/ResourcePlacementApi.ts": 6,
+    "src/domains/Skill/apis/SkillApi.ts": 10,
+    "src/domains/Speech/apis/SpeechApi.ts": 1,
+    "src/domains/Tag/apis/TagApi.ts": 5,
+    "src/domains/User/apis/UserApi.ts": 11,
+    "src/domains/User/apis/UserTaskApi.ts": 2,
+    "src/domains/User/apis/UserTourApi.ts": 2,
+    "src/domains/Wallet/apis/WalletApi.ts": 4
+  },
+  "specialTransports": {
+    "src/domains/HtmlPage/apis/HtmlPageApi.ts": {
+      "apiGetText": 1
+    }
+  },
+  "directFetches": {
+    "src/domains/Chat/session/useChatSession.ts": 1
+  }
+}

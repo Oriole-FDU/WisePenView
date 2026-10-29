@@ -3,11 +3,10 @@ import {
   type ApiContractResponse,
   defineApiContract,
 } from '@/apis/contract';
+import { EmptyApiRequestSchema, EmptyApiResponseSchema } from '@/apis/schema';
 
 import {
   ChangePasswordApiRequestSchema,
-  EmptyAuthApiRequestSchema,
-  EmptyAuthApiResponseSchema,
   LoginApiRequestSchema,
   LoginApiResponseSchema,
   NewPasswordApiRequestSchema,
@@ -17,44 +16,62 @@ import {
 
 export const LoginApiContract = defineApiContract({
   name: 'LoginApi',
+  method: 'POST',
   endpoint: '/auth/login',
+  requestPlacement: 'body',
+  transport: 'json',
   request: LoginApiRequestSchema,
   response: LoginApiResponseSchema,
 });
 
 export const LogoutApiContract = defineApiContract({
   name: 'LogoutApi',
+  method: 'POST',
   endpoint: '/auth/logout',
-  request: EmptyAuthApiRequestSchema,
-  response: EmptyAuthApiResponseSchema,
+  requestPlacement: 'none',
+  transport: 'json',
+  request: EmptyApiRequestSchema,
+  response: EmptyApiResponseSchema,
 });
 
 export const RegisterApiContract = defineApiContract({
   name: 'RegisterApi',
+  method: 'POST',
   endpoint: '/auth/register',
+  requestPlacement: 'body',
+  transport: 'json',
   request: RegisterApiRequestSchema,
-  response: EmptyAuthApiResponseSchema,
+  response: EmptyApiResponseSchema,
 });
 
 export const ResetPasswordEmailApiContract = defineApiContract({
   name: 'ResetPasswordEmailApi',
+  method: 'POST',
   endpoint: '/auth/sendResetMail',
+  requestPlacement: 'body',
+  transport: 'json',
   request: ResetPasswordApiRequestSchema,
-  response: EmptyAuthApiResponseSchema,
+  response: EmptyApiResponseSchema,
 });
 
 export const ResetPasswordApiContract = defineApiContract({
   name: 'ResetPasswordApi',
+  method: 'POST',
   endpoint: '/auth/resetPassword',
+  requestPlacement: 'body',
+  transport: 'json',
   request: NewPasswordApiRequestSchema,
-  response: EmptyAuthApiResponseSchema,
+  response: EmptyApiResponseSchema,
 });
 
 export const ChangePasswordApiContract = defineApiContract({
   name: 'ChangePasswordApi',
+  method: 'POST',
   endpoint: '/auth/changePassword',
+  requestPlacement: 'body',
+  transport: 'json',
   request: ChangePasswordApiRequestSchema,
-  response: EmptyAuthApiResponseSchema,
+  response: EmptyApiResponseSchema,
 });
 
 export type LoginApiRequest = ApiContractRequest<typeof LoginApiContract>;

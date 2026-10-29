@@ -13,6 +13,7 @@
 ## Domain 任务
 
 - `domain-api.md`：API 薄层、DTO 和请求边界。
+- `schema-contract-roadmap.md`：Zod Schema 建设 DAG、全接口处置矩阵、迁移波次与长期边界规约。
 - `domain-mapper.md`：按需映射、fallback、协议兼容和归一化。
 - `domain-service.md`：Service 编排、依赖注入和错误处理。
 - `domain-entity.md`：Entity、Enum、常量和类型边界。

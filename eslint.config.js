@@ -108,7 +108,7 @@ const domainMockImportPattern = {
 const apiRequestImportPattern = {
   group: ['@/apis/request', '**/apis/request'],
   message:
-    'apiGet/apiPost/apiPut/apiDelete 只能在 src/domains/<Domain>/apis 中使用；其它层请通过 useXxxService() 或 service 编排调用。',
+    'apiGet/apiPost/apiPut/apiPatch/apiDelete 只能在 src/domains/<Domain>/apis 或 src/apis/executeApiContract.ts 中使用；其它层请通过 useXxxService() 或 service 编排调用。',
 };
 
 const domainApiFunctionImportPattern = {
@@ -588,8 +588,17 @@ export default defineConfig([
     },
   },
   {
-    // Domain API 层是唯一允许调用 apiGet/apiPost/apiPut/apiDelete 的业务层。
+    // Domain API 层负责把 Contract 绑定到领域方法，不直接操作底层客户端。
     files: ['src/domains/*/apis/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': buildRestrictedImportsRule({
+        allowApiRequest: true,
+      }),
+    },
+  },
+  {
+    // Contract 统一调用器负责 transport 分发，业务 API 只绑定 Contract 与参数。
+    files: ['src/apis/executeApiContract.ts'],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({
         allowApiRequest: true,
