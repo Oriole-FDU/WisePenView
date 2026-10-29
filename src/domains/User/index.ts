@@ -26,7 +26,6 @@ export type {
 } from './enum';
 export {
   DEGREE,
-  EMAIL_SUFFIX,
   FEEDBACK_TYPE,
   IDENTITY,
   SEX,

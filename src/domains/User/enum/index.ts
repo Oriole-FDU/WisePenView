@@ -1,12 +1,6 @@
 import type { EnumValue } from '@/utils/type/enum';
 import { createEnum } from '@/utils/type/enum';
 
-/** 邮箱后缀类型（发起邮箱验证用）：0 -> @m.fudan.edu.cn；1 -> @fudan.edu.cn */
-export const EMAIL_SUFFIX = createEnum([
-  { value: 0, key: 'M_FUDAN', label: '@m.fudan.edu.cn' },
-  { value: 1, key: 'FUDAN', label: '@fudan.edu.cn' },
-] as const);
-
 /** 身份类型 */
 export const IDENTITY = createEnum([
   { value: 1, key: 'STUDENT', label: '学生' },
