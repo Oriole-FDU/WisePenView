@@ -40,6 +40,22 @@ src/domains/<Domain>/enum/index.ts
 
 若只是页面私有配置，放在 view 目录或组件同目录配置文件，不要提升到 domain。
 
+枚举定义按语义选择 `defineEnum` 的输入形式：
+
+- key 与 wire value 相同时使用字符串数组：
+
+  ```ts
+  export const USER_STATUS = defineEnum(['NORMAL', 'BANNED'] as const);
+  ```
+
+- 前端语义 key 与 wire value 不同，或后端值必须为数字时使用映射对象：
+
+  ```ts
+  export const ROLE = defineEnum({ OWNER: 0, ADMIN: 1, MEMBER: 2 } as const);
+  ```
+
+身份枚举只需要一个 `EnumValue` 类型；只有映射枚举才同时使用 `EnumKey` 和 `EnumValue`。
+
 ## 三、类型来源边界
 
 - 后端协议类型手写在同域 `apis/*Api.type.ts`，属于 API 层输入。

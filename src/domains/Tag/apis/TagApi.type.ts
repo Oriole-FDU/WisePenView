@@ -1,17 +1,7 @@
-import type { NumericEnumApiValue } from '@/apis/api.type';
+import type { ResourceAction } from '@/domains/_shared/access';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
 type TagAccessControlScopeApiValue = 'ALL' | 'ONLY_ADMIN' | 'WHITELIST' | 'BLACKLIST';
-type TagResourceActionApiKey =
-  | 'DISCOVER'
-  | 'VIEW'
-  | 'LOAD'
-  | 'EDIT'
-  | 'INLINE_COMMENT'
-  | 'DOWNLOAD_WATERMARK'
-  | 'DOWNLOAD_ORIGINAL'
-  | 'FORK'
-  | 'COMMENT';
 
 export interface AddTagApiRequest {
   groupId?: string;
@@ -28,7 +18,7 @@ export interface AddTagApiRequest {
   taggedResourceAclGrantSpecifiedUsers?: string[];
   tagMountPermissionScope?: TagAccessControlScopeApiValue;
   tagMountSpecifiedUsers?: string[];
-  grantedActions?: TagResourceActionApiKey[];
+  grantedActions?: ResourceAction[];
 }
 
 export interface ChangeTagApiRequest extends Omit<AddTagApiRequest, 'parentId' | 'tagName'> {
@@ -63,10 +53,9 @@ export interface TagTreeApiResponse {
   visibilityMode?: string;
   taggedResourceAclGrantScope?: TagAccessControlScopeApiValue;
   taggedResourceAclGrantSpecifiedUsers?: string[];
-  taggedResourceGrantedActionsMask?: number;
   tagMountPermissionScope?: TagAccessControlScopeApiValue;
   tagMountSpecifiedUsers?: string[];
-  grantedActions?: Array<TagResourceActionApiKey | NumericEnumApiValue>;
+  grantedActions: ResourceAction[];
   parentId?: string;
   children?: TagTreeApiResponse[];
 }

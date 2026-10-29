@@ -1,4 +1,5 @@
-import { coerceResourceActions, type ResourcePermissionOverview } from '@/domains/Resource';
+import { parseResourceActions } from '@/domains/_shared/access';
+import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
@@ -140,7 +141,7 @@ function mapSkillDetail(params: {
     updatedAt: '',
     creatorId: ownerId,
     ownerId,
-    currentActions: coerceResourceActions(resourceInfo?.currentActions),
+    currentActions: parseResourceActions(resourceInfo?.currentActions),
     fileCount: files.length,
     files,
     scopeType: 'PERSONAL',

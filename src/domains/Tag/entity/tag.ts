@@ -2,9 +2,10 @@
  * Tag 领域模型及组合类型
  */
 
+import type { AccessControlScope, ResourceAction } from '@/domains/_shared/access';
 import type { UserDisplayBase } from '@/domains/User';
 
-import type { AccessControlScope, TagResourceAction, TagVisibilityModeString } from '../enum';
+import type { TagVisibilityModeString } from '../enum';
 
 /** 后端以 JSON 字符串透传；前端保留未知字段，避免不同功能相互覆盖。 */
 export interface TagMetaInfo {
@@ -28,10 +29,9 @@ export interface TagTreeNode {
   visibilityMode?: TagVisibilityModeString;
   taggedResourceAclGrantScope?: AccessControlScope;
   taggedResourceAclGrantSpecifiedUsers?: string[];
-  taggedResourceGrantedActionsMask?: number;
   tagMountPermissionScope?: AccessControlScope;
   tagMountSpecifiedUsers?: string[];
-  grantedActions?: TagResourceAction[];
+  grantedActions: ResourceAction[];
   parentId?: string;
   children?: TagTreeNode[];
 }

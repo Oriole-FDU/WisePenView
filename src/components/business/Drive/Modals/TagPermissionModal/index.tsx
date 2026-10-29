@@ -18,7 +18,7 @@ import {
 } from '@/components/business/Drive/common/tagPermissionPreset';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import TagPermissionActionEditor from '@/components/business/Drive/PermissionActionEditor';
-import { ACCESS_CONTROL_SCOPE } from '@/domains/Tag';
+import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { TagMountPermissionModalProps, TagPermissionModalProps } from './index.type';
@@ -308,7 +308,7 @@ const TagPolicyModalBase = ({
           t('permission.tag.disabledAria', { strategy: strategy.label, action }),
         enabled: (strategy, action) =>
           t('permission.tag.enabledAria', { strategy: strategy.label, action }),
-        getActionLabel: (action) => t(`permission.actions.${action.key}`, { ns: 'resource' }),
+        getActionLabel: (action) => t(`permission.actions.${action}`, { ns: 'resource' }),
         getPresetLabel: (preset) =>
           TAG_PERMISSION_ACTION_PRESET_OPTIONS.find((item) => item.key === preset)?.label ?? preset,
         toggleHeader: t('permission.tag.toggleHeader'),

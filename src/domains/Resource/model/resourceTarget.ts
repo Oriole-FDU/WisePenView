@@ -1,26 +1,26 @@
 import type { EnumValue } from '@/utils/type/enum';
 import { defineEnum } from '@/utils/type/enum';
 
-export const RESOURCE_KIND = defineEnum([
-  { value: 'note', key: 'NOTE' },
-  { value: 'drawio', key: 'DRAWIO' },
-  { value: 'file', key: 'FILE' },
-  { value: 'skill', key: 'SKILL' },
-  { value: 'agent', key: 'AGENT' },
-  { value: 'html', key: 'HTML' },
-] as const);
+export const RESOURCE_KIND = defineEnum({
+  NOTE: 'note',
+  DRAWIO: 'drawio',
+  FILE: 'file',
+  SKILL: 'skill',
+  AGENT: 'agent',
+  HTML: 'html',
+} as const);
 
 export type ResourceKind = EnumValue<typeof RESOURCE_KIND>;
 
-export const RESOURCE_VIEWER = defineEnum([
-  { value: 'office', key: 'OFFICE' },
-  { value: 'pdfPreview', key: 'PDF_PREVIEW' },
-  { value: 'note', key: 'NOTE' },
-  { value: 'drawio', key: 'DRAWIO' },
-  { value: 'skill', key: 'SKILL' },
-  { value: 'agent', key: 'AGENT' },
-  { value: 'html', key: 'HTML' },
-] as const);
+export const RESOURCE_VIEWER = defineEnum({
+  OFFICE: 'office',
+  PDF_PREVIEW: 'pdfPreview',
+  NOTE: 'note',
+  DRAWIO: 'drawio',
+  SKILL: 'skill',
+  AGENT: 'agent',
+  HTML: 'html',
+} as const);
 
 export type ResourceViewer = EnumValue<typeof RESOURCE_VIEWER>;
 

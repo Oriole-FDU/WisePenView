@@ -4,24 +4,15 @@ import { defineEnum } from '@/utils/type/enum';
 /**
  * 钱包展示主体（仅前端区分个人 / 小组 Tab，接口统一走 /user/wallet）。
  */
-export const WALLET_TARGET_TYPE = defineEnum([
-  { value: 'USER', key: 'USER' },
-  { value: 'GROUP', key: 'GROUP' },
-] as const);
+export const WALLET_TARGET_TYPE = defineEnum(['USER', 'GROUP'] as const);
 export type WalletTargetType = EnumValue<typeof WALLET_TARGET_TYPE>;
 
 /**
  * listTransactions 可选 walletBusinessType。
  */
-export const WALLET_BUSINESS_TYPE = defineEnum([
-  { value: 'TOKEN', key: 'TOKEN' },
-  { value: 'COIN', key: 'COIN' },
-] as const);
+export const WALLET_BUSINESS_TYPE = defineEnum(['TOKEN', 'COIN'] as const);
 export type WalletBusinessType = EnumValue<typeof WALLET_BUSINESS_TYPE>;
 
 /** Owner<->Group 划拨：GROUP_INFLOW 转入小组，USER_INFLOW 转回组长 */
-export const WALLET_TOKEN_TRANSFER_TYPE = defineEnum([
-  { value: 'GROUP_INFLOW', key: 'GROUP_INFLOW' },
-  { value: 'USER_INFLOW', key: 'USER_INFLOW' },
-] as const);
+export const WALLET_TOKEN_TRANSFER_TYPE = defineEnum(['GROUP_INFLOW', 'USER_INFLOW'] as const);
 export type WalletTokenTransferType = EnumValue<typeof WALLET_TOKEN_TRANSFER_TYPE>;

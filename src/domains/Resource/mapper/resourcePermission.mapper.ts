@@ -1,3 +1,10 @@
+import {
+  filterSupportedResourcePermissionActions,
+  normalizeResourceActions,
+  RESOURCE_ACTION,
+  RESOURCE_PERMISSION_ACTION_ORDER,
+  type ResourceAction,
+} from '@/domains/_shared/access';
 import type { UserDisplayBase } from '@/domains/User';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
@@ -7,16 +14,7 @@ import type {
   ResourceGroupDisplayBaseApiResponse,
   ResourceItemApiResponse,
 } from '../apis/ResourceApi.type';
-import {
-  filterSupportedResourcePermissionActions,
-  getSupportedResourcePermissionActions,
-  normalizeResourceActions,
-  RESOURCE_ACTION,
-  RESOURCE_PERMISSION_ACTION_ORDER,
-  type ResourceAction,
-  type ResourceActionKey,
-  resourceActionsToApiKeys,
-} from '../enum';
+import { getSupportedResourcePermissionActions } from '../enum';
 import type {
   ResourcePermissionActionOption,
   ResourcePermissionOverview,
@@ -78,9 +76,9 @@ const mapSpecifiedUsersGrantedActionsToApi = (
     return undefined;
   }
 
-  const byUserId: Record<string, ResourceActionKey[]> = {};
+  const byUserId: Record<string, ResourceAction[]> = {};
   for (const userId in value) {
-    byUserId[userId] = resourceActionsToApiKeys(value[userId]) ?? [];
+    byUserId[userId] = normalizeResourceActions(value[userId]);
   }
   return byUserId;
 };
@@ -96,10 +94,10 @@ const mapOverrideGrantedActionsToApi = (
     return undefined;
   }
 
-  const byGroupId: Record<string, ResourceActionKey[] | null> = {};
+  const byGroupId: Record<string, ResourceAction[] | null> = {};
   for (const groupId in value) {
     const actions = value[groupId];
-    byGroupId[groupId] = actions === null ? null : (resourceActionsToApiKeys(actions) ?? []);
+    byGroupId[groupId] = actions === null ? null : normalizeResourceActions(actions);
   }
   return byGroupId;
 };

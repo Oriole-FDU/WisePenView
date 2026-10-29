@@ -10,13 +10,11 @@ import {
   TAG_PERMISSION_RESOURCE_STRATEGIES,
   type TagPermissionResourceStrategy,
 } from '@/components/business/Drive/common/tagPermissionPreset';
+import { normalizeResourceActions, type ResourceAction } from '@/domains/_shared/access';
 import {
   buildTagPermissionListActionSelectionPatch,
   isTagPermissionListActionSelected,
-  normalizeResourceActions,
-  type TagPermissionListAction,
   type TagPermissionPresetKey,
-  type TagResourceAction,
 } from '@/domains/Tag';
 
 import styles from './style.module.scss';
@@ -27,7 +25,7 @@ const PRESET_TAB_KEYS: PresetTabKey[] = ['private', 'readonly', 'shared', 'custo
 
 interface TagPermissionActionEditorProps {
   ariaLabel: string;
-  actions: TagResourceAction[];
+  actions: ResourceAction[];
   isDisabled?: boolean;
   labels: {
     actionHeader: string;
@@ -37,11 +35,11 @@ interface TagPermissionActionEditorProps {
     customPreset: string;
     disabled: (strategy: TagPermissionResourceStrategy, action: string) => string;
     enabled: (strategy: TagPermissionResourceStrategy, action: string) => string;
-    getActionLabel: (action: TagPermissionListAction) => string;
+    getActionLabel: (action: ResourceAction) => string;
     getPresetLabel: (preset: ActionPresetKey) => string;
     toggleHeader: string;
   };
-  onActionsChange: (actions: TagResourceAction[]) => void;
+  onActionsChange: (actions: ResourceAction[]) => void;
 }
 
 function TagPermissionActionEditor({
@@ -59,7 +57,7 @@ function TagPermissionActionEditor({
     onActionsChange(normalizeResourceActions(preset.values.grantedActions));
   };
 
-  const handleActionToggle = (action: TagPermissionListAction, checked: boolean) => {
+  const handleActionToggle = (action: ResourceAction, checked: boolean) => {
     if (isDisabled) return;
     const patch = buildTagPermissionListActionSelectionPatch(
       { grantedActions: actions },
@@ -117,11 +115,11 @@ function TagPermissionActionEditor({
                 row.action
               );
               return (
-                <tr key={row.key}>
+                <tr key={row.action}>
                   <th className={styles.actionCell}>
                     <span className={styles.actionName}>
                       <ResourcePermissionActionIcon
-                        action={row.action.action}
+                        action={row.action}
                         className={styles.actionIcon}
                       />
                       <span className={styles.actionText}>{actionLabel}</span>
