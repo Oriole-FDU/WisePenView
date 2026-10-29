@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag 与前端 `defineEnum` 枚举工具重构已实施；下一前沿为 G Group。
+> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag Schema 与前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 G Group。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -357,8 +357,8 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 
 | 接口                                                                                                                        | 决策                                                                                                    |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `GET /resource/tag/getTagTree`                                                                                              | 已完成 `C + D`：保留 checked 兼容入口；service 已不再调用                                               |
-| 新增前端迁移目标 `GET /resource/tag/getPersonalTagTree`、`GET /resource/tag/getGroupTagTree`                                | 已完成 `C + N`：按个人/小组作用域读取，避免前端用空 groupId 猜作用域                                    |
+| `GET /resource/tag/getTagTree`                                                                                              | 已完成 `C`：作为当前线上唯一 Tag 树读取入口，由 service 继续使用                                        |
+| 新增前端迁移目标 `GET /resource/tag/getPersonalTagTree`、`GET /resource/tag/getGroupTagTree`                                | 阻塞 `B + C + N`：后端未上线前不得调用；上线后再迁移并按个人/小组作用域读取                             |
 | `POST /resource/tag/addTag`、`POST /resource/tag/changeTag`、`POST /resource/tag/moveTags`、`POST /resource/tag/removeTags` | 已完成 `C + M`：精确 Scope/Action 字符串枚举；grantedActions 单一事实源；tagMetaInfo 保留 v1 字符串兼容 |
 
 ### User
@@ -605,7 +605,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 3：Tag
 
-- [x] 迁移 `getPersonalTagTree` / `getGroupTagTree`；旧 `getTagTree` 保留 checked 兼容入口并标记 deprecated。
+- [ ] 迁移 `getPersonalTagTree` / `getGroupTagTree`；阻塞于后端上线，当前继续使用通用 `getTagTree`。
 - [x] 建立 TagTree、TagCommand、TagPolicy Schema 与 checked Contract。
 - [x] 请求严格拒绝后端已移除或由服务端维护的 `visibilityMode`、`tagCreator`、`isPath`。
 - [x] 保留 tagMetaInfo 字符串兼容 mapper；结构化 metadata 等后端提供独立字段和版本迁移规则后再实施。
@@ -680,7 +680,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 | ------------------------------------------------------------------------------ | --------------------------------------- | --------------------------------------------------------- |
 | `apiGetUnchecked`、`apiPostUnchecked`、`apiPutUnchecked`、`apiDeleteUnchecked` | `executeApiContract`                    | 对应域迁移完成，基线中的 unchecked 数量降为 0             |
 | `NumericEnumApiValue`                                                          | 各 wire enum 的精确 Zod enum            | IdentityType、GroupType、GroupRoleType 等调用点完成契约化 |
-| Tag 通用 `getTagTree`                                                          | `getPersonalTagTree`、`getGroupTagTree` | 个人与小组标签读取全部迁移到 scoped endpoint              |
+| Tag 通用 `getTagTree`                                                          | `getPersonalTagTree`、`getGroupTagTree` | Cloud scoped endpoint 已部署，且个人与小组读取完成迁移    |
 | Fudan UIS 两个认证接口                                                         | Campus Identity 通用认证接口            | Provider 列表、发起、Challenge 与状态查询全部接线         |
 
 ## 十一、验收门槛

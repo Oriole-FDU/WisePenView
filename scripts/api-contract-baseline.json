@@ -1,5 +1,5 @@
 {
-  "checkedContracts": 16,
+  "checkedContracts": 14,
   "uncheckedCalls": {
     "src/domains/Admin/apis/AdminMessageApi.ts": 2,
     "src/domains/Admin/apis/AdminUserApi.ts": 5,

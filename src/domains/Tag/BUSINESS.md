@@ -8,7 +8,7 @@
 
 ## 原始树与可见树
 
-- `p_` 开头的 groupId 表示个人标签作用域。读取时先归一化作用域：个人读取 `getPersonalTagTree`，真实小组读取 `getGroupTagTree`；不能继续用空 groupId 让后端猜测作用域。依据：[normalizeTagGroupId](utils/normalizeTagGroupId.ts)、[fetchTagTree](service/TagServices.impl.ts)。
+- `p_` 开头的 groupId 表示个人标签作用域；读取时归一化为不传 groupId，真实小组 ID 必须保留。当前唯一可用读取入口是已上线的通用 `getTagTree`，scoped 接口在后端上线前不得接入。依据：[normalizeTagGroupId](utils/normalizeTagGroupId.ts)、[fetchTagTree](service/TagServices.impl.ts)。
 - `getRawTagTree` 保留路径型与系统标签。`getTagTree` 先排除名称以 `/` 开头的根节点，再递归排除 trim 后名称以 `.` 开头的系统节点及其子树。二者不能互换，Drive 与权限计算不能只依赖普通 Tag 视图的可见节点。依据：[TagServices](service/TagServices.impl.ts)。
 - `getTagGrantedActions` 读取未过滤的标签树，按 tagId 收集动作，不能因标签未显示在普通 Tag 视图中就丢弃其权限策略。索引只在 service 内构建，不保留无独立映射语义的 mapper。依据：[getTagGrantedActions](service/TagServices.impl.ts)。
 - 原始树、可见树与各自的扁平索引按归一化 groupId 隔离，TTL 为 15 秒；`getTagById`／`getRawTagById` 只读已有索引。标签写入成功后失效相关缓存，会话清理时全部清空。依据：[缓存与清理入口](service/TagServices.impl.ts)。

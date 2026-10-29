@@ -86,8 +86,6 @@ const children = (parentId?: string, groupId?: string) =>
   !parentId || parentId === '0' ? roots(groupId) : requireTag(parentId, groupId).children;
 
 export const TagApi: typeof TagApiContract = {
-  getPersonalTagTree: () => mockResponse(roots('')),
-  getGroupTagTree: ({ groupId }) => mockResponse(roots(groupId)),
   getTagTree: (params?: { groupId?: string }) => mockResponse(roots(params?.groupId)),
   addTag: async (params) => {
     const tagId = `mock-tag-${crypto.randomUUID()}`;

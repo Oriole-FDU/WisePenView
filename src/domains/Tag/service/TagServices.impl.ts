@@ -60,9 +60,9 @@ const filterHiddenTags = (nodes: TagTreeNode[]): TagTreeNode[] => {
 
 const fetchTagTree = async (groupId?: string): Promise<TagTreeNode[]> => {
   const normalizedGroupId = normalizeTagGroupId(groupId);
-  const data = normalizedGroupId
-    ? await TagApi.getGroupTagTree({ groupId: normalizedGroupId })
-    : await TagApi.getPersonalTagTree();
+  const data = await TagApi.getTagTree(
+    normalizedGroupId ? { groupId: normalizedGroupId } : undefined
+  );
   return TagServicesMap.mapTagTreeFromApi(data);
 };
 

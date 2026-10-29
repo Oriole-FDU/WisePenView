@@ -3,39 +3,17 @@ import {
   type ApiContractResponse,
   defineApiContract,
 } from '@/apis/contract';
-import { EmptyApiRequestSchema, EmptyApiResponseSchema, OpaqueIdSchema } from '@/apis/schema';
+import { EmptyApiResponseSchema, OpaqueIdSchema } from '@/apis/schema';
 
 import {
   AddTagApiRequestSchema,
   ChangeTagApiRequestSchema,
-  GetGroupTagTreeApiRequestSchema,
   GetTagTreeApiRequestSchema,
   MoveTagsApiRequestSchema,
   RemoveTagsApiRequestSchema,
   TagTreeApiResponseSchema,
 } from './TagApi.schema';
 
-export const GetPersonalTagTreeApiContract = defineApiContract({
-  name: 'GetPersonalTagTreeApi',
-  method: 'GET',
-  endpoint: '/resource/tag/getPersonalTagTree',
-  requestPlacement: 'none',
-  transport: 'json',
-  request: EmptyApiRequestSchema,
-  response: TagTreeApiResponseSchema,
-});
-
-export const GetGroupTagTreeApiContract = defineApiContract({
-  name: 'GetGroupTagTreeApi',
-  method: 'GET',
-  endpoint: '/resource/tag/getGroupTagTree',
-  requestPlacement: 'query',
-  transport: 'json',
-  request: GetGroupTagTreeApiRequestSchema,
-  response: TagTreeApiResponseSchema,
-});
-
-/** @deprecated 使用 GetPersonalTagTreeApiContract 或 GetGroupTagTreeApiContract。 */
 export const GetTagTreeApiContract = defineApiContract({
   name: 'GetTagTreeApi',
   method: 'GET',
@@ -86,11 +64,6 @@ export const MoveTagsApiContract = defineApiContract({
   response: EmptyApiResponseSchema,
 });
 
-export type GetPersonalTagTreeApiResponse = ApiContractResponse<
-  typeof GetPersonalTagTreeApiContract
->;
-export type GetGroupTagTreeApiRequest = ApiContractRequest<typeof GetGroupTagTreeApiContract>;
-export type GetGroupTagTreeApiResponse = ApiContractResponse<typeof GetGroupTagTreeApiContract>;
 export type GetTagTreeApiRequest = ApiContractRequest<typeof GetTagTreeApiContract>;
 export type GetTagTreeApiResponse = ApiContractResponse<typeof GetTagTreeApiContract>;
 export type AddTagApiRequest = ApiContractRequest<typeof AddTagApiContract>;

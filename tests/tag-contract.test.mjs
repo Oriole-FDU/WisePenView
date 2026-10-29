@@ -20,8 +20,7 @@ try {
         export {
           AddTagApiContract,
           ChangeTagApiContract,
-          GetGroupTagTreeApiContract,
-          GetPersonalTagTreeApiContract,
+          GetTagTreeApiContract,
           MoveTagsApiContract,
           RemoveTagsApiContract,
         } from '@/domains/Tag/apis/TagApi.contract';
@@ -50,8 +49,7 @@ try {
     AddTagApiRequestSchema,
     ChangeTagApiContract,
     ChangeTagApiRequestSchema,
-    GetGroupTagTreeApiContract,
-    GetPersonalTagTreeApiContract,
+    GetTagTreeApiContract,
     MoveTagsApiContract,
     MoveTagsApiRequestSchema,
     parseApiRequest,
@@ -64,8 +62,9 @@ try {
     TagTreeApiResponseSchema,
   } = await import(pathToFileURL(outfile).href);
 
-  assert.equal(GetPersonalTagTreeApiContract.requestPlacement, 'none');
-  assert.equal(GetGroupTagTreeApiContract.requestPlacement, 'query');
+  assert.equal(GetTagTreeApiContract.method, 'GET');
+  assert.equal(GetTagTreeApiContract.requestPlacement, 'query');
+  assert.equal(GetTagTreeApiContract.transport, 'json');
   for (const contract of [
     AddTagApiContract,
     ChangeTagApiContract,
@@ -76,8 +75,8 @@ try {
     assert.equal(contract.requestPlacement, 'body');
     assert.equal(contract.transport, 'json');
   }
-  assert.equal(parseApiRequest(GetPersonalTagTreeApiContract, undefined), undefined);
-  assert.deepEqual(parseApiRequest(GetGroupTagTreeApiContract, { groupId: 'group-1' }), {
+  assert.deepEqual(parseApiRequest(GetTagTreeApiContract, {}), {});
+  assert.deepEqual(parseApiRequest(GetTagTreeApiContract, { groupId: 'group-1' }), {
     groupId: 'group-1',
   });
 
@@ -108,13 +107,13 @@ try {
   assert(MoveTagsApiRequestSchema.safeParse({ targetTagIds: ['tag-1'] }).success);
   assert(!MoveTagsApiRequestSchema.safeParse({ targetTagIds: [''] }).success);
 
-  const personalTree = await TagApi.getPersonalTagTree();
-  const parsedTree = parseApiResponse(GetPersonalTagTreeApiContract, personalTree);
+  const personalTree = await TagApi.getTagTree();
+  const parsedTree = parseApiResponse(GetTagTreeApiContract, personalTree);
   assert(parsedTree.length > 0);
   assert.equal(parsedTree[0].groupId, 'p_mock-user');
   assert(parsedTree[0].children.length > 0);
 
-  const groupTree = await TagApi.getGroupTagTree({ groupId: '2' });
+  const groupTree = await TagApi.getTagTree({ groupId: '2' });
   assert(TagTreeApiResponseSchema.safeParse(groupTree).success);
   assert(TagPolicyApiSchema.safeParse(groupTree[0]).success);
 

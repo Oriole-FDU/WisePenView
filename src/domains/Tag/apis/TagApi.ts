@@ -5,9 +5,6 @@ import type {
   AddTagApiResponse,
   ChangeTagApiRequest,
   ChangeTagApiResponse,
-  GetGroupTagTreeApiRequest,
-  GetGroupTagTreeApiResponse,
-  GetPersonalTagTreeApiResponse,
   GetTagTreeApiRequest,
   GetTagTreeApiResponse,
   MoveTagsApiRequest,
@@ -18,24 +15,11 @@ import type {
 import {
   AddTagApiContract,
   ChangeTagApiContract,
-  GetGroupTagTreeApiContract,
-  GetPersonalTagTreeApiContract,
   GetTagTreeApiContract,
   MoveTagsApiContract,
   RemoveTagsApiContract,
 } from './TagApi.contract';
 
-async function getPersonalTagTree(): Promise<GetPersonalTagTreeApiResponse> {
-  return executeApiContract(GetPersonalTagTreeApiContract, undefined);
-}
-
-async function getGroupTagTree(
-  req: GetGroupTagTreeApiRequest
-): Promise<GetGroupTagTreeApiResponse> {
-  return executeApiContract(GetGroupTagTreeApiContract, req);
-}
-
-/** @deprecated 使用 getPersonalTagTree 或 getGroupTagTree。 */
 async function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> {
   return executeApiContract(GetTagTreeApiContract, req ?? {});
 }
@@ -57,8 +41,6 @@ async function moveTags(req: MoveTagsApiRequest): Promise<MoveTagsApiResponse> {
 }
 
 export const TagApi = {
-  getPersonalTagTree,
-  getGroupTagTree,
   getTagTree,
   addTag,
   changeTag,

@@ -41,11 +41,7 @@ const TagTreeApiNodeSchema = createTreeSchema(TagTreeApiNodeFieldsSchema.shape);
 
 export const TagTreeApiResponseSchema = z.array(TagTreeApiNodeSchema);
 
-export const GetGroupTagTreeApiRequestSchema = z.strictObject({
-  groupId: OpaqueIdSchema,
-});
-
-/** 旧通用接口的兼容请求；新读取路径不得继续依赖空 groupId 猜测作用域。 */
+/** 当前线上通用标签树接口；groupId 省略时读取个人标签树。 */
 export const GetTagTreeApiRequestSchema = z.strictObject({
   groupId: OpaqueIdSchema.optional(),
 });
@@ -91,7 +87,6 @@ export const MoveTagsApiRequestSchema = RemoveTagsApiRequestSchema.extend({
 
 export type TagPolicyApi = z.infer<typeof TagPolicyApiSchema>;
 export type TagTreeApiResponse = z.infer<typeof TagTreeApiResponseSchema>;
-export type GetGroupTagTreeApiRequest = z.infer<typeof GetGroupTagTreeApiRequestSchema>;
 export type GetTagTreeApiRequest = z.infer<typeof GetTagTreeApiRequestSchema>;
 export type AddTagApiRequest = z.infer<typeof AddTagApiRequestSchema>;
 export type ChangeTagApiRequest = z.infer<typeof ChangeTagApiRequestSchema>;
