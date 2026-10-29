@@ -1,14 +1,22 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  ChangeResourceActionPermissionApiRequest,
-  GlobalSearchApiRequest,
-  GlobalSearchApiResponse,
-  ListResourceItemsApiRequest,
-  RemoveResourcesApiRequest,
-  RenameResourceApiRequest,
-  ResourceListPageApiResponse,
-} from './ResourceApi.type';
+import {
+  ChangeResourceActionPermissionApiContract,
+  type ChangeResourceActionPermissionApiContractRequest,
+  type ChangeResourceActionPermissionApiContractResponse,
+  GlobalSearchResourcesApiContract,
+  type GlobalSearchResourcesApiContractRequest,
+  type GlobalSearchResourcesApiContractResponse,
+  ListResourcesApiContract,
+  type ListResourcesApiContractRequest,
+  type ListResourcesApiContractResponse,
+  RemoveResourcesApiContract,
+  type RemoveResourcesApiContractRequest,
+  type RemoveResourcesApiContractResponse,
+  RenameResourceApiContract,
+  type RenameResourceApiContractRequest,
+  type RenameResourceApiContractResponse,
+} from './ResourceCoreApi.contract';
 
 // /resource/item/*
 
@@ -29,29 +37,38 @@ const serializeListResourcesQuery = (params: Record<string, unknown>): string =>
   return searchParams.toString();
 };
 
-function listResources(req: ListResourceItemsApiRequest): Promise<ResourceListPageApiResponse> {
-  return apiGetUnchecked('/resource/item/listResources', {
-    params: req,
+async function listResources(
+  req: ListResourcesApiContractRequest
+): Promise<ListResourcesApiContractResponse> {
+  return executeApiContract(ListResourcesApiContract, req, {
     paramsSerializer: serializeListResourcesQuery,
   });
 }
 
-function renameResource(req: RenameResourceApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/item/renameResource', req);
+async function renameResource(
+  req: RenameResourceApiContractRequest
+): Promise<RenameResourceApiContractResponse> {
+  return executeApiContract(RenameResourceApiContract, req);
 }
 
-function changeResourceActionPermission(
-  req: ChangeResourceActionPermissionApiRequest
-): Promise<void> {
-  return apiPostUnchecked('/resource/item/changeResourceActionPermission', req);
+async function changeResourceActionPermission(
+  req: ChangeResourceActionPermissionApiContractRequest
+): Promise<ChangeResourceActionPermissionApiContractResponse> {
+  return executeApiContract(ChangeResourceActionPermissionApiContract, req);
 }
 
-function removeResources(req: RemoveResourcesApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/item/removeResources', req);
+async function removeResources(
+  req: RemoveResourcesApiContractRequest
+): Promise<RemoveResourcesApiContractResponse> {
+  return executeApiContract(RemoveResourcesApiContract, req);
 }
 
-function globalSearch(req: GlobalSearchApiRequest): Promise<GlobalSearchApiResponse> {
-  return apiGetUnchecked('/resource/search/globalSearchResources', { params: req });
+async function globalSearch(
+  req: GlobalSearchResourcesApiContractRequest
+): Promise<GlobalSearchResourcesApiContractResponse> {
+  return executeApiContract(GlobalSearchResourcesApiContract, req, {
+    paramsSerializer: serializeListResourcesQuery,
+  });
 }
 
 export const ResourceItemApi = {

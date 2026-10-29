@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag、G Group Schema 与前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 R ResourceCore。
+> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag、G Group、R ResourceCore 的列表/搜索/写命令，以及前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 ResourceCore Base/Detail 消费与 ResourceAccess。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -99,7 +99,8 @@ flowchart TD
 当前 DAG 前沿：
 
 - 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`、`G Group`。
-- 下一前沿：`R ResourceCore`。
+- 进行中：`R ResourceCore`，已完成列表、全局搜索、重命名、删除和权限更新 5 个前端接口；Base/Detail 仍由资源叶域使用历史 DTO。
+- 下一前沿：ResourceCore Base/Detail 消费与 `ResourceAccess` 聚合。
 - 仍被阻塞：`T Tag` 的 scoped endpoint 迁移继续等待后端上线；其他叶域和聚合域继续沿 DAG 向后等待。
 
 关键约束：
@@ -328,11 +329,11 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 
 | 接口                                                                                                                                                                  | 决策                                                                                                 |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `GET /resource/item/listResources`                                                                                                                                    | `C + M`：列表响应单独建模；ResourceType、Action、排序枚举严格；Long size 字符串                      |
-| `POST /resource/item/renameResource`、`POST /resource/item/removeResources`                                                                                           | `C`：command Schema 与非空 ID 数组；v2 delete 使用 DELETE                                            |
-| `POST /resource/item/changeResourceActionPermission`                                                                                                                  | `B + C + N`：改用显式 operation 数组，避免 map 中 `null/undefined/[]` 三态歧义                       |
-| `GET /resource/search/globalSearchResources`                                                                                                                          | `C`：SearchScope、ResourceType、分页严格；highlight 语义固定                                         |
-| `POST /resource/placement/setPersonalResourcesPathTag`、`POST /resource/placement/movePersonalResourcesToTrash`、`POST /resource/placement/replacePersonalNormalTags` | `C + M`：当前 request 与 service 形状几乎一致，收紧 Schema 后删除机械 mapper                         |
+| `GET /resource/item/listResources`                                                                                                                                    | 已完成 `C + M`：列表响应单独建模；ResourceType、Action、排序枚举严格；Long size 字符串               |
+| `POST /resource/item/renameResource`、`POST /resource/item/removeResources`                                                                                           | 已完成 `C`：command Schema 与非空 ID 数组；v2 delete 使用 DELETE                                     |
+| `POST /resource/item/changeResourceActionPermission`                                                                                                                  | 已完成 `C`：保留 `undefined/null/[]` 三态；v2 显式 operation 数组仍待 `B + N`                        |
+| `GET /resource/search/globalSearchResources`                                                                                                                          | 已完成 `C + M`：SearchScope、ResourceType、分页与毫秒时间严格；highlight 语义固定                    |
+| `POST /resource/placement/setPersonalResourcesPathTag`、`POST /resource/placement/movePersonalResourcesToTrash`、`POST /resource/placement/replacePersonalNormalTags` | 已删除机械 request mapper，service 直接传递同形参数；checked Contract 仍待 `C`                       |
 | `POST /resource/placement/mountResourcesToGroup`、`POST /resource/placement/unmountResourcesToGroup`、`POST /resource/placement/moveResourcesInGroup`                 | `B + C + N`：新增 `POST /resource/placements` 批量命令并返回逐项结果；只返回请求数量无法处理部分失败 |
 | 新增 `POST /resource/access/overviews`                                                                                                                                | `N`：替代前端按资源类型调用多个详情接口后再补 Group/Tag 的 N+1 聚合                                  |
 
@@ -555,6 +556,7 @@ defineEnum({ STUDENT: 1, TEACHER: 2 } as const);
 ### Wave 0：契约内核与基准（已完成）
 
 - [x] 新增 [共享 Schema](../../src/apis/schema)：`NonEmptyStringSchema`、ID、time、page、envelope 和 empty response。
+- [x] 将 `PageR.total` 按 Java primitive Long 的字符串 wire 解析，并在契约边界转回安全整数，避免分页响应在真实联调中被误报。
 - [x] 为 Contract 增加 method/request location/transport。
 - [x] 建立 `check:api-contracts`：每个域 API 方法必须绑定 checked Contract；`Unchecked` 只能存在于迁移白名单。
 - [x] 将公共命名收敛为 `defineApiContract` 与 `executeApiContract`，传输细节只存在于 Contract 字段。
@@ -613,7 +615,8 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 4：Resource Core + Access
 
-- ResourceList/Base/Detail/Search 分开 Schema。
+- [x] ResourceList/Search 建立独立 Schema，并迁移重命名、删除与权限更新 5 个 checked Contract。
+- [ ] ResourceBase/Detail 建立共享 Schema，并替换 Note、Document、Skill、Agent、HtmlPage 中的历史 ResourceItem DTO。
 - Placement 改成明确批量命令与逐项结果。
 - 新增 Resource Access Overview 聚合 endpoint。
 - 删除 436 行权限补全 mapper 的目标从这里开始，而不是一次性删。

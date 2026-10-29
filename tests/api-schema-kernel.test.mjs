@@ -111,7 +111,7 @@ try {
   const PageResponseSchema = createPageResponseSchema(JavaLongIdSchema.transform((id) => ({ id })));
   const pageResult = PageResponseSchema.safeParse({
     list: ['1', '2'],
-    total: 2,
+    total: '2',
     page: 1,
     size: 20,
     totalPage: 1,
@@ -125,6 +125,7 @@ try {
     size: 20,
     totalPage: 1,
   });
+  assert(!PageResponseSchema.safeParse({ ...pageResult.data, total: 2 }).success);
 
   const TreeSchema = createTreeSchema({
     id: JavaLongIdSchema,

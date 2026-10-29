@@ -1,6 +1,8 @@
-import type { JavaLongApiValue, NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
+import type { JavaLongApiValue, NumericEnumApiValue } from '@/apis/api.type';
 import type { ResourceAction } from '@/domains/_shared/access';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
+
+import type { ResourceTagInfoApi } from './ResourceCoreApi.schema';
 
 export type ResourceActionApiList = ResourceAction[];
 export interface ResourceInteractionInfoApiResponse {
@@ -20,19 +22,11 @@ export interface ResourceUserInteractionRecordApiResponse {
   resourceId?: string | null;
 }
 
-interface ResourceTagInfoApiResponse {
-  tagName?: string;
-  tagDesc?: string;
-  tagIcon?: string;
-  tagColor?: string;
-  tagCreator?: string;
-  isPath?: boolean;
-}
-
 interface ResourceTagBindApiResponse {
   groupId?: string;
   primaryTagId?: string;
-  tags?: Record<string, ResourceTagInfoApiResponse | null | undefined>;
+  /** 尚未迁移的资源叶域只保证部分展示字段，字段定义仍以 ResourceCore Schema 为准。 */
+  tags?: Record<string, Partial<ResourceTagInfoApi> | null | undefined>;
 }
 
 type ResourceGroupTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
@@ -42,6 +36,7 @@ export interface ResourceGroupDisplayBaseApiResponse {
   groupDesc?: string | null;
   groupCoverUrl?: string | null;
   groupType?: ResourceGroupTypeApiValue | null;
+  groupMetaInfo?: string | null;
 }
 
 export interface ResourceGroupGrantedActionsApiResponse {
@@ -63,7 +58,7 @@ export interface ResourceItemApiResponse {
   size?: JavaLongApiValue | null;
   ownerInfo: UserDisplayBaseApiResponse;
   resourceType?: string;
-  preview?: string;
+  preview?: string | null;
   path?: string;
   resourceInteractionInfo?: ResourceInteractionInfoApiResponse;
   myInteractionRecord?: ResourceUserInteractionRecordApiResponse | null;
@@ -73,45 +68,3 @@ export interface ResourceItemApiResponse {
   overrideGrantedActions?: ResourceGroupGrantedActionsApiResponse[] | null;
   specifiedUsersGrantedActions?: ResourceSpecifiedUserGrantedActionsApiResponse[] | null;
 }
-
-export type ResourceListPageApiResponse = PageR<ResourceItemApiResponse>;
-
-export interface ListResourceItemsApiRequest extends PageApiRequest {
-  sortBy: string;
-  sortDir: string;
-  resourceType?: string;
-  tagIds?: string[];
-  tagQueryLogicMode?: string;
-  groupId?: string;
-  includeMyInteraction?: boolean;
-}
-
-export interface RenameResourceApiRequest {
-  resourceId: string;
-  newName: string;
-}
-
-export interface ChangeResourceActionPermissionApiRequest {
-  resourceId: string;
-  overrideGrantedActions?: Record<string, ResourceAction[] | null> | null;
-  specifiedUsersGrantedActions?: Record<string, ResourceAction[]> | null;
-}
-
-export interface RemoveResourcesApiRequest {
-  resourceIds: string[];
-}
-
-export interface GlobalSearchApiRequest extends PageApiRequest {
-  keyword: string;
-  scope: string;
-}
-
-export interface GlobalSearchItemApiResponse {
-  resourceId: string;
-  resourceType: string;
-  resourceName: string;
-  highlightContent: string | null;
-  updateTime: string;
-}
-
-export type GlobalSearchApiResponse = PageR<GlobalSearchItemApiResponse>;

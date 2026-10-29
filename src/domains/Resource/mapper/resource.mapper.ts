@@ -4,35 +4,24 @@ import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
-  GlobalSearchApiResponse,
-  ListResourceItemsApiRequest,
   ResourceGroupGrantedActionsApiResponse,
   ResourceItemApiResponse,
-  ResourceListPageApiResponse,
   ResourceSpecifiedUserGrantedActionsApiResponse,
 } from '../apis/ResourceApi.type';
 import type {
-  MountResourcesToGroupApiRequest,
-  MovePersonalResourcesToTrashApiRequest,
-  MoveResourcesInGroupApiRequest,
-  ReplacePersonalNormalTagsApiRequest,
-  ResourcePlacementApiResponse,
-  SetPersonalResourcesPathTagApiRequest,
-  UnmountResourcesToGroupApiRequest,
-} from '../apis/ResourcePlacementApi.type';
+  GlobalSearchResourcesApiContractResponse,
+  ListResourcesApiContractRequest,
+  ListResourcesApiContractResponse,
+} from '../apis/ResourceCoreApi.contract';
+import type { ResourceCoreItemApi } from '../apis/ResourceCoreApi.schema';
+import type { ResourcePlacementApiResponse } from '../apis/ResourcePlacementApi.type';
 import type { ResourceItem, ResourceTagBind } from '../entity/resource';
 import { normalizeSearchResourceType, TAG_QUERY_LOGIC_MODE } from '../enum';
 import type {
   GetUserResourcesRequest,
-  MountResourcesToGroupRequest,
-  MovePersonalResourcesToTrashRequest,
-  MoveResourcesInGroupRequest,
-  ReplacePersonalNormalTagsRequest,
   ResourceListPage,
   SearchHitItem,
   SearchResultPage,
-  SetPersonalResourcesPathTagRequest,
-  UnmountResourcesToGroupRequest,
 } from '../service/index.type';
 import { resolveResourceIconType } from '../utils/resolveResourceIconType';
 
@@ -54,8 +43,8 @@ interface MapResourceItemContext {
 /** Service 入参 → GET /resource/item/listResources query */
 export const mapListResourceItemsRequest = (
   params: GetUserResourcesRequest,
-  overrides: Partial<ListResourceItemsApiRequest> = {}
-): ListResourceItemsApiRequest => {
+  overrides: Partial<ListResourcesApiContractRequest> = {}
+): ListResourcesApiContractRequest => {
   const resourceType = params.resourceType;
   const tagIds = params.tagIds;
   const hasResourceType = resourceType != null && resourceType !== '';
@@ -69,7 +58,9 @@ export const mapListResourceItemsRequest = (
     // 未传时显式使用 OpenAPI 默认 OR。
     tagQueryLogicMode: params.tagQueryLogicMode ?? TAG_QUERY_LOGIC_MODE.OR,
     // 不传 resourceType：空串会被后端当作有效筛选值
-    ...(hasResourceType ? { resourceType } : {}),
+    ...(hasResourceType
+      ? { resourceType: resourceType as ListResourcesApiContractRequest['resourceType'] }
+      : {}),
     // 不传 tagIds：空数组仍会触发按标签过滤
     ...(hasTagIds ? { tagIds } : {}),
     ...(params.includeMyInteraction !== undefined
@@ -79,49 +70,6 @@ export const mapListResourceItemsRequest = (
     ...overrides,
   };
 };
-
-export const mapSetPersonalResourcesPathTagRequest = (
-  params: SetPersonalResourcesPathTagRequest
-): SetPersonalResourcesPathTagApiRequest => ({
-  resourceIds: params.resourceIds,
-  targetPathTagId: params.targetPathTagId,
-});
-
-export const mapMovePersonalResourcesToTrashRequest = (
-  params: MovePersonalResourcesToTrashRequest
-): MovePersonalResourcesToTrashApiRequest => ({
-  resourceIds: params.resourceIds,
-});
-
-export const mapReplacePersonalNormalTagsRequest = (
-  params: ReplacePersonalNormalTagsRequest
-): ReplacePersonalNormalTagsApiRequest => ({
-  resourceIds: params.resourceIds,
-  normalTagIds: params.normalTagIds,
-});
-
-export const mapMountResourcesToGroupRequest = (
-  params: MountResourcesToGroupRequest
-): MountResourcesToGroupApiRequest => ({
-  resourceIds: params.resourceIds,
-  groupId: params.groupId,
-  targetTagId: params.targetTagId,
-});
-
-export const mapUnmountResourcesToGroupRequest = (
-  params: UnmountResourcesToGroupRequest
-): UnmountResourcesToGroupApiRequest => ({
-  groupId: params.groupId,
-  resourceSourceTagMap: params.resourceSourceTagMap,
-});
-
-export const mapMoveResourcesInGroupRequest = (
-  params: MoveResourcesInGroupRequest
-): MoveResourcesInGroupApiRequest => ({
-  groupId: params.groupId,
-  resourceSourceTagMap: params.resourceSourceTagMap,
-  targetTagId: params.targetTagId,
-});
 
 export const mapResourcePlacementCountFromApi = (data: ResourcePlacementApiResponse): number =>
   data.resourceCount;
@@ -148,12 +96,29 @@ const mapTagsToCurrentTags = (
 };
 
 const mapResourceTagBindsFromApi = (
-  tagBinds: ResourceItemApiResponse['tagBinds']
+  tagBinds:
+    NonNullable<ResourceItemApiResponse['tagBinds'] | ResourceCoreItemApi['tagBinds']> | undefined
 ): ResourceTagBind[] | undefined =>
   tagBinds?.map((bind) => ({
     groupId: bind.groupId,
     primaryTagId: bind.primaryTagId,
-    tags: bind.tags,
+    tags: bind.tags
+      ? Object.fromEntries(
+          Object.entries(bind.tags).map(([tagId, tag]) => [
+            tagId,
+            tag
+              ? {
+                  tagName: tag.tagName ?? undefined,
+                  tagDesc: tag.tagDesc ?? undefined,
+                  tagIcon: tag.tagIcon ?? undefined,
+                  tagColor: tag.tagColor ?? undefined,
+                  tagCreator: tag.tagCreator ?? undefined,
+                  isPath: tag.isPath ?? undefined,
+                }
+              : null,
+          ])
+        )
+      : undefined,
   }));
 
 const mapMyInteractionFromApi = (
@@ -197,7 +162,7 @@ const normalizeResourceActionMap = (
 
 /** 单条资源：Java Long 字符串、标签派生字段 */
 export const mapResourceItemFromApi = (
-  raw: ResourceItemApiResponse,
+  raw: ResourceItemApiResponse | ResourceCoreItemApi,
   context: MapResourceItemContext = {}
 ): ResourceItem => {
   const interactionInfo = raw.resourceInteractionInfo;
@@ -207,12 +172,12 @@ export const mapResourceItemFromApi = (
     ownerId: raw.ownerId,
     ownerInfo: normalizeUserDisplayBaseFromApi(raw.ownerInfo) ?? {},
     resourceType: raw.resourceType,
-    preview: raw.preview,
+    preview: raw.preview ?? undefined,
     // 后端 resourceInfo.size 当前以字符串返回，前端统一归一化为 number。
     size: normalizeNonNegativeNumber(raw.size),
     tagBinds: mapResourceTagBindsFromApi(raw.tagBinds),
     currentActions: parseResourceActions(raw.currentActions),
-    resourceAccessRole: raw.resourceAccessRole,
+    resourceAccessRole: 'resourceAccessRole' in raw ? raw.resourceAccessRole : undefined,
     overrideGrantedActions: normalizeResourceActionMap(raw.overrideGrantedActions),
     specifiedUsersGrantedActions: normalizeResourceActionMap(raw.specifiedUsersGrantedActions),
     readCount: normalizeNonNegativeNumber(interactionInfo?.readCount),
@@ -235,7 +200,7 @@ export const mapResourceItemFromApi = (
 
 /** 分页列表 API 响应 → Service 领域分页 */
 export const mapResourceListPageFromApi = (
-  data: ResourceListPageApiResponse,
+  data: ListResourcesApiContractResponse,
   context: MapResourceItemContext = {}
 ): ResourceListPage => {
   const list = data.list.map((item) => mapResourceItemFromApi(item, context));
@@ -250,13 +215,17 @@ export const mapResourceListPageFromApi = (
 };
 
 // 枚举归一化大小写，下游 === 比较与分组 label 生效
-const mapSearchHitFromApi = (raw: GlobalSearchApiResponse['list'][number]): SearchHitItem => ({
+const mapSearchHitFromApi = (
+  raw: GlobalSearchResourcesApiContractResponse['list'][number]
+): SearchHitItem => ({
   ...raw,
   resourceType: normalizeSearchResourceType(raw.resourceType),
   resourceIconType: resolveResourceIconType(raw.resourceType),
 });
 
-export const mapSearchResultPageFromApi = (data: GlobalSearchApiResponse): SearchResultPage => ({
+export const mapSearchResultPageFromApi = (
+  data: GlobalSearchResourcesApiContractResponse
+): SearchResultPage => ({
   list: data.list.map(mapSearchHitFromApi),
   total: data.total,
   page: data.page,
