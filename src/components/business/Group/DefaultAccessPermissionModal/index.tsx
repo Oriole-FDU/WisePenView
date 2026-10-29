@@ -112,6 +112,7 @@ function GroupDefaultAccessPermissionModal({
     async (actions: ResourceAction[]) => {
       await groupService.updateGroupResConfig({
         groupId,
+        fileOrgLogic: groupResConfig.fileOrgLogic,
         defaultMemberActions: normalizeResourceActions(actions),
       });
     },

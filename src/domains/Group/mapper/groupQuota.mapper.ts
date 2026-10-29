@@ -2,14 +2,12 @@ import { GROUP_TYPE, type GroupQuotaInfo, type UserGroupQuota } from '@/domains/
 import type {
   GetAllMyGroupTokenInfoApiResponse,
   GetMyGroupMemberInfoApiResponse,
-  GroupTokenInfoApiResponseItem,
-} from '@/domains/Group/apis/GroupApi.type';
+} from '@/domains/Group/apis/GroupApi.contract';
+import type { GroupTokenInfoApi } from '@/domains/Group/apis/GroupApi.schema';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { normalizeId } from '@/utils/normalize/normalizeId';
-import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
-const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApiResponseItem): UserGroupQuota => {
-  const base = item.groupDisplayBase ?? {};
+const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApi): UserGroupQuota => {
+  const base = item.groupDisplayBase;
   const groupType = base.groupType;
   if (
     groupType !== GROUP_TYPE.NORMAL &&
@@ -20,29 +18,27 @@ const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApiResponseItem): UserGrou
   }
 
   return {
-    groupId: normalizeId(base.groupId),
-    groupName: base.groupName ?? '',
+    groupName: base.groupName,
     groupType,
-    quotaLimit: normalizeNonNegativeNumber(item.tokenLimit) ?? 0,
-    quotaUsed: normalizeNonNegativeNumber(item.tokenUsed) ?? 0,
+    quotaLimit: item.tokenLimit,
+    quotaUsed: item.tokenUsed,
   };
 };
 
 const mapFetchUserGroupQuotasFromApi = (
   data: GetAllMyGroupTokenInfoApiResponse
 ): { quotas: UserGroupQuota[]; total: number } => {
-  const rawList = data.list ?? [];
-  const quotas = rawList.map(mapUserGroupQuotaFromApi);
+  const quotas = data.list.map(mapUserGroupQuotaFromApi);
 
   return {
     quotas,
-    total: normalizeNonNegativeNumber(data.total) ?? quotas.length,
+    total: data.total,
   };
 };
 
 const mapFetchGroupQuotaFromApi = (data: GetMyGroupMemberInfoApiResponse): GroupQuotaInfo => ({
-  used: normalizeNonNegativeNumber(data.tokenUsed) ?? 0,
-  limit: normalizeNonNegativeNumber(data.tokenLimit) ?? 0,
+  used: data.tokenUsed,
+  limit: data.tokenLimit,
 });
 
 export const GroupQuotaMap = {

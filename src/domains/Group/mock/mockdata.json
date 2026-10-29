@@ -41,53 +41,53 @@
       "groupMetaInfo": "{}"
     },
     {
-      "groupId": "course-data-structures",
+      "groupId": "1001",
       "groupName": "数据结构与算法",
       "groupDesc": "从抽象数据类型到经典算法，理解数据组织、问题建模与程序效率之间的关系。",
       "groupType": 2,
       "groupCoverUrl": "",
-      "groupMetaInfo": "{\"course\":{\"term\":\"2026 春季\",\"category\":\"必修课\",\"startAt\":\"2026-03-02T00:00:00+08:00\",\"endAt\":\"2026-07-03T23:59:59+08:00\",\"learningObjectives\":[\"理解线性结构、树、图、查找和排序等常用数据结构与经典算法。\",\"能够根据问题约束选择合适的数据结构，并分析时间与空间复杂度。\",\"能够完成核心数据结构的实现、测试与工程化应用。\"],\"meetings\":[{\"meetingId\":\"meeting-tuesday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周二\",\"startPeriod\":3,\"endPeriod\":4,\"location\":\"示例楼 A203\"}],\"assessmentItems\":[{\"label\":\"平时分\",\"weight\":10},{\"label\":\"作业\",\"weight\":20},{\"label\":\"期末考试\",\"weight\":70}],\"finalAssessment\":{\"type\":\"EXAM\",\"examForm\":\"闭卷\",\"date\":\"2026-06-29\",\"startTime\":\"13:30\",\"endTime\":\"15:30\",\"location\":\"示例楼 201\"},\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-course-data-structures\"}}",
-      "ownerId": "mock-teacher-primary",
+      "groupMetaInfo": "{\"course\":{\"term\":\"2026 春季\",\"category\":\"必修课\",\"startAt\":\"2026-03-02T00:00:00+08:00\",\"endAt\":\"2026-07-03T23:59:59+08:00\",\"learningObjectives\":[\"理解线性结构、树、图、查找和排序等常用数据结构与经典算法。\",\"能够根据问题约束选择合适的数据结构，并分析时间与空间复杂度。\",\"能够完成核心数据结构的实现、测试与工程化应用。\"],\"meetings\":[{\"meetingId\":\"meeting-tuesday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周二\",\"startPeriod\":3,\"endPeriod\":4,\"location\":\"示例楼 A203\"}],\"assessmentItems\":[{\"label\":\"平时分\",\"weight\":10},{\"label\":\"作业\",\"weight\":20},{\"label\":\"期末考试\",\"weight\":70}],\"finalAssessment\":{\"type\":\"EXAM\",\"examForm\":\"闭卷\",\"date\":\"2026-06-29\",\"startTime\":\"13:30\",\"endTime\":\"15:30\",\"location\":\"示例楼 201\"},\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-1001\"}}",
+      "ownerId": "2001",
       "ownerInfo": {
         "nickname": "示例教师",
         "identityType": 2
       },
       "memberCount": 86,
-      "inviteCode": "COURSE-course-data-structures",
+      "inviteCode": "COURSE-1001",
       "tokenUsed": 0,
       "tokenBalance": 1000
     },
     {
-      "groupId": "course-computer-networks",
+      "groupId": "1002",
       "groupName": "计算机网络",
       "groupDesc": "理解分层网络体系、核心协议与现代互联网基础设施。",
       "groupType": 2,
       "groupCoverUrl": "",
-      "groupMetaInfo": "{\"course\":{\"term\":\"2026 春季\",\"category\":\"必修课\",\"startAt\":\"2026-03-02T00:00:00+08:00\",\"endAt\":\"2026-07-03T23:59:59+08:00\",\"learningObjectives\":[\"理解分层网络体系与端到端通信的基本原理。\",\"能够分析常见网络协议及其工程取舍。\"],\"meetings\":[{\"meetingId\":\"meeting-monday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周一\",\"startPeriod\":6,\"endPeriod\":7,\"location\":\"示例楼 B305\"}],\"assessmentItems\":[{\"label\":\"实验\",\"weight\":30},{\"label\":\"期中考试\",\"weight\":20},{\"label\":\"期末考试\",\"weight\":50}],\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-course-computer-networks\"}}",
-      "ownerId": "mock-teacher-network",
+      "groupMetaInfo": "{\"course\":{\"term\":\"2026 春季\",\"category\":\"必修课\",\"startAt\":\"2026-03-02T00:00:00+08:00\",\"endAt\":\"2026-07-03T23:59:59+08:00\",\"learningObjectives\":[\"理解分层网络体系与端到端通信的基本原理。\",\"能够分析常见网络协议及其工程取舍。\"],\"meetings\":[{\"meetingId\":\"meeting-monday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周一\",\"startPeriod\":6,\"endPeriod\":7,\"location\":\"示例楼 B305\"}],\"assessmentItems\":[{\"label\":\"实验\",\"weight\":30},{\"label\":\"期中考试\",\"weight\":20},{\"label\":\"期末考试\",\"weight\":50}],\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-1002\"}}",
+      "ownerId": "2002",
       "ownerInfo": {
         "nickname": "示例教师甲",
         "identityType": 2
       },
       "memberCount": 72,
-      "inviteCode": "COURSE-course-computer-networks",
+      "inviteCode": "COURSE-1002",
       "tokenUsed": 0,
       "tokenBalance": 1000
     },
     {
-      "groupId": "course-database-systems",
+      "groupId": "1003",
       "groupName": "数据库系统",
       "groupDesc": "数据库系统原理、关系模型、查询处理与事务管理。",
       "groupType": 2,
       "groupCoverUrl": "",
-      "groupMetaInfo": "{\"course\":{\"term\":\"2025 秋季\",\"category\":\"专业选修\",\"startAt\":\"2025-09-01T00:00:00+08:00\",\"endAt\":\"2026-01-09T23:59:59+08:00\",\"learningObjectives\":[\"掌握关系模型、查询处理和事务管理的基本原理。\"],\"meetings\":[{\"meetingId\":\"meeting-friday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周五\",\"startPeriod\":6,\"endPeriod\":8,\"location\":\"示例楼 C401\"}],\"assessmentItems\":[{\"label\":\"课程项目\",\"weight\":40},{\"label\":\"期末考试\",\"weight\":60}],\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-course-database-systems\"}}",
-      "ownerId": "mock-current-user",
+      "groupMetaInfo": "{\"course\":{\"term\":\"2025 秋季\",\"category\":\"专业选修\",\"startAt\":\"2025-09-01T00:00:00+08:00\",\"endAt\":\"2026-01-09T23:59:59+08:00\",\"learningObjectives\":[\"掌握关系模型、查询处理和事务管理的基本原理。\"],\"meetings\":[{\"meetingId\":\"meeting-friday\",\"weekPattern\":\"EVERY\",\"weekday\":\"周五\",\"startPeriod\":6,\"endPeriod\":8,\"location\":\"示例楼 C401\"}],\"assessmentItems\":[{\"label\":\"课程项目\",\"weight\":40},{\"label\":\"期末考试\",\"weight\":60}],\"schema\":\"wisepen.course.v1\",\"outlineRootTagId\":\"outline-root-1003\"}}",
+      "ownerId": "2003",
       "ownerInfo": {
         "nickname": "当前教师",
         "identityType": 2
       },
       "memberCount": 64,
-      "inviteCode": "COURSE-course-database-systems",
+      "inviteCode": "COURSE-1003",
       "tokenUsed": 0,
       "tokenBalance": 1000
     }
@@ -709,10 +709,10 @@
         }
       }
     ],
-    "course-data-structures": [
+    "1001": [
       {
-        "memberId": "mock-teacher-primary",
-        "groupId": "course-data-structures",
+        "memberId": "2001",
+        "groupId": "1001",
         "role": "0",
         "joinTime": "2026-03-01T00:00:00Z",
         "tokenLimit": 1000,
@@ -728,8 +728,8 @@
         }
       },
       {
-        "memberId": "mock-assistant",
-        "groupId": "course-data-structures",
+        "memberId": "2007",
+        "groupId": "1001",
         "role": "1",
         "joinTime": "2026-03-01T00:00:00Z",
         "tokenLimit": 1000,
@@ -745,8 +745,8 @@
         }
       },
       {
-        "memberId": "mock-student-current",
-        "groupId": "course-data-structures",
+        "memberId": "2004",
+        "groupId": "1001",
         "role": "2",
         "joinTime": "2026-03-01T00:00:00Z",
         "tokenLimit": 1000,
@@ -762,10 +762,10 @@
         }
       }
     ],
-    "course-computer-networks": [
+    "1002": [
       {
-        "memberId": "mock-teacher-network",
-        "groupId": "course-computer-networks",
+        "memberId": "2002",
+        "groupId": "1002",
         "role": "0",
         "joinTime": "2026-03-01T00:00:00Z",
         "tokenLimit": 1000,
@@ -781,8 +781,8 @@
         }
       },
       {
-        "memberId": "mock-student-network-current",
-        "groupId": "course-computer-networks",
+        "memberId": "2005",
+        "groupId": "1002",
         "role": "2",
         "joinTime": "2026-03-01T00:00:00Z",
         "tokenLimit": 1000,
@@ -798,8 +798,8 @@
         }
       },
       {
-        "memberId": "mock-student-network-peer",
-        "groupId": "course-computer-networks",
+        "memberId": "2006",
+        "groupId": "1002",
         "role": "2",
         "joinTime": "2026-03-01T00:00:00Z",
         "tokenLimit": 1000,
@@ -815,13 +815,13 @@
         }
       }
     ],
-    "course-database-systems": []
+    "1003": []
   },
   "myRoles": {
     "1": "0",
     "2": "0",
-    "course-data-structures": "0",
-    "course-computer-networks": "2",
-    "course-database-systems": "0"
+    "1001": "0",
+    "1002": "2",
+    "1003": "0"
   }
 }

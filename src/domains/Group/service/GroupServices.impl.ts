@@ -4,6 +4,7 @@ import { normalizeResourceActions } from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig, ROLE } from '@/domains/Group';
 import { DEFAULT_MEMBER_ACTIONS, GROUP_TYPE } from '@/domains/Group';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { normalizeId } from '@/utils/normalize/normalizeId';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
@@ -33,33 +34,26 @@ const fetchGroupList = async (params: FetchGroupListRequest): Promise<FetchGroup
 
 const fetchGroupInfo = async (groupId: string): Promise<Group> => {
   const myRole = await fetchMyRoleInGroup(groupId);
-  const query = GroupServicesMap.mapFetchGroupInfoRequest(groupId);
   const data = await (myRole === 'MEMBER'
-    ? GroupApi.getGroupBaseInfo(query)
-    : GroupApi.getGroupDetailInfo(query));
-  if (!data) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
-  return GroupServicesMap.mapFetchGroupInfoFromApi(data);
+    ? GroupApi.getGroupBaseInfo({ groupId })
+    : GroupApi.getGroupDetailInfo({ groupId }));
+  return GroupServicesMap.mapGroupFromApi(data);
 };
 
 const fetchGroupBaseInfo = async (groupId: string): Promise<GroupBaseInfo> => {
-  const query = GroupServicesMap.mapFetchGroupBaseInfoRequest(groupId);
-  const data = await GroupApi.getGroupBaseInfo(query);
-  if (!data) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
-  return GroupServicesMap.mapFetchGroupBaseInfoFromApi(data, groupId);
+  const data = await GroupApi.getGroupBaseInfo({ groupId });
+  return GroupServicesMap.mapFetchGroupBaseInfoFromApi(data);
 };
 
 const getGroupWalletInfo = async (params: GetGroupWalletInfoRequest): Promise<number> => {
   const { groupId } = params;
   if (!groupId) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ID_REQUIRED);
   const data = await GroupApi.getGroupDetailInfo({ groupId });
-  if (!data) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_WALLET_FETCH_FAILED);
-  return GroupServicesMap.mapGroupWalletInfoFromApi(data);
+  return data.tokenBalance;
 };
 
 const fetchGroupResConfig = async (groupId: string): Promise<GroupResConfig> => {
-  const query = GroupServicesMap.mapFetchGroupResConfigRequest(groupId);
-  const data = await GroupResConfigApi.getConfig(query);
-  if (!data) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_RES_CONFIG_FETCH_FAILED);
+  const data = await GroupResConfigApi.getConfig({ groupId });
   return GroupServicesMap.mapFetchGroupResConfigFromApi(data);
 };
 
@@ -69,16 +63,11 @@ const updateGroupResConfig = async (params: UpdateGroupResConfigRequest) => {
 };
 
 const createGroup = async (params: CreateGroupRequest): Promise<string> => {
-  const payload = await GroupApi.addGroup(GroupServicesMap.mapCreateGroupRequest(params));
-  if (payload == null) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_CREATE_FAILED);
-  }
-  const groupId = GroupServicesMap.mapCreateGroupFromApi(payload);
-  if (!groupId) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_CREATE_FAILED);
-  }
+  const groupId = await GroupApi.addGroup(GroupServicesMap.mapCreateGroupRequest(params));
+  const currentConfig = await GroupResConfigApi.getConfig({ groupId });
   await updateGroupResConfig({
     groupId,
+    fileOrgLogic: currentConfig.fileOrgLogic,
     defaultMemberActions: normalizeResourceActions(DEFAULT_MEMBER_ACTIONS),
   });
   return groupId;
@@ -97,17 +86,12 @@ const fetchGroupMembers = async (
   page: number,
   size: number
 ): Promise<GroupMemberList> => {
-  const query = GroupServicesMap.mapFetchGroupMembersRequest(groupId, page, size);
-  const data = await GroupMemberApi.list(query);
-  if (!data) {
-    return { members: [], total: 0 };
-  }
+  const data = await GroupMemberApi.list({ groupId: normalizeId(groupId), page, size });
   return GroupServicesMap.mapFetchGroupMembersFromApi(data);
 };
 
 const fetchMyRoleInGroup = async (groupId: string): Promise<EnumKey<typeof ROLE>> => {
-  const query = GroupServicesMap.mapFetchMyRoleInGroupRequest(groupId);
-  const data = await GroupMemberApi.getMyRole(query);
+  const data = await GroupMemberApi.getMyRole(groupId);
   const role = GroupServicesMap.mapFetchMyRoleInGroupFromApi(data);
   if (!role) {
     throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ROLE_FETCH_FAILED);
@@ -124,7 +108,7 @@ const quitGroup = async (params: QuitGroupRequest) => {
 };
 
 const updateMemberRole = async (params: UpdateMemberRoleRequest) => {
-  await GroupMemberApi.changeRole(GroupServicesMap.mapUpdateMemberRoleRequest(params));
+  await GroupMemberApi.changeRole(params);
 };
 
 const kickMembers = async (params: KickMembersRequest) => {
@@ -152,7 +136,7 @@ const fetchUserGroupQuotas = async (
 };
 
 const fetchGroupQuota = async (groupId: string | number): Promise<GroupQuotaInfo> => {
-  const data = await GroupMemberApi.getMyGroupMemberInfo({ groupId });
+  const data = await GroupMemberApi.getMyGroupMemberInfo({ groupId: normalizeId(groupId) });
   return GroupQuotaMap.mapFetchGroupQuotaFromApi(data);
 };
 

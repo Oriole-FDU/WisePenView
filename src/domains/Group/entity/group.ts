@@ -38,7 +38,7 @@ export type GroupFileOrgLogic = EnumValue<typeof GROUP_FILE_ORG_LOGIC>;
 export interface GroupResConfig {
   groupId: string;
   fileOrgLogic: GroupFileOrgLogic;
-  defaultMemberActions?: ResourceAction[];
+  defaultMemberActions: ResourceAction[];
 }
 
 /** 小组基础展示信息（由 GET /group/getGroupBaseInfo 映射） */

@@ -10,7 +10,7 @@ import SelectedMemberList from '@/components/business/SelectedMemberList';
 import { useGroupService } from '@/domains';
 import { ROLE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import type { EnumKey } from '@/utils/type/enum';
+import type { EnumKey, EnumValue } from '@/utils/type/enum';
 
 import type { EditPermissionModalProps } from './index.type';
 import styles from './style.module.scss';
@@ -29,7 +29,7 @@ function EditPermissionModal({
   const groupService = useGroupService();
   const [selectedPermission, setSelectedPermission] = useState<EnumKey<typeof ROLE>>('MEMBER');
   const { loading, run: runUpdatePermission } = useApi(
-    async (role: number) =>
+    async (role: EnumValue<typeof ROLE>) =>
       groupService.updateMemberRole({
         groupId,
         targetUserIds: memberIds,

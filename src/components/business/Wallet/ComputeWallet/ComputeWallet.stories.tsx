@@ -54,7 +54,7 @@ function WalletProviderFrame({ group = false }: { group?: boolean }) {
       <div className={styles.frame}>
         <ComputeWallet
           targetType={group ? WALLET_TARGET_TYPE.GROUP : WALLET_TARGET_TYPE.USER}
-          targetId={group ? 'course-data-structures' : undefined}
+          targetId={group ? '1001' : undefined}
           canRecharge={!group}
           showOperatorColumn={group}
         />

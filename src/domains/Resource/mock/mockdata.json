@@ -32,7 +32,7 @@
         }
       },
       {
-        "groupId": "course-computer-networks",
+        "groupId": "1002",
         "primaryTagId": "network-chapter-1",
         "tags": {
           "network-chapter-1": {
@@ -41,7 +41,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "chapter-1",
         "tags": {
           "chapter-1": {
@@ -87,7 +87,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "section-21",
         "tags": {
           "section-21": {
@@ -610,7 +610,7 @@
         }
       },
       {
-        "groupId": "course-computer-networks",
+        "groupId": "1002",
         "primaryTagId": "network-http",
         "tags": {
           "network-http": {
@@ -619,7 +619,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "chapter-1",
         "tags": {
           "chapter-1": {
@@ -664,7 +664,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "section-21",
         "tags": {
           "section-21": {
@@ -709,7 +709,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "section-22",
         "tags": {
           "section-22": {
@@ -754,7 +754,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "section-22",
         "tags": {
           "section-22": {
@@ -799,7 +799,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "chapter-3",
         "tags": {
           "chapter-3": {
@@ -844,7 +844,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "chapter-3",
         "tags": {
           "chapter-3": {
@@ -889,7 +889,7 @@
         }
       },
       {
-        "groupId": "course-data-structures",
+        "groupId": "1001",
         "primaryTagId": "chapter-4",
         "tags": {
           "chapter-4": {
