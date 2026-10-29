@@ -1,9 +1,8 @@
 import type { AdminUser } from '@/domains/Admin';
+import { USER_STATUS } from '@/domains/User';
 import {
   mapIdentityTypeToApi,
-  mapUserStatusToApi,
   normalizeIdentityTypeFromApi,
-  normalizeUserStatusFromApi,
 } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
@@ -37,7 +36,7 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
     email: raw.email ?? undefined,
     mobile: raw.mobile ?? undefined,
     verificationMode: raw.verificationMode ?? null,
-    status: raw.status == null ? 0 : normalizeUserStatusFromApi(raw.status),
+    status: raw.status ?? USER_STATUS.UNIDENTIFIED,
     createTime: raw.createTime ?? undefined,
     updateTime: raw.updateTime ?? undefined,
   };
@@ -49,7 +48,7 @@ const mapFetchAdminUserListRequest = (
   page: params.page,
   size: params.size,
   keyword: params.keyword,
-  ...(mapUserStatusToApi(params.status) ? { status: mapUserStatusToApi(params.status) } : {}),
+  status: params.status,
   ...(mapIdentityTypeToApi(params.identityType)
     ? { identityType: mapIdentityTypeToApi(params.identityType) }
     : {}),
@@ -84,7 +83,6 @@ const mapChangeAdminUserInfoRequest = (
 ): ChangeAdminUserInfoApiRequest => ({
   ...params,
   identityType: mapIdentityTypeToApi(params.identityType),
-  status: mapUserStatusToApi(params.status),
 });
 
 const mapChangeAdminUserProfileRequest = (

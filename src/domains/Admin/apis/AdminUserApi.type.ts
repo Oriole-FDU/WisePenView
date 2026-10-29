@@ -25,7 +25,7 @@ export interface AdminUserApiModel {
 
 export interface FetchAdminUserListApiRequest extends PageApiRequest {
   keyword: string;
-  status?: string;
+  status?: UserStatusApiValue;
   identityType?: string;
 }
 
@@ -56,7 +56,7 @@ export interface ChangeAdminUserInfoApiRequest {
   avatar?: string;
   email?: string | null;
   mobile?: string | null;
-  status?: string;
+  status?: UserStatusApiValue;
   identityType?: string;
 }
 

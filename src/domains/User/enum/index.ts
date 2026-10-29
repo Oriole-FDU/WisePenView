@@ -18,10 +18,11 @@ export type Sex = EnumValue<typeof SEX>;
 
 /** 账号状态 */
 export const USER_STATUS = createEnum([
-  { value: -1, key: 'UNVERIFIED' },
-  { value: -2, key: 'BANNED' },
-  { value: 1, key: 'NORMAL' },
+  { value: 'NORMAL', key: 'NORMAL' },
+  { value: 'UNIDENTIFIED', key: 'UNIDENTIFIED' },
+  { value: 'BANNED', key: 'BANNED' },
 ] as const);
+export type UserStatus = EnumValue<typeof USER_STATUS>;
 
 /** 认证方式（与后端 UserVerificationMode 对齐） */
 export const USER_VERIFICATION = createEnum([

@@ -47,11 +47,7 @@ import type {
   SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from '../service/index.type';
-import {
-  normalizeIdentityTypeFromApi,
-  normalizeUserDisplayBaseFromApi,
-  normalizeUserStatusFromApi,
-} from './userEnum.mapper';
+import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
   User,
@@ -73,7 +69,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       mobile: userInfo.mobile ?? undefined,
       verificationMode: userInfo.verificationMode,
       verificationProviderCode: userInfo.verificationProviderCode,
-      status: normalizeUserStatusFromApi(userInfo.userStatus),
+      status: userInfo.userStatus,
     },
     userProfile: {
       sex: userProfile.sex ?? undefined,

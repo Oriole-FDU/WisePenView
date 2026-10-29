@@ -1,4 +1,4 @@
-import type { DegreeLevel, Sex, UserVerificationMode } from '../enum';
+import type { DegreeLevel, Sex, UserStatus, UserVerificationMode } from '../enum';
 
 // 只存储需要的用户字段；id 用 string 避免大数精度丢失
 export interface User {
@@ -39,7 +39,7 @@ export interface UserAccountInfo {
   verificationMode: UserVerificationMode | null;
   /** 校园身份提供方的开放编码，例如 FUDAN_UIS，不以单一学校做联合类型兜底。 */
   verificationProviderCode: string | null;
-  status: number;
+  status: UserStatus;
 }
 
 export interface UserProfileInfo {

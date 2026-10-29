@@ -22,6 +22,7 @@ export type {
   DegreeLevel,
   FeedbackType,
   Sex,
+  UserStatus,
   UserVerificationMode,
   UserVerificationProvider,
 } from './enum';
