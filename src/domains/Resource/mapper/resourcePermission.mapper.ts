@@ -10,10 +10,10 @@ import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
-  ChangeResourceActionPermissionApiRequest,
   ResourceGroupDisplayBaseApiResponse,
   ResourceItemApiResponse,
 } from '../apis/ResourceApi.type';
+import type { ChangeResourceActionPermissionApiContractRequest } from '../apis/ResourceCoreApi.contract';
 import { getSupportedResourcePermissionActions } from '../enum';
 import type {
   ResourcePermissionActionOption,
@@ -68,7 +68,7 @@ const mapSpecifiedUserInfoByIdFromApi = (
 /** userId → ResourceAction[] 转为 API 请求的 userId → 枚举 key[]；null/undefined 原样透传 */
 const mapSpecifiedUsersGrantedActionsToApi = (
   value: UpdateResourceActionPermissionRequest['specifiedUsersGrantedActions']
-): ChangeResourceActionPermissionApiRequest['specifiedUsersGrantedActions'] => {
+): ChangeResourceActionPermissionApiContractRequest['specifiedUsersGrantedActions'] => {
   if (value === null) {
     return null;
   }
@@ -86,7 +86,7 @@ const mapSpecifiedUsersGrantedActionsToApi = (
 /** groupId → ResourceAction[] 转为 API 请求的 groupId → 枚举 key[]；null 表示清空整组覆盖配置。 */
 const mapOverrideGrantedActionsToApi = (
   value: UpdateResourceActionPermissionRequest['overrideGrantedActions']
-): ChangeResourceActionPermissionApiRequest['overrideGrantedActions'] => {
+): ChangeResourceActionPermissionApiContractRequest['overrideGrantedActions'] => {
   if (value === null) {
     return null;
   }
@@ -104,7 +104,7 @@ const mapOverrideGrantedActionsToApi = (
 
 export const mapChangeResourceActionPermissionRequest = (
   params: UpdateResourceActionPermissionRequest
-): ChangeResourceActionPermissionApiRequest => {
+): ChangeResourceActionPermissionApiContractRequest => {
   return {
     resourceId: params.resourceId,
     overrideGrantedActions: mapOverrideGrantedActionsToApi(params.overrideGrantedActions),
@@ -116,7 +116,7 @@ export const mapChangeResourceActionPermissionRequest = (
 
 export const mapChangeResourceActionPermissionRequestFromSubjects = (
   params: UpdateResourcePermissionSubjectsRequest
-): ChangeResourceActionPermissionApiRequest => {
+): ChangeResourceActionPermissionApiContractRequest => {
   const overrideGrantedActions: Record<string, ResourceAction[] | null> = {};
   const specifiedUsersGrantedActions: Record<string, ResourceAction[]> = {};
 

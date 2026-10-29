@@ -1,15 +1,9 @@
 import {
   mapListResourceItemsRequest,
-  mapMountResourcesToGroupRequest,
-  mapMovePersonalResourcesToTrashRequest,
-  mapMoveResourcesInGroupRequest,
-  mapReplacePersonalNormalTagsRequest,
   mapResourceItemFromApi,
   mapResourceListPageFromApi,
   mapResourcePlacementCountFromApi,
   mapSearchResultPageFromApi,
-  mapSetPersonalResourcesPathTagRequest,
-  mapUnmountResourcesToGroupRequest,
 } from './resource.mapper';
 import {
   mapChangeResourceActionPermissionRequest,
@@ -20,12 +14,6 @@ import { mergeResourcePermissionHydration } from './resourcePermissionHydration.
 
 export const ResourceServicesMap = {
   mapListResourceItemsRequest,
-  mapSetPersonalResourcesPathTagRequest,
-  mapMovePersonalResourcesToTrashRequest,
-  mapReplacePersonalNormalTagsRequest,
-  mapMountResourcesToGroupRequest,
-  mapUnmountResourcesToGroupRequest,
-  mapMoveResourcesInGroupRequest,
   mapResourcePlacementCountFromApi,
   mapResourceListPageFromApi,
   mapResourceItemFromApi,

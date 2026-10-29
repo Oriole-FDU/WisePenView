@@ -64,7 +64,8 @@ export interface SearchHitItem {
   resourceIconType: ResourceIconType;
   resourceName: string;
   highlightContent: string | null;
-  updateTime: string;
+  /** Java LocalDateTime 经统一 Jackson 配置序列化为毫秒时间戳。 */
+  updateTime: number;
 }
 
 /** 搜索分页结果 */
