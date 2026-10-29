@@ -2,8 +2,9 @@ import type { TFunction } from 'i18next';
 import { type Key, useState } from 'react';
 
 import { useGroupService, useTagService } from '@/domains';
+import { isAccessControlScope } from '@/domains/_shared/access';
 import type { GroupMember } from '@/domains/Group';
-import { ACCESS_CONTROL_SCOPE, type TagTreeNode } from '@/domains/Tag';
+import type { TagTreeNode } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
@@ -195,7 +196,7 @@ export const useTagPermissionModalController = ({
   };
 
   const handlePersonnelScopeChange = (target: PersonnelPolicyTarget, nextKey: Key) => {
-    if (!ACCESS_CONTROL_SCOPE.isValue(nextKey)) return;
+    if (!isAccessControlScope(nextKey)) return;
     const nextScope = nextKey;
     const supportedScope = normalizeSupportedScope(nextScope);
     setPermissionForm((prev) => {

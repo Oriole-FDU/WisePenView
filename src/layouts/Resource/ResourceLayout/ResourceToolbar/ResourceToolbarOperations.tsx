@@ -17,16 +17,16 @@ import {
   useSkillService,
 } from '@/domains';
 import {
+  RESOURCE_ACTION,
+  type ResourceAction,
+  resourceActionsInclude,
+} from '@/domains/_shared/access';
+import {
   buildDriveNodeScope,
   type DriveContainerNode,
   type DriveResourceNode,
 } from '@/domains/Drive';
-import {
-  RESOURCE_ACTION,
-  type ResourceAction,
-  resourceActionsInclude,
-  type ResourceItem,
-} from '@/domains/Resource';
+import { type ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';

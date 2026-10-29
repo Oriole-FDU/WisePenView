@@ -1,5 +1,5 @@
-import type { ResourceAccessRole, ResourceAction, ResourceIconType } from '@/domains/Resource';
-import type { AccessControlScope, TagResourceAction } from '@/domains/Tag';
+import type { AccessControlScope, ResourceAction } from '@/domains/_shared/access';
+import type { ResourceAccessRole, ResourceIconType } from '@/domains/Resource';
 import type { UserDisplayBase } from '@/domains/User';
 
 export type DriveSystemFolderType = 'trash' | 'shared' | 'note' | 'page';
@@ -52,7 +52,7 @@ interface FolderNode extends DriveNodeBase {
   description?: string;
   taggedResourceAclGrantScope?: AccessControlScope;
   tagMountPermissionScope?: AccessControlScope;
-  grantedActions?: TagResourceAction[];
+  grantedActions?: ResourceAction[];
 }
 
 interface DriveResourceNodeBase extends DriveNodeBase {

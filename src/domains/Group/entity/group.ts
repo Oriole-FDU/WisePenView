@@ -1,5 +1,5 @@
+import type { ResourceAction } from '@/domains/_shared/access';
 import type { GROUP_FILE_ORG_LOGIC, GroupType, ROLE } from '@/domains/Group';
-import type { TagResourceAction } from '@/domains/Tag';
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
 
 /** 成员列表领域模型（由 OpenAPI GroupMemberDetailResponse 映射）；userId 对应接口 memberId，避免大数精度丢失 */
@@ -38,7 +38,7 @@ export type GroupFileOrgLogic = EnumValue<typeof GROUP_FILE_ORG_LOGIC>;
 export interface GroupResConfig {
   groupId: string;
   fileOrgLogic: GroupFileOrgLogic;
-  defaultMemberActions?: TagResourceAction[];
+  defaultMemberActions?: ResourceAction[];
 }
 
 /** 小组基础展示信息（由 GET /group/getGroupBaseInfo 映射） */

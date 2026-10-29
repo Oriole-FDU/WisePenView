@@ -5,11 +5,8 @@ import {
   filterResourcePermissionActionsByOptions,
   getResourcePermissionActionLabel,
 } from '@/components/business/Drive/common/resourcePermissionPolicy';
-import type {
-  ResourceAction,
-  ResourcePermissionActionOption,
-  ResourcePermissionSubject,
-} from '@/domains/Resource';
+import type { ResourceAction } from '@/domains/_shared/access';
+import type { ResourcePermissionActionOption, ResourcePermissionSubject } from '@/domains/Resource';
 import type { UserSearchUser } from '@/domains/User';
 
 export type SpecifiedUserCandidate = Pick<

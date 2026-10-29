@@ -4,9 +4,14 @@ import { useTranslation } from 'react-i18next';
 
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useDocumentService, useHtmlPageService, useNoteService } from '@/domains';
-import { RESOURCE_ACTION, type ResourceAction, type ResourceItem } from '@/domains/Resource';
+import {
+  ACCESS_CONTROL_SCOPE,
+  type AccessControlScope,
+  RESOURCE_ACTION,
+  type ResourceAction,
+} from '@/domains/_shared/access';
+import type { ResourceItem } from '@/domains/Resource';
 import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
-import { ACCESS_CONTROL_SCOPE, type AccessControlScope } from '@/domains/Tag';
 import type { UserDisplayBase } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { formatFileSize } from '@/utils/format/formatFileSize';

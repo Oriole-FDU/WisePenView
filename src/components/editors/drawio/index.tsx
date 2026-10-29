@@ -12,12 +12,13 @@ import EditorPresentationBinding from '@/components/editors/_runtime/EditorPrese
 import type { EditorPresentation } from '@/components/editors/editor.type';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useInteractService, useNoteService, useUserService } from '@/domains';
+import type { ResourceAction } from '@/domains/_shared/access';
 import type {
   DrawIoLatestSnapshotData,
   NoteInfoDisplayData,
   NoteVersionListPage,
 } from '@/domains/Note';
-import type { ResourceAction, ResourceItem } from '@/domains/Resource';
+import type { ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';

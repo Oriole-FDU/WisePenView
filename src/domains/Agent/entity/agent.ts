@@ -1,4 +1,5 @@
-import type { ResourceAction, ResourceItem } from '@/domains/Resource';
+import type { ResourceAction } from '@/domains/_shared/access';
+import type { ResourceItem } from '@/domains/Resource';
 
 export type AgentAssetResourceType = 'MD' | 'PYTHON_SCRIPT' | 'TEXT' | 'JSON' | 'YAML' | 'TOML';
 

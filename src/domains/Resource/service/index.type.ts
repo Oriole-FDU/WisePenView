@@ -3,8 +3,8 @@
  * 与 resource.openapi.json 对齐
  */
 
+import type { ResourceAction } from '@/domains/_shared/access';
 import type {
-  ResourceAction,
   ResourceIconType,
   ResourceItem,
   ResourceSortBy,

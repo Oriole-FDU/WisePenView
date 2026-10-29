@@ -1,3 +1,4 @@
+import type { ResourceAction } from '@/domains/_shared/access';
 import type {
   Group,
   GroupBaseInfo,
@@ -5,7 +6,6 @@ import type {
   GroupResConfig,
   GroupType,
 } from '@/domains/Group';
-import type { TagResourceAction } from '@/domains/Tag';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
 
@@ -111,7 +111,7 @@ export interface KickMembersRequest {
 /** 设置小组资源配置（与 OpenAPI GroupResConfigUpdateRequest 对齐） */
 export interface UpdateGroupResConfigRequest {
   groupId: string;
-  defaultMemberActions?: TagResourceAction[];
+  defaultMemberActions?: ResourceAction[];
 }
 
 /** 设置成员配额请求参数（与 OpenAPI changeTokenLimit 对齐）；ID 用 string 避免大数精度丢失 */

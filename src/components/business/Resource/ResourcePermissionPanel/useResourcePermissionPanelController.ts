@@ -3,11 +3,11 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useResourcePermissionService, useResourceService, useUserService } from '@/domains';
+import { updateResourceActionSelection } from '@/domains/_shared/access';
 import {
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
   type ResourcePermissionSubject,
-  updateResourceActionSelection,
 } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';

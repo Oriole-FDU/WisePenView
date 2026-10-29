@@ -1,9 +1,11 @@
 import {
   areResourcePermissionActionsEqual,
   filterSupportedResourcePermissionActions,
-  getSupportedResourcePermissionActions,
   RESOURCE_ACTION,
   type ResourceAction,
+} from '@/domains/_shared/access';
+import {
+  getSupportedResourcePermissionActions,
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
   type ResourcePermissionSubject,
