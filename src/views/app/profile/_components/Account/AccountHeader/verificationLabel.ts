@@ -2,7 +2,6 @@ import {
   USER_VERIFICATION,
   USER_VERIFICATION_PROVIDER,
   type UserVerificationMode,
-  type UserVerificationProvider,
 } from '@/domains/User';
 
 const VERIFICATION_MODE_LABEL_KEY = {
@@ -18,7 +17,7 @@ export type VerificationLabelKey =
 
 export function resolveVerificationLabelKey(
   mode: UserVerificationMode | null,
-  provider: UserVerificationProvider | null
+  provider: string | null
 ): VerificationLabelKey {
   if (!mode) return 'header.verification.verified';
   // API 新增认证方式时先显示通用已认证文案，避免把未翻译的枚举键直接暴露给用户。

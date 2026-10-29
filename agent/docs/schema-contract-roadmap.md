@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核已实施并提交（`f804527e`）；152 个业务接口的逐域迁移尚未开始。
+> 状态：Wave 0 契约内核与 U UserInformation 已实施；其余业务接口的逐域迁移尚未开始。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -12,7 +12,7 @@
 
 1. 建立共享 wire 基础 Schema、Contract 元数据和覆盖率检查。
 2. 修正现有 P0 契约事故，并冻结 Auth 作为已完成样板。
-3. 建设 UserDirectory、AccessPolicy、Group、Tag 四个基础域。
+3. 建设 UserInformation、AccessPolicy、Group、Tag 四个基础域。
 4. 建设 ResourceCore、ResourceAccess、ResourcePlacement。
 5. 分别建设 Document、Note、Skill、Agent、HtmlPage。
 6. 建设 Interact、InlineComment、Message、Wallet、UserTask、Admin。
@@ -37,7 +37,7 @@
 flowchart TD
   W[Shared Wire Schema<br/>ID / Long / Time / Page / Envelope]
   A[Access Policy<br/>ResourceAction / Scope]
-  U[User Directory<br/>UserSummary / GroupOwner]
+  U[User Information<br/>UserSummary / GroupOwner]
   G[Group<br/>Group / Membership]
   T[Tag<br/>TagSummary / TagTree / TagPolicy]
   R[Resource Core<br/>List / Base / Detail / Search]
@@ -93,20 +93,21 @@ flowchart TD
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef next fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
   class W completed
-  class A,U next
+  class A next
+  class U completed
 ```
 
 当前 DAG 前沿：
 
-- 已完成：`W Shared Wire Schema`。
-- 已解锁、可作为 Wave 1 并行启动：`A AccessPolicy`、`U UserDirectory`。
+- 已完成：`W Shared Wire Schema`、`U UserInformation`。
+- 已解锁、可作为 Wave 1 并行启动：`A AccessPolicy`。
 - 仍被阻塞：`G Group` 与 `T Tag` 需要 `A + U`；`R ResourceCore` 还需要 `G + T`；其他叶域和聚合域继续沿 DAG 向后等待。
 
 关键约束：
 
 - `Shared Wire Schema` 不拥有业务规则，只表达后端序列化事实和公共结构。
 - `Access Policy` 拥有 `DISCOVER / VIEW / LOAD / EDIT / ... / MARKET_VIEW` 以及访问范围，Tag、Group、Resource 都依赖它，不再让 Tag 反向依赖 Resource 来取得动作定义。
-- `User Directory` 只暴露稳定用户摘要；不要把完整账户资料、钱包、消息、任务全部塞进所有消费者。
+- `User Information` 只暴露稳定用户摘要；不要把完整账户资料、钱包、消息、任务全部塞进所有消费者。
 - `Tag` 的树节点依赖用户摘要与访问策略，不依赖 Resource entity。
 - `ResourceCore` 消费 Group、Tag、User 的摘要契约，不拥有 Tag 编辑、评论、收藏、文档解析等能力。
 - `Document / Note / Skill / Agent / HtmlPage` 是 ResourceCore 之上的资源能力叶域。
@@ -143,10 +144,10 @@ flowchart TD
 
 从当前 User 域拆成：
 
-- `UserDirectory`：`UserSummary`、当前用户展示信息、用户搜索与补全。
+- `UserInformation`：`UserSummary`、当前用户展示信息、用户搜索与补全。
 - `AccountProfile`：账号展示字段、学籍资料、CRUD 字段边界。
 - `IdentityVerification`：邮箱、Provider 列表、发起、挑战、状态查询。
-- `UserTask`、`UserTour`、`Message`、`Wallet`：继续保持独立业务域，不并回 UserDirectory。
+- `UserTask`、`UserTour`、`Message`、`Wallet`：继续保持独立业务域，不并回 UserInformation。
 - `Feedback`：若继续扩展，独立为 Support/Feedback API，不再混在 UserApi。
 
 ### 2. Resource 与 Access
@@ -440,7 +441,7 @@ src/
     │       └── AccessPolicy.schema.ts
     ├── User/
     │   └── apis/
-    │       ├── UserDirectoryApi.schema.ts
+    │       ├── UserInformationApi.schema.ts
     │       ├── AccountProfileApi.schema.ts
     │       ├── IdentityVerificationApi.schema.ts
     │       └── ...
@@ -559,9 +560,10 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - 不在 Wave 0.5 合并或删除 `defineApiContract`、`executeApiContract`、`parseApiRequest/Response`、`isApiResponseEnvelope` 与 `parseApiErrorBody`；它们职责不同。
 - 静态审计确认当前 152 个领域 API 方法均被 service 调用，没有可立即删除的完全未使用方法。
 
-### Wave 1：UserDirectory + AccessPolicy
+### Wave 1：UserInformation + AccessPolicy
 
-- UserSummary、UserDetail、UserSearch、AccountProfile、IdentityVerification Schema。
+- [x] UserSummary、UserDetail、UserSearch Schema 与 checked Contract。
+- [ ] AccountProfile CRUD 与 IdentityVerification Schema。
 - ResourceAction 与 AccessControlScope 从 Resource/Tag 提到独立 AccessPolicy。
 - 修正 Long/Millis/枚举。
 - 迁移 Campus Identity 通用接口，冻结 deprecated Fudan API。

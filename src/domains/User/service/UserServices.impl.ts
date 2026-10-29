@@ -34,16 +34,19 @@ const getFullUserInfo = async (): Promise<UserAccountProfile> => {
 };
 
 const searchUsers = async (params: SearchUsersRequest) => {
-  const query = UserServicesMap.mapSearchUsersRequest(params);
-  if (!query.keyword) return [];
-  const data = await UserApi.searchUser(query);
+  const keyword = params.keyword.trim();
+  if (!keyword) return [];
+  const data = await UserApi.searchUser({ keyword });
   return UserServicesMap.mapSearchUsersFromApi(data);
 };
 
 const listUserSearchSuggestions = async (params: ListUserSearchSuggestionsRequest) => {
-  const query = UserServicesMap.mapListUserSearchSuggestionsRequest(params);
-  if (query.keyword.length < 2) return [];
-  const data = await UserApi.listUserSearchSuggestions(query);
+  const keyword = params.keyword.trim();
+  if (keyword.length < 2) return [];
+  const data = await UserApi.listUserSearchSuggestions({
+    keyword,
+    ...(params.size == null ? {} : { size: params.size }),
+  });
   return UserServicesMap.mapSearchUsersFromApi(data);
 };
 
