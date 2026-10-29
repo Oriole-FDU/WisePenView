@@ -1,7 +1,7 @@
 import type { EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
-export const SKILL_VERSION_STATUS = createEnum([
+export const SKILL_VERSION_STATUS = defineEnum([
   { value: 'DRAFT', key: 'DRAFT' },
   { value: 'PUBLISHED', key: 'PUBLISHED' },
 ] as const);

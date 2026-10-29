@@ -2,10 +2,10 @@
  * 钱包流水领域类型；由 /user/wallet/listTransactions 的 list 项映射。
  */
 import type { EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
 /** 展示用分类（含小组划拨流水） */
-export const WALLET_TRANSACTION_KIND = createEnum([
+export const WALLET_TRANSACTION_KIND = defineEnum([
   { value: 'REFILL', key: 'REFILL' },
   { value: 'SPEND', key: 'SPEND' },
   { value: 'TRANSFER_IN', key: 'TRANSFER_IN' },

@@ -1,7 +1,7 @@
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
 /** 文档处理状态（与后端 syncPendingDocStatus 返回的 status 字符串对齐） */
-export const DOCUMENT_PROCESS = createEnum([
+export const DOCUMENT_PROCESS = defineEnum([
   { value: 'UPLOADING', key: 'UPLOADING' },
   { value: 'UPLOADED', key: 'UPLOADED' },
   { value: 'CONVERTING_AND_PARSING', key: 'CONVERTING_AND_PARSING' },

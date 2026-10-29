@@ -1,8 +1,8 @@
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
 /** 排序字段枚举 */
-export const RESOURCE_SORT_BY = createEnum([
+export const RESOURCE_SORT_BY = defineEnum([
   { value: 'UPDATE_TIME', key: 'UPDATE_TIME' },
   { value: 'CREATE_TIME', key: 'CREATE_TIME' },
   { value: 'NAME', key: 'NAME' },
@@ -10,26 +10,26 @@ export const RESOURCE_SORT_BY = createEnum([
 ] as const);
 
 /** 排序方向枚举 */
-export const RESOURCE_SORT_DIR = createEnum([
+export const RESOURCE_SORT_DIR = defineEnum([
   { value: 'ASC', key: 'ASC' },
   { value: 'DESC', key: 'DESC' },
 ] as const);
 
 /** 标签查询逻辑：OR=包含任意标签，AND=包含全部标签 */
-export const TAG_QUERY_LOGIC_MODE = createEnum([
+export const TAG_QUERY_LOGIC_MODE = defineEnum([
   { value: 'OR', key: 'OR' },
   { value: 'AND', key: 'AND' },
 ] as const);
 
 /** 全文搜索范围：与后端 SearchScope 枚举字面值一致 */
-export const SEARCH_SCOPE = createEnum([
+export const SEARCH_SCOPE = defineEnum([
   { value: 'ALL', key: 'ALL' },
   { value: 'DOCUMENT', key: 'DOCUMENT' },
   { value: 'NOTE', key: 'NOTE' },
 ] as const);
 
 /** 全文搜索可命中的资源细分类型：仅文档类 + 笔记（Skill/Agent 属 AI 资产，不进搜索）；小写值对齐后端 extension */
-const SEARCH_RESOURCE_TYPE = createEnum([
+const SEARCH_RESOURCE_TYPE = defineEnum([
   { value: 'note', key: 'NOTE' },
   { value: 'drawio', key: 'DRAWIO' },
   { value: 'pdf', key: 'PDF' },
@@ -43,7 +43,7 @@ const SEARCH_RESOURCE_TYPE = createEnum([
 ] as const);
 
 /** 资源访问权限（与后端 ResourceAction 对齐） */
-export const RESOURCE_ACTION = createEnum([
+export const RESOURCE_ACTION = defineEnum([
   { value: 1, key: 'DISCOVER' },
   { value: 2, key: 'VIEW' },
   { value: 4, key: 'LOAD' },

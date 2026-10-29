@@ -1,7 +1,7 @@
 import type { EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
-export const RESOURCE_KIND = createEnum([
+export const RESOURCE_KIND = defineEnum([
   { value: 'note', key: 'NOTE' },
   { value: 'drawio', key: 'DRAWIO' },
   { value: 'file', key: 'FILE' },
@@ -12,7 +12,7 @@ export const RESOURCE_KIND = createEnum([
 
 export type ResourceKind = EnumValue<typeof RESOURCE_KIND>;
 
-export const RESOURCE_VIEWER = createEnum([
+export const RESOURCE_VIEWER = defineEnum([
   { value: 'office', key: 'OFFICE' },
   { value: 'pdfPreview', key: 'PDF_PREVIEW' },
   { value: 'note', key: 'NOTE' },

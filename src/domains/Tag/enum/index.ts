@@ -11,12 +11,12 @@ import {
   updateResourceActionSelection,
 } from '@/domains/Resource';
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
 export const TAG_META_SCHEMA = 'wisepen.tag-meta.v1';
 
 /** 与 OpenAPI 文档语义对应的别名，值为接口要求的字符串 */
-export const TAG_VISIBILITY_MODE = createEnum([
+export const TAG_VISIBILITY_MODE = defineEnum([
   { value: '0', key: 'ALL' },
   { value: '1', key: 'ONLY_ADMIN' },
   { value: '2', key: 'WHITELIST' },
@@ -29,7 +29,7 @@ export type TagVisibilityModeString = EnumValue<typeof TAG_VISIBILITY_MODE>;
 export type TagVisibilityMode = EnumValue<typeof TAG_VISIBILITY_MODE>;
 
 /** 访问控制范围（与 OpenAPI AccessControlScope 对齐） */
-export const ACCESS_CONTROL_SCOPE = createEnum([
+export const ACCESS_CONTROL_SCOPE = defineEnum([
   { value: 'ALL', key: 'ALL' },
   { value: 'ONLY_ADMIN', key: 'ONLY_ADMIN' },
   { value: 'WHITELIST', key: 'WHITELIST' },

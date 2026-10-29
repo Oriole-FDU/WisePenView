@@ -1,7 +1,7 @@
 import type { EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
-export const AI_DIFF_DISPLAY_MODE = createEnum([
+export const AI_DIFF_DISPLAY_MODE = defineEnum([
   { value: 'oldOnly', key: 'OLD_ONLY' },
   { value: 'newOnly', key: 'NEW_ONLY' },
   { value: 'compare', key: 'COMPARE' },
