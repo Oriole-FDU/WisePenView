@@ -8,5 +8,3 @@ export const AI_DIFF_DISPLAY_MODE = createEnum([
 ] as const);
 
 export type AiDiffDisplayMode = EnumValue<typeof AI_DIFF_DISPLAY_MODE>;
-
-export const AI_DIFF_DISPLAY_MODE_LABELS = AI_DIFF_DISPLAY_MODE.labels;

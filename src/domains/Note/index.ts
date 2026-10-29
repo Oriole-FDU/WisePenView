@@ -6,7 +6,7 @@ export type {
 export type { Block, NoteAiDiffPreviewData, NoteBlockSnapshot } from './entity/note';
 export type { NoteSelectionSnapshot, SelectedNoteScope } from './entity/noteSelection';
 export type { AiDiffDisplayMode } from './enum';
-export { AI_DIFF_DISPLAY_MODE, AI_DIFF_DISPLAY_MODE_LABELS } from './enum';
+export { AI_DIFF_DISPLAY_MODE } from './enum';
 export type {
   CreateNoteRequest,
   CreateNoteResponse,
