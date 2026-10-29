@@ -14,16 +14,16 @@ import type {
   ChangeUserProfileApiRequest,
   CheckEmailVerifyApiRequest,
   CheckFudanUISVerifyApiResponse,
-  GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
   ListUserInviteRecordsApiRequest,
   ListUserInviteRecordsApiResponse,
-  ListUserSearchSuggestionsApiRequest,
-  SearchUserApiRequest,
   UserInviteRecordApiResponse,
-  UserSearchUserApiResponse,
 } from '../apis/UserApi.type';
+import type {
+  GetUserInfoApiResponse,
+  SearchUsersApiResponse,
+} from '../apis/UserInformationApi.contract';
 import type {
   UserTaskCheckInApiResponse,
   UserTaskPeriodicStatusApiResponse,
@@ -43,8 +43,6 @@ import type {
   FudanUISVerifyStatusData,
   InitiateUISVerifyRequest,
   ListUserInviteRecordsRequest,
-  ListUserSearchSuggestionsRequest,
-  SearchUsersRequest,
   SendEmailVerifyRequest,
   SubmitFeedbackRequest,
   UpdateUserInfoRequest,
@@ -74,7 +72,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       avatar: userInfo.avatar ?? undefined,
       identityType: normalizeIdentityTypeFromApi(userInfo.identityType),
       username: userInfo.username,
-      campusNo: userInfo.campusNo,
+      campusNo: userInfo.campusNo ?? undefined,
       email: userInfo.email ?? undefined,
       mobile: userInfo.mobile ?? undefined,
       verificationMode: userInfo.verificationMode,
@@ -82,7 +80,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       status: normalizeUserStatusFromApi(userInfo.userStatus),
     },
     userProfile: {
-      sex: normalizeSexFromApi(userProfile.sex),
+      sex: userProfile.sex == null ? undefined : normalizeSexFromApi(userProfile.sex),
       inviteCode: userProfile.inviteCode ?? undefined,
       university: userProfile.university,
       college: userProfile.college ?? undefined,
@@ -90,7 +88,10 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       className: userProfile.className ?? undefined,
       enrollmentYear:
         userProfile.enrollmentYear == null ? undefined : String(userProfile.enrollmentYear),
-      degreeLevel: normalizeDegreeLevelFromApi(userProfile.degreeLevel),
+      degreeLevel:
+        userProfile.degreeLevel == null
+          ? undefined
+          : normalizeDegreeLevelFromApi(userProfile.degreeLevel),
       academicTitle: userProfile.academicTitle ?? undefined,
     },
     readonlyFields: data.readonlyFields ?? [],
@@ -107,18 +108,7 @@ const mapUserSafeFromAccountProfile = (data: UserAccountProfile): CachedUserSafe
   inviteCode: data.userProfile.inviteCode,
 });
 
-const mapSearchUsersRequest = (params: SearchUsersRequest): SearchUserApiRequest => ({
-  keyword: params.keyword.trim(),
-});
-
-const mapListUserSearchSuggestionsRequest = (
-  params: ListUserSearchSuggestionsRequest
-): ListUserSearchSuggestionsApiRequest => ({
-  keyword: params.keyword.trim(),
-  ...(params.size == null ? {} : { size: params.size }),
-});
-
-const mapSearchUserFromApi = (data: UserSearchUserApiResponse): UserSearchUser => {
+const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchUser => {
   const displayInfo = normalizeUserDisplayBaseFromApi(data);
   return {
     userId: normalizeId(data.userId),
@@ -130,7 +120,7 @@ const mapSearchUserFromApi = (data: UserSearchUserApiResponse): UserSearchUser =
   };
 };
 
-const mapSearchUsersFromApi = (data: UserSearchUserApiResponse[]): UserSearchUser[] =>
+const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =>
   data.map(mapSearchUserFromApi);
 
 const mapSendEmailVerifyRequest = (
@@ -296,8 +286,6 @@ const mapUpdateUserInfoRequests = (
 export const UserServicesMap = {
   mapAccountProfileFromApi,
   mapUserSafeFromAccountProfile,
-  mapSearchUsersRequest,
-  mapListUserSearchSuggestionsRequest,
   mapSearchUsersFromApi,
   mapSendEmailVerifyRequest,
   mapInitiateUISVerifyRequest,

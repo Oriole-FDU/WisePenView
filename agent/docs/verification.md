@@ -14,7 +14,7 @@
 | Markdown、模板、普通配置               | `git diff --check`                                                                                | `pnpm lint`（若影响 JS 配置）                                |
 | `src/**/*.ts(x)`                       | `pnpm lint`、`pnpm typecheck`                                                                     | `pnpm build`（跨层或构建配置）                               |
 | `src/**/*.{less,scss,css}`、主题 token | `pnpm lint`、`pnpm check:radius`、`pnpm check:z-index`、`pnpm check:spacing`、`pnpm check:styles` | `pnpm build-storybook`（stories 变更）                       |
-| `src/domains/**`、registry、mock       | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`                                                  | `pnpm build`                                                 |
+| `src/domains/**`、registry、mock       | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm check:api-contracts`                      | `pnpm build`                                                 |
 | `vite.config.ts`、tsconfig、Electron   | `pnpm lint`、`pnpm typecheck`、`pnpm build`                                                       | 对应打包脚本                                                 |
 | 应用初始化、认证与运行时配置           | `pnpm lint`、`pnpm typecheck`、`pnpm check:mock`、`pnpm build`                                    | `pnpm build --mode mock`、配置错误启动检查、浏览器运行态回归 |
 | 前端可观测性与异常捕获                 | `pnpm lint`、`pnpm typecheck`、`pnpm test:observability`、`pnpm build`                            | Collector、OTLP 内容、私有附件权限和浏览器运行态             |
@@ -26,6 +26,8 @@
 PR CI 固定执行 commitlint、格式检查、lint、行为回归、build、mock contract、token 与样式契约和 whitespace 检查。`Code Quality & Build Gate` 是 GitHub branch protection 的稳定检查名，修改 job 名称前必须同步仓库设置。
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
+
+`pnpm check:api-contracts` 使用 `scripts/api-contract-baseline.json` 锁定尚未迁移的 unchecked REST 调用。新增 unchecked 调用会失败；迁移接口后必须同步下调基线，不能借旧文件继续扩大无契约接口。
 
 行为回归统一放在 `tests/**/*.test.mjs`，由 `pnpm test` 收集；新增业务回归优先补到对应领域测试，不再为单个场景新增包脚本。`pnpm check:styles` 只保留长期稳定的样式契约：共用 partial 和 mixin 边界、Input 与 Table 基础封装、AppButton 行式触发器的按压缩放开关、token 归属、所有 CSS Module 可编译，以及禁止 Less 回流。迁移期的精确规则数量、声明顺序和内部文件拆分快照不作为长期 CI 契约；涉及视觉、布局或交互的风险由 Storybook 或已授权的浏览器回归验证。
 

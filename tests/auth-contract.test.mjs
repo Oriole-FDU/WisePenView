@@ -68,18 +68,19 @@ try {
   ]) {
     assert(Object.hasOwn(contract, 'request'), `${contract.name} 缺少 request`);
     assert(Object.hasOwn(contract, 'response'), `${contract.name} 缺少 response`);
+    assert.equal(contract.method, 'POST', `${contract.name} method 错误`);
+    assert.equal(contract.transport, 'json', `${contract.name} transport 错误`);
+    assert.equal(
+      contract.requestPlacement,
+      contract.name === 'LogoutApi' ? 'none' : 'body',
+      `${contract.name} requestPlacement 错误`
+    );
   }
   assert(LogoutApiContract.request.safeParse(undefined).success);
   assert(LogoutApiContract.response.safeParse(null).success);
 
   assert.equal(LoginApiContract.name, 'LoginApi');
   assert.equal(LoginApiContract.endpoint, '/auth/login');
-  assert.deepEqual(
-    parseApiRequest(LoginApiContract, { account: 'alice', password: 'secret', ignored: true }),
-    { account: 'alice', password: 'secret' }
-  );
-  assert.equal(parseApiResponse(LoginApiContract, 'session-id'), 'session-id');
-
   const expectContractError = (run, expected) => {
     let thrown;
     try {
@@ -99,6 +100,29 @@ try {
       )
     );
   };
+
+  assert.deepEqual(parseApiRequest(LoginApiContract, { account: 'alice', password: 'secret' }), {
+    account: 'alice',
+    password: 'secret',
+  });
+  expectContractError(
+    () =>
+      parseApiRequest(LoginApiContract, {
+        account: 'alice',
+        password: 'secret',
+        ignored: true,
+      }),
+    {
+      code: 100,
+      source: 'client',
+      direction: 'request',
+      endpoint: '/auth/login',
+      contract: 'LoginApi',
+      path: '$',
+      issueCode: 'unrecognized_keys',
+    }
+  );
+  assert.equal(parseApiResponse(LoginApiContract, 'session-id'), 'session-id');
 
   expectContractError(() => parseApiRequest(LoginApiContract, { password: 'secret' }), {
     code: 100,
@@ -176,6 +200,10 @@ const registerVirtualModules = {
       postedRequests.push({ endpoint, request });
       return null;
     };
+    export const apiGet = async () => null;
+    export const apiPut = async () => null;
+    export const apiPatch = async () => null;
+    export const apiDelete = async () => null;
 
     export const getPostedRequests = () => postedRequests;
   `,

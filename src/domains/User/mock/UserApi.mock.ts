@@ -3,14 +3,13 @@ import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
 import type { UserApi as UserApiContract } from '../apis/UserApi';
 import type {
   CheckFudanUISVerifyApiResponse,
-  GetUserInfoApiResponse,
   UserInviteRecordApiResponse,
-  UserSearchUserApiResponse,
 } from '../apis/UserApi.type';
+import type { GetUserInfoApiResponse, UserSummaryApi } from '../apis/UserInformationApi.schema';
 import mockdata from './mockdata.json';
 
 const fullUserInfo = structuredClone(mockdata) as GetUserInfoApiResponse;
-const mockSearchUsers: UserSearchUserApiResponse[] = [
+const mockSearchUsers: UserSummaryApi[] = [
   {
     userId: '10086',
     username: 'xiaoming',

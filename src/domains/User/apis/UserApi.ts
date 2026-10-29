@@ -1,5 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 
+import { executeApiContract } from '@/apis/executeApiContract';
 import { apiGetUnchecked, apiPostUnchecked, apiPutUnchecked } from '@/apis/request';
 
 import type {
@@ -8,30 +9,36 @@ import type {
   ChangeUserProfileApiRequest,
   CheckEmailVerifyApiRequest,
   CheckFudanUISVerifyApiResponse,
-  GetUserInfoApiResponse,
   InitiateEmailVerifyApiRequest,
   InitiateFudanUISVerifyApiRequest,
   ListUserInviteRecordsApiRequest,
   ListUserInviteRecordsApiResponse,
-  ListUserSearchSuggestionsApiRequest,
-  SearchUserApiRequest,
-  UserSearchUserApiResponse,
 } from './UserApi.type';
+import {
+  GetUserInfoApiContract,
+  type GetUserInfoApiResponse,
+  ListUserSearchSuggestionsApiContract,
+  type ListUserSearchSuggestionsApiRequest,
+  type ListUserSearchSuggestionsApiResponse,
+  SearchUsersApiContract,
+  type SearchUsersApiRequest,
+  type SearchUsersApiResponse,
+} from './UserInformationApi.contract';
 
 /** User API: /user/* */
 
-function getUserInfo(config?: AxiosRequestConfig): Promise<GetUserInfoApiResponse> {
-  return apiGetUnchecked('/user/getUserInfo', config);
+async function getUserInfo(config?: AxiosRequestConfig): Promise<GetUserInfoApiResponse> {
+  return executeApiContract(GetUserInfoApiContract, undefined, config);
 }
 
-function searchUser(req: SearchUserApiRequest): Promise<UserSearchUserApiResponse[]> {
-  return apiGetUnchecked('/user/searchUser', { params: req });
+async function searchUser(req: SearchUsersApiRequest): Promise<SearchUsersApiResponse> {
+  return executeApiContract(SearchUsersApiContract, req);
 }
 
-function listUserSearchSuggestions(
+async function listUserSearchSuggestions(
   req: ListUserSearchSuggestionsApiRequest
-): Promise<UserSearchUserApiResponse[]> {
-  return apiGetUnchecked('/user/listUserSearchSuggestions', { params: req });
+): Promise<ListUserSearchSuggestionsApiResponse> {
+  return executeApiContract(ListUserSearchSuggestionsApiContract, req);
 }
 
 function initiateEmailVerify(req: InitiateEmailVerifyApiRequest): Promise<void> {

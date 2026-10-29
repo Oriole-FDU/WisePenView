@@ -1,6 +1,6 @@
 import type { NumericEnumApiValue, PageApiRequest, PageR } from '@/apis/api.type';
-import type { UserVerificationMode } from '@/domains/User';
 
+/** 尚未迁移的接口保留宽松枚举兼容；UserInformation 契约使用严格数字 code。 */
 export type UserIdentityTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
 export type UserStatusApiValue = 'NORMAL' | 'UNIDENTIFIED' | 'BANNED';
 export type UserSexApiValue = 'MALE' | 'FEMALE' | 'UNKNOWN';
@@ -16,48 +16,6 @@ export interface UserDisplayBaseApiResponse {
   campusNo?: string | null;
   email?: string | null;
   mobile?: string | null;
-}
-
-interface GetUserInfoApiResponseUserInfo {
-  nickname: string | null;
-  realName: string | null;
-  avatar: string | null;
-  identityType: UserIdentityTypeApiValue;
-  username: string;
-  campusNo: string;
-  email: string | null;
-  mobile: string | null;
-  verificationMode: UserVerificationMode | null;
-  verificationProviderCode: UserVerificationProviderApiValue | null;
-  userStatus: UserStatusApiValue;
-}
-
-interface GetUserInfoApiResponseUserProfile {
-  sex: UserSexApiValue;
-  inviteCode: string | null;
-  university: string | null;
-  college: string | null;
-  major: string | null;
-  className: string | null;
-  enrollmentYear: number | string | null;
-  degreeLevel: UserDegreeLevelApiValue;
-  academicTitle: string | null;
-}
-
-export interface GetUserInfoApiResponse {
-  userId?: string | number;
-  userInfo: GetUserInfoApiResponseUserInfo;
-  userProfile: GetUserInfoApiResponseUserProfile;
-  readonlyFields: string[] | null;
-}
-
-export interface SearchUserApiRequest {
-  keyword: string;
-}
-
-export interface ListUserSearchSuggestionsApiRequest {
-  keyword: string;
-  size?: number;
 }
 
 export interface UserSearchUserApiResponse extends UserDisplayBaseApiResponse {

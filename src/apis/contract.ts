@@ -7,9 +7,16 @@ import {
   WisePenError,
 } from '@/utils/error';
 
+export type ApiHttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type ApiRequestPlacement = 'body' | 'query' | 'none';
+export type ApiTransport = 'json' | 'multipart' | 'sse' | 'text';
+
 export interface ApiContract<Request, Response> {
   name: string;
+  method: ApiHttpMethod;
   endpoint: string;
+  requestPlacement: ApiRequestPlacement;
+  transport: ApiTransport;
   request: ZodType<Request>;
   response: ZodType<Response>;
 }
