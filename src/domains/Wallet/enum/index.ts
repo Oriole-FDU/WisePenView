@@ -5,8 +5,8 @@ import { createEnum } from '@/utils/type/enum';
  * 钱包展示主体（仅前端区分个人 / 小组 Tab，接口统一走 /user/wallet）。
  */
 export const WALLET_TARGET_TYPE = createEnum([
-  { value: 1, key: 'USER' },
-  { value: 2, key: 'GROUP' },
+  { value: 'USER', key: 'USER' },
+  { value: 'GROUP', key: 'GROUP' },
 ] as const);
 export type WalletTargetType = EnumValue<typeof WALLET_TARGET_TYPE>;
 
