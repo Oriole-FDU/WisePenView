@@ -17,10 +17,10 @@ export const TAG_META_SCHEMA = 'wisepen.tag-meta.v1';
 
 /** 与 OpenAPI 文档语义对应的别名，值为接口要求的字符串 */
 export const TAG_VISIBILITY_MODE = createEnum([
-  { value: '0', key: 'ALL', label: '全部可见' },
-  { value: '1', key: 'ONLY_ADMIN', label: '仅管理员' },
-  { value: '2', key: 'WHITELIST', label: '白名单' },
-  { value: '3', key: 'BLACKLIST', label: '黑名单' },
+  { value: '0', key: 'ALL' },
+  { value: '1', key: 'ONLY_ADMIN' },
+  { value: '2', key: 'WHITELIST' },
+  { value: '3', key: 'BLACKLIST' },
 ] as const);
 
 /** OpenAPI TagTreeResponse.visibilityMode / TagCreateRequest / TagUpdateRequest */
@@ -30,10 +30,10 @@ export type TagVisibilityMode = EnumValue<typeof TAG_VISIBILITY_MODE>;
 
 /** 访问控制范围（与 OpenAPI AccessControlScope 对齐） */
 export const ACCESS_CONTROL_SCOPE = createEnum([
-  { value: 0, key: 'ALL', label: '全部' },
-  { value: 1, key: 'ONLY_ADMIN', label: '仅管理员' },
-  { value: 2, key: 'WHITELIST', label: '白名单' },
-  { value: 3, key: 'BLACKLIST', label: '黑名单' },
+  { value: 0, key: 'ALL' },
+  { value: 1, key: 'ONLY_ADMIN' },
+  { value: 2, key: 'WHITELIST' },
+  { value: 3, key: 'BLACKLIST' },
 ] as const);
 
 export type AccessControlScope = EnumValue<typeof ACCESS_CONTROL_SCOPE>;
@@ -66,7 +66,6 @@ export interface TagMountPermissionPresetValues {
 export interface TagPermissionListAction {
   kind: 'resource';
   key: TagResourceActionKey;
-  label: string;
   action: TagResourceAction;
 }
 
@@ -124,7 +123,6 @@ export const TAG_PERMISSION_LIST_ACTIONS: TagPermissionListAction[] =
   TAG_RESOURCE_ACTION.options.map((item) => ({
     kind: 'resource' as const,
     key: item.key,
-    label: item.label,
     action: item.value as TagResourceAction,
   }));
 

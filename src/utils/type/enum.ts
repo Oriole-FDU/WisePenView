@@ -1,7 +1,6 @@
 type EnumConfigItem = {
   value: string | number;
   key: string;
-  label: string;
   [key: string]: unknown;
 };
 

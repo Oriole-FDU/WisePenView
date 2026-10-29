@@ -308,7 +308,7 @@ const TagPolicyModalBase = ({
           t('permission.tag.disabledAria', { strategy: strategy.label, action }),
         enabled: (strategy, action) =>
           t('permission.tag.enabledAria', { strategy: strategy.label, action }),
-        getActionLabel: (action) => action.label,
+        getActionLabel: (action) => t(`permission.actions.${action.key}`, { ns: 'resource' }),
         getPresetLabel: (preset) =>
           TAG_PERMISSION_ACTION_PRESET_OPTIONS.find((item) => item.key === preset)?.label ?? preset,
         toggleHeader: t('permission.tag.toggleHeader'),

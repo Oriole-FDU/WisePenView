@@ -3,56 +3,56 @@ import { createEnum } from '@/utils/type/enum';
 
 /** 排序字段枚举 */
 export const RESOURCE_SORT_BY = createEnum([
-  { value: 'UPDATE_TIME', key: 'UPDATE_TIME', label: '更新时间' },
-  { value: 'CREATE_TIME', key: 'CREATE_TIME', label: '创建时间' },
-  { value: 'NAME', key: 'NAME', label: '名称' },
-  { value: 'SIZE', key: 'SIZE', label: '大小' },
+  { value: 'UPDATE_TIME', key: 'UPDATE_TIME' },
+  { value: 'CREATE_TIME', key: 'CREATE_TIME' },
+  { value: 'NAME', key: 'NAME' },
+  { value: 'SIZE', key: 'SIZE' },
 ] as const);
 
 /** 排序方向枚举 */
 export const RESOURCE_SORT_DIR = createEnum([
-  { value: 'ASC', key: 'ASC', label: '升序' },
-  { value: 'DESC', key: 'DESC', label: '降序' },
+  { value: 'ASC', key: 'ASC' },
+  { value: 'DESC', key: 'DESC' },
 ] as const);
 
 /** 标签查询逻辑：OR=包含任意标签，AND=包含全部标签 */
 export const TAG_QUERY_LOGIC_MODE = createEnum([
-  { value: 'OR', key: 'OR', label: '包含任意' },
-  { value: 'AND', key: 'AND', label: '包含全部' },
+  { value: 'OR', key: 'OR' },
+  { value: 'AND', key: 'AND' },
 ] as const);
 
 /** 全文搜索范围：与后端 SearchScope 枚举字面值一致 */
 export const SEARCH_SCOPE = createEnum([
-  { value: 'ALL', key: 'ALL', label: '全部' },
-  { value: 'DOCUMENT', key: 'DOCUMENT', label: '文档' },
-  { value: 'NOTE', key: 'NOTE', label: '笔记' },
+  { value: 'ALL', key: 'ALL' },
+  { value: 'DOCUMENT', key: 'DOCUMENT' },
+  { value: 'NOTE', key: 'NOTE' },
 ] as const);
 
 /** 全文搜索可命中的资源细分类型：仅文档类 + 笔记（Skill/Agent 属 AI 资产，不进搜索）；小写值对齐后端 extension */
 const SEARCH_RESOURCE_TYPE = createEnum([
-  { value: 'note', key: 'NOTE', label: 'Note' },
-  { value: 'drawio', key: 'DRAWIO', label: 'Draw.io 图' },
-  { value: 'pdf', key: 'PDF', label: 'PDF' },
-  { value: 'doc', key: 'DOC', label: 'DOC' },
-  { value: 'docx', key: 'DOCX', label: 'DOCX' },
-  { value: 'ppt', key: 'PPT', label: 'PPT' },
-  { value: 'pptx', key: 'PPTX', label: 'PPTX' },
-  { value: 'xls', key: 'XLS', label: 'XLS' },
-  { value: 'xlsx', key: 'XLSX', label: 'XLSX' },
-  { value: 'unknown', key: 'UNKNOWN', label: '其他' },
+  { value: 'note', key: 'NOTE' },
+  { value: 'drawio', key: 'DRAWIO' },
+  { value: 'pdf', key: 'PDF' },
+  { value: 'doc', key: 'DOC' },
+  { value: 'docx', key: 'DOCX' },
+  { value: 'ppt', key: 'PPT' },
+  { value: 'pptx', key: 'PPTX' },
+  { value: 'xls', key: 'XLS' },
+  { value: 'xlsx', key: 'XLSX' },
+  { value: 'unknown', key: 'UNKNOWN' },
 ] as const);
 
 /** 资源访问权限（与后端 ResourceAction 对齐） */
 export const RESOURCE_ACTION = createEnum([
-  { value: 1, key: 'DISCOVER', label: '列表可见' },
-  { value: 2, key: 'VIEW', label: '在线阅读' },
-  { value: 4, key: 'LOAD', label: 'AI 装载' },
-  { value: 8, key: 'EDIT', label: '协同编辑' },
-  { value: 16, key: 'INLINE_COMMENT', label: '批注' },
-  { value: 32, key: 'DOWNLOAD_WATERMARK', label: '导出/下载带水印' },
-  { value: 64, key: 'DOWNLOAD_ORIGINAL', label: '下载源文件' },
-  { value: 128, key: 'FORK', label: '复制资源' },
-  { value: 256, key: 'COMMENT', label: '评论' },
+  { value: 1, key: 'DISCOVER' },
+  { value: 2, key: 'VIEW' },
+  { value: 4, key: 'LOAD' },
+  { value: 8, key: 'EDIT' },
+  { value: 16, key: 'INLINE_COMMENT' },
+  { value: 32, key: 'DOWNLOAD_WATERMARK' },
+  { value: 64, key: 'DOWNLOAD_ORIGINAL' },
+  { value: 128, key: 'FORK' },
+  { value: 256, key: 'COMMENT' },
 ] as const);
 
 export type TagQueryLogicMode = EnumValue<typeof TAG_QUERY_LOGIC_MODE>;
