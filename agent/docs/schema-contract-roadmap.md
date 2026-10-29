@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核已实施；152 个业务接口的逐域迁移尚未开始。
+> 状态：Wave 0 契约内核已实施并提交（`f804527e`）；152 个业务接口的逐域迁移尚未开始。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -10,7 +10,7 @@
 
 建议按以下顺序推进：
 
-1. 建立共享 wire 基础 Schema、Contract v2 和覆盖率检查。
+1. 建立共享 wire 基础 Schema、Contract 元数据和覆盖率检查。
 2. 修正现有 P0 契约事故，并冻结 Auth 作为已完成样板。
 3. 建设 UserDirectory、AccessPolicy、Group、Tag 四个基础域。
 4. 建设 ResourceCore、ResourceAccess、ResourcePlacement。
@@ -89,7 +89,18 @@ flowchart TD
   H --> RA
   U --> AD
   I --> AD
+
+  classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
+  classDef next fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
+  class W completed
+  class A,U next
 ```
+
+当前 DAG 前沿：
+
+- 已完成：`W Shared Wire Schema`。
+- 已解锁、可作为 Wave 1 并行启动：`A AccessPolicy`、`U UserDirectory`。
+- 仍被阻塞：`G Group` 与 `T Tag` 需要 `A + U`；`R ResourceCore` 还需要 `G + T`；其他叶域和聚合域继续沿 DAG 向后等待。
 
 关键约束：
 
@@ -412,18 +423,19 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 src/
 ├── apis/
 │   ├── schema/
-│   │   ├── wire.ts
-│   │   ├── page.ts
+│   │   ├── empty.ts
 │   │   ├── envelope.ts
-│   │   └── contract.ts
+│   │   ├── ids.ts
+│   │   ├── index.ts
+│   │   ├── page.ts
+│   │   ├── string.ts
+│   │   └── time.ts
 │   ├── contract.ts
-│   └── request.ts
+│   ├── executeApiContract.ts
+│   ├── request.ts
+│   └── runtimeContract.ts
 └── domains/
     ├── _shared/
-    │   ├── schema/
-    │   │   ├── ids.ts
-    │   │   ├── time.ts
-    │   │   └── display.ts
     │   └── access/
     │       └── AccessPolicy.schema.ts
     ├── User/
@@ -441,22 +453,23 @@ src/
             └── ...
 ```
 
-### 1. Contract 需要表达 method 与传输位置
+### 1. Contract 已表达的元数据
 
-当前 Contract 只有 `name/endpoint/request/response`，API 方法仍手写 query/body 放置。建议逐步升级为：
+Wave 0 已让 Contract 强制包含 HTTP method、请求位置和 transport：
 
 ```ts
-interface ApiContract<Query, Body, Response> {
+interface ApiContract<Request, Response> {
   name: string;
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   endpoint: string;
-  query?: ZodType<Query>;
-  body?: ZodType<Body>;
+  requestPlacement: 'body' | 'query' | 'none';
+  transport: 'json' | 'multipart' | 'sse' | 'text';
+  request: ZodType<Request>;
   response: ZodType<Response>;
 }
 ```
 
-文本、multipart、SSE 使用显式变体，不要强塞进 JSON Contract：
+当前 `executeApiContract` 实现 JSON transport，历史文本、multipart 与 SSE 仍走白名单入口。后续需要把特殊 transport 改为显式执行器，而不是把所有传输都继续塞进 JSON helper：
 
 ```ts
 type ApiTransport =
@@ -468,10 +481,10 @@ type ApiTransport =
 
 API 方法最终只负责：
 
-1. 校验 query/body。
+1. 绑定 Contract 与业务参数。
 2. 调用统一 transport。
-3. 解包 envelope。
-4. 校验 payload。
+
+请求校验、envelope 解包和 payload 校验已由 `executeApiContract` 集中完成。
 
 不要再让每个 API 文件复制同一套 parse 顺序。
 
@@ -479,6 +492,7 @@ API 方法最终只负责：
 
 至少区分：
 
+- `NonEmptyStringSchema`：普通非空字符串，不 trim，保留密码等值的空白语义。
 - `JavaLongStringSchema`：后端 Jackson 已将 Long 序列化为字符串，使用数字字符串校验，不再接受 number。
 - `ObjectIdStringSchema`：Mongo ObjectId，24 位十六进制。
 - `OpaqueIdSchema`：Resource ID 等跨服务不透明字符串，只校验非空。
@@ -520,13 +534,30 @@ API 方法最终只负责：
 
 ## 九、渐进实施波次
 
-### Wave 0：契约内核与基准
+### Wave 0：契约内核与基准（已完成）
 
-- [x] 新增共享字符串、ID、time、page、envelope、empty response Schema。
+- [x] 新增 [共享 Schema](../../src/apis/schema)：`NonEmptyStringSchema`、ID、time、page、envelope 和 empty response。
 - [x] 为 Contract 增加 method/request location/transport。
 - [x] 建立 `check:api-contracts`：每个域 API 方法必须绑定 checked Contract；`Unchecked` 只能存在于迁移白名单。
-- [x] Auth 迁移到 `executeApiContract`，作为 golden sample。
+- [x] 将公共命名收敛为 `defineApiContract` 与 `executeApiContract`，传输细节只存在于 Contract 字段。
+- [x] Auth 迁移到 `executeApiContract` 并将请求对象收紧为 `z.strictObject`，作为 golden sample。
+- [x] 将 `apiGetUnchecked/apiPostUnchecked/apiPutUnchecked/apiDeleteUnchecked` 标记为 `@deprecated`。
+- [x] 将 `NumericEnumApiValue` 标记为 `@deprecated`，作为各域精确 enum 迁移后的删除项。
+- [x] 增加共享 Schema、Contract 调用、Auth 契约和静态边界测试。
+- [x] 建立 6 个 Contract、146 个待迁移 REST 调用的可下降基线。
 - [ ] 为每个 P0 差异继续补失败测试；当前只覆盖共享 Schema、Auth 与静态边界基线。
+
+Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`。
+
+### Wave 0.5：公共 API 基础层瘦身
+
+- 将仅内部使用的 `parseTextApiResponse` 收回模块私有，不扩大公共导出面。
+- 保持 checked transport 方法不变；它们虽共享内部实现，但分别约束 HTTP 参数形态，当前合并收益低。
+- 等 146 个存量调用清零后，整体删除四个 deprecated 的 unchecked transport。
+- 将 `KeyedApiResponse`、`PythonApiResponse`、`ApiResponse`、`PageApiRequest`、`PageR` 等手写类型逐步改为 Schema 推导，消除类型与运行期 Schema 双事实源。
+- 清理当前无外部消费者的 `Nullable`、`InfrastructureApiErrorBody`、`ApiErrorBody` 前，先完成 API error 类型归属确认。
+- 不在 Wave 0.5 合并或删除 `defineApiContract`、`executeApiContract`、`parseApiRequest/Response`、`isApiResponseEnvelope` 与 `parseApiErrorBody`；它们职责不同。
+- 静态审计确认当前 152 个领域 API 方法均被 service 调用，没有可立即删除的完全未使用方法。
 
 ### Wave 1：UserDirectory + AccessPolicy
 
@@ -607,8 +638,17 @@ API 方法最终只负责：
 14. **域名按业务能力而非后端微服务命名。** 同一 user-service 内的 Wallet/Message/Verification 不应合成为一个巨型 User DTO。
 15. **一个 URL 只定义一次。** 不同领域复用通过 service 编排，不复制 endpoint。
 16. **新增接口必须同时交付 Zod、Contract、transport、mock 和契约测试。** 没有运行时测试的“类型化接口”不算完成。
-17. **旧接口必须有退场计划。** 标明 deprecated 日期、替代 endpoint、调用点清理时机，不保留无限期双路径。
+17. **旧接口必须有退场计划。** 使用 TypeScript `@deprecated` 或业务文档标明替代入口、调用点清理条件和删除时机，不保留无限期双路径。
 18. **Schema 诊断只记录 endpoint、contract、字段路径和 issue code。** 不记录原始请求/响应正文，避免凭据和用户数据进入遥测。
+
+### 当前明确标记的退场项
+
+| 退场项                                                                         | 替代方案                                | 删除条件                                                  |
+| ------------------------------------------------------------------------------ | --------------------------------------- | --------------------------------------------------------- |
+| `apiGetUnchecked`、`apiPostUnchecked`、`apiPutUnchecked`、`apiDeleteUnchecked` | `executeApiContract`                    | 对应域迁移完成，基线中的 unchecked 数量降为 0             |
+| `NumericEnumApiValue`                                                          | 各 wire enum 的精确 Zod enum            | IdentityType、GroupType、GroupRoleType 等调用点完成契约化 |
+| Tag 通用 `getTagTree`                                                          | `getPersonalTagTree`、`getGroupTagTree` | 个人与小组标签读取全部迁移到 scoped endpoint              |
+| Fudan UIS 两个认证接口                                                         | Campus Identity 通用认证接口            | Provider 列表、发起、Challenge 与状态查询全部接线         |
 
 ## 十一、验收门槛
 
