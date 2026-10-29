@@ -1,32 +1,43 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
 import type {
   AddTagApiRequest,
+  AddTagApiResponse,
   ChangeTagApiRequest,
+  ChangeTagApiResponse,
   GetTagTreeApiRequest,
   GetTagTreeApiResponse,
   MoveTagsApiRequest,
+  MoveTagsApiResponse,
   RemoveTagsApiRequest,
-} from './TagApi.type';
+  RemoveTagsApiResponse,
+} from './TagApi.contract';
+import {
+  AddTagApiContract,
+  ChangeTagApiContract,
+  GetTagTreeApiContract,
+  MoveTagsApiContract,
+  RemoveTagsApiContract,
+} from './TagApi.contract';
 
-function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> {
-  return apiGetUnchecked('/resource/tag/getTagTree', { params: req });
+async function getTagTree(req?: GetTagTreeApiRequest): Promise<GetTagTreeApiResponse> {
+  return executeApiContract(GetTagTreeApiContract, req ?? {});
 }
 
-function addTag(req: AddTagApiRequest): Promise<string> {
-  return apiPostUnchecked('/resource/tag/addTag', req);
+async function addTag(req: AddTagApiRequest): Promise<AddTagApiResponse> {
+  return executeApiContract(AddTagApiContract, req);
 }
 
-function changeTag(req: ChangeTagApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/tag/changeTag', req);
+async function changeTag(req: ChangeTagApiRequest): Promise<ChangeTagApiResponse> {
+  return executeApiContract(ChangeTagApiContract, req);
 }
 
-function removeTags(req: RemoveTagsApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/tag/removeTags', req);
+async function removeTags(req: RemoveTagsApiRequest): Promise<RemoveTagsApiResponse> {
+  return executeApiContract(RemoveTagsApiContract, req);
 }
 
-function moveTags(req: MoveTagsApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/tag/moveTags', req);
+async function moveTags(req: MoveTagsApiRequest): Promise<MoveTagsApiResponse> {
+  return executeApiContract(MoveTagsApiContract, req);
 }
 
 export const TagApi = {

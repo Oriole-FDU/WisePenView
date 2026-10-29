@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心与前端 `defineEnum` 枚举工具重构已实施；其余业务接口的逐域迁移尚未开始。
+> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag Schema 与前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 G Group。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -92,15 +92,15 @@ flowchart TD
 
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef next fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-  class W,A,U completed
-  class G,T next
+  class W,A,U,T completed
+  class G next
 ```
 
 当前 DAG 前沿：
 
-- 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心。
-- 下一前沿：`G Group` 与 `T Tag`。
-- 仍被阻塞：`R ResourceCore` 还需要 `G + T`；其他叶域和聚合域继续沿 DAG 向后等待。
+- 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`。
+- 下一前沿：`G Group`。
+- 仍被阻塞：`R ResourceCore` 还需要 `G`；其他叶域和聚合域继续沿 DAG 向后等待。
 
 关键约束：
 
@@ -355,11 +355,11 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 
 ### Tag
 
-| 接口                                                                                                                        | 决策                                                                                                           |
-| --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `GET /resource/tag/getTagTree`                                                                                              | `B + C + D`：保留兼容；个人/小组调用迁移到语义化 endpoint 后逐步弃用                                           |
-| 新增前端迁移目标 `GET /resource/tag/getPersonalTagTree`、`GET /resource/tag/getGroupTagTree`                                | `B + C + N`：Cloud 分支已有；避免前端用 `p_` 与空 groupId 猜作用域                                             |
-| `POST /resource/tag/addTag`、`POST /resource/tag/changeTag`、`POST /resource/tag/moveTags`、`POST /resource/tag/removeTags` | `B + C + M`：AccessControlScope 用字符串枚举；grantedActions 单一事实源；tagMetaInfo 逐步升级为结构化 metadata |
+| 接口                                                                                                                        | 决策                                                                                                    |
+| --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `GET /resource/tag/getTagTree`                                                                                              | 已完成 `C`：作为当前线上唯一 Tag 树读取入口，由 service 继续使用                                        |
+| 新增前端迁移目标 `GET /resource/tag/getPersonalTagTree`、`GET /resource/tag/getGroupTagTree`                                | 阻塞 `B + C + N`：后端未上线前不得调用；上线后再迁移并按个人/小组作用域读取                             |
+| `POST /resource/tag/addTag`、`POST /resource/tag/changeTag`、`POST /resource/tag/moveTags`、`POST /resource/tag/removeTags` | 已完成 `C + M`：精确 Scope/Action 字符串枚举；grantedActions 单一事实源；tagMetaInfo 保留 v1 字符串兼容 |
 
 ### User
 
@@ -399,7 +399,6 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 - `ResourceServicesMap`：全部 placement request 复制函数、`mapResourcePlacementCountFromApi`。
 - `WalletServicesMap`：`mapRedeemVoucherRequest`。
 - `ChatServicesMap`：`mapCreateSessionFromApi`、`mapSetSessionAgentFromApi`、`mapRenameSessionFromApi` 三个别名；`mapActiveTurnIdFromApi` 可在 Contract 类型对齐后内联。
-- `TagServicesMap.mapAddTagFromApi`：改为非空 Schema 后直接返回。
 
 ### 应保留但可显著缩小的 mapper
 
@@ -606,9 +605,11 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 3：Tag
 
-- 迁移 `getPersonalTagTree` / `getGroupTagTree`。
-- TagTree、TagCommand、TagPolicy Schema。
-- 先保留 tagMetaInfo 兼容 mapper，制定结构化 metadata v2 计划。
+- [ ] 迁移 `getPersonalTagTree` / `getGroupTagTree`；阻塞于后端上线，当前继续使用通用 `getTagTree`。
+- [x] 建立 TagTree、TagCommand、TagPolicy Schema 与 checked Contract。
+- [x] 请求严格拒绝后端已移除或由服务端维护的 `visibilityMode`、`tagCreator`、`isPath`。
+- [x] 保留 tagMetaInfo 字符串兼容 mapper；结构化 metadata 等后端提供独立字段和版本迁移规则后再实施。
+- [x] Tag mock、mapper 与合法/非法 wire 契约测试同步完成。
 
 ### Wave 4：Resource Core + Access
 
@@ -679,7 +680,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 | ------------------------------------------------------------------------------ | --------------------------------------- | --------------------------------------------------------- |
 | `apiGetUnchecked`、`apiPostUnchecked`、`apiPutUnchecked`、`apiDeleteUnchecked` | `executeApiContract`                    | 对应域迁移完成，基线中的 unchecked 数量降为 0             |
 | `NumericEnumApiValue`                                                          | 各 wire enum 的精确 Zod enum            | IdentityType、GroupType、GroupRoleType 等调用点完成契约化 |
-| Tag 通用 `getTagTree`                                                          | `getPersonalTagTree`、`getGroupTagTree` | 个人与小组标签读取全部迁移到 scoped endpoint              |
+| Tag 通用 `getTagTree`                                                          | `getPersonalTagTree`、`getGroupTagTree` | Cloud scoped endpoint 已部署，且个人与小组读取完成迁移    |
 | Fudan UIS 两个认证接口                                                         | Campus Identity 通用认证接口            | Provider 列表、发起、Challenge 与状态查询全部接线         |
 
 ## 十一、验收门槛

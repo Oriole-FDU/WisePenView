@@ -1,38 +1,15 @@
-import {
-  ACCESS_CONTROL_SCOPE,
-  type AccessControlScope,
-  normalizeResourceActions,
-  parseResourceActions,
-} from '@/domains/_shared/access';
-import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
+import { normalizeResourceActions } from '@/domains/_shared/access';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 
 import type {
   AddTagApiRequest,
   ChangeTagApiRequest,
-  GetTagTreeApiRequest,
   GetTagTreeApiResponse,
-} from '../apis/TagApi.type';
+} from '../apis/TagApi.contract';
 import type { TagMetaInfo, TagTreeNode } from '../entity/tag';
-import { TAG_VISIBILITY_MODE, type TagVisibilityModeString } from '../enum';
 import type { TagCreateRequest, TagUpdateRequest } from '../service/index.type';
 
-const mapGetTagTreeRequest = (groupId?: string): GetTagTreeApiRequest | undefined => {
-  const normalizedGroupId = normalizeTagGroupId(groupId);
-  return normalizedGroupId
-    ? {
-        groupId: normalizedGroupId,
-      }
-    : undefined;
-};
-
-const isTagVisibilityModeString = (value: unknown): value is TagVisibilityModeString =>
-  TAG_VISIBILITY_MODE.isValue(value);
-
-const coerceAccessControlScope = (value: unknown): AccessControlScope | undefined =>
-  ACCESS_CONTROL_SCOPE.isValue(value) ? value : undefined;
-
-const parseTagMetaInfo = (value: string | undefined): TagMetaInfo | undefined => {
+const parseTagMetaInfo = (value: string | null | undefined): TagMetaInfo | undefined => {
   if (!value?.trim()) return undefined;
   try {
     const parsed: unknown = JSON.parse(value);
@@ -75,69 +52,66 @@ const sortTagTreeNodes = (nodes: TagTreeNode[]): TagTreeNode[] =>
     .map(({ node }) => node);
 
 const mapTagTreeNodeFromApi = (node: GetTagTreeApiResponse[number]): TagTreeNode => {
-  const visibilityMode = node.visibilityMode;
-  const tagMetaInfo = parseTagMetaInfo(node.tagMetaInfo);
-  const normalizedVisibilityMode = isTagVisibilityModeString(visibilityMode)
-    ? visibilityMode
-    : undefined;
-
   return {
-    ...node,
-    tagMetaInfo,
+    tagId: node.tagId,
+    tagName: node.tagName,
+    groupId: node.groupId,
+    tagDesc: node.tagDesc ?? undefined,
+    tagIcon: node.tagIcon ?? undefined,
+    tagColor: node.tagColor ?? undefined,
+    tagMetaInfo: parseTagMetaInfo(node.tagMetaInfo),
+    tagCreator: node.tagCreator ?? undefined,
     creatorInfo: normalizeUserDisplayBaseFromApi(node.creatorInfo),
-    // fallback：兼容后端返回未约束的 visibilityMode 字符串
-    visibilityMode: normalizedVisibilityMode,
-    taggedResourceAclGrantScope: coerceAccessControlScope(node.taggedResourceAclGrantScope),
-    tagMountPermissionScope: coerceAccessControlScope(node.tagMountPermissionScope),
-    grantedActions: parseResourceActions(node.grantedActions),
-    children: node.children?.map(mapTagTreeNodeFromApi),
+    isPath: node.isPath,
+    taggedResourceAclGrantScope: node.taggedResourceAclGrantScope ?? undefined,
+    taggedResourceAclGrantSpecifiedUsers: node.taggedResourceAclGrantSpecifiedUsers ?? undefined,
+    tagMountPermissionScope: node.tagMountPermissionScope ?? undefined,
+    tagMountSpecifiedUsers: node.tagMountSpecifiedUsers ?? undefined,
+    grantedActions: normalizeResourceActions(node.grantedActions),
+    parentId: node.parentId,
+    children: node.children.map(mapTagTreeNodeFromApi),
   };
 };
 
 const mapTagTreeFromApi = (data: GetTagTreeApiResponse): TagTreeNode[] =>
   sortTagTreeNodes(data.map(mapTagTreeNodeFromApi));
 
-const mapTagGrantedActions = (
-  roots: TagTreeNode[]
-): ReadonlyMap<string, TagTreeNode['grantedActions']> => {
-  const actionsByTagId = new Map<string, TagTreeNode['grantedActions']>();
-  const walk = (node: TagTreeNode) => {
-    actionsByTagId.set(node.tagId, node.grantedActions);
-    node.children?.forEach(walk);
-  };
-  roots.forEach(walk);
-  return actionsByTagId;
-};
-
 const mapAddTagRequest = (params: TagCreateRequest): AddTagApiRequest => ({
-  ...params,
+  groupId: params.groupId,
+  parentId: params.parentId,
+  tagName: params.tagName,
+  tagDesc: params.tagDesc,
+  tagIcon: params.tagIcon,
+  tagColor: params.tagColor,
   tagMetaInfo: serializeTagMetaInfo(params.tagMetaInfo),
+  taggedResourceAclGrantScope: params.taggedResourceAclGrantScope,
+  taggedResourceAclGrantSpecifiedUsers: params.taggedResourceAclGrantSpecifiedUsers,
+  tagMountPermissionScope: params.tagMountPermissionScope,
+  tagMountSpecifiedUsers: params.tagMountSpecifiedUsers,
   grantedActions: params.grantedActions
     ? normalizeResourceActions(params.grantedActions)
     : undefined,
 });
 
 const mapUpdateTagRequest = (params: TagUpdateRequest): ChangeTagApiRequest => ({
-  ...params,
+  groupId: params.groupId,
+  targetTagId: params.targetTagId,
+  tagName: params.tagName,
+  tagDesc: params.tagDesc,
+  tagIcon: params.tagIcon,
+  tagColor: params.tagColor,
   tagMetaInfo: serializeTagMetaInfo(params.tagMetaInfo),
+  taggedResourceAclGrantScope: params.taggedResourceAclGrantScope,
+  taggedResourceAclGrantSpecifiedUsers: params.taggedResourceAclGrantSpecifiedUsers,
+  tagMountPermissionScope: params.tagMountPermissionScope,
+  tagMountSpecifiedUsers: params.tagMountSpecifiedUsers,
   grantedActions: params.grantedActions
     ? normalizeResourceActions(params.grantedActions)
     : undefined,
 });
 
-const mapAddTagFromApi = (data: string): string => {
-  // fallback：旧接口可能返回空 data，保持原有空串行为
-  return data ?? '';
-};
-
 export const TagServicesMap = {
-  mapGetTagTreeRequest,
   mapTagTreeFromApi,
-  mapTagGrantedActions,
   mapAddTagRequest,
   mapUpdateTagRequest,
-  mapAddTagFromApi,
-  parseTagMetaInfo,
-  serializeTagMetaInfo,
-  sortTagTreeNodes,
 };

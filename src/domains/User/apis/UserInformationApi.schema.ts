@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-import { JavaLongIdSchema, NonEmptyStringSchema } from '@/apis/schema';
-
-const NullableStringSchema = z.string().nullable();
+import { JavaLongIdSchema, NonEmptyStringSchema, NullableStringSchema } from '@/apis/schema';
 
 /** 后端 IdentityType 通过 @JsonValue 输出数字 code。 */
 export const UserIdentityTypeApiSchema = z.union([z.literal(1), z.literal(2), z.literal(3)]);
@@ -33,6 +31,18 @@ export const UserReadonlyFieldApiSchema = z.enum([
   'degreeLevel',
   'inviteCode',
 ]);
+
+/** 跨资源复用的轻量用户展示信息；后端各字段均可能为 null。 */
+export const UserDisplayApiSchema = z.object({
+  nickname: NullableStringSchema,
+  username: NullableStringSchema,
+  avatar: NullableStringSchema,
+  identityType: UserIdentityTypeApiSchema.nullable(),
+  realName: NullableStringSchema,
+  campusNo: NullableStringSchema,
+  email: NullableStringSchema,
+  mobile: NullableStringSchema,
+});
 
 /** 资源作者、创建者等轻量展示使用；这里只暴露稳定的用户展示信息。 */
 export const UserSummaryApiSchema = z.object({
@@ -94,6 +104,7 @@ export type UserSexApiValue = z.infer<typeof UserSexApiSchema>;
 export type UserDegreeLevelApiValue = z.infer<typeof UserDegreeLevelApiSchema>;
 export type UserVerificationModeApiValue = z.infer<typeof UserVerificationModeApiSchema>;
 export type UserReadonlyFieldApiValue = z.infer<typeof UserReadonlyFieldApiSchema>;
+export type UserDisplayApi = z.infer<typeof UserDisplayApiSchema>;
 export type UserSummaryApi = z.infer<typeof UserSummaryApiSchema>;
 export type GetUserInfoApiResponse = z.infer<typeof GetUserInfoApiResponseSchema>;
 export type SearchUsersApiRequest = z.infer<typeof SearchUsersApiRequestSchema>;

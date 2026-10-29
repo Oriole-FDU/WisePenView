@@ -5,8 +5,6 @@ export type {
   TagPermissionActionValues,
   TagPermissionPresetKey,
   TagPermissionPresetValues,
-  TagVisibilityMode,
-  TagVisibilityModeString,
 } from './enum';
 export {
   buildTagPermissionListActionSelectionPatch,
@@ -17,7 +15,6 @@ export {
   TAG_MOUNT_PERMISSION_PRESET_VALUES,
   TAG_PERMISSION_LIST_ACTIONS,
   TAG_PERMISSION_PRESET_VALUES,
-  TAG_VISIBILITY_MODE,
 } from './enum';
 export type {
   ITagService,

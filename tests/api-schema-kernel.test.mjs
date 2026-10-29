@@ -19,15 +19,20 @@ try {
         export {
           ApiResponseEnvelopeSchema,
           createPageResponseSchema,
+          createTreeSchema,
           DecimalStringSchema,
           EmptyApiRequestSchema,
           EmptyApiResponseSchema,
           EpochMillisSchema,
           IsoDateTimeSchema,
+          JavaLongIdListSchema,
           JavaLongIdSchema,
           JavaLongStringSchema,
+          NonBlankStringSchema,
           NonEmptyStringSchema,
+          NullableStringSchema,
           ObjectIdStringSchema,
+          OptionalStringSchema,
           PageApiRequestSchema,
         } from '@/apis/schema';
       `,
@@ -43,15 +48,20 @@ try {
   const {
     ApiResponseEnvelopeSchema,
     createPageResponseSchema,
+    createTreeSchema,
     DecimalStringSchema,
     EmptyApiRequestSchema,
     EmptyApiResponseSchema,
     EpochMillisSchema,
     IsoDateTimeSchema,
+    JavaLongIdListSchema,
     JavaLongIdSchema,
     JavaLongStringSchema,
+    NonBlankStringSchema,
     NonEmptyStringSchema,
+    NullableStringSchema,
     ObjectIdStringSchema,
+    OptionalStringSchema,
     PageApiRequestSchema,
   } = await import(pathToFileURL(outfile).href);
 
@@ -65,9 +75,18 @@ try {
   assert(!NonEmptyStringSchema.safeParse('').success);
   assert(!NonEmptyStringSchema.safeParse(1).success);
 
+  assert(NullableStringSchema.safeParse(null).success);
+  assert.equal(OptionalStringSchema.parse(undefined), undefined);
+  assert(OptionalStringSchema.safeParse('').success);
+  assert(!OptionalStringSchema.safeParse(null).success);
+  assert.equal(NonBlankStringSchema.parse('  alice  '), 'alice');
+  assert(!NonBlankStringSchema.safeParse('   ').success);
+
   assert(JavaLongIdSchema.safeParse('123').success);
   assert(!JavaLongIdSchema.safeParse('0').success);
   assert(!JavaLongIdSchema.safeParse('-1').success);
+  assert(JavaLongIdListSchema.safeParse(['1', '2']).success);
+  assert(!JavaLongIdListSchema.safeParse([1, 2]).success);
 
   assert(ObjectIdStringSchema.safeParse('507f1f77bcf86cd799439011').success);
   assert(!ObjectIdStringSchema.safeParse('resource-1').success);
@@ -106,6 +125,23 @@ try {
     size: 20,
     totalPage: 1,
   });
+
+  const TreeSchema = createTreeSchema({
+    id: JavaLongIdSchema,
+  });
+  assert(
+    TreeSchema.safeParse({
+      id: '1',
+      children: [{ id: '2', children: [] }],
+    }).success
+  );
+  assert(!TreeSchema.safeParse({ id: '1' }).success);
+  assert(
+    !TreeSchema.safeParse({
+      id: '1',
+      children: [{ id: 2, children: [] }],
+    }).success
+  );
 
   assert(EmptyApiRequestSchema.safeParse(undefined).success);
   assert(!EmptyApiRequestSchema.safeParse(null).success);

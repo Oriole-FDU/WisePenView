@@ -656,7 +656,6 @@ export const createDriveServices = (
       groupId: getGroupId(parent.scope),
       parentId: parent.tagId ?? '0',
       tagName: parent.scope.type === 'personal' ? `/${tagName}` : tagName,
-      isPath: parent.scope.type === 'personal',
     });
     await tagService.getRawTagTree(getGroupId(parent.scope), { refresh: true });
     const tag = tagService.getRawTagById(tagId, getGroupId(parent.scope));
