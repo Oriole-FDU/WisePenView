@@ -2,7 +2,7 @@ import type { UserInviteRecordList } from '../entity/invite';
 import type { User, UserAccountProfile, UserSearchUser } from '../entity/user';
 import type { UserTaskCheckInResult, UserTaskStatus } from '../entity/userTask';
 import type { TourCode, UserTourStatus } from '../entity/userTour';
-import type { DegreeLevel, FeedbackType } from '../enum';
+import type { DegreeLevel, FeedbackType, Sex } from '../enum';
 
 /** UserService 接口：供依赖注入使用 */
 export interface IUserService {
@@ -91,7 +91,7 @@ export interface UpdateUserInfoRequest {
   realName?: string;
   /** 头像 URL（图床上传后的公开地址，与后端 UserInfoUpdateRequest.avatar 对齐） */
   avatar?: string;
-  sex?: number;
+  sex?: Sex;
   university?: string | null;
   college?: string;
   major?: string;

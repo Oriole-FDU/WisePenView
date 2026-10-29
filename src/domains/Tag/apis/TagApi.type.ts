@@ -1,7 +1,7 @@
 import type { NumericEnumApiValue } from '@/apis/api.type';
 import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
 
-type TagAccessControlScopeApiValue = 0 | 1 | 2 | 3;
+type TagAccessControlScopeApiValue = 'ALL' | 'ONLY_ADMIN' | 'WHITELIST' | 'BLACKLIST';
 type TagResourceActionApiKey =
   | 'DISCOVER'
   | 'VIEW'

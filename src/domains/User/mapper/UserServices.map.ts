@@ -47,15 +47,7 @@ import type {
   SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from '../service/index.type';
-import {
-  mapDegreeLevelToApi,
-  mapSexToApi,
-  normalizeDegreeLevelFromApi,
-  normalizeIdentityTypeFromApi,
-  normalizeSexFromApi,
-  normalizeUserDisplayBaseFromApi,
-  normalizeUserStatusFromApi,
-} from './userEnum.mapper';
+import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
   User,
@@ -77,10 +69,10 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       mobile: userInfo.mobile ?? undefined,
       verificationMode: userInfo.verificationMode,
       verificationProviderCode: userInfo.verificationProviderCode,
-      status: normalizeUserStatusFromApi(userInfo.userStatus),
+      status: userInfo.userStatus,
     },
     userProfile: {
-      sex: userProfile.sex == null ? undefined : normalizeSexFromApi(userProfile.sex),
+      sex: userProfile.sex ?? undefined,
       inviteCode: userProfile.inviteCode ?? undefined,
       university: userProfile.university,
       college: userProfile.college ?? undefined,
@@ -88,10 +80,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       className: userProfile.className ?? undefined,
       enrollmentYear:
         userProfile.enrollmentYear == null ? undefined : String(userProfile.enrollmentYear),
-      degreeLevel:
-        userProfile.degreeLevel == null
-          ? undefined
-          : normalizeDegreeLevelFromApi(userProfile.degreeLevel),
+      degreeLevel: userProfile.degreeLevel ?? undefined,
       academicTitle: userProfile.academicTitle ?? undefined,
     },
     readonlyFields: data.readonlyFields ?? [],
@@ -264,7 +253,7 @@ const mapUpdateUserInfoRequests = (
   if (params.avatar !== undefined) userInfoPayload.avatar = params.avatar;
 
   const userProfilePayload: ChangeUserProfileApiRequest = {};
-  if (params.sex !== undefined) userProfilePayload.sex = mapSexToApi(params.sex);
+  if (params.sex !== undefined) userProfilePayload.sex = params.sex;
   if (params.university !== undefined) userProfilePayload.university = params.university;
   if (params.college !== undefined) userProfilePayload.college = params.college;
   if (params.major !== undefined) userProfilePayload.major = params.major;
@@ -276,7 +265,7 @@ const mapUpdateUserInfoRequests = (
     }
   }
   if (params.degreeLevel !== undefined) {
-    userProfilePayload.degreeLevel = mapDegreeLevelToApi(params.degreeLevel);
+    userProfilePayload.degreeLevel = params.degreeLevel;
   }
   if (params.academicTitle !== undefined) userProfilePayload.academicTitle = params.academicTitle;
 

@@ -3,7 +3,7 @@ import { type Key, useState } from 'react';
 
 import { useGroupService, useTagService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
-import type { TagTreeNode } from '@/domains/Tag';
+import { ACCESS_CONTROL_SCOPE, type TagTreeNode } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
@@ -195,7 +195,8 @@ export const useTagPermissionModalController = ({
   };
 
   const handlePersonnelScopeChange = (target: PersonnelPolicyTarget, nextKey: Key) => {
-    const nextScope = Number(nextKey) as TagPermissionFormValues['taggedResourceAclGrantScope'];
+    if (!ACCESS_CONTROL_SCOPE.isValue(nextKey)) return;
+    const nextScope = nextKey;
     const supportedScope = normalizeSupportedScope(nextScope);
     setPermissionForm((prev) => {
       if (target === 'resourceGrant') {

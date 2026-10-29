@@ -11,16 +11,16 @@ import {
   updateResourceActionSelection,
 } from '@/domains/Resource';
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
 export const TAG_META_SCHEMA = 'wisepen.tag-meta.v1';
 
 /** 与 OpenAPI 文档语义对应的别名，值为接口要求的字符串 */
-export const TAG_VISIBILITY_MODE = createEnum([
-  { value: '0', key: 'ALL', label: '全部可见' },
-  { value: '1', key: 'ONLY_ADMIN', label: '仅管理员' },
-  { value: '2', key: 'WHITELIST', label: '白名单' },
-  { value: '3', key: 'BLACKLIST', label: '黑名单' },
+export const TAG_VISIBILITY_MODE = defineEnum([
+  { value: '0', key: 'ALL' },
+  { value: '1', key: 'ONLY_ADMIN' },
+  { value: '2', key: 'WHITELIST' },
+  { value: '3', key: 'BLACKLIST' },
 ] as const);
 
 /** OpenAPI TagTreeResponse.visibilityMode / TagCreateRequest / TagUpdateRequest */
@@ -29,11 +29,11 @@ export type TagVisibilityModeString = EnumValue<typeof TAG_VISIBILITY_MODE>;
 export type TagVisibilityMode = EnumValue<typeof TAG_VISIBILITY_MODE>;
 
 /** 访问控制范围（与 OpenAPI AccessControlScope 对齐） */
-export const ACCESS_CONTROL_SCOPE = createEnum([
-  { value: 0, key: 'ALL', label: '全部' },
-  { value: 1, key: 'ONLY_ADMIN', label: '仅管理员' },
-  { value: 2, key: 'WHITELIST', label: '白名单' },
-  { value: 3, key: 'BLACKLIST', label: '黑名单' },
+export const ACCESS_CONTROL_SCOPE = defineEnum([
+  { value: 'ALL', key: 'ALL' },
+  { value: 'ONLY_ADMIN', key: 'ONLY_ADMIN' },
+  { value: 'WHITELIST', key: 'WHITELIST' },
+  { value: 'BLACKLIST', key: 'BLACKLIST' },
 ] as const);
 
 export type AccessControlScope = EnumValue<typeof ACCESS_CONTROL_SCOPE>;
@@ -66,7 +66,6 @@ export interface TagMountPermissionPresetValues {
 export interface TagPermissionListAction {
   kind: 'resource';
   key: TagResourceActionKey;
-  label: string;
   action: TagResourceAction;
 }
 
@@ -124,7 +123,6 @@ export const TAG_PERMISSION_LIST_ACTIONS: TagPermissionListAction[] =
   TAG_RESOURCE_ACTION.options.map((item) => ({
     kind: 'resource' as const,
     key: item.key,
-    label: item.label,
     action: item.value as TagResourceAction,
   }));
 
@@ -165,6 +163,6 @@ export const resourceActionsToApiKeys = (
 ): TagResourceActionKey[] | undefined => {
   if (!actions) return undefined;
   return normalizeResourceActions(actions)
-    .map((action) => TAG_RESOURCE_ACTION.getKey(action))
+    .map((action) => TAG_RESOURCE_ACTION.getOption(action)?.key)
     .filter((key): key is TagResourceActionKey => key != null);
 };

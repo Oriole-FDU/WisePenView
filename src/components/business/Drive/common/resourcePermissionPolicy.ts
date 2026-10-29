@@ -115,15 +115,18 @@ export const resolveResourcePermissionPresetKey = (
 export const buildResourcePermissionActionOptions = (
   supportedActions: ResourceAction[]
 ): ResourcePermissionActionOption[] =>
-  supportedActions.map((action) => ({
-    action,
-    key: RESOURCE_ACTION.getKey(action) ?? String(action),
-    label: getResourcePermissionActionLabel(action),
-    supported: true,
-  }));
+  supportedActions.map((action) => {
+    const key = RESOURCE_ACTION.getOption(action)?.key ?? String(action);
+    return {
+      action,
+      key,
+      label: getResourcePermissionActionLabel(action),
+      supported: true,
+    };
+  });
 
 export const getResourcePermissionActionLabel = (action: ResourceAction): string => {
-  const key = RESOURCE_ACTION.getKey(action);
+  const key = RESOURCE_ACTION.getOption(action)?.key;
   return key ? i18n.t(`permission.actions.${key}`, { ns: 'resource' }) : String(action);
 };
 

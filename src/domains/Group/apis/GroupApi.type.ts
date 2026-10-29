@@ -4,7 +4,7 @@ import type { UserDisplayBase } from '@/domains/User';
 import type { UserIdentityTypeApiValue } from '@/domains/User/apis/UserApi.type';
 
 type GroupFileOrgLogicApiValue = 'FOLDER' | 'TAG';
-type GroupTypeApiValue = NumericEnumApiValue<1 | 2 | 3>;
+export type GroupTypeApiValue = 1 | 2 | 3;
 type GroupTypeApiRequestValue = 'NORMAL_GROUP' | 'ADVANCED_GROUP' | 'MARKET_GROUP';
 type GroupRoleApiValue = '0' | '1' | '2' | '-1';
 type GroupResourceActionApiValue = TagResourceActionKey | NumericEnumApiValue;
@@ -43,7 +43,7 @@ export type GetGroupBaseInfoApiRequest = GetGroupInfoApiRequest;
 export type GetGroupBaseInfoApiResponse = GroupApiResponse;
 export type AddGroupApiRequest = {
   groupName: string;
-  groupType: string;
+  groupType: GroupTypeApiValue;
   groupDesc: string;
   groupCoverUrl?: string;
   groupMetaInfo?: string;
@@ -55,7 +55,7 @@ export type ChangeGroupApiRequest = {
   groupDesc: string;
   groupCoverUrl: string;
   groupMetaInfo?: string;
-  groupType: string;
+  groupType: GroupTypeApiValue;
 };
 export interface RemoveGroupApiRequest {
   groupId: string;

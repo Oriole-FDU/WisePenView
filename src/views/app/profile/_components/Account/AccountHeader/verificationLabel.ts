@@ -21,7 +21,7 @@ export function resolveVerificationLabelKey(
 ): VerificationLabelKey {
   if (!mode) return 'header.verification.verified';
   // API 新增认证方式时先显示通用已认证文案，避免把未翻译的枚举键直接暴露给用户。
-  if (!USER_VERIFICATION.getKey(mode)) return 'header.verification.verified';
+  if (!USER_VERIFICATION.isValue(mode)) return 'header.verification.verified';
   if (
     mode === USER_VERIFICATION.CAMPUS_IDENTITY_PROVIDER &&
     provider === USER_VERIFICATION_PROVIDER.FUDAN_UIS

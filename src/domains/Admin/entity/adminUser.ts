@@ -1,4 +1,4 @@
-import type { UserVerificationMode } from '@/domains/User/enum';
+import type { UserStatus, UserVerificationMode } from '@/domains/User/enum';
 
 export interface AdminUser {
   id: string;
@@ -11,7 +11,7 @@ export interface AdminUser {
   email?: string;
   mobile?: string;
   verificationMode?: UserVerificationMode | null;
-  status: number;
+  status: UserStatus;
   createTime?: string;
   updateTime?: string;
 }

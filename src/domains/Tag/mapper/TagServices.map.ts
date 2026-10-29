@@ -31,21 +31,10 @@ const mapGetTagTreeRequest = (groupId?: string): GetTagTreeApiRequest | undefine
 };
 
 const isTagVisibilityModeString = (value: unknown): value is TagVisibilityModeString =>
-  typeof value === 'string' && TAG_VISIBILITY_MODE.getKey(value) != null;
+  TAG_VISIBILITY_MODE.isValue(value);
 
-const coerceAccessControlScope = (value: unknown): AccessControlScope | undefined => {
-  if (typeof value === 'number' && value in ACCESS_CONTROL_SCOPE.configs) {
-    return value as AccessControlScope;
-  }
-  if (typeof value !== 'string') return undefined;
-  const byKey = (ACCESS_CONTROL_SCOPE.values as Record<string, number>)[value];
-  if (byKey !== undefined) return byKey as AccessControlScope;
-  const asNumber = Number(value);
-  if (!Number.isNaN(asNumber) && asNumber in ACCESS_CONTROL_SCOPE.configs) {
-    return asNumber as AccessControlScope;
-  }
-  return undefined;
-};
+const coerceAccessControlScope = (value: unknown): AccessControlScope | undefined =>
+  ACCESS_CONTROL_SCOPE.isValue(value) ? value : undefined;
 
 const coercePermissionMask = (mask: unknown): number | undefined => {
   if (typeof mask === 'number' && Number.isFinite(mask)) return mask;

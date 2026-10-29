@@ -1,13 +1,8 @@
 import type { AdminUser } from '@/domains/Admin';
+import { USER_STATUS } from '@/domains/User';
 import {
-  mapDegreeLevelToApi,
   mapIdentityTypeToApi,
-  mapSexToApi,
-  mapUserStatusToApi,
-  normalizeDegreeLevelFromApi,
   normalizeIdentityTypeFromApi,
-  normalizeSexFromApi,
-  normalizeUserStatusFromApi,
 } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
@@ -41,7 +36,7 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
     email: raw.email ?? undefined,
     mobile: raw.mobile ?? undefined,
     verificationMode: raw.verificationMode ?? null,
-    status: raw.status == null ? 0 : normalizeUserStatusFromApi(raw.status),
+    status: raw.status ?? USER_STATUS.UNIDENTIFIED,
     createTime: raw.createTime ?? undefined,
     updateTime: raw.updateTime ?? undefined,
   };
@@ -53,7 +48,7 @@ const mapFetchAdminUserListRequest = (
   page: params.page,
   size: params.size,
   keyword: params.keyword,
-  ...(mapUserStatusToApi(params.status) ? { status: mapUserStatusToApi(params.status) } : {}),
+  status: params.status,
   ...(mapIdentityTypeToApi(params.identityType)
     ? { identityType: mapIdentityTypeToApi(params.identityType) }
     : {}),
@@ -77,10 +72,9 @@ const mapGetAdminUserInfoFromApi = (
 ): GetAdminUserInfoResponse => ({
   userProfile: {
     ...data,
-    sex: data.sex == null ? undefined : normalizeSexFromApi(data.sex),
+    sex: data.sex ?? undefined,
     enrollmentYear: data.enrollmentYear == null ? undefined : String(data.enrollmentYear),
-    degreeLevel:
-      data.degreeLevel == null ? undefined : normalizeDegreeLevelFromApi(data.degreeLevel),
+    degreeLevel: data.degreeLevel ?? undefined,
   },
 });
 
@@ -89,7 +83,6 @@ const mapChangeAdminUserInfoRequest = (
 ): ChangeAdminUserInfoApiRequest => ({
   ...params,
   identityType: mapIdentityTypeToApi(params.identityType),
-  status: mapUserStatusToApi(params.status),
 });
 
 const mapChangeAdminUserProfileRequest = (
@@ -99,16 +92,13 @@ const mapChangeAdminUserProfileRequest = (
   const payload: ChangeAdminUserProfileApiRequest = {
     userId: params.userId,
   };
-  const sex = mapSexToApi(params.sex);
-  const degreeLevel = mapDegreeLevelToApi(params.degreeLevel);
-
-  if (sex !== undefined) payload.sex = sex;
+  if (params.sex !== undefined) payload.sex = params.sex;
   if (params.university !== undefined) payload.university = params.university;
   if (params.college !== undefined) payload.college = params.college;
   if (params.major !== undefined) payload.major = params.major;
   if (params.className !== undefined) payload.className = params.className;
   if (Number.isInteger(enrollmentYear)) payload.enrollmentYear = enrollmentYear;
-  if (degreeLevel !== undefined) payload.degreeLevel = degreeLevel;
+  if (params.degreeLevel !== undefined) payload.degreeLevel = params.degreeLevel;
   if (params.academicTitle !== undefined) payload.academicTitle = params.academicTitle;
 
   return payload;

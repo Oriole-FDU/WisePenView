@@ -1,4 +1,5 @@
 import type { AdminUser } from '@/domains/Admin';
+import type { DegreeLevel, Sex, UserStatus } from '@/domains/User';
 
 import type { AdminMessage } from '../entity/message';
 
@@ -17,7 +18,7 @@ export interface FetchAdminUserListRequest {
   page: number;
   size: number;
   keyword: string;
-  status: number;
+  status: UserStatus;
   identityType: number;
 }
 
@@ -44,19 +45,19 @@ export interface ChangeAdminUserInfoRequest {
   avatar?: string;
   email?: string | null;
   mobile?: string | null;
-  status?: number;
+  status?: UserStatus;
   identityType?: number;
 }
 
 export interface ChangeAdminUserProfileRequest {
   userId: string;
-  sex?: number;
+  sex?: Sex;
   university?: string | null;
   college?: string;
   major?: string;
   className?: string;
   enrollmentYear?: string;
-  degreeLevel?: number;
+  degreeLevel?: DegreeLevel;
   academicTitle?: string;
 }
 

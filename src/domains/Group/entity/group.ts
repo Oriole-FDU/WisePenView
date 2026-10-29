@@ -1,4 +1,4 @@
-import type { GROUP_FILE_ORG_LOGIC, ROLE } from '@/domains/Group';
+import type { GROUP_FILE_ORG_LOGIC, GroupType, ROLE } from '@/domains/Group';
 import type { TagResourceAction } from '@/domains/Tag';
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
 
@@ -9,7 +9,7 @@ export interface GroupMember {
   nickname: string;
   campusNo?: string;
   email?: string;
-  /** 组内角色（由接口数字角色码经 ROLE.getKey 映射） */
+  /** 组内角色（由接口数字角色码经 ROLE.getOption 映射） */
   role: EnumKey<typeof ROLE>;
   joinTime: string;
   avatar: string;
@@ -48,7 +48,7 @@ export interface GroupBaseInfo {
   groupDesc: string;
   groupCoverUrl: string;
   groupMetaInfo: Record<string, unknown>;
-  groupType: number;
+  groupType: GroupType;
 }
 
 /** 小组结构（与 OpenAPI GroupDetailInfoResponse/GroupItemInfoResponse 对齐） */
@@ -58,7 +58,7 @@ export interface Group {
   groupDesc: string;
   groupCoverUrl: string;
   groupMetaInfo: Record<string, unknown>;
-  groupType: number;
+  groupType: GroupType;
   ownerId?: string;
   ownerInfo?: GroupOwnerInfo;
   memberCount: number;

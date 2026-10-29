@@ -21,12 +21,13 @@ export type { TourCode, UserTourStatus } from './entity/userTour';
 export type {
   DegreeLevel,
   FeedbackType,
+  Sex,
+  UserStatus,
   UserVerificationMode,
   UserVerificationProvider,
 } from './enum';
 export {
   DEGREE,
-  EMAIL_SUFFIX,
   FEEDBACK_TYPE,
   IDENTITY,
   SEX,

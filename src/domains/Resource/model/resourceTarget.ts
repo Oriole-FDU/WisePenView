@@ -1,25 +1,25 @@
 import type { EnumValue } from '@/utils/type/enum';
-import { createEnum } from '@/utils/type/enum';
+import { defineEnum } from '@/utils/type/enum';
 
-export const RESOURCE_KIND = createEnum([
-  { value: 'note', key: 'NOTE', label: '笔记' },
-  { value: 'drawio', key: 'DRAWIO', label: 'DrawIO' },
-  { value: 'file', key: 'FILE', label: '文件' },
-  { value: 'skill', key: 'SKILL', label: '技能' },
-  { value: 'agent', key: 'AGENT', label: '智能体' },
-  { value: 'html', key: 'HTML', label: 'HTML 页面' },
+export const RESOURCE_KIND = defineEnum([
+  { value: 'note', key: 'NOTE' },
+  { value: 'drawio', key: 'DRAWIO' },
+  { value: 'file', key: 'FILE' },
+  { value: 'skill', key: 'SKILL' },
+  { value: 'agent', key: 'AGENT' },
+  { value: 'html', key: 'HTML' },
 ] as const);
 
 export type ResourceKind = EnumValue<typeof RESOURCE_KIND>;
 
-export const RESOURCE_VIEWER = createEnum([
-  { value: 'office', key: 'OFFICE', label: 'Office' },
-  { value: 'pdfPreview', key: 'PDF_PREVIEW', label: 'PDF 预览' },
-  { value: 'note', key: 'NOTE', label: '笔记' },
-  { value: 'drawio', key: 'DRAWIO', label: 'DrawIO' },
-  { value: 'skill', key: 'SKILL', label: '技能' },
-  { value: 'agent', key: 'AGENT', label: '智能体' },
-  { value: 'html', key: 'HTML', label: 'HTML 页面' },
+export const RESOURCE_VIEWER = defineEnum([
+  { value: 'office', key: 'OFFICE' },
+  { value: 'pdfPreview', key: 'PDF_PREVIEW' },
+  { value: 'note', key: 'NOTE' },
+  { value: 'drawio', key: 'DRAWIO' },
+  { value: 'skill', key: 'SKILL' },
+  { value: 'agent', key: 'AGENT' },
+  { value: 'html', key: 'HTML' },
 ] as const);
 
 export type ResourceViewer = EnumValue<typeof RESOURCE_VIEWER>;

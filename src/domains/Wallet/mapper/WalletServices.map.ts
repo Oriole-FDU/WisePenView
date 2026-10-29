@@ -103,13 +103,11 @@ const mapListTransactionsRequest = (
   const groupId = params.groupId;
   const hasGroupId = groupId != null && groupId !== '';
   const transactionTypes = params.transactionTypes?.filter(
-    (type): type is WalletTransactionTypeApiValue => WALLET_TRANSACTION_KIND.getKey(type) != null
+    (type): type is WalletTransactionTypeApiValue => WALLET_TRANSACTION_KIND.isValue(type)
   );
   const businessType = params.businessType;
   const walletBusinessType: WalletBusinessTypeApiValue | undefined =
-    businessType != null && WALLET_BUSINESS_TYPE.getKey(businessType) != null
-      ? businessType
-      : undefined;
+    businessType != null && WALLET_BUSINESS_TYPE.isValue(businessType) ? businessType : undefined;
 
   return {
     page: params.page ?? 1,

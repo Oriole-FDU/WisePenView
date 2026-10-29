@@ -101,14 +101,16 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
     .charAt(0)
     .toUpperCase();
   const identityKey =
-    user?.userInfo?.identityType != null ? IDENTITY.getKey(user.userInfo.identityType) : undefined;
+    user?.userInfo?.identityType != null
+      ? IDENTITY.getOption(user.userInfo.identityType)?.key
+      : undefined;
   const identityLabel = identityKey ? t(`role.${identityKey}`, { ns: 'shell' }) : '';
   const verificationMode = user?.userInfo?.verificationMode ?? null;
   const verifiedText = t(
     resolveVerificationLabelKey(verificationMode, user?.userInfo?.verificationProviderCode ?? null)
   );
   const statusText =
-    user?.userInfo?.status === USER_STATUS.UNVERIFIED
+    user?.userInfo?.status === USER_STATUS.UNIDENTIFIED
       ? t('header.status.unverified')
       : user?.userInfo?.status === USER_STATUS.BANNED
         ? t('header.status.banned')
@@ -117,7 +119,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
   const statusToneClass =
     user?.userInfo?.status === USER_STATUS.BANNED
       ? styles.statusBadgeBanned
-      : user?.userInfo?.status === USER_STATUS.UNVERIFIED
+      : user?.userInfo?.status === USER_STATUS.UNIDENTIFIED
         ? styles.statusBadgeUnverified
         : styles.statusBadgeVerified;
 
@@ -161,7 +163,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
                   <span className={styles.statusIcon} aria-hidden="true">
                     {user.userInfo.status === USER_STATUS.BANNED ? (
                       <X size={14} />
-                    ) : user.userInfo.status === USER_STATUS.UNVERIFIED ? (
+                    ) : user.userInfo.status === USER_STATUS.UNIDENTIFIED ? (
                       <TriangleAlert size={14} />
                     ) : (
                       <Check size={14} />

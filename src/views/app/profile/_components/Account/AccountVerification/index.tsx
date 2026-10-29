@@ -51,7 +51,7 @@ function AccountVerification({
     setVerifyModalOpen(true);
   };
 
-  const showBanner = showVerifyBanner && user?.userInfo?.status === USER_STATUS.UNVERIFIED;
+  const showBanner = showVerifyBanner && user?.userInfo?.status === USER_STATUS.UNIDENTIFIED;
 
   return (
     <>

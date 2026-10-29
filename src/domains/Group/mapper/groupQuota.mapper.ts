@@ -1,22 +1,28 @@
-import type { GroupQuotaInfo, UserGroupQuota } from '@/domains/Group';
+import { GROUP_TYPE, type GroupQuotaInfo, type UserGroupQuota } from '@/domains/Group';
 import type {
   GetAllMyGroupTokenInfoApiResponse,
   GetMyGroupMemberInfoApiResponse,
   GroupTokenInfoApiResponseItem,
 } from '@/domains/Group/apis/GroupApi.type';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { normalizeId } from '@/utils/normalize/normalizeId';
-import {
-  normalizeFiniteNumber,
-  normalizeNonNegativeNumber,
-} from '@/utils/normalize/normalizeNumber';
+import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApiResponseItem): UserGroupQuota => {
   const base = item.groupDisplayBase ?? {};
+  const groupType = base.groupType;
+  if (
+    groupType !== GROUP_TYPE.NORMAL &&
+    groupType !== GROUP_TYPE.ADVANCED &&
+    groupType !== GROUP_TYPE.PUBLIC
+  ) {
+    throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+  }
 
   return {
     groupId: normalizeId(base.groupId),
     groupName: base.groupName ?? '',
-    groupType: normalizeFiniteNumber(base.groupType) ?? 0,
+    groupType,
     quotaLimit: normalizeNonNegativeNumber(item.tokenLimit) ?? 0,
     quotaUsed: normalizeNonNegativeNumber(item.tokenUsed) ?? 0,
   };
