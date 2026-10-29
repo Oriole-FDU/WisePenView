@@ -17,9 +17,6 @@ export function createEnum<const T extends readonly EnumConfigItem[]>(cfg: T) {
   const values = Object.fromEntries(cfg.map((item) => [item.key, item.value])) as {
     [K in T[number]['key']]: Extract<T[number], { key: K }>['value'];
   };
-  const labels = Object.fromEntries(cfg.map((item) => [item.value, item.label])) as {
-    [V in T[number]['value']]: string;
-  };
   const configs = Object.fromEntries(cfg.map((item) => [item.value, item])) as {
     [V in T[number]['value']]: Extract<T[number], { value: V }>;
   };
@@ -32,9 +29,6 @@ export function createEnum<const T extends readonly EnumConfigItem[]>(cfg: T) {
 
     /** 字典：通过 Key 获取 Value（模拟 Enum） */
     values,
-
-    /** 映射：通过 Value 获取 Label */
-    labels,
 
     /** 通过 Value 获取 Key，找不到时返回 undefined */
     getKey: (value: string | number): T[number]['key'] | undefined =>
