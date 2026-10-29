@@ -21,6 +21,12 @@ import styles from './style.module.scss';
 
 const EMPTY_META = '—';
 const NOTE_RESOURCE_TYPES = new Set(['note', 'drawio']);
+const ACCESS_SCOPE_LABEL_KEYS = {
+  [ACCESS_CONTROL_SCOPE.ALL]: 'permission.tag.scope.all',
+  [ACCESS_CONTROL_SCOPE.ONLY_ADMIN]: 'permission.tag.scope.onlyAdmin',
+  [ACCESS_CONTROL_SCOPE.BLACKLIST]: 'permission.tag.scope.blacklist',
+  [ACCESS_CONTROL_SCOPE.WHITELIST]: 'permission.tag.scope.whitelist',
+} satisfies Record<AccessControlScope, string>;
 
 interface DriveDetailPanelProps {
   selectedRow?: DriveTableRow;
@@ -51,10 +57,6 @@ function formatActionList(
   return actions.map(getActionLabel).join('、');
 }
 
-function formatAccessScope(scope?: AccessControlScope): string {
-  return scope == null ? EMPTY_META : ACCESS_CONTROL_SCOPE.getLabel(scope);
-}
-
 function DetailMetaLoading({ label }: { label: string }) {
   return <span className={styles.detailMetaLoading}>{label}</span>;
 }
@@ -82,6 +84,9 @@ function DriveDetailPanel({ selectedRow, isEditMode, selectedCount }: DriveDetai
   const noteService = useNoteService();
   const documentService = useDocumentService();
   const htmlPageService = useHtmlPageService();
+
+  const formatAccessScope = (scope?: AccessControlScope): string =>
+    scope == null ? EMPTY_META : t(ACCESS_SCOPE_LABEL_KEYS[scope], { ns: 'resource' });
 
   const resourceNode =
     selectedRow && (selectedRow.node.type === 'resource' || selectedRow.node.type === 'link')
