@@ -163,6 +163,6 @@ export const resourceActionsToApiKeys = (
 ): TagResourceActionKey[] | undefined => {
   if (!actions) return undefined;
   return normalizeResourceActions(actions)
-    .map((action) => TAG_RESOURCE_ACTION.getKey(action))
+    .map((action) => TAG_RESOURCE_ACTION.getOption(action)?.key)
     .filter((key): key is TagResourceActionKey => key != null);
 };

@@ -160,7 +160,7 @@ function DriveDetailPanel({ selectedRow, isEditMode, selectedCount }: DriveDetai
   const actionTarget = isDriveActionTarget(selectedRow.node) ? selectedRow.node : null;
   const shouldShowPermissionMeta = selectedRow.node.scope.type === 'group';
   const getActionLabel = (action: ResourceAction) => {
-    const key = RESOURCE_ACTION.getKey(action);
+    const key = RESOURCE_ACTION.getOption(action)?.key;
     return key ? t(`permission.actions.${key}`, { ns: 'resource' }) : String(action);
   };
   const formatResourceDefaultPermission = (

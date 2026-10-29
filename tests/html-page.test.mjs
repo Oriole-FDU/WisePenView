@@ -71,7 +71,7 @@ test('HTML 权限只暴露 DISCOVER、VIEW、EDIT', () => {
     assert.deepEqual(
       resourceModule
         .getSupportedResourcePermissionActions(token)
-        .map((action) => resourceModule.RESOURCE_ACTION.getKey(action)),
+        .map((action) => resourceModule.RESOURCE_ACTION.getOption(action)?.key),
       ['DISCOVER', 'VIEW', 'EDIT']
     );
   }

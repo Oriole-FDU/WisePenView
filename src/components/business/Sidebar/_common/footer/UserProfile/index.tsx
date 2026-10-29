@@ -81,7 +81,7 @@ function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: User
 
   const displayName = user?.nickname || user?.username || '-';
   const identityKey =
-    user?.identityType !== undefined ? IDENTITY.getKey(user.identityType) : undefined;
+    user?.identityType !== undefined ? IDENTITY.getOption(user.identityType)?.key : undefined;
   const identityLabel = identityKey
     ? t(`role.${identityKey}`)
     : t('placeholder.dash', { ns: 'common' });

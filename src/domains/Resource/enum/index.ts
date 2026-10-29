@@ -77,7 +77,7 @@ export const resourceActionsToApiKeys = (
   if (actions === null) return null;
   if (actions === undefined) return undefined;
   return normalizeResourceActions(actions)
-    .map((action) => RESOURCE_ACTION.getKey(action))
+    .map((action) => RESOURCE_ACTION.getOption(action)?.key)
     .filter((key): key is ResourceActionKey => key != null);
 };
 

@@ -151,12 +151,10 @@ export const mapChangeResourceActionPermissionRequestFromSubjects = (
 const mapPermissionActionOptions = (
   supportedActions: ResourceAction[]
 ): ResourcePermissionActionOption[] => {
-  return supportedActions.map((action) => ({
-    action,
-    key: RESOURCE_ACTION.getKey(action) ?? String(action),
-    label: RESOURCE_ACTION.getKey(action) ?? String(action),
-    supported: true,
-  }));
+  return supportedActions.map((action) => {
+    const key = RESOURCE_ACTION.getOption(action)?.key ?? String(action);
+    return { action, key, label: key, supported: true };
+  });
 };
 
 const resolveOwnerName = (ownerInfo: UserDisplayBase | undefined, ownerId?: string): string =>

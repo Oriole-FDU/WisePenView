@@ -11,7 +11,7 @@ import type { GroupMemberApiResponse } from '../apis/GroupApi.type';
 const normalizeRoleFromApi = (value: unknown): GroupMember['role'] => {
   const numericValue = normalizeFiniteNumber(value);
   if (numericValue == null || numericValue < 0) return 'MEMBER';
-  return ROLE.getKey(numericValue) ?? 'MEMBER';
+  return ROLE.getOption(numericValue)?.key ?? 'MEMBER';
 };
 
 /** OpenAPI GroupMemberDetailResponse -> 领域 GroupMember（userId <- memberId） */

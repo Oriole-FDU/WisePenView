@@ -9,7 +9,7 @@ export interface GroupMember {
   nickname: string;
   campusNo?: string;
   email?: string;
-  /** 组内角色（由接口数字角色码经 ROLE.getKey 映射） */
+  /** 组内角色（由接口数字角色码经 ROLE.getOption 映射） */
   role: EnumKey<typeof ROLE>;
   joinTime: string;
   avatar: string;

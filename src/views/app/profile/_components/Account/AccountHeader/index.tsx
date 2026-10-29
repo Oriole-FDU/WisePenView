@@ -101,7 +101,9 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
     .charAt(0)
     .toUpperCase();
   const identityKey =
-    user?.userInfo?.identityType != null ? IDENTITY.getKey(user.userInfo.identityType) : undefined;
+    user?.userInfo?.identityType != null
+      ? IDENTITY.getOption(user.userInfo.identityType)?.key
+      : undefined;
   const identityLabel = identityKey ? t(`role.${identityKey}`, { ns: 'shell' }) : '';
   const verificationMode = user?.userInfo?.verificationMode ?? null;
   const verifiedText = t(

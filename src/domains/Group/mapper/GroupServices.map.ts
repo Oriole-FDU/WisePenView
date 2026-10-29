@@ -207,7 +207,7 @@ const mapFetchMyRoleInGroupRequest = (groupId: string): string => groupId;
 const mapFetchMyRoleInGroupFromApi = (data: GroupRoleApiResponse): EnumKey<typeof ROLE> | null => {
   const roleNum = normalizeRoleCodeFromApi(data);
   if (roleNum == null || roleNum < 0) return null;
-  return ROLE.getKey(roleNum) ?? null;
+  return ROLE.getOption(roleNum)?.key ?? null;
 };
 
 export const GroupServicesMap = {

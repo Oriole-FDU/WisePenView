@@ -25,8 +25,8 @@ export function createEnum<const T extends readonly EnumConfigItem[]>(cfg: T) {
     /** 原始数组：用于 Select/Radio 的 options */
     options: cfg,
 
-    /** 通过 Value 获取 Key，找不到时返回 undefined */
-    getKey: (value: string | number): T[number]['key'] | undefined => optionByValue.get(value)?.key,
+    /** 通过 Value 获取完整配置 */
+    getOption: (value: unknown): T[number] | undefined => optionByValue.get(value),
 
     /** 判断值是否为合法枚举值 */
     isValue: (value: unknown): value is T[number]['value'] => optionByValue.has(value),
