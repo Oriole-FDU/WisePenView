@@ -1,54 +1,31 @@
-import {
-  normalizeResourceActions,
-  parseResourceActions,
-  type ResourceAction,
-} from '@/domains/_shared/access';
+import { normalizeResourceActions } from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
-import { GROUP_FILE_ORG_LOGIC, GROUP_TYPE, type GroupType, ROLE } from '@/domains/Group';
+import { GROUP_TYPE, type GroupType, ROLE } from '@/domains/Group';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
-import { normalizeId } from '@/utils/normalize/normalizeId';
-import {
-  normalizeFiniteNumber,
-  normalizeNonNegativeNumber,
-} from '@/utils/normalize/normalizeNumber';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type {
   AddGroupApiRequest,
   ChangeGroupApiRequest,
   ChangeGroupConfigApiRequest,
-  ChangeRoleApiRequest,
-  FetchGroupMembersApiResponse,
-  GetGroupBaseInfoApiRequest,
   GetGroupBaseInfoApiResponse,
-  GetGroupConfigApiRequest,
   GetGroupConfigApiResponse,
-  GetGroupInfoApiRequest,
-  GroupApiResponse,
-  GroupRoleApiResponse,
-  GroupTypeApiValue,
+  GetMyRoleInGroupApiResponse,
   ListGroupApiRequest,
   ListGroupApiResponse,
-  ListMemberApiRequest,
-} from '../apis/GroupApi.type';
+  ListGroupMemberApiResponse,
+} from '../apis/GroupApi.contract';
+import type { GroupDetailApi, GroupItemApi } from '../apis/GroupApi.schema';
 import type {
   CreateGroupRequest,
   EditGroupRequest,
   FetchGroupListRequest,
   FetchGroupListResponse,
   UpdateGroupResConfigRequest,
-  UpdateMemberRoleRequest,
 } from '../service/index.type';
 import { mapGroupMemberFromApi } from './groupMember.mapper';
-
-const mapGroupTypeFromApi = (value: GroupTypeApiValue | undefined): GroupType => {
-  if (value === GROUP_TYPE.NORMAL || value === GROUP_TYPE.ADVANCED || value === GROUP_TYPE.PUBLIC) {
-    return value;
-  }
-  throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
-};
 
 const mapGroupTypeToListApi = (value?: GroupType): ListGroupApiRequest['groupType'] | undefined => {
   if (value === GROUP_TYPE.NORMAL) return 'NORMAL_GROUP';
@@ -72,21 +49,17 @@ const parseGroupMetaInfo = (value: unknown): Record<string, unknown> => {
 const serializeGroupMetaInfo = (value?: Record<string, unknown>): string | undefined =>
   value === undefined ? undefined : JSON.stringify(value);
 
-const normalizeRoleCodeFromApi = (value: unknown): number | null =>
-  normalizeFiniteNumber(value) ?? null;
-
-const mapRoleToApi = (value: number): string => String(value);
-
-const mapGroupFromApi = (raw: GroupApiResponse): Group => {
+const mapGroupFromApi = (raw: GroupItemApi | GroupDetailApi): Group => {
   const ownerInfo = normalizeUserDisplayBaseFromApi(raw.ownerInfo);
+  const hasDetail = 'inviteCode' in raw;
   return {
-    groupId: normalizeId(raw.groupId),
-    groupName: raw.groupName ?? '',
-    groupDesc: raw.groupDesc ?? '',
-    groupCoverUrl: raw.groupCoverUrl ?? '',
+    groupId: raw.groupId,
+    groupName: raw.groupName,
+    groupDesc: raw.groupDesc,
+    groupCoverUrl: raw.groupCoverUrl,
     groupMetaInfo: parseGroupMetaInfo(raw.groupMetaInfo),
-    groupType: mapGroupTypeFromApi(raw.groupType),
-    ownerId: raw.ownerId == null ? undefined : normalizeId(raw.ownerId),
+    groupType: raw.groupType,
+    ownerId: raw.ownerId,
     ownerInfo:
       ownerInfo == null
         ? undefined
@@ -96,17 +69,13 @@ const mapGroupFromApi = (raw: GroupApiResponse): Group => {
             avatar: ownerInfo.avatar,
             identityType: ownerInfo.identityType,
           },
-    memberCount: normalizeNonNegativeNumber(raw.memberCount) ?? 0,
+    memberCount: raw.memberCount,
     createTime: formatTimestampToDate(raw.createTime),
-    inviteCode: raw.inviteCode ?? undefined,
-    tokenUsed: raw.tokenUsed == null ? undefined : (normalizeNonNegativeNumber(raw.tokenUsed) ?? 0),
-    tokenBalance:
-      raw.tokenBalance == null ? undefined : (normalizeNonNegativeNumber(raw.tokenBalance) ?? 0),
+    inviteCode: hasDetail ? raw.inviteCode : undefined,
+    tokenUsed: hasDetail ? raw.tokenUsed : undefined,
+    tokenBalance: hasDetail ? raw.tokenBalance : undefined,
   };
 };
-
-const mapDefaultMemberActionsFromApi = (actions?: unknown[]): ResourceAction[] =>
-  parseResourceActions(actions);
 
 const mapFetchGroupListRequest = (params: FetchGroupListRequest): ListGroupApiRequest => ({
   groupRoleFilter: params.groupRoleFilter,
@@ -124,55 +93,32 @@ const mapFetchGroupListFromApi = (data: ListGroupApiResponse): FetchGroupListRes
   hasMore: data.page < data.totalPage,
 });
 
-const mapFetchGroupInfoFromApi = (data: GroupApiResponse): Group => mapGroupFromApi(data);
-
-const mapFetchGroupInfoRequest = (groupId: string): GetGroupInfoApiRequest => ({
-  groupId,
-});
-
-const mapFetchGroupBaseInfoRequest = (groupId: string): GetGroupBaseInfoApiRequest => ({
-  groupId,
-});
-
-const mapFetchGroupBaseInfoFromApi = (
-  data: GetGroupBaseInfoApiResponse,
-  fallbackGroupId: string
-): GroupBaseInfo => ({
-  // 基础信息接口若省略 groupId，使用请求入参保持调用方按 ID 回填。
-  groupId: normalizeId(data.groupId) || fallbackGroupId,
-  groupName: data.groupName ?? '',
-  groupDesc: data.groupDesc ?? '',
-  groupCoverUrl: data.groupCoverUrl ?? '',
+const mapFetchGroupBaseInfoFromApi = (data: GetGroupBaseInfoApiResponse): GroupBaseInfo => ({
+  groupId: data.groupId,
+  groupName: data.groupName,
+  groupDesc: data.groupDesc,
+  groupCoverUrl: data.groupCoverUrl,
   groupMetaInfo: parseGroupMetaInfo(data.groupMetaInfo),
-  groupType: mapGroupTypeFromApi(data.groupType),
+  groupType: data.groupType,
 });
-
-const mapGroupWalletInfoFromApi = (data: GroupApiResponse): number =>
-  normalizeNonNegativeNumber(data.tokenBalance) ?? 0;
 
 const mapFetchGroupResConfigFromApi = (data: GetGroupConfigApiResponse): GroupResConfig => {
   return {
-    groupId: normalizeId(data.groupId),
-    fileOrgLogic: GROUP_FILE_ORG_LOGIC.TAG,
-    defaultMemberActions: mapDefaultMemberActionsFromApi(data.defaultMemberActions),
+    groupId: data.groupId,
+    fileOrgLogic: data.fileOrgLogic,
+    defaultMemberActions: normalizeResourceActions(data.defaultMemberActions),
   };
 };
-
-const mapFetchGroupResConfigRequest = (groupId: string): GetGroupConfigApiRequest => ({
-  groupId,
-});
 
 const mapUpdateGroupResConfigRequest = (
   params: UpdateGroupResConfigRequest
 ): ChangeGroupConfigApiRequest => ({
   groupId: params.groupId,
-  fileOrgLogic: GROUP_FILE_ORG_LOGIC.TAG,
+  fileOrgLogic: params.fileOrgLogic,
   defaultMemberActions: params.defaultMemberActions
     ? normalizeResourceActions(params.defaultMemberActions)
     : undefined,
 });
-
-const mapCreateGroupFromApi = (data: string | number): string => normalizeId(data);
 
 const mapCreateGroupRequest = (params: CreateGroupRequest): AddGroupApiRequest => ({
   ...params,
@@ -184,51 +130,29 @@ const mapEditGroupRequest = (params: EditGroupRequest): ChangeGroupApiRequest =>
   groupMetaInfo: serializeGroupMetaInfo(params.groupMetaInfo),
 });
 
-const mapUpdateMemberRoleRequest = (params: UpdateMemberRoleRequest): ChangeRoleApiRequest => ({
-  ...params,
-  role: mapRoleToApi(params.role),
-});
-
-const mapFetchGroupMembersRequest = (
-  groupId: string | number,
-  page: number,
-  size: number
-): ListMemberApiRequest => ({
-  groupId,
-  page,
-  size,
-});
-
-const mapFetchGroupMembersFromApi = (data: FetchGroupMembersApiResponse): GroupMemberList => ({
+const mapFetchGroupMembersFromApi = (data: ListGroupMemberApiResponse): GroupMemberList => ({
   members: data.list.map(mapGroupMemberFromApi),
   total: data.total,
 });
 
-const mapFetchMyRoleInGroupRequest = (groupId: string): string => groupId;
-
-const mapFetchMyRoleInGroupFromApi = (data: GroupRoleApiResponse): EnumKey<typeof ROLE> | null => {
-  const roleNum = normalizeRoleCodeFromApi(data);
-  if (roleNum == null || roleNum < 0) return null;
-  return ROLE.getOption(roleNum)?.key ?? null;
+const mapFetchMyRoleInGroupFromApi = (
+  data: GetMyRoleInGroupApiResponse
+): EnumKey<typeof ROLE> | null => {
+  if (data < 0) return null;
+  const role = ROLE.getOption(data);
+  if (!role) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ROLE_FETCH_FAILED);
+  return role.key;
 };
 
 export const GroupServicesMap = {
   mapFetchGroupListRequest,
   mapFetchGroupListFromApi,
-  mapFetchGroupInfoFromApi,
-  mapFetchGroupInfoRequest,
-  mapFetchGroupBaseInfoRequest,
+  mapGroupFromApi,
   mapFetchGroupBaseInfoFromApi,
-  mapGroupWalletInfoFromApi,
   mapFetchGroupResConfigFromApi,
-  mapFetchGroupResConfigRequest,
   mapUpdateGroupResConfigRequest,
-  mapCreateGroupFromApi,
   mapCreateGroupRequest,
   mapEditGroupRequest,
-  mapUpdateMemberRoleRequest,
-  mapFetchGroupMembersRequest,
   mapFetchGroupMembersFromApi,
-  mapFetchMyRoleInGroupRequest,
   mapFetchMyRoleInGroupFromApi,
 };

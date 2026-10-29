@@ -1,60 +1,89 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  AddGroupApiRequest,
-  AddGroupApiResponse,
-  ChangeGroupApiRequest,
-  ChangeGroupConfigApiRequest,
-  ChangeRoleApiRequest,
-  ChangeTokenLimitApiRequest,
-  FetchGroupMembersApiResponse,
-  GetAllMyGroupTokenInfoApiRequest,
-  GetAllMyGroupTokenInfoApiResponse,
-  GetGroupBaseInfoApiRequest,
-  GetGroupBaseInfoApiResponse,
-  GetGroupConfigApiRequest,
-  GetGroupConfigApiResponse,
-  GetGroupInfoApiRequest,
-  GetGroupInfoApiResponse,
-  GetMyGroupMemberInfoApiRequest,
-  GetMyGroupMemberInfoApiResponse,
-  GroupRoleApiResponse,
-  JoinGroupApiRequest,
-  KickMemberApiRequest,
-  ListGroupApiRequest,
-  ListGroupApiResponse,
-  ListMemberApiRequest,
-  QuitGroupApiRequest,
-  RemoveGroupApiRequest,
-} from './GroupApi.type';
+import {
+  AddGroupApiContract,
+  type AddGroupApiRequest,
+  type AddGroupApiResponse,
+  ChangeGroupApiContract,
+  type ChangeGroupApiRequest,
+  type ChangeGroupApiResponse,
+  ChangeGroupConfigApiContract,
+  type ChangeGroupConfigApiRequest,
+  type ChangeGroupConfigApiResponse,
+  ChangeGroupMemberRoleApiContract,
+  type ChangeGroupMemberRoleApiRequest,
+  type ChangeGroupMemberRoleApiResponse,
+  ChangeGroupMemberTokenLimitApiContract,
+  type ChangeGroupMemberTokenLimitApiRequest,
+  type ChangeGroupMemberTokenLimitApiResponse,
+  GetAllMyGroupTokenInfoApiContract,
+  type GetAllMyGroupTokenInfoApiRequest,
+  type GetAllMyGroupTokenInfoApiResponse,
+  GetGroupBaseInfoApiContract,
+  type GetGroupBaseInfoApiRequest,
+  type GetGroupBaseInfoApiResponse,
+  GetGroupConfigApiContract,
+  type GetGroupConfigApiRequest,
+  type GetGroupConfigApiResponse,
+  GetGroupDetailInfoApiContract,
+  type GetGroupDetailInfoApiRequest,
+  type GetGroupDetailInfoApiResponse,
+  GetMyGroupMemberInfoApiContract,
+  type GetMyGroupMemberInfoApiRequest,
+  type GetMyGroupMemberInfoApiResponse,
+  GetMyRoleInGroupApiContract,
+  type GetMyRoleInGroupApiResponse,
+  JoinGroupApiContract,
+  type JoinGroupApiRequest,
+  type JoinGroupApiResponse,
+  KickGroupMembersApiContract,
+  type KickGroupMembersApiRequest,
+  type KickGroupMembersApiResponse,
+  ListGroupApiContract,
+  type ListGroupApiRequest,
+  type ListGroupApiResponse,
+  ListGroupMemberApiContract,
+  type ListGroupMemberApiRequest,
+  type ListGroupMemberApiResponse,
+  QuitGroupApiContract,
+  type QuitGroupApiRequest,
+  type QuitGroupApiResponse,
+  RemoveGroupApiContract,
+  type RemoveGroupApiRequest,
+  type RemoveGroupApiResponse,
+} from './GroupApi.contract';
 
 /** Group API: /group/* */
-function listGroups(req: ListGroupApiRequest): Promise<ListGroupApiResponse> {
-  return apiGetUnchecked('/group/list', { params: req });
+async function listGroups(req: ListGroupApiRequest): Promise<ListGroupApiResponse> {
+  return executeApiContract(ListGroupApiContract, req);
 }
 
-function getGroupDetailInfo(req: GetGroupInfoApiRequest): Promise<GetGroupInfoApiResponse> {
-  return apiGetUnchecked('/group/getGroupDetailInfo', { params: req });
+async function getGroupDetailInfo(
+  req: GetGroupDetailInfoApiRequest
+): Promise<GetGroupDetailInfoApiResponse> {
+  return executeApiContract(GetGroupDetailInfoApiContract, req);
 }
 
-function getGroupBaseInfo(req: GetGroupBaseInfoApiRequest): Promise<GetGroupBaseInfoApiResponse> {
-  return apiGetUnchecked('/group/getGroupBaseInfo', { params: req });
+async function getGroupBaseInfo(
+  req: GetGroupBaseInfoApiRequest
+): Promise<GetGroupBaseInfoApiResponse> {
+  return executeApiContract(GetGroupBaseInfoApiContract, req);
 }
 
-function addGroup(req: AddGroupApiRequest): Promise<AddGroupApiResponse> {
-  return apiPostUnchecked('/group/addGroup', req);
+async function addGroup(req: AddGroupApiRequest): Promise<AddGroupApiResponse> {
+  return executeApiContract(AddGroupApiContract, req);
 }
 
-function changeGroup(req: ChangeGroupApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/changeGroup', req);
+async function changeGroup(req: ChangeGroupApiRequest): Promise<ChangeGroupApiResponse> {
+  return executeApiContract(ChangeGroupApiContract, req);
 }
 
-function removeGroup(req: RemoveGroupApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/removeGroup', req);
+async function removeGroup(req: RemoveGroupApiRequest): Promise<RemoveGroupApiResponse> {
+  return executeApiContract(RemoveGroupApiContract, req);
 }
 
-function joinGroup(req: JoinGroupApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/joinGroup', req);
+async function joinGroup(req: JoinGroupApiRequest): Promise<JoinGroupApiResponse> {
+  return executeApiContract(JoinGroupApiContract, req);
 }
 
 export const GroupApi = {
@@ -69,12 +98,14 @@ export const GroupApi = {
 
 /** Group Config API: /resource/groupConfig/* */
 
-function getConfig(req: GetGroupConfigApiRequest): Promise<GetGroupConfigApiResponse> {
-  return apiGetUnchecked('/resource/groupConfig/getConfig', { params: req });
+async function getConfig(req: GetGroupConfigApiRequest): Promise<GetGroupConfigApiResponse> {
+  return executeApiContract(GetGroupConfigApiContract, req);
 }
 
-function changeConfig(req: ChangeGroupConfigApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/groupConfig/changeConfig', req);
+async function changeConfig(
+  req: ChangeGroupConfigApiRequest
+): Promise<ChangeGroupConfigApiResponse> {
+  return executeApiContract(ChangeGroupConfigApiContract, req);
 }
 
 export const GroupResConfigApi = {
@@ -84,40 +115,44 @@ export const GroupResConfigApi = {
 
 /** Group Member API: /group/member/* */
 
-function listMembers(req: ListMemberApiRequest): Promise<FetchGroupMembersApiResponse> {
-  return apiGetUnchecked('/group/member/list', { params: req });
+async function listMembers(req: ListGroupMemberApiRequest): Promise<ListGroupMemberApiResponse> {
+  return executeApiContract(ListGroupMemberApiContract, req);
 }
 
-function getMyRole(groupId: string): Promise<GroupRoleApiResponse> {
-  return apiGetUnchecked('/group/member/getMyRole', { params: { groupId } });
+async function getMyRole(groupId: string): Promise<GetMyRoleInGroupApiResponse> {
+  return executeApiContract(GetMyRoleInGroupApiContract, { groupId });
 }
 
-function quit(req: QuitGroupApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/member/quit', req);
+async function quit(req: QuitGroupApiRequest): Promise<QuitGroupApiResponse> {
+  return executeApiContract(QuitGroupApiContract, req);
 }
 
-function changeRole(req: ChangeRoleApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/member/changeRole', req);
+async function changeRole(
+  req: ChangeGroupMemberRoleApiRequest
+): Promise<ChangeGroupMemberRoleApiResponse> {
+  return executeApiContract(ChangeGroupMemberRoleApiContract, req);
 }
 
-function kick(req: KickMemberApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/member/kick', req);
+async function kick(req: KickGroupMembersApiRequest): Promise<KickGroupMembersApiResponse> {
+  return executeApiContract(KickGroupMembersApiContract, req);
 }
 
-function getMyGroupMemberInfo(
+async function getMyGroupMemberInfo(
   req: GetMyGroupMemberInfoApiRequest
 ): Promise<GetMyGroupMemberInfoApiResponse> {
-  return apiGetUnchecked('/group/member/getMyGroupMemberInfo', { params: req });
+  return executeApiContract(GetMyGroupMemberInfoApiContract, req);
 }
 
-function changeTokenLimit(req: ChangeTokenLimitApiRequest): Promise<void> {
-  return apiPostUnchecked('/group/member/changeTokenLimit', req);
+async function changeTokenLimit(
+  req: ChangeGroupMemberTokenLimitApiRequest
+): Promise<ChangeGroupMemberTokenLimitApiResponse> {
+  return executeApiContract(ChangeGroupMemberTokenLimitApiContract, req);
 }
 
-function getAllMyGroupTokenInfo(
+async function getAllMyGroupTokenInfo(
   req: GetAllMyGroupTokenInfoApiRequest
 ): Promise<GetAllMyGroupTokenInfoApiResponse> {
-  return apiGetUnchecked('/group/member/getAllMyGroupTokenInfo', { params: req });
+  return executeApiContract(GetAllMyGroupTokenInfoApiContract, req);
 }
 
 export const GroupMemberApi = {

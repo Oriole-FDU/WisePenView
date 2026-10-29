@@ -81,6 +81,6 @@ export const WalletApi: typeof WalletApiContract = {
     }
     const amount = isGroupInflow ? -tokenCount : tokenCount;
     balance += amount;
-    group.tokenBalance = (groupBalance - amount).toString();
+    group.tokenBalance = groupBalance - amount;
   },
 };

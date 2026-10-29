@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag Schema 与前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 G Group。
+> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag、G Group Schema 与前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 R ResourceCore。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -92,15 +92,15 @@ flowchart TD
 
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef next fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-  class W,A,U,T completed
-  class G next
+  class W,A,U,T,G completed
+  class R next
 ```
 
 当前 DAG 前沿：
 
-- 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`。
-- 下一前沿：`G Group`。
-- 仍被阻塞：`R ResourceCore` 还需要 `G`；其他叶域和聚合域继续沿 DAG 向后等待。
+- 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`、`G Group`。
+- 下一前沿：`R ResourceCore`。
+- 仍被阻塞：`T Tag` 的 scoped endpoint 迁移继续等待后端上线；其他叶域和聚合域继续沿 DAG 向后等待。
 
 关键约束：
 
@@ -388,9 +388,8 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 
 ### 可以直接删除的机械 mapper
 
-在 API Schema 与服务入参命名对齐后，以下函数没有独立语义：
+Group 文档中列出的请求映射、创建响应映射、成员请求映射与角色编号字符串转换已删除。其余域在 API Schema 与服务入参命名对齐后，以下函数没有独立语义：
 
-- `GroupServicesMap`：`mapFetchGroupInfoRequest`、`mapFetchGroupBaseInfoRequest`、`mapFetchGroupResConfigRequest`、`mapFetchGroupMembersRequest`、`mapFetchMyRoleInGroupRequest`。
 - `UserServicesMap`：`mapSendEmailVerifyRequest`、`mapConfirmEmailVerifyRequest`、`mapListInviteRecordsRequest`。
 - `MessageServicesMap`：`mapListUserMessagesRequest`、`mapReadMessagesRequest`。
 - `AdminMessageServicesMap`：`mapListAdminMessagesRequest`。
@@ -599,9 +598,10 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 2：Group
 
-- Group、GroupMember、GroupResConfig。
-- 移除 identity request mapper。
-- 精确 UserSummary、GroupType、GroupRole。
+- [x] Group、GroupMember、GroupResConfig 建立精确 Schema 与 17 个 checked Contract。
+- [x] 移除 Group identity request mapper、成员角色字符串兼容和配置模式硬编码。
+- [x] 精确 UserDisplay、GroupType、GroupRole、Java Long、毫秒时间与分页契约。
+- [x] Group mock、mapper、合法/非法 wire 契约测试同步完成。
 
 ### Wave 3：Tag
 
@@ -685,7 +685,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ## 十一、验收门槛
 
-- REST checked contract 覆盖率从 6/152 提升到 100%；兼容白名单只能下降。
+- REST checked contract 覆盖率从当前基线继续提升到 100%；兼容白名单只能下降。
 - 每个 domain API 方法都有 request 和 response Schema，空响应也显式声明。
 - P0 差异全部有正反测试：合法响应、缺字段、错误枚举、错误 null/undefined、错误 Long/时间类型。
 - `rg "api(Get|Post|Put|Delete)Unchecked|apiGetText|fetch\\(" src/domains` 只允许特殊传输和明确白名单命中。

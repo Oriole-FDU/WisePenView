@@ -450,17 +450,17 @@
       "groupId": "2"
     }
   ],
-  "course-computer-networks": [
+  "1002": [
     {
-      "tagId": "outline-root-course-computer-networks",
+      "tagId": "outline-root-1002",
       "tagName": "大纲内容",
-      "groupId": "course-computer-networks",
+      "groupId": "1002",
       "parentId": "0",
       "children": [
         {
           "tagId": "network-chapter-1",
-          "parentId": "outline-root-course-computer-networks",
-          "groupId": "course-computer-networks",
+          "parentId": "outline-root-1002",
+          "groupId": "1002",
           "tagName": "第一章 计算机网络概述",
           "tagDesc": "了解计算机网络的基本组成、分层思想以及本课程的学习要求。",
           "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-note-1\"]}",
@@ -468,8 +468,8 @@
         },
         {
           "tagId": "network-chapter-2",
-          "parentId": "outline-root-course-computer-networks",
-          "groupId": "course-computer-networks",
+          "parentId": "outline-root-1002",
+          "groupId": "1002",
           "tagName": "第二章 应用层",
           "tagDesc": "",
           "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[]}",
@@ -477,7 +477,7 @@
             {
               "tagId": "network-http",
               "parentId": "network-chapter-2",
-              "groupId": "course-computer-networks",
+              "groupId": "1002",
               "tagName": "2.1 HTTP 与 Web",
               "tagDesc": "",
               "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-course-syllabus\"]}",
@@ -488,17 +488,17 @@
       ]
     }
   ],
-  "course-data-structures": [
+  "1001": [
     {
-      "tagId": "outline-root-course-data-structures",
+      "tagId": "outline-root-1001",
       "tagName": "大纲内容",
-      "groupId": "course-data-structures",
+      "groupId": "1001",
       "parentId": "0",
       "children": [
         {
           "tagId": "chapter-1",
-          "parentId": "outline-root-course-data-structures",
-          "groupId": "course-data-structures",
+          "parentId": "outline-root-1001",
+          "groupId": "1001",
           "tagName": "第一章 课程概览",
           "tagDesc": "从课程导学开始，了解本学期的学习安排、考核方式与资源使用方法。",
           "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-note-1\",\"mock-course-syllabus\"]}",
@@ -506,8 +506,8 @@
         },
         {
           "tagId": "chapter-2",
-          "parentId": "outline-root-course-data-structures",
-          "groupId": "course-data-structures",
+          "parentId": "outline-root-1001",
+          "groupId": "1001",
           "tagName": "第二章 线性结构",
           "tagDesc": "",
           "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[]}",
@@ -515,7 +515,7 @@
             {
               "tagId": "section-21",
               "parentId": "chapter-2",
-              "groupId": "course-data-structures",
+              "groupId": "1001",
               "tagName": "2.1 线性表",
               "tagDesc": "学习线性表的逻辑结构，并比较顺序存储与链式存储的实现特点。",
               "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-video-list\",\"mock-note-2\"]}",
@@ -524,7 +524,7 @@
             {
               "tagId": "section-22",
               "parentId": "chapter-2",
-              "groupId": "course-data-structures",
+              "groupId": "1001",
               "tagName": "2.2 栈与队列",
               "tagDesc": "",
               "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-video-stack\",\"mock-pdf-queue\"]}",
@@ -534,8 +534,8 @@
         },
         {
           "tagId": "chapter-3",
-          "parentId": "outline-root-course-data-structures",
-          "groupId": "course-data-structures",
+          "parentId": "outline-root-1001",
+          "groupId": "1001",
           "tagName": "第三章 树与图",
           "tagDesc": "",
           "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-video-tree\",\"mock-note-graph\"]}",
@@ -543,8 +543,8 @@
         },
         {
           "tagId": "chapter-4",
-          "parentId": "outline-root-course-data-structures",
-          "groupId": "course-data-structures",
+          "parentId": "outline-root-1001",
+          "groupId": "1001",
           "tagName": "第四章 查找与排序",
           "tagDesc": "",
           "tagMetaInfo": "{\"schema\":\"wisepen.tag.v1\",\"resourceOrder\":[\"mock-pdf-sort\"]}",
@@ -553,11 +553,11 @@
       ]
     }
   ],
-  "course-database-systems": [
+  "1003": [
     {
-      "tagId": "outline-root-course-database-systems",
+      "tagId": "outline-root-1003",
       "tagName": "大纲内容",
-      "groupId": "course-database-systems",
+      "groupId": "1003",
       "parentId": "0",
       "children": []
     }

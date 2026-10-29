@@ -76,7 +76,7 @@ function QuotaByGroup({ pagination }: QuotaByGroupProps) {
   const total = quotaPageData.total;
   const dataSource = quotaPageData.quotas.map((quota) => ({
     ...quota,
-    key: quota.groupId || quota.groupName,
+    key: `${quota.groupType}:${quota.groupName}`,
   }));
   const loadedCount = dataSource.length;
   const start = loadedCount === 0 ? 0 : 1;

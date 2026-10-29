@@ -2,10 +2,13 @@ import type { ResourceAction } from '@/domains/_shared/access';
 import type {
   Group,
   GroupBaseInfo,
+  GroupFileOrgLogic,
   GroupMemberList,
   GroupResConfig,
   GroupType,
+  ROLE,
 } from '@/domains/Group';
+import type { EnumValue } from '@/utils/type/enum';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
 
@@ -21,7 +24,7 @@ export interface IGroupService {
   fetchGroupBaseInfo(groupId: string): Promise<GroupBaseInfo>;
   fetchGroupInfo(groupId: string): Promise<Group>;
   getGroupWalletInfo(params: GetGroupWalletInfoRequest): Promise<number>;
-  /** GET /resource/groupConfig/getConfig；fileOrgLogic 由 mapper 统一收敛为 TAG */
+  /** GET /resource/groupConfig/getConfig；保留后端实际文件组织模式 */
   fetchGroupResConfig(groupId: string): Promise<GroupResConfig>;
   /** POST /resource/groupConfig/changeConfig；仅 OWNER/ADMIN */
   updateGroupResConfig(params: UpdateGroupResConfigRequest): Promise<void>;
@@ -99,7 +102,7 @@ export interface QuitGroupRequest {
 export interface UpdateMemberRoleRequest {
   groupId: string;
   targetUserIds: string[];
-  role: number;
+  role: EnumValue<typeof ROLE>;
 }
 
 /** 批量踢出成员请求参数 */
@@ -111,6 +114,7 @@ export interface KickMembersRequest {
 /** 设置小组资源配置（与 OpenAPI GroupResConfigUpdateRequest 对齐） */
 export interface UpdateGroupResConfigRequest {
   groupId: string;
+  fileOrgLogic: GroupFileOrgLogic;
   defaultMemberActions?: ResourceAction[];
 }
 
