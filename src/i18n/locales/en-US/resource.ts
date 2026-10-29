@@ -227,6 +227,7 @@ const enUSResource = {
       DOWNLOAD_ORIGINAL: 'Download original',
       FORK: 'Copy resource',
       COMMENT: 'Comment',
+      MARKET_VIEW: 'View in market',
     },
     preset: {
       inherit: {
