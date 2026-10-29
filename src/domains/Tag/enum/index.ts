@@ -30,10 +30,10 @@ export type TagVisibilityMode = EnumValue<typeof TAG_VISIBILITY_MODE>;
 
 /** 访问控制范围（与 OpenAPI AccessControlScope 对齐） */
 export const ACCESS_CONTROL_SCOPE = createEnum([
-  { value: 0, key: 'ALL' },
-  { value: 1, key: 'ONLY_ADMIN' },
-  { value: 2, key: 'WHITELIST' },
-  { value: 3, key: 'BLACKLIST' },
+  { value: 'ALL', key: 'ALL' },
+  { value: 'ONLY_ADMIN', key: 'ONLY_ADMIN' },
+  { value: 'WHITELIST', key: 'WHITELIST' },
+  { value: 'BLACKLIST', key: 'BLACKLIST' },
 ] as const);
 
 export type AccessControlScope = EnumValue<typeof ACCESS_CONTROL_SCOPE>;

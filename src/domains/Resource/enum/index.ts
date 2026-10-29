@@ -140,7 +140,7 @@ const coerceResourceActionItem = (item: unknown): ResourceAction | null => {
     return item as ResourceAction;
   }
   if (typeof item === 'string') {
-    const byKey = (RESOURCE_ACTION.values as Record<string, number>)[item];
+    const byKey = RESOURCE_ACTION.options.find((option) => option.key === item)?.value;
     if (byKey !== undefined) return byKey as ResourceAction;
     const asNumber = Number(item);
     if (!Number.isNaN(asNumber) && asNumber in RESOURCE_ACTION.configs) {
