@@ -16,9 +16,9 @@ export const DocumentApi: typeof DocumentApiContract = {
     };
   },
   listPendingDocs: async () => [],
-  syncDocStatus: async () => ({ status: 'READY' }),
-  retryDocProcess: async () => undefined,
-  cancelDocProcess: async () => undefined,
+  syncDocStatus: async () => ({ status: 'READY', errorMessage: null }),
+  retryDocProcess: async () => null,
+  cancelDocProcess: async () => null,
   getDocInfo: ({ resourceId }) => {
     const resourceInfo = getMockResource(resourceId);
     return mockResponse({
@@ -28,12 +28,15 @@ export const DocumentApi: typeof DocumentApiContract = {
         uploadMeta: {
           documentName: resourceInfo.resourceName,
           uploaderId: resourceInfo.ownerId,
-          fileType: resourceInfo.resourceType ?? 'pdf',
+          fileType: resourceInfo.resourceType ?? 'UNKNOWN',
           size: (resourceInfo.size ?? 1024).toString(),
+          mountTargetTagId: resourceInfo.tagBinds?.[0]?.primaryTagId ?? null,
         },
-        documentStatus: { status: 'SUCCESS' },
+        documentStatus: { status: 'READY', errorMessage: null },
         maxPreviewPages: 20,
       },
+      updateTime: Date.parse('2026-03-01T00:00:00Z'),
+      authorsDisplay: null,
     });
   },
   forkDocument: async ({ resourceId, forkedResourceName }) =>

@@ -6,13 +6,13 @@ import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
-  DocMetaInfoApiResponse,
+  DocumentProcessStatusApi,
+  DocumentVersionInfoApi,
   GetDocInfoApiResponse,
   ListPendingDocsApiResponse,
-  PendingDocItemApiResponse,
-  PendingDocumentStatusApiResponse,
+  PendingDocItemApi,
   UploadDocApiRequest,
-} from '../apis/DocumentApi.type';
+} from '../apis/DocumentApi.schema';
 import type {
   DocDisplayInfoResponse,
   DocMetaInfo,
@@ -44,15 +44,13 @@ const normalizeOptionalId = (value: string | number | null | undefined): string 
 };
 
 const mapDocumentProcessStatusFromApi = (
-  data: PendingDocumentStatusApiResponse
+  data: DocumentProcessStatusApi
 ): DocumentProcessStatus => ({
   status: data.status,
   errorMessage: data.errorMessage,
 });
 
-const mapDocMetaInfoFromApi = (
-  data: DocMetaInfoApiResponse & { version?: number }
-): DocMetaInfo => ({
+const mapDocMetaInfoFromApi = (data: DocumentVersionInfoApi | PendingDocItemApi): DocMetaInfo => ({
   ...data,
   uploadMeta: {
     ...data.uploadMeta,
@@ -62,7 +60,7 @@ const mapDocMetaInfoFromApi = (
   documentStatus: mapDocumentProcessStatusFromApi(data.documentStatus),
 });
 
-const mapPendingDocItemFromApi = (item: PendingDocItemApiResponse): PendingDocItem => ({
+const mapPendingDocItemFromApi = (item: PendingDocItemApi): PendingDocItem => ({
   ...item,
   ...mapDocMetaInfoFromApi(item),
 });
@@ -70,9 +68,7 @@ const mapPendingDocItemFromApi = (item: PendingDocItemApiResponse): PendingDocIt
 const mapListPendingDocsFromApi = (data: ListPendingDocsApiResponse): PendingDocItem[] =>
   data.map(mapPendingDocItemFromApi);
 
-const readDocumentVersionInfoFromApi = (
-  data: GetDocInfoApiResponse
-): DocMetaInfoApiResponse & { version?: number } => {
+const readDocumentVersionInfoFromApi = (data: GetDocInfoApiResponse): DocumentVersionInfoApi => {
   if (data.documentVersionInfo == null) {
     throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_VERSION_INFO_MISSING);
   }

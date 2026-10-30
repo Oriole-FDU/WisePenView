@@ -1,11 +1,10 @@
 {
-  "checkedContracts": 43,
+  "checkedContracts": 51,
   "uncheckedCalls": {
     "src/domains/Admin/apis/AdminMessageApi.ts": 2,
     "src/domains/Admin/apis/AdminUserApi.ts": 5,
     "src/domains/Agent/apis/AgentApi.ts": 9,
     "src/domains/Chat/apis/ChatApi.ts": 23,
-    "src/domains/Document/apis/DocumentApi.ts": 8,
     "src/domains/HtmlPage/apis/HtmlPageApi.ts": 1,
     "src/domains/Image/apis/ImageApi.ts": 1,
     "src/domains/InlineComment/apis/InlineCommentApi.ts": 8,
