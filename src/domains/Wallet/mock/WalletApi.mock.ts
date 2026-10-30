@@ -6,18 +6,34 @@ import type { WalletApi as WalletApiContract } from '../apis/WalletApi';
 import type {
   GetUserWalletInfoApiResponse,
   WalletTransactionRecordApiResponse,
-} from '../apis/WalletApi.type';
+} from '../apis/WalletApi.schema';
 import mockdata from './mockdata.json';
 
 let balance = Number(mockdata.tokenBalance);
-const records = structuredClone(
+const records: WalletTransactionRecordApiResponse[] = structuredClone(
   mockdata.transactions.records
-) as WalletTransactionRecordApiResponse[];
+).map((record) => ({
+  traceId: record.traceId,
+  operatorId: '1',
+  count: record.count,
+  walletTransactionType:
+    record.walletTransactionType as WalletTransactionRecordApiResponse['walletTransactionType'],
+  walletBusinessType:
+    record.walletBusinessType as WalletTransactionRecordApiResponse['walletBusinessType'],
+  meta: record.meta,
+  billingDetail: null,
+  operatorDisplay: {
+    ...record.operatorDisplay,
+    identityType: record.operatorDisplay.identityType as 1 | 2 | 3,
+  },
+  createTime: Date.parse(record.createTime),
+}));
 export const WalletApi: typeof WalletApiContract = {
   getUserWalletInfo: (): Promise<GetUserWalletInfoApiResponse> =>
     mockResponse({
-      tokenBalance: balance.toString(),
-      tokenUsed: mockdata.tokenUsed.toString(),
+      tokenBalance: balance,
+      tokenUsed: mockdata.tokenUsed,
+      coinBalance: 0,
     }),
   redeemVoucher: async ({ voucherCode }) => {
     const code = voucherCode.replace(/[\s-]/g, '').toUpperCase();
@@ -30,7 +46,9 @@ export const WalletApi: typeof WalletApiContract = {
     balance += 500;
     records.unshift({
       traceId: `mock-${crypto.randomUUID()}`,
-      createTime: new Date().toISOString(),
+      operatorId: '1',
+      billingDetail: null,
+      createTime: Date.now(),
       walletTransactionType: 'REFILL',
       walletBusinessType: 'TOKEN',
       count: 500,

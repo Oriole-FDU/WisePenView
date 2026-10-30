@@ -1,16 +1,20 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  GetUserWalletInfoApiResponse,
-  ListTransactionsApiRequest,
-  ListTransactionsApiResponse,
-  RedeemVoucherApiRequest,
-  TransferTokenBetweenGroupAndUserApiRequest,
-} from './WalletApi.type';
+import {
+  GetUserWalletInfoApiContract,
+  type GetUserWalletInfoApiContractResponse,
+  ListTransactionsApiContract,
+  type ListTransactionsApiContractRequest,
+  type ListTransactionsApiContractResponse,
+  RedeemVoucherApiContract,
+  type RedeemVoucherApiContractRequest,
+  TransferTokenBetweenGroupAndUserApiContract,
+  type TransferTokenBetweenGroupAndUserApiContractRequest,
+} from './WalletApi.contract';
 
 /** User Wallet API: /user/wallet/* */
 
-const serializeWalletTransactionsQuery = (params: ListTransactionsApiRequest): string => {
+const serializeWalletTransactionsQuery = (params: Record<string, unknown>): string => {
   const searchParams = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null) return;
@@ -27,25 +31,26 @@ const serializeWalletTransactionsQuery = (params: ListTransactionsApiRequest): s
   return searchParams.toString();
 };
 
-function getUserWalletInfo(): Promise<GetUserWalletInfoApiResponse> {
-  return apiGetUnchecked('/user/wallet/getUserWalletInfo');
+function getUserWalletInfo(): Promise<GetUserWalletInfoApiContractResponse> {
+  return executeApiContract(GetUserWalletInfoApiContract, undefined);
 }
 
-function redeemVoucher(req: RedeemVoucherApiRequest): Promise<void> {
-  return apiPostUnchecked('/user/wallet/redeemVoucher', req);
+async function redeemVoucher(req: RedeemVoucherApiContractRequest): Promise<void> {
+  await executeApiContract(RedeemVoucherApiContract, req);
 }
 
-function listTransactions(req: ListTransactionsApiRequest): Promise<ListTransactionsApiResponse> {
-  return apiGetUnchecked('/user/wallet/listTransactions', {
-    params: req,
+function listTransactions(
+  req: ListTransactionsApiContractRequest
+): Promise<ListTransactionsApiContractResponse> {
+  return executeApiContract(ListTransactionsApiContract, req, {
     paramsSerializer: serializeWalletTransactionsQuery,
   });
 }
 
-function transferTokenBetweenGroupAndUser(
-  req: TransferTokenBetweenGroupAndUserApiRequest
+async function transferTokenBetweenGroupAndUser(
+  req: TransferTokenBetweenGroupAndUserApiContractRequest
 ): Promise<void> {
-  return apiPostUnchecked('/user/wallet/transferTokenBetweenGroupAndUser', req);
+  await executeApiContract(TransferTokenBetweenGroupAndUserApiContract, req);
 }
 
 export const WalletApi = {

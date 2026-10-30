@@ -5,7 +5,7 @@ import type {
   ListUserMessagesApiResponse,
   ReadMessageApiRequest,
   UserMessageApiModel,
-} from '../apis/MessageApi.type';
+} from '../apis/MessageApi.schema';
 import type { UserMessage } from '../entity/message';
 import type {
   ListUserMessagesRequest,

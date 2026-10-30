@@ -13,15 +13,15 @@ export interface UserTaskRewardPreview {
 
 export interface UserTaskOnceStatus {
   completed: boolean;
-  completeTime?: string;
+  completeTime?: number;
 }
 
 export interface UserTaskPeriodicStatus {
   completedTimes: number;
   maxTimes: number;
-  windowStart?: string;
-  windowEnd?: string;
-  lastCompleteTime?: string;
+  windowStart?: number;
+  windowEnd?: number;
+  lastCompleteTime?: number;
 }
 
 export interface UserTaskStatus {

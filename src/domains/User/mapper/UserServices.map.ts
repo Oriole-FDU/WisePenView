@@ -29,8 +29,8 @@ import type {
   UserTaskPeriodicStatusApiResponse,
   UserTaskRewardPreviewApiResponse,
   UserTaskStatusApiResponse,
-} from '../apis/UserTaskApi.type';
-import type { UserTourStatusApiResponse } from '../apis/UserTourApi.type';
+} from '../apis/UserTaskApi.schema';
+import type { UserTourStatusApiResponse } from '../apis/UserTourApi.schema';
 import type {
   UserTaskCheckInResult,
   UserTaskPeriodicStatus,

@@ -1,7 +1,7 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
 
 import type { UserTourApi as UserTourApiContract } from '../apis/UserTourApi';
-import type { TourCodeApiValue } from '../apis/UserTourApi.type';
+import type { TourCodeApiValue } from '../apis/UserTourApi.schema';
 
 const TOUR_CODES = [
   'SYSTEM_FEATURES_TOUR',

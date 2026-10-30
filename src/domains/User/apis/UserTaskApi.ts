@@ -1,13 +1,18 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type { UserTaskCheckInApiResponse, UserTaskStatusApiResponse } from './UserTaskApi.type';
+import {
+  DailyCheckInApiContract,
+  type DailyCheckInApiContractResponse,
+  ListUserTaskStatusApiContract,
+  type ListUserTaskStatusApiContractResponse,
+} from './UserTaskApi.contract';
 
-function listTaskStatus(): Promise<UserTaskStatusApiResponse[]> {
-  return apiGetUnchecked('/user/task/listTaskStatus');
+function listTaskStatus(): Promise<ListUserTaskStatusApiContractResponse> {
+  return executeApiContract(ListUserTaskStatusApiContract, undefined);
 }
 
-function dailyCheckIn(): Promise<UserTaskCheckInApiResponse> {
-  return apiPostUnchecked('/user/task/dailyCheckIn', null);
+function dailyCheckIn(): Promise<DailyCheckInApiContractResponse> {
+  return executeApiContract(DailyCheckInApiContract, undefined);
 }
 
 export const UserTaskApi = {

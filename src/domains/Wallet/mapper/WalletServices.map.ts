@@ -13,7 +13,7 @@ import type {
   WalletBusinessTypeApiValue,
   WalletTransactionRecordApiResponse,
   WalletTransactionTypeApiValue,
-} from '../apis/WalletApi.type';
+} from '../apis/WalletApi.schema';
 import type {
   GetWalletInfoResponse,
   ListWalletTransactionsRequest,

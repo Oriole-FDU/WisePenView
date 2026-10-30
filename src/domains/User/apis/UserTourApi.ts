@@ -1,13 +1,18 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type { TourCodeApiValue, UserTourStatusApiResponse } from './UserTourApi.type';
+import {
+  CompleteTourApiContract,
+  ListUserTourStatusApiContract,
+  type ListUserTourStatusApiContractResponse,
+} from './UserTourApi.contract';
+import type { TourCodeApiValue } from './UserTourApi.schema';
 
-function listTourStatus(): Promise<UserTourStatusApiResponse[]> {
-  return apiGetUnchecked('/user/tour/listTourStatus');
+function listTourStatus(): Promise<ListUserTourStatusApiContractResponse> {
+  return executeApiContract(ListUserTourStatusApiContract, undefined);
 }
 
-function completeTour(tourCode: TourCodeApiValue): Promise<void> {
-  return apiPostUnchecked('/user/tour/completeTour', null, { params: { tourCode } });
+async function completeTour(tourCode: TourCodeApiValue): Promise<void> {
+  await executeApiContract(CompleteTourApiContract, { tourCode });
 }
 
 export const UserTourApi = {
