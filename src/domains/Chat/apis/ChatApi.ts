@@ -1,13 +1,5 @@
 import { executeApiContract } from '@/apis/executeApiContract';
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
-import type {
-  DeleteUserToolConfigApiRequest,
-  DeleteUserToolConfigApiResponse,
-  ListToolsApiResponse,
-  UpdateUserToolConfigApiRequest,
-  UpdateUserToolConfigApiResponse,
-} from './ChatApi.type';
 import {
   BindModelProviderApiContract,
   CreateUserModelApiContract,
@@ -62,6 +54,17 @@ import type {
   RenameSessionApiRequest,
   SetSessionAgentApiRequest,
 } from './ChatSessionApi.schema';
+import {
+  DeleteUserToolConfigApiContract,
+  ListToolsApiContract,
+  UpdateUserToolConfigApiContract,
+} from './ChatToolApi.contract';
+import type {
+  DeleteUserToolConfigApiRequest,
+  ListToolsApiResponse,
+  ToolApiResponse,
+  UpdateUserToolConfigApiRequest,
+} from './ChatToolApi.schema';
 
 /** Chat API: /chat/* */
 
@@ -74,7 +77,7 @@ function listModels(req: ListModelsApiRequest): Promise<ListModelsApiResponse> {
 }
 
 function listTools(): Promise<ListToolsApiResponse> {
-  return apiGetUnchecked('/chat/tool/listUserTools');
+  return executeApiContract(ListToolsApiContract, undefined);
 }
 
 function initTemporaryAttachmentUpload(
@@ -119,16 +122,12 @@ async function unbindModelProvider(req: UnbindModelProviderApiRequest): Promise<
   await executeApiContract(UnbindModelProviderApiContract, req);
 }
 
-function updateUserToolConfig(
-  req: UpdateUserToolConfigApiRequest
-): Promise<UpdateUserToolConfigApiResponse> {
-  return apiPostUnchecked('/chat/tool/updateUserToolConfig', req);
+function updateUserToolConfig(req: UpdateUserToolConfigApiRequest): Promise<ToolApiResponse> {
+  return executeApiContract(UpdateUserToolConfigApiContract, req);
 }
 
-function deleteUserToolConfig(
-  req: DeleteUserToolConfigApiRequest
-): Promise<DeleteUserToolConfigApiResponse> {
-  return apiPostUnchecked('/chat/tool/deleteUserToolConfig', req);
+async function deleteUserToolConfig(req: DeleteUserToolConfigApiRequest): Promise<void> {
+  await executeApiContract(DeleteUserToolConfigApiContract, req);
 }
 
 export const ChatApi = {

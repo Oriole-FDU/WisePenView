@@ -1,6 +1,5 @@
 import type { DynamicToolUIPart, ToolUIPart, UITool, UIToolInvocation } from 'ai';
 
-import type { ListToolsApiResponse, ToolApiResponse } from '../apis/ChatApi.type';
 import type {
   ListAvailableModelsApiResponse,
   ListModelsApiResponse,
@@ -20,6 +19,7 @@ import type {
   RenameSessionApiRequest,
   SetSessionAgentApiRequest,
 } from '../apis/ChatSessionApi.schema';
+import type { ListToolsApiResponse, ToolApiResponse } from '../apis/ChatToolApi.schema';
 import type {
   ChatMessageMetadata,
   MessageAttachmentSnapshot,

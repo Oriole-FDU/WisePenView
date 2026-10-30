@@ -6,12 +6,12 @@ import type {
   ChatCompletionApi as ChatCompletionApiContract,
   ChatSessionApi as ChatSessionApiContract,
 } from '../apis/ChatApi';
-import type { ToolApiResponse } from '../apis/ChatApi.type';
 import type { ModelResponse, ProviderApiResponse } from '../apis/ChatModelApi.schema';
 import type {
   ChatSessionApi as ChatSessionApiModel,
   UIMessageApi as MessageResponse,
 } from '../apis/ChatSessionApi.schema';
+import type { ToolApiResponse } from '../apis/ChatToolApi.schema';
 
 const MOCK_HISTORY_SIZE = 260;
 const MOCK_HISTORY_INTERVAL_MS = 45 * 1000;
@@ -175,6 +175,7 @@ const tools: ToolApiResponse[] = [
   configured: Boolean(configured),
   requires_config: Boolean(requiresConfig),
   source: { type: 'system', server_id: null, server_display_name: null, remote_name: null },
+  missing_config_keys: [],
   config_schema: { type: 'object' },
   secret_fingerprints: configured && requiresConfig ? { api_key: 'mock***key' } : {},
 }));
@@ -362,6 +363,5 @@ export const ChatApi: typeof ChatApiContract = {
     const tool = requireTool(tool_name);
     tool.configured = false;
     tool.secret_fingerprints = {};
-    return null;
   },
 };
