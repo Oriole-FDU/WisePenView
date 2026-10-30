@@ -15,8 +15,6 @@ import {
   UserSexApiSchema,
 } from './UserInformationApi.schema';
 
-export const UserVerificationProviderApiSchema = z.enum(['FUDAN_UIS']);
-
 export const ChangeUserInfoApiRequestSchema = z.strictObject({
   nickname: z.string().optional(),
   avatar: z.string().optional(),
@@ -87,7 +85,6 @@ export const UserInviteRecordApiSchema = z.object({
 export const ListUserInviteRecordsApiResponseSchema =
   createPageResponseSchema(UserInviteRecordApiSchema);
 
-export type UserVerificationProviderApiValue = z.infer<typeof UserVerificationProviderApiSchema>;
 export type ChangeUserInfoApiRequest = z.infer<typeof ChangeUserInfoApiRequestSchema>;
 export type ChangeUserProfileApiRequest = z.infer<typeof ChangeUserProfileApiRequestSchema>;
 export type InitiateEmailVerifyApiRequest = z.infer<typeof InitiateEmailVerifyApiRequestSchema>;
