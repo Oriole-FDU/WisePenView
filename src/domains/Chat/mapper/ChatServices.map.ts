@@ -1,26 +1,26 @@
 import type { DynamicToolUIPart, ToolUIPart, UITool, UIToolInvocation } from 'ai';
 
 import type {
-  ActiveChatTurnApiResponse,
-  CreateSessionApiRequest,
-  CreateSessionApiResponse,
   ListAvailableModelsApiResponse,
-  ListHistoryMessagesApiRequest,
-  ListHistoryMessagesApiResponse,
   ListModelsApiResponse,
-  ListSessionsApiRequest,
-  ListSessionsApiResponse,
   ListToolsApiResponse,
   ListUserProvidersApiResponse,
   ModelProviderMappingResponse,
   ModelResponse,
   ProviderApiResponse,
-  RenameSessionApiRequest,
-  RenameSessionApiResponse,
-  SetSessionAgentApiRequest,
-  SetSessionAgentApiResponse,
   ToolApiResponse,
 } from '../apis/ChatApi.type';
+import type {
+  ActiveChatTurnApiResponse,
+  ChatSessionApi,
+  CreateSessionApiRequest,
+  ListHistoryMessagesApiRequest,
+  ListHistoryMessagesApiResponse,
+  ListSessionsApiRequest,
+  ListSessionsApiResponse,
+  RenameSessionApiRequest,
+  SetSessionAgentApiRequest,
+} from '../apis/ChatSessionApi.schema';
 import type {
   ChatMessageMetadata,
   MessageAttachmentSnapshot,
@@ -280,16 +280,14 @@ const mapCreateSessionRequest = (params?: CreateSessionRequest): CreateSessionAp
   const title = params?.title;
   const hasTitle = title !== undefined;
   const agentId = params?.agentId;
-  const agentVersion = params?.agentVersion;
 
   return {
     ...(hasTitle ? { title } : {}),
     ...(agentId !== undefined ? { agent_id: agentId } : {}),
-    ...(agentVersion !== undefined ? { agent_version: agentVersion } : {}),
   };
 };
 
-const mapSessionFromApi = (data: CreateSessionApiResponse): ChatSession => ({
+const mapSessionFromApi = (data: ChatSessionApi): ChatSession => ({
   id: data.id,
   userId: data.user_id,
   title: data.title,
@@ -299,17 +297,14 @@ const mapSessionFromApi = (data: CreateSessionApiResponse): ChatSession => ({
   agentVersion: data.agent_version,
 });
 
-const mapCreateSessionFromApi = (data: CreateSessionApiResponse): ChatSession =>
-  mapSessionFromApi(data);
+const mapCreateSessionFromApi = (data: ChatSessionApi): ChatSession => mapSessionFromApi(data);
 
 const mapSetSessionAgentRequest = (params: SetSessionAgentRequest): SetSessionAgentApiRequest => ({
   session_id: params.sessionId,
   ...(params.agentId !== undefined ? { agent_id: params.agentId } : {}),
-  ...(params.agentVersion !== undefined ? { agent_version: params.agentVersion } : {}),
 });
 
-const mapSetSessionAgentFromApi = (data: SetSessionAgentApiResponse): ChatSession =>
-  mapSessionFromApi(data);
+const mapSetSessionAgentFromApi = (data: ChatSessionApi): ChatSession => mapSessionFromApi(data);
 
 const mapRenameSessionRequest = (params: RenameSessionRequest): RenameSessionApiRequest => {
   const newTitle = params.newTitle;
@@ -321,8 +316,7 @@ const mapRenameSessionRequest = (params: RenameSessionRequest): RenameSessionApi
   };
 };
 
-const mapRenameSessionFromApi = (data: RenameSessionApiResponse): ChatSession =>
-  mapSessionFromApi(data);
+const mapRenameSessionFromApi = (data: ChatSessionApi): ChatSession => mapSessionFromApi(data);
 
 const mapListSessionsRequest = (params?: ListSessionsRequest): ListSessionsApiRequest => ({
   ...(params?.page !== undefined ? { page: params.page } : {}),

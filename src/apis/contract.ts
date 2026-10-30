@@ -16,6 +16,8 @@ export interface ApiContract<Request, Response> {
   method: ApiHttpMethod;
   endpoint: string;
   requestPlacement: ApiRequestPlacement;
+  /** JSON body 与 query 混合传输时，从请求对象中拆出的 query 字段。 */
+  queryKeys?: readonly string[];
   transport: ApiTransport;
   request: ZodType<Request>;
   response: ZodType<Response>;

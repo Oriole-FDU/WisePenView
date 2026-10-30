@@ -1,40 +1,23 @@
+import { executeApiContract } from '@/apis/executeApiContract';
 import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
-  ActiveChatTurnApiRequest,
-  ActiveChatTurnApiResponse,
   BindModelProviderApiRequest,
   BindModelProviderApiResponse,
-  CancelChatTurnApiRequest,
-  CancelChatTurnApiResponse,
-  CreateSessionApiRequest,
-  CreateSessionApiResponse,
   CreateUserModelApiRequest,
   CreateUserModelApiResponse,
   CreateUserProviderApiRequest,
-  DeleteSessionApiRequest,
-  DeleteSessionApiResponse,
   DeleteUserModelApiRequest,
   DeleteUserModelApiResponse,
   DeleteUserProviderApiRequest,
   DeleteUserProviderApiResponse,
   DeleteUserToolConfigApiRequest,
   DeleteUserToolConfigApiResponse,
-  InitTemporaryAttachmentUploadApiRequest,
-  InitTemporaryAttachmentUploadApiResponse,
   ListAvailableModelsApiResponse,
-  ListHistoryMessagesApiRequest,
-  ListHistoryMessagesApiResponse,
   ListModelsApiRequest,
   ListModelsApiResponse,
-  ListSessionsApiRequest,
-  ListSessionsApiResponse,
   ListToolsApiResponse,
   ListUserProvidersApiResponse,
-  RenameSessionApiRequest,
-  RenameSessionApiResponse,
-  SetSessionAgentApiRequest,
-  SetSessionAgentApiResponse,
   UnbindModelProviderApiRequest,
   UnbindModelProviderApiResponse,
   UpdateUserModelApiRequest,
@@ -44,6 +27,33 @@ import type {
   UpdateUserToolConfigApiRequest,
   UpdateUserToolConfigApiResponse,
 } from './ChatApi.type';
+import {
+  CancelChatTurnApiContract,
+  CreateSessionApiContract,
+  DeleteSessionApiContract,
+  GetActiveChatTurnApiContract,
+  InitTemporaryAttachmentUploadApiContract,
+  ListHistoryMessagesApiContract,
+  ListSessionsApiContract,
+  RenameSessionApiContract,
+  SetSessionAgentApiContract,
+} from './ChatSessionApi.contract';
+import type {
+  ActiveChatTurnApiRequest,
+  ActiveChatTurnApiResponse,
+  CancelChatTurnApiRequest,
+  ChatSessionApi as ChatSessionApiModel,
+  CreateSessionApiRequest,
+  DeleteSessionApiRequest,
+  InitTemporaryAttachmentUploadApiRequest,
+  InitTemporaryAttachmentUploadApiResponse,
+  ListHistoryMessagesApiRequest,
+  ListHistoryMessagesApiResponse,
+  ListSessionsApiRequest,
+  ListSessionsApiResponse,
+  RenameSessionApiRequest,
+  SetSessionAgentApiRequest,
+} from './ChatSessionApi.schema';
 
 /** Chat API: /chat/* */
 
@@ -62,7 +72,7 @@ function listTools(): Promise<ListToolsApiResponse> {
 function initTemporaryAttachmentUpload(
   req: InitTemporaryAttachmentUploadApiRequest
 ): Promise<InitTemporaryAttachmentUploadApiResponse> {
-  return apiPostUnchecked('/chat/attachment/initUploadTemporaryAttachment', req);
+  return executeApiContract(InitTemporaryAttachmentUploadApiContract, req);
 }
 
 function listUserProviders(): Promise<ListUserProvidersApiResponse> {
@@ -142,11 +152,11 @@ export const ChatApi = {
 /** Chat Completion API: /chat/completions/* */
 
 function getActiveTurn(req: ActiveChatTurnApiRequest): Promise<ActiveChatTurnApiResponse> {
-  return apiGetUnchecked('/chat/completions/active', { params: req });
+  return executeApiContract(GetActiveChatTurnApiContract, req);
 }
 
-function cancelTurn(req: CancelChatTurnApiRequest): Promise<CancelChatTurnApiResponse> {
-  return apiPostUnchecked('/chat/completions/cancel', req);
+async function cancelTurn(req: CancelChatTurnApiRequest): Promise<void> {
+  await executeApiContract(CancelChatTurnApiContract, req);
 }
 
 export const ChatCompletionApi = {
@@ -156,49 +166,30 @@ export const ChatCompletionApi = {
 
 /** Chat Session API: /chat/session/* */
 
-function createSession(req: CreateSessionApiRequest): Promise<CreateSessionApiResponse> {
-  return apiPostUnchecked('/chat/session/createSession', req);
+function createSession(req: CreateSessionApiRequest): Promise<ChatSessionApiModel> {
+  return executeApiContract(CreateSessionApiContract, req);
 }
 
-function setSessionAgent(req: SetSessionAgentApiRequest): Promise<SetSessionAgentApiResponse> {
-  return apiPostUnchecked(
-    '/chat/session/setSessionAgent',
-    {
-      agent_id: req.agent_id,
-      agent_version: req.agent_version,
-    },
-    {
-      params: { session_id: req.session_id },
-    }
-  );
+function setSessionAgent(req: SetSessionAgentApiRequest): Promise<ChatSessionApiModel> {
+  return executeApiContract(SetSessionAgentApiContract, req);
 }
 
-function renameSession(req: RenameSessionApiRequest): Promise<RenameSessionApiResponse> {
-  return apiPostUnchecked(
-    '/chat/session/renameSession',
-    { new_title: req.new_title },
-    {
-      params: { session_id: req.session_id },
-    }
-  );
+function renameSession(req: RenameSessionApiRequest): Promise<ChatSessionApiModel> {
+  return executeApiContract(RenameSessionApiContract, req);
 }
 
-function deleteSession(req: DeleteSessionApiRequest): Promise<DeleteSessionApiResponse> {
-  return apiPostUnchecked('/chat/session/deleteSession', undefined, {
-    params: { session_id: req.session_id },
-  });
+async function deleteSession(req: DeleteSessionApiRequest): Promise<void> {
+  await executeApiContract(DeleteSessionApiContract, req);
 }
 
 function listSessions(req: ListSessionsApiRequest): Promise<ListSessionsApiResponse> {
-  return apiGetUnchecked('/chat/session/listSessions', { params: req });
+  return executeApiContract(ListSessionsApiContract, req);
 }
 
 function listHistoryMessages(
   req: ListHistoryMessagesApiRequest
 ): Promise<ListHistoryMessagesApiResponse> {
-  return apiGetUnchecked('/chat/session/listHistoryMessages', {
-    params: req,
-  });
+  return executeApiContract(ListHistoryMessagesApiContract, req);
 }
 
 export const ChatSessionApi = {

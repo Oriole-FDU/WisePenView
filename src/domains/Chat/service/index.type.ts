@@ -259,13 +259,11 @@ export interface RenameSessionRequest {
 export interface CreateSessionRequest {
   title?: string;
   agentId?: string | null;
-  agentVersion?: number | null;
 }
 
 export interface SetSessionAgentRequest {
   sessionId: string;
   agentId?: string | null;
-  agentVersion?: number | null;
 }
 
 /** 会话实体 */

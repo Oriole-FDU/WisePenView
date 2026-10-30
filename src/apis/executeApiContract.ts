@@ -13,12 +13,33 @@ const assertSupportedPlacement = (contract: ApiContract<unknown, unknown>): void
   }
 };
 
-const withQuery = (
+const getRequestParts = (
   contract: ApiContract<unknown, unknown>,
   request: unknown,
   config?: AxiosRequestConfig
-): AxiosRequestConfig | undefined =>
-  contract.requestPlacement === 'query' ? { ...config, params: request } : config;
+): {
+  body: unknown;
+  config: AxiosRequestConfig | undefined;
+} => {
+  if (contract.requestPlacement === 'query') {
+    return { body: undefined, config: { ...config, params: request } };
+  }
+
+  if (contract.requestPlacement === 'body' && contract.queryKeys?.length) {
+    const body = { ...(request as Record<string, unknown>) };
+    const query: Record<string, unknown> = {};
+    for (const key of contract.queryKeys) {
+      query[key] = body[key];
+      delete body[key];
+    }
+    return { body, config: { ...config, params: query } };
+  }
+
+  return {
+    body: contract.requestPlacement === 'body' ? request : undefined,
+    config,
+  };
+};
 
 /**
  * 按 Contract 元数据完成请求校验、调用、envelope 解包和响应校验。
@@ -31,7 +52,8 @@ export async function executeApiContract<Request, Response>(
 ): Promise<Response> {
   assertSupportedPlacement(contract);
   const request = parseApiRequest(contract, value);
-  const requestConfig = withQuery(contract, request, config);
+  const requestParts = getRequestParts(contract, request, config);
+  const requestConfig = requestParts.config;
 
   let data: unknown;
   if (contract.transport === 'text') {
@@ -51,21 +73,21 @@ export async function executeApiContract<Request, Response>(
     case 'POST':
       data = await apiPost(
         contract.endpoint,
-        contract.requestPlacement === 'body' ? request : undefined,
+        contract.method === 'POST' ? requestParts.body : undefined,
         requestConfig
       );
       break;
     case 'PUT':
       data = await apiPut(
         contract.endpoint,
-        contract.requestPlacement === 'body' ? request : undefined,
+        contract.method === 'PUT' ? requestParts.body : undefined,
         requestConfig
       );
       break;
     case 'PATCH':
       data = await apiPatch(
         contract.endpoint,
-        contract.requestPlacement === 'body' ? request : undefined,
+        contract.method === 'PATCH' ? requestParts.body : undefined,
         requestConfig
       );
       break;

@@ -6,13 +6,11 @@ import type {
   ChatCompletionApi as ChatCompletionApiContract,
   ChatSessionApi as ChatSessionApiContract,
 } from '../apis/ChatApi';
+import type { ModelResponse, ProviderApiResponse, ToolApiResponse } from '../apis/ChatApi.type';
 import type {
-  ChatSession as ChatSessionApiModel,
-  MessageResponse,
-  ModelResponse,
-  ProviderApiResponse,
-  ToolApiResponse,
-} from '../apis/ChatApi.type';
+  ChatSessionApi as ChatSessionApiModel,
+  UIMessageApi as MessageResponse,
+} from '../apis/ChatSessionApi.schema';
 
 const MOCK_HISTORY_SIZE = 260;
 const MOCK_HISTORY_INTERVAL_MS = 45 * 1000;
@@ -39,6 +37,8 @@ let mockSessions: ChatSessionApiModel[] = [
     title: '项目需求讨论',
     created_at: '2026-04-08T09:00:00Z',
     updated_at: '2026-04-08T09:00:00Z',
+    agent_id: null,
+    agent_version: null,
   },
   {
     id: 'mock-session-2',
@@ -46,6 +46,8 @@ let mockSessions: ChatSessionApiModel[] = [
     title: '接口联调记录',
     created_at: '2026-04-07T10:00:00Z',
     updated_at: '2026-04-07T10:00:00Z',
+    agent_id: null,
+    agent_version: null,
   },
   {
     id: 'mock-session-3',
@@ -53,6 +55,8 @@ let mockSessions: ChatSessionApiModel[] = [
     title: '代码评审',
     created_at: '2026-04-06T11:00:00Z',
     updated_at: '2026-04-06T11:00:00Z',
+    agent_id: null,
+    agent_version: null,
   },
 ];
 
@@ -94,9 +98,18 @@ const buildMockHistoryMessages = (sessionId: string, total: number): MessageResp
     return {
       id: `${sessionId}-msg-${messageSeq}`,
       role,
-      parts: [{ type: 'text', text, state: 'done' }],
+      parts: [
+        {
+          type: 'text',
+          text,
+          state: 'done',
+          toolCallId: null,
+          input: null,
+          output: null,
+        },
+      ],
       metadata,
-      created_at: createdAt,
+      createdAt,
     };
   });
 };
@@ -176,8 +189,8 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
       title: params.title?.trim() || 'New Chat',
       created_at: now,
       updated_at: now,
-      agent_id: params.agent_id,
-      agent_version: params.agent_version,
+      agent_id: params.agent_id ?? null,
+      agent_version: params.agent_id ? 1 : null,
     };
     mockSessions.unshift(session);
     mockHistoryMessagesBySessionId[session.id] = [];
@@ -186,8 +199,8 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
   setSessionAgent: async (params) => {
     const session = requireSession(params.session_id);
     Object.assign(session, {
-      agent_id: params.agent_id,
-      agent_version: params.agent_version,
+      agent_id: params.agent_id ?? null,
+      agent_version: params.agent_id ? 1 : null,
       updated_at: new Date().toISOString(),
     });
     return mockResponse(session);
@@ -201,7 +214,6 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
   deleteSession: async ({ session_id }) => {
     mockSessions = mockSessions.filter((item) => item.id !== session_id);
     delete mockHistoryMessagesBySessionId[session_id];
-    return null;
   },
   listSessions: ({ page = 1, size = 20 }) => {
     const rows = [...mockSessions].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
@@ -227,7 +239,7 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
 };
 export const ChatCompletionApi: typeof ChatCompletionApiContract = {
   getActiveTurn: async () => ({ turn_id: null }),
-  cancelTurn: async () => null,
+  cancelTurn: async () => undefined,
 };
 export const ChatApi: typeof ChatApiContract = {
   listAvailableModels: () =>
@@ -241,6 +253,8 @@ export const ChatApi: typeof ChatApiContract = {
   initTemporaryAttachmentUpload: async () => ({
     attachment_id: `mock-attachment-${crypto.randomUUID()}`,
     object_key: 'mock/attachment',
+    put_url: 'https://mock-storage.example.invalid/upload',
+    callback_header: 'mock-callback',
     flash_uploaded: true,
   }),
   listUserProviders: () => mockResponse({ providers }),
