@@ -15,7 +15,7 @@ import type {
   ListInlineCommentsApiResponse,
   SetInlineCommentItemReactionApiRequest,
   UpdateInlineCommentItemApiRequest,
-} from '../apis/InlineCommentApi.type';
+} from '../apis/InlineCommentApi.schema';
 import type {
   InlineCommentAuthor,
   InlineCommentItem,

@@ -1,46 +1,65 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  AddInlineCommentItemApiRequest,
-  ChangeInlineCommentResolveStatusApiRequest,
-  CreateInlineCommentApiRequest,
-  DeleteInlineCommentItemApiRequest,
-  DeleteInlineCommentItemReactionApiRequest,
-  ListInlineCommentsApiRequest,
-  ListInlineCommentsApiResponse,
-  SetInlineCommentItemReactionApiRequest,
-  UpdateInlineCommentItemApiRequest,
-} from './InlineCommentApi.type';
+import {
+  AddInlineCommentItemApiContract,
+  type AddInlineCommentItemApiContractRequest,
+  ChangeInlineCommentResolveStatusApiContract,
+  type ChangeInlineCommentResolveStatusApiContractRequest,
+  CreateInlineCommentApiContract,
+  type CreateInlineCommentApiContractRequest,
+  DeleteInlineCommentItemApiContract,
+  type DeleteInlineCommentItemApiContractRequest,
+  DeleteInlineCommentItemReactionApiContract,
+  type DeleteInlineCommentItemReactionApiContractRequest,
+  ListInlineCommentsApiContract,
+  type ListInlineCommentsApiContractRequest,
+  type ListInlineCommentsApiContractResponse,
+  SetInlineCommentItemReactionApiContract,
+  type SetInlineCommentItemReactionApiContractRequest,
+  UpdateInlineCommentItemApiContract,
+  type UpdateInlineCommentItemApiContractRequest,
+} from './InlineCommentApi.contract';
 
 const listInlineComments = (
-  req: ListInlineCommentsApiRequest
-): Promise<ListInlineCommentsApiResponse> =>
-  apiGetUnchecked(`/resource/inlineComment/listInlineComments`, { params: req });
+  req: ListInlineCommentsApiContractRequest
+): Promise<ListInlineCommentsApiContractResponse> =>
+  executeApiContract(ListInlineCommentsApiContract, req);
 
-const createInlineComment = (req: CreateInlineCommentApiRequest): Promise<string> =>
-  apiPostUnchecked(`/resource/inlineComment/createInlineComment`, req);
+const createInlineComment = (req: CreateInlineCommentApiContractRequest): Promise<string> =>
+  executeApiContract(CreateInlineCommentApiContract, req);
 
-const addInlineCommentItem = (req: AddInlineCommentItemApiRequest): Promise<string> =>
-  apiPostUnchecked(`/resource/inlineComment/addInlineCommentItem`, req);
+const addInlineCommentItem = (req: AddInlineCommentItemApiContractRequest): Promise<string> =>
+  executeApiContract(AddInlineCommentItemApiContract, req);
 
-const updateInlineCommentItem = (req: UpdateInlineCommentItemApiRequest): Promise<void> =>
-  apiPostUnchecked(`/resource/inlineComment/updateInlineCommentItem`, req);
+const updateInlineCommentItem = async (
+  req: UpdateInlineCommentItemApiContractRequest
+): Promise<void> => {
+  await executeApiContract(UpdateInlineCommentItemApiContract, req);
+};
 
-const setInlineCommentItemReaction = (req: SetInlineCommentItemReactionApiRequest): Promise<void> =>
-  apiPostUnchecked(`/resource/inlineComment/setInlineCommentItemReaction`, req);
+const setInlineCommentItemReaction = async (
+  req: SetInlineCommentItemReactionApiContractRequest
+): Promise<void> => {
+  await executeApiContract(SetInlineCommentItemReactionApiContract, req);
+};
 
-const deleteInlineCommentItemReaction = (
-  req: DeleteInlineCommentItemReactionApiRequest
-): Promise<void> =>
-  apiPostUnchecked(`/resource/inlineComment/deleteInlineCommentItemReaction`, req);
+const deleteInlineCommentItemReaction = async (
+  req: DeleteInlineCommentItemReactionApiContractRequest
+): Promise<void> => {
+  await executeApiContract(DeleteInlineCommentItemReactionApiContract, req);
+};
 
-const deleteInlineCommentItem = (req: DeleteInlineCommentItemApiRequest): Promise<void> =>
-  apiPostUnchecked(`/resource/inlineComment/deleteInlineCommentItem`, req);
+const deleteInlineCommentItem = async (
+  req: DeleteInlineCommentItemApiContractRequest
+): Promise<void> => {
+  await executeApiContract(DeleteInlineCommentItemApiContract, req);
+};
 
-const changeInlineCommentResolveStatus = (
-  req: ChangeInlineCommentResolveStatusApiRequest
-): Promise<void> =>
-  apiPostUnchecked(`/resource/inlineComment/changeInlineCommentResolveStatus`, req);
+const changeInlineCommentResolveStatus = async (
+  req: ChangeInlineCommentResolveStatusApiContractRequest
+): Promise<void> => {
+  await executeApiContract(ChangeInlineCommentResolveStatusApiContract, req);
+};
 
 export const InlineCommentApi = {
   listInlineComments,

@@ -6,7 +6,7 @@ import type {
   InlineCommentApiResponse,
   InlineCommentItemApiResponse,
   InlineCommentReactionApiResponse,
-} from '../apis/InlineCommentApi.type';
+} from '../apis/InlineCommentApi.schema';
 
 type MockItem = Omit<InlineCommentItemApiResponse, 'reactions'> & {
   itemId: string;
@@ -19,7 +19,16 @@ type MockThread = Omit<InlineCommentApiResponse, 'items'> & {
 };
 const threads = new Map<string, MockThread>();
 const userId = '1';
-const userInfo = { nickname: '示例用户' };
+const userInfo = {
+  nickname: '示例用户',
+  username: null,
+  avatar: null,
+  identityType: null,
+  realName: null,
+  campusNo: null,
+  email: null,
+  mobile: null,
+};
 const thread = (resourceId: string, id: string) => {
   const value = threads.get(id);
   if (!value || value.resourceId !== resourceId)
@@ -78,17 +87,20 @@ export const InlineCommentApi: typeof InlineCommentApiContract = {
     threads.set(id, {
       inlineCommentId: id,
       resourceId: params.resourceId,
-      applicableFromVersion: params.applicableFromVersion,
-      applicableToVersion: params.applicableToVersion,
+      applicableFromVersion: params.applicableFromVersion ?? null,
+      applicableToVersion: params.applicableToVersion ?? null,
       creatorId: userId,
       creatorInfo: userInfo,
       anchorRef: {
         externalAnchorId: params.externalAnchorId,
-        quoteText: params.quoteText,
-        anchorPayload: params.anchorPayload,
+        quoteText: params.quoteText ?? null,
+        anchorPayload: params.anchorPayload ?? {},
       },
       items: [createItem(params.content, params.imageUrls, params.mentionUserIds)],
       resolved: false,
+      resolvedBy: null,
+      resolvedByInfo: null,
+      resolvedAt: null,
       createTime: now,
       updateTime: now,
     });
