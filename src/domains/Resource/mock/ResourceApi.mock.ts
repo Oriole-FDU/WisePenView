@@ -13,7 +13,9 @@ export const ResourceItemApi: typeof ResourceItemApiContract = {
         resource.resourceType?.toUpperCase() !== params.resourceType.toUpperCase()
       )
         return false;
-      const bind = resource.tagBinds?.find((item) => item.groupId === params.groupId);
+      const bind = resource.tagBinds?.find((item) =>
+        params.groupId ? item.groupId === params.groupId : item.groupId.startsWith('p_')
+      );
       if (!bind) return false;
       if (!params.tagIds?.length) return true;
       const hasTag = (id: string) => Object.hasOwn(bind.tags ?? {}, id);
