@@ -1,11 +1,10 @@
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeId } from '@/utils/normalize/normalizeId';
-import { normalizeFiniteNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
   CommentPageApiResponse,
   ResourceCommentItemApiResponse,
-} from '../apis/CommentApi.type';
+} from '../apis/CommentApi.schema';
 import type {
   ChangeFavoriteStatusApiRequest,
   CreateCollectionApiRequest,
@@ -16,8 +15,8 @@ import type {
   ListFavoritedResourcesApiRequest,
   ListFavoritedResourcesApiResponse,
   UpdateCollectionInfoApiRequest,
-} from '../apis/FavoriteApi.type';
-import type { GetUserInteractionRecordApiResponse } from '../apis/InteractApi.type';
+} from '../apis/FavoriteApi.schema';
+import type { GetUserInteractionRecordApiResponse } from '../apis/InteractApi.schema';
 import type { CommentAuthor, CommentPage, ResourceComment } from '../entity/comment';
 import type { FavoriteCollection, FavoritedResourcesPage, FavoriteItem } from '../entity/favorite';
 import type { ResourceInteractionRecord } from '../entity/interaction';
@@ -28,9 +27,6 @@ import type {
   UpdateFavoriteCollectionRequest,
   UpdateFavoriteCollectionsRequest,
 } from '../service/index.type';
-
-const normalizeTimestamp = (value: number | string | undefined): number =>
-  normalizeFiniteNumber(value) ?? 0;
 
 function mapCommentAuthorFromApi(
   value: ResourceCommentItemApiResponse['authorInfo'],
@@ -66,15 +62,15 @@ const mapCommentPageFromApi = (data: CommentPageApiResponse): CommentPage => ({
 });
 
 const mapResourceInteractionRecordFromApi = (
-  data: GetUserInteractionRecordApiResponse | null | undefined
+  data: GetUserInteractionRecordApiResponse
 ): ResourceInteractionRecord => ({
-  liked: data?.liked ?? false,
-  score: data?.score ?? 0,
-  likedCommentIds: new Set(data?.likedCommentIds ?? []),
+  liked: data.liked,
+  score: data.score ?? 0,
+  likedCommentIds: new Set(data.likedCommentIds),
 });
 
 const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] =>
-  (data.collectionIds ?? []).map(normalizeId).filter(Boolean);
+  data.collectionIds.map(normalizeId).filter(Boolean);
 
 const mapFavoriteCollectionFromApi = (data: FavoriteCollectionApiResponse): FavoriteCollection => ({
   collectionId: normalizeId(data.collectionId),
@@ -111,7 +107,7 @@ const mapUpdateFavoriteCollectionRequest = (
 ): UpdateCollectionInfoApiRequest => ({
   collectionId: normalizeId(params.collectionId),
   collectionName: params.collectionName,
-  ...(params.description !== undefined ? { description: params.description } : {}),
+  description: params.description ?? null,
 });
 
 const mapDeleteFavoriteCollectionRequest = (
@@ -133,11 +129,11 @@ const mapFavoriteItemFromApi = (data: FavoriteItemApiResponse): FavoriteItem => 
   const normalizedResource = data.resourceInfo
     ? ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo)
     : null;
-  const accessible = data.accessible ?? normalizedResource != null;
+  const accessible = data.accessible;
   const resourceInfo = accessible ? normalizedResource : null;
   return {
     resourceId: normalizeId(data.resourceId) || resourceInfo?.resourceId || '',
-    favoritedAt: normalizeTimestamp(data.favoritedAt),
+    favoritedAt: data.favoritedAt,
     resourceInfo,
   };
 };
@@ -145,8 +141,8 @@ const mapFavoriteItemFromApi = (data: FavoriteItemApiResponse): FavoriteItem => 
 const mapFavoritedResourcesPageFromApi = (
   data: ListFavoritedResourcesApiResponse
 ): FavoritedResourcesPage => ({
-  list: (data.list ?? []).map(mapFavoriteItemFromApi),
-  total: Number(data.total) || 0,
+  list: data.list.map(mapFavoriteItemFromApi),
+  total: data.total,
   totalPage: data.totalPage,
 });
 

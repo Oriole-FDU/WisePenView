@@ -16,14 +16,15 @@ export const InteractApi: typeof InteractApiContract = {
       }),
       likedCommentIds: [...getMockCommentLikeIds(resourceId)],
     }),
-  setLike: async ({ resourceId, liked }) => {
-    (getMockResource(resourceId).myInteractionRecord ??= {
+  setLike: async ({ resourceId }) => {
+    const record = (getMockResource(resourceId).myInteractionRecord ??= {
       read: false,
       liked: false,
       score: null,
       likedCommentIds: [],
       resourceId,
-    }).liked = liked;
+    });
+    record.liked = !record.liked;
   },
   rate: async ({ resourceId, score }) => {
     (getMockResource(resourceId).myInteractionRecord ??= {

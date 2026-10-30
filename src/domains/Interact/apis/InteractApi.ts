@@ -1,29 +1,34 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  GetUserInteractionRecordApiResponse,
-  RateApiRequest,
-  ResourceInteractionApiRequest,
-  ResourceLikeApiRequest,
-} from './InteractApi.type';
+import {
+  ChangeResourceLikeApiContract,
+  type ChangeResourceLikeApiContractRequest,
+  GetResourceUserInteractionRecordApiContract,
+  type GetResourceUserInteractionRecordApiContractRequest,
+  type GetResourceUserInteractionRecordApiContractResponse,
+  RateResourceApiContract,
+  type RateResourceApiContractRequest,
+  RecordResourceReadApiContract,
+  type RecordResourceReadApiContractRequest,
+} from './InteractApi.contract';
 
 /** /resource/interaction/* 子路由 API */
-function setLike(req: ResourceLikeApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/interaction/toggleLike', req);
+async function setLike(req: ChangeResourceLikeApiContractRequest): Promise<void> {
+  await executeApiContract(ChangeResourceLikeApiContract, req);
 }
 
-function rate(req: RateApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/interaction/rate', req);
+async function rate(req: RateResourceApiContractRequest): Promise<void> {
+  await executeApiContract(RateResourceApiContract, req);
 }
 
-function read(req: ResourceInteractionApiRequest): Promise<void> {
-  return apiPostUnchecked('/resource/interaction/read', req);
+async function read(req: RecordResourceReadApiContractRequest): Promise<void> {
+  await executeApiContract(RecordResourceReadApiContract, req);
 }
 
 function getUserInteractionRecord(
-  req: ResourceInteractionApiRequest
-): Promise<GetUserInteractionRecordApiResponse> {
-  return apiGetUnchecked('/resource/interaction/getResourceUserInteractionRecord', { params: req });
+  req: GetResourceUserInteractionRecordApiContractRequest
+): Promise<GetResourceUserInteractionRecordApiContractResponse> {
+  return executeApiContract(GetResourceUserInteractionRecordApiContract, req);
 }
 
 export const InteractApi = { setLike, rate, read, getUserInteractionRecord };

@@ -88,7 +88,7 @@ function ResourceInteractionPanel({
 
   const { run: submitResourceLike, loading: resourceLikePending } = useApi(
     async (liked: boolean) => {
-      await interactService.setResourceLike(resourceId, liked);
+      await interactService.toggleResourceLike(resourceId);
       return liked;
     },
     {

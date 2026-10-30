@@ -4,7 +4,7 @@ import type { ResourceInteractionRecord } from '../entity/interaction';
 
 export interface IInteractService {
   getResourceInteraction(resourceId: string): Promise<ResourceInteractionRecord>;
-  setResourceLike(resourceId: string, liked: boolean): Promise<void>;
+  toggleResourceLike(resourceId: string): Promise<void>;
   rateResource(params: RateResourceRequest): Promise<void>;
   recordResourceRead(resourceId: string): Promise<void>;
   listComments(params: ListCommentsRequest): Promise<CommentPage>;

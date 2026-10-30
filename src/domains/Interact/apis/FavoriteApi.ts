@@ -1,40 +1,55 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  ChangeFavoriteStatusApiRequest,
-  CreateCollectionApiRequest,
-  DeleteCollectionApiRequest,
-  FavoriteCollectionApiResponse,
-  GetFavoriteStatusApiResponse,
-  ListFavoritedResourcesApiRequest,
-  ListFavoritedResourcesApiResponse,
-  UpdateCollectionInfoApiRequest,
-} from './FavoriteApi.type';
+import {
+  ChangeFavoriteStatusApiContract,
+  type ChangeFavoriteStatusApiContractRequest,
+  CreateCollectionApiContract,
+  type CreateCollectionApiContractRequest,
+  type CreateCollectionApiContractResponse,
+  DeleteCollectionApiContract,
+  type DeleteCollectionApiContractRequest,
+  GetFavoriteStatusApiContract,
+  type GetFavoriteStatusApiContractResponse,
+  ListFavoriteCollectionsApiContract,
+  type ListFavoriteCollectionsApiContractResponse,
+  ListFavoritedResourcesApiContract,
+  type ListFavoritedResourcesApiContractRequest,
+  type ListFavoritedResourcesApiContractResponse,
+  UpdateCollectionInfoApiContract,
+  type UpdateCollectionInfoApiContractRequest,
+} from './FavoriteApi.contract';
 
-const getFavoriteStatus = (resourceId: string): Promise<GetFavoriteStatusApiResponse> =>
-  apiGetUnchecked('/resource/favorite/getResourceFavoriteStatus', {
-    params: { resourceId },
-  });
+const getFavoriteStatus = (resourceId: string): Promise<GetFavoriteStatusApiContractResponse> =>
+  executeApiContract(GetFavoriteStatusApiContract, { resourceId });
 
-const changeFavoriteStatus = (request: ChangeFavoriteStatusApiRequest): Promise<void> =>
-  apiPostUnchecked('/resource/favorite/changeResourceFavoriteStatus', request);
+const changeFavoriteStatus = async (
+  request: ChangeFavoriteStatusApiContractRequest
+): Promise<void> => {
+  await executeApiContract(ChangeFavoriteStatusApiContract, request);
+};
 
-const listCollections = (): Promise<FavoriteCollectionApiResponse[]> =>
-  apiGetUnchecked('/resource/favorite/listCollections');
+const listCollections = (): Promise<ListFavoriteCollectionsApiContractResponse> =>
+  executeApiContract(ListFavoriteCollectionsApiContract, undefined);
 
-const createCollection = (request: CreateCollectionApiRequest): Promise<string | number> =>
-  apiPostUnchecked('/resource/favorite/createCollection', request);
+const createCollection = (
+  request: CreateCollectionApiContractRequest
+): Promise<CreateCollectionApiContractResponse> =>
+  executeApiContract(CreateCollectionApiContract, request);
 
-const updateCollectionInfo = (request: UpdateCollectionInfoApiRequest): Promise<void> =>
-  apiPostUnchecked('/resource/favorite/updateCollectionInfo', request);
+const updateCollectionInfo = async (
+  request: UpdateCollectionInfoApiContractRequest
+): Promise<void> => {
+  await executeApiContract(UpdateCollectionInfoApiContract, request);
+};
 
-const deleteCollection = (request: DeleteCollectionApiRequest): Promise<void> =>
-  apiPostUnchecked('/resource/favorite/deleteCollection', request);
+const deleteCollection = async (request: DeleteCollectionApiContractRequest): Promise<void> => {
+  await executeApiContract(DeleteCollectionApiContract, request);
+};
 
 const listFavoritedResources = (
-  request: ListFavoritedResourcesApiRequest
-): Promise<ListFavoritedResourcesApiResponse> =>
-  apiGetUnchecked('/resource/favorite/listFavoritedResources', { params: request });
+  request: ListFavoritedResourcesApiContractRequest
+): Promise<ListFavoritedResourcesApiContractResponse> =>
+  executeApiContract(ListFavoritedResourcesApiContract, request);
 
 export const FavoriteApi = {
   getFavoriteStatus,

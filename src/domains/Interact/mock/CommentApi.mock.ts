@@ -11,7 +11,7 @@ import type {
   ListCommentsApiRequest,
   ListRepliesApiRequest,
   ResourceCommentItemApiResponse,
-} from '../apis/CommentApi.type';
+} from '../apis/CommentApi.schema';
 
 interface MockComment extends ResourceCommentItemApiResponse {
   likeCount: number;
@@ -24,7 +24,16 @@ const CURRENT_USER_ID = '1';
 const commentsByResource = new Map<string, MockComment[]>();
 const likedIdsByResource = new Map<string, Set<string>>();
 
-const author = (name: string) => ({ nickname: name });
+const author = (name: string) => ({
+  nickname: name,
+  username: null,
+  avatar: null,
+  identityType: null,
+  realName: null,
+  campusNo: null,
+  email: null,
+  mobile: null,
+});
 const buildMockId = (resourceId: string, suffix: string) => `mock-${resourceId}-${suffix}`;
 
 function createInitialComments(resourceId: string): MockComment[] {
@@ -33,6 +42,9 @@ function createInitialComments(resourceId: string): MockComment[] {
   const featured: MockComment[] = [
     {
       commentId: rootCommentId,
+      resourceId,
+      replyToUserId: null,
+      replyToUserInfo: null,
       authorId: '10086',
       authorInfo: author('王明'),
       content: '这份内容结构清晰，第二部分的示例很有帮助。',
@@ -45,6 +57,7 @@ function createInitialComments(resourceId: string): MockComment[] {
     },
     {
       commentId: buildMockId(resourceId, 'reply-1'),
+      resourceId,
       rootCommentId,
       authorId: CURRENT_USER_ID,
       authorInfo: author('张三'),
@@ -60,6 +73,7 @@ function createInitialComments(resourceId: string): MockComment[] {
     },
     {
       commentId: buildMockId(resourceId, 'reply-2'),
+      resourceId,
       rootCommentId,
       authorId: '10087',
       authorInfo: author('陈思齐'),
@@ -76,6 +90,9 @@ function createInitialComments(resourceId: string): MockComment[] {
   ];
   const remaining = Array.from({ length: 11 }, (_, index): MockComment => ({
     commentId: buildMockId(resourceId, `comment-${index + 2}`),
+    resourceId,
+    replyToUserId: null,
+    replyToUserInfo: null,
     authorId: index % 2 === 0 ? CURRENT_USER_ID : '10088',
     authorInfo: author(index % 2 === 0 ? '张三' : '陈思齐'),
     content: `这是第 ${index + 2} 条资源讨论。`,
@@ -132,6 +149,9 @@ async function createMockComment(params: CreateCommentApiRequest): Promise<strin
   const commentId = `mock-comment-${createUuid()}`;
   getComments(params.resourceId).unshift({
     commentId,
+    resourceId: params.resourceId,
+    replyToUserId: null,
+    replyToUserInfo: null,
     authorId: CURRENT_USER_ID,
     authorInfo: author('张三'),
     content: params.content,
@@ -155,6 +175,7 @@ async function createMockReply(params: CreateReplyApiRequest): Promise<string> {
   const commentId = `mock-reply-${createUuid()}`;
   comments.push({
     commentId,
+    resourceId: params.resourceId,
     rootCommentId,
     authorId: CURRENT_USER_ID,
     authorInfo: author('张三'),
