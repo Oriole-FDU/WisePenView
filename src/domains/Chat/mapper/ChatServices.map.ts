@@ -1,15 +1,14 @@
 import type { DynamicToolUIPart, ToolUIPart, UITool, UIToolInvocation } from 'ai';
 
+import type { ListToolsApiResponse, ToolApiResponse } from '../apis/ChatApi.type';
 import type {
   ListAvailableModelsApiResponse,
   ListModelsApiResponse,
-  ListToolsApiResponse,
   ListUserProvidersApiResponse,
   ModelProviderMappingResponse,
   ModelResponse,
   ProviderApiResponse,
-  ToolApiResponse,
-} from '../apis/ChatApi.type';
+} from '../apis/ChatModelApi.schema';
 import type {
   ActiveChatTurnApiResponse,
   ChatSessionApi,
@@ -237,8 +236,10 @@ const mapProviderFromApi = (provider: ProviderApiResponse): ChatProvider => ({
   scope: provider.scope,
   type: provider.type,
   isActive: provider.is_active,
-  tokenUsage: provider.token_usage,
-  billableTokenUsage: provider.billable_token_usage,
+  inputTokenUsage: provider.input_tokens,
+  cachedInputTokenUsage: provider.cached_input_tokens,
+  outputTokenUsage: provider.output_tokens,
+  billableTokenUsage: provider.billable_tokens,
 });
 
 const mapUserProvidersFromApi = (data: ListUserProvidersApiResponse): ChatProvider[] =>

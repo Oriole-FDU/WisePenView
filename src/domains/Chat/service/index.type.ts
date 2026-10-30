@@ -34,7 +34,9 @@ export interface ChatProvider {
   scope: 'SYSTEM' | 'USER';
   type: ChatProviderType;
   isActive: boolean;
-  tokenUsage: number;
+  inputTokenUsage: number;
+  cachedInputTokenUsage: number;
+  outputTokenUsage: number;
   billableTokenUsage: number;
 }
 

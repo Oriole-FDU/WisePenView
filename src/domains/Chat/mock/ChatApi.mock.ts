@@ -6,7 +6,8 @@ import type {
   ChatCompletionApi as ChatCompletionApiContract,
   ChatSessionApi as ChatSessionApiContract,
 } from '../apis/ChatApi';
-import type { ModelResponse, ProviderApiResponse, ToolApiResponse } from '../apis/ChatApi.type';
+import type { ToolApiResponse } from '../apis/ChatApi.type';
+import type { ModelResponse, ProviderApiResponse } from '../apis/ChatModelApi.schema';
 import type {
   ChatSessionApi as ChatSessionApiModel,
   UIMessageApi as MessageResponse,
@@ -15,6 +16,11 @@ import type {
 const MOCK_HISTORY_SIZE = 260;
 const MOCK_HISTORY_INTERVAL_MS = 45 * 1000;
 const MOCK_HISTORY_BASE_TS = Date.parse('2026-03-01T08:00:00.000Z');
+const mockObjectId = (value: number) => String(value).padStart(24, '0');
+const createMockObjectId = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(12)), (byte) =>
+    byte.toString(16).padStart(2, '0')
+  ).join('');
 
 /**
  * 原文引用链接（`wisepen://note/<noteId>#p_<blockId>`）的 mock 覆盖。
@@ -128,23 +134,26 @@ const models: ModelResponse[] = [
   'Claude 3.7 Sonnet',
   'o3',
 ].map((name, i) => ({
-  id: `mock-${i < 3 ? 'system' : 'user'}-${i + 1}`,
+  id: mockObjectId(i + 1),
   scope: i < 3 ? 'SYSTEM' : 'USER',
   display_name: name,
   model_family: 'GENERIC',
   support_thinking: i >= 3,
   support_vision: i !== 1,
   support_tools: true,
+  context_window_tokens: null,
+  max_output_tokens: null,
   is_active: true,
   mappings: [
     {
-      model_id: `mock-${i < 3 ? 'system' : 'user'}-${i + 1}`,
-      provider_id: `mock-provider-${i + 1}`,
+      model_id: mockObjectId(i + 1),
+      provider_id: mockObjectId(i + 101),
       provider_name: ['OpenAI', 'DeepSeek', 'Google', 'Anthropic', 'OpenAI'][i],
       provider_model_name: name,
       input_billing_ratio: i === 0 ? '0' : '1',
       cached_input_billing_ratio: i === 0 ? '0' : '1',
       output_billing_ratio: i === 0 ? '0' : '1',
+      support_runtime_options: {},
       is_preferred: true,
       is_active: true,
       priority: 0,
@@ -261,14 +270,16 @@ export const ChatApi: typeof ChatApiContract = {
   createUserProvider: async ({ api_key: _apiKey, ...params }) => {
     providers.push({
       ...params,
-      id: `mock-provider-${crypto.randomUUID()}`,
+      id: createMockObjectId(),
       api_key_fingerprint: 'mock***key',
       scope: 'USER',
+      base_url: params.base_url ?? null,
       is_active: params.is_active ?? true,
-      token_usage: 0,
-      billable_token_usage: 0,
+      input_tokens: 0,
+      cached_input_tokens: 0,
+      output_tokens: 0,
+      billable_tokens: 0,
     });
-    return null;
   },
   updateUserProvider: async ({ provider_id, api_key, ...params }) => {
     const provider = providers.find((p) => p.id === provider_id);
@@ -278,28 +289,25 @@ export const ChatApi: typeof ChatApiContract = {
         Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined)),
         api_key ? { api_key_fingerprint: 'mock***key' } : {}
       );
-    return null;
   },
   deleteUserProvider: async ({ provider_id }) => {
     const i = providers.findIndex((p) => p.id === provider_id);
     if (i >= 0) providers.splice(i, 1);
-    return null;
   },
   createUserModel: async (params) => {
     models.push({
-      id: `mock-model-${crypto.randomUUID()}`,
+      id: createMockObjectId(),
       scope: 'USER',
       display_name: params.display_name,
       model_family: params.model_family ?? 'GENERIC',
       support_thinking: params.support_thinking ?? false,
       support_vision: params.support_vision ?? false,
       support_tools: params.support_tools ?? true,
-      context_window_tokens: params.context_window_tokens,
-      max_output_tokens: params.max_output_tokens,
+      context_window_tokens: params.context_window_tokens ?? null,
+      max_output_tokens: params.max_output_tokens ?? null,
       is_active: true,
       mappings: [],
     });
-    return null;
   },
   updateUserModel: async ({ model_id, ...params }) => {
     const model = models.find((m) => m.id === model_id);
@@ -308,12 +316,10 @@ export const ChatApi: typeof ChatApiContract = {
         model,
         Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined))
       );
-    return null;
   },
   deleteUserModel: async ({ model_id }) => {
     const i = models.findIndex((m) => m.id === model_id);
     if (i >= 0) models.splice(i, 1);
-    return null;
   },
   bindModelProvider: async (params) => {
     const model = models.find((m) => m.id === params.model_id);
@@ -329,17 +335,19 @@ export const ChatApi: typeof ChatApiContract = {
           input_billing_ratio: '1',
           cached_input_billing_ratio: '1',
           output_billing_ratio: '1',
+          support_runtime_options: {},
           is_preferred: params.is_preferred ?? true,
           is_active: params.is_active ?? true,
           priority: model.mappings?.length ?? 0,
         },
       ];
-    return null;
   },
   unbindModelProvider: async ({ model_id, provider_id }) => {
     const model = models.find((m) => m.id === model_id);
-    if (model) model.mappings = model.mappings?.filter((m) => m.provider_id !== provider_id);
-    return null;
+    if (model) {
+      model.mappings =
+        model.mappings?.filter((mapping) => mapping.provider_id !== provider_id) ?? null;
+    }
   },
   updateUserToolConfig: async ({ tool_name, enabled, secret_config }) => {
     const tool = requireTool(tool_name);

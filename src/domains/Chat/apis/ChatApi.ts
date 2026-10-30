@@ -2,31 +2,39 @@ import { executeApiContract } from '@/apis/executeApiContract';
 import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
 
 import type {
-  BindModelProviderApiRequest,
-  BindModelProviderApiResponse,
-  CreateUserModelApiRequest,
-  CreateUserModelApiResponse,
-  CreateUserProviderApiRequest,
-  DeleteUserModelApiRequest,
-  DeleteUserModelApiResponse,
-  DeleteUserProviderApiRequest,
-  DeleteUserProviderApiResponse,
   DeleteUserToolConfigApiRequest,
   DeleteUserToolConfigApiResponse,
-  ListAvailableModelsApiResponse,
-  ListModelsApiRequest,
-  ListModelsApiResponse,
   ListToolsApiResponse,
-  ListUserProvidersApiResponse,
-  UnbindModelProviderApiRequest,
-  UnbindModelProviderApiResponse,
-  UpdateUserModelApiRequest,
-  UpdateUserModelApiResponse,
-  UpdateUserProviderApiRequest,
-  UpdateUserProviderApiResponse,
   UpdateUserToolConfigApiRequest,
   UpdateUserToolConfigApiResponse,
 } from './ChatApi.type';
+import {
+  BindModelProviderApiContract,
+  CreateUserModelApiContract,
+  CreateUserProviderApiContract,
+  DeleteUserModelApiContract,
+  DeleteUserProviderApiContract,
+  ListAvailableModelsApiContract,
+  ListModelsApiContract,
+  ListUserProvidersApiContract,
+  UnbindModelProviderApiContract,
+  UpdateUserModelApiContract,
+  UpdateUserProviderApiContract,
+} from './ChatModelApi.contract';
+import type {
+  BindModelProviderApiRequest,
+  CreateUserModelApiRequest,
+  CreateUserProviderApiRequest,
+  DeleteUserModelApiRequest,
+  DeleteUserProviderApiRequest,
+  ListAvailableModelsApiResponse,
+  ListModelsApiRequest,
+  ListModelsApiResponse,
+  ListUserProvidersApiResponse,
+  UnbindModelProviderApiRequest,
+  UpdateUserModelApiRequest,
+  UpdateUserProviderApiRequest,
+} from './ChatModelApi.schema';
 import {
   CancelChatTurnApiContract,
   CreateSessionApiContract,
@@ -58,11 +66,11 @@ import type {
 /** Chat API: /chat/* */
 
 function listAvailableModels(): Promise<ListAvailableModelsApiResponse> {
-  return apiGetUnchecked('/chat/model/listAvailableModels');
+  return executeApiContract(ListAvailableModelsApiContract, undefined);
 }
 
 function listModels(req: ListModelsApiRequest): Promise<ListModelsApiResponse> {
-  return apiGetUnchecked('/chat/model/listModels', { params: req });
+  return executeApiContract(ListModelsApiContract, req);
 }
 
 function listTools(): Promise<ListToolsApiResponse> {
@@ -76,47 +84,39 @@ function initTemporaryAttachmentUpload(
 }
 
 function listUserProviders(): Promise<ListUserProvidersApiResponse> {
-  return apiGetUnchecked('/chat/model/listUserProviders');
+  return executeApiContract(ListUserProvidersApiContract, undefined);
 }
 
-function createUserProvider(req: CreateUserProviderApiRequest): Promise<null> {
-  return apiPostUnchecked('/chat/model/createUserProvider', req);
+async function createUserProvider(req: CreateUserProviderApiRequest): Promise<void> {
+  await executeApiContract(CreateUserProviderApiContract, req);
 }
 
-function updateUserProvider(
-  req: UpdateUserProviderApiRequest
-): Promise<UpdateUserProviderApiResponse> {
-  return apiPostUnchecked('/chat/model/updateUserProvider', req);
+async function updateUserProvider(req: UpdateUserProviderApiRequest): Promise<void> {
+  await executeApiContract(UpdateUserProviderApiContract, req);
 }
 
-function deleteUserProvider(
-  req: DeleteUserProviderApiRequest
-): Promise<DeleteUserProviderApiResponse> {
-  return apiPostUnchecked('/chat/model/deleteUserProvider', req);
+async function deleteUserProvider(req: DeleteUserProviderApiRequest): Promise<void> {
+  await executeApiContract(DeleteUserProviderApiContract, req);
 }
 
-function createUserModel(req: CreateUserModelApiRequest): Promise<CreateUserModelApiResponse> {
-  return apiPostUnchecked('/chat/model/createUserModel', req);
+async function createUserModel(req: CreateUserModelApiRequest): Promise<void> {
+  await executeApiContract(CreateUserModelApiContract, req);
 }
 
-function updateUserModel(req: UpdateUserModelApiRequest): Promise<UpdateUserModelApiResponse> {
-  return apiPostUnchecked('/chat/model/updateUserModel', req);
+async function updateUserModel(req: UpdateUserModelApiRequest): Promise<void> {
+  await executeApiContract(UpdateUserModelApiContract, req);
 }
 
-function deleteUserModel(req: DeleteUserModelApiRequest): Promise<DeleteUserModelApiResponse> {
-  return apiPostUnchecked('/chat/model/deleteUserModel', req);
+async function deleteUserModel(req: DeleteUserModelApiRequest): Promise<void> {
+  await executeApiContract(DeleteUserModelApiContract, req);
 }
 
-function bindModelProvider(
-  req: BindModelProviderApiRequest
-): Promise<BindModelProviderApiResponse> {
-  return apiPostUnchecked('/chat/model/bindModelProvider', req);
+async function bindModelProvider(req: BindModelProviderApiRequest): Promise<void> {
+  await executeApiContract(BindModelProviderApiContract, req);
 }
 
-function unbindModelProvider(
-  req: UnbindModelProviderApiRequest
-): Promise<UnbindModelProviderApiResponse> {
-  return apiPostUnchecked('/chat/model/unbindModelProvider', req);
+async function unbindModelProvider(req: UnbindModelProviderApiRequest): Promise<void> {
+  await executeApiContract(UnbindModelProviderApiContract, req);
 }
 
 function updateUserToolConfig(
