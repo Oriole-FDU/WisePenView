@@ -184,11 +184,12 @@ function resolveAssetResourceType(name: string): AssetResourceTypeEnum {
 const mapSkillPermissionOverviewFromApi = (
   info: SkillInfoApiResponse | null | undefined,
   resourceId: string
-): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(
-    info?.resourceInfo ?? { resourceId, resourceName: '', ownerInfo: {} },
-    resourceId
-  );
+): ResourcePermissionOverview => {
+  if (!info?.resourceInfo) {
+    return { resourceId, subjects: [], supportedActions: [], actionOptions: [] };
+  }
+  return ResourceServicesMap.mapResourcePermissionOverviewFromApi(info.resourceInfo, resourceId);
+};
 
 export const SkillServicesMap = {
   formatVersion,

@@ -3,10 +3,6 @@ import type { UserDisplayBase } from '@/domains/User';
 
 /** Resource 领域模型 */
 
-/** 与后端 ResourceAccessRole 字面值一致 */
-export type ResourceAccessRole =
-  'OWNER' | 'OWNER_SPECIFIED' | 'GROUP_ADMIN' | 'GROUP_MEMBER' | 'NONE';
-
 export type ResourceIconType =
   | 'file'
   | 'doc'
@@ -63,8 +59,6 @@ export interface ResourceItem {
   mainTagId?: string;
   /** 当前用户对该资源已生效的权限动作（详情接口返回） */
   currentActions?: ResourceAction[] | null;
-  /** 当前用户对该资源的访问角色（详情接口返回） */
-  resourceAccessRole?: ResourceAccessRole;
   // ---- 权限配置字段 ----
   /** 资源级组覆盖权限，key 为 groupId，仅 owner 查询资源详情时返回 */
   overrideGrantedActions?: Record<string, ResourceAction[]> | null;

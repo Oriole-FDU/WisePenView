@@ -1,10 +1,9 @@
 /** 全文搜索 mock 语料 + 查询模拟，对齐后端 SearchQueryServiceImpl */
-import type { ResourceItemApiResponse } from '../apis/ResourceApi.type';
 import type {
   GlobalSearchResourcesApiContractRequest,
   GlobalSearchResourcesApiContractResponse,
 } from '../apis/ResourceCoreApi.contract';
-import type { ResourceTypeApi } from '../apis/ResourceCoreApi.schema';
+import type { ResourceItemApi, ResourceTypeApi } from '../apis/ResourceCoreApi.schema';
 
 /** 一篇可被搜索的 mock 资源；content 仅 mock 内部用，后端不返回 */
 interface SearchCorpusItem {
@@ -244,7 +243,7 @@ function emptyPage(page: number, size: number): GlobalSearchResourcesApiContract
 /** 对齐后端流程：scope 过滤 → 标题/正文匹配 → 相关性排序（resourceName^3 加权）→ 分页 */
 export function simulateGlobalSearch(
   params: GlobalSearchResourcesApiContractRequest,
-  resources: ReadonlyMap<string, ResourceItemApiResponse>
+  resources: ReadonlyMap<string, ResourceItemApi>
 ): GlobalSearchResourcesApiContractResponse {
   const { page, size, scope } = params;
   const keyword = params.keyword.trim();

@@ -1,5 +1,4 @@
 export type {
-  ResourceAccessRole,
   ResourceIconType,
   ResourceItem,
   ResourceTagBind,

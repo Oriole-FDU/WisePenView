@@ -166,7 +166,6 @@ export const mapResourceItemToChildNode = (
     ownerId: item.ownerId,
     ownerInfo: item.ownerInfo,
     currentActions: item.currentActions,
-    resourceAccessRole: item.resourceAccessRole,
     resourceIconType: item.resourceIconType ?? resolveResourceIconType(item.resourceType),
     mountTagId: parentTagId,
   } as const;

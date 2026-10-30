@@ -80,7 +80,6 @@ function resolveResourceInfoFromNode(row: DriveTableRow): ResourceItem | undefin
     resourceIconType: node.resourceIconType,
     mainTagId: node.type === 'link' ? node.primaryTagId : node.mountTagId,
     currentActions: node.currentActions,
-    resourceAccessRole: node.resourceAccessRole,
   };
 }
 

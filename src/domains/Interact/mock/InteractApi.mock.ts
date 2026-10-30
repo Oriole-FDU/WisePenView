@@ -7,16 +7,40 @@ import { getMockCommentLikeIds } from './CommentApi.mock';
 export const InteractApi: typeof InteractApiContract = {
   getUserInteractionRecord: ({ resourceId }) =>
     mockResponse({
-      ...getMockResource(resourceId).myInteractionRecord,
+      ...(getMockResource(resourceId).myInteractionRecord ?? {
+        read: false,
+        liked: false,
+        score: null,
+        likedCommentIds: [],
+        resourceId,
+      }),
       likedCommentIds: [...getMockCommentLikeIds(resourceId)],
     }),
   setLike: async ({ resourceId, liked }) => {
-    (getMockResource(resourceId).myInteractionRecord ??= {}).liked = liked;
+    (getMockResource(resourceId).myInteractionRecord ??= {
+      read: false,
+      liked: false,
+      score: null,
+      likedCommentIds: [],
+      resourceId,
+    }).liked = liked;
   },
   rate: async ({ resourceId, score }) => {
-    (getMockResource(resourceId).myInteractionRecord ??= {}).score = score;
+    (getMockResource(resourceId).myInteractionRecord ??= {
+      read: false,
+      liked: false,
+      score: null,
+      likedCommentIds: [],
+      resourceId,
+    }).score = score;
   },
   read: async ({ resourceId }) => {
-    (getMockResource(resourceId).myInteractionRecord ??= {}).read = true;
+    (getMockResource(resourceId).myInteractionRecord ??= {
+      read: false,
+      liked: false,
+      score: null,
+      likedCommentIds: [],
+      resourceId,
+    }).read = true;
   },
 };

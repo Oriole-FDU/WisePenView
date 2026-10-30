@@ -177,7 +177,6 @@ export const mapResourceItemFromApi = (
     size: normalizeNonNegativeNumber(raw.size),
     tagBinds: mapResourceTagBindsFromApi(raw.tagBinds),
     currentActions: parseResourceActions(raw.currentActions),
-    resourceAccessRole: 'resourceAccessRole' in raw ? raw.resourceAccessRole : undefined,
     overrideGrantedActions: normalizeResourceActionMap(raw.overrideGrantedActions),
     specifiedUsersGrantedActions: normalizeResourceActionMap(raw.specifiedUsersGrantedActions),
     readCount: normalizeNonNegativeNumber(interactionInfo?.readCount),

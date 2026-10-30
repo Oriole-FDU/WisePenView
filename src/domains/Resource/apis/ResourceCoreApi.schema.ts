@@ -178,6 +178,11 @@ export type ResourceTypeApi = z.infer<typeof ResourceTypeApiSchema>;
 export type ResourceTagInfoApi = z.infer<typeof ResourceTagInfoApiSchema>;
 export type ResourceBaseInfoApi = z.infer<typeof ResourceBaseInfoApiSchema>;
 export type ResourceItemApi = z.infer<typeof ResourceItemApiSchema>;
+export type ResourceGroupDisplayApi = z.infer<typeof ResourceGroupDisplayApiSchema>;
+export type ResourceGroupGrantedActionsApi = z.infer<typeof ResourceGroupGrantedActionsApiSchema>;
+export type ResourceSpecifiedUserGrantedActionsApi = z.infer<
+  typeof ResourceSpecifiedUserGrantedActionsApiSchema
+>;
 export type GetResourceBaseInfoApiRequest = z.infer<typeof GetResourceBaseInfoApiRequestSchema>;
 export type ListResourcesApiRequest = z.infer<typeof ListResourcesApiRequestSchema>;
 export type ListResourcesApiResponse = z.infer<typeof ListResourcesApiResponseSchema>;

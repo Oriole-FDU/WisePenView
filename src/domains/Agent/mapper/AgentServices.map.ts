@@ -160,11 +160,12 @@ const mapAgentDetail = (params: {
 const mapAgentPermissionOverviewFromApi = (
   info: AgentInfoApiResponse | null | undefined,
   resourceId: string
-): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(
-    info?.resourceInfo ?? { resourceId, resourceName: '', ownerInfo: {} },
-    resourceId
-  );
+): ResourcePermissionOverview => {
+  if (!info?.resourceInfo) {
+    return { resourceId, subjects: [], supportedActions: [], actionOptions: [] };
+  }
+  return ResourceServicesMap.mapResourcePermissionOverviewFromApi(info.resourceInfo, resourceId);
+};
 
 export const AgentServicesMap = {
   mapAgentDetail,
