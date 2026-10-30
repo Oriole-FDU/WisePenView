@@ -13,7 +13,7 @@ import type {
   ListResourcesApiContractRequest,
   ListResourcesApiContractResponse,
 } from '../apis/ResourceCoreApi.contract';
-import type { ResourceCoreItemApi } from '../apis/ResourceCoreApi.schema';
+import type { ResourceItemApi as ResourceItemApiValue } from '../apis/ResourceCoreApi.schema';
 import type { ResourcePlacementApiResponse } from '../apis/ResourcePlacementApi.type';
 import type { ResourceItem, ResourceTagBind } from '../entity/resource';
 import { normalizeSearchResourceType, TAG_QUERY_LOGIC_MODE } from '../enum';
@@ -97,7 +97,7 @@ const mapTagsToCurrentTags = (
 
 const mapResourceTagBindsFromApi = (
   tagBinds:
-    NonNullable<ResourceItemApiResponse['tagBinds'] | ResourceCoreItemApi['tagBinds']> | undefined
+    NonNullable<ResourceItemApiResponse['tagBinds'] | ResourceItemApiValue['tagBinds']> | undefined
 ): ResourceTagBind[] | undefined =>
   tagBinds?.map((bind) => ({
     groupId: bind.groupId,
@@ -162,7 +162,7 @@ const normalizeResourceActionMap = (
 
 /** 单条资源：Java Long 字符串、标签派生字段 */
 export const mapResourceItemFromApi = (
-  raw: ResourceItemApiResponse | ResourceCoreItemApi,
+  raw: ResourceItemApiResponse | ResourceItemApiValue,
   context: MapResourceItemContext = {}
 ): ResourceItem => {
   const interactionInfo = raw.resourceInteractionInfo;

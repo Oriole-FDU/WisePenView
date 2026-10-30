@@ -25,6 +25,7 @@ export interface ResourceUserInteractionRecordApiResponse {
 interface ResourceTagBindApiResponse {
   groupId?: string;
   primaryTagId?: string;
+  aiBillingApproved?: boolean;
   /** 尚未迁移的资源叶域只保证部分展示字段，字段定义仍以 ResourceCore Schema 为准。 */
   tags?: Record<string, Partial<ResourceTagInfoApi> | null | undefined>;
 }
@@ -53,6 +54,7 @@ export interface ResourceSpecifiedUserGrantedActionsApiResponse {
 
 export interface ResourceItemApiResponse {
   resourceId: string;
+  createTime?: number;
   resourceName: string;
   ownerId?: string;
   size?: JavaLongApiValue | null;

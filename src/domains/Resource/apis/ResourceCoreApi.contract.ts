@@ -7,13 +7,25 @@ import { EmptyApiResponseSchema } from '@/apis/schema';
 
 import {
   ChangeResourceActionPermissionApiRequestSchema,
+  GetResourceBaseInfoApiRequestSchema,
   GlobalSearchResourcesApiRequestSchema,
   GlobalSearchResourcesApiResponseSchema,
   ListResourcesApiRequestSchema,
   ListResourcesApiResponseSchema,
   RemoveResourcesApiRequestSchema,
   RenameResourceApiRequestSchema,
+  ResourceBaseInfoApiSchema,
 } from './ResourceCoreApi.schema';
+
+export const GetResourceBaseInfoApiContract = defineApiContract({
+  name: 'GetResourceBaseInfoApi',
+  method: 'GET',
+  endpoint: '/resource/item/getResourceBaseInfo',
+  requestPlacement: 'query',
+  transport: 'json',
+  request: GetResourceBaseInfoApiRequestSchema,
+  response: ResourceBaseInfoApiSchema,
+});
 
 export const ListResourcesApiContract = defineApiContract({
   name: 'ListResourcesApi',
@@ -65,6 +77,12 @@ export const GlobalSearchResourcesApiContract = defineApiContract({
   response: GlobalSearchResourcesApiResponseSchema,
 });
 
+export type GetResourceBaseInfoApiContractRequest = ApiContractRequest<
+  typeof GetResourceBaseInfoApiContract
+>;
+export type GetResourceBaseInfoApiContractResponse = ApiContractResponse<
+  typeof GetResourceBaseInfoApiContract
+>;
 export type ListResourcesApiContractRequest = ApiContractRequest<typeof ListResourcesApiContract>;
 export type ListResourcesApiContractResponse = ApiContractResponse<typeof ListResourcesApiContract>;
 export type RenameResourceApiContractRequest = ApiContractRequest<typeof RenameResourceApiContract>;

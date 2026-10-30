@@ -3,7 +3,7 @@ import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
 import type { ResourceItemApi as ResourceItemApiContract } from '../apis/ResourceApi';
 import type { ResourceItemApiResponse } from '../apis/ResourceApi.type';
 import type {
-  ResourceCoreItemApi,
+  ResourceItemApi as ResourceItemApiValue,
   ResourceTagInfoApi,
   ResourceTypeApi,
 } from '../apis/ResourceCoreApi.schema';
@@ -20,7 +20,7 @@ const normalizeResourceType = (value?: string): ResourceTypeApi => {
 
 const normalizeUserDisplay = (
   value: ResourceItemApiResponse['ownerInfo'] | null | undefined
-): ResourceCoreItemApi['ownerInfo'] => {
+): ResourceItemApiValue['ownerInfo'] => {
   const identityType = Number(value?.identityType);
   return {
     nickname: value?.nickname ?? null,
@@ -51,8 +51,9 @@ const toInteractionCount = (value: string | number | null | undefined): number =
   return Number.isSafeInteger(count) && count >= 0 ? count : 0;
 };
 
-const toResourceCoreItem = (item: ResourceItemApiResponse): ResourceCoreItemApi => ({
+const toResourceItem = (item: ResourceItemApiResponse): ResourceItemApiValue => ({
   resourceId: item.resourceId,
+  createTime: item.createTime ?? 0,
   resourceName: item.resourceName,
   resourceType: normalizeResourceType(item.resourceType),
   ownerId: item.ownerId ?? '1',
@@ -86,6 +87,7 @@ const toResourceCoreItem = (item: ResourceItemApiResponse): ResourceCoreItemApi 
       {
         groupId: bind.groupId,
         primaryTagId,
+        aiBillingApproved: bind.aiBillingApproved ?? false,
         tags: Object.fromEntries(
           Object.entries(bind.tags ?? {}).map(([tagId, tag]) => [
             tagId,
@@ -124,6 +126,8 @@ const toResourceCoreItem = (item: ResourceItemApiResponse): ResourceCoreItemApi 
 });
 
 export const ResourceItemApi: typeof ResourceItemApiContract = {
+  getResourceBaseInfo: ({ resourceId }) =>
+    Promise.resolve(toResourceItem(getMockResource(resourceId))),
   listResources: (params) => {
     const rows = [...mockResources.values()].filter((resource) => {
       if (
@@ -144,7 +148,7 @@ export const ResourceItemApi: typeof ResourceItemApiContract = {
         (a, b) =>
           a.resourceName.localeCompare(b.resourceName) * (params.sortDir === 'DESC' ? -1 : 1)
       );
-    return mockResponse(mockPage(rows.map(toResourceCoreItem), params));
+    return mockResponse(mockPage(rows.map(toResourceItem), params));
   },
   renameResource: async ({ resourceId, newName }) => {
     getMockResource(resourceId).resourceName = newName;

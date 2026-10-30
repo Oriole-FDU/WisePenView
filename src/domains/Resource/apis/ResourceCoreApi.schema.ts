@@ -57,6 +57,7 @@ export const ResourceTagInfoApiSchema = z.object({
 export const ResourceTagBindApiSchema = z.object({
   groupId: NonEmptyStringSchema,
   primaryTagId: NonEmptyStringSchema,
+  aiBillingApproved: z.boolean().nullable(),
   tags: z.record(NonEmptyStringSchema, ResourceTagInfoApiSchema.nullable()),
 });
 
@@ -97,8 +98,10 @@ export const ResourceSpecifiedUserGrantedActionsApiSchema = z.object({
   grantedActions: ResourceActionListSchema.nullable(),
 });
 
-export const ResourceCoreItemApiSchema = z.object({
+/** 资源基础信息，供跨域详情投影与独立基础信息接口复用。 */
+export const ResourceBaseInfoApiSchema = z.object({
   resourceId: OpaqueIdSchema,
+  createTime: EpochMillisSchema,
   resourceName: NonEmptyStringSchema,
   resourceType: ResourceTypeApiSchema,
   ownerId: NonEmptyStringSchema,
@@ -106,11 +109,19 @@ export const ResourceCoreItemApiSchema = z.object({
   preview: NullableStringSchema,
   size: JavaLongStringSchema.nullable(),
   resourceInteractionInfo: ResourceInteractionInfoApiSchema.nullable(),
+});
+
+/** 列表、搜索和资源叶域详情共用的完整资源项。 */
+export const ResourceItemApiSchema = ResourceBaseInfoApiSchema.extend({
   myInteractionRecord: ResourceUserInteractionRecordApiSchema.nullable(),
   tagBinds: z.array(ResourceTagBindApiSchema),
   currentActions: ResourceActionListSchema,
   overrideGrantedActions: z.array(ResourceGroupGrantedActionsApiSchema).nullable(),
   specifiedUsersGrantedActions: z.array(ResourceSpecifiedUserGrantedActionsApiSchema).nullable(),
+});
+
+export const GetResourceBaseInfoApiRequestSchema = z.strictObject({
+  resourceId: OpaqueIdSchema,
 });
 
 export const ListResourcesApiRequestSchema = ResourceListPageRequestSchema.extend({
@@ -123,7 +134,7 @@ export const ListResourcesApiRequestSchema = ResourceListPageRequestSchema.exten
   sortDir: ResourceSortDirApiSchema,
 });
 
-export const ListResourcesApiResponseSchema = createPageResponseSchema(ResourceCoreItemApiSchema);
+export const ListResourcesApiResponseSchema = createPageResponseSchema(ResourceItemApiSchema);
 
 export const RenameResourceApiRequestSchema = z.strictObject({
   resourceId: OpaqueIdSchema,
@@ -165,7 +176,9 @@ export const GlobalSearchResourcesApiResponseSchema =
 
 export type ResourceTypeApi = z.infer<typeof ResourceTypeApiSchema>;
 export type ResourceTagInfoApi = z.infer<typeof ResourceTagInfoApiSchema>;
-export type ResourceCoreItemApi = z.infer<typeof ResourceCoreItemApiSchema>;
+export type ResourceBaseInfoApi = z.infer<typeof ResourceBaseInfoApiSchema>;
+export type ResourceItemApi = z.infer<typeof ResourceItemApiSchema>;
+export type GetResourceBaseInfoApiRequest = z.infer<typeof GetResourceBaseInfoApiRequestSchema>;
 export type ListResourcesApiRequest = z.infer<typeof ListResourcesApiRequestSchema>;
 export type ListResourcesApiResponse = z.infer<typeof ListResourcesApiResponseSchema>;
 export type RenameResourceApiRequest = z.infer<typeof RenameResourceApiRequestSchema>;
