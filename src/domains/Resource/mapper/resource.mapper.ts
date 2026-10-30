@@ -14,7 +14,7 @@ import type {
   ListResourcesApiContractResponse,
 } from '../apis/ResourceCoreApi.contract';
 import type { ResourceItemApi as ResourceItemApiValue } from '../apis/ResourceCoreApi.schema';
-import type { ResourcePlacementApiResponse } from '../apis/ResourcePlacementApi.type';
+import type { ResourcePlacementApiResponse } from '../apis/ResourcePlacementApi.schema';
 import type { ResourceItem, ResourceTagBind } from '../entity/resource';
 import { normalizeSearchResourceType, TAG_QUERY_LOGIC_MODE } from '../enum';
 import type {
