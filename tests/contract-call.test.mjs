@@ -34,6 +34,7 @@ const virtualModules = {
       calls.push({ method: 'DELETE', endpoint, config });
       return null;
     };
+    export const apiGetText = async () => '';
 
     export const getCalls = () => calls;
   `,

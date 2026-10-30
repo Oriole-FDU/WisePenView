@@ -5,6 +5,11 @@ export { AdminUserApi } from '@/domains/Admin/mock/AdminUserApi.mock';
 export { AgentApi } from '@/domains/Agent/mock/AgentApi.mock';
 export { AuthApi } from '@/domains/Auth/mock/AuthApi.mock';
 export { ChatApi, ChatCompletionApi, ChatSessionApi } from '@/domains/Chat/mock/ChatApi.mock';
+export {
+  reconnectChatStream,
+  streamChatCompletion,
+  streamChatRecovery,
+} from '@/domains/Chat/mock/ChatStreamApi.mock';
 export { DocumentApi } from '@/domains/Document/mock/DocumentApi.mock';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/mock/GroupApi.mock';
 export { HtmlPageApi } from '@/domains/HtmlPage/mock/HtmlPageApi.mock';
