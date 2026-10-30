@@ -1,10 +1,8 @@
 {
-  "checkedContracts": 151,
+  "checkedContracts": 154,
   "uncheckedCalls": {
     "src/domains/Admin/apis/AdminMessageApi.ts": 2
   },
   "specialTransports": {},
-  "directFetches": {
-    "src/domains/Chat/session/useChatSession.ts": 1
-  }
+  "directFetches": {}
 }

@@ -65,6 +65,9 @@ export function useChatTurnController({
     sessionId: currentSessionId ?? '',
     model: currentModel?.modelId,
     getActiveTurnId: chatService.getActiveTurnId,
+    streamChatCompletion: chatService.streamChatCompletion,
+    recoverChatStream: chatService.recoverChatStream,
+    reconnectChatStream: chatService.reconnectChatStream,
     onError: (error) => {
       toast.danger(parseErrorMessage(error));
     },

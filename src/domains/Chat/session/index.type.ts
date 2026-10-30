@@ -1,5 +1,7 @@
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
+import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
+
 interface ChatSelectedResourceContext {
   resourceId: string;
   resourceName: string;
@@ -67,5 +69,11 @@ export interface UseChatSessionOptions {
   sessionId: string;
   model?: string;
   getActiveTurnId: (sessionId: string) => Promise<string | null>;
+  streamChatCompletion: (
+    request: ChatCompletionApiRequest,
+    signal?: AbortSignal
+  ) => Promise<Response>;
+  recoverChatStream: (request: ChatRecoverApiRequest, signal?: AbortSignal) => Promise<Response>;
+  reconnectChatStream: (sessionId: string, signal?: AbortSignal) => Promise<Response>;
   onError?: (error: Error) => void;
 }

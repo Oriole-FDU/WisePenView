@@ -1,13 +1,16 @@
 import { useChat } from '@ai-sdk/react';
 import { useLatest } from 'ahooks';
 import { DefaultChatTransport } from 'ai';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
-import { applyXDeveloperHeader, awaitAddrReady, notifyAddrFailure } from '@/apis/runtime';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
+import {
+  pickChatCompletionApiRequest,
+  pickChatRecoverApiRequest,
+} from '../apis/ChatStreamApi.schema';
 import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
 import { mapChatCompletionRequest } from '../mapper/chatCompletion.mapper';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
@@ -20,14 +23,6 @@ import type {
 
 const CHAT_STREAM_THROTTLE_MS = 50;
 
-function buildChatFetchInit(init?: RequestInit): RequestInit {
-  return {
-    ...init,
-    credentials: 'include',
-    headers: applyXDeveloperHeader(new Headers(init?.headers)),
-  };
-}
-
 function resolveChatApiUrl(input: RequestInfo | URL): string {
   return typeof input === 'string' || input instanceof URL
     ? new URL(input.toString(), buildApiUrl('/')).toString()
@@ -36,16 +31,31 @@ function resolveChatApiUrl(input: RequestInfo | URL): string {
 
 async function fetchChatCompletion(
   input: RequestInfo | URL,
-  init?: RequestInit
+  init: RequestInit | undefined,
+  streamApi: Pick<
+    UseChatSessionOptions,
+    'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
+  >
 ): Promise<Response> {
-  await awaitAddrReady();
-  try {
-    const response = await fetch(resolveChatApiUrl(input), buildChatFetchInit(init));
-    return normalizeChatSseResponse(response);
-  } catch (error) {
-    notifyAddrFailure();
-    throw error;
-  }
+  const requestUrl = new URL(resolveChatApiUrl(input));
+  const rawBody = typeof init?.body === 'string' ? JSON.parse(init.body) : {};
+
+  const response = requestUrl.pathname.endsWith('/chat/completions/recover')
+    ? await streamApi.recoverChatStream(
+        pickChatRecoverApiRequest(rawBody),
+        init?.signal ?? undefined
+      )
+    : requestUrl.pathname.endsWith('/chat/completions/stream')
+      ? await streamApi.reconnectChatStream(
+          requestUrl.searchParams.get('session_id') ?? '',
+          init?.signal ?? undefined
+        )
+      : await streamApi.streamChatCompletion(
+          pickChatCompletionApiRequest(rawBody),
+          init?.signal ?? undefined
+        );
+
+  return normalizeChatSseResponse(response);
 }
 
 function isChatRecoverRequest(
@@ -58,26 +68,32 @@ function isChatRecoverRequest(
   );
 }
 
-const chatTransport = new DefaultChatTransport<WisePenUIMessage>({
-  api: '/chat/completions',
-  fetch: fetchChatCompletion,
-  prepareSendMessagesRequest: ({ body }) => {
-    if (isChatRecoverRequest(body)) {
-      return { api: '/chat/completions/recover', body };
-    }
-    return { body: body ?? {} };
-  },
-  prepareReconnectToStreamRequest: ({ body }) => {
-    const sessionId = body?.session_id;
-    if (typeof sessionId !== 'string' || sessionId === '') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: '重连聊天流时缺少 session_id',
-      });
-    }
-    const params = new URLSearchParams({ session_id: sessionId });
-    return { api: `/chat/completions/stream?${params.toString()}` };
-  },
-});
+const createChatTransport = (
+  streamApi: Pick<
+    UseChatSessionOptions,
+    'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
+  >
+) =>
+  new DefaultChatTransport<WisePenUIMessage>({
+    api: '/chat/completions',
+    fetch: (input, init) => fetchChatCompletion(input, init, streamApi),
+    prepareSendMessagesRequest: ({ body }) => {
+      if (isChatRecoverRequest(body)) {
+        return { api: '/chat/completions/recover', body };
+      }
+      return { body: body ?? {} };
+    },
+    prepareReconnectToStreamRequest: ({ body }) => {
+      const sessionId = body?.session_id;
+      if (typeof sessionId !== 'string' || sessionId === '') {
+        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+          reason: '重连聊天流时缺少 session_id',
+        });
+      }
+      const params = new URLSearchParams({ session_id: sessionId });
+      return { api: `/chat/completions/stream?${params.toString()}` };
+    },
+  });
 
 /**
  * 对 useChat 的薄封装：
@@ -89,8 +105,21 @@ export const useChatSession = ({
   sessionId,
   model,
   getActiveTurnId,
+  streamChatCompletion,
+  recoverChatStream,
+  reconnectChatStream,
   onError,
 }: UseChatSessionOptions) => {
+  /**
+   * @wisepen-manual-memo
+   * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
+   * 收益：仅在服务传输函数变化时重建，稳定聊天会话与重连逻辑。
+   * 失效条件：streamChatCompletion、recoverChatStream 或 reconnectChatStream 引用变化。
+   */
+  const chatTransport = useMemo(
+    () => createChatTransport({ streamChatCompletion, recoverChatStream, reconnectChatStream }),
+    [recoverChatStream, reconnectChatStream, streamChatCompletion]
+  );
   const chat = useChat<WisePenUIMessage>({
     experimental_throttle: CHAT_STREAM_THROTTLE_MS,
     onError: (error) => {

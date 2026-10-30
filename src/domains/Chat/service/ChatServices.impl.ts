@@ -1,4 +1,12 @@
-import { ChatApi, ChatCompletionApi, ChatSessionApi, putOssPresignedUrl } from '@domain-apis';
+import {
+  ChatApi,
+  ChatCompletionApi,
+  ChatSessionApi,
+  putOssPresignedUrl,
+  reconnectChatStream as reconnectChatStreamApi,
+  streamChatCompletion as streamChatCompletionApi,
+  streamChatRecovery as streamChatRecoveryApi,
+} from '@domain-apis';
 
 import type { Group } from '@/domains/Group';
 import type { ResourceSkillSummary } from '@/domains/Resource';
@@ -396,6 +404,10 @@ const uploadAttachment = async ({
 };
 
 export const createChatServices = (deps: ChatServiceDeps): IChatService => ({
+  streamChatCompletion: (request, signal) => streamChatCompletionApi(request, signal),
+  recoverChatStream: (request, signal) => streamChatRecoveryApi(request, signal),
+  reconnectChatStream: (sessionId, signal) =>
+    reconnectChatStreamApi({ session_id: sessionId }, signal),
   getModels,
   getActiveTurnId,
   cancelTurn,

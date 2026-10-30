@@ -1,6 +1,7 @@
 import type { Group, IGroupService } from '@/domains/Group';
 import type { IResourceService, ResourceSkillSummary } from '@/domains/Resource';
 
+import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
 import type { ChatAgentOption } from '../entity/agent';
 import type { WisePenUIMessage } from '../entity/message';
 import type { CapabilityToolOption } from '../mapper/capabilityPicker.mapper';
@@ -209,6 +210,9 @@ export interface ListChatInputSkillsRequest {
 
 /** ChatService 接口 */
 export interface IChatService {
+  streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
+  recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
+  reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
   getModels(): Promise<ChatModel[]>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;

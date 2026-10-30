@@ -1,5 +1,9 @@
 import { type EventSourceMessage, EventSourceParserStream } from 'eventsource-parser/stream';
 
+import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
+
+import { ChatSseEventDataApiSchema } from '../apis/ChatStreamApi.schema';
+
 const CHAT_SSE_MAX_EVENT_SIZE = 8 * 1024 * 1024;
 
 type BackendToolApprovalRequestEvent = {
@@ -63,8 +67,28 @@ export function normalizeChatSseData(data: string): string[] {
   let parsed: unknown;
   try {
     parsed = JSON.parse(data);
-  } catch {
-    return [data];
+  } catch (error) {
+    throw new WisePenError({
+      code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
+      source: 'http',
+      message: '聊天流事件不是合法 JSON',
+      cause: error,
+    });
+  }
+  const validation = ChatSseEventDataApiSchema.safeParse(parsed);
+  if (!validation.success) {
+    throw new WisePenError({
+      code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
+      source: 'http',
+      message: '聊天流事件契约不匹配',
+      meta: {
+        issues: validation.error.issues.map((issue) => ({
+          path: issue.path.join('.') || '$',
+          code: issue.code,
+        })),
+      },
+      cause: validation.error,
+    });
   }
   const event = getRecord(parsed);
   if (!event) return [data];
