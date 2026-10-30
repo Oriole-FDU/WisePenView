@@ -30,3 +30,4 @@
 
 - 完整详情需要 documentVersionInfo，缺失时 mapper 抛出明确错误；资源权限概览只从 resourceInfo 构造，不依赖文件版本或预览元数据。不可为了读取权限而强制调用完整详情映射。依据：[mapGetDocInfoFromApi、mapDocPermissionOverviewFromApi](mapper/DocumentServices.map.ts)。
 - 文档复制通过独立 `forkDocument` 请求传送资源 ID、新名称与可选版本，不能把本地文件复制或重新挂载等同于后端 fork。service 类型注解将 FORK 校验交给后端，但本仓前端来源不能证明正式后端已实施该校验。依据：[forkDocument](service/DocumentServices.impl.ts)、[ForkDocumentRequest](service/index.type.ts)、[DocumentApi](apis/DocumentApi.ts)。
+- `getDocInfo` 在文档当前版本为 0 时返回 `documentVersionInfo: null`；版本摘要只在版本大于 0 时存在，前端契约必须保留该 nullable 边界。Java 时间统一为毫秒时间戳，ONLYOFFICE `Config` 作为受控开放对象校验。依据：[DocumentApi.schema.ts](apis/DocumentApi.schema.ts)。

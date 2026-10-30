@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag、G Group、R ResourceCore 的列表/搜索/写命令，以及前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 ResourceCore Base/Detail 消费与 ResourceAccess。
+> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag、G Group、R ResourceCore Base/Detail、五个资源叶域，以及前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 Interaction、InlineComment 与支撑域。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -99,9 +99,9 @@ flowchart TD
 当前 DAG 前沿：
 
 - 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`、`G Group`。
-- 进行中：`R ResourceCore`，已完成列表、全局搜索、重命名、删除和权限更新 5 个前端接口；Base/Detail 仍由资源叶域使用历史 DTO。
-- 下一前沿：ResourceCore Base/Detail 消费与 `ResourceAccess` 聚合。
-- 仍被阻塞：`T Tag` 的 scoped endpoint 迁移继续等待后端上线；其他叶域和聚合域继续沿 DAG 向后等待。
+- 已完成：`R ResourceCore` Base/Item 共用 Schema，以及 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。
+- 下一前沿：`I Interaction`、`C InlineComment` 与 Message/Wallet/UserTask/Admin 等支撑域。
+- 仍被阻塞：`T Tag` 的 scoped endpoint 迁移继续等待后端上线；ResourceAccess 聚合 endpoint 继续等待后端契约。
 
 关键约束：
 
@@ -616,7 +616,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 ### Wave 4：Resource Core + Access
 
 - [x] ResourceList/Search 建立独立 Schema，并迁移重命名、删除与权限更新 5 个 checked Contract。
-- [ ] ResourceBase/Detail 建立共享 Schema，并替换 Note、Document、Skill、Agent、HtmlPage 中的历史 ResourceItem DTO。
+- [x] ResourceBase/Detail 建立共享 Schema，并替换 Note、Document、Skill、Agent、HtmlPage 中的历史 ResourceItem DTO。
 - Placement 改成明确批量命令与逐项结果。
 - 新增 Resource Access Overview 聚合 endpoint。
 - 删除 436 行权限补全 mapper 的目标从这里开始，而不是一次性删。
@@ -625,11 +625,11 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 可并行拆成五个独立批次：
 
-- Document
-- Note
-- Skill
-- Agent
-- HtmlPage
+- [x] Document：8 个 REST 接口、精确版本状态与 nullable 版本信息、受控 ONLYOFFICE 配置。
+- [x] Note：6 个 REST 接口，修正 `updateTime` / 分页版本契约并删除不存在的 `noteInfo`。
+- [x] Skill：10 个 REST 接口，复用版本资产 Schema 与 Java 毫秒 STS 凭证。
+- [x] Agent：9 个 REST 接口，复用版本资产 Schema，并补齐 Tool／Skill 策略实际字段。
+- [x] HtmlPage：2 个接口，HTML 正文使用显式 text transport，其余使用 checked JSON Contract。
 
 每个叶域都必须复用 Resource/User/Access 的公共 Schema，不复制 DTO。
 
