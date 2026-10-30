@@ -1,6 +1,6 @@
 # Zod Schema 与接口边界建设方案
 
-> 状态：Wave 0 契约内核、U UserInformation、A AccessPolicy 核心、T Tag、G Group、R ResourceCore Base/Detail、五个资源叶域，以及前端 `defineEnum` 枚举工具重构已实施；scoped Tag endpoint 因后端尚未上线保持迁移阻塞，下一前沿为 Interaction、InlineComment 与支撑域。
+> 状态：除后端尚未提供的 Admin 公告 Controller、scoped Tag endpoint 与 Resource Access Overview 外，前端存量 REST 已完成 Contract 迁移；Chat 三条 SSE 流水线也已建立独立 Contract。当前基线为 154 个 Contract、2 个 unchecked REST 调用、0 个 direct fetch。
 >
 > 调研基线：WisePenView `main`、WisePenCloud `codex/resource-tag-tree-scoped-endpoints`（含 `origin/main`）、WisePenCloud-AI `wisepen-chat-service`。
 
@@ -100,8 +100,8 @@ flowchart TD
 
 - 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`、`G Group`。
 - 已完成：`R ResourceCore` Base/Item 共用 Schema，以及 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。
-- 下一前沿：`I Interaction`、`C InlineComment` 与 Message/Wallet/UserTask/Admin 等支撑域。
-- 仍被阻塞：`T Tag` 的 scoped endpoint 迁移继续等待后端上线；ResourceAccess 聚合 endpoint 继续等待后端契约。
+- 已完成：Interaction、InlineComment、Message、Wallet、UserTask、UserTour、Admin User、Chat Session/Model/Provider/Tool/Speech 与 SSE。
+- 仍被阻塞：Admin 公告 2 个前端 endpoint 没有对应 Cloud Controller；`T Tag` scoped endpoint 与 ResourceAccess 聚合 endpoint 继续等待后端上线。
 
 关键约束：
 
@@ -565,7 +565,7 @@ defineEnum({ STUDENT: 1, TEACHER: 2 } as const);
 - [x] 将 `NumericEnumApiValue` 标记为 `@deprecated`，作为各域精确 enum 迁移后的删除项。
 - [x] 增加共享 Schema、Contract 调用、Auth 契约和静态边界测试。
 - [x] 建立 6 个 Contract、146 个待迁移 REST 调用的可下降基线。
-- [ ] 为每个 P0 差异继续补失败测试；当前只覆盖共享 Schema、Auth 与静态边界基线。
+- [x] 为 Note 时间/版本、Feedback type/browser、Chat Provider usage、Chat Agent version、Speech body 等已修复 P0 差异补正反例测试；Admin 公告等待后端 Controller。
 
 Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`。
 
@@ -591,7 +591,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 ### Wave 1：UserInformation + AccessPolicy
 
 - [x] UserSummary、UserDetail、UserSearch Schema 与 checked Contract。
-- [ ] AccountProfile CRUD 与 IdentityVerification Schema。
+- [x] AccountProfile、邮箱认证、邀请记录与用户反馈 Schema 及 checked Contract。
 - [x] ResourceAction、AccessControlScope、动作依赖和通用权限选择规则从 Resource/Tag 提到独立 AccessPolicy。
 - [x] 补 `MARKET_VIEW`，区分完整动作集合与普通权限编辑器可配置动作。
 - [x] 提供严格的 `ResourceActionSchema` 与 `AccessControlScopeSchema`，前端权限只使用动作集合。
@@ -617,9 +617,9 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 - [x] ResourceList/Search 建立独立 Schema，并迁移重命名、删除与权限更新 5 个 checked Contract。
 - [x] ResourceBase/Detail 建立共享 Schema，并替换 Note、Document、Skill、Agent、HtmlPage 中的历史 ResourceItem DTO。
-- Placement 改成明确批量命令与逐项结果。
-- 新增 Resource Access Overview 聚合 endpoint。
-- 删除 436 行权限补全 mapper 的目标从这里开始，而不是一次性删。
+- [x] Placement 6 个接口完成 checked Contract；命令语义仍是现有后端 POST，批量逐项结果等待后端新契约。
+- [ ] 新增 Resource Access Overview 聚合 endpoint；阻塞于后端。
+- [ ] 删除 436 行权限补全 mapper；阻塞于 Resource Access Overview 上线。
 
 ### Wave 5：资源叶域
 
@@ -635,21 +635,23 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 6：互动与支撑域
 
-- Interact
-- InlineComment
-- Message
-- Wallet
-- UserTask / UserTour
-- Admin
+- [x] Interact：互动状态、评论与收藏共 17 个 checked Contract。
+- [x] InlineComment：8 个 checked Contract，reaction 固定为 `userId -> reaction[]`。
+- [x] Message：列表与批量已读 checked Contract。
+- [x] Wallet：钱包、兑换、流水与划转 checked Contract。
+- [x] UserTask / UserTour：任务状态、签到、引导状态与完成命令 checked Contract。
+- [x] Admin User：修正 `userStatus`、身份查询枚举、毫秒时间与重置密码请求。
+- [ ] Admin 公告：`/admin/message/*` 在后端不存在，保持 unchecked；需先新增受管理员权限保护的 Controller、DTO 与数据源。
 
 这一步重点是把 toggle 改成幂等命令、补逐项批量结果、修正 AdminMessage Controller。
 
 ### Wave 7：Chat 与 SSE
 
-- 拆 Session/Completion/Model/Provider/Tool/Speech。
-- 建立 UI message part 和 SSE event union。
-- 修正 Provider usage、Agent version、Speech body。
-- 对流式事件建立最大长度、错误事件、重连和终止条件测试。
+- [x] 拆分 Session、Model/Provider、Tool、Completion 与 Speech Schema/Contract。
+- [x] 建立 UIMessage part 结构校验与 SSE 请求 Contract，支持 POST、recover、GET reconnect。
+- [x] 修正 Provider 真实 usage 字段、移除不存在的 `agent_version` 请求字段、修正 Speech `{ provider, options }` body。
+- [x] SSE 复用 8 MiB 事件上限；坏 JSON 与非对象事件 fail-fast，停止流保留 AbortSignal。
+- [ ] 补真实后端运行态的断流、重连和终止回归；该检查需要明确授权的联调环境。
 
 ### Wave 8：Product Applications
 

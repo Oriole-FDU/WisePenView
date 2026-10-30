@@ -19,3 +19,4 @@
 ## Mock 限制
 
 - Admin Message mock 的发布是 no-op、列表为固定样本；Admin User mock 的修改与重设也是 no-op。这些成功响应不验证持久化、账号修改、密码变更、全员广播或阅读统计。依据：[AdminMessageApi](mock/AdminMessageApi.mock.ts)、[AdminUserApi](mock/AdminUserApi.mock.ts)。
+- 正式环境当前没有 `/admin/message/listMessages` 与 `/admin/message/publishMessage` Controller，因此这两个接口继续保留在 unchecked 基线中；不得把内部 `/internal/user/message/publishMessage` 当作管理员公开接口。Admin User 已使用 checked Contract，并修正查询/更新字段为 `userStatus`。依据：[契约基线](../../../scripts/api-contract-baseline.json)、[AdminUser Schema](apis/AdminUserApi.schema.ts)。
