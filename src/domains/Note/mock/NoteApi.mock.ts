@@ -5,7 +5,7 @@ import type { NoteApi as NoteApiContract } from '../apis/NoteApi';
 import type {
   GetDrawIoLatestSnapshotApiResponse,
   ListNoteVersionsApiResponse,
-} from '../apis/NoteApi.type';
+} from '../apis/NoteApi.schema';
 
 const snapshots = new Map<string, GetDrawIoLatestSnapshotApiResponse>();
 export const NoteApi: typeof NoteApiContract = {
@@ -15,8 +15,19 @@ export const NoteApi: typeof NoteApiContract = {
     mockResponse({
       resourceInfo: getMockResource(resourceId),
       version: 0,
-      noteInfo: { authors: ['1'], lastUpdatedAt: '2026-03-01T00:00:00Z' },
-      authorsDisplay: { '1': { nickname: '示例用户' } },
+      updateTime: Date.parse('2026-03-01T00:00:00Z'),
+      authorsDisplay: {
+        '1': {
+          nickname: '示例用户',
+          username: null,
+          avatar: null,
+          identityType: 1,
+          realName: null,
+          campusNo: null,
+          email: null,
+          mobile: null,
+        },
+      },
     }),
   getDrawIoLatestSnapshot: ({ resourceId }) =>
     mockResponse(
@@ -24,6 +35,7 @@ export const NoteApi: typeof NoteApiContract = {
     ),
   saveDrawIoSnapshot: async ({ resourceId, version, data }) => {
     snapshots.set(resourceId, { resourceId, version, fullSnapshot: data, deltas: null });
+    return null;
   },
   forkNote: async ({ resourceId, forkedResourceName }) => {
     const source = getMockResource(resourceId);

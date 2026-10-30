@@ -1,42 +1,54 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  AddNoteApiRequest,
-  AddNoteApiResponse,
-  ForkNoteApiRequest,
-  GetDrawIoLatestSnapshotApiRequest,
-  GetDrawIoLatestSnapshotApiResponse,
-  GetNoteInfoApiRequest,
-  GetNoteInfoApiResponse,
-  ListNoteVersionsApiRequest,
-  ListNoteVersionsApiResponse,
-  SaveDrawIoSnapshotApiRequest,
-} from './NoteApi.type';
+import {
+  AddNoteApiContract,
+  type AddNoteApiContractRequest,
+  type AddNoteApiContractResponse,
+  ForkNoteApiContract,
+  type ForkNoteApiContractRequest,
+  type ForkNoteApiContractResponse,
+  GetDrawIoLatestSnapshotApiContract,
+  type GetDrawIoLatestSnapshotApiContractRequest,
+  type GetDrawIoLatestSnapshotApiContractResponse,
+  GetNoteInfoApiContract,
+  type GetNoteInfoApiContractRequest,
+  type GetNoteInfoApiContractResponse,
+  ListNoteVersionsApiContract,
+  type ListNoteVersionsApiContractRequest,
+  type ListNoteVersionsApiContractResponse,
+  SaveDrawIoSnapshotApiContract,
+  type SaveDrawIoSnapshotApiContractRequest,
+  type SaveDrawIoSnapshotApiContractResponse,
+} from './NoteApi.contract';
 
-function addNote(req: AddNoteApiRequest): Promise<AddNoteApiResponse> {
-  return apiPostUnchecked('/note/addNote', req);
+function addNote(req: AddNoteApiContractRequest): Promise<AddNoteApiContractResponse> {
+  return executeApiContract(AddNoteApiContract, req);
 }
 
-function getNoteInfo(req: GetNoteInfoApiRequest): Promise<GetNoteInfoApiResponse> {
-  return apiGetUnchecked('/note/getNoteInfo', { params: req });
+function getNoteInfo(req: GetNoteInfoApiContractRequest): Promise<GetNoteInfoApiContractResponse> {
+  return executeApiContract(GetNoteInfoApiContract, req);
 }
 
 function getDrawIoLatestSnapshot(
-  req: GetDrawIoLatestSnapshotApiRequest
-): Promise<GetDrawIoLatestSnapshotApiResponse> {
-  return apiGetUnchecked('/note/getDrawIOLatestVersion', { params: req });
+  req: GetDrawIoLatestSnapshotApiContractRequest
+): Promise<GetDrawIoLatestSnapshotApiContractResponse> {
+  return executeApiContract(GetDrawIoLatestSnapshotApiContract, req);
 }
 
-function saveDrawIoSnapshot(req: SaveDrawIoSnapshotApiRequest): Promise<void> {
-  return apiPostUnchecked('/note/saveDrawIOSnapshot', req);
+function saveDrawIoSnapshot(
+  req: SaveDrawIoSnapshotApiContractRequest
+): Promise<SaveDrawIoSnapshotApiContractResponse> {
+  return executeApiContract(SaveDrawIoSnapshotApiContract, req);
 }
 
-function forkNote(req: ForkNoteApiRequest): Promise<string> {
-  return apiPostUnchecked('/note/forkNote', req);
+function forkNote(req: ForkNoteApiContractRequest): Promise<ForkNoteApiContractResponse> {
+  return executeApiContract(ForkNoteApiContract, req);
 }
 
-function listNoteVersions(req: ListNoteVersionsApiRequest): Promise<ListNoteVersionsApiResponse> {
-  return apiGetUnchecked('/note/listNoteVersions', { params: req });
+function listNoteVersions(
+  req: ListNoteVersionsApiContractRequest
+): Promise<ListNoteVersionsApiContractResponse> {
+  return executeApiContract(ListNoteVersionsApiContract, req);
 }
 
 export const NoteApi = {

@@ -59,7 +59,11 @@ const forkNote = async (params: ForkNoteRequest): Promise<ForkNoteResponse> => {
 };
 
 const listNoteVersions = async (params: ListNoteVersionsRequest): Promise<NoteVersionListPage> => {
-  const data = await NoteApi.listNoteVersions(params);
+  const data = await NoteApi.listNoteVersions({
+    resourceId: params.resourceId,
+    page: params.page ?? 1,
+    size: params.size ?? 20,
+  });
   return NoteServicesMap.mapNoteVersionListPageFromApi(data);
 };
 
