@@ -19,7 +19,7 @@ import type {
   ListUserInviteRecordsApiRequest,
   ListUserInviteRecordsApiResponse,
   UserInviteRecordApiResponse,
-} from '../apis/UserApi.type';
+} from '../apis/AccountApi.schema';
 import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
@@ -37,7 +37,6 @@ import type {
   UserTaskRewardPreview,
   UserTaskStatus,
 } from '../entity/userTask';
-import { FEEDBACK_TYPE, type FeedbackType } from '../enum';
 import type {
   ConfirmEmailVerifyRequest,
   FudanUISVerifyStatusData,
@@ -168,18 +167,12 @@ const mapListInviteRecordsFromApi = (
   totalPage: data.totalPage,
 });
 
-const hasFeedbackType = (types: FeedbackType[], type: FeedbackType): boolean =>
-  types.includes(type);
-
 const mapSubmitFeedbackRequest = (params: SubmitFeedbackRequest): AddFeedbackApiRequest => ({
   content: params.content,
   contact: params.contact,
   imageUrl: params.imageUrl?.trim() || undefined,
-  bugReport: hasFeedbackType(params.types, FEEDBACK_TYPE.BUG_REPORT),
-  suggestion: hasFeedbackType(params.types, FEEDBACK_TYPE.SUGGESTION),
-  consultation: hasFeedbackType(params.types, FEEDBACK_TYPE.CONSULTATION),
-  complaint: hasFeedbackType(params.types, FEEDBACK_TYPE.COMPLAINT),
-  other: hasFeedbackType(params.types, FEEDBACK_TYPE.OTHER),
+  browser: typeof navigator === 'undefined' ? undefined : navigator.userAgent,
+  type: params.type,
 });
 
 const mapTaskRewardPreviewFromApi = (

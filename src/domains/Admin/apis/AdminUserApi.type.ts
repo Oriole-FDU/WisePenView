@@ -4,7 +4,7 @@ import type {
   UserIdentityTypeApiValue,
   UserSexApiValue,
   UserStatusApiValue,
-} from '@/domains/User/apis/UserApi.type';
+} from '@/domains/User/apis/UserInformationApi.schema';
 import type { UserVerificationMode } from '@/domains/User/enum';
 
 export interface AdminUserApiModel {

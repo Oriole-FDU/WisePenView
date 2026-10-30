@@ -79,7 +79,7 @@ export interface FudanUISVerifyStatusData {
 }
 
 export interface SubmitFeedbackRequest {
-  types: FeedbackType[];
+  type: FeedbackType;
   content: string;
   contact: string;
   imageUrl?: string;

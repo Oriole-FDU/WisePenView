@@ -1,4 +1,4 @@
-import type { UserDisplayBaseApiResponse, UserIdentityTypeApiValue } from '../apis/UserApi.type';
+import type { UserDisplayApi, UserIdentityTypeApiValue } from '../apis/UserInformationApi.schema';
 import type { UserDisplayBase } from '../entity/user';
 
 export const normalizeIdentityTypeFromApi = (value: UserIdentityTypeApiValue): number =>
@@ -8,7 +8,7 @@ export const mapIdentityTypeToApi = (value: number | undefined): string | undefi
   value == null ? undefined : String(value);
 
 export const normalizeUserDisplayBaseFromApi = (
-  value: UserDisplayBaseApiResponse | null | undefined
+  value: Partial<UserDisplayApi> | null | undefined
 ): UserDisplayBase | undefined => {
   if (value == null) return undefined;
   return {

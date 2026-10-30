@@ -1,19 +1,26 @@
 import type { AxiosRequestConfig } from 'axios';
 
 import { executeApiContract } from '@/apis/executeApiContract';
-import { apiGetUnchecked, apiPostUnchecked, apiPutUnchecked } from '@/apis/request';
 
-import type {
-  AddFeedbackApiRequest,
-  ChangeUserInfoApiRequest,
-  ChangeUserProfileApiRequest,
-  CheckEmailVerifyApiRequest,
-  CheckFudanUISVerifyApiResponse,
-  InitiateEmailVerifyApiRequest,
-  InitiateFudanUISVerifyApiRequest,
-  ListUserInviteRecordsApiRequest,
-  ListUserInviteRecordsApiResponse,
-} from './UserApi.type';
+import {
+  AddFeedbackApiContract,
+  type AddFeedbackApiContractRequest,
+  ChangeUserInfoApiContract,
+  type ChangeUserInfoApiContractRequest,
+  ChangeUserProfileApiContract,
+  type ChangeUserProfileApiContractRequest,
+  CheckEmailVerifyApiContract,
+  type CheckEmailVerifyApiContractRequest,
+  CheckFudanUISVerifyApiContract,
+  type CheckFudanUISVerifyApiContractResponse,
+  InitiateEmailVerifyApiContract,
+  type InitiateEmailVerifyApiContractRequest,
+  InitiateFudanUISVerifyApiContract,
+  type InitiateFudanUISVerifyApiContractRequest,
+  ListUserInviteRecordsApiContract,
+  type ListUserInviteRecordsApiContractRequest,
+  type ListUserInviteRecordsApiContractResponse,
+} from './AccountApi.contract';
 import {
   GetUserInfoApiContract,
   type GetUserInfoApiResponse,
@@ -41,38 +48,40 @@ async function listUserSearchSuggestions(
   return executeApiContract(ListUserSearchSuggestionsApiContract, req);
 }
 
-function initiateEmailVerify(req: InitiateEmailVerifyApiRequest): Promise<void> {
-  return apiPostUnchecked('/user/verify/initiateEmailVerify', null, { params: req });
+async function initiateEmailVerify(req: InitiateEmailVerifyApiContractRequest): Promise<void> {
+  await executeApiContract(InitiateEmailVerifyApiContract, req);
 }
 
-function initiateFudanUISVerify(req: InitiateFudanUISVerifyApiRequest): Promise<void> {
-  return apiPostUnchecked('/user/verify/initiateFudanUISVerify', null, { params: req });
+async function initiateFudanUISVerify(
+  req: InitiateFudanUISVerifyApiContractRequest
+): Promise<void> {
+  await executeApiContract(InitiateFudanUISVerifyApiContract, req);
 }
 
-function checkFudanUISVerify(): Promise<CheckFudanUISVerifyApiResponse> {
-  return apiGetUnchecked('/user/verify/checkFudanUISVerify');
+function checkFudanUISVerify(): Promise<CheckFudanUISVerifyApiContractResponse> {
+  return executeApiContract(CheckFudanUISVerifyApiContract, undefined);
 }
 
-function checkEmailVerify(req: CheckEmailVerifyApiRequest): Promise<void> {
-  return apiGetUnchecked('/user/verify/checkEmailVerify', { params: req });
+async function checkEmailVerify(req: CheckEmailVerifyApiContractRequest): Promise<void> {
+  await executeApiContract(CheckEmailVerifyApiContract, req);
 }
 
-function changeUserInfo(req: ChangeUserInfoApiRequest): Promise<void> {
-  return apiPutUnchecked('/user/changeUserInfo', req);
+async function changeUserInfo(req: ChangeUserInfoApiContractRequest): Promise<void> {
+  await executeApiContract(ChangeUserInfoApiContract, req);
 }
 
-function changeUserProfile(req: ChangeUserProfileApiRequest): Promise<void> {
-  return apiPutUnchecked('/user/changeUserProfile', req);
+async function changeUserProfile(req: ChangeUserProfileApiContractRequest): Promise<void> {
+  await executeApiContract(ChangeUserProfileApiContract, req);
 }
 
-function addFeedback(req: AddFeedbackApiRequest): Promise<void> {
-  return apiPostUnchecked('/system/feedback/addFeedback', req);
+async function addFeedback(req: AddFeedbackApiContractRequest): Promise<void> {
+  await executeApiContract(AddFeedbackApiContract, req);
 }
 
 function listInviteRecords(
-  req: ListUserInviteRecordsApiRequest
-): Promise<ListUserInviteRecordsApiResponse> {
-  return apiGetUnchecked('/user/invite/listRecords', { params: req });
+  req: ListUserInviteRecordsApiContractRequest
+): Promise<ListUserInviteRecordsApiContractResponse> {
+  return executeApiContract(ListUserInviteRecordsApiContract, req);
 }
 
 export const UserApi = {

@@ -1,5 +1,5 @@
 {
-  "checkedContracts": 97,
+  "checkedContracts": 105,
   "uncheckedCalls": {
     "src/domains/Admin/apis/AdminMessageApi.ts": 2,
     "src/domains/Admin/apis/AdminUserApi.ts": 5,
@@ -8,7 +8,6 @@
     "src/domains/Message/apis/MessageApi.ts": 2,
     "src/domains/Resource/apis/ResourcePlacementApi.ts": 6,
     "src/domains/Speech/apis/SpeechApi.ts": 1,
-    "src/domains/User/apis/UserApi.ts": 8,
     "src/domains/User/apis/UserTaskApi.ts": 2,
     "src/domains/User/apis/UserTourApi.ts": 2,
     "src/domains/Wallet/apis/WalletApi.ts": 4

@@ -1,5 +1,5 @@
 import type { OptionalPageApiRequest, PageR } from '@/apis/api.type';
-import type { UserDisplayBaseApiResponse } from '@/domains/User/apis/UserApi.type';
+import type { UserDisplayApi as UserDisplayBaseApiResponse } from '@/domains/User/apis/UserInformationApi.schema';
 
 export interface RedeemVoucherApiRequest {
   voucherCode: string;

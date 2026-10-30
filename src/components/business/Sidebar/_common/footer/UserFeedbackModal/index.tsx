@@ -18,14 +18,14 @@ import type { UserFeedbackModalProps } from './index.type';
 import styles from './style.module.scss';
 
 interface FeedbackFormValues {
-  types: FeedbackType[];
+  type: FeedbackType | '';
   content: string;
   contact: string;
   image: File | null;
 }
 
 const DEFAULT_FORM_VALUES: FeedbackFormValues = {
-  types: [],
+  type: '',
   content: '',
   contact: '',
   image: null,
@@ -82,6 +82,10 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
 
   const { loading: submitting, run: runSubmitFeedback } = useApi(
     async (values: FeedbackFormValues) => {
+      if (!isFeedbackType(values.type)) {
+        toast.warning(t('feedback.typeRequired'));
+        return;
+      }
       let imageUrl: string | undefined;
       if (values.image) {
         const uploadResult = await imageService.uploadImage({
@@ -93,7 +97,7 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
       }
 
       await userService.submitFeedback({
-        types: values.types,
+        type: values.type,
         content: values.content,
         contact: values.contact,
         imageUrl,
@@ -110,7 +114,7 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
   );
 
   const validateForm = (): boolean => {
-    if (formValues.types.length === 0) {
+    if (formValues.type === '') {
       toast.warning(t('feedback.typeRequired'));
       return false;
     }
@@ -162,11 +166,10 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
         label={t('feedback.typeLabel')}
         aria-label={t('feedback.typeLabel')}
         placeholder={t('feedback.typeRequired')}
-        selectionMode="multiple"
-        value={formValues.types}
+        value={formValues.type}
         onChange={(values) => {
-          if (!Array.isArray(values)) return;
-          updateFormValue('types', values.map(String).filter(isFeedbackType));
+          const value = String(values);
+          updateFormValue('type', isFeedbackType(value) ? value : '');
         }}
         isDisabled={submitting}
         isRequired
