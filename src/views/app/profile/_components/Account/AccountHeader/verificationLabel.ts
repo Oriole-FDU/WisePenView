@@ -6,7 +6,6 @@ import {
 
 const VERIFICATION_MODE_LABEL_KEY = {
   [USER_VERIFICATION.EDU_EMAIL]: 'header.verification.EDU_EMAIL',
-  [USER_VERIFICATION.FDU_UIS_SYS]: 'header.verification.FDU_UIS_SYS',
   [USER_VERIFICATION.CAMPUS_IDENTITY_PROVIDER]: 'header.verification.CAMPUS_IDENTITY_PROVIDER',
 } as const satisfies Record<UserVerificationMode, string>;
 

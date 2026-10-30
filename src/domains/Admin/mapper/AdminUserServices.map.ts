@@ -1,9 +1,6 @@
 import type { AdminUser } from '@/domains/Admin';
-import { USER_STATUS } from '@/domains/User';
-import {
-  mapIdentityTypeToApi,
-  normalizeIdentityTypeFromApi,
-} from '@/domains/User/mapper/userEnum.mapper';
+import { IDENTITY } from '@/domains/User';
+import { normalizeIdentityTypeFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -14,7 +11,7 @@ import type {
   FetchAdminUserListApiResponse,
   GetAdminUserInfoApiResponse,
   ResetAdminUserPasswordApiRequest,
-} from '../apis/AdminUserApi.type';
+} from '../apis/AdminUserApi.schema';
 import type {
   ChangeAdminUserInfoRequest,
   ChangeAdminUserProfileRequest,
@@ -36,7 +33,7 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
     email: raw.email ?? undefined,
     mobile: raw.mobile ?? undefined,
     verificationMode: raw.verificationMode ?? null,
-    status: raw.status ?? USER_STATUS.UNIDENTIFIED,
+    status: raw.userStatus,
     createTime: raw.createTime ?? undefined,
     updateTime: raw.updateTime ?? undefined,
   };
@@ -44,15 +41,16 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
 
 const mapFetchAdminUserListRequest = (
   params: FetchAdminUserListRequest
-): FetchAdminUserListApiRequest => ({
-  page: params.page,
-  size: params.size,
-  keyword: params.keyword,
-  status: params.status,
-  ...(mapIdentityTypeToApi(params.identityType)
-    ? { identityType: mapIdentityTypeToApi(params.identityType) }
-    : {}),
-});
+): FetchAdminUserListApiRequest => {
+  const identityType = IDENTITY.getOption(params.identityType)?.key;
+  return {
+    page: params.page,
+    size: params.size,
+    keyword: params.keyword,
+    userStatus: params.status,
+    ...(identityType ? { identityType } : {}),
+  };
+};
 
 const mapFetchAdminUserListFromApi = (
   data: FetchAdminUserListApiResponse
@@ -80,10 +78,13 @@ const mapGetAdminUserInfoFromApi = (
 
 const mapChangeAdminUserInfoRequest = (
   params: ChangeAdminUserInfoRequest
-): ChangeAdminUserInfoApiRequest => ({
-  ...params,
-  identityType: mapIdentityTypeToApi(params.identityType),
-});
+): ChangeAdminUserInfoApiRequest => {
+  const { status, ...rest } = params;
+  return {
+    ...rest,
+    ...(status !== undefined ? { userStatus: status } : {}),
+  };
+};
 
 const mapChangeAdminUserProfileRequest = (
   params: ChangeAdminUserProfileRequest

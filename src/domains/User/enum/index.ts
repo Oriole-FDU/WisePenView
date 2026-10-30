@@ -17,11 +17,7 @@ export const USER_STATUS = defineEnum(['NORMAL', 'UNIDENTIFIED', 'BANNED'] as co
 export type UserStatus = EnumValue<typeof USER_STATUS>;
 
 /** 认证方式（与后端 UserVerificationMode 对齐） */
-export const USER_VERIFICATION = defineEnum([
-  'EDU_EMAIL',
-  'FDU_UIS_SYS',
-  'CAMPUS_IDENTITY_PROVIDER',
-] as const);
+export const USER_VERIFICATION = defineEnum(['EDU_EMAIL', 'CAMPUS_IDENTITY_PROVIDER'] as const);
 export type UserVerificationMode = EnumValue<typeof USER_VERIFICATION>;
 
 /** 认证提供方（与后端 verificationProviderCode 对齐） */

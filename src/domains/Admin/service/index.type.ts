@@ -19,7 +19,7 @@ export interface FetchAdminUserListRequest {
   size: number;
   keyword: string;
   status: UserStatus;
-  identityType: number;
+  identityType: 1 | 2 | 3;
 }
 
 export interface FetchAdminUserListResponse {
@@ -46,7 +46,7 @@ export interface ChangeAdminUserInfoRequest {
   email?: string | null;
   mobile?: string | null;
   status?: UserStatus;
-  identityType?: number;
+  identityType?: 1 | 2 | 3;
 }
 
 export interface ChangeAdminUserProfileRequest {
