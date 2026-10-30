@@ -1,14 +1,17 @@
 import { parseResourceActions } from '@/domains/_shared/access';
+import {
+  ASSET_RESOURCE_TYPE,
+  type AssetResourceType,
+} from '@/domains/_shared/apis/versionAsset.enum';
 import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
-import {
-  AssetResourceTypeEnum,
-  type SkillAssetApiInfo,
-  type SkillInfoApiResponse,
-  type SkillVersionBundleApiResponse,
-} from '../apis/SkillApi.type';
+import type {
+  SkillAssetApiInfo,
+  SkillInfoApiResponse,
+  SkillVersionBundleApiResponse,
+} from '../apis/SkillApi.schema';
 import type { SkillDetail, SkillFileNode, SkillSummary } from '../entity/skill';
 import type { SkillVersionStatus } from '../enum';
 import { SKILL_VERSION_STATUS } from '../enum';
@@ -82,7 +85,7 @@ function assetToFileNode(asset: SkillAssetApiInfo): SkillFileNode {
     path: normalizeDirectoryPath(asset.path),
     kind: 'file',
     language: resolveLanguage(name),
-    objectKey: asset.objectKey,
+    objectKey: asset.objectKey ?? undefined,
     uploadStatus: asset.uploadStatus,
     size: normalizeNonNegativeNumber(asset.size),
   };
@@ -167,18 +170,18 @@ function mapSkillSummary(item: {
   };
 }
 
-function resolveAssetResourceType(name: string): AssetResourceTypeEnum {
+function resolveAssetResourceType(name: string): AssetResourceType {
   const ext = name.split('.').pop()?.toLowerCase();
-  const typeMap: Record<string, AssetResourceTypeEnum> = {
-    md: AssetResourceTypeEnum.MD,
-    py: AssetResourceTypeEnum.PYTHON_SCRIPT,
-    txt: AssetResourceTypeEnum.TEXT,
-    json: AssetResourceTypeEnum.JSON,
-    yaml: AssetResourceTypeEnum.YAML,
-    yml: AssetResourceTypeEnum.YAML,
-    toml: AssetResourceTypeEnum.TOML,
+  const typeMap: Record<string, AssetResourceType> = {
+    md: ASSET_RESOURCE_TYPE.MD,
+    py: ASSET_RESOURCE_TYPE.PYTHON_SCRIPT,
+    txt: ASSET_RESOURCE_TYPE.TEXT,
+    json: ASSET_RESOURCE_TYPE.JSON,
+    yaml: ASSET_RESOURCE_TYPE.YAML,
+    yml: ASSET_RESOURCE_TYPE.YAML,
+    toml: ASSET_RESOURCE_TYPE.TOML,
   };
-  return typeMap[ext ?? ''] ?? AssetResourceTypeEnum.TEXT;
+  return typeMap[ext ?? ''] ?? ASSET_RESOURCE_TYPE.TEXT;
 }
 
 const mapSkillPermissionOverviewFromApi = (

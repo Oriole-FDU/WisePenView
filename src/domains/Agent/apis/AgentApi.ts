@@ -1,50 +1,62 @@
-import { apiPostUnchecked } from '@/apis/request';
-import type {
-  CancelUploadAssetsApiRequest,
-  InitUploadAssetsApiResponse,
-} from '@/domains/_shared/apis/versionAssetApi.type';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  AgentInfoApiResponse,
-  AgentVersionBundleApiResponse,
-  CreateAgentApiRequest,
-  DeleteAgentAssetsApiRequest,
-  InitUploadAgentAssetsApiRequest,
-  UpdateAgentInfoApiRequest,
-  UpdateAgentSpecApiRequest,
-} from './AgentApi.type';
+import {
+  CancelUploadAgentAssetsApiContract,
+  type CancelUploadAgentAssetsApiContractRequest,
+  ChangeAgentInfoApiContract,
+  type ChangeAgentInfoApiContractRequest,
+  CreateAgentApiContract,
+  type CreateAgentApiContractRequest,
+  type CreateAgentApiContractResponse,
+  DeleteAgentAssetsApiContract,
+  type DeleteAgentAssetsApiContractRequest,
+  GetAgentInfoApiContract,
+  type GetAgentInfoApiContractRequest,
+  type GetAgentInfoApiContractResponse,
+  GetAgentVersionBundleInfoApiContract,
+  type GetAgentVersionBundleInfoApiContractResponse,
+  InitUploadAgentAssetsApiContract,
+  type InitUploadAgentAssetsApiContractRequest,
+  type InitUploadAgentAssetsApiContractResponse,
+  PublishAgentVersionApiContract,
+  type PublishAgentVersionApiContractRequest,
+  UpdateAgentSpecApiContract,
+  type UpdateAgentSpecApiContractRequest,
+} from './AgentApi.contract';
 
-const createAgent = (body: CreateAgentApiRequest): Promise<string | undefined> =>
-  apiPostUnchecked('/agent/createAgent', body);
+const createAgent = (
+  body: CreateAgentApiContractRequest
+): Promise<CreateAgentApiContractResponse> => executeApiContract(CreateAgentApiContract, body);
 
-const getAgentInfo = (resourceId: string): Promise<AgentInfoApiResponse | undefined> =>
-  apiPostUnchecked('/agent/getAgentInfo', null, { params: { resourceId } });
+const getAgentInfo = (
+  req: GetAgentInfoApiContractRequest
+): Promise<GetAgentInfoApiContractResponse> => executeApiContract(GetAgentInfoApiContract, req);
 
 const getAgentVersionBundleInfo = (
   resourceId: string,
   version: number
-): Promise<AgentVersionBundleApiResponse | undefined> =>
-  apiPostUnchecked('/agent/getAgentVersionBundleInfo', null, { params: { resourceId, version } });
+): Promise<GetAgentVersionBundleInfoApiContractResponse> =>
+  executeApiContract(GetAgentVersionBundleInfoApiContract, { resourceId, version });
 
-const changeAgentInfo = (body: UpdateAgentInfoApiRequest): Promise<void> =>
-  apiPostUnchecked('/agent/changeAgentInfo', body);
+const changeAgentInfo = (body: ChangeAgentInfoApiContractRequest): Promise<null> =>
+  executeApiContract(ChangeAgentInfoApiContract, body);
 
-const updateAgentSpec = (body: UpdateAgentSpecApiRequest): Promise<void> =>
-  apiPostUnchecked('/agent/updateAgentSpec', body);
+const updateAgentSpec = (body: UpdateAgentSpecApiContractRequest): Promise<null> =>
+  executeApiContract(UpdateAgentSpecApiContract, body);
 
-const publishAgentVersion = (resourceId: string): Promise<void> =>
-  apiPostUnchecked('/agent/publishAgentVersion', { resourceId });
+const publishAgentVersion = (body: PublishAgentVersionApiContractRequest): Promise<null> =>
+  executeApiContract(PublishAgentVersionApiContract, body);
 
 const initUploadAgentAssets = (
-  body: InitUploadAgentAssetsApiRequest
-): Promise<InitUploadAssetsApiResponse | undefined> =>
-  apiPostUnchecked('/agent/initUploadAgentAssets', body);
+  body: InitUploadAgentAssetsApiContractRequest
+): Promise<InitUploadAgentAssetsApiContractResponse> =>
+  executeApiContract(InitUploadAgentAssetsApiContract, body);
 
-const deleteAgentAssets = (body: DeleteAgentAssetsApiRequest): Promise<void> =>
-  apiPostUnchecked('/agent/deleteAgentAssets', body);
+const deleteAgentAssets = (body: DeleteAgentAssetsApiContractRequest): Promise<null> =>
+  executeApiContract(DeleteAgentAssetsApiContract, body);
 
-const cancelUploadAgentAssets = (body: CancelUploadAssetsApiRequest): Promise<void> =>
-  apiPostUnchecked('/agent/cancelUploadAgentAssets', body);
+const cancelUploadAgentAssets = (body: CancelUploadAgentAssetsApiContractRequest): Promise<null> =>
+  executeApiContract(CancelUploadAgentAssetsApiContract, body);
 
 export const AgentApi = {
   createAgent,

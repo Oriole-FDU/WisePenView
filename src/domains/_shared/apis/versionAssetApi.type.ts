@@ -1,64 +1,25 @@
-import type { JavaLongApiValue } from '@/apis/api.type';
+import type {
+  AssetResourceTypeApiValue,
+  VersionAssetInfoApi,
+  VersionBundleApi,
+} from './versionAssetApi.schema';
 
-export type VersionStatusApiValue = 'DRAFT' | 'PUBLISHED';
-export type AssetUploadStatusApiValue = 'UPLOADING' | 'AVAILABLE';
-
-export interface VersionAssetApiInfo<AssetResourceType extends string = string> {
-  id?: string;
-  name?: string;
-  path?: string;
-  objectKey?: string;
-  assetResourceType?: AssetResourceType;
-  uploadStatus?: AssetUploadStatusApiValue;
-  size?: JavaLongApiValue;
-  pendingUpload?: {
-    objectKey?: string;
-    assetResourceType?: AssetResourceType;
-    expectedSize?: JavaLongApiValue;
-    createTime?: number;
-  } | null;
-}
-
-export interface VersionBundleApiResponse<AssetResourceType extends string = string> {
-  version?: number;
-  status?: VersionStatusApiValue;
-  assets?: VersionAssetApiInfo<AssetResourceType>[];
-  resourceId?: string;
-}
-
-export interface VersionResourceInfoApiResponse {
-  name?: string;
-  description?: string;
-  version?: number;
-  sourceType?: string;
-}
-
-export interface InitUploadAssetApiItem<AssetResourceType extends string = string> {
-  name: string;
-  path: string;
+export type VersionAssetApiInfo<
+  AssetResourceType extends AssetResourceTypeApiValue = AssetResourceTypeApiValue,
+> = Omit<VersionAssetInfoApi, 'assetResourceType'> & {
   assetResourceType: AssetResourceType;
-  md5?: string;
-  expectedSize?: number;
-}
+};
 
-export interface AssetUploadTicketApiResponse {
-  assetId?: string;
-  path?: string;
-  name?: string;
-  objectKey?: string;
-  putUrl?: string;
-  callbackHeader?: string;
-  flashUploaded?: boolean;
-}
+export type VersionBundleApiResponse<
+  AssetResourceType extends AssetResourceTypeApiValue = AssetResourceTypeApiValue,
+> = Omit<VersionBundleApi, 'assets'> & {
+  assets: VersionAssetApiInfo<AssetResourceType>[];
+};
 
-export interface InitUploadAssetsApiResponse {
-  resourceId?: string;
-  version?: number;
-  assetUploadTickets?: AssetUploadTicketApiResponse[];
-}
-
-export interface CancelUploadAssetsApiRequest {
-  resourceId: string;
-  draftVersion: number;
-  uploads: { assetId: string; objectKey: string }[];
-}
+export type {
+  AssetUploadTicketApiResponse,
+  CancelUploadAssetsApiRequest,
+  InitUploadAssetApiItem,
+  InitUploadAssetsApiResponse,
+  AIResourceInfoApi as VersionResourceInfoApiResponse,
+} from './versionAssetApi.schema';

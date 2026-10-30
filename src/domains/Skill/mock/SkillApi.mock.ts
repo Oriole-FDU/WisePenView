@@ -1,4 +1,3 @@
-import type { VersionResourceInfoApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
 import { mockObjects } from '@/domains/_shared/mock/ossClient.mock';
 import { mockResponse } from '@/domains/_shared/mock/response';
 import {
@@ -10,15 +9,22 @@ import {
 import { addMockResource, getMockResource } from '@/domains/Resource/mock/resourceStore';
 
 import type { SkillApi as SkillApiContract } from '../apis/SkillApi';
-import type { SkillVersionBundleApiResponse } from '../apis/SkillApi.type';
+import type { SkillInfoApiResponse, SkillVersionBundleApiResponse } from '../apis/SkillApi.schema';
 
-const infos = new Map<string, VersionResourceInfoApiResponse>();
+const infos = new Map<string, SkillInfoApiResponse['skillInfo']>();
 const bundles = new Map<string, SkillVersionBundleApiResponse>();
 const info = (id: string) => {
   getMockResource(id);
   let result = infos.get(id);
   if (!result) {
-    result = { name: 'mock_skill', description: '', version: 0 };
+    result = {
+      resourceId: id,
+      name: 'mock_skill',
+      description: '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.parse('2026-03-01T00:00:00Z'),
+    };
     infos.set(id, result);
   }
   return result;
@@ -41,6 +47,8 @@ const bundle = (id: string, version: number) => {
           objectKey,
           assetResourceType: 'MD',
           uploadStatus: 'AVAILABLE',
+          size: '14',
+          pendingUpload: null,
         },
       ],
     };
@@ -51,7 +59,14 @@ const bundle = (id: string, version: number) => {
 export const SkillApi: typeof SkillApiContract = {
   createSkill: async ({ title, name, description, mountTargetTagId }) => {
     const id = addMockResource(title, 'SKILL', mountTargetTagId);
-    infos.set(id, { name, description, version: 0 });
+    infos.set(id, {
+      resourceId: id,
+      name: name ?? 'mock_skill',
+      description: description ?? '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.now(),
+    });
     return id;
   },
   forkSkill: async ({ resourceId, forkedResourceName }) => {
@@ -68,10 +83,11 @@ export const SkillApi: typeof SkillApiContract = {
     securityToken: 'mock',
     bucket: 'mock',
     region: 'mock',
-    expiration: '2099-01-01T00:00:00Z',
+    expiration: Date.parse('2099-01-01T00:00:00Z'),
   }),
   changeSkillInfo: async ({ resourceId, name, description }) => {
     if (resourceId) Object.assign(info(resourceId), { name, description });
+    return null;
   },
   initUploadSkillAssets: async ({ resourceId, draftVersion, assets }) => {
     const target = bundle(resourceId, draftVersion);
@@ -83,10 +99,12 @@ export const SkillApi: typeof SkillApiContract = {
   },
   cancelUploadSkillAssets: async ({ resourceId, draftVersion, uploads }) => {
     cancelMockVersionUploads(bundle(resourceId, draftVersion), uploads);
+    return null;
   },
   deleteSkillAssets: async ({ resourceId, draftVersion, assetIds }) => {
     const target = bundle(resourceId, draftVersion);
     deleteMockVersionAssets(target, assetIds);
+    return null;
   },
   publishSkillVersion: async ({ resourceId }) => {
     const data = info(resourceId);
@@ -100,5 +118,6 @@ export const SkillApi: typeof SkillApiContract = {
       version: version + 1,
       status: 'DRAFT',
     });
+    return null;
   },
 };

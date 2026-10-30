@@ -1,4 +1,3 @@
-import type { VersionResourceInfoApiResponse } from '@/domains/_shared/apis/versionAssetApi.type';
 import { mockResponse } from '@/domains/_shared/mock/response';
 import {
   assertMockVersionUploadsComplete,
@@ -9,15 +8,22 @@ import {
 import { addMockResource, getMockResource } from '@/domains/Resource/mock/resourceStore';
 
 import type { AgentApi as AgentApiContract } from '../apis/AgentApi';
-import type { AgentVersionBundleApiResponse } from '../apis/AgentApi.type';
+import type { AgentInfoApiResponse, AgentVersionBundleApiResponse } from '../apis/AgentApi.schema';
 
-const infos = new Map<string, VersionResourceInfoApiResponse>();
+const infos = new Map<string, AgentInfoApiResponse['agentInfo']>();
 const bundles = new Map<string, AgentVersionBundleApiResponse>();
 const info = (id: string) => {
   getMockResource(id);
   let result = infos.get(id);
   if (!result) {
-    result = { name: '', description: '', version: 0 };
+    result = {
+      resourceId: id,
+      name: '',
+      description: '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.parse('2026-03-01T00:00:00Z'),
+    };
     infos.set(id, result);
   }
   return result;
@@ -30,7 +36,7 @@ const bundle = (id: string, version: number) => {
       resourceId: id,
       version,
       status: version <= (info(id).version ?? 0) ? 'PUBLISHED' : 'DRAFT',
-      spec: {},
+      spec: null,
       assets: [],
     };
     bundles.set(key, result);
@@ -40,19 +46,28 @@ const bundle = (id: string, version: number) => {
 export const AgentApi: typeof AgentApiContract = {
   createAgent: async ({ title, name, description, mountTargetTagId }) => {
     const id = addMockResource(title, 'AGENT', mountTargetTagId);
-    infos.set(id, { name, description, version: 0 });
+    infos.set(id, {
+      resourceId: id,
+      name: name ?? '',
+      description: description ?? '',
+      version: 0,
+      sourceType: 'MANUAL',
+      updateTime: Date.now(),
+    });
     return id;
   },
-  getAgentInfo: (resourceId) =>
+  getAgentInfo: ({ resourceId }) =>
     mockResponse({ resourceInfo: getMockResource(resourceId), agentInfo: info(resourceId) }),
   getAgentVersionBundleInfo: (resourceId, version) => mockResponse(bundle(resourceId, version)),
   changeAgentInfo: async ({ resourceId, name, description }) => {
     Object.assign(info(resourceId), { name, description });
+    return null;
   },
   updateAgentSpec: async ({ resourceId, draftVersion, spec }) => {
     bundle(resourceId, draftVersion).spec = structuredClone(spec);
+    return null;
   },
-  publishAgentVersion: async (resourceId) => {
+  publishAgentVersion: async ({ resourceId }) => {
     const data = info(resourceId);
     const version = (data.version ?? 0) + 1;
     const published = bundle(resourceId, version);
@@ -64,6 +79,7 @@ export const AgentApi: typeof AgentApiContract = {
       version: version + 1,
       status: 'DRAFT',
     });
+    return null;
   },
   initUploadAgentAssets: async ({ resourceId, draftVersion, assets }) => {
     const target = bundle(resourceId, draftVersion);
@@ -75,9 +91,11 @@ export const AgentApi: typeof AgentApiContract = {
   },
   cancelUploadAgentAssets: async ({ resourceId, draftVersion, uploads }) => {
     cancelMockVersionUploads(bundle(resourceId, draftVersion), uploads);
+    return null;
   },
   deleteAgentAssets: async ({ resourceId, draftVersion, assetIds }) => {
     const target = bundle(resourceId, draftVersion);
     deleteMockVersionAssets(target, assetIds);
+    return null;
   },
 };
