@@ -122,8 +122,8 @@ for (const path of contractFiles) {
       if (!placement || !allowedPlacements.has(placement)) {
         errors.push(`${relativePath}:${node.name.text} 的 requestPlacement 非法`);
       }
-      if (transport !== 'json') {
-        errors.push(`${relativePath}:${node.name.text} 必须使用 JSON Contract`);
+      if (transport !== 'json' && transport !== 'text') {
+        errors.push(`${relativePath}:${node.name.text} 必须使用 JSON 或 text Contract`);
       }
       if ((method === 'GET' || method === 'DELETE') && placement === 'body') {
         errors.push(`${relativePath}:${node.name.text} 的 ${method} 请求不能使用 body`);

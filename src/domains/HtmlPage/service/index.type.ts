@@ -1,12 +1,12 @@
 import type { ResourceItem, ResourcePermissionOverview } from '@/domains/Resource';
 
-import type { SingleHtmlPageStatusApiValue } from '../apis/HtmlPageApi.type';
+import type { SingleHtmlPageStatusApiValue } from '../apis/HtmlPageApi.schema';
 
 export interface HtmlPageVersionInfo {
   version: number;
   status: SingleHtmlPageStatusApiValue;
   size?: number;
-  updateTime?: string;
+  updateTime?: number;
   lastEditedAtText: string;
 }
 

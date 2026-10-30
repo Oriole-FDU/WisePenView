@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig } from 'axios';
 
 import { type ApiContract, parseApiRequest, parseApiResponse } from '@/apis/contract';
-import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from '@/apis/request';
+import { apiDelete, apiGet, apiGetText, apiPatch, apiPost, apiPut } from '@/apis/request';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 const assertSupportedPlacement = (contract: ApiContract<unknown, unknown>): void => {
@@ -34,6 +34,16 @@ export async function executeApiContract<Request, Response>(
   const requestConfig = withQuery(contract, request, config);
 
   let data: unknown;
+  if (contract.transport === 'text') {
+    if (contract.method !== 'GET') {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: `${contract.name} 的文本 transport 仅支持 GET`,
+      });
+    }
+    data = await apiGetText(contract.endpoint, requestConfig);
+    return parseApiResponse(contract, data);
+  }
+
   switch (contract.method) {
     case 'GET':
       data = await apiGet(contract.endpoint, requestConfig);
