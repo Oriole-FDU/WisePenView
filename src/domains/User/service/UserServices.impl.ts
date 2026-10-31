@@ -7,7 +7,6 @@ import type { User, UserAccountProfile } from '@/domains/User';
 import { UserServicesMap } from '../mapper/UserServices.map';
 import type {
   IUserService,
-  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
@@ -43,12 +42,6 @@ const listUserSearchSuggestions = async (params: ListUserSearchSuggestionsReques
     ...(params.size == null ? {} : { size: params.size }),
   });
   return UserServicesMap.mapSearchUsersFromApi(data);
-};
-
-const listInviteRecords = async (params: ListUserInviteRecordsRequest) => {
-  const query = UserServicesMap.mapListInviteRecordsRequest(params);
-  const data = await UserApi.listInviteRecords(query);
-  return UserServicesMap.mapListInviteRecordsFromApi(data);
 };
 
 const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesRequest) => {
@@ -121,7 +114,6 @@ export const createUserServices = (): IUserService => {
     getUserInfo,
     searchUsers,
     listUserSearchSuggestions,
-    listInviteRecords,
     queryUserSearchCandidates,
     updateUserInfo,
   };

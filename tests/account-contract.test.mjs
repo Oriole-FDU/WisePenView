@@ -20,7 +20,6 @@ try {
         export {
           ChangeUserInfoApiContract,
           ChangeUserProfileApiContract,
-          ListUserInviteRecordsApiContract,
         } from '@/domains/User/apis/AccountApi.contract';
         export {
           CheckEmailVerifyApiContract,
@@ -30,9 +29,10 @@ try {
         } from '@/domains/UserVerification/apis/UserVerificationApi.contract';
         export { UserVerificationApi } from '@/domains/UserVerification/mock/UserVerificationApi.mock';
         export { AddFeedbackApiContract } from '@/domains/Feedback/apis/FeedbackApi.contract';
+        export { ListUserInviteRecordsApiContract } from '@/domains/UserInvite/apis/UserInviteApi.contract';
         export { FeedbackApi } from '@/domains/Feedback/mock/FeedbackApi.mock';
-        export { UserServicesMap } from '@/domains/User/mapper/UserServices.map';
-        export { UserApi } from '@/domains/User/mock/UserApi.mock';
+        export { UserInviteServicesMap } from '@/domains/UserInvite/mapper/UserInviteServices.map';
+        export { UserInviteApi } from '@/domains/UserInvite/mock/UserInviteApi.mock';
       `,
       resolveDir: root,
     },
@@ -55,8 +55,8 @@ try {
     ListUserInviteRecordsApiContract,
     parseApiRequest,
     parseApiResponse,
-    UserApi,
-    UserServicesMap,
+    UserInviteApi,
+    UserInviteServicesMap,
     UserVerificationApi,
   } = await import(pathToFileURL(outfile).href);
 
@@ -114,10 +114,10 @@ try {
   assert.equal(typeof fudanStatus.requireAction, 'boolean');
 
   const inviteRecords = parseApiResponse(ListUserInviteRecordsApiContract, {
-    ...(await UserApi.listInviteRecords({ page: 1, size: 20 })),
+    ...(await UserInviteApi.listInviteRecords({ page: 1, size: 20 })),
     total: '2',
   });
-  const mappedInvites = UserServicesMap.mapListInviteRecordsFromApi(inviteRecords);
+  const mappedInvites = UserInviteServicesMap.mapListInviteRecordsFromApi(inviteRecords);
   assert.equal(mappedInvites.records.length, 2);
   assert.equal(mappedInvites.records[0].status, 'REWARDED');
   assert.equal(typeof mappedInvites.records[0].createTime, 'number');

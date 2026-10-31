@@ -1,4 +1,3 @@
-export type { UserInviteRecord, UserInviteRecordList, UserInviteStatus } from './entity/invite';
 export type {
   User,
   UserAccountInfo,
@@ -22,9 +21,9 @@ export {
   USER_VERIFICATION,
   USER_VERIFICATION_PROVIDER,
 } from './enum';
+export { normalizeUserDisplayBaseFromApi } from './mapper/userEnum.mapper';
 export type {
   IUserService,
-  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,

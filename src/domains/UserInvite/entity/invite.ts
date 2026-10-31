@@ -1,9 +1,8 @@
-import type { UserDisplayBase } from './user';
+import type { UserDisplayBase } from '@/domains/User';
 
-/** 邀请关系状态：后端被邀请人完成身份认证后由 BOUND 变为 REWARDED */
+/** 邀请关系状态：后端被邀请人完成身份认证后由 BOUND 变为 REWARDED。 */
 export type UserInviteStatus = 'BOUND' | 'REWARDED';
 
-/** 当前用户发出的邀请记录 */
 export interface UserInviteRecord {
   id: string;
   inviteeUserId: string;

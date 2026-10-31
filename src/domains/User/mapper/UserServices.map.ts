@@ -1,24 +1,15 @@
-import type {
-  User,
-  UserAccountProfile,
-  UserInviteRecord,
-  UserInviteRecordList,
-  UserSearchUser,
-} from '@/domains/User';
+import type { User, UserAccountProfile, UserSearchUser } from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
-  ListUserInviteRecordsApiRequest,
-  ListUserInviteRecordsApiResponse,
-  UserInviteRecordApiResponse,
 } from '../apis/AccountApi.schema';
 import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
-import type { ListUserInviteRecordsRequest, UpdateUserInfoRequest } from '../service/index.type';
+import type { UpdateUserInfoRequest } from '../service/index.type';
 import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
@@ -84,32 +75,6 @@ const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchU
 const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =>
   data.map(mapSearchUserFromApi);
 
-const mapListInviteRecordsRequest = (
-  params: ListUserInviteRecordsRequest
-): ListUserInviteRecordsApiRequest => ({
-  page: params.page,
-  size: params.size,
-});
-
-const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRecord => ({
-  id: normalizeId(data.id),
-  inviteeUserId: normalizeId(data.inviteeUserId),
-  invitee: normalizeUserDisplayBaseFromApi(data.inviteeDisplay),
-  status: data.status === 'REWARDED' ? 'REWARDED' : 'BOUND',
-  createTime: data.createTime ?? undefined,
-  rewardTime: data.rewardTime ?? undefined,
-});
-
-const mapListInviteRecordsFromApi = (
-  data: ListUserInviteRecordsApiResponse
-): UserInviteRecordList => ({
-  records: data.list.map(mapInviteRecordFromApi),
-  total: data.total,
-  page: data.page,
-  size: data.size,
-  totalPage: data.totalPage,
-});
-
 const mapUpdateUserInfoRequests = (
   params: UpdateUserInfoRequest
 ): {
@@ -145,7 +110,5 @@ export const UserServicesMap = {
   mapAccountProfileFromApi,
   mapUserSafeFromAccountProfile,
   mapSearchUsersFromApi,
-  mapListInviteRecordsRequest,
-  mapListInviteRecordsFromApi,
   mapUpdateUserInfoRequests,
 };

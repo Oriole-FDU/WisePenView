@@ -23,6 +23,7 @@ import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
+import type { IUserInviteService } from '@/domains/UserInvite';
 import type { IUserTaskService } from '@/domains/UserTask';
 import type { IUserTourService } from '@/domains/UserTour';
 import type { IUserVerificationService } from '@/domains/UserVerification';
@@ -54,6 +55,7 @@ export interface ServicesContextValue {
   speechService: ISpeechService;
   tagService: ITagService;
   userService: IUserService;
+  userInviteService: IUserInviteService;
   userTaskService: IUserTaskService;
   userTourService: IUserTourService;
   userVerificationService: IUserVerificationService;

@@ -35,6 +35,7 @@ import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl'
 import { createSpeechServices } from '@/domains/Speech/service/SpeechServices.impl';
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
 import { createUserServices } from '@/domains/User/service/UserServices.impl';
+import { createUserInviteServices } from '@/domains/UserInvite/service/UserInviteServices.impl';
 import { createUserTaskServices } from '@/domains/UserTask/service/UserTaskServices.impl';
 import { createUserTourServices } from '@/domains/UserTour/service/UserTourServices.impl';
 import { createUserVerificationServices } from '@/domains/UserVerification/service/UserVerificationServices.impl';
@@ -59,6 +60,7 @@ const resourceService = createResourceServices();
 const speechService = createSpeechServices();
 const tagService = createTagServices();
 const userService = createUserServices();
+const userInviteService = createUserInviteServices();
 const userTaskService = createUserTaskServices();
 const userTourService = createUserTourServices();
 const userVerificationService = createUserVerificationServices();
@@ -125,6 +127,7 @@ const servicesValue: ServicesContextValue = {
   speechService: speechService,
   tagService: tagService,
   userService: userService,
+  userInviteService,
   userTaskService,
   userTourService,
   userVerificationService,

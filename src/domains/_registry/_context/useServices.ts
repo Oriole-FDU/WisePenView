@@ -23,6 +23,7 @@ import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
+import type { IUserInviteService } from '@/domains/UserInvite';
 import type { IUserTaskService } from '@/domains/UserTask';
 import type { IUserTourService } from '@/domains/UserTour';
 import type { IUserVerificationService } from '@/domains/UserVerification';
@@ -69,6 +70,8 @@ export const useSkillService = (): ISkillService => useServicesContext().skillSe
 export const useSpeechService = (): ISpeechService => useServicesContext().speechService;
 export const useTagService = (): ITagService => useServicesContext().tagService;
 export const useUserService = (): IUserService => useServicesContext().userService;
+export const useUserInviteService = (): IUserInviteService =>
+  useServicesContext().userInviteService;
 export const useUserTaskService = (): IUserTaskService => useServicesContext().userTaskService;
 export const useUserTourService = (): IUserTourService => useServicesContext().userTourService;
 export const useUserVerificationService = (): IUserVerificationService =>

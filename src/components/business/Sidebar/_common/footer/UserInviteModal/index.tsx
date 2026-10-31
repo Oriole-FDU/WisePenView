@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
-import { useUserService } from '@/domains';
-import type { UserInviteRecord } from '@/domains/User';
+import { useUserInviteService } from '@/domains';
+import type { UserInviteRecord } from '@/domains/UserInvite';
 import { useApi } from '@/hooks/useApi';
 import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
 import { formatTimestampToDate } from '@/utils/format';
@@ -22,7 +22,7 @@ const INVITE_RECORD_PREVIEW_SIZE = 5;
 
 function UserInviteModal({ isOpen, onOpenChange, inviteCode }: UserInviteModalProps) {
   const { t } = useTranslation(['shell', 'common']);
-  const userService = useUserService();
+  const userInviteService = useUserInviteService();
   const [copiedTarget, setCopiedTarget] = useState<'code' | 'link' | null>(null);
   const hasInviteCode = Boolean(inviteCode);
   const inviteUrl = hasInviteCode ? buildAbsoluteAppUrl(buildRegisterInvitePath(inviteCode)) : '';
@@ -32,10 +32,13 @@ function UserInviteModal({ isOpen, onOpenChange, inviteCode }: UserInviteModalPr
     data: inviteRecordList,
     loading,
     error,
-  } = useApi(() => userService.listInviteRecords({ page: 1, size: INVITE_RECORD_PREVIEW_SIZE }), {
-    ready: isOpen,
-    refreshDeps: [isOpen],
-  });
+  } = useApi(
+    () => userInviteService.listInviteRecords({ page: 1, size: INVITE_RECORD_PREVIEW_SIZE }),
+    {
+      ready: isOpen,
+      refreshDeps: [isOpen],
+    }
+  );
   const inviteRecords = inviteRecordList?.records ?? [];
 
   const resolveInviteeName = (record: UserInviteRecord): string =>

@@ -29,6 +29,7 @@ export { SkillApi } from '@/domains/Skill/mock/SkillApi.mock';
 export { SpeechApi } from '@/domains/Speech/mock/SpeechApi.mock';
 export { TagApi } from '@/domains/Tag/mock/TagApi.mock';
 export { UserApi } from '@/domains/User/mock/UserApi.mock';
+export { UserInviteApi } from '@/domains/UserInvite/mock/UserInviteApi.mock';
 export { UserTaskApi } from '@/domains/UserTask/mock/UserTaskApi.mock';
 export { UserTourApi } from '@/domains/UserTour/mock/UserTourApi.mock';
 export { UserVerificationApi } from '@/domains/UserVerification/mock/UserVerificationApi.mock';

@@ -25,6 +25,7 @@ export {
   useSkillService,
   useSpeechService,
   useTagService,
+  useUserInviteService,
   useUserService,
   useUserTaskService,
   useUserTourService,
