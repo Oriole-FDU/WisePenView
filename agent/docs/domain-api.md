@@ -196,4 +196,4 @@ api -> views/components
 - [ ] 未新增 `any`。
 - [ ] 未在 API 层做 fallback、字段映射、UI 提示或缓存。
 - [ ] 同一 URL 没有重复定义。
-- [ ] `pnpm check:api-contracts` 通过，且迁移接口后同步下调 unchecked 基线。
+- [ ] `pnpm check:api-contracts` 通过，不存在绕过统一请求契约的调用。

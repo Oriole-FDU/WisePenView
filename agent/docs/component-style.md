@@ -126,7 +126,7 @@ ComponentName/
 - 组件样式不得直接引用 `--radius-*`，也不得硬编码圆角数值；需要更大或更小的几何值时报给应用语义层处理。新增语义 token 时同步更新本节表格。
 - 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
 - HeroUI 字段圆角通过 `radius.css` 中的 `--field-radius: var(--app-radius-field)` 单向桥接，不得在组件侧重新建立第二套字段圆角来源。
-- `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.scss`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。守卫亦能识别误加的 Less，但 `check:styles` 会直接拒绝该来源。
+- `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.scss`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。守卫亦会扫描误加的 Less；项目仍禁止引入 Less，但不再维护独立的样式迁移验收脚本。
 
 ## 七、层级（z-index）
 

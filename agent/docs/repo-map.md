@@ -32,7 +32,6 @@ API DTO 不得越过 mapper 直接进入组件；跨 service 依赖必须通过 
 corepack pnpm install --frozen-lockfile
 corepack pnpm lint
 corepack pnpm typecheck
-corepack pnpm check:mock
 corepack pnpm build
 ```
 

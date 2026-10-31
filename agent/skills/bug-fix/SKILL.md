@@ -23,5 +23,5 @@ description: 将 WisePenView 的 Bug 描述转成可验证的代码修复；适�
 
 - 根因有代码证据，不是只改变表面文案或增加兜底。
 - 修改范围只覆盖必要文件，旧路径和重复逻辑已删除。
-- 相关 lint、typecheck、mock contract 或 build 已通过。
+- 相关 lint、typecheck、API 边界检查或 build 已通过。
 - PR 描述可以直接使用 `agent/templates/pull-request.md`。

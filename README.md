@@ -70,8 +70,7 @@ Note AI Diff 与 PDF 使用本机展示数据。课程公告、作业等正式 s
 - `pnpm lint:fix`：自动整理导入、移除未使用的导入并修复可自动处理的问题
 - `pnpm format:check`：检查 JS、TS、JSON、Markdown 与 GitHub workflow 的格式
 - `pnpm typecheck`：执行 TypeScript 类型检查
-- `pnpm test`：执行鉴权契约、编辑会话、前端状态、云盘、HTML 页面、Note 链接等行为回归
-- `pnpm check:mock`：离线检查 mock API 与正式 service 的跨领域读写，不启动服务器
+- `pnpm test`：执行共享 Schema 与请求契约、鉴权、编辑会话、前端状态、HTML 安全约束及可观测性核心回归
 - `pnpm test:observability`：检查异常/HTTP 管线、隐私、预算和私有 source map 还原
 
 提交前由 lint-staged 对暂存的 JS、MJS、CJS、TS、TSX 文件执行 ESLint 自动修复，再交给

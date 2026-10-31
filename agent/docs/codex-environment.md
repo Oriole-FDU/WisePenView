@@ -16,7 +16,6 @@ corepack pnpm install --frozen-lockfile
 
 - Lint：`corepack pnpm lint`
 - Typecheck：`corepack pnpm typecheck`
-- Mock contract：`corepack pnpm check:mock`
 - Build：`corepack pnpm build`
 
 不要把启动 `pnpm dev` 或 `pnpm mock` 设置成自动 setup；运行态验证必须由任务明确要求。

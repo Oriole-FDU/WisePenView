@@ -5,8 +5,6 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const baselinePath = join(root, 'scripts/api-contract-baseline.json');
-const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
 
 const normalizePath = (path) => relative(root, path).split('\\').join('/');
 
@@ -140,8 +138,6 @@ for (const path of contractFiles) {
   visit(sourceFile);
 }
 
-const uncheckedCalls = {};
-const specialTransportCalls = {};
 const usedContractNames = new Set();
 for (const path of apiFiles) {
   const relativePath = normalizePath(path);
@@ -199,11 +195,17 @@ for (const path of apiFiles) {
       `${relativePath} 直接调用 ${directCheckedCount} 个 checked transport；必须改用 executeApiContract`
     );
   }
-  if (!Object.hasOwn(baseline.uncheckedCalls, relativePath) && checkedContractCallCount === 0) {
+  if (checkedContractCallCount === 0) {
     errors.push(`${relativePath} 未使用 executeApiContract，不能新增无契约 API 文件`);
   }
-  if (uncheckedCount > 0) uncheckedCalls[relativePath] = uncheckedCount;
-  if (textCount > 0) specialTransportCalls[relativePath] = { apiGetText: textCount };
+  if (uncheckedCount > 0) {
+    errors.push(
+      `${relativePath} 存在 ${uncheckedCount} 个 unchecked 调用；必须改用 executeApiContract`
+    );
+  }
+  if (textCount > 0) {
+    errors.push(`${relativePath} 直接调用 ${textCount} 个 apiGetText；必须改用 executeApiContract`);
+  }
 }
 
 for (const contractName of usedContractNames) {
@@ -217,7 +219,6 @@ for (const contractName of contractNames) {
   }
 }
 
-const directFetchCounts = {};
 for (const path of sourceFiles) {
   const relativePath = normalizePath(path);
   const sourceFile = parseSourceFile(path);
@@ -233,41 +234,9 @@ for (const path of sourceFiles) {
     ts.forEachChild(node, visit);
   };
   visit(sourceFile);
-  if (fetchCount > 0) directFetchCounts[relativePath] = fetchCount;
-}
-
-const compareExactCounts = (label, actual, expected) => {
-  const files = new Set([...Object.keys(actual), ...Object.keys(expected)]);
-  for (const file of files) {
-    const actualCount = actual[file] ?? 0;
-    const expectedCount = expected[file] ?? 0;
-    if (actualCount !== expectedCount) {
-      errors.push(
-        `${label}：${file} 当前 ${actualCount}，基线 ${expectedCount}；迁移完成后请同步下调基线`
-      );
-    }
+  if (fetchCount > 0) {
+    errors.push(`${relativePath} 存在 ${fetchCount} 个直接 fetch 调用；必须使用统一请求契约`);
   }
-};
-
-const flattenSpecialTransports = (counts) =>
-  Object.fromEntries(
-    Object.entries(counts).flatMap(([file, methods]) =>
-      Object.entries(methods).map(([method, count]) => [`${file}#${method}`, count])
-    )
-  );
-
-compareExactCounts('未契约化调用', uncheckedCalls, baseline.uncheckedCalls);
-compareExactCounts(
-  '特殊 transport',
-  flattenSpecialTransports(specialTransportCalls),
-  flattenSpecialTransports(baseline.specialTransports)
-);
-compareExactCounts('直接 fetch', directFetchCounts, baseline.directFetches);
-
-if (checkedContracts !== baseline.checkedContracts) {
-  errors.push(
-    `checked Contract 当前 ${checkedContracts}，基线 ${baseline.checkedContracts}；变更后请同步更新基线`
-  );
 }
 
 if (errors.length > 0) {
@@ -275,12 +244,7 @@ if (errors.length > 0) {
   errors.forEach((error) => console.error(`- ${error}`));
   process.exitCode = 1;
 } else {
-  const uncheckedTotal = Object.values(uncheckedCalls).reduce((sum, count) => sum + count, 0);
-  const specialTransportTotal = Object.values(specialTransportCalls).reduce(
-    (sum, methods) => sum + Object.values(methods).reduce((fileSum, count) => fileSum + count, 0),
-    0
-  );
   console.log(
-    `API Contract 边界检查通过：${checkedContracts} 个 Contract，${uncheckedTotal + specialTransportTotal} 个待迁移 REST 调用（${uncheckedTotal} unchecked，${specialTransportTotal} special），0 个重复 endpoint。`
+    `API Contract 边界检查通过：${checkedContracts} 个 Contract，无绕过契约的请求调用，0 个重复 endpoint。`
   );
 }

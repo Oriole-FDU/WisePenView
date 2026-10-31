@@ -1,6 +1,6 @@
 ---
 name: wisepen-ci-failure
-description: 定位 WisePenView GitHub Actions 的 lint、typecheck、mock contract、build 或 commitlint 失败。
+description: 定位 WisePenView GitHub Actions 的 lint、typecheck、API 边界检查、build 或 commitlint 失败。
 ---
 
 # 处理 CI 失败
