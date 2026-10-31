@@ -52,7 +52,9 @@ flowchart TD
   S[Skill]
   AG[Agent]
   H[HtmlPage]
-  CH[Chat<br/>Session / Completion / Model / Tool]
+  CHS[Chat Session<br/>History / Attachment]
+  CHT[Chat Turn<br/>Completion / Recovery]
+  CHC[Chat Config<br/>Model / Provider / Tool]
   CO[Course Application]
   DR[Drive Application]
   RA[Resource Access Overview]
@@ -78,8 +80,9 @@ flowchart TD
   R --> S
   R --> AG
   R --> H
-  G --> CH
-  R --> CH
+  G --> CHC
+  R --> CHC
+  CHS --> CHT
   G --> CO
   R --> CO
   I --> CO
@@ -99,7 +102,7 @@ flowchart TD
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef partial fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
   classDef decision fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:2px
-  class W,A,U,G,R,I,CM,F,C,D,N,S,AG,H,CH,DR completed
+  class W,A,U,G,R,I,CM,F,C,D,N,S,AG,H,CHS,CHT,CHC,DR completed
   class T,AD,RA partial
   class CO decision
 ```
@@ -108,7 +111,7 @@ flowchart TD
 
 - 已完成：`W Shared Wire Schema`、`A AccessPolicy`、`U UserInformation`、`G Group`、`R ResourceCore`。
 - 已完成：`I Resource Interaction`、`CM Resource Comment`、`F Resource Favorite`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。原 `Interact` 聚合域已删除，没有保留转发壳。
-- 已完成：Message、Wallet、UserTask、UserTour、Chat Session/Model/Provider/Tool/Speech 与 SSE；Drive 保持纯前端聚合。
+- 已完成：Message、Wallet、UserTask、UserTour、ChatSession、ChatTurn、ChatConfig、Speech 与 SSE；Drive 保持纯前端聚合。原 Chat 聚合域已删除。
 - 部分完成：`T Tag` 的通用树、命令、策略已完成，scoped endpoint 仍阻塞；`AD Admin` 的用户管理已完成，公告接口仍阻塞。
 - 部分完成：`RA Resource Access` 已从前端 ResourceCore 拆成独立聚合域；后端 Overview endpoint 尚未上线，权限补全 mapper 暂时不能删除。
 - 待业务决策：`CO Course` 是否升级为正式后端域；当前仍只能视为高级 Group 聚合。
@@ -127,13 +130,14 @@ flowchart TD
 
 ### 当前实际依赖边
 
-下表是 2026-10-31 按当前源码扫描得到的 37 组跨 domain 边。`强` 表示类型或协议无法独立成立，`软` 表示只发生在 service 编排、mock 或展示摘要场景。
+下表是 2026-10-31 按当前源码扫描得到的 38 组跨 domain 边。`强` 表示类型或协议无法独立成立，`软` 表示只发生在 service 编排、mock 或展示摘要场景。
 
 | 依赖边                                                                               | 主要位置                             | 判断                                                        |
 | ------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------------------------------------------- |
 | Admin -> User                                                                        | Admin user DTO、枚举、mapper         | 强；Admin 是聚合器，方向合理                                |
 | Agent -> Resource                                                                    | ResourceItem 内嵌、权限概览、service | 强；后续应收敛为 ResourceSummary                            |
-| Chat -> Group、Resource                                                              | 群聊输入选项、资源附件               | 软；Chat 在上层，方向合理                                   |
+| ChatConfig -> Group、Resource                                                        | 群聊输入选项、Agent/Skill 资源       | 软；配置聚合在上层，方向合理                                |
+| ChatTurn -> ChatSession                                                              | 流式消息与历史消息共用 UI 消息模型   | 强；Turn 可依赖 Session，反向禁止                           |
 | Course -> Group、Resource、ResourceInteraction、Tag                                  | 课程聚合 service、mapper             | 软；Course 只消费资源级互动，不依赖评论或收藏               |
 | Document -> Resource、User                                                           | 详情内嵌 ResourceItem、作者摘要      | 强；后续应收敛为 ResourceSummary/UserSummary                |
 | Drive -> Resource、Tag、User                                                         | 浏览模型与系统文件夹                 | 软；Drive 是产品聚合层                                      |
@@ -150,7 +154,7 @@ flowchart TD
 | Tag -> User                                                                          | 创建者摘要                           | 强；应使用 UserSummary                                      |
 | Wallet -> Group、User                                                                | 操作人摘要、mock 群组钱包            | User 为强依赖；Group 仅 mock 软依赖                         |
 
-当前代码没有 service 实现级循环，ResourceAccess 的资源叶域依赖与 Course 的编排依赖都通过 registry 注入。`ResourceInteraction`、`ResourceComment`、`ResourceFavorite` 已互不依赖，并由 `check:boundaries` 固化；三者也不得反向依赖 ResourceAccess。
+当前代码没有 service 实现级循环，ResourceAccess 的资源叶域依赖与 Course 的编排依赖都通过 registry 注入。Resource 互动三域互不依赖；ChatConfig 与 ChatSession 互不依赖，ChatTurn 只依赖 ChatSession 的消息模型；两个拆分组都由 `check:boundaries` 固化。
 
 ## 四、推荐 API 域拆分
 
@@ -181,14 +185,12 @@ flowchart TD
 
 当前 Chat API 文件应拆成独立 Schema/Contract 组：
 
-- `ChatSessionApi`
-- `ChatCompletionApi`
-- `ChatModelApi`
-- `ChatProviderApi`
-- `ChatToolApi`
+- `ChatSession`：会话、历史与附件。
+- `ChatTurn`：Completion、SSE、recovery、active turn 与 cancel。
+- `ChatConfig`：模型、Provider、Tool 与输入能力选项。
 - `SpeechCredentialApi`
 
-它们都属于 Chat 产品边界，但不属于同一个 service 变化原因。Chat 主服务可以继续做编排，API Contract 与测试应独立。
+它们属于同一产品体验，但变化原因不同；UI 组合根可以同时消费三个 service，不再保留 Chat 聚合 service。
 
 Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` 等 Schema，但是否共用 Controller 由后端资源语义决定，不以“防止重复代码”为名合并两个业务入口。
 
@@ -414,14 +416,14 @@ Group 文档中列出的请求映射、创建响应映射、成员请求映射�
 - `InlineCommentServicesMap`：`mapSetReactionRequest`、`mapDeleteReactionRequest`、`mapDeleteItemRequest`、`mapResolveRequest`、`mapCreatedId`。
 - `ResourceServicesMap`：全部 placement request 复制函数、`mapResourcePlacementCountFromApi`。
 - `WalletServicesMap`：`mapRedeemVoucherRequest`。
-- `ChatServicesMap`：`mapCreateSessionFromApi`、`mapSetSessionAgentFromApi`、`mapRenameSessionFromApi` 三个别名；`mapActiveTurnIdFromApi` 可在 Contract 类型对齐后内联。
+- `ChatSessionServicesMap`：三个机械 response alias 已删除，统一使用 `mapSessionFromApi`。
 
 ### 应保留但可显著缩小的 mapper
 
 - `AgentServicesMap.mapSpec`：当前大量 fallback 是因为 response 全 optional；后端保证完整默认 spec 后只保留领域命名差异。
 - `TagServicesMap`：只消费 `grantedActions` 集合，不读取 `taggedResourceGrantedActionsMask`；标签 metadata JSON 兼容仍保留。
 - `WalletServicesMap`：当前对 unknown 交易类型、金额、时间做兼容；数据迁移完成后改为枚举/数字直读。
-- `ChatServicesMap`：snake_case 到 camelCase、UI message 投影仍需 mapper；但不能再以 unknown 和静默丢弃承载契约错误。
+- `ChatSessionServicesMap`：snake_case 到 camelCase、UI message 投影仍需 mapper；但不能再以 unknown 和静默丢弃承载契约错误。
 - `SkillServicesMap.mapSkillFilesFromApi`：目录树构建是真实领域转换，应保留。
 - `CourseServicesMap`、`DriveServices`：是聚合模型与领域规则，不是多余 mapper；但 Course 长期应下沉为后端正式域。
 
@@ -675,6 +677,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 7：Chat 与 SSE
 
+- [x] 将原 Chat 聚合域拆成 ChatSession、ChatTurn、ChatConfig；删除旧 Chat service、入口与转发壳。
 - [x] 拆分 Session、Model/Provider、Tool、Completion 与 Speech Schema/Contract。
 - [x] 建立 UIMessage part 结构校验与 SSE 请求 Contract，支持 POST、recover、GET reconnect。
 - [x] 修正 Provider 真实 usage 字段、移除不存在的 `agent_version` 请求字段、修正 Speech `{ provider, options }` body。

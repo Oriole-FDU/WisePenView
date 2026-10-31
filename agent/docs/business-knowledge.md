@@ -38,7 +38,7 @@ CI 通过不能代替业务审查。迁移盘点、审查结论与覆盖进度�
 1. **第 1 轮**：Drive、Skill domain、Skill editor workflow，确定 domain 与 editor 流程的文档粒度。
 2. **第 2 轮**：Resource、Tag、Image、Document；先处理跨页面共用的资源与标签规则，再补文档与图片生命周期。
 3. **第 3 轮**：Auth、User、Group、Wallet；集中确认账号、群组、权限与资产归属边界。
-4. **第 4 轮**：Chat、Agent、Course、Message；整理对话、代理、课程与消息状态及跨域引用。
+4. **第 4 轮**：ChatSession、ChatTurn、ChatConfig、Agent、Course、Message；整理会话、流式轮次、模型配置、代理、课程与消息状态及跨域引用。
 5. **第 5 轮**：Note、Speech、ResourceInteraction、ResourceComment、ResourceFavorite、InlineComment、Admin，并做一次全局索引、重复规则与断链审查。
 
 上述轮次只估算业务知识覆盖。大型代码文件按各批次的 ESLint 告警量逐项拆分或审查，不承诺五轮清零全仓告警。第 5 轮追加全局索引、重复知识与断链审查。
