@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FolderTable, type FolderTableColumn, type FolderTableRow } from '@/components/base/Table';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
-import type { FavoriteItem } from '@/domains/Interact';
+import type { FavoriteItem } from '@/domains/ResourceFavorite';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
 import { useFavoriteResourceTableController } from '../hooks/useFavoriteResourceTableController';

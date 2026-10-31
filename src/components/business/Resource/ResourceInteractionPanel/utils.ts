@@ -1,4 +1,4 @@
-import type { ResourceComment } from '@/domains/Interact';
+import type { ResourceComment } from '@/domains/ResourceComment';
 
 /** 资源互动评论的展示与乐观计数工具。 */
 const IMAGE_ONLY_CONTENT = '\u200B';

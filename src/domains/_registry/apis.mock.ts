@@ -15,13 +15,13 @@ export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/moc
 export { HtmlPageApi } from '@/domains/HtmlPage/mock/HtmlPageApi.mock';
 export { ImageApi } from '@/domains/Image/mock/ImageApi.mock';
 export { InlineCommentApi } from '@/domains/InlineComment/mock/InlineCommentApi.mock';
-export { CommentApi } from '@/domains/Interact/mock/CommentApi.mock';
-export { FavoriteApi } from '@/domains/Interact/mock/FavoriteApi.mock';
-export { InteractApi } from '@/domains/Interact/mock/InteractApi.mock';
 export { MessageApi } from '@/domains/Message/mock/MessageApi.mock';
 export { NoteApi } from '@/domains/Note/mock/NoteApi.mock';
 export { ResourceItemApi } from '@/domains/Resource/mock/ResourceApi.mock';
 export { ResourcePlacementApi } from '@/domains/Resource/mock/ResourcePlacementApi.mock';
+export { CommentApi } from '@/domains/ResourceComment/mock/CommentApi.mock';
+export { FavoriteApi } from '@/domains/ResourceFavorite/mock/FavoriteApi.mock';
+export { ResourceInteractionApi } from '@/domains/ResourceInteraction/mock/ResourceInteractionApi.mock';
 export { SkillApi } from '@/domains/Skill/mock/SkillApi.mock';
 export { SpeechApi } from '@/domains/Speech/mock/SpeechApi.mock';
 export { TagApi } from '@/domains/Tag/mock/TagApi.mock';

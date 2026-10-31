@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文件拥有收藏页的集合选择、集合管理与资源列操作；完整收藏归属及不可访问条目的数据语义由 [Interact](../../../../../domains/Interact/BUSINESS.md) 拥有，picker 由 [共享收藏流程](../../../../../components/business/Resource/BUSINESS.md) 拥有。
+本文件拥有收藏页的集合选择、集合管理与资源列操作；完整收藏归属及不可访问条目的数据语义由 [ResourceFavorite](../../../../../domains/ResourceFavorite/BUSINESS.md) 拥有，picker 由 [共享收藏流程](../../../../../components/business/Resource/BUSINESS.md) 拥有。
 
 ## 集合管理
 
@@ -15,4 +15,4 @@
 ## 资源列与移除
 
 - resourceInfo 缺失时不开启资源，也不进入收藏管理 picker，但仍可移除目前集合的收藏；不要以不可开启推论后端资源已删除。依据：[useFavoriteResourceTableController](hooks/useFavoriteResourceTableController.ts)。
-- 从目前集合移除时先读取完整归属，再交由 Interact 更新剩余集合；成功后刷新资源列及集合计数。这是两个请求，不承诺与其他同时修改原子合并。依据：[UnfavoriteResourceModal](components/UnfavoriteResourceModal.tsx)、[useFavoriteResourceTableController](hooks/useFavoriteResourceTableController.ts)、[完整归属规则](../../../../../domains/Interact/BUSINESS.md)。
+- 从目前集合移除时先读取完整归属，再交由 ResourceFavorite 更新剩余集合；成功后刷新资源列及集合计数。这是两个请求，不承诺与其他同时修改原子合并。依据：[UnfavoriteResourceModal](components/UnfavoriteResourceModal.tsx)、[useFavoriteResourceTableController](hooks/useFavoriteResourceTableController.ts)、[完整归属规则](../../../../../domains/ResourceFavorite/BUSINESS.md)。

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Empty, Spin } from '@/components/base/Feedback';
-import type { FavoriteCollection } from '@/domains/Interact';
+import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
 import FavoriteCollectionList from './components/FavoriteCollectionList';
 import FavoriteResourceTable from './components/FavoriteResourceTable';

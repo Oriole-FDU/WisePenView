@@ -11,7 +11,7 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import type { EditorPresentation } from '@/components/editors/editor.type';
 import { publicAppConfig } from '@/config/runtimeConfig';
-import { useInteractService, useNoteService, useUserService } from '@/domains';
+import { useNoteService, useResourceInteractionService, useUserService } from '@/domains';
 import type { ResourceAction } from '@/domains/_shared/access';
 import type {
   DrawIoLatestSnapshotData,
@@ -329,7 +329,7 @@ function DrawioEditorContent() {
   } = useEditorSurface();
   const { t } = useTranslation('workspace');
   const noteService = useNoteService();
-  const interactService = useInteractService();
+  const interactionService = useResourceInteractionService();
   const {
     data,
     error,
@@ -355,7 +355,7 @@ function DrawioEditorContent() {
   );
   const refreshDrawioInfoStable = useMemoizedFn(refreshDrawioInfo);
 
-  useApi(() => interactService.recordResourceRead(resourceId as string), {
+  useApi(() => interactionService.recordResourceRead(resourceId as string), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });

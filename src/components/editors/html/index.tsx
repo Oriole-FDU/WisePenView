@@ -6,7 +6,7 @@ import { getApiBaseUrl } from '@/apis/runtime';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
-import { isHtmlPageReady, useHtmlPageService, useInteractService } from '@/domains';
+import { isHtmlPageReady, useHtmlPageService, useResourceInteractionService } from '@/domains';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
@@ -58,7 +58,7 @@ function HtmlPageContent() {
   const { target } = useEditorSurface();
   const { resourceId } = target;
   const htmlPageService = useHtmlPageService();
-  const interactService = useInteractService();
+  const interactionService = useResourceInteractionService();
   const {
     data: info,
     error: infoError,
@@ -78,7 +78,7 @@ function HtmlPageContent() {
     ready: Boolean(resourceId && ready),
     refreshDeps: [resourceId, info?.currentVersion, ready],
   });
-  useApi(() => interactService.recordResourceRead(resourceId!), {
+  useApi(() => interactionService.recordResourceRead(resourceId!), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });

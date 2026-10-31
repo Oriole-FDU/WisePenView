@@ -2,7 +2,7 @@
 
 ## 范围
 
-Course 是前端建立在 Group、Tag、Resource 与 Interact 服务上的聚合视图，不是独立后端 Course API。Course entity 与服务只表示目前 UI 使用的聚合模型。
+Course 是前端建立在 Group、Tag、Resource 与 ResourceInteraction 服务上的聚合视图，不是独立后端 Course API。Course entity 与服务只表示目前 UI 使用的聚合模型。
 
 ## 规则
 

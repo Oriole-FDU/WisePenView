@@ -22,7 +22,7 @@ try {
           GetResourceUserInteractionRecordApiContract,
           RateResourceApiContract,
           RecordResourceReadApiContract,
-        } from '@/domains/Interact/apis/InteractApi.contract';
+        } from '@/domains/ResourceInteraction/apis/ResourceInteractionApi.contract';
         export {
           CreateCommentApiContract,
           CreateReplyApiContract,
@@ -30,7 +30,7 @@ try {
           ListCommentsApiContract,
           ListRepliesApiContract,
           ToggleCommentLikeApiContract,
-        } from '@/domains/Interact/apis/CommentApi.contract';
+        } from '@/domains/ResourceComment/apis/CommentApi.contract';
         export {
           ChangeFavoriteStatusApiContract,
           CreateCollectionApiContract,
@@ -39,11 +39,13 @@ try {
           ListFavoriteCollectionsApiContract,
           ListFavoritedResourcesApiContract,
           UpdateCollectionInfoApiContract,
-        } from '@/domains/Interact/apis/FavoriteApi.contract';
-        export { InteractServicesMap } from '@/domains/Interact/mapper/InteractServices.map';
-        export { CommentApi } from '@/domains/Interact/mock/CommentApi.mock';
-        export { FavoriteApi } from '@/domains/Interact/mock/FavoriteApi.mock';
-        export { InteractApi } from '@/domains/Interact/mock/InteractApi.mock';
+        } from '@/domains/ResourceFavorite/apis/FavoriteApi.contract';
+        export { ResourceInteractionServicesMap } from '@/domains/ResourceInteraction/mapper/ResourceInteractionServices.map';
+        export { ResourceCommentServicesMap } from '@/domains/ResourceComment/mapper/ResourceCommentServices.map';
+        export { ResourceFavoriteServicesMap } from '@/domains/ResourceFavorite/mapper/ResourceFavoriteServices.map';
+        export { CommentApi } from '@/domains/ResourceComment/mock/CommentApi.mock';
+        export { FavoriteApi } from '@/domains/ResourceFavorite/mock/FavoriteApi.mock';
+        export { ResourceInteractionApi } from '@/domains/ResourceInteraction/mock/ResourceInteractionApi.mock';
       `,
       resolveDir: root,
     },
@@ -66,8 +68,6 @@ try {
     FavoriteApi,
     GetFavoriteStatusApiContract,
     GetResourceUserInteractionRecordApiContract,
-    InteractApi,
-    InteractServicesMap,
     ListCommentsApiContract,
     ListFavoriteCollectionsApiContract,
     ListFavoritedResourcesApiContract,
@@ -76,6 +76,10 @@ try {
     parseApiResponse,
     RateResourceApiContract,
     RecordResourceReadApiContract,
+    ResourceCommentServicesMap,
+    ResourceFavoriteServicesMap,
+    ResourceInteractionApi,
+    ResourceInteractionServicesMap,
     ToggleCommentLikeApiContract,
     UpdateCollectionInfoApiContract,
   } = await import(pathToFileURL(outfile).href);
@@ -117,10 +121,14 @@ try {
 
   const interaction = parseApiResponse(
     GetResourceUserInteractionRecordApiContract,
-    await InteractApi.getUserInteractionRecord({ resourceId: 'mock-note-1' })
+    await ResourceInteractionApi.getUserInteractionRecord({ resourceId: 'mock-note-1' })
   );
   assert.equal(interaction.resourceId, 'mock-note-1');
   assert.equal(interaction.read, true);
+  const interactionRecord =
+    ResourceInteractionServicesMap.mapResourceInteractionRecordFromApi(interaction);
+  assert.equal(interactionRecord.liked, interaction.liked);
+  assert.deepEqual([...interactionRecord.likedCommentIds], interaction.likedCommentIds);
 
   const commentRequest = parseApiRequest(CreateCommentApiContract, {
     resourceId: 'mock-note-1',
@@ -147,7 +155,7 @@ try {
     ...rawCommentPage,
     total: String(rawCommentPage.total),
   });
-  const mappedPage = InteractServicesMap.mapCommentPageFromApi(commentPage);
+  const mappedPage = ResourceCommentServicesMap.mapCommentPageFromApi(commentPage);
   assert.equal(mappedPage.items[0].commentId, 'mock-mock-note-1-comment-1');
   assert.equal(mappedPage.items[0].author.name, '王明');
 
@@ -156,6 +164,9 @@ try {
     await FavoriteApi.getFavoriteStatus('mock-note-1')
   );
   assert.deepEqual(favoriteStatus.collectionIds, ['mock-favorite-default']);
+  assert.deepEqual(ResourceFavoriteServicesMap.mapFavoriteCollectionIdsFromApi(favoriteStatus), [
+    'mock-favorite-default',
+  ]);
 
   const collections = parseApiResponse(
     ListFavoriteCollectionsApiContract,
@@ -183,7 +194,7 @@ try {
     }).success
   );
 
-  console.log('Interact API 契约检查通过');
+  console.log('Resource interaction、comment 与 favorite API 契约检查通过');
 } finally {
   await rm(tempDir, { recursive: true, force: true });
 }

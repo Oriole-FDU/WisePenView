@@ -10,9 +10,13 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import ResourceFavoriteAction from '@/components/business/Resource/ResourceFavoriteAction';
 import { WorkspacePanel } from '@/components/business/WorkspacePanel';
-import { useInteractService, useUserService } from '@/domains';
-import type { CommentSortBy, ResourceComment } from '@/domains/Interact';
+import {
+  useResourceCommentService,
+  useResourceInteractionService,
+  useUserService,
+} from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
+import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
@@ -58,7 +62,8 @@ function ResourceInteractionPanel({
   onClose,
 }: ResourceInteractionPanelProps) {
   const { t } = useTranslation(['resource', 'common']);
-  const interactService = useInteractService();
+  const interactionService = useResourceInteractionService();
+  const commentService = useResourceCommentService();
   const userService = useUserService();
   const resourceId = resource.resourceId;
   const resourceLikeCount = resource.likeCount ?? 0;
@@ -75,7 +80,7 @@ function ResourceInteractionPanel({
     data: interaction,
     loading: interactionLoading,
     refresh: refreshInteraction,
-  } = useApi(() => interactService.getResourceInteraction(resourceId), {
+  } = useApi(() => interactionService.getResourceInteraction(resourceId), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });
@@ -88,7 +93,7 @@ function ResourceInteractionPanel({
 
   const { run: submitResourceLike, loading: resourceLikePending } = useApi(
     async (liked: boolean) => {
-      await interactService.toggleResourceLike(resourceId);
+      await interactionService.toggleResourceLike(resourceId);
       return liked;
     },
     {
@@ -112,7 +117,7 @@ function ResourceInteractionPanel({
   } = useInfiniteScroll<CommentListPage>(
     async (current) => {
       const nextPage = Math.floor((current?.list.length ?? 0) / COMMENT_PAGE_SIZE) + 1;
-      const data = await interactService.listComments({
+      const data = await commentService.listComments({
         resourceId,
         sortBy,
         page: nextPage,
@@ -168,7 +173,7 @@ function ResourceInteractionPanel({
 
     setPendingLikeIds((current) => new Set(current).add(comment.commentId));
     try {
-      const liked = await interactService.toggleCommentLike({
+      const liked = await commentService.toggleCommentLike({
         resourceId,
         commentId: comment.commentId,
       });
@@ -206,7 +211,7 @@ function ResourceInteractionPanel({
       const target = pendingDeletion;
       if (!target) return;
 
-      await interactService.deleteComment({
+      await commentService.deleteComment({
         resourceId,
         commentId: target.comment.commentId,
       });
@@ -367,7 +372,7 @@ function ResourceInteractionPanel({
         <CommentComposer
           placeholder={t('resource:comment.placeholder')}
           onSubmit={async (content, imageUrls) => {
-            await interactService.createComment({ resourceId, content, imageUrls });
+            await commentService.createComment({ resourceId, content, imageUrls });
             await refreshComments();
           }}
         />

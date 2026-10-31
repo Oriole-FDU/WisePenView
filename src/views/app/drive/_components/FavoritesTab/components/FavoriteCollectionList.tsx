@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
-import type { FavoriteCollection } from '@/domains/Interact';
+import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
 import styles from '../style.module.scss';
 

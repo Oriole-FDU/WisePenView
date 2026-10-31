@@ -21,11 +21,13 @@ import { createGroupServices } from '@/domains/Group/service/GroupServices.impl'
 import { createHtmlPageServices } from '@/domains/HtmlPage/service/HtmlPageServices.impl';
 import { createImageServices } from '@/domains/Image/service/ImageServices.impl';
 import { createInlineCommentServices } from '@/domains/InlineComment/service/InlineCommentServices.impl';
-import { createInteractServices } from '@/domains/Interact/service/InteractServices.impl';
 import { createMessageServices } from '@/domains/Message/service/MessageServices.impl';
 import { createNoteServices } from '@/domains/Note/service/NoteServices.impl';
 import { createResourceServices } from '@/domains/Resource/service/ResourceServices.impl';
 import { createResourceAccessServices } from '@/domains/ResourceAccess/service/ResourceAccessServices.impl';
+import { createResourceCommentServices } from '@/domains/ResourceComment/service/ResourceCommentServices.impl';
+import { createResourceFavoriteServices } from '@/domains/ResourceFavorite/service/ResourceFavoriteServices.impl';
+import { createResourceInteractionServices } from '@/domains/ResourceInteraction/service/ResourceInteractionServices.impl';
 import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl';
 import { createSpeechServices } from '@/domains/Speech/service/SpeechServices.impl';
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
@@ -43,7 +45,9 @@ const groupService = createGroupServices();
 const htmlPageService = createHtmlPageServices();
 const imageService = createImageServices();
 const inlineCommentService = createInlineCommentServices();
-const interactService = createInteractServices();
+const resourceCommentService = createResourceCommentServices();
+const resourceFavoriteService = createResourceFavoriteServices();
+const resourceInteractionService = createResourceInteractionServices();
 const messageService = createMessageServices();
 const resourceService = createResourceServices();
 const speechService = createSpeechServices();
@@ -67,7 +71,7 @@ const driveService = createDriveServices({
 });
 const courseService = createCourseServices({
   groupService: groupService,
-  interactService: interactService,
+  resourceInteractionService,
   resourceService: resourceService,
   tagService: tagService,
 });
@@ -95,10 +99,12 @@ const servicesValue: ServicesContextValue = {
   htmlPageService: htmlPageService,
   imageService: imageService,
   inlineCommentService: inlineCommentService,
-  interactService: interactService,
   messageService: messageService,
   noteService: noteService,
   resourceAccessService,
+  resourceCommentService,
+  resourceFavoriteService,
+  resourceInteractionService,
   resourceService: resourceService,
   skillService: skillService,
   speechService: speechService,

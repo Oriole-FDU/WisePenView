@@ -6,7 +6,7 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Tooltip } from '@/components/base/Tooltip';
-import type { ResourceComment } from '@/domains/Interact';
+import type { ResourceComment } from '@/domains/ResourceComment';
 import {
   formatRelativeTimestamp,
   formatTimestampToDateTime,

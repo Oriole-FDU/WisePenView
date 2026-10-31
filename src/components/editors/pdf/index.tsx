@@ -7,7 +7,7 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import PdfViewer from '@/components/editors/pdf/components/PdfViewer/index';
 import { publicAppConfig } from '@/config/runtimeConfig';
-import { useDocumentService, useInteractService } from '@/domains';
+import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
@@ -46,7 +46,7 @@ function PdfEditorContent() {
   const { t } = useTranslation('workspace');
   const [viewerErrorMap, setViewerErrorMap] = useState<Record<string, unknown>>({});
   const documentService = useDocumentService();
-  const interactService = useInteractService();
+  const interactionService = useResourceInteractionService();
   const {
     data: docInfo,
     error: docInfoError,
@@ -68,7 +68,7 @@ function PdfEditorContent() {
   );
 
   // 进入页面时上报阅读
-  useApi(() => interactService.recordResourceRead(resourceId as string), {
+  useApi(() => interactionService.recordResourceRead(resourceId as string), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });

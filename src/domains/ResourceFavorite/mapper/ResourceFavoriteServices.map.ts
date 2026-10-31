@@ -1,10 +1,6 @@
-import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
+import { ResourceServicesMap } from '@/domains/Resource';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
-import type {
-  CommentPageApiResponse,
-  ResourceCommentItemApiResponse,
-} from '../apis/CommentApi.schema';
 import type {
   ChangeFavoriteStatusApiRequest,
   CreateCollectionApiRequest,
@@ -16,10 +12,7 @@ import type {
   ListFavoritedResourcesApiResponse,
   UpdateCollectionInfoApiRequest,
 } from '../apis/FavoriteApi.schema';
-import type { GetUserInteractionRecordApiResponse } from '../apis/InteractApi.schema';
-import type { CommentAuthor, CommentPage, ResourceComment } from '../entity/comment';
 import type { FavoriteCollection, FavoritedResourcesPage, FavoriteItem } from '../entity/favorite';
-import type { ResourceInteractionRecord } from '../entity/interaction';
 import type {
   CreateFavoriteCollectionRequest,
   DeleteFavoriteCollectionRequest,
@@ -28,56 +21,15 @@ import type {
   UpdateFavoriteCollectionsRequest,
 } from '../service/index.type';
 
-function mapCommentAuthorFromApi(
-  value: ResourceCommentItemApiResponse['authorInfo'],
-  fallbackId: string
-): CommentAuthor {
-  return {
-    name: value?.realName?.trim() || value?.nickname?.trim() || fallbackId,
-    avatar: value?.avatar?.trim() || undefined,
-  };
-}
-
-function mapCommentFromApi(data: ResourceCommentItemApiResponse): ResourceComment {
-  return {
-    commentId: data.commentId,
-    authorId: data.authorId,
-    author: mapCommentAuthorFromApi(data.authorInfo, data.authorId),
-    replyToUser: data.replyToUserId
-      ? mapCommentAuthorFromApi(data.replyToUserInfo, data.replyToUserId)
-      : undefined,
-    content: data.content ?? '',
-    imageUrls: data.imageUrls ?? [],
-    likeCount: data.likeCount ?? 0,
-    replyCount: data.replyCount ?? 0,
-    createTime: data.createTime,
-    deleted: data.deleted ?? false,
-  };
-}
-
-const mapCommentPageFromApi = (data: CommentPageApiResponse): CommentPage => ({
-  items: data.list.map(mapCommentFromApi),
-  total: data.total,
-  totalPage: data.totalPage,
-});
-
-const mapResourceInteractionRecordFromApi = (
-  data: GetUserInteractionRecordApiResponse
-): ResourceInteractionRecord => ({
-  liked: data.liked,
-  score: data.score ?? 0,
-  likedCommentIds: new Set(data.likedCommentIds),
-});
-
 const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] =>
   data.collectionIds.map(normalizeId).filter(Boolean);
 
 const mapFavoriteCollectionFromApi = (data: FavoriteCollectionApiResponse): FavoriteCollection => ({
   collectionId: normalizeId(data.collectionId),
-  collectionName: data.collectionName ?? null,
-  description: data.description ?? null,
-  isDefault: data.isDefault ?? false,
-  itemCount: data.itemCount ?? 0,
+  collectionName: data.collectionName,
+  description: data.description,
+  isDefault: data.isDefault,
+  itemCount: data.itemCount,
 });
 
 const mapFavoriteCollectionsFromApi = (
@@ -129,8 +81,7 @@ const mapFavoriteItemFromApi = (data: FavoriteItemApiResponse): FavoriteItem => 
   const normalizedResource = data.resourceInfo
     ? ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo)
     : null;
-  const accessible = data.accessible;
-  const resourceInfo = accessible ? normalizedResource : null;
+  const resourceInfo = data.accessible ? normalizedResource : null;
   return {
     resourceId: normalizeId(data.resourceId) || resourceInfo?.resourceId || '',
     favoritedAt: data.favoritedAt,
@@ -146,9 +97,7 @@ const mapFavoritedResourcesPageFromApi = (
   totalPage: data.totalPage,
 });
 
-export const InteractServicesMap = {
-  mapCommentPageFromApi,
-  mapResourceInteractionRecordFromApi,
+export const ResourceFavoriteServicesMap = {
   mapFavoriteCollectionIdsFromApi,
   mapFavoriteCollectionsFromApi,
   mapUpdateFavoriteCollectionsRequest,

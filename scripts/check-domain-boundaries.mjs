@@ -21,6 +21,9 @@ const forbiddenImports = {
   Document: new Set(['ResourceAccess']),
   HtmlPage: new Set(['ResourceAccess']),
   Note: new Set(['ResourceAccess']),
+  ResourceInteraction: new Set(['ResourceAccess', 'ResourceComment', 'ResourceFavorite']),
+  ResourceComment: new Set(['ResourceAccess', 'ResourceFavorite', 'ResourceInteraction']),
+  ResourceFavorite: new Set(['ResourceAccess', 'ResourceComment', 'ResourceInteraction']),
   Skill: new Set(['ResourceAccess']),
 };
 
@@ -54,4 +57,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log('Domain 依赖边界检查通过：ResourceCore 与资源叶域未反向依赖上游聚合。');
+console.log('Domain 依赖边界检查通过：ResourceCore、资源叶域与互动拆分域未反向依赖上游聚合。');

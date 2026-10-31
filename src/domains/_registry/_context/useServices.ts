@@ -9,11 +9,13 @@ import type { IGroupService } from '@/domains/Group';
 import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { IImageService } from '@/domains/Image';
 import type { IInlineCommentService } from '@/domains/InlineComment';
-import type { IInteractService } from '@/domains/Interact';
 import type { IMessageService } from '@/domains/Message';
 import type { INoteService } from '@/domains/Note';
 import type { IResourceService } from '@/domains/Resource';
 import type { IResourceAccessService } from '@/domains/ResourceAccess';
+import type { IResourceCommentService } from '@/domains/ResourceComment';
+import type { IResourceFavoriteService } from '@/domains/ResourceFavorite';
+import type { IResourceInteractionService } from '@/domains/ResourceInteraction';
 import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
@@ -41,11 +43,16 @@ export const useHtmlPageService = (): IHtmlPageService => useServicesContext().h
 export const useImageService = (): IImageService => useServicesContext().imageService;
 export const useInlineCommentService = (): IInlineCommentService =>
   useServicesContext().inlineCommentService;
-export const useInteractService = (): IInteractService => useServicesContext().interactService;
 export const useMessageService = (): IMessageService => useServicesContext().messageService;
 export const useNoteService = (): INoteService => useServicesContext().noteService;
 export const useResourceAccessService = (): IResourceAccessService =>
   useServicesContext().resourceAccessService;
+export const useResourceCommentService = (): IResourceCommentService =>
+  useServicesContext().resourceCommentService;
+export const useResourceFavoriteService = (): IResourceFavoriteService =>
+  useServicesContext().resourceFavoriteService;
+export const useResourceInteractionService = (): IResourceInteractionService =>
+  useServicesContext().resourceInteractionService;
 export const useResourceService = (): IResourceService => useServicesContext().resourceService;
 export const useSkillService = (): ISkillService => useServicesContext().skillService;
 export const useSpeechService = (): ISpeechService => useServicesContext().speechService;

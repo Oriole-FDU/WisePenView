@@ -16,13 +16,13 @@ export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/api
 export { HtmlPageApi } from '@/domains/HtmlPage/apis/HtmlPageApi';
 export { ImageApi } from '@/domains/Image/apis/ImageApi';
 export { InlineCommentApi } from '@/domains/InlineComment/apis/InlineCommentApi';
-export { CommentApi } from '@/domains/Interact/apis/CommentApi';
-export { FavoriteApi } from '@/domains/Interact/apis/FavoriteApi';
-export { InteractApi } from '@/domains/Interact/apis/InteractApi';
 export { MessageApi } from '@/domains/Message/apis/MessageApi';
 export { NoteApi } from '@/domains/Note/apis/NoteApi';
 export { ResourceItemApi } from '@/domains/Resource/apis/ResourceApi';
 export { ResourcePlacementApi } from '@/domains/Resource/apis/ResourcePlacementApi';
+export { CommentApi } from '@/domains/ResourceComment/apis/CommentApi';
+export { FavoriteApi } from '@/domains/ResourceFavorite/apis/FavoriteApi';
+export { ResourceInteractionApi } from '@/domains/ResourceInteraction/apis/ResourceInteractionApi';
 export { SkillApi } from '@/domains/Skill/apis/SkillApi';
 export { SpeechApi } from '@/domains/Speech/apis/SpeechApi';
 export { TagApi } from '@/domains/Tag/apis/TagApi';

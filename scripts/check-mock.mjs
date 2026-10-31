@@ -66,7 +66,9 @@ try {
     noteService: note,
     documentService: document,
     resourceAccessService: permission,
-    interactService: interact,
+    resourceInteractionService: interaction,
+    resourceCommentService: comment,
+    resourceFavoriteService: favorite,
     chatService: chat,
     skillService: skill,
     agentService: agent,
@@ -210,6 +212,24 @@ try {
   const created = await note.createNote({ title: '共用筆記' });
   const resourceId = created.resourceId;
   assert(resourceId);
+  await interaction.toggleResourceLike(resourceId);
+  assert.equal((await interaction.getResourceInteraction(resourceId)).liked, true);
+  await comment.createComment({
+    resourceId,
+    content: '離線評論',
+    imageUrls: [],
+  });
+  assert.equal(
+    (
+      await comment.listComments({
+        resourceId,
+        sortBy: 'CREATE_TIME',
+        page: 1,
+        size: 20,
+      })
+    ).items[0].content,
+    '離線評論'
+  );
   await course.mountCourseOutlineResources({
     courseId,
     targetNodeId: first,
@@ -239,10 +259,10 @@ try {
   await drive.setPersonalResourcesLocation({ resourceIds: [resourceId], target: folder });
   assert.equal((await drive.loadNodeChildren({ parent: folder })).resourceTotal, 1);
   assert(!(await tag.getTagTree()).some((item) => item.tagName.startsWith('/')));
-  const collectionId = await interact.createFavoriteCollection({ collectionName: '驗證收藏' });
-  await interact.updateFavoriteCollections({ resourceId, collectionIds: [collectionId] });
+  const collectionId = await favorite.createFavoriteCollection({ collectionName: '驗證收藏' });
+  await favorite.updateFavoriteCollections({ resourceId, collectionIds: [collectionId] });
   await resource.renameResource({ resourceId, newName: '新筆記名稱' });
-  const favorites = await interact.listFavoritedResources({ collectionId, page: 1, size: 20 });
+  const favorites = await favorite.listFavoritedResources({ collectionId, page: 1, size: 20 });
   assert.equal(favorites.list[0].resourceInfo.resourceName, '新筆記名稱');
   assert.equal((await note.getNoteInfoDisplay({ resourceId })).noteTitle, '新筆記名稱');
   const search = await resource.globalSearch({ keyword: '算法', scope: 'ALL', page: 1, size: 50 });

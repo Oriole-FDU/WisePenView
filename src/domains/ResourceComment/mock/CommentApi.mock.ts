@@ -1,3 +1,7 @@
+import {
+  ensureMockCommentLikeIds,
+  toggleMockCommentLike as toggleLikedCommentState,
+} from '@/domains/_shared/mock/commentLikeState.mock';
 import { mockResponse } from '@/domains/_shared/mock/response';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
@@ -22,8 +26,6 @@ interface MockComment extends ResourceCommentItemApiResponse {
 
 const CURRENT_USER_ID = '1';
 const commentsByResource = new Map<string, MockComment[]>();
-const likedIdsByResource = new Map<string, Set<string>>();
-
 const author = (name: string) => ({
   nickname: name,
   username: null,
@@ -111,7 +113,7 @@ function getComments(resourceId: string): MockComment[] {
   if (existing) return existing;
   const comments = createInitialComments(resourceId);
   commentsByResource.set(resourceId, comments);
-  likedIdsByResource.set(resourceId, new Set([buildMockId(resourceId, 'comment-1')]));
+  ensureMockCommentLikeIds(resourceId, [buildMockId(resourceId, 'comment-1')]);
   return comments;
 }
 
@@ -214,18 +216,9 @@ async function toggleMockCommentLike(params: CommentItemActionApiRequest): Promi
   if (!item || item.deleted) {
     throw createClientError(FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND);
   }
-  const likedIds = likedIdsByResource.get(params.resourceId) ?? new Set<string>();
-  likedIdsByResource.set(params.resourceId, likedIds);
-  const liked = !likedIds.has(params.commentId);
-  if (liked) likedIds.add(params.commentId);
-  else likedIds.delete(params.commentId);
+  const liked = toggleLikedCommentState(params.resourceId, params.commentId);
   item.likeCount = Math.max(0, item.likeCount + (liked ? 1 : -1));
   return liked;
-}
-
-export function getMockCommentLikeIds(resourceId: string): ReadonlySet<string> {
-  getComments(resourceId);
-  return new Set(likedIdsByResource.get(resourceId));
 }
 
 export const CommentApi: typeof CommentApiContract = {

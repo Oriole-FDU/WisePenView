@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { FavoriteItem } from '@/domains/Interact';
+import type { FavoriteItem } from '@/domains/ResourceFavorite';
 import { useOpenResource } from '@/hooks/useOpenResource';
 
 import { useFavoriteResources } from './useFavoriteResources';

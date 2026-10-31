@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文件拥有通用锚点批注数据边界；面板操作由 [共享批注面板](../../components/business/InlineComment/BUSINESS.md) 拥有，Note 专用 session、mapper 与 Yjs 锚点整体由 [Note editor](../../components/editors/note/BUSINESS.md) 拥有。一般 Resource 评论由 [Interact](../Interact/BUSINESS.md) 拥有，不共用 thread 生命周期。
+本文件拥有通用锚点批注数据边界；面板操作由 [共享批注面板](../../components/business/InlineComment/BUSINESS.md) 拥有，Note 专用 session、mapper 与 Yjs 锚点整体由 [Note editor](../../components/editors/note/BUSINESS.md) 拥有。一般 Resource 评论由 [ResourceComment](../ResourceComment/BUSINESS.md) 拥有，不共用 thread 生命周期。
 
 ## 锚点与版本
 

@@ -10,9 +10,9 @@ import {
   type RateResourceApiContractRequest,
   RecordResourceReadApiContract,
   type RecordResourceReadApiContractRequest,
-} from './InteractApi.contract';
+} from './ResourceInteractionApi.contract';
 
-/** /resource/interaction/* 子路由 API */
+/** `/resource/interaction/*` 子路由 API。 */
 async function setLike(req: ChangeResourceLikeApiContractRequest): Promise<void> {
   await executeApiContract(ChangeResourceLikeApiContract, req);
 }
@@ -31,4 +31,4 @@ function getUserInteractionRecord(
   return executeApiContract(GetResourceUserInteractionRecordApiContract, req);
 }
 
-export const InteractApi = { setLike, rate, read, getUserInteractionRecord };
+export const ResourceInteractionApi = { setLike, rate, read, getUserInteractionRecord };

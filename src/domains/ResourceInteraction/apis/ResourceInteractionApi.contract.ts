@@ -10,7 +10,7 @@ import {
   RateApiRequestSchema,
   ResourceInteractionApiRequestSchema,
   ResourceLikeApiRequestSchema,
-} from './InteractApi.schema';
+} from './ResourceInteractionApi.schema';
 
 export const ChangeResourceLikeApiContract = defineApiContract({
   name: 'ChangeResourceLikeApi',
