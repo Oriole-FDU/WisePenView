@@ -8,18 +8,18 @@ import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSessio
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
+import type { ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
 import {
   pickChatCompletionApiRequest,
   pickChatRecoverApiRequest,
 } from '../apis/ChatStreamApi.schema';
-import { mapChatCompletionRequest } from '../mapper/chatCompletion.mapper';
-import { normalizeChatSseResponse } from './chatSseNormalizer';
+import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type {
-  ChatRecoverRequest,
-  SendSessionMessageOptions,
+  SendTurnMessageOptions,
   ToolApprovalStatusRequest,
-  UseChatSessionOptions,
-} from './index.type';
+  UseChatTurnOptions,
+} from '../service/index.type';
+import { normalizeChatSseResponse } from './chatSseNormalizer';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
 
@@ -33,7 +33,7 @@ async function fetchChatCompletion(
   input: RequestInfo | URL,
   init: RequestInit | undefined,
   streamApi: Pick<
-    UseChatSessionOptions,
+    UseChatTurnOptions,
     'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
   >
 ): Promise<Response> {
@@ -60,7 +60,7 @@ async function fetchChatCompletion(
 
 function isChatRecoverRequest(
   body: Record<string, unknown> | undefined
-): body is ChatRecoverRequest {
+): body is ChatRecoverApiRequest {
   return (
     typeof body?.session_id === 'string' &&
     Array.isArray(body.client_tool_results) &&
@@ -70,7 +70,7 @@ function isChatRecoverRequest(
 
 const createChatTransport = (
   streamApi: Pick<
-    UseChatSessionOptions,
+    UseChatTurnOptions,
     'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
   >
 ) =>
@@ -101,7 +101,7 @@ const createChatTransport = (
  * 2) 统一补齐后端 ChatRequest 字段
  * 3) 保留 useChat 原始能力（messages、status、stop 等）
  */
-export const useChatSession = ({
+export const useChatTurn = ({
   sessionId,
   model,
   getActiveTurnId,
@@ -109,7 +109,7 @@ export const useChatSession = ({
   recoverChatStream,
   reconnectChatStream,
   onError,
-}: UseChatSessionOptions) => {
+}: UseChatTurnOptions) => {
   /**
    * @wisepen-manual-memo
    * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
@@ -146,7 +146,7 @@ export const useChatSession = ({
   const latestActiveTurnId = useLatest(getActiveTurnId);
   const latestOnError = useLatest(onError);
 
-  const resumeSessionStream = (): Promise<void> => {
+  const resumeTurnStream = (): Promise<void> => {
     if (!sessionId) return Promise.resolve();
 
     const targetSessionId = sessionId;
@@ -211,8 +211,8 @@ export const useChatSession = ({
     return promise;
   };
 
-  const sendSessionMessage = async (query: string, options?: SendSessionMessageOptions) => {
-    const requestBody = mapChatCompletionRequest({
+  const sendTurnMessage = async (query: string, options?: SendTurnMessageOptions) => {
+    const requestBody = mapChatTurnRequest({
       defaultSessionId: sessionId,
       defaultModel: model,
       query,
@@ -243,14 +243,14 @@ export const useChatSession = ({
     await chat.sendMessage({ text: query, metadata }, { body: requestBody });
   };
 
-  const recoverSession = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
+  const recoverTurn = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
     try {
       if (!sessionId) {
         throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
           reason: '恢复聊天时缺少 session_id',
         });
       }
-      const requestBody: ChatRecoverRequest = {
+      const requestBody: ChatRecoverApiRequest = {
         session_id: sessionId,
         client_tool_results: [],
         tool_approval_status: toolApprovalStatus,
@@ -267,8 +267,8 @@ export const useChatSession = ({
 
   return {
     ...chat,
-    sendSessionMessage,
-    recoverSession,
-    resumeSessionStream,
+    sendTurnMessage,
+    recoverTurn,
+    resumeTurnStream,
   };
 };

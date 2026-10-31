@@ -21,12 +21,12 @@ try {
           ChatCompletionStreamApiContract,
           ChatReconnectStreamApiContract,
           ChatRecoverStreamApiContract,
-        } from '@/domains/Chat/apis/ChatStreamApi.contract';
+        } from '@/domains/ChatTurn/apis/ChatStreamApi.contract';
         export {
           pickChatCompletionApiRequest,
           pickChatRecoverApiRequest,
-        } from '@/domains/Chat/apis/ChatStreamApi.schema';
-        export { normalizeChatSseData } from '@/domains/Chat/session/chatSseNormalizer';
+        } from '@/domains/ChatTurn/apis/ChatStreamApi.schema';
+        export { normalizeChatSseData } from '@/domains/ChatTurn/runtime/chatSseNormalizer';
       `,
       resolveDir: root,
     },

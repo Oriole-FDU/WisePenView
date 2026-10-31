@@ -29,7 +29,7 @@ try {
         export {
           CancelChatTurnApiContract,
           GetActiveChatTurnApiContract,
-        } from '@/domains/Chat/apis/ChatTurnApi.contract';
+        } from '@/domains/ChatTurn/apis/ChatTurnApi.contract';
         export { ChatSessionServicesMap } from '@/domains/ChatSession/mapper/ChatSessionServices.map';
         export { ChatSessionApi } from '@/domains/ChatSession/mock/ChatSessionApi.mock';
       `,

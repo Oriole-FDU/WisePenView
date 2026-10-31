@@ -1,8 +1,8 @@
 import type { ChatStatus } from 'ai';
 import { useState } from 'react';
 
-import type { ToolApprovalStatusRequest } from '@/domains/Chat';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { ToolApprovalStatusRequest } from '@/domains/ChatTurn';
 
 import { listToolApprovalRequests } from './toolApprovalModel';
 

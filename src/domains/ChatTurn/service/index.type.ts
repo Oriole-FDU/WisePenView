@@ -15,30 +15,10 @@ interface ChatUploadedAttachmentContext {
   enabled: boolean;
 }
 
-export interface ChatCompletionRequest {
-  session_id: string;
-  query: string;
-  model?: string;
-  provider_id?: string;
-  runtime_options?: Record<string, unknown>;
-  frontend_states?: FrontendStateEntry[];
-  user_defined_attachment_ids?: string[];
-  tool_selection_default_enabled: true;
-  tool_selection_overrides?: Record<string, boolean>;
-  user_defined_on_demand_skill_ids?: string[];
-  client_tool_capabilities?: ClientToolCapabilityRequest[];
-}
-
 export interface ToolApprovalStatusRequest {
   tool_call_id: string;
   approved: boolean;
 }
-
-export type ChatRecoverRequest = {
-  session_id: string;
-  client_tool_results: [];
-  tool_approval_status: ToolApprovalStatusRequest[];
-};
 
 export interface ClientToolCapability {
   name: string;
@@ -46,13 +26,7 @@ export interface ClientToolCapability {
   inputSchema: Record<string, unknown>;
 }
 
-export interface ClientToolCapabilityRequest {
-  name: string;
-  description: string;
-  input_schema: Record<string, unknown>;
-}
-
-export interface SendSessionMessageOptions {
+export interface SendTurnMessageOptions {
   sessionId?: string;
   model?: string;
   providerId?: string;
@@ -65,7 +39,7 @@ export interface SendSessionMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
-export interface UseChatSessionOptions {
+export interface UseChatTurnOptions {
   sessionId: string;
   model?: string;
   getActiveTurnId: (sessionId: string) => Promise<string | null>;
@@ -76,4 +50,12 @@ export interface UseChatSessionOptions {
   recoverChatStream: (request: ChatRecoverApiRequest, signal?: AbortSignal) => Promise<Response>;
   reconnectChatStream: (sessionId: string, signal?: AbortSignal) => Promise<Response>;
   onError?: (error: Error) => void;
+}
+
+export interface IChatTurnService {
+  streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
+  recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
+  reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
+  getActiveTurnId(sessionId: string): Promise<string | null>;
+  cancelTurn(sessionId: string): Promise<void>;
 }

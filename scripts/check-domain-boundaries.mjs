@@ -16,6 +16,9 @@ const walk = (directory) =>
 const normalizePath = (path) => relative(root, path).split('\\').join('/');
 
 const forbiddenImports = {
+  ChatConfig: new Set(['ChatSession', 'ChatTurn']),
+  ChatSession: new Set(['ChatConfig', 'ChatTurn']),
+  ChatTurn: new Set(['ChatConfig']),
   Resource: new Set(['Agent', 'Document', 'HtmlPage', 'Note', 'ResourceAccess', 'Skill']),
   Agent: new Set(['ResourceAccess']),
   Document: new Set(['ResourceAccess']),
@@ -57,4 +60,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log('Domain 依赖边界检查通过：ResourceCore、资源叶域与互动拆分域未反向依赖上游聚合。');
+console.log('Domain 依赖边界检查通过：Chat 与 Resource 拆分域未反向依赖其下游聚合。');

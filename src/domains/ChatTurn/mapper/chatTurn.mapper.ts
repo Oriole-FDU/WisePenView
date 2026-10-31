@@ -1,15 +1,13 @@
-import type {
-  ChatCompletionRequest,
-  ClientToolCapability,
-  ClientToolCapabilityRequest,
-  SendSessionMessageOptions,
-} from '../session/index.type';
+import type { ChatCompletionApiRequest } from '../apis/ChatStreamApi.schema';
+import type { ClientToolCapability, SendTurnMessageOptions } from '../service/index.type';
 
 function unique(values?: readonly string[]): string[] {
   return Array.from(new Set(values ?? []));
 }
 
-function mapClientToolCapability(capability: ClientToolCapability): ClientToolCapabilityRequest {
+function mapClientToolCapability(
+  capability: ClientToolCapability
+): NonNullable<ChatCompletionApiRequest['client_tool_capabilities']>[number] {
   return {
     name: capability.name,
     description: capability.description,
@@ -17,12 +15,12 @@ function mapClientToolCapability(capability: ClientToolCapability): ClientToolCa
   };
 }
 
-export function mapChatCompletionRequest(params: {
+export function mapChatTurnRequest(params: {
   defaultSessionId: string;
   defaultModel?: string;
   query: string;
-  options?: SendSessionMessageOptions;
-}): ChatCompletionRequest {
+  options?: SendTurnMessageOptions;
+}): ChatCompletionApiRequest {
   const { defaultSessionId, defaultModel, query, options = {} } = params;
   const resolvedModel = options.model ?? defaultModel;
   const frontendStates = options.frontendStates ?? [];
