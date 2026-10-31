@@ -25,6 +25,7 @@ import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
 import type { IUserTaskService } from '@/domains/UserTask';
 import type { IUserTourService } from '@/domains/UserTour';
+import type { IUserVerificationService } from '@/domains/UserVerification';
 import type { IWalletService } from '@/domains/Wallet';
 import { useRequiredContext } from '@/hooks/useRequiredContext';
 
@@ -70,5 +71,7 @@ export const useTagService = (): ITagService => useServicesContext().tagService;
 export const useUserService = (): IUserService => useServicesContext().userService;
 export const useUserTaskService = (): IUserTaskService => useServicesContext().userTaskService;
 export const useUserTourService = (): IUserTourService => useServicesContext().userTourService;
+export const useUserVerificationService = (): IUserVerificationService =>
+  useServicesContext().userVerificationService;
 /** 个人中心钱包、高级组 token 相关页注入 */
 export const useWalletService = (): IWalletService => useServicesContext().walletService;

@@ -32,4 +32,5 @@ export { TagApi } from '@/domains/Tag/apis/TagApi';
 export { UserApi } from '@/domains/User/apis/UserApi';
 export { UserTaskApi } from '@/domains/UserTask/apis/UserTaskApi';
 export { UserTourApi } from '@/domains/UserTour/apis/UserTourApi';
+export { UserVerificationApi } from '@/domains/UserVerification/apis/UserVerificationApi';
 export { WalletApi } from '@/domains/Wallet/apis/WalletApi';

@@ -23,14 +23,10 @@ export {
   USER_VERIFICATION_PROVIDER,
 } from './enum';
 export type {
-  ConfirmEmailVerifyRequest,
-  FudanUISVerifyStatusData,
-  InitiateUISVerifyRequest,
   IUserService,
   ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
-  SendEmailVerifyRequest,
   UpdateUserInfoRequest,
 } from './service/index.type';

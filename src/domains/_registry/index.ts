@@ -35,6 +35,7 @@ export {
   useUserService,
   useUserTaskService,
   useUserTourService,
+  useUserVerificationService,
   useWalletService,
 } from './_context';
 export { ServicesProvider } from './_context';

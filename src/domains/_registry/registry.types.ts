@@ -25,6 +25,7 @@ import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
 import type { IUserTaskService } from '@/domains/UserTask';
 import type { IUserTourService } from '@/domains/UserTour';
+import type { IUserVerificationService } from '@/domains/UserVerification';
 import type { IWalletService } from '@/domains/Wallet';
 
 export interface ServicesContextValue {
@@ -55,5 +56,6 @@ export interface ServicesContextValue {
   userService: IUserService;
   userTaskService: IUserTaskService;
   userTourService: IUserTourService;
+  userVerificationService: IUserVerificationService;
   walletService: IWalletService;
 }

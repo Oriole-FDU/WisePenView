@@ -10,15 +10,15 @@ import {
 } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/base/Button';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
-import { useUserService } from '@/domains';
-import type { ConfirmEmailVerifyRequest } from '@/domains/User';
+import { useUserVerificationService } from '@/domains';
+import type { ConfirmEmailVerifyRequest } from '@/domains/UserVerification';
 import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import auth from '../_common/style.module.scss';
 
 function VerifyEmail() {
-  const userService = useUserService();
+  const userVerificationService = useUserVerificationService();
   const { t } = useTranslation('auth');
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ function VerifyEmail() {
   const { loading, run: runVerify } = useApi(
     (verifyToken: string) => {
       const params: ConfirmEmailVerifyRequest = { token: verifyToken };
-      return userService.confirmEmailVerify(params);
+      return userVerificationService.confirmEmailVerify(params);
     },
     {
       manual: true,

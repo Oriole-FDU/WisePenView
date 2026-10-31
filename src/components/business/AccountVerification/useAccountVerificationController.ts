@@ -11,8 +11,8 @@ import {
   readRedirectParam,
   saveAuthContinuation,
 } from '@/bootstrap/authContinuation';
-import { useUserService } from '@/domains';
-import type { InitiateUISVerifyRequest, SendEmailVerifyRequest } from '@/domains/User';
+import { useUserVerificationService } from '@/domains';
+import type { InitiateUISVerifyRequest, SendEmailVerifyRequest } from '@/domains/UserVerification';
 import { useApi } from '@/hooks/useApi';
 
 import type { UisOutcomeState, VerifyFormErrors, VerifyModalMode } from './index.type';
@@ -41,7 +41,7 @@ export const useAccountVerificationController = ({
   onVerified,
 }: UseAccountVerificationControllerOptions) => {
   const { t } = useTranslation(['profile']);
-  const userService = useUserService();
+  const userVerificationService = useUserVerificationService();
   const [verifyMode, setVerifyMode] = useState<VerifyModalMode>(defaultMode);
   const [email, setEmail] = useState('');
   const [uisAccount, setUisAccount] = useState('');
@@ -89,7 +89,7 @@ export const useAccountVerificationController = ({
   };
 
   const { run: runUisPolling, cancel: cancelUisPolling } = useApi(
-    () => userService.checkFudanUISVerify(),
+    () => userVerificationService.checkFudanUISVerify(),
     {
       manual: true,
       pollingInterval: 2000,
@@ -141,7 +141,7 @@ export const useAccountVerificationController = ({
     async () => {
       const params: SendEmailVerifyRequest = { email: email.trim() };
       saveAuthContinuation('verifyEmail', resolveVerificationRedirectPath());
-      await userService.sendEmailVerify(params);
+      await userVerificationService.sendEmailVerify(params);
     },
     {
       manual: true,
@@ -161,7 +161,7 @@ export const useAccountVerificationController = ({
         uisPassword,
       };
       saveAuthContinuation('uisVerify', resolveVerificationRedirectPath());
-      await userService.initiateUISVerify(params);
+      await userVerificationService.initiateUISVerify(params);
     },
     {
       manual: true,

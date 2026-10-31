@@ -7,14 +7,6 @@ import {
   type ChangeUserInfoApiContractRequest,
   ChangeUserProfileApiContract,
   type ChangeUserProfileApiContractRequest,
-  CheckEmailVerifyApiContract,
-  type CheckEmailVerifyApiContractRequest,
-  CheckFudanUISVerifyApiContract,
-  type CheckFudanUISVerifyApiContractResponse,
-  InitiateEmailVerifyApiContract,
-  type InitiateEmailVerifyApiContractRequest,
-  InitiateFudanUISVerifyApiContract,
-  type InitiateFudanUISVerifyApiContractRequest,
   ListUserInviteRecordsApiContract,
   type ListUserInviteRecordsApiContractRequest,
   type ListUserInviteRecordsApiContractResponse,
@@ -46,24 +38,6 @@ async function listUserSearchSuggestions(
   return executeApiContract(ListUserSearchSuggestionsApiContract, req);
 }
 
-async function initiateEmailVerify(req: InitiateEmailVerifyApiContractRequest): Promise<void> {
-  await executeApiContract(InitiateEmailVerifyApiContract, req);
-}
-
-async function initiateFudanUISVerify(
-  req: InitiateFudanUISVerifyApiContractRequest
-): Promise<void> {
-  await executeApiContract(InitiateFudanUISVerifyApiContract, req);
-}
-
-function checkFudanUISVerify(): Promise<CheckFudanUISVerifyApiContractResponse> {
-  return executeApiContract(CheckFudanUISVerifyApiContract, undefined);
-}
-
-async function checkEmailVerify(req: CheckEmailVerifyApiContractRequest): Promise<void> {
-  await executeApiContract(CheckEmailVerifyApiContract, req);
-}
-
 async function changeUserInfo(req: ChangeUserInfoApiContractRequest): Promise<void> {
   await executeApiContract(ChangeUserInfoApiContract, req);
 }
@@ -82,10 +56,6 @@ export const UserApi = {
   getUserInfo,
   searchUser,
   listUserSearchSuggestions,
-  initiateEmailVerify,
-  initiateFudanUISVerify,
-  checkFudanUISVerify,
-  checkEmailVerify,
   changeUserInfo,
   changeUserProfile,
   listInviteRecords,

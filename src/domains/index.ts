@@ -31,6 +31,7 @@ export {
   useUserService,
   useUserTaskService,
   useUserTourService,
+  useUserVerificationService,
   useWalletService,
 } from './_registry';
 export type { FeedbackType, SubmitFeedbackRequest } from './Feedback';

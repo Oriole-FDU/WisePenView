@@ -31,4 +31,5 @@ export { TagApi } from '@/domains/Tag/mock/TagApi.mock';
 export { UserApi } from '@/domains/User/mock/UserApi.mock';
 export { UserTaskApi } from '@/domains/UserTask/mock/UserTaskApi.mock';
 export { UserTourApi } from '@/domains/UserTour/mock/UserTourApi.mock';
+export { UserVerificationApi } from '@/domains/UserVerification/mock/UserVerificationApi.mock';
 export { WalletApi } from '@/domains/Wallet/mock/WalletApi.mock';

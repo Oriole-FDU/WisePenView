@@ -20,12 +20,15 @@ try {
         export {
           ChangeUserInfoApiContract,
           ChangeUserProfileApiContract,
+          ListUserInviteRecordsApiContract,
+        } from '@/domains/User/apis/AccountApi.contract';
+        export {
           CheckEmailVerifyApiContract,
           CheckFudanUISVerifyApiContract,
           InitiateEmailVerifyApiContract,
           InitiateFudanUISVerifyApiContract,
-          ListUserInviteRecordsApiContract,
-        } from '@/domains/User/apis/AccountApi.contract';
+        } from '@/domains/UserVerification/apis/UserVerificationApi.contract';
+        export { UserVerificationApi } from '@/domains/UserVerification/mock/UserVerificationApi.mock';
         export { AddFeedbackApiContract } from '@/domains/Feedback/apis/FeedbackApi.contract';
         export { FeedbackApi } from '@/domains/Feedback/mock/FeedbackApi.mock';
         export { UserServicesMap } from '@/domains/User/mapper/UserServices.map';
@@ -54,6 +57,7 @@ try {
     parseApiResponse,
     UserApi,
     UserServicesMap,
+    UserVerificationApi,
   } = await import(pathToFileURL(outfile).href);
 
   const contracts = [
@@ -104,7 +108,7 @@ try {
 
   const fudanStatus = parseApiResponse(
     CheckFudanUISVerifyApiContract,
-    await UserApi.checkFudanUISVerify()
+    await UserVerificationApi.checkFudanUISVerify()
   );
   assert.equal(fudanStatus.completed, false);
   assert.equal(typeof fudanStatus.requireAction, 'boolean');

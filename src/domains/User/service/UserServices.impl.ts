@@ -6,15 +6,11 @@ import type { User, UserAccountProfile } from '@/domains/User';
 
 import { UserServicesMap } from '../mapper/UserServices.map';
 import type {
-  ConfirmEmailVerifyRequest,
-  FudanUISVerifyStatusData,
-  InitiateUISVerifyRequest,
   IUserService,
   ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
-  SendEmailVerifyRequest,
   UpdateUserInfoRequest,
 } from './index.type';
 
@@ -70,26 +66,6 @@ const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesReques
     }
   });
   return Array.from(userMap.values()).slice(0, size);
-};
-
-const sendEmailVerify = async (params: SendEmailVerifyRequest): Promise<void> => {
-  const query = UserServicesMap.mapSendEmailVerifyRequest(params);
-  await UserApi.initiateEmailVerify(query);
-};
-
-const initiateUISVerify = async (params: InitiateUISVerifyRequest): Promise<void> => {
-  const query = UserServicesMap.mapInitiateUISVerifyRequest(params);
-  await UserApi.initiateFudanUISVerify(query);
-};
-
-const checkFudanUISVerify = async (): Promise<FudanUISVerifyStatusData> => {
-  const data = await UserApi.checkFudanUISVerify();
-  return UserServicesMap.mapFudanUISVerifyStatusFromApi(data);
-};
-
-const confirmEmailVerify = async (params: ConfirmEmailVerifyRequest): Promise<void> => {
-  const query = UserServicesMap.mapConfirmEmailVerifyRequest(params);
-  await UserApi.checkEmailVerify(query);
 };
 
 export const createUserServices = (): IUserService => {
@@ -148,9 +124,5 @@ export const createUserServices = (): IUserService => {
     listInviteRecords,
     queryUserSearchCandidates,
     updateUserInfo,
-    sendEmailVerify,
-    initiateUISVerify,
-    checkFudanUISVerify,
-    confirmEmailVerify,
   };
 };

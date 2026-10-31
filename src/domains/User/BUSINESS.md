@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文档维护当前用户资料、认证信息与邀请。任务与签到由 [UserTask](../UserTask/BUSINESS.md) 拥有，新手导览由 [UserTour](../UserTour/BUSINESS.md) 拥有；头像上传规则由 [Image](../Image/BUSINESS.md) 维护。
+本文档维护当前用户资料、认证展示字段与邀请。认证发起和挑战由 [UserVerification](../UserVerification/BUSINESS.md) 拥有，任务与签到由 [UserTask](../UserTask/BUSINESS.md) 拥有，新手导览由 [UserTour](../UserTour/BUSINESS.md) 拥有；头像上传规则由 [Image](../Image/BUSINESS.md) 维护。
 
 ## 用户资料与认证
 

@@ -76,6 +76,7 @@ try {
     userService: user,
     userTaskService: userTask,
     userTourService: userTour,
+    userVerificationService: userVerification,
     feedbackService: feedback,
     walletService: wallet,
     groupService: group,
@@ -373,6 +374,13 @@ try {
   assert((await userTask.listTaskStatus()).some((task) => task.taskCode === 'DAILY_CHECK_IN'));
   assert.equal(typeof (await userTask.dailyCheckIn()).rewardAmount, 'number');
   assert((await userTour.listTourStatus()).length > 0);
+  await userVerification.sendEmailVerify({ email: 'test@example.com' });
+  await userVerification.confirmEmailVerify({ token: 'mock-token' });
+  await userVerification.initiateUISVerify({
+    uisAccount: 'mock-account',
+    uisPassword: 'mock-password',
+  });
+  assert.equal(typeof (await userVerification.checkFudanUISVerify()).completed, 'boolean');
   await feedback.submitFeedback({
     type: 'BUG_REPORT',
     content: '離線回饋',

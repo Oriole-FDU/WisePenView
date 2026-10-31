@@ -10,10 +10,6 @@ import { normalizeId } from '@/utils/normalize/normalizeId';
 import type {
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
-  CheckEmailVerifyApiRequest,
-  CheckFudanUISVerifyApiResponse,
-  InitiateEmailVerifyApiRequest,
-  InitiateFudanUISVerifyApiRequest,
   ListUserInviteRecordsApiRequest,
   ListUserInviteRecordsApiResponse,
   UserInviteRecordApiResponse,
@@ -22,14 +18,7 @@ import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
-import type {
-  ConfirmEmailVerifyRequest,
-  FudanUISVerifyStatusData,
-  InitiateUISVerifyRequest,
-  ListUserInviteRecordsRequest,
-  SendEmailVerifyRequest,
-  UpdateUserInfoRequest,
-} from '../service/index.type';
+import type { ListUserInviteRecordsRequest, UpdateUserInfoRequest } from '../service/index.type';
 import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
@@ -95,36 +84,6 @@ const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchU
 const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =>
   data.map(mapSearchUserFromApi);
 
-const mapSendEmailVerifyRequest = (
-  params: SendEmailVerifyRequest
-): InitiateEmailVerifyApiRequest => ({
-  email: params.email,
-});
-
-const mapInitiateUISVerifyRequest = (
-  params: InitiateUISVerifyRequest
-): InitiateFudanUISVerifyApiRequest => ({
-  uisAccount: params.uisAccount,
-  uisPassword: params.uisPassword,
-});
-
-const mapFudanUISVerifyStatusFromApi = (
-  data: CheckFudanUISVerifyApiResponse | null | undefined
-): FudanUISVerifyStatusData => {
-  return {
-    completed: data?.completed === true,
-    requireAction: data?.requireAction === true,
-    actionPayload: typeof data?.actionPayload === 'string' ? data.actionPayload : '',
-    message: typeof data?.message === 'string' ? data.message : '',
-  };
-};
-
-const mapConfirmEmailVerifyRequest = (
-  params: ConfirmEmailVerifyRequest
-): CheckEmailVerifyApiRequest => ({
-  token: params.token,
-});
-
 const mapListInviteRecordsRequest = (
   params: ListUserInviteRecordsRequest
 ): ListUserInviteRecordsApiRequest => ({
@@ -186,10 +145,6 @@ export const UserServicesMap = {
   mapAccountProfileFromApi,
   mapUserSafeFromAccountProfile,
   mapSearchUsersFromApi,
-  mapSendEmailVerifyRequest,
-  mapInitiateUISVerifyRequest,
-  mapFudanUISVerifyStatusFromApi,
-  mapConfirmEmailVerifyRequest,
   mapListInviteRecordsRequest,
   mapListInviteRecordsFromApi,
   mapUpdateUserInfoRequests,
