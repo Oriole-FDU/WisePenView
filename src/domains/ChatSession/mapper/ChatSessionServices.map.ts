@@ -47,14 +47,10 @@ const mapSessionFromApi = (data: ChatSessionApi): ChatSession => ({
   agentVersion: data.agent_version,
 });
 
-const mapCreateSessionFromApi = (data: ChatSessionApi): ChatSession => mapSessionFromApi(data);
-
 const mapSetSessionAgentRequest = (params: SetSessionAgentRequest): SetSessionAgentApiRequest => ({
   session_id: params.sessionId,
   ...(params.agentId !== undefined ? { agent_id: params.agentId } : {}),
 });
-
-const mapSetSessionAgentFromApi = (data: ChatSessionApi): ChatSession => mapSessionFromApi(data);
 
 const mapRenameSessionRequest = (params: RenameSessionRequest): RenameSessionApiRequest => {
   const newTitle = params.newTitle;
@@ -65,8 +61,6 @@ const mapRenameSessionRequest = (params: RenameSessionRequest): RenameSessionApi
     ...(hasNewTitle ? { new_title: newTitle } : {}),
   };
 };
-
-const mapRenameSessionFromApi = (data: ChatSessionApi): ChatSession => mapSessionFromApi(data);
 
 const mapListSessionsRequest = (params?: ListSessionsRequest): ListSessionsApiRequest => ({
   ...(params?.page !== undefined ? { page: params.page } : {}),
@@ -346,11 +340,9 @@ const mapListHistoryMessagesFromApi = (
 
 export const ChatSessionServicesMap = {
   mapCreateSessionRequest,
-  mapCreateSessionFromApi,
   mapSetSessionAgentRequest,
-  mapSetSessionAgentFromApi,
   mapRenameSessionRequest,
-  mapRenameSessionFromApi,
+  mapSessionFromApi,
   mapListSessionsRequest,
   mapListSessionsFromApi,
   mapListHistoryMessagesRequest,

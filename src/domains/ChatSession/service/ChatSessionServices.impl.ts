@@ -31,7 +31,7 @@ const createSession = async (params?: CreateSessionRequest): Promise<ChatSession
   if (!data) {
     throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_CREATE_SESSION_FAILED);
   }
-  const session = ChatSessionServicesMap.mapCreateSessionFromApi(data);
+  const session = ChatSessionServicesMap.mapSessionFromApi(data);
   cacheSessions([session], snapshot);
   return session;
 };
@@ -44,7 +44,7 @@ const setSessionAgent = async (params: SetSessionAgentRequest): Promise<ChatSess
   if (!data) {
     throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_CREATE_SESSION_FAILED);
   }
-  const session = ChatSessionServicesMap.mapSetSessionAgentFromApi(data);
+  const session = ChatSessionServicesMap.mapSessionFromApi(data);
   cacheSessions([session], snapshot);
   return session;
 };
@@ -57,7 +57,7 @@ const renameSession = async (params: RenameSessionRequest): Promise<ChatSession>
   if (!data) {
     throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_RENAME_SESSION_FAILED);
   }
-  const session = ChatSessionServicesMap.mapRenameSessionFromApi(data);
+  const session = ChatSessionServicesMap.mapSessionFromApi(data);
   cacheSessions([session], snapshot);
   return session;
 };
