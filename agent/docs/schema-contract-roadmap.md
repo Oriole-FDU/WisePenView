@@ -7,8 +7,8 @@
 ## 一、计数口径
 
 - **Contract 缺口：0 个 endpoint。** Admin 公告的路由、API、service 与 mock 已删除；UI 组件作为未路由的受控组件保留。
-- **待办 track：17 项。** 按可独立验收的能力或决策计数，不把一组 CRUD 内的每个 endpoint 重复计数。
-- 其中：后端/协议依赖 8 项、前端边界债务 2 项、运行态验证 1 项、业务决策 6 项。
+- **待办 track：16 项。** 按可独立验收的能力或决策计数，不把一组 CRUD 内的每个 endpoint 重复计数。
+- 其中：后端/协议依赖 8 项、前端边界债务 1 项、运行态验证 1 项、业务决策 6 项。
 
 ## 二、后端或协议依赖
 
@@ -25,10 +25,9 @@
 
 ## 三、前端可以直接推进
 
-| ID  | 未完成项             | 当前问题                                                                                 | 完成条件                                                                                                                                                              | 证据                                                                                                                                                                                                                                                                |
-| --- | -------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1  | ResourceSummary 边界 | Agent、Document、HtmlPage、Note、Skill、Favorite 仍穿透完整 `ResourceItem`，跨域依赖过宽 | 定义稳定 ResourceSummary；资源叶域只消费摘要，完整 ResourceCore 类型留在 ResourceAccess 等上层聚合                                                                    | [Resource entity](../../src/domains/Resource/entity/resource.ts)                                                                                                                                                                                                    |
-| F2  | 无领域语义 mapper    | 仍有只复制字段或只检查非空的 mapper，增加调用层与维护面                                  | 删除 UserInvite/UserVerification 请求复制、Message request 映射、Note title/create/fork 映射、InlineComment identity 映射、Placement count 映射和 Wallet voucher 映射 | [UserServices.map.ts](../../src/domains/User/mapper/UserServices.map.ts)、[InlineCommentServices.map.ts](../../src/domains/InlineComment/mapper/InlineCommentServices.map.ts)、[ResourceServices.map.ts](../../src/domains/Resource/mapper/ResourceServices.map.ts) |
+| ID  | 未完成项             | 当前问题                                                                                 | 完成条件                                                                                           | 证据                                                             |
+| --- | -------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| F1  | ResourceSummary 边界 | Agent、Document、HtmlPage、Note、Skill、Favorite 仍穿透完整 `ResourceItem`，跨域依赖过宽 | 定义稳定 ResourceSummary；资源叶域只消费摘要，完整 ResourceCore 类型留在 ResourceAccess 等上层聚合 | [Resource entity](../../src/domains/Resource/entity/resource.ts) |
 
 ## 四、运行态验证
 
@@ -49,12 +48,11 @@
 
 ## 六、建议顺序
 
-1. 先完成 F2，这是当前唯一无需等后端、且可直接减少代码面的工作。
-2. 按业务影响推进 B3、B2，分别解决权限 N+1 与 Tag 作用域。
-3. B5、B6、B7、B8 属于新的写命令语义，应合并进同一轮后端 API v2 设计，避免零散新增 endpoint。
-4. F1 在 ResourceSummary Contract 稳定后统一迁移，避免各叶域分别造临时类型。
-5. V1 在联调环境可用后执行，不能以 mock 或静态检查替代。
-6. D1-D6 应在对应后端改造开始前关闭，不能以 mapper fallback 维持不确定状态。
+1. 按业务影响推进 B3、B2，分别解决权限 N+1 与 Tag 作用域。
+2. B5、B6、B7、B8 属于新的写命令语义，应合并进同一轮后端 API v2 设计，避免零散新增 endpoint。
+3. F1 在 ResourceSummary Contract 稳定后统一迁移，避免各叶域分别造临时类型。
+4. V1 在联调环境可用后执行，不能以 mock 或静态检查替代。
+5. D1-D6 应在对应后端改造开始前关闭，不能以 mapper fallback 维持不确定状态。
 
 ## 七、完成定义
 
