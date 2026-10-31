@@ -29,6 +29,6 @@ export { SkillApi } from '@/domains/Skill/apis/SkillApi';
 export { SpeechApi } from '@/domains/Speech/apis/SpeechApi';
 export { TagApi } from '@/domains/Tag/apis/TagApi';
 export { UserApi } from '@/domains/User/apis/UserApi';
-export { UserTourApi } from '@/domains/User/apis/UserTourApi';
 export { UserTaskApi } from '@/domains/UserTask/apis/UserTaskApi';
+export { UserTourApi } from '@/domains/UserTour/apis/UserTourApi';
 export { WalletApi } from '@/domains/Wallet/apis/WalletApi';

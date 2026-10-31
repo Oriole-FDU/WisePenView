@@ -4,7 +4,6 @@ import type {
   UserInviteRecord,
   UserInviteRecordList,
   UserSearchUser,
-  UserTourStatus,
 } from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
@@ -24,7 +23,6 @@ import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
-import type { UserTourStatusApiResponse } from '../apis/UserTourApi.schema';
 import type {
   ConfirmEmailVerifyRequest,
   FudanUISVerifyStatusData,
@@ -163,12 +161,6 @@ const mapSubmitFeedbackRequest = (params: SubmitFeedbackRequest): AddFeedbackApi
   type: params.type,
 });
 
-const mapTourStatusesFromApi = (data: UserTourStatusApiResponse[]): UserTourStatus[] =>
-  data.map(({ tourCode, completed }) => ({
-    tourCode,
-    completed: completed === true,
-  }));
-
 const mapUpdateUserInfoRequests = (
   params: UpdateUserInfoRequest
 ): {
@@ -211,6 +203,5 @@ export const UserServicesMap = {
   mapListInviteRecordsRequest,
   mapListInviteRecordsFromApi,
   mapSubmitFeedbackRequest,
-  mapTourStatusesFromApi,
   mapUpdateUserInfoRequests,
 };

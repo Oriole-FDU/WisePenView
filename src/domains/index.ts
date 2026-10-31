@@ -29,6 +29,7 @@ export {
   useTagService,
   useUserService,
   useUserTaskService,
+  useUserTourService,
   useWalletService,
 } from './_registry';
 export type { HtmlPageDisplayInfo, HtmlPageVersionInfo, IHtmlPageService } from './HtmlPage';

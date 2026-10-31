@@ -7,7 +7,6 @@ export type {
   UserProfileInfo,
   UserSearchUser,
 } from './entity/user';
-export type { TourCode, UserTourStatus } from './entity/userTour';
 export type {
   DegreeLevel,
   FeedbackType,

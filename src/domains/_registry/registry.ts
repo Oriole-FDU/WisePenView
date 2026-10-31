@@ -35,6 +35,7 @@ import { createSpeechServices } from '@/domains/Speech/service/SpeechServices.im
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
 import { createUserServices } from '@/domains/User/service/UserServices.impl';
 import { createUserTaskServices } from '@/domains/UserTask/service/UserTaskServices.impl';
+import { createUserTourServices } from '@/domains/UserTour/service/UserTourServices.impl';
 import { createWalletServices } from '@/domains/Wallet/service/WalletServices.impl';
 
 import type { ServicesContextValue } from './registry.types';
@@ -57,6 +58,7 @@ const speechService = createSpeechServices();
 const tagService = createTagServices();
 const userService = createUserServices();
 const userTaskService = createUserTaskServices();
+const userTourService = createUserTourServices();
 const walletService = createWalletServices();
 
 // Level 1：依赖 Level 0
@@ -119,6 +121,7 @@ const servicesValue: ServicesContextValue = {
   tagService: tagService,
   userService: userService,
   userTaskService,
+  userTourService,
   walletService: walletService,
 };
 

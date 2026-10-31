@@ -1,8 +1,8 @@
-import { UserApi, UserTourApi } from '@domain-apis';
+import { UserApi } from '@domain-apis';
 
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createTtlCache } from '@/domains/_shared/ttlCache';
-import type { TourCode, User, UserAccountProfile, UserTourStatus } from '@/domains/User';
+import type { User, UserAccountProfile } from '@/domains/User';
 
 import { UserServicesMap } from '../mapper/UserServices.map';
 import type {
@@ -98,15 +98,6 @@ const submitFeedback = async (params: SubmitFeedbackRequest): Promise<void> => {
   await UserApi.addFeedback(payload);
 };
 
-const listTourStatus = async (): Promise<UserTourStatus[]> => {
-  const data = await UserTourApi.listTourStatus();
-  return UserServicesMap.mapTourStatusesFromApi(data);
-};
-
-const completeTour = async (tourCode: TourCode): Promise<void> => {
-  await UserTourApi.completeTour(tourCode);
-};
-
 export const createUserServices = (): IUserService => {
   /** 闭包级缓存，仅存非敏感展示字段，退出登录时清理，读缓存自动过期。 */
   const userInfoCache = createTtlCache<string, CachedUserSafe>(USER_INFO_CACHE_TTL_MS);
@@ -168,7 +159,5 @@ export const createUserServices = (): IUserService => {
     checkFudanUISVerify,
     confirmEmailVerify,
     submitFeedback,
-    listTourStatus,
-    completeTour,
   };
 };

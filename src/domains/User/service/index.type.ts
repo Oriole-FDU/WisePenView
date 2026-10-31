@@ -1,6 +1,5 @@
 import type { UserInviteRecordList } from '../entity/invite';
 import type { User, UserAccountProfile, UserSearchUser } from '../entity/user';
-import type { TourCode, UserTourStatus } from '../entity/userTour';
 import type { DegreeLevel, FeedbackType, Sex } from '../enum';
 
 /** UserService 接口：供依赖注入使用 */
@@ -26,8 +25,6 @@ export interface IUserService {
   checkFudanUISVerify(): Promise<FudanUISVerifyStatusData>;
   confirmEmailVerify(params: ConfirmEmailVerifyRequest): Promise<void>;
   submitFeedback(params: SubmitFeedbackRequest): Promise<void>;
-  listTourStatus(): Promise<UserTourStatus[]>;
-  completeTour(tourCode: TourCode): Promise<void>;
 }
 
 /** 确认邮箱验证请求参数 */

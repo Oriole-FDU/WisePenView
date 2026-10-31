@@ -23,6 +23,7 @@ import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
 import type { IUserTaskService } from '@/domains/UserTask';
+import type { IUserTourService } from '@/domains/UserTour';
 import type { IWalletService } from '@/domains/Wallet';
 import { useRequiredContext } from '@/hooks/useRequiredContext';
 
@@ -66,5 +67,6 @@ export const useSpeechService = (): ISpeechService => useServicesContext().speec
 export const useTagService = (): ITagService => useServicesContext().tagService;
 export const useUserService = (): IUserService => useServicesContext().userService;
 export const useUserTaskService = (): IUserTaskService => useServicesContext().userTaskService;
+export const useUserTourService = (): IUserTourService => useServicesContext().userTourService;
 /** 个人中心钱包、高级组 token 相关页注入 */
 export const useWalletService = (): IWalletService => useServicesContext().walletService;

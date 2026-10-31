@@ -24,7 +24,7 @@ try {
         export {
           CompleteTourApiContract,
           ListUserTourStatusApiContract,
-        } from '@/domains/User/apis/UserTourApi.contract';
+        } from '@/domains/UserTour/apis/UserTourApi.contract';
         export {
           ListUserMessagesApiContract,
           ReadMessageApiContract,
@@ -36,12 +36,12 @@ try {
           TransferTokenBetweenGroupAndUserApiContract,
         } from '@/domains/Wallet/apis/WalletApi.contract';
         export { ListUserTaskStatusApiContract as TaskContract } from '@/domains/UserTask/apis/UserTaskApi.contract';
-        export { ListUserTourStatusApiContract as TourContract } from '@/domains/User/apis/UserTourApi.contract';
+        export { ListUserTourStatusApiContract as TourContract } from '@/domains/UserTour/apis/UserTourApi.contract';
         export { ListUserMessagesApiContract as MessageContract } from '@/domains/Message/apis/MessageApi.contract';
         export { ListTransactionsApiContract as WalletContract } from '@/domains/Wallet/apis/WalletApi.contract';
         export { MessageApi } from '@/domains/Message/mock/MessageApi.mock';
         export { UserTaskApi } from '@/domains/UserTask/mock/UserTaskApi.mock';
-        export { UserTourApi } from '@/domains/User/mock/UserTourApi.mock';
+        export { UserTourApi } from '@/domains/UserTour/mock/UserTourApi.mock';
         export { WalletApi } from '@/domains/Wallet/mock/WalletApi.mock';
       `,
       resolveDir: root,

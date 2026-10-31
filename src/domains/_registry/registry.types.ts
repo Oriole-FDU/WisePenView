@@ -23,6 +23,7 @@ import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
 import type { IUserTaskService } from '@/domains/UserTask';
+import type { IUserTourService } from '@/domains/UserTour';
 import type { IWalletService } from '@/domains/Wallet';
 
 export interface ServicesContextValue {
@@ -51,5 +52,6 @@ export interface ServicesContextValue {
   tagService: ITagService;
   userService: IUserService;
   userTaskService: IUserTaskService;
+  userTourService: IUserTourService;
   walletService: IWalletService;
 }

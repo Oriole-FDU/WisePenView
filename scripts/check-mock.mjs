@@ -75,6 +75,7 @@ try {
     agentService: agent,
     userService: user,
     userTaskService: userTask,
+    userTourService: userTour,
     walletService: wallet,
     groupService: group,
     inlineCommentService: inline,
@@ -370,6 +371,7 @@ try {
   assert.equal(candidates.length, 1);
   assert((await userTask.listTaskStatus()).some((task) => task.taskCode === 'DAILY_CHECK_IN'));
   assert.equal(typeof (await userTask.dailyCheckIn()).rewardAmount, 'number');
+  assert((await userTour.listTourStatus()).length > 0);
   assert(
     (await wallet.listTransactions({ transactionTypes: ['REFILL', 'SPEND'], page: 1, size: 20 }))
       .records.length > 0

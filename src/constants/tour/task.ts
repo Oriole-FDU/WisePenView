@@ -1,4 +1,4 @@
-import type { TourCode } from '@/domains/User';
+import type { TourCode } from '@/domains/UserTour';
 
 import type { GuideTourId } from './types';
 

@@ -33,6 +33,7 @@ export {
   useTagService,
   useUserService,
   useUserTaskService,
+  useUserTourService,
   useWalletService,
 } from './_context';
 export { ServicesProvider } from './_context';
