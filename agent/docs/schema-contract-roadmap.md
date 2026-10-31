@@ -43,8 +43,6 @@ flowchart TD
   UV[User Verification<br/>Email / Campus Provider]
   UT[User Task<br/>Status / Check-in]
   UR[User Tour<br/>Status / Completion]
-  WI[User Invite<br/>Records / Status]
-  FB[Feedback<br/>Types / Submission]
   G[Group<br/>Group / Membership]
   T[Tag<br/>TagSummary / TagTree / TagPolicy]
   R[Resource Core<br/>List / Base / Detail / Search]
@@ -70,8 +68,6 @@ flowchart TD
   W --> UV
   W --> UT
   W --> UR
-  W --> FB
-  U --> WI
   U --> G
   A --> G
   U --> T
@@ -112,7 +108,7 @@ flowchart TD
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef partial fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
   classDef decision fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:2px
-  class W,A,U,UV,UT,UR,WI,FB,G,R,I,CM,F,C,D,N,S,AG,H,CHS,CHT,CHC,DR completed
+  class W,A,U,UV,UT,UR,G,R,I,CM,F,C,D,N,S,AG,H,CHS,CHT,CHC,DR completed
   class T,AD,RA partial
   class CO decision
 ```
@@ -121,7 +117,7 @@ flowchart TD
 
 - 已完成：`W Shared Wire Schema`、`A AccessPolicy`、`U UserInformation`、`G Group`、`R ResourceCore`。
 - 已完成：`I Resource Interaction`、`CM Resource Comment`、`F Resource Favorite`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。原 `Interact` 聚合域已删除，没有保留转发壳。
-- 已完成：UserVerification、UserTask、UserTour、UserInvite、Feedback、Message、Wallet、ChatSession、ChatTurn、ChatConfig、Speech 与 SSE；Drive 保持纯前端聚合。原 Chat 聚合域已删除。
+- 已完成：UserVerification、UserTask、UserTour、Message、Wallet、ChatSession、ChatTurn、ChatConfig、Speech 与 SSE；Drive 保持纯前端聚合。原 Chat 聚合域已删除。
 - 部分完成：`T Tag` 的通用树、命令、策略已完成，scoped endpoint 仍阻塞；`AD Admin` 的用户管理已完成，公告接口仍阻塞。
 - 部分完成：`RA Resource Access` 已从前端 ResourceCore 拆成独立聚合域；后端 Overview endpoint 尚未上线，权限补全 mapper 暂时不能删除。
 - 待业务决策：`CO Course` 是否升级为正式后端域；当前仍只能视为高级 Group 聚合。
@@ -131,7 +127,7 @@ flowchart TD
 - `Shared Wire Schema` 不拥有业务规则，只表达后端序列化事实和公共结构。
 - `Access Policy` 拥有 `DISCOVER / VIEW / LOAD / EDIT / ... / MARKET_VIEW` 以及访问范围，Tag、Group、Resource 都依赖它，不再让 Tag 反向依赖 Resource 来取得动作定义。
 - `User Information` 只暴露稳定用户摘要；不要把完整账户资料、钱包、消息、任务全部塞进所有消费者。
-- `UserVerification`、`UserTask`、`UserTour`、`UserInvite`、`Feedback` 是独立变化原因，不因使用 `/user/*` endpoint 而重新合并进 UserInformation。
+- `UserVerification`、`UserTask`、`UserTour` 有独立生命周期，保留为独立域；邀请与反馈只有一个列表／提交接口，继续留在 User，不为了 endpoint 对称拆域。
 - `Tag` 的树节点依赖用户摘要与访问策略，不依赖 Resource entity。
 - `ResourceCore` 消费 Group、Tag、User 的摘要契约，不拥有 Tag 编辑、评论、收藏、文档解析等能力。
 - `Document / Note / Skill / Agent / HtmlPage` 是 ResourceCore 之上的资源能力叶域。
@@ -141,7 +137,7 @@ flowchart TD
 
 ### 当前实际依赖边
 
-下表是 2026-10-31 按当前源码扫描得到的 39 组跨 domain 边。`强` 表示类型或协议无法独立成立，`软` 表示只发生在 service 编排、mock 或展示摘要场景。
+下表是 2026-10-31 按当前源码扫描得到的 38 组跨 domain 边。`强` 表示类型或协议无法独立成立，`软` 表示只发生在 service 编排、mock 或展示摘要场景。
 
 | 依赖边                                                                               | 主要位置                             | 判断                                                        |
 | ------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------------------------------------------- |
@@ -163,7 +159,6 @@ flowchart TD
 | ResourceInteraction -> Resource                                                      | mock 资源状态                        | 仅 mock 软依赖；正式 service/type 不依赖 Resource           |
 | Skill -> Resource                                                                    | 详情内嵌、权限概览、service          | 强；后续应收敛为 ResourceSummary                            |
 | Tag -> User                                                                          | 创建者摘要                           | 强；应使用 UserSummary                                      |
-| UserInvite -> User                                                                   | 邀请人展示与邀请记录 DTO             | 强；使用公开 UserDisplay 类型                               |
 | Wallet -> Group、User                                                                | 操作人摘要、mock 群组钱包            | User 为强依赖；Group 仅 mock 软依赖                         |
 
 当前代码没有 service 实现级循环，ResourceAccess 的资源叶域依赖与 Course 的编排依赖都通过 registry 注入。Resource 互动三域互不依赖；ChatConfig 与 ChatSession 互不依赖，ChatTurn 只依赖 ChatSession 的消息模型；两个拆分组都由 `check:boundaries` 固化。
@@ -176,7 +171,8 @@ flowchart TD
 
 - `UserInformation`：已完成 `UserSummary`、当前用户展示信息、用户搜索与补全；账号资料更新暂留在 User，后续再按 profile CRUD 变化拆出。
 - `UserVerification`：已完成邮箱、Provider 发起、挑战与状态查询。
-- `UserTask`、`UserTour`、`UserInvite`、`Feedback`、`Message`、`Wallet`：已完成独立业务域，不并回 UserInformation。
+- `UserTask`、`UserTour`、`Message`、`Wallet`：已完成独立业务域，不并回 UserInformation。
+- `User`：资料、邀请记录与反馈提交共同属于当前用户能力；单接口邀请／反馈不拆 domain。
 
 ### 2. Resource 与 Access
 
@@ -630,7 +626,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 - [x] UserSummary、UserDetail、UserSearch Schema 与 checked Contract。
 - [x] AccountProfile、邮箱认证、邀请记录与用户反馈 Schema 及 checked Contract。
-- [x] 邮箱/校园认证拆为 UserVerification，用户反馈拆为 Feedback，任务与导览分别拆为 UserTask、UserTour。
+- [x] 邮箱/校园认证拆为 UserVerification；任务与导览分别拆为 UserTask、UserTour；单接口邀请与反馈保留在 User。
 - [x] ResourceAction、AccessControlScope、动作依赖和通用权限选择规则从 Resource/Tag 提到独立 AccessPolicy。
 - [x] 补 `MARKET_VIEW`，区分完整动作集合与普通权限编辑器可配置动作。
 - [x] 提供严格的 `ResourceActionSchema` 与 `AccessControlScopeSchema`，前端权限只使用动作集合。
@@ -680,7 +676,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - [x] InlineComment：8 个 checked Contract，reaction 固定为 `userId -> reaction[]`。
 - [x] Message：列表与批量已读 checked Contract。
 - [x] Wallet：钱包、兑换、流水与划转 checked Contract。
-- [x] UserTask / UserTour / UserInvite / UserVerification / Feedback：各自拥有 service、mapper、mock 与 `BUSINESS.md`，不通过 UserService 转发。
+- [x] UserTask / UserTour / UserVerification：各自拥有 service、mapper、mock 与 `BUSINESS.md`；邀请与反馈因不足独立能力粒度，保留在 UserService。
 - [x] Admin User：修正 `userStatus`、身份查询枚举、毫秒时间与重置密码请求。
 - [ ] Admin 公告：`/admin/message/*` 在后端不存在，保持 unchecked；需先新增受管理员权限保护的 Controller、DTO 与数据源。
 
@@ -716,10 +712,11 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 12. **SSE、文本、二进制有独立 Contract。** 不得绕过 Observability、错误归一化和安全检查直接使用裸 `fetch` 默认值。
 13. **DTO、entity、view model 三层不能互相穿透。** View/Controller 不读取 wire DTO；API 不读取 entity；mapper 不处理 React/UI。
 14. **域名按业务能力而非后端微服务命名。** 同一 user-service 内的 Wallet/Message/Verification 不应合成为一个巨型 User DTO。
-15. **一个 URL 只定义一次。** 不同领域复用通过 service 编排，不复制 endpoint。
-16. **新增接口必须同时交付 Zod、Contract、transport、mock 和契约测试。** 没有运行时测试的“类型化接口”不算完成。
-17. **旧接口必须有退场计划。** 使用 TypeScript `@deprecated` 或业务文档标明替代入口、调用点清理条件和删除时机，不保留无限期双路径。
-18. **Schema 诊断只记录 endpoint、contract、字段路径和 issue code。** 不记录原始请求/响应正文，避免凭据和用户数据进入遥测。
+15. **Domain 不能按 endpoint 碎裂。** 最低粒度应是一组完整 CRUD 或等价生命周期能力；单次查询、单次提交和薄 wrapper 默认留在父域。
+16. **一个 URL 只定义一次。** 不同领域复用通过 service 编排，不复制 endpoint。
+17. **新增接口必须同时交付 Zod、Contract、transport、mock 和契约测试。** 没有运行时测试的“类型化接口”不算完成。
+18. **旧接口必须有退场计划。** 使用 TypeScript `@deprecated` 或业务文档标明替代入口、调用点清理条件和删除时机，不保留无限期双路径。
+19. **Schema 诊断只记录 endpoint、contract、字段路径和 issue code。** 不记录原始请求/响应正文，避免凭据和用户数据进入遥测。
 
 ### 当前明确标记的退场项
 

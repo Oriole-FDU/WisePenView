@@ -2,6 +2,15 @@
 
 Service 层位于 `src/domains/<Domain>/service`，负责业务编排和错误抛出。它是 view/component 获取领域能力的主要入口。
 
+## Domain 粒度
+
+Domain 不是越细越好。拆分依据是独立业务能力、生命周期和变化原因，不是 endpoint 数量或目录对称。
+
+- 最低粒度应是一组完整 CRUD、命令／查询能力，或等价的内聚状态生命周期。
+- 单一查询、单一提交、纯 DTO 转换和转发 wrapper 默认留在父域，等能力成长为稳定边界后再拆。
+- 只有多个接口但共享同一父域生命周期时，也优先保留在同一 domain 内，通过模块或 service 方法隔离。
+- `Feedback`、`UserInvite` 这类单接口能力不应单独成域；`UserVerification`、`UserTask`、`UserTour` 有独立状态与生命周期，可以保留边界。
+
 ## 一、职责
 
 Service 应负责：
