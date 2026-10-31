@@ -40,6 +40,10 @@ flowchart TD
   W[Shared Wire Schema<br/>ID / Long / Time / Page / Envelope]
   A[Access Policy<br/>ResourceAction / Scope]
   U[User Information<br/>UserSummary / GroupOwner]
+  UV[User Verification<br/>Email / Campus Provider]
+  UT[User Task<br/>Status / Check-in]
+  UR[User Tour<br/>Status / Completion]
+  FB[Feedback<br/>Types / Submission]
   G[Group<br/>Group / Membership]
   T[Tag<br/>TagSummary / TagTree / TagPolicy]
   R[Resource Core<br/>List / Base / Detail / Search]
@@ -62,6 +66,10 @@ flowchart TD
 
   W --> A
   W --> U
+  W --> UV
+  W --> UT
+  W --> UR
+  W --> FB
   U --> G
   A --> G
   U --> T
@@ -102,7 +110,7 @@ flowchart TD
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef partial fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
   classDef decision fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:2px
-  class W,A,U,G,R,I,CM,F,C,D,N,S,AG,H,CHS,CHT,CHC,DR completed
+  class W,A,U,UV,UT,UR,FB,G,R,I,CM,F,C,D,N,S,AG,H,CHS,CHT,CHC,DR completed
   class T,AD,RA partial
   class CO decision
 ```
@@ -111,7 +119,7 @@ flowchart TD
 
 - 已完成：`W Shared Wire Schema`、`A AccessPolicy`、`U UserInformation`、`G Group`、`R ResourceCore`。
 - 已完成：`I Resource Interaction`、`CM Resource Comment`、`F Resource Favorite`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。原 `Interact` 聚合域已删除，没有保留转发壳。
-- 已完成：Message、Wallet、UserTask、UserTour、ChatSession、ChatTurn、ChatConfig、Speech 与 SSE；Drive 保持纯前端聚合。原 Chat 聚合域已删除。
+- 已完成：UserVerification、UserTask、UserTour、Feedback、Message、Wallet、ChatSession、ChatTurn、ChatConfig、Speech 与 SSE；Drive 保持纯前端聚合。原 Chat 聚合域已删除。
 - 部分完成：`T Tag` 的通用树、命令、策略已完成，scoped endpoint 仍阻塞；`AD Admin` 的用户管理已完成，公告接口仍阻塞。
 - 部分完成：`RA Resource Access` 已从前端 ResourceCore 拆成独立聚合域；后端 Overview endpoint 尚未上线，权限补全 mapper 暂时不能删除。
 - 待业务决策：`CO Course` 是否升级为正式后端域；当前仍只能视为高级 Group 聚合。
@@ -121,6 +129,7 @@ flowchart TD
 - `Shared Wire Schema` 不拥有业务规则，只表达后端序列化事实和公共结构。
 - `Access Policy` 拥有 `DISCOVER / VIEW / LOAD / EDIT / ... / MARKET_VIEW` 以及访问范围，Tag、Group、Resource 都依赖它，不再让 Tag 反向依赖 Resource 来取得动作定义。
 - `User Information` 只暴露稳定用户摘要；不要把完整账户资料、钱包、消息、任务全部塞进所有消费者。
+- `UserVerification`、`UserTask`、`UserTour`、`Feedback` 是独立变化原因，不因使用 `/user/*` endpoint 而重新合并进 UserInformation。
 - `Tag` 的树节点依赖用户摘要与访问策略，不依赖 Resource entity。
 - `ResourceCore` 消费 Group、Tag、User 的摘要契约，不拥有 Tag 编辑、评论、收藏、文档解析等能力。
 - `Document / Note / Skill / Agent / HtmlPage` 是 ResourceCore 之上的资源能力叶域。
@@ -162,11 +171,9 @@ flowchart TD
 
 从当前 User 域拆成：
 
-- `UserInformation`：`UserSummary`、当前用户展示信息、用户搜索与补全。
-- `AccountProfile`：账号展示字段、学籍资料、CRUD 字段边界。
-- `IdentityVerification`：邮箱、Provider 列表、发起、挑战、状态查询。
-- `UserTask`、`UserTour`、`Message`、`Wallet`：继续保持独立业务域，不并回 UserInformation。
-- `Feedback`：若继续扩展，独立为 Support/Feedback API，不再混在 UserApi。
+- `UserInformation`：已完成 `UserSummary`、当前用户展示信息、用户搜索与补全；账号资料更新暂留在 User，后续再按 profile CRUD 变化拆出。
+- `UserVerification`：已完成邮箱、Provider 发起、挑战与状态查询。
+- `UserTask`、`UserTour`、`Feedback`、`Message`、`Wallet`：已完成独立业务域，不并回 UserInformation。
 
 ### 2. Resource 与 Access
 
@@ -620,6 +627,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 - [x] UserSummary、UserDetail、UserSearch Schema 与 checked Contract。
 - [x] AccountProfile、邮箱认证、邀请记录与用户反馈 Schema 及 checked Contract。
+- [x] 邮箱/校园认证拆为 UserVerification，用户反馈拆为 Feedback，任务与导览分别拆为 UserTask、UserTour。
 - [x] ResourceAction、AccessControlScope、动作依赖和通用权限选择规则从 Resource/Tag 提到独立 AccessPolicy。
 - [x] 补 `MARKET_VIEW`，区分完整动作集合与普通权限编辑器可配置动作。
 - [x] 提供严格的 `ResourceActionSchema` 与 `AccessControlScopeSchema`，前端权限只使用动作集合。
@@ -669,7 +677,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - [x] InlineComment：8 个 checked Contract，reaction 固定为 `userId -> reaction[]`。
 - [x] Message：列表与批量已读 checked Contract。
 - [x] Wallet：钱包、兑换、流水与划转 checked Contract。
-- [x] UserTask / UserTour：任务状态、签到、引导状态与完成命令 checked Contract。
+- [x] UserTask / UserTour / UserVerification / Feedback：各自拥有 service、mapper、mock 与 `BUSINESS.md`，不通过 UserService 转发。
 - [x] Admin User：修正 `userStatus`、身份查询枚举、毫秒时间与重置密码请求。
 - [ ] Admin 公告：`/admin/message/*` 在后端不存在，保持 unchecked；需先新增受管理员权限保护的 Controller、DTO 与数据源。
 
