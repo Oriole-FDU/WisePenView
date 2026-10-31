@@ -1,5 +1,3 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-
 import type {
   AddInlineCommentItemApiRequest,
   CreateInlineCommentApiRequest,
@@ -28,19 +26,6 @@ import type {
 type InlineCommentUserReactionApiValue = NonNullable<
   InlineCommentItemApiResponse['reactions']
 >[string];
-
-function requiredTimestamp(value: number | null | undefined, field: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `行内批注 ${field} 无效`,
-    });
-  }
-  return value;
-}
-
-function optionalTimestamp(value: number | null | undefined): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
-}
 
 function mapUserDisplay(
   raw: InlineCommentUserDisplayApiResponse | null | undefined,
@@ -92,7 +77,7 @@ function mapUserReactions(
   return (Array.isArray(reactions) ? reactions : [reactions]).flatMap((reaction) => {
     const emojiId = reaction?.emojiId?.trim();
     if (!userId || !emojiId) return [];
-    return [{ userId, emojiId, createdAt: optionalTimestamp(reaction?.createTime) }];
+    return [{ userId, emojiId, createdAt: reaction?.createTime }];
   });
 }
 
@@ -110,8 +95,8 @@ function mapItem(raw: InlineCommentItemApiResponse): InlineCommentItem {
       mapUserReactions(userId, reactions)
     ),
     reactionGroups: mapReactionGroups(raw.reactionGroups),
-    createdAt: requiredTimestamp(raw.createTime, 'item.createTime'),
-    updatedAt: requiredTimestamp(raw.updateTime, 'item.updateTime'),
+    createdAt: raw.createTime,
+    updatedAt: raw.updateTime,
   };
 }
 
@@ -136,9 +121,9 @@ function mapThread(raw: InlineCommentApiResponse): InlineCommentThread {
     resolved: raw.resolved ?? false,
     resolvedBy,
     resolvedByUser: resolvedBy ? mapAuthor(resolvedBy, raw.resolvedByInfo) : undefined,
-    resolvedAt: optionalTimestamp(raw.resolvedAt),
-    createdAt: requiredTimestamp(raw.createTime, 'createTime'),
-    updatedAt: requiredTimestamp(raw.updateTime, 'updateTime'),
+    resolvedAt: raw.resolvedAt ?? undefined,
+    createdAt: raw.createTime,
+    updatedAt: raw.updateTime,
   };
 }
 
