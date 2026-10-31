@@ -19,7 +19,6 @@ import { createChatTurnServices } from '@/domains/ChatTurn/service/ChatTurnServi
 import { createCourseServices } from '@/domains/Course/service/CourseServices.impl';
 import { createDocumentServices } from '@/domains/Document/service/DocumentServices.impl';
 import { createDriveServices } from '@/domains/Drive/service/DriveServices.impl';
-import { createFeedbackServices } from '@/domains/Feedback/service/FeedbackServices.impl';
 import { createGroupServices } from '@/domains/Group/service/GroupServices.impl';
 import { createHtmlPageServices } from '@/domains/HtmlPage/service/HtmlPageServices.impl';
 import { createImageServices } from '@/domains/Image/service/ImageServices.impl';
@@ -35,7 +34,6 @@ import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl'
 import { createSpeechServices } from '@/domains/Speech/service/SpeechServices.impl';
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
 import { createUserServices } from '@/domains/User/service/UserServices.impl';
-import { createUserInviteServices } from '@/domains/UserInvite/service/UserInviteServices.impl';
 import { createUserTaskServices } from '@/domains/UserTask/service/UserTaskServices.impl';
 import { createUserTourServices } from '@/domains/UserTour/service/UserTourServices.impl';
 import { createUserVerificationServices } from '@/domains/UserVerification/service/UserVerificationServices.impl';
@@ -60,7 +58,6 @@ const resourceService = createResourceServices();
 const speechService = createSpeechServices();
 const tagService = createTagServices();
 const userService = createUserServices();
-const userInviteService = createUserInviteServices();
 const userTaskService = createUserTaskServices();
 const userTourService = createUserTourServices();
 const userVerificationService = createUserVerificationServices();
@@ -82,7 +79,6 @@ const driveService = createDriveServices({
   tagService: tagService,
   resourceService: resourceService,
 });
-const feedbackService = createFeedbackServices();
 const courseService = createCourseServices({
   groupService: groupService,
   resourceInteractionService,
@@ -111,7 +107,6 @@ const servicesValue: ServicesContextValue = {
   courseService: courseService,
   documentService: documentService,
   driveService: driveService,
-  feedbackService,
   groupService: groupService,
   htmlPageService: htmlPageService,
   imageService: imageService,
@@ -127,7 +122,6 @@ const servicesValue: ServicesContextValue = {
   speechService: speechService,
   tagService: tagService,
   userService: userService,
-  userInviteService,
   userTaskService,
   userTourService,
   userVerificationService,

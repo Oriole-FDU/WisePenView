@@ -74,11 +74,9 @@ try {
     skillService: skill,
     agentService: agent,
     userService: user,
-    userInviteService: userInvite,
     userTaskService: userTask,
     userTourService: userTour,
     userVerificationService: userVerification,
-    feedbackService: feedback,
     walletService: wallet,
     groupService: group,
     inlineCommentService: inline,
@@ -372,7 +370,7 @@ try {
   assert.equal((await user.getUserInfo()).nickname, '更新後的使用者');
   const candidates = await user.queryUserSearchCandidates({ keyword: 'xiaoming' });
   assert.equal(candidates.length, 1);
-  assert((await userInvite.listInviteRecords({ page: 1, size: 5 })).records.length > 0);
+  assert((await user.listInviteRecords({ page: 1, size: 5 })).records.length > 0);
   assert((await userTask.listTaskStatus()).some((task) => task.taskCode === 'DAILY_CHECK_IN'));
   assert.equal(typeof (await userTask.dailyCheckIn()).rewardAmount, 'number');
   assert((await userTour.listTourStatus()).length > 0);
@@ -383,7 +381,7 @@ try {
     uisPassword: 'mock-password',
   });
   assert.equal(typeof (await userVerification.checkFudanUISVerify()).completed, 'boolean');
-  await feedback.submitFeedback({
+  await user.submitFeedback({
     type: 'BUG_REPORT',
     content: '離線回饋',
     contact: 'test@example.com',

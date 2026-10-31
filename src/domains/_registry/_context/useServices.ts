@@ -7,7 +7,6 @@ import type { IChatTurnService } from '@/domains/ChatTurn';
 import type { ICourseService } from '@/domains/Course';
 import type { IDocumentService } from '@/domains/Document';
 import type { IDriveService } from '@/domains/Drive';
-import type { IFeedbackService } from '@/domains/Feedback';
 import type { IGroupService } from '@/domains/Group';
 import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { IImageService } from '@/domains/Image';
@@ -23,7 +22,6 @@ import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
-import type { IUserInviteService } from '@/domains/UserInvite';
 import type { IUserTaskService } from '@/domains/UserTask';
 import type { IUserTourService } from '@/domains/UserTour';
 import type { IUserVerificationService } from '@/domains/UserVerification';
@@ -49,7 +47,6 @@ export const useChatTurnService = (): IChatTurnService => useServicesContext().c
 export const useCourseService = (): ICourseService => useServicesContext().courseService;
 export const useDocumentService = (): IDocumentService => useServicesContext().documentService;
 export const useDriveService = (): IDriveService => useServicesContext().driveService;
-export const useFeedbackService = (): IFeedbackService => useServicesContext().feedbackService;
 export const useGroupService = (): IGroupService => useServicesContext().groupService;
 export const useHtmlPageService = (): IHtmlPageService => useServicesContext().htmlPageService;
 export const useImageService = (): IImageService => useServicesContext().imageService;
@@ -70,8 +67,6 @@ export const useSkillService = (): ISkillService => useServicesContext().skillSe
 export const useSpeechService = (): ISpeechService => useServicesContext().speechService;
 export const useTagService = (): ITagService => useServicesContext().tagService;
 export const useUserService = (): IUserService => useServicesContext().userService;
-export const useUserInviteService = (): IUserInviteService =>
-  useServicesContext().userInviteService;
 export const useUserTaskService = (): IUserTaskService => useServicesContext().userTaskService;
 export const useUserTourService = (): IUserTourService => useServicesContext().userTourService;
 export const useUserVerificationService = (): IUserVerificationService =>

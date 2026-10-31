@@ -1,9 +1,16 @@
-import { type ApiContractRequest, defineApiContract } from '@/apis/contract';
+import {
+  type ApiContractRequest,
+  type ApiContractResponse,
+  defineApiContract,
+} from '@/apis/contract';
 import { EmptyApiResponseSchema } from '@/apis/schema';
 
 import {
+  AddFeedbackApiRequestSchema,
   ChangeUserInfoApiRequestSchema,
   ChangeUserProfileApiRequestSchema,
+  ListUserInviteRecordsApiRequestSchema,
+  ListUserInviteRecordsApiResponseSchema,
 } from './AccountApi.schema';
 
 export const ChangeUserInfoApiContract = defineApiContract({
@@ -26,7 +33,34 @@ export const ChangeUserProfileApiContract = defineApiContract({
   response: EmptyApiResponseSchema,
 });
 
+export const AddFeedbackApiContract = defineApiContract({
+  name: 'AddFeedbackApi',
+  method: 'POST',
+  endpoint: '/system/feedback/addFeedback',
+  requestPlacement: 'body',
+  transport: 'json',
+  request: AddFeedbackApiRequestSchema,
+  response: EmptyApiResponseSchema,
+});
+
+export const ListUserInviteRecordsApiContract = defineApiContract({
+  name: 'ListUserInviteRecordsApi',
+  method: 'GET',
+  endpoint: '/user/invite/listRecords',
+  requestPlacement: 'query',
+  transport: 'json',
+  request: ListUserInviteRecordsApiRequestSchema,
+  response: ListUserInviteRecordsApiResponseSchema,
+});
+
 export type ChangeUserInfoApiContractRequest = ApiContractRequest<typeof ChangeUserInfoApiContract>;
 export type ChangeUserProfileApiContractRequest = ApiContractRequest<
   typeof ChangeUserProfileApiContract
+>;
+export type AddFeedbackApiContractRequest = ApiContractRequest<typeof AddFeedbackApiContract>;
+export type ListUserInviteRecordsApiContractRequest = ApiContractRequest<
+  typeof ListUserInviteRecordsApiContract
+>;
+export type ListUserInviteRecordsApiContractResponse = ApiContractResponse<
+  typeof ListUserInviteRecordsApiContract
 >;

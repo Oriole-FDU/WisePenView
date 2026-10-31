@@ -18,8 +18,10 @@ try {
       contents: `
         export { parseApiRequest, parseApiResponse } from '@/apis/contract';
         export {
+          AddFeedbackApiContract,
           ChangeUserInfoApiContract,
           ChangeUserProfileApiContract,
+          ListUserInviteRecordsApiContract,
         } from '@/domains/User/apis/AccountApi.contract';
         export {
           CheckEmailVerifyApiContract,
@@ -28,11 +30,8 @@ try {
           InitiateFudanUISVerifyApiContract,
         } from '@/domains/UserVerification/apis/UserVerificationApi.contract';
         export { UserVerificationApi } from '@/domains/UserVerification/mock/UserVerificationApi.mock';
-        export { AddFeedbackApiContract } from '@/domains/Feedback/apis/FeedbackApi.contract';
-        export { ListUserInviteRecordsApiContract } from '@/domains/UserInvite/apis/UserInviteApi.contract';
-        export { FeedbackApi } from '@/domains/Feedback/mock/FeedbackApi.mock';
-        export { UserInviteServicesMap } from '@/domains/UserInvite/mapper/UserInviteServices.map';
-        export { UserInviteApi } from '@/domains/UserInvite/mock/UserInviteApi.mock';
+        export { UserServicesMap } from '@/domains/User/mapper/UserServices.map';
+        export { UserApi } from '@/domains/User/mock/UserApi.mock';
       `,
       resolveDir: root,
     },
@@ -49,14 +48,13 @@ try {
     ChangeUserProfileApiContract,
     CheckEmailVerifyApiContract,
     CheckFudanUISVerifyApiContract,
-    FeedbackApi,
     InitiateEmailVerifyApiContract,
     InitiateFudanUISVerifyApiContract,
     ListUserInviteRecordsApiContract,
     parseApiRequest,
     parseApiResponse,
-    UserInviteApi,
-    UserInviteServicesMap,
+    UserApi,
+    UserServicesMap,
     UserVerificationApi,
   } = await import(pathToFileURL(outfile).href);
 
@@ -92,7 +90,7 @@ try {
     type: 'BUG_REPORT',
     browser: 'test-browser',
   });
-  await FeedbackApi.addFeedback(feedbackRequest);
+  await UserApi.addFeedback(feedbackRequest);
   assert.equal(feedbackRequest.type, 'BUG_REPORT');
   assert(
     !AddFeedbackApiContract.request.safeParse({
@@ -114,10 +112,10 @@ try {
   assert.equal(typeof fudanStatus.requireAction, 'boolean');
 
   const inviteRecords = parseApiResponse(ListUserInviteRecordsApiContract, {
-    ...(await UserInviteApi.listInviteRecords({ page: 1, size: 20 })),
+    ...(await UserApi.listInviteRecords({ page: 1, size: 20 })),
     total: '2',
   });
-  const mappedInvites = UserInviteServicesMap.mapListInviteRecordsFromApi(inviteRecords);
+  const mappedInvites = UserServicesMap.mapListInviteRecordsFromApi(inviteRecords);
   assert.equal(mappedInvites.records.length, 2);
   assert.equal(mappedInvites.records[0].status, 'REWARDED');
   assert.equal(typeof mappedInvites.records[0].createTime, 'number');

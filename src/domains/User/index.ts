@@ -1,3 +1,4 @@
+export type { UserInviteRecord, UserInviteRecordList, UserInviteStatus } from './entity/invite';
 export type {
   User,
   UserAccountInfo,
@@ -8,6 +9,7 @@ export type {
 } from './entity/user';
 export type {
   DegreeLevel,
+  FeedbackType,
   Sex,
   UserStatus,
   UserVerificationMode,
@@ -15,6 +17,7 @@ export type {
 } from './enum';
 export {
   DEGREE,
+  FEEDBACK_TYPE,
   IDENTITY,
   SEX,
   USER_STATUS,
@@ -24,8 +27,10 @@ export {
 export { normalizeUserDisplayBaseFromApi } from './mapper/userEnum.mapper';
 export type {
   IUserService,
+  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
+  SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from './service/index.type';

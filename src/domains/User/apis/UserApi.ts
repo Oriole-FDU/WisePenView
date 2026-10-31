@@ -3,10 +3,15 @@ import type { AxiosRequestConfig } from 'axios';
 import { executeApiContract } from '@/apis/executeApiContract';
 
 import {
+  AddFeedbackApiContract,
+  type AddFeedbackApiContractRequest,
   ChangeUserInfoApiContract,
   type ChangeUserInfoApiContractRequest,
   ChangeUserProfileApiContract,
   type ChangeUserProfileApiContractRequest,
+  ListUserInviteRecordsApiContract,
+  type ListUserInviteRecordsApiContractRequest,
+  type ListUserInviteRecordsApiContractResponse,
 } from './AccountApi.contract';
 import {
   GetUserInfoApiContract,
@@ -43,10 +48,22 @@ async function changeUserProfile(req: ChangeUserProfileApiContractRequest): Prom
   await executeApiContract(ChangeUserProfileApiContract, req);
 }
 
+async function addFeedback(req: AddFeedbackApiContractRequest): Promise<void> {
+  await executeApiContract(AddFeedbackApiContract, req);
+}
+
+function listInviteRecords(
+  req: ListUserInviteRecordsApiContractRequest
+): Promise<ListUserInviteRecordsApiContractResponse> {
+  return executeApiContract(ListUserInviteRecordsApiContract, req);
+}
+
 export const UserApi = {
   getUserInfo,
   searchUser,
   listUserSearchSuggestions,
   changeUserInfo,
   changeUserProfile,
+  addFeedback,
+  listInviteRecords,
 };

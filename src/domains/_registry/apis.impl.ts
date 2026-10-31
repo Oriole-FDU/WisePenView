@@ -14,7 +14,6 @@ export {
 } from '@/domains/ChatTurn/apis/ChatStreamApi';
 export { ChatTurnApi } from '@/domains/ChatTurn/apis/ChatTurnApi';
 export { DocumentApi } from '@/domains/Document/apis/DocumentApi';
-export { FeedbackApi } from '@/domains/Feedback/apis/FeedbackApi';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/apis/GroupApi';
 export { HtmlPageApi } from '@/domains/HtmlPage/apis/HtmlPageApi';
 export { ImageApi } from '@/domains/Image/apis/ImageApi';
@@ -30,7 +29,6 @@ export { SkillApi } from '@/domains/Skill/apis/SkillApi';
 export { SpeechApi } from '@/domains/Speech/apis/SpeechApi';
 export { TagApi } from '@/domains/Tag/apis/TagApi';
 export { UserApi } from '@/domains/User/apis/UserApi';
-export { UserInviteApi } from '@/domains/UserInvite/apis/UserInviteApi';
 export { UserTaskApi } from '@/domains/UserTask/apis/UserTaskApi';
 export { UserTourApi } from '@/domains/UserTour/apis/UserTourApi';
 export { UserVerificationApi } from '@/domains/UserVerification/apis/UserVerificationApi';

@@ -6,7 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, Select, TextArea, UploadZone } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
-import { FEEDBACK_TYPE, type FeedbackType, useFeedbackService, useImageService } from '@/domains';
+import { FEEDBACK_TYPE, type FeedbackType, useImageService, useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import {
@@ -39,7 +39,7 @@ function isFeedbackType(value: string): value is FeedbackType {
 
 function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
   const { t } = useTranslation(['shell', 'common']);
-  const feedbackService = useFeedbackService();
+  const userService = useUserService();
   const imageService = useImageService();
   const [formValues, setFormValues] = useState<FeedbackFormValues>(DEFAULT_FORM_VALUES);
 
@@ -96,7 +96,7 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
         imageUrl = uploadResult.publicUrl;
       }
 
-      await feedbackService.submitFeedback({
+      await userService.submitFeedback({
         type: values.type,
         content: values.content,
         contact: values.contact,

@@ -13,7 +13,6 @@ export {
 } from '@/domains/ChatTurn/mock/ChatStreamApi.mock';
 export { ChatTurnApi } from '@/domains/ChatTurn/mock/ChatTurnApi.mock';
 export { DocumentApi } from '@/domains/Document/mock/DocumentApi.mock';
-export { FeedbackApi } from '@/domains/Feedback/mock/FeedbackApi.mock';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/mock/GroupApi.mock';
 export { HtmlPageApi } from '@/domains/HtmlPage/mock/HtmlPageApi.mock';
 export { ImageApi } from '@/domains/Image/mock/ImageApi.mock';
@@ -29,7 +28,6 @@ export { SkillApi } from '@/domains/Skill/mock/SkillApi.mock';
 export { SpeechApi } from '@/domains/Speech/mock/SpeechApi.mock';
 export { TagApi } from '@/domains/Tag/mock/TagApi.mock';
 export { UserApi } from '@/domains/User/mock/UserApi.mock';
-export { UserInviteApi } from '@/domains/UserInvite/mock/UserInviteApi.mock';
 export { UserTaskApi } from '@/domains/UserTask/mock/UserTaskApi.mock';
 export { UserTourApi } from '@/domains/UserTour/mock/UserTourApi.mock';
 export { UserVerificationApi } from '@/domains/UserVerification/mock/UserVerificationApi.mock';

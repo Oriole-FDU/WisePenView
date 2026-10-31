@@ -7,9 +7,11 @@ import type { User, UserAccountProfile } from '@/domains/User';
 import { UserServicesMap } from '../mapper/UserServices.map';
 import type {
   IUserService,
+  ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
+  SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from './index.type';
 
@@ -44,6 +46,11 @@ const listUserSearchSuggestions = async (params: ListUserSearchSuggestionsReques
   return UserServicesMap.mapSearchUsersFromApi(data);
 };
 
+const listInviteRecords = async (params: ListUserInviteRecordsRequest) =>
+  UserServicesMap.mapListInviteRecordsFromApi(
+    await UserApi.listInviteRecords(UserServicesMap.mapListInviteRecordsRequest(params))
+  );
+
 const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesRequest) => {
   const keyword = params.keyword.trim();
   if (!keyword) return [];
@@ -59,6 +66,10 @@ const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesReques
     }
   });
   return Array.from(userMap.values()).slice(0, size);
+};
+
+const submitFeedback = async (params: SubmitFeedbackRequest): Promise<void> => {
+  await UserApi.addFeedback(UserServicesMap.mapSubmitFeedbackRequest(params));
 };
 
 export const createUserServices = (): IUserService => {
@@ -114,7 +125,9 @@ export const createUserServices = (): IUserService => {
     getUserInfo,
     searchUsers,
     listUserSearchSuggestions,
+    listInviteRecords,
     queryUserSearchCandidates,
     updateUserInfo,
+    submitFeedback,
   };
 };

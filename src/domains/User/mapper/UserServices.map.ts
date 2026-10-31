@@ -1,15 +1,29 @@
-import type { User, UserAccountProfile, UserSearchUser } from '@/domains/User';
+import type {
+  User,
+  UserAccountProfile,
+  UserInviteRecord,
+  UserInviteRecordList,
+  UserSearchUser,
+} from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
+  AddFeedbackApiRequest,
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
+  ListUserInviteRecordsApiRequest,
+  ListUserInviteRecordsApiResponse,
+  UserInviteRecordApiResponse,
 } from '../apis/AccountApi.schema';
 import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
-import type { UpdateUserInfoRequest } from '../service/index.type';
+import type {
+  ListUserInviteRecordsRequest,
+  SubmitFeedbackRequest,
+  UpdateUserInfoRequest,
+} from '../service/index.type';
 import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
@@ -75,6 +89,37 @@ const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchU
 const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =>
   data.map(mapSearchUserFromApi);
 
+const mapListInviteRecordsRequest = (
+  params: ListUserInviteRecordsRequest
+): ListUserInviteRecordsApiRequest => params;
+
+const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRecord => ({
+  id: normalizeId(data.id),
+  inviteeUserId: normalizeId(data.inviteeUserId),
+  invitee: normalizeUserDisplayBaseFromApi(data.inviteeDisplay),
+  status: data.status,
+  createTime: data.createTime,
+  rewardTime: data.rewardTime ?? undefined,
+});
+
+const mapListInviteRecordsFromApi = (
+  data: ListUserInviteRecordsApiResponse
+): UserInviteRecordList => ({
+  records: data.list.map(mapInviteRecordFromApi),
+  total: data.total,
+  page: data.page,
+  size: data.size,
+  totalPage: data.totalPage,
+});
+
+const mapSubmitFeedbackRequest = (params: SubmitFeedbackRequest): AddFeedbackApiRequest => ({
+  content: params.content,
+  contact: params.contact,
+  imageUrl: params.imageUrl?.trim() || undefined,
+  browser: typeof navigator === 'undefined' ? undefined : navigator.userAgent,
+  type: params.type,
+});
+
 const mapUpdateUserInfoRequests = (
   params: UpdateUserInfoRequest
 ): {
@@ -110,5 +155,8 @@ export const UserServicesMap = {
   mapAccountProfileFromApi,
   mapUserSafeFromAccountProfile,
   mapSearchUsersFromApi,
+  mapListInviteRecordsRequest,
+  mapListInviteRecordsFromApi,
+  mapSubmitFeedbackRequest,
   mapUpdateUserInfoRequests,
 };

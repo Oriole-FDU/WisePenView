@@ -24,6 +24,16 @@ export type UserVerificationMode = EnumValue<typeof USER_VERIFICATION>;
 export const USER_VERIFICATION_PROVIDER = defineEnum(['FUDAN_UIS'] as const);
 export type UserVerificationProvider = EnumValue<typeof USER_VERIFICATION_PROVIDER>;
 
+/** 用户反馈类型选项 */
+export const FEEDBACK_TYPE = defineEnum([
+  'BUG_REPORT',
+  'SUGGESTION',
+  'CONSULTATION',
+  'COMPLAINT',
+  'OTHER',
+] as const);
+export type FeedbackType = EnumValue<typeof FEEDBACK_TYPE>;
+
 /** 学历层次（学生用） */
 export const DEGREE = defineEnum(['UNKNOWN', 'UNDERGRADUATE', 'MASTER', 'DOCTOR'] as const);
 
