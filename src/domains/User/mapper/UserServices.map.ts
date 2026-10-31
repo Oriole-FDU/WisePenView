@@ -11,7 +11,6 @@ import type {
   AddFeedbackApiRequest,
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
-  ListUserInviteRecordsApiRequest,
   ListUserInviteRecordsApiResponse,
   UserInviteRecordApiResponse,
 } from '../apis/AccountApi.schema';
@@ -19,11 +18,7 @@ import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
-import type {
-  ListUserInviteRecordsRequest,
-  SubmitFeedbackRequest,
-  UpdateUserInfoRequest,
-} from '../service/index.type';
+import type { SubmitFeedbackRequest, UpdateUserInfoRequest } from '../service/index.type';
 import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
@@ -89,10 +84,6 @@ const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchU
 const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =>
   data.map(mapSearchUserFromApi);
 
-const mapListInviteRecordsRequest = (
-  params: ListUserInviteRecordsRequest
-): ListUserInviteRecordsApiRequest => params;
-
 const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRecord => ({
   id: normalizeId(data.id),
   inviteeUserId: normalizeId(data.inviteeUserId),
@@ -155,7 +146,6 @@ export const UserServicesMap = {
   mapAccountProfileFromApi,
   mapUserSafeFromAccountProfile,
   mapSearchUsersFromApi,
-  mapListInviteRecordsRequest,
   mapListInviteRecordsFromApi,
   mapSubmitFeedbackRequest,
   mapUpdateUserInfoRequests,

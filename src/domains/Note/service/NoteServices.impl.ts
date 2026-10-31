@@ -26,7 +26,7 @@ interface NoteServicesDeps {
 
 const createNote = async (params: CreateNoteRequest): Promise<CreateNoteResponse> => {
   const resourceId = await NoteApi.addNote(NoteServicesMap.mapCreateNoteRequest(params));
-  return NoteServicesMap.mapCreateNoteFromApi(resourceId);
+  return { resourceId };
 };
 
 const getNoteInfoDisplay = async (params: GetNoteInfoRequest): Promise<NoteInfoDisplayData> => {
@@ -41,7 +41,7 @@ const getDrawIoLatestSnapshot = async (
   params: GetDrawIoLatestSnapshotRequest
 ): Promise<DrawIoLatestSnapshotData> => {
   const data = await NoteApi.getDrawIoLatestSnapshot(params);
-  return NoteServicesMap.mapDrawIoLatestSnapshotFromApi(data, params.resourceId);
+  return data;
 };
 
 const getResourceAccessInfo: INoteService['getResourceAccessInfo'] = async (resourceId) => {
@@ -55,7 +55,7 @@ const saveDrawIoSnapshot = async (params: SaveDrawIoSnapshotRequest): Promise<vo
 
 const forkNote = async (params: ForkNoteRequest): Promise<ForkNoteResponse> => {
   const resourceId = await NoteApi.forkNote(params);
-  return NoteServicesMap.mapForkNoteFromApi(resourceId);
+  return { resourceId };
 };
 
 const listNoteVersions = async (params: ListNoteVersionsRequest): Promise<NoteVersionListPage> => {
@@ -64,7 +64,7 @@ const listNoteVersions = async (params: ListNoteVersionsRequest): Promise<NoteVe
     page: params.page ?? 1,
     size: params.size ?? 20,
   });
-  return NoteServicesMap.mapNoteVersionListPageFromApi(data);
+  return data;
 };
 
 export const createNoteServices = (deps: NoteServicesDeps): INoteService => {
@@ -72,8 +72,7 @@ export const createNoteServices = (deps: NoteServicesDeps): INoteService => {
 
   // syncTitle 是 resource 的工作，但语义上属于 note 服务
   const syncTitle = async (params: SyncTitleRequest): Promise<void> => {
-    const payload = NoteServicesMap.mapSyncTitleRequest(params);
-    await resourceService.renameResource(payload);
+    await resourceService.renameResource(params);
   };
 
   return {

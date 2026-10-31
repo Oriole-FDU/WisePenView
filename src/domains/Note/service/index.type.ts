@@ -62,7 +62,7 @@ export interface CreateNoteRequest {
 
 /** 与调用方约定：成功时携带新资源 ID（后端 doc_id 由实现层映射） */
 export interface CreateNoteResponse {
-  resourceId?: string;
+  resourceId: string;
 }
 
 export interface SyncTitleRequest {
@@ -99,7 +99,7 @@ export interface ForkNoteRequest {
 }
 
 export interface ForkNoteResponse {
-  resourceId?: string;
+  resourceId: string;
 }
 
 export interface ListNoteVersionsRequest {

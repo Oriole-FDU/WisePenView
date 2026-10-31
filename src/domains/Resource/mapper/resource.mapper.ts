@@ -13,7 +13,6 @@ import type {
   ResourceItemApi,
   ResourceSpecifiedUserGrantedActionsApi,
 } from '../apis/ResourceCoreApi.schema';
-import type { ResourcePlacementApiResponse } from '../apis/ResourcePlacementApi.schema';
 import type { ResourceItem, ResourceTagBind } from '../entity/resource';
 import { normalizeSearchResourceType, TAG_QUERY_LOGIC_MODE } from '../enum';
 import type {
@@ -62,9 +61,6 @@ export const mapListResourceItemsRequest = (
     ...overrides,
   };
 };
-
-export const mapResourcePlacementCountFromApi = (data: ResourcePlacementApiResponse): number =>
-  data.resourceCount;
 
 const resolveCurrentTagBind = (
   item: ResourceItem,

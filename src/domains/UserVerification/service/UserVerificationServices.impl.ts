@@ -4,18 +4,9 @@ import { UserVerificationServicesMap } from '../mapper/UserVerificationServices.
 import type { IUserVerificationService } from './index.type';
 
 export const createUserVerificationServices = (): IUserVerificationService => ({
-  sendEmailVerify: (params) =>
-    UserVerificationApi.initiateEmailVerify(
-      UserVerificationServicesMap.mapSendEmailVerifyRequest(params)
-    ),
-  confirmEmailVerify: (params) =>
-    UserVerificationApi.checkEmailVerify(
-      UserVerificationServicesMap.mapConfirmEmailVerifyRequest(params)
-    ),
-  initiateUISVerify: (params) =>
-    UserVerificationApi.initiateFudanUISVerify(
-      UserVerificationServicesMap.mapInitiateUISVerifyRequest(params)
-    ),
+  sendEmailVerify: (params) => UserVerificationApi.initiateEmailVerify(params),
+  confirmEmailVerify: (params) => UserVerificationApi.checkEmailVerify(params),
+  initiateUISVerify: (params) => UserVerificationApi.initiateFudanUISVerify(params),
   checkFudanUISVerify: async () =>
     UserVerificationServicesMap.mapFudanUISVerifyStatusFromApi(
       await UserVerificationApi.checkFudanUISVerify()

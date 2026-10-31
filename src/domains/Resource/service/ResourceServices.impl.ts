@@ -49,36 +49,36 @@ const setPersonalResourcesPathTag = async (
   params: SetPersonalResourcesPathTagRequest
 ): Promise<number> => {
   const data = await ResourcePlacementApi.setPersonalResourcesPathTag(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const movePersonalResourcesToTrash = async (
   params: MovePersonalResourcesToTrashRequest
 ): Promise<number> => {
   const data = await ResourcePlacementApi.movePersonalResourcesToTrash(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const replacePersonalNormalTags = async (
   params: ReplacePersonalNormalTagsRequest
 ): Promise<number> => {
   const data = await ResourcePlacementApi.replacePersonalNormalTags(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const mountResourcesToGroup = async (params: MountResourcesToGroupRequest): Promise<number> => {
   const data = await ResourcePlacementApi.mountResourcesToGroup(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const unmountResourcesToGroup = async (params: UnmountResourcesToGroupRequest): Promise<number> => {
   const data = await ResourcePlacementApi.unmountResourcesToGroup(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const moveResourcesInGroup = async (params: MoveResourcesInGroupRequest): Promise<number> => {
   const data = await ResourcePlacementApi.moveResourcesInGroup(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const globalSearch = async (params: SearchQueryRequest): Promise<SearchResultPage> => {

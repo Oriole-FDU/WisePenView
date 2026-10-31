@@ -5,9 +5,7 @@ import {
 } from '@/domains/_shared/access';
 import type {
   AddNoteApiContractRequest,
-  GetDrawIoLatestSnapshotApiContractResponse,
   GetNoteInfoApiContractResponse,
-  ListNoteVersionsApiContractResponse,
   SaveDrawIoSnapshotApiContractRequest,
 } from '@/domains/Note/apis/NoteApi.contract';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
@@ -16,35 +14,15 @@ import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   CreateNoteRequest,
-  CreateNoteResponse,
-  DrawIoLatestSnapshotData,
-  ForkNoteResponse,
   NoteInfoDisplayAuthor,
   NoteInfoDisplayData,
-  NoteVersionListPage,
   SaveDrawIoSnapshotRequest,
-  SyncTitleRequest,
 } from '../service/index.type';
-
-const mapSyncTitleRequest = (
-  params: SyncTitleRequest
-): { resourceId: string; newName: string } => ({
-  resourceId: params.resourceId,
-  newName: params.newName,
-});
-
-const mapCreateNoteFromApi = (resourceId: string): CreateNoteResponse => ({
-  resourceId: resourceId || undefined,
-});
 
 const mapCreateNoteRequest = (params: CreateNoteRequest): AddNoteApiContractRequest => ({
   title: params.title,
   ...(params.resourceType ? { resourceType: params.resourceType } : {}),
   ...(params.pathTagId ? { mountTargetTagId: params.pathTagId } : {}),
-});
-
-const mapForkNoteFromApi = (resourceId: string): ForkNoteResponse => ({
-  resourceId: resourceId || undefined,
 });
 
 const mapAuthorDisplay = (
@@ -95,16 +73,6 @@ const encodeBase64Utf8 = (value: string): string => {
   return window.btoa(binary);
 };
 
-const mapDrawIoLatestSnapshotFromApi = (
-  raw: GetDrawIoLatestSnapshotApiContractResponse,
-  _fallbackResourceId: string
-): DrawIoLatestSnapshotData => ({
-  resourceId: raw.resourceId,
-  version: raw.version,
-  fullSnapshot: raw.fullSnapshot,
-  deltas: raw.deltas,
-});
-
 const mapSaveDrawIoSnapshotRequest = (
   params: SaveDrawIoSnapshotRequest
 ): SaveDrawIoSnapshotApiContractRequest => ({
@@ -114,17 +82,8 @@ const mapSaveDrawIoSnapshotRequest = (
   plainText: params.plainText,
 });
 
-const mapNoteVersionListPageFromApi = (
-  data: ListNoteVersionsApiContractResponse
-): NoteVersionListPage => data;
-
 export const NoteServicesMap = {
-  mapSyncTitleRequest,
   mapCreateNoteRequest,
-  mapCreateNoteFromApi,
-  mapForkNoteFromApi,
   mapNoteInfoDisplayFromApi,
-  mapDrawIoLatestSnapshotFromApi,
   mapSaveDrawIoSnapshotRequest,
-  mapNoteVersionListPageFromApi,
 };

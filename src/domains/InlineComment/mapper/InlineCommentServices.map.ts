@@ -3,17 +3,13 @@ import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   AddInlineCommentItemApiRequest,
-  ChangeInlineCommentResolveStatusApiRequest,
   CreateInlineCommentApiRequest,
-  DeleteInlineCommentItemApiRequest,
-  DeleteInlineCommentItemReactionApiRequest,
   InlineCommentApiResponse,
   InlineCommentItemApiResponse,
   InlineCommentReactionGroupApiResponse,
   InlineCommentUserDisplayApiResponse,
   ListInlineCommentsApiRequest,
   ListInlineCommentsApiResponse,
-  SetInlineCommentItemReactionApiRequest,
   UpdateInlineCommentItemApiRequest,
 } from '../apis/InlineCommentApi.schema';
 import type {
@@ -25,12 +21,8 @@ import type {
 } from '../entity/inlineComment';
 import type {
   AddInlineCommentItemRequest,
-  ChangeInlineCommentResolveStatusRequest,
   CreateInlineCommentRequest,
-  DeleteInlineCommentItemReactionRequest,
-  DeleteInlineCommentItemRequest,
   ListInlineCommentsRequest,
-  SetInlineCommentItemReactionRequest,
   UpdateInlineCommentItemRequest,
 } from '../service/index.type';
 
@@ -202,36 +194,13 @@ const mapUpdateItemRequest = (
   itemId: params.itemId,
 });
 
-const mapSetReactionRequest = (
-  params: SetInlineCommentItemReactionRequest
-): SetInlineCommentItemReactionApiRequest => ({ ...params });
-
-const mapDeleteReactionRequest = (
-  params: DeleteInlineCommentItemReactionRequest
-): DeleteInlineCommentItemReactionApiRequest => ({ ...params });
-
-const mapDeleteItemRequest = (
-  params: DeleteInlineCommentItemRequest
-): DeleteInlineCommentItemApiRequest => ({ ...params });
-
-const mapResolveRequest = (
-  params: ChangeInlineCommentResolveStatusRequest
-): ChangeInlineCommentResolveStatusApiRequest => ({ ...params });
-
 const mapListFromApi = (data: ListInlineCommentsApiResponse): InlineCommentThread[] =>
   data.map(mapThread);
-
-const mapCreatedId = (value: string, field: string): string => requiredId(value, field);
 
 export const InlineCommentServicesMap = {
   mapListRequest,
   mapCreateRequest,
   mapAddItemRequest,
   mapUpdateItemRequest,
-  mapSetReactionRequest,
-  mapDeleteReactionRequest,
-  mapDeleteItemRequest,
-  mapResolveRequest,
   mapListFromApi,
-  mapCreatedId,
 };

@@ -47,9 +47,7 @@ const listUserSearchSuggestions = async (params: ListUserSearchSuggestionsReques
 };
 
 const listInviteRecords = async (params: ListUserInviteRecordsRequest) =>
-  UserServicesMap.mapListInviteRecordsFromApi(
-    await UserApi.listInviteRecords(UserServicesMap.mapListInviteRecordsRequest(params))
-  );
+  UserServicesMap.mapListInviteRecordsFromApi(await UserApi.listInviteRecords(params));
 
 const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesRequest) => {
   const keyword = params.keyword.trim();
