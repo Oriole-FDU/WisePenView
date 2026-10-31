@@ -6,7 +6,7 @@
 
 ## 一、结论
 
-当前前端最紧迫的问题不是“缺少 Zod”，而是既有手写 DTO 把后端契约描述得过宽、过旧，且 146 个 REST 业务调用没有运行时响应校验。直接给现有类型补 Zod 会把错误契约固化，因此必须先分层、先修正 P0 接口差异，再逐域迁移。
+迁移前前端最紧迫的问题不是“缺少 Zod”，而是既有手写 DTO 把后端契约描述得过宽、过旧，且 146 个 REST 业务调用没有运行时响应校验。直接给现有类型补 Zod 会把错误契约固化，因此必须先分层、先修正 P0 接口差异，再逐域迁移。
 
 建议按以下顺序推进：
 
@@ -20,7 +20,9 @@
 
 总体原则是“先底座、后叶域；先消费契约、后 domain entity；先新增语义接口、后淘汰历史接口”。不要一次性批量改写全部 152 个 REST 接口。
 
-## 二、调研范围与量化结果
+## 二、迁移前调研范围与量化基线
+
+以下数字用于解释迁移策略和历史问题，不代表当前覆盖率；当前结果以上方状态与 `check:api-contracts` 输出为准。
 
 - 152 个前端 REST 业务 endpoint。
 - 3 个直接 `fetch` 的聊天流式 endpoint：`POST /chat/completions`、`POST /chat/completions/recover`、`GET /chat/completions/stream`。
@@ -91,17 +93,23 @@ flowchart TD
   I --> AD
 
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
-  classDef next fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-  class W,A,U,T,G completed
-  class R next
+  classDef partial fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
+  classDef blocked fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-width:2px
+  classDef decision fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:2px
+  class W,A,U,G,R,I,C,D,N,S,AG,H,CH,DR completed
+  class T,AD partial
+  class RA blocked
+  class CO decision
 ```
 
 当前 DAG 前沿：
 
-- 已完成：`W Shared Wire Schema`、`U UserInformation`、`A AccessPolicy` 核心、`T Tag`、`G Group`。
-- 已完成：`R ResourceCore` Base/Item 共用 Schema，以及 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。
-- 已完成：Interaction、InlineComment、Message、Wallet、UserTask、UserTour、Admin User、Chat Session/Model/Provider/Tool/Speech 与 SSE。
-- 仍被阻塞：Admin 公告 2 个前端 endpoint 没有对应 Cloud Controller；`T Tag` scoped endpoint 与 ResourceAccess 聚合 endpoint 继续等待后端上线。
+- 已完成：`W Shared Wire Schema`、`A AccessPolicy`、`U UserInformation`、`G Group`、`R ResourceCore`。
+- 已完成：`I Interaction`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。
+- 已完成：Message、Wallet、UserTask、UserTour、Chat Session/Model/Provider/Tool/Speech 与 SSE；Drive 保持纯前端聚合。
+- 部分完成：`T Tag` 的通用树、命令、策略已完成，scoped endpoint 仍阻塞；`AD Admin` 的用户管理已完成，公告接口仍阻塞。
+- 完全阻塞：`RA Resource Access Overview` 聚合 endpoint 尚未上线，相关权限补全 mapper 暂时不能删除。
+- 待业务决策：`CO Course` 是否升级为正式后端域；当前仍只能视为高级 Group 聚合。
 
 关键约束：
 
