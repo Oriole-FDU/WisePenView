@@ -4,9 +4,7 @@ import { ResourceFavoriteServicesMap } from '../mapper/ResourceFavoriteServices.
 import type { IResourceFavoriteService } from './index.type';
 
 const getFavoriteCollectionIds = async (resourceId: string) =>
-  ResourceFavoriteServicesMap.mapFavoriteCollectionIdsFromApi(
-    await FavoriteApi.getFavoriteStatus(resourceId)
-  );
+  (await FavoriteApi.getFavoriteStatus(resourceId)).collectionIds;
 
 const updateFavoriteCollections: IResourceFavoriteService['updateFavoriteCollections'] = (params) =>
   FavoriteApi.changeFavoriteStatus(
@@ -18,10 +16,7 @@ const listFavoriteCollections = async () =>
 
 const createFavoriteCollection = async (
   params: Parameters<IResourceFavoriteService['createFavoriteCollection']>[0]
-): Promise<string> =>
-  FavoriteApi.createCollection(
-    ResourceFavoriteServicesMap.mapCreateFavoriteCollectionRequest(params)
-  );
+): Promise<string> => FavoriteApi.createCollection(params);
 
 const updateFavoriteCollection: IResourceFavoriteService['updateFavoriteCollection'] = (params) =>
   FavoriteApi.updateCollectionInfo(
@@ -29,9 +24,7 @@ const updateFavoriteCollection: IResourceFavoriteService['updateFavoriteCollecti
   );
 
 const deleteFavoriteCollection: IResourceFavoriteService['deleteFavoriteCollection'] = (params) =>
-  FavoriteApi.deleteCollection(
-    ResourceFavoriteServicesMap.mapDeleteFavoriteCollectionRequest(params)
-  );
+  FavoriteApi.deleteCollection(params);
 
 const listFavoritedResources: IResourceFavoriteService['listFavoritedResources'] = async (params) =>
   ResourceFavoriteServicesMap.mapFavoritedResourcesPageFromApi(
