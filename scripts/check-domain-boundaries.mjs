@@ -19,6 +19,11 @@ const forbiddenImports = {
   ChatConfig: new Set(['ChatSession', 'ChatTurn']),
   ChatSession: new Set(['ChatConfig', 'ChatTurn']),
   ChatTurn: new Set(['ChatConfig']),
+  User: new Set(['Feedback', 'UserTask', 'UserTour', 'UserVerification']),
+  Feedback: new Set(['User', 'UserTask', 'UserTour', 'UserVerification']),
+  UserTask: new Set(['Feedback', 'User', 'UserTour', 'UserVerification']),
+  UserTour: new Set(['Feedback', 'User', 'UserTask', 'UserVerification']),
+  UserVerification: new Set(['Feedback', 'User', 'UserTask', 'UserTour']),
   Resource: new Set(['Agent', 'Document', 'HtmlPage', 'Note', 'ResourceAccess', 'Skill']),
   Agent: new Set(['ResourceAccess']),
   Document: new Set(['ResourceAccess']),
@@ -60,4 +65,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log('Domain 依赖边界检查通过：Chat 与 Resource 拆分域未反向依赖其下游聚合。');
+console.log('Domain 依赖边界检查通过：Chat、Resource、User 拆分域未反向依赖其下游聚合。');
