@@ -1,5 +1,4 @@
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   AddInlineCommentItemApiRequest,
@@ -29,16 +28,6 @@ import type {
 type InlineCommentUserReactionApiValue = NonNullable<
   InlineCommentItemApiResponse['reactions']
 >[string];
-
-function requiredId(value: string | null | undefined, field: string): string {
-  const id = normalizeId(value);
-  if (!id) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `行内批注 ${field} 缺失`,
-    });
-  }
-  return id;
-}
 
 function requiredTimestamp(value: number | null | undefined, field: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -108,8 +97,8 @@ function mapUserReactions(
 }
 
 function mapItem(raw: InlineCommentItemApiResponse): InlineCommentItem {
-  const itemId = requiredId(raw.itemId, 'itemId');
-  const authorId = requiredId(raw.authorId, 'authorId');
+  const itemId = raw.itemId;
+  const authorId = raw.authorId;
   return {
     itemId,
     authorId,
@@ -127,10 +116,10 @@ function mapItem(raw: InlineCommentItemApiResponse): InlineCommentItem {
 }
 
 function mapThread(raw: InlineCommentApiResponse): InlineCommentThread {
-  const inlineCommentId = requiredId(raw.inlineCommentId, 'inlineCommentId');
-  const resourceId = requiredId(raw.resourceId, 'resourceId');
-  const creatorId = requiredId(raw.creatorId, 'creatorId');
-  const resolvedBy = normalizeId(raw.resolvedBy) || undefined;
+  const inlineCommentId = raw.inlineCommentId;
+  const resourceId = raw.resourceId;
+  const creatorId = raw.creatorId;
+  const resolvedBy = raw.resolvedBy ?? undefined;
   return {
     inlineCommentId,
     resourceId,

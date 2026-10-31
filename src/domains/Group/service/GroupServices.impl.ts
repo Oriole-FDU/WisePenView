@@ -4,7 +4,6 @@ import { normalizeResourceActions } from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig, ROLE } from '@/domains/Group';
 import { DEFAULT_MEMBER_ACTIONS, GROUP_TYPE } from '@/domains/Group';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
@@ -82,11 +81,11 @@ const deleteGroup = async (params: DeleteGroupRequest) => {
 };
 
 const fetchGroupMembers = async (
-  groupId: string | number,
+  groupId: string,
   page: number,
   size: number
 ): Promise<GroupMemberList> => {
-  const data = await GroupMemberApi.list({ groupId: normalizeId(groupId), page, size });
+  const data = await GroupMemberApi.list({ groupId, page, size });
   return GroupServicesMap.mapFetchGroupMembersFromApi(data);
 };
 
@@ -135,8 +134,8 @@ const fetchUserGroupQuotas = async (
   };
 };
 
-const fetchGroupQuota = async (groupId: string | number): Promise<GroupQuotaInfo> => {
-  const data = await GroupMemberApi.getMyGroupMemberInfo({ groupId: normalizeId(groupId) });
+const fetchGroupQuota = async (groupId: string): Promise<GroupQuotaInfo> => {
+  const data = await GroupMemberApi.getMyGroupMemberInfo({ groupId });
   return GroupQuotaMap.mapFetchGroupQuotaFromApi(data);
 };
 

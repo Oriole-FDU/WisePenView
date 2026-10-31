@@ -19,10 +19,8 @@ const listFavoriteCollections = async () =>
 const createFavoriteCollection = async (
   params: Parameters<IResourceFavoriteService['createFavoriteCollection']>[0]
 ): Promise<string> =>
-  ResourceFavoriteServicesMap.mapCollectionIdFromApi(
-    await FavoriteApi.createCollection(
-      ResourceFavoriteServicesMap.mapCreateFavoriteCollectionRequest(params)
-    )
+  FavoriteApi.createCollection(
+    ResourceFavoriteServicesMap.mapCreateFavoriteCollectionRequest(params)
   );
 
 const updateFavoriteCollection: IResourceFavoriteService['updateFavoriteCollection'] = (params) =>

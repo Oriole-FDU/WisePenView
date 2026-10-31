@@ -1,5 +1,4 @@
 import { ResourceServicesMap } from '@/domains/Resource';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   ChangeFavoriteStatusApiRequest,
@@ -21,11 +20,12 @@ import type {
   UpdateFavoriteCollectionsRequest,
 } from '../service/index.type';
 
-const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] =>
-  data.collectionIds.map(normalizeId).filter(Boolean);
+const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] => [
+  ...data.collectionIds,
+];
 
 const mapFavoriteCollectionFromApi = (data: FavoriteCollectionApiResponse): FavoriteCollection => ({
-  collectionId: normalizeId(data.collectionId),
+  collectionId: data.collectionId,
   collectionName: data.collectionName,
   description: data.description,
   isDefault: data.isDefault,
@@ -39,9 +39,9 @@ const mapFavoriteCollectionsFromApi = (
 const mapUpdateFavoriteCollectionsRequest = (
   params: UpdateFavoriteCollectionsRequest
 ): ChangeFavoriteStatusApiRequest => {
-  const collectionIds = params.collectionIds.map(normalizeId).filter(Boolean);
+  const collectionIds = [...params.collectionIds];
   return {
-    resourceId: normalizeId(params.resourceId),
+    resourceId: params.resourceId,
     favorite: collectionIds.length > 0,
     ...(collectionIds.length > 0 ? { collectionIds } : {}),
   };
@@ -57,7 +57,7 @@ const mapCreateFavoriteCollectionRequest = (
 const mapUpdateFavoriteCollectionRequest = (
   params: UpdateFavoriteCollectionRequest
 ): UpdateCollectionInfoApiRequest => ({
-  collectionId: normalizeId(params.collectionId),
+  collectionId: params.collectionId,
   collectionName: params.collectionName,
   description: params.description ?? null,
 });
@@ -65,14 +65,14 @@ const mapUpdateFavoriteCollectionRequest = (
 const mapDeleteFavoriteCollectionRequest = (
   params: DeleteFavoriteCollectionRequest
 ): DeleteCollectionApiRequest => ({
-  collectionId: normalizeId(params.collectionId),
+  collectionId: params.collectionId,
   keepResourcesToDefault: params.keepResourcesToDefault,
 });
 
 const mapListFavoritedResourcesRequest = (
   params: ListFavoritedResourcesRequest
 ): ListFavoritedResourcesApiRequest => ({
-  ...(params.collectionId ? { collectionId: normalizeId(params.collectionId) } : {}),
+  ...(params.collectionId ? { collectionId: params.collectionId } : {}),
   page: params.page,
   size: params.size,
 });
@@ -83,7 +83,7 @@ const mapFavoriteItemFromApi = (data: FavoriteItemApiResponse): FavoriteItem => 
     : null;
   const resourceInfo = data.accessible ? normalizedResource : null;
   return {
-    resourceId: normalizeId(data.resourceId) || resourceInfo?.resourceId || '',
+    resourceId: data.resourceId,
     favoritedAt: data.favoritedAt,
     resourceInfo,
   };
@@ -106,5 +106,4 @@ export const ResourceFavoriteServicesMap = {
   mapDeleteFavoriteCollectionRequest,
   mapListFavoritedResourcesRequest,
   mapFavoritedResourcesPageFromApi,
-  mapCollectionIdFromApi: normalizeId,
 };

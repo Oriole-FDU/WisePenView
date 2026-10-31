@@ -3,7 +3,6 @@ import { useState } from 'react';
 import ResourcePermissionModal from '@/components/business/Resource/ResourcePermissionModal';
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type { ResourceToolbarProps } from './index.type';
 import ResourceToolbarActions from './ResourceToolbarActions';
@@ -38,14 +37,11 @@ export default function ResourceToolbar({
 }: ResourceToolbarProps) {
   const userService = useUserService();
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
-  const normalizedOwnerId = normalizeId(ownerId);
   const { data: currentUser } = useApi(() => userService.getUserInfo(), {
-    ready: Boolean(resourceId && normalizedOwnerId),
-    refreshDeps: [resourceId, normalizedOwnerId],
+    ready: Boolean(resourceId && ownerId),
+    refreshDeps: [resourceId, ownerId],
   });
-  const canManagePermission = Boolean(
-    resourceId && normalizedOwnerId && currentUser?.id === normalizedOwnerId
-  );
+  const canManagePermission = Boolean(resourceId && ownerId && currentUser?.id === ownerId);
 
   return (
     <>

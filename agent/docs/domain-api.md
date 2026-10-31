@@ -28,6 +28,7 @@ API 层禁止：
 - API Schema 是前端消费契约，只声明前端实际发送和消费的字段；不得 import 后端 Entity、共享 Base 或 Swagger 生成类型。
 - 响应字段必须存在时不要使用 `.optional()`；值可为 `null` 时使用 `.nullable()`。请求字段的 `.optional()` 只表示允许省略，`.nullable()` 表示允许显式传 `null`，两者不能混用。
 - Zod 只约束 wire 结构与 primitive 类型。ID、时间、枚举和数值范围按后端真实序列化规则声明，不使用 `z.coerce()` 掩盖类型漂移。
+- Java Long ID 必须由后端序列化为字符串；`JSON.parse` 后无法恢复已丢失的数值精度，禁止在 mapper 中用 `String(number)` 补救。
 - 普通非空字符串复用 `NonEmptyStringSchema`，数字长整型字符串、ObjectId、毫秒时间和 ISO 时间分别复用 `@/apis/schema` 的专用 Schema，不在领域内重复定义同义 primitive。
 - 请求使用 `z.strictObject()`，未知字段直接失败；响应使用普通 `z.object()`，允许后端新增字段并剥离。两者都不使用 `.catch()` 或 `.default()` 静默掩盖 wire 违约。
 - 每个 API 使用一个 `ApiContract` 描述 `name`、`method`、`endpoint`、`requestPlacement`、`transport`、`request` 和 `response`；空 payload 必须复用 `@/apis/schema` 的 `EmptyApiRequestSchema`、`EmptyApiResponseSchema`。

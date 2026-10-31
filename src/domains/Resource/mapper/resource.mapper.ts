@@ -1,6 +1,5 @@
 import { normalizeResourceActions, type ResourceAction } from '@/domains/_shared/access';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
@@ -125,8 +124,8 @@ const isGrantedActionListItem = (
 const getGrantedActionSubjectId = (
   item: ResourceGroupGrantedActionsApi | ResourceSpecifiedUserGrantedActionsApi
 ): string => {
-  if ('groupId' in item) return normalizeId(item.groupId);
-  return normalizeId(item.userId);
+  if ('groupId' in item) return item.groupId;
+  return item.userId;
 };
 
 const normalizeResourceActionMap = (
