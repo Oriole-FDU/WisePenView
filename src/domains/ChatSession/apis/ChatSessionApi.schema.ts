@@ -111,18 +111,6 @@ export const PythonPageResponseSchema = <ItemSchema extends z.ZodType>(itemSchem
 export const ListSessionsApiResponseSchema = PythonPageResponseSchema(ChatSessionApiSchema);
 export const ListHistoryMessagesApiResponseSchema = PythonPageResponseSchema(UIMessageApiSchema);
 
-export const ActiveChatTurnApiRequestSchema = z.strictObject({
-  session_id: OpaqueIdSchema,
-});
-
-export const ActiveChatTurnApiResponseSchema = z.object({
-  turn_id: OpaqueIdSchema.nullable(),
-});
-
-export const CancelChatTurnApiRequestSchema = z.strictObject({
-  session_id: OpaqueIdSchema,
-});
-
 export const InitTemporaryAttachmentUploadApiRequestSchema = z.strictObject({
   session_id: OpaqueIdSchema,
   filename: NonEmptyStringSchema.max(255),
@@ -154,9 +142,6 @@ export type ListSessionsApiResponse = z.infer<typeof ListSessionsApiResponseSche
 export type ListHistoryMessagesApiRequest = z.infer<typeof ListHistoryMessagesApiRequestSchema>;
 export type ListHistoryMessagesApiResponse = z.infer<typeof ListHistoryMessagesApiResponseSchema>;
 export type UIMessageApi = z.infer<typeof UIMessageApiSchema>;
-export type ActiveChatTurnApiRequest = z.infer<typeof ActiveChatTurnApiRequestSchema>;
-export type ActiveChatTurnApiResponse = z.infer<typeof ActiveChatTurnApiResponseSchema>;
-export type CancelChatTurnApiRequest = z.infer<typeof CancelChatTurnApiRequestSchema>;
 export type InitTemporaryAttachmentUploadApiRequest = z.infer<
   typeof InitTemporaryAttachmentUploadApiRequestSchema
 >;

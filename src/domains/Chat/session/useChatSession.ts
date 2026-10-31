@@ -4,6 +4,7 @@ import { DefaultChatTransport } from 'ai';
 import { useMemo, useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
+import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
@@ -11,7 +12,6 @@ import {
   pickChatCompletionApiRequest,
   pickChatRecoverApiRequest,
 } from '../apis/ChatStreamApi.schema';
-import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
 import { mapChatCompletionRequest } from '../mapper/chatCompletion.mapper';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
 import type {

@@ -3,6 +3,7 @@ import type { IAgentService } from '@/domains/Agent';
 import type { IAuthService } from '@/domains/Auth';
 import type { IChatService } from '@/domains/Chat';
 import type { IChatConfigService } from '@/domains/ChatConfig';
+import type { IChatSessionService } from '@/domains/ChatSession';
 import type { ICourseService } from '@/domains/Course';
 import type { IDocumentService } from '@/domains/Document';
 import type { IDriveService } from '@/domains/Drive';
@@ -38,6 +39,8 @@ export const useAuthService = (): IAuthService => useServicesContext().authServi
 export const useChatService = (): IChatService => useServicesContext().chatService;
 export const useChatConfigService = (): IChatConfigService =>
   useServicesContext().chatConfigService;
+export const useChatSessionService = (): IChatSessionService =>
+  useServicesContext().chatSessionService;
 export const useCourseService = (): ICourseService => useServicesContext().courseService;
 export const useDocumentService = (): IDocumentService => useServicesContext().documentService;
 export const useDriveService = (): IDriveService => useServicesContext().driveService;

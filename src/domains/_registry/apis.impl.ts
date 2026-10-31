@@ -5,13 +5,14 @@ export { AdminMessageApi } from '@/domains/Admin/apis/AdminMessageApi';
 export { AdminUserApi } from '@/domains/Admin/apis/AdminUserApi';
 export { AgentApi } from '@/domains/Agent/apis/AgentApi';
 export { AuthApi } from '@/domains/Auth/apis/AuthApi';
-export { ChatApi, ChatCompletionApi, ChatSessionApi } from '@/domains/Chat/apis/ChatApi';
 export {
   reconnectChatStream,
   streamChatCompletion,
   streamChatRecovery,
 } from '@/domains/Chat/apis/ChatStreamApi';
+export { ChatTurnApi } from '@/domains/Chat/apis/ChatTurnApi';
 export { ChatConfigApi } from '@/domains/ChatConfig/apis/ChatConfigApi';
+export { ChatSessionApi } from '@/domains/ChatSession/apis/ChatSessionApi';
 export { DocumentApi } from '@/domains/Document/apis/DocumentApi';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/apis/GroupApi';
 export { HtmlPageApi } from '@/domains/HtmlPage/apis/HtmlPageApi';

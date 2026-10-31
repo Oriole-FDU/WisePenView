@@ -2,8 +2,8 @@ import { toast } from '@heroui/react';
 import { useLatest } from 'ahooks';
 import { useEffect } from 'react';
 
-import { useChatService } from '@/domains';
-import { useChatHistory, type WisePenUIMessage } from '@/domains/Chat';
+import { useChatSessionService } from '@/domains';
+import { useChatHistory, type WisePenUIMessage } from '@/domains/ChatSession';
 import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -37,13 +37,13 @@ export function useChatTurnHistory({
   clearNewlyCreatedSession,
 }: UseChatTurnHistoryOptions) {
   const appAuth = useAppAuth();
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const { sessionId: currentSessionId } = useChatSessionRoute();
   const routeLatest = useLatest({ sessionId: currentSessionId });
 
   const { runAsync: runLoadSessionHistory } = useApi(
     async (sessionId: string, page: number, size: number) =>
-      chatService.listHistoryMessages({ sessionId, page, size }),
+      chatSessionService.listHistoryMessages({ sessionId, page, size }),
     { manual: true }
   );
   const {

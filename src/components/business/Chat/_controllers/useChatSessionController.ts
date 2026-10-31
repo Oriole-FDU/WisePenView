@@ -2,12 +2,12 @@ import { useLatest, useMemoizedFn, useUnmountedRef } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useChatService } from '@/domains';
+import { useChatSessionService } from '@/domains';
 import {
   type ChatSession,
   type CreateSessionRequest,
   useChatSessionMetadata,
-} from '@/domains/Chat';
+} from '@/domains/ChatSession';
 import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -28,7 +28,7 @@ interface UseChatSessionControllerOptions {
 export function useChatSessionController({ resourceChat }: UseChatSessionControllerOptions) {
   const { t } = useTranslation(['chat', 'common']);
   const appAuth = useAppAuth();
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const requestChatSessionHistoryRefresh = useChatSessionHistoryRefreshStore(
     (state) => state.requestRefresh
   );
@@ -47,11 +47,12 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const clearResourceChatContext = resourceChat?.clearContext;
 
   const { runAsync: runCreateSession } = useApi(
-    (params?: CreateSessionRequest) => chatService.createSession(params),
+    (params?: CreateSessionRequest) => chatSessionService.createSession(params),
     { manual: true }
   );
   const { runAsync: runSetSessionAgent } = useApi(
-    (params: { sessionId: string; agentId?: string | null }) => chatService.setSessionAgent(params),
+    (params: { sessionId: string; agentId?: string | null }) =>
+      chatSessionService.setSessionAgent(params),
     { manual: true }
   );
 

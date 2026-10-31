@@ -18,18 +18,20 @@ try {
       contents: `
         export { parseApiRequest, parseApiResponse } from '@/apis/contract';
         export {
-          CancelChatTurnApiContract,
           CreateSessionApiContract,
           DeleteSessionApiContract,
-          GetActiveChatTurnApiContract,
           InitTemporaryAttachmentUploadApiContract,
           ListHistoryMessagesApiContract,
           ListSessionsApiContract,
           RenameSessionApiContract,
           SetSessionAgentApiContract,
-        } from '@/domains/Chat/apis/ChatSessionApi.contract';
-        export { ChatServicesMap } from '@/domains/Chat/mapper/ChatServices.map';
-        export { ChatApi, ChatSessionApi } from '@/domains/Chat/mock/ChatApi.mock';
+        } from '@/domains/ChatSession/apis/ChatSessionApi.contract';
+        export {
+          CancelChatTurnApiContract,
+          GetActiveChatTurnApiContract,
+        } from '@/domains/Chat/apis/ChatTurnApi.contract';
+        export { ChatSessionServicesMap } from '@/domains/ChatSession/mapper/ChatSessionServices.map';
+        export { ChatSessionApi } from '@/domains/ChatSession/mock/ChatSessionApi.mock';
       `,
       resolveDir: root,
     },
@@ -42,8 +44,7 @@ try {
 
   const {
     CancelChatTurnApiContract,
-    ChatApi,
-    ChatServicesMap,
+    ChatSessionServicesMap,
     ChatSessionApi,
     CreateSessionApiContract,
     DeleteSessionApiContract,
@@ -76,7 +77,7 @@ try {
   assert.deepEqual(SetSessionAgentApiContract.queryKeys, ['session_id']);
   assert.deepEqual(RenameSessionApiContract.queryKeys, ['session_id']);
 
-  const mappedCreateRequest = ChatServicesMap.mapCreateSessionRequest({
+  const mappedCreateRequest = ChatSessionServicesMap.mapCreateSessionRequest({
     title: '新会话',
     agentId: 'agent-1',
     agentVersion: 99,
@@ -117,7 +118,7 @@ try {
 
   const attachment = parseApiResponse(
     InitTemporaryAttachmentUploadApiContract,
-    await ChatApi.initTemporaryAttachmentUpload({
+    await ChatSessionApi.initTemporaryAttachmentUpload({
       session_id: session.id,
       filename: 'report.pdf',
       extension: 'pdf',

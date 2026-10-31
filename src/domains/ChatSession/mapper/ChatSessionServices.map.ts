@@ -1,7 +1,8 @@
 import type { DynamicToolUIPart, ToolUIPart, UITool, UIToolInvocation } from 'ai';
 
+import type { PageResult } from '@/domains/_shared/entity/page';
+
 import type {
-  ActiveChatTurnApiResponse,
   ChatSessionApi,
   CreateSessionApiRequest,
   ListHistoryMessagesApiRequest,
@@ -21,12 +22,9 @@ import type {
   CreateSessionRequest,
   ListHistoryMessagesRequest,
   ListSessionsRequest,
-  PageResult,
   RenameSessionRequest,
   SetSessionAgentRequest,
 } from '../service/index.type';
-
-const mapActiveTurnIdFromApi = (data: ActiveChatTurnApiResponse): string | null => data.turn_id;
 
 const mapCreateSessionRequest = (params?: CreateSessionRequest): CreateSessionApiRequest => {
   const title = params?.title;
@@ -346,8 +344,7 @@ const mapListHistoryMessagesFromApi = (
   totalPage: data.total_page,
 });
 
-export const ChatServicesMap = {
-  mapActiveTurnIdFromApi,
+export const ChatSessionServicesMap = {
   mapCreateSessionRequest,
   mapCreateSessionFromApi,
   mapSetSessionAgentRequest,

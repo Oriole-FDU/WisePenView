@@ -6,6 +6,7 @@ export {
   useAuthService,
   useChatConfigService,
   useChatService,
+  useChatSessionService,
   useCourseService,
   useDocumentService,
   useDriveService,

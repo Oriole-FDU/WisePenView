@@ -1,8 +1,9 @@
 import { useLatest } from 'ahooks';
 import { useRef, useState } from 'react';
 
+import type { PageResult } from '@/domains/_shared/entity/page';
+
 import type { WisePenUIMessage } from '../entity/message';
-import type { PageResult } from '../service/index.type';
 
 interface UseChatHistoryOptions {
   sessionId: string | null;

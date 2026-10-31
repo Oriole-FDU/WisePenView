@@ -1,5 +1,5 @@
-import type { WisePenUIMessage } from '@/domains/Chat';
 import type { ChatModel } from '@/domains/ChatConfig';
+import type { WisePenUIMessage } from '@/domains/ChatSession';
 
 /** 消息展示契约；会话身份、消息写入与审批编排由调用方维护。 */
 export interface ChatMessageListProps {

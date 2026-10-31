@@ -7,7 +7,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FormField, Input } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useChatService } from '@/domains';
+import { useChatSessionService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import type { SessionMenuItemProps } from './index.type';
@@ -15,7 +15,7 @@ import styles from './style.module.scss';
 
 function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps) {
   const { t } = useTranslation(['chat', 'common']);
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [editingTitle, setEditingTitle] = useState(session.title || '');
   const [editingTitleError, setEditingTitleError] = useState('');
@@ -23,7 +23,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
 
   const { runAsync: runRenameSession } = useApi(
     async (newTitle: string) =>
-      chatService.renameSession({
+      chatSessionService.renameSession({
         sessionId: session.id,
         newTitle,
       }),
@@ -39,7 +39,7 @@ function SessionMenuItem({ session, onUpdated, onDeleted }: SessionMenuItemProps
 
   const { runAsync: runDeleteSession, loading: deleting } = useApi(
     async () =>
-      chatService.deleteSession({
+      chatSessionService.deleteSession({
         sessionId: session.id,
       }),
     {

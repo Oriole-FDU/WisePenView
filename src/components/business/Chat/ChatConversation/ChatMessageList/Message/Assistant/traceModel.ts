@@ -7,7 +7,7 @@ import {
   type ToolUIPart,
 } from 'ai';
 
-import type { WisePenUIMessage } from '@/domains/Chat';
+import type { WisePenUIMessage } from '@/domains/ChatSession';
 
 export type RenderableToolPart = ToolUIPart | DynamicToolUIPart;
 

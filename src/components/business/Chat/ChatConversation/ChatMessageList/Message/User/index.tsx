@@ -14,7 +14,7 @@ import AppPopover from '@/components/base/AppPopover';
 import { AppPressable } from '@/components/base/Button';
 import CopyButton from '@/components/base/Button/CopyButton';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
-import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/Chat';
+import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/ChatSession';
 
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';

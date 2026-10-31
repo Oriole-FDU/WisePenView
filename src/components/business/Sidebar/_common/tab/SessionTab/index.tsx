@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
-import { useChatService } from '@/domains';
-import type { ChatSession, PageResult } from '@/domains/Chat';
+import { useChatSessionService } from '@/domains';
+import type { PageResult } from '@/domains/_shared/entity/page';
+import type { ChatSession } from '@/domains/ChatSession';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { buildChatPath } from '@/utils/navigation/appRoute';
@@ -20,7 +21,7 @@ import styles from './style.module.scss';
 const SESSION_PAGE_SIZE = 20;
 
 const useSessionTab = () => {
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const { sessionId: currentSessionId, selectSession: selectRouteSession } = useChatSessionRoute();
   const sessionItems = useSidebarSessionHistoryStore((state) => state.sessionItems);
   const setSessionPageResult = useSidebarSessionHistoryStore((state) => state.setSessionPageResult);
@@ -36,7 +37,7 @@ const useSessionTab = () => {
     reloadAsync: reloadSessions,
   } = useInfiniteScroll<PageResult<ChatSession>>(
     async (current) =>
-      chatService.listSessions({
+      chatSessionService.listSessions({
         page: Math.floor((current?.list.length ?? 0) / SESSION_PAGE_SIZE) + 1,
         size: SESSION_PAGE_SIZE,
       }),

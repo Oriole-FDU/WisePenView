@@ -1,11 +1,7 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type {
-  ChatApi as ChatApiContract,
-  ChatCompletionApi as ChatCompletionApiContract,
-  ChatSessionApi as ChatSessionApiContract,
-} from '../apis/ChatApi';
+import type { ChatSessionApi as ChatSessionApiContract } from '../apis/ChatSessionApi';
 import type {
   ChatSessionApi as ChatSessionApiModel,
   UIMessageApi as MessageResponse,
@@ -126,6 +122,13 @@ const requireSession = (id: string) => {
   return session;
 };
 export const ChatSessionApi: typeof ChatSessionApiContract = {
+  initTemporaryAttachmentUpload: async () => ({
+    attachment_id: `mock-attachment-${crypto.randomUUID()}`,
+    object_key: 'mock/attachment',
+    put_url: 'https://mock-storage.example.invalid/upload',
+    callback_header: 'mock-callback',
+    flash_uploaded: true,
+  }),
   createSession: async (params) => {
     const now = new Date().toISOString();
     const session: ChatSessionApiModel = {
@@ -181,17 +184,4 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
       total_page: Math.ceil(rows.length / size),
     });
   },
-};
-export const ChatCompletionApi: typeof ChatCompletionApiContract = {
-  getActiveTurn: async () => ({ turn_id: null }),
-  cancelTurn: async () => undefined,
-};
-export const ChatApi: typeof ChatApiContract = {
-  initTemporaryAttachmentUpload: async () => ({
-    attachment_id: `mock-attachment-${crypto.randomUUID()}`,
-    object_key: 'mock/attachment',
-    put_url: 'https://mock-storage.example.invalid/upload',
-    callback_header: 'mock-callback',
-    flash_uploaded: true,
-  }),
 };

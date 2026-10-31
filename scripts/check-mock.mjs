@@ -69,8 +69,8 @@ try {
     resourceInteractionService: interaction,
     resourceCommentService: comment,
     resourceFavoriteService: favorite,
-    chatService: chat,
     chatConfigService: chatConfig,
+    chatSessionService: chatSession,
     skillService: skill,
     agentService: agent,
     userService: user,
@@ -295,24 +295,24 @@ try {
   });
   assert(cleared.subjects.every((s) => s.source === 'tag' || s.source === 'owner'));
 
-  const sessions = await chat.listSessions({ page: 1, size: 2 });
-  const history = await chat.listHistoryMessages({
+  const sessions = await chatSession.listSessions({ page: 1, size: 2 });
+  const history = await chatSession.listHistoryMessages({
     sessionId: sessions.list[0].id,
     page: 1,
     size: 20,
   });
   assert.equal(history.list.length, 20);
   assert(history.total > history.list.length);
-  const session = await chat.createSession({ title: '離線對話' });
+  const session = await chatSession.createSession({ title: '離線對話' });
   assert.equal(
-    (await chat.renameSession({ sessionId: session.id, newTitle: '重新命名' })).title,
+    (await chatSession.renameSession({ sessionId: session.id, newTitle: '重新命名' })).title,
     '重新命名'
   );
   assert(
     (await chatConfig.listChatInputSkills({ scope: 'PERSONAL', page: 1, size: 20 })).list.length > 0
   );
   await chatConfig.getChatInputCapabilityOptions({ agent: null });
-  await chat.deleteSession({ sessionId: session.id });
+  await chatSession.deleteSession({ sessionId: session.id });
 
   const skillId = await skill.createSkill('驗證 Skill');
   const { draftVersion } = await skill.getSkillDetail(skillId);
