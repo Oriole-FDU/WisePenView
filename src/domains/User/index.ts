@@ -9,7 +9,6 @@ export type {
 } from './entity/user';
 export type {
   DegreeLevel,
-  FeedbackType,
   Sex,
   UserStatus,
   UserVerificationMode,
@@ -17,7 +16,6 @@ export type {
 } from './enum';
 export {
   DEGREE,
-  FEEDBACK_TYPE,
   IDENTITY,
   SEX,
   USER_STATUS,
@@ -34,6 +32,5 @@ export type {
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
   SendEmailVerifyRequest,
-  SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from './service/index.type';

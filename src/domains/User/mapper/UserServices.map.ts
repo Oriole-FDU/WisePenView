@@ -8,7 +8,6 @@ import type {
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
-  AddFeedbackApiRequest,
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
   CheckEmailVerifyApiRequest,
@@ -29,7 +28,6 @@ import type {
   InitiateUISVerifyRequest,
   ListUserInviteRecordsRequest,
   SendEmailVerifyRequest,
-  SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from '../service/index.type';
 import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
@@ -153,14 +151,6 @@ const mapListInviteRecordsFromApi = (
   totalPage: data.totalPage,
 });
 
-const mapSubmitFeedbackRequest = (params: SubmitFeedbackRequest): AddFeedbackApiRequest => ({
-  content: params.content,
-  contact: params.contact,
-  imageUrl: params.imageUrl?.trim() || undefined,
-  browser: typeof navigator === 'undefined' ? undefined : navigator.userAgent,
-  type: params.type,
-});
-
 const mapUpdateUserInfoRequests = (
   params: UpdateUserInfoRequest
 ): {
@@ -202,6 +192,5 @@ export const UserServicesMap = {
   mapConfirmEmailVerifyRequest,
   mapListInviteRecordsRequest,
   mapListInviteRecordsFromApi,
-  mapSubmitFeedbackRequest,
   mapUpdateUserInfoRequests,
 };

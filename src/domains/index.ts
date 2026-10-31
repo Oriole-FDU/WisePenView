@@ -13,6 +13,7 @@ export {
   useCourseService,
   useDocumentService,
   useDriveService,
+  useFeedbackService,
   useGroupService,
   useHtmlPageService,
   useImageService,
@@ -32,8 +33,8 @@ export {
   useUserTourService,
   useWalletService,
 } from './_registry';
+export type { FeedbackType, SubmitFeedbackRequest } from './Feedback';
+export { FEEDBACK_TYPE } from './Feedback';
 export type { HtmlPageDisplayInfo, HtmlPageVersionInfo, IHtmlPageService } from './HtmlPage';
 export { isHtmlPageReady } from './HtmlPage';
 export type { IMessageService, UserMessage } from './Message';
-export type { FeedbackType, SubmitFeedbackRequest } from './User';
-export { FEEDBACK_TYPE } from './User';

@@ -15,7 +15,6 @@ import type {
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
   SendEmailVerifyRequest,
-  SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from './index.type';
 
@@ -93,11 +92,6 @@ const confirmEmailVerify = async (params: ConfirmEmailVerifyRequest): Promise<vo
   await UserApi.checkEmailVerify(query);
 };
 
-const submitFeedback = async (params: SubmitFeedbackRequest): Promise<void> => {
-  const payload = UserServicesMap.mapSubmitFeedbackRequest(params);
-  await UserApi.addFeedback(payload);
-};
-
 export const createUserServices = (): IUserService => {
   /** 闭包级缓存，仅存非敏感展示字段，退出登录时清理，读缓存自动过期。 */
   const userInfoCache = createTtlCache<string, CachedUserSafe>(USER_INFO_CACHE_TTL_MS);
@@ -158,6 +152,5 @@ export const createUserServices = (): IUserService => {
     initiateUISVerify,
     checkFudanUISVerify,
     confirmEmailVerify,
-    submitFeedback,
   };
 };

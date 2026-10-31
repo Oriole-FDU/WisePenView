@@ -3,8 +3,6 @@ import type { AxiosRequestConfig } from 'axios';
 import { executeApiContract } from '@/apis/executeApiContract';
 
 import {
-  AddFeedbackApiContract,
-  type AddFeedbackApiContractRequest,
   ChangeUserInfoApiContract,
   type ChangeUserInfoApiContractRequest,
   ChangeUserProfileApiContract,
@@ -74,10 +72,6 @@ async function changeUserProfile(req: ChangeUserProfileApiContractRequest): Prom
   await executeApiContract(ChangeUserProfileApiContract, req);
 }
 
-async function addFeedback(req: AddFeedbackApiContractRequest): Promise<void> {
-  await executeApiContract(AddFeedbackApiContract, req);
-}
-
 function listInviteRecords(
   req: ListUserInviteRecordsApiContractRequest
 ): Promise<ListUserInviteRecordsApiContractResponse> {
@@ -94,6 +88,5 @@ export const UserApi = {
   checkEmailVerify,
   changeUserInfo,
   changeUserProfile,
-  addFeedback,
   listInviteRecords,
 };

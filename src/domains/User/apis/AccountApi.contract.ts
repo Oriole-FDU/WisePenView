@@ -6,7 +6,6 @@ import {
 import { EmptyApiRequestSchema, EmptyApiResponseSchema } from '@/apis/schema';
 
 import {
-  AddFeedbackApiRequestSchema,
   ChangeUserInfoApiRequestSchema,
   ChangeUserProfileApiRequestSchema,
   CheckEmailVerifyApiRequestSchema,
@@ -77,16 +76,6 @@ export const ChangeUserProfileApiContract = defineApiContract({
   response: EmptyApiResponseSchema,
 });
 
-export const AddFeedbackApiContract = defineApiContract({
-  name: 'AddFeedbackApi',
-  method: 'POST',
-  endpoint: '/system/feedback/addFeedback',
-  requestPlacement: 'body',
-  transport: 'json',
-  request: AddFeedbackApiRequestSchema,
-  response: EmptyApiResponseSchema,
-});
-
 export const ListUserInviteRecordsApiContract = defineApiContract({
   name: 'ListUserInviteRecordsApi',
   method: 'GET',
@@ -113,7 +102,6 @@ export type ChangeUserInfoApiContractRequest = ApiContractRequest<typeof ChangeU
 export type ChangeUserProfileApiContractRequest = ApiContractRequest<
   typeof ChangeUserProfileApiContract
 >;
-export type AddFeedbackApiContractRequest = ApiContractRequest<typeof AddFeedbackApiContract>;
 export type ListUserInviteRecordsApiContractRequest = ApiContractRequest<
   typeof ListUserInviteRecordsApiContract
 >;

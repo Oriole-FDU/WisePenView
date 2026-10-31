@@ -7,6 +7,7 @@ import type { IChatTurnService } from '@/domains/ChatTurn';
 import type { ICourseService } from '@/domains/Course';
 import type { IDocumentService } from '@/domains/Document';
 import type { IDriveService } from '@/domains/Drive';
+import type { IFeedbackService } from '@/domains/Feedback';
 import type { IGroupService } from '@/domains/Group';
 import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { IImageService } from '@/domains/Image';
@@ -46,6 +47,7 @@ export const useChatTurnService = (): IChatTurnService => useServicesContext().c
 export const useCourseService = (): ICourseService => useServicesContext().courseService;
 export const useDocumentService = (): IDocumentService => useServicesContext().documentService;
 export const useDriveService = (): IDriveService => useServicesContext().driveService;
+export const useFeedbackService = (): IFeedbackService => useServicesContext().feedbackService;
 export const useGroupService = (): IGroupService => useServicesContext().groupService;
 export const useHtmlPageService = (): IHtmlPageService => useServicesContext().htmlPageService;
 export const useImageService = (): IImageService => useServicesContext().imageService;

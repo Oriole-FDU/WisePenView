@@ -14,6 +14,7 @@ export {
 } from '@/domains/ChatTurn/apis/ChatStreamApi';
 export { ChatTurnApi } from '@/domains/ChatTurn/apis/ChatTurnApi';
 export { DocumentApi } from '@/domains/Document/apis/DocumentApi';
+export { FeedbackApi } from '@/domains/Feedback/apis/FeedbackApi';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/apis/GroupApi';
 export { HtmlPageApi } from '@/domains/HtmlPage/apis/HtmlPageApi';
 export { ImageApi } from '@/domains/Image/apis/ImageApi';

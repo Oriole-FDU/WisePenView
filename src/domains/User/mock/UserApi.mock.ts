@@ -128,6 +128,5 @@ export const UserApi: typeof UserApiContract = {
   changeUserProfile: async (params) => {
     Object.assign(fullUserInfo.userProfile, params);
   },
-  addFeedback: async () => undefined,
   listInviteRecords: (params) => mockResponse(mockPage(mockInviteRecords, params)),
 };

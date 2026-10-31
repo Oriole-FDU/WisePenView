@@ -1,6 +1,6 @@
 import type { UserInviteRecordList } from '../entity/invite';
 import type { User, UserAccountProfile, UserSearchUser } from '../entity/user';
-import type { DegreeLevel, FeedbackType, Sex } from '../enum';
+import type { DegreeLevel, Sex } from '../enum';
 
 /** UserService 接口：供依赖注入使用 */
 export interface IUserService {
@@ -24,7 +24,6 @@ export interface IUserService {
   /** 查询复旦 UIS 认证状态（单次，与 checkFudanUISVerify 对齐） */
   checkFudanUISVerify(): Promise<FudanUISVerifyStatusData>;
   confirmEmailVerify(params: ConfirmEmailVerifyRequest): Promise<void>;
-  submitFeedback(params: SubmitFeedbackRequest): Promise<void>;
 }
 
 /** 确认邮箱验证请求参数 */
@@ -70,13 +69,6 @@ export interface FudanUISVerifyStatusData {
   /** 需用户操作时：二维码图片的 base64 字符（PNG/JPEG）；可选带 data:image/*;base64, 前缀 */
   actionPayload: string;
   message: string;
-}
-
-export interface SubmitFeedbackRequest {
-  type: FeedbackType;
-  content: string;
-  contact: string;
-  imageUrl?: string;
 }
 
 /** 更新用户信息请求参数（仅基本资料可编辑；账号栏只读；impl 内按 userInfo / userProfile 拆成两次 PUT） */

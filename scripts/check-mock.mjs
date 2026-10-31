@@ -76,6 +76,7 @@ try {
     userService: user,
     userTaskService: userTask,
     userTourService: userTour,
+    feedbackService: feedback,
     walletService: wallet,
     groupService: group,
     inlineCommentService: inline,
@@ -372,6 +373,11 @@ try {
   assert((await userTask.listTaskStatus()).some((task) => task.taskCode === 'DAILY_CHECK_IN'));
   assert.equal(typeof (await userTask.dailyCheckIn()).rewardAmount, 'number');
   assert((await userTour.listTourStatus()).length > 0);
+  await feedback.submitFeedback({
+    type: 'BUG_REPORT',
+    content: '離線回饋',
+    contact: 'test@example.com',
+  });
   assert(
     (await wallet.listTransactions({ transactionTypes: ['REFILL', 'SPEND'], page: 1, size: 20 }))
       .records.length > 0

@@ -53,22 +53,6 @@ export const CheckFudanUISVerifyApiResponseSchema = z.object({
   message: NullableStringSchema,
 });
 
-export const UserFeedbackTypeApiSchema = z.enum([
-  'BUG_REPORT',
-  'SUGGESTION',
-  'CONSULTATION',
-  'COMPLAINT',
-  'OTHER',
-]);
-
-export const AddFeedbackApiRequestSchema = z.strictObject({
-  content: z.string(),
-  contact: z.string(),
-  imageUrl: z.string().max(1024).optional(),
-  browser: z.string().optional(),
-  type: UserFeedbackTypeApiSchema,
-});
-
 export const ListUserInviteRecordsApiRequestSchema = PageApiRequestSchema;
 
 export const UserInviteStatusApiSchema = z.enum(['BOUND', 'REWARDED']);
@@ -93,8 +77,6 @@ export type InitiateFudanUISVerifyApiRequest = z.infer<
   typeof InitiateFudanUISVerifyApiRequestSchema
 >;
 export type CheckFudanUISVerifyApiResponse = z.infer<typeof CheckFudanUISVerifyApiResponseSchema>;
-export type UserFeedbackTypeApiValue = z.infer<typeof UserFeedbackTypeApiSchema>;
-export type AddFeedbackApiRequest = z.infer<typeof AddFeedbackApiRequestSchema>;
 export type ListUserInviteRecordsApiRequest = z.infer<typeof ListUserInviteRecordsApiRequestSchema>;
 export type UserInviteStatusApiValue = z.infer<typeof UserInviteStatusApiSchema>;
 export type UserInviteRecordApiResponse = z.infer<typeof UserInviteRecordApiSchema>;

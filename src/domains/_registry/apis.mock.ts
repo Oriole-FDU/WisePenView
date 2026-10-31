@@ -13,6 +13,7 @@ export {
 } from '@/domains/ChatTurn/mock/ChatStreamApi.mock';
 export { ChatTurnApi } from '@/domains/ChatTurn/mock/ChatTurnApi.mock';
 export { DocumentApi } from '@/domains/Document/mock/DocumentApi.mock';
+export { FeedbackApi } from '@/domains/Feedback/mock/FeedbackApi.mock';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/mock/GroupApi.mock';
 export { HtmlPageApi } from '@/domains/HtmlPage/mock/HtmlPageApi.mock';
 export { ImageApi } from '@/domains/Image/mock/ImageApi.mock';

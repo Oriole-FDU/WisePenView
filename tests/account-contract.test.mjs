@@ -18,7 +18,6 @@ try {
       contents: `
         export { parseApiRequest, parseApiResponse } from '@/apis/contract';
         export {
-          AddFeedbackApiContract,
           ChangeUserInfoApiContract,
           ChangeUserProfileApiContract,
           CheckEmailVerifyApiContract,
@@ -27,6 +26,8 @@ try {
           InitiateFudanUISVerifyApiContract,
           ListUserInviteRecordsApiContract,
         } from '@/domains/User/apis/AccountApi.contract';
+        export { AddFeedbackApiContract } from '@/domains/Feedback/apis/FeedbackApi.contract';
+        export { FeedbackApi } from '@/domains/Feedback/mock/FeedbackApi.mock';
         export { UserServicesMap } from '@/domains/User/mapper/UserServices.map';
         export { UserApi } from '@/domains/User/mock/UserApi.mock';
       `,
@@ -45,6 +46,7 @@ try {
     ChangeUserProfileApiContract,
     CheckEmailVerifyApiContract,
     CheckFudanUISVerifyApiContract,
+    FeedbackApi,
     InitiateEmailVerifyApiContract,
     InitiateFudanUISVerifyApiContract,
     ListUserInviteRecordsApiContract,
@@ -86,6 +88,7 @@ try {
     type: 'BUG_REPORT',
     browser: 'test-browser',
   });
+  await FeedbackApi.addFeedback(feedbackRequest);
   assert.equal(feedbackRequest.type, 'BUG_REPORT');
   assert(
     !AddFeedbackApiContract.request.safeParse({

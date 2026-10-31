@@ -17,6 +17,7 @@ export {
   useCourseService,
   useDocumentService,
   useDriveService,
+  useFeedbackService,
   useGroupService,
   useHtmlPageService,
   useImageService,

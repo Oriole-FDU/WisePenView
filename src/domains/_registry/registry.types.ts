@@ -7,6 +7,7 @@ import type { IChatTurnService } from '@/domains/ChatTurn';
 import type { ICourseService } from '@/domains/Course';
 import type { IDocumentService } from '@/domains/Document';
 import type { IDriveService } from '@/domains/Drive';
+import type { IFeedbackService } from '@/domains/Feedback';
 import type { IGroupService } from '@/domains/Group';
 import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { IImageService } from '@/domains/Image';
@@ -36,6 +37,7 @@ export interface ServicesContextValue {
   courseService: ICourseService;
   documentService: IDocumentService;
   driveService: IDriveService;
+  feedbackService: IFeedbackService;
   groupService: IGroupService;
   htmlPageService: IHtmlPageService;
   imageService: IImageService;

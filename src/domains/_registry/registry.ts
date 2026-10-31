@@ -19,6 +19,7 @@ import { createChatTurnServices } from '@/domains/ChatTurn/service/ChatTurnServi
 import { createCourseServices } from '@/domains/Course/service/CourseServices.impl';
 import { createDocumentServices } from '@/domains/Document/service/DocumentServices.impl';
 import { createDriveServices } from '@/domains/Drive/service/DriveServices.impl';
+import { createFeedbackServices } from '@/domains/Feedback/service/FeedbackServices.impl';
 import { createGroupServices } from '@/domains/Group/service/GroupServices.impl';
 import { createHtmlPageServices } from '@/domains/HtmlPage/service/HtmlPageServices.impl';
 import { createImageServices } from '@/domains/Image/service/ImageServices.impl';
@@ -77,6 +78,7 @@ const driveService = createDriveServices({
   tagService: tagService,
   resourceService: resourceService,
 });
+const feedbackService = createFeedbackServices();
 const courseService = createCourseServices({
   groupService: groupService,
   resourceInteractionService,
@@ -105,6 +107,7 @@ const servicesValue: ServicesContextValue = {
   courseService: courseService,
   documentService: documentService,
   driveService: driveService,
+  feedbackService,
   groupService: groupService,
   htmlPageService: htmlPageService,
   imageService: imageService,
