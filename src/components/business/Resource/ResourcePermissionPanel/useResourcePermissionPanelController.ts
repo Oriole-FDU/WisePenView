@@ -2,13 +2,13 @@ import { toast } from '@heroui/react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useResourcePermissionService, useResourceService, useUserService } from '@/domains';
+import { useResourceAccessService, useUserService } from '@/domains';
 import { updateResourceActionSelection } from '@/domains/_shared/access';
 import {
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
   type ResourcePermissionSubject,
-} from '@/domains/Resource';
+} from '@/domains/ResourceAccess';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
@@ -44,8 +44,7 @@ export const useResourcePermissionPanelController = ({
   onSuccess,
 }: ResourcePermissionPanelProps) => {
   const { t } = useTranslation('resource');
-  const resourceService = useResourceService();
-  const resourcePermissionService = useResourcePermissionService();
+  const resourceAccessService = useResourceAccessService();
   const userService = useUserService();
   const updateQueueRef = useRef<Promise<void>>(Promise.resolve());
   const latestSubjectsRef = useRef<ResourcePermissionSubject[]>([]);
@@ -69,7 +68,7 @@ export const useResourcePermissionPanelController = ({
     refresh: refreshPermissionOverview,
   } = useApi(
     () =>
-      resourcePermissionService.getResourcePermissionOverview({
+      resourceAccessService.getResourcePermissionOverview({
         resourceId,
         resourceType,
         groupHydrationLimit,
@@ -107,7 +106,7 @@ export const useResourcePermissionPanelController = ({
     updateQueueRef.current = updateQueueRef.current
       .catch(() => undefined)
       .then(async () => {
-        await resourceService.updateResourcePermissionSubjects({
+        await resourceAccessService.updateResourcePermissionSubjects({
           resourceId,
           subjects: nextSubjects,
         });

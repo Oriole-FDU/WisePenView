@@ -2,7 +2,6 @@ import {
   ASSET_RESOURCE_TYPE,
   type AssetResourceType,
 } from '@/domains/_shared/apis/versionAsset.enum';
-import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
@@ -172,19 +171,8 @@ const mapAgentDetail = (params: {
   };
 };
 
-const mapAgentPermissionOverviewFromApi = (
-  info: AgentInfoApiResponse | null | undefined,
-  resourceId: string
-): ResourcePermissionOverview => {
-  if (!info?.resourceInfo) {
-    return { resourceId, subjects: [], supportedActions: [], actionOptions: [] };
-  }
-  return ResourceServicesMap.mapResourcePermissionOverviewFromApi(info.resourceInfo, resourceId);
-};
-
 export const AgentServicesMap = {
   mapAgentDetail,
-  mapAgentPermissionOverviewFromApi,
   mapSaveAgentDraftRequests,
   mapSpec,
   resolveAssetResourceType,

@@ -24,8 +24,8 @@ import { createInlineCommentServices } from '@/domains/InlineComment/service/Inl
 import { createInteractServices } from '@/domains/Interact/service/InteractServices.impl';
 import { createMessageServices } from '@/domains/Message/service/MessageServices.impl';
 import { createNoteServices } from '@/domains/Note/service/NoteServices.impl';
-import { createResourcePermissionServices } from '@/domains/Resource/service/ResourcePermissionServices.impl';
 import { createResourceServices } from '@/domains/Resource/service/ResourceServices.impl';
+import { createResourceAccessServices } from '@/domains/ResourceAccess/service/ResourceAccessServices.impl';
 import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl';
 import { createSpeechServices } from '@/domains/Speech/service/SpeechServices.impl';
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
@@ -73,7 +73,7 @@ const courseService = createCourseServices({
 });
 
 // Level 2：在 Note、Skill 装配后组合权限概览，避免 Resource 与它们相互依赖。
-const resourcePermissionService = createResourcePermissionServices({
+const resourceAccessService = createResourceAccessServices({
   agentService,
   documentService,
   groupService,
@@ -98,7 +98,7 @@ const servicesValue: ServicesContextValue = {
   interactService: interactService,
   messageService: messageService,
   noteService: noteService,
-  resourcePermissionService,
+  resourceAccessService,
   resourceService: resourceService,
   skillService: skillService,
   speechService: speechService,

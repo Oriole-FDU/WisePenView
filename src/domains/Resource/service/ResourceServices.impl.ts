@@ -18,8 +18,6 @@ import type {
   SearchResultPage,
   SetPersonalResourcesPathTagRequest,
   UnmountResourcesToGroupRequest,
-  UpdateResourceActionPermissionRequest,
-  UpdateResourcePermissionSubjectsRequest,
 } from './index.type';
 const requestResourceItemList = async (
   params: GetUserResourcesRequest,
@@ -83,20 +81,6 @@ const moveResourcesInGroup = async (params: MoveResourcesInGroupRequest): Promis
   return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
 };
 
-const updateResourceActionPermission = async (
-  params: UpdateResourceActionPermissionRequest
-): Promise<void> => {
-  const request = ResourceServicesMap.mapChangeResourceActionPermissionRequest(params);
-  await ResourceItemApi.changeResourceActionPermission(request);
-};
-
-const updateResourcePermissionSubjects = async (
-  params: UpdateResourcePermissionSubjectsRequest
-): Promise<void> => {
-  const request = ResourceServicesMap.mapChangeResourceActionPermissionRequestFromSubjects(params);
-  await ResourceItemApi.changeResourceActionPermission(request);
-};
-
 const globalSearch = async (params: SearchQueryRequest): Promise<SearchResultPage> => {
   const data = await ResourceItemApi.globalSearch(params);
   return ResourceServicesMap.mapSearchResultPageFromApi(data);
@@ -113,7 +97,5 @@ export const createResourceServices = (): IResourceService => ({
   mountResourcesToGroup,
   unmountResourcesToGroup,
   moveResourcesInGroup,
-  updateResourceActionPermission,
-  updateResourcePermissionSubjects,
   globalSearch,
 });

@@ -3,12 +3,9 @@ import type { ReactNode } from 'react';
 
 import type { ChatHostAgentPort } from '@/components/business/Chat/index.type';
 import type { ResourceAction } from '@/domains/_shared/access';
-import type {
-  ResourceIconType,
-  ResourceItem,
-  ResourcePermissionResourceType,
-} from '@/domains/Resource';
+import type { ResourceIconType, ResourceItem } from '@/domains/Resource';
 import type { ResourceKind, ResourceViewer } from '@/domains/Resource/model/resourceTarget';
+import type { ResourcePermissionResourceType } from '@/domains/ResourceAccess';
 
 export type EditorKind = 'note' | 'pdf' | 'skill' | 'agent' | 'drawio' | 'office' | 'html';
 export interface EditorTarget {

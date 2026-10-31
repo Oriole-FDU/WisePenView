@@ -21,6 +21,7 @@ try {
         export { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
         export { RESOURCE_ACTION } from '@/domains/_shared/access';
         export { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
+        export { ResourceAccessServicesMap } from '@/domains/ResourceAccess/mapper/ResourceAccessServices.map';
       `,
       resolveDir: root,
     },
@@ -54,6 +55,7 @@ try {
     getContextValue,
     clearAllServiceCaches,
     ResourceServicesMap: resourceMap,
+    ResourceAccessServicesMap: resourceAccessMap,
     RESOURCE_ACTION: action,
   } = await import(pathToFileURL(outfile).href);
   const {
@@ -63,7 +65,7 @@ try {
     resourceService: resource,
     noteService: note,
     documentService: document,
-    resourcePermissionService: permission,
+    resourceAccessService: permission,
     interactService: interact,
     chatService: chat,
     skillService: skill,
@@ -121,7 +123,10 @@ try {
     resourceMap.mapResourceItemFromApi(rawResource, { groupId: 'missing' }).mainTagId,
     'tag-group'
   );
-  const mappedOverview = resourceMap.mapResourcePermissionOverviewFromApi(rawResource, 'fallback');
+  const mappedOverview = resourceAccessMap.mapResourcePermissionOverviewFromApi(
+    rawResource,
+    'fallback'
+  );
   assert.equal(mappedOverview.owner.readonly, true);
   assert(!mappedOverview.subjects.some((subject) => subject.groupId?.startsWith('p_')));
   assert(!mappedOverview.supportedActions.includes(action.LOAD));
@@ -136,14 +141,14 @@ try {
     inheritedActionsBySubjectId: new Map(),
   };
   assert.deepEqual(
-    resourceMap.mergeResourcePermissionHydration(mappedOverview, emptyHydration),
+    resourceAccessMap.mergeResourcePermissionHydration(mappedOverview, emptyHydration),
     mappedOverview
   );
   const overrideSubject = mappedOverview.subjects.find(
     (subject) => subject.source === 'resourceOverride'
   );
   assert(overrideSubject);
-  const inheritedOverview = resourceMap.mergeResourcePermissionHydration(mappedOverview, {
+  const inheritedOverview = resourceAccessMap.mergeResourcePermissionHydration(mappedOverview, {
     ...emptyHydration,
     inheritedActionsBySubjectId: new Map([[overrideSubject.id, overrideSubject.editableActions]]),
   });
@@ -154,7 +159,7 @@ try {
   assert.deepEqual(inheritedSubject.effectiveActions, overrideSubject.editableActions);
 
   for (const value of [undefined, null, {}]) {
-    const request = resourceMap.mapChangeResourceActionPermissionRequest({
+    const request = resourceAccessMap.mapChangeResourceActionPermissionRequest({
       resourceId: rawResource.resourceId,
       overrideGrantedActions: value,
       specifiedUsersGrantedActions: value,
@@ -162,7 +167,7 @@ try {
     assert.deepEqual(request.overrideGrantedActions, value);
     assert.deepEqual(request.specifiedUsersGrantedActions, value);
   }
-  const actionRequest = resourceMap.mapChangeResourceActionPermissionRequest({
+  const actionRequest = resourceAccessMap.mapChangeResourceActionPermissionRequest({
     resourceId: rawResource.resourceId,
     overrideGrantedActions: { inherit: null, denied: [], edited: [action.EDIT] },
     specifiedUsersGrantedActions: { denied: [], reader: [action.VIEW] },
@@ -176,7 +181,7 @@ try {
     denied: [],
     reader: ['DISCOVER', 'VIEW'],
   });
-  const subjectRequest = resourceMap.mapChangeResourceActionPermissionRequestFromSubjects({
+  const subjectRequest = resourceAccessMap.mapChangeResourceActionPermissionRequestFromSubjects({
     resourceId: rawResource.resourceId,
     subjects: [
       mappedOverview.owner,
@@ -258,7 +263,7 @@ try {
     new Set(overview.subjects.map((s) => s.source)),
     new Set(['owner', 'tag', 'resourceOverride', 'specifiedUser'])
   );
-  await resource.updateResourceActionPermission({
+  await permission.updateResourceActionPermission({
     resourceId: 'res-001',
     specifiedUsersGrantedActions: null,
     overrideGrantedActions: null,

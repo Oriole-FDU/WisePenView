@@ -1,4 +1,3 @@
-import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
@@ -33,13 +32,6 @@ export const mapHtmlPageInfoFromApi = (
   };
 };
 
-export const mapHtmlPagePermissionOverviewFromApi = (
-  data: SingleHtmlPageInfoApiResponse,
-  resourceId: string
-): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(data.resourceInfo, resourceId);
-
 export const HtmlPageServicesMap = {
   mapHtmlPageInfoFromApi,
-  mapHtmlPagePermissionOverviewFromApi,
 };

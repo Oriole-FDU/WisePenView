@@ -39,5 +39,3 @@ export const normalizeSearchResourceType = (raw: string): SearchResourceType => 
 
 export type ResourceSortBy = EnumValue<typeof RESOURCE_SORT_BY>;
 export type ResourceSortDir = EnumValue<typeof RESOURCE_SORT_DIR>;
-
-export { getSupportedResourcePermissionActions } from './permission';

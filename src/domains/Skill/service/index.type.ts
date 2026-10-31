@@ -1,4 +1,4 @@
-import type { ResourcePermissionOverview } from '@/domains/Resource';
+import type { ResourceItemApi } from '@/domains/Resource/apis/ResourceCoreApi.schema';
 
 import type { SkillDetail, SkillSummary } from '../entity/skill';
 
@@ -55,8 +55,8 @@ export interface ISkillService {
   /** 复制已发布 Skill，后端统一校验 FORK 权限。 */
   forkSkill(params: ForkSkillRequest): Promise<string>;
   getSkillDetail(resourceId: string): Promise<SkillDetail>;
-  /** Skill 自身的权限概览，小组与标签信息由权限服务补全。 */
-  getSkillPermissionOverview(resourceId: string): Promise<ResourcePermissionOverview>;
+  /** 返回权限聚合所需的资源摘要，不构造权限概览。 */
+  getResourceAccessInfo(resourceId: string): Promise<ResourceItemApi>;
   getSkillVersionFiles(resourceId: string, version: number): Promise<SkillDetail>;
   updateSkillInfo(resourceId: string, name?: string, description?: string): Promise<void>;
   publishVersion(resourceId: string): Promise<void>;

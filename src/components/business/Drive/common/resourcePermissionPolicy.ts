@@ -9,7 +9,7 @@ import {
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
   type ResourcePermissionSubject,
-} from '@/domains/Resource';
+} from '@/domains/ResourceAccess';
 import type { TagTreeNode } from '@/domains/Tag';
 import { getTagPermissionPresetValues, type TagPermissionPresetKey } from '@/domains/Tag';
 import i18n from '@/i18n';

@@ -3,7 +3,6 @@ import {
   ASSET_RESOURCE_TYPE,
   type AssetResourceType,
 } from '@/domains/_shared/apis/versionAsset.enum';
-import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
@@ -184,20 +183,9 @@ function resolveAssetResourceType(name: string): AssetResourceType {
   return typeMap[ext ?? ''] ?? ASSET_RESOURCE_TYPE.TEXT;
 }
 
-const mapSkillPermissionOverviewFromApi = (
-  info: SkillInfoApiResponse | null | undefined,
-  resourceId: string
-): ResourcePermissionOverview => {
-  if (!info?.resourceInfo) {
-    return { resourceId, subjects: [], supportedActions: [], actionOptions: [] };
-  }
-  return ResourceServicesMap.mapResourcePermissionOverviewFromApi(info.resourceInfo, resourceId);
-};
-
 export const SkillServicesMap = {
   formatVersion,
   mapSkillDetail,
-  mapSkillPermissionOverviewFromApi,
   mapSkillSummary,
   mapSkillFilesFromApi,
   resolveAssetResourceType,

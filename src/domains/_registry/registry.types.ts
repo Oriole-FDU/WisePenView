@@ -12,7 +12,8 @@ import type { IInlineCommentService } from '@/domains/InlineComment';
 import type { IInteractService } from '@/domains/Interact';
 import type { IMessageService } from '@/domains/Message';
 import type { INoteService } from '@/domains/Note';
-import type { IResourcePermissionService, IResourceService } from '@/domains/Resource';
+import type { IResourceService } from '@/domains/Resource';
+import type { IResourceAccessService } from '@/domains/ResourceAccess';
 import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
@@ -34,7 +35,7 @@ export interface ServicesContextValue {
   interactService: IInteractService;
   messageService: IMessageService;
   noteService: INoteService;
-  resourcePermissionService: IResourcePermissionService;
+  resourceAccessService: IResourceAccessService;
   resourceService: IResourceService;
   skillService: ISkillService;
   speechService: ISpeechService;

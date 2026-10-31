@@ -1,4 +1,4 @@
-import type { ResourcePermissionOverview } from '@/domains/Resource';
+import type { ResourceItemApi } from '@/domains/Resource/apis/ResourceCoreApi.schema';
 
 import type { AgentDetail, AgentSpec } from '../entity/agent';
 
@@ -23,8 +23,8 @@ export interface IAgentService {
     pathTagId?: string
   ): Promise<string>;
   getAgentDetail(resourceId: string, version?: number): Promise<AgentDetail>;
-  /** Agent 自身的权限概览，小组与标签信息由权限服务补全。 */
-  getAgentPermissionOverview(resourceId: string): Promise<ResourcePermissionOverview>;
+  /** 返回权限聚合所需的资源摘要，不构造权限概览。 */
+  getResourceAccessInfo(resourceId: string): Promise<ResourceItemApi>;
   saveAgentDraft(request: SaveAgentDraftRequest): Promise<void>;
   publishVersion(resourceId: string): Promise<void>;
   uploadAsset(

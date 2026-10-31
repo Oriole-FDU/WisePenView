@@ -5,15 +5,16 @@ import {
   RESOURCE_PERMISSION_ACTION_ORDER,
   type ResourceAction,
 } from '@/domains/_shared/access';
+import { isPersonalGroupId, ResourceServicesMap } from '@/domains/Resource';
+import type { ChangeResourceActionPermissionApiContractRequest } from '@/domains/Resource/apis/ResourceCoreApi.contract';
+import type {
+  ResourceGroupDisplayApi,
+  ResourceItemApi,
+} from '@/domains/Resource/apis/ResourceCoreApi.schema';
 import type { UserDisplayBase } from '@/domains/User';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
-import type {
-  ResourceGroupDisplayBaseApiResponse,
-  ResourceItemApiResponse,
-} from '../apis/ResourceApi.type';
-import type { ChangeResourceActionPermissionApiContractRequest } from '../apis/ResourceCoreApi.contract';
 import { getSupportedResourcePermissionActions } from '../enum';
 import type {
   ResourcePermissionActionOption,
@@ -22,7 +23,6 @@ import type {
   UpdateResourceActionPermissionRequest,
   UpdateResourcePermissionSubjectsRequest,
 } from '../service/index.type';
-import { isPersonalGroupId, mapResourceItemFromApi } from './resource.mapper';
 
 const resolveUserDisplayName = (
   userInfo: UserDisplayBase | undefined,
@@ -30,13 +30,13 @@ const resolveUserDisplayName = (
 ): string => userInfo?.realName?.trim() || userInfo?.nickname?.trim() || fallbackId;
 
 const resolveGroupDisplayName = (
-  groupInfo: ResourceGroupDisplayBaseApiResponse | undefined,
+  groupInfo: ResourceGroupDisplayApi | undefined,
   fallbackId: string
 ): string => groupInfo?.groupName?.trim() || fallbackId;
 
 const mapOverrideGroupInfoByIdFromApi = (
-  value: ResourceItemApiResponse['overrideGrantedActions']
-): Record<string, ResourceGroupDisplayBaseApiResponse> => {
+  value: ResourceItemApi['overrideGrantedActions']
+): Record<string, ResourceGroupDisplayApi> => {
   if (!Array.isArray(value)) return {};
   return Object.fromEntries(
     value
@@ -44,14 +44,12 @@ const mapOverrideGroupInfoByIdFromApi = (
         const groupId = normalizeId(item.groupId);
         return groupId && item.groupInfo ? ([groupId, item.groupInfo] as const) : null;
       })
-      .filter((entry): entry is readonly [string, ResourceGroupDisplayBaseApiResponse] =>
-        Boolean(entry)
-      )
+      .filter((entry): entry is readonly [string, ResourceGroupDisplayApi] => Boolean(entry))
   );
 };
 
 const mapSpecifiedUserInfoByIdFromApi = (
-  value: ResourceItemApiResponse['specifiedUsersGrantedActions']
+  value: ResourceItemApi['specifiedUsersGrantedActions']
 ): Record<string, UserDisplayBase> => {
   if (!Array.isArray(value)) return {};
   return Object.fromEntries(
@@ -159,12 +157,12 @@ const resolveOwnerName = (ownerInfo: UserDisplayBase | undefined, ownerId?: stri
   ownerInfo?.realName?.trim() || ownerInfo?.nickname?.trim() || ownerId || '';
 
 export const mapResourcePermissionOverviewFromApi = (
-  raw: ResourceItemApiResponse,
+  raw: ResourceItemApi,
   fallbackResourceId: string
 ): ResourcePermissionOverview => {
   const overrideGroupInfoById = mapOverrideGroupInfoByIdFromApi(raw.overrideGrantedActions);
   const specifiedUserInfoById = mapSpecifiedUserInfoByIdFromApi(raw.specifiedUsersGrantedActions);
-  const resourceInfo = mapResourceItemFromApi(raw);
+  const resourceInfo = ResourceServicesMap.mapResourceItemFromApi(raw);
   const ownerInfo = resourceInfo.ownerInfo;
   const resourceId = resourceInfo.resourceId || fallbackResourceId;
   const supportedActions = getSupportedResourcePermissionActions(resourceInfo.resourceType);

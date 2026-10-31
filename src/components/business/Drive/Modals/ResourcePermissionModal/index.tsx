@@ -21,7 +21,7 @@ import {
   RESOURCE_PERMISSION_PRESETS,
   type ResourcePermissionPresetKey,
 } from '@/components/business/Drive/common/resourcePermissionPolicy';
-import { useResourcePermissionService, useResourceService, useTagService } from '@/domains';
+import { useResourceAccessService, useTagService } from '@/domains';
 import {
   areResourcePermissionActionsEqual,
   type ResourceAction,
@@ -30,7 +30,7 @@ import {
 import {
   type ResourcePermissionActionOption,
   type ResourcePermissionOverview,
-} from '@/domains/Resource';
+} from '@/domains/ResourceAccess';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
@@ -85,8 +85,7 @@ function ResourcePermissionModal({
   onSuccess,
 }: ResourcePermissionModalProps) {
   const { t } = useTranslation(['resource', 'common']);
-  const resourceService = useResourceService();
-  const resourcePermissionService = useResourcePermissionService();
+  const resourceAccessService = useResourceAccessService();
   const tagService = useTagService();
   const [selectedActions, setSelectedActions] = useState<ResourceAction[]>([]);
 
@@ -101,7 +100,7 @@ function ResourcePermissionModal({
         throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING);
       }
 
-      const overview = await resourcePermissionService.getResourcePermissionOverview({
+      const overview = await resourceAccessService.getResourcePermissionOverview({
         resourceId: target.resourceId,
         resourceType: target.resourceType,
       });
@@ -175,7 +174,7 @@ function ResourcePermissionModal({
         policy.inheritedActions,
         policy.supportedActions
       );
-      await resourceService.updateResourceActionPermission({
+      await resourceAccessService.updateResourceActionPermission({
         resourceId: target.resourceId,
         overrideGrantedActions: {
           [groupId]: overrideActions,

@@ -3,7 +3,6 @@
  * 与 resource.openapi.json 对齐
  */
 
-import type { ResourceAction } from '@/domains/_shared/access';
 import type {
   ResourceIconType,
   ResourceItem,
@@ -35,18 +34,8 @@ export interface IResourceService {
   mountResourcesToGroup(params: MountResourcesToGroupRequest): Promise<number>;
   unmountResourcesToGroup(params: UnmountResourcesToGroupRequest): Promise<number>;
   moveResourcesInGroup(params: MoveResourcesInGroupRequest): Promise<number>;
-  updateResourceActionPermission(params: UpdateResourceActionPermissionRequest): Promise<void>;
-  updateResourcePermissionSubjects(params: UpdateResourcePermissionSubjectsRequest): Promise<void>;
   /** 全局全文搜索（ACL 过滤 + 高亮，分页） */
   globalSearch(params: SearchQueryRequest): Promise<SearchResultPage>;
-}
-
-/** 权限概览组合查询；独立于资源列表与写操作，避免反向依赖。 */
-export interface IResourcePermissionService {
-  /** 获取 View 直接消费的资源权限概览 */
-  getResourcePermissionOverview(
-    params: GetResourcePermissionOverviewRequest
-  ): Promise<ResourcePermissionOverview>;
 }
 
 /** 全文搜索请求（对齐 GET /resource/search/globalSearchResources） */
@@ -117,87 +106,6 @@ export interface UnmountResourcesToGroupRequest {
 
 export interface MoveResourcesInGroupRequest extends UnmountResourcesToGroupRequest {
   targetTagId: string;
-}
-
-/** 更新单个资源的动作权限配置 */
-export interface UpdateResourceActionPermissionRequest {
-  resourceId: string;
-  overrideGrantedActions?: Record<string, ResourceAction[] | null> | null;
-  specifiedUsersGrantedActions?: Record<string, ResourceAction[]> | null;
-}
-
-export interface UpdateResourcePermissionSubjectsRequest {
-  resourceId: string;
-  subjects: ResourcePermissionSubject[];
-}
-
-export type ResourcePermissionResourceType =
-  'note' | 'drawio' | 'file' | 'skill' | 'agent' | 'html';
-
-export interface GetResourcePermissionOverviewRequest {
-  resourceId: string;
-  resourceType: ResourcePermissionResourceType;
-  /** 权限概览最多补全的小组数量；超出部分由调用方按需加载。 */
-  groupHydrationLimit?: number;
-}
-
-export type ResourcePermissionSubjectKind = 'owner' | 'group' | 'user';
-export type ResourcePermissionSource = 'owner' | 'tag' | 'resourceOverride' | 'specifiedUser';
-
-export interface ResourcePermissionActionOption {
-  action: ResourceAction;
-  key: string;
-  label: string;
-  supported: boolean;
-}
-
-export interface ResourcePermissionSubject {
-  id: string;
-  kind: ResourcePermissionSubjectKind;
-  source: ResourcePermissionSource;
-  name: string;
-  description?: string;
-  avatar?: string;
-  groupId?: string;
-  primaryTagId?: string;
-  userId?: string;
-  effectiveActions: ResourceAction[];
-  editableActions: ResourceAction[];
-  inheritedActions?: ResourceAction[];
-  readonly?: boolean;
-}
-
-export interface ResourcePermissionOverview {
-  resourceId: string;
-  resourceType?: string;
-  owner?: ResourcePermissionSubject;
-  subjects: ResourcePermissionSubject[];
-  supportedActions: ResourceAction[];
-  actionOptions: ResourcePermissionActionOption[];
-}
-
-/** 权限概览补全所需的用户展示字段，已脱离用户服务的请求协议。 */
-export interface ResourcePermissionUserInfo {
-  userId: string;
-  username: string;
-  nickname?: string;
-  realName?: string;
-  avatar?: string;
-}
-
-/** 权限概览补全所需的小组展示字段，已脱离小组服务的请求协议。 */
-export interface ResourcePermissionGroupInfo {
-  groupId: string;
-  groupName: string;
-  groupDesc: string;
-  groupCoverUrl: string;
-}
-
-/** 二次查询结果交给 Resource mapper 做确定性归并。 */
-export interface ResourcePermissionHydration {
-  userInfoById: ReadonlyMap<string, ResourcePermissionUserInfo>;
-  groupInfoById: ReadonlyMap<string, ResourcePermissionGroupInfo>;
-  inheritedActionsBySubjectId: ReadonlyMap<string, ResourceAction[]>;
 }
 
 /**

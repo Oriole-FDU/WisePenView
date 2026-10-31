@@ -13,18 +13,16 @@ export type {
   TagQueryLogicMode,
 } from './enum';
 export {
-  getSupportedResourcePermissionActions,
   normalizeSearchResourceType,
   RESOURCE_SORT_BY,
   RESOURCE_SORT_DIR,
   SEARCH_SCOPE,
   TAG_QUERY_LOGIC_MODE,
 } from './enum';
+export { ResourceServicesMap } from './mapper/ResourceServices.map';
 export type {
   GetGroupResourceRequest,
-  GetResourcePermissionOverviewRequest,
   GetUserResourcesRequest,
-  IResourcePermissionService,
   IResourceService,
   MountResourcesToGroupRequest,
   MovePersonalResourcesToTrashRequest,
@@ -33,22 +31,12 @@ export type {
   RenameResourceRequest,
   ReplacePersonalNormalTagsRequest,
   ResourceListPage,
-  ResourcePermissionActionOption,
-  ResourcePermissionGroupInfo,
-  ResourcePermissionHydration,
-  ResourcePermissionOverview,
-  ResourcePermissionResourceType,
-  ResourcePermissionSource,
-  ResourcePermissionSubject,
-  ResourcePermissionSubjectKind,
-  ResourcePermissionUserInfo,
   ResourceSourceTagMap,
   SearchHitItem,
   SearchQueryRequest,
   SearchResultPage,
   SetPersonalResourcesPathTagRequest,
   UnmountResourcesToGroupRequest,
-  UpdateResourceActionPermissionRequest,
-  UpdateResourcePermissionSubjectsRequest,
 } from './service/index.type';
+export { isPersonalGroupId } from './utils/isPersonalGroupId';
 export { resolveResourceIconType } from './utils/resolveResourceIconType';

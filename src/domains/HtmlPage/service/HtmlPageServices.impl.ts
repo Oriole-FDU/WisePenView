@@ -15,15 +15,13 @@ const getHtmlPageContent = (resourceId: string, targetVersion?: number): Promise
   return HtmlPageApi.getSingleHtmlPageContent({ resourceId, targetVersion });
 };
 
-const getHtmlPagePermissionOverview: IHtmlPageService['getHtmlPagePermissionOverview'] = async (
-  resourceId
-) => {
+const getResourceAccessInfo: IHtmlPageService['getResourceAccessInfo'] = async (resourceId) => {
   const data = await HtmlPageApi.getSingleHtmlPageInfo({ resourceId });
-  return HtmlPageServicesMap.mapHtmlPagePermissionOverviewFromApi(data, resourceId);
+  return data.resourceInfo;
 };
 
 export const createHtmlPageServices = (): IHtmlPageService => ({
   getHtmlPageInfo,
   getHtmlPageContent,
-  getHtmlPagePermissionOverview,
+  getResourceAccessInfo,
 });

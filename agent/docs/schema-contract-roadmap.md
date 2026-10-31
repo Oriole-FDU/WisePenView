@@ -94,11 +94,9 @@ flowchart TD
 
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef partial fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-  classDef blocked fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-width:2px
   classDef decision fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:2px
   class W,A,U,G,R,I,C,D,N,S,AG,H,CH,DR completed
-  class T,AD partial
-  class RA blocked
+  class T,AD,RA partial
   class CO decision
 ```
 
@@ -108,7 +106,7 @@ flowchart TD
 - 已完成：`I Interaction`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。
 - 已完成：Message、Wallet、UserTask、UserTour、Chat Session/Model/Provider/Tool/Speech 与 SSE；Drive 保持纯前端聚合。
 - 部分完成：`T Tag` 的通用树、命令、策略已完成，scoped endpoint 仍阻塞；`AD Admin` 的用户管理已完成，公告接口仍阻塞。
-- 完全阻塞：`RA Resource Access Overview` 聚合 endpoint 尚未上线，相关权限补全 mapper 暂时不能删除。
+- 部分完成：`RA Resource Access` 已从前端 ResourceCore 拆成独立聚合域；后端 Overview endpoint 尚未上线，权限补全 mapper 暂时不能删除。
 - 待业务决策：`CO Course` 是否升级为正式后端域；当前仍只能视为高级 Group 聚合。
 
 关键约束：
@@ -626,6 +624,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - [x] ResourceList/Search 建立独立 Schema，并迁移重命名、删除与权限更新 5 个 checked Contract。
 - [x] ResourceBase/Detail 建立共享 Schema，并替换 Note、Document、Skill、Agent、HtmlPage 中的历史 ResourceItem DTO。
 - [x] Placement 6 个接口完成 checked Contract；命令语义仍是现有后端 POST，批量逐项结果等待后端新契约。
+- [x] 将 ResourceAccess 从前端 ResourceCore 拆为独立 service/mapper/type 域，并用 `check:boundaries` 固化依赖方向。
 - [ ] 新增 Resource Access Overview 聚合 endpoint；阻塞于后端。
 - [ ] 删除 436 行权限补全 mapper；阻塞于 Resource Access Overview 上线。
 

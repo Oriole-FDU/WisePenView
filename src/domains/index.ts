@@ -18,7 +18,7 @@ export {
   useInteractService,
   useMessageService,
   useNoteService,
-  useResourcePermissionService,
+  useResourceAccessService,
   useResourceService,
   useSkillService,
   useSpeechService,

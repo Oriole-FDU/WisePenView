@@ -1,3 +1,5 @@
+import { ResourceItemApi } from '@domain-apis';
+
 import type { ResourceAction } from '@/domains/_shared/access';
 import type { IAgentService } from '@/domains/Agent';
 import type { IDocumentService } from '@/domains/Document';
@@ -7,22 +9,24 @@ import type { INoteService } from '@/domains/Note';
 import type { ISkillService } from '@/domains/Skill';
 import type { ITagService } from '@/domains/Tag';
 
-import { ResourceServicesMap } from '../mapper/ResourceServices.map';
+import { ResourceAccessServicesMap } from '../mapper/ResourceAccessServices.map';
 import type {
   GetResourcePermissionOverviewRequest,
-  IResourcePermissionService,
+  IResourceAccessService,
   ResourcePermissionGroupInfo,
   ResourcePermissionHydration,
   ResourcePermissionOverview,
+  UpdateResourceActionPermissionRequest,
+  UpdateResourcePermissionSubjectsRequest,
 } from './index.type';
 
-interface ResourcePermissionServicesDeps {
-  agentService: Pick<IAgentService, 'getAgentPermissionOverview'>;
-  documentService: Pick<IDocumentService, 'getDocPermissionOverview'>;
+interface ResourceAccessServicesDeps {
+  agentService: Pick<IAgentService, 'getResourceAccessInfo'>;
+  documentService: Pick<IDocumentService, 'getResourceAccessInfo'>;
   groupService: Pick<IGroupService, 'fetchGroupBaseInfo'>;
-  htmlPageService: Pick<IHtmlPageService, 'getHtmlPagePermissionOverview'>;
-  noteService: Pick<INoteService, 'getNotePermissionOverview'>;
-  skillService: Pick<ISkillService, 'getSkillPermissionOverview'>;
+  htmlPageService: Pick<IHtmlPageService, 'getResourceAccessInfo'>;
+  noteService: Pick<INoteService, 'getResourceAccessInfo'>;
+  skillService: Pick<ISkillService, 'getResourceAccessInfo'>;
   tagService: Pick<ITagService, 'getTagGrantedActions'>;
 }
 
@@ -75,26 +79,26 @@ const collectPermissionGroupIds = (
 
 const loadResourcePermissionOverview = (
   params: GetResourcePermissionOverviewRequest,
-  deps: ResourcePermissionServicesDeps
+  deps: ResourceAccessServicesDeps
 ): Promise<ResourcePermissionOverview> => {
-  switch (params.resourceType) {
-    case 'note':
-    case 'drawio':
-      return deps.noteService.getNotePermissionOverview(params.resourceId);
-    case 'file':
-      return deps.documentService.getDocPermissionOverview(params.resourceId);
-    case 'skill':
-      return deps.skillService.getSkillPermissionOverview(params.resourceId);
-    case 'agent':
-      return deps.agentService.getAgentPermissionOverview(params.resourceId);
-    case 'html':
-      return deps.htmlPageService.getHtmlPagePermissionOverview(params.resourceId);
-  }
+  const getResourceInfo =
+    params.resourceType === 'note' || params.resourceType === 'drawio'
+      ? deps.noteService.getResourceAccessInfo
+      : params.resourceType === 'file'
+        ? deps.documentService.getResourceAccessInfo
+        : params.resourceType === 'skill'
+          ? deps.skillService.getResourceAccessInfo
+          : params.resourceType === 'agent'
+            ? deps.agentService.getResourceAccessInfo
+            : deps.htmlPageService.getResourceAccessInfo;
+  return getResourceInfo(params.resourceId).then((resourceInfo) =>
+    ResourceAccessServicesMap.mapResourcePermissionOverviewFromApi(resourceInfo, params.resourceId)
+  );
 };
 
 const loadPermissionGroupInfo = async (
   groupIds: string[],
-  groupService: ResourcePermissionServicesDeps['groupService']
+  groupService: ResourceAccessServicesDeps['groupService']
 ): Promise<ReadonlyMap<string, ResourcePermissionGroupInfo>> => {
   if (groupIds.length === 0) return new Map();
 
@@ -121,7 +125,7 @@ const loadPermissionGroupInfo = async (
 const loadPermissionInheritedActions = async (
   overview: ResourcePermissionOverview,
   groupIds: string[],
-  tagService: ResourcePermissionServicesDeps['tagService']
+  tagService: ResourceAccessServicesDeps['tagService']
 ): Promise<ReadonlyMap<string, ResourceAction[]>> => {
   const groupIdSet = new Set(groupIds);
   const subjectsByGroupId = new Map<string, ResourcePermissionOverview['subjects']>();
@@ -158,7 +162,7 @@ const loadPermissionInheritedActions = async (
 const enrichResourcePermissionOverview = async (
   overview: ResourcePermissionOverview,
   params: GetResourcePermissionOverviewRequest,
-  deps: ResourcePermissionServicesDeps
+  deps: ResourceAccessServicesDeps
 ): Promise<ResourcePermissionOverview> => {
   const groupIds = collectPermissionGroupIds(overview, params.groupHydrationLimit);
   const [groupInfoById, inheritedActionsBySubjectId] = await Promise.all([
@@ -171,15 +175,32 @@ const enrichResourcePermissionOverview = async (
     groupInfoById,
     inheritedActionsBySubjectId,
   };
-  return ResourceServicesMap.mergeResourcePermissionHydration(overview, hydration);
+  return ResourceAccessServicesMap.mergeResourcePermissionHydration(overview, hydration);
 };
 
-/** 组合已装配的领域服务；资源列表与写操作不依赖此查询流程。 */
-export const createResourcePermissionServices = (
-  deps: ResourcePermissionServicesDeps
-): IResourcePermissionService => ({
+const updateResourceActionPermission = async (
+  params: UpdateResourceActionPermissionRequest
+): Promise<void> => {
+  const request = ResourceAccessServicesMap.mapChangeResourceActionPermissionRequest(params);
+  await ResourceItemApi.changeResourceActionPermission(request);
+};
+
+const updateResourcePermissionSubjects = async (
+  params: UpdateResourcePermissionSubjectsRequest
+): Promise<void> => {
+  const request =
+    ResourceAccessServicesMap.mapChangeResourceActionPermissionRequestFromSubjects(params);
+  await ResourceItemApi.changeResourceActionPermission(request);
+};
+
+/** 组合底层资源能力和小组资料；ResourceCore 不再认识任何资源叶域。 */
+export const createResourceAccessServices = (
+  deps: ResourceAccessServicesDeps
+): IResourceAccessService => ({
   async getResourcePermissionOverview(params) {
     const overview = await loadResourcePermissionOverview(params, deps);
     return enrichResourcePermissionOverview(overview, params, deps);
   },
+  updateResourceActionPermission,
+  updateResourcePermissionSubjects,
 });

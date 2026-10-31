@@ -12,7 +12,8 @@ import type { IInlineCommentService } from '@/domains/InlineComment';
 import type { IInteractService } from '@/domains/Interact';
 import type { IMessageService } from '@/domains/Message';
 import type { INoteService } from '@/domains/Note';
-import type { IResourcePermissionService, IResourceService } from '@/domains/Resource';
+import type { IResourceService } from '@/domains/Resource';
+import type { IResourceAccessService } from '@/domains/ResourceAccess';
 import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
@@ -43,8 +44,8 @@ export const useInlineCommentService = (): IInlineCommentService =>
 export const useInteractService = (): IInteractService => useServicesContext().interactService;
 export const useMessageService = (): IMessageService => useServicesContext().messageService;
 export const useNoteService = (): INoteService => useServicesContext().noteService;
-export const useResourcePermissionService = (): IResourcePermissionService =>
-  useServicesContext().resourcePermissionService;
+export const useResourceAccessService = (): IResourceAccessService =>
+  useServicesContext().resourceAccessService;
 export const useResourceService = (): IResourceService => useServicesContext().resourceService;
 export const useSkillService = (): ISkillService => useServicesContext().skillService;
 export const useSpeechService = (): ISpeechService => useServicesContext().speechService;
