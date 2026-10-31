@@ -105,6 +105,25 @@ try {
   );
   assert.equal(sessions.list.length > 0, true);
 
+  const sessionsWithoutOffset = parseApiResponse(ListSessionsApiContract, {
+    list: [
+      {
+        id: 'mock-session-local',
+        user_id: 'mock-user',
+        title: 'MongoDB 默认时间格式',
+        created_at: '2026-10-29T16:00:00.123456',
+        updated_at: '2026-10-29T16:00:00.123456',
+        agent_id: null,
+        agent_version: null,
+      },
+    ],
+    total: 1,
+    page: 1,
+    size: 20,
+    total_page: 1,
+  });
+  assert.equal(sessionsWithoutOffset.list[0].created_at, '2026-10-29T16:00:00.123456');
+
   const history = parseApiResponse(
     ListHistoryMessagesApiContract,
     await ChatSessionApi.listHistoryMessages({
@@ -115,6 +134,23 @@ try {
   );
   assert.equal(history.list[0].role, 'user');
   assert.equal(history.list[0].parts[0].type, 'text');
+
+  const historyWithoutOffset = parseApiResponse(ListHistoryMessagesApiContract, {
+    list: [
+      {
+        id: 'mock-message-local',
+        role: 'assistant',
+        parts: [],
+        createdAt: '2026-10-29T16:00:00.123456',
+        metadata: null,
+      },
+    ],
+    total: 1,
+    page: 1,
+    size: 20,
+    total_page: 1,
+  });
+  assert.equal(historyWithoutOffset.list[0].createdAt, '2026-10-29T16:00:00.123456');
 
   const attachment = parseApiResponse(
     InitTemporaryAttachmentUploadApiContract,

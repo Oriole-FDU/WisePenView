@@ -97,12 +97,16 @@ try {
 
   assert(IsoDateTimeSchema.safeParse('2026-10-29T08:00:00Z').success);
   assert(IsoDateTimeSchema.safeParse('2026-10-29T16:00:00+08:00').success);
+  assert(IsoDateTimeSchema.safeParse('2026-10-29T16:00:00').success);
   assert(!IsoDateTimeSchema.safeParse('2026-10-29 16:00:00').success);
 
   assert(DecimalStringSchema.safeParse('0.25').success);
   assert(DecimalStringSchema.safeParse('1').success);
+  assert(DecimalStringSchema.safeParse('1E-8').success);
+  assert(DecimalStringSchema.safeParse('0E-8').success);
   assert(!DecimalStringSchema.safeParse(0.25).success);
   assert(!DecimalStringSchema.safeParse('.25').success);
+  assert(!DecimalStringSchema.safeParse('1E').success);
 
   assert(PageApiRequestSchema.safeParse({ page: 1, size: 20 }).success);
   assert(!PageApiRequestSchema.safeParse({ page: 0, size: 20 }).success);

@@ -88,6 +88,25 @@ try {
   const mappedModels = ChatConfigServicesMap.mapGetModelsFromApi(available);
   assert.equal(mappedModels.length > 0, true);
 
+  const scientificNotationModels = parseApiResponse(ListAvailableModelsApiContract, {
+    system_models: available.system_models.map((model) => ({
+      ...model,
+      mappings:
+        model.mappings?.map((mapping) => ({
+          ...mapping,
+          input_billing_ratio: '1E-8',
+          cached_input_billing_ratio: '0E-8',
+          output_billing_ratio: '1e+2',
+        })) ?? null,
+    })),
+    user_models: available.user_models,
+  });
+  assert.equal(scientificNotationModels.system_models[0].mappings?.[0].input_billing_ratio, '1E-8');
+  assert.equal(
+    ChatConfigServicesMap.mapGetModelsFromApi(scientificNotationModels).length > 0,
+    true
+  );
+
   const userModels = parseApiResponse(
     ListModelsApiContract,
     await ChatConfigApi.listModels({ model_scope: 'USER' })
