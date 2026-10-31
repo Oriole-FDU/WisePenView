@@ -1,6 +1,6 @@
 import { createOssClient } from '@domain-apis';
 
-import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
+import type { OssStsTokenApi } from '@/domains/_shared/apis/ossStsApi.schema';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
@@ -8,7 +8,7 @@ import { isRecord } from '@/utils/type/typeGuards';
 import type { OssReadClient } from './apis/ossClient';
 
 export interface OssStsClientManagerOptions<Key> {
-  loadToken: (key: Key) => Promise<OssStsTokenApiResponse | null | undefined>;
+  loadToken: (key: Key) => Promise<OssStsTokenApi | null | undefined>;
   resolveCacheKey: (key: Key) => string;
   refreshBufferMs?: number;
   defaultExpiresInMs?: number;
