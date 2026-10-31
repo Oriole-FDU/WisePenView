@@ -1,7 +1,6 @@
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
@@ -37,11 +36,6 @@ const mapUploadDocToApi = ({
   mountTargetTagId: pathTagId,
 });
 
-const normalizeOptionalId = (value: string | number | null | undefined): string | null => {
-  const normalized = normalizeId(value);
-  return normalized || null;
-};
-
 const mapDocumentProcessStatusFromApi = (
   data: DocumentProcessStatusApi
 ): DocumentProcessStatus => ({
@@ -53,7 +47,7 @@ const mapDocMetaInfoFromApi = (data: DocumentVersionInfoApi | PendingDocItemApi)
   ...data,
   uploadMeta: {
     ...data.uploadMeta,
-    uploaderId: normalizeOptionalId(data.uploadMeta.uploaderId),
+    uploaderId: data.uploadMeta.uploaderId,
     size: normalizeNonNegativeNumber(data.uploadMeta.size) ?? 0,
   },
   documentStatus: mapDocumentProcessStatusFromApi(data.documentStatus),

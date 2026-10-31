@@ -10,7 +10,6 @@ import type {
 } from '@/domains/Note/apis/NoteApi.contract';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   CreateNoteRequest,
@@ -36,14 +35,14 @@ const mapAuthorDisplay = (
     | null
     | undefined
 ): NoteInfoDisplayAuthor => ({
-  id: normalizeId(authorId),
-  name: author?.nickname || author?.realName || normalizeId(authorId),
+  id: authorId,
+  name: author?.nickname || author?.realName || authorId,
   avatar: author?.avatar ?? undefined,
 });
 
 const mapNoteInfoDisplayFromApi = (data: GetNoteInfoApiContractResponse): NoteInfoDisplayData => {
   const resourceInfo = ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo);
-  const ownerId = normalizeId(resourceInfo.ownerId) || undefined;
+  const ownerId = resourceInfo.ownerId || undefined;
   const currentActions = normalizeResourceActions(resourceInfo.currentActions);
   const canCollaborativeEdit = resourceActionsInclude(currentActions, RESOURCE_ACTION.EDIT);
   const authorsDisplay = data.authorsDisplay ?? {};

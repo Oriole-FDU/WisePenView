@@ -1,12 +1,10 @@
-import { normalizeId } from '@/utils/normalize/normalizeId';
-
 import type { ListUserMessagesApiResponse, UserMessageApiModel } from '../apis/MessageApi.schema';
 import type { UserMessage } from '../entity/message';
 import type { ListUserMessagesResponse } from '../service/index.type';
 import { normalizeMessageType } from './messageType.mapper';
 
 const mapUserMessageApiModelToEntity = (raw: UserMessageApiModel): UserMessage => ({
-  messageId: normalizeId(raw.messageId),
+  messageId: raw.messageId,
   deliveryScope: raw.deliveryScope ?? undefined,
   messageType: normalizeMessageType(raw.messageType ?? undefined) ?? raw.messageType ?? undefined,
   title: raw.title?.trim() ?? '',

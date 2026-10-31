@@ -8,7 +8,6 @@ import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
 import { useApiPagination } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { MemberListProps } from './index.type';
@@ -30,7 +29,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
   const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
   const groupService = useGroupService();
   const selectedMembersMapRef = useRef<Map<string, GroupMember>>(new Map());
-  const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [selectedMembersList, setSelectedMembersList] = useState<GroupMember[]>([]);
   const [singleDeleteMember, setSingleDeleteMember] = useState<GroupMember | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
@@ -111,14 +110,14 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
   };
 
   const handleSelectionChange = (keys: Selection, currentPageMembers: GroupMember[]) => {
-    const currentPageKeySet = new Set(currentPageMembers.map((member) => String(member.userId)));
+    const currentPageKeySet = new Set(currentPageMembers.map((member) => member.userId));
     const currentPageSelectedKeySet =
       keys === 'all' ? currentPageKeySet : new Set(Array.from(keys).map((key) => String(key)));
-    const otherPageKeys = selectedRowKeys.filter((key) => !currentPageKeySet.has(String(key)));
+    const otherPageKeys = selectedRowKeys.filter((key) => !currentPageKeySet.has(key));
     const finalKeys = [...otherPageKeys, ...Array.from(currentPageSelectedKeySet)];
 
     currentPageMembers.forEach((member) => {
-      const idKey = String(member.userId);
+      const idKey = member.userId;
       if (currentPageSelectedKeySet.has(idKey)) {
         selectedMembersMapRef.current.set(idKey, member);
       } else {
@@ -126,7 +125,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       }
     });
 
-    const finalKeySet = new Set(finalKeys.map((key) => String(key)));
+    const finalKeySet = new Set(finalKeys);
     Array.from(selectedMembersMapRef.current.keys()).forEach((key) => {
       if (!finalKeySet.has(key)) {
         selectedMembersMapRef.current.delete(key);
@@ -142,7 +141,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
   };
 
   const handleStartInlineEdit = (member: GroupMember, kind: MemberListInlineEditKind) => {
-    setEditingRowId(String(member.userId));
+    setEditingRowId(member.userId);
     setEditingKind(kind);
     setSavingRowId(null);
     setErrorRowId(null);
@@ -183,7 +182,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       return;
     }
 
-    const rowId = String(member.userId);
+    const rowId = member.userId;
     setSavingRowId(rowId);
     setErrorRowId(null);
     setInlineErrorMessage(null);
@@ -226,15 +225,11 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
     setActiveModal('deleteMember');
   };
 
-  const selectedMemberIds = selectedRowKeys.map((k) => normalizeId(k));
-
   const activeDeleteMembers = singleDeleteMember ? [singleDeleteMember] : selectedMembersList;
-  const activeDeleteMemberIds = singleDeleteMember
-    ? [singleDeleteMember.userId]
-    : selectedMemberIds;
+  const activeDeleteMemberIds = singleDeleteMember ? [singleDeleteMember.userId] : selectedRowKeys;
   const currentPageSelectedKeys = (() => {
-    const currentPageKeys = new Set(members.map((member) => String(member.userId)));
-    return new Set(selectedRowKeys.filter((key) => currentPageKeys.has(String(key))).map(String));
+    const currentPageKeys = new Set(members.map((member) => member.userId));
+    return new Set(selectedRowKeys.filter((key) => currentPageKeys.has(key)));
   })();
 
   const showBatchActions = groupDisplayConfig.canEnterEditMode;
@@ -332,7 +327,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
         isOpen={activeModal === 'editPermission'}
         onOpenChange={(open) => !open && onCancelModal()}
         groupId={groupId}
-        memberIds={selectedMemberIds}
+        memberIds={selectedRowKeys}
         members={selectedMembersList}
         groupDisplayConfig={groupDisplayConfig}
         onSuccess={onSuccessModal}
@@ -352,7 +347,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
         isOpen={activeModal === 'assignQuota'}
         onOpenChange={(open) => !open && onCancelModal()}
         groupId={groupId}
-        memberIds={selectedMemberIds}
+        memberIds={selectedRowKeys}
         members={selectedMembersList}
         groupDisplayConfig={groupDisplayConfig}
         onSuccess={onSuccessModal}

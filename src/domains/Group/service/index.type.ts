@@ -19,7 +19,7 @@ export interface IGroupService {
     page: number,
     pageSize: number
   ): Promise<{ quotas: UserGroupQuota[]; total: number }>;
-  fetchGroupQuota(groupId: string | number): Promise<GroupQuotaInfo>;
+  fetchGroupQuota(groupId: string): Promise<GroupQuotaInfo>;
   setGroupQuota(params: SetGroupQuotaRequest): Promise<void>;
   fetchGroupList(params: FetchGroupListRequest): Promise<FetchGroupListResponse>;
   fetchGroupBaseInfo(groupId: string): Promise<GroupBaseInfo>;
@@ -33,7 +33,7 @@ export interface IGroupService {
   createGroup(params: CreateGroupRequest): Promise<string>;
   editGroup(params: EditGroupRequest): Promise<void>;
   deleteGroup(params: DeleteGroupRequest): Promise<void>;
-  fetchGroupMembers(groupId: string | number, page: number, size: number): Promise<GroupMemberList>;
+  fetchGroupMembers(groupId: string, page: number, size: number): Promise<GroupMemberList>;
   fetchMyRoleInGroup(groupId: string): Promise<'OWNER' | 'ADMIN' | 'MEMBER'>;
   joinGroup(params: JoinGroupRequest): Promise<void>;
   quitGroup(params: QuitGroupRequest): Promise<void>;

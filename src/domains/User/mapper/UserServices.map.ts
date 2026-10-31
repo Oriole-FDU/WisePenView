@@ -5,7 +5,6 @@ import type {
   UserInviteRecordList,
   UserSearchUser,
 } from '@/domains/User';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
   AddFeedbackApiRequest,
@@ -29,7 +28,7 @@ type CachedUserSafe = Pick<
 const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProfile => {
   const { userInfo, userProfile } = data;
   return {
-    id: normalizeId(data.userId),
+    id: data.userId,
     userInfo: {
       nickname: userInfo.nickname ?? undefined,
       realName: userInfo.realName ?? undefined,
@@ -72,7 +71,7 @@ const mapUserSafeFromAccountProfile = (data: UserAccountProfile): CachedUserSafe
 const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchUser => {
   const displayInfo = normalizeUserDisplayBaseFromApi(data);
   return {
-    userId: normalizeId(data.userId),
+    userId: data.userId,
     username: data.username,
     nickname: displayInfo?.nickname,
     realName: displayInfo?.realName,
@@ -85,8 +84,8 @@ const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =
   data.map(mapSearchUserFromApi);
 
 const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRecord => ({
-  id: normalizeId(data.id),
-  inviteeUserId: normalizeId(data.inviteeUserId),
+  id: data.id,
+  inviteeUserId: data.inviteeUserId,
   invitee: normalizeUserDisplayBaseFromApi(data.inviteeDisplay),
   status: data.status,
   createTime: data.createTime,

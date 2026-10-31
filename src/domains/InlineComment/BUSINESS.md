@@ -13,7 +13,7 @@
 
 ## 必要数据与显示降级
 
-- thread 的 inlineCommentId、resourceId、creatorId，item 的 itemId、authorId 都是必要身份，正规化后缺失即拒绝；thread／item 的建立与更新时间须为有限数字，不能为了显示降级而容忍缺主键。建立返回 ID 也会检查非空。依据：[requiredId](mapper/InlineCommentServices.map.ts)、[requiredTimestamp](mapper/InlineCommentServices.map.ts)、[mapCreatedId](mapper/InlineCommentServices.map.ts)。
+- thread 的 inlineCommentId、resourceId、creatorId，item 的 itemId、authorId 都是必要身份，由 API Schema 在契约边界拒绝缺失或空值；thread／item 的建立与更新时间须为有限数字，不能为了显示降级而容忍缺主键。依据：[InlineCommentApiSchema](apis/InlineCommentApi.schema.ts)、[requiredTimestamp](mapper/InlineCommentServices.map.ts)。
 - 显示信息另有降级：作者优先 nickname、再 realName，最后用 ID；缺少 avatar、reaction 用户展示或 optional 时间不等于缺少作者身份。空 emoji 会过滤，正文／图片／mentions 可使用空值。依据：[mapUserDisplay](mapper/InlineCommentServices.map.ts)、[mapAuthor](mapper/InlineCommentServices.map.ts)、[mapReactionGroups](mapper/InlineCommentServices.map.ts)、[mapItem](mapper/InlineCommentServices.map.ts)。
 
 ## 服务边界

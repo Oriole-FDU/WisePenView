@@ -12,7 +12,6 @@ import type {
 } from '@/domains/Resource/apis/ResourceCoreApi.schema';
 import type { UserDisplayBase } from '@/domains/User';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import { getSupportedResourcePermissionActions } from '../enum';
 import type {
@@ -40,7 +39,7 @@ const mapOverrideGroupInfoByIdFromApi = (
   return Object.fromEntries(
     value
       .map((item) => {
-        const groupId = normalizeId(item.groupId);
+        const groupId = item.groupId;
         return groupId && item.groupInfo ? ([groupId, item.groupInfo] as const) : null;
       })
       .filter((entry): entry is readonly [string, ResourceGroupDisplayApi] => Boolean(entry))
@@ -54,7 +53,7 @@ const mapSpecifiedUserInfoByIdFromApi = (
   return Object.fromEntries(
     value
       .map((item) => {
-        const userId = normalizeId(item.userId);
+        const userId = item.userId;
         const userInfo = normalizeUserDisplayBaseFromApi(item.userInfo);
         return userId && userInfo ? ([userId, userInfo] as const) : null;
       })

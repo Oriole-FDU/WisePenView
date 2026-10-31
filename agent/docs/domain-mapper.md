@@ -9,7 +9,7 @@ Mapper 或 service 边界应处理：
 - 后端 DTO 到 entity/view model 的转换。
 - service 请求参数到 API request 的转换。
 - fallback 和协议兼容。
-- ID 归一化，例如使用 `normalizeId` 处理数字 ID 或大整数 ID。
+- 历史非契约接口的 ID 兼容；已 checked Contract 的 ID 必须在 Schema 边界统一为字符串，不在 mapper 重复转换。
 - 时间、枚举、权限动作、状态值等展示前归一化。
 - 后端大小写不一致、字段缺失、字段别名兼容等问题。
 
@@ -27,7 +27,7 @@ Mapper 不应处理：
 
 - API request 与 service request 的字段和语义一致。
 - API response 已被 Zod Schema 校验，并且 service 可以直接消费其稳定字段。
-- 不存在字段改名、枚举转换、ID 归一化、时间格式化或协议兼容。
+- 不存在字段改名、枚举转换、契约未覆盖的 ID 兼容、时间格式化或协议兼容。
 
 出现上述映射需求时再创建 mapper。只有一处调用的业务归一化也可以留在 service；当同一转换被多个流程复用，或兼容规则需要独立审查时，再抽成纯函数或 mapper。不要为了维持目录形状保留只做逐字段复制的 `mapXxx`。
 
@@ -73,7 +73,7 @@ src/domains/<Domain>/mapper/<entity>.mapper.ts
 
 - [ ] 存在真实字段转换时才创建 mapper，没有保留机械复制的映射函数。
 - [ ] fallback 有明确业务或兼容原因。
-- [ ] ID、时间、枚举在 mapper 或明确的 service 业务边界中归一化。
+- [ ] 已 checked Contract 的 ID 在 Schema 层保证为字符串，mapper 没有重复转换；历史非契约 ID 兼容有明确原因。
 - [ ] 组件没有直接消费后端 raw DTO。
 - [ ] service 中没有堆叠大量字段兼容逻辑。
 - [ ] mapper 输入使用明确 API DTO，不接收未分层的 `unknown` 响应。
