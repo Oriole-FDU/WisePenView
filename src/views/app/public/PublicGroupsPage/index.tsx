@@ -9,7 +9,7 @@ import { Select } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import PageHeader from '@/components/base/PageHeader';
 import { useGroupService } from '@/domains';
-import { GROUP_ROLE_FILTER_MAP, GROUP_TYPE } from '@/domains/Group';
+import { GROUP_ROLE_FILTER, GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import {
   buildGroupFilesPath,
@@ -34,7 +34,7 @@ function PublicGroupsPage() {
   const query = parseGroupListRouteQuery(searchParams);
   const [joinModalOpen, setJoinModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const roleFilter = GROUP_ROLE_FILTER_MAP[query.role];
+  const roleFilter = GROUP_ROLE_FILTER[query.role];
   const { data, loading, error, refresh } = useApi(
     () =>
       groupService.fetchGroupList({

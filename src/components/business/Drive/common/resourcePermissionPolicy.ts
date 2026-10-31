@@ -1,7 +1,6 @@
 import {
   areResourcePermissionActionsEqual,
   filterSupportedResourcePermissionActions,
-  RESOURCE_ACTION,
   type ResourceAction,
 } from '@/domains/_shared/access';
 import {
@@ -118,7 +117,7 @@ export const buildResourcePermissionActionOptions = (
   supportedActions: ResourceAction[]
 ): ResourcePermissionActionOption[] =>
   supportedActions.map((action) => {
-    const key = RESOURCE_ACTION.getOption(action)?.key ?? String(action);
+    const key = action;
     return {
       action,
       key,
@@ -128,7 +127,7 @@ export const buildResourcePermissionActionOptions = (
   });
 
 export const getResourcePermissionActionLabel = (action: ResourceAction): string => {
-  const key = RESOURCE_ACTION.getOption(action)?.key;
+  const key = action;
   return key ? i18n.t(`permission.actions.${key}`, { ns: 'resource' }) : String(action);
 };
 

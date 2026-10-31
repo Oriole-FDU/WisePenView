@@ -1,4 +1,4 @@
-import type { DegreeLevel, Sex, UserStatus, UserVerificationMode } from '../enum';
+import type { DegreeLevel, IdentityType, Sex, UserStatus, UserVerificationMode } from '../enum';
 
 // 只存储需要的用户字段；id 用 string 避免大数精度丢失
 export interface User {
@@ -6,7 +6,7 @@ export interface User {
   username: string;
   nickname?: string;
   avatar?: string;
-  identityType: number;
+  identityType: IdentityType;
   realName?: string;
   campusNo?: string;
   /** 当前用户自己的邀请码，用于生成邀请链接 */
@@ -18,7 +18,7 @@ export interface UserDisplayBase {
   nickname?: string;
   realName?: string;
   avatar?: string;
-  identityType?: number;
+  identityType?: IdentityType;
 }
 
 /** 用户搜索结果：用于选择接收人、协作者等轻量用户选择场景。 */
@@ -31,7 +31,7 @@ export interface UserAccountInfo {
   nickname?: string;
   realName?: string;
   avatar?: string;
-  identityType: number;
+  identityType: IdentityType;
   username: string;
   campusNo?: string;
   email?: string;

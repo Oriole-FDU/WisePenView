@@ -1,8 +1,5 @@
-import type { UserDisplayApi, UserIdentityTypeApiValue } from '../apis/UserInformationApi.schema';
+import type { UserDisplayApi } from '../apis/UserInformationApi.schema';
 import type { UserDisplayBase } from '../entity/user';
-
-export const normalizeIdentityTypeFromApi = (value: UserIdentityTypeApiValue): number =>
-  Number(value);
 
 export const normalizeUserDisplayBaseFromApi = (
   value: Partial<UserDisplayApi> | null | undefined
@@ -12,7 +9,6 @@ export const normalizeUserDisplayBaseFromApi = (
     nickname: value.nickname ?? undefined,
     realName: value.realName ?? undefined,
     avatar: value.avatar ?? undefined,
-    identityType:
-      value.identityType == null ? undefined : normalizeIdentityTypeFromApi(value.identityType),
+    identityType: value.identityType ?? undefined,
   };
 };

@@ -1,4 +1,4 @@
-import { parseResourceActions } from '@/domains/_shared/access';
+import { normalizeResourceActions } from '@/domains/_shared/access';
 import {
   ASSET_RESOURCE_TYPE,
   type AssetResourceType,
@@ -143,7 +143,7 @@ function mapSkillDetail(params: {
     updatedAt: '',
     creatorId: ownerId,
     ownerId,
-    currentActions: parseResourceActions(resourceInfo?.currentActions),
+    currentActions: normalizeResourceActions(resourceInfo?.currentActions),
     fileCount: files.length,
     files,
     scopeType: 'PERSONAL',

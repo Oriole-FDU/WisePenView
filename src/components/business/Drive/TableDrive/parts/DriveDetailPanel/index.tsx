@@ -7,7 +7,6 @@ import { useDocumentService, useHtmlPageService, useNoteService } from '@/domain
 import {
   ACCESS_CONTROL_SCOPE,
   type AccessControlScope,
-  RESOURCE_ACTION,
   type ResourceAction,
 } from '@/domains/_shared/access';
 import type { ResourceItem } from '@/domains/Resource';
@@ -164,7 +163,7 @@ function DriveDetailPanel({ selectedRow, isEditMode, selectedCount }: DriveDetai
   const actionTarget = isDriveActionTarget(selectedRow.node) ? selectedRow.node : null;
   const shouldShowPermissionMeta = selectedRow.node.scope.type === 'group';
   const getActionLabel = (action: ResourceAction) => {
-    const key = RESOURCE_ACTION.getOption(action)?.key;
+    const key = action;
     return key ? t(`permission.actions.${key}`, { ns: 'resource' }) : String(action);
   };
   const formatResourceDefaultPermission = (

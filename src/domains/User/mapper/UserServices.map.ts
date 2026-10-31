@@ -19,7 +19,7 @@ import type {
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
 import type { SubmitFeedbackRequest, UpdateUserInfoRequest } from '../service/index.type';
-import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
+import { normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
   User,
@@ -34,7 +34,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       nickname: userInfo.nickname ?? undefined,
       realName: userInfo.realName ?? undefined,
       avatar: userInfo.avatar ?? undefined,
-      identityType: normalizeIdentityTypeFromApi(userInfo.identityType),
+      identityType: userInfo.identityType,
       username: userInfo.username,
       campusNo: userInfo.campusNo ?? undefined,
       email: userInfo.email ?? undefined,

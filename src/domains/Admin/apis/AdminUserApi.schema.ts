@@ -14,8 +14,9 @@ import {
   UserStatusApiSchema,
   UserVerificationModeApiSchema,
 } from '@/domains/User/apis/UserInformationApi.schema';
+import { IDENTITY } from '@/domains/User/enum';
 
-export const AdminIdentityTypeQueryApiSchema = z.enum(['STUDENT', 'TEACHER', 'ADMIN']);
+export const AdminIdentityTypeQueryApiSchema = z.enum(IDENTITY.options.map((option) => option.key));
 
 export const AdminUserApiSchema = z.object({
   userId: JavaLongIdSchema,

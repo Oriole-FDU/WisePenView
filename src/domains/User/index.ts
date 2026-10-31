@@ -10,6 +10,7 @@ export type {
 export type {
   DegreeLevel,
   FeedbackType,
+  IdentityType,
   Sex,
   UserStatus,
   UserVerificationMode,
@@ -20,6 +21,8 @@ export {
   FEEDBACK_TYPE,
   IDENTITY,
   SEX,
+  USER_INVITE_STATUS,
+  USER_READONLY_FIELD,
   USER_STATUS,
   USER_VERIFICATION,
   USER_VERIFICATION_PROVIDER,

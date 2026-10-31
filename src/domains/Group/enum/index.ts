@@ -10,12 +10,20 @@ import { defineEnum } from '@/utils/type/enum';
 export const GROUP_TYPE = defineEnum({ NORMAL: 1, ADVANCED: 2, PUBLIC: 3 } as const);
 export type GroupType = EnumValue<typeof GROUP_TYPE>;
 
+/** 列表 query 使用后端枚举名，与 GroupType 的 JSON 数字值不同。 */
+export const GROUP_TYPE_QUERY = defineEnum({
+  NORMAL: 'NORMAL_GROUP',
+  ADVANCED: 'ADVANCED_GROUP',
+  PUBLIC: 'MARKET_GROUP',
+} as const);
+
 /** 当前用户与小组的关系筛选 */
-export const GROUP_ROLE_FILTER_MAP: Record<string, 'ALL' | 'JOINED' | 'MANAGED'> = {
+export const GROUP_ROLE_FILTER = defineEnum({
   all: 'ALL',
   joined: 'JOINED',
   managed: 'MANAGED',
-};
+} as const);
+export type GroupRoleFilter = EnumValue<typeof GROUP_ROLE_FILTER>;
 
 /** 小组成员角色码：0=OWNER，1=ADMIN，2=MEMBER（与后端约定一致） */
 export const ROLE = defineEnum({ OWNER: 0, ADMIN: 1, MEMBER: 2 } as const);

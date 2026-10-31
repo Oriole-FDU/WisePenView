@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文件拥有 Chat 模型、Provider、Tool、Agent／Skill 输入能力与模型选择和计费展示语义。会话、历史消息和附件由 [Chat](../Chat/BUSINESS.md) 拥有；输入区与设置页的用户流程分别由 [Chat workflow](../../components/business/Chat/BUSINESS.md) 与对应 profile view 拥有。
+本文件拥有 Chat 模型、Provider、Tool、Agent／Skill 输入能力与模型选择和计费展示语义。会话、历史消息和附件由 [ChatSession](../ChatSession/BUSINESS.md) 拥有，单轮流式生命周期由 [ChatTurn](../ChatTurn/BUSINESS.md) 拥有；输入区与设置页的用户流程分别由 [Chat workflow](../../components/business/Chat/BUSINESS.md) 与对应 profile view 拥有。
 
 ## 模型与 Provider
 

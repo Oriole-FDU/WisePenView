@@ -56,6 +56,8 @@ src/domains/<Domain>/enum/index.ts
 
 身份枚举只需要一个 `EnumValue` 类型；只有映射枚举才同时使用 `EnumKey` 和 `EnumValue`。
 
+API 需要 Zod 校验时，从同一枚举的 `options` 派生 Schema，不另行复制值数组；枚举值不能反向依赖 API Schema。
+
 ## 三、类型来源边界
 
 - 后端协议类型手写在同域 `apis/*Api.type.ts`，属于 API 层输入。

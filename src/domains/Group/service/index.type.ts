@@ -11,6 +11,7 @@ import type {
 import type { EnumValue } from '@/utils/type/enum';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
+import type { GroupRoleFilter } from '../enum';
 
 /** GroupService 接口：供依赖注入使用 */
 export interface IGroupService {
@@ -61,8 +62,6 @@ export interface FetchGroupListRequest {
   page: number;
   size: number;
 }
-
-export type GroupRoleFilter = 'ALL' | 'JOINED' | 'MANAGED';
 
 /** 创建小组请求参数；基础字段与 OpenAPI addGroup 对齐 */
 export interface CreateGroupRequest {

@@ -8,6 +8,7 @@ import {
   PageApiRequestSchema,
 } from '@/apis/schema';
 
+import { FEEDBACK_TYPE, USER_INVITE_STATUS } from '../enum';
 import {
   UserDegreeLevelApiSchema,
   UserDisplayApiSchema,
@@ -32,13 +33,9 @@ export const ChangeUserProfileApiRequestSchema = z.strictObject({
   academicTitle: NullableStringSchema.optional(),
 });
 
-export const UserFeedbackTypeApiSchema = z.enum([
-  'BUG_REPORT',
-  'SUGGESTION',
-  'CONSULTATION',
-  'COMPLAINT',
-  'OTHER',
-]);
+export const UserFeedbackTypeApiSchema = z.enum(
+  FEEDBACK_TYPE.options.map((option) => option.value)
+);
 
 export const AddFeedbackApiRequestSchema = z.strictObject({
   content: z.string(),
@@ -50,7 +47,9 @@ export const AddFeedbackApiRequestSchema = z.strictObject({
 
 export const ListUserInviteRecordsApiRequestSchema = PageApiRequestSchema;
 
-export const UserInviteStatusApiSchema = z.enum(['BOUND', 'REWARDED']);
+export const UserInviteStatusApiSchema = z.enum(
+  USER_INVITE_STATUS.options.map((option) => option.value)
+);
 
 export const UserInviteRecordApiSchema = z.object({
   id: JavaLongIdSchema,

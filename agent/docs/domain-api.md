@@ -33,9 +33,9 @@ API 层禁止：
 - 每个 API 使用一个 `ApiContract` 描述 `name`、`method`、`endpoint`、`requestPlacement`、`transport`、`request` 和 `response`；空 payload 必须复用 `@/apis/schema` 的 `EmptyApiRequestSchema`、`EmptyApiResponseSchema`。
 - `requestPlacement` 只能是 `body`、`query`、`none`。GET 与 DELETE 不得声明 body；历史接口同时需要 query 与 body 时，在 body Contract 上用 `queryKeys` 明确列出 query 字段，执行器会拆分传输。
 - API 方法统一调用 `executeApiContract`，不重复手写 `parseApiRequest`、transport 和 `parseApiResponse`。解析失败必须 fail-fast，不把缺失字段、错误类型或意外 `null` 继续传给 mapper 或 service。
-- 未迁移契约的旧接口只能使用显式标注的 `apiGetUnchecked<T>`、`apiPostUnchecked<T>`、`apiPutUnchecked<T>`、`apiDeleteUnchecked<T>` 或特殊 transport 兼容入口；`pnpm check:api-contracts` 以基线锁定数量，新增调用或迁移后未下调基线都会失败。
+- 所有 REST 调用必须使用 checked Contract；`pnpm check:api-contracts` 锁定 Contract、特殊 transport 与直接 `fetch` 的数量，新增绕过契约的调用会失败。
 - 契约违约诊断只记录 endpoint、contract、字段路径和 issue code，不记录原始请求或响应正文。
-- 未迁移的领域可以继续使用手写 `apis/*Api.type.ts`，但同一声明只能有一个事实源。
+- 历史 `apis/*Api.type.ts` 在迁移时同步删除；同一 wire 声明只能保留一个事实源。
 - 普通接口使用 `transport: 'json'`；裸文本使用 `'text'`；`FormData` 使用 `'multipart'`；SSE 使用 `'sse'` 并提供独立事件归一化器。特殊 transport 不得退回领域层裸 `fetch`。
 - 接口字段、枚举或响应结构需要结合 Java 实现、mapper 与业务语义确认；无法从代码得到稳定结论时，先向用户确认，不要盲猜。
 - API DTO 只作为后端协议类型，不允许泄漏到组件展示层。
@@ -190,8 +190,7 @@ api -> views/components
 - [ ] 每个 JSON API 的 Contract 都显式包含 name、method、endpoint、requestPlacement、transport、request 和 response。
 - [ ] API 方法通过 `executeApiContract` 执行请求校验、传输、envelope 解包和响应校验。
 - [ ] 请求使用严格对象，响应使用允许新增字段的普通对象。
-- [ ] 新接口未使用 `apiGetUnchecked<T>`、`apiPostUnchecked<T>`、`apiPutUnchecked<T>` 或
-      `apiDeleteUnchecked<T>`。
+- [ ] API 调用使用 checked Contract，没有未校验 transport 或直接 `fetch`。
 - [ ] API DTO 未泄漏到组件展示层。
 - [ ] API 方法返回明确 DTO，不以 `unknown` 作为未分层的响应出口。
 - [ ] 未新增 `any`。

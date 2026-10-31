@@ -13,6 +13,19 @@ const assertSupportedPlacement = (contract: ApiContract<unknown, unknown>): void
   }
 };
 
+const assertSupportedTransport = (contract: ApiContract<unknown, unknown>): void => {
+  if (
+    contract.transport === 'json' ||
+    contract.transport === 'multipart' ||
+    contract.transport === 'text'
+  ) {
+    return;
+  }
+  throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+    reason: `${contract.name} 的 ${contract.transport} transport 不能由 executeApiContract 执行`,
+  });
+};
+
 const getRequestParts = (
   contract: ApiContract<unknown, unknown>,
   request: unknown,
@@ -51,6 +64,7 @@ export async function executeApiContract<Request, Response>(
   config?: AxiosRequestConfig
 ): Promise<Response> {
   assertSupportedPlacement(contract);
+  assertSupportedTransport(contract);
   const request = parseApiRequest(contract, value);
   const requestParts = getRequestParts(contract, request, config);
   const requestConfig = requestParts.config;
@@ -71,25 +85,13 @@ export async function executeApiContract<Request, Response>(
       data = await apiGet(contract.endpoint, requestConfig);
       break;
     case 'POST':
-      data = await apiPost(
-        contract.endpoint,
-        contract.method === 'POST' ? requestParts.body : undefined,
-        requestConfig
-      );
+      data = await apiPost(contract.endpoint, requestParts.body, requestConfig);
       break;
     case 'PUT':
-      data = await apiPut(
-        contract.endpoint,
-        contract.method === 'PUT' ? requestParts.body : undefined,
-        requestConfig
-      );
+      data = await apiPut(contract.endpoint, requestParts.body, requestConfig);
       break;
     case 'PATCH':
-      data = await apiPatch(
-        contract.endpoint,
-        contract.method === 'PATCH' ? requestParts.body : undefined,
-        requestConfig
-      );
+      data = await apiPatch(contract.endpoint, requestParts.body, requestConfig);
       break;
     case 'DELETE':
       data = await apiDelete(contract.endpoint, requestConfig);

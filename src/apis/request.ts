@@ -99,16 +99,6 @@ export function apiGet(url: string, config?: AxiosRequestConfig): Promise<unknow
   return executeRequest('get', url, config, undefined, unwrap<unknown>);
 }
 
-/**
- * 未迁移契约的 GET 兼容入口。
- * 该泛型不会执行运行期校验，新接口应使用 executeApiContract。
- *
- * @deprecated 仅供存量 API 迁移使用；对应领域完成 Contract 化后删除。
- */
-export function apiGetUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return executeRequest('get', url, config, undefined, unwrap<T>);
-}
-
 /** POST 并解包 envelope；payload 在契约解析前保持 unknown。 */
 export function apiPost(
   url: string,
@@ -116,20 +106,6 @@ export function apiPost(
   config?: AxiosRequestConfig
 ): Promise<unknown> {
   return executeRequest('post', url, config, data, unwrap<unknown>);
-}
-
-/**
- * 未迁移契约的 POST 兼容入口。
- * 该泛型不会执行运行期校验，新接口应使用 executeApiContract。
- *
- * @deprecated 仅供存量 API 迁移使用；对应领域完成 Contract 化后删除。
- */
-export function apiPostUnchecked<T>(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<T> {
-  return executeRequest('post', url, config, data, unwrap<T>);
 }
 
 /** 读取裸文本响应；仅用于后端明确声明非 R<T> 的接口。 */
@@ -152,20 +128,6 @@ export function apiPut(url: string, data?: unknown, config?: AxiosRequestConfig)
   return executeRequest('put', url, config, data, unwrap<unknown>);
 }
 
-/**
- * 未迁移契约的 PUT 兼容入口。
- * 该泛型不会执行运行期校验，新接口应使用 executeApiContract。
- *
- * @deprecated 仅供存量 API 迁移使用；对应领域完成 Contract 化后删除。
- */
-export function apiPutUnchecked<T>(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<T> {
-  return executeRequest('put', url, config, data, unwrap<T>);
-}
-
 /** PATCH 并解包 envelope；payload 在契约解析前保持 unknown。 */
 export function apiPatch(
   url: string,
@@ -178,14 +140,4 @@ export function apiPatch(
 /** DELETE 并解包 envelope；payload 在契约解析前保持 unknown。 */
 export function apiDelete(url: string, config?: AxiosRequestConfig): Promise<unknown> {
   return executeRequest('delete', url, config, undefined, unwrap<unknown>);
-}
-
-/**
- * 未迁移契约的 DELETE 兼容入口。
- * 该泛型不会执行运行期校验，新接口应使用 executeApiContract。
- *
- * @deprecated 仅供存量 API 迁移使用；对应领域完成 Contract 化后删除。
- */
-export function apiDeleteUnchecked<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-  return executeRequest('delete', url, config, undefined, unwrap<T>);
 }

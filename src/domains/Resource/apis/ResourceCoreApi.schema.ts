@@ -14,30 +14,32 @@ import { ResourceActionListSchema } from '@/domains/_shared/access';
 import { GroupTypeApiSchema } from '@/domains/Group/apis/GroupApi.schema';
 import { UserDisplayApiSchema } from '@/domains/User/apis/UserInformationApi.schema';
 
+import {
+  RESOURCE_SORT_BY,
+  RESOURCE_SORT_DIR,
+  RESOURCE_TYPE,
+  SEARCH_SCOPE,
+  TAG_QUERY_LOGIC_MODE,
+} from '../enum';
+
 /** 后端 ResourceType 通过 @JsonValue 输出枚举名称。 */
-export const ResourceTypeApiSchema = z.enum([
-  'NOTE',
-  'DRAWIO',
-  'PDF',
-  'DOC',
-  'DOCX',
-  'PPT',
-  'PPTX',
-  'XLS',
-  'XLSX',
-  'SKILL',
-  'AGENT',
-  'SINGLE_HTML_PAGE',
-  'UNKNOWN',
-]);
+export const ResourceTypeApiSchema = z.enum(RESOURCE_TYPE.options.map((option) => option.value));
 
-export const ResourceSortByApiSchema = z.enum(['UPDATE_TIME', 'CREATE_TIME', 'NAME', 'SIZE']);
+export const ResourceSortByApiSchema = z.enum(
+  RESOURCE_SORT_BY.options.map((option) => option.value)
+);
 
-export const ResourceSortDirApiSchema = z.enum(['ASC', 'DESC']);
+export const ResourceSortDirApiSchema = z.enum(
+  RESOURCE_SORT_DIR.options.map((option) => option.value)
+);
 
-export const ResourceTagQueryLogicModeApiSchema = z.enum(['OR', 'AND']);
+export const ResourceTagQueryLogicModeApiSchema = z.enum(
+  TAG_QUERY_LOGIC_MODE.options.map((option) => option.value)
+);
 
-export const ResourceSearchScopeApiSchema = z.enum(['ALL', 'DOCUMENT', 'NOTE']);
+export const ResourceSearchScopeApiSchema = z.enum(
+  SEARCH_SCOPE.options.map((option) => option.value)
+);
 
 const ResourceListPageRequestSchema = PageApiRequestSchema.extend({
   size: z.number().int().min(1).max(100),

@@ -14,26 +14,38 @@ import {
 import { ResourceActionListSchema } from '@/domains/_shared/access';
 import { UserDisplayApiSchema } from '@/domains/User/apis/UserInformationApi.schema';
 
+import {
+  GROUP_FILE_ORG_LOGIC,
+  GROUP_ROLE_FILTER,
+  GROUP_TYPE,
+  GROUP_TYPE_QUERY,
+  ROLE,
+} from '../enum';
+
 /** 后端 GroupType 通过 @JsonValue 输出数字 code。 */
-export const GroupTypeApiSchema = z.union([z.literal(1), z.literal(2), z.literal(3)]);
+export const GroupTypeApiSchema = z.literal(GROUP_TYPE.options.map((option) => option.value));
 
 /** 查询参数仍由 Spring 按枚举名转换，与 JSON body/response 的数字值不同。 */
-export const GroupTypeQueryApiSchema = z.enum(['NORMAL_GROUP', 'ADVANCED_GROUP', 'MARKET_GROUP']);
+export const GroupTypeQueryApiSchema = z.enum(
+  GROUP_TYPE_QUERY.options.map((option) => option.value)
+);
 
-export const GroupRoleFilterApiSchema = z.enum(['ALL', 'JOINED', 'MANAGED']);
+export const GroupRoleFilterApiSchema = z.enum(
+  GROUP_ROLE_FILTER.options.map((option) => option.value)
+);
 
 /** 包含 NOT_MEMBER，供“我的角色”接口使用。 */
 export const GroupRoleApiSchema = z.union([
-  z.literal(0),
-  z.literal(1),
-  z.literal(2),
+  z.literal(ROLE.options.map((option) => option.value)),
   z.literal(-1),
 ]);
 
 /** 成员列表与成员变更只允许真实成员角色。 */
-export const GroupMemberRoleApiSchema = z.union([z.literal(0), z.literal(1), z.literal(2)]);
+export const GroupMemberRoleApiSchema = z.literal(ROLE.options.map((option) => option.value));
 
-export const GroupFileOrgLogicApiSchema = z.enum(['FOLDER', 'TAG']);
+export const GroupFileOrgLogicApiSchema = z.enum(
+  GROUP_FILE_ORG_LOGIC.options.map((option) => option.value)
+);
 
 export const GroupItemApiSchema = z.object({
   groupId: JavaLongIdSchema,

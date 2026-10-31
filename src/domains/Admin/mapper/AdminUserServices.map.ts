@@ -1,6 +1,5 @@
 import type { AdminUser } from '@/domains/Admin';
 import { IDENTITY } from '@/domains/User';
-import { normalizeIdentityTypeFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
 import type {
@@ -28,7 +27,7 @@ const mapAdminUserApiModelToEntity = (raw: AdminUserApiModel): AdminUser => {
     nickname: raw.nickname ?? undefined,
     realName: raw.realName ?? undefined,
     avatar: raw.avatar ?? undefined,
-    identityType: raw.identityType == null ? 0 : normalizeIdentityTypeFromApi(raw.identityType),
+    identityType: raw.identityType ?? 0,
     campusNo: raw.campusNo ?? undefined,
     email: raw.email ?? undefined,
     mobile: raw.mobile ?? undefined,

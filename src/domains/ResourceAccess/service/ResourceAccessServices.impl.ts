@@ -8,6 +8,7 @@ import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { INoteService } from '@/domains/Note';
 import type { ISkillService } from '@/domains/Skill';
 import type { ITagService } from '@/domains/Tag';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { ResourceAccessServicesMap } from '../mapper/ResourceAccessServices.map';
 import type {
@@ -77,22 +78,37 @@ const collectPermissionGroupIds = (
   return groupIds;
 };
 
-const loadResourcePermissionOverview = (
+const loadResourceInfo = (
+  params: GetResourcePermissionOverviewRequest,
+  deps: ResourceAccessServicesDeps
+) => {
+  switch (params.resourceType) {
+    case 'note':
+    case 'drawio':
+      return deps.noteService.getResourceAccessInfo(params.resourceId);
+    case 'file':
+      return deps.documentService.getResourceAccessInfo(params.resourceId);
+    case 'skill':
+      return deps.skillService.getResourceAccessInfo(params.resourceId);
+    case 'agent':
+      return deps.agentService.getResourceAccessInfo(params.resourceId);
+    case 'html':
+      return deps.htmlPageService.getResourceAccessInfo(params.resourceId);
+    default:
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: `不支持权限概览的资源类型：${params.resourceType}`,
+      });
+  }
+};
+
+const loadResourcePermissionOverview = async (
   params: GetResourcePermissionOverviewRequest,
   deps: ResourceAccessServicesDeps
 ): Promise<ResourcePermissionOverview> => {
-  const getResourceInfo =
-    params.resourceType === 'note' || params.resourceType === 'drawio'
-      ? deps.noteService.getResourceAccessInfo
-      : params.resourceType === 'file'
-        ? deps.documentService.getResourceAccessInfo
-        : params.resourceType === 'skill'
-          ? deps.skillService.getResourceAccessInfo
-          : params.resourceType === 'agent'
-            ? deps.agentService.getResourceAccessInfo
-            : deps.htmlPageService.getResourceAccessInfo;
-  return getResourceInfo(params.resourceId).then((resourceInfo) =>
-    ResourceAccessServicesMap.mapResourcePermissionOverviewFromApi(resourceInfo, params.resourceId)
+  const resourceInfo = await loadResourceInfo(params, deps);
+  return ResourceAccessServicesMap.mapResourcePermissionOverviewFromApi(
+    resourceInfo,
+    params.resourceId
   );
 };
 

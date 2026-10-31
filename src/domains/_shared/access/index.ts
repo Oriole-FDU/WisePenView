@@ -1,6 +1,5 @@
 export type { AccessControlScope } from './AccessControlScope';
 export { ACCESS_CONTROL_SCOPE, isAccessControlScope } from './AccessControlScope';
-export { parseResourceActions } from './AccessPolicy.parser';
 export {
   AccessControlScopeSchema,
   ResourceActionListSchema,

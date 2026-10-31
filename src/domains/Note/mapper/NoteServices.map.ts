@@ -1,5 +1,5 @@
 import {
-  parseResourceActions,
+  normalizeResourceActions,
   RESOURCE_ACTION,
   resourceActionsInclude,
 } from '@/domains/_shared/access';
@@ -44,7 +44,7 @@ const mapAuthorDisplay = (
 const mapNoteInfoDisplayFromApi = (data: GetNoteInfoApiContractResponse): NoteInfoDisplayData => {
   const resourceInfo = ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo);
   const ownerId = normalizeId(resourceInfo.ownerId) || undefined;
-  const currentActions = parseResourceActions(resourceInfo.currentActions);
+  const currentActions = normalizeResourceActions(resourceInfo.currentActions);
   const canCollaborativeEdit = resourceActionsInclude(currentActions, RESOURCE_ACTION.EDIT);
   const authorsDisplay = data.authorsDisplay ?? {};
   const authorIds = Object.keys(authorsDisplay);

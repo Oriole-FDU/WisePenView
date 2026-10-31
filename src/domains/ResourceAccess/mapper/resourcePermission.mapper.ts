@@ -1,7 +1,6 @@
 import {
   filterSupportedResourcePermissionActions,
   normalizeResourceActions,
-  RESOURCE_ACTION,
   RESOURCE_PERMISSION_ACTION_ORDER,
   type ResourceAction,
 } from '@/domains/_shared/access';
@@ -147,10 +146,12 @@ export const mapChangeResourceActionPermissionRequestFromSubjects = (
 const mapPermissionActionOptions = (
   supportedActions: ResourceAction[]
 ): ResourcePermissionActionOption[] => {
-  return supportedActions.map((action) => {
-    const key = RESOURCE_ACTION.getOption(action)?.key ?? String(action);
-    return { action, key, label: key, supported: true };
-  });
+  return supportedActions.map((action) => ({
+    action,
+    key: action,
+    label: action,
+    supported: true,
+  }));
 };
 
 const resolveOwnerName = (ownerInfo: UserDisplayBase | undefined, ownerId?: string): string =>

@@ -2,35 +2,33 @@ import { z } from 'zod';
 
 import { JavaLongIdSchema, NonEmptyStringSchema, NullableStringSchema } from '@/apis/schema';
 
+import {
+  DEGREE,
+  IDENTITY,
+  SEX,
+  USER_READONLY_FIELD,
+  USER_STATUS,
+  USER_VERIFICATION,
+} from '../enum';
+
 /** 后端 IdentityType 通过 @JsonValue 输出数字 code。 */
-export const UserIdentityTypeApiSchema = z.union([z.literal(1), z.literal(2), z.literal(3)]);
+export const UserIdentityTypeApiSchema = z.literal(IDENTITY.options.map((option) => option.value));
 
 /** 后端 UserStatus 通过 @JsonValue 输出字符串 value。 */
-export const UserStatusApiSchema = z.enum(['NORMAL', 'UNIDENTIFIED', 'BANNED']);
+export const UserStatusApiSchema = z.enum(USER_STATUS.options.map((option) => option.value));
 
-export const UserSexApiSchema = z.enum(['MALE', 'FEMALE', 'UNKNOWN']);
+export const UserSexApiSchema = z.enum(SEX.options.map((option) => option.value));
 
-export const UserDegreeLevelApiSchema = z.enum(['UNKNOWN', 'UNDERGRADUATE', 'MASTER', 'DOCTOR']);
+export const UserDegreeLevelApiSchema = z.enum(DEGREE.options.map((option) => option.value));
 
-export const UserVerificationModeApiSchema = z.enum(['EDU_EMAIL', 'CAMPUS_IDENTITY_PROVIDER']);
+export const UserVerificationModeApiSchema = z.enum(
+  USER_VERIFICATION.options.map((option) => option.value)
+);
 
 /** 只读字段来自后端认证策略，新增字段时必须同步更新前后端契约。 */
-export const UserReadonlyFieldApiSchema = z.enum([
-  'username',
-  'realName',
-  'campusNo',
-  'email',
-  'mobile',
-  'userStatus',
-  'sex',
-  'university',
-  'college',
-  'major',
-  'className',
-  'enrollmentYear',
-  'degreeLevel',
-  'inviteCode',
-]);
+export const UserReadonlyFieldApiSchema = z.enum(
+  USER_READONLY_FIELD.options.map((option) => option.value)
+);
 
 /** 跨资源复用的轻量用户展示信息；后端各字段均可能为 null。 */
 export const UserDisplayApiSchema = z.object({
