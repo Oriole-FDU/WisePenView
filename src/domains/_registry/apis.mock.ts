@@ -1,6 +1,5 @@
 /** 构建期选择 API 实现；service 与 mapper 始终共用。 */
 export { createOssClient, putOssPresignedUrl } from '@/domains/_shared/mock/ossClient.mock';
-export { AdminMessageApi } from '@/domains/Admin/mock/AdminMessageApi.mock';
 export { AdminUserApi } from '@/domains/Admin/mock/AdminUserApi.mock';
 export { AgentApi } from '@/domains/Agent/mock/AgentApi.mock';
 export { AuthApi } from '@/domains/Auth/mock/AuthApi.mock';

@@ -5,34 +5,40 @@ import { useTranslation } from 'react-i18next';
 import { FormField, Input, Select, TextArea } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useAdminService } from '@/domains';
-import type { PublishMessageDeliveryScope, PublishMessageType } from '@/domains/Admin';
-import { useApi } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
 
+import type {
+  AnnouncementDeliveryScope,
+  AnnouncementPublishMessageType,
+  PublishAnnouncementRequest,
+} from '../index.type';
 import styles from './style.module.scss';
 
 interface CreateAnnouncementModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSubmit: (request: PublishAnnouncementRequest) => Promise<void>;
 }
 
 interface AnnouncementFormValues {
   title: string;
-  messageType: PublishMessageType;
-  deliveryScope: PublishMessageDeliveryScope;
+  messageType: AnnouncementPublishMessageType;
+  deliveryScope: AnnouncementDeliveryScope;
   content: string;
   jumpUrl: string;
   receiverUserIds: string;
 }
 
-const MESSAGE_TYPE_OPTIONS: Array<{ value: PublishMessageType; labelKey: string }> = [
+const MESSAGE_TYPE_OPTIONS: Array<{
+  value: AnnouncementPublishMessageType;
+  labelKey: string;
+}> = [
   { value: 'SYSTEM', labelKey: 'announcement.type.SYSTEM' },
   { value: 'NORMAL', labelKey: 'announcement.type.NORMAL' },
 ];
 
 const DELIVERY_SCOPE_OPTIONS: Array<{
-  value: PublishMessageDeliveryScope;
+  value: AnnouncementDeliveryScope;
   labelKey: string;
 }> = [
   { value: 'ALL_USERS', labelKey: 'announcement.scope.ALL_USERS' },
@@ -55,20 +61,16 @@ const parseReceiverUserIds = (value: string): string[] =>
     .map((item) => item.trim())
     .filter(Boolean);
 
-function CreateAnnouncementModal({
-  isOpen,
-  onOpenChange,
-  onSuccess,
-}: CreateAnnouncementModalProps) {
+function CreateAnnouncementModal({ isOpen, onOpenChange, onSubmit }: CreateAnnouncementModalProps) {
   const { t } = useTranslation(['admin', 'common']);
-  const adminService = useAdminService();
   const [formValues, setFormValues] = useState<AnnouncementFormValues>(INITIAL_FORM_VALUES);
+  const [submitting, setSubmitting] = useState(false);
 
   function updateFormValue<K extends keyof AnnouncementFormValues>(
     field: K,
     value: AnnouncementFormValues[K]
   ) {
-    setFormValues((prev) => ({ ...prev, [field]: value }));
+    setFormValues((previous) => ({ ...previous, [field]: value }));
   }
 
   const reset = () => {
@@ -76,10 +78,8 @@ function CreateAnnouncementModal({
   };
 
   const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      reset();
-    }
-    onOpenChange(open);
+    if (!open && !submitting) reset();
+    if (!submitting) onOpenChange(open);
   };
 
   const handleCancel = () => {
@@ -87,49 +87,40 @@ function CreateAnnouncementModal({
     onOpenChange(false);
   };
 
-  const { loading: submitting, run: runPublishMessage } = useApi(
-    async (values: AnnouncementFormValues) => {
-      const receiverUserIds = parseReceiverUserIds(values.receiverUserIds);
-      await adminService.publishMessage({
-        deliveryScope: values.deliveryScope,
-        messageType: values.deliveryScope === 'ALL_USERS' ? 'SYSTEM' : values.messageType,
-        title: values.title,
-        content: values.content,
-        jumpUrl: values.jumpUrl,
-        receiverUserIds,
-      });
-    },
-    {
-      manual: true,
-      onSuccess: () => {
-        toast.success(t('announcement.publish.success'));
-        reset();
-        onOpenChange(false);
-        onSuccess?.();
-      },
-    }
-  );
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formValues.title.trim()) {
       toast.warning(t('announcement.publish.titleRequired'));
       return;
     }
-
     if (!formValues.content.trim()) {
       toast.warning(t('announcement.publish.contentRequired'));
       return;
     }
 
-    if (
-      formValues.deliveryScope === 'DIRECT' &&
-      parseReceiverUserIds(formValues.receiverUserIds).length === 0
-    ) {
+    const receiverUserIds = parseReceiverUserIds(formValues.receiverUserIds);
+    if (formValues.deliveryScope === 'DIRECT' && receiverUserIds.length === 0) {
       toast.warning(t('announcement.publish.receiverRequired'));
       return;
     }
 
-    runPublishMessage(formValues);
+    setSubmitting(true);
+    try {
+      await onSubmit({
+        deliveryScope: formValues.deliveryScope,
+        messageType: formValues.deliveryScope === 'ALL_USERS' ? 'SYSTEM' : formValues.messageType,
+        title: formValues.title,
+        content: formValues.content,
+        jumpUrl: formValues.jumpUrl,
+        receiverUserIds,
+      });
+      toast.success(t('announcement.publish.success'));
+      reset();
+      onOpenChange(false);
+    } catch (error) {
+      toast.danger(parseErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const canSubmit = Boolean(
@@ -172,7 +163,7 @@ function CreateAnnouncementModal({
             value={formValues.messageType}
             onChange={(value) => {
               if (value == null || Array.isArray(value)) return;
-              updateFormValue('messageType', value as PublishMessageType);
+              updateFormValue('messageType', value as AnnouncementPublishMessageType);
             }}
             isDisabled={formValues.deliveryScope === 'ALL_USERS' || submitting}
             isRequired
@@ -199,11 +190,9 @@ function CreateAnnouncementModal({
             value={formValues.deliveryScope}
             onChange={(value) => {
               if (value == null || Array.isArray(value)) return;
-              const nextScope = value as PublishMessageDeliveryScope;
+              const nextScope = value as AnnouncementDeliveryScope;
               updateFormValue('deliveryScope', nextScope);
-              if (nextScope === 'ALL_USERS') {
-                updateFormValue('messageType', 'SYSTEM');
-              }
+              if (nextScope === 'ALL_USERS') updateFormValue('messageType', 'SYSTEM');
             }}
             isDisabled={submitting}
             isRequired
