@@ -16,7 +16,6 @@
 
 - `pnpm lint`：
 - `pnpm typecheck`：
-- `pnpm check:mock`：
 - `pnpm build`：
 - 运行态验证：
 

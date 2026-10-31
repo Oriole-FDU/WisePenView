@@ -21,4 +21,4 @@
 ## Mock 与能力限制
 
 - 目前 mock 凭证的 `speech.example.invalid` 不符合上述信任限制；离线 mock 的存在不代表可以启动识别。依据：[SpeechApi](mock/SpeechApi.mock.ts)、[mapRecognitionCredentialFromApi](mapper/SpeechServices.map.ts)。
-- 既有 mock contract 脚本未调用 Speech service，也不验证麦克风、WebSocket、AudioWorklet 或结果替换。不能由该检查推论正式语音可用；目前这些行为没有专门的产品测试覆盖。依据：[check-mock.mjs](../../../scripts/check-mock.mjs)、[XfyunSpeechRecognizer](runtime/XfyunSpeechRecognizer.ts)。
+- 麦克风、WebSocket、AudioWorklet 或结果替换目前没有专门的产品测试覆盖，不能由离线 mock 推论正式语音可用。依据：[XfyunSpeechRecognizer](runtime/XfyunSpeechRecognizer.ts)。
