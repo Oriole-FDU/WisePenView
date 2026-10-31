@@ -74,6 +74,7 @@ try {
     skillService: skill,
     agentService: agent,
     userService: user,
+    userTaskService: userTask,
     walletService: wallet,
     groupService: group,
     inlineCommentService: inline,
@@ -367,6 +368,8 @@ try {
   assert.equal((await user.getUserInfo()).nickname, '更新後的使用者');
   const candidates = await user.queryUserSearchCandidates({ keyword: 'xiaoming' });
   assert.equal(candidates.length, 1);
+  assert((await userTask.listTaskStatus()).some((task) => task.taskCode === 'DAILY_CHECK_IN'));
+  assert.equal(typeof (await userTask.dailyCheckIn()).rewardAmount, 'number');
   assert(
     (await wallet.listTransactions({ transactionTypes: ['REFILL', 'SPEND'], page: 1, size: 20 }))
       .records.length > 0

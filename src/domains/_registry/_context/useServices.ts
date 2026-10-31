@@ -22,6 +22,7 @@ import type { ISkillService } from '@/domains/Skill';
 import type { ISpeechService } from '@/domains/Speech';
 import type { ITagService } from '@/domains/Tag';
 import type { IUserService } from '@/domains/User';
+import type { IUserTaskService } from '@/domains/UserTask';
 import type { IWalletService } from '@/domains/Wallet';
 import { useRequiredContext } from '@/hooks/useRequiredContext';
 
@@ -64,5 +65,6 @@ export const useSkillService = (): ISkillService => useServicesContext().skillSe
 export const useSpeechService = (): ISpeechService => useServicesContext().speechService;
 export const useTagService = (): ITagService => useServicesContext().tagService;
 export const useUserService = (): IUserService => useServicesContext().userService;
+export const useUserTaskService = (): IUserTaskService => useServicesContext().userTaskService;
 /** 个人中心钱包、高级组 token 相关页注入 */
 export const useWalletService = (): IWalletService => useServicesContext().walletService;

@@ -6,8 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import { AppButton, AppIconButton } from '@/components/base/Button';
-import { useUserService } from '@/domains';
-import type { UserTaskCheckInResult, UserTaskRewardPreview } from '@/domains/User';
+import { useUserTaskService } from '@/domains';
+import type { UserTaskCheckInResult, UserTaskRewardPreview } from '@/domains/UserTask';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.scss';
@@ -45,7 +45,7 @@ const getRandomRewardText = (preview: UserTaskRewardPreview, rollingMemes: strin
 
 function UserCheckIn() {
   const { t } = useTranslation(['shell', 'common']);
-  const userService = useUserService();
+  const userTaskService = useUserTaskService();
   const rollingMemes = getRollingMemes(t('checkIn.rollingMemes', { returnObjects: true }));
   const [isOpen, setIsOpen] = useState(false);
   const [canCheckIn, setCanCheckIn] = useState(false);
@@ -57,7 +57,7 @@ function UserCheckIn() {
 
   const { loading: loadingStatus } = useApi(
     async () => {
-      const task = (await userService.listTaskStatus()).find(
+      const task = (await userTaskService.listTaskStatus()).find(
         (item) => item.taskCode === 'DAILY_CHECK_IN'
       );
       return task;
@@ -73,13 +73,16 @@ function UserCheckIn() {
     }
   );
 
-  const { loading: checkingIn, run: runCheckIn } = useApi(async () => userService.dailyCheckIn(), {
-    manual: true,
-    onSuccess: (nextResult) => {
-      setResult(nextResult);
-      setCanCheckIn(false);
-    },
-  });
+  const { loading: checkingIn, run: runCheckIn } = useApi(
+    async () => userTaskService.dailyCheckIn(),
+    {
+      manual: true,
+      onSuccess: (nextResult) => {
+        setResult(nextResult);
+        setCanCheckIn(false);
+      },
+    }
+  );
 
   useInterval(
     () => {

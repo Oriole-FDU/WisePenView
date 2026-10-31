@@ -7,16 +7,6 @@ export type {
   UserProfileInfo,
   UserSearchUser,
 } from './entity/user';
-export type {
-  UserTaskCheckInResult,
-  UserTaskCode,
-  UserTaskOnceStatus,
-  UserTaskPeriodicStatus,
-  UserTaskRewardPreview,
-  UserTaskRewardType,
-  UserTaskStatus,
-  UserTaskType,
-} from './entity/userTask';
 export type { TourCode, UserTourStatus } from './entity/userTour';
 export type {
   DegreeLevel,

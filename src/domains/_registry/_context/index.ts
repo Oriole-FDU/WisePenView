@@ -25,5 +25,6 @@ export {
   useSpeechService,
   useTagService,
   useUserService,
+  useUserTaskService,
   useWalletService,
 } from './useServices';

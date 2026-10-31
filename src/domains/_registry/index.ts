@@ -32,6 +32,7 @@ export {
   useSpeechService,
   useTagService,
   useUserService,
+  useUserTaskService,
   useWalletService,
 } from './_context';
 export { ServicesProvider } from './_context';

@@ -1,6 +1,5 @@
 import type { UserInviteRecordList } from '../entity/invite';
 import type { User, UserAccountProfile, UserSearchUser } from '../entity/user';
-import type { UserTaskCheckInResult, UserTaskStatus } from '../entity/userTask';
 import type { TourCode, UserTourStatus } from '../entity/userTour';
 import type { DegreeLevel, FeedbackType, Sex } from '../enum';
 
@@ -27,8 +26,6 @@ export interface IUserService {
   checkFudanUISVerify(): Promise<FudanUISVerifyStatusData>;
   confirmEmailVerify(params: ConfirmEmailVerifyRequest): Promise<void>;
   submitFeedback(params: SubmitFeedbackRequest): Promise<void>;
-  listTaskStatus(): Promise<UserTaskStatus[]>;
-  dailyCheckIn(): Promise<UserTaskCheckInResult>;
   listTourStatus(): Promise<UserTourStatus[]>;
   completeTour(tourCode: TourCode): Promise<void>;
 }

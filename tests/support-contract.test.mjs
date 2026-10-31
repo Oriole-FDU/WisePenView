@@ -20,7 +20,7 @@ try {
         export {
           DailyCheckInApiContract,
           ListUserTaskStatusApiContract,
-        } from '@/domains/User/apis/UserTaskApi.contract';
+        } from '@/domains/UserTask/apis/UserTaskApi.contract';
         export {
           CompleteTourApiContract,
           ListUserTourStatusApiContract,
@@ -35,12 +35,12 @@ try {
           RedeemVoucherApiContract,
           TransferTokenBetweenGroupAndUserApiContract,
         } from '@/domains/Wallet/apis/WalletApi.contract';
-        export { ListUserTaskStatusApiContract as TaskContract } from '@/domains/User/apis/UserTaskApi.contract';
+        export { ListUserTaskStatusApiContract as TaskContract } from '@/domains/UserTask/apis/UserTaskApi.contract';
         export { ListUserTourStatusApiContract as TourContract } from '@/domains/User/apis/UserTourApi.contract';
         export { ListUserMessagesApiContract as MessageContract } from '@/domains/Message/apis/MessageApi.contract';
         export { ListTransactionsApiContract as WalletContract } from '@/domains/Wallet/apis/WalletApi.contract';
         export { MessageApi } from '@/domains/Message/mock/MessageApi.mock';
-        export { UserTaskApi } from '@/domains/User/mock/UserTaskApi.mock';
+        export { UserTaskApi } from '@/domains/UserTask/mock/UserTaskApi.mock';
         export { UserTourApi } from '@/domains/User/mock/UserTourApi.mock';
         export { WalletApi } from '@/domains/Wallet/mock/WalletApi.mock';
       `,

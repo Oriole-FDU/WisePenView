@@ -28,6 +28,7 @@ export {
   useSpeechService,
   useTagService,
   useUserService,
+  useUserTaskService,
   useWalletService,
 } from './_registry';
 export type { HtmlPageDisplayInfo, HtmlPageVersionInfo, IHtmlPageService } from './HtmlPage';

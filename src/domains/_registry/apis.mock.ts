@@ -28,6 +28,6 @@ export { SkillApi } from '@/domains/Skill/mock/SkillApi.mock';
 export { SpeechApi } from '@/domains/Speech/mock/SpeechApi.mock';
 export { TagApi } from '@/domains/Tag/mock/TagApi.mock';
 export { UserApi } from '@/domains/User/mock/UserApi.mock';
-export { UserTaskApi } from '@/domains/User/mock/UserTaskApi.mock';
 export { UserTourApi } from '@/domains/User/mock/UserTourApi.mock';
+export { UserTaskApi } from '@/domains/UserTask/mock/UserTaskApi.mock';
 export { WalletApi } from '@/domains/Wallet/mock/WalletApi.mock';
