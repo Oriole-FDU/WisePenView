@@ -1,17 +1,8 @@
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
-import type {
-  ListUserMessagesApiRequest,
-  ListUserMessagesApiResponse,
-  ReadMessageApiRequest,
-  UserMessageApiModel,
-} from '../apis/MessageApi.type';
+import type { ListUserMessagesApiResponse, UserMessageApiModel } from '../apis/MessageApi.schema';
 import type { UserMessage } from '../entity/message';
-import type {
-  ListUserMessagesRequest,
-  ListUserMessagesResponse,
-  ReadMessagesRequest,
-} from '../service/index.type';
+import type { ListUserMessagesResponse } from '../service/index.type';
 import { normalizeMessageType } from './messageType.mapper';
 
 const mapUserMessageApiModelToEntity = (raw: UserMessageApiModel): UserMessage => ({
@@ -26,13 +17,6 @@ const mapUserMessageApiModelToEntity = (raw: UserMessageApiModel): UserMessage =
   createTime: raw.createTime ?? undefined,
 });
 
-const mapListUserMessagesRequest = (
-  params: ListUserMessagesRequest
-): ListUserMessagesApiRequest => ({
-  page: params.page,
-  size: params.size,
-});
-
 const mapListUserMessagesFromApi = (
   data: ListUserMessagesApiResponse
 ): ListUserMessagesResponse => ({
@@ -43,12 +27,6 @@ const mapListUserMessagesFromApi = (
   totalPage: data.totalPage,
 });
 
-const mapReadMessagesRequest = (params: ReadMessagesRequest): ReadMessageApiRequest => ({
-  messageIds: params.messageIds,
-});
-
 export const MessageServicesMap = {
-  mapListUserMessagesRequest,
   mapListUserMessagesFromApi,
-  mapReadMessagesRequest,
 };

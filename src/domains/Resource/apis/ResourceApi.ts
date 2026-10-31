@@ -4,6 +4,9 @@ import {
   ChangeResourceActionPermissionApiContract,
   type ChangeResourceActionPermissionApiContractRequest,
   type ChangeResourceActionPermissionApiContractResponse,
+  GetResourceBaseInfoApiContract,
+  type GetResourceBaseInfoApiContractRequest,
+  type GetResourceBaseInfoApiContractResponse,
   GlobalSearchResourcesApiContract,
   type GlobalSearchResourcesApiContractRequest,
   type GlobalSearchResourcesApiContractResponse,
@@ -19,6 +22,12 @@ import {
 } from './ResourceCoreApi.contract';
 
 // /resource/item/*
+
+async function getResourceBaseInfo(
+  req: GetResourceBaseInfoApiContractRequest
+): Promise<GetResourceBaseInfoApiContractResponse> {
+  return executeApiContract(GetResourceBaseInfoApiContract, req);
+}
 
 const serializeListResourcesQuery = (params: Record<string, unknown>): string => {
   const searchParams = new URLSearchParams();
@@ -72,6 +81,7 @@ async function globalSearch(
 }
 
 export const ResourceItemApi = {
+  getResourceBaseInfo,
   listResources,
   renameResource,
   changeResourceActionPermission,

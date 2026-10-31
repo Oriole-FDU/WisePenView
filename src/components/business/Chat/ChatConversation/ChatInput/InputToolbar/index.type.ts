@@ -1,4 +1,4 @@
-import type { ChatAgentOption, ChatInputCapabilityOptions } from '@/domains/Chat';
+import type { ChatAgentOption, ChatInputCapabilityOptions } from '@/domains/ChatConfig';
 
 import type { VoiceInputProps } from '../VoiceInput';
 

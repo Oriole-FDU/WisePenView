@@ -1,13 +1,13 @@
 import { useShallow } from 'zustand/react/shallow';
 
 import ModelSelector from '@/components/business/ModelSelector';
-import { useChatService } from '@/domains';
+import { useChatConfigService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 
 function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const store = useChatInputStoreApi();
   const { availableModels, modelOpen, selectedModelId } = useChatInputStore(
     useShallow((state) => ({
@@ -17,7 +17,7 @@ function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {
     }))
   );
   const { setModelOpen, setSelectedModelId } = store.getState();
-  const { loading } = useApi(() => chatService.getModels(), {
+  const { loading } = useApi(() => chatConfigService.getModels(), {
     onSuccess: (nextModels) => {
       const state = store.getState();
       state.setAvailableModels(nextModels);

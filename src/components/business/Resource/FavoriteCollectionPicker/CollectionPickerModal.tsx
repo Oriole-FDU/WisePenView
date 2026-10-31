@@ -8,7 +8,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
 import { InlineInput } from '@/components/base/Input';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
-import type { FavoriteCollection } from '@/domains/Interact';
+import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
 import styles from './style.module.scss';
 

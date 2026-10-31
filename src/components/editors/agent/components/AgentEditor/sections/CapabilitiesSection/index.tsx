@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import type { AgentSpec } from '@/domains/Agent';
-import type { ToolOption } from '@/domains/Chat';
+import type { ToolOption } from '@/domains/ChatConfig';
 import type { SkillSummary } from '@/domains/Skill';
 
 import CapabilityPolicyPanel, { type CapabilityPolicyOption } from './CapabilityPolicyPanel';

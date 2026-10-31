@@ -1,5 +1,13 @@
-import { apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
+import {
+  MountResourcesToGroupApiContract,
+  MovePersonalResourcesToTrashApiContract,
+  MoveResourcesInGroupApiContract,
+  ReplacePersonalNormalTagsApiContract,
+  SetPersonalResourcesPathTagApiContract,
+  UnmountResourcesToGroupApiContract,
+} from './ResourcePlacementApi.contract';
 import type {
   MountResourcesToGroupApiRequest,
   MovePersonalResourcesToTrashApiRequest,
@@ -8,44 +16,42 @@ import type {
   ResourcePlacementApiResponse,
   SetPersonalResourcesPathTagApiRequest,
   UnmountResourcesToGroupApiRequest,
-} from './ResourcePlacementApi.type';
-
-const BASE_URL = '/resource/placement';
+} from './ResourcePlacementApi.schema';
 
 function setPersonalResourcesPathTag(
   req: SetPersonalResourcesPathTagApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPostUnchecked(`${BASE_URL}/setPersonalResourcesPathTag`, req);
+  return executeApiContract(SetPersonalResourcesPathTagApiContract, req);
 }
 
 function movePersonalResourcesToTrash(
   req: MovePersonalResourcesToTrashApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPostUnchecked(`${BASE_URL}/movePersonalResourcesToTrash`, req);
+  return executeApiContract(MovePersonalResourcesToTrashApiContract, req);
 }
 
 function replacePersonalNormalTags(
   req: ReplacePersonalNormalTagsApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPostUnchecked(`${BASE_URL}/replacePersonalNormalTags`, req);
+  return executeApiContract(ReplacePersonalNormalTagsApiContract, req);
 }
 
 function mountResourcesToGroup(
   req: MountResourcesToGroupApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPostUnchecked(`${BASE_URL}/mountResourcesToGroup`, req);
+  return executeApiContract(MountResourcesToGroupApiContract, req);
 }
 
 function unmountResourcesToGroup(
   req: UnmountResourcesToGroupApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPostUnchecked(`${BASE_URL}/unmountResourcesToGroup`, req);
+  return executeApiContract(UnmountResourcesToGroupApiContract, req);
 }
 
 function moveResourcesInGroup(
   req: MoveResourcesInGroupApiRequest
 ): Promise<ResourcePlacementApiResponse> {
-  return apiPostUnchecked(`${BASE_URL}/moveResourcesInGroup`, req);
+  return executeApiContract(MoveResourcesInGroupApiContract, req);
 }
 
 export const ResourcePlacementApi = {

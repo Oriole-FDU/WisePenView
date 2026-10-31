@@ -13,12 +13,11 @@ import type {
   WalletBusinessTypeApiValue,
   WalletTransactionRecordApiResponse,
   WalletTransactionTypeApiValue,
-} from '../apis/WalletApi.type';
+} from '../apis/WalletApi.schema';
 import type {
   GetWalletInfoResponse,
   ListWalletTransactionsRequest,
   ListWalletTransactionsResponse,
-  RedeemVoucherRequest,
   TransferTokenBetweenGroupAndUserRequest,
 } from '../service/index.type';
 
@@ -93,10 +92,6 @@ const mapGetUserWalletInfoFromApi = (data: GetUserWalletInfoApiResponse): GetWal
   return { tokenBalance, tokenUsed, balance: tokenBalance };
 };
 
-const mapRedeemVoucherRequest = (params: RedeemVoucherRequest): { voucherCode: string } => ({
-  voucherCode: params.voucherCode,
-});
-
 const mapListTransactionsRequest = (
   params: ListWalletTransactionsRequest
 ): ListTransactionsApiRequest => {
@@ -142,7 +137,6 @@ const mapTransferTokenBetweenGroupAndUserRequest = (
 
 export const WalletServicesMap = {
   mapGetUserWalletInfoFromApi,
-  mapRedeemVoucherRequest,
   mapListTransactionsRequest,
   mapListTransactionsFromApi,
   mapTransferTokenBetweenGroupAndUserRequest,

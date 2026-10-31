@@ -8,7 +8,7 @@ import {
 
 /**
  * 负责权限编辑器中的动作过滤、高低阶联动与集合比较。
- * 后端动作名称校验由 AccessPolicy.parser 处理。
+ * 后端动作名称由各领域 API Contract 校验。
  */
 export type ConfigurableResourceAction = Exclude<
   ResourceAction,

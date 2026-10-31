@@ -18,7 +18,7 @@ Note 专用批注的 session、mapper 与 Yjs 锚点桥接统一由 [Note editor
 
 ## 权限、协同与保存提示
 
-- `canCollaborativeEdit` 取决于正规化后的 `currentActions` 是否含 EDIT，不是 owner ID 比对；NOTE／DRAWIO 自身权限概览沿用 Resource mapper。这是前端推导，不代替后端授权。依据：[mapNoteInfoDisplayFromApi](mapper/NoteServices.map.ts)、[mapNotePermissionOverviewFromApi](mapper/NoteServices.map.ts)。
+- `canCollaborativeEdit` 取决于正规化后的 `currentActions` 是否含 EDIT，不是 owner ID 比对；NOTE／DRAWIO 只向 ResourceAccess 提供资源摘要，不自行构造权限概览。这是前端推导，不代替后端授权。依据：[mapNoteInfoDisplayFromApi](mapper/NoteServices.map.ts)、[ResourceAccess](../ResourceAccess/BUSINESS.md)。
 - IDB room 以 account 与 resource 隔离；没有 actor ID 或使用 local mock preview 时不建立 IDB。这不承诺离线冷启动能打开笔记。依据：[noteYjsIdbRoomName](session/useNoteSession.ts)、[useNoteSession](session/useNoteSession.ts)。
 - WebSocket 的 connected 事件仍让协同观察器保持 connecting，收到非 false 的 sync 事件才上报 connected。IDB hydration、连接状态与正文保存提示是不同概念。依据：[NoteStatusObserver](session/NoteStatusObserver.ts)、[useNoteSession](session/useNoteSession.ts)。
 - 正文 `saved` 根据本地 Yjs 更新、连接与 WebSocket 发送队列推估；断线可进入 waiting，没有后端持久化 ACK。不能把此提示当成内容已写入正式存储的证明。依据：[NoteSaveStatusObserver](session/NoteSaveStatusObserver.ts)。

@@ -1,5 +1,5 @@
 import type { AccessControlScope, ResourceAction } from '@/domains/_shared/access';
-import type { ResourceAccessRole, ResourceIconType } from '@/domains/Resource';
+import type { ResourceIconType } from '@/domains/Resource';
 import type { UserDisplayBase } from '@/domains/User';
 
 export type DriveSystemFolderType = 'trash' | 'shared' | 'note' | 'page';
@@ -66,7 +66,6 @@ interface DriveResourceNodeBase extends DriveNodeBase {
   ownerId?: string;
   ownerInfo?: UserDisplayBase;
   currentActions?: ResourceAction[] | null;
-  resourceAccessRole?: ResourceAccessRole;
   /** 当前节点所在目录 tag，用来描述资源是主挂载还是辅助挂载。 */
   mountTagId: string;
 }

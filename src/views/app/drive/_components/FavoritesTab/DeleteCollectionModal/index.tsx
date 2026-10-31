@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Checkbox } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
-import { useInteractService } from '@/domains';
+import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 interface DeleteCollectionModalProps {
@@ -21,11 +21,11 @@ function DeleteCollectionModal({
   onSuccess,
 }: DeleteCollectionModalProps) {
   const { t } = useTranslation(['resource', 'common']);
-  const interactService = useInteractService();
+  const favoriteService = useResourceFavoriteService();
   const [keepResources, setKeepResources] = useState(false);
   const { loading, run: remove } = useApi(
     () =>
-      interactService.deleteFavoriteCollection({
+      favoriteService.deleteFavoriteCollection({
         collectionId,
         keepResourcesToDefault: keepResources,
       }),

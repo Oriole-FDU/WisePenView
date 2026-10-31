@@ -1,4 +1,4 @@
-import { useInteractService, useSkillService, useUserService } from '@/domains';
+import { useResourceInteractionService, useSkillService, useUserService } from '@/domains';
 import type { SkillDetail } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
 
@@ -10,7 +10,7 @@ interface SkillResourceData {
 
 export function useSkillResourceController(resourceId: string) {
   const skillService = useSkillService();
-  const interactService = useInteractService();
+  const interactionService = useResourceInteractionService();
   const userService = useUserService();
 
   const {
@@ -36,7 +36,7 @@ export function useSkillResourceController(resourceId: string) {
     }
   );
 
-  useApi(() => interactService.recordResourceRead(resourceId), {
+  useApi(() => interactionService.recordResourceRead(resourceId), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });

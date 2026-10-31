@@ -19,12 +19,16 @@ try {
         export { parseApiRequest, parseApiResponse } from '@/apis/contract';
         export {
           ChangeResourceActionPermissionApiContract,
+          GetResourceBaseInfoApiContract,
           GlobalSearchResourcesApiContract,
           ListResourcesApiContract,
           RemoveResourcesApiContract,
           RenameResourceApiContract,
         } from '@/domains/Resource/apis/ResourceCoreApi.contract';
-        export { ChangeResourceActionPermissionApiRequestSchema } from '@/domains/Resource/apis/ResourceCoreApi.schema';
+        export {
+          ChangeResourceActionPermissionApiRequestSchema,
+          ResourceItemApiSchema,
+        } from '@/domains/Resource/apis/ResourceCoreApi.schema';
         export { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
         export { ResourceItemApi } from '@/domains/Resource/mock/ResourceApi.mock';
       `,
@@ -40,6 +44,7 @@ try {
   const {
     ChangeResourceActionPermissionApiContract,
     ChangeResourceActionPermissionApiRequestSchema,
+    GetResourceBaseInfoApiContract,
     GlobalSearchResourcesApiContract,
     ListResourcesApiContract,
     parseApiRequest,
@@ -47,10 +52,15 @@ try {
     RemoveResourcesApiContract,
     RenameResourceApiContract,
     ResourceItemApi,
+    ResourceItemApiSchema,
     ResourceServicesMap,
   } = await import(pathToFileURL(outfile).href);
 
-  for (const contract of [ListResourcesApiContract, GlobalSearchResourcesApiContract]) {
+  for (const contract of [
+    GetResourceBaseInfoApiContract,
+    ListResourcesApiContract,
+    GlobalSearchResourcesApiContract,
+  ]) {
     assert.equal(contract.method, 'GET');
     assert.equal(contract.requestPlacement, 'query');
   }
@@ -88,6 +98,7 @@ try {
 
   const resourceItem = {
     resourceId: 'resource-1',
+    createTime: 1_779_483_700_000,
     resourceName: '数据结构.pdf',
     resourceType: 'PDF',
     ownerId: '10086',
@@ -116,6 +127,7 @@ try {
       {
         groupId: 'p_10086',
         primaryTagId: 'tag-1',
+        aiBillingApproved: false,
         tags: {
           'tag-1': {
             groupId: 'p_10086',
@@ -147,6 +159,21 @@ try {
   });
   assert.equal(mappedPage.list[0].size, 2048);
   assert.equal(mappedPage.list[0].mainTagId, 'tag-1');
+
+  const parsedBase = parseApiResponse(GetResourceBaseInfoApiContract, resourceItem);
+  assert.equal(parsedBase.createTime, 1_779_483_700_000);
+  assert(
+    !GetResourceBaseInfoApiContract.response.safeParse({
+      ...resourceItem,
+      createTime: '1779483700000',
+    }).success
+  );
+  assert(
+    !ResourceItemApiSchema.safeParse({
+      ...resourceItem,
+      tagBinds: [{ ...resourceItem.tagBinds[0], aiBillingApproved: undefined }],
+    }).success
+  );
 
   const numericSize = structuredClone(listResponse);
   numericSize.list[0].size = 2048;

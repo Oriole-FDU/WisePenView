@@ -1,12 +1,13 @@
-import type { ResourceItem, ResourcePermissionOverview } from '@/domains/Resource';
+import type { ResourceItem } from '@/domains/Resource';
+import type { ResourceItemApi } from '@/domains/Resource/apis/ResourceCoreApi.schema';
 
-import type { SingleHtmlPageStatusApiValue } from '../apis/HtmlPageApi.type';
+import type { SingleHtmlPageStatusApiValue } from '../apis/HtmlPageApi.schema';
 
 export interface HtmlPageVersionInfo {
   version: number;
   status: SingleHtmlPageStatusApiValue;
   size?: number;
-  updateTime?: string;
+  updateTime?: number;
   lastEditedAtText: string;
 }
 
@@ -19,7 +20,7 @@ export interface HtmlPageDisplayInfo {
 export interface IHtmlPageService {
   getHtmlPageInfo(resourceId: string, targetVersion?: number): Promise<HtmlPageDisplayInfo>;
   getHtmlPageContent(resourceId: string, targetVersion?: number): Promise<string>;
-  getHtmlPagePermissionOverview(resourceId: string): Promise<ResourcePermissionOverview>;
+  getResourceAccessInfo(resourceId: string): Promise<ResourceItemApi>;
 }
 
 /** 只有存在当前版本且该版本已完成资源注册时才允许读取正文。 */

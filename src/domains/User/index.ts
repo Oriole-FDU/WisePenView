@@ -8,19 +8,9 @@ export type {
   UserSearchUser,
 } from './entity/user';
 export type {
-  UserTaskCheckInResult,
-  UserTaskCode,
-  UserTaskOnceStatus,
-  UserTaskPeriodicStatus,
-  UserTaskRewardPreview,
-  UserTaskRewardType,
-  UserTaskStatus,
-  UserTaskType,
-} from './entity/userTask';
-export type { TourCode, UserTourStatus } from './entity/userTour';
-export type {
   DegreeLevel,
   FeedbackType,
+  IdentityType,
   Sex,
   UserStatus,
   UserVerificationMode,
@@ -31,20 +21,19 @@ export {
   FEEDBACK_TYPE,
   IDENTITY,
   SEX,
+  USER_INVITE_STATUS,
+  USER_READONLY_FIELD,
   USER_STATUS,
   USER_VERIFICATION,
   USER_VERIFICATION_PROVIDER,
 } from './enum';
+export { normalizeUserDisplayBaseFromApi } from './mapper/userEnum.mapper';
 export type {
-  ConfirmEmailVerifyRequest,
-  FudanUISVerifyStatusData,
-  InitiateUISVerifyRequest,
   IUserService,
   ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
-  SendEmailVerifyRequest,
   SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from './service/index.type';

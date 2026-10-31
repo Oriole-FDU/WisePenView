@@ -4,7 +4,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { computeFileMd5 } from '@/utils/file/computeFileMd5';
 import { parseExtension } from '@/utils/file/parseExtension';
 
-import type { UploadDocApiRequest, UploadDocApiResponse } from '../apis/DocumentApi.type';
+import type { UploadDocApiRequest, UploadDocApiResponse } from '../apis/DocumentApi.schema';
 import { DocumentServicesMap } from '../mapper/DocumentServices.map';
 import type {
   DocDisplayInfoResponse,
@@ -22,7 +22,7 @@ const isAllowedExtension = (ext: string): ext is DocumentAllowedExtension =>
 
 const DOCUMENT_MAX_FILE_BYTES = 100 * 1024 * 1024;
 
-const assertDocumentUploadAllowed = (file: File): void => {
+const assertDocumentUploadAllowed = (file: File): DocumentAllowedExtension => {
   if (file.size > DOCUMENT_MAX_FILE_BYTES) {
     throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_FILE_TOO_LARGE);
   }
@@ -30,6 +30,7 @@ const assertDocumentUploadAllowed = (file: File): void => {
   if (!isAllowedExtension(ext)) {
     throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_UNSUPPORTED_TYPE);
   }
+  return ext;
 };
 
 const initUpload = async (body: UploadDocApiRequest): Promise<UploadDocApiResponse> => {
@@ -42,10 +43,9 @@ const initUpload = async (body: UploadDocApiRequest): Promise<UploadDocApiRespon
 
 const uploadDocument = async (params: UploadDocumentParams): Promise<string> => {
   const { file, pathTagId, onUploadInitialized, onUploadProgress } = params;
-  assertDocumentUploadAllowed(file);
+  const extension = assertDocumentUploadAllowed(file);
 
   const md5 = await computeFileMd5(file);
-  const extension = parseExtension(file.name);
 
   const init = await initUpload(
     DocumentServicesMap.mapUploadDocToApi({
@@ -112,11 +112,9 @@ const forkDocument: IDocumentService['forkDocument'] = async (params) => {
   return DocumentApi.forkDocument(params);
 };
 
-const getDocPermissionOverview: IDocumentService['getDocPermissionOverview'] = async (
-  resourceId
-) => {
+const getResourceAccessInfo: IDocumentService['getResourceAccessInfo'] = async (resourceId) => {
   const data = await DocumentApi.getDocInfo({ resourceId });
-  return DocumentServicesMap.mapDocPermissionOverviewFromApi(data, resourceId);
+  return data.resourceInfo;
 };
 
 const getOnlyOfficeEditorConfig = async (resourceId: string) => {
@@ -130,7 +128,7 @@ export const createDocumentServices = (): IDocumentService => ({
   retryPendingDoc,
   cancelPendingDoc,
   getDocInfo,
-  getDocPermissionOverview,
+  getResourceAccessInfo,
   forkDocument,
   getOnlyOfficeEditorConfig,
 });

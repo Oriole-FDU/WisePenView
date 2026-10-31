@@ -1,13 +1,13 @@
 import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
 
 import type { MessageApi as MessageApiContract } from '../apis/MessageApi';
-import type { UserMessageApiModel } from '../apis/MessageApi.type';
+import type { UserMessageApiModel } from '../apis/MessageApi.schema';
 
 const now = Date.now();
 
 const mockMessages: UserMessageApiModel[] = [
   {
-    messageId: 'mock-message-1',
+    messageId: '80001',
     deliveryScope: 'ALL_USERS',
     messageType: 'SYSTEM',
     title: 'WisePen 系统维护与功能更新公告',
@@ -32,10 +32,11 @@ WisePen 将在 **今晚 23:30 - 23:50** 进行一次短暂维护。维护期间�
 维护结束后无需重新登录。若遇到异常，可先刷新页面，或通过用户反馈联系我们。`,
     jumpUrl: '/drive/personal',
     readTime: null,
+    extra: null,
     createTime: now,
   },
   {
-    messageId: 'mock-message-2',
+    messageId: '80002',
     deliveryScope: 'DIRECT',
     messageType: 'NORMAL',
     title: '课程资料已更新',
@@ -46,8 +47,10 @@ WisePen 将在 **今晚 23:30 - 23:50** 进行一次短暂维护。维护期间�
 - 关联任务：课堂讨论准备
 
 请进入课程页面查看详情，并根据材料中的检查项更新自己的学习笔记。`,
-    readTime: new Date(now).toISOString(),
+    jumpUrl: null,
+    readTime: now,
     createTime: now - 86_400_000,
+    extra: null,
   },
 ];
 
@@ -55,7 +58,6 @@ export const MessageApi: typeof MessageApiContract = {
   listUserMessages: (params) => mockResponse(mockPage(mockMessages, params)),
   readMessage: async ({ messageIds }) => {
     for (const message of mockMessages)
-      if (messageIds.includes(String(message.messageId)))
-        message.readTime = new Date().toISOString();
+      if (messageIds.includes(String(message.messageId))) message.readTime = Date.now();
   },
 };

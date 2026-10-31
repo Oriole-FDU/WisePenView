@@ -23,7 +23,6 @@ import AuthenticatedRouteGuard from '@/views/app/guard/AuthenticatedRouteGuard';
 const UserManagement = lazy(() => import('@/views/admin/UserManagement'));
 const ResourceManagement = lazy(() => import('@/views/admin/ResourceManagement'));
 const GroupManagement = lazy(() => import('@/views/admin/GroupManagement'));
-const AnnouncementManagement = lazy(() => import('@/views/admin/AnnouncementManagement'));
 const DataStatistics = lazy(() => import('@/views/admin/DataStatistics'));
 const PermissionManagement = lazy(() => import('@/views/admin/PermissionManagement'));
 const SystemSettings = lazy(() => import('@/views/admin/SystemSettings'));
@@ -377,7 +376,6 @@ const router = createBrowserRouter([
           { path: 'users', element: <UserManagement /> },
           { path: 'resources', element: <ResourceManagement /> },
           { path: 'groups', element: <GroupManagement /> },
-          { path: 'announcements', element: <AnnouncementManagement /> },
           { path: 'statistics', element: <DataStatistics /> },
           { path: 'permissions', element: <PermissionManagement /> },
           { path: 'settings', element: <SystemSettings /> },

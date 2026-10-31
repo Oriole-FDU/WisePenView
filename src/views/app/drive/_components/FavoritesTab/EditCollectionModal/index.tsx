@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useInteractService } from '@/domains';
-import type { FavoriteCollection } from '@/domains/Interact';
+import { useResourceFavoriteService } from '@/domains';
+import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.scss';
@@ -18,7 +18,7 @@ interface EditCollectionModalProps {
 
 function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollectionModalProps) {
   const { t } = useTranslation(['resource', 'common']);
-  const interactService = useInteractService();
+  const favoriteService = useResourceFavoriteService();
   const isCreate = collection == null;
   const [name, setName] = useState(collection?.collectionName ?? '');
   const [description, setDescription] = useState(collection?.description ?? '');
@@ -27,12 +27,12 @@ function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollec
       const trimmedName = name.trim();
       const trimmedDescription = description.trim();
       if (isCreate) {
-        await interactService.createFavoriteCollection({
+        await favoriteService.createFavoriteCollection({
           collectionName: trimmedName,
           description: trimmedDescription || null,
         });
       } else {
-        await interactService.updateFavoriteCollection({
+        await favoriteService.updateFavoriteCollection({
           collectionId: collection.collectionId,
           collectionName: trimmedName,
           description: trimmedDescription || null,

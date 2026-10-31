@@ -3,8 +3,9 @@ import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import { AppPressable } from '@/components/base/Button';
-import { useChatService } from '@/domains';
-import type { ChatSession, PageResult } from '@/domains/Chat';
+import { useChatSessionService } from '@/domains';
+import type { PageResult } from '@/domains/_shared/entity/page';
+import type { ChatSession } from '@/domains/ChatSession';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import styles from '../../style.module.scss';
@@ -24,7 +25,7 @@ const formatSessionTime = (session: ChatSession): string => {
 
 function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessionBarProps) {
   const { t } = useTranslation('chat');
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const {
     data: sessionPage,
     loading,
@@ -33,7 +34,7 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
     loadMore,
   } = useInfiniteScroll<PageResult<ChatSession>>(
     (current) =>
-      chatService.listSessions({
+      chatSessionService.listSessions({
         page: Math.floor((current?.list.length ?? 0) / SESSION_PAGE_SIZE) + 1,
         size: SESSION_PAGE_SIZE,
       }),

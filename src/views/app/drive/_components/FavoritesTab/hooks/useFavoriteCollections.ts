@@ -1,9 +1,9 @@
-import { useInteractService } from '@/domains';
+import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 export function useFavoriteCollections() {
-  const interactService = useInteractService();
-  const { data, loading, refresh } = useApi(() => interactService.listFavoriteCollections(), {});
+  const favoriteService = useResourceFavoriteService();
+  const { data, loading, refresh } = useApi(() => favoriteService.listFavoriteCollections(), {});
 
   return {
     collections: data ?? [],

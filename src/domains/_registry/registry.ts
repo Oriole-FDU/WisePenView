@@ -13,7 +13,9 @@
 import { createAdminServices } from '@/domains/Admin/service/AdminServices.impl';
 import { createAgentServices } from '@/domains/Agent/service/AgentServices.impl';
 import { createAuthServices } from '@/domains/Auth/service/AuthServices.impl';
-import { createChatServices } from '@/domains/Chat/service/ChatServices.impl';
+import { createChatConfigServices } from '@/domains/ChatConfig/service/ChatConfigServices.impl';
+import { createChatSessionServices } from '@/domains/ChatSession/service/ChatSessionServices.impl';
+import { createChatTurnServices } from '@/domains/ChatTurn/service/ChatTurnServices.impl';
 import { createCourseServices } from '@/domains/Course/service/CourseServices.impl';
 import { createDocumentServices } from '@/domains/Document/service/DocumentServices.impl';
 import { createDriveServices } from '@/domains/Drive/service/DriveServices.impl';
@@ -21,15 +23,20 @@ import { createGroupServices } from '@/domains/Group/service/GroupServices.impl'
 import { createHtmlPageServices } from '@/domains/HtmlPage/service/HtmlPageServices.impl';
 import { createImageServices } from '@/domains/Image/service/ImageServices.impl';
 import { createInlineCommentServices } from '@/domains/InlineComment/service/InlineCommentServices.impl';
-import { createInteractServices } from '@/domains/Interact/service/InteractServices.impl';
 import { createMessageServices } from '@/domains/Message/service/MessageServices.impl';
 import { createNoteServices } from '@/domains/Note/service/NoteServices.impl';
-import { createResourcePermissionServices } from '@/domains/Resource/service/ResourcePermissionServices.impl';
 import { createResourceServices } from '@/domains/Resource/service/ResourceServices.impl';
+import { createResourceAccessServices } from '@/domains/ResourceAccess/service/ResourceAccessServices.impl';
+import { createResourceCommentServices } from '@/domains/ResourceComment/service/ResourceCommentServices.impl';
+import { createResourceFavoriteServices } from '@/domains/ResourceFavorite/service/ResourceFavoriteServices.impl';
+import { createResourceInteractionServices } from '@/domains/ResourceInteraction/service/ResourceInteractionServices.impl';
 import { createSkillServices } from '@/domains/Skill/service/SkillServices.impl';
 import { createSpeechServices } from '@/domains/Speech/service/SpeechServices.impl';
 import { createTagServices } from '@/domains/Tag/service/TagServices.impl';
 import { createUserServices } from '@/domains/User/service/UserServices.impl';
+import { createUserTaskServices } from '@/domains/UserTask/service/UserTaskServices.impl';
+import { createUserTourServices } from '@/domains/UserTour/service/UserTourServices.impl';
+import { createUserVerificationServices } from '@/domains/UserVerification/service/UserVerificationServices.impl';
 import { createWalletServices } from '@/domains/Wallet/service/WalletServices.impl';
 
 import type { ServicesContextValue } from './registry.types';
@@ -43,12 +50,17 @@ const groupService = createGroupServices();
 const htmlPageService = createHtmlPageServices();
 const imageService = createImageServices();
 const inlineCommentService = createInlineCommentServices();
-const interactService = createInteractServices();
+const resourceCommentService = createResourceCommentServices();
+const resourceFavoriteService = createResourceFavoriteServices();
+const resourceInteractionService = createResourceInteractionServices();
 const messageService = createMessageServices();
 const resourceService = createResourceServices();
 const speechService = createSpeechServices();
 const tagService = createTagServices();
 const userService = createUserServices();
+const userTaskService = createUserTaskServices();
+const userTourService = createUserTourServices();
+const userVerificationService = createUserVerificationServices();
 const walletService = createWalletServices();
 
 // Level 1：依赖 Level 0
@@ -56,10 +68,12 @@ const noteService = createNoteServices({ resourceService: resourceService });
 const skillService = createSkillServices({
   resourceService: resourceService,
 });
-const chatService = createChatServices({
-  groupService: groupService,
-  resourceService: resourceService,
+const chatConfigService = createChatConfigServices({
+  groupService,
+  resourceService,
 });
+const chatSessionService = createChatSessionServices();
+const chatTurnService = createChatTurnServices();
 
 const driveService = createDriveServices({
   tagService: tagService,
@@ -67,13 +81,13 @@ const driveService = createDriveServices({
 });
 const courseService = createCourseServices({
   groupService: groupService,
-  interactService: interactService,
+  resourceInteractionService,
   resourceService: resourceService,
   tagService: tagService,
 });
 
 // Level 2：在 Note、Skill 装配后组合权限概览，避免 Resource 与它们相互依赖。
-const resourcePermissionService = createResourcePermissionServices({
+const resourceAccessService = createResourceAccessServices({
   agentService,
   documentService,
   groupService,
@@ -87,7 +101,9 @@ const servicesValue: ServicesContextValue = {
   adminService: adminService,
   agentService: agentService,
   authService: authService,
-  chatService: chatService,
+  chatConfigService,
+  chatSessionService,
+  chatTurnService,
   courseService: courseService,
   documentService: documentService,
   driveService: driveService,
@@ -95,15 +111,20 @@ const servicesValue: ServicesContextValue = {
   htmlPageService: htmlPageService,
   imageService: imageService,
   inlineCommentService: inlineCommentService,
-  interactService: interactService,
   messageService: messageService,
   noteService: noteService,
-  resourcePermissionService,
+  resourceAccessService,
+  resourceCommentService,
+  resourceFavoriteService,
+  resourceInteractionService,
   resourceService: resourceService,
   skillService: skillService,
   speechService: speechService,
   tagService: tagService,
   userService: userService,
+  userTaskService,
+  userTourService,
+  userVerificationService,
   walletService: walletService,
 };
 

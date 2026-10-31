@@ -1,35 +1,44 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  ChangeAdminUserInfoApiRequest,
-  ChangeAdminUserProfileApiRequest,
-  FetchAdminUserListApiRequest,
-  FetchAdminUserListApiResponse,
-  GetAdminUserInfoApiRequest,
-  GetAdminUserInfoApiResponse,
-  ResetAdminUserPasswordApiRequest,
-} from './AdminUserApi.type';
+import {
+  ChangeAdminUserInfoApiContract,
+  type ChangeAdminUserInfoApiContractRequest,
+  ChangeAdminUserProfileApiContract,
+  type ChangeAdminUserProfileApiContractRequest,
+  FetchAdminUserListApiContract,
+  type FetchAdminUserListApiContractRequest,
+  type FetchAdminUserListApiContractResponse,
+  GetAdminUserInfoApiContract,
+  type GetAdminUserInfoApiContractRequest,
+  type GetAdminUserInfoApiContractResponse,
+  ResetAdminUserPasswordApiContract,
+  type ResetAdminUserPasswordApiContractRequest,
+} from './AdminUserApi.contract';
 
 /** Admin User API: /admin/user/* */
 
-function getUserList(req: FetchAdminUserListApiRequest): Promise<FetchAdminUserListApiResponse> {
-  return apiGetUnchecked('/admin/user/getUserList', { params: req });
+function getUserList(
+  req: FetchAdminUserListApiContractRequest
+): Promise<FetchAdminUserListApiContractResponse> {
+  return executeApiContract(FetchAdminUserListApiContract, req);
 }
 
-function getUserInfo(req: GetAdminUserInfoApiRequest): Promise<GetAdminUserInfoApiResponse> {
-  return apiGetUnchecked('/admin/user/getUserInfo', { params: req });
+function getUserInfo(
+  req: GetAdminUserInfoApiContractRequest
+): Promise<GetAdminUserInfoApiContractResponse> {
+  return executeApiContract(GetAdminUserInfoApiContract, req);
 }
 
-function changeUserInfo(req: ChangeAdminUserInfoApiRequest): Promise<void> {
-  return apiPostUnchecked('/admin/user/changeUserInfo', req);
+async function changeUserInfo(req: ChangeAdminUserInfoApiContractRequest): Promise<void> {
+  await executeApiContract(ChangeAdminUserInfoApiContract, req);
 }
 
-function changeUserProfile(req: ChangeAdminUserProfileApiRequest): Promise<void> {
-  return apiPostUnchecked('/admin/user/changeUserProfile', req);
+async function changeUserProfile(req: ChangeAdminUserProfileApiContractRequest): Promise<void> {
+  await executeApiContract(ChangeAdminUserProfileApiContract, req);
 }
 
-function resetPassword(req: ResetAdminUserPasswordApiRequest): Promise<void> {
-  return apiPostUnchecked('/admin/user/resetPassword', req);
+async function resetPassword(req: ResetAdminUserPasswordApiContractRequest): Promise<void> {
+  await executeApiContract(ResetAdminUserPasswordApiContract, req);
 }
 
 export const AdminUserApi = {

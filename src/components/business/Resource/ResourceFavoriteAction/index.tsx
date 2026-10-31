@@ -2,7 +2,7 @@ import { toast } from '@heroui/react';
 import { useState } from 'react';
 
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
-import { useInteractService } from '@/domains';
+import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
@@ -19,13 +19,13 @@ function ResourceFavoriteAction({
   onSuccess,
   showLabel = false,
 }: ResourceFavoriteActionProps) {
-  const interactService = useInteractService();
+  const favoriteService = useResourceFavoriteService();
   const [pickerOpen, setPickerOpen] = useState(false);
   const {
     data: collectionIds,
     loading: loadingStatus,
     mutate: mutateCollectionIds,
-  } = useApi(() => interactService.getFavoriteCollectionIds(resourceId), {
+  } = useApi(() => favoriteService.getFavoriteCollectionIds(resourceId), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });
@@ -36,8 +36,8 @@ function ResourceFavoriteAction({
 
   const { loading: loadingUnfavorite, run: unfavorite } = useApi(
     async () => {
-      await interactService.updateFavoriteCollections({ resourceId, collectionIds: [] });
-      return interactService.getFavoriteCollectionIds(resourceId);
+      await favoriteService.updateFavoriteCollections({ resourceId, collectionIds: [] });
+      return favoriteService.getFavoriteCollectionIds(resourceId);
     },
     {
       manual: true,

@@ -19,41 +19,27 @@ const listInlineComments = async (params: ListInlineCommentsRequest) =>
   );
 
 const createInlineComment = async (params: CreateInlineCommentRequest): Promise<string> =>
-  InlineCommentServicesMap.mapCreatedId(
-    await InlineCommentApi.createInlineComment(InlineCommentServicesMap.mapCreateRequest(params)),
-    'inlineCommentId'
-  );
+  InlineCommentApi.createInlineComment(InlineCommentServicesMap.mapCreateRequest(params));
 
 const addInlineCommentItem = async (params: AddInlineCommentItemRequest): Promise<string> =>
-  InlineCommentServicesMap.mapCreatedId(
-    await InlineCommentApi.addInlineCommentItem(InlineCommentServicesMap.mapAddItemRequest(params)),
-    'itemId'
-  );
+  InlineCommentApi.addInlineCommentItem(InlineCommentServicesMap.mapAddItemRequest(params));
 
 const updateInlineCommentItem = (params: UpdateInlineCommentItemRequest): Promise<void> =>
   InlineCommentApi.updateInlineCommentItem(InlineCommentServicesMap.mapUpdateItemRequest(params));
 
 const setInlineCommentItemReaction = (params: SetInlineCommentItemReactionRequest): Promise<void> =>
-  InlineCommentApi.setInlineCommentItemReaction(
-    InlineCommentServicesMap.mapSetReactionRequest(params)
-  );
+  InlineCommentApi.setInlineCommentItemReaction(params);
 
 const deleteInlineCommentItemReaction = (
   params: DeleteInlineCommentItemReactionRequest
-): Promise<void> =>
-  InlineCommentApi.deleteInlineCommentItemReaction(
-    InlineCommentServicesMap.mapDeleteReactionRequest(params)
-  );
+): Promise<void> => InlineCommentApi.deleteInlineCommentItemReaction(params);
 
 const deleteInlineCommentItem = (params: DeleteInlineCommentItemRequest): Promise<void> =>
-  InlineCommentApi.deleteInlineCommentItem(InlineCommentServicesMap.mapDeleteItemRequest(params));
+  InlineCommentApi.deleteInlineCommentItem(params);
 
 const changeInlineCommentResolveStatus = (
   params: ChangeInlineCommentResolveStatusRequest
-): Promise<void> =>
-  InlineCommentApi.changeInlineCommentResolveStatus(
-    InlineCommentServicesMap.mapResolveRequest(params)
-  );
+): Promise<void> => InlineCommentApi.changeInlineCommentResolveStatus(params);
 
 export const createInlineCommentServices = (): IInlineCommentService => ({
   listInlineComments,

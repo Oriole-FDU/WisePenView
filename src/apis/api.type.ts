@@ -19,13 +19,6 @@ export interface PythonApiResponse<T = unknown> {
 /** WisePen 各后端服务可能返回的统一响应体。 */
 export type ApiResponse<T = unknown> = KeyedApiResponse<T> | PythonApiResponse<T>;
 
-/**
- * 数字枚举的历史兼容值。
- *
- * @deprecated 各域迁移到精确 Zod enum 后删除；新接口不得接受 number 与 string 的联合。
- */
-export type NumericEnumApiValue<Value extends number = number> = Value | `${Value}`;
-
 /** Java Long 的 API 值。 */
 export type JavaLongApiValue = string;
 

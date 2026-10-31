@@ -34,6 +34,10 @@ const virtualModules = {
       calls.push({ method: 'DELETE', endpoint, config });
       return null;
     };
+    export const apiGetText = async (endpoint, config) => {
+      calls.push({ method: 'GET_TEXT', endpoint, config });
+      return '';
+    };
 
     export const getCalls = () => calls;
   `,
@@ -49,8 +53,11 @@ try {
 
         import { defineApiContract } from '@/apis/contract';
         import { executeApiContract } from '@/apis/executeApiContract';
-        import { EmptyApiResponseSchema } from '@/apis/schema';
+        import { EmptyApiRequestSchema, EmptyApiResponseSchema } from '@/apis/schema';
+        import { FRONTEND_CLIENT_ERROR } from '@/utils/error';
         import { getCalls } from '@/apis/request';
+
+        export const INTERNAL_STATE_CODE = FRONTEND_CLIENT_ERROR.INTERNAL_STATE;
 
         const queryRequestSchema = z.strictObject({ id: z.string().min(1) });
         const bodyRequestSchema = z.strictObject({ name: z.string().min(1) });
@@ -100,6 +107,24 @@ try {
           request: queryRequestSchema,
           response: EmptyApiResponseSchema,
         });
+        const textContract = defineApiContract({
+          name: 'TextContract',
+          method: 'GET',
+          endpoint: '/example/text',
+          requestPlacement: 'none',
+          transport: 'text',
+          request: EmptyApiRequestSchema,
+          response: z.string(),
+        });
+        const sseContract = defineApiContract({
+          name: 'SseContract',
+          method: 'GET',
+          endpoint: '/example/stream',
+          requestPlacement: 'none',
+          transport: 'sse',
+          request: EmptyApiRequestSchema,
+          response: EmptyApiResponseSchema,
+        });
 
         export const run = async () => {
           await executeApiContract(getContract, { id: '1' }, { timeout: 1_000 });
@@ -107,7 +132,17 @@ try {
           await executeApiContract(putContract, { name: 'demo' });
           await executeApiContract(patchContract, { name: 'demo' });
           await executeApiContract(deleteContract, { id: '1' });
+          await executeApiContract(textContract, undefined);
           return getCalls();
+        };
+
+        export const runSse = async () => {
+          try {
+            await executeApiContract(sseContract, undefined);
+            return null;
+          } catch (error) {
+            return error.code;
+          }
         };
       `,
       resolveDir: root,
@@ -136,7 +171,7 @@ try {
     ],
   });
 
-  const { run } = await import(pathToFileURL(outfile).href);
+  const { INTERNAL_STATE_CODE, run, runSse } = await import(pathToFileURL(outfile).href);
   const calls = await run();
 
   assert.deepEqual(calls, [
@@ -145,7 +180,9 @@ try {
     { method: 'PUT', endpoint: '/example/1', request: { name: 'demo' }, config: undefined },
     { method: 'PATCH', endpoint: '/example/1', request: { name: 'demo' }, config: undefined },
     { method: 'DELETE', endpoint: '/example/1', config: { params: { id: '1' } } },
+    { method: 'GET_TEXT', endpoint: '/example/text', config: undefined },
   ]);
+  assert.equal(await runSse(), INTERNAL_STATE_CODE);
 
   console.log('Contract 统一调用与请求位置检查通过');
 } finally {

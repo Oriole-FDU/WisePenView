@@ -1,68 +1,80 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
-import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
-import type {
-  CancelUploadAssetsApiRequest,
-  InitUploadAssetsApiResponse,
-} from '@/domains/_shared/apis/versionAssetApi.type';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  CreateSkillApiRequest,
-  DeleteSkillAssetsApiRequest,
-  ForkSkillApiRequest,
-  GetSkillAssetStsTokenApiRequest,
-  GetSkillInfoApiRequest,
-  GetSkillVersionBundleInfoApiRequest,
-  InitUploadSkillAssetsApiRequest,
-  PublishSkillVersionApiRequest,
-  SkillInfoApiResponse,
-  SkillVersionBundleApiResponse,
-  UpdateSkillInfoApiRequest,
-} from './SkillApi.type';
+import {
+  CancelUploadSkillAssetsApiContract,
+  type CancelUploadSkillAssetsApiContractRequest,
+  ChangeSkillInfoApiContract,
+  type ChangeSkillInfoApiContractRequest,
+  CreateSkillApiContract,
+  type CreateSkillApiContractRequest,
+  type CreateSkillApiContractResponse,
+  DeleteSkillAssetsApiContract,
+  type DeleteSkillAssetsApiContractRequest,
+  ForkSkillApiContract,
+  type ForkSkillApiContractRequest,
+  type ForkSkillApiContractResponse,
+  GetSkillAssetStsTokenApiContract,
+  type GetSkillAssetStsTokenApiContractRequest,
+  type GetSkillAssetStsTokenApiContractResponse,
+  GetSkillInfoApiContract,
+  type GetSkillInfoApiContractRequest,
+  type GetSkillInfoApiContractResponse,
+  GetSkillVersionBundleInfoApiContract,
+  type GetSkillVersionBundleInfoApiContractRequest,
+  type GetSkillVersionBundleInfoApiContractResponse,
+  InitUploadSkillAssetsApiContract,
+  type InitUploadSkillAssetsApiContractRequest,
+  type InitUploadSkillAssetsApiContractResponse,
+  PublishSkillVersionApiContract,
+  type PublishSkillVersionApiContractRequest,
+} from './SkillApi.contract';
 
-function createSkill(body: CreateSkillApiRequest): Promise<string | undefined> {
-  return apiPostUnchecked('/skill/createSkill', body);
+function createSkill(body: CreateSkillApiContractRequest): Promise<CreateSkillApiContractResponse> {
+  return executeApiContract(CreateSkillApiContract, body);
 }
 
-function forkSkill(body: ForkSkillApiRequest): Promise<string | undefined> {
-  return apiPostUnchecked('/skill/forkSkill', body);
+function forkSkill(body: ForkSkillApiContractRequest): Promise<ForkSkillApiContractResponse> {
+  return executeApiContract(ForkSkillApiContract, body);
 }
 
-function getSkillInfo(query: GetSkillInfoApiRequest): Promise<SkillInfoApiResponse | undefined> {
-  return apiPostUnchecked('/skill/getSkillInfo', null, { params: query });
+function getSkillInfo(
+  query: GetSkillInfoApiContractRequest
+): Promise<GetSkillInfoApiContractResponse> {
+  return executeApiContract(GetSkillInfoApiContract, query);
 }
 
 function getSkillVersionBundleInfo(
-  query: GetSkillVersionBundleInfoApiRequest
-): Promise<SkillVersionBundleApiResponse | undefined> {
-  return apiPostUnchecked('/skill/getSkillVersionBundleInfo', null, { params: query });
+  query: GetSkillVersionBundleInfoApiContractRequest
+): Promise<GetSkillVersionBundleInfoApiContractResponse> {
+  return executeApiContract(GetSkillVersionBundleInfoApiContract, query);
 }
 
 function getSkillAssetStsToken(
-  query: GetSkillAssetStsTokenApiRequest
-): Promise<OssStsTokenApiResponse | undefined> {
-  return apiGetUnchecked('/skill/getSkillAssetStsToken', { params: query });
+  query: GetSkillAssetStsTokenApiContractRequest
+): Promise<GetSkillAssetStsTokenApiContractResponse> {
+  return executeApiContract(GetSkillAssetStsTokenApiContract, query);
 }
 
-function changeSkillInfo(body: UpdateSkillInfoApiRequest): Promise<void> {
-  return apiPostUnchecked('/skill/changeSkillInfo', body);
+function changeSkillInfo(body: ChangeSkillInfoApiContractRequest): Promise<null> {
+  return executeApiContract(ChangeSkillInfoApiContract, body);
 }
 
 function initUploadSkillAssets(
-  body: InitUploadSkillAssetsApiRequest
-): Promise<InitUploadAssetsApiResponse | undefined> {
-  return apiPostUnchecked('/skill/initUploadSkillAssets', body);
+  body: InitUploadSkillAssetsApiContractRequest
+): Promise<InitUploadSkillAssetsApiContractResponse> {
+  return executeApiContract(InitUploadSkillAssetsApiContract, body);
 }
 
-function deleteSkillAssets(body: DeleteSkillAssetsApiRequest): Promise<void> {
-  return apiPostUnchecked('/skill/deleteSkillAssets', body);
+function deleteSkillAssets(body: DeleteSkillAssetsApiContractRequest): Promise<null> {
+  return executeApiContract(DeleteSkillAssetsApiContract, body);
 }
 
-function cancelUploadSkillAssets(body: CancelUploadAssetsApiRequest): Promise<void> {
-  return apiPostUnchecked('/skill/cancelUploadSkillAssets', body);
+function cancelUploadSkillAssets(body: CancelUploadSkillAssetsApiContractRequest): Promise<null> {
+  return executeApiContract(CancelUploadSkillAssetsApiContract, body);
 }
 
-function publishSkillVersion(body: PublishSkillVersionApiRequest): Promise<void> {
-  return apiPostUnchecked('/skill/publishSkillVersion', body);
+function publishSkillVersion(body: PublishSkillVersionApiContractRequest): Promise<null> {
+  return executeApiContract(PublishSkillVersionApiContract, body);
 }
 
 export const SkillApi = {

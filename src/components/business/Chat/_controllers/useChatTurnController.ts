@@ -3,8 +3,10 @@ import { useLatest, useUnmountedRef } from 'ahooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useChatService } from '@/domains';
-import { type ChatModel, type CreateSessionRequest, useChatSession } from '@/domains/Chat';
+import { useChatTurnService } from '@/domains';
+import type { ChatModel } from '@/domains/ChatConfig';
+import type { CreateSessionRequest } from '@/domains/ChatSession';
+import { useChatTurn } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -42,7 +44,7 @@ export function useChatTurnController({
 }: UseChatTurnControllerOptions) {
   const { t } = useTranslation(['chat', 'common']);
   const appAuth = useAppAuth();
-  const chatService = useChatService();
+  const chatTurnService = useChatTurnService();
   const { sessionId: currentSessionId, locationKey } = useChatSessionRoute();
   const routeLatest = useLatest({ sessionId: currentSessionId, locationKey });
   const unmountedRef = useUnmountedRef();
@@ -53,26 +55,22 @@ export function useChatTurnController({
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
-  const {
-    messages,
-    status,
-    setMessages,
-    sendSessionMessage,
-    recoverSession,
-    stop,
-    resumeSessionStream,
-  } = useChatSession({
-    sessionId: currentSessionId ?? '',
-    model: currentModel?.modelId,
-    getActiveTurnId: chatService.getActiveTurnId,
-    onError: (error) => {
-      toast.danger(parseErrorMessage(error));
-    },
-  });
+  const { messages, status, setMessages, sendTurnMessage, recoverTurn, stop, resumeTurnStream } =
+    useChatTurn({
+      sessionId: currentSessionId ?? '',
+      model: currentModel?.modelId,
+      getActiveTurnId: chatTurnService.getActiveTurnId,
+      streamChatCompletion: chatTurnService.streamChatCompletion,
+      recoverChatStream: chatTurnService.recoverChatStream,
+      reconnectChatStream: chatTurnService.reconnectChatStream,
+      onError: (error) => {
+        toast.danger(parseErrorMessage(error));
+      },
+    });
 
   const history = useChatTurnHistory({
     setMessages,
-    resumeSessionStream,
+    resumeTurnStream,
     stop,
     isNewlyCreatedSession,
     clearNewlyCreatedSession,
@@ -81,7 +79,7 @@ export function useChatTurnController({
     sessionId: currentSessionId,
     messages,
     status,
-    recover: recoverSession,
+    recover: recoverTurn,
   });
 
   /** 发送一轮消息：校验登录与资源上下文，必要时先建立会话，再把前端状态随消息提交。 */
@@ -108,10 +106,9 @@ export function useChatTurnController({
     if (selectedAgent?.resourceId) {
       agentParams = {
         agentId: selectedAgent.resourceId,
-        agentVersion: selectedAgent.agentVersion,
       };
     } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
-      agentParams = { agentId: null, agentVersion: null };
+      agentParams = { agentId: null };
     }
 
     let targetSessionId: string | undefined;
@@ -148,7 +145,7 @@ export function useChatTurnController({
         ? Array.from(new Set([...(selectedSkillIds ?? []), ...(resourceSkillIds ?? [])]))
         : undefined;
 
-    void sendSessionMessage(text, {
+    void sendTurnMessage(text, {
       model: targetModel.modelId,
       providerId: targetModel.providerId,
       sessionId: targetSessionId,
@@ -179,7 +176,7 @@ export function useChatTurnController({
     setCancellingSessionId(targetSessionId);
     void stop();
     try {
-      await chatService.cancelTurn(targetSessionId);
+      await chatTurnService.cancelTurn(targetSessionId);
     } catch (error) {
       toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
     } finally {

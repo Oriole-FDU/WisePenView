@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig } from 'axios';
 
 import { type ApiContract, parseApiRequest, parseApiResponse } from '@/apis/contract';
-import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from '@/apis/request';
+import { apiDelete, apiGet, apiGetText, apiPatch, apiPost, apiPut } from '@/apis/request';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 const assertSupportedPlacement = (contract: ApiContract<unknown, unknown>): void => {
@@ -13,12 +13,46 @@ const assertSupportedPlacement = (contract: ApiContract<unknown, unknown>): void
   }
 };
 
-const withQuery = (
+const assertSupportedTransport = (contract: ApiContract<unknown, unknown>): void => {
+  if (
+    contract.transport === 'json' ||
+    contract.transport === 'multipart' ||
+    contract.transport === 'text'
+  ) {
+    return;
+  }
+  throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+    reason: `${contract.name} 的 ${contract.transport} transport 不能由 executeApiContract 执行`,
+  });
+};
+
+const getRequestParts = (
   contract: ApiContract<unknown, unknown>,
   request: unknown,
   config?: AxiosRequestConfig
-): AxiosRequestConfig | undefined =>
-  contract.requestPlacement === 'query' ? { ...config, params: request } : config;
+): {
+  body: unknown;
+  config: AxiosRequestConfig | undefined;
+} => {
+  if (contract.requestPlacement === 'query') {
+    return { body: undefined, config: { ...config, params: request } };
+  }
+
+  if (contract.requestPlacement === 'body' && contract.queryKeys?.length) {
+    const body = { ...(request as Record<string, unknown>) };
+    const query: Record<string, unknown> = {};
+    for (const key of contract.queryKeys) {
+      query[key] = body[key];
+      delete body[key];
+    }
+    return { body, config: { ...config, params: query } };
+  }
+
+  return {
+    body: contract.requestPlacement === 'body' ? request : undefined,
+    config,
+  };
+};
 
 /**
  * 按 Contract 元数据完成请求校验、调用、envelope 解包和响应校验。
@@ -30,34 +64,34 @@ export async function executeApiContract<Request, Response>(
   config?: AxiosRequestConfig
 ): Promise<Response> {
   assertSupportedPlacement(contract);
+  assertSupportedTransport(contract);
   const request = parseApiRequest(contract, value);
-  const requestConfig = withQuery(contract, request, config);
+  const requestParts = getRequestParts(contract, request, config);
+  const requestConfig = requestParts.config;
 
   let data: unknown;
+  if (contract.transport === 'text') {
+    if (contract.method !== 'GET') {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: `${contract.name} 的文本 transport 仅支持 GET`,
+      });
+    }
+    data = await apiGetText(contract.endpoint, requestConfig);
+    return parseApiResponse(contract, data);
+  }
+
   switch (contract.method) {
     case 'GET':
       data = await apiGet(contract.endpoint, requestConfig);
       break;
     case 'POST':
-      data = await apiPost(
-        contract.endpoint,
-        contract.requestPlacement === 'body' ? request : undefined,
-        requestConfig
-      );
+      data = await apiPost(contract.endpoint, requestParts.body, requestConfig);
       break;
     case 'PUT':
-      data = await apiPut(
-        contract.endpoint,
-        contract.requestPlacement === 'body' ? request : undefined,
-        requestConfig
-      );
+      data = await apiPut(contract.endpoint, requestParts.body, requestConfig);
       break;
     case 'PATCH':
-      data = await apiPatch(
-        contract.endpoint,
-        contract.requestPlacement === 'body' ? request : undefined,
-        requestConfig
-      );
+      data = await apiPatch(contract.endpoint, requestParts.body, requestConfig);
       break;
     case 'DELETE':
       data = await apiDelete(contract.endpoint, requestConfig);

@@ -8,7 +8,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
-import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/Chat';
+import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/ChatConfig';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.scss';

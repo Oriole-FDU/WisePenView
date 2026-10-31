@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useMessageScroller } from '@/components/_shadcn';
-import type { WisePenUIMessage } from '@/domains/Chat';
+import type { WisePenUIMessage } from '@/domains/ChatSession';
 
 interface StreamingScrollFollowerProps {
   active: boolean;

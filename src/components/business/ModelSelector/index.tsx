@@ -8,7 +8,7 @@ import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
-import type { ChatModel } from '@/domains/Chat';
+import type { ChatModel } from '@/domains/ChatConfig';
 
 import styles from './style.module.scss';
 

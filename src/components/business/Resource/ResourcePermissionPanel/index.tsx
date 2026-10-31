@@ -14,7 +14,7 @@ import {
   type ResourcePermissionActionOption,
   type ResourcePermissionSource,
   type ResourcePermissionSubject,
-} from '@/domains/Resource';
+} from '@/domains/ResourceAccess';
 import { parseErrorMessage } from '@/utils/error';
 
 import type { ResourcePermissionPanelProps } from './index.type';

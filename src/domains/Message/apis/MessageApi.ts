@@ -1,17 +1,21 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  ListUserMessagesApiRequest,
-  ListUserMessagesApiResponse,
-  ReadMessageApiRequest,
-} from './MessageApi.type';
+import {
+  ListUserMessagesApiContract,
+  type ListUserMessagesApiContractRequest,
+  type ListUserMessagesApiContractResponse,
+  ReadMessageApiContract,
+  type ReadMessageApiContractRequest,
+} from './MessageApi.contract';
 
-function listUserMessages(req: ListUserMessagesApiRequest): Promise<ListUserMessagesApiResponse> {
-  return apiGetUnchecked('/user/message/listMessages', { params: req });
+function listUserMessages(
+  req: ListUserMessagesApiContractRequest
+): Promise<ListUserMessagesApiContractResponse> {
+  return executeApiContract(ListUserMessagesApiContract, req);
 }
 
-function readMessage(req: ReadMessageApiRequest): Promise<void> {
-  return apiPostUnchecked('/user/message/readMessage', req);
+async function readMessage(req: ReadMessageApiContractRequest): Promise<void> {
+  await executeApiContract(ReadMessageApiContract, req);
 }
 
 export const MessageApi = {

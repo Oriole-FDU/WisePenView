@@ -1,4 +1,4 @@
-import type { ChatSession } from '@/domains/Chat';
+import type { ChatSession } from '@/domains/ChatSession';
 
 export interface SessionMenuItemProps {
   session: ChatSession;

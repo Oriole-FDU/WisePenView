@@ -7,6 +7,7 @@ export const IDENTITY = defineEnum({
   TEACHER: 2,
   ADMIN: 3,
 } as const);
+export type IdentityType = EnumValue<typeof IDENTITY>;
 
 /** 性别 */
 export const SEX = defineEnum(['MALE', 'FEMALE', 'UNKNOWN'] as const);
@@ -17,11 +18,7 @@ export const USER_STATUS = defineEnum(['NORMAL', 'UNIDENTIFIED', 'BANNED'] as co
 export type UserStatus = EnumValue<typeof USER_STATUS>;
 
 /** 认证方式（与后端 UserVerificationMode 对齐） */
-export const USER_VERIFICATION = defineEnum([
-  'EDU_EMAIL',
-  'FDU_UIS_SYS',
-  'CAMPUS_IDENTITY_PROVIDER',
-] as const);
+export const USER_VERIFICATION = defineEnum(['EDU_EMAIL', 'CAMPUS_IDENTITY_PROVIDER'] as const);
 export type UserVerificationMode = EnumValue<typeof USER_VERIFICATION>;
 
 /** 认证提供方（与后端 verificationProviderCode 对齐） */
@@ -42,3 +39,24 @@ export type FeedbackType = EnumValue<typeof FEEDBACK_TYPE>;
 export const DEGREE = defineEnum(['UNKNOWN', 'UNDERGRADUATE', 'MASTER', 'DOCTOR'] as const);
 
 export type DegreeLevel = EnumValue<typeof DEGREE>;
+
+/** 后端认证策略指定的只读账号字段。 */
+export const USER_READONLY_FIELD = defineEnum([
+  'username',
+  'realName',
+  'campusNo',
+  'email',
+  'mobile',
+  'userStatus',
+  'sex',
+  'university',
+  'college',
+  'major',
+  'className',
+  'enrollmentYear',
+  'degreeLevel',
+  'inviteCode',
+] as const);
+
+export const USER_INVITE_STATUS = defineEnum(['BOUND', 'REWARDED'] as const);
+export type UserInviteStatus = EnumValue<typeof USER_INVITE_STATUS>;

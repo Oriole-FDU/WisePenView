@@ -169,11 +169,9 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     });
   };
 
-  const getSkillPermissionOverview: ISkillService['getSkillPermissionOverview'] = async (
-    resourceId
-  ) => {
+  const getResourceAccessInfo: ISkillService['getResourceAccessInfo'] = async (resourceId) => {
     const data = await SkillApi.getSkillInfo({ resourceId });
-    return SkillServicesMap.mapSkillPermissionOverviewFromApi(data, resourceId);
+    return data.resourceInfo;
   };
 
   const updateSkillInfo = async (resourceId: string, name?: string, description?: string) => {
@@ -377,7 +375,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     createSkill,
     forkSkill,
     getSkillDetail,
-    getSkillPermissionOverview,
+    getResourceAccessInfo,
     getSkillVersionFiles,
     updateSkillInfo,
     publishVersion,

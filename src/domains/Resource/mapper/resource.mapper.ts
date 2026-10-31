@@ -1,20 +1,18 @@
-import { parseResourceActions, type ResourceAction } from '@/domains/_shared/access';
+import { normalizeResourceActions, type ResourceAction } from '@/domains/_shared/access';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
-  ResourceGroupGrantedActionsApiResponse,
-  ResourceItemApiResponse,
-  ResourceSpecifiedUserGrantedActionsApiResponse,
-} from '../apis/ResourceApi.type';
-import type {
   GlobalSearchResourcesApiContractResponse,
   ListResourcesApiContractRequest,
   ListResourcesApiContractResponse,
 } from '../apis/ResourceCoreApi.contract';
-import type { ResourceCoreItemApi } from '../apis/ResourceCoreApi.schema';
-import type { ResourcePlacementApiResponse } from '../apis/ResourcePlacementApi.type';
+import type {
+  ResourceGroupGrantedActionsApi,
+  ResourceItemApi,
+  ResourceSpecifiedUserGrantedActionsApi,
+} from '../apis/ResourceCoreApi.schema';
 import type { ResourceItem, ResourceTagBind } from '../entity/resource';
 import { normalizeSearchResourceType, TAG_QUERY_LOGIC_MODE } from '../enum';
 import type {
@@ -23,18 +21,11 @@ import type {
   SearchHitItem,
   SearchResultPage,
 } from '../service/index.type';
+import { isPersonalGroupId } from '../utils/isPersonalGroupId';
 import { resolveResourceIconType } from '../utils/resolveResourceIconType';
 
-const PERSONAL_GROUP_PREFIX = 'p_';
-
-export const isPersonalGroupId = (groupId?: string): boolean =>
-  groupId?.startsWith(PERSONAL_GROUP_PREFIX) ?? false;
-
 type ResourcePermissionActionField =
-  | ResourceGroupGrantedActionsApiResponse[]
-  | ResourceSpecifiedUserGrantedActionsApiResponse[]
-  | null
-  | undefined;
+  ResourceGroupGrantedActionsApi[] | ResourceSpecifiedUserGrantedActionsApi[] | null | undefined;
 
 interface MapResourceItemContext {
   groupId?: string;
@@ -71,9 +62,6 @@ export const mapListResourceItemsRequest = (
   };
 };
 
-export const mapResourcePlacementCountFromApi = (data: ResourcePlacementApiResponse): number =>
-  data.resourceCount;
-
 const resolveCurrentTagBind = (
   item: ResourceItem,
   context: MapResourceItemContext
@@ -96,8 +84,7 @@ const mapTagsToCurrentTags = (
 };
 
 const mapResourceTagBindsFromApi = (
-  tagBinds:
-    NonNullable<ResourceItemApiResponse['tagBinds'] | ResourceCoreItemApi['tagBinds']> | undefined
+  tagBinds: ResourceItemApi['tagBinds']
 ): ResourceTagBind[] | undefined =>
   tagBinds?.map((bind) => ({
     groupId: bind.groupId,
@@ -122,7 +109,7 @@ const mapResourceTagBindsFromApi = (
   }));
 
 const mapMyInteractionFromApi = (
-  interaction: ResourceItemApiResponse['myInteractionRecord']
+  interaction: ResourceItemApi['myInteractionRecord']
 ): ResourceItem['myInteraction'] => {
   if (!interaction) return undefined;
   return {
@@ -132,12 +119,11 @@ const mapMyInteractionFromApi = (
 
 const isGrantedActionListItem = (
   value: unknown
-): value is
-  ResourceGroupGrantedActionsApiResponse | ResourceSpecifiedUserGrantedActionsApiResponse =>
+): value is ResourceGroupGrantedActionsApi | ResourceSpecifiedUserGrantedActionsApi =>
   value != null && typeof value === 'object' && 'grantedActions' in value;
 
 const getGrantedActionSubjectId = (
-  item: ResourceGroupGrantedActionsApiResponse | ResourceSpecifiedUserGrantedActionsApiResponse
+  item: ResourceGroupGrantedActionsApi | ResourceSpecifiedUserGrantedActionsApi
 ): string => {
   if ('groupId' in item) return normalizeId(item.groupId);
   return normalizeId(item.userId);
@@ -154,7 +140,9 @@ const normalizeResourceActionMap = (
     .filter(isGrantedActionListItem)
     .map((item) => {
       const subjectId = getGrantedActionSubjectId(item);
-      return subjectId ? ([subjectId, parseResourceActions(item.grantedActions)] as const) : null;
+      return subjectId
+        ? ([subjectId, normalizeResourceActions(item.grantedActions)] as const)
+        : null;
     })
     .filter((entry): entry is readonly [string, ResourceAction[]] => Boolean(entry));
   return entries.length > 0 ? Object.fromEntries(entries) : null;
@@ -162,7 +150,7 @@ const normalizeResourceActionMap = (
 
 /** 单条资源：Java Long 字符串、标签派生字段 */
 export const mapResourceItemFromApi = (
-  raw: ResourceItemApiResponse | ResourceCoreItemApi,
+  raw: ResourceItemApi,
   context: MapResourceItemContext = {}
 ): ResourceItem => {
   const interactionInfo = raw.resourceInteractionInfo;
@@ -176,8 +164,7 @@ export const mapResourceItemFromApi = (
     // 后端 resourceInfo.size 当前以字符串返回，前端统一归一化为 number。
     size: normalizeNonNegativeNumber(raw.size),
     tagBinds: mapResourceTagBindsFromApi(raw.tagBinds),
-    currentActions: parseResourceActions(raw.currentActions),
-    resourceAccessRole: 'resourceAccessRole' in raw ? raw.resourceAccessRole : undefined,
+    currentActions: normalizeResourceActions(raw.currentActions),
     overrideGrantedActions: normalizeResourceActionMap(raw.overrideGrantedActions),
     specifiedUsersGrantedActions: normalizeResourceActionMap(raw.specifiedUsersGrantedActions),
     readCount: normalizeNonNegativeNumber(interactionInfo?.readCount),

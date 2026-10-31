@@ -14,30 +14,32 @@ import { ResourceActionListSchema } from '@/domains/_shared/access';
 import { GroupTypeApiSchema } from '@/domains/Group/apis/GroupApi.schema';
 import { UserDisplayApiSchema } from '@/domains/User/apis/UserInformationApi.schema';
 
+import {
+  RESOURCE_SORT_BY,
+  RESOURCE_SORT_DIR,
+  RESOURCE_TYPE,
+  SEARCH_SCOPE,
+  TAG_QUERY_LOGIC_MODE,
+} from '../enum';
+
 /** 后端 ResourceType 通过 @JsonValue 输出枚举名称。 */
-export const ResourceTypeApiSchema = z.enum([
-  'NOTE',
-  'DRAWIO',
-  'PDF',
-  'DOC',
-  'DOCX',
-  'PPT',
-  'PPTX',
-  'XLS',
-  'XLSX',
-  'SKILL',
-  'AGENT',
-  'SINGLE_HTML_PAGE',
-  'UNKNOWN',
-]);
+export const ResourceTypeApiSchema = z.enum(RESOURCE_TYPE.options.map((option) => option.value));
 
-export const ResourceSortByApiSchema = z.enum(['UPDATE_TIME', 'CREATE_TIME', 'NAME', 'SIZE']);
+export const ResourceSortByApiSchema = z.enum(
+  RESOURCE_SORT_BY.options.map((option) => option.value)
+);
 
-export const ResourceSortDirApiSchema = z.enum(['ASC', 'DESC']);
+export const ResourceSortDirApiSchema = z.enum(
+  RESOURCE_SORT_DIR.options.map((option) => option.value)
+);
 
-export const ResourceTagQueryLogicModeApiSchema = z.enum(['OR', 'AND']);
+export const ResourceTagQueryLogicModeApiSchema = z.enum(
+  TAG_QUERY_LOGIC_MODE.options.map((option) => option.value)
+);
 
-export const ResourceSearchScopeApiSchema = z.enum(['ALL', 'DOCUMENT', 'NOTE']);
+export const ResourceSearchScopeApiSchema = z.enum(
+  SEARCH_SCOPE.options.map((option) => option.value)
+);
 
 const ResourceListPageRequestSchema = PageApiRequestSchema.extend({
   size: z.number().int().min(1).max(100),
@@ -57,6 +59,7 @@ export const ResourceTagInfoApiSchema = z.object({
 export const ResourceTagBindApiSchema = z.object({
   groupId: NonEmptyStringSchema,
   primaryTagId: NonEmptyStringSchema,
+  aiBillingApproved: z.boolean().nullable(),
   tags: z.record(NonEmptyStringSchema, ResourceTagInfoApiSchema.nullable()),
 });
 
@@ -97,8 +100,10 @@ export const ResourceSpecifiedUserGrantedActionsApiSchema = z.object({
   grantedActions: ResourceActionListSchema.nullable(),
 });
 
-export const ResourceCoreItemApiSchema = z.object({
+/** 资源基础信息，供跨域详情投影与独立基础信息接口复用。 */
+export const ResourceBaseInfoApiSchema = z.object({
   resourceId: OpaqueIdSchema,
+  createTime: EpochMillisSchema,
   resourceName: NonEmptyStringSchema,
   resourceType: ResourceTypeApiSchema,
   ownerId: NonEmptyStringSchema,
@@ -106,11 +111,19 @@ export const ResourceCoreItemApiSchema = z.object({
   preview: NullableStringSchema,
   size: JavaLongStringSchema.nullable(),
   resourceInteractionInfo: ResourceInteractionInfoApiSchema.nullable(),
+});
+
+/** 列表、搜索和资源叶域详情共用的完整资源项。 */
+export const ResourceItemApiSchema = ResourceBaseInfoApiSchema.extend({
   myInteractionRecord: ResourceUserInteractionRecordApiSchema.nullable(),
   tagBinds: z.array(ResourceTagBindApiSchema),
   currentActions: ResourceActionListSchema,
   overrideGrantedActions: z.array(ResourceGroupGrantedActionsApiSchema).nullable(),
   specifiedUsersGrantedActions: z.array(ResourceSpecifiedUserGrantedActionsApiSchema).nullable(),
+});
+
+export const GetResourceBaseInfoApiRequestSchema = z.strictObject({
+  resourceId: OpaqueIdSchema,
 });
 
 export const ListResourcesApiRequestSchema = ResourceListPageRequestSchema.extend({
@@ -123,7 +136,7 @@ export const ListResourcesApiRequestSchema = ResourceListPageRequestSchema.exten
   sortDir: ResourceSortDirApiSchema,
 });
 
-export const ListResourcesApiResponseSchema = createPageResponseSchema(ResourceCoreItemApiSchema);
+export const ListResourcesApiResponseSchema = createPageResponseSchema(ResourceItemApiSchema);
 
 export const RenameResourceApiRequestSchema = z.strictObject({
   resourceId: OpaqueIdSchema,
@@ -165,7 +178,14 @@ export const GlobalSearchResourcesApiResponseSchema =
 
 export type ResourceTypeApi = z.infer<typeof ResourceTypeApiSchema>;
 export type ResourceTagInfoApi = z.infer<typeof ResourceTagInfoApiSchema>;
-export type ResourceCoreItemApi = z.infer<typeof ResourceCoreItemApiSchema>;
+export type ResourceBaseInfoApi = z.infer<typeof ResourceBaseInfoApiSchema>;
+export type ResourceItemApi = z.infer<typeof ResourceItemApiSchema>;
+export type ResourceGroupDisplayApi = z.infer<typeof ResourceGroupDisplayApiSchema>;
+export type ResourceGroupGrantedActionsApi = z.infer<typeof ResourceGroupGrantedActionsApiSchema>;
+export type ResourceSpecifiedUserGrantedActionsApi = z.infer<
+  typeof ResourceSpecifiedUserGrantedActionsApiSchema
+>;
+export type GetResourceBaseInfoApiRequest = z.infer<typeof GetResourceBaseInfoApiRequestSchema>;
 export type ListResourcesApiRequest = z.infer<typeof ListResourcesApiRequestSchema>;
 export type ListResourcesApiResponse = z.infer<typeof ListResourcesApiResponseSchema>;
 export type RenameResourceApiRequest = z.infer<typeof RenameResourceApiRequestSchema>;

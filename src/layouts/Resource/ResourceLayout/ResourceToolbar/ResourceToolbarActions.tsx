@@ -25,7 +25,8 @@ import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide
 import type { EditorResourcePresentation } from '@/components/editors/editor.type';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 import type { ResourceAction } from '@/domains/_shared/access';
-import type { ResourceItem, ResourcePermissionResourceType } from '@/domains/Resource';
+import type { ResourceItem } from '@/domains/Resource';
+import type { ResourcePermissionResourceType } from '@/domains/ResourceAccess';
 
 import ResourceToolbarOperations, {
   type ResourceToolbarOperationHandlers,

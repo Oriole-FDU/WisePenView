@@ -1,6 +1,5 @@
 import { normalizeResourceActions } from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
-import { GROUP_TYPE, type GroupType, ROLE } from '@/domains/Group';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
@@ -18,6 +17,7 @@ import type {
   ListGroupMemberApiResponse,
 } from '../apis/GroupApi.contract';
 import type { GroupDetailApi, GroupItemApi } from '../apis/GroupApi.schema';
+import { GROUP_TYPE, GROUP_TYPE_QUERY, type GroupType, ROLE } from '../enum';
 import type {
   CreateGroupRequest,
   EditGroupRequest,
@@ -28,10 +28,8 @@ import type {
 import { mapGroupMemberFromApi } from './groupMember.mapper';
 
 const mapGroupTypeToListApi = (value?: GroupType): ListGroupApiRequest['groupType'] | undefined => {
-  if (value === GROUP_TYPE.NORMAL) return 'NORMAL_GROUP';
-  if (value === GROUP_TYPE.ADVANCED) return 'ADVANCED_GROUP';
-  if (value === GROUP_TYPE.PUBLIC) return 'MARKET_GROUP';
-  return undefined;
+  const key = value === undefined ? undefined : GROUP_TYPE.getOption(value)?.key;
+  return key ? GROUP_TYPE_QUERY[key] : undefined;
 };
 
 const parseGroupMetaInfo = (value: unknown): Record<string, unknown> => {

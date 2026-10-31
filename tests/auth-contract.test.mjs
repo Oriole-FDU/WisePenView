@@ -204,6 +204,7 @@ const registerVirtualModules = {
     export const apiPut = async () => null;
     export const apiPatch = async () => null;
     export const apiDelete = async () => null;
+    export const apiGetText = async () => '';
 
     export const getPostedRequests = () => postedRequests;
   `,

@@ -2,8 +2,8 @@ import { toast } from '@heroui/react';
 import { useLatest } from 'ahooks';
 import { useEffect } from 'react';
 
-import { useChatService } from '@/domains';
-import { useChatHistory, type WisePenUIMessage } from '@/domains/Chat';
+import { useChatSessionService } from '@/domains';
+import { useChatHistory, type WisePenUIMessage } from '@/domains/ChatSession';
 import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -17,7 +17,7 @@ interface UseChatTurnHistoryOptions {
     messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
   ) => void;
   /** 历史加载成功后接续后台 turn 的流 */
-  resumeSessionStream: () => Promise<void>;
+  resumeTurnStream: () => Promise<void>;
   /** 会话切换时中止旧 Chat 的客户端连接 */
   stop: () => void;
   isNewlyCreatedSession: (sessionId: string) => boolean;
@@ -31,19 +31,19 @@ interface UseChatTurnHistoryOptions {
  */
 export function useChatTurnHistory({
   setMessages,
-  resumeSessionStream,
+  resumeTurnStream,
   stop,
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
 }: UseChatTurnHistoryOptions) {
   const appAuth = useAppAuth();
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const { sessionId: currentSessionId } = useChatSessionRoute();
   const routeLatest = useLatest({ sessionId: currentSessionId });
 
   const { runAsync: runLoadSessionHistory } = useApi(
     async (sessionId: string, page: number, size: number) =>
-      chatService.listHistoryMessages({ sessionId, page, size }),
+      chatSessionService.listHistoryMessages({ sessionId, page, size }),
     { manual: true }
   );
   const {
@@ -72,7 +72,7 @@ export function useChatTurnHistory({
   const historyActionsLatest = useLatest({
     clearConversation,
     loadHistoryMessages,
-    resumeSessionStream,
+    resumeTurnStream,
   });
 
   const loadMore = async () => {
@@ -92,7 +92,7 @@ export function useChatTurnHistory({
    * 执行时机：当前会话 ID 首次可用或发生切换时加载历史，并在历史成功后检查 active turn。
    * 不可替代原因：历史加载和 SSE 重连都是异步外部副作用，必须按顺序写入当前 Chat 运行时。
    * cleanup：标记本次会话加载失效并中止旧 Chat 的客户端连接，配合 useChatHistory 与
-   * useChatSession 丢弃旧请求结果；stop 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
+   * useChatTurn 丢弃旧请求结果；stop 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
    */
   useEffect(() => {
     const actions = historyActionsLatest.current;
@@ -112,7 +112,7 @@ export function useChatTurnHistory({
       const loaded = await actions.loadHistoryMessages(targetSessionId);
       if (!loaded || cancelled) return;
       if (routeLatest.current.sessionId !== targetSessionId) return;
-      await actions.resumeSessionStream();
+      await actions.resumeTurnStream();
     })();
     return () => {
       cancelled = true;

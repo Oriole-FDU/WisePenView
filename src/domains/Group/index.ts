@@ -8,11 +8,11 @@ export type {
   GroupResConfig,
 } from './entity/group';
 export type { GroupQuotaInfo, UserGroupQuota } from './entity/quota';
-export type { GroupType } from './enum';
+export type { GroupRoleFilter, GroupType } from './enum';
 export {
   DEFAULT_MEMBER_ACTIONS,
   GROUP_FILE_ORG_LOGIC,
-  GROUP_ROLE_FILTER_MAP,
+  GROUP_ROLE_FILTER,
   GROUP_TYPE,
   ROLE,
 } from './enum';
@@ -23,7 +23,6 @@ export type {
   FetchGroupListRequest,
   FetchGroupListResponse,
   GetGroupWalletInfoRequest,
-  GroupRoleFilter,
   IGroupService,
   JoinGroupRequest,
   KickMembersRequest,

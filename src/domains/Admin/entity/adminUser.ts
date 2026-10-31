@@ -12,6 +12,6 @@ export interface AdminUser {
   mobile?: string;
   verificationMode?: UserVerificationMode | null;
   status: UserStatus;
-  createTime?: string;
-  updateTime?: string;
+  createTime?: number;
+  updateTime?: number;
 }

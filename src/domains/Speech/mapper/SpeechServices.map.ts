@@ -3,7 +3,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import type {
   IssueRecognitionCredentialApiRequest,
   IssueRecognitionCredentialApiResponse,
-} from '../apis/SpeechApi.type';
+} from '../apis/SpeechApi.schema';
 import type { XfyunSpeechLanguage } from '../runtime/XfyunSpeechRecognizer';
 import type {
   IssueRecognitionCredentialRequest,
@@ -21,7 +21,7 @@ function mapIssueRecognitionCredentialRequest(
   if (!Number.isInteger(params.eosMs) || params.eosMs < 1000 || params.eosMs > 10000) {
     throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_EOS_INVALID);
   }
-  return { eos_ms: params.eosMs };
+  return { provider: 'IFLYTEK', options: { eos_ms: params.eosMs } };
 }
 
 function mapRecognitionCredentialFromApi(

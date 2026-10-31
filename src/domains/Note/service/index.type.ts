@@ -4,7 +4,8 @@
  */
 
 import type { Block, NoteAiDiffPreviewData } from '@/domains/Note';
-import type { ResourceItem, ResourcePermissionOverview } from '@/domains/Resource';
+import type { ResourceItem } from '@/domains/Resource';
+import type { ResourceItemApi } from '@/domains/Resource/apis/ResourceCoreApi.schema';
 
 /** NoteService 接口：供依赖注入使用 */
 /** web-socket服务放在了yjs目录下 */
@@ -14,8 +15,8 @@ export interface INoteService {
   createNote(params: CreateNoteRequest): Promise<CreateNoteResponse>;
   /** 获取可直接渲染的 Note 信息（作者展示 + 编辑时间文案） */
   getNoteInfoDisplay(params: GetNoteInfoRequest): Promise<NoteInfoDisplayData>;
-  /** NOTE/DRAWIO 自身的权限概览，小组与标签信息由权限服务补全。 */
-  getNotePermissionOverview(resourceId: string): Promise<ResourcePermissionOverview>;
+  /** 返回权限聚合所需的资源摘要，不构造权限概览。 */
+  getResourceAccessInfo(resourceId: string): Promise<ResourceItemApi>;
   /** 获取 DRAWIO 最新完整快照 */
   getDrawIoLatestSnapshot(
     params: GetDrawIoLatestSnapshotRequest
@@ -61,7 +62,7 @@ export interface CreateNoteRequest {
 
 /** 与调用方约定：成功时携带新资源 ID（后端 doc_id 由实现层映射） */
 export interface CreateNoteResponse {
-  resourceId?: string;
+  resourceId: string;
 }
 
 export interface SyncTitleRequest {
@@ -98,7 +99,7 @@ export interface ForkNoteRequest {
 }
 
 export interface ForkNoteResponse {
-  resourceId?: string;
+  resourceId: string;
 }
 
 export interface ListNoteVersionsRequest {
@@ -109,8 +110,8 @@ export interface ListNoteVersionsRequest {
 
 export interface NoteVersionSummary {
   version?: number;
-  type?: 'FULL' | 'DELTA' | string;
-  createdBy?: number[];
+  type?: 'FULL' | 'DELTA';
+  createdBy?: string[];
 }
 
 export interface NoteVersionListPage {

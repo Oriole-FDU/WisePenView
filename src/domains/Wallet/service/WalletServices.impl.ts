@@ -19,8 +19,7 @@ const getUserWalletInfo = async (): Promise<GetWalletInfoResponse> => {
 };
 
 const redeemVoucher = async (params: RedeemVoucherRequest): Promise<void> => {
-  const payload = WalletServicesMap.mapRedeemVoucherRequest(params);
-  await WalletApi.redeemVoucher(payload);
+  await WalletApi.redeemVoucher(params);
 };
 
 const listTransactions = async (

@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { fn } from 'storybook/test';
 
 import { ServicesProvider } from '@/domains';
-import type { ChatSession } from '@/domains/Chat';
+import type { ChatSession } from '@/domains/ChatSession';
 import { buildDriveNodeScope, type RootNode } from '@/domains/Drive';
 import { AppAuthProvider } from '@/layouts/App/_context';
 

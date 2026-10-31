@@ -2,7 +2,7 @@ import { toast } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useInteractService } from '@/domains';
+import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 interface UseFavoriteCollectionPickerControllerOptions {
@@ -17,7 +17,7 @@ export function useFavoriteCollectionPickerController({
   onOpenChange,
 }: UseFavoriteCollectionPickerControllerOptions) {
   const { t } = useTranslation('resource');
-  const interactService = useInteractService();
+  const favoriteService = useResourceFavoriteService();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showCreateInput, setShowCreateInput] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
@@ -25,9 +25,9 @@ export function useFavoriteCollectionPickerController({
     data: collections,
     loading: loadingCollections,
     refresh: refreshCollections,
-  } = useApi(() => interactService.listFavoriteCollections(), {});
+  } = useApi(() => favoriteService.listFavoriteCollections(), {});
   const { loading: loadingStatus } = useApi(
-    () => interactService.getFavoriteCollectionIds(resourceId),
+    () => favoriteService.getFavoriteCollectionIds(resourceId),
     {
       onSuccess: setSelectedIds,
     }
@@ -35,8 +35,8 @@ export function useFavoriteCollectionPickerController({
 
   const { loading: loadingConfirm, run: confirm } = useApi(
     async () => {
-      await interactService.updateFavoriteCollections({ resourceId, collectionIds: selectedIds });
-      return interactService.getFavoriteCollectionIds(resourceId);
+      await favoriteService.updateFavoriteCollections({ resourceId, collectionIds: selectedIds });
+      return favoriteService.getFavoriteCollectionIds(resourceId);
     },
     {
       manual: true,
@@ -48,7 +48,7 @@ export function useFavoriteCollectionPickerController({
   );
 
   const { loading: loadingCreate, run: createCollection } = useApi(
-    (collectionName: string) => interactService.createFavoriteCollection({ collectionName }),
+    (collectionName: string) => favoriteService.createFavoriteCollection({ collectionName }),
     {
       manual: true,
       onSuccess: (collectionId) => {

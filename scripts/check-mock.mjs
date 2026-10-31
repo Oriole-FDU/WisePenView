@@ -21,6 +21,7 @@ try {
         export { clearAllServiceCaches } from '@/domains/_shared/cacheRegistry';
         export { RESOURCE_ACTION } from '@/domains/_shared/access';
         export { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
+        export { ResourceAccessServicesMap } from '@/domains/ResourceAccess/mapper/ResourceAccessServices.map';
       `,
       resolveDir: root,
     },
@@ -54,6 +55,7 @@ try {
     getContextValue,
     clearAllServiceCaches,
     ResourceServicesMap: resourceMap,
+    ResourceAccessServicesMap: resourceAccessMap,
     RESOURCE_ACTION: action,
   } = await import(pathToFileURL(outfile).href);
   const {
@@ -63,12 +65,18 @@ try {
     resourceService: resource,
     noteService: note,
     documentService: document,
-    resourcePermissionService: permission,
-    interactService: interact,
-    chatService: chat,
+    resourceAccessService: permission,
+    resourceInteractionService: interaction,
+    resourceCommentService: comment,
+    resourceFavoriteService: favorite,
+    chatConfigService: chatConfig,
+    chatSessionService: chatSession,
     skillService: skill,
     agentService: agent,
     userService: user,
+    userTaskService: userTask,
+    userTourService: userTour,
+    userVerificationService: userVerification,
     walletService: wallet,
     groupService: group,
     inlineCommentService: inline,
@@ -121,7 +129,10 @@ try {
     resourceMap.mapResourceItemFromApi(rawResource, { groupId: 'missing' }).mainTagId,
     'tag-group'
   );
-  const mappedOverview = resourceMap.mapResourcePermissionOverviewFromApi(rawResource, 'fallback');
+  const mappedOverview = resourceAccessMap.mapResourcePermissionOverviewFromApi(
+    rawResource,
+    'fallback'
+  );
   assert.equal(mappedOverview.owner.readonly, true);
   assert(!mappedOverview.subjects.some((subject) => subject.groupId?.startsWith('p_')));
   assert(!mappedOverview.supportedActions.includes(action.LOAD));
@@ -136,14 +147,14 @@ try {
     inheritedActionsBySubjectId: new Map(),
   };
   assert.deepEqual(
-    resourceMap.mergeResourcePermissionHydration(mappedOverview, emptyHydration),
+    resourceAccessMap.mergeResourcePermissionHydration(mappedOverview, emptyHydration),
     mappedOverview
   );
   const overrideSubject = mappedOverview.subjects.find(
     (subject) => subject.source === 'resourceOverride'
   );
   assert(overrideSubject);
-  const inheritedOverview = resourceMap.mergeResourcePermissionHydration(mappedOverview, {
+  const inheritedOverview = resourceAccessMap.mergeResourcePermissionHydration(mappedOverview, {
     ...emptyHydration,
     inheritedActionsBySubjectId: new Map([[overrideSubject.id, overrideSubject.editableActions]]),
   });
@@ -154,7 +165,7 @@ try {
   assert.deepEqual(inheritedSubject.effectiveActions, overrideSubject.editableActions);
 
   for (const value of [undefined, null, {}]) {
-    const request = resourceMap.mapChangeResourceActionPermissionRequest({
+    const request = resourceAccessMap.mapChangeResourceActionPermissionRequest({
       resourceId: rawResource.resourceId,
       overrideGrantedActions: value,
       specifiedUsersGrantedActions: value,
@@ -162,7 +173,7 @@ try {
     assert.deepEqual(request.overrideGrantedActions, value);
     assert.deepEqual(request.specifiedUsersGrantedActions, value);
   }
-  const actionRequest = resourceMap.mapChangeResourceActionPermissionRequest({
+  const actionRequest = resourceAccessMap.mapChangeResourceActionPermissionRequest({
     resourceId: rawResource.resourceId,
     overrideGrantedActions: { inherit: null, denied: [], edited: [action.EDIT] },
     specifiedUsersGrantedActions: { denied: [], reader: [action.VIEW] },
@@ -176,7 +187,7 @@ try {
     denied: [],
     reader: ['DISCOVER', 'VIEW'],
   });
-  const subjectRequest = resourceMap.mapChangeResourceActionPermissionRequestFromSubjects({
+  const subjectRequest = resourceAccessMap.mapChangeResourceActionPermissionRequestFromSubjects({
     resourceId: rawResource.resourceId,
     subjects: [
       mappedOverview.owner,
@@ -205,6 +216,24 @@ try {
   const created = await note.createNote({ title: '共用筆記' });
   const resourceId = created.resourceId;
   assert(resourceId);
+  await interaction.toggleResourceLike(resourceId);
+  assert.equal((await interaction.getResourceInteraction(resourceId)).liked, true);
+  await comment.createComment({
+    resourceId,
+    content: '離線評論',
+    imageUrls: [],
+  });
+  assert.equal(
+    (
+      await comment.listComments({
+        resourceId,
+        sortBy: 'CREATE_TIME',
+        page: 1,
+        size: 20,
+      })
+    ).items[0].content,
+    '離線評論'
+  );
   await course.mountCourseOutlineResources({
     courseId,
     targetNodeId: first,
@@ -234,10 +263,10 @@ try {
   await drive.setPersonalResourcesLocation({ resourceIds: [resourceId], target: folder });
   assert.equal((await drive.loadNodeChildren({ parent: folder })).resourceTotal, 1);
   assert(!(await tag.getTagTree()).some((item) => item.tagName.startsWith('/')));
-  const collectionId = await interact.createFavoriteCollection({ collectionName: '驗證收藏' });
-  await interact.updateFavoriteCollections({ resourceId, collectionIds: [collectionId] });
+  const collectionId = await favorite.createFavoriteCollection({ collectionName: '驗證收藏' });
+  await favorite.updateFavoriteCollections({ resourceId, collectionIds: [collectionId] });
   await resource.renameResource({ resourceId, newName: '新筆記名稱' });
-  const favorites = await interact.listFavoritedResources({ collectionId, page: 1, size: 20 });
+  const favorites = await favorite.listFavoritedResources({ collectionId, page: 1, size: 20 });
   assert.equal(favorites.list[0].resourceInfo.resourceName, '新筆記名稱');
   assert.equal((await note.getNoteInfoDisplay({ resourceId })).noteTitle, '新筆記名稱');
   const search = await resource.globalSearch({ keyword: '算法', scope: 'ALL', page: 1, size: 50 });
@@ -258,7 +287,7 @@ try {
     new Set(overview.subjects.map((s) => s.source)),
     new Set(['owner', 'tag', 'resourceOverride', 'specifiedUser'])
   );
-  await resource.updateResourceActionPermission({
+  await permission.updateResourceActionPermission({
     resourceId: 'res-001',
     specifiedUsersGrantedActions: null,
     overrideGrantedActions: null,
@@ -269,24 +298,24 @@ try {
   });
   assert(cleared.subjects.every((s) => s.source === 'tag' || s.source === 'owner'));
 
-  const sessions = await chat.listSessions({ page: 1, size: 2 });
-  const history = await chat.listHistoryMessages({
+  const sessions = await chatSession.listSessions({ page: 1, size: 2 });
+  const history = await chatSession.listHistoryMessages({
     sessionId: sessions.list[0].id,
     page: 1,
     size: 20,
   });
   assert.equal(history.list.length, 20);
   assert(history.total > history.list.length);
-  const session = await chat.createSession({ title: '離線對話' });
+  const session = await chatSession.createSession({ title: '離線對話' });
   assert.equal(
-    (await chat.renameSession({ sessionId: session.id, newTitle: '重新命名' })).title,
+    (await chatSession.renameSession({ sessionId: session.id, newTitle: '重新命名' })).title,
     '重新命名'
   );
   assert(
-    (await chat.listChatInputSkills({ scope: 'PERSONAL', page: 1, size: 20 })).list.length > 0
+    (await chatConfig.listChatInputSkills({ scope: 'PERSONAL', page: 1, size: 20 })).list.length > 0
   );
-  await chat.getChatInputCapabilityOptions({ agent: null });
-  await chat.deleteSession({ sessionId: session.id });
+  await chatConfig.getChatInputCapabilityOptions({ agent: null });
+  await chatSession.deleteSession({ sessionId: session.id });
 
   const skillId = await skill.createSkill('驗證 Skill');
   const { draftVersion } = await skill.getSkillDetail(skillId);
@@ -341,6 +370,22 @@ try {
   assert.equal((await user.getUserInfo()).nickname, '更新後的使用者');
   const candidates = await user.queryUserSearchCandidates({ keyword: 'xiaoming' });
   assert.equal(candidates.length, 1);
+  assert((await user.listInviteRecords({ page: 1, size: 5 })).records.length > 0);
+  assert((await userTask.listTaskStatus()).some((task) => task.taskCode === 'DAILY_CHECK_IN'));
+  assert.equal(typeof (await userTask.dailyCheckIn()).rewardAmount, 'number');
+  assert((await userTour.listTourStatus()).length > 0);
+  await userVerification.sendEmailVerify({ email: 'test@example.com' });
+  await userVerification.confirmEmailVerify({ token: 'mock-token' });
+  await userVerification.initiateUISVerify({
+    uisAccount: 'mock-account',
+    uisPassword: 'mock-password',
+  });
+  assert.equal(typeof (await userVerification.checkFudanUISVerify()).completed, 'boolean');
+  await user.submitFeedback({
+    type: 'BUG_REPORT',
+    content: '離線回饋',
+    contact: 'test@example.com',
+  });
   assert(
     (await wallet.listTransactions({ transactionTypes: ['REFILL', 'SPEND'], page: 1, size: 20 }))
       .records.length > 0

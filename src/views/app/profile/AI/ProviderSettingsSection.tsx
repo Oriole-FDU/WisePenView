@@ -8,8 +8,8 @@ import { FormField, Input, PasswordInput, Select, Switch } from '@/components/ba
 import ListBox from '@/components/base/ListBox';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useChatService } from '@/domains';
-import type { ChatModelConfig, ChatProvider, ChatProviderType } from '@/domains/Chat';
+import { useChatConfigService } from '@/domains';
+import type { ChatModelConfig, ChatProvider, ChatProviderType } from '@/domains/ChatConfig';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.scss';
@@ -24,7 +24,7 @@ const PROVIDER_TYPES: ChatProviderType[] = [
 
 function ProviderSettingsSection() {
   const { t } = useTranslation('profile');
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const [providers, setProviders] = useState<ChatProvider[]>([]);
   const [models, setModels] = useState<ChatModelConfig[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -49,8 +49,8 @@ function ProviderSettingsSection() {
   const { loading, runAsync: reload } = useApi(
     async () => {
       const [nextProviders, nextModels] = await Promise.all([
-        chatService.getUserProviders(),
-        chatService.getBindableModels(),
+        chatConfigService.getUserProviders(),
+        chatConfigService.getBindableModels(),
       ]);
       return { providers: nextProviders, models: nextModels };
     },
@@ -62,16 +62,16 @@ function ProviderSettingsSection() {
     }
   );
   const { loading: saving, runAsync: save } = useApi(
-    (params: Parameters<typeof chatService.createUserProvider>[0]) =>
+    (params: Parameters<typeof chatConfigService.createUserProvider>[0]) =>
       editingProvider
-        ? chatService.updateUserProvider({
+        ? chatConfigService.updateUserProvider({
             providerId: editingProvider.id,
             name: params.name,
             type: params.type,
             apiKey: params.apiKey || undefined,
             baseUrl: params.baseUrl,
           })
-        : chatService.createUserProvider(params),
+        : chatConfigService.createUserProvider(params),
     {
       manual: true,
       onSuccess: () => {
@@ -82,7 +82,7 @@ function ProviderSettingsSection() {
   );
   const { loading: toggling, runAsync: toggle } = useApi(
     async (provider: ChatProvider, isActive: boolean) => {
-      await chatService.updateUserProvider({ providerId: provider.id, isActive });
+      await chatConfigService.updateUserProvider({ providerId: provider.id, isActive });
       return { providerId: provider.id, isActive };
     },
     {
@@ -97,7 +97,7 @@ function ProviderSettingsSection() {
     }
   );
   const { loading: deleting, runAsync: remove } = useApi(
-    (providerId: string) => chatService.deleteUserProvider(providerId),
+    (providerId: string) => chatConfigService.deleteUserProvider(providerId),
     {
       manual: true,
       onSuccess: () => {
@@ -108,7 +108,7 @@ function ProviderSettingsSection() {
   );
   const { loading: savingBinding, runAsync: saveBinding } = useApi(
     (params: { providerId: string; modelId: string; providerModelName: string }) =>
-      chatService.bindModelProvider(params),
+      chatConfigService.bindModelProvider(params),
     {
       manual: true,
       onSuccess: () => {
@@ -119,7 +119,7 @@ function ProviderSettingsSection() {
   );
   const { loading: unbinding, runAsync: unbind } = useApi(
     (target: { model: ChatModelConfig; provider: ChatProvider }) =>
-      chatService.unbindModelProvider(target.model.id, target.provider.id),
+      chatConfigService.unbindModelProvider(target.model.id, target.provider.id),
     {
       manual: true,
       onSuccess: () => {

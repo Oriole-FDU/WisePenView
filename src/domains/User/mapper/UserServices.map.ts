@@ -4,7 +4,6 @@ import type {
   UserInviteRecord,
   UserInviteRecordList,
   UserSearchUser,
-  UserTourStatus,
 } from '@/domains/User';
 import { normalizeId } from '@/utils/normalize/normalizeId';
 
@@ -12,42 +11,15 @@ import type {
   AddFeedbackApiRequest,
   ChangeUserInfoApiRequest,
   ChangeUserProfileApiRequest,
-  CheckEmailVerifyApiRequest,
-  CheckFudanUISVerifyApiResponse,
-  InitiateEmailVerifyApiRequest,
-  InitiateFudanUISVerifyApiRequest,
-  ListUserInviteRecordsApiRequest,
   ListUserInviteRecordsApiResponse,
   UserInviteRecordApiResponse,
-} from '../apis/UserApi.type';
+} from '../apis/AccountApi.schema';
 import type {
   GetUserInfoApiResponse,
   SearchUsersApiResponse,
 } from '../apis/UserInformationApi.contract';
-import type {
-  UserTaskCheckInApiResponse,
-  UserTaskPeriodicStatusApiResponse,
-  UserTaskRewardPreviewApiResponse,
-  UserTaskStatusApiResponse,
-} from '../apis/UserTaskApi.type';
-import type { UserTourStatusApiResponse } from '../apis/UserTourApi.type';
-import type {
-  UserTaskCheckInResult,
-  UserTaskPeriodicStatus,
-  UserTaskRewardPreview,
-  UserTaskStatus,
-} from '../entity/userTask';
-import { FEEDBACK_TYPE, type FeedbackType } from '../enum';
-import type {
-  ConfirmEmailVerifyRequest,
-  FudanUISVerifyStatusData,
-  InitiateUISVerifyRequest,
-  ListUserInviteRecordsRequest,
-  SendEmailVerifyRequest,
-  SubmitFeedbackRequest,
-  UpdateUserInfoRequest,
-} from '../service/index.type';
-import { normalizeIdentityTypeFromApi, normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
+import type { SubmitFeedbackRequest, UpdateUserInfoRequest } from '../service/index.type';
+import { normalizeUserDisplayBaseFromApi } from './userEnum.mapper';
 
 type CachedUserSafe = Pick<
   User,
@@ -62,7 +34,7 @@ const mapAccountProfileFromApi = (data: GetUserInfoApiResponse): UserAccountProf
       nickname: userInfo.nickname ?? undefined,
       realName: userInfo.realName ?? undefined,
       avatar: userInfo.avatar ?? undefined,
-      identityType: normalizeIdentityTypeFromApi(userInfo.identityType),
+      identityType: userInfo.identityType,
       username: userInfo.username,
       campusNo: userInfo.campusNo ?? undefined,
       email: userInfo.email ?? undefined,
@@ -112,49 +84,12 @@ const mapSearchUserFromApi = (data: SearchUsersApiResponse[number]): UserSearchU
 const mapSearchUsersFromApi = (data: SearchUsersApiResponse): UserSearchUser[] =>
   data.map(mapSearchUserFromApi);
 
-const mapSendEmailVerifyRequest = (
-  params: SendEmailVerifyRequest
-): InitiateEmailVerifyApiRequest => ({
-  email: params.email,
-});
-
-const mapInitiateUISVerifyRequest = (
-  params: InitiateUISVerifyRequest
-): InitiateFudanUISVerifyApiRequest => ({
-  uisAccount: params.uisAccount,
-  uisPassword: params.uisPassword,
-});
-
-const mapFudanUISVerifyStatusFromApi = (
-  data: CheckFudanUISVerifyApiResponse | null | undefined
-): FudanUISVerifyStatusData => {
-  return {
-    completed: data?.completed === true,
-    requireAction: data?.requireAction === true,
-    actionPayload: typeof data?.actionPayload === 'string' ? data.actionPayload : '',
-    message: typeof data?.message === 'string' ? data.message : '',
-  };
-};
-
-const mapConfirmEmailVerifyRequest = (
-  params: ConfirmEmailVerifyRequest
-): CheckEmailVerifyApiRequest => ({
-  token: params.token,
-});
-
-const mapListInviteRecordsRequest = (
-  params: ListUserInviteRecordsRequest
-): ListUserInviteRecordsApiRequest => ({
-  page: params.page,
-  size: params.size,
-});
-
 const mapInviteRecordFromApi = (data: UserInviteRecordApiResponse): UserInviteRecord => ({
   id: normalizeId(data.id),
   inviteeUserId: normalizeId(data.inviteeUserId),
   invitee: normalizeUserDisplayBaseFromApi(data.inviteeDisplay),
-  status: data.status === 'REWARDED' ? 'REWARDED' : 'BOUND',
-  createTime: data.createTime ?? undefined,
+  status: data.status,
+  createTime: data.createTime,
   rewardTime: data.rewardTime ?? undefined,
 });
 
@@ -168,78 +103,13 @@ const mapListInviteRecordsFromApi = (
   totalPage: data.totalPage,
 });
 
-const hasFeedbackType = (types: FeedbackType[], type: FeedbackType): boolean =>
-  types.includes(type);
-
 const mapSubmitFeedbackRequest = (params: SubmitFeedbackRequest): AddFeedbackApiRequest => ({
   content: params.content,
   contact: params.contact,
   imageUrl: params.imageUrl?.trim() || undefined,
-  bugReport: hasFeedbackType(params.types, FEEDBACK_TYPE.BUG_REPORT),
-  suggestion: hasFeedbackType(params.types, FEEDBACK_TYPE.SUGGESTION),
-  consultation: hasFeedbackType(params.types, FEEDBACK_TYPE.CONSULTATION),
-  complaint: hasFeedbackType(params.types, FEEDBACK_TYPE.COMPLAINT),
-  other: hasFeedbackType(params.types, FEEDBACK_TYPE.OTHER),
+  browser: typeof navigator === 'undefined' ? undefined : navigator.userAgent,
+  type: params.type,
 });
-
-const mapTaskRewardPreviewFromApi = (
-  data: UserTaskRewardPreviewApiResponse | null | undefined
-): UserTaskRewardPreview | undefined => {
-  if (!data) return undefined;
-  return {
-    rewardType: data.rewardType,
-    rewardAmount: data.rewardAmount ?? undefined,
-    minRewardAmount: data.minRewardAmount ?? undefined,
-    maxRewardAmount: data.maxRewardAmount ?? undefined,
-    rewardStepAmount: data.rewardStepAmount ?? undefined,
-  };
-};
-
-const mapTaskPeriodicStatusFromApi = (
-  data: UserTaskPeriodicStatusApiResponse | null | undefined
-): UserTaskPeriodicStatus | undefined => {
-  if (!data) return undefined;
-  return {
-    completedTimes: data.completedTimes,
-    maxTimes: data.maxTimes,
-    windowStart: data.windowStart ?? undefined,
-    windowEnd: data.windowEnd ?? undefined,
-    lastCompleteTime: data.lastCompleteTime ?? undefined,
-  };
-};
-
-const mapTaskStatusFromApi = (data: UserTaskStatusApiResponse): UserTaskStatus => ({
-  taskCode: data.taskCode,
-  taskType: data.taskType,
-  enabled: data.enabled,
-  canComplete: data.canComplete,
-  rewardPreview: mapTaskRewardPreviewFromApi(data.rewardPreview),
-  once: data.once
-    ? {
-        completed: data.once.completed,
-        completeTime: data.once.completeTime ?? undefined,
-      }
-    : undefined,
-  periodic: mapTaskPeriodicStatusFromApi(data.periodic),
-});
-
-const mapTaskStatusesFromApi = (data: UserTaskStatusApiResponse[]): UserTaskStatus[] =>
-  data.map(mapTaskStatusFromApi);
-
-const mapTaskCheckInFromApi = (data: UserTaskCheckInApiResponse): UserTaskCheckInResult => ({
-  rewardType: data.rewardType,
-  rewardAmount: data.rewardAmount,
-  hitGuarantee: data.hitGuarantee,
-  cycleProgress: data.cycleProgress,
-  cycleCount: data.cycleCount,
-  checkedInToday: data.checkedInToday,
-});
-
-const mapTourStatusesFromApi = (data: UserTourStatusApiResponse[]): UserTourStatus[] =>
-  data.map(({ tourCode, completed }) => ({
-    tourCode,
-    completed: completed === true,
-  }));
 
 const mapUpdateUserInfoRequests = (
   params: UpdateUserInfoRequest
@@ -276,15 +146,7 @@ export const UserServicesMap = {
   mapAccountProfileFromApi,
   mapUserSafeFromAccountProfile,
   mapSearchUsersFromApi,
-  mapSendEmailVerifyRequest,
-  mapInitiateUISVerifyRequest,
-  mapFudanUISVerifyStatusFromApi,
-  mapConfirmEmailVerifyRequest,
-  mapListInviteRecordsRequest,
   mapListInviteRecordsFromApi,
   mapSubmitFeedbackRequest,
-  mapTaskStatusesFromApi,
-  mapTaskCheckInFromApi,
-  mapTourStatusesFromApi,
   mapUpdateUserInfoRequests,
 };

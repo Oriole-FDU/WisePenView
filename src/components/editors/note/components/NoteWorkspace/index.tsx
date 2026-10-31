@@ -18,7 +18,7 @@ import type {
 import { NoteEditorSlot } from '@/components/editors/note/CustomBlockNote/NoteEditorSession';
 import { useNoteEditorStatus } from '@/components/editors/note/CustomBlockNote/useNoteEditorStatus';
 import { GUIDE_ACTION_ID } from '@/constants/tour';
-import { useInteractService } from '@/domains';
+import { useResourceInteractionService } from '@/domains';
 import type { NoteInfoDisplayData } from '@/domains/Note';
 import { encodeNoteClientContentSignature } from '@/domains/Note';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
@@ -93,8 +93,10 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
       }),
     [isOutlineOpen]
   );
-  const interactService = useInteractService();
-  useApi(() => interactService.recordResourceRead(resourceId), { refreshDeps: [resourceId] });
+  const interactionService = useResourceInteractionService();
+  useApi(() => interactionService.recordResourceRead(resourceId), {
+    refreshDeps: [resourceId],
+  });
   const headerSaveStatus = resolveNoteHeaderSaveStatus(session.saveStatus, titleSaveStatus);
   const saveStatusText = t(`save.${headerSaveStatus}`);
   const { target } = useEditorSurface();

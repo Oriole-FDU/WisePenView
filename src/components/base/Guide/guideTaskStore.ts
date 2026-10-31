@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import { GUIDE_TOUR_CODE, GUIDE_TOUR_ID, type GuideTourId } from '@/constants/tour';
-import type { UserTourStatus } from '@/domains/User';
+import type { UserTourStatus } from '@/domains/UserTour';
 import { registerStore } from '@/store/lifecycle';
 
 type GuideTourPendingMap = Record<GuideTourId, boolean>;

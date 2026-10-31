@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
-import type { ChatSession, PageResult } from '@/domains/Chat';
+import type { PageResult } from '@/domains/_shared/entity/page';
+import type { ChatSession } from '@/domains/ChatSession';
 import { registerStore } from '@/store/lifecycle';
 
 interface SidebarSessionHistoryState {

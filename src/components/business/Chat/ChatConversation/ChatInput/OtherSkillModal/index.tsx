@@ -6,7 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
-import { type ChatAgentOption } from '@/domains/Chat';
+import { type ChatAgentOption } from '@/domains/ChatConfig';
 import type { ResourceSkillSummary } from '@/domains/Resource';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';

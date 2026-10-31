@@ -12,9 +12,12 @@ export interface AgentModelPolicy {
 }
 
 export interface AgentToolAndSkillPolicy {
+  enableUseTool: boolean;
   toolSelectionDefaultEnabled: boolean;
   toolSelectionOverrides: Record<string, boolean>;
+  enableUseSkill: boolean;
   onDemandSkillIds: string[];
+  skillMatchTopK: number;
 }
 
 export interface AgentMemoryPolicy {

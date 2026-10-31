@@ -1,4 +1,4 @@
-import type { ResourcePermissionResourceType } from '@/domains/Resource';
+import type { ResourcePermissionResourceType } from '@/domains/ResourceAccess';
 
 export interface ResourcePermissionModalTarget {
   resourceId: string;

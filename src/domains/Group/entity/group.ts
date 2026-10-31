@@ -1,5 +1,6 @@
 import type { ResourceAction } from '@/domains/_shared/access';
 import type { GROUP_FILE_ORG_LOGIC, GroupType, ROLE } from '@/domains/Group';
+import type { IdentityType } from '@/domains/User';
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
 
 /** 成员列表领域模型（由 OpenAPI GroupMemberDetailResponse 映射）；userId 对应接口 memberId，避免大数精度丢失 */
@@ -28,7 +29,7 @@ export interface GroupOwnerInfo {
   nickname: string;
   realName?: string;
   avatar?: string;
-  identityType?: number;
+  identityType?: IdentityType;
 }
 
 /** 小组文件组织模式（与 OpenAPI GroupResConfigResponse.fileOrgLogic 对齐） */

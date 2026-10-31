@@ -1,7 +1,7 @@
 import { GROUP_TYPE, type IGroupService } from '@/domains/Group';
-import type { IInteractService } from '@/domains/Interact';
 import type { IResourceService } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
+import type { IResourceInteractionService } from '@/domains/ResourceInteraction';
 import type { ITagService, TagTreeNode } from '@/domains/Tag';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
@@ -43,14 +43,14 @@ const parseCourseResourceCursor = (cursor?: string): number => {
 
 interface CourseServicesDeps {
   groupService: IGroupService;
-  interactService: IInteractService;
+  resourceInteractionService: IResourceInteractionService;
   resourceService: IResourceService;
   tagService: ITagService;
 }
 
 /** Course 是高级组的前端聚合视图，不拥有独立 API。 */
 export const createCourseServices = (deps: CourseServicesDeps): ICourseService => {
-  const { groupService, interactService, resourceService, tagService } = deps;
+  const { groupService, resourceInteractionService, resourceService, tagService } = deps;
 
   const listMyCourses = async ({ page, size }: ListMyCoursesRequest) => {
     const data = await groupService.fetchGroupList({
@@ -356,7 +356,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     listCourseAnnouncements: unavailable,
     getCourseOutline,
     loadCourseOutlineResources,
-    setResourceRead: ({ resourceId }) => interactService.recordResourceRead(resourceId),
+    setResourceRead: ({ resourceId }) => resourceInteractionService.recordResourceRead(resourceId),
     listCourseMembers,
     createCourse,
     updateCourse,

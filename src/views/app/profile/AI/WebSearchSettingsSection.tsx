@@ -6,26 +6,26 @@ import { AppButton } from '@/components/base/Button';
 import { FormField, PasswordInput, Switch } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useChatService } from '@/domains';
-import type { ToolOption } from '@/domains/Chat';
+import { useChatConfigService } from '@/domains';
+import type { ToolOption } from '@/domains/ChatConfig';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.scss';
 
 function WebSearchSettingsSection() {
   const { t } = useTranslation('profile');
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const [tools, setTools] = useState<ToolOption[]>([]);
   const [editingTool, setEditingTool] = useState<ToolOption | null>(null);
   const [deleteTool, setDeleteTool] = useState<ToolOption | null>(null);
   const [apiKey, setApiKey] = useState('');
 
-  const { loading, runAsync: reload } = useApi(() => chatService.getTools(), {
+  const { loading, runAsync: reload } = useApi(() => chatConfigService.getTools(), {
     onSuccess: setTools,
   });
   const { loading: saving, runAsync: save } = useApi(
     (tool: ToolOption, key: string) =>
-      chatService.updateUserToolConfig({
+      chatConfigService.updateUserToolConfig({
         toolName: tool.toolId,
         enabled: true,
         secretConfig: { api_key: key },
@@ -40,7 +40,7 @@ function WebSearchSettingsSection() {
   );
   const { loading: toggling, runAsync: toggle } = useApi(
     (tool: ToolOption, enabled: boolean) =>
-      chatService.updateUserToolConfig({ toolName: tool.toolId, enabled }),
+      chatConfigService.updateUserToolConfig({ toolName: tool.toolId, enabled }),
     {
       manual: true,
       onSuccess: (updatedTool) => {
@@ -51,7 +51,7 @@ function WebSearchSettingsSection() {
     }
   );
   const { loading: deleting, runAsync: remove } = useApi(
-    (toolName: string) => chatService.deleteUserToolConfig(toolName),
+    (toolName: string) => chatConfigService.deleteUserToolConfig(toolName),
     {
       manual: true,
       onSuccess: () => {

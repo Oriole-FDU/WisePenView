@@ -4,7 +4,7 @@
 
 ## 范围
 
-本文件拥有资源点赞、收藏、阅读统计与一般根评论、回复、评论点赞、删除显示及 composer。数据语义由 [Interact](../../../../domains/Interact/BUSINESS.md) 拥有；收藏只使用 [共享收藏流程](../BUSINESS.md)，不与锚点批注混用。
+本文件拥有资源点赞、收藏、阅读统计与一般根评论、回复、评论点赞、删除显示及 composer。资源级互动由 [ResourceInteraction](../../../../domains/ResourceInteraction/BUSINESS.md) 拥有，评论由 [ResourceComment](../../../../domains/ResourceComment/BUSINESS.md) 拥有，收藏由 [ResourceFavorite](../../../../domains/ResourceFavorite/BUSINESS.md) 拥有；收藏只使用 [共享收藏流程](../BUSINESS.md)，不与锚点批注混用。
 
 锚点批注的互动另见 [共享批注面板](../../InlineComment/BUSINESS.md)。
 
@@ -13,7 +13,7 @@
 - 根评论可按时间或赞数排序，切换资源／排序会清空旧清单；回复展开时才加载，以根评论 ID 分页，回复任一项时送该项 commentId 为 replyTo。提交回复后展开并刷新回复与根清单。依据：[ResourceInteractionPanel](index.tsx)、[ResourceCommentThread](ResourceCommentThread.tsx)。
 - deleted 项目显示 tombstone，隐藏正文、图片、回复、点赞与删除操作；不自行删除整条 thread，既有回复仍可通过根项的回复数入口展开。不能推论后端是硬删除还是软删除。依据：[ResourceCommentItem](ResourceCommentItem.tsx)、[ResourceCommentThread](ResourceCommentThread.tsx)。
 - 未删除项目的删除入口只对作者或 Resource owner 显示；确认后调用删除 API，按需刷新回复，再刷新根清单与资源信息。这是前端 gate，不是后端授权证据。依据：[ResourceCommentItem](ResourceCommentItem.tsx)、[ResourceInteractionPanel](index.tsx)。
-- Resource 赞数先做本地乐观显示，失败清除乐观值，成功通知资源刷新并重读互动；评论则依返回 liked 更新 ID 集合与计数，同项 pending 时不重送。两者的请求语义只由 Interact 定义。依据：[ResourceInteractionPanel](index.tsx)、[ResourceCommentThread](ResourceCommentThread.tsx)、[点赞规则](../../../../domains/Interact/BUSINESS.md)。
+- Resource 赞数先做本地乐观显示，失败清除乐观值，成功通知资源刷新并重读互动；评论则依返回 liked 更新 ID 集合与计数，同项 pending 时不重送。两者的请求语义分别由 ResourceInteraction 与 ResourceComment 定义。依据：[ResourceInteractionPanel](index.tsx)、[ResourceCommentThread](ResourceCommentThread.tsx)、[资源点赞规则](../../../../domains/ResourceInteraction/BUSINESS.md)、[评论点赞规则](../../../../domains/ResourceComment/BUSINESS.md)。
 
 ## 图片提交与限制
 

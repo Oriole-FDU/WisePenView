@@ -7,8 +7,8 @@ import { FormField, Input, Select, Switch } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { useChatService } from '@/domains';
-import type { ChatModelConfig, ChatModelFamily } from '@/domains/Chat';
+import { useChatConfigService } from '@/domains';
+import type { ChatModelConfig, ChatModelFamily } from '@/domains/ChatConfig';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './style.module.scss';
@@ -49,20 +49,20 @@ function isValidOptionalPositiveInteger(value: string): boolean {
 
 function ModelSettingsSection() {
   const { t } = useTranslation('profile');
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const [models, setModels] = useState<ChatModelConfig[]>([]);
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [editingModel, setEditingModel] = useState<ChatModelConfig | null>(null);
   const [deleteModel, setDeleteModel] = useState<ChatModelConfig | null>(null);
   const [modelForm, setModelForm] = useState<ModelFormState>(createDefaultModelForm);
 
-  const { loading, runAsync: reload } = useApi(() => chatService.getUserModels(), {
+  const { loading, runAsync: reload } = useApi(() => chatConfigService.getUserModels(), {
     onSuccess: setModels,
   });
   const { loading: savingModel, runAsync: saveModel } = useApi(
     (form: ModelFormState) =>
       editingModel
-        ? chatService.updateUserModel({
+        ? chatConfigService.updateUserModel({
             modelId: editingModel.id,
             displayName: form.displayName,
             modelFamily: form.modelFamily,
@@ -71,7 +71,7 @@ function ModelSettingsSection() {
             contextWindowTokens: parseOptionalPositiveInteger(form.contextWindowTokens),
             maxOutputTokens: parseOptionalPositiveInteger(form.maxOutputTokens),
           })
-        : chatService.createUserModel({
+        : chatConfigService.createUserModel({
             displayName: form.displayName,
             modelFamily: form.modelFamily,
             supportThinking: form.supportThinking,
@@ -88,7 +88,7 @@ function ModelSettingsSection() {
     }
   );
   const { loading: deletingModel, runAsync: removeModel } = useApi(
-    (modelId: string) => chatService.deleteUserModel(modelId),
+    (modelId: string) => chatConfigService.deleteUserModel(modelId),
     {
       manual: true,
       onSuccess: () => {

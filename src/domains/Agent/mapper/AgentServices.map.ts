@@ -1,16 +1,18 @@
-import type { ResourcePermissionOverview } from '@/domains/Resource';
+import {
+  ASSET_RESOURCE_TYPE,
+  type AssetResourceType,
+} from '@/domains/_shared/apis/versionAsset.enum';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
-  AgentAssetResourceTypeApiValue,
   AgentInfoApiResponse,
   AgentSpecApi,
+  AgentSpecRequest,
   AgentVersionBundleApiResponse,
   UpdateAgentInfoApiRequest,
   UpdateAgentSpecApiRequest,
-} from '../apis/AgentApi.type';
-import { AGENT_ASSET_RESOURCE_TYPE_API } from '../apis/AgentApi.type';
+} from '../apis/AgentApi.schema';
 import type { AgentDetail, AgentSpec } from '../entity/agent';
 import type { SaveAgentDraftRequest } from '../service/index.type';
 
@@ -19,9 +21,12 @@ const AGENT_SPEC_FALLBACK: AgentSpec = {
   autoGenerateTitle: true,
   modelPolicy: { defaultModelId: '', defaultProviderId: '', allowRequestOverride: true },
   toolAndSkillPolicy: {
+    enableUseTool: true,
     toolSelectionDefaultEnabled: true,
     toolSelectionOverrides: {},
+    enableUseSkill: true,
     onDemandSkillIds: [],
+    skillMatchTopK: 10,
   },
   memoryPolicy: {
     enableChatMemory: true,
@@ -47,11 +52,20 @@ const mapSpec = (spec?: AgentSpecApi | null): AgentSpec => ({
       AGENT_SPEC_FALLBACK.modelPolicy.allowRequestOverride,
   },
   toolAndSkillPolicy: {
+    enableUseTool:
+      spec?.toolAndSkillPolicy?.enableUseTool ??
+      AGENT_SPEC_FALLBACK.toolAndSkillPolicy.enableUseTool,
     toolSelectionDefaultEnabled:
       spec?.toolAndSkillPolicy?.toolSelectionDefaultEnabled ??
       AGENT_SPEC_FALLBACK.toolAndSkillPolicy.toolSelectionDefaultEnabled,
     toolSelectionOverrides: { ...(spec?.toolAndSkillPolicy?.toolSelectionOverrides ?? {}) },
+    enableUseSkill:
+      spec?.toolAndSkillPolicy?.enableUseSkill ??
+      AGENT_SPEC_FALLBACK.toolAndSkillPolicy.enableUseSkill,
     onDemandSkillIds: [...(spec?.toolAndSkillPolicy?.onDemandSkillIds ?? [])],
+    skillMatchTopK:
+      spec?.toolAndSkillPolicy?.skillMatchTopK ??
+      AGENT_SPEC_FALLBACK.toolAndSkillPolicy.skillMatchTopK,
   },
   memoryPolicy: {
     enableChatMemory:
@@ -79,7 +93,7 @@ const mapSpec = (spec?: AgentSpecApi | null): AgentSpec => ({
   },
 });
 
-const mapAgentSpecToApi = (spec: AgentSpec): AgentSpecApi => ({
+const mapAgentSpecToApi = (spec: AgentSpec): AgentSpecRequest => ({
   systemPrompt: spec.systemPrompt,
   autoGenerateTitle: spec.autoGenerateTitle,
   modelPolicy: { ...spec.modelPolicy },
@@ -109,17 +123,17 @@ const mapSaveAgentDraftRequests = (
   },
 });
 
-const resolveAssetResourceType = (name: string): AgentAssetResourceTypeApiValue => {
+const resolveAssetResourceType = (name: string): AssetResourceType => {
   const extension = name.split('.').pop()?.toLowerCase();
-  const typeMap: Record<string, AgentAssetResourceTypeApiValue> = {
-    md: AGENT_ASSET_RESOURCE_TYPE_API.MD,
-    py: AGENT_ASSET_RESOURCE_TYPE_API.PYTHON_SCRIPT,
-    json: AGENT_ASSET_RESOURCE_TYPE_API.JSON,
-    yaml: AGENT_ASSET_RESOURCE_TYPE_API.YAML,
-    yml: AGENT_ASSET_RESOURCE_TYPE_API.YAML,
-    toml: AGENT_ASSET_RESOURCE_TYPE_API.TOML,
+  const typeMap: Record<string, AssetResourceType> = {
+    md: ASSET_RESOURCE_TYPE.MD,
+    py: ASSET_RESOURCE_TYPE.PYTHON_SCRIPT,
+    json: ASSET_RESOURCE_TYPE.JSON,
+    yaml: ASSET_RESOURCE_TYPE.YAML,
+    yml: ASSET_RESOURCE_TYPE.YAML,
+    toml: ASSET_RESOURCE_TYPE.TOML,
   };
-  return typeMap[extension ?? ''] ?? AGENT_ASSET_RESOURCE_TYPE_API.TEXT;
+  return typeMap[extension ?? ''] ?? ASSET_RESOURCE_TYPE.TEXT;
 };
 
 const mapAgentDetail = (params: {
@@ -144,12 +158,12 @@ const mapAgentDetail = (params: {
     status: params.bundle?.status ?? (publishedVersion > 0 ? 'PUBLISHED' : 'DRAFT'),
     spec: mapSpec(params.bundle?.spec),
     assets: (params.bundle?.assets ?? []).map((asset) => ({
-      id: asset.id ?? '',
-      name: asset.name ?? '',
-      path: asset.path ?? '/',
-      objectKey: asset.objectKey,
-      assetResourceType: asset.assetResourceType ?? 'TEXT',
-      uploadStatus: asset.uploadStatus ?? 'UPLOADING',
+      id: asset.id,
+      name: asset.name,
+      path: asset.path,
+      objectKey: asset.objectKey ?? undefined,
+      assetResourceType: asset.assetResourceType,
+      uploadStatus: asset.uploadStatus,
       size: normalizeNonNegativeNumber(asset.size) ?? 0,
     })),
     ownerId: resource?.ownerId,
@@ -157,18 +171,8 @@ const mapAgentDetail = (params: {
   };
 };
 
-const mapAgentPermissionOverviewFromApi = (
-  info: AgentInfoApiResponse | null | undefined,
-  resourceId: string
-): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(
-    info?.resourceInfo ?? { resourceId, resourceName: '', ownerInfo: {} },
-    resourceId
-  );
-
 export const AgentServicesMap = {
   mapAgentDetail,
-  mapAgentPermissionOverviewFromApi,
   mapSaveAgentDraftRequests,
   mapSpec,
   resolveAssetResourceType,

@@ -2,7 +2,7 @@ import { useLatest, useMemoizedFn, useUnmountedRef } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 
 import type { ChatSendInterceptor } from '@/components/business/Chat/index.type';
-import type { ChatAgentOption } from '@/domains/Chat';
+import type { ChatAgentOption } from '@/domains/ChatConfig';
 
 interface UseAgentDebugSendGuardControllerOptions {
   /** 注入聊天输入选择器的草稿 Agent；不在可调试状态时为 undefined */

@@ -3,7 +3,7 @@ import { type ChangeEvent, type ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { HiddenFileInput } from '@/components/base/Input';
-import { useChatService } from '@/domains';
+import { useChatSessionService } from '@/domains';
 import { parseErrorMessage } from '@/utils/error';
 import { generateThumbnail } from '@/utils/file/upload';
 import { createUuid } from '@/utils/random/createUuid';
@@ -25,7 +25,7 @@ export function ChatInputFileProvider({
   getUploadSessionId: () => Promise<string | undefined>;
 }) {
   const { t } = useTranslation('chat');
-  const chatService = useChatService();
+  const chatSessionService = useChatSessionService();
   const store = useChatInputStoreApi();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
@@ -55,7 +55,7 @@ export function ChatInputFileProvider({
         removePendingAttachmentUpload(id);
         return null;
       }
-      const result = await chatService.uploadAttachment({
+      const result = await chatSessionService.uploadAttachment({
         sessionId,
         file,
         saveToLibrary: false,

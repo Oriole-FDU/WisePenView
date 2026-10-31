@@ -6,14 +6,16 @@ import { AppButton } from '@/components/base/Button';
 import { Select } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
-import { useAdminService } from '@/domains';
-import type { AdminMessage } from '@/domains/Admin';
-import { useApi } from '@/hooks/useApi';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import AdminPageHeader from '@/views/admin/_common/AdminPageHeader';
 
 import styles from '../style.module.scss';
 import CreateAnnouncementModal from './CreateAnnouncementModal';
+import type {
+  AnnouncementManagementProps,
+  AnnouncementRecord,
+  PublishAnnouncementRequest,
+} from './index.type';
 import pageStyles from './style.module.scss';
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
@@ -30,19 +32,18 @@ const formatDateTime = (value?: string | null): string => {
   return formatted || EMPTY_TEXT;
 };
 
-function AnnouncementManagement() {
+function AnnouncementManagement({
+  items,
+  total,
+  loading,
+  page,
+  pageSize,
+  onPageChange,
+  onRefresh,
+  onPublish,
+}: AnnouncementManagementProps) {
   const { t } = useTranslation(['admin', 'common']);
-  const adminService = useAdminService();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-
-  const { data, loading, refresh } = useApi(
-    () => adminService.listAdminMessages({ page: currentPage, size: pageSize }),
-    {
-      refreshDeps: [adminService, currentPage, pageSize],
-    }
-  );
 
   const columns = [
     {
@@ -123,23 +124,24 @@ function AnnouncementManagement() {
         <DataTable.TextCell>{formatDateTime(record.createTime)}</DataTable.TextCell>
       ),
     },
-  ] satisfies DataTableColumn<AdminMessage>[];
+  ] satisfies DataTableColumn<AnnouncementRecord>[];
 
-  const messages = data?.messages ?? [];
-  const total = data?.total ?? 0;
-
-  const handlePageChange = (nextPage: number, nextPageSize: number) => {
-    setCurrentPage(nextPage);
-    setPageSize(nextPageSize);
+  const handlePublish = async (request: PublishAnnouncementRequest) => {
+    await onPublish(request);
+    if (page !== 1) {
+      onPageChange(1, pageSize);
+      return;
+    }
+    await onRefresh();
   };
 
   return (
     <div className={styles.pageContainer}>
       <AdminPageHeader page="announcements" />
-      <DataTable<AdminMessage>
+      <DataTable<AnnouncementRecord>
         ariaLabel={t('announcement.tableAria')}
         rowKey="messageId"
-        items={messages}
+        items={items}
         loading={loading}
         columns={columns}
         title={t('announcement.tableTitle')}
@@ -156,7 +158,7 @@ function AnnouncementManagement() {
               size="sm"
               isDisabled={loading}
               onPress={() => {
-                void refresh();
+                void onRefresh();
               }}
             >
               {t('actions.refresh', { ns: 'common' })}
@@ -165,17 +167,17 @@ function AnnouncementManagement() {
         }
         pagination={{
           total,
-          current: currentPage,
+          current: page,
           pageSize,
           summary: t('announcement.total', { count: total }),
-          onChange: handlePageChange,
+          onChange: onPageChange,
           pageSizeControl: (
             <Select
               aria-label={t('announcement.pageSizeAria')}
               value={String(pageSize)}
               onChange={(key) => {
                 if (key == null || Array.isArray(key)) return;
-                handlePageChange(1, Number(key));
+                onPageChange(1, Number(key));
               }}
               className={pageStyles.pageSizeSelect}
             >
@@ -202,13 +204,7 @@ function AnnouncementManagement() {
       <CreateAnnouncementModal
         isOpen={createModalOpen}
         onOpenChange={setCreateModalOpen}
-        onSuccess={() => {
-          if (currentPage === 1) {
-            void refresh();
-          } else {
-            setCurrentPage(1);
-          }
-        }}
+        onSubmit={handlePublish}
       />
     </div>
   );

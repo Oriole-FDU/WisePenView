@@ -9,7 +9,7 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import { publicAppConfig } from '@/config/runtimeConfig';
-import { useDocumentService, useInteractService } from '@/domains';
+import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { captureException } from '@/observability';
@@ -126,7 +126,7 @@ function OfficeEditorContent() {
   } = useEditorSurface();
   const { t } = useTranslation('workspace');
   const documentService = useDocumentService();
-  const interactService = useInteractService();
+  const interactionService = useResourceInteractionService();
   const [editorReady, setEditorReady] = useState(false);
   const [editorError, setEditorError] = useState<unknown>(null);
 
@@ -154,7 +154,7 @@ function OfficeEditorContent() {
     }
   );
 
-  useApi(() => interactService.recordResourceRead(resourceId as string), {
+  useApi(() => interactionService.recordResourceRead(resourceId as string), {
     ready: Boolean(resourceId),
     refreshDeps: [resourceId],
   });

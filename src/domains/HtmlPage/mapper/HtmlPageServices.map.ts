@@ -1,4 +1,3 @@
-import type { ResourcePermissionOverview } from '@/domains/Resource';
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
@@ -6,24 +5,24 @@ import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 import type {
   SingleHtmlPageInfoApiResponse,
   SingleHtmlPageVersionInfoApiResponse,
-} from '../apis/HtmlPageApi.type';
+} from '../apis/HtmlPageApi.schema';
 import type { HtmlPageDisplayInfo, HtmlPageVersionInfo } from '../service/index.type';
 
 const mapVersionInfoFromApi = (
   data: SingleHtmlPageVersionInfoApiResponse,
   fallbackVersion: number
 ): HtmlPageVersionInfo => ({
-  version: normalizeNonNegativeNumber(data.version) ?? fallbackVersion,
-  status: data.singleHtmlPageStatus ?? 'FAILED',
+  version: data.version || fallbackVersion,
+  status: data.singleHtmlPageStatus,
   size: normalizeNonNegativeNumber(data.size),
-  updateTime: data.updateTime ?? undefined,
+  updateTime: data.updateTime,
   lastEditedAtText: formatTimestampToDateTime(data.updateTime),
 });
 
 export const mapHtmlPageInfoFromApi = (
   data: SingleHtmlPageInfoApiResponse
 ): HtmlPageDisplayInfo => {
-  const currentVersion = normalizeNonNegativeNumber(data.currentVersion) ?? 0;
+  const currentVersion = data.currentVersion;
   return {
     resourceInfo: ResourceServicesMap.mapResourceItemFromApi(data.resourceInfo),
     currentVersion,
@@ -33,13 +32,6 @@ export const mapHtmlPageInfoFromApi = (
   };
 };
 
-export const mapHtmlPagePermissionOverviewFromApi = (
-  data: SingleHtmlPageInfoApiResponse,
-  resourceId: string
-): ResourcePermissionOverview =>
-  ResourceServicesMap.mapResourcePermissionOverviewFromApi(data.resourceInfo, resourceId);
-
 export const HtmlPageServicesMap = {
   mapHtmlPageInfoFromApi,
-  mapHtmlPagePermissionOverviewFromApi,
 };

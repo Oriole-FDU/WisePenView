@@ -3,7 +3,6 @@ import {
   List,
   ListTodo,
   LockKeyhole,
-  Megaphone,
   Settings,
   Shield,
   UserCog,
@@ -18,13 +17,12 @@ import HeaderNav from '../../_common/header/HeaderNav';
 import type { HeaderNavSection } from '../../_common/header/HeaderNav/index.type';
 import type { AdminHeaderNavProps } from './index.type';
 
-const MAIN_PAGE_KEYS = ['users', 'resources', 'groups', 'announcements', 'statistics'] as const;
+const MAIN_PAGE_KEYS = ['users', 'resources', 'groups', 'statistics'] as const;
 const SYSTEM_PAGE_KEYS = ['permissions', 'settings', 'logs', 'tasks'] as const;
 const PAGE_ICONS = {
   users: UserCog,
   resources: List,
   groups: Users,
-  announcements: Megaphone,
   statistics: Layers,
   permissions: Shield,
   settings: Settings,

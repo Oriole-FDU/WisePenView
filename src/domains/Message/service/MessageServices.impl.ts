@@ -11,14 +11,12 @@ import type {
 const listUserMessages = async (
   params: ListUserMessagesRequest
 ): Promise<ListUserMessagesResponse> => {
-  const query = MessageServicesMap.mapListUserMessagesRequest(params);
-  const data = await MessageApi.listUserMessages(query);
+  const data = await MessageApi.listUserMessages(params);
   return MessageServicesMap.mapListUserMessagesFromApi(data);
 };
 
 const readMessages = async (params: ReadMessagesRequest): Promise<void> => {
-  const body = MessageServicesMap.mapReadMessagesRequest(params);
-  await MessageApi.readMessage(body);
+  await MessageApi.readMessage(params);
 };
 
 export const createMessageServices = (): IMessageService => ({

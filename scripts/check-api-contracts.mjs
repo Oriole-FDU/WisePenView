@@ -122,8 +122,10 @@ for (const path of contractFiles) {
       if (!placement || !allowedPlacements.has(placement)) {
         errors.push(`${relativePath}:${node.name.text} 的 requestPlacement 非法`);
       }
-      if (transport !== 'json') {
-        errors.push(`${relativePath}:${node.name.text} 必须使用 JSON Contract`);
+      if (!['json', 'text', 'multipart', 'sse'].includes(transport)) {
+        errors.push(
+          `${relativePath}:${node.name.text} 必须使用 JSON、text、multipart 或 sse Contract`
+        );
       }
       if ((method === 'GET' || method === 'DELETE') && placement === 'body') {
         errors.push(`${relativePath}:${node.name.text} 的 ${method} 请求不能使用 body`);
@@ -178,7 +180,7 @@ for (const path of apiFiles) {
           `${relativePath}:${callName}`
         );
       }
-      if (callName === 'executeApiContract') {
+      if (callName === 'executeApiContract' || callName === 'executeSseApiContract') {
         checkedContractCallCount += 1;
         const contractName = node.arguments[0];
         if (ts.isIdentifier(contractName)) {

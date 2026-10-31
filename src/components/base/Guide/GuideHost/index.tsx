@@ -13,7 +13,7 @@ import {
   type GuideTourConfig,
   type GuideTourId,
 } from '@/constants/tour';
-import { useUserService } from '@/domains';
+import { useUserTourService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import { getActivePageTourId, subscribeActivePageTour } from '../activePageTourStore';
@@ -404,7 +404,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
 
 /** 新手指引宿主。按后端引导记录决定是否播放，并在结束时汇报完成状态。 */
 function GuideHost({ shellTourId, actions }: GuideHostProps) {
-  const userService = useUserService();
+  const userTourService = useUserTourService();
   const location = useLocation();
   const routeKey = `${location.pathname}${location.search}`;
   const tourStatusLoaded = useGuideTaskStore((state) => state.loaded);
@@ -413,7 +413,7 @@ function GuideHost({ shellTourId, actions }: GuideHostProps) {
   const loadTourStatuses = useGuideTaskStore((state) => state.loadTourStatuses);
   const finishLoading = useGuideTaskStore((state) => state.finishLoading);
   const markCompleted = useGuideTaskStore((state) => state.markCompleted);
-  const { run: loadTourStatus } = useApi(() => userService.listTourStatus(), {
+  const { run: loadTourStatus } = useApi(() => userTourService.listTourStatus(), {
     manual: true,
     showErrorToast: false,
     onSuccess: loadTourStatuses,
@@ -478,7 +478,7 @@ function GuideHost({ shellTourId, actions }: GuideHostProps) {
     previousTourId.current = null;
     setVisibleTourRouteKey(null);
     setVisibleTourId(null);
-    void userService.completeTour(GUIDE_TOUR_CODE[tourId]).catch(() => undefined);
+    void userTourService.completeTour(GUIDE_TOUR_CODE[tourId]).catch(() => undefined);
   };
 
   const visibleTourPending = visibleTourId ? Boolean(pendingByTourId[visibleTourId]) : false;

@@ -1,20 +1,16 @@
-import { UserApi, UserTaskApi, UserTourApi } from '@domain-apis';
+import { UserApi } from '@domain-apis';
 
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createTtlCache } from '@/domains/_shared/ttlCache';
-import type { TourCode, User, UserAccountProfile, UserTourStatus } from '@/domains/User';
+import type { User, UserAccountProfile } from '@/domains/User';
 
 import { UserServicesMap } from '../mapper/UserServices.map';
 import type {
-  ConfirmEmailVerifyRequest,
-  FudanUISVerifyStatusData,
-  InitiateUISVerifyRequest,
   IUserService,
   ListUserInviteRecordsRequest,
   ListUserSearchSuggestionsRequest,
   QueryUserSearchCandidatesRequest,
   SearchUsersRequest,
-  SendEmailVerifyRequest,
   SubmitFeedbackRequest,
   UpdateUserInfoRequest,
 } from './index.type';
@@ -50,11 +46,8 @@ const listUserSearchSuggestions = async (params: ListUserSearchSuggestionsReques
   return UserServicesMap.mapSearchUsersFromApi(data);
 };
 
-const listInviteRecords = async (params: ListUserInviteRecordsRequest) => {
-  const query = UserServicesMap.mapListInviteRecordsRequest(params);
-  const data = await UserApi.listInviteRecords(query);
-  return UserServicesMap.mapListInviteRecordsFromApi(data);
-};
+const listInviteRecords = async (params: ListUserInviteRecordsRequest) =>
+  UserServicesMap.mapListInviteRecordsFromApi(await UserApi.listInviteRecords(params));
 
 const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesRequest) => {
   const keyword = params.keyword.trim();
@@ -73,48 +66,8 @@ const queryUserSearchCandidates = async (params: QueryUserSearchCandidatesReques
   return Array.from(userMap.values()).slice(0, size);
 };
 
-const sendEmailVerify = async (params: SendEmailVerifyRequest): Promise<void> => {
-  const query = UserServicesMap.mapSendEmailVerifyRequest(params);
-  await UserApi.initiateEmailVerify(query);
-};
-
-const initiateUISVerify = async (params: InitiateUISVerifyRequest): Promise<void> => {
-  const query = UserServicesMap.mapInitiateUISVerifyRequest(params);
-  await UserApi.initiateFudanUISVerify(query);
-};
-
-const checkFudanUISVerify = async (): Promise<FudanUISVerifyStatusData> => {
-  const data = await UserApi.checkFudanUISVerify();
-  return UserServicesMap.mapFudanUISVerifyStatusFromApi(data);
-};
-
-const confirmEmailVerify = async (params: ConfirmEmailVerifyRequest): Promise<void> => {
-  const query = UserServicesMap.mapConfirmEmailVerifyRequest(params);
-  await UserApi.checkEmailVerify(query);
-};
-
 const submitFeedback = async (params: SubmitFeedbackRequest): Promise<void> => {
-  const payload = UserServicesMap.mapSubmitFeedbackRequest(params);
-  await UserApi.addFeedback(payload);
-};
-
-const listTaskStatus = async () => {
-  const data = await UserTaskApi.listTaskStatus();
-  return UserServicesMap.mapTaskStatusesFromApi(data);
-};
-
-const dailyCheckIn = async () => {
-  const data = await UserTaskApi.dailyCheckIn();
-  return UserServicesMap.mapTaskCheckInFromApi(data);
-};
-
-const listTourStatus = async (): Promise<UserTourStatus[]> => {
-  const data = await UserTourApi.listTourStatus();
-  return UserServicesMap.mapTourStatusesFromApi(data);
-};
-
-const completeTour = async (tourCode: TourCode): Promise<void> => {
-  await UserTourApi.completeTour(tourCode);
+  await UserApi.addFeedback(UserServicesMap.mapSubmitFeedbackRequest(params));
 };
 
 export const createUserServices = (): IUserService => {
@@ -173,14 +126,6 @@ export const createUserServices = (): IUserService => {
     listInviteRecords,
     queryUserSearchCandidates,
     updateUserInfo,
-    sendEmailVerify,
-    initiateUISVerify,
-    checkFudanUISVerify,
-    confirmEmailVerify,
     submitFeedback,
-    listTaskStatus,
-    dailyCheckIn,
-    listTourStatus,
-    completeTour,
   };
 };

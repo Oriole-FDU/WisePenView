@@ -18,8 +18,6 @@ import type {
   SearchResultPage,
   SetPersonalResourcesPathTagRequest,
   UnmountResourcesToGroupRequest,
-  UpdateResourceActionPermissionRequest,
-  UpdateResourcePermissionSubjectsRequest,
 } from './index.type';
 const requestResourceItemList = async (
   params: GetUserResourcesRequest,
@@ -51,50 +49,36 @@ const setPersonalResourcesPathTag = async (
   params: SetPersonalResourcesPathTagRequest
 ): Promise<number> => {
   const data = await ResourcePlacementApi.setPersonalResourcesPathTag(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const movePersonalResourcesToTrash = async (
   params: MovePersonalResourcesToTrashRequest
 ): Promise<number> => {
   const data = await ResourcePlacementApi.movePersonalResourcesToTrash(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const replacePersonalNormalTags = async (
   params: ReplacePersonalNormalTagsRequest
 ): Promise<number> => {
   const data = await ResourcePlacementApi.replacePersonalNormalTags(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const mountResourcesToGroup = async (params: MountResourcesToGroupRequest): Promise<number> => {
   const data = await ResourcePlacementApi.mountResourcesToGroup(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const unmountResourcesToGroup = async (params: UnmountResourcesToGroupRequest): Promise<number> => {
   const data = await ResourcePlacementApi.unmountResourcesToGroup(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
+  return data.resourceCount;
 };
 
 const moveResourcesInGroup = async (params: MoveResourcesInGroupRequest): Promise<number> => {
   const data = await ResourcePlacementApi.moveResourcesInGroup(params);
-  return ResourceServicesMap.mapResourcePlacementCountFromApi(data);
-};
-
-const updateResourceActionPermission = async (
-  params: UpdateResourceActionPermissionRequest
-): Promise<void> => {
-  const request = ResourceServicesMap.mapChangeResourceActionPermissionRequest(params);
-  await ResourceItemApi.changeResourceActionPermission(request);
-};
-
-const updateResourcePermissionSubjects = async (
-  params: UpdateResourcePermissionSubjectsRequest
-): Promise<void> => {
-  const request = ResourceServicesMap.mapChangeResourceActionPermissionRequestFromSubjects(params);
-  await ResourceItemApi.changeResourceActionPermission(request);
+  return data.resourceCount;
 };
 
 const globalSearch = async (params: SearchQueryRequest): Promise<SearchResultPage> => {
@@ -113,7 +97,5 @@ export const createResourceServices = (): IResourceService => ({
   mountResourcesToGroup,
   unmountResourcesToGroup,
   moveResourcesInGroup,
-  updateResourceActionPermission,
-  updateResourcePermissionSubjects,
   globalSearch,
 });

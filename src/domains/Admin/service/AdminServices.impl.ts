@@ -1,6 +1,5 @@
-import { AdminMessageApi, AdminUserApi } from '@domain-apis';
+import { AdminUserApi } from '@domain-apis';
 
-import { AdminMessageServicesMap } from '../mapper/AdminMessageServices.map';
 import { AdminUserServicesMap } from '../mapper/AdminUserServices.map';
 import type {
   ChangeAdminUserInfoRequest,
@@ -10,9 +9,6 @@ import type {
   GetAdminUserInfoRequest,
   GetAdminUserInfoResponse,
   IAdminService,
-  ListAdminMessagesRequest,
-  ListAdminMessagesResponse,
-  PublishMessageRequest,
   ResetAdminUserPasswordRequest,
 } from './index.type';
 
@@ -43,25 +39,10 @@ const resetPassword = async (params: ResetAdminUserPasswordRequest): Promise<voi
   await AdminUserApi.resetPassword(AdminUserServicesMap.mapResetAdminUserPasswordRequest(params));
 };
 
-const listAdminMessages = async (
-  params: ListAdminMessagesRequest
-): Promise<ListAdminMessagesResponse> => {
-  const query = AdminMessageServicesMap.mapListAdminMessagesRequest(params);
-  const data = await AdminMessageApi.listAdminMessages(query);
-  return AdminMessageServicesMap.mapListAdminMessagesFromApi(data);
-};
-
-const publishMessage = async (params: PublishMessageRequest): Promise<void> => {
-  const payload = AdminMessageServicesMap.mapPublishMessageRequest(params);
-  await AdminMessageApi.publishMessage(payload);
-};
-
 export const createAdminServices = (): IAdminService => ({
   fetchUserList,
   getUserInfo,
   changeUserInfo,
   changeUserProfile,
   resetPassword,
-  listAdminMessages,
-  publishMessage,
 });

@@ -20,16 +20,16 @@ export const createAgentServices = (): IAgentService => ({
     return resourceId;
   },
   async getAgentDetail(resourceId, version) {
-    const info = await AgentApi.getAgentInfo(resourceId);
+    const info = await AgentApi.getAgentInfo({ resourceId });
     const bundle =
       version !== undefined && version > 0
         ? await AgentApi.getAgentVersionBundleInfo(resourceId, version)
         : undefined;
     return AgentServicesMap.mapAgentDetail({ resourceId, info, bundle });
   },
-  async getAgentPermissionOverview(resourceId) {
-    const data = await AgentApi.getAgentInfo(resourceId);
-    return AgentServicesMap.mapAgentPermissionOverviewFromApi(data, resourceId);
+  async getResourceAccessInfo(resourceId) {
+    const data = await AgentApi.getAgentInfo({ resourceId });
+    return data.resourceInfo;
   },
   async saveAgentDraft(request) {
     const requests = AgentServicesMap.mapSaveAgentDraftRequests(request);
@@ -39,7 +39,7 @@ export const createAgentServices = (): IAgentService => ({
     ]);
   },
   async publishVersion(resourceId) {
-    await AgentApi.publishAgentVersion(resourceId);
+    await AgentApi.publishAgentVersion({ resourceId });
   },
   async uploadAsset(resourceId, draftVersion, { file, path = '/' }) {
     const response = await AgentApi.initUploadAgentAssets({
@@ -55,7 +55,7 @@ export const createAgentServices = (): IAgentService => ({
         },
       ],
     });
-    const ticket = response?.assetUploadTickets?.[0];
+    const ticket = response.assetUploadTickets[0];
     if (!ticket?.assetId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.AGENT_UPLOAD_ASSET_ID_MISSING);
     }

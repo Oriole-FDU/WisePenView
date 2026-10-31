@@ -1,19 +1,24 @@
-import { apiGetText, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  GetSingleHtmlPageContentApiRequest,
-  GetSingleHtmlPageInfoApiRequest,
-  SingleHtmlPageInfoApiResponse,
-} from './HtmlPageApi.type';
+import {
+  GetSingleHtmlPageContentApiContract,
+  type GetSingleHtmlPageContentApiContractRequest,
+  type GetSingleHtmlPageContentApiContractResponse,
+  GetSingleHtmlPageInfoApiContract,
+  type GetSingleHtmlPageInfoApiContractRequest,
+  type GetSingleHtmlPageInfoApiContractResponse,
+} from './HtmlPageApi.contract';
 
 function getSingleHtmlPageInfo(
-  req: GetSingleHtmlPageInfoApiRequest
-): Promise<SingleHtmlPageInfoApiResponse> {
-  return apiPostUnchecked('/singleHtmlPage/getSingleHtmlPageInfo', undefined, { params: req });
+  req: GetSingleHtmlPageInfoApiContractRequest
+): Promise<GetSingleHtmlPageInfoApiContractResponse> {
+  return executeApiContract(GetSingleHtmlPageInfoApiContract, req);
 }
 
-function getSingleHtmlPageContent(req: GetSingleHtmlPageContentApiRequest): Promise<string> {
-  return apiGetText('/singleHtmlPage/getSingleHtmlPageContent', { params: req });
+function getSingleHtmlPageContent(
+  req: GetSingleHtmlPageContentApiContractRequest
+): Promise<GetSingleHtmlPageContentApiContractResponse> {
+  return executeApiContract(GetSingleHtmlPageContentApiContract, req);
 }
 
 export const HtmlPageApi = {

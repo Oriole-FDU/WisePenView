@@ -1,14 +1,15 @@
-import { apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
+import { IssueRecognitionCredentialApiContract } from './SpeechApi.contract';
 import type {
   IssueRecognitionCredentialApiRequest,
   IssueRecognitionCredentialApiResponse,
-} from './SpeechApi.type';
+} from './SpeechApi.schema';
 
 function issueRecognitionCredential(
   body: IssueRecognitionCredentialApiRequest
 ): Promise<IssueRecognitionCredentialApiResponse> {
-  return apiPostUnchecked('/chat/speech/getCredential', body);
+  return executeApiContract(IssueRecognitionCredentialApiContract, body);
 }
 
 export const SpeechApi = {

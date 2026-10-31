@@ -1,50 +1,71 @@
-import { apiGetUnchecked, apiPostUnchecked } from '@/apis/request';
+import { executeApiContract } from '@/apis/executeApiContract';
 
-import type {
-  DocumentIdApiRequest,
-  ForkDocumentApiRequest,
-  GetDocInfoApiRequest,
-  GetDocInfoApiResponse,
-  GetOnlyOfficeEditorConfigApiRequest,
-  ListPendingDocsApiResponse,
-  OnlyOfficeEditorConfigApiResponse,
-  PendingDocumentStatusApiResponse,
-  UploadDocApiRequest,
-  UploadDocApiResponse,
-} from './DocumentApi.type';
+import {
+  CancelDocProcessApiContract,
+  type CancelDocProcessApiContractRequest,
+  type CancelDocProcessApiContractResponse,
+  ForkDocumentApiContract,
+  type ForkDocumentApiContractRequest,
+  type ForkDocumentApiContractResponse,
+  GetDocInfoApiContract,
+  type GetDocInfoApiContractRequest,
+  type GetDocInfoApiContractResponse,
+  GetOnlyOfficeEditorConfigApiContract,
+  type GetOnlyOfficeEditorConfigApiContractRequest,
+  type GetOnlyOfficeEditorConfigApiContractResponse,
+  ListPendingDocsApiContract,
+  type ListPendingDocsApiContractResponse,
+  RetryDocProcessApiContract,
+  type RetryDocProcessApiContractRequest,
+  type RetryDocProcessApiContractResponse,
+  SyncDocStatusApiContract,
+  type SyncDocStatusApiContractRequest,
+  type SyncDocStatusApiContractResponse,
+  UploadDocApiContract,
+  type UploadDocApiContractRequest,
+  type UploadDocApiContractResponse,
+} from './DocumentApi.contract';
 
-function uploadDoc(req: UploadDocApiRequest): Promise<UploadDocApiResponse> {
-  return apiPostUnchecked('/document/uploadDoc', req, { timeout: 30_000 });
+function uploadDoc(req: UploadDocApiContractRequest): Promise<UploadDocApiContractResponse> {
+  return executeApiContract(UploadDocApiContract, req, { timeout: 30_000 });
 }
 
-function listPendingDocs(): Promise<ListPendingDocsApiResponse> {
-  return apiGetUnchecked('/document/listPendingDocs');
+function listPendingDocs(): Promise<ListPendingDocsApiContractResponse> {
+  return executeApiContract(ListPendingDocsApiContract, undefined);
 }
 
-function syncDocStatus(req: DocumentIdApiRequest): Promise<PendingDocumentStatusApiResponse> {
-  return apiPostUnchecked('/document/syncDocStatus', null, { params: req });
+function syncDocStatus(
+  req: SyncDocStatusApiContractRequest
+): Promise<SyncDocStatusApiContractResponse> {
+  return executeApiContract(SyncDocStatusApiContract, req);
 }
 
-function retryDocProcess(req: DocumentIdApiRequest): Promise<void> {
-  return apiPostUnchecked('/document/retryDocProcess', null, { params: req });
+function retryDocProcess(
+  req: RetryDocProcessApiContractRequest
+): Promise<RetryDocProcessApiContractResponse> {
+  return executeApiContract(RetryDocProcessApiContract, req);
 }
 
-function cancelDocProcess(req: DocumentIdApiRequest): Promise<void> {
-  return apiPostUnchecked('/document/cancelDocProcess', null, { params: req });
+function cancelDocProcess(
+  req: CancelDocProcessApiContractRequest
+): Promise<CancelDocProcessApiContractResponse> {
+  return executeApiContract(CancelDocProcessApiContract, req);
 }
 
-function getDocInfo(req: GetDocInfoApiRequest): Promise<GetDocInfoApiResponse> {
-  return apiGetUnchecked('/document/getDocInfo', { params: req });
+function getDocInfo(req: GetDocInfoApiContractRequest): Promise<GetDocInfoApiContractResponse> {
+  return executeApiContract(GetDocInfoApiContract, req);
 }
 
-function forkDocument(req: ForkDocumentApiRequest): Promise<string> {
-  return apiPostUnchecked('/document/forkDocument', req);
+function forkDocument(
+  req: ForkDocumentApiContractRequest
+): Promise<ForkDocumentApiContractResponse> {
+  return executeApiContract(ForkDocumentApiContract, req);
 }
 
 function getOnlyOfficeEditorConfig(
-  req: GetOnlyOfficeEditorConfigApiRequest
-): Promise<OnlyOfficeEditorConfigApiResponse> {
-  return apiGetUnchecked('/document/onlyoffice/editorConfig', { params: req });
+  req: GetOnlyOfficeEditorConfigApiContractRequest
+): Promise<GetOnlyOfficeEditorConfigApiContractResponse> {
+  return executeApiContract(GetOnlyOfficeEditorConfigApiContract, req);
 }
 
 export const DocumentApi = {

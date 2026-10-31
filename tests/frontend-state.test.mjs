@@ -15,14 +15,14 @@ const { createFrontendStateRegistry } = await import(
   `data:text/javascript;base64,${Buffer.from(bundled.outputFiles[0].contents).toString('base64')}`
 );
 const mapped = await build({
-  entryPoints: ['src/domains/Chat/mapper/chatCompletion.mapper.ts'],
+  entryPoints: ['src/domains/ChatTurn/mapper/chatTurn.mapper.ts'],
   bundle: true,
   platform: 'node',
   format: 'esm',
   tsconfig: 'tsconfig.app.json',
   write: false,
 });
-const { mapChatCompletionRequest } = await import(
+const { mapChatTurnRequest } = await import(
   `data:text/javascript;base64,${Buffer.from(mapped.outputFiles[0].contents).toString('base64')}`
 );
 
@@ -187,7 +187,7 @@ test('请求 mapper 原样序列化读取结果，不额外生成 key', () => {
     entries: [{ key: 'selected_text', value: '选区' }],
   });
   const snapshot = registry.readFrontendStates({ resourceId: 'note-1' });
-  const request = mapChatCompletionRequest({
+  const request = mapChatTurnRequest({
     defaultSessionId: 'session-1',
     query: '提问',
     options: { frontendStates: snapshot.states },
@@ -195,7 +195,7 @@ test('请求 mapper 原样序列化读取结果，不额外生成 key', () => {
   assert.deepEqual(request.frontend_states, snapshot.states);
   assert.equal(request.frontend_states.length, 3);
   assert.equal(
-    mapChatCompletionRequest({ defaultSessionId: 'session-1', query: '提问' }).frontend_states,
+    mapChatTurnRequest({ defaultSessionId: 'session-1', query: '提问' }).frontend_states,
     undefined
   );
 });

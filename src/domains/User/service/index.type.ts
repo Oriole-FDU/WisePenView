@@ -1,7 +1,5 @@
 import type { UserInviteRecordList } from '../entity/invite';
 import type { User, UserAccountProfile, UserSearchUser } from '../entity/user';
-import type { UserTaskCheckInResult, UserTaskStatus } from '../entity/userTask';
-import type { TourCode, UserTourStatus } from '../entity/userTour';
 import type { DegreeLevel, FeedbackType, Sex } from '../enum';
 
 /** UserService 接口：供依赖注入使用 */
@@ -14,33 +12,12 @@ export interface IUserService {
   searchUsers(params: SearchUsersRequest): Promise<UserSearchUser[]>;
   /** 当前用户小组范围内的用户搜索补全 */
   listUserSearchSuggestions(params: ListUserSearchSuggestionsRequest): Promise<UserSearchUser[]>;
-  /** 当前用户发出的邀请记录（按邀请时间倒序分页） */
   listInviteRecords(params: ListUserInviteRecordsRequest): Promise<UserInviteRecordList>;
   /** 用户选择框候选查询：合并精确搜索与补全结果 */
   queryUserSearchCandidates(params: QueryUserSearchCandidatesRequest): Promise<UserSearchUser[]>;
   /** 更新用户信息（内部两次 PUT：userInfo + userProfile）；不拉 GET，需全量时由调用方自行 getFullUserInfo */
   updateUserInfo(params: UpdateUserInfoRequest): Promise<void>;
-  sendEmailVerify(params: SendEmailVerifyRequest): Promise<void>;
-  /** 发起复旦 UIS 认证（与 OpenAPI initiateFudanUISVerify 对齐） */
-  initiateUISVerify(params: InitiateUISVerifyRequest): Promise<void>;
-  /** 查询复旦 UIS 认证状态（单次，与 checkFudanUISVerify 对齐） */
-  checkFudanUISVerify(): Promise<FudanUISVerifyStatusData>;
-  confirmEmailVerify(params: ConfirmEmailVerifyRequest): Promise<void>;
   submitFeedback(params: SubmitFeedbackRequest): Promise<void>;
-  listTaskStatus(): Promise<UserTaskStatus[]>;
-  dailyCheckIn(): Promise<UserTaskCheckInResult>;
-  listTourStatus(): Promise<UserTourStatus[]>;
-  completeTour(tourCode: TourCode): Promise<void>;
-}
-
-/** 确认邮箱验证请求参数 */
-export interface ConfirmEmailVerifyRequest {
-  token: string;
-}
-
-/** 发起邮箱验证请求参数（后端接受完整邮箱字符串） */
-export interface SendEmailVerifyRequest {
-  email: string;
 }
 
 export interface SearchUsersRequest {
@@ -62,24 +39,8 @@ export interface ListUserInviteRecordsRequest {
   size: number;
 }
 
-/** 发起复旦 UIS 认证请求参数（OpenAPI：query uisAccount、uisPassword） */
-export interface InitiateUISVerifyRequest {
-  uisAccount: string;
-  uisPassword: string;
-}
-
-/** checkFudanUISVerify 响应 data */
-export interface FudanUISVerifyStatusData {
-  /** 认证流程是否已结束 */
-  completed: boolean;
-  requireAction: boolean;
-  /** 需用户操作时：二维码图片的 base64 字符（PNG/JPEG）；可选带 data:image/*;base64, 前缀 */
-  actionPayload: string;
-  message: string;
-}
-
 export interface SubmitFeedbackRequest {
-  types: FeedbackType[];
+  type: FeedbackType;
   content: string;
   contact: string;
   imageUrl?: string;

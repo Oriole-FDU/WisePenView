@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useAgentService, useChatService, useSkillService, useUserService } from '@/domains';
+import { useAgentService, useChatConfigService, useSkillService, useUserService } from '@/domains';
 import type { AgentDetail } from '@/domains/Agent';
 import { useApi } from '@/hooks/useApi';
 
@@ -12,7 +12,7 @@ interface UseAgentVersionControllerOptions {
 
 export function useAgentVersionController({ resourceId }: UseAgentVersionControllerOptions) {
   const agentService = useAgentService();
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const skillService = useSkillService();
   const userService = useUserService();
   const [agentOverride, setAgentOverride] = useState<AgentDetail | null>(null);
@@ -28,8 +28,8 @@ export function useAgentVersionController({ resourceId }: UseAgentVersionControl
         isOwner && baseAgent.draftVersion > 0
           ? agentService.getAgentDetail(resourceId, baseAgent.draftVersion)
           : Promise.resolve(baseAgent),
-        chatService.getModels(),
-        chatService.getTools(),
+        chatConfigService.getModels(),
+        chatConfigService.getTools(),
         skillService.getSkillSummaries(),
       ]);
       return {

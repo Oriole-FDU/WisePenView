@@ -18,11 +18,11 @@ export function assertImageProxyUploadLimit(file: File): void {
 
 /** 上传成功后的存储记录（与后端 StorageRecordDTO 核心字段对齐） */
 export interface ImageStorageRecord {
-  fileId?: number;
+  fileId: string;
   domain: string;
   objectKey: string;
-  md5?: string;
-  size?: number;
+  md5: string;
+  size: number;
 }
 
 export interface ImageUploadRequest {

@@ -5,8 +5,8 @@ import { type RefObject, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { useInteractService } from '@/domains';
-import type { ResourceComment } from '@/domains/Interact';
+import { useResourceCommentService } from '@/domains';
+import type { ResourceComment } from '@/domains/ResourceComment';
 import { parseErrorMessage } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
@@ -57,7 +57,7 @@ function ResourceCommentThread({
   onPreviewImage,
 }: ResourceCommentThreadProps) {
   const { t } = useTranslation('resource');
-  const interactService = useInteractService();
+  const commentService = useResourceCommentService();
   const [expanded, setExpanded] = useState(false);
   const [replyTarget, setReplyTarget] = useState<ResourceComment>();
 
@@ -74,7 +74,7 @@ function ResourceCommentThread({
   } = useInfiniteScroll<ReplyListPage>(
     async (current) => {
       const nextPage = Math.floor((current?.list.length ?? 0) / REPLY_PAGE_SIZE) + 1;
-      const data = await interactService.listReplies({
+      const data = await commentService.listReplies({
         rootCommentId: rootComment.commentId,
         page: nextPage,
         size: REPLY_PAGE_SIZE,
@@ -144,7 +144,7 @@ function ResourceCommentThread({
 
   const handleReplySubmit = async (content: string, imageUrls: string[]) => {
     if (!replyTarget) return;
-    await interactService.createReply({
+    await commentService.createReply({
       resourceId,
       replyTo: replyTarget.commentId,
       content,

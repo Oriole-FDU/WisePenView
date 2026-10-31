@@ -18,7 +18,16 @@ export function initMockVersionAssets(
       (item) => item.path === request.path && item.name === request.name
     );
     if (!asset) {
-      asset = { id: `mock-asset-${crypto.randomUUID()}`, path: request.path, name: request.name };
+      asset = {
+        id: `mock-asset-${crypto.randomUUID()}`,
+        path: request.path,
+        name: request.name,
+        objectKey: null,
+        assetResourceType: request.assetResourceType,
+        uploadStatus: 'UPLOADING',
+        size: null,
+        pendingUpload: null,
+      };
       target.assets.push(asset);
     }
     if (asset.pendingUpload?.objectKey) {
@@ -28,7 +37,7 @@ export function initMockVersionAssets(
     asset.pendingUpload = {
       objectKey,
       assetResourceType: request.assetResourceType,
-      expectedSize: request.expectedSize?.toString(),
+      expectedSize: String(request.expectedSize ?? mockObjects.get(objectKey)?.size ?? 0),
       createTime: Date.now(),
     };
     asset.uploadStatus = 'UPLOADING';
@@ -38,11 +47,19 @@ export function initMockVersionAssets(
       if (!target.assets?.includes(asset) || asset.pendingUpload?.objectKey !== objectKey) return;
       asset.objectKey = objectKey;
       asset.assetResourceType = request.assetResourceType;
-      asset.size = mockObjects.get(objectKey)?.size.toString();
+      asset.size = mockObjects.get(objectKey)?.size.toString() ?? null;
       asset.uploadStatus = 'AVAILABLE';
-      delete asset.pendingUpload;
+      asset.pendingUpload = null;
     });
-    return { assetId: asset.id, objectKey, putUrl: objectKey, callbackHeader: 'mock' };
+    return {
+      assetId: asset.id,
+      path: request.path,
+      name: request.name,
+      objectKey,
+      putUrl: objectKey,
+      callbackHeader: 'mock',
+      flashUploaded: false,
+    };
   });
 }
 
@@ -56,7 +73,7 @@ export function cancelMockVersionUploads(
     );
     if (!asset) continue;
     if (asset.objectKey) {
-      delete asset.pendingUpload;
+      asset.pendingUpload = null;
       asset.uploadStatus = 'AVAILABLE';
     } else {
       target.assets = target.assets?.filter((item) => item !== asset);

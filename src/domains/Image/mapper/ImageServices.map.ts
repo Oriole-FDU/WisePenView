@@ -1,4 +1,6 @@
-import type { ImageUploadApiRequest, ImageUploadApiResponse } from '../apis/ImageApi.type';
+import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
+
+import type { ImageUploadApiRequest, ImageUploadApiResponse } from '../apis/ImageApi.schema';
 import type { ImageUploadRequest, ImageUploadResult } from '../service/index.type';
 import { buildImagePublicUrl } from '../service/index.type';
 
@@ -14,7 +16,10 @@ const mapImageUploadRequest = (params: ImageUploadRequest): ImageUploadApiReques
 };
 
 const mapImageUploadFromApi = (record: ImageUploadApiResponse): ImageUploadResult => ({
-  record,
+  record: {
+    ...record,
+    size: normalizeNonNegativeNumber(record.size) ?? 0,
+  },
   publicUrl: buildImagePublicUrl(record),
 });
 

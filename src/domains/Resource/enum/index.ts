@@ -1,6 +1,23 @@
 import type { EnumValue } from '@/utils/type/enum';
 import { defineEnum } from '@/utils/type/enum';
 
+/** 后端资源类型 wire value；资源图标与路由能力在此之上归一化。 */
+export const RESOURCE_TYPE = defineEnum([
+  'NOTE',
+  'DRAWIO',
+  'PDF',
+  'DOC',
+  'DOCX',
+  'PPT',
+  'PPTX',
+  'XLS',
+  'XLSX',
+  'SKILL',
+  'AGENT',
+  'SINGLE_HTML_PAGE',
+  'UNKNOWN',
+] as const);
+
 /** 排序字段枚举 */
 export const RESOURCE_SORT_BY = defineEnum(['UPDATE_TIME', 'CREATE_TIME', 'NAME', 'SIZE'] as const);
 
@@ -39,5 +56,3 @@ export const normalizeSearchResourceType = (raw: string): SearchResourceType => 
 
 export type ResourceSortBy = EnumValue<typeof RESOURCE_SORT_BY>;
 export type ResourceSortDir = EnumValue<typeof RESOURCE_SORT_DIR>;
-
-export { getSupportedResourcePermissionActions } from './permission';
