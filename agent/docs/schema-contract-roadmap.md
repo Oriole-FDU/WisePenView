@@ -15,7 +15,7 @@
 3. 建设 UserInformation、AccessPolicy、Group、Tag 四个基础域。
 4. 建设 ResourceCore、ResourceAccess、ResourcePlacement。
 5. 分别建设 Document、Note、Skill、Agent、HtmlPage。
-6. 建设 Interact、InlineComment、Message、Wallet、UserTask、Admin。
+6. 建设 ResourceInteraction、ResourceComment、ResourceFavorite、InlineComment、Message、Wallet、UserTask、Admin。
 7. 最后建设 Chat、SSE、Speech，以及 Course、Drive 两个聚合域。
 
 总体原则是“先底座、后叶域；先消费契约、后 domain entity；先新增语义接口、后淘汰历史接口”。不要一次性批量改写全部 152 个 REST 接口。
@@ -43,7 +43,9 @@ flowchart TD
   G[Group<br/>Group / Membership]
   T[Tag<br/>TagSummary / TagTree / TagPolicy]
   R[Resource Core<br/>List / Base / Detail / Search]
-  I[Interaction<br/>Comment / Favorite / Like / Rating]
+  I[Resource Interaction<br/>Read / Like / Rating]
+  CM[Resource Comment<br/>Root / Reply / Comment Like]
+  F[Resource Favorite<br/>Collection / Favorite Status]
   C[Inline Comment]
   D[Document]
   N[Note]
@@ -67,6 +69,9 @@ flowchart TD
   U --> R
   A --> R
   R --> I
+  R --> CM
+  U --> CM
+  R --> F
   R --> C
   R --> D
   R --> N
@@ -90,12 +95,11 @@ flowchart TD
   AG --> RA
   H --> RA
   U --> AD
-  I --> AD
 
   classDef completed fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
   classDef partial fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
   classDef decision fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:2px
-  class W,A,U,G,R,I,C,D,N,S,AG,H,CH,DR completed
+  class W,A,U,G,R,I,CM,F,C,D,N,S,AG,H,CH,DR completed
   class T,AD,RA partial
   class CO decision
 ```
@@ -103,7 +107,7 @@ flowchart TD
 当前 DAG 前沿：
 
 - 已完成：`W Shared Wire Schema`、`A AccessPolicy`、`U UserInformation`、`G Group`、`R ResourceCore`。
-- 已完成：`I Interaction`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。
+- 已完成：`I Resource Interaction`、`CM Resource Comment`、`F Resource Favorite`、`C InlineComment` 与 Document、Note、Skill、Agent、HtmlPage 五个资源叶域。原 `Interact` 聚合域已删除，没有保留转发壳。
 - 已完成：Message、Wallet、UserTask、UserTour、Chat Session/Model/Provider/Tool/Speech 与 SSE；Drive 保持纯前端聚合。
 - 部分完成：`T Tag` 的通用树、命令、策略已完成，scoped endpoint 仍阻塞；`AD Admin` 的用户管理已完成，公告接口仍阻塞。
 - 部分完成：`RA Resource Access` 已从前端 ResourceCore 拆成独立聚合域；后端 Overview endpoint 尚未上线，权限补全 mapper 暂时不能删除。
@@ -117,32 +121,36 @@ flowchart TD
 - `Tag` 的树节点依赖用户摘要与访问策略，不依赖 Resource entity。
 - `ResourceCore` 消费 Group、Tag、User 的摘要契约，不拥有 Tag 编辑、评论、收藏、文档解析等能力。
 - `Document / Note / Skill / Agent / HtmlPage` 是 ResourceCore 之上的资源能力叶域。
-- `Resource Access Overview` 是聚合器，不是 ResourceCore 的一部分。当前它放在 Resource service 内并依赖 Note、Skill、Agent 等叶域，形成了概念上的倒置依赖。
+- `Resource Access Overview` 是聚合器，不是 ResourceCore 的一部分。它已是独立 ResourceAccess domain，通过 registry 依赖 Note、Skill、Agent 等叶域；叶域不得反向依赖它。
 - `Course` 和 `Drive` 是产品级聚合应用，不应反向成为 Resource、Tag、Group 的基础依赖。
 - `Admin` 是管理聚合入口，依赖底层业务契约，不被底层 domain 依赖。
 
 ### 当前实际依赖边
 
-下表是本次扫描得到的 32 组跨 domain 边。`强` 表示类型或协议无法独立成立，`软` 表示只发生在 service 编排或展示摘要场景。
+下表是 2026-10-31 按当前源码扫描得到的 37 组跨 domain 边。`强` 表示类型或协议无法独立成立，`软` 表示只发生在 service 编排、mock 或展示摘要场景。
 
-| 依赖边                                                               | 主要位置                             | 判断                                                        |
-| -------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------- |
-| Admin -> User                                                        | Admin user DTO、枚举、mapper         | 强；Admin 是聚合器，方向本身合理                            |
-| Agent -> Resource                                                    | ResourceItem 内嵌、权限概览、service | 强；应依赖 ResourceSummary 而非完整 ResourceItem            |
-| Chat -> Group、Resource                                              | 群聊输入选项与资源附件               | 软；Chat 在上层，方向合理                                   |
-| Course -> Group、Interact、Resource、Tag                             | 课程聚合 service、mapper             | 软；Course 不能成为基础域                                   |
-| Document -> Resource、User                                           | 详情内嵌 ResourceItem、作者摘要      | 强；应拆分 ResourceSummary/UserSummary                      |
-| Drive -> Resource、Tag、User                                         | 浏览模型与系统文件夹                 | 软；Drive 是产品聚合层                                      |
-| Group -> Tag、User                                                   | 默认成员动作、ownerInfo              | 强；默认动作应移到 AccessPolicy，User 用摘要                |
-| HtmlPage -> Resource                                                 | 详情内嵌 ResourceItem                | 强；应依赖 ResourceSummary                                  |
-| Interact -> Resource                                                 | 收藏条目内嵌 ResourceItem            | 强；应依赖 ResourceSummary                                  |
-| Note -> InlineComment、Resource、User                                | 批注投影、详情、作者摘要             | 强；Resource/User 用摘要，InlineComment 单独编排            |
-| Resource -> Agent、Document、Group、HtmlPage、Note、Skill、Tag、User | 权限聚合与摘要                       | 混合；User/Group/Tag Summary 是合法底座，叶域查询属于聚合器 |
-| Skill -> Resource                                                    | 详情内嵌、权限概览、service          | 强；应依赖 ResourceSummary                                  |
-| Tag -> Resource、User                                                | 权限动作枚举、创建者摘要             | 强；动作应移到 AccessPolicy，User 用摘要                    |
-| Wallet -> User                                                       | 操作人展示摘要                       | 强；应依赖 UserSummary                                      |
+| 依赖边                                                                               | 主要位置                             | 判断                                                        |
+| ------------------------------------------------------------------------------------ | ------------------------------------ | ----------------------------------------------------------- |
+| Admin -> User                                                                        | Admin user DTO、枚举、mapper         | 强；Admin 是聚合器，方向合理                                |
+| Agent -> Resource                                                                    | ResourceItem 内嵌、权限概览、service | 强；后续应收敛为 ResourceSummary                            |
+| Chat -> Group、Resource                                                              | 群聊输入选项、资源附件               | 软；Chat 在上层，方向合理                                   |
+| Course -> Group、Resource、ResourceInteraction、Tag                                  | 课程聚合 service、mapper             | 软；Course 只消费资源级互动，不依赖评论或收藏               |
+| Document -> Resource、User                                                           | 详情内嵌 ResourceItem、作者摘要      | 强；后续应收敛为 ResourceSummary/UserSummary                |
+| Drive -> Resource、Tag、User                                                         | 浏览模型与系统文件夹                 | 软；Drive 是产品聚合层                                      |
+| Group -> User                                                                        | ownerInfo、成员摘要                  | 强；应继续使用 UserSummary                                  |
+| HtmlPage -> Resource                                                                 | 详情内嵌 ResourceItem                | 强；后续应收敛为 ResourceSummary                            |
+| InlineComment -> User                                                                | 批注作者展示 Schema                  | 强；应使用 UserSummary                                      |
+| Note -> InlineComment、Resource、User                                                | 批注投影、详情、作者摘要             | 强；Resource/User 用摘要，InlineComment 单独编排            |
+| Resource -> Group、User                                                              | 资源摘要与访问主体                   | 强；只依赖基础摘要，不再认识资源叶域或权限聚合              |
+| ResourceAccess -> Agent、Document、Group、HtmlPage、Note、Resource、Skill、Tag、User | 权限概览、主体补全、叶域详情查询     | 软聚合；方向合理，但正式 Overview endpoint 上线后应显著收缩 |
+| ResourceComment -> User                                                              | 评论作者展示 Schema                  | 强；应使用 UserSummary                                      |
+| ResourceFavorite -> Resource                                                         | 收藏条目内嵌 ResourceItem            | 强；后续应收敛为 ResourceSummary                            |
+| ResourceInteraction -> Resource                                                      | mock 资源状态                        | 仅 mock 软依赖；正式 service/type 不依赖 Resource           |
+| Skill -> Resource                                                                    | 详情内嵌、权限概览、service          | 强；后续应收敛为 ResourceSummary                            |
+| Tag -> User                                                                          | 创建者摘要                           | 强；应使用 UserSummary                                      |
+| Wallet -> Group、User                                                                | 操作人摘要、mock 群组钱包            | User 为强依赖；Group 仅 mock 软依赖                         |
 
-当前代码没有 service 实现级循环，因为 Resource 对叶域的依赖通过 registry 注入；但类型所有权和聚合职责仍形成“底层 Resource 反过来认识所有资源叶域”的概念循环。Schema 建设不能照搬当前 `ResourceServicesMap` 的聚合方式。
+当前代码没有 service 实现级循环，ResourceAccess 的资源叶域依赖与 Course 的编排依赖都通过 registry 注入。`ResourceInteraction`、`ResourceComment`、`ResourceFavorite` 已互不依赖，并由 `check:boundaries` 固化；三者也不得反向依赖 ResourceAccess。
 
 ## 四、推荐 API 域拆分
 
@@ -164,7 +172,9 @@ flowchart TD
 - `ResourcePlacement`：个人路径、回收站、小组挂载、卸载、移动。
 - `ResourceTag`：标签树、标签 CRUD、标签策略。
 - `ResourceAccess`：动作集合、主体权限、权限概览、批量授权。
-- `ResourceInteraction`：评论、收藏、点赞、阅读、评分。
+- `ResourceInteraction`：资源点赞、阅读与评分。
+- `ResourceComment`：一般根评论、回复与评论点赞。
+- `ResourceFavorite`：收藏集合、收藏归属与收藏条目。
 - `ResourceMarket`：若产品需要展示或购买集市资源，应补前端 domain，而不是继续让 `ResourceItemResponse.marketSaleInfos` 被 Schema 静默丢弃。
 
 ### 3. AI 与 Chat
@@ -184,7 +194,7 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 
 ### 4. Product Applications
 
-- `Course` 不应长期只是 Group、Tag、Resource、Interact 的临时拼接。若课程是正式产品域，应新增后端 Course API/Controller 与 Course DB 模型。
+- `Course` 不应长期只是 Group、Tag、Resource、ResourceInteraction 的临时拼接。若课程是正式产品域，应新增后端 Course API/Controller 与 Course DB 模型。
 - `Drive` 可以继续作为前端浏览聚合层，但只能依赖 Resource 和 Tag 的稳定 service 契约，不拥有自己的后端 endpoint。
 
 ## 五、P0：已经确认的严重接口问题
@@ -298,7 +308,7 @@ Skill 与 Agent 可以共享 `VersionAssetSchema`、`AssetUploadTicketSchema` �
 | `POST /resource/inlineComment/deleteInlineCommentItem`                                                                      | `C + M`：v2 使用 DELETE；补 expectedVersion 防并发覆盖                   |
 | `POST /resource/inlineComment/changeInlineCommentResolveStatus`                                                             | `C + M`：改成显式 `resolved: boolean` command；删除 identity mapper      |
 
-### Interact
+### ResourceInteraction、ResourceComment 与 ResourceFavorite
 
 | 接口                                                                                                                                          | 决策                                                                                    |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -418,7 +428,7 @@ Group 文档中列出的请求映射、创建响应映射、成员请求映射�
 ### 可由后端聚合而整体消失的 mapper
 
 - `resourcePermission.mapper.ts` 与 `resourcePermissionHydration.mapper.ts` 合计 436 行。若新增 Resource Access Overview endpoint，让后端一次返回 owner/group/tag/override/specifiedUser 主体和 effective/editable/inherited actions，这两个文件的职责可由稳定 DTO 取代。
-- 当前 `ResourcePermissionServices` 会按小组并发查询 Group 和 Tag，存在 N+1 式网络扇出；这不是 schema 能彻底解决的问题。
+- 当前 `ResourceAccessServices` 会按小组并发查询 Group 和 Tag，存在 N+1 式网络扇出；这不是 schema 能彻底解决的问题。
 
 ## 八、Zod Schema 建设结构
 
@@ -449,13 +459,23 @@ src/
     │       ├── AccountProfileApi.schema.ts
     │       ├── IdentityVerificationApi.schema.ts
     │       └── ...
-    └── Resource/
+    ├── Resource/
+    │   └── apis/
+    │       ├── ResourceCoreApi.schema.ts
+    │       ├── ResourcePlacementApi.schema.ts
+    │       └── ...
+    ├── ResourceAccess/
+    │   └── apis/
+    │       └── ResourceAccessApi.schema.ts
+    ├── ResourceInteraction/
+    │   └── apis/
+    │       └── ResourceInteractionApi.schema.ts
+    ├── ResourceComment/
+    │   └── apis/
+    │       └── CommentApi.schema.ts
+    └── ResourceFavorite/
         └── apis/
-            ├── ResourceCoreApi.schema.ts
-            ├── ResourcePlacementApi.schema.ts
-            ├── ResourceAccessApi.schema.ts
-            ├── ResourceInteractionApi.schema.ts
-            └── ...
+            └── FavoriteApi.schema.ts
 ```
 
 ### 1. Contract 已表达的元数据
@@ -642,7 +662,8 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 
 ### Wave 6：互动与支撑域
 
-- [x] Interact：互动状态、评论与收藏共 17 个 checked Contract。
+- [x] ResourceInteraction / ResourceComment / ResourceFavorite：原 Interact 的 17 个 checked Contract 按能力拆成三个 domain，并删除旧聚合 service、mapper、类型与导出。
+- [x] 三个互动域各自拥有 service、mapper、mock 与 `BUSINESS.md`；只共享 mock 点赞状态，正式实现互不依赖。
 - [x] InlineComment：8 个 checked Contract，reaction 固定为 `userId -> reaction[]`。
 - [x] Message：列表与批量已读 checked Contract。
 - [x] Wallet：钱包、兑换、流水与划转 checked Contract。
@@ -650,7 +671,7 @@ Wave 0 的提交为 `f804527e feat(api): 建立 Zod 契约内核与迁移基线`
 - [x] Admin User：修正 `userStatus`、身份查询枚举、毫秒时间与重置密码请求。
 - [ ] Admin 公告：`/admin/message/*` 在后端不存在，保持 unchecked；需先新增受管理员权限保护的 Controller、DTO 与数据源。
 
-这一步重点是把 toggle 改成幂等命令、补逐项批量结果、修正 AdminMessage Controller。
+这一步重点是继续把 toggle 改成幂等命令、补逐项批量结果、修正 AdminMessage Controller。
 
 ### Wave 7：Chat 与 SSE
 
