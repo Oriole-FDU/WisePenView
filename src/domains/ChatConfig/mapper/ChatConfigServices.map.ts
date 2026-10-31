@@ -106,14 +106,19 @@ const createFallbackProviderOption = (model: ModelResponse): ChatModelProviderOp
   priority: 0,
 });
 
+/** 在 DecimalStringSchema 已校验的前提下，用词法精确判断数值是否为零。 */
+const isZeroDecimalString = (value: string | undefined): boolean =>
+  value !== undefined && /^-?0(?:\.0+)?(?:[eE][+-]?\d+)?$/.test(value);
+
 const isFreeModel = (
   model: ModelResponse,
   providerOption: ChatModelProviderOption | undefined
 ): boolean =>
   model.scope === 'SYSTEM' &&
-  providerOption?.inputBillingRatio === '0' &&
-  providerOption?.cachedInputBillingRatio === '0' &&
-  providerOption?.outputBillingRatio === '0';
+  providerOption !== undefined &&
+  isZeroDecimalString(providerOption.inputBillingRatio) &&
+  isZeroDecimalString(providerOption.cachedInputBillingRatio) &&
+  isZeroDecimalString(providerOption.outputBillingRatio);
 
 const mapModelOption = (
   model: ModelResponse,
