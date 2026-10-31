@@ -14,6 +14,7 @@ import { createAdminServices } from '@/domains/Admin/service/AdminServices.impl'
 import { createAgentServices } from '@/domains/Agent/service/AgentServices.impl';
 import { createAuthServices } from '@/domains/Auth/service/AuthServices.impl';
 import { createChatServices } from '@/domains/Chat/service/ChatServices.impl';
+import { createChatConfigServices } from '@/domains/ChatConfig/service/ChatConfigServices.impl';
 import { createCourseServices } from '@/domains/Course/service/CourseServices.impl';
 import { createDocumentServices } from '@/domains/Document/service/DocumentServices.impl';
 import { createDriveServices } from '@/domains/Drive/service/DriveServices.impl';
@@ -60,9 +61,10 @@ const noteService = createNoteServices({ resourceService: resourceService });
 const skillService = createSkillServices({
   resourceService: resourceService,
 });
-const chatService = createChatServices({
-  groupService: groupService,
-  resourceService: resourceService,
+const chatService = createChatServices();
+const chatConfigService = createChatConfigServices({
+  groupService,
+  resourceService,
 });
 
 const driveService = createDriveServices({
@@ -92,6 +94,7 @@ const servicesValue: ServicesContextValue = {
   agentService: agentService,
   authService: authService,
   chatService: chatService,
+  chatConfigService,
   courseService: courseService,
   documentService: documentService,
   driveService: driveService,

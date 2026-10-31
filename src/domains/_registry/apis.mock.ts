@@ -10,6 +10,7 @@ export {
   streamChatCompletion,
   streamChatRecovery,
 } from '@/domains/Chat/mock/ChatStreamApi.mock';
+export { ChatConfigApi } from '@/domains/ChatConfig/mock/ChatConfigApi.mock';
 export { DocumentApi } from '@/domains/Document/mock/DocumentApi.mock';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/mock/GroupApi.mock';
 export { HtmlPageApi } from '@/domains/HtmlPage/mock/HtmlPageApi.mock';

@@ -1,5 +1,5 @@
 import type { AgentDetail, AgentSpec } from '@/domains/Agent';
-import type { ChatAgentOption, ChatModel, ToolOption } from '@/domains/Chat';
+import type { ChatAgentOption, ChatModel, ToolOption } from '@/domains/ChatConfig';
 import type { SkillSummary } from '@/domains/Skill';
 
 export interface AgentDraft {

@@ -29,9 +29,9 @@ try {
           UnbindModelProviderApiContract,
           UpdateUserModelApiContract,
           UpdateUserProviderApiContract,
-        } from '@/domains/Chat/apis/ChatModelApi.contract';
-        export { ChatServicesMap } from '@/domains/Chat/mapper/ChatServices.map';
-        export { ChatApi } from '@/domains/Chat/mock/ChatApi.mock';
+        } from '@/domains/ChatConfig/apis/ChatModelApi.contract';
+        export { ChatConfigServicesMap } from '@/domains/ChatConfig/mapper/ChatConfigServices.map';
+        export { ChatConfigApi } from '@/domains/ChatConfig/mock/ChatConfigApi.mock';
       `,
       resolveDir: root,
     },
@@ -44,8 +44,8 @@ try {
 
   const {
     BindModelProviderApiContract,
-    ChatApi,
-    ChatServicesMap,
+    ChatConfigApi,
+    ChatConfigServicesMap,
     CreateUserModelApiContract,
     CreateUserProviderApiContract,
     DeleteUserModelApiContract,
@@ -81,16 +81,16 @@ try {
 
   const available = parseApiResponse(
     ListAvailableModelsApiContract,
-    await ChatApi.listAvailableModels()
+    await ChatConfigApi.listAvailableModels()
   );
   assert.equal(available.system_models[0].id.length, 24);
   assert.equal(available.system_models[0].mappings?.[0].support_runtime_options != null, true);
-  const mappedModels = ChatServicesMap.mapGetModelsFromApi(available);
+  const mappedModels = ChatConfigServicesMap.mapGetModelsFromApi(available);
   assert.equal(mappedModels.length > 0, true);
 
   const userModels = parseApiResponse(
     ListModelsApiContract,
-    await ChatApi.listModels({ model_scope: 'USER' })
+    await ChatConfigApi.listModels({ model_scope: 'USER' })
   );
   assert.equal(
     userModels.models.every((model) => model.scope === 'USER'),
@@ -103,10 +103,10 @@ try {
     api_key: 'secret',
     base_url: 'https://api.example.com',
   });
-  await ChatApi.createUserProvider(providerRequest);
+  await ChatConfigApi.createUserProvider(providerRequest);
   const providers = parseApiResponse(
     ListUserProvidersApiContract,
-    await ChatApi.listUserProviders()
+    await ChatConfigApi.listUserProviders()
   );
   assert.equal(typeof providers.providers[0].input_tokens, 'number');
   assert.equal('token_usage' in providers.providers[0], false);
@@ -123,7 +123,7 @@ try {
     model_family: 'GENERIC',
     support_tools: true,
   });
-  await ChatApi.createUserModel(modelRequest);
+  await ChatConfigApi.createUserModel(modelRequest);
 
   const bindRequest = parseApiRequest(BindModelProviderApiContract, {
     model_id: available.user_models[0].id,

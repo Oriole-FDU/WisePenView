@@ -1,4 +1,4 @@
-import type { CapabilitySkillSelection, ChatAgentOption, ChatModel } from '@/domains/Chat';
+import type { CapabilitySkillSelection, ChatAgentOption, ChatModel } from '@/domains/ChatConfig';
 
 export interface LocalAttachmentPayload {
   attachmentId: string;

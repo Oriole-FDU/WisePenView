@@ -11,6 +11,7 @@ export {
   streamChatCompletion,
   streamChatRecovery,
 } from '@/domains/Chat/apis/ChatStreamApi';
+export { ChatConfigApi } from '@/domains/ChatConfig/apis/ChatConfigApi';
 export { DocumentApi } from '@/domains/Document/apis/DocumentApi';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/apis/GroupApi';
 export { HtmlPageApi } from '@/domains/HtmlPage/apis/HtmlPageApi';

@@ -1,33 +1,6 @@
 import { executeApiContract } from '@/apis/executeApiContract';
 
 import {
-  BindModelProviderApiContract,
-  CreateUserModelApiContract,
-  CreateUserProviderApiContract,
-  DeleteUserModelApiContract,
-  DeleteUserProviderApiContract,
-  ListAvailableModelsApiContract,
-  ListModelsApiContract,
-  ListUserProvidersApiContract,
-  UnbindModelProviderApiContract,
-  UpdateUserModelApiContract,
-  UpdateUserProviderApiContract,
-} from './ChatModelApi.contract';
-import type {
-  BindModelProviderApiRequest,
-  CreateUserModelApiRequest,
-  CreateUserProviderApiRequest,
-  DeleteUserModelApiRequest,
-  DeleteUserProviderApiRequest,
-  ListAvailableModelsApiResponse,
-  ListModelsApiRequest,
-  ListModelsApiResponse,
-  ListUserProvidersApiResponse,
-  UnbindModelProviderApiRequest,
-  UpdateUserModelApiRequest,
-  UpdateUserProviderApiRequest,
-} from './ChatModelApi.schema';
-import {
   CancelChatTurnApiContract,
   CreateSessionApiContract,
   DeleteSessionApiContract,
@@ -54,31 +27,7 @@ import type {
   RenameSessionApiRequest,
   SetSessionAgentApiRequest,
 } from './ChatSessionApi.schema';
-import {
-  DeleteUserToolConfigApiContract,
-  ListToolsApiContract,
-  UpdateUserToolConfigApiContract,
-} from './ChatToolApi.contract';
-import type {
-  DeleteUserToolConfigApiRequest,
-  ListToolsApiResponse,
-  ToolApiResponse,
-  UpdateUserToolConfigApiRequest,
-} from './ChatToolApi.schema';
-
 /** Chat API: /chat/* */
-
-function listAvailableModels(): Promise<ListAvailableModelsApiResponse> {
-  return executeApiContract(ListAvailableModelsApiContract, undefined);
-}
-
-function listModels(req: ListModelsApiRequest): Promise<ListModelsApiResponse> {
-  return executeApiContract(ListModelsApiContract, req);
-}
-
-function listTools(): Promise<ListToolsApiResponse> {
-  return executeApiContract(ListToolsApiContract, undefined);
-}
 
 function initTemporaryAttachmentUpload(
   req: InitTemporaryAttachmentUploadApiRequest
@@ -86,66 +35,8 @@ function initTemporaryAttachmentUpload(
   return executeApiContract(InitTemporaryAttachmentUploadApiContract, req);
 }
 
-function listUserProviders(): Promise<ListUserProvidersApiResponse> {
-  return executeApiContract(ListUserProvidersApiContract, undefined);
-}
-
-async function createUserProvider(req: CreateUserProviderApiRequest): Promise<void> {
-  await executeApiContract(CreateUserProviderApiContract, req);
-}
-
-async function updateUserProvider(req: UpdateUserProviderApiRequest): Promise<void> {
-  await executeApiContract(UpdateUserProviderApiContract, req);
-}
-
-async function deleteUserProvider(req: DeleteUserProviderApiRequest): Promise<void> {
-  await executeApiContract(DeleteUserProviderApiContract, req);
-}
-
-async function createUserModel(req: CreateUserModelApiRequest): Promise<void> {
-  await executeApiContract(CreateUserModelApiContract, req);
-}
-
-async function updateUserModel(req: UpdateUserModelApiRequest): Promise<void> {
-  await executeApiContract(UpdateUserModelApiContract, req);
-}
-
-async function deleteUserModel(req: DeleteUserModelApiRequest): Promise<void> {
-  await executeApiContract(DeleteUserModelApiContract, req);
-}
-
-async function bindModelProvider(req: BindModelProviderApiRequest): Promise<void> {
-  await executeApiContract(BindModelProviderApiContract, req);
-}
-
-async function unbindModelProvider(req: UnbindModelProviderApiRequest): Promise<void> {
-  await executeApiContract(UnbindModelProviderApiContract, req);
-}
-
-function updateUserToolConfig(req: UpdateUserToolConfigApiRequest): Promise<ToolApiResponse> {
-  return executeApiContract(UpdateUserToolConfigApiContract, req);
-}
-
-async function deleteUserToolConfig(req: DeleteUserToolConfigApiRequest): Promise<void> {
-  await executeApiContract(DeleteUserToolConfigApiContract, req);
-}
-
 export const ChatApi = {
-  listAvailableModels,
-  listModels,
-  listTools,
   initTemporaryAttachmentUpload,
-  listUserProviders,
-  createUserProvider,
-  updateUserProvider,
-  deleteUserProvider,
-  createUserModel,
-  updateUserModel,
-  deleteUserModel,
-  bindModelProvider,
-  unbindModelProvider,
-  updateUserToolConfig,
-  deleteUserToolConfig,
 };
 
 /** Chat Completion API: /chat/completions/* */

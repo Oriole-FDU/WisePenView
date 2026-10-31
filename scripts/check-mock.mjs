@@ -70,6 +70,7 @@ try {
     resourceCommentService: comment,
     resourceFavoriteService: favorite,
     chatService: chat,
+    chatConfigService: chatConfig,
     skillService: skill,
     agentService: agent,
     userService: user,
@@ -308,9 +309,9 @@ try {
     '重新命名'
   );
   assert(
-    (await chat.listChatInputSkills({ scope: 'PERSONAL', page: 1, size: 20 })).list.length > 0
+    (await chatConfig.listChatInputSkills({ scope: 'PERSONAL', page: 1, size: 20 })).list.length > 0
   );
-  await chat.getChatInputCapabilityOptions({ agent: null });
+  await chatConfig.getChatInputCapabilityOptions({ agent: null });
   await chat.deleteSession({ sessionId: session.id });
 
   const skillId = await skill.createSkill('驗證 Skill');

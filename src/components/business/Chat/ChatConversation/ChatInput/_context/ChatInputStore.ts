@@ -7,7 +7,7 @@ import {
   type CapabilityToolOption,
   type ChatAgentOption,
   type ChatModel,
-} from '@/domains/Chat';
+} from '@/domains/ChatConfig';
 import type { ResourceSkillSummary } from '@/domains/Resource';
 import { createStoreJSONStorage } from '@/store/persistence';
 

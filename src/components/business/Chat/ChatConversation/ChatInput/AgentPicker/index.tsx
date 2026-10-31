@@ -12,8 +12,9 @@ import { GuideAnchor } from '@/components/base/Guide';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
-import { useChatService } from '@/domains';
-import { buildDefaultPersonalAgent, type ChatAgentOption, type PageResult } from '@/domains/Chat';
+import { useChatConfigService } from '@/domains';
+import type { PageResult } from '@/domains/_shared/entity/page';
+import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatConfig';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.scss';
@@ -64,7 +65,7 @@ function AgentMenuSkeleton({ ariaLabel }: { ariaLabel: string }) {
 
 function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   const { t } = useTranslation('chat');
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const store = useChatInputStoreApi();
   const selectedAgent = useChatInputStore((state) => state.selectedAgent);
   const agentOpen = useChatInputStore((state) => state.agentOpen);
@@ -78,7 +79,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
     loadMore: loadMorePersonal,
   } = useInfiniteScroll<AgentPageState>(
     async (current) =>
-      chatService.listChatInputAgents({
+      chatConfigService.listChatInputAgents({
         scope: 'PERSONAL',
         page: Math.floor((current?.list.length ?? 0) / AGENT_PAGE_SIZE) + 1,
         size: AGENT_PAGE_SIZE,

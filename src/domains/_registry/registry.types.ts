@@ -2,6 +2,7 @@ import type { IAdminService } from '@/domains/Admin';
 import type { IAgentService } from '@/domains/Agent';
 import type { IAuthService } from '@/domains/Auth';
 import type { IChatService } from '@/domains/Chat';
+import type { IChatConfigService } from '@/domains/ChatConfig';
 import type { ICourseService } from '@/domains/Course';
 import type { IDocumentService } from '@/domains/Document';
 import type { IDriveService } from '@/domains/Drive';
@@ -27,6 +28,7 @@ export interface ServicesContextValue {
   agentService: IAgentService;
   authService: IAuthService;
   chatService: IChatService;
+  chatConfigService: IChatConfigService;
   courseService: ICourseService;
   documentService: IDocumentService;
   driveService: IDriveService;

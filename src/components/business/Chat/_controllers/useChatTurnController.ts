@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useChatService } from '@/domains';
-import { type ChatModel, type CreateSessionRequest, useChatSession } from '@/domains/Chat';
+import { type CreateSessionRequest, useChatSession } from '@/domains/Chat';
+import type { ChatModel } from '@/domains/ChatConfig';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';

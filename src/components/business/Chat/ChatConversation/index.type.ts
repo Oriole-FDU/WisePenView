@@ -1,4 +1,4 @@
-import type { ChatAgentOption } from '@/domains/Chat';
+import type { ChatAgentOption } from '@/domains/ChatConfig';
 
 import type { useChatSessionController } from '../_controllers/useChatSessionController';
 import type { useChatTurnController } from '../_controllers/useChatTurnController';

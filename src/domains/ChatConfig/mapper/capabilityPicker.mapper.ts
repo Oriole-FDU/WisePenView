@@ -1,14 +1,11 @@
 import type { ResourceSkillSummary } from '@/domains/Resource';
 
+import type { CapabilityToolOption } from '../entity/config';
+
 interface SkillScopeTreeGroup {
   key: string;
   label: string;
   skills: ResourceSkillSummary[];
-}
-
-export interface CapabilityToolOption {
-  toolId: string;
-  label: string;
 }
 
 interface ChatInputToolCandidate extends CapabilityToolOption {

@@ -21,9 +21,9 @@ try {
           DeleteUserToolConfigApiContract,
           ListToolsApiContract,
           UpdateUserToolConfigApiContract,
-        } from '@/domains/Chat/apis/ChatToolApi.contract';
-        export { ChatServicesMap } from '@/domains/Chat/mapper/ChatServices.map';
-        export { ChatApi } from '@/domains/Chat/mock/ChatApi.mock';
+        } from '@/domains/ChatConfig/apis/ChatToolApi.contract';
+        export { ChatConfigServicesMap } from '@/domains/ChatConfig/mapper/ChatConfigServices.map';
+        export { ChatConfigApi } from '@/domains/ChatConfig/mock/ChatConfigApi.mock';
       `,
       resolveDir: root,
     },
@@ -35,8 +35,8 @@ try {
   });
 
   const {
-    ChatApi,
-    ChatServicesMap,
+    ChatConfigApi,
+    ChatConfigServicesMap,
     DeleteUserToolConfigApiContract,
     ListToolsApiContract,
     parseApiRequest,
@@ -44,10 +44,10 @@ try {
     UpdateUserToolConfigApiContract,
   } = await import(pathToFileURL(outfile).href);
 
-  const tools = parseApiResponse(ListToolsApiContract, await ChatApi.listTools());
+  const tools = parseApiResponse(ListToolsApiContract, await ChatConfigApi.listTools());
   assert.equal(tools.tools.length > 0, true);
   assert.equal(tools.tools[0].selection_mode, 'user_selectable');
-  const mapped = ChatServicesMap.mapGetToolsFromApi(tools);
+  const mapped = ChatConfigServicesMap.mapGetToolsFromApi(tools);
   assert.equal(mapped[0].toolId, 'default_web_search');
 
   const updateRequest = parseApiRequest(UpdateUserToolConfigApiContract, {
@@ -58,7 +58,7 @@ try {
   });
   const updated = parseApiResponse(
     UpdateUserToolConfigApiContract,
-    await ChatApi.updateUserToolConfig(updateRequest)
+    await ChatConfigApi.updateUserToolConfig(updateRequest)
   );
   assert.equal(updated.enabled, false);
 

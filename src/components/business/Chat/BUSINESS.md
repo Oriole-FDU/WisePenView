@@ -2,7 +2,7 @@
 
 ## 范围
 
-本文件拥有共用 Chat 输入、会话切换、消息传送、历史与工具审批的前端流程。数据 DTO 与 service 规则由 [Chat domain](../../../domains/Chat/BUSINESS.md) 拥有；URL 规则由 [routing 规范](../../../../agent/docs/routing.md) 拥有。
+本文件拥有共用 Chat 输入、会话切换、消息传送、历史与工具审批的前端流程。会话数据由 [Chat domain](../../../domains/Chat/BUSINESS.md) 拥有，模型／Provider／Tool／能力选项由 [ChatConfig domain](../../../domains/ChatConfig/BUSINESS.md) 拥有；URL 规则由 [routing 规范](../../../../agent/docs/routing.md) 拥有。
 
 ## 规则
 

@@ -9,8 +9,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useChatService } from '@/domains';
-import { mapChatInputToolSelectionOverrides } from '@/domains/Chat';
+import { useChatConfigService } from '@/domains';
+import { mapChatInputToolSelectionOverrides } from '@/domains/ChatConfig';
 import { useApi } from '@/hooks/useApi';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
@@ -36,7 +36,7 @@ export function useChatInputController({
 }: UseChatInputControllerOptions) {
   const { t } = useTranslation('chat');
   const { isAuthenticated, requireLogin } = useAppAuth();
-  const chatService = useChatService();
+  const chatConfigService = useChatConfigService();
   const store = useChatInputStoreApi();
   const dragCounterRef = useRef(0);
   const { routeFiles } = useChatInputFiles();
@@ -59,7 +59,7 @@ export function useChatInputController({
   const capabilityRequest = useApi(
     async () => ({
       agent: completionState.selectedAgent,
-      options: await chatService.getChatInputCapabilityOptions({
+      options: await chatConfigService.getChatInputCapabilityOptions({
         agent: completionState.selectedAgent,
       }),
     }),
