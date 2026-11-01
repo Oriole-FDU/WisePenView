@@ -144,6 +144,6 @@ dirty 快照来自映射后的 spec，已不包含原 nullable 意图（F6/F10�
 - 一次性前端样本（Node.js 22.23.2 + esbuild，6 组通过）：nullable/omitted 与顶层 spec；10/false/水位显示；无关保存固化继承；显式 false/0/工具覆盖；前端接受 Python 拒绝的数值；未加载／null／全继承映射不可区分。临时 bundle 已删除。
 - 一次性 Python 样本（本地 venv，仅导入已跟踪 `models.py`，8 组通过）：null/omitted 默认；Chat Memory 依赖；关闭后的归一化；工具联动；false/0；None／空 Skill 集合；数值拒绝；未校验 low < high。未启动服务；解释器提示相对路径形式的 venv prefix warning，不影响断言结果。
 - 文档检查：`git diff --check`、来源路径／行号／链接锚点检查；提交钩子执行 Markdown 格式化与 commitlint。本地被忽略 TODO 另做文本差异核对，不把空 Git diff 当检查结果。
-- 未运行 lint/typecheck/build：只读分析与 Markdown 变更按验证矩阵不要求，不复用前项结果冒充本次执行。
+- 推送钩子实际执行 `pnpm run lint`、`pnpm typecheck`，均通过；未运行 build（纯 Markdown 不要求）。未复用前项结果冒充本次执行。
 - 未验证：真实 Java HTTP null/omitted、Mongo 读回、线上 settings、浏览器、草稿调试／发布回放、部分成功／并发；未启动 dev/mock、未连接生产。
 - 交接：T11 分析完成，T12 待确认；忽略的本地 TODO 仅更新 T11。下一步先确认 Q1–Q7 并提供必要样本，再确定 T12 批准切片；其他 T/H 项未推进。
