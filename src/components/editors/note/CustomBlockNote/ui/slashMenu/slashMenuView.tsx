@@ -140,16 +140,14 @@ export function SlashMenuDropdownItems({
 
 export function SlashMenuListBoxItems({
   getItemId,
-  hoveredItemId,
+  activeItemId,
   items,
   onItemClick,
-  onItemMouseMove,
 }: {
   getItemId: (item: DefaultReactSuggestionItem, index: number) => string;
-  hoveredItemId?: string;
+  activeItemId?: string;
   items: DefaultReactSuggestionItem[];
   onItemClick?: (item: DefaultReactSuggestionItem) => void;
-  onItemMouseMove?: (index: number, event: MouseEvent) => void;
 }) {
   const groupedItems = groupSortedSuggestionItems(items);
 
@@ -170,9 +168,8 @@ export function SlashMenuListBoxItems({
                   id={itemId}
                   textValue={title}
                   className={styles.item}
-                  data-menu-hovered={itemId === hoveredItemId || undefined}
+                  data-menu-active={itemId === activeItemId || undefined}
                   data-slash-menu-index={itemIndex}
-                  onMouseMove={(event) => onItemMouseMove?.(itemIndex, event.nativeEvent)}
                   onMouseDown={(event) => event.preventDefault()}
                   onAction={() => onItemClick?.(item)}
                 >
