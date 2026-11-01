@@ -73,7 +73,7 @@ const loadRequestModules = async (context) => {
   await writeFile(
     entry,
     `
-      export { apiGet, apiGetText, apiPost } from '@/apis/request';
+      export { apiGet, apiGetText } from '@/apis/request';
       export { defineApiContract } from '@/apis/contract';
       export { executeApiContract } from '@/apis/executeApiContract';
       export { captureException } from '@/observability';
@@ -187,7 +187,10 @@ test('成功请求只有一个逻辑 span，传输层位于其上下文，不生
     });
   };
 
-  assert.equal(await telemetry.apiGet('/success?token=secret', { adapter }), 42);
+  assert.equal(
+    await telemetry.apiGet('/success?token=secret', { adapter }, telemetry.z.number().parse),
+    42
+  );
   assert.equal(logs.length, 0);
   assert.equal(activeRequestSpan, spans[0]);
   assert.equal(spans.length, 1);
@@ -216,7 +219,13 @@ test('逻辑请求覆盖全部重试，只生成一个最终 HTTP 失败事件',
     );
   };
 
-  await assert.rejects(telemetry.apiGet('/retry?token=secret', { adapter, retryDelayMs: 0 }));
+  await assert.rejects(
+    telemetry.apiGet(
+      '/retry?token=secret',
+      { adapter, retryDelayMs: 0 },
+      telemetry.z.number().parse
+    )
+  );
   assert.equal(attempts, 3);
   assert.equal(logs.length, 1);
   assert.equal(logs[0].attributes['event.name'], 'frontend.request_failure');
@@ -281,10 +290,11 @@ test('最终失败按 HTTP、网络、超时、业务、契约和取消分类', 
   for (const item of cases) {
     const before = logs.length;
     await assert.rejects(
-      telemetry.apiGet(`/${item.name}`, {
-        adapter: item.adapter,
-        retry: false,
-      })
+      telemetry.apiGet(
+        `/${item.name}`,
+        { adapter: item.adapter, retry: false },
+        telemetry.z.number().parse
+      )
     );
     assert.equal(logs.length, before + 1);
     assert.equal(logs.at(-1).attributes['error.kind'], item.kind);
@@ -293,12 +303,16 @@ test('最终失败按 HTTP、网络、超时、业务、契约和取消分类', 
 
   const beforeCancel = logs.length;
   await assert.rejects(
-    telemetry.apiGet('/cancel', {
-      adapter(config) {
-        throw new telemetry.AxiosError('canceled', 'ERR_CANCELED', config);
+    telemetry.apiGet(
+      '/cancel',
+      {
+        adapter(config) {
+          throw new telemetry.AxiosError('canceled', 'ERR_CANCELED', config);
+        },
+        retry: false,
       },
-      retry: false,
-    })
+      telemetry.z.number().parse
+    )
   );
   assert.equal(logs.length, beforeCancel);
 });
@@ -321,7 +335,11 @@ test('迟到请求失败保留发起时的用户与会话，不污染新账号 b
       response(config, {}, 503)
     );
   };
-  const pending = telemetry.apiGet('/old-request', { adapter, retry: false });
+  const pending = telemetry.apiGet(
+    '/old-request',
+    { adapter, retry: false },
+    telemetry.z.number().parse
+  );
   await started.promise;
 
   telemetry.authSessionCoordinator.publish('login');
@@ -558,7 +576,10 @@ test('文本 Contract 保留裸文本及非 envelope JSON 的既有语义', asyn
   for (const text of ['plain text', '{broken json', '{"domain":"text"}']) {
     const adapter = async (config) => response(config, text);
     assert.equal(await telemetry.executeApiContract(contract, undefined, { adapter }), text);
-    assert.equal(await telemetry.apiGetText('/raw-text', { adapter }), text);
+    assert.equal(
+      await telemetry.apiGetText('/raw-text', { adapter }, telemetry.z.string().parse),
+      text
+    );
   }
   assert.equal(logs.length, 0);
   assert.equal(spans.length, 6);

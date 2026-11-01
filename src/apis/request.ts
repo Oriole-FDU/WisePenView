@@ -20,7 +20,7 @@ function checkResponse(res: ApiResponse<unknown>): void {
   }
 }
 
-function unwrap<T>(res: unknown): T {
+function unwrap(res: unknown): unknown {
   if (!isApiResponseEnvelope(res)) {
     throw new WisePenError({
       code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
@@ -30,7 +30,7 @@ function unwrap<T>(res: unknown): T {
   }
   checkResponse(res);
   // envelope 已通过运行期校验，payload 具体形状由后续 Contract 解析器校验。
-  return res.data as T;
+  return res.data;
 }
 
 /**
@@ -95,55 +95,30 @@ async function executeRequest<T>(
 }
 
 /** GET 解包后在同一请求观测内完成契约解析。 */
-export function apiGet(url: string, config?: AxiosRequestConfig): Promise<unknown>;
 export function apiGet<T>(
   url: string,
   config: AxiosRequestConfig | undefined,
   parsePayload: (value: unknown) => T
-): Promise<T>;
-export function apiGet(
-  url: string,
-  config?: AxiosRequestConfig,
-  parsePayload?: (value: unknown) => unknown
-): Promise<unknown> {
-  return executeRequest('get', url, config, undefined, (value) => {
-    const payload = unwrap<unknown>(value);
-    return parsePayload ? parsePayload(payload) : payload;
-  });
+): Promise<T> {
+  return executeRequest('get', url, config, undefined, (value) => parsePayload(unwrap(value)));
 }
 
 /** POST 解包后在同一请求观测内完成契约解析。 */
-export function apiPost(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<unknown>;
 export function apiPost<T>(
   url: string,
   data: unknown,
   config: AxiosRequestConfig | undefined,
   parsePayload: (value: unknown) => T
-): Promise<T>;
-export function apiPost(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig,
-  parsePayload?: (value: unknown) => unknown
-): Promise<unknown> {
-  return executeRequest('post', url, config, data, (value) => {
-    const payload = unwrap<unknown>(value);
-    return parsePayload ? parsePayload(payload) : payload;
-  });
+): Promise<T> {
+  return executeRequest('post', url, config, data, (value) => parsePayload(unwrap(value)));
 }
 
 /** 读取文本并在同一请求观测内完成契约解析。 */
-export function apiGetText(url: string, config?: AxiosRequestConfig): Promise<string>;
 export function apiGetText<T>(
   url: string,
   config: AxiosRequestConfig | undefined,
   parsePayload: (value: unknown) => T
-): Promise<T>;
-export function apiGetText(
-  url: string,
-  config?: AxiosRequestConfig,
-  parsePayload?: (value: unknown) => unknown
-): Promise<unknown> {
+): Promise<T> {
   return executeRequest(
     'get',
     url,
@@ -153,71 +128,35 @@ export function apiGetText(
       ...config,
     },
     undefined,
-    (value) => {
-      const payload = parseTextApiResponse(value);
-      return parsePayload ? parsePayload(payload) : payload;
-    }
+    (value) => parsePayload(parseTextApiResponse(value))
   );
 }
 
 /** PUT 解包后在同一请求观测内完成契约解析。 */
-export function apiPut(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<unknown>;
 export function apiPut<T>(
   url: string,
   data: unknown,
   config: AxiosRequestConfig | undefined,
   parsePayload: (value: unknown) => T
-): Promise<T>;
-export function apiPut(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig,
-  parsePayload?: (value: unknown) => unknown
-): Promise<unknown> {
-  return executeRequest('put', url, config, data, (value) => {
-    const payload = unwrap<unknown>(value);
-    return parsePayload ? parsePayload(payload) : payload;
-  });
+): Promise<T> {
+  return executeRequest('put', url, config, data, (value) => parsePayload(unwrap(value)));
 }
 
 /** PATCH 解包后在同一请求观测内完成契约解析。 */
-export function apiPatch(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<unknown>;
 export function apiPatch<T>(
   url: string,
   data: unknown,
   config: AxiosRequestConfig | undefined,
   parsePayload: (value: unknown) => T
-): Promise<T>;
-export function apiPatch(
-  url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig,
-  parsePayload?: (value: unknown) => unknown
-): Promise<unknown> {
-  return executeRequest('patch', url, config, data, (value) => {
-    const payload = unwrap<unknown>(value);
-    return parsePayload ? parsePayload(payload) : payload;
-  });
+): Promise<T> {
+  return executeRequest('patch', url, config, data, (value) => parsePayload(unwrap(value)));
 }
 
 /** DELETE 解包后在同一请求观测内完成契约解析。 */
-export function apiDelete(url: string, config?: AxiosRequestConfig): Promise<unknown>;
 export function apiDelete<T>(
   url: string,
   config: AxiosRequestConfig | undefined,
   parsePayload: (value: unknown) => T
-): Promise<T>;
-export function apiDelete(
-  url: string,
-  config?: AxiosRequestConfig,
-  parsePayload?: (value: unknown) => unknown
-): Promise<unknown> {
-  return executeRequest('delete', url, config, undefined, (value) => {
-    const payload = unwrap<unknown>(value);
-    return parsePayload ? parsePayload(payload) : payload;
-  });
+): Promise<T> {
+  return executeRequest('delete', url, config, undefined, (value) => parsePayload(unwrap(value)));
 }
