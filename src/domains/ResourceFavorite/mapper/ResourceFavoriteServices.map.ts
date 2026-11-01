@@ -2,27 +2,18 @@ import { ResourceServicesMap } from '@/domains/Resource';
 
 import type {
   ChangeFavoriteStatusApiRequest,
-  CreateCollectionApiRequest,
-  DeleteCollectionApiRequest,
   FavoriteCollectionApiResponse,
   FavoriteItemApiResponse,
-  GetFavoriteStatusApiResponse,
   ListFavoritedResourcesApiRequest,
   ListFavoritedResourcesApiResponse,
   UpdateCollectionInfoApiRequest,
 } from '../apis/FavoriteApi.schema';
 import type { FavoriteCollection, FavoritedResourcesPage, FavoriteItem } from '../entity/favorite';
 import type {
-  CreateFavoriteCollectionRequest,
-  DeleteFavoriteCollectionRequest,
   ListFavoritedResourcesRequest,
   UpdateFavoriteCollectionRequest,
   UpdateFavoriteCollectionsRequest,
 } from '../service/index.type';
-
-const mapFavoriteCollectionIdsFromApi = (data: GetFavoriteStatusApiResponse): string[] => [
-  ...data.collectionIds,
-];
 
 const mapFavoriteCollectionFromApi = (data: FavoriteCollectionApiResponse): FavoriteCollection => ({
   collectionId: data.collectionId,
@@ -47,26 +38,12 @@ const mapUpdateFavoriteCollectionsRequest = (
   };
 };
 
-const mapCreateFavoriteCollectionRequest = (
-  params: CreateFavoriteCollectionRequest
-): CreateCollectionApiRequest => ({
-  collectionName: params.collectionName,
-  ...(params.description !== undefined ? { description: params.description } : {}),
-});
-
 const mapUpdateFavoriteCollectionRequest = (
   params: UpdateFavoriteCollectionRequest
 ): UpdateCollectionInfoApiRequest => ({
   collectionId: params.collectionId,
   collectionName: params.collectionName,
   description: params.description ?? null,
-});
-
-const mapDeleteFavoriteCollectionRequest = (
-  params: DeleteFavoriteCollectionRequest
-): DeleteCollectionApiRequest => ({
-  collectionId: params.collectionId,
-  keepResourcesToDefault: params.keepResourcesToDefault,
 });
 
 const mapListFavoritedResourcesRequest = (
@@ -98,12 +75,9 @@ const mapFavoritedResourcesPageFromApi = (
 });
 
 export const ResourceFavoriteServicesMap = {
-  mapFavoriteCollectionIdsFromApi,
   mapFavoriteCollectionsFromApi,
   mapUpdateFavoriteCollectionsRequest,
-  mapCreateFavoriteCollectionRequest,
   mapUpdateFavoriteCollectionRequest,
-  mapDeleteFavoriteCollectionRequest,
   mapListFavoritedResourcesRequest,
   mapFavoritedResourcesPageFromApi,
 };

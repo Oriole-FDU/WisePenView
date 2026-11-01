@@ -14,7 +14,7 @@
 ## Asset 身份与保存
 
 - path、name、assetId 与 objectKey 是不同信息；mapper 可为缺 ID 的显示节点合成 ID，但不代表该值可当作后端 asset identity。上传结果以 clientId 关联输入，再提供 ticket assetId／objectKey 或 error。依据：[assetToFileNode](mapper/SkillServices.map.ts)、[uploadAssets](service/SkillServices.impl.ts)。
-- upload 初始化分批取得 ticket，再依 ticket PUT；失败时以该 ticket 的 assetId 与 objectKey 组成 uploads 项目，best-effort 取消候选，不按复用的 assetId 删除资产；取消失败仍保留原上传错误。配套后端以 pendingUpload 隔离候选，正式 objectKey／类型／大小保留至成功回调提交；前端代码不能证明该后端已部署。依据：[uploadAssets](service/SkillServices.impl.ts)、[版本资产 API 类型](../_shared/apis/versionAssetApi.type.ts)。
+- upload 初始化分批取得 ticket，再依 ticket PUT；失败时以该 ticket 的 assetId 与 objectKey 组成 uploads 项目，best-effort 取消候选，不按复用的 assetId 删除资产；取消失败仍保留原上传错误。配套后端以 pendingUpload 隔离候选，正式 objectKey／类型／大小保留至成功回调提交；前端代码不能证明该后端已部署。依据：[uploadAssets](service/SkillServices.impl.ts)、[版本资产 API 类型](../_shared/apis/versionAssetApi.schema.ts)。
 - move 先读取或使用 caller 提供的内容，上传新位置，确认结果的 ID／objectKey 齐全后才删旧资产；部分失败时保留源文件及已成功上传的目标，不按返回的 ID 回滚删除覆盖目标。这不是后端原子 move，部分目标可能已经更新。依据：[moveAssets](service/SkillServices.impl.ts)。
 - 批次 upload 会把各项错误放在结果中，并非遇到任何失败都只抛出单一错误；其他 API 请求可直接拒绝。workspace 必须检查结果再更新 persisted baseline，不能把 Promise resolve 当全档成功。依据：[uploadAssets](service/SkillServices.impl.ts)、[useSkillSaveController](../../components/editors/skill/controllers/useSkillSaveController.ts)。
 

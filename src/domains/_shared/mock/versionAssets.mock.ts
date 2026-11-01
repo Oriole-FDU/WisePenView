@@ -3,12 +3,12 @@ import { WisePenError } from '@/utils/error';
 import type {
   CancelUploadAssetsApiRequest,
   InitUploadAssetApiItem,
-  VersionBundleApiResponse,
-} from '../apis/versionAssetApi.type';
+  VersionBundleApi,
+} from '../apis/versionAssetApi.schema';
 import { mockObjects, mockUploadCallbacks } from './ossClient.mock';
 
 export function initMockVersionAssets(
-  target: VersionBundleApiResponse,
+  target: VersionBundleApi,
   assets: InitUploadAssetApiItem[],
   prefix: string
 ) {
@@ -64,7 +64,7 @@ export function initMockVersionAssets(
 }
 
 export function cancelMockVersionUploads(
-  target: VersionBundleApiResponse,
+  target: VersionBundleApi,
   uploads: CancelUploadAssetsApiRequest['uploads']
 ) {
   for (const { assetId, objectKey } of uploads) {
@@ -83,7 +83,7 @@ export function cancelMockVersionUploads(
   }
 }
 
-export function deleteMockVersionAssets(target: VersionBundleApiResponse, assetIds: string[]) {
+export function deleteMockVersionAssets(target: VersionBundleApi, assetIds: string[]) {
   for (const asset of target.assets ?? []) {
     if (assetIds.includes(asset.id ?? '') && asset.pendingUpload?.objectKey) {
       mockUploadCallbacks.delete(asset.pendingUpload.objectKey);
@@ -93,7 +93,7 @@ export function deleteMockVersionAssets(target: VersionBundleApiResponse, assetI
   target.assets = target.assets?.filter((asset) => !assetIds.includes(asset.id ?? ''));
 }
 
-export function assertMockVersionUploadsComplete(target: VersionBundleApiResponse) {
+export function assertMockVersionUploadsComplete(target: VersionBundleApi) {
   if (
     target.assets?.some(
       (asset) => !asset.objectKey || asset.uploadStatus !== 'AVAILABLE' || asset.pendingUpload

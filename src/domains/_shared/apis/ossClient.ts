@@ -1,13 +1,13 @@
 import OSS from 'ali-oss';
 
-import type { OssStsTokenApiResponse } from '@/domains/_shared/apis/ossStsApi.type';
+import type { OssStsTokenApi } from '@/domains/_shared/apis/ossStsApi.schema';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 export interface OssReadClient {
   get(objectKey: string): Promise<{ content?: unknown }>;
 }
 
-export const createOssClient = (token: OssStsTokenApiResponse): OssReadClient => {
+export const createOssClient = (token: OssStsTokenApi): OssReadClient => {
   if (
     !token.accessKeyId ||
     !token.accessKeySecret ||
