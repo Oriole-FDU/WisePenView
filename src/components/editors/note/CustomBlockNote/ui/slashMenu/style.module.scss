@@ -63,29 +63,6 @@
   opacity: 1;
 }
 
-.keyboardFrame {
-  position: absolute;
-  z-index: var(--app-z-index-raised);
-  top: 0;
-  left: 0;
-  width: var(--note-slash-menu-frame-width, 0);
-  height: var(--note-slash-menu-frame-height, 0);
-  border-radius: var(--app-radius-popover-item);
-  background: var(--accent-soft);
-  box-shadow: inset 0 0 0 1px var(--accent-border);
-  opacity: 0;
-  pointer-events: none;
-  transform: translate3d(
-    var(--note-slash-menu-frame-left, 0),
-    var(--note-slash-menu-frame-top, 0),
-    0
-  );
-}
-
-.menuShell[data-keyboard-navigation] .keyboardFrame {
-  opacity: 1;
-}
-
 .menuViewport {
   position: relative;
   z-index: var(--app-z-index-elevated);
@@ -125,16 +102,14 @@
   line-height: var(--line-height-sm);
 }
 
-.menuShell[data-mouse-navigation]:not([data-keyboard-navigation]) .item:hover,
-.menuShell[data-mouse-navigation]:not([data-keyboard-navigation]) .item[data-hovered],
-.item[data-menu-hovered] {
-  background: var(--accent-soft);
-  color: var(--foreground);
+// 高亮只由当前导航项决定，避免原生 Hover 与键盘选中同时生效。
+.menuShell .item:not([data-menu-active]) {
+  background: transparent;
 }
 
-.menuShell[data-keyboard-navigation] .item:hover,
-.menuShell[data-keyboard-navigation] .item[data-hovered] {
-  background: transparent;
+.menuShell .item[data-menu-active] {
+  background: var(--accent-soft);
+  color: var(--foreground);
 }
 
 .item[data-focus-visible] {

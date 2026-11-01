@@ -56,32 +56,35 @@ function NoteSuggestionMenuList({
   const {
     canScrollDown,
     canScrollUp,
-    handleItemMouseMove,
+    activeIndex,
+    handleMouseMove,
+    handleMouseLeave,
+    handleWheel,
     handleScroll,
-    hoveredIndex,
-    isKeyboardNavigating,
-    isMouseNavigating,
     viewportRef,
   } = useSlashMenuNavigation({ editor, items, onItemClick });
-  const hoveredItemId = hoveredIndex === undefined ? undefined : getSlashMenuItemId(hoveredIndex);
+  const activeItemId = activeIndex === undefined ? undefined : getSlashMenuItemId(activeIndex);
 
   return (
     <div
       className={styles.menuShell}
       data-can-scroll-down={canScrollDown || undefined}
       data-can-scroll-up={canScrollUp || undefined}
-      data-keyboard-navigation={isKeyboardNavigating || undefined}
-      data-mouse-navigation={isMouseNavigating || undefined}
     >
-      <span aria-hidden className={styles.keyboardFrame} />
-      <div ref={viewportRef} className={styles.menuViewport} onScroll={handleScroll}>
+      <div
+        ref={viewportRef}
+        className={styles.menuViewport}
+        onMouseMove={(event) => handleMouseMove(event.nativeEvent)}
+        onMouseLeave={handleMouseLeave}
+        onWheel={(event) => handleWheel(event.nativeEvent)}
+        onScroll={handleScroll}
+      >
         <ListBox id="bn-suggestion-menu" aria-label={t('slashMenu.label')} className={styles.menu}>
           <SlashMenuListBoxItems
             items={items}
             getItemId={(_item, index) => getSlashMenuItemId(index)}
-            hoveredItemId={isKeyboardNavigating ? undefined : hoveredItemId}
+            activeItemId={activeItemId}
             onItemClick={onItemClick}
-            onItemMouseMove={handleItemMouseMove}
           />
         </ListBox>
       </div>

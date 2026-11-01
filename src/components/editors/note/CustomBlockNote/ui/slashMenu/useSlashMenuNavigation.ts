@@ -7,6 +7,16 @@ import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition
 const EDGE_ANCHOR_ITEM_COUNT = 2;
 const SCROLL_EDGE_TOLERANCE = 1;
 
+interface NavigationState {
+  mode: 'keyboard' | 'mouse';
+  index: number | undefined;
+}
+
+interface MousePosition {
+  clientX: number;
+  clientY: number;
+}
+
 interface ScrollEdges {
   canScrollDown: boolean;
   canScrollUp: boolean;
@@ -76,25 +86,6 @@ function scrollItemIntoAnchor(viewport: HTMLDivElement, index: number) {
   viewport.scrollTop = Math.min(maxScrollTop, Math.max(0, nextScrollTop));
 }
 
-function positionKeyboardFrame(viewport: HTMLDivElement, index: number) {
-  const menuShell = viewport.parentElement;
-  const item = getMenuItem(viewport, index);
-  if (!menuShell || !item) return;
-
-  const menuShellRect = menuShell.getBoundingClientRect();
-  const itemRect = item.getBoundingClientRect();
-  menuShell.style.setProperty(
-    '--note-slash-menu-frame-left',
-    `${itemRect.left - menuShellRect.left}px`
-  );
-  menuShell.style.setProperty(
-    '--note-slash-menu-frame-top',
-    `${itemRect.top - menuShellRect.top}px`
-  );
-  menuShell.style.setProperty('--note-slash-menu-frame-width', `${itemRect.width}px`);
-  menuShell.style.setProperty('--note-slash-menu-frame-height', `${itemRect.height}px`);
-}
-
 function stopMenuKeyboardEvent(event: KeyboardEvent) {
   event.preventDefault();
   event.stopPropagation();
@@ -107,12 +98,9 @@ export function useSlashMenuNavigation({
   onItemClick,
 }: UseSlashMenuNavigationProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
-  const hoveredIndexRef = useRef<number | undefined>(undefined);
-  const keyboardIndexRef = useRef<number | undefined>(undefined);
-  const mousePositionRef = useRef<{ clientX: number; clientY: number } | undefined>(undefined);
-  const [hoveredIndex, setHoveredIndex] = useState<number | undefined>(undefined);
-  const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
-  const [isMouseNavigating, setIsMouseNavigating] = useState(false);
+  const [navigation, setNavigation] = useState<NavigationState>({ mode: 'keyboard', index: 0 });
+  const navigationRef = useRef(navigation);
+  const mousePositionRef = useRef<MousePosition | undefined>(undefined);
   const [scrollEdges, setScrollEdges] = useState<ScrollEdges>({
     canScrollDown: false,
     canScrollUp: false,
@@ -127,27 +115,34 @@ export function useSlashMenuNavigation({
     );
   });
 
-  const syncEditorActiveDescendant = useMemoizedFn((index: number) => {
-    editor.domElement?.setAttribute('aria-activedescendant', getSlashMenuItemId(index));
+  const updateNavigation = useMemoizedFn((next: NavigationState) => {
+    const current = navigationRef.current;
+    navigationRef.current = next;
+    if (current.mode !== next.mode || current.index !== next.index) {
+      setNavigation(next);
+    }
+    if (next.index === undefined) {
+      editor.domElement?.removeAttribute('aria-activedescendant');
+    } else {
+      editor.domElement?.setAttribute('aria-activedescendant', getSlashMenuItemId(next.index));
+    }
   });
 
   const activateKeyboardItem = useMemoizedFn((index: number) => {
-    keyboardIndexRef.current = index;
+    if (!items[index]) return;
+    updateNavigation({ mode: 'keyboard', index });
     const viewport = viewportRef.current;
     if (viewport) {
       scrollItemIntoAnchor(viewport, index);
-      positionKeyboardFrame(viewport, index);
       updateScrollEdges();
     }
-    setIsKeyboardNavigating(true);
-    syncEditorActiveDescendant(index);
   });
 
   const moveKeyboardSelection = useMemoizedFn((offset: number) => {
     const itemCount = items.length;
     if (itemCount === 0) return;
 
-    const activeIndex = keyboardIndexRef.current ?? hoveredIndexRef.current;
+    const activeIndex = navigationRef.current.index;
     if (activeIndex === undefined) {
       activateKeyboardItem(offset > 0 ? 0 : itemCount - 1);
       return;
@@ -155,21 +150,45 @@ export function useSlashMenuNavigation({
     activateKeyboardItem((activeIndex + offset + itemCount) % itemCount);
   });
 
-  const handleItemMouseMove = (index: number, event: MouseEvent) => {
+  const syncMouseItem = useMemoizedFn(() => {
+    const viewport = viewportRef.current;
+    const position = mousePositionRef.current;
+    const target =
+      position && viewport?.ownerDocument.elementFromPoint(position.clientX, position.clientY);
+    const item = target?.closest<HTMLElement>('[data-slash-menu-index]');
+    const index =
+      item && viewport?.contains(item) ? Number(item.dataset.slashMenuIndex) : undefined;
+    updateNavigation({ mode: 'mouse', index });
+  });
+
+  const handleMouseMove = (event: MouseEvent) => {
     const previousPosition = mousePositionRef.current;
     const hasActualMovement = previousPosition
       ? previousPosition.clientX !== event.clientX || previousPosition.clientY !== event.clientY
       : event.movementX !== 0 || event.movementY !== 0;
-    mousePositionRef.current = event;
+    mousePositionRef.current = { clientX: event.clientX, clientY: event.clientY };
 
-    if (keyboardIndexRef.current !== undefined && !hasActualMovement) return;
-    if (keyboardIndexRef.current === undefined && hoveredIndexRef.current === index) return;
-    hoveredIndexRef.current = index;
-    keyboardIndexRef.current = undefined;
-    setHoveredIndex(index);
-    setIsKeyboardNavigating(false);
-    setIsMouseNavigating(true);
-    syncEditorActiveDescendant(index);
+    // 键盘滚动可能让静止指针下的元素变化，只有真实移动才交还鼠标导航。
+    if (navigationRef.current.mode === 'keyboard' && !hasActualMovement) return;
+    syncMouseItem();
+  };
+
+  const handleMouseLeave = () => {
+    mousePositionRef.current = undefined;
+    if (navigationRef.current.mode === 'mouse') {
+      updateNavigation({ mode: 'mouse', index: undefined });
+    }
+  };
+
+  const handleWheel = (event: WheelEvent) => {
+    mousePositionRef.current = { clientX: event.clientX, clientY: event.clientY };
+    syncMouseItem();
+  };
+
+  const handleScroll = () => {
+    updateScrollEdges();
+    // 滚轮和惯性滚动不产生鼠标移动事件，需要重新命中指针下的选项。
+    if (navigationRef.current.mode === 'mouse') syncMouseItem();
   };
 
   /**
@@ -200,8 +219,8 @@ export function useSlashMenuNavigation({
 
       if (event.key !== 'Enter' || event.isComposing) return;
       stopMenuKeyboardEvent(event);
-      const selectedIndex = keyboardIndexRef.current ?? hoveredIndexRef.current ?? 0;
-      const selectedItem = items[selectedIndex];
+      const selectedIndex = navigationRef.current.index;
+      const selectedItem = selectedIndex === undefined ? undefined : items[selectedIndex];
       if (selectedItem) {
         onItemClick?.(selectedItem);
       }
@@ -209,21 +228,21 @@ export function useSlashMenuNavigation({
 
     const animationFrame = requestAnimationFrame(() => {
       syncAvailableHeight(viewport);
-      if (items.length > 0) {
-        const activeIndex = keyboardIndexRef.current ?? hoveredIndexRef.current;
-        activateKeyboardItem(
-          activeIndex === undefined ? 0 : Math.min(activeIndex, items.length - 1)
-        );
+      const { mode, index } = navigationRef.current;
+      if (mode === 'keyboard' && index !== undefined) {
+        activateKeyboardItem(index);
+      } else {
+        syncMouseItem();
       }
       updateScrollEdges();
     });
     const floatingLayer = viewport.parentElement?.parentElement;
     const keepActiveItemAnchored = () => {
-      const activeIndex = keyboardIndexRef.current ?? hoveredIndexRef.current;
-      if (activeIndex === undefined) return;
-      scrollItemIntoAnchor(viewport, activeIndex);
-      if (keyboardIndexRef.current !== undefined) {
-        positionKeyboardFrame(viewport, activeIndex);
+      const { mode, index } = navigationRef.current;
+      if (mode === 'keyboard' && index !== undefined) {
+        scrollItemIntoAnchor(viewport, index);
+      } else {
+        syncMouseItem();
       }
       updateScrollEdges();
     };
@@ -250,17 +269,17 @@ export function useSlashMenuNavigation({
     items,
     moveKeyboardSelection,
     onItemClick,
-    syncEditorActiveDescendant,
+    syncMouseItem,
     updateScrollEdges,
   ]);
 
   return {
     ...scrollEdges,
-    handleItemMouseMove,
-    handleScroll: updateScrollEdges,
-    hoveredIndex,
-    isKeyboardNavigating,
-    isMouseNavigating,
+    activeIndex: navigation.index,
+    handleMouseMove,
+    handleMouseLeave,
+    handleWheel,
+    handleScroll,
     viewportRef,
   };
 }
