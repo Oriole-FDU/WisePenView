@@ -64,7 +64,7 @@ function PublicCoursesPage() {
   if (boundedPath) return <Navigate to={boundedPath} replace />;
 
   return (
-    <>
+    <div className={styles.publicPage}>
       <PageHeader
         title={t('list.title')}
         subtitle={t('list.subtitle')}
@@ -134,7 +134,7 @@ function PublicCoursesPage() {
         onOpenChange={setCreateModalOpen}
         onCreated={(courseId) => navigate(buildCoursePath(courseId, 'home'))}
       />
-    </>
+    </div>
   );
 }
 

@@ -26,6 +26,7 @@
   overflow: hidden;
   cursor: pointer;
   border: 1px solid var(--border-secondary, var(--border));
+  border-radius: var(--app-radius-content);
   box-shadow: var(--shadow-none);
   transition: border-color var(--motion-duration-fast) var(--motion-ease-standard);
 
@@ -84,4 +85,18 @@
   margin-left: auto;
   color: var(--muted);
   font-size: var(--font-size-sm);
+}
+
+@container public-page (width < 664px) {
+  .header {
+    padding: var(--space-sm) var(--space-sm) 0;
+  }
+
+  .title {
+    font-size: var(--font-size-base);
+  }
+
+  .footer {
+    padding: var(--space-xs) var(--space-sm) var(--space-sm);
+  }
 }
