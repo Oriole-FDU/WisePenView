@@ -1,11 +1,6 @@
 import { clsx } from 'clsx';
 import { type CSSProperties, useRef } from 'react';
-import type {
-  Layout,
-  LayoutChangedMeta,
-  PanelImperativeHandle,
-  PanelSize,
-} from 'react-resizable-panels';
+import type { Layout, LayoutChangedMeta, PanelSize } from 'react-resizable-panels';
 
 import {
   RESIZE_TARGET_MINIMUM_SIZE,
@@ -13,17 +8,14 @@ import {
   SystemResizablePanel,
   SystemResizablePanelGroup,
 } from '@/components/base/SystemResizable';
+import { PANEL_RESIZE_DURATION_MS, PANEL_RESIZE_EASING } from '@/constants/layoutMotion';
 import { LAYOUT_RESIZE_HANDLE_RESERVE } from '@/constants/layoutScale';
-import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 
 import { WorkspacePanelPortalProvider } from './_context';
+import { useWorkspacePanelMotion } from './controllers/useWorkspacePanelMotion';
 import type { WorkspaceRightPanelLayoutProps } from './index.type';
 import styles from './style.module.scss';
-import {
-  clampWorkspacePanelWidth,
-  getWorkspacePanelSlotLabelId,
-  type WorkspacePanelId,
-} from './workspacePanelModel';
+import { getWorkspacePanelSlotLabelId, type WorkspacePanelId } from './workspacePanelModel';
 import { WorkspacePanelTarget } from './WorkspacePanelTarget';
 
 const RIGHT_PANEL_DOM_ID = 'workspace-right-panel';
@@ -46,35 +38,37 @@ export default function WorkspaceRightPanelLayout({
   resizeLabel,
   onPanelResize,
 }: WorkspaceRightPanelLayoutProps) {
-  const panelRef = useRef<PanelImperativeHandle | null>(null);
   const pendingWidthRef = useRef<number | null>(null);
   const activePanel = findActivePanel(panelSlots, activePanelId);
   const open = Boolean(activePanel);
-  const panelSize = activePanel
-    ? clampWorkspacePanelWidth(activePanel.id, panelWidths[activePanel.id])
-    : 0;
+  const motion = useWorkspacePanelMotion({ activePanel, panelSlots, panelWidths });
   const canvasMinWidth = activePanel
-    ? mainMinWidth + panelSize + LAYOUT_RESIZE_HANDLE_RESERVE
+    ? mainMinWidth + motion.panelSize + LAYOUT_RESIZE_HANDLE_RESERVE
     : mainMinWidth;
-  const canvasStyle = { minWidth: `${canvasMinWidth}px` } as CSSProperties;
-
-  useResizablePanelSize({ panelRef, size: panelSize });
+  const canvasStyle = {
+    minWidth: `${canvasMinWidth}px`,
+    '--workspace-panel-motion-duration': `${PANEL_RESIZE_DURATION_MS}ms`,
+    '--workspace-panel-motion-ease': PANEL_RESIZE_EASING,
+  } as CSSProperties;
 
   const handleResize = (size: PanelSize) => {
-    if (activePanel) pendingWidthRef.current = Math.round(size.inPixels);
+    if (activePanel && !motion.transitioning) pendingWidthRef.current = Math.round(size.inPixels);
   };
 
   const handleLayoutChanged = (_layout: Layout, meta: LayoutChangedMeta) => {
     const pendingWidth = pendingWidthRef.current;
     pendingWidthRef.current = null;
-    if (meta.isUserInteraction && activePanel && pendingWidth != null) {
+    if (meta.isUserInteraction && !motion.transitioning && activePanel && pendingWidth != null) {
       onPanelResize(activePanel.id, pendingWidth);
     }
   };
 
   return (
     <WorkspacePanelPortalProvider>
-      <div className={clsx(styles.viewport, className)}>
+      <div
+        className={clsx(styles.viewport, className)}
+        data-panel-transitioning={motion.transitioning || undefined}
+      >
         <div className={styles.canvas} style={canvasStyle}>
           <SystemResizablePanelGroup
             id={panelGroupId}
@@ -87,25 +81,33 @@ export default function WorkspaceRightPanelLayout({
               {main}
             </SystemResizablePanel>
 
-            <SystemResizableHandle collapsed={!open} disabled={!open} aria-label={resizeLabel} />
+            <SystemResizableHandle
+              collapsed={!motion.visiblePanel}
+              disabled={!open || motion.transitioning}
+              aria-label={resizeLabel}
+            />
 
             <SystemResizablePanel
               id={RIGHT_PANEL_DOM_ID}
-              panelRef={panelRef}
-              defaultSize={panelSize}
-              minSize={activePanel?.minWidth ?? 0}
-              maxSize={activePanel?.maxWidth ?? 0}
+              panelRef={motion.panelRef}
+              defaultSize={motion.panelSize}
+              minSize={motion.minSize}
+              maxSize={motion.maxSize}
               groupResizeBehavior="preserve-pixel-size"
               className={styles.rightPanel}
+              inert={!open}
               aria-hidden={!open || undefined}
               onResize={handleResize}
             >
-              <div className={styles.panelStack}>
+              <div
+                className={styles.panelStack}
+                style={motion.transitioning ? { minWidth: motion.visibleWidth } : undefined}
+              >
                 {panelSlots.map((panel) => (
                   <WorkspacePanelTarget
                     key={panel.id}
                     panelId={panel.id}
-                    active={panel.id === activePanelId}
+                    active={panel.id === motion.visiblePanel?.id}
                     labelledBy={getWorkspacePanelSlotLabelId(panel.id)}
                   />
                 ))}

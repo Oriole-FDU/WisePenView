@@ -8,12 +8,12 @@
 }
 
 .tabs {
-  --sidebar-motion-ease: var(--main-sidebar-motion-ease, cubic-bezier(0.32, 0.72, 0, 1));
-  --sidebar-motion-duration: var(--main-sidebar-motion-duration, 220ms);
-  --sidebar-motion-fade: var(--main-sidebar-motion-fade-duration, 160ms);
+  --sidebar-motion-ease: var(--main-sidebar-motion-ease, cubic-bezier(0.333333, 0, 0.666667, 1));
+  --sidebar-motion-duration: var(--main-sidebar-motion-duration, 180ms);
+  --sidebar-motion-fade: var(--main-sidebar-motion-fade-duration, 108ms);
   --sidebar-tab-label-fade-duration: var(--sidebar-motion-fade);
-  --sidebar-tab-label-reveal-delay: var(--main-sidebar-motion-reveal-delay, 110ms);
-  --sidebar-tab-label-collapse-delay: var(--main-sidebar-motion-collapse-delay, 55ms);
+  --sidebar-tab-label-reveal-delay: var(--main-sidebar-motion-reveal-delay, 63ms);
+  --sidebar-tab-label-collapse-delay: var(--main-sidebar-motion-collapse-delay, 45ms);
   --sidebar-tab-size: 32px;
   --sidebar-tab-pad-x: 7px;
   --sidebar-tab-pad-x-selected: 10px;

@@ -3,11 +3,11 @@
 @use '@/styles/mixins/scrollbar' as scrollbar;
 
 .root {
-  --main-sidebar-motion-duration: 220ms;
-  --main-sidebar-motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --main-sidebar-motion-fade-duration: 160ms;
-  --main-sidebar-motion-reveal-delay: 110ms;
-  --main-sidebar-motion-collapse-delay: 55ms;
+  --main-sidebar-motion-duration: 180ms;
+  --main-sidebar-motion-ease: cubic-bezier(0.333333, 0, 0.666667, 1);
+  --main-sidebar-motion-fade-duration: 108ms;
+  --main-sidebar-motion-reveal-delay: 63ms;
+  --main-sidebar-motion-collapse-delay: 45ms;
 
   position: relative;
   width: 100%;
