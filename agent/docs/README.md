@@ -14,6 +14,7 @@
 
 - `domain-api.md`：API 薄层、DTO 和请求边界。
 - `schema-contract-roadmap.md`：仅列未完成 Contract、后端阻塞、前端边界债务与待决策项。
+- `agent-spec-contract-proposal.md`：T11 的 Agent 默认值与保存语义证据、待确认方案；不是已批准业务契约。
 - `domain-mapper.md`：按需映射、fallback、协议兼容和归一化。
 - `domain-service.md`：Service 编排、依赖注入和错误处理。
 - `domain-entity.md`：Entity、Enum、常量和类型边界。
