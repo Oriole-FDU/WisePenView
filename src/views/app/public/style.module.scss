@@ -1,4 +1,16 @@
 @use '@/styles/mixins/breakpoints' as breakpoints;
+
+// 两张目标宽度 320px 的卡片与标准列间距共需 664px。
+$public-grid-two-column-breakpoint: 664px;
+
+.publicPage {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  box-sizing: border-box;
+  container: public-page / inline-size;
+}
+
 .actionsRow {
   display: flex;
   gap: var(--space-sm);
@@ -10,7 +22,12 @@
   justify-content: space-between;
   gap: var(--space-md);
   min-height: calc(var(--control-height, 36px) + 2px);
-  margin-top: var(--space-md);
+  margin-top: 0;
+}
+
+.listControls > :first-child {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .roleFilter {
@@ -19,8 +36,15 @@
 }
 
 .grid {
+  --public-card-target-width: 320px;
+
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--public-card-target-width)), var(--public-card-target-width))
+  );
+  align-items: start;
+  justify-content: start;
   gap: var(--space-lg);
   margin-top: var(--space-xl);
 }
@@ -43,9 +67,19 @@
   text-align: center;
 }
 
-@media (max-width: breakpoints.$breakpoint-md) {
+@container public-page (width < #{$public-grid-two-column-breakpoint}) {
+  .listControls {
+    flex: 0 0 auto;
+    align-items: center;
+    min-height: auto;
+    gap: var(--space-sm);
+  }
+
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
   }
 }
 
@@ -57,19 +91,6 @@
   .actionsRow > * {
     flex: 1 1 0;
     min-width: 0;
-  }
-
-  .listControls {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .roleFilter {
-    width: 100%;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
   }
 }
 
