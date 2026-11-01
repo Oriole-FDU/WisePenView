@@ -53,8 +53,10 @@ pnpm mock
 前端 OTel 默认关闭；设置 `VITE_OTEL_ENDPOINT`（同源 `/otel` 或绝对 OTLP HTTP 地址）
 后启用 logs/traces，mock 模式始终禁用。当前支持统一异常捕获、逻辑请求 span、
 请求失败分类、自动 Fetch/XHR span、隐私清洗、聚合预算、构建身份和私有源码映射。
-Jenkins 开启 `ENABLE_OTEL` 时会使用
-API origin 下的 `/otel`。实现、能力边界和验证方式见
+Jenkins 只执行 `production` 模式构建，`DEPLOY_ENV=dev|prod` 会自动选择对应的
+API、DrawIO 与 ONLYOFFICE 地址并写入 `.env.production`；开启 `ENABLE_OTEL`
+时会使用所选公网 API base URL 下的 `/otel`。
+实现、能力边界和验证方式见
 [`agent/docs/observability.md`](agent/docs/observability.md)。
 
 Mock 与正式环境共用 service、mapper、缓存和 registry，只在 `@domain-apis` 替换 API 与 OSS I/O。模拟数据存于内存，重新整理后重置；API 契约变更时需同步更新 mock API。

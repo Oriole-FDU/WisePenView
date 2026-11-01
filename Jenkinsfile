@@ -13,20 +13,16 @@ pipeline {
 
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'main', description: '选择需要构建的 Git 分支')
+        choice(name: 'DEPLOY_ENV', choices: ['dev', 'prod'], description: '部署环境：自动选择对应的 API、DrawIO 与 ONLYOFFICE 地址')
         choice(name: 'DEPLOY_TARGET', choices: ['oss', 'container', 'none'], description: '部署目标：OSS 静态部署、Nginx 容器部署，或仅构建')
-        choice(name: 'BUILD_MODE', choices: ['production', 'development'], description: 'Vite 构建模式')
         booleanParam(name: 'DEPLOY_AFTER_BUILD', defaultValue: true, description: '构建成功后是否执行部署')
         booleanParam(name: 'PUSH_TO_REGISTRY', defaultValue: false, description: '容器构建时是否额外上传镜像到用户指定的制品仓')
         string(name: 'REGISTRY_HOST', defaultValue: '', description: '制品仓主机名和可选端口，不包含协议或路径')
         string(name: 'REGISTRY_NAMESPACE', defaultValue: '', description: '制品仓命名空间，例如 wisepen')
         booleanParam(name: 'RUN_LINT', defaultValue: true, description: '是否执行 pnpm lint')
         choice(name: 'OSS_CLEAN_POLICY', choices: ['keep-previous-release', 'delete-all-stale'], description: 'OSS 清理策略')
-        string(name: 'VITE_API_BASE_URL', defaultValue: 'https://api.wisepen.oriole.cn', description: '公网 API 地址')
-        string(name: 'VITE_API_BASE_URL_INTRANET', defaultValue: 'https://api.fudan.wisepen.oriole.cn', description: '校内 API 地址')
         string(name: 'VITE_INTRANET_PING_PATH', defaultValue: '/ping', description: '校内 API 探测路径')
         string(name: 'VITE_NETWORK_PROBE_TIMEOUT', defaultValue: '1000', description: '校内 API 探测超时，单位毫秒')
-        string(name: 'VITE_DRAWIO_EMBED_URL', defaultValue: 'https://drawio.wisepen.oriole.cn/index.html', description: 'DrawIO 嵌入地址')
-        string(name: 'VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL', defaultValue: 'https://office.wisepen.oriole.cn', description: 'ONLYOFFICE Document Server 前端访问地址')
         booleanParam(name: 'ENABLE_OTEL', defaultValue: false, description: '是否启用前端 OTel，入口自动使用 API 地址下的 /otel')
 
         string(name: 'OSS_ENDPOINT', defaultValue: '', description: '阿里云 OSS Endpoint，例如 oss-cn-shanghai.aliyuncs.com')
@@ -40,6 +36,7 @@ pipeline {
         COMPOSE_FILE_PATH = 'docker-compose-app.yml'
         RELEASE_MANIFEST = '.wisepen-release-manifest.json'
         FRONTEND_PORT = '8085'
+        BUILD_MODE = 'production'
     }
 
     stages {
@@ -100,15 +97,29 @@ pipeline {
                 }
                 echo "使用 pnpm ${ACTUAL_VERSION}"
 
-                case "${BUILD_MODE}" in
-                  production|development) ;;
-                  *) echo "不支持的 BUILD_MODE: ${BUILD_MODE}"; exit 1 ;;
+                case "${DEPLOY_ENV}" in
+                  dev)
+                    VITE_API_BASE_URL="http://api.test.wisepen.oriole.cn"
+                    VITE_API_BASE_URL_INTRANET="http://api.fudan.test.wisepen.oriole.cn"
+                    VITE_DRAWIO_EMBED_URL="http://drawio.wisepen.oriole.cn/index.html"
+                    VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL="http://api.fudan.test.wisepen.oriole.cn:8101"
+                    ;;
+                  prod)
+                    VITE_API_BASE_URL="https://api.wisepen.oriole.cn"
+                    VITE_API_BASE_URL_INTRANET="https://api.fudan.wisepen.oriole.cn"
+                    VITE_DRAWIO_EMBED_URL="https://drawio.wisepen.oriole.cn/index.html"
+                    VITE_ONLYOFFICE_DOCUMENT_SERVER_PUBLIC_URL="https://office.wisepen.oriole.cn"
+                    ;;
+                  *) echo "不支持的 DEPLOY_ENV: ${DEPLOY_ENV}"; exit 1 ;;
                 esac
                 case "${ENABLE_OTEL}" in
                   true) VITE_OTEL_ENDPOINT="${VITE_API_BASE_URL%/}/otel" ;;
                   false) VITE_OTEL_ENDPOINT= ;;
                   *) echo "ENABLE_OTEL 必须是 true 或 false：${ENABLE_OTEL}"; exit 1 ;;
                 esac
+                echo "部署环境: ${DEPLOY_ENV}"
+                echo "公网 API: ${VITE_API_BASE_URL}"
+                echo "OTel 入口: ${VITE_OTEL_ENDPOINT:-已关闭}"
                 TARGET_ENV_FILE=".env.${BUILD_MODE}"
                 cat > "${TARGET_ENV_FILE}" <<EOF
 VITE_API_BASE_URL=${VITE_API_BASE_URL}
@@ -138,11 +149,7 @@ EOF
                     } else {
                         echo '跳过静态校验：RUN_LINT=false'
                     }
-                    if (params.BUILD_MODE == 'production') {
-                        sh 'pnpm build'
-                    } else {
-                        sh 'pnpm build:dev'
-                    }
+                    sh 'pnpm build'
                 }
             }
         }

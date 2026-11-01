@@ -6,6 +6,8 @@
 
 - 设置 `VITE_OTEL_ENDPOINT` 后启用 OTLP HTTP logs/traces。
 - `mock` 模式始终禁用遥测。
+- Jenkins 开启 `ENABLE_OTEL` 时，使用 `DEPLOY_ENV` 所选环境的公网
+  `VITE_API_BASE_URL` 拼接 `/otel`；关闭时清空入口。
 - 未启用时不注册 Provider、浏览器监听器或定时器，也不产生上报请求。
 - 同源 `/otel` 会解析为当前站点 origin；默认上报地址为 `/v1/logs` 和 `/v1/traces`。
 
