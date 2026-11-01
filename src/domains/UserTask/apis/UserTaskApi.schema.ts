@@ -4,6 +4,7 @@ import { EpochMillisSchema } from '@/apis/schema';
 
 export const UserTaskCodeApiSchema = z.enum([
   'DAILY_CHECK_IN',
+  'ONBOARDING_TUTORIAL',
   'STUDENT_VERIFICATION',
   'TEACHER_VERIFICATION',
   'INVITE_VERIFIED_USER',
