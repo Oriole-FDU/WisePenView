@@ -36,8 +36,10 @@
 
 ### 请求与自动网络 span
 
-- 每个顶层 `apiGet/apiPost/apiPut/apiDelete/apiGetText` 创建一条 `api.request` 逻辑 span，
-  覆盖地址等待、全部重试、响应解包和解析。
+- 每个顶层 `apiGet/apiPost/apiPut/apiPatch/apiDelete/apiGetText` 创建一条 `api.request` 逻辑 span，
+  覆盖地址等待、全部重试、响应 envelope 解包和 Contract payload 校验；校验通过后才记录成功。
+- JSON、multipart 与 text 的响应校验均位于同一请求结果边界；SSE 的流与事件生命周期不进入该边界。
+- request helper 必须传入响应解析器，只有一个泛型签名，不提供仅解包而跳过 payload 校验的调用形式；生产调用统一由 `executeApiContract` 传入 Contract 解析器。
 - 最终失败只生成一次 `frontend.request_failure`，并分类为 HTTP、network、timeout、
   business、contract 或 canceled。
 - 请求事件记录 method、稳定 endpoint、状态码、脱敏 path、host/port、request ID、

@@ -69,34 +69,26 @@ export async function executeApiContract<Request, Response>(
   const requestParts = getRequestParts(contract, request, config);
   const requestConfig = requestParts.config;
 
-  let data: unknown;
+  const parseResponse = (payload: unknown): Response => parseApiResponse(contract, payload);
   if (contract.transport === 'text') {
     if (contract.method !== 'GET') {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
         reason: `${contract.name} 的文本 transport 仅支持 GET`,
       });
     }
-    data = await apiGetText(contract.endpoint, requestConfig);
-    return parseApiResponse(contract, data);
+    return apiGetText(contract.endpoint, requestConfig, parseResponse);
   }
 
   switch (contract.method) {
     case 'GET':
-      data = await apiGet(contract.endpoint, requestConfig);
-      break;
+      return apiGet(contract.endpoint, requestConfig, parseResponse);
     case 'POST':
-      data = await apiPost(contract.endpoint, requestParts.body, requestConfig);
-      break;
+      return apiPost(contract.endpoint, requestParts.body, requestConfig, parseResponse);
     case 'PUT':
-      data = await apiPut(contract.endpoint, requestParts.body, requestConfig);
-      break;
+      return apiPut(contract.endpoint, requestParts.body, requestConfig, parseResponse);
     case 'PATCH':
-      data = await apiPatch(contract.endpoint, requestParts.body, requestConfig);
-      break;
+      return apiPatch(contract.endpoint, requestParts.body, requestConfig, parseResponse);
     case 'DELETE':
-      data = await apiDelete(contract.endpoint, requestConfig);
-      break;
+      return apiDelete(contract.endpoint, requestConfig, parseResponse);
   }
-
-  return parseApiResponse(contract, data);
 }

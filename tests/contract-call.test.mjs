@@ -14,29 +14,29 @@ const virtualModules = {
   '@/apis/request': `
     const calls = [];
 
-    export const apiGet = async (endpoint, config) => {
+    export const apiGet = async (endpoint, config, parsePayload) => {
       calls.push({ method: 'GET', endpoint, config });
-      return null;
+      return parsePayload(null);
     };
-    export const apiPost = async (endpoint, request, config) => {
+    export const apiPost = async (endpoint, request, config, parsePayload) => {
       calls.push({ method: 'POST', endpoint, request, config });
-      return null;
+      return parsePayload(null);
     };
-    export const apiPut = async (endpoint, request, config) => {
+    export const apiPut = async (endpoint, request, config, parsePayload) => {
       calls.push({ method: 'PUT', endpoint, request, config });
-      return null;
+      return parsePayload(null);
     };
-    export const apiPatch = async (endpoint, request, config) => {
+    export const apiPatch = async (endpoint, request, config, parsePayload) => {
       calls.push({ method: 'PATCH', endpoint, request, config });
-      return null;
+      return parsePayload(null);
     };
-    export const apiDelete = async (endpoint, config) => {
+    export const apiDelete = async (endpoint, config, parsePayload) => {
       calls.push({ method: 'DELETE', endpoint, config });
-      return null;
+      return parsePayload(null);
     };
-    export const apiGetText = async (endpoint, config) => {
+    export const apiGetText = async (endpoint, config, parsePayload) => {
       calls.push({ method: 'GET_TEXT', endpoint, config });
-      return '';
+      return parsePayload('');
     };
 
     export const getCalls = () => calls;

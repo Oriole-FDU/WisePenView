@@ -196,15 +196,15 @@ const registerVirtualModules = {
   '@/apis/request': `
     const postedRequests = [];
 
-    export const apiPost = async (endpoint, request) => {
+    export const apiPost = async (endpoint, request, _config, parsePayload) => {
       postedRequests.push({ endpoint, request });
-      return null;
+      return parsePayload(null);
     };
-    export const apiGet = async () => null;
-    export const apiPut = async () => null;
-    export const apiPatch = async () => null;
-    export const apiDelete = async () => null;
-    export const apiGetText = async () => '';
+    export const apiGet = async (_endpoint, _config, parsePayload) => parsePayload(null);
+    export const apiPut = async (_endpoint, _request, _config, parsePayload) => parsePayload(null);
+    export const apiPatch = async (_endpoint, _request, _config, parsePayload) => parsePayload(null);
+    export const apiDelete = async (_endpoint, _config, parsePayload) => parsePayload(null);
+    export const apiGetText = async (_endpoint, _config, parsePayload) => parsePayload('');
 
     export const getPostedRequests = () => postedRequests;
   `,

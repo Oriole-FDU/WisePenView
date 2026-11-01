@@ -20,7 +20,7 @@ function checkResponse(res: ApiResponse<unknown>): void {
   }
 }
 
-function unwrap<T>(res: unknown): T {
+function unwrap(res: unknown): unknown {
   if (!isApiResponseEnvelope(res)) {
     throw new WisePenError({
       code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
@@ -29,8 +29,8 @@ function unwrap<T>(res: unknown): T {
     });
   }
   checkResponse(res);
-  // envelope 已通过运行期校验，DTO 具体形状由调用侧的 API 类型约束。
-  return res.data as T;
+  // envelope 已通过运行期校验，payload 具体形状由后续 Contract 解析器校验。
+  return res.data;
 }
 
 /**
@@ -60,7 +60,7 @@ export function parseTextApiResponse(value: unknown): string {
   }
 }
 
-/** 每个顶层请求只创建一个逻辑现场，响应解包失败仍保留发起时的身份与页面。 */
+/** 每个顶层请求只创建一个逻辑现场，解包与契约校验共享最终结果边界。 */
 async function executeRequest<T>(
   method: 'get' | 'post' | 'put' | 'patch' | 'delete',
   url: string,
@@ -94,22 +94,31 @@ async function executeRequest<T>(
   }
 }
 
-/** GET 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export function apiGet(url: string, config?: AxiosRequestConfig): Promise<unknown> {
-  return executeRequest('get', url, config, undefined, unwrap<unknown>);
-}
-
-/** POST 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export function apiPost(
+/** GET 解包后在同一请求观测内完成契约解析。 */
+export function apiGet<T>(
   url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<unknown> {
-  return executeRequest('post', url, config, data, unwrap<unknown>);
+  config: AxiosRequestConfig | undefined,
+  parsePayload: (value: unknown) => T
+): Promise<T> {
+  return executeRequest('get', url, config, undefined, (value) => parsePayload(unwrap(value)));
 }
 
-/** 读取裸文本响应；仅用于后端明确声明非 R<T> 的接口。 */
-export function apiGetText(url: string, config?: AxiosRequestConfig): Promise<string> {
+/** POST 解包后在同一请求观测内完成契约解析。 */
+export function apiPost<T>(
+  url: string,
+  data: unknown,
+  config: AxiosRequestConfig | undefined,
+  parsePayload: (value: unknown) => T
+): Promise<T> {
+  return executeRequest('post', url, config, data, (value) => parsePayload(unwrap(value)));
+}
+
+/** 读取文本并在同一请求观测内完成契约解析。 */
+export function apiGetText<T>(
+  url: string,
+  config: AxiosRequestConfig | undefined,
+  parsePayload: (value: unknown) => T
+): Promise<T> {
   return executeRequest(
     'get',
     url,
@@ -119,25 +128,35 @@ export function apiGetText(url: string, config?: AxiosRequestConfig): Promise<st
       ...config,
     },
     undefined,
-    parseTextApiResponse
+    (value) => parsePayload(parseTextApiResponse(value))
   );
 }
 
-/** PUT 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export function apiPut(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<unknown> {
-  return executeRequest('put', url, config, data, unwrap<unknown>);
-}
-
-/** PATCH 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export function apiPatch(
+/** PUT 解包后在同一请求观测内完成契约解析。 */
+export function apiPut<T>(
   url: string,
-  data?: unknown,
-  config?: AxiosRequestConfig
-): Promise<unknown> {
-  return executeRequest('patch', url, config, data, unwrap<unknown>);
+  data: unknown,
+  config: AxiosRequestConfig | undefined,
+  parsePayload: (value: unknown) => T
+): Promise<T> {
+  return executeRequest('put', url, config, data, (value) => parsePayload(unwrap(value)));
 }
 
-/** DELETE 并解包 envelope；payload 在契约解析前保持 unknown。 */
-export function apiDelete(url: string, config?: AxiosRequestConfig): Promise<unknown> {
-  return executeRequest('delete', url, config, undefined, unwrap<unknown>);
+/** PATCH 解包后在同一请求观测内完成契约解析。 */
+export function apiPatch<T>(
+  url: string,
+  data: unknown,
+  config: AxiosRequestConfig | undefined,
+  parsePayload: (value: unknown) => T
+): Promise<T> {
+  return executeRequest('patch', url, config, data, (value) => parsePayload(unwrap(value)));
+}
+
+/** DELETE 解包后在同一请求观测内完成契约解析。 */
+export function apiDelete<T>(
+  url: string,
+  config: AxiosRequestConfig | undefined,
+  parsePayload: (value: unknown) => T
+): Promise<T> {
+  return executeRequest('delete', url, config, undefined, (value) => parsePayload(unwrap(value)));
 }
