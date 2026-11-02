@@ -2,6 +2,8 @@ import type { RefObject } from 'react';
 import { useEffect, useRef } from 'react';
 import type { PanelImperativeHandle } from 'react-resizable-panels';
 
+import { PANEL_RESIZE_DURATION_MS } from '@/constants/layoutMotion';
+
 type ResizablePanelSize = number | string;
 
 interface UseResizablePanelSizeOptions {
@@ -19,12 +21,8 @@ interface UseResizablePanelSizeOptions {
   onComplete?: () => void;
 }
 
-const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
-const easeInCubic = (t: number): number => t ** 3;
-
-const SNAP_EXPAND_PX = 2.5;
-/** 收起更早吸附，避免收到 0 时末段顿挫 */
-const SNAP_COLLAPSE_PX = 10;
+// 两端速度归零，避免收起时加速撞边或提前吸附。
+const easeInOut = (t: number): number => t * t * (3 - 2 * t);
 
 const toPixelSize = (size: ResizablePanelSize): number | null =>
   typeof size === 'number' && Number.isFinite(size) ? size : null;
@@ -34,7 +32,7 @@ export function useResizablePanelSize({
   size,
   enabled = true,
   animate = false,
-  durationMs = 200,
+  durationMs = PANEL_RESIZE_DURATION_MS,
   onComplete,
 }: UseResizablePanelSizeOptions) {
   const frameRef = useRef<number | null>(null);
@@ -96,7 +94,14 @@ export function useResizablePanelSize({
     const targetPx = toPixelSize(size);
     const currentPx = panel.getSize().inPixels;
 
-    if (!animate || targetPx == null || !Number.isFinite(currentPx)) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (
+      !animate ||
+      reducedMotion ||
+      durationMs <= 0 ||
+      targetPx == null ||
+      !Number.isFinite(currentPx)
+    ) {
       resizeTo(size);
       finish();
       return cancelFrame;
@@ -111,19 +116,14 @@ export function useResizablePanelSize({
       return cancelFrame;
     }
 
-    const collapsing = delta < 0;
-    const ease = collapsing ? easeInCubic : easeOutCubic;
-    const snapPx = collapsing ? SNAP_COLLAPSE_PX : SNAP_EXPAND_PX;
-
     let startedAt: number | null = null;
     let lastRounded = Math.round(startPx);
     const tick = (now: number) => {
       if (startedAt == null) startedAt = now;
       const progress = Math.min(1, (now - startedAt) / durationMs);
-      const next = startPx + delta * ease(progress);
-      const remaining = Math.abs(endPx - next);
+      const next = startPx + delta * easeInOut(progress);
 
-      if (progress >= 1 || remaining <= snapPx) {
+      if (progress >= 1) {
         if (lastRounded !== endPx) {
           lastRounded = endPx;
           resizeTo(endPx);

@@ -11,7 +11,7 @@ import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 
 import { useSystemLayoutStore } from './_store/useSystemLayoutStore';
 import { focusVisibleSidebarToggle } from './focusSidebarToggle';
-import { SIDEBAR_COLLAPSE_DURATION_MS, useSidebarCollapseMotion } from './useSidebarCollapseMotion';
+import { useSidebarCollapseMotion } from './useSidebarCollapseMotion';
 
 type SidebarMotionPhase = 'expanded' | 'collapsing' | 'collapsed' | 'expanding';
 
@@ -38,6 +38,7 @@ export function useSystemSidebarPanel({
   const { panelSize, minSize, maxSize, isMotionLockedRef, notifyAnimationComplete } =
     useSidebarCollapseMotion({
       collapsed,
+      transitioning: motionPhase === 'collapsing' || motionPhase === 'expanding',
       expandedWidth: width,
       collapsedWidth,
       minSize: SIDEBAR_MIN_WIDTH,
@@ -63,7 +64,6 @@ export function useSystemSidebarPanel({
     size: panelSize,
     enabled,
     animate: true,
-    durationMs: SIDEBAR_COLLAPSE_DURATION_MS,
     onComplete: handleAnimationComplete,
   });
 

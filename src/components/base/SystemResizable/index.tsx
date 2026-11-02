@@ -21,10 +21,17 @@ function SystemResizablePanelGroup({
 
 function SystemResizablePanel({
   className,
+  style,
   ...props
 }: ComponentProps<typeof ResizablePrimitive.Panel>) {
   return (
-    <ResizablePrimitive.Panel data-slot="system-resizable-panel" className={className} {...props} />
+    <ResizablePrimitive.Panel
+      data-slot="system-resizable-panel"
+      className={className}
+      // 库把 className 和 style 放在内部 flex 容器；需覆盖其内联 overflow: auto，滚动交给内容区。
+      style={{ minWidth: 0, minHeight: 0, overflow: 'hidden', ...style }}
+      {...props}
+    />
   );
 }
 

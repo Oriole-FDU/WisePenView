@@ -16,6 +16,16 @@
   min-height: 0;
 }
 
+// 窄窗口的横向画布同步收放，避免右栏结束后主内容再跳一次宽度。
+.viewport[data-panel-transitioning='true'] {
+  // 中间帧只负责裁切；稳定后恢复 auto，保留窄窗口真正需要的横向滚动。
+  overflow-x: hidden;
+
+  .canvas {
+    transition: min-width var(--workspace-panel-motion-duration) var(--workspace-panel-motion-ease);
+  }
+}
+
 .root {
   width: 100%;
   height: 100%;

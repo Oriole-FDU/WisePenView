@@ -12,6 +12,7 @@ import {
   SystemResizablePanel,
   SystemResizablePanelGroup,
 } from '@/components/base/SystemResizable';
+import { PANEL_RESIZE_DURATION_MS, PANEL_RESIZE_EASING } from '@/constants/layoutMotion';
 import { MAIN_SIDEBAR_RAIL_WIDTH } from '@/constants/layoutScale';
 import { SIDEBAR_TOGGLE_BUTTON_PROPS } from '@/constants/sidebarToggle';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
@@ -20,7 +21,6 @@ import { type MainShellContextValue, MainShellProvider } from './_context';
 import SkipToMainLink, { MAIN_CONTENT_ID } from './SkipToMainLink';
 import styles from './style.module.scss';
 import { useMainShellMobileSnapshot } from './useMainShellMobile';
-import { SIDEBAR_COLLAPSE_DURATION_MS, SIDEBAR_COLLAPSE_EASING } from './useSidebarCollapseMotion';
 import { useSystemSidebarPanel } from './useSystemSidebarPanel';
 
 interface MainSidebarRenderState {
@@ -108,11 +108,11 @@ function MainShell({
     onToggleSidebar: toggleSidebar,
   } satisfies MainShellContextValue;
   const motionStyle = {
-    '--main-sidebar-motion-duration': `${SIDEBAR_COLLAPSE_DURATION_MS}ms`,
-    '--main-sidebar-motion-ease': SIDEBAR_COLLAPSE_EASING,
-    '--main-sidebar-motion-fade-duration': '160ms',
-    '--main-sidebar-motion-reveal-delay': `${Math.round(SIDEBAR_COLLAPSE_DURATION_MS * 0.65)}ms`,
-    '--main-sidebar-motion-collapse-delay': `${SIDEBAR_COLLAPSE_DURATION_MS / 4}ms`,
+    '--main-sidebar-motion-duration': `${PANEL_RESIZE_DURATION_MS}ms`,
+    '--main-sidebar-motion-ease': PANEL_RESIZE_EASING,
+    '--main-sidebar-motion-fade-duration': `${Math.round(PANEL_RESIZE_DURATION_MS * 0.6)}ms`,
+    '--main-sidebar-motion-reveal-delay': `${Math.round(PANEL_RESIZE_DURATION_MS * 0.35)}ms`,
+    '--main-sidebar-motion-collapse-delay': `${PANEL_RESIZE_DURATION_MS / 4}ms`,
   } as CSSProperties;
 
   const mainColumn = (
@@ -206,7 +206,7 @@ function MainShell({
 
             <SystemResizableHandle
               collapsed={sidebar.collapsed}
-              disabled={sidebar.collapsed}
+              disabled={sidebar.collapsed || sidebar.motionPhase === 'expanding'}
               aria-label={t('navigation.resizeSidebar')}
             />
 

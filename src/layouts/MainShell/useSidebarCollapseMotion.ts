@@ -2,11 +2,9 @@ import { type RefObject, useEffect, useRef } from 'react';
 
 import { SIDEBAR_MAX_WIDTH, SIDEBAR_MIN_WIDTH } from '@/constants/layoutScale';
 
-export const SIDEBAR_COLLAPSE_DURATION_MS = 220;
-export const SIDEBAR_COLLAPSE_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)';
-
 interface UseSidebarCollapseMotionOptions {
   collapsed: boolean;
+  transitioning: boolean;
   expandedWidth: number;
   collapsedWidth: number;
   minSize?: number;
@@ -21,9 +19,10 @@ interface SidebarCollapseMotion {
   notifyAnimationComplete: () => void;
 }
 
-/** 侧栏开合：放宽 Panel 约束；结束时清锁并摘 motion 标记，不 setState。 */
+/** 侧栏开合：过渡期间放宽面板下限，结束后解除尺寸回写锁。 */
 export function useSidebarCollapseMotion({
   collapsed,
+  transitioning,
   expandedWidth,
   collapsedWidth,
   minSize = SIDEBAR_MIN_WIDTH,
@@ -48,7 +47,7 @@ export function useSidebarCollapseMotion({
 
   return {
     panelSize: collapsed ? collapsedWidth : expandedWidth,
-    minSize: collapsed ? 0 : minSize,
+    minSize: collapsed || transitioning ? collapsedWidth : minSize,
     maxSize,
     isMotionLockedRef,
     notifyAnimationComplete: () => {
