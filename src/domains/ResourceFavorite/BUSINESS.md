@@ -14,7 +14,7 @@
 ## 条目与集合
 
 - 收藏条目与 Resource 可访问性是不同生命周期：`accessible: false` 时不提供 resourceInfo，但仍保留条目 ID 与收藏时间；`resourceInfo: null` 不证明资源已删除或权限可以恢复。依据：[mapFavoriteItemFromApi](mapper/ResourceFavoriteServices.map.ts)、[FavoriteItem](entity/favorite.ts)。
-- 默认集合只按 `isDefault` 识别。当前 API Contract 将集合名称声明为非空字符串，不应再以空名称推断默认集合；entity 的旧可空类型只用于兼容既有 UI，不构成新的 wire 契约。依据：[FavoriteApi schema](apis/FavoriteApi.schema.ts)、[mapFavoriteCollectionFromApi](mapper/ResourceFavoriteServices.map.ts)。
+- 默认集合只按 `isDefault` 识别。后端创建默认集合时 `collectionName` 为 `null`，前端只负责展示回退文案；自定义集合的创建和更新请求仍要求非空名称。依据：[FavoriteApi schema](apis/FavoriteApi.schema.ts)、[mapFavoriteCollectionFromApi](mapper/ResourceFavoriteServices.map.ts)。
 - 收藏条目内嵌的 Resource 摘要、权限和可访问性规则沿用 [Resource](../Resource/BUSINESS.md)，不在收藏域另订。依据：[mapFavoriteItemFromApi](mapper/ResourceFavoriteServices.map.ts)。
 
 ## 证据限制

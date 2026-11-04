@@ -38,7 +38,8 @@ export const GetFavoriteStatusApiResponseSchema = z.object({
 
 export const FavoriteCollectionApiSchema = z.object({
   collectionId: OpaqueIdSchema,
-  collectionName: NonBlankStringSchema,
+  // 后端创建默认收藏夹时名称为 null，由前端使用默认收藏夹文案展示。
+  collectionName: NullableStringSchema,
   description: NullableStringSchema,
   isDefault: z.boolean(),
   itemCount: z.number().int().nonnegative(),
