@@ -22,6 +22,7 @@ import axios, {
 import { parseApiErrorBody } from '@/apis/apiError';
 import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
 import { isWisePenError } from '@/utils/error/WisePenError';
+import { isPlainRecord } from '@/utils/type/typeGuards';
 
 import { getSupportErrorId, markExceptionObserved } from './capture';
 import { emitRequestEvent, getRequestTracingHandles, recordRequestBreadcrumb } from './pipeline';
@@ -37,6 +38,46 @@ type RequestFailureKind = 'http' | 'network' | 'timeout' | 'business' | 'contrac
 
 const compactAttributes = (attributes: Attributes): Attributes =>
   Object.fromEntries(Object.entries(attributes).filter(([, value]) => value !== undefined));
+
+const getContractDiagnostics = (error: unknown): Attributes => {
+  if (
+    !isWisePenError(error) ||
+    error.source !== 'http' ||
+    error.code !== FRONTEND_NETWORK_ERROR.INVALID_RESPONSE ||
+    !error.meta
+  ) {
+    return {};
+  }
+
+  const attributes: Attributes = {};
+  const contract = error.meta.contract;
+  if (typeof contract === 'string') {
+    attributes['api.contract.name'] = sanitizeDiagnosticText(contract, 128);
+  }
+
+  const direction = error.meta.direction;
+  if (direction === 'request' || direction === 'response') {
+    attributes['api.contract.direction'] = direction;
+  }
+
+  const rawIssues = error.meta.issues;
+  if (Array.isArray(rawIssues)) {
+    const issues = rawIssues
+      .filter(isPlainRecord)
+      .map((issue) => ({
+        path: typeof issue.path === 'string' ? sanitizeDiagnosticText(issue.path, 128) : undefined,
+        code: typeof issue.code === 'string' ? sanitizeDiagnosticText(issue.code, 128) : undefined,
+      }))
+      .filter(
+        (issue): issue is { path: string; code: string } =>
+          issue.path !== undefined && issue.code !== undefined
+      )
+      .slice(0, 20);
+    if (issues.length > 0) attributes['api.contract.issues'] = JSON.stringify(issues);
+  }
+
+  return attributes;
+};
 
 interface RequestFailureClassification {
   kind: RequestFailureKind | 'canceled';
@@ -203,9 +244,7 @@ export class RequestObservation {
 
       const severity = classification.severity ?? 'ERROR';
       const businessCode =
-        classification.businessCode ??
-        parseApiErrorBody(cause?.response?.data)?.code ??
-        (isWisePenError(error) ? error.code : undefined);
+        classification.businessCode ?? parseApiErrorBody(cause?.response?.data)?.code;
       const serverMessage = sanitizeDiagnosticText(
         classification.serverMessage ?? (isWisePenError(error) ? (error.serverMsg ?? '') : ''),
         512
@@ -227,6 +266,7 @@ export class RequestObservation {
           this.attributes['http.request.method']
         }:${this.attributes['api.endpoint']}:${classification.status ?? ''}:${businessCode ?? ''}`,
         'error.source': isWisePenError(error) ? error.source : classification.kind,
+        ...getContractDiagnostics(error),
       });
       if (classification.kind === 'http') {
         requestAttributes['error.fingerprint'] = `${classification.kind}:${

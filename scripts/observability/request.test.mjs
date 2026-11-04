@@ -442,6 +442,17 @@ test('各 HTTP 方法及 transport 的 Contract 校验只产生一个最终请�
           logs.at(-1).attributes['error.kind'],
           outcome === 'business' ? 'business' : 'contract'
         );
+        if (outcome === 'payload') {
+          assert.notEqual(
+            logs.at(-1).attributes['api.business_code'],
+            logs.at(-1).attributes['error.code']
+          );
+          assert.equal(logs.at(-1).attributes['api.contract.name'], 'ObservedContract');
+          assert.equal(logs.at(-1).attributes['api.contract.direction'], 'response');
+          assert.deepEqual(JSON.parse(logs.at(-1).attributes['api.contract.issues']), [
+            { path: '$', code: 'too_small' },
+          ]);
+        }
       }
       assert.equal(spans.length - beforeSpans, 1);
       assert.equal(spans.at(-1).ended, true);
