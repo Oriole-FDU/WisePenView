@@ -10,7 +10,7 @@
 
 - 根评论按 Resource ID 查询，回复按 `rootCommentId` 分页；新增回复的 `replyTo` 是一次点击所回复的具体项目 ID，可以是根评论或另一条回复。依据：[ResourceCommentServices](service/ResourceCommentServices.impl.ts)、[ResourceCommentApi](apis/CommentApi.contract.ts)。
 - 评论类型区分根评论、回复评论与回复中的回复；此模型没有锚点或 resolved thread 语义，不能替代 InlineComment。依据：[CommentApi schema](apis/CommentApi.schema.ts)。
-- 当前 Contract 将正文、图片、计数、删除状态与评论类型都声明为必填。mapper 只为作者展示生成姓名和头像降级，不替缺失协议字段制造默认值。依据：[ResourceCommentServicesMap](mapper/ResourceCommentServices.map.ts)。
+- 后端 `createTime` 是 Java `Long`，wire 值为毫秒时间戳字符串，进入 mapper 前归一化为数字。软删除评论的正文和图片返回 `null`；mapper 将其归一化为空正文和空图片列表，供删除占位展示。计数、删除状态与评论类型仍为必填。依据：[CommentApi schema](apis/CommentApi.schema.ts)、[ResourceCommentServicesMap](mapper/ResourceCommentServices.map.ts)。
 
 ## 点赞语义
 

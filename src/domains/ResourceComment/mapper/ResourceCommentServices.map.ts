@@ -22,8 +22,8 @@ function mapCommentFromApi(data: ResourceCommentItemApiResponse): ResourceCommen
     replyToUser: data.replyToUserId
       ? mapCommentAuthorFromApi(data.replyToUserInfo, data.replyToUserId)
       : undefined,
-    content: data.content,
-    imageUrls: data.imageUrls,
+    content: data.content ?? '',
+    imageUrls: data.imageUrls ?? [],
     likeCount: data.likeCount,
     replyCount: data.replyCount,
     createTime: data.createTime,
