@@ -44,6 +44,8 @@
   business、contract 或 canceled。
 - 请求事件记录 method、稳定 endpoint、状态码、脱敏 path、host/port、request ID、
   business code、resend count 和 duration。
+- 契约失败额外记录 `api.contract.name`、`api.contract.direction` 与
+  `api.contract.issues`；前端错误码不会回填为业务码。
 - 请求发起时保存 user/session/page 快照；账号切换后迟到的失败仍归属发起请求的账号。
 - 已记录的请求异常会标记为 observed，业务 catch 不会重复生成 `frontend.error`。
 - Fetch/XHR 自动 span 覆盖网络调用；OTLP 自身请求被排除。
