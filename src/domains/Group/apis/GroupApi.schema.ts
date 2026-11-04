@@ -51,7 +51,7 @@ export const GroupItemApiSchema = z.object({
   groupId: JavaLongIdSchema,
   groupName: NonEmptyStringSchema,
   groupDesc: z.string(),
-  groupCoverUrl: z.string(),
+  groupCoverUrl: NullableStringSchema,
   groupMetaInfo: NullableStringSchema,
   groupType: GroupTypeApiSchema,
   ownerId: JavaLongIdSchema,

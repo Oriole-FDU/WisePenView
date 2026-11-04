@@ -54,7 +54,7 @@ const mapGroupFromApi = (raw: GroupItemApi | GroupDetailApi): Group => {
     groupId: raw.groupId,
     groupName: raw.groupName,
     groupDesc: raw.groupDesc,
-    groupCoverUrl: raw.groupCoverUrl,
+    groupCoverUrl: raw.groupCoverUrl ?? '',
     groupMetaInfo: parseGroupMetaInfo(raw.groupMetaInfo),
     groupType: raw.groupType,
     ownerId: raw.ownerId,
@@ -95,7 +95,7 @@ const mapFetchGroupBaseInfoFromApi = (data: GetGroupBaseInfoApiResponse): GroupB
   groupId: data.groupId,
   groupName: data.groupName,
   groupDesc: data.groupDesc,
-  groupCoverUrl: data.groupCoverUrl,
+  groupCoverUrl: data.groupCoverUrl ?? '',
   groupMetaInfo: parseGroupMetaInfo(data.groupMetaInfo),
   groupType: data.groupType,
 });
