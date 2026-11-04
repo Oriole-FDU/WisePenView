@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
   createPageResponseSchema,
   EpochMillisSchema,
+  JavaLongStringSchema,
   NonBlankStringSchema,
   OpaqueIdSchema,
   PageApiRequestSchema,
@@ -39,19 +40,22 @@ export const ListRepliesApiRequestSchema = PageApiRequestSchema.extend({
   size: z.number().int().min(1).max(50),
 });
 
+// 后端 createTime 是 Long，统一 Jackson 配置会将其序列化为字符串。
+const JavaLongEpochMillisSchema = JavaLongStringSchema.transform(Number).pipe(EpochMillisSchema);
+
 export const ResourceCommentItemApiSchema = z.object({
   resourceId: OpaqueIdSchema,
   replyToUserId: OpaqueIdSchema.nullable(),
   authorId: OpaqueIdSchema,
-  content: z.string(),
-  imageUrls: z.array(z.string()),
+  content: z.string().nullable(),
+  imageUrls: z.array(z.string()).nullable(),
   likeCount: z.number().int().nonnegative(),
   replyCount: z.number().int().nonnegative(),
   commentType: CommentTypeApiSchema,
   commentId: OpaqueIdSchema,
   authorInfo: UserDisplayApiSchema.nullable(),
   replyToUserInfo: UserDisplayApiSchema.nullable(),
-  createTime: EpochMillisSchema,
+  createTime: JavaLongEpochMillisSchema,
   deleted: z.boolean(),
 });
 
