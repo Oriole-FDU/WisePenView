@@ -24,8 +24,10 @@ export const SingleHtmlPageVersionInfoApiSchema = z.object({
   resourceId: OpaqueIdSchema,
   version: z.number().int().positive(),
   singleHtmlPageStatus: SingleHtmlPageStatusApiSchema,
-  size: JavaLongStringSchema,
-  createTime: EpochMillisSchema,
+  // 上传任务创建后、文件完成落盘前，后端的 size 仍为 null。
+  size: JavaLongStringSchema.nullable(),
+  // 现网历史版本可能没有 CreatedDate 审计值，但 updateTime 仍可用于展示。
+  createTime: EpochMillisSchema.nullable(),
   updateTime: EpochMillisSchema,
 });
 
