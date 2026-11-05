@@ -85,7 +85,9 @@ function SkillEditor({
       saveViewState
       language={fileExtToLanguage(fileName)}
       value={content}
-      onChange={(value) => onChange?.(value ?? '')}
+      onChange={(value, event) => {
+        if (!event.isFlush) onChange?.(value ?? '');
+      }}
       onMount={handleMount}
       options={{
         readOnly,
