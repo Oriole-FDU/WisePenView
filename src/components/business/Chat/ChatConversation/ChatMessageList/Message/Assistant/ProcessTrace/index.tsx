@@ -1,6 +1,11 @@
 import { useState } from 'react';
 
-import { describeTraceItem, findActiveTraceIndex, type TraceHeadline } from '../traceModel';
+import {
+  describeTraceItem,
+  findActiveTraceIndex,
+  getToolOutputText,
+  type TraceHeadline,
+} from '../traceModel';
 import type { ProcessTraceProps } from './index.type';
 import ReasoningBlock from './ReasoningBlock';
 import styles from './style.module.scss';
@@ -23,8 +28,11 @@ function ProcessTrace({ items, streaming }: ProcessTraceProps) {
   const activeItem = activeIndex >= 0 ? items[activeIndex] : null;
   const headlineItem = activeItem ?? items[items.length - 1];
   const isSingleItem = items.length === 1;
-  const singleItemContent =
-    isSingleItem && headlineItem.kind === 'reasoning' ? headlineItem.content : '';
+  const singleItemContent = !isSingleItem
+    ? ''
+    : headlineItem.kind === 'reasoning'
+      ? headlineItem.content
+      : (getToolOutputText(headlineItem.part) ?? '');
   // 多节点展开后换成汇总文案，避免首行与最后一条节点行重复
   const headline: TraceHeadline =
     expanded && !isSingleItem

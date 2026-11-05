@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,10 +11,18 @@ import styles from './style.module.scss';
 import { useCollapseHeight } from './useCollapseHeight';
 
 /**
- * 过程行的公共骨架：一行提示 + 指示箭头 + 可折叠正文。
- * 展开状态由调用方持有，这里只负责行标渲染、高度动画与折叠面板的可访问性关联。
+ * 过程行的公共骨架：一行提示 + 横向箭头 + 可折叠正文。
+ * 步骤行的箭头默认隐藏，hover / 聚焦 / 已展开时再显现；展开状态由调用方持有。
  */
-function TraceRow({ children, expanded, headline, item, animated, onToggle }: TraceRowProps) {
+function TraceRow({
+  children,
+  expanded,
+  headline,
+  item,
+  animated,
+  indicator = 'hover',
+  onToggle,
+}: TraceRowProps) {
   const { t } = useTranslation('chat');
   const panelId = useId();
   const collapseRef = useCollapseHeight(expanded);
@@ -31,10 +39,11 @@ function TraceRow({ children, expanded, headline, item, animated, onToggle }: Tr
         </span>
       </span>
       {expandable ? (
-        <ChevronDown
+        <ChevronRight
           size={14}
           aria-hidden="true"
           className={styles.indicator}
+          data-visibility={indicator}
           data-expanded={expanded ? 'true' : 'false'}
         />
       ) : null}
