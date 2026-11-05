@@ -40,6 +40,8 @@ release
 *.sw?
 
 docs/*
+!docs/drive-refactor/
+!docs/drive-refactor/**
 
 CLAUDE.md
 

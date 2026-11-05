@@ -120,6 +120,29 @@ test('CSP 文档包装保留原内容，并覆盖 head、html 和 fragment 三�
   assert(fragment.includes('<body><section>片段内容</section></body>'));
 });
 
+test('HTML 样式表移除 crossorigin，避免沙箱 Blob 文档以不透明来源发起 CORS 请求', () => {
+  const document = resourceModule.buildHtmlDocument(
+    [
+      '<html><head>',
+      '<link rel="stylesheet" crossorigin="anonymous" href="tokens.css">',
+      '<link rel="alternate stylesheet" crossorigin href="print.css">',
+      '<link crossorigin="use-credentials" rel="stylesheet" href="theme.css">',
+      '<link rel="icon" crossorigin="anonymous" href="favicon.ico">',
+      '</head><body></body></html>',
+    ].join(''),
+    'https://api.example.com'
+  );
+
+  assert.match(document, /<link rel="stylesheet" href="tokens\.css">/);
+  assert.match(document, /<link rel="alternate stylesheet" href="print\.css">/);
+  assert.match(document, /<link rel="stylesheet" href="theme\.css">/);
+  assert.match(document, /<link rel="icon" crossorigin="anonymous" href="favicon\.ico">/);
+  assert.doesNotMatch(
+    document,
+    /rel="stylesheet"[^>]*crossorigin|<link[^>]*crossorigin[^>]*rel="stylesheet"/
+  );
+});
+
 test('HTML iframe 只授予脚本权限，不使用 allow-same-origin', async () => {
   const source = await readFile(join(root, 'src/components/editors/html/index.tsx'), 'utf8');
   assert.match(source, /sandbox="allow-scripts"/);
