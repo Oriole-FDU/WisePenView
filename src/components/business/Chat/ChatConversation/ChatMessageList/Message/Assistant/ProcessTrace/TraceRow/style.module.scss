@@ -77,7 +77,7 @@
   }
 }
 
-/* 工具名可能很长：截断留给标签，chevron 始终可见 */
+/* 工具名可能很长：截断留给标签；箭头默认隐藏， */
 .labelClip {
   flex: 0 1 auto;
   min-width: 0;
@@ -89,14 +89,34 @@
 .indicator {
   flex-shrink: 0;
   color: currentColor;
-  transition: transform var(--motion-duration-mid) var(--motion-ease-fluid);
+  opacity: 0;
+  transition:
+    transform var(--motion-duration-mid) var(--motion-ease-fluid),
+    opacity var(--motion-duration-fast) var(--motion-ease-out);
+
+  &[data-visibility='persistent'],
+  &[data-expanded='true'] {
+    opacity: 1;
+  }
 
   &[data-expanded='true'] {
-    transform: rotate(180deg);
+    transform: rotate(90deg);
+  }
+
+  .trigger:hover &,
+  .trigger:focus-visible &,
+  .trigger[data-focus-visible] & {
+    opacity: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
     transition-duration: var(--motion-duration-reduced);
+  }
+
+  @media (hover: none) {
+    &[data-visibility='hover'] {
+      opacity: 0.55;
+    }
   }
 }
 

@@ -12,5 +12,9 @@ export interface TraceRowProps {
   item: TraceItem;
   /** 流式中是否让行标做轮换动画 */
   animated: boolean;
+  /**
+   * 组标题始终露出横向箭头；步骤行默认藏到 hover
+   */
+  indicator?: 'persistent' | 'hover';
   onToggle: () => void;
 }
