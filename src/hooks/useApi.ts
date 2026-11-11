@@ -20,6 +20,7 @@ import type {
   Service as UseRequestService,
 } from 'ahooks/es/useRequest/src/types';
 
+import { captureException } from '@/observability';
 import { isWisePenError, parseErrorMessage } from '@/utils/error';
 
 interface UseApiErrorOptions<TParams extends unknown[]> {
@@ -38,6 +39,9 @@ type UseApiPaginationOptions<
 
 type UseApiInfiniteScrollOptions<TData extends UseInfiniteScrollData> =
   InfiniteScrollOptions<TData> & UseApiErrorOptions<[]>;
+
+type UseApiErrorHandlerOptions<TParams extends unknown[]> = UseApiErrorOptions<TParams> &
+  Pick<UseRequestOptions<unknown, TParams>, 'onError'>;
 
 type UseApiResult<TData, TParams extends unknown[]> = UseRequestResult<TData, TParams> & {
   empty: boolean;
@@ -68,6 +72,20 @@ const notifyApiError = <TParams extends unknown[]>(
   onErrorEffect?.(error, params);
 };
 
+/** 所有 useApi 消费到的错误都进入统一遥测；已观测的请求或客户端错误会自动去重。 */
+const handleApiError = <TParams extends unknown[]>(
+  error: Error,
+  params: TParams,
+  options: UseApiErrorHandlerOptions<TParams>
+): void => {
+  captureException(error, { detector: 'error-consumed' });
+  if (options.onError) {
+    options.onError(error, params);
+    return;
+  }
+  notifyApiError(error, params, options);
+};
+
 export function useApi<TData, TParams extends unknown[]>(
   service: UseRequestService<TData, TParams>,
   options: UseApiOptions<TData, TParams> = {}
@@ -81,10 +99,13 @@ export function useApi<TData, TParams extends unknown[]>(
   } = options;
   const request = useRequest<TData, TParams>(service, {
     ...restOptions,
-    onError:
-      onError ??
-      ((error, params) =>
-        notifyApiError(error, params, { getErrorMessage, onErrorEffect, showErrorToast })),
+    onError: (error, params) =>
+      handleApiError(error, params, {
+        getErrorMessage,
+        onError,
+        onErrorEffect,
+        showErrorToast,
+      }),
   });
 
   return {
@@ -111,10 +132,13 @@ export function useApiPagination<
   } = options;
   return usePagination<TData, TParams>(service, {
     ...restOptions,
-    onError:
-      onError ??
-      ((error, params) =>
-        notifyApiError(error, params, { getErrorMessage, onErrorEffect, showErrorToast })),
+    onError: (error, params) =>
+      handleApiError(error, params, {
+        getErrorMessage,
+        onError,
+        onErrorEffect,
+        showErrorToast,
+      }),
   });
 }
 
@@ -131,8 +155,12 @@ export function useApiInfiniteScroll<TData extends UseInfiniteScrollData>(
   } = options;
   return useInfiniteScroll<TData>(service, {
     ...restOptions,
-    onError:
-      onError ??
-      ((error) => notifyApiError(error, [], { getErrorMessage, onErrorEffect, showErrorToast })),
+    onError: (error) =>
+      handleApiError(error, [], {
+        getErrorMessage,
+        onError,
+        onErrorEffect,
+        showErrorToast,
+      }),
   });
 }

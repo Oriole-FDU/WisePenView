@@ -542,7 +542,7 @@ test('Contract 请求重试后只按最终传输及 payload 结果结束同一 s
   }
 });
 
-test('请求 Contract 校验失败不发送请求，也不创建请求观测', async (context) => {
+test('请求 Contract 校验失败不发送请求，只上报客户端错误', async (context) => {
   const telemetry = await loadRequestModules(context);
   const { logs, spans } = createHarness(telemetry, context);
   let attempts = 0;
@@ -568,8 +568,13 @@ test('请求 Contract 校验失败不发送请求，也不创建请求观测', a
     )
   );
   assert.equal(attempts, 0);
-  assert.equal(spans.length, 0);
-  assert.equal(logs.length, 0);
+  assert.equal(spans.length, 1);
+  assert.equal(spans[0].name, 'frontend.error');
+  assert.equal(logs.length, 1);
+  assert.equal(logs[0].attributes['event.name'], 'frontend.error');
+  assert.equal(logs[0].attributes['error.detector'], 'error-created');
+  assert.equal(logs[0].attributes['error.code'], 100);
+  assert.equal(logs[0].attributes['api.endpoint'], undefined);
 });
 
 test('文本 Contract 保留裸文本及非 envelope JSON 的既有语义', async (context) => {

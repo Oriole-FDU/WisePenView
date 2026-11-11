@@ -47,7 +47,8 @@ const loadObservability = async (context) => {
       export { startPipeline } from '@/observability/pipeline';
       export { sanitizeDiagnosticText, sanitizeRequestUrl } from '@/observability/privacy';
       export { sanitizeSpanUrl } from '@/observability/otel';
-      export { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
+      export { createClientError } from '@/utils/error/createClientError';
+      export { FRONTEND_CLIENT_ERROR, FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
       export { WisePenError } from '@/utils/error/WisePenError';
     `
   );
@@ -203,6 +204,43 @@ test('异常进入统一聚合管线并过滤未提供的可选属性', async (c
     });
     assert.match(id, /^WPE-[A-Z0-9]{8}$/);
   });
+});
+
+test('客户端错误在创建时立即上报，后续捕获不重复记录', async (context) => {
+  const telemetry = await loadObservability(context);
+  const logs = [];
+  const attributes = telemetry.createInitialContextAttributes('test');
+  const observabilityContext = new telemetry.ObservabilityContext(attributes, 0);
+  observabilityContext.setRoute({
+    'page.path': '/resource/note/note-1',
+    'page.route': '/resources/:resourceType/:resourceId',
+  });
+  telemetry.setActiveContext(observabilityContext);
+  const fakeSpan = {
+    end() {},
+    recordException() {},
+    setStatus() {},
+  };
+  const stop = telemetry.startPipeline(
+    observabilityContext,
+    { startSpan: () => fakeSpan },
+    { emit: (record) => logs.push(record) }
+  );
+  context.after(stop);
+
+  const error = telemetry.createClientError(telemetry.FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+    operation: 'resource.move',
+  });
+
+  assert.equal(logs.length, 1);
+  assert.equal(logs[0].attributes['event.name'], 'frontend.error');
+  assert.equal(logs[0].attributes['error.detector'], 'error-created');
+  assert.equal(logs[0].attributes['error.code'], telemetry.FRONTEND_CLIENT_ERROR.INTERNAL_STATE);
+  assert.equal(logs[0].attributes['error.source'], 'client');
+  assert.equal(logs[0].attributes['operation.name'], undefined);
+
+  telemetry.captureException(error, { detector: 'window-unhandled-rejection' });
+  assert.equal(logs.length, 1);
 });
 
 test('聚合摘要和预算使用同一套 occurrence 计数', async (context) => {
