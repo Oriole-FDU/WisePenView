@@ -121,6 +121,7 @@ export default function AgentWorkspace({
         copyVersion: agent.version,
         permissionResourceType: RESOURCE_KIND.AGENT,
         ownerId: agent.ownerId,
+        onResourceChanged: onRefresh,
         titleMeta:
           isOwner && (draftSession.savePhase === 'dirty' || draftSession.savePhase === 'failed') ? (
             <span className={styles.saveStatus}>{t('agent:page.saveStatus.dirty')}</span>

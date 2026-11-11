@@ -58,6 +58,8 @@ export interface EditorResourcePresentation {
   permissionResourceType: ResourcePermissionResourceType;
   ownerId?: string | null;
   onPermissionSuccess?: () => void;
+  /** 资源位置或权限变化后，通知编辑器重新获取资源详情。 */
+  onResourceChanged?: () => unknown | Promise<unknown>;
   isDisabled?: boolean;
   titleMeta?: ReactNode;
   leadingActions?: ReactNode;

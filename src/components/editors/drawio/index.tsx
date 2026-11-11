@@ -90,6 +90,7 @@ function DrawioPresentationBinding({
         permissionResourceType: RESOURCE_KIND.DRAWIO,
         ownerId,
         onPermissionSuccess,
+        onResourceChanged,
         titleMeta,
         actions,
       },

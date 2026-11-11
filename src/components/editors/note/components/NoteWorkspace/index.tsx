@@ -203,6 +203,7 @@ function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteW
         permissionResourceType: RESOURCE_KIND.NOTE,
         ownerId: noteInfoDisplay.ownerId,
         onPermissionSuccess: onRefreshNoteInfo,
+        onResourceChanged: onRefreshNoteInfo,
         isDisabled: session.showFullPageSpin,
         titleMeta: (
           <span
