@@ -116,6 +116,7 @@ function HtmlPageContent() {
         permissionResourceType: RESOURCE_KIND.HTML,
         ownerId: resourceInfo?.ownerId,
         onPermissionSuccess: refreshInfo,
+        onResourceChanged: refreshInfo,
       },
     },
   };

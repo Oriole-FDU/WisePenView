@@ -55,6 +55,7 @@ export default function ResourceWorkspacePresentation({
             permissionResourceType: RESOURCE_KIND.FILE,
             ownerId: resourceInfo.ownerId,
             onPermissionSuccess,
+            onResourceChanged,
             moreMenu: isOfficeResourceType(documentType)
               ? {
                   actions: [
