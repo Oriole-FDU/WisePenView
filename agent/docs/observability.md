@@ -33,6 +33,10 @@
   operation、资源、用户和会话聚合。
 - 主动取消和 `CanceledError` 不记录。
 - `WisePenError` 记录 `source`、`code` 和脱敏诊断，不复制 `meta` 或服务端正文。
+- `createClientError` 创建客户端错误后立即以 `error-created` detector 上报；同一错误对象
+  后续被业务或全局异常入口再次捕获时不会重复产生 `frontend.error`。
+- `useApi` 的普通、分页和无限滚动变体在错误被消费时统一以 `error-consumed`
+  detector 上报。最终请求失败和客户端错误已经标记为 observed，因此不会重复记录。
 
 ### 请求与自动网络 span
 
@@ -78,8 +82,9 @@
 - `drawio.save`
 - `skill.save`
 
-前置条件不满足、权限拒绝、主动取消、dispose 和未 ready 拒绝不记录为错误。
-`createClientError` 只创建业务错误，不自动上报。
+`application-handled` 下的前置条件不满足、权限拒绝、主动取消、dispose 和未 ready
+拒绝不额外记录。通过 `createClientError` 产生的客户端错误不区分业务是否恢复，均立即
+上报；主动取消仍需由调用方使用标准取消错误表达，不能包装成普通客户端错误。
 
 ## 事件流
 

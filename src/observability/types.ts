@@ -13,6 +13,8 @@ export type ExceptionDetector =
   | 'router-error'
   | 'window-error'
   | 'window-unhandled-rejection'
+  | 'error-created'
+  | 'error-consumed'
   | 'application-handled';
 
 export type ExceptionOperation =
