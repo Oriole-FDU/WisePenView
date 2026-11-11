@@ -55,6 +55,7 @@ interface ResourceToolbarOperationsProps {
   currentActions?: ResourceAction[] | null;
   copyVersion?: number;
   onResolve: (handlers: ResourceToolbarOperationHandlers) => ReactNode;
+  onResourceChanged?: () => unknown | Promise<unknown>;
 }
 
 const normalizeResourceType = (resourceType?: string): string =>
@@ -68,6 +69,7 @@ function ResourceToolbarOperations({
   currentActions,
   copyVersion,
   onResolve,
+  onResourceChanged,
 }: ResourceToolbarOperationsProps) {
   const { t } = useTranslation(['resource', 'drive']);
   const driveService = useDriveService();
@@ -82,6 +84,18 @@ function ResourceToolbarOperations({
   const [targetModal, setTargetModal] = useState<TargetModal>(null);
   const [moveOpen, setMoveOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [pendingMove, setPendingMove] = useState<{
+    locationKey: string;
+    resourceInfo: ResourceItem;
+  }>();
+  const driveLocationKey = driveLocation
+    ? `${driveLocation.scope.rootId}:${driveLocation.mountTagId}`
+    : undefined;
+  const pendingLocationRefresh = Boolean(
+    pendingMove &&
+    pendingMove.locationKey === driveLocationKey &&
+    pendingMove.resourceInfo === resourceInfo
+  );
 
   const { data: node, loading: resolvingNode } = useApi<DriveResourceNode, []>(
     () =>
@@ -90,7 +104,12 @@ function ResourceToolbarOperations({
         location: driveLocation!,
       }),
     {
-      ready: Boolean(resourceInfo && resourceInfo.resourceId === resourceId && driveLocation),
+      ready: Boolean(
+        resourceInfo &&
+        resourceInfo.resourceId === resourceId &&
+        driveLocation &&
+        !pendingLocationRefresh
+      ),
       refreshDeps: [
         resourceId,
         resourceInfo,
@@ -230,13 +249,29 @@ function ResourceToolbarOperations({
 
   const handleMoveSuccess = (target: DriveContainerNode) => {
     const mountTagId = target.tagId;
+    const nextDriveLocation = mountTagId ? { scope: target.scope, mountTagId } : undefined;
+    if (resourceInfo && nextDriveLocation) {
+      setPendingMove({
+        locationKey: `${nextDriveLocation.scope.rootId}:${nextDriveLocation.mountTagId}`,
+        resourceInfo,
+      });
+    }
     openResource({
       resourceId,
       resourceType,
       resourceName,
       replace: true,
-      driveLocation: mountTagId ? { scope: target.scope, mountTagId } : undefined,
+      driveLocation: nextDriveLocation,
     });
+    if (!onResourceChanged) {
+      setPendingMove(undefined);
+      return;
+    }
+    void Promise.resolve()
+      .then(() => onResourceChanged())
+      .catch(() => {
+        setPendingMove(undefined);
+      });
   };
 
   const handleDeleteSuccess = () => {
@@ -252,7 +287,10 @@ function ResourceToolbarOperations({
           : isTrashView
             ? t('drive:delete.permanent')
             : t('drive:delete.moveToTrash'),
-    isLocating: Boolean(driveLocation && (!resourceInfo || resolvingNode || locatingParentPath)),
+    isLocating: Boolean(
+      driveLocation &&
+      (!resourceInfo || resolvingNode || locatingParentPath || pendingLocationRefresh)
+    ),
     onCopy: canCopy ? () => setTargetModal('copy') : undefined,
     onCreateLink: groupId && node?.type === 'resource' ? () => setTargetModal('link') : undefined,
     onMove: node ? () => setMoveOpen(true) : undefined,

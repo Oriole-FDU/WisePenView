@@ -26,6 +26,7 @@ export default function ResourceToolbar({
   permissionResourceType,
   ownerId,
   onPermissionSuccess,
+  onResourceChanged,
   isDisabled,
   titleMeta,
   breadcrumbItems,
@@ -70,6 +71,7 @@ export default function ResourceToolbar({
           trailingActions={trailingActions}
           canManagePermission={canManagePermission}
           onOpenPermission={() => setIsPermissionModalOpen(true)}
+          onResourceChanged={onResourceChanged}
         />
       </div>
       {resourceId && canManagePermission ? (

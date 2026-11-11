@@ -333,6 +333,7 @@ export interface ResourceToolbarActionsProps {
   trailingActions?: ReactNode;
   canManagePermission: boolean;
   onOpenPermission: () => void;
+  onResourceChanged?: () => unknown | Promise<unknown>;
 }
 
 /** 资源工具栏动作区：编辑器提供的动作节点、资源管理菜单与右侧栏动作都走这里。 */
@@ -351,6 +352,7 @@ export default function ResourceToolbarActions({
   trailingActions,
   canManagePermission,
   onOpenPermission,
+  onResourceChanged,
 }: ResourceToolbarActionsProps) {
   return (
     <div className={styles.actions}>
@@ -366,6 +368,7 @@ export default function ResourceToolbarActions({
               resourceInfo={resourceInfo}
               currentActions={currentActions}
               copyVersion={copyVersion}
+              onResourceChanged={onResourceChanged}
               onResolve={(operations: ResourceToolbarOperationHandlers) => (
                 <ResourceToolbarMore
                   menu={moreMenu}

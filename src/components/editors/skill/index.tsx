@@ -215,6 +215,7 @@ function SkillEditorContent() {
         permissionResourceType: RESOURCE_KIND.SKILL,
         ownerId: resource.skill?.ownerId,
         onPermissionSuccess: resource.refreshSkill,
+        onResourceChanged: resource.refreshSkill,
         titleMeta: headerSaveStatusText ? (
           <span className={`${styles.toolbarSaveStatus} ${styles.toolbarSaveStatusDirty}`}>
             {headerSaveStatusText}
