@@ -31,10 +31,6 @@ function GroupFilesPage() {
         actions={{
           toolbar: {
             canCreateFolder: displayConfig.canCreateTag,
-            canCreateNote: displayConfig.canCreateResource,
-            canCreateDrawio: displayConfig.canCreateResource,
-            canCreateSkill: displayConfig.canCreateResource,
-            canCreateAgent: displayConfig.canCreateResource,
             canUploadToGroup: displayConfig.canUploadToGroup,
             canManageTagPermission: displayConfig.canManageTag,
           },

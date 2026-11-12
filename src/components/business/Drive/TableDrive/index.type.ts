@@ -16,10 +16,6 @@ export type DriveTableRow = FolderTableRow & {
 export interface TableDriveActionConfig {
   toolbar?: {
     canCreateFolder?: boolean;
-    canCreateNote?: boolean;
-    canCreateDrawio?: boolean;
-    canCreateSkill?: boolean;
-    canCreateAgent?: boolean;
     canUploadToGroup?: boolean;
     canManageTagPermission?: boolean;
   };

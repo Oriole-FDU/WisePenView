@@ -1,4 +1,4 @@
-import { Bell, Folder, type LucideIcon, MessageSquarePlus, NotebookPen, Users } from 'lucide-react';
+import { Bell, Folder, type LucideIcon, MessageSquarePlus, Plus, Users } from 'lucide-react';
 
 import { APP_SIDEBAR_HEADER_NAV_KEY, type AppSidebarHeaderNavKey } from '@/config/appSidebar';
 import { GUIDE_TOOL_ID, type GuideToolId } from '@/constants/tour';
@@ -13,15 +13,15 @@ export interface AppSidebarNavigateItem {
   toolId: GuideToolId;
 }
 
-interface AppSidebarCreateNoteItem {
-  type: 'createNote';
-  key: 'create-note';
+interface AppSidebarCreateResourceItem {
+  type: 'createResource';
+  key: 'create-resource';
   labelKey: string;
   icon: LucideIcon;
   toolId: GuideToolId;
 }
 
-export type AppSidebarHeaderItem = AppSidebarNavigateItem | AppSidebarCreateNoteItem;
+export type AppSidebarHeaderItem = AppSidebarNavigateItem | AppSidebarCreateResourceItem;
 
 export const APP_SIDEBAR_HEADER_ITEMS: readonly AppSidebarHeaderItem[] = [
   {
@@ -33,11 +33,11 @@ export const APP_SIDEBAR_HEADER_ITEMS: readonly AppSidebarHeaderItem[] = [
     toolId: GUIDE_TOOL_ID.sidebarNewChat,
   },
   {
-    type: 'createNote',
-    key: 'create-note',
-    labelKey: 'navigation.newNote',
-    icon: NotebookPen,
-    toolId: GUIDE_TOOL_ID.sidebarNewNote,
+    type: 'createResource',
+    key: 'create-resource',
+    labelKey: 'navigation.createResource',
+    icon: Plus,
+    toolId: GUIDE_TOOL_ID.sidebarCreateResource,
   },
   {
     type: 'navigate',

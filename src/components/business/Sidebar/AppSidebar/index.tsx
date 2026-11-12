@@ -22,44 +22,53 @@ function AppSidebar({
   motionPhase = collapsed ? 'collapsed' : 'expanded',
 }: AppSidebarProps) {
   const { t } = useTranslation('shell');
-  const { items: headerNavItems, selectedKey } = useAppSidebarHeaderNav({ onNavigate });
+  const {
+    items: headerNavItems,
+    selectedKey,
+    ModalHost,
+  } = useAppSidebarHeaderNav({
+    onNavigate,
+  });
   const labelsHidden = motionPhase !== 'expanded';
   const railLayout = motionPhase === 'collapsed';
 
   return (
-    <div
-      className={styles.sider}
-      data-sidebar-phase={motionPhase}
-      data-sidebar-compact={railLayout || undefined}
-      data-sidebar-labels-hidden={labelsHidden || undefined}
-    >
-      <SidebarHeader
-        collapsed={railLayout}
-        labelsHidden={labelsHidden}
-        canGoBack={canGoBack}
-        canGoForward={canGoForward}
-        nav={
-          <HeaderNav
-            ariaLabel={t('navigation.appAria')}
-            activeKey={selectedKey}
-            collapsed={railLayout}
-            guideToolId={GUIDE_TOOL_ID.sidebarNavigation}
-            items={headerNavItems}
-            labelsHidden={labelsHidden}
-            showIndicator
-          />
-        }
-        onGoBack={onGoBack}
-        onGoForward={onGoForward}
-        onToggle={onToggle}
-      />
-      <div className={styles.expandedBody}>
-        <AppSidebarTabs />
+    <>
+      <div
+        className={styles.sider}
+        data-sidebar-phase={motionPhase}
+        data-sidebar-compact={railLayout || undefined}
+        data-sidebar-labels-hidden={labelsHidden || undefined}
+      >
+        <SidebarHeader
+          collapsed={railLayout}
+          labelsHidden={labelsHidden}
+          canGoBack={canGoBack}
+          canGoForward={canGoForward}
+          nav={
+            <HeaderNav
+              ariaLabel={t('navigation.appAria')}
+              activeKey={selectedKey}
+              collapsed={railLayout}
+              guideToolId={GUIDE_TOOL_ID.sidebarNavigation}
+              items={headerNavItems}
+              labelsHidden={labelsHidden}
+              showIndicator
+            />
+          }
+          onGoBack={onGoBack}
+          onGoForward={onGoForward}
+          onToggle={onToggle}
+        />
+        <div className={styles.expandedBody}>
+          <AppSidebarTabs />
+        </div>
+        <div className={styles.sidebarFooter}>
+          <UserProfile collapsed={railLayout} labelsHidden={labelsHidden} />
+        </div>
       </div>
-      <div className={styles.sidebarFooter}>
-        <UserProfile collapsed={railLayout} labelsHidden={labelsHidden} />
-      </div>
-    </div>
+      {ModalHost}
+    </>
   );
 }
 

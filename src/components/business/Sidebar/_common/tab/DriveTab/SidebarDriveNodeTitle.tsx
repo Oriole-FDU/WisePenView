@@ -1,14 +1,6 @@
 import { Label } from '@heroui/react';
 import { clsx } from 'clsx';
-import {
-  CloudUpload,
-  FileInput,
-  FolderPlus,
-  Pencil,
-  Plus,
-  SquareMinus,
-  Trash2,
-} from 'lucide-react';
+import { CloudUpload, FolderPlus, Pencil, Plus, SquareMinus, Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,8 +22,7 @@ import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
 import styles from './style.module.scss';
 
-export type SidebarDriveCreateAction =
-  'folder' | 'note' | 'importNote' | 'drawio' | 'skill' | 'agent' | 'upload';
+export type SidebarDriveCreateAction = 'folder' | 'upload';
 
 interface SidebarDriveNodeTitleProps {
   node: DriveViewNode;
@@ -89,9 +80,8 @@ function SidebarDriveNodeTitle({
     node.type === 'resource' || node.type === 'link' ? node.resourceIconType : undefined;
   const isSystemFolder = node.type === 'folder' && Boolean(node.systemType);
   const canCreateFolder = !isSystemFolder && (node.type === 'root' || node.type === 'folder');
-  const canCreateResource =
+  const canUploadDocument =
     !isSystemFolder && (node.type === 'folder' || (node.type === 'root' && node.canMountResources));
-  const canUploadDocument = canCreateResource;
   const canRename = !isSystemFolder && (node.type === 'folder' || node.type === 'resource');
   const canDelete =
     !isSystemFolder && (node.type === 'folder' || node.type === 'resource' || node.type === 'link');
@@ -165,55 +155,16 @@ function SidebarDriveNodeTitle({
                   aria-label={t('drive:sidebar.createIn', { name: label })}
                   onAction={(key) => handleCreate(String(key) as SidebarDriveCreateAction)}
                 >
+                  {canUploadDocument ? (
+                    <Dropdown.Item id="upload" textValue={t('drive:create.upload')}>
+                      <CloudUpload size={15} color="var(--accent)" aria-hidden="true" />
+                      <Label>{t('drive:create.upload')}</Label>
+                    </Dropdown.Item>
+                  ) : null}
                   <Dropdown.Item id="folder" textValue={t('drive:create.folder')}>
                     <FolderPlus size={15} color="var(--accent)" aria-hidden="true" />
                     <Label>{t('drive:create.folder')}</Label>
                   </Dropdown.Item>
-                  {canCreateResource ? (
-                    <>
-                      <Dropdown.Item id="note" textValue={t('drive:create.note')}>
-                        <EntryIcon
-                          entryType="resource"
-                          resourceIconType="note"
-                          size={15}
-                          color="var(--accent)"
-                        />
-                        <Label>{t('drive:create.note')}</Label>
-                      </Dropdown.Item>
-                      <Dropdown.Item id="importNote" textValue={t('drive:create.importNote')}>
-                        <FileInput size={15} color="var(--accent)" aria-hidden="true" />
-                        <Label>{t('drive:create.importNote')}</Label>
-                      </Dropdown.Item>
-                      <Dropdown.Item id="drawio" textValue={t('drive:create.drawio')}>
-                        <EntryIcon
-                          entryType="resource"
-                          resourceIconType="drawio"
-                          size={15}
-                          color="var(--accent)"
-                        />
-                        <Label>{t('drive:create.drawio')}</Label>
-                      </Dropdown.Item>
-                      <Dropdown.Item id="skill" textValue={t('drive:create.skill')}>
-                        <EntryIcon
-                          entryType="resource"
-                          resourceIconType="skill"
-                          size={15}
-                          color="var(--accent)"
-                        />
-                        <Label>{t('drive:create.skill')}</Label>
-                      </Dropdown.Item>
-                      <Dropdown.Item id="agent" textValue={t('drive:create.agent')}>
-                        <EntryIcon entryType="resource" resourceIconType="agent" size={15} />
-                        <Label>{t('drive:create.agent')}</Label>
-                      </Dropdown.Item>
-                      {canUploadDocument ? (
-                        <Dropdown.Item id="upload" textValue={t('drive:create.upload')}>
-                          <CloudUpload size={15} color="var(--accent)" aria-hidden="true" />
-                          <Label>{t('drive:create.upload')}</Label>
-                        </Dropdown.Item>
-                      ) : null}
-                    </>
-                  ) : null}
                 </Dropdown.Menu>
               </Dropdown.Popover>
             </Dropdown>

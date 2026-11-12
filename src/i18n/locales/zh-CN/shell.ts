@@ -2,8 +2,7 @@ const zhCNShell = {
   navigation: {
     appAria: '应用导航',
     newChat: '新建对话',
-    newNote: '新建笔记',
-    defaultNoteTitle: '未命名笔记',
+    createResource: '创建资源',
     drive: '我的云盘',
     notifications: '消息通知',
     groups: '我的小组',
@@ -15,6 +14,14 @@ const zhCNShell = {
     skipToMain: '跳到主内容',
     appSidebar: '应用侧边栏',
     adminSidebar: '管理侧边栏',
+  },
+  resourceCreate: {
+    title: '创建资源',
+    description: '选择要创建的资源类型，资源将保存到个人云盘根目录。',
+    noteDescription: '从空白页开始记录想法与知识',
+    drawioDescription: '用图形与连线梳理结构和流程',
+    skillDescription: '为 AI 添加可复用的工作方法',
+    agentDescription: '配置面向特定任务的 AI 助手',
   },
   windowControls: {
     minimize: '最小化',

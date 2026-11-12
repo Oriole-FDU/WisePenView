@@ -2,7 +2,6 @@
 export const GUIDE_ACTION_ID = {
   openChat: 'open-chat',
   openOutline: 'open-outline',
-  openCreateMenu: 'open-create-menu',
   openModelMenu: 'open-model-menu',
   openUploadMenu: 'open-upload-menu',
   openAgentMenu: 'open-agent-menu',

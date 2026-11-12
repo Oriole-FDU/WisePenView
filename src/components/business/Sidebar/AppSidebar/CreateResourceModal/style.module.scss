@@ -1,0 +1,80 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm);
+  border: 0;
+  border-radius: var(--app-radius-content);
+  color: var(--foreground);
+  background: var(--surface-secondary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background var(--motion-duration-fast) var(--motion-ease-standard);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-hover);
+  }
+
+  &:focus-visible {
+    @include focusRing.appFocusRing();
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: var(--disabled-opacity);
+  }
+
+  &[aria-busy='true'] {
+    opacity: 1;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--app-radius-content);
+  color: var(--accent-soft-foreground);
+  background: var(--accent-soft);
+}
+
+.copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-sm);
+}
+
+.description {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 18px;
+}
+
+.trailing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}

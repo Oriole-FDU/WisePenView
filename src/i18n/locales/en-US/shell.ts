@@ -2,8 +2,7 @@ const enUSShell = {
   navigation: {
     appAria: 'Application navigation',
     newChat: 'New chat',
-    newNote: 'New note',
-    defaultNoteTitle: 'Untitled note',
+    createResource: 'Create resource',
     drive: 'Documents and Drive',
     notifications: 'Notifications',
     groups: 'My Groups',
@@ -15,6 +14,14 @@ const enUSShell = {
     skipToMain: 'Skip to main content',
     appSidebar: 'Application sidebar',
     adminSidebar: 'Admin sidebar',
+  },
+  resourceCreate: {
+    title: 'Create resource',
+    description: 'Choose a resource type. New resources are saved to your personal Drive root.',
+    noteDescription: 'Start with a blank page for ideas and knowledge',
+    drawioDescription: 'Map structures and flows with diagrams',
+    skillDescription: 'Give AI a reusable way to complete work',
+    agentDescription: 'Configure an AI assistant for a specific task',
   },
   windowControls: {
     minimize: 'Minimize',

@@ -8,8 +8,8 @@ export const GUIDE_TOOL_ID = {
   sidebarNavigation: 'sidebar-navigation',
   /** 侧栏 HeaderNav：新建对话 */
   sidebarNewChat: 'sidebar-new-chat',
-  /** 侧栏 HeaderNav：新建笔记 */
-  sidebarNewNote: 'sidebar-new-note',
+  /** 侧栏 HeaderNav：创建资源 */
+  sidebarCreateResource: 'sidebar-create-resource',
   /** 侧栏 HeaderNav：我的云盘 */
   sidebarDrive: 'sidebar-drive',
   /** 侧栏 HeaderNav：我的小组 */
@@ -96,10 +96,6 @@ export const GUIDE_TOOL_ID = {
   driveViewContent: 'drive-view-content',
   /** 云盘路径 */
   drivePath: 'drive-path',
-  /** 云盘新建按钮 */
-  driveCreate: 'drive-create',
-  /** 已打开的新建菜单 */
-  driveCreateOpen: 'drive-create-open',
   /** 云盘文件表 */
   driveFiles: 'drive-files',
   /** 文件详情开关。展开和收起是同一颗按钮。 */

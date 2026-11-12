@@ -25,10 +25,6 @@ function CourseMaterialsPage() {
           actions={{
             toolbar: {
               canCreateFolder: canManage,
-              canCreateNote: canManage,
-              canCreateDrawio: canManage,
-              canCreateSkill: false,
-              canCreateAgent: false,
               canUploadToGroup: canManage,
               canManageTagPermission: canManage,
             },

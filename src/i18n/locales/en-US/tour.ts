@@ -10,7 +10,7 @@ const enUSTour = {
     navigation: {
       title: 'Feature navigation',
       content:
-        'The top-left corner holds the essentials. Start a chat with AI, create a note, open Drive, visit your groups, or check messages from here.',
+        'The top-left corner holds the essentials. Start a chat with AI, create a resource, open Drive, visit your groups, or check messages from here.',
     },
     sessions: {
       title: 'Pick up where you left off',

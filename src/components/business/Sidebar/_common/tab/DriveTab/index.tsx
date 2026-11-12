@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Empty, Spin } from '@/components/base/Feedback';
-import { HiddenFileInput } from '@/components/base/Input';
 import type { DataNode } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
 import { buildDriveTreeData } from '@/components/business/Drive/common/buildDriveTreeData';
@@ -14,22 +13,15 @@ import {
 } from '@/components/business/Drive/common/driveComponentModel';
 import {
   DriveCreateModal,
-  type DriveCreateType,
   DriveDeleteModal,
   RenameNodeModal,
   TrashDeleteModal,
   UploadDocumentModal,
 } from '@/components/business/Drive/Modals';
-import {
-  MARKDOWN_NOTE_FILE_ACCEPT,
-  useMarkdownNoteImport,
-} from '@/components/editors/note/hooks/useMarkdownNoteImport';
-import { useGroupService, useNoteService } from '@/domains';
-import type { DriveResourceLocation, FolderNode, RootNode } from '@/domains/Drive';
-import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { useGroupService } from '@/domains';
+import type { FolderNode, RootNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
 import {
@@ -45,24 +37,16 @@ import SidebarDriveScopeSwitcher from './SidebarDriveScopeSwitcher';
 import styles from './style.module.scss';
 import { useSidebarDriveTreeController } from './useSidebarDriveTreeController';
 
-interface SidebarDriveCreateTarget {
-  type: DriveCreateType;
-  target: RootNode | FolderNode;
-}
-
 function DriveTab() {
   const { t } = useTranslation('drive');
   const groupService = useGroupService();
-  const noteService = useNoteService();
   const scope = useSidebarDriveScopeStore((state) => state.scope);
   const groupId = getDriveScopeGroupId(scope);
   const openResource = useOpenResource();
-  const [noteTarget, setNoteTarget] = useState<RootNode | FolderNode | null>(null);
   const [uploadDocumentPathTagId, setUploadDocumentPathTagId] = useState<string>();
-  const [driveCreateTarget, setDriveCreateTarget] = useState<SidebarDriveCreateTarget | null>(null);
+  const [folderCreateTarget, setFolderCreateTarget] = useState<RootNode | FolderNode | null>(null);
   const [renameTarget, setRenameTarget] = useState<DriveActionTarget | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DriveActionTarget | null>(null);
-  const importTargetRef = useRef<RootNode | FolderNode | null>(null);
   const { data: groupBaseInfo } = useApi(
     async () => {
       if (!groupId) return undefined;
@@ -83,43 +67,6 @@ function DriveTab() {
     if (node.type === 'folder') return node.tagId;
     return node.canMountResources ? node.tagId : undefined;
   };
-  const resolveContainerResourceLocation = (
-    node: RootNode | FolderNode
-  ): DriveResourceLocation | undefined => {
-    const mountTagId = resolveContainerMountTagId(node);
-    return mountTagId ? { scope: node.scope, mountTagId } : undefined;
-  };
-
-  const {
-    fileInputRef: markdownFileInputRef,
-    importing: importingMarkdownNote,
-    openFilePicker: openMarkdownFilePicker,
-    handleFileChange: handleMarkdownFileChange,
-  } = useMarkdownNoteImport({
-    getPathTagId: () => {
-      const target = importTargetRef.current;
-      if (!target) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: 'Markdown 导入目标不存在',
-        });
-      }
-      return resolveContainerMountTagId(target);
-    },
-    onSuccess: ({ resourceId, title }) => {
-      const target = importTargetRef.current;
-      importTargetRef.current = null;
-      if (!target) return;
-      openResource({
-        resourceId,
-        resourceType: RESOURCE_KIND.NOTE,
-        resourceName: title,
-        driveLocation: resolveContainerResourceLocation(target),
-      });
-    },
-    onError: () => {
-      importTargetRef.current = null;
-    },
-  });
 
   const handleCreateNode = (
     node: RootNode | FolderNode,
@@ -127,24 +74,7 @@ function DriveTab() {
   ): void => {
     switch (action) {
       case 'folder':
-        setDriveCreateTarget({ type: 'folder', target: node });
-        break;
-      case 'note':
-        setNoteTarget(node);
-        break;
-      case 'importNote':
-        if (importingMarkdownNote) return;
-        importTargetRef.current = node;
-        openMarkdownFilePicker();
-        break;
-      case 'drawio':
-        setDriveCreateTarget({ type: 'drawio', target: node });
-        break;
-      case 'skill':
-        setDriveCreateTarget({ type: 'skill', target: node });
-        break;
-      case 'agent':
-        setDriveCreateTarget({ type: 'agent', target: node });
+        setFolderCreateTarget(node);
         break;
       case 'upload':
         {
@@ -218,58 +148,16 @@ function DriveTab() {
     },
   });
 
-  useApi(
-    async () => {
-      if (!noteTarget) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '笔记创建目标不存在',
-        });
-      }
-      const { resourceId } = await noteService.createNote({
-        title: t('create.defaultNoteTitle'),
-        pathTagId: resolveContainerMountTagId(noteTarget),
-      });
-      if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return {
-        resourceId,
-        target: noteTarget,
-      };
-    },
-    {
-      ready: Boolean(noteTarget),
-      refreshDeps: [noteTarget],
-      onSuccess: ({ resourceId, target }) => {
-        setNoteTarget(null);
-        openResource({
-          resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          driveLocation: resolveContainerResourceLocation(target),
-        });
-      },
-      onErrorEffect: () => {
-        setNoteTarget(null);
-      },
-    }
-  );
-
   const showSpin = treeLoading && treeData.length === 0;
   const showEmpty = !treeLoading && treeData.length === 0;
   const existingFolderNames =
-    driveCreateTarget?.type === 'folder'
-      ? getSidebarExistingFolderNames(nodeMap, driveCreateTarget.target.id)
+    folderCreateTarget !== null
+      ? getSidebarExistingFolderNames(nodeMap, folderCreateTarget.id)
       : [];
   const isDeleteTargetInTrash = isSidebarNodeInTrash(deleteTarget, nodeMap);
 
   return (
     <div className={styles.sidebar}>
-      <HiddenFileInput
-        ref={markdownFileInputRef}
-        accept={MARKDOWN_NOTE_FILE_ACCEPT}
-        onChange={handleMarkdownFileChange}
-        hidden
-      />
       {showSpin ? (
         <div className={styles.stateBlock}>
           <Spin />
@@ -302,30 +190,20 @@ function DriveTab() {
           onSuccess={refreshTree}
         />
       ) : null}
-      {driveCreateTarget ? (
+      {folderCreateTarget ? (
         <DriveCreateModal
-          type={driveCreateTarget.type}
+          type="folder"
           isOpen
-          parent={driveCreateTarget.target}
-          pathTagId={resolveContainerMountTagId(driveCreateTarget.target)}
-          parentLabel={getDriveNodeLabel(driveCreateTarget.target)}
+          parent={folderCreateTarget}
+          pathTagId={resolveContainerMountTagId(folderCreateTarget)}
+          parentLabel={getDriveNodeLabel(folderCreateTarget)}
           existingFolderNames={existingFolderNames}
           onOpenChange={(open) => {
-            if (!open) setDriveCreateTarget(null);
+            if (!open) setFolderCreateTarget(null);
           }}
-          onSuccess={(createdId, type) => {
-            const target = driveCreateTarget.target;
-            if (type === 'folder') {
-              setDriveCreateTarget(null);
-              refreshTree();
-              return;
-            }
-            setDriveCreateTarget(null);
-            openResource({
-              resourceId: createdId,
-              resourceType: type,
-              driveLocation: resolveContainerResourceLocation(target),
-            });
+          onSuccess={() => {
+            setFolderCreateTarget(null);
+            refreshTree();
           }}
         />
       ) : null}
