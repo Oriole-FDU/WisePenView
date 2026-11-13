@@ -13,6 +13,7 @@ import type { ChatHeaderProps } from './index.type';
 
 function ChatHeader({
   panelTitle,
+  titleMeta,
   sessionBarOpen,
   showCollapseButton,
   reserveTitleBarEnd = false,
@@ -33,7 +34,12 @@ function ChatHeader({
 
   return (
     <WorkspacePanelHeader
-      title={panelTitle}
+      title={
+        <span className={styles.headerTitle}>
+          <span className={styles.headerTitleText}>{panelTitle}</span>
+          {titleMeta}
+        </span>
+      }
       closeLabel={t('panel.collapse')}
       onClose={showCollapseButton ? onCollapsePanel : undefined}
       className={clsx(titleBarInsetEnd && styles.titleBarInsetEnd)}

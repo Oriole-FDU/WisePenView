@@ -5,7 +5,7 @@ import type { AgentSpec } from '@/domains/Agent';
 import type { ToolOption } from '@/domains/ChatConfig';
 import type { SkillSummary } from '@/domains/Skill';
 
-import CapabilityPolicyPanel, { type CapabilityPolicyOption } from './CapabilityPolicyPanel';
+import CapabilityPolicyPanel from './CapabilityPolicyPanel';
 
 interface Props {
   spec: AgentSpec;
@@ -18,101 +18,92 @@ interface Props {
 export default function CapabilitiesSection({ spec, tools, skills, disabled, onChange }: Props) {
   const { t } = useTranslation('agent');
   const policy = spec.toolAndSkillPolicy;
-  const enabledToolOverrideIds = Object.entries(policy.toolSelectionOverrides)
-    .filter(([, enabled]) => enabled)
-    .map(([toolId]) => toolId);
-  const disabledToolOverrideIds = Object.entries(policy.toolSelectionOverrides)
-    .filter(([, enabled]) => !enabled)
-    .map(([toolId]) => toolId);
-
-  const getToolAvailabilityReason = (tool: ToolOption) => {
-    if (!tool.enabled) return t('capabilities.toolDisabled');
-    if (tool.requiresConfig && !tool.configured) return t('capabilities.toolRequiresConfig');
-    if (!tool.configured) return t('capabilities.toolIncomplete');
-    return undefined;
-  };
-
-  const toToolOptions = (): CapabilityPolicyOption[] =>
-    tools.map((tool) => {
-      const disabledReason = getToolAvailabilityReason(tool);
-      return {
-        id: tool.toolId,
-        name: tool.label,
-        internalName: tool.toolId,
-        description: tool.description,
-        disabled: Boolean(disabledReason),
-        disabledReason,
-      };
-    });
-
-  const skillOptions: CapabilityPolicyOption[] = skills.map((skill) => ({
+  const toolOptions = tools.map((tool) => {
+    const disabledReason = !tool.enabled
+      ? t('capabilities.toolDisabled')
+      : tool.requiresConfig && !tool.configured
+        ? t('capabilities.toolRequiresConfig')
+        : !tool.configured
+          ? t('capabilities.toolIncomplete')
+          : undefined;
+    return {
+      id: tool.toolId,
+      name: tool.label,
+      internalName: tool.toolId,
+      description: tool.description,
+      disabled: Boolean(disabledReason),
+      disabledReason,
+    };
+  });
+  const skillOptions = skills.map((skill) => ({
     id: skill.resourceId,
     name: skill.title,
     internalName: skill.skillName,
     description: skill.description,
   }));
-  const toolOptions = toToolOptions();
+  const selectedToolIds = policy.enableUseTool
+    ? tools
+        .filter(
+          (tool) => policy.toolSelectionOverrides[tool.toolId] ?? policy.toolSelectionDefaultEnabled
+        )
+        .map((tool) => tool.toolId)
+    : [];
+  const selectedSkillIds = policy.enableUseSkill ? policy.onDemandSkillIds : [];
 
   const updatePolicy = (next: Partial<typeof policy>) => {
     onChange({ ...spec, toolAndSkillPolicy: { ...policy, ...next } });
   };
 
-  const updateToolOverrides = (enabled: boolean, toolIds: string[]) => {
-    const nextOverrides = Object.fromEntries(
-      Object.entries(policy.toolSelectionOverrides).filter(([, value]) => value !== enabled)
-    );
-    toolIds.forEach((toolId) => {
-      nextOverrides[toolId] = enabled;
+  const updateSelectedTools = (ids: string[]) => {
+    const selectedIds = new Set(ids);
+    const nextOverrides = { ...policy.toolSelectionOverrides };
+    tools.forEach((tool) => {
+      const shouldEnable = selectedIds.has(tool.toolId);
+      const override = nextOverrides[tool.toolId];
+      if (policy.toolSelectionDefaultEnabled) {
+        if (shouldEnable && override === false) delete nextOverrides[tool.toolId];
+        if (!shouldEnable && override !== false) nextOverrides[tool.toolId] = false;
+      } else {
+        if (shouldEnable && override !== true) nextOverrides[tool.toolId] = true;
+        if (!shouldEnable && override === true) delete nextOverrides[tool.toolId];
+      }
     });
-    updatePolicy({ toolSelectionOverrides: nextOverrides });
+    updatePolicy({
+      enableUseTool: ids.length > 0,
+      toolSelectionOverrides: nextOverrides,
+    });
   };
 
   return (
     <AppForm.Section id="capabilities" title={t('capabilities.title')} variant="editor">
-      <AppForm.Row
-        title={t('capabilities.defaultToolSelection')}
-        selected={policy.toolSelectionDefaultEnabled}
-        disabled={disabled}
-        onChange={(value) => updatePolicy({ toolSelectionDefaultEnabled: value })}
-      />
       <CapabilityPolicyPanel
         kind="tool"
-        title={t('capabilities.enabledToolOverrides')}
-        description={t('capabilities.enabledToolOverridesDescription')}
-        addLabel={t('capabilities.addEnabledToolOverride')}
+        title={t('capabilities.tools')}
+        addLabel={t('capabilities.addTool')}
         searchPlaceholder={t('capabilities.searchTool')}
         emptyText={t('capabilities.noTool')}
-        selectedEmptyText={t('capabilities.noToolOverride')}
+        selectedEmptyText={t('capabilities.noSelectedTool')}
         options={toolOptions}
-        selectedIds={enabledToolOverrideIds}
+        selectedIds={selectedToolIds}
         disabled={disabled}
-        onChange={(ids) => updateToolOverrides(true, ids)}
-      />
-      <CapabilityPolicyPanel
-        kind="tool"
-        title={t('capabilities.disabledToolOverrides')}
-        description={t('capabilities.disabledToolOverridesDescription')}
-        addLabel={t('capabilities.addDisabledToolOverride')}
-        searchPlaceholder={t('capabilities.searchTool')}
-        emptyText={t('capabilities.noTool')}
-        selectedEmptyText={t('capabilities.noToolOverride')}
-        options={toolOptions}
-        selectedIds={disabledToolOverrideIds}
-        disabled={disabled}
-        onChange={(ids) => updateToolOverrides(false, ids)}
+        onChange={updateSelectedTools}
       />
       <CapabilityPolicyPanel
         kind="skill"
-        title={t('capabilities.onDemandSkill')}
-        description={t('capabilities.onDemandSkillDescription')}
-        addLabel={t('capabilities.addOnDemandSkill')}
+        title={t('capabilities.skills')}
+        addLabel={t('capabilities.addSkill')}
         searchPlaceholder={t('capabilities.searchSkill')}
         emptyText={t('capabilities.noSkill')}
         selectedEmptyText={t('capabilities.noSelectedSkill')}
         options={skillOptions}
-        selectedIds={policy.onDemandSkillIds}
+        selectedIds={selectedSkillIds}
         disabled={disabled}
-        onChange={(ids) => updatePolicy({ onDemandSkillIds: ids })}
+        onChange={(ids) =>
+          updatePolicy({
+            enableUseSkill: ids.length > 0,
+            onDemandSkillIds: ids,
+          })
+        }
       />
     </AppForm.Section>
   );

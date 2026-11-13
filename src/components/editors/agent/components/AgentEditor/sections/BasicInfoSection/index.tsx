@@ -2,28 +2,23 @@ import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import { FormField, Input, TextArea } from '@/components/base/Input';
-import type { AgentSpec } from '@/domains/Agent';
 
 import styles from './style.module.scss';
 
 interface Props {
   name: string;
   description: string;
-  spec: AgentSpec;
   disabled: boolean;
   onNameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
-  onSpecChange: (spec: AgentSpec) => void;
 }
 
 export default function BasicInfoSection({
   name,
   description,
-  spec,
   disabled,
   onNameChange,
   onDescriptionChange,
-  onSpecChange,
 }: Props) {
   const { t } = useTranslation('agent');
 
@@ -46,12 +41,6 @@ export default function BasicInfoSection({
         >
           <TextArea maxLength={500} rows={4} placeholder={t('basic.descriptionPlaceholder')} />
         </FormField>
-        <AppForm.Row
-          title={t('basic.autoTitle')}
-          selected={spec.autoGenerateTitle}
-          disabled={disabled}
-          onChange={(value) => onSpecChange({ ...spec, autoGenerateTitle: value })}
-        />
       </div>
     </AppForm.Section>
   );

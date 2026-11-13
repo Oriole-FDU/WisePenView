@@ -2,10 +2,13 @@ import { toast } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
+import Chat from '@/components/business/Chat';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import type { EditorPresentation } from '@/components/editors/editor.type';
+import { useResourceService } from '@/domains';
 import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { useApi } from '@/hooks/useApi';
 
 import { useEditorSurface } from '../../../_context';
 import { prepareDraftExit } from '../../../_runtime/draftExit';
@@ -22,7 +25,6 @@ interface AgentWorkspaceProps {
   data: AgentWorkspaceData;
   disabledVersionKeys: Set<string>;
   isOwner: boolean;
-  resourceId: string;
   versionItems: AgentVersionItem[];
   versionLoading: boolean;
   viewingVersion: number | null;
@@ -35,7 +37,6 @@ export default function AgentWorkspace({
   data,
   disabledVersionKeys,
   isOwner,
-  resourceId,
   versionItems,
   versionLoading,
   viewingVersion,
@@ -43,6 +44,8 @@ export default function AgentWorkspace({
   onVersionSelect,
 }: AgentWorkspaceProps) {
   const { t } = useTranslation(['agent', 'common']);
+  const resourceId = agent.resourceId;
+  const resourceService = useResourceService();
   const draftSession = useAgentDraftSessionController({
     agent,
     baseAgent: data.agent,
@@ -75,6 +78,18 @@ export default function AgentWorkspace({
         interceptSend: debugGuard.interceptSend,
       }
     : undefined;
+  const renameDisplayName = useApi(
+    async (newName: string) => {
+      await resourceService.renameResource({ resourceId, newName });
+      onRefresh();
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        toast.success(t('agent:page.displayNameRenamed'));
+      },
+    }
+  );
   const { target } = useEditorSurface();
   useEditorRuntime(
     {
@@ -86,9 +101,8 @@ export default function AgentWorkspace({
       loading: versionLoading,
       readOnly: draftSession.isReadOnly,
       hasUnsavedChanges: draftSession.isDirty,
-      pendingWork: draftSession.saveLoading || draftSession.publishLoading,
-      warnBeforeUnload:
-        draftSession.isDirty || draftSession.saveLoading || draftSession.publishLoading,
+      pendingWork: draftSession.savePhase === 'saving' || draftSession.publishLoading,
+      warnBeforeUnload: draftSession.isDirty || draftSession.publishLoading,
     },
     (context, editor) =>
       prepareDraftExit(
@@ -110,7 +124,6 @@ export default function AgentWorkspace({
       )
   );
   const headerConfig = {
-    chat: { hostAgentPort },
     header: {
       resource: {
         resourceId: agent.resourceId,
@@ -123,20 +136,19 @@ export default function AgentWorkspace({
         ownerId: agent.ownerId,
         onResourceChanged: onRefresh,
         titleMeta:
-          isOwner && (draftSession.savePhase === 'dirty' || draftSession.savePhase === 'failed') ? (
-            <span className={styles.saveStatus}>{t('agent:page.saveStatus.dirty')}</span>
+          isOwner && viewingVersion === null ? (
+            <span className={styles.saveStatus} data-phase={draftSession.savePhase}>
+              {t(`agent:page.saveStatus.${draftSession.savePhase}`)}
+            </span>
           ) : undefined,
         actions: isOwner ? (
           <AgentHeaderActions
             disabledVersionKeys={disabledVersionKeys}
-            isDirty={draftSession.isDirty}
             publishLoading={draftSession.publishLoading}
-            saveLoading={draftSession.saveLoading}
             versionItems={versionItems}
             versionLoading={versionLoading}
             viewingVersion={viewingVersion}
             onPublish={draftSession.publishDraft}
-            onSave={draftSession.saveDraft}
             onVersionSelect={handleVersionSelect}
           />
         ) : undefined,
@@ -149,7 +161,22 @@ export default function AgentWorkspace({
       <EditorPresentationBinding className={styles.pageWrap} {...headerConfig} />
       <AgentEditor
         assets={agent.assets}
+        chatPanel={
+          <Chat
+            fullWidth="panel"
+            resourceId={resourceId}
+            showHeader
+            showCollapseButton={false}
+            hostAgentPort={hostAgentPort}
+            titleMeta={
+              <span className={styles.chatDebugMeta} title={t('agent:page.debugChatHint')}>
+                {t('agent:page.debugChat')}
+              </span>
+            }
+          />
+        }
         draft={draftSession.draft}
+        displayName={agent.title}
         draftVersion={data.agent.draftVersion}
         models={data.models}
         readOnly={draftSession.isReadOnly}
@@ -158,6 +185,9 @@ export default function AgentWorkspace({
         tools={data.tools}
         onDescriptionChange={draftSession.setDescription}
         onNameChange={draftSession.setName}
+        onDisplayNameChange={async (name) => {
+          await renameDisplayName.runAsync(name);
+        }}
         onSpecChange={draftSession.setSpec}
         onSystemPromptChange={draftSession.setSystemPrompt}
       />
@@ -171,7 +201,7 @@ export default function AgentWorkspace({
         description={t('agent:page.debugSave.description')}
         cancelText={t('common:actions.cancel')}
         confirmText={t('agent:page.debugSave.confirm')}
-        isConfirmLoading={debugGuard.saving || draftSession.saveLoading}
+        isConfirmLoading={debugGuard.saving || draftSession.savePhase === 'saving'}
         onConfirm={() => void debugGuard.confirm()}
       />
     </>

@@ -5,8 +5,8 @@ import { useRef, useState } from 'react';
 import { useAgentService } from '@/domains';
 import type { AgentDetail, AgentSpec } from '@/domains/Agent';
 import { useApi } from '@/hooks/useApi';
+import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 
-import { buildGuidedPrompt, getDefaultGuidedPromptFields } from '../../../guidedPrompt';
 import {
   type AgentDraft,
   buildAgentDraft,
@@ -14,7 +14,7 @@ import {
   snapshotAgentDraft,
 } from '../../../model';
 
-type AgentSavePhase = 'clean' | 'dirty' | 'saving' | 'failed';
+type AgentSavePhase = 'clean' | 'saving' | 'failed';
 
 interface UseAgentDraftSessionControllerOptions {
   agent: AgentDetail;
@@ -39,35 +39,12 @@ export function useAgentDraftSessionController({
 }: UseAgentDraftSessionControllerOptions) {
   const agentService = useAgentService();
   const initialSavedDraft = buildAgentDraft(agent);
-  const initialDraft =
-    isOwner && viewingVersion === null && !initialSavedDraft.spec.systemPrompt
-      ? {
-          ...initialSavedDraft,
-          spec: {
-            ...initialSavedDraft.spec,
-            systemPrompt: buildGuidedPrompt(getDefaultGuidedPromptFields(), true),
-          },
-        }
-      : initialSavedDraft;
-  const [draft, setDraftState] = useState(initialDraft);
-  const [savedSnapshot, setSavedSnapshot] = useState(() => snapshotAgentDraft(initialSavedDraft));
-  const [savePhase, setSavePhase] = useState<AgentSavePhase>(() =>
-    snapshotAgentDraft(initialDraft) === snapshotAgentDraft(initialSavedDraft) ? 'clean' : 'dirty'
-  );
-  const savePromiseRef = useRef<Promise<unknown> | null>(null);
-  const isDirty = savePhase === 'dirty' || savePhase === 'saving' || savePhase === 'failed';
-
-  const setDraft = (updater: (current: AgentDraft) => AgentDraft) =>
-    setDraftState((current) => {
-      const next = updater(current);
-      setSavePhase(snapshotAgentDraft(next) === savedSnapshot ? 'clean' : 'dirty');
-      return next;
-    });
+  const savedSnapshotRef = useRef(snapshotAgentDraft(initialSavedDraft));
+  const [draft, setDraftState] = useState(initialSavedDraft);
 
   const saveRequest = useApi(
     async (draftSnapshot: AgentDraft) => {
       if (!isOwner || viewingVersion !== null) return;
-      setSavePhase('saving');
       await agentService.saveAgentDraft({
         resourceId,
         draftVersion: baseAgent.draftVersion,
@@ -75,39 +52,43 @@ export function useAgentDraftSessionController({
         description: draftSnapshot.description.trim(),
         spec: draftSnapshot.spec,
       });
-      return snapshotAgentDraft(draftSnapshot);
     },
     {
       manual: true,
-      onSuccess: (savedDraftSnapshot) => {
-        if (!savedDraftSnapshot) return;
-        setSavedSnapshot(savedDraftSnapshot);
-        setDraftState((current) => {
-          setSavePhase(snapshotAgentDraft(current) === savedDraftSnapshot ? 'clean' : 'dirty');
-          return current;
-        });
-        toast.success(t('agent:page.saved'));
-      },
-      onErrorEffect: () => {
-        setSavePhase('failed');
-      },
+      showErrorToast: false,
     }
   );
 
-  const saveDraftRequest = async () => {
-    if (savePromiseRef.current) {
-      await savePromiseRef.current;
-      return;
-    }
-    const draftSnapshot = structuredClone(draft);
-    const request = saveRequest.runAsync(draftSnapshot);
-    savePromiseRef.current = request;
-    try {
-      await request;
-    } finally {
-      savePromiseRef.current = null;
-    }
-  };
+  const autoSave = useDebouncedSave<AgentDraft>({
+    canSave: () => isOwner && viewingVersion === null,
+    save: async (draftSnapshot) => {
+      await saveRequest.runAsync(draftSnapshot);
+    },
+    onSuccess: (savedDraft) => {
+      savedSnapshotRef.current = snapshotAgentDraft(savedDraft);
+    },
+  });
+  const savePhase: AgentSavePhase =
+    autoSave.status === 'failed' ? 'failed' : autoSave.status === 'idle' ? 'clean' : 'saving';
+  const isDirty = autoSave.status !== 'idle';
+
+  const setDraft = (updater: (current: AgentDraft) => AgentDraft) =>
+    setDraftState((current) => {
+      const next = updater(current);
+      const nextSnapshot = snapshotAgentDraft(next);
+      if (nextSnapshot === savedSnapshotRef.current) {
+        if (autoSave.status === 'saving') {
+          autoSave.schedule(structuredClone(next));
+        } else {
+          autoSave.cancel();
+        }
+      } else {
+        autoSave.schedule(structuredClone(next));
+      }
+      return next;
+    });
+
+  const saveDraftRequest = () => autoSave.flush();
 
   const publishRequest = useApi(
     async () => {
@@ -135,11 +116,7 @@ export function useAgentDraftSessionController({
 
   const setSpec = (spec: AgentSpec) => setDraft((current) => ({ ...current, spec }));
   const isReadOnly =
-    !isOwner ||
-    viewingVersion !== null ||
-    saveRequest.loading ||
-    publishRequest.loading ||
-    versionLoading;
+    !isOwner || viewingVersion !== null || publishRequest.loading || versionLoading;
 
   return {
     currentDraftAgent: buildCurrentDraftAgent(baseAgent, draft, t('agent:page.currentAgent')),
@@ -148,12 +125,8 @@ export function useAgentDraftSessionController({
     isReadOnly,
     publishDraft: () => publishRequest.run(),
     publishLoading: publishRequest.loading,
-    saveDraft: () => {
-      void saveDraftRequest().catch(() => undefined);
-    },
     saveDraftForDebug,
     saveDraftRequest,
-    saveLoading: saveRequest.loading,
     savePhase,
     setDescription: (description: string) => setDraft((current) => ({ ...current, description })),
     setName: (name: string) => setDraft((current) => ({ ...current, name })),

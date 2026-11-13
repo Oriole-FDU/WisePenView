@@ -1,5 +1,8 @@
+import type { ReactNode } from 'react';
+
 export interface ChatHeaderProps {
   panelTitle: string;
+  titleMeta?: ReactNode;
   sessionBarOpen: boolean;
   showCollapseButton: boolean;
   /** Workspace 右栏贴窗时为 true，为 Win overlay 按钮让位 */

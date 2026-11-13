@@ -1,18 +1,49 @@
 @use '@/styles/mixins/scrollbar' as scrollbar;
-@use '@/styles/mixins/breakpoints' as breakpoints;
 
 .pageWrap {
   min-height: 0;
 }
-.page {
+
+.frame {
   height: 100%;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
+  background: var(--background);
+  container-name: agent-editor;
+  container-type: inline-size;
+}
+
+.page {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   background: var(--background);
 }
+.resizableGroup {
+  height: 100%;
+}
+.formPanel {
+  min-width: 0;
+  min-height: 0;
+}
 .content {
+  /* Agent 设置以留白分区，避免长表单被密集分隔线切碎。 */
+  --app-form-section-inline-padding: var(--space-xl);
+  --app-form-section-padding-top: var(--space-md);
+  --app-form-section-padding-bottom: var(--space-lg);
+  --app-form-section-last-padding-bottom: var(--space-xl);
+  --app-form-section-header-gap: var(--space-sm);
+  --app-form-section-title-size: var(--font-size-heading-4);
+  --app-form-row-min-height: 56px;
+  --app-form-row-padding-block: var(--space-xs);
+  --app-form-row-gap: var(--space-md);
+  --app-form-row-title-size: var(--font-size-base);
+  --app-form-row-direction: row;
+  --app-form-row-align: center;
+  --app-form-row-control-width: auto;
+  --app-form-section-divider: 0;
+  --app-form-row-divider: 0;
+  --app-form-section-inner-margin: 0;
   min-width: 0;
   min-height: 0;
   height: 100%;
@@ -20,6 +51,41 @@
   background: var(--surface);
   scroll-behavior: smooth;
   @include scrollbar.appSubtleScrollbar();
+}
+
+.chatPanel {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.chatPanelInner {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.chatDebugMeta {
+  flex: 0 0 auto;
+  padding: 0 var(--space-2xs-plus);
+  border-radius: var(--app-radius-menu-item);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-xs);
+}
+
+.chatPanelBody {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
 }
 .overlay {
   height: 100%;
@@ -35,11 +101,31 @@
   gap: var(--space-sm);
 }
 .saveStatus {
-  color: var(--warning-text);
+  color: var(--muted);
   font-size: var(--font-size-xs);
 }
-@media (max-width: breakpoints.$breakpoint-md) {
-  .page {
-    grid-template-columns: 1fr;
+
+.saveStatus[data-phase='failed'] {
+  color: var(--danger-text);
+}
+
+@container agent-editor (max-width: 720px) {
+  .content {
+    --app-form-section-inline-padding: var(--space-md);
+    --app-form-section-padding-top: var(--space-sm);
+    --app-form-section-padding-bottom: var(--space-md);
+    --app-form-section-last-padding-bottom: var(--space-lg);
+    --app-form-section-header-gap: var(--space-sm);
+  }
+}
+
+@container agent-editor (max-width: 520px) {
+  .content {
+    --app-form-row-min-height: 0;
+    --app-form-row-padding-block: 10px;
+    --app-form-row-gap: var(--space-xs);
+    --app-form-row-direction: column;
+    --app-form-row-align: stretch;
+    --app-form-row-control-width: 100%;
   }
 }

@@ -1,6 +1,5 @@
 .dropZone {
   position: relative;
-  border-radius: var(--app-radius-content);
 }
 
 .dropHint {
@@ -19,8 +18,54 @@
   pointer-events: none;
 }
 
-.empty {
-  padding: var(--space-md-plus);
+.assetRow {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--space-sm);
+  border-top: 1px solid var(--separator);
+}
+
+.assetRow:first-child {
+  border-top: 0;
+}
+
+.assetIcon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--muted);
-  text-align: center;
+  border: 1px solid var(--separator);
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+}
+
+.assetCopy {
+  min-width: 0;
+}
+
+.assetCopy strong,
+.assetCopy small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assetCopy strong {
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.assetCopy small {
+  margin-top: var(--space-3xs);
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
 }

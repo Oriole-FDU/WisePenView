@@ -3,40 +3,28 @@ const enUSAgent = {
     noDescription: 'No description',
     unavailable: 'Unavailable',
     done: 'Done',
-    restorePreset: 'Restore preset',
   },
   page: {
-    anchor: {
-      basic: 'Basic info',
-      prompt: 'System Prompt',
-      model: 'Model',
-      capabilities: 'Tools and Skills',
-      memory: 'Memory',
-      assets: 'Assets',
-    },
     saveStatus: {
-      dirty: 'Unsaved changes',
       saving: 'Saving...',
       failed: 'Save failed',
-      clean: 'Saved to cloud',
+      clean: 'Saved',
     },
-    saved: 'Agent saved',
     published: 'Agent published',
     publishAction: 'Publish',
     assetUploaded: 'Asset uploaded',
     assetDeleted: 'Asset deleted',
     switchVersionBlocked: 'Save or discard your changes before switching versions',
     currentAgent: 'Current Agent',
+    displayNameLabel: 'Agent display name',
+    displayNameEdit: 'Edit Agent display name',
+    displayNameRenamed: 'Display name updated',
+    debugChat: 'Agent debug chat',
+    debugChatHint: 'Test how this Agent responds',
+    resizeLayout: 'Resize form and debug chat',
     openFailed: 'Unable to open Agent',
     backToDrive: 'Back to drive',
     loading: 'Loading Agent...',
-    promptReset: {
-      title: 'Guided editing is unavailable',
-      description:
-        'The preset heading structure in this System Prompt is invalid. Clearing it will delete the current content and rebuild it from the general preset.',
-      cancel: 'Keep free editing',
-      confirm: 'Clear and switch',
-    },
     debugSave: {
       title: 'Save before debugging?',
       description:
@@ -55,18 +43,17 @@ const enUSAgent = {
       description: 'Delete this asset from the current Agent draft?',
     },
   },
-  navigation: { aria: 'Agent configuration navigation', title: 'Agent configuration navigation' },
   basic: {
     title: 'Basic information',
     nameLabel: 'Agent name',
     descriptionLabel: 'Purpose',
     descriptionPlaceholder: 'Summarize the tasks this Agent is suited for',
-    autoTitle: 'Generate conversation titles',
   },
   model: {
-    title: 'Model',
+    title: 'Model and conversation',
     default: 'Default model',
     allowSwitch: 'Allow model switching',
+    autoTitle: 'Generate conversation titles',
   },
   memory: {
     title: 'Memory',
@@ -74,14 +61,12 @@ const enUSAgent = {
     persist: 'Save conversation history',
     summary: 'Summarize long conversations',
     longTerm: 'Long-term memory across conversations',
-    collapse: 'Hide settings',
-    more: 'More settings',
-    advanced: 'Advanced parameters',
+    advanced: 'Memory parameters',
     restore: 'Restore recommended preset',
-    highWatermark: 'Summary trigger {{percent}}%',
-    lowWatermark: 'Summary target {{percent}}%',
+    highWatermark: 'Summary trigger',
+    lowWatermark: 'Summary target',
     recallLimit: 'Long-term memory recall count',
-    scoreThreshold: 'Long-term memory relevance {{percent}}%',
+    scoreThreshold: 'Long-term memory relevance',
     summaryPrompt: 'Summary prompt',
     summaryPlaceholder: 'Leave blank to use the WisePen default',
     restoreTitle: 'Restore recommended preset?',
@@ -89,9 +74,15 @@ const enUSAgent = {
       'This restores the advanced parameters to WisePen recommended values. Modified ratios, recall count, relevance, and summary prompt will be overwritten. The four memory switches will not change.',
   },
   capabilities: {
-    title: 'Tools and Skills',
+    title: 'Capabilities',
+    tools: 'Tools',
+    skills: 'Skills',
+    addTool: 'Add Tool',
+    addSkill: 'Add Skill',
+    noSelectedTool: 'No Tools added',
+    noSelectedSkill: 'No Skills added',
     helpLabel: 'View help for “{{title}}”',
-    defaultToolSelection: 'Enable Tools by default',
+    advancedTitle: 'Tool exceptions',
     enabledToolOverrides: 'Always enabled Tools',
     enabledToolOverridesDescription: 'Enable these Tools regardless of the default policy',
     addEnabledToolOverride: 'Add enabled Tool override',
@@ -101,12 +92,8 @@ const enUSAgent = {
     searchTool: 'Search Tool names or descriptions',
     noTool: 'No matching Tools',
     noToolOverride: 'No overrides configured',
-    onDemandSkill: 'On-demand Skills',
-    onDemandSkillDescription: 'Add Skills the Agent may load when relevant',
-    addOnDemandSkill: 'Add on-demand Skill',
     searchSkill: 'Search Skill names or descriptions',
     noSkill: 'No matching Skills',
-    noSelectedSkill: 'No Skills selected',
     toolDisabled: 'This Tool is disabled',
     toolRequiresConfig: 'This Tool requires configuration',
     toolIncomplete: 'This Tool configuration is incomplete',
@@ -115,12 +102,8 @@ const enUSAgent = {
   },
   assets: {
     title: 'Assets',
+    listTitle: 'Assets',
     upload: 'Upload assets',
-    tableAria: 'Agent assets',
-    file: 'File',
-    typeAndSize: 'Type and size',
-    status: 'Status',
-    actions: 'Actions',
     empty: 'No assets',
     available: 'Available',
     uploading: 'Uploading',
@@ -128,82 +111,31 @@ const enUSAgent = {
     drop: 'Release to upload assets',
   },
   prompt: {
-    title: 'System Prompt',
-    modeAria: 'System Prompt editing mode',
-    guided: 'Guided',
-    free: 'Free edit',
-    markdownLabel: 'System Prompt Markdown',
-    compatible: 'This content can return to guided editing',
-    incompatible: 'This content cannot return to guided editing',
-    guidedTitle: 'Role and workflow',
-    fieldHelpLabel: 'View help for “{{label}}”',
-    restore: 'Restore general preset',
-    soulTitle: 'SOUL (optional)',
-    soulAria: 'Enable SOUL',
-    restoreTitle: 'Restore general preset?',
-    restoreDescription:
-      'This rebuilds the System Prompt from the general template and overwrites the current guided and SOUL content.',
-    field: {
-      overview: {
-        label: 'Overview',
-        description: 'What does this Agent do? When should and should it not be used?',
-      },
-      context: { label: 'Context', description: 'What background does it need?' },
-      workflow: { label: 'Workflow', description: 'How should it approach tasks?' },
-      outputFormat: { label: 'Output Format', description: 'How should it organize responses?' },
-      exampleOutput: {
-        label: 'Example Output',
-        description: 'Provide a response skeleton that can be adapted to the task.',
-      },
-      qualityChecks: {
-        label: 'Quality Checks',
-        description: 'How should it ensure reliable results?',
-      },
-      whenToAsk: {
-        label: 'When To Ask First',
-        description: 'When must it ask the user before proceeding?',
-      },
-      soulRole: {
-        label: 'Role & Relationship',
-        description: 'How should it collaborate with the user?',
-      },
-      soulStyle: { label: 'Communication Style', description: 'How should it communicate?' },
-      soulInitiative: { label: 'Initiative Level', description: 'How proactive should it be?' },
-      soulTaste: { label: 'Quality Taste', description: 'What does it consider a good result?' },
-      soulTruth: {
-        label: 'Truth & Uncertainty',
-        description: 'How should it handle evidence, inference, and uncertainty?',
-      },
-      soulBoundaries: { label: 'Boundaries', description: 'What must it never do?' },
+    title: 'Instructions',
+    label: 'System Prompt',
+    placeholder: 'Describe the Agent’s role, goals, workflow, and boundaries.',
+    useTemplate: 'Use template',
+    replaceWithTemplate: 'Replace',
+    templateConfirmTitle: 'Replace the current instructions?',
+    templateConfirmDescription: 'The current System Prompt will be replaced with the template.',
+    template: {
+      roleTitle: 'Role',
+      role: '(Example: You are a research assistant for a product team.)',
+      goalTitle: 'Goal',
+      goal: '(Example: Turn scattered materials into actionable research conclusions.)',
+      workflowTitle: 'Workflow',
+      workflow: '(Example: Read the attachments, list key questions, then provide conclusions.)',
+      outputTitle: 'Output',
+      output: '(Example: Give the conclusion, then list evidence and next steps.)',
+      qualityTitle: 'Quality checks',
+      quality: '(Example: Check figures, label inferences, and list uncertainties.)',
+      boundariesTitle: 'Boundaries',
+      boundaries:
+        '(Example: Do not make final medical decisions for the user or disclose private information.)',
     },
   },
-  defaultPrompt: {
-    overview:
-      'This Agent helps users analyze problems, develop plans, write and review content, and complete concrete tasks. It is suited to work requiring structured reasoning, judgment, creation, revision, and execution. It should not make high-risk final decisions for the user or assert uncertain facts without evidence.',
-    context:
-      'Use information supplied by the user, conversation context, available attachments, and tool results. Do not assume background, permissions, or facts the user has not provided. Identify missing critical information.',
-    workflow:
-      'Clarify the goal and completion criteria, then decide whether the available information is sufficient. Handle simple tasks directly and break complex tasks into clear steps. Use available sources or tools when verification is needed, and check requirements, constraints, and next actions before finishing.',
-    outputFormat:
-      'Choose the structure best suited to the task. Lead with the conclusion or directly usable result, then provide necessary evidence, steps, limitations, and next actions. Do not add hierarchy that does not help.',
-    exampleOutput:
-      'Result:\nProvide content the user can use directly.\n\nKey evidence:\n- Explain important judgments, sources, or assumptions.\n\nNext steps:\n- List confirmations or actions that remain.',
-    qualityChecks:
-      'Before submitting, verify that the result fully addresses the goal, distinguishes facts from inference, supports key conclusions, follows the requested format, and contains no fabricated details, missed constraints, or contradictions.',
-    whenToAsk:
-      'Ask first when critical missing information would materially affect the result, when multiple choices would change its direction, or when an action carries high risk, is irreversible, affects privacy or permissions, or has external impact.',
-    soulRole:
-      'Act as a reliable collaborator, not merely a command executor. Respect the user’s judgment while calmly identifying risks or better paths when needed.',
-    soulStyle:
-      'Be concise, natural, and considerate, and direct when useful. Avoid bureaucracy, filler, excessive apologies, and pretending to know everything.',
-    soulInitiative:
-      'Proceed proactively with low-risk, reversible details. Ask before high-risk, irreversible, or direction-changing decisions.',
-    soulTaste:
-      'Prefer clear, well-structured, actionable, evidence-based results. Avoid needless complexity, excessive packaging, and polished language that does not help.',
-    soulTruth:
-      'Distinguish facts, inferences, and recommendations. Explain what is uncertain and how it can be verified.',
-    soulBoundaries:
-      'Do not fabricate, pretend to have seen unavailable content, disclose private information, manipulate the user, or sacrifice truth to be agreeable.',
+  advanced: {
+    title: 'Advanced',
   },
 };
 

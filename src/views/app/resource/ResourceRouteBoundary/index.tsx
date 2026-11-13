@@ -54,6 +54,7 @@ function ResourceRouteBoundary() {
   const search = new URLSearchParams(location.search);
   const viewerParam = search.get('viewer') ?? undefined;
   const resourceKind = normalizeResourceKind(rawResourceType);
+  const isAgentResource = resourceKind === RESOURCE_KIND.AGENT;
   const isNoteResource = resourceKind === RESOURCE_KIND.NOTE;
   const target: ResourceTarget = {
     resourceType: rawResourceType,
@@ -105,7 +106,9 @@ function ResourceRouteBoundary() {
   };
 
   const chatContext = useResourceChatContextStore((state) => state.context);
-  useMount(() => openPanel('chat'));
+  useMount(() => {
+    if (!isAgentResource) openPanel('chat');
+  });
   useUnmount(closePanel);
   /**
    * @wisepen-manual-effect
@@ -114,6 +117,15 @@ function ResourceRouteBoundary() {
    * cleanup：移除当前资源的选区和匹配信息。
    */
   useEffect(() => () => resourceChatContextActions.clearContext(), []);
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：进入 Agent 资源或 Agent 路由下外层右栏仍停留在 Chat。
+   * 不可替代原因：Agent 的调试 Chat 已由编辑器内部持有，外层通用 Chat 必须关闭以避免双实例。
+   * cleanup：没有订阅或延迟任务，无需清理。
+   */
+  useEffect(() => {
+    if (isAgentResource && activePanelId === 'chat') closePanel();
+  }, [activePanelId, closePanel, isAgentResource]);
 
   const navigateResourceHash = (hash: string) => {
     void navigate(
@@ -143,17 +155,19 @@ function ResourceRouteBoundary() {
           onPanelResize={setPanelWidth}
           main={
             <>
-              <WorkspacePanelPortal panelId="chat">
-                <GuideAnchor id={GUIDE_TOOL_ID.noteAiPanel} layout="fill">
-                  <ResourceChatPanel
-                    target={routeContext}
-                    showCollapseButton
-                    onCollapsePanel={closePanel}
-                    context={chatContext}
-                    clearContext={resourceChatContextActions.clearContext}
-                  />
-                </GuideAnchor>
-              </WorkspacePanelPortal>
+              {!isAgentResource ? (
+                <WorkspacePanelPortal panelId="chat">
+                  <GuideAnchor id={GUIDE_TOOL_ID.noteAiPanel} layout="fill">
+                    <ResourceChatPanel
+                      target={routeContext}
+                      showCollapseButton
+                      onCollapsePanel={closePanel}
+                      context={chatContext}
+                      clearContext={resourceChatContextActions.clearContext}
+                    />
+                  </GuideAnchor>
+                </WorkspacePanelPortal>
+              ) : null}
               <ResourceHost
                 routeContext={routeContext}
                 openResource={openResource}
