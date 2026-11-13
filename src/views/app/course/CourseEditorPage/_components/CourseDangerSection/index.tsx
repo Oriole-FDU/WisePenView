@@ -44,7 +44,6 @@ function CourseDangerSection({ courseId, courseName }: CourseDangerSectionProps)
       <div className={styles.sectionHead}>
         <div>
           <h2>{t('editor.danger.title')}</h2>
-          <p>{t('editor.danger.description')}</p>
         </div>
       </div>
       <div className={styles.dangerActions}>

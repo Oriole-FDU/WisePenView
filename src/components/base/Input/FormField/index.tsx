@@ -1,17 +1,18 @@
-import { Description, ErrorMessage, Label, TextField } from '@heroui/react';
+import { ErrorMessage, Label, TextField } from '@heroui/react';
 import { clsx } from 'clsx';
+
+import FieldHelp from '@/components/base/FieldHelp';
 
 import type { FormFieldProps } from './index.type';
 import styles from './style.module.scss';
 
 function FormField({
   label,
-  description,
+  help,
   errorMessage,
   children,
   className,
   labelClassName,
-  descriptionClassName,
   errorClassName,
   isInvalid,
   isRequired,
@@ -26,17 +27,17 @@ function FormField({
       isRequired={isRequired}
       {...props}
     >
-      {label ? (
-        <Label className={clsx(styles.label, labelClassName)} isRequired={isRequired}>
-          {label}
-        </Label>
+      {label || help ? (
+        <div className={styles.labelRow}>
+          {label ? (
+            <Label className={clsx(styles.label, labelClassName)} isRequired={isRequired}>
+              {label}
+            </Label>
+          ) : null}
+          {help ? <FieldHelp {...help} /> : null}
+        </div>
       ) : null}
       {children}
-      {description ? (
-        <Description className={clsx(styles.description, descriptionClassName)}>
-          {description}
-        </Description>
-      ) : null}
       {errorMessage ? (
         <ErrorMessage className={clsx(styles.error, errorClassName)}>{errorMessage}</ErrorMessage>
       ) : null}

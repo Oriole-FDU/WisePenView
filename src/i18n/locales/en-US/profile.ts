@@ -59,8 +59,6 @@ const enUSProfile = {
       maxOutputTokens: 'Maximum output (tokens)',
       maxOutputTokensHint: 'Leave empty to use the backend default.',
       maxOutputTokensPlaceholder: 'For example: 4096',
-      streamingUnsupported:
-        'Streaming is handled by the Chat API. The backend does not currently expose a separate model switch.',
       provider: 'Provider',
       providerModelName: 'Provider model name',
       providerModelNamePlaceholder: 'For example: gpt-4o-mini',

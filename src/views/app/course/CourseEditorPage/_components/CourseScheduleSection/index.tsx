@@ -38,7 +38,6 @@ function CourseScheduleSection({ form, onUpdate, onUpdateMeeting }: CourseSchedu
       <div className={styles.sectionHead}>
         <div>
           <h2>{t('editor.schedule.title')}</h2>
-          <p>{t('editor.schedule.description')}</p>
         </div>
       </div>
       <div className={styles.dateRangeField}>
@@ -66,7 +65,6 @@ function CourseScheduleSection({ form, onUpdate, onUpdateMeeting }: CourseSchedu
       <div className={styles.subsectionHead}>
         <div>
           <h3>{t('editor.schedule.meetings')}</h3>
-          <p>{t('editor.schedule.meetingsHint')}</p>
         </div>
         <AppButton
           variant="secondary"

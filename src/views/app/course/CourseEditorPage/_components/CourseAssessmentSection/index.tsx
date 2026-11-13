@@ -20,23 +20,27 @@ import { CourseDateField, CourseTimeField } from '../CourseEditorDateFields';
 interface CourseAssessmentSectionProps {
   form: CourseEditorForm;
   assessmentTotal: number;
+  assessmentError?: string;
   noFinalAssessmentValue: string;
   hasNoFinalAssessment: boolean;
   onUpdate: UpdateCourseEditorForm;
   onUpdateAssessment: (editorId: string, patch: Partial<CourseAssessmentItem>) => void;
   onUpdateDeadlineDate: (value: string) => void;
   onUpdateDeadlineTime: (value: string) => void;
+  onBlurAssessment: (field: 'assessmentItems') => void;
 }
 
 function CourseAssessmentSection({
   form,
   assessmentTotal,
+  assessmentError,
   noFinalAssessmentValue,
   hasNoFinalAssessment,
   onUpdate,
   onUpdateAssessment,
   onUpdateDeadlineDate,
   onUpdateDeadlineTime,
+  onBlurAssessment,
 }: CourseAssessmentSectionProps) {
   const { t } = useTranslation('course');
 
@@ -45,11 +49,21 @@ function CourseAssessmentSection({
       <div className={styles.sectionHead}>
         <div>
           <h2>{t('editor.assessment.title')}</h2>
-          <p>{t('editor.assessment.description')}</p>
         </div>
       </div>
-      <div className={styles.assessmentWorkbench}>
+      <div
+        className={styles.assessmentWorkbench}
+        onBlur={() => onBlurAssessment('assessmentItems')}
+      >
         <div className={styles.assessmentEditor}>
+          <span className={styles.assessmentTotal} aria-live="polite">
+            {t('editor.assessment.total', { total: assessmentTotal })}
+          </span>
+          {assessmentError ? (
+            <p className={styles.validationMessage} role="alert">
+              {assessmentError}
+            </p>
+          ) : null}
           <div className={styles.assessmentColumns}>
             <span>{t('editor.fields.assessmentName')}</span>
             <span>{t('editor.fields.weight')}</span>
@@ -111,7 +125,6 @@ function CourseAssessmentSection({
           }))}
           targetValue={100}
           title={t('editor.assessment.chartTitle')}
-          description={t('editor.assessment.chartDescription')}
           unallocatedLabel={t('editor.assessment.unallocated')}
           emptyLabel={t('editor.assessment.unallocated')}
           valueFormatter={(value) => `${value}%`}
@@ -122,7 +135,6 @@ function CourseAssessmentSection({
         <div className={styles.subsectionHead}>
           <div>
             <h3>{t('editor.assessment.final')}</h3>
-            <p>{t('editor.assessment.finalDescription')}</p>
           </div>
         </div>
         <Select

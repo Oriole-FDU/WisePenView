@@ -65,7 +65,7 @@
 .advanced label {
   display: block;
   margin-bottom: var(--space-xs);
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 
 @media (max-width: breakpoints.$breakpoint-md) {

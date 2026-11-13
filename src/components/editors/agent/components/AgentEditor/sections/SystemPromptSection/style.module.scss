@@ -35,13 +35,7 @@
 }
 .groupHead strong,
 .soulHead strong {
-  font-size: 15px;
-}
-.groupHead p,
-.soulHead p {
-  margin: var(--space-2xs) 0 0;
-  color: var(--muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-heading-5);
 }
 .groupHead {
   margin-bottom: var(--space-sm);
@@ -63,6 +57,7 @@
   justify-content: space-between;
   margin-bottom: 10px;
 }
+
 .editorHead span {
   color: var(--success-text);
   font-size: var(--font-size-xs);

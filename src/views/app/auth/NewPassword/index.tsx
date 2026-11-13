@@ -11,8 +11,8 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useAuthService } from '@/domains';
 import type { NewPasswordRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
+import { useFormValidation } from '@/hooks/useFormValidation';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { type FieldErrors, hasFieldErrors } from '@/utils/validation/formValidation';
 
 import { validateConfirmPasswordField, validatePasswordField } from '../_common/passwordValidation';
 import auth from '../_common/style.module.scss';
@@ -32,8 +32,6 @@ function NewPassword() {
   const { t } = useTranslation('auth');
   const [token, setToken] = useState('');
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [formValues, setFormValues] = useState<NewPasswordFormValues>(DEFAULT_NEW_PASSWORD_VALUES);
-  const [formErrors, setFormErrors] = useState<FieldErrors<NewPasswordField>>({});
   const navigate = useNavigate();
 
   useMount(() => {
@@ -41,18 +39,28 @@ function NewPassword() {
     setToken(queryToken);
   });
 
-  const { loading, run: submitNewPassword } = useApi(
-    async (values: NewPasswordFormValues) =>
-      authService.newPassword({ newPassword: values.newPassword, token }),
-    {
-      manual: true,
-      onSuccess: () => {
-        setSuccessModalOpen(true);
-      },
+  const validateField = (
+    field: NewPasswordField,
+    values: NewPasswordFormValues
+  ): string | undefined => {
+    switch (field) {
+      case 'newPassword':
+        return validatePasswordField(values.newPassword, {
+          required: t('newPassword.passwordRequired'),
+          minLength: t('newPassword.passwordMinLength'),
+          containsLetter: t('newPassword.passwordContainsLetter'),
+          containsNumber: t('newPassword.passwordContainsNumber'),
+        });
+      case 'confirmPassword':
+        return validateConfirmPasswordField(values.confirmPassword, values.newPassword, {
+          required: t('newPassword.confirmPasswordRequired'),
+          mismatch: t('newPassword.confirmPasswordMismatch'),
+        });
+      default:
+        return undefined;
     }
-  );
-
-  const isFieldEmpty = (field: NewPasswordField, values: NewPasswordFormValues): boolean => {
+  };
+  const isFieldEmpty = (field: NewPasswordField, values: NewPasswordFormValues) => {
     switch (field) {
       case 'newPassword':
         return values.newPassword.length === 0;
@@ -63,70 +71,31 @@ function NewPassword() {
     }
   };
 
-  const validateField = (
-    field: NewPasswordField,
-    values: NewPasswordFormValues,
-    options: { withRequired?: boolean } = {}
-  ): string | undefined => {
-    if (!options.withRequired && isFieldEmpty(field, values)) return undefined;
-
-    switch (field) {
-      case 'newPassword':
-        return validatePasswordField(
-          values.newPassword,
-          {
-            required: t('newPassword.passwordRequired'),
-            minLength: t('newPassword.passwordMinLength'),
-            containsLetter: t('newPassword.passwordContainsLetter'),
-            containsNumber: t('newPassword.passwordContainsNumber'),
-          },
-          options
-        );
-      case 'confirmPassword':
-        return validateConfirmPasswordField(
-          values.confirmPassword,
-          values.newPassword,
-          {
-            required: t('newPassword.confirmPasswordRequired'),
-            mismatch: t('newPassword.confirmPasswordMismatch'),
-          },
-          options
-        );
-      default:
-        return undefined;
+  const validation = useFormValidation<NewPasswordFormValues, NewPasswordField>({
+    initialValues: DEFAULT_NEW_PASSWORD_VALUES,
+    fields: ['newPassword', 'confirmPassword'],
+    validateField,
+    isFieldEmpty,
+  });
+  const { loading, run: submitNewPassword } = useApi(
+    async (values: NewPasswordFormValues) =>
+      authService.newPassword({ newPassword: values.newPassword, token }),
+    {
+      manual: true,
+      onSuccess: () => {
+        setSuccessModalOpen(true);
+      },
     }
-  };
+  );
+  const formValues = validation.values;
 
   const updateFormValue = (field: NewPasswordField, value: string) => {
-    const nextValues = { ...formValues, [field]: value };
-    setFormValues(nextValues);
-    const fieldsToValidate: NewPasswordField[] =
-      field === 'newPassword' ? ['newPassword', 'confirmPassword'] : [field];
-    setFormErrors((prev) => {
-      const nextErrors = { ...prev };
-      fieldsToValidate.forEach((key) => {
-        nextErrors[key] = validateField(key, nextValues);
-      });
-      return nextErrors;
-    });
-  };
-
-  const handleFieldBlur = (field: NewPasswordField) => {
-    setFormErrors((prev) => ({ ...prev, [field]: validateField(field, formValues) }));
-  };
-
-  const validateForm = () => {
-    const nextErrors: FieldErrors<NewPasswordField> = {
-      newPassword: validateField('newPassword', formValues, { withRequired: true }),
-      confirmPassword: validateField('confirmPassword', formValues, { withRequired: true }),
-    };
-    setFormErrors(nextErrors);
-    return !hasFieldErrors(nextErrors);
+    validation.changeField(field, value, field === 'newPassword' ? ['confirmPassword'] : []);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!validateForm()) return;
+    if (!validation.validateForm()) return;
     if (!token) {
       toast.danger(t('newPassword.tokenMissing'));
       return;
@@ -135,8 +104,7 @@ function NewPassword() {
   };
 
   const resetForm = () => {
-    setFormValues(DEFAULT_NEW_PASSWORD_VALUES);
-    setFormErrors({});
+    validation.reset();
   };
 
   return (
@@ -149,8 +117,8 @@ function NewPassword() {
           name="newPassword"
           value={formValues.newPassword}
           onChange={(value) => updateFormValue('newPassword', value)}
-          onBlur={() => handleFieldBlur('newPassword')}
-          errorMessage={formErrors.newPassword}
+          onBlur={() => validation.blurField('newPassword')}
+          errorMessage={validation.errors.newPassword}
           isRequired
         >
           <PasswordInput
@@ -167,8 +135,8 @@ function NewPassword() {
           name="confirmPassword"
           value={formValues.confirmPassword}
           onChange={(value) => updateFormValue('confirmPassword', value)}
-          onBlur={() => handleFieldBlur('confirmPassword')}
-          errorMessage={formErrors.confirmPassword}
+          onBlur={() => validation.blurField('confirmPassword')}
+          errorMessage={validation.errors.confirmPassword}
           isRequired
         >
           <PasswordInput

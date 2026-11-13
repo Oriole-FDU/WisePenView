@@ -57,36 +57,23 @@ const enUSAgent = {
   },
   navigation: { aria: 'Agent configuration navigation', title: 'Agent configuration navigation' },
   basic: {
-    title: 'Agent Info',
-    description:
-      'Set the internal Agent name and purpose. The resource title is managed in the drive.',
-    nameHint: 'Use a stable English name.',
-    descriptionHint: 'A clear description helps users understand what this Agent does.',
+    title: 'Basic information',
+    nameLabel: 'Agent name',
+    descriptionLabel: 'Purpose',
     descriptionPlaceholder: 'Summarize the tasks this Agent is suited for',
     autoTitle: 'Generate conversation titles',
-    autoTitleDescription: 'Generate a short title from the first user message.',
   },
   model: {
     title: 'Model',
-    description:
-      'Choose the default model and whether users may switch models during a conversation.',
     default: 'Default model',
-    defaultHint: 'Choose from models available to this account',
     allowSwitch: 'Allow model switching',
-    allowSwitchDescription: 'When disabled, conversations always use the model above.',
   },
   memory: {
     title: 'Memory',
-    description:
-      'Control how the Agent uses the current conversation, conversation history, and long-term memory.',
     chat: 'Conversation memory',
-    chatDescription: 'Use earlier messages from the current conversation to preserve context.',
     persist: 'Save conversation history',
-    persistDescription: 'Continue after reopening the conversation.',
     summary: 'Summarize long conversations',
-    summaryDescription: 'Compress earlier messages near the context limit.',
     longTerm: 'Long-term memory across conversations',
-    longTermDescription: 'Use relevant facts and preferences in future conversations.',
     collapse: 'Hide settings',
     more: 'More settings',
     advanced: 'Advanced parameters',
@@ -103,10 +90,8 @@ const enUSAgent = {
   },
   capabilities: {
     title: 'Tools and Skills',
-    description: 'Configure the tools and specialized capabilities available to this Agent.',
+    helpLabel: 'View help for “{{title}}”',
     defaultToolSelection: 'Enable Tools by default',
-    defaultToolSelectionDescription:
-      'Controls whether Tools without an explicit override are available.',
     enabledToolOverrides: 'Always enabled Tools',
     enabledToolOverridesDescription: 'Enable these Tools regardless of the default policy',
     addEnabledToolOverride: 'Add enabled Tool override',
@@ -130,7 +115,6 @@ const enUSAgent = {
   },
   assets: {
     title: 'Assets',
-    description: 'Provide reference files and scripts saved with each Agent version.',
     upload: 'Upload assets',
     tableAria: 'Agent assets',
     file: 'File',
@@ -145,19 +129,16 @@ const enUSAgent = {
   },
   prompt: {
     title: 'System Prompt',
-    description:
-      'Maintain the preset through a guided form or switch to free editing for the complete Markdown.',
     modeAria: 'System Prompt editing mode',
     guided: 'Guided',
     free: 'Free edit',
+    markdownLabel: 'System Prompt Markdown',
     compatible: 'This content can return to guided editing',
     incompatible: 'This content cannot return to guided editing',
-    agentDescription:
-      'Define the purpose, workflow, output structure, and confirmation boundaries.',
+    guidedTitle: 'Role and workflow',
+    fieldHelpLabel: 'View help for “{{label}}”',
     restore: 'Restore general preset',
     soulTitle: 'SOUL (optional)',
-    soulDescription:
-      'Define collaboration, communication, initiative, quality preferences, and boundaries.',
     soulAria: 'Enable SOUL',
     restoreTitle: 'Restore general preset?',
     restoreDescription:

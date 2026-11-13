@@ -28,16 +28,10 @@ export default function BasicInfoSection({
   const { t } = useTranslation('agent');
 
   return (
-    <AppForm.Section
-      id="agent-info"
-      title={t('basic.title')}
-      description={t('basic.description')}
-      variant="editor"
-    >
+    <AppForm.Section id="agent-info" title={t('basic.title')} variant="editor">
       <div className={styles.form}>
         <FormField
-          label="name"
-          description={t('basic.nameHint')}
+          label={t('basic.nameLabel')}
           value={name}
           isDisabled={disabled}
           onChange={onNameChange}
@@ -45,8 +39,7 @@ export default function BasicInfoSection({
           <Input maxLength={64} placeholder="course_research_assistant" />
         </FormField>
         <FormField
-          label="description"
-          description={t('basic.descriptionHint')}
+          label={t('basic.descriptionLabel')}
           value={description}
           isDisabled={disabled}
           onChange={onDescriptionChange}
@@ -55,7 +48,6 @@ export default function BasicInfoSection({
         </FormField>
         <AppForm.Row
           title={t('basic.autoTitle')}
-          description={t('basic.autoTitleDescription')}
           selected={spec.autoGenerateTitle}
           disabled={disabled}
           onChange={(value) => onSpecChange({ ...spec, autoGenerateTitle: value })}

@@ -46,6 +46,7 @@ const zhCNCommon = {
     closeAria: '关闭',
   },
   feedback: { empty: '暂无数据' },
+  fieldHelp: '查看「{{label}}」说明',
   tree: { collapse: '收起节点', expand: '展开节点', select: '选择节点' },
   uploadZone: {
     label: '点击或拖拽文件到此区域',

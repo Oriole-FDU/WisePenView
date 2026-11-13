@@ -67,7 +67,6 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
       <AppForm.Section
         id="prompt"
         title={t('prompt.title')}
-        description={t('prompt.description')}
         variant="editor"
         actions={
           <Tabs
@@ -96,7 +95,7 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
         {mode === 'free' ? (
           <div>
             <div className={styles.editorHead}>
-              <strong>System Prompt Markdown</strong>
+              <strong>{t('prompt.markdownLabel')}</strong>
               <span data-compatible={parsed.compatible}>
                 {parsed.compatible ? t('prompt.compatible') : t('prompt.incompatible')}
               </span>
@@ -114,8 +113,7 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
           <div className={styles.guided}>
             <div className={styles.groupHead}>
               <div>
-                <strong>Agent</strong>
-                <p>{t('prompt.agentDescription')}</p>
+                <strong>{t('prompt.guidedTitle')}</strong>
               </div>
               <AppButton
                 className={styles.presetButton}
@@ -131,7 +129,12 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
               <div key={field.key} className={styles.promptField}>
                 <FormField
                   label={t(`prompt.field.${field.key}.label`)}
-                  description={t(`prompt.field.${field.key}.description`)}
+                  help={{
+                    label: t('prompt.fieldHelpLabel', {
+                      label: t(`prompt.field.${field.key}.label`),
+                    }),
+                    content: t(`prompt.field.${field.key}.description`),
+                  }}
                   value={String(fields[field.key])}
                   isDisabled={disabled}
                   onChange={(value) => update({ ...fields, [field.key]: value })}
@@ -143,7 +146,6 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
             <div className={styles.soulHead}>
               <div>
                 <strong>{t('prompt.soulTitle')}</strong>
-                <p>{t('prompt.soulDescription')}</p>
               </div>
               <Switch
                 size="md"
@@ -160,7 +162,12 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
                 <div className={styles.promptField}>
                   <FormField
                     label={t('prompt.field.soulRole.label')}
-                    description={t('prompt.field.soulRole.description')}
+                    help={{
+                      label: t('prompt.fieldHelpLabel', {
+                        label: t('prompt.field.soulRole.label'),
+                      }),
+                      content: t('prompt.field.soulRole.description'),
+                    }}
                     value={fields.soulRole}
                     isDisabled={disabled}
                     onChange={(value) => update({ ...fields, soulRole: value })}
@@ -172,7 +179,12 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
                   <div key={field} className={styles.presetField}>
                     <FormField
                       label={t(`prompt.field.${field}.label`)}
-                      description={t(`prompt.field.${field}.description`)}
+                      help={{
+                        label: t('prompt.fieldHelpLabel', {
+                          label: t(`prompt.field.${field}.label`),
+                        }),
+                        content: t(`prompt.field.${field}.description`),
+                      }}
                       value={fields[field]}
                       isDisabled={disabled}
                       onChange={(value) => update({ ...fields, [field]: value })}

@@ -13,9 +13,11 @@ interface CourseBasicSectionProps {
   form: CourseEditorForm;
   saved: boolean;
   saving: boolean;
+  errors: Partial<Record<'name' | 'term', string>>;
   coverUrl: string;
   onUpdate: UpdateCourseEditorForm;
   onSave: () => void;
+  onBlur: (field: 'name' | 'term') => void;
   onChangeCover: () => void;
   onCoverImageError: (event: SyntheticEvent<HTMLImageElement>) => void;
 }
@@ -24,9 +26,11 @@ function CourseBasicSection({
   form,
   saved,
   saving,
+  errors,
   coverUrl,
   onUpdate,
   onSave,
+  onBlur,
   onChangeCover,
   onCoverImageError,
 }: CourseBasicSectionProps) {
@@ -37,7 +41,6 @@ function CourseBasicSection({
       <div className={styles.sectionHead}>
         <div>
           <h2>{t('editor.basic.title')}</h2>
-          <p>{t('editor.basic.description')}</p>
         </div>
         <div className={styles.saveActions}>
           <span className={saved ? styles.saved : styles.unsaved}>
@@ -55,6 +58,9 @@ function CourseBasicSection({
             label={t('editor.fields.name')}
             value={form.name}
             onChange={(value) => onUpdate('name', value)}
+            onBlur={() => onBlur('name')}
+            errorMessage={errors.name}
+            isRequired
           >
             <Input />
           </FormField>
@@ -62,6 +68,9 @@ function CourseBasicSection({
             label={t('editor.fields.term')}
             value={form.term}
             onChange={(value) => onUpdate('term', value)}
+            onBlur={() => onBlur('term')}
+            errorMessage={errors.term}
+            isRequired
           >
             <Input placeholder="2026-2027 春季" />
           </FormField>

@@ -15,22 +15,14 @@ const enUSSkill = {
   config: {
     title: 'Config',
     ariaLabel: 'Skill configuration',
-    introTitle: 'Skill Info',
-    intro:
-      'Enter a name and description to help the model understand when to use this Skill. Both fields are required for publishing.',
     nameAriaLabel: 'Skill name',
-    nameLabel: 'name',
-    nameDescription:
-      'A stable name used by the model to identify this Skill, such as planning_with_files.',
+    nameLabel: 'Name',
     nameRequired: 'Enter a name.',
     namePlaceholder: 'planning_with_files',
     descriptionAriaLabel: 'Skill description',
-    descriptionLabel: 'description',
-    descriptionHelp:
-      'Describe the tasks this Skill handles. A clear description helps the model select it correctly.',
+    descriptionLabel: 'Description',
     descriptionRequired: 'Enter a description.',
     descriptionPlaceholder: 'Describe the tasks this Skill handles',
-    publishBlocked: 'Enter a name and description before publishing the Skill.',
     dirty: 'Configuration changes have not been applied',
     reset: 'Reset',
     update: 'Update configuration',

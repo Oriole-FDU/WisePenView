@@ -6,6 +6,7 @@ import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { useCourseService, useImageService } from '@/domains';
 import type { CourseAssessmentItem, CourseDetail, CourseMeeting } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
+import { useFormValidation } from '@/hooks/useFormValidation';
 import { parseErrorMessage } from '@/utils/error';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
@@ -20,6 +21,10 @@ interface UseCourseEditorFormControllerParams {
   refreshCourse: () => void;
 }
 
+type CourseEditorField = keyof CourseEditorForm;
+
+const COURSE_EDITOR_VALIDATION_FIELDS: CourseEditorField[] = ['name', 'term', 'assessmentItems'];
+
 export function useCourseEditorFormController({
   course,
   refreshCourse,
@@ -27,7 +32,51 @@ export function useCourseEditorFormController({
   const { t } = useTranslation('course');
   const courseService = useCourseService();
   const imageService = useImageService();
-  const [form, setForm] = useState<CourseEditorForm>(() => mapCourseDetailToEditorForm(course));
+  const validateField = (
+    field: CourseEditorField,
+    values: CourseEditorForm
+  ): string | undefined => {
+    switch (field) {
+      case 'name':
+        return values.name.trim() ? undefined : t('editor.validation.nameRequired');
+      case 'term':
+        return values.term.trim() ? undefined : t('editor.validation.termRequired');
+      case 'assessmentItems': {
+        if (values.assessmentItems.length === 0) {
+          return t('editor.validation.assessmentRequired');
+        }
+        if (values.assessmentItems.some((item) => !item.label.trim())) {
+          return t('editor.validation.assessmentLabelRequired');
+        }
+        return values.assessmentItems.some(
+          (item) => !Number.isFinite(item.weight) || item.weight < 0 || item.weight > 100
+        )
+          ? t('editor.validation.assessmentWeightRange')
+          : undefined;
+      }
+      default:
+        return undefined;
+    }
+  };
+  const isFieldEmpty = (field: CourseEditorField, values: CourseEditorForm) => {
+    switch (field) {
+      case 'name':
+        return values.name.trim().length === 0;
+      case 'term':
+        return values.term.trim().length === 0;
+      case 'assessmentItems':
+        return values.assessmentItems.length === 0;
+      default:
+        return false;
+    }
+  };
+  const validation = useFormValidation<CourseEditorForm, CourseEditorField>({
+    initialValues: () => mapCourseDetailToEditorForm(course),
+    fields: COURSE_EDITOR_VALIDATION_FIELDS,
+    validateField,
+    isFieldEmpty,
+  });
+  const form = validation.values;
   const [saved, setSaved] = useState(true);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -35,7 +84,7 @@ export function useCourseEditorFormController({
   const [coverPreview, setCoverPreview] = useState<string>();
   const coverPreviewRequestRef = useRef(0);
 
-  const { loading: saving, run: saveCourse } = useApi(
+  const { loading: saving, runAsync: saveCourse } = useApi(
     async () => {
       let coverUrl = form.coverUrl.trim() || undefined;
       if (coverFile) {
@@ -61,7 +110,7 @@ export function useCourseEditorFormController({
         coverPreviewRequestRef.current += 1;
         setCoverFile(null);
         setCoverPreview(coverUrl);
-        setForm((current) => ({ ...current, coverUrl: coverUrl ?? '' }));
+        validation.changeField('coverUrl', coverUrl ?? '');
         setSaved(true);
         refreshCourse();
         toast.success(t('editor.saveSuccess'));
@@ -70,16 +119,22 @@ export function useCourseEditorFormController({
   );
 
   const updateForm = <K extends keyof CourseEditorForm>(key: K, value: CourseEditorForm[K]) => {
-    setForm((current) => ({ ...current, [key]: value }));
+    validation.changeField(key as CourseEditorField, value);
     setSaved(false);
   };
 
-  const handleSave = () => {
-    if (!form.name.trim() || !form.term.trim()) {
-      toast.warning(t('editor.required'));
-      return;
+  const saveCourseRequest = async () => {
+    if (!validation.validateForm()) return false;
+    try {
+      await saveCourse();
+      return true;
+    } catch {
+      return false;
     }
-    saveCourse();
+  };
+
+  const handleSave = () => {
+    void saveCourseRequest();
   };
 
   const handleCoverFileChange = (file: File | null) => {
@@ -149,15 +204,12 @@ export function useCourseEditorFormController({
 
   const updateDeadlineTime = (value: string) => {
     const nextTime = value || '23:59';
-    setForm((current) => {
-      const deadlineDate = current.finalAssessment.deadline?.split('T')[0];
-      return {
-        ...current,
-        finalAssessmentDeadlineTime: nextTime,
-        finalAssessment: deadlineDate
-          ? { ...current.finalAssessment, deadline: `${deadlineDate}T${nextTime}` }
-          : current.finalAssessment,
-      };
+    const deadlineDate = form.finalAssessment.deadline?.split('T')[0];
+    validation.changeValues({
+      finalAssessmentDeadlineTime: nextTime,
+      finalAssessment: deadlineDate
+        ? { ...form.finalAssessment, deadline: `${deadlineDate}T${nextTime}` }
+        : form.finalAssessment,
     });
     setSaved(false);
   };
@@ -177,7 +229,10 @@ export function useCourseEditorFormController({
       form.finalAssessment.customName?.trim() === noFinalAssessmentValue,
     saved,
     saving,
+    errors: validation.errors,
     handleSave,
+    saveCourseRequest,
+    blurField: validation.blurField,
     cover: {
       isOpen: coverModalOpen,
       modalFile: modalCoverFile,

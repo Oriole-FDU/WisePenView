@@ -24,33 +24,21 @@
 
 .heading {
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   display: flex;
-  align-items: baseline;
-  gap: 10px;
+  align-items: center;
+  gap: var(--space-3xs);
 }
 
-.header strong,
-.header span {
+.header strong {
   min-width: 0;
 }
 
 .header strong {
-  flex: 0 0 auto;
   color: var(--foreground);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-sm);
-}
-
-.header span {
-  flex: 1 1 auto;
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.45;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .options {
@@ -100,7 +88,7 @@
 
 .optionCopy strong {
   color: var(--foreground);
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
 }
 
@@ -171,7 +159,7 @@
 .selectedTitle strong {
   min-width: 0;
   color: var(--foreground);
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
 }
 
@@ -211,8 +199,6 @@
   }
 
   .heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 3px;
+    align-items: center;
   }
 }

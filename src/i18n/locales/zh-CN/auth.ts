@@ -3,7 +3,6 @@ const zhCNAuth = {
     formAria: '认证表单',
     showPassword: '显示密码',
     hidePassword: '隐藏密码',
-    passwordRules: '至少 9 位，需同时包含字母和数字。',
   },
   login: {
     title: '登录',
@@ -28,7 +27,7 @@ const zhCNAuth = {
     usernameLength: '用户名长度必须为 4-20 位',
     usernameContainsLetter: '用户名必须包含字母',
     usernameIsCampusNo: '用户名不能是学工号',
-    usernamePlaceholder: '4-20 位，需包含字母',
+    usernamePlaceholder: '4-20 位，含字母，可用数字或下划线',
     passwordLabel: '密码',
     passwordRequired: '请输入密码',
     passwordMinLength: '密码至少长度为9位',
@@ -50,6 +49,9 @@ const zhCNAuth = {
     registerSuccess: '注册成功',
     registerFailed: '注册失败',
     agreementRequired: '请接受用户协议',
+    leaveTitle: '离开注册页？',
+    leaveDescription: '已填写的注册信息不会保留。',
+    leaveConfirm: '放弃并离开',
   },
   onboarding: {
     title: '完成账号认证',

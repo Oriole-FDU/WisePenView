@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import FieldHelp from '@/components/base/FieldHelp';
 import { Autocomplete, SearchField } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 
@@ -89,7 +90,7 @@ export default function CapabilityPolicyPanel({
         <header className={styles.header}>
           <div className={styles.heading}>
             <strong>{title}</strong>
-            <span>{description}</span>
+            <FieldHelp label={t('capabilities.helpLabel', { title })} content={description} />
           </div>
           <AppIconButton
             icon={<Plus size={15} aria-hidden="true" />}

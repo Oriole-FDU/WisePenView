@@ -23,7 +23,7 @@ const PROVIDER_TYPES: ChatProviderType[] = [
 ];
 
 function ProviderSettingsSection() {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'common']);
   const chatConfigService = useChatConfigService();
   const [providers, setProviders] = useState<ChatProvider[]>([]);
   const [models, setModels] = useState<ChatModelConfig[]>([]);
@@ -310,7 +310,14 @@ function ProviderSettingsSection() {
           </Select>
           <FormField
             label={t('ai.byok.apiKey')}
-            description={editingProvider ? t('ai.byok.apiKeyHint') : undefined}
+            help={
+              editingProvider
+                ? {
+                    label: t('common:fieldHelp', { label: t('ai.byok.apiKey') }),
+                    content: t('ai.byok.apiKeyHint'),
+                  }
+                : undefined
+            }
             value={form.apiKey}
             onChange={(apiKey) => setForm((current) => ({ ...current, apiKey }))}
             isRequired={!editingProvider}
@@ -323,7 +330,10 @@ function ProviderSettingsSection() {
           </FormField>
           <FormField
             label={t('ai.byok.baseUrl')}
-            description={t('ai.byok.baseUrlHint')}
+            help={{
+              label: t('common:fieldHelp', { label: t('ai.byok.baseUrl') }),
+              content: t('ai.byok.baseUrlHint'),
+            }}
             value={form.baseUrl}
             onChange={(baseUrl) => setForm((current) => ({ ...current, baseUrl }))}
           >

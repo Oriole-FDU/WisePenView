@@ -48,7 +48,7 @@ function isValidOptionalPositiveInteger(value: string): boolean {
 }
 
 function ModelSettingsSection() {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'common']);
   const chatConfigService = useChatConfigService();
   const [models, setModels] = useState<ChatModelConfig[]>([]);
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
@@ -230,7 +230,10 @@ function ModelSettingsSection() {
           </div>
           <FormField
             label={t('ai.models.contextWindowTokens')}
-            description={t('ai.models.contextWindowTokensHint')}
+            help={{
+              label: t('common:fieldHelp', { label: t('ai.models.contextWindowTokens') }),
+              content: t('ai.models.contextWindowTokensHint'),
+            }}
             value={modelForm.contextWindowTokens}
             onChange={(contextWindowTokens) =>
               setModelForm((current) => ({ ...current, contextWindowTokens }))
@@ -247,7 +250,10 @@ function ModelSettingsSection() {
           </FormField>
           <FormField
             label={t('ai.models.maxOutputTokens')}
-            description={t('ai.models.maxOutputTokensHint')}
+            help={{
+              label: t('common:fieldHelp', { label: t('ai.models.maxOutputTokens') }),
+              content: t('ai.models.maxOutputTokensHint'),
+            }}
             value={modelForm.maxOutputTokens}
             onChange={(maxOutputTokens) =>
               setModelForm((current) => ({ ...current, maxOutputTokens }))
@@ -262,7 +268,6 @@ function ModelSettingsSection() {
               placeholder={t('ai.models.maxOutputTokensPlaceholder')}
             />
           </FormField>
-          <p className={styles.capabilityNote}>{t('ai.models.streamingUnsupported')}</p>
         </div>
       </AppFormDialog>
 

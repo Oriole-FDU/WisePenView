@@ -28,6 +28,7 @@
 - `context.md`：Context 的组成、归属、Provider 和消费规范。
 - `component-controller.md`：复杂组件和 Controller 拆分。
 - `component-style.md`：SCSS、CSS Modules、HeroUI 和样式规则。
+- `forms.md`：表单职责、帮助文案、校验时机、离开保护与排版层级。
 - `layout.md`：Layout 的职责、槽位、状态归属与依赖边界。
 - `overlay.md`：弹层触发、焦点和可访问性边界。
 

@@ -181,13 +181,6 @@
   gap: var(--space-md);
 }
 
-.capabilityNote {
-  margin: calc(var(--space-xs) * -1) 0 0;
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.5;
-}
-
 .bindModelSelectPopover:global(.select__popover) {
   max-height: min(360px, 70vh);
   overflow: hidden auto;

@@ -63,12 +63,6 @@
   padding: 38px clamp(28px, 5vw, 72px) 90px;
 }
 
-.sectionHead p,
-.subsectionHead p {
-  margin: 0;
-  color: var(--muted);
-}
-
 .editorSection {
   scroll-margin-top: var(--space-md-plus);
   padding: 30px 0 36px;
@@ -89,11 +83,23 @@
   margin-bottom: var(--space-lg);
 }
 
-.sectionHead h2,
+.validationMessage {
+  margin: 0;
+  color: var(--danger-text);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.sectionHead h2 {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-heading-3);
+  font-weight: var(--font-weight-semibold);
+}
+
 .subsectionHead h3,
 .finalAssessment h3 {
   margin: 0 0 var(--space-xs);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-heading-5);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -105,8 +111,7 @@
 
 .saved,
 .unsaved,
-.totalValid,
-.totalInvalid {
+.assessmentTotal {
   flex: 0 0 auto;
   color: var(--muted);
   font-size: var(--font-size-sm);
@@ -126,10 +131,6 @@
 
 .unsaved::before {
   background: var(--warning);
-}
-
-.totalInvalid {
-  color: var(--warning-foreground);
 }
 
 .basicLayout {
@@ -379,10 +380,6 @@
 
 .finalAssessment .subsectionHead {
   margin-bottom: 0;
-}
-
-.totalValid {
-  color: var(--foreground);
 }
 
 .permissionActions {

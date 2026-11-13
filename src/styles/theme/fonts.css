@@ -7,18 +7,20 @@
 .dark,
 [data-theme='light'],
 [data-theme='dark'] {
-  /* WisePen 桌面端排版：正文 14px、辅助文本 12px，重点层级使用 16px 以上字号。 */
-  /* 字重只通过 Regular、Medium、Semibold、Bold 四档表达层级，避免同层级出现多套数值。 */
+  /*
+   * 字号按用途单调递增：2xs < xs < sm < base < md < lg < heading-5 < ... < heading-1。
+   * heading 编号与 HTML 语义保持一致，禁止出现 heading-2 小于 heading-3 的反向层级。
+   */
   --font-size-base: 14px;
-  --font-size-sm: 14px;
+  --font-size-sm: 13px;
   --font-size-xs: 12px;
   --font-size-2xs: 11px;
-  --font-size-md: var(--font-size-base);
+  --font-size-md: 16px;
   --font-size-lg: 18px;
-  --font-size-heading-1: 26px;
-  --font-size-heading-2: 20px;
-  --font-size-heading-3: 24px;
-  --font-size-heading-4: 22px;
+  --font-size-heading-1: 28px;
+  --font-size-heading-2: 24px;
+  --font-size-heading-3: 20px;
+  --font-size-heading-4: 18px;
   --font-size-heading-5: 16px;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
