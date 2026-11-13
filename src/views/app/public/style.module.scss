@@ -82,8 +82,6 @@ $public-grid-two-column-breakpoint: 664px;
   }
 
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    justify-content: center;
     gap: var(--space-sm);
     margin-top: var(--space-lg);
   }

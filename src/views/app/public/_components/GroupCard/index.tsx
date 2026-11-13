@@ -60,7 +60,9 @@ function GroupCard({ group, onClick }: GroupCardProps) {
       <div className={styles.body}>
         {isSpecialGroup && <span className={badgeClassName}>{groupTypeLabel}</span>}
         <Card.Header className={`${styles.header} ${isSpecialGroup ? styles.headerWithBadge : ''}`}>
-          <Card.Title className={styles.title}>{groupName}</Card.Title>
+          <Card.Title className={styles.title} title={groupName}>
+            {groupName}
+          </Card.Title>
         </Card.Header>
         <Card.Footer className={styles.footer}>
           {ownerInfo && <UserCapsule name={ownerName} avatar={ownerInfo.avatar} />}

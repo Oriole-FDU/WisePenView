@@ -69,12 +69,15 @@
 }
 
 .title {
+  display: -webkit-box;
   overflow: hidden;
+  min-height: calc(1.4em * 2);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   line-height: 1.4;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .footer {
