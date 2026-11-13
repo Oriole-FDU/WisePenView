@@ -75,6 +75,12 @@ export default function AgentWorkspace({
         interceptSend: debugGuard.interceptSend,
       }
     : undefined;
+  const visibleSaveStatus =
+    draftSession.savePhase === 'failed'
+      ? 'failed'
+      : draftSession.savePhase === 'dirty' || draftSession.savePhase === 'saving'
+        ? 'saving'
+        : 'clean';
   const { target } = useEditorSurface();
   useEditorRuntime(
     {
@@ -86,9 +92,8 @@ export default function AgentWorkspace({
       loading: versionLoading,
       readOnly: draftSession.isReadOnly,
       hasUnsavedChanges: draftSession.isDirty,
-      pendingWork: draftSession.saveLoading || draftSession.publishLoading,
-      warnBeforeUnload:
-        draftSession.isDirty || draftSession.saveLoading || draftSession.publishLoading,
+      pendingWork: draftSession.savePhase === 'saving' || draftSession.publishLoading,
+      warnBeforeUnload: draftSession.isDirty || draftSession.publishLoading,
     },
     (context, editor) =>
       prepareDraftExit(
@@ -123,20 +128,19 @@ export default function AgentWorkspace({
         ownerId: agent.ownerId,
         onResourceChanged: onRefresh,
         titleMeta:
-          isOwner && (draftSession.savePhase === 'dirty' || draftSession.savePhase === 'failed') ? (
-            <span className={styles.saveStatus}>{t('agent:page.saveStatus.dirty')}</span>
+          isOwner && viewingVersion === null ? (
+            <span className={styles.saveStatus} data-phase={visibleSaveStatus}>
+              {t(`agent:page.saveStatus.${visibleSaveStatus}`)}
+            </span>
           ) : undefined,
         actions: isOwner ? (
           <AgentHeaderActions
             disabledVersionKeys={disabledVersionKeys}
-            isDirty={draftSession.isDirty}
             publishLoading={draftSession.publishLoading}
-            saveLoading={draftSession.saveLoading}
             versionItems={versionItems}
             versionLoading={versionLoading}
             viewingVersion={viewingVersion}
             onPublish={draftSession.publishDraft}
-            onSave={draftSession.saveDraft}
             onVersionSelect={handleVersionSelect}
           />
         ) : undefined,
@@ -171,7 +175,7 @@ export default function AgentWorkspace({
         description={t('agent:page.debugSave.description')}
         cancelText={t('common:actions.cancel')}
         confirmText={t('agent:page.debugSave.confirm')}
-        isConfirmLoading={debugGuard.saving || draftSession.saveLoading}
+        isConfirmLoading={debugGuard.saving || draftSession.savePhase === 'saving'}
         onConfirm={() => void debugGuard.confirm()}
       />
     </>
