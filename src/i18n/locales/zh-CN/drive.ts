@@ -3,6 +3,10 @@ const zhCNDrive = {
     title: '我的云盘',
     backToDrive: '返回云盘',
     viewAria: '云盘视图',
+    trashLoading: '正在打开回收站',
+    trashLoadFailed: '无法打开回收站',
+    trashLoadFailedDescription: '回收站暂时没有加载成功，请重试。',
+    retry: '重试',
     tabs: {
       drive: '文件',
       uploadQueue: '上传队列',

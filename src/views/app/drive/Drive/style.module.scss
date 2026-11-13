@@ -14,3 +14,10 @@
   min-height: 0;
   overflow: hidden;
 }
+
+.trashState {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding-block: var(--space-xl);
+}
