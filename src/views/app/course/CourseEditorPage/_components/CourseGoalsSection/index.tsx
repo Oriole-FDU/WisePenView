@@ -18,7 +18,6 @@ function CourseGoalsSection({ value, onUpdate }: CourseGoalsSectionProps) {
       <div className={styles.sectionHead}>
         <div>
           <h2>{t('editor.goals.title')}</h2>
-          <p>{t('editor.goals.description')}</p>
         </div>
       </div>
       <FormField

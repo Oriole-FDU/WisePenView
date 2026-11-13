@@ -3,6 +3,7 @@ import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { AppPressable } from '@/components/base/Button';
+import FieldHelp, { type FieldHelpProps } from '@/components/base/FieldHelp';
 import { Switch } from '@/components/base/Input';
 
 import styles from './style.module.scss';
@@ -10,7 +11,7 @@ import styles from './style.module.scss';
 interface AppFormSectionProps {
   id?: string;
   title: ReactNode;
-  description?: ReactNode;
+  help?: FieldHelpProps;
   actions?: ReactNode;
   children: ReactNode;
   variant?: 'plain' | 'editor';
@@ -18,7 +19,6 @@ interface AppFormSectionProps {
   innerClassName?: string;
   headerClassName?: string;
   titleClassName?: string;
-  descriptionClassName?: string;
   actionsClassName?: string;
 }
 
@@ -29,7 +29,7 @@ interface AppFormRowsProps {
 
 interface AppFormRowProps {
   title: ReactNode;
-  description?: ReactNode;
+  help?: FieldHelpProps;
   selected?: boolean;
   disabled?: boolean;
   control?: ReactNode;
@@ -112,7 +112,7 @@ const getActiveSectionId = (
 function AppFormSection({
   id,
   title,
-  description,
+  help,
   actions,
   children,
   variant = 'plain',
@@ -120,7 +120,6 @@ function AppFormSection({
   innerClassName,
   headerClassName,
   titleClassName,
-  descriptionClassName,
   actionsClassName,
 }: AppFormSectionProps) {
   return (
@@ -128,10 +127,10 @@ function AppFormSection({
       <div className={clsx(styles.sectionInner, innerClassName)}>
         <header className={clsx(styles.sectionHeader, headerClassName)}>
           <div className={styles.sectionCopy}>
-            <h2 className={clsx(styles.sectionTitle, titleClassName)}>{title}</h2>
-            {description ? (
-              <p className={clsx(styles.sectionDescription, descriptionClassName)}>{description}</p>
-            ) : null}
+            <div className={styles.sectionTitleRow}>
+              <h2 className={clsx(styles.sectionTitle, titleClassName)}>{title}</h2>
+              {help ? <FieldHelp {...help} /> : null}
+            </div>
           </div>
           {actions ? (
             <div className={clsx(styles.sectionActions, actionsClassName)}>{actions}</div>
@@ -149,7 +148,7 @@ function AppFormRows({ children, className }: AppFormRowsProps) {
 
 function AppFormRow({
   title,
-  description,
+  help,
   selected,
   disabled,
   control,
@@ -174,8 +173,10 @@ function AppFormRow({
   return (
     <div className={clsx(styles.row, className)}>
       <div className={clsx(styles.rowCopy, copyClassName)}>
-        <strong>{title}</strong>
-        {description ? <span>{description}</span> : null}
+        <div className={styles.rowTitle}>
+          <strong>{title}</strong>
+          {help ? <FieldHelp {...help} /> : null}
+        </div>
         {children}
       </div>
       {resolvedControl ? (

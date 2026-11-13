@@ -40,15 +40,9 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
 
   return (
     <>
-      <AppForm.Section
-        id="memory"
-        title={t('memory.title')}
-        description={t('memory.description')}
-        variant="editor"
-      >
+      <AppForm.Section id="memory" title={t('memory.title')} variant="editor">
         <AppForm.Row
           title={t('memory.chat')}
-          description={t('memory.chatDescription')}
           selected={policy.enableChatMemory}
           disabled={disabled}
           onChange={(value) => updatePolicy({ enableChatMemory: value })}
@@ -57,14 +51,12 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
           <>
             <AppForm.Row
               title={t('memory.persist')}
-              description={t('memory.persistDescription')}
               selected={policy.enablePersistenceChatMemory}
               disabled={disabled}
               onChange={(value) => updatePolicy({ enablePersistenceChatMemory: value })}
             />
             <AppForm.Row
               title={t('memory.summary')}
-              description={t('memory.summaryDescription')}
               selected={policy.enableChatMemorySummary}
               disabled={disabled}
               onChange={(value) => updatePolicy({ enableChatMemorySummary: value })}
@@ -73,7 +65,6 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
         ) : null}
         <AppForm.Row
           title={t('memory.longTerm')}
-          description={t('memory.longTermDescription')}
           selected={policy.enableLongTermMemory}
           disabled={disabled}
           onChange={(value) => updatePolicy({ enableLongTermMemory: value })}

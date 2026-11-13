@@ -6,8 +6,6 @@ import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/ChatConfig';
 
-import styles from './style.module.scss';
-
 interface Props {
   spec: AgentSpec;
   models: ChatModel[];
@@ -38,29 +36,22 @@ export default function ModelSection({ spec, models, disabled, onChange }: Props
   };
 
   return (
-    <AppForm.Section
-      id="model"
-      title={t('model.title')}
-      description={t('model.description')}
-      variant="editor"
-    >
-      <div className={styles.modelRow}>
-        <div>
-          <strong>{t('model.default')}</strong>
-          <span>{t('model.defaultHint')}</span>
-        </div>
-        <ModelSelector
-          models={models}
-          selectedId={selected?.id}
-          isOpen={open}
-          onOpenChange={setOpen}
-          onChange={selectModel}
-          disabled={disabled || models.length === 0}
-        />
-      </div>
+    <AppForm.Section id="model" title={t('model.title')} variant="editor">
+      <AppForm.Row
+        title={t('model.default')}
+        control={
+          <ModelSelector
+            models={models}
+            selectedId={selected?.id}
+            isOpen={open}
+            onOpenChange={setOpen}
+            onChange={selectModel}
+            disabled={disabled || models.length === 0}
+          />
+        }
+      />
       <AppForm.Row
         title={t('model.allowSwitch')}
-        description={t('model.allowSwitchDescription')}
         selected={spec.modelPolicy.allowRequestOverride}
         disabled={disabled}
         onChange={(value) =>

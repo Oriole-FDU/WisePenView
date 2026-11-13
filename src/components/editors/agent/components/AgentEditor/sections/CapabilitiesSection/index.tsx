@@ -68,15 +68,9 @@ export default function CapabilitiesSection({ spec, tools, skills, disabled, onC
   };
 
   return (
-    <AppForm.Section
-      id="capabilities"
-      title={t('capabilities.title')}
-      description={t('capabilities.description')}
-      variant="editor"
-    >
+    <AppForm.Section id="capabilities" title={t('capabilities.title')} variant="editor">
       <AppForm.Row
         title={t('capabilities.defaultToolSelection')}
-        description={t('capabilities.defaultToolSelectionDescription')}
         selected={policy.toolSelectionDefaultEnabled}
         disabled={disabled}
         onChange={(value) => updatePolicy({ toolSelectionDefaultEnabled: value })}

@@ -50,6 +50,33 @@
   gap: var(--space-xs);
 }
 
+.agreement {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  color: var(--foreground);
+
+  :global(.checkbox) {
+    display: inline-flex;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  :global(a) {
+    width: auto;
+    @include authTextLink();
+  }
+}
+
+.agreementError {
+  width: 100%;
+  color: var(--danger-text);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
 .submitButton {
   width: 100%;
   margin-top: var(--space-2xs);

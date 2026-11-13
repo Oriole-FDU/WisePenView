@@ -3,24 +3,24 @@
   min-width: 0;
 }
 
+.labelRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
 .label {
   color: var(--foreground);
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   line-height: 1.4;
   letter-spacing: 0;
 }
 
-.description {
-  color: var(--muted);
-  font-size: var(--font-size-xs, var(--font-size-xs));
-  line-height: 1.45;
-  letter-spacing: 0;
-}
-
 .error {
   color: var(--danger-text);
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
   line-height: 1.4;
   letter-spacing: 0;
 }

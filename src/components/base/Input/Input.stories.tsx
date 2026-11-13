@@ -82,7 +82,10 @@ function FormFieldStory() {
         label="工作区名称"
         value={value}
         onChange={setValue}
-        description="该名称会展示给工作区成员。"
+        help={{
+          label: '查看工作区名称说明',
+          content: '该名称会展示给工作区成员。',
+        }}
         isRequired
       >
         <Input fullWidth placeholder="请输入工作区名称" />

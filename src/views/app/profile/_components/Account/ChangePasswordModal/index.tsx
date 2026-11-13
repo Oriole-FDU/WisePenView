@@ -10,9 +10,9 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useAuthService } from '@/domains';
 import type { ChangePasswordRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
+import { useFormValidation } from '@/hooks/useFormValidation';
 import { authSessionCoordinator } from '@/utils/auth/authSessionCoordinator';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import { type FieldErrors, hasFieldErrors } from '@/utils/validation/formValidation';
 import {
   validateConfirmPasswordField,
   validatePasswordField,
@@ -39,29 +39,33 @@ function ChangePasswordModal({ isOpen, onOpenChange }: ChangePasswordModalProps)
   const { t } = useTranslation(['auth', 'common']);
   const navigate = useNavigate();
   const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [formValues, setFormValues] = useState<ChangePasswordFormValues>(
-    DEFAULT_CHANGE_PASSWORD_VALUES
-  );
-  const [formErrors, setFormErrors] = useState<FieldErrors<ChangePasswordField>>({});
 
-  const resetForm = () => {
-    setFormValues(DEFAULT_CHANGE_PASSWORD_VALUES);
-    setFormErrors({});
-  };
-
-  const { loading, run: submitChangePassword } = useApi(
-    (values: ChangePasswordRequest) => authService.changePassword(values),
-    {
-      manual: true,
-      onSuccess: () => {
-        resetForm();
-        onOpenChange(false);
-        setSuccessModalOpen(true);
-      },
+  const validateField = (
+    field: ChangePasswordField,
+    values: ChangePasswordFormValues
+  ): string | undefined => {
+    switch (field) {
+      case 'oldPassword':
+        return values.oldPassword.length > 0
+          ? undefined
+          : t('auth:changePassword.oldPasswordRequired');
+      case 'newPassword':
+        return validatePasswordField(values.newPassword, {
+          required: t('auth:changePassword.passwordRequired'),
+          minLength: t('auth:changePassword.passwordMinLength'),
+          containsLetter: t('auth:changePassword.passwordContainsLetter'),
+          containsNumber: t('auth:changePassword.passwordContainsNumber'),
+        });
+      case 'confirmPassword':
+        return validateConfirmPasswordField(values.confirmPassword, values.newPassword, {
+          required: t('auth:changePassword.confirmPasswordRequired'),
+          mismatch: t('auth:changePassword.confirmPasswordMismatch'),
+        });
+      default:
+        return undefined;
     }
-  );
-
-  const isFieldEmpty = (field: ChangePasswordField, values: ChangePasswordFormValues): boolean => {
+  };
+  const isFieldEmpty = (field: ChangePasswordField, values: ChangePasswordFormValues) => {
     switch (field) {
       case 'oldPassword':
         return values.oldPassword.length === 0;
@@ -74,74 +78,32 @@ function ChangePasswordModal({ isOpen, onOpenChange }: ChangePasswordModalProps)
     }
   };
 
-  const validateField = (
-    field: ChangePasswordField,
-    values: ChangePasswordFormValues,
-    options: { withRequired?: boolean } = {}
-  ): string | undefined => {
-    if (!options.withRequired && isFieldEmpty(field, values)) return undefined;
-
-    switch (field) {
-      case 'oldPassword':
-        return values.oldPassword.length > 0
-          ? undefined
-          : t('auth:changePassword.oldPasswordRequired');
-      case 'newPassword':
-        return validatePasswordField(
-          values.newPassword,
-          {
-            required: t('auth:changePassword.passwordRequired'),
-            minLength: t('auth:changePassword.passwordMinLength'),
-            containsLetter: t('auth:changePassword.passwordContainsLetter'),
-            containsNumber: t('auth:changePassword.passwordContainsNumber'),
-          },
-          options
-        );
-      case 'confirmPassword':
-        return validateConfirmPasswordField(
-          values.confirmPassword,
-          values.newPassword,
-          {
-            required: t('auth:changePassword.confirmPasswordRequired'),
-            mismatch: t('auth:changePassword.confirmPasswordMismatch'),
-          },
-          options
-        );
-      default:
-        return undefined;
+  const validation = useFormValidation<ChangePasswordFormValues, ChangePasswordField>({
+    initialValues: DEFAULT_CHANGE_PASSWORD_VALUES,
+    fields: ['oldPassword', 'newPassword', 'confirmPassword'],
+    validateField,
+    isFieldEmpty,
+  });
+  const formValues = validation.values;
+  const resetForm = () => validation.reset();
+  const { loading, run: submitChangePassword } = useApi(
+    (values: ChangePasswordRequest) => authService.changePassword(values),
+    {
+      manual: true,
+      onSuccess: () => {
+        resetForm();
+        onOpenChange(false);
+        setSuccessModalOpen(true);
+      },
     }
-  };
+  );
 
   const updateFormValue = (field: ChangePasswordField, value: string) => {
-    const nextValues = { ...formValues, [field]: value };
-    setFormValues(nextValues);
-    const fieldsToValidate: ChangePasswordField[] =
-      field === 'newPassword' ? ['newPassword', 'confirmPassword'] : [field];
-    setFormErrors((prev) => {
-      const nextErrors = { ...prev };
-      fieldsToValidate.forEach((key) => {
-        nextErrors[key] = validateField(key, nextValues);
-      });
-      return nextErrors;
-    });
-  };
-
-  const handleFieldBlur = (field: ChangePasswordField) => {
-    setFormErrors((prev) => ({ ...prev, [field]: validateField(field, formValues) }));
-  };
-
-  const validateForm = () => {
-    const nextErrors: FieldErrors<ChangePasswordField> = {
-      oldPassword: validateField('oldPassword', formValues, { withRequired: true }),
-      newPassword: validateField('newPassword', formValues, { withRequired: true }),
-      confirmPassword: validateField('confirmPassword', formValues, { withRequired: true }),
-    };
-    setFormErrors(nextErrors);
-    return !hasFieldErrors(nextErrors);
+    validation.changeField(field, value, field === 'newPassword' ? ['confirmPassword'] : []);
   };
 
   const handleFormSubmit = () => {
-    if (loading || !validateForm()) return;
+    if (loading || !validation.validateForm()) return;
     submitChangePassword({
       oldPassword: formValues.oldPassword,
       newPassword: formValues.newPassword,
@@ -221,8 +183,8 @@ function ChangePasswordModal({ isOpen, onOpenChange }: ChangePasswordModalProps)
           name="oldPassword"
           value={formValues.oldPassword}
           onChange={(value) => updateFormValue('oldPassword', value)}
-          onBlur={() => handleFieldBlur('oldPassword')}
-          errorMessage={formErrors.oldPassword}
+          onBlur={() => validation.blurField('oldPassword')}
+          errorMessage={validation.errors.oldPassword}
           isRequired
         >
           <PasswordInput
@@ -239,8 +201,8 @@ function ChangePasswordModal({ isOpen, onOpenChange }: ChangePasswordModalProps)
           name="newPassword"
           value={formValues.newPassword}
           onChange={(value) => updateFormValue('newPassword', value)}
-          onBlur={() => handleFieldBlur('newPassword')}
-          errorMessage={formErrors.newPassword}
+          onBlur={() => validation.blurField('newPassword')}
+          errorMessage={validation.errors.newPassword}
           isRequired
         >
           <PasswordInput
@@ -257,8 +219,8 @@ function ChangePasswordModal({ isOpen, onOpenChange }: ChangePasswordModalProps)
           name="confirmPassword"
           value={formValues.confirmPassword}
           onChange={(value) => updateFormValue('confirmPassword', value)}
-          onBlur={() => handleFieldBlur('confirmPassword')}
-          errorMessage={formErrors.confirmPassword}
+          onBlur={() => validation.blurField('confirmPassword')}
+          errorMessage={validation.errors.confirmPassword}
           isRequired
         >
           <PasswordInput

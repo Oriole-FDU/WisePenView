@@ -11,16 +11,15 @@ import {
 } from '@/bootstrap/authContinuation';
 import { AppButton } from '@/components/base/Button';
 import { Checkbox, FormField, PasswordInput } from '@/components/base/Input';
+import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 import { useAuthService } from '@/domains';
 import type { RegisterRequest } from '@/domains/Auth';
 import { normalizeInviteCode } from '@/domains/Auth/utils/normalizeRegisterRequest';
 import { useApi } from '@/hooks/useApi';
+import { useFormValidation } from '@/hooks/useFormValidation';
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { APP_ROUTE_PATH, readRegisterInviteCode } from '@/utils/navigation/appRoute';
-import {
-  type FieldErrors,
-  hasFieldErrors,
-  runFieldValidation,
-} from '@/utils/validation/formValidation';
+import { runFieldValidation } from '@/utils/validation/formValidation';
 import ServiceAgreement from '@/views/app/auth/_components/ServiceAgreement/index';
 
 import AuthIconField from '../_common/AuthIconField';
@@ -55,17 +54,13 @@ function Register() {
   const authService = useAuthService();
   const { t } = useTranslation('auth');
   const [agreement, setAgreement] = useState(false);
+  const [agreementError, setAgreementError] = useState<string>();
   const [contractOpen, setContractOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const redirectPath = readRedirectParam(location.search);
   /** 邀请链接携带的邀请码，用于初始化表单 */
   const linkedInviteCode = readRegisterInviteCode(location.search);
-  const [formValues, setFormValues] = useState<RegisterFormValues>(() => ({
-    ...DEFAULT_REGISTER_VALUES,
-    inviteCode: linkedInviteCode,
-  }));
-  const [formErrors, setFormErrors] = useState<FieldErrors<RegisterField>>({});
 
   const { run: submitLogin } = useApi(
     (values: RegisterRequest) =>
@@ -98,32 +93,7 @@ function Register() {
     }
   );
 
-  /** 判断字段是否为空，用于区分「未填写」与「已填写但不合规」 */
-  const isFieldEmpty = (field: RegisterField, values: RegisterFormValues): boolean => {
-    switch (field) {
-      case 'username':
-        return values.username.trim().length === 0;
-      case 'password':
-        return values.password.length === 0;
-      case 'confirmPassword':
-        return values.confirmPassword.length === 0;
-      case 'inviteCode':
-        return values.inviteCode.trim().length === 0;
-      default:
-        return false;
-    }
-  };
-
-  /** 单字段校验规则，返回首个未通过的原因，供输入、失焦与提交共用 */
-  const validateField = (
-    field: RegisterField,
-    values: RegisterFormValues,
-    options: { withRequired?: boolean } = {}
-  ): string | undefined => {
-    // 填写过程中未填写不报红，必填提示只在提交时给出，避免满屏红框
-    if (!options.withRequired && isFieldEmpty(field, values)) {
-      return undefined;
-    }
+  const validateField = (field: RegisterField, values: RegisterFormValues): string | undefined => {
     switch (field) {
       case 'username': {
         const username = values.username.trim();
@@ -149,26 +119,17 @@ function Register() {
         ]);
       }
       case 'password':
-        return validatePasswordField(
-          values.password,
-          {
-            required: t('register.passwordRequired'),
-            minLength: t('register.passwordMinLength'),
-            containsLetter: t('register.passwordContainsLetter'),
-            containsNumber: t('register.passwordContainsNumber'),
-          },
-          options
-        );
+        return validatePasswordField(values.password, {
+          required: t('register.passwordRequired'),
+          minLength: t('register.passwordMinLength'),
+          containsLetter: t('register.passwordContainsLetter'),
+          containsNumber: t('register.passwordContainsNumber'),
+        });
       case 'confirmPassword':
-        return validateConfirmPasswordField(
-          values.confirmPassword,
-          values.password,
-          {
-            required: t('register.confirmPasswordRequired'),
-            mismatch: t('register.confirmPasswordMismatch'),
-          },
-          options
-        );
+        return validateConfirmPasswordField(values.confirmPassword, values.password, {
+          required: t('register.confirmPasswordRequired'),
+          mismatch: t('register.confirmPasswordMismatch'),
+        });
       case 'inviteCode':
         return runFieldValidation([
           {
@@ -183,45 +144,48 @@ function Register() {
         return undefined;
     }
   };
+  const isFieldEmpty = (field: RegisterField, values: RegisterFormValues) => {
+    switch (field) {
+      case 'username':
+        return values.username.trim().length === 0;
+      case 'password':
+        return values.password.length === 0;
+      case 'confirmPassword':
+        return values.confirmPassword.length === 0;
+      case 'inviteCode':
+        return values.inviteCode.trim().length === 0;
+      default:
+        return false;
+    }
+  };
 
-  /** 输入时实时校验当前字段；密码变更时同步重算确认密码，避免提示滞后 */
+  const validation = useFormValidation<RegisterFormValues, RegisterField>({
+    initialValues: () => ({
+      ...DEFAULT_REGISTER_VALUES,
+      inviteCode: linkedInviteCode,
+    }),
+    fields: ['username', 'password', 'confirmPassword', 'inviteCode'],
+    validateField,
+    isFieldEmpty,
+  });
+  const formValues = validation.values;
+  const formErrors = validation.errors;
+
+  /** 仅对已经失焦或在提交后需要持续反馈的字段重新校验。 */
   const updateFormValue = (field: RegisterField, value: string) => {
-    const nextValues = { ...formValues, [field]: value };
-    setFormValues(nextValues);
-    const fieldsToValidate: RegisterField[] =
-      field === 'password' ? ['password', 'confirmPassword'] : [field];
-    setFormErrors((prev) => {
-      const nextErrors = { ...prev };
-      fieldsToValidate.forEach((key) => {
-        nextErrors[key] = validateField(key, nextValues);
-      });
-      return nextErrors;
-    });
+    validation.changeField(field, value, field === 'password' ? ['confirmPassword'] : []);
   };
 
-  /** 失焦时校验当前字段；未填写的字段不报红，必填提示留到提交时 */
-  const handleFieldBlur = (field: RegisterField) => {
-    setFormErrors((prev) => ({ ...prev, [field]: validateField(field, formValues) }));
-  };
-
-  const validateForm = () => {
-    const nextErrors: FieldErrors<RegisterField> = {
-      username: validateField('username', formValues, { withRequired: true }),
-      password: validateField('password', formValues, { withRequired: true }),
-      confirmPassword: validateField('confirmPassword', formValues, { withRequired: true }),
-      inviteCode: validateField('inviteCode', formValues, { withRequired: true }),
-    };
-    setFormErrors(nextErrors);
-    return !hasFieldErrors(nextErrors);
+  const handleAgreementChange = (selected: boolean) => {
+    setAgreement(selected);
+    if (selected) setAgreementError(undefined);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!validateForm()) return;
-    if (!agreement) {
-      toast.danger(t('register.agreementRequired'));
-      return;
-    }
+    const fieldsValid = validation.validateForm();
+    setAgreementError(agreement ? undefined : t('register.agreementRequired'));
+    if (!fieldsValid || !agreement) return;
     const inviteCode = normalizeInviteCode(formValues.inviteCode);
     submitRegister({
       username: formValues.username.trim(),
@@ -229,6 +193,14 @@ function Register() {
       ...(inviteCode ? { inviteCode } : {}),
     });
   };
+
+  const hasDraft =
+    formValues.username.length > 0 ||
+    formValues.password.length > 0 ||
+    formValues.confirmPassword.length > 0 ||
+    (formValues.inviteCode.length > 0 && formValues.inviteCode !== linkedInviteCode) ||
+    agreement;
+  const leaveGuard = useUnsavedChangesGuard(hasDraft && !loading);
 
   return (
     <div className={auth.authContainer}>
@@ -240,7 +212,7 @@ function Register() {
           name="username"
           value={formValues.username}
           onChange={(value) => updateFormValue('username', value)}
-          onBlur={() => handleFieldBlur('username')}
+          onBlur={() => validation.blurField('username')}
           errorMessage={formErrors.username}
           isRequired
         >
@@ -257,7 +229,7 @@ function Register() {
           name="password"
           value={formValues.password}
           onChange={(value) => updateFormValue('password', value)}
-          onBlur={() => handleFieldBlur('password')}
+          onBlur={() => validation.blurField('password')}
           errorMessage={formErrors.password}
           isRequired
         >
@@ -275,7 +247,7 @@ function Register() {
           name="confirmPassword"
           value={formValues.confirmPassword}
           onChange={(value) => updateFormValue('confirmPassword', value)}
-          onBlur={() => handleFieldBlur('confirmPassword')}
+          onBlur={() => validation.blurField('confirmPassword')}
           errorMessage={formErrors.confirmPassword}
           isRequired
         >
@@ -293,7 +265,7 @@ function Register() {
           name="inviteCode"
           value={formValues.inviteCode}
           onChange={(value) => updateFormValue('inviteCode', normalizeInviteCode(value))}
-          onBlur={() => handleFieldBlur('inviteCode')}
+          onBlur={() => validation.blurField('inviteCode')}
           errorMessage={formErrors.inviteCode}
         >
           <AuthIconField
@@ -304,6 +276,26 @@ function Register() {
             spellCheck={false}
           />
         </FormField>
+
+        <div className={auth.agreement}>
+          <Checkbox
+            id="register-agreement"
+            isSelected={agreement}
+            isInvalid={Boolean(agreementError)}
+            aria-describedby={agreementError ? 'register-agreement-error' : undefined}
+            onChange={handleAgreementChange}
+          >
+            {t('register.agreementCheckedPrefix')}
+          </Checkbox>
+          <Link to="#" onClick={() => setContractOpen(true)}>
+            {t('register.agreementLink')}
+          </Link>
+          {agreementError ? (
+            <span id="register-agreement-error" className={auth.agreementError} role="alert">
+              {agreementError}
+            </span>
+          ) : null}
+        </div>
 
         <div className={auth.formActions}>
           <AppButton
@@ -326,16 +318,15 @@ function Register() {
         </div>
       </Form>
 
-      <div className={auth.leftBottomLinks}>
-        <Checkbox isSelected={agreement} onChange={setAgreement}>
-          {t('register.agreementCheckedPrefix')}
-        </Checkbox>
-        <Link to="#" onClick={() => setContractOpen(true)}>
-          {t('register.agreementLink')}
-        </Link>
-      </div>
-
       <ServiceAgreement isOpen={contractOpen} onOpenChange={setContractOpen} />
+      <UnsavedChangesDialog
+        isOpen={leaveGuard.isBlocked}
+        title={t('register.leaveTitle')}
+        description={t('register.leaveDescription')}
+        confirmText={t('register.leaveConfirm')}
+        onCancel={leaveGuard.reset}
+        onConfirm={leaveGuard.proceed}
+      />
     </div>
   );
 }

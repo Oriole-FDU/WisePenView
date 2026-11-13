@@ -5,6 +5,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import AppForm from '@/components/base/AppForm';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { useCourseContext } from '@/layouts/Course/_context';
 import { buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
@@ -26,6 +28,7 @@ function CourseEditorPage() {
   const location = useLocation();
   const editorScrollRef = useRef<HTMLElement | null>(null);
   const editor = useCourseEditorFormController({ course, refreshCourse });
+  const leaveGuard = useUnsavedChangesGuard(!editor.saved);
   const navGroups = [
     {
       title: t('editor.groups.info'),
@@ -41,6 +44,15 @@ function CourseEditorPage() {
       items: [{ id: 'course-editor-access', label: t('editor.nav.access') }],
     },
   ];
+
+  const handleSaveAndLeave = async () => {
+    const savedSuccessfully = await editor.saveCourseRequest();
+    if (savedSuccessfully) {
+      leaveGuard.proceed();
+      return;
+    }
+    leaveGuard.reset();
+  };
 
   return (
     <div className={styles.editorShell}>
@@ -81,6 +93,8 @@ function CourseEditorPage() {
               coverUrl={editor.cover.displayUrl}
               onUpdate={editor.updateForm}
               onSave={editor.handleSave}
+              errors={editor.errors}
+              onBlur={editor.blurField}
               onChangeCover={() => editor.cover.handleOpenChange(true)}
               onCoverImageError={editor.cover.handleImageError}
             />
@@ -96,19 +110,20 @@ function CourseEditorPage() {
             <CourseAssessmentSection
               form={editor.form}
               assessmentTotal={editor.assessmentTotal}
+              assessmentError={editor.errors.assessmentItems}
               noFinalAssessmentValue={editor.noFinalAssessmentValue}
               hasNoFinalAssessment={editor.hasNoFinalAssessment}
               onUpdate={editor.updateForm}
               onUpdateAssessment={editor.updateAssessment}
               onUpdateDeadlineDate={editor.updateDeadlineDate}
               onUpdateDeadlineTime={editor.updateDeadlineTime}
+              onBlurAssessment={editor.blurField}
             />
 
             <section id="course-editor-access" className={styles.editorSection}>
               <div className={styles.sectionHead}>
                 <div>
                   <h2>{t('editor.permissions.title')}</h2>
-                  <p>{t('editor.permissions.description')}</p>
                 </div>
               </div>
               <CoursePermissionSection
@@ -129,6 +144,18 @@ function CourseEditorPage() {
         onOpenChange={editor.cover.handleOpenChange}
         onFileChange={editor.cover.handleFileChange}
         onConfirm={editor.cover.handleConfirm}
+      />
+      <UnsavedChangesDialog
+        isOpen={leaveGuard.isBlocked}
+        isLoading={editor.saving}
+        title={t('editor.leave.title')}
+        description={t('editor.leave.description')}
+        cancelText={t('editor.leave.cancel')}
+        discardText={t('editor.leave.discard')}
+        confirmText={t('editor.leave.confirm')}
+        onCancel={leaveGuard.reset}
+        onDiscard={leaveGuard.proceed}
+        onConfirm={() => void handleSaveAndLeave()}
       />
     </div>
   );

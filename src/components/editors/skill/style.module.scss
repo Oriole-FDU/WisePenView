@@ -299,25 +299,6 @@
   @include scrollbar.appSubtleScrollbar();
 }
 
-.configFormHint {
-  display: grid;
-  gap: var(--space-2xs-plus);
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-  line-height: 1.65;
-}
-
-.configFormHint strong {
-  color: var(--foreground);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.35;
-}
-
-.configFormHint span {
-  max-width: 720px;
-}
-
 .configFooterText {
   color: var(--muted);
   font-size: var(--font-size-xs);

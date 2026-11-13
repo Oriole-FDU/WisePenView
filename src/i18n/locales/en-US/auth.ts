@@ -3,7 +3,6 @@ const enUSAuth = {
     formAria: 'Authentication form',
     showPassword: 'Show password',
     hidePassword: 'Hide password',
-    passwordRules: 'At least 9 characters, including both letters and numbers.',
   },
   login: {
     title: 'Sign In',
@@ -28,7 +27,7 @@ const enUSAuth = {
     usernameLength: 'Username must be 4-20 characters long',
     usernameContainsLetter: 'Username must contain a letter',
     usernameIsCampusNo: 'Username cannot be a campus ID',
-    usernamePlaceholder: '4-20 characters, must contain a letter',
+    usernamePlaceholder: '4–20 characters with a letter; numbers/underscores allowed',
     passwordLabel: 'Password',
     passwordRequired: 'Please enter password',
     passwordMinLength: 'Password must be at least 9 characters',
@@ -50,6 +49,9 @@ const enUSAuth = {
     registerSuccess: 'Registration successful.',
     registerFailed: 'Registration failed',
     agreementRequired: 'Please accept the user agreement',
+    leaveTitle: 'Leave registration?',
+    leaveDescription: 'The information you entered will not be kept.',
+    leaveConfirm: 'Discard and leave',
   },
   onboarding: {
     title: 'Verify your account',

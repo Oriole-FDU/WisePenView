@@ -75,7 +75,6 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
     <AppForm.Section
       id="assets"
       title={t('assets.title')}
-      description={t('assets.description')}
       variant="editor"
       actions={
         <AppButton

@@ -32,11 +32,7 @@ function SkillConfigPanel({
   const nameMissing = name.trim().length === 0;
   const descriptionMissing = description.trim().length === 0;
   const hasMissingConfig = nameMissing || descriptionMissing;
-  const footerStatus = hasMissingConfig
-    ? t('config.publishBlocked')
-    : !isLoading && isDirty
-      ? t('config.dirty')
-      : null;
+  const footerStatus = !isLoading && isDirty ? t('config.dirty') : null;
 
   return (
     <>
@@ -46,10 +42,6 @@ function SkillConfigPanel({
       <div className={styles.editorBody}>
         <section className={styles.configPage} aria-label={t('config.ariaLabel')}>
           <div className={styles.configForm}>
-            <div className={styles.configFormHint}>
-              <strong>{t('config.introTitle')}</strong>
-              <span>{t('config.intro')}</span>
-            </div>
             <FormField
               aria-label={t('config.nameAriaLabel')}
               value={name}
@@ -57,7 +49,6 @@ function SkillConfigPanel({
               isDisabled={!canEdit || isLoading}
               isRequired
               label={t('config.nameLabel')}
-              description={t('config.nameDescription')}
               errorMessage={nameMissing ? t('config.nameRequired') : undefined}
             >
               <Input placeholder={t('config.namePlaceholder')} />
@@ -70,7 +61,6 @@ function SkillConfigPanel({
               isDisabled={!canEdit || isLoading}
               isRequired
               label={t('config.descriptionLabel')}
-              description={t('config.descriptionHelp')}
               errorMessage={descriptionMissing ? t('config.descriptionRequired') : undefined}
             >
               <TextArea

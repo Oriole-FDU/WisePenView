@@ -13,7 +13,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作为主题
 - 全局样式入口 `src/styles/global/index.css` 只负责聚合：`tailwind.css` 承接 Tailwind/HeroUI、主题 token 导入和第三方名称桥接；`base.css` 只承接 `:root`、`body`、选区与 reduced-motion 等文档级样式。桌面端外壳约束（`html`/`body` 占满视口、整页不滚动、`#root` 接管滚动与选区）放在 `src/styles/global/app-shell.css`，只有应用入口引入，否则 Storybook 预览与 Docs 页面会被裁掉且无法滚动。
 - 动画时长、缓动曲线和 reduced-motion 基准集中在 `src/styles/theme/motion.css`，组件只消费 `--motion-*` token。
 - 间距单位、`--space-*` 刻度和页面／输入区／表格间距集中在 `src/styles/theme/spacing.css`；`gap`、`margin`、`padding` 在数值命中公共刻度时必须消费对应 token。
-- 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则由 `src/styles/global/base.css` 消费这些变量。
+- 字体、字号、字重和行高变量集中在 `src/styles/theme/fonts.css`，其他 token 文件不再重复定义；全局排版应用规则由 `src/styles/global/base.css` 消费这些变量。字号按 `2xs < xs < sm < base < md < lg < heading-5 < heading-4 < heading-3 < heading-2 < heading-1` 单调递增，页面标题直接使用 heading 语义 token，不用 `calc()` 从别的标题层级临时推导。表单相关规则见 `agent/docs/forms.md`。
 - Tailwind/HeroUI 的 `--font-sans`、`--font-mono` 只在 `@theme inline` 中做名称桥接；项目自有样式直接使用 `--app-font-family`、`--app-font-mono`，不得绕经第三方别名。
 - 布局尺寸、控件规格（含焦点环）和阴影／滚动条效果分别集中在 `src/styles/theme/layout.css`、`controls.css` 和 `effects.css`；不再维护通用 `tokens.css` 杂项文件。
 - 通用 Table 的尺寸、间距和圆角别名集中在 `src/components/base/Table/shared/styles/tokens.css`；表格颜色继续由 `palette.css` 管理，Drive 专属布局 token 由 `TableDrive` 自己维护。

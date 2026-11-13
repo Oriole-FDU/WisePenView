@@ -54,7 +54,6 @@ const zhCNProfile = {
       maxOutputTokens: '最大输出（Token）',
       maxOutputTokensHint: '留空表示使用后端默认值。',
       maxOutputTokensPlaceholder: '例如：4096',
-      streamingUnsupported: '流式输出由 Chat 接口统一处理，当前后端模型配置未提供独立开关。',
       provider: 'Provider',
       providerModelName: 'Provider 模型名',
       providerModelNamePlaceholder: '例如：gpt-4o-mini',

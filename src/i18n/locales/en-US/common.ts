@@ -46,6 +46,7 @@ const enUSCommon = {
     closeAria: 'Close',
   },
   feedback: { empty: 'No data' },
+  fieldHelp: 'View help for “{{label}}”',
   tree: { collapse: 'Collapse node', expand: 'Expand node', select: 'Select node' },
   uploadZone: {
     label: 'Click or drag files here',
