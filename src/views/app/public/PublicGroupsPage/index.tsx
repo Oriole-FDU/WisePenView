@@ -20,6 +20,7 @@ import {
 
 import { CreateGroupModal } from '../../group/_components/GroupModals';
 import GroupCard from '../_components/GroupCard';
+import PublicListErrorState from '../_components/PublicListErrorState';
 import PublicListPagination from '../_components/PublicListPagination';
 import { JoinGroupModal } from '../_components/PublicModals';
 import PublicSectionTabs from '../_components/PublicSectionTabs';
@@ -47,6 +48,7 @@ function PublicGroupsPage() {
       refreshDeps: [query.role, query.page, query.size],
       loadingDelay: 160,
       getErrorMessage: () => t('list.loadFailed'),
+      showErrorToast: false,
     }
   );
   const groups = data?.groups ?? [];
@@ -134,6 +136,13 @@ function PublicGroupsPage() {
         <div className={styles.loading} role="status" aria-label={t('list.loading')}>
           <Spin size="large" />
         </div>
+      ) : error ? (
+        <PublicListErrorState
+          className={styles.errorState}
+          description={t('list.loadFailedHint')}
+          title={t('list.loadFailed')}
+          onRetry={refresh}
+        />
       ) : groups.length > 0 ? (
         <div className={styles.grid}>
           {groups.map((group) => (
@@ -151,12 +160,14 @@ function PublicGroupsPage() {
         </div>
       )}
 
-      <PublicListPagination
-        page={query.page}
-        size={query.size}
-        total={total}
-        onChange={(page, size) => navigateWithQuery({ page, size })}
-      />
+      {error ? null : (
+        <PublicListPagination
+          page={query.page}
+          size={query.size}
+          total={total}
+          onChange={(page, size) => navigateWithQuery({ page, size })}
+        />
+      )}
       <JoinGroupModal
         isOpen={joinModalOpen}
         onOpenChange={setJoinModalOpen}

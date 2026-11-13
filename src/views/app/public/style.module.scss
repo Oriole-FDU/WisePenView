@@ -53,7 +53,8 @@ $public-grid-two-column-breakpoint: 664px;
   min-width: 0;
 }
 
-.loading {
+.loading,
+.errorState {
   display: flex;
   align-items: center;
   justify-content: center;

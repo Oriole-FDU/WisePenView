@@ -14,6 +14,7 @@ const enUSGroup = {
     managed: 'Managed',
     loading: 'Loading groups',
     loadFailed: 'Failed to load groups',
+    loadFailedHint: 'Check your connection and retry. Your current filters will be kept.',
     empty: 'No groups',
     summary: '{{start}} - {{end}} of {{total}}',
     previous: 'Previous',
