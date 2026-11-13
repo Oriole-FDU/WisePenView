@@ -1,0 +1,51 @@
+.contentState {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 28rem;
+  margin-inline: auto;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.default {
+  gap: var(--space-xs);
+}
+
+.compact {
+  gap: var(--space-2xs);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+}
+
+.danger .icon {
+  color: var(--danger-text);
+}
+
+.title {
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.45;
+}
+
+.description {
+  max-width: 25rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs, var(--font-size-sm));
+  line-height: 1.6;
+}
+
+.action {
+  margin-top: var(--space-2xs);
+}

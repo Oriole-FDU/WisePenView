@@ -1,4 +1,4 @@
-import { EmptyState, Tag, TagGroup, useFilter } from '@heroui/react';
+import { EmptyState as HeroEmptyState, Tag, TagGroup, useFilter } from '@heroui/react';
 import { X } from 'lucide-react';
 import type { Key, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import { Autocomplete, SearchField } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import { Tabs } from '@/components/base/Tabs';
@@ -88,7 +88,7 @@ const TagPolicyModalBase = ({
     if (memberOptions.length === 0) {
       return (
         <div className={styles.memberState}>
-          <Empty description={t('permission.tag.noMembers')} />
+          <EmptyState title={t('permission.tag.noMembers')} size="compact" />
         </div>
       );
     }
@@ -101,7 +101,7 @@ const TagPolicyModalBase = ({
       if (selectedMembers.length === 0) {
         return (
           <div className={styles.selectedMemberEmpty}>
-            <Empty description={t('permission.tag.noSelectedMembers')} />
+            <EmptyState title={t('permission.tag.noSelectedMembers')} size="compact" />
           </div>
         );
       }
@@ -197,7 +197,7 @@ const TagPolicyModalBase = ({
                 className={styles.memberList}
                 aria-label={t('permission.tag.memberListAria', { title: policy.title })}
                 renderEmptyState={() => (
-                  <EmptyState>{t('permission.tag.noMatchingMembers')}</EmptyState>
+                  <HeroEmptyState>{t('permission.tag.noMatchingMembers')}</HeroEmptyState>
                 )}
               >
                 {memberOptions.map((member) => (
@@ -396,7 +396,7 @@ const TagPolicyModalBase = ({
             {!selectedTag ? (
               <div className={styles.emptyState}>
                 {showTagTree ? (
-                  <Empty description={t('permission.tag.selectTagHint')} />
+                  <EmptyState title={t('permission.tag.selectTagHint')} />
                 ) : (
                   <Spin size="large" tip={t('permission.tag.loadingTagPermission')} />
                 )}

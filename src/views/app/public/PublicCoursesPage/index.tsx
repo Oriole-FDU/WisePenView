@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import PageHeader from '@/components/base/PageHeader';
 import CourseCard from '@/components/business/CourseCard';
 import { useCourseService, useUserService } from '@/domains';
@@ -16,13 +16,14 @@ import {
   parseCourseListRouteQuery,
 } from '@/utils/navigation/appRoute';
 
+import PublicListErrorState from '../_components/PublicListErrorState';
 import PublicListPagination from '../_components/PublicListPagination';
 import { CreateCourseModal, JoinCourseModal } from '../_components/PublicModals';
 import PublicSectionTabs from '../_components/PublicSectionTabs';
 import styles from '../style.module.scss';
 
 function PublicCoursesPage() {
-  const { t } = useTranslation(['course', 'group']);
+  const { t } = useTranslation('course');
   const courseService = useCourseService();
   const userService = useUserService();
   const navigate = useNavigate();
@@ -37,7 +38,8 @@ function PublicCoursesPage() {
     {
       refreshDeps: [query.page, query.size],
       loadingDelay: 160,
-      getErrorMessage: () => t('group:list.loadFailed'),
+      getErrorMessage: () => t('list.loadFailed'),
+      showErrorToast: false,
     }
   );
   const identityType = userRequest.data?.identityType;
@@ -47,6 +49,7 @@ function PublicCoursesPage() {
   const total = courseRequest.data?.total ?? 0;
   const waitingForInitialData =
     courseRequest.data === undefined && !courseRequest.error && !courseRequest.loading;
+  const courseError = courseRequest.error;
   const canonicalPath = buildCourseListPath(query);
   const totalPages = Math.max(Math.ceil(total / query.size), 1);
   const boundedPath =
@@ -98,9 +101,15 @@ function PublicCoursesPage() {
       {waitingForInitialData ? (
         <div className={styles.loading} aria-hidden />
       ) : courseRequest.loading ? (
-        <div className={styles.loading} role="status" aria-label={t('group:list.loading')}>
+        <div className={styles.loading} role="status" aria-label={t('list.loading')}>
           <Spin size="large" />
         </div>
+      ) : courseError ? (
+        <PublicListErrorState
+          className={styles.errorState}
+          title={t('list.loadFailed')}
+          onRetry={courseRequest.refresh}
+        />
       ) : courses.length > 0 ? (
         <div className={styles.grid}>
           {courses.map((course) => (
@@ -113,17 +122,17 @@ function PublicCoursesPage() {
           ))}
         </div>
       ) : (
-        <div className={styles.emptyState}>
-          <Empty description={t('list.empty')} />
-        </div>
+        <EmptyState className={styles.contentState} title={t('list.empty')} />
       )}
 
-      <PublicListPagination
-        page={query.page}
-        size={query.size}
-        total={total}
-        onChange={(page, size) => navigateWithQuery({ page, size })}
-      />
+      {courseError ? null : (
+        <PublicListPagination
+          page={query.page}
+          size={query.size}
+          total={total}
+          onChange={(page, size) => navigateWithQuery({ page, size })}
+        />
+      )}
       <JoinCourseModal
         isOpen={joinModalOpen}
         onOpenChange={setJoinModalOpen}

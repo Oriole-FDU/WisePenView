@@ -75,7 +75,7 @@ function WithFilterStory() {
           <ListBox
             aria-label="能力"
             selectionMode="multiple"
-            renderEmptyState={() => <EmptyState>没有匹配的能力</EmptyState>}
+            renderEmptyState={() => <EmptyState title="没有匹配的能力" />}
           >
             {OPTIONS.map((option) => (
               <ListBox.Item key={option.id} id={option.id} textValue={option.label}>

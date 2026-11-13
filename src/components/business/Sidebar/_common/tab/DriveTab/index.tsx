@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import { HiddenFileInput } from '@/components/base/Input';
 import type { DataNode } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
@@ -276,7 +276,7 @@ function DriveTab() {
         </div>
       ) : showEmpty ? (
         <div className={styles.stateBlock}>
-          <Empty description={t('navigator.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <EmptyState title={t('navigator.empty')} showIcon={false} size="compact" />
         </div>
       ) : (
         <Tree

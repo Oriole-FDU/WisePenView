@@ -10,6 +10,8 @@ const zhCNCourse = {
     subtitle: '管理课程与学习',
     join: '加入课程',
     create: '新建课程',
+    loading: '正在加载课程列表',
+    loadFailed: '获取课程列表失败',
     empty: '暂无课程',
     progress: '已完成 {{read}} / {{total}}',
     pendingAssignments: '有 {{count}} 项作业待完成',

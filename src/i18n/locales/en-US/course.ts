@@ -10,6 +10,8 @@ const enUSCourse = {
     subtitle: 'Manage courses and learning',
     join: 'Join course',
     create: 'Create course',
+    loading: 'Loading courses',
+    loadFailed: 'Failed to load courses',
     empty: 'No courses yet',
     progress: '{{read}} / {{total}} completed',
     pendingAssignments: '{{count}} assignments remaining',

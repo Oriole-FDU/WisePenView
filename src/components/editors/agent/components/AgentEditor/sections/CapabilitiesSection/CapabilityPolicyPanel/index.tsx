@@ -157,7 +157,7 @@ export default function CapabilityPolicyPanel({
               selectionMode="multiple"
               selectedKeys={selectedIds}
               onSelectionChange={commitSelection}
-              renderEmptyState={() => <EmptyState>{emptyText}</EmptyState>}
+              renderEmptyState={() => <EmptyState title={emptyText} />}
             >
               {options.map((option) => {
                 const helper =

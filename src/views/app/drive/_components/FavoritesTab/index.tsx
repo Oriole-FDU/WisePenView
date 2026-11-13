@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
 import FavoriteCollectionList from './components/FavoriteCollectionList';
@@ -45,7 +45,7 @@ function FavoritesTab() {
     return (
       <div className={styles.container}>
         <div className={styles.feedbackState}>
-          <Empty description={t('favorite.collection.empty')} />
+          <EmptyState title={t('favorite.collection.empty')} />
         </div>
       </div>
     );
