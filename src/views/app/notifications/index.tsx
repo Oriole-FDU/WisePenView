@@ -96,7 +96,7 @@ function NotificationsPage() {
       ? messageVirtualizer.getTotalSize() - (virtualItems[virtualItems.length - 1]?.end ?? 0)
       : 0;
 
-  const { runAsync: readMessages } = useApi(
+  const { loading: readingMessages, runAsync: readMessages } = useApi(
     (messageIds: string[]) => messageService.readMessages({ messageIds }),
     { manual: true }
   );
@@ -114,12 +114,15 @@ function NotificationsPage() {
     );
   };
 
-  const markLoadedMessagesAsRead = () => {
+  const markMessagesAsRead = (messageIds: readonly string[]) => {
+    const readMessageIds = new Set(messageIds);
     messagesRequest.mutate((data) =>
       data
         ? {
             ...data,
-            list: data.list.map((message) => ({ ...message, read: true })),
+            list: data.list.map((message) =>
+              readMessageIds.has(message.messageId) ? { ...message, read: true } : message
+            ),
           }
         : data
     );
@@ -152,8 +155,9 @@ function NotificationsPage() {
     const unreadMessages = messages.filter((message) => !message.read);
     if (unreadMessages.length === 0) return;
     try {
-      await readMessages(unreadMessages.map((message) => message.messageId));
-      markLoadedMessagesAsRead();
+      const messageIds = unreadMessages.map((message) => message.messageId);
+      await readMessages(messageIds);
+      markMessagesAsRead(messageIds);
     } catch (error: unknown) {
       toast.warning(parseErrorMessage(error));
     }
@@ -179,11 +183,12 @@ function NotificationsPage() {
           <AppButton
             size="sm"
             variant="secondary"
-            isDisabled={!hasUnreadMessages}
+            isDisabled={!hasUnreadMessages || readingMessages}
+            aria-busy={readingMessages || undefined}
             onPress={handleMarkAllAsRead}
           >
             <CheckCheck size={16} />
-            {t('page.markAllAsRead')}
+            {t('page.markLoadedAsRead')}
           </AppButton>
         }
       />
