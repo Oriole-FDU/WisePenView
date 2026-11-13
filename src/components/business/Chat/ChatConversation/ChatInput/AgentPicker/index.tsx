@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
-import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
@@ -157,11 +156,8 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   };
 
   const getAgentLabel = (agent: ChatAgentOption): string =>
-    agent.isDefault ? t('input.agentPicker.defaultAgent') : agent.label;
-
-  const agentTooltip = selectedAgent.isDefault
-    ? t('input.agentPicker.selectAgentTooltip')
-    : getAgentLabel(selectedAgent);
+    agent.isDefault ? t('input.agentPicker.defaultMode') : agent.label;
+  const selectedAgentLabel = getAgentLabel(selectedAgent);
 
   const renderAgentIcon = (agent: ChatAgentOption, size: number) =>
     agent.isDefault ? (
@@ -188,19 +184,16 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   return (
     <>
       <Dropdown isOpen={agentOpen} onOpenChange={setAgentOpen}>
-        <Dropdown.Trigger
-          render={({ disabled, ...triggerProps }) => (
-            <GuideAnchor id={GUIDE_TOOL_ID.chatAgent}>
-              <AppIconButton
-                {...triggerProps}
-                isDisabled={disabled}
-                icon={renderAgentIcon(selectedAgent, 17)}
-                label={t('input.agentPicker.trigger')}
-                tooltip={{ content: agentTooltip }}
-              />
-            </GuideAnchor>
-          )}
-        />
+        <GuideAnchor id={GUIDE_TOOL_ID.chatAgent}>
+          <Dropdown.Trigger
+            className={styles.agentTrigger}
+            aria-label={t('input.agentPicker.triggerAria', { name: selectedAgentLabel })}
+          >
+            {renderAgentIcon(selectedAgent, 17)}
+            <span className={styles.agentTriggerLabel}>{selectedAgentLabel}</span>
+            <ChevronDown size={14} aria-hidden="true" className={styles.agentTriggerChevron} />
+          </Dropdown.Trigger>
+        </GuideAnchor>
         <GuideAnchor id={GUIDE_TOOL_ID.chatAgentOpen} asChild>
           <Dropdown.Popover className={styles.popoverPanelAgent} placement="top">
             {showSkeleton ? (

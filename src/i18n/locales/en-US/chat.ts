@@ -59,9 +59,10 @@ const enUSChat = {
     agentPicker: {
       title: 'Agent',
       trigger: 'Select an Agent',
+      triggerAria: 'Current Agent: {{name}}. Open Agent menu.',
       currentDraft: 'Current draft',
-      defaultAgent: 'No Agent',
-      selectAgentTooltip: 'Select an Agent',
+      defaultMode: 'Default chat',
+      defaultAgent: 'Default Agent',
       loadingAria: 'Loading agents',
       selectFromGroup: 'Select from group',
       groupModalTitle: 'Select Agent from group',

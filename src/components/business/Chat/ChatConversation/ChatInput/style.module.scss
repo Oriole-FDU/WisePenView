@@ -286,6 +286,52 @@
   display: inline-flex;
 }
 
+.agentTrigger {
+  flex: 0 1 auto;
+  width: max-content;
+  min-width: 0;
+  max-width: 180px;
+  height: 32px;
+  padding-inline: var(--space-xs);
+  gap: var(--space-2xs-plus);
+  border: 0;
+  border-radius: var(--app-radius-button);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color var(--motion-duration-mid),
+    background-color var(--motion-duration-mid);
+
+  > :global(svg) {
+    flex: 0 0 auto;
+  }
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+    outline: none;
+  }
+
+  &:disabled {
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    opacity: 1;
+  }
+}
+
+.agentTriggerLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agentTriggerChevron {
+  flex: 0 0 auto;
+}
+
 .skillMenuBadge {
   position: absolute;
   top: -5px;
@@ -382,6 +428,23 @@
 
   .toolsRight {
     gap: var(--space-xs);
+  }
+}
+
+@container chat-input (max-width: 620px) {
+  .agentTrigger {
+    flex: 0 0 auto;
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    padding: 0;
+    justify-content: center;
+    border-radius: var(--app-radius-pill);
+  }
+
+  .agentTriggerLabel,
+  .agentTriggerChevron {
+    display: none;
   }
 }
 
