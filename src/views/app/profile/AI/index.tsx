@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import PageHeader from '@/components/base/PageHeader';
@@ -9,13 +10,15 @@ import WebSearchSettingsSection from './WebSearchSettingsSection';
 
 function AISettings() {
   const { t } = useTranslation('profile');
+  const modelAddButtonRef = useRef<HTMLButtonElement>(null);
+  const requestAddModel = () => modelAddButtonRef.current?.click();
 
   return (
     <>
       <PageHeader title={t('ai.title')} />
       <div className={styles.page}>
-        <ProviderSettingsSection />
-        <ModelSettingsSection />
+        <ProviderSettingsSection onRequestAddModel={requestAddModel} />
+        <ModelSettingsSection addButtonRef={modelAddButtonRef} />
         <WebSearchSettingsSection />
       </div>
     </>

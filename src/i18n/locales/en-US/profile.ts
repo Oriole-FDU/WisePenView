@@ -63,6 +63,7 @@ const enUSProfile = {
       providerModelName: 'Provider model name',
       providerModelNamePlaceholder: 'For example: gpt-4o-mini',
       bind: 'Bind',
+      addFirst: 'Add a model first',
       bindTitle: 'Bind model Provider',
       bindDescription:
         'The current provider can bind multiple models. Enter the actual model name used by this provider.',

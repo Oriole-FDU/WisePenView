@@ -1,5 +1,5 @@
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { type RefObject, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
@@ -47,7 +47,11 @@ function isValidOptionalPositiveInteger(value: string): boolean {
   return !value.trim() || parseOptionalPositiveInteger(value) != null;
 }
 
-function ModelSettingsSection() {
+interface ModelSettingsSectionProps {
+  addButtonRef: RefObject<HTMLButtonElement | null>;
+}
+
+function ModelSettingsSection({ addButtonRef }: ModelSettingsSectionProps) {
   const { t } = useTranslation(['profile', 'common']);
   const chatConfigService = useChatConfigService();
   const [models, setModels] = useState<ChatModelConfig[]>([]);
@@ -124,7 +128,7 @@ function ModelSettingsSection() {
             <h2>{t('ai.models.title')}</h2>
             <p>{t('ai.models.description')}</p>
           </div>
-          <AppButton size="sm" variant="primary" onPress={openCreate}>
+          <AppButton ref={addButtonRef} size="sm" variant="primary" onPress={openCreate}>
             <Plus size={16} aria-hidden="true" />
             {t('ai.models.add')}
           </AppButton>

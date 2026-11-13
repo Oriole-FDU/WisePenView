@@ -22,7 +22,11 @@ const PROVIDER_TYPES: ChatProviderType[] = [
   'OPENAI_COMPATIBLE',
 ];
 
-function ProviderSettingsSection() {
+interface ProviderSettingsSectionProps {
+  onRequestAddModel: () => void;
+}
+
+function ProviderSettingsSection({ onRequestAddModel }: ProviderSettingsSectionProps) {
   const { t } = useTranslation(['profile', 'common']);
   const chatConfigService = useChatConfigService();
   const [providers, setProviders] = useState<ChatProvider[]>([]);
@@ -148,7 +152,11 @@ function ProviderSettingsSection() {
 
   const openBinding = async (provider: ChatProvider) => {
     const data = await reload();
-    if (!data || data.models.length === 0) return;
+    if (!data) return;
+    if (data.models.length === 0) {
+      onRequestAddModel();
+      return;
+    }
 
     setBindingForm({
       modelId: data.models[0].id,
@@ -242,10 +250,16 @@ function ProviderSettingsSection() {
                   size="sm"
                   variant="ghost"
                   isDisabled={loading}
-                  onPress={() => void openBinding(provider)}
+                  onPress={() => {
+                    if (models.length === 0) {
+                      onRequestAddModel();
+                      return;
+                    }
+                    void openBinding(provider);
+                  }}
                 >
                   <Link size={15} aria-hidden="true" />
-                  {t('ai.models.bind')}
+                  {models.length === 0 ? t('ai.models.addFirst') : t('ai.models.bind')}
                 </AppButton>
                 <AppButton size="sm" variant="ghost" onPress={() => setDeleteProvider(provider)}>
                   <Trash2 size={15} aria-hidden="true" />
