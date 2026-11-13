@@ -63,7 +63,7 @@ function Account() {
 
   return (
     <>
-      <PageHeader title={t('account.title')} subtitle={t('account.subtitle')} />
+      <PageHeader title={t('account.title')} />
       <AccountVerification user={user} onUserInfoReload={reloadUserInfo} />
       <Spin spinning={loading}>
         <div className={styles.identitySlot}>

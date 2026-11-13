@@ -7,7 +7,6 @@ const zhCNCourse = {
   },
   list: {
     title: '我的课程',
-    subtitle: '管理课程与学习',
     join: '加入课程',
     create: '新建课程',
     loading: '正在加载课程列表',

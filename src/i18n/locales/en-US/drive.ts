@@ -1,7 +1,6 @@
 const enUSDrive = {
   page: {
     title: 'My Drive',
-    subtitle: 'Manage personal files',
     backToDrive: 'Back to Drive',
     viewAria: 'Drive views',
     tabs: {
