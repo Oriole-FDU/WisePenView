@@ -1,9 +1,10 @@
-import { ListBoxSection, Separator } from '@heroui/react';
+import { Separator } from '@heroui/react';
 import { clsx } from 'clsx';
 import { type ComponentPropsWithRef, useLayoutEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
+import { AppPressable } from '@/components/base/Button';
 import { GuideAnchor } from '@/components/base/Guide';
-import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { Tooltip } from '@/components/base/Tooltip';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
@@ -83,78 +84,116 @@ function HeaderNav({
         <Icon size={18} />
       </span>
     );
+    const content = collapsed ? (
+      <span className={styles.menuTooltipTrigger}>{icon}</span>
+    ) : (
+      <>
+        {icon}
+        <span className={styles.menuLabel} aria-hidden={labelsHidden || undefined}>
+          <span className={styles.menuLabelText}>{item.name}</span>
+        </span>
+      </>
+    );
+    const className = clsx(
+      styles.menuItem,
+      collapsed && styles.menuItemCollapsed,
+      labelsHidden && styles.menuItemLabelsHidden,
+      isActive && styles.menuItemActive
+    );
+    const itemStateProps = {
+      'aria-label': item.name,
+      'aria-current': isActive ? ('page' as const) : undefined,
+      'data-nav-active': isActive ? 'true' : undefined,
+      'data-guide-tool-id': item.toolId,
+    };
+
+    const renderLink = (extraProps: ComponentPropsWithRef<'a'> = {}) => {
+      const { ref, ...props } = extraProps;
+      return (
+        <Link
+          {...props}
+          {...itemStateProps}
+          ref={mergeRefs(setItemRef(item.key), ref)}
+          to={item.href ?? '#'}
+          className={className}
+          onClick={item.onPress}
+        >
+          {content}
+        </Link>
+      );
+    };
+
+    const renderButton = (extraProps: ComponentPropsWithRef<'button'> = {}) => {
+      const { ref, ...props } = extraProps;
+      return (
+        <AppPressable
+          {...props}
+          {...itemStateProps}
+          ref={mergeRefs(setItemRef(item.key), ref)}
+          className={className}
+          disabled={item.isDisabled}
+          onClick={item.onPress}
+        >
+          {content}
+        </AppPressable>
+      );
+    };
+
+    let control;
+    if (!collapsed) {
+      control = item.href ? renderLink() : renderButton();
+    } else if (item.href) {
+      control = (
+        <Tooltip>
+          <Tooltip.Trigger<'a'>
+            render={({ ref, ...props }) =>
+              renderLink({ ...props, ref } as ComponentPropsWithRef<'a'>)
+            }
+          >
+            {content}
+          </Tooltip.Trigger>
+          <Tooltip.Content placement="right">{item.name}</Tooltip.Content>
+        </Tooltip>
+      );
+    } else {
+      control = (
+        <Tooltip isDisabled={item.isDisabled}>
+          <Tooltip.Trigger<'button'>
+            render={({ ref, ...props }) =>
+              renderButton({ ...props, ref } as ComponentPropsWithRef<'button'>)
+            }
+          >
+            {content}
+          </Tooltip.Trigger>
+          <Tooltip.Content placement="right">{item.name}</Tooltip.Content>
+        </Tooltip>
+      );
+    }
 
     return (
-      <ListBoxItem
-        key={item.key}
-        id={item.key}
-        ref={setItemRef(item.key)}
-        textValue={item.name}
-        aria-label={item.name}
-        aria-current={isActive ? 'page' : undefined}
-        data-nav-active={isActive ? 'true' : undefined}
-        data-guide-tool-id={item.toolId}
-        isDisabled={item.isDisabled}
-        className={clsx(
-          styles.menuItem,
-          collapsed && styles.menuItemCollapsed,
-          labelsHidden && styles.menuItemLabelsHidden,
-          isActive && styles.menuItemActive
-        )}
-        onAction={item.onPress}
-        render={
-          collapsed
-            ? (domProps) => {
-                // 导航项只使用 onAction，不传 href；React Aria 在此始终渲染 div。
-                const { ref: itemRef, ...itemProps } = domProps as ComponentPropsWithRef<'div'>;
-                return (
-                  <Tooltip isDisabled={item.isDisabled}>
-                    <Tooltip.Trigger
-                      {...itemProps}
-                      render={({ ref: tooltipRef, ...tooltipProps }) => (
-                        <div
-                          {...tooltipProps}
-                          data-guide-tool-id={item.toolId}
-                          tabIndex={itemProps.tabIndex}
-                          ref={mergeRefs(itemRef, tooltipRef)}
-                        />
-                      )}
-                    />
-                    <Tooltip.Content placement="right">{item.name}</Tooltip.Content>
-                  </Tooltip>
-                );
-              }
-            : undefined
-        }
-      >
-        {collapsed ? (
-          <span className={styles.menuTooltipTrigger}>{icon}</span>
-        ) : (
-          <>
-            {icon}
-            <span className={styles.menuLabel} aria-hidden={labelsHidden || undefined}>
-              <span className={styles.menuLabelText}>{item.name}</span>
-            </span>
-          </>
-        )}
-      </ListBoxItem>
+      <li key={item.key} className={styles.menuItemSlot}>
+        {control}
+      </li>
     );
   };
 
   const renderSection = (section: HeaderNavSection) => (
-    <ListBoxSection key={section.key} id={section.key} className={styles.menuSection}>
-      {section.items.map(renderItem)}
-    </ListBoxSection>
+    <div key={section.key} className={styles.menuSection}>
+      <ul className={styles.menuList}>{section.items.map(renderItem)}</ul>
+    </div>
   );
 
   const menu = (
-    <ListBox
+    <nav
       aria-label={ariaLabel}
-      selectionMode="none"
       className={clsx(styles.headerMenu, collapsed && styles.headerMenuCollapsed)}
     >
-      {shouldRenderSections ? navSections.map(renderSection) : navItems.map(renderItem)}
-    </ListBox>
+      {shouldRenderSections ? (
+        navSections.map(renderSection)
+      ) : (
+        <ul className={styles.menuList}>{navItems.map(renderItem)}</ul>
+      )}
+    </nav>
   );
 
   return (

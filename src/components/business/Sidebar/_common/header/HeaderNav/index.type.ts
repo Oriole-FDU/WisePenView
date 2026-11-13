@@ -6,7 +6,10 @@ export interface HeaderNavItem {
   key: string;
   name: string;
   icon: LucideIcon;
-  onPress: () => void;
+  /** 页面目的地使用真实链接，保留浏览器的新标签与复制地址能力。 */
+  href?: string;
+  /** 链接导航后的回调，或非链接动作的点击处理器。 */
+  onPress?: () => void;
   isDisabled?: boolean;
   /** 新手指引的固定目标。不传则不参与高亮。 */
   toolId?: GuideToolId;
