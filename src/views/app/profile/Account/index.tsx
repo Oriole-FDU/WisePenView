@@ -74,7 +74,7 @@ function Account() {
           <section className={styles.panel}>
             <div className={styles.sectionHeader}>
               <h3 className={styles.sectionTitle}>{t('account.sectionTitle')}</h3>
-              <AppButton variant="danger-soft" onPress={() => setChangePasswordModalOpen(true)}>
+              <AppButton variant="secondary" onPress={() => setChangePasswordModalOpen(true)}>
                 <Lock size={16} aria-hidden="true" />
                 {t('account.changePassword')}
               </AppButton>
