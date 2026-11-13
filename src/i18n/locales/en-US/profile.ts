@@ -1,6 +1,9 @@
 const enUSProfile = {
   account: {
     title: 'Account',
+    loading: 'Loading account details',
+    loadFailed: "Couldn't load account details",
+    loadFailedDescription: 'Your account details could not be loaded. Please try again.',
     sectionTitle: 'Account details',
     changePassword: 'Change password',
     username: 'Username',

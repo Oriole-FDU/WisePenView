@@ -1,9 +1,9 @@
-import { Lock } from 'lucide-react';
+import { Lock, RotateCw } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, LoadingState, Spin } from '@/components/base/Feedback';
 import PageHeader from '@/components/base/PageHeader';
 import { useUserService } from '@/domains';
 import type { UserAccountProfile } from '@/domains/User';
@@ -35,10 +35,17 @@ function Account() {
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const emptyLabel = t('form.emptyValue');
 
-  const { loading, runAsync: reloadUserInfo } = useApi(() => userService.getFullUserInfo(), {
+  const {
+    loading,
+    error,
+    refresh,
+    runAsync: reloadUserInfo,
+  } = useApi(() => userService.getFullUserInfo(), {
     onSuccess: (data) => {
       setUser(data);
     },
+    getErrorMessage: () => t('account.loadFailed'),
+    showErrorToast: Boolean(user),
   });
 
   const identityType = user?.userInfo?.identityType ?? IDENTITY.STUDENT;
@@ -60,6 +67,36 @@ function Account() {
     { key: 'email', label: t('account.email'), ...email },
     { key: 'mobile', label: t('account.mobile'), ...mobile },
   ];
+
+  const retryAction = (
+    <AppButton variant="primary" size="sm" onPress={refresh}>
+      <RotateCw size={16} aria-hidden="true" />
+      {t('actions.retry', { ns: 'common' })}
+    </AppButton>
+  );
+
+  if (!user && error) {
+    return (
+      <>
+        <PageHeader title={t('account.title')} />
+        <ErrorState
+          className={styles.pageState}
+          title={t('account.loadFailed')}
+          description={t('account.loadFailedDescription')}
+          action={retryAction}
+        />
+      </>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <PageHeader title={t('account.title')} />
+        <LoadingState className={styles.pageState} label={t('account.loading')} />
+      </>
+    );
+  }
 
   return (
     <>
