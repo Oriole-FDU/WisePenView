@@ -1,8 +1,11 @@
 import { toast } from '@heroui/react';
+import { RotateCw } from 'lucide-react';
 import { type Key, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { AppButton } from '@/components/base/Button';
+import { ErrorState, LoadingState } from '@/components/base/Feedback';
 import { GuideAnchor, GuideScope, registerGuideActionHandlers } from '@/components/base/Guide';
 import PageHeader from '@/components/base/PageHeader';
 import { Tabs } from '@/components/base/Tabs';
@@ -61,13 +64,17 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
     });
   }, []);
 
-  const { data: trashFolder } = useApi(
-    () => driveService.getSystemFolder({ scope: driveScope, type: 'trash' }),
-    {
-      ready: isTrashView && !activeFolderId,
-      refreshDeps: [activeViewMode, activeFolderId],
-    }
-  );
+  const {
+    data: trashFolder,
+    loading: trashFolderLoading,
+    error: trashFolderError,
+    refresh: refreshTrashFolder,
+  } = useApi(() => driveService.getSystemFolder({ scope: driveScope, type: 'trash' }), {
+    ready: isTrashView && !activeFolderId,
+    refreshDeps: [activeViewMode, activeFolderId],
+    getErrorMessage: () => t('page.trashLoadFailed'),
+    showErrorToast: false,
+  });
   const trashFolderNodeId = trashFolder?.id;
 
   const handleCurrentNodeChange = (nodeId: string) => {
@@ -104,7 +111,9 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
   };
 
   const initialNodeId = activeFolderId ?? trashFolderNodeId;
-  const isTrashPending = Boolean(isTrashView && !activeFolderId && !trashFolderNodeId);
+  const isTrashRoot = Boolean(isTrashView && !activeFolderId);
+  const isTrashPending =
+    isTrashRoot && !trashFolderError && (trashFolderLoading || !trashFolderNodeId);
   const tableDriveLocationKey = `${driveScope.rootId}\u0000${initialNodeId ?? driveScope.rootId}`;
 
   const handleTrashNodeChange = (nodeId: string) => {
@@ -172,12 +181,25 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
         )}
         {activeViewMode === 'uploadQueue' && <UploadQueueTab />}
         {activeViewMode === 'favorites' && <FavoritesTab />}
-        {isTrashView ? (
+        {isTrashRoot && trashFolderError ? (
+          <ErrorState
+            className={styles.trashState}
+            title={t('page.trashLoadFailed')}
+            description={t('page.trashLoadFailedDescription')}
+            action={
+              <AppButton variant="primary" size="sm" onPress={refreshTrashFolder}>
+                <RotateCw size={16} aria-hidden="true" />
+                {t('page.retry')}
+              </AppButton>
+            }
+          />
+        ) : isTrashPending ? (
+          <LoadingState className={styles.trashState} label={t('page.trashLoading')} />
+        ) : isTrashView ? (
           <DriveBrowser
             key={tableDriveLocationKey}
             scope={driveScope}
             initialNodeId={initialNodeId}
-            loading={isTrashPending}
             onCurrentNodeChange={handleTrashNodeChange}
             onPathError={(error) => {
               toast.danger(parseErrorMessage(error));

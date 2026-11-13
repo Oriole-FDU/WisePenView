@@ -3,6 +3,10 @@ const enUSDrive = {
     title: 'My Drive',
     backToDrive: 'Back to Drive',
     viewAria: 'Drive views',
+    trashLoading: 'Opening Trash',
+    trashLoadFailed: "Couldn't open Trash",
+    trashLoadFailedDescription: 'Trash could not be loaded. Please try again.',
+    retry: 'Try again',
     tabs: {
       drive: 'Drive',
       uploadQueue: 'Upload queue',
