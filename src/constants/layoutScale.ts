@@ -72,8 +72,8 @@ export const WORKSPACE_SPLIT_HEADER_HEIGHT = 56;
 
 export const LAYOUT_COMPACT_MAX_WIDTH = MAIN_SHELL_DRAWER_MAX_WIDTH;
 
-/** fullWidth ChatInput 窄于此宽度时，模型按钮改为仅图标 */
-export const FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH = 800;
+/** fullWidth ChatInput 窄于此宽度时，模型按钮改为仅图标；720px 内容轴下优先展示模型短名 */
+export const FULL_WIDTH_MODEL_ICON_ONLY_MAX_WIDTH = 600;
 
 /** fullWidth 下带名称的模型按钮最大宽 */
 export const MODEL_SELECTOR_LABEL_MAX_WIDTH = 240;
