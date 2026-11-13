@@ -13,6 +13,8 @@
 - owner 开启 system prompt 为空的目前草稿时，编辑器保持空 prompt，不注入通用模板。依据：[useAgentDraftSessionController](components/AgentWorkspace/controllers/useAgentDraftSessionController.ts) 的 `initialDraft`。
 - 普通设置只展示基本信息、System Prompt、Tool／Skill 能力与附件。Tool 与 Skill 各只有一个添加／移除列表；模型、会话标题、Tool 显式覆盖和全部记忆策略统一放在默认折叠的高级设置中。依据：[AgentEditor](components/AgentEditor/index.tsx) 与各 section 组件。
 - owner 查看目前草稿时可将草稿 Agent 注入 Chat 调试；若草稿 dirty，送出会等待确认，且只有保存成功才继续。历史版本与非 owner 不注入目前草稿。依据：[AgentWorkspace](components/AgentWorkspace/index.tsx) 的 `debugAgent`、[useAgentDebugSendGuardController](components/AgentWorkspace/controllers/useAgentDebugSendGuardController.ts) 的 `interceptSend`、`confirm`。
+- Agent 调试 Chat 实例由编辑器右侧列持有；Agent 资源不挂载外层通用 Chat 右栏，避免同一草稿出现两个会话与发送守卫。编辑器仅向外层隐藏 Chat 面板能力，其他资源的右侧面板行为不变。依据：[AgentEditor](components/AgentEditor/index.tsx)、[AgentWorkspace](components/AgentWorkspace/index.tsx)、[ResourceRouteBoundary](../../../views/app/resource/ResourceRouteBoundary/index.tsx)。
+- 表单顶部展示的是资源展示名 `resourceName`，不是 Agent 内部 `name`。内联重命名调用 ResourceService 并刷新资源；内部名称仍由基本信息字段维护。依据：[AgentDisplayName](components/AgentEditor/components/AgentDisplayName/index.tsx)、[AgentWorkspace](components/AgentWorkspace/index.tsx) 的 `renameDisplayName`。
 - asset 多档上传按顺序逐档提交；上传或删除成功后重新读取 draft version 的资产清单。依据：[useAgentAssetsController](components/AgentEditor/controllers/useAgentAssetsController.ts) 的 `uploadRequest`、`refreshAssets`、`deleteRequest`。
 
 ## 尚未由前端证明的事项

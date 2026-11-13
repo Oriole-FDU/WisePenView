@@ -31,6 +31,8 @@ export default function ResourceWorkspacePresentation({
   const presentation = useStore(store, (state) => state.presentation);
   const { activePanelId, closePanel } = useWorkspaceRightPanel();
   const { document, chat, sidePanel, ...workspace } = presentation;
+  const chatBinding = chat === false ? undefined : chat;
+  const chatAvailable = kind !== 'agent' && Boolean(chatBinding);
   const resourceInfo = document?.resourceInfo ?? sidePanel?.resource;
   const onResourceChanged = document?.onResourceChanged ?? sidePanel?.onResourceChanged;
   const inlineComment = sidePanel?.inlineComment;
@@ -115,12 +117,15 @@ export default function ResourceWorkspacePresentation({
         {...workspace}
         headerTrailingActions={
           <ResourceWorkspacePanelActions
+            chatAvailable={chatAvailable}
             inlineCommentAvailable={inlineCommentAvailable}
             interactAvailable={interactAvailable}
           />
         }
       >
-        {chat ? <ResourceChatBinding resourceId={target.resourceId} {...chat} /> : null}
+        {chatAvailable && chatBinding ? (
+          <ResourceChatBinding resourceId={target.resourceId} {...chatBinding} />
+        ) : null}
         {children}
       </ResourceLayout>
     </>

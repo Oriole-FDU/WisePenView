@@ -2,10 +2,13 @@ import { toast } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
+import Chat from '@/components/business/Chat';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import type { EditorPresentation } from '@/components/editors/editor.type';
+import { useResourceService } from '@/domains';
 import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { useApi } from '@/hooks/useApi';
 
 import { useEditorSurface } from '../../../_context';
 import { prepareDraftExit } from '../../../_runtime/draftExit';
@@ -43,6 +46,7 @@ export default function AgentWorkspace({
   onVersionSelect,
 }: AgentWorkspaceProps) {
   const { t } = useTranslation(['agent', 'common']);
+  const resourceService = useResourceService();
   const draftSession = useAgentDraftSessionController({
     agent,
     baseAgent: data.agent,
@@ -75,6 +79,18 @@ export default function AgentWorkspace({
         interceptSend: debugGuard.interceptSend,
       }
     : undefined;
+  const renameDisplayName = useApi(
+    async (newName: string) => {
+      await resourceService.renameResource({ resourceId, newName });
+      onRefresh();
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        toast.success(t('agent:page.displayNameRenamed'));
+      },
+    }
+  );
   const visibleSaveStatus =
     draftSession.savePhase === 'failed'
       ? 'failed'
@@ -115,7 +131,7 @@ export default function AgentWorkspace({
       )
   );
   const headerConfig = {
-    chat: { hostAgentPort },
+    chat: false,
     header: {
       resource: {
         resourceId: agent.resourceId,
@@ -153,7 +169,22 @@ export default function AgentWorkspace({
       <EditorPresentationBinding className={styles.pageWrap} {...headerConfig} />
       <AgentEditor
         assets={agent.assets}
+        chatPanel={
+          <Chat
+            fullWidth="panel"
+            resourceId={resourceId}
+            showHeader
+            showCollapseButton={false}
+            hostAgentPort={hostAgentPort}
+            titleMeta={
+              <span className={styles.chatDebugMeta} title={t('agent:page.debugChatHint')}>
+                {t('agent:page.debugChat')}
+              </span>
+            }
+          />
+        }
         draft={draftSession.draft}
+        displayName={agent.title}
         draftVersion={data.agent.draftVersion}
         models={data.models}
         readOnly={draftSession.isReadOnly}
@@ -162,6 +193,9 @@ export default function AgentWorkspace({
         tools={data.tools}
         onDescriptionChange={draftSession.setDescription}
         onNameChange={draftSession.setName}
+        onDisplayNameChange={async (name) => {
+          await renameDisplayName.runAsync(name);
+        }}
         onSpecChange={draftSession.setSpec}
         onSystemPromptChange={draftSession.setSystemPrompt}
       />

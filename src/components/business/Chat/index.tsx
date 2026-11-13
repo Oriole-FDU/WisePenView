@@ -20,6 +20,7 @@ function Chat({
   resourceChat,
   resourceId,
   hostAgentPort,
+  titleMeta,
   showCollapseButton = true,
   onCollapsePanel,
 }: ChatProps) {
@@ -81,6 +82,7 @@ function Chat({
         {showHeader ? (
           <ChatHeader
             panelTitle={session.panelTitle}
+            titleMeta={titleMeta}
             sessionBarOpen={session.sessionBarOpen}
             showCollapseButton={showCollapseButton}
             reserveTitleBarEnd={!isFullWidth}

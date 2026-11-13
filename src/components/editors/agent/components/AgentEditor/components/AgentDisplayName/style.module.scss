@@ -1,0 +1,52 @@
+.root {
+  padding: var(--space-xl) var(--app-form-section-inline-padding) var(--space-md);
+}
+
+.inner {
+  width: min(100%, 800px);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--app-radius-content);
+  color: var(--accent-text);
+  background: var(--accent-soft);
+}
+
+.copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.titleRow {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.title {
+  min-width: 0;
+  max-width: min(100%, 520px);
+  margin: 0;
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: var(--font-size-heading-2);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.input {
+  width: min(100%, 420px);
+}
