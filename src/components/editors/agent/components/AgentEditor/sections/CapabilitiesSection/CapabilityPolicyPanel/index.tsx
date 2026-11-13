@@ -13,9 +13,9 @@ import ListBox from '@/components/base/ListBox';
 import SettingsListPanel from '../../../shared/SettingsListPanel';
 import styles from './style.module.scss';
 
-export type CapabilityPolicyKind = 'tool' | 'skill';
+type CapabilityPolicyKind = 'tool' | 'skill';
 
-export interface CapabilityPolicyOption {
+interface CapabilityPolicyOption {
   id: string;
   name: string;
   internalName?: string;

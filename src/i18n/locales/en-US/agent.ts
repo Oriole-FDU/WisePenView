@@ -3,11 +3,9 @@ const enUSAgent = {
     noDescription: 'No description',
     unavailable: 'Unavailable',
     done: 'Done',
-    restorePreset: 'Restore preset',
   },
   page: {
     saveStatus: {
-      dirty: 'Unsaved changes',
       saving: 'Saving...',
       failed: 'Save failed',
       clean: 'Saved',

@@ -16,7 +16,7 @@
 }
 
 /* 每个字段作为独立设置单元，用紧凑矩阵明确分组。 */
-.grid > div {
+.item {
   display: flex;
   align-items: center;
   width: auto;

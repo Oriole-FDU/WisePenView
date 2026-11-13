@@ -90,7 +90,6 @@ export default function AgentEditor({
                 onMarkdownChange={onSystemPromptChange}
               />
               <CapabilitiesSection
-                mode="basic"
                 spec={draft.spec}
                 tools={tools}
                 skills={skills}
@@ -108,7 +107,6 @@ export default function AgentEditor({
                 spec={draft.spec}
                 models={models}
                 tools={tools}
-                skills={skills}
                 disabled={readOnly}
                 onChange={onSpecChange}
               />

@@ -25,7 +25,6 @@ interface AgentWorkspaceProps {
   data: AgentWorkspaceData;
   disabledVersionKeys: Set<string>;
   isOwner: boolean;
-  resourceId: string;
   versionItems: AgentVersionItem[];
   versionLoading: boolean;
   viewingVersion: number | null;
@@ -38,7 +37,6 @@ export default function AgentWorkspace({
   data,
   disabledVersionKeys,
   isOwner,
-  resourceId,
   versionItems,
   versionLoading,
   viewingVersion,
@@ -46,6 +44,7 @@ export default function AgentWorkspace({
   onVersionSelect,
 }: AgentWorkspaceProps) {
   const { t } = useTranslation(['agent', 'common']);
+  const resourceId = agent.resourceId;
   const resourceService = useResourceService();
   const draftSession = useAgentDraftSessionController({
     agent,
@@ -91,12 +90,6 @@ export default function AgentWorkspace({
       },
     }
   );
-  const visibleSaveStatus =
-    draftSession.savePhase === 'failed'
-      ? 'failed'
-      : draftSession.savePhase === 'dirty' || draftSession.savePhase === 'saving'
-        ? 'saving'
-        : 'clean';
   const { target } = useEditorSurface();
   useEditorRuntime(
     {
@@ -131,7 +124,6 @@ export default function AgentWorkspace({
       )
   );
   const headerConfig = {
-    chat: false,
     header: {
       resource: {
         resourceId: agent.resourceId,
@@ -145,8 +137,8 @@ export default function AgentWorkspace({
         onResourceChanged: onRefresh,
         titleMeta:
           isOwner && viewingVersion === null ? (
-            <span className={styles.saveStatus} data-phase={visibleSaveStatus}>
-              {t(`agent:page.saveStatus.${visibleSaveStatus}`)}
+            <span className={styles.saveStatus} data-phase={draftSession.savePhase}>
+              {t(`agent:page.saveStatus.${draftSession.savePhase}`)}
             </span>
           ) : undefined,
         actions: isOwner ? (

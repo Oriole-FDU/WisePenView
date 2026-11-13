@@ -95,7 +95,7 @@ export interface EditorPresentation {
     inlineComment?: ReactNode;
     onResourceChanged?: () => unknown | Promise<unknown>;
   };
-  chat?: { provider?: EditorChatProvider; hostAgentPort?: ChatHostAgentPort } | false;
+  chat?: { provider?: EditorChatProvider; hostAgentPort?: ChatHostAgentPort };
   document?: {
     resourceInfo?: ResourceItem;
     documentType?: string;

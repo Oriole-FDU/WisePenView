@@ -6,9 +6,8 @@ import AppForm from '@/components/base/AppForm';
 import { AppPressable } from '@/components/base/Button';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel, ToolOption } from '@/domains/ChatConfig';
-import type { SkillSummary } from '@/domains/Skill';
 
-import CapabilitiesSection from '../CapabilitiesSection';
+import CapabilityOverridesSection from '../CapabilitiesSection/CapabilityOverridesSection';
 import MemorySection from '../MemorySection';
 import ModelSection from '../ModelSection';
 import styles from './style.module.scss';
@@ -17,7 +16,6 @@ interface Props {
   spec: AgentSpec;
   models: ChatModel[];
   tools: ToolOption[];
-  skills: SkillSummary[];
   disabled: boolean;
   onChange: (spec: AgentSpec) => void;
 }
@@ -26,7 +24,6 @@ export default function AdvancedSettingsSection({
   spec,
   models,
   tools,
-  skills,
   disabled,
   onChange,
 }: Props) {
@@ -55,11 +52,9 @@ export default function AdvancedSettingsSection({
           </section>
           <section className={styles.group}>
             <h3>{t('capabilities.advancedTitle')}</h3>
-            <CapabilitiesSection
-              mode="advanced"
+            <CapabilityOverridesSection
               spec={spec}
               tools={tools}
-              skills={skills}
               disabled={disabled}
               onChange={onChange}
             />

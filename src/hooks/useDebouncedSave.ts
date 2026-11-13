@@ -1,7 +1,7 @@
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
 
-export type DebouncedSaveStatus = 'idle' | 'scheduled' | 'saving' | 'failed';
+type DebouncedSaveStatus = 'idle' | 'scheduled' | 'saving' | 'failed';
 
 interface UseDebouncedSaveOptions<TValue> {
   save: (value: TValue) => Promise<void>;
@@ -15,7 +15,6 @@ interface UseDebouncedSaveOptions<TValue> {
 interface UseDebouncedSaveResult<TValue> {
   cancel: () => void;
   flush: () => Promise<void>;
-  retry: () => Promise<void>;
   schedule: (value: TValue) => void;
   status: DebouncedSaveStatus;
 }
@@ -110,8 +109,6 @@ export function useDebouncedSave<TValue>({
     }, waitMs);
   });
 
-  const retry = useMemoizedFn(() => flush());
-
   const cancel = useMemoizedFn(() => {
     clearTimer();
     pendingRef.current = null;
@@ -126,7 +123,6 @@ export function useDebouncedSave<TValue>({
   return {
     cancel,
     flush,
-    retry,
     schedule,
     status,
   };

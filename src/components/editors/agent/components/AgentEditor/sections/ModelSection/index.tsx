@@ -6,7 +6,10 @@ import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/ChatConfig';
 
-import SettingsFieldGrid, { SettingsSwitchField } from '../../shared/SettingsFieldGrid';
+import SettingsFieldGrid, {
+  SettingsGridItem,
+  SettingsSwitchField,
+} from '../../shared/SettingsFieldGrid';
 import styles from './style.module.scss';
 
 interface Props {
@@ -41,19 +44,21 @@ export default function ModelSection({ spec, models, disabled, onChange }: Props
   return (
     <div className={styles.groups}>
       <SettingsFieldGrid columns={1}>
-        <AppForm.Row
-          title={t('model.default')}
-          control={
-            <ModelSelector
-              models={models}
-              selectedId={selected?.id}
-              isOpen={open}
-              onOpenChange={setOpen}
-              onChange={selectModel}
-              disabled={disabled || models.length === 0}
-            />
-          }
-        />
+        <SettingsGridItem>
+          <AppForm.Row
+            title={t('model.default')}
+            control={
+              <ModelSelector
+                models={models}
+                selectedId={selected?.id}
+                isOpen={open}
+                onOpenChange={setOpen}
+                onChange={selectModel}
+                disabled={disabled || models.length === 0}
+              />
+            }
+          />
+        </SettingsGridItem>
       </SettingsFieldGrid>
       <SettingsFieldGrid columns={2}>
         <SettingsSwitchField

@@ -14,7 +14,7 @@ import {
   snapshotAgentDraft,
 } from '../../../model';
 
-type AgentSavePhase = 'clean' | 'dirty' | 'saving' | 'failed';
+type AgentSavePhase = 'clean' | 'saving' | 'failed';
 
 interface UseAgentDraftSessionControllerOptions {
   agent: AgentDetail;
@@ -39,9 +39,8 @@ export function useAgentDraftSessionController({
 }: UseAgentDraftSessionControllerOptions) {
   const agentService = useAgentService();
   const initialSavedDraft = buildAgentDraft(agent);
-  const initialDraft = initialSavedDraft;
   const savedSnapshotRef = useRef(snapshotAgentDraft(initialSavedDraft));
-  const [draft, setDraftState] = useState(initialDraft);
+  const [draft, setDraftState] = useState(initialSavedDraft);
 
   const saveRequest = useApi(
     async (draftSnapshot: AgentDraft) => {
@@ -53,7 +52,6 @@ export function useAgentDraftSessionController({
         description: draftSnapshot.description.trim(),
         spec: draftSnapshot.spec,
       });
-      return snapshotAgentDraft(draftSnapshot);
     },
     {
       manual: true,
@@ -71,13 +69,7 @@ export function useAgentDraftSessionController({
     },
   });
   const savePhase: AgentSavePhase =
-    autoSave.status === 'scheduled'
-      ? 'dirty'
-      : autoSave.status === 'saving'
-        ? 'saving'
-        : autoSave.status === 'failed'
-          ? 'failed'
-          : 'clean';
+    autoSave.status === 'failed' ? 'failed' : autoSave.status === 'idle' ? 'clean' : 'saving';
   const isDirty = autoSave.status !== 'idle';
 
   const setDraft = (updater: (current: AgentDraft) => AgentDraft) =>

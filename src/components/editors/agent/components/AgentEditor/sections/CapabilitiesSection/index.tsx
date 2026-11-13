@@ -5,10 +5,9 @@ import type { AgentSpec } from '@/domains/Agent';
 import type { ToolOption } from '@/domains/ChatConfig';
 import type { SkillSummary } from '@/domains/Skill';
 
-import CapabilityPolicyPanel, { type CapabilityPolicyOption } from './CapabilityPolicyPanel';
+import CapabilityPolicyPanel from './CapabilityPolicyPanel';
 
 interface Props {
-  mode: 'basic' | 'advanced';
   spec: AgentSpec;
   tools: ToolOption[];
   skills: SkillSummary[];
@@ -16,32 +15,17 @@ interface Props {
   onChange: (spec: AgentSpec) => void;
 }
 
-export default function CapabilitiesSection({
-  mode,
-  spec,
-  tools,
-  skills,
-  disabled,
-  onChange,
-}: Props) {
+export default function CapabilitiesSection({ spec, tools, skills, disabled, onChange }: Props) {
   const { t } = useTranslation('agent');
   const policy = spec.toolAndSkillPolicy;
-  const enabledToolOverrideIds = Object.entries(policy.toolSelectionOverrides)
-    .filter(([, enabled]) => enabled)
-    .map(([toolId]) => toolId);
-  const disabledToolOverrideIds = Object.entries(policy.toolSelectionOverrides)
-    .filter(([, enabled]) => !enabled)
-    .map(([toolId]) => toolId);
-
-  const getToolAvailabilityReason = (tool: ToolOption) => {
-    if (!tool.enabled) return t('capabilities.toolDisabled');
-    if (tool.requiresConfig && !tool.configured) return t('capabilities.toolRequiresConfig');
-    if (!tool.configured) return t('capabilities.toolIncomplete');
-    return undefined;
-  };
-
-  const toolOptions: CapabilityPolicyOption[] = tools.map((tool) => {
-    const disabledReason = getToolAvailabilityReason(tool);
+  const toolOptions = tools.map((tool) => {
+    const disabledReason = !tool.enabled
+      ? t('capabilities.toolDisabled')
+      : tool.requiresConfig && !tool.configured
+        ? t('capabilities.toolRequiresConfig')
+        : !tool.configured
+          ? t('capabilities.toolIncomplete')
+          : undefined;
     return {
       id: tool.toolId,
       name: tool.label,
@@ -51,7 +35,7 @@ export default function CapabilitiesSection({
       disabledReason,
     };
   });
-  const skillOptions: CapabilityPolicyOption[] = skills.map((skill) => ({
+  const skillOptions = skills.map((skill) => ({
     id: skill.resourceId,
     name: skill.title,
     internalName: skill.skillName,
@@ -90,56 +74,6 @@ export default function CapabilitiesSection({
     });
   };
 
-  const updateSelectedSkills = (ids: string[]) => {
-    updatePolicy({
-      enableUseSkill: ids.length > 0,
-      onDemandSkillIds: ids,
-    });
-  };
-
-  const updateToolOverrides = (enabled: boolean, toolIds: string[]) => {
-    const nextOverrides = Object.fromEntries(
-      Object.entries(policy.toolSelectionOverrides).filter(([, value]) => value !== enabled)
-    );
-    toolIds.forEach((toolId) => {
-      nextOverrides[toolId] = enabled;
-    });
-    updatePolicy({ toolSelectionOverrides: nextOverrides });
-  };
-
-  if (mode === 'advanced') {
-    return (
-      <>
-        <CapabilityPolicyPanel
-          kind="tool"
-          title={t('capabilities.enabledToolOverrides')}
-          description={t('capabilities.enabledToolOverridesDescription')}
-          addLabel={t('capabilities.addEnabledToolOverride')}
-          searchPlaceholder={t('capabilities.searchTool')}
-          emptyText={t('capabilities.noTool')}
-          selectedEmptyText={t('capabilities.noToolOverride')}
-          options={toolOptions}
-          selectedIds={enabledToolOverrideIds}
-          disabled={disabled}
-          onChange={(ids) => updateToolOverrides(true, ids)}
-        />
-        <CapabilityPolicyPanel
-          kind="tool"
-          title={t('capabilities.disabledToolOverrides')}
-          description={t('capabilities.disabledToolOverridesDescription')}
-          addLabel={t('capabilities.addDisabledToolOverride')}
-          searchPlaceholder={t('capabilities.searchTool')}
-          emptyText={t('capabilities.noTool')}
-          selectedEmptyText={t('capabilities.noToolOverride')}
-          options={toolOptions}
-          selectedIds={disabledToolOverrideIds}
-          disabled={disabled}
-          onChange={(ids) => updateToolOverrides(false, ids)}
-        />
-      </>
-    );
-  }
-
   return (
     <AppForm.Section id="capabilities" title={t('capabilities.title')} variant="editor">
       <CapabilityPolicyPanel
@@ -164,7 +98,12 @@ export default function CapabilitiesSection({
         options={skillOptions}
         selectedIds={selectedSkillIds}
         disabled={disabled}
-        onChange={updateSelectedSkills}
+        onChange={(ids) =>
+          updatePolicy({
+            enableUseSkill: ids.length > 0,
+            onDemandSkillIds: ids,
+          })
+        }
       />
     </AppForm.Section>
   );

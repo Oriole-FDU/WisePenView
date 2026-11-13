@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
 import { Switch } from '@/components/base/Input';
@@ -17,6 +18,15 @@ export default function SettingsFieldGrid({ columns, children }: Props) {
   );
 }
 
+interface SettingsGridItemProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function SettingsGridItem({ children, className }: SettingsGridItemProps) {
+  return <div className={clsx(styles.item, className)}>{children}</div>;
+}
+
 interface SettingsSwitchFieldProps {
   label: string;
   selected: boolean;
@@ -31,10 +41,10 @@ export function SettingsSwitchField({
   onChange,
 }: SettingsSwitchFieldProps) {
   return (
-    <div className={styles.switchItem}>
+    <SettingsGridItem className={styles.switchItem}>
       <Switch aria-label={label} isSelected={selected} isDisabled={disabled} onChange={onChange}>
         <span className={styles.switchLabel}>{label}</span>
       </Switch>
-    </div>
+    </SettingsGridItem>
   );
 }

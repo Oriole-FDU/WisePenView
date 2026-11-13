@@ -3,11 +3,9 @@ const zhCNAgent = {
     noDescription: '暂无描述',
     unavailable: '不可用',
     done: '完成',
-    restorePreset: '恢复预设',
   },
   page: {
     saveStatus: {
-      dirty: '有未保存修改',
       saving: '保存中...',
       failed: '保存失败',
       clean: '已保存',

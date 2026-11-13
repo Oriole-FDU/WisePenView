@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { FormField, NumberField, Slider, TextArea } from '@/components/base/Input';
+import AppAlertDialog from '@/components/business/AppAlertDialog';
 import type { AgentSpec } from '@/domains/Agent';
 
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';
-import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
 import SettingsFieldGrid, { SettingsSwitchField } from '../../shared/SettingsFieldGrid';
 import styles from './style.module.scss';
 
@@ -19,8 +19,38 @@ interface Props {
 
 const toScalar = (value: number | number[]) => (Array.isArray(value) ? value[0] : value);
 
+interface MemorySliderProps {
+  label: string;
+  value: number;
+  minValue: number;
+  maxValue: number;
+  disabled: boolean;
+  onChange: (value: number) => void;
+}
+
+function MemorySlider({ label, value, minValue, maxValue, disabled, onChange }: MemorySliderProps) {
+  return (
+    <Slider
+      minValue={minValue}
+      maxValue={maxValue}
+      step={0.05}
+      value={value}
+      formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
+      isDisabled={disabled}
+      onChange={(nextValue) => onChange(toScalar(nextValue))}
+    >
+      <Label>{label}</Label>
+      <Slider.Output />
+      <Slider.Track>
+        <Slider.Fill />
+        <Slider.Thumb />
+      </Slider.Track>
+    </Slider>
+  );
+}
+
 export default function MemorySection({ spec, disabled, onChange }: Props) {
-  const { t } = useTranslation('agent');
+  const { t } = useTranslation(['agent', 'common']);
   const [restoreOpen, setRestoreOpen] = useState(false);
   const policy = spec.memoryPolicy;
   const updatePolicy = (next: Partial<typeof policy>) => {
@@ -83,38 +113,22 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
           </AppButton>
         </div>
         <div className={styles.settingGrid}>
-          <Slider
+          <MemorySlider
+            label={t('memory.highWatermark')}
+            value={policy.highWatermarkRatio}
             minValue={0.5}
             maxValue={0.95}
-            step={0.05}
-            value={policy.highWatermarkRatio}
-            formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
-            isDisabled={disabled || !policy.enableChatMemorySummary}
-            onChange={(value) => updatePolicy({ highWatermarkRatio: toScalar(value) })}
-          >
-            <Label>{t('memory.highWatermark')}</Label>
-            <Slider.Output />
-            <Slider.Track>
-              <Slider.Fill />
-              <Slider.Thumb />
-            </Slider.Track>
-          </Slider>
-          <Slider
+            disabled={disabled || !policy.enableChatMemorySummary}
+            onChange={(value) => updatePolicy({ highWatermarkRatio: value })}
+          />
+          <MemorySlider
+            label={t('memory.lowWatermark')}
+            value={policy.lowWatermarkRatio}
             minValue={0.1}
             maxValue={0.8}
-            step={0.05}
-            value={policy.lowWatermarkRatio}
-            formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
-            isDisabled={disabled || !policy.enableChatMemorySummary}
-            onChange={(value) => updatePolicy({ lowWatermarkRatio: toScalar(value) })}
-          >
-            <Label>{t('memory.lowWatermark')}</Label>
-            <Slider.Output />
-            <Slider.Track>
-              <Slider.Fill />
-              <Slider.Thumb />
-            </Slider.Track>
-          </Slider>
+            disabled={disabled || !policy.enableChatMemorySummary}
+            onChange={(value) => updatePolicy({ lowWatermarkRatio: value })}
+          />
         </div>
         <div className={styles.settingGrid}>
           <NumberField
@@ -134,22 +148,14 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
               </NumberField.Group>
             </div>
           </NumberField>
-          <Slider
+          <MemorySlider
+            label={t('memory.scoreThreshold')}
+            value={policy.longTermMemoryScoreThreshold}
             minValue={0}
             maxValue={1}
-            step={0.05}
-            value={policy.longTermMemoryScoreThreshold}
-            formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
-            isDisabled={disabled || !policy.enableLongTermMemory}
-            onChange={(value) => updatePolicy({ longTermMemoryScoreThreshold: toScalar(value) })}
-          >
-            <Label>{t('memory.scoreThreshold')}</Label>
-            <Slider.Output />
-            <Slider.Track>
-              <Slider.Fill />
-              <Slider.Thumb />
-            </Slider.Track>
-          </Slider>
+            disabled={disabled || !policy.enableLongTermMemory}
+            onChange={(value) => updatePolicy({ longTermMemoryScoreThreshold: value })}
+          />
         </div>
         <FormField
           label={t('memory.summaryPrompt')}
@@ -160,11 +166,14 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
           <TextArea rows={3} placeholder={t('memory.summaryPlaceholder')} />
         </FormField>
       </div>
-      <PresetRestoreConfirmDialog
+      <AppAlertDialog
+        type="warning"
         isOpen={restoreOpen}
         onOpenChange={setRestoreOpen}
-        title={t('memory.restoreTitle')}
-        description={t('memory.restoreDescription')}
+        title={t('agent:memory.restoreTitle')}
+        description={t('agent:memory.restoreDescription')}
+        cancelText={t('common:actions.cancel')}
+        confirmText={t('agent:memory.restore')}
         onConfirm={() => {
           restoreRecommendedSettings();
           setRestoreOpen(false);

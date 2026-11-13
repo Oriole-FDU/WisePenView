@@ -105,10 +105,6 @@
   font-size: var(--font-size-xs);
 }
 
-.saveStatus[data-phase='dirty'] {
-  color: var(--warning-text);
-}
-
 .saveStatus[data-phase='failed'] {
   color: var(--danger-text);
 }
