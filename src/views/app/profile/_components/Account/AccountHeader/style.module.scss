@@ -168,12 +168,6 @@
   width: fit-content;
 }
 
-.avatarModalHint {
-  margin: 0 0 var(--space-md) 0;
-  font-size: var(--font-size-sm);
-  color: var(--muted);
-}
-
 @media (max-width: breakpoints.$breakpoint-sm) {
   .accountHeader {
     flex-direction: column;

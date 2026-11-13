@@ -202,9 +202,6 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
           </>
         }
       >
-        <p className={styles.avatarModalHint}>
-          {t('header.avatarHint', { maxSize: IMAGE_UPLOAD_MAX_SIZE_LABEL })}
-        </p>
         <UploadZone
           file={avatarFile}
           disabled={avatarSubmitting}
