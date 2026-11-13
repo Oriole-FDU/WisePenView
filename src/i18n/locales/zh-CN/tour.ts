@@ -9,7 +9,7 @@ const zhCNTour = {
   sidebar: {
     navigation: {
       title: '功能导航区',
-      content: '从这里开始，和 AI 对话、新建笔记、打开云盘、进入小组和查看消息',
+      content: '从这里开始，和 AI 对话、创建资源、打开云盘、进入小组和查看消息',
     },
     sessions: {
       title: '查看历史对话',

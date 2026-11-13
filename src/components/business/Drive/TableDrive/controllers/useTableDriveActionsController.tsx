@@ -11,7 +11,6 @@ import {
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import {
   DriveCreateModal,
-  type DriveCreateType,
   DriveDeleteModal,
   MoveNodeModal,
   RenameNodeModal,
@@ -22,22 +21,13 @@ import {
   TrashDeleteModal,
   UploadFileToGroupModal,
 } from '@/components/business/Drive/Modals';
-import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
-import {
-  MARKDOWN_NOTE_FILE_ACCEPT,
-  useMarkdownNoteImport,
-} from '@/components/editors/note/hooks/useMarkdownNoteImport';
-import { useDriveService, useNoteService } from '@/domains';
+import { useDriveService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
-import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
-import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
 import type { DriveTableRow, TableDriveActionConfig } from '../index.type';
-import type { CreateMenuItem } from '../parts/CreateMenu/index.type';
 
 interface UseTableDriveActionsControllerParams {
   currentNodeId: string;
@@ -54,11 +44,12 @@ interface UseTableDriveActionsControllerParams {
 }
 
 interface UseTableDriveActionsControllerReturn {
-  showCreateMenu: boolean;
+  showUploadDocument: boolean;
+  showCreateFolder: boolean;
   showUploadToGroup: boolean;
   showManagePermission: boolean;
-  createMenuItems: CreateMenuItem[];
-  handleCreateMenuSelect: (id: CreateMenuItem['id']) => void;
+  openUploadDocument: () => void;
+  openCreateFolder: () => void;
   openUploadToGroup: () => void;
   openTagAccessPermission: (tagId: string) => void;
   openTagMountPermission: (tagId: string) => void;
@@ -76,10 +67,6 @@ interface UseTableDriveActionsControllerReturn {
 
 const DEFAULT_TOOLBAR_CONFIG: Required<NonNullable<TableDriveActionConfig['toolbar']>> = {
   canCreateFolder: true,
-  canCreateNote: true,
-  canCreateDrawio: true,
-  canCreateSkill: true,
-  canCreateAgent: true,
   canUploadToGroup: false,
   canManageTagPermission: false,
 };
@@ -98,9 +85,7 @@ export function useTableDriveActionsController({
   onNodeActionSuccess,
 }: UseTableDriveActionsControllerParams): UseTableDriveActionsControllerReturn {
   const { t } = useTranslation('drive');
-  const openResource = useOpenResource();
   const groupId = scope.type === 'group' ? scope.groupId : undefined;
-  const noteService = useNoteService();
   const driveService = useDriveService();
   const toolbarConfig = { ...DEFAULT_TOOLBAR_CONFIG, ...actions?.toolbar };
 
@@ -132,7 +117,7 @@ export function useTableDriveActionsController({
   const [tagMountPermissionTagId, setTagMountPermissionTagId] = useState<string>();
   const [resourcePermissionTarget, setResourcePermissionTarget] =
     useState<ResourcePermissionModalTarget | null>(null);
-  const [driveCreateType, setDriveCreateType] = useState<DriveCreateType | null>(null);
+  const [createFolderOpen, setCreateFolderOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<DriveActionTarget | null>(null);
   const [moveNodes, setMoveNodes] = useState<DriveActionTarget[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<DriveActionTarget | null>(null);
@@ -154,66 +139,13 @@ export function useTableDriveActionsController({
   const canCreateFolder = Boolean(
     currentContainer && (currentContainer.type === 'root' || !currentContainer.systemType)
   );
-  const resourceDriveLocation = mountTagId ? { scope, mountTagId } : undefined;
 
-  const {
-    fileInputRef: markdownFileInputRef,
-    importing: importingMarkdownNote,
-    openFilePicker: openMarkdownFilePicker,
-    handleFileChange: handleMarkdownFileChange,
-  } = useMarkdownNoteImport({
-    getPathTagId: () => mountTagId,
-    onSuccess: ({ resourceId, title }) => {
-      refresh();
-      openResource({
-        resourceId,
-        resourceType: RESOURCE_KIND.NOTE,
-        resourceName: title,
-        driveLocation: resourceDriveLocation,
-      });
-    },
-  });
   const documentFileInputRef = useRef<HTMLInputElement>(null);
   const { queueDocuments } = useDriveDocumentUpload({ pathTagId: mountTagId, onSuccess: refresh });
 
-  const { loading: creatingNote, run: runCreateNote } = useApi(
-    async () => {
-      const { resourceId } = await noteService.createNote({
-        title: t('create.defaultNoteTitle'),
-        pathTagId: mountTagId,
-      });
-      if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return resourceId;
-    },
-    {
-      manual: true,
-      onSuccess: (resourceId) => {
-        useNewNoteStore.getState().setNewNoteResourceId(resourceId);
-        refresh();
-        openResource({
-          resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          driveLocation: resourceDriveLocation,
-        });
-      },
-    }
-  );
-
-  const handleDriveCreateSuccess = (createdId: string, type: DriveCreateType) => {
-    if (type === 'folder') {
-      setDriveCreateType(null);
-      refresh();
-      return;
-    }
-    setDriveCreateType(null);
+  const handleCreateFolderSuccess = () => {
+    setCreateFolderOpen(false);
     refresh();
-    openResource({
-      resourceId: createdId,
-      resourceType: type,
-      driveLocation: resourceDriveLocation,
-    });
   };
 
   const ModalHost = (
@@ -234,12 +166,6 @@ export function useTableDriveActionsController({
           queueDocuments(supportedFiles);
           toast.success(t('upload.feedback.queued', { count: supportedFiles.length }));
         }}
-        hidden
-      />
-      <HiddenFileInput
-        ref={markdownFileInputRef}
-        accept={MARKDOWN_NOTE_FILE_ACCEPT}
-        onChange={handleMarkdownFileChange}
         hidden
       />
       {groupId && uploadOpen ? (
@@ -289,17 +215,17 @@ export function useTableDriveActionsController({
           onSuccess={refresh}
         />
       ) : null}
-      {driveCreateType ? (
+      {createFolderOpen ? (
         <DriveCreateModal
-          type={driveCreateType}
+          type="folder"
           isOpen
           parent={resolveCurrentDriveContainer(currentNodeId, pathNodes)}
           pathTagId={mountTagId}
           existingFolderNames={existingFolderNames}
           onOpenChange={(open) => {
-            if (!open) setDriveCreateType(null);
+            if (!open) setCreateFolderOpen(false);
           }}
-          onSuccess={handleDriveCreateSuccess}
+          onSuccess={handleCreateFolderSuccess}
         />
       ) : null}
       <RenameNodeModal
@@ -355,89 +281,19 @@ export function useTableDriveActionsController({
     setUploadOpen(true);
   };
 
-  const handleCreateNote = () => {
-    if (creatingNote) return;
-    const pendingNewNoteId = useNewNoteStore.getState().newNoteResourceId;
-    if (!groupId && pendingNewNoteId) {
-      openResource({
-        resourceId: pendingNewNoteId,
-        resourceType: RESOURCE_KIND.NOTE,
-        driveLocation: resourceDriveLocation,
-      });
-      return;
-    }
-    runCreateNote();
-  };
-
-  const handleCreateMenuSelect = (id: CreateMenuItem['id']) => {
-    switch (id) {
-      case 'folder':
-      case 'drawio':
-      case 'skill':
-      case 'agent':
-        setDriveCreateType(id);
-        break;
-      case 'note':
-        handleCreateNote();
-        break;
-      case 'importNote':
-        openMarkdownFilePicker();
-        break;
-      case 'upload':
-        documentFileInputRef.current?.click();
-        break;
-    }
-  };
-
   const canCreateInCurrentFolder = Boolean(mountTagId);
   const showUploadDocument = canCreateInCurrentFolder && !isTrashView;
-
-  const showCreateMenu = Boolean(
-    !disabled &&
-    !isTrashView &&
-    ((toolbarConfig.canCreateFolder && canCreateFolder) ||
-      (canCreateInCurrentFolder &&
-        (toolbarConfig.canCreateNote ||
-          toolbarConfig.canCreateDrawio ||
-          toolbarConfig.canCreateSkill ||
-          toolbarConfig.canCreateAgent ||
-          showUploadDocument)))
+  const showCreateFolder = Boolean(
+    !disabled && !isTrashView && toolbarConfig.canCreateFolder && canCreateFolder
   );
 
-  const createMenuItems = (() => {
-    if (!showCreateMenu) return [];
-    const items: CreateMenuItem[] = [];
-    if (toolbarConfig.canCreateFolder && canCreateFolder) {
-      items.push({ id: 'folder', label: t('create.folder') });
-    }
-    if (canCreateInCurrentFolder && toolbarConfig.canCreateDrawio) {
-      items.push({ id: 'drawio', label: t('create.drawio') });
-    }
-    if (canCreateInCurrentFolder && toolbarConfig.canCreateNote) {
-      items.push({ id: 'note', label: t('create.note'), disabled: creatingNote });
-      items.push({
-        id: 'importNote',
-        label: t('create.importNote'),
-        disabled: importingMarkdownNote,
-      });
-    }
-    if (canCreateInCurrentFolder && toolbarConfig.canCreateSkill) {
-      items.push({ id: 'skill', label: t('create.skill') });
-    }
-    if (canCreateInCurrentFolder && toolbarConfig.canCreateAgent)
-      items.push({ id: 'agent', label: t('create.agent') });
-    if (showUploadDocument) {
-      items.push({ id: 'upload', label: t('create.upload') });
-    }
-    return items;
-  })() satisfies CreateMenuItem[];
-
   return {
-    showCreateMenu,
+    showUploadDocument: Boolean(!disabled && showUploadDocument),
+    showCreateFolder,
     showUploadToGroup: Boolean(!disabled && toolbarConfig.canUploadToGroup && groupId),
     showManagePermission: Boolean(toolbarConfig.canManageTagPermission && groupId),
-    createMenuItems,
-    handleCreateMenuSelect,
+    openUploadDocument: () => documentFileInputRef.current?.click(),
+    openCreateFolder: () => setCreateFolderOpen(true),
     openUploadToGroup,
     openTagAccessPermission: setTagAccessPermissionTagId,
     openTagMountPermission: setTagMountPermissionTagId,

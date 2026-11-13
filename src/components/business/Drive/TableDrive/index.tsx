@@ -5,7 +5,7 @@ import {
   type Modifiers,
   pointerWithin,
 } from '@dnd-kit/core';
-import { PanelRightClose, PanelRightOpen, Trash2 } from 'lucide-react';
+import { CloudUpload, FolderPlus, PanelRightClose, PanelRightOpen, Trash2 } from 'lucide-react';
 import { type CSSProperties, type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -42,7 +42,6 @@ import {
   useTableDriveTrashController,
 } from './controllers';
 import type { DriveTableRow, TableDriveProps } from './index.type';
-import CreateMenu from './parts/CreateMenu';
 import DriveDetailPanel from './parts/DriveDetailPanel';
 import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './parts/DriveDnd';
 import styles from './style.module.scss';
@@ -287,11 +286,17 @@ function TableDrive({
 
   const toolbar = (
     <div className={styles.toolbarActions}>
-      {!isEditMode && actionsController.showCreateMenu ? (
-        <CreateMenu
-          items={actionsController.createMenuItems}
-          onSelect={actionsController.handleCreateMenuSelect}
-        />
+      {!isEditMode && actionsController.showCreateFolder ? (
+        <AppButton variant="secondary" size="sm" onPress={actionsController.openCreateFolder}>
+          <FolderPlus size={16} aria-hidden="true" />
+          {t('create.folder')}
+        </AppButton>
+      ) : null}
+      {!isEditMode && actionsController.showUploadDocument ? (
+        <AppButton variant="primary" size="sm" onPress={actionsController.openUploadDocument}>
+          <CloudUpload size={16} aria-hidden="true" />
+          {t('create.upload')}
+        </AppButton>
       ) : null}
       {!isEditMode && actionsController.showUploadToGroup ? (
         <AppButton variant="secondary" size="sm" onPress={actionsController.openUploadToGroup}>

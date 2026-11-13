@@ -1,16 +1,17 @@
+import { type ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useCurrentRouteHandle } from '@/bootstrap/router';
+import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import type { HeaderNavItem } from '@/components/business/Sidebar/_common/header/HeaderNav/index.type';
-import { useNoteService } from '@/domains';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
-import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { useAppAuth } from '@/layouts/App/_context';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { APP_SIDEBAR_HEADER_ITEMS, type AppSidebarNavigateItem } from './appSidebarNavigation';
+import CreateResourceModal from './CreateResourceModal';
+import type { CreatedResource } from './CreateResourceModal/index.type';
 
 interface UseAppSidebarHeaderNavOptions {
   onNavigate?: () => void;
@@ -19,38 +20,18 @@ interface UseAppSidebarHeaderNavOptions {
 interface AppSidebarHeaderNavResult {
   items: HeaderNavItem[];
   selectedKey?: string;
+  ModalHost: ReactElement;
 }
 
 export function useAppSidebarHeaderNav({
   onNavigate,
 }: UseAppSidebarHeaderNavOptions = {}): AppSidebarHeaderNavResult {
-  const { t } = useTranslation('shell');
+  const { t } = useTranslation(['shell', 'drive']);
   const navigate = useNavigate();
   const appAuth = useAppAuth();
-  const noteService = useNoteService();
   const openResource = useOpenResource();
   const selectedKey = useCurrentRouteHandle()?.appSidebar?.selectedHeaderNavKey ?? undefined;
-
-  const { loading: creatingNote, run: createNote } = useApi(
-    async () => {
-      const title = t('navigation.defaultNoteTitle');
-      const result = await noteService.createNote({ title });
-      if (!result.resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return { resourceId: result.resourceId, title };
-    },
-    {
-      manual: true,
-      onSuccess: ({ resourceId, title }) => {
-        openResource({
-          resourceId,
-          resourceType: RESOURCE_KIND.NOTE,
-          resourceName: title,
-        });
-      },
-    }
-  );
+  const [createResourceOpen, setCreateResourceOpen] = useState(false);
 
   const handleNavItemPress = (item: AppSidebarNavigateItem) => {
     if (!appAuth.isAuthenticated) {
@@ -61,27 +42,34 @@ export function useAppSidebarHeaderNav({
     onNavigate?.();
   };
 
-  const handleCreateNote = () => {
+  const handleCreateResource = () => {
     if (!appAuth.isAuthenticated) {
       appAuth.requireLogin();
       return;
     }
-    if (!creatingNote) {
-      createNote();
-      onNavigate?.();
-    }
+    setCreateResourceOpen(true);
+    onNavigate?.();
+  };
+
+  const handleResourceCreated = ({ resourceId, type, root }: CreatedResource) => {
+    setCreateResourceOpen(false);
+    requestDriveRefresh();
+    openResource({
+      resourceId,
+      resourceType: type === 'note' ? RESOURCE_KIND.NOTE : type,
+      driveLocation: { scope: root.scope, mountTagId: root.tagId },
+    });
   };
 
   const items: HeaderNavItem[] = APP_SIDEBAR_HEADER_ITEMS.map((item) => {
-    // createNote 类型的菜单项不导航到其他页面，而是触发创建笔记操作。
-    if (item.type === 'createNote') {
+    // 创建资源项不导航到其他页面，而是打开资源类型选择器。
+    if (item.type === 'createResource') {
       return {
         key: item.key,
         name: t(item.labelKey),
         icon: item.icon,
         toolId: item.toolId,
-        isDisabled: creatingNote,
-        onPress: handleCreateNote,
+        onPress: handleCreateResource,
       };
     }
 
@@ -95,8 +83,17 @@ export function useAppSidebarHeaderNav({
     };
   });
 
+  const ModalHost = (
+    <CreateResourceModal
+      isOpen={createResourceOpen}
+      onOpenChange={setCreateResourceOpen}
+      onCreated={handleResourceCreated}
+    />
+  );
+
   return {
     items,
     selectedKey,
+    ModalHost,
   };
 }

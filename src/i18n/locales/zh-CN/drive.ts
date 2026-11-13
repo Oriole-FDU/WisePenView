@@ -119,7 +119,7 @@ const zhCNDrive = {
     importNote: '导入笔记',
     skill: '新建 Skill',
     agent: '新建 Agent',
-    upload: '从本地添加',
+    upload: '上传文档',
     success: '新建成功',
     currentDirectory: '当前目录',
     createUnder: '创建到「{{parent}}」下',
