@@ -1,6 +1,9 @@
 const zhCNProfile = {
   account: {
     title: '账号管理',
+    loading: '正在加载账号资料',
+    loadFailed: '无法加载账号资料',
+    loadFailedDescription: '账号资料暂时没有读取成功，请重试。',
     sectionTitle: '账号',
     changePassword: '修改密码',
     username: '用户名',
