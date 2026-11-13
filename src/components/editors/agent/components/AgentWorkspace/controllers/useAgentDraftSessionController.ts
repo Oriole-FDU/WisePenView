@@ -6,7 +6,6 @@ import { useAgentService } from '@/domains';
 import type { AgentDetail, AgentSpec } from '@/domains/Agent';
 import { useApi } from '@/hooks/useApi';
 
-import { buildGuidedPrompt, getDefaultGuidedPromptFields } from '../../../guidedPrompt';
 import {
   type AgentDraft,
   buildAgentDraft,
@@ -39,16 +38,7 @@ export function useAgentDraftSessionController({
 }: UseAgentDraftSessionControllerOptions) {
   const agentService = useAgentService();
   const initialSavedDraft = buildAgentDraft(agent);
-  const initialDraft =
-    isOwner && viewingVersion === null && !initialSavedDraft.spec.systemPrompt
-      ? {
-          ...initialSavedDraft,
-          spec: {
-            ...initialSavedDraft.spec,
-            systemPrompt: buildGuidedPrompt(getDefaultGuidedPromptFields(), true),
-          },
-        }
-      : initialSavedDraft;
+  const initialDraft = initialSavedDraft;
   const [draft, setDraftState] = useState(initialDraft);
   const [savedSnapshot, setSavedSnapshot] = useState(() => snapshotAgentDraft(initialSavedDraft));
   const [savePhase, setSavePhase] = useState<AgentSavePhase>(() =>

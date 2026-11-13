@@ -6,6 +6,9 @@ import ModelSelector from '@/components/business/ModelSelector';
 import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/ChatConfig';
 
+import SettingsFieldGrid, { SettingsSwitchField } from '../../shared/SettingsFieldGrid';
+import styles from './style.module.scss';
+
 interface Props {
   spec: AgentSpec;
   models: ChatModel[];
@@ -36,31 +39,41 @@ export default function ModelSection({ spec, models, disabled, onChange }: Props
   };
 
   return (
-    <AppForm.Section id="model" title={t('model.title')} variant="editor">
-      <AppForm.Row
-        title={t('model.default')}
-        control={
-          <ModelSelector
-            models={models}
-            selectedId={selected?.id}
-            isOpen={open}
-            onOpenChange={setOpen}
-            onChange={selectModel}
-            disabled={disabled || models.length === 0}
-          />
-        }
-      />
-      <AppForm.Row
-        title={t('model.allowSwitch')}
-        selected={spec.modelPolicy.allowRequestOverride}
-        disabled={disabled}
-        onChange={(value) =>
-          onChange({
-            ...spec,
-            modelPolicy: { ...spec.modelPolicy, allowRequestOverride: value },
-          })
-        }
-      />
-    </AppForm.Section>
+    <div className={styles.groups}>
+      <SettingsFieldGrid columns={1}>
+        <AppForm.Row
+          title={t('model.default')}
+          control={
+            <ModelSelector
+              models={models}
+              selectedId={selected?.id}
+              isOpen={open}
+              onOpenChange={setOpen}
+              onChange={selectModel}
+              disabled={disabled || models.length === 0}
+            />
+          }
+        />
+      </SettingsFieldGrid>
+      <SettingsFieldGrid columns={2}>
+        <SettingsSwitchField
+          label={t('model.allowSwitch')}
+          selected={spec.modelPolicy.allowRequestOverride}
+          disabled={disabled}
+          onChange={(value) =>
+            onChange({
+              ...spec,
+              modelPolicy: { ...spec.modelPolicy, allowRequestOverride: value },
+            })
+          }
+        />
+        <SettingsSwitchField
+          label={t('model.autoTitle')}
+          selected={spec.autoGenerateTitle}
+          disabled={disabled}
+          onChange={(value) => onChange({ ...spec, autoGenerateTitle: value })}
+        />
+      </SettingsFieldGrid>
+    </div>
   );
 }

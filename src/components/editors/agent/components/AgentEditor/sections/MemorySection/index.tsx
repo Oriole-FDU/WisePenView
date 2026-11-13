@@ -2,13 +2,13 @@ import { Label } from '@heroui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
 import { FormField, NumberField, Slider, TextArea } from '@/components/base/Input';
 import type { AgentSpec } from '@/domains/Agent';
 
 import { RECOMMENDED_AGENT_MEMORY_SETTINGS } from '../../config/agentPresets';
 import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
+import SettingsFieldGrid, { SettingsSwitchField } from '../../shared/SettingsFieldGrid';
 import styles from './style.module.scss';
 
 interface Props {
@@ -21,7 +21,6 @@ const toScalar = (value: number | number[]) => (Array.isArray(value) ? value[0] 
 
 export default function MemorySection({ spec, disabled, onChange }: Props) {
   const { t } = useTranslation('agent');
-  const [more, setMore] = useState(false);
   const [restoreOpen, setRestoreOpen] = useState(false);
   const policy = spec.memoryPolicy;
   const updatePolicy = (next: Partial<typeof policy>) => {
@@ -40,140 +39,127 @@ export default function MemorySection({ spec, disabled, onChange }: Props) {
 
   return (
     <>
-      <AppForm.Section id="memory" title={t('memory.title')} variant="editor">
-        <AppForm.Row
-          title={t('memory.chat')}
+      <SettingsFieldGrid columns={2}>
+        <SettingsSwitchField
+          label={t('memory.chat')}
           selected={policy.enableChatMemory}
           disabled={disabled}
           onChange={(value) => updatePolicy({ enableChatMemory: value })}
         />
         {policy.enableChatMemory ? (
           <>
-            <AppForm.Row
-              title={t('memory.persist')}
+            <SettingsSwitchField
+              label={t('memory.persist')}
               selected={policy.enablePersistenceChatMemory}
               disabled={disabled}
               onChange={(value) => updatePolicy({ enablePersistenceChatMemory: value })}
             />
-            <AppForm.Row
-              title={t('memory.summary')}
+            <SettingsSwitchField
+              label={t('memory.summary')}
               selected={policy.enableChatMemorySummary}
               disabled={disabled}
               onChange={(value) => updatePolicy({ enableChatMemorySummary: value })}
             />
           </>
         ) : null}
-        <AppForm.Row
-          title={t('memory.longTerm')}
+        <SettingsSwitchField
+          label={t('memory.longTerm')}
           selected={policy.enableLongTermMemory}
           disabled={disabled}
           onChange={(value) => updatePolicy({ enableLongTermMemory: value })}
         />
-        <div className={styles.moreRow}>
+      </SettingsFieldGrid>
+      <div className={styles.advanced}>
+        <div className={styles.advancedHeader}>
+          <span>{t('memory.advanced')}</span>
           <AppButton
-            className={styles.more}
+            className={styles.presetButton}
             size="sm"
-            variant="ghost"
-            onPress={() => setMore((value) => !value)}
+            variant="secondary"
+            isDisabled={disabled}
+            onPress={() => setRestoreOpen(true)}
           >
-            {more ? t('memory.collapse') : t('memory.more')}
+            {t('memory.restore')}
           </AppButton>
         </div>
-        {more ? (
-          <div className={styles.advanced}>
-            <div className={styles.advancedHeader}>
-              <span>{t('memory.advanced')}</span>
-              <AppButton
-                className={styles.presetButton}
-                size="sm"
-                variant="secondary"
-                isDisabled={disabled}
-                onPress={() => setRestoreOpen(true)}
-              >
-                {t('memory.restore')}
-              </AppButton>
+        <div className={styles.settingGrid}>
+          <Slider
+            minValue={0.5}
+            maxValue={0.95}
+            step={0.05}
+            value={policy.highWatermarkRatio}
+            formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
+            isDisabled={disabled || !policy.enableChatMemorySummary}
+            onChange={(value) => updatePolicy({ highWatermarkRatio: toScalar(value) })}
+          >
+            <Label>{t('memory.highWatermark')}</Label>
+            <Slider.Output />
+            <Slider.Track>
+              <Slider.Fill />
+              <Slider.Thumb />
+            </Slider.Track>
+          </Slider>
+          <Slider
+            minValue={0.1}
+            maxValue={0.8}
+            step={0.05}
+            value={policy.lowWatermarkRatio}
+            formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
+            isDisabled={disabled || !policy.enableChatMemorySummary}
+            onChange={(value) => updatePolicy({ lowWatermarkRatio: toScalar(value) })}
+          >
+            <Label>{t('memory.lowWatermark')}</Label>
+            <Slider.Output />
+            <Slider.Track>
+              <Slider.Fill />
+              <Slider.Thumb />
+            </Slider.Track>
+          </Slider>
+        </div>
+        <div className={styles.settingGrid}>
+          <NumberField
+            value={policy.longTermMemoryLimit}
+            minValue={1}
+            maxValue={50}
+            step={1}
+            isDisabled={disabled || !policy.enableLongTermMemory}
+            onChange={(value) => updatePolicy({ longTermMemoryLimit: Number(value) })}
+          >
+            <Label>{t('memory.recallLimit')}</Label>
+            <div className={styles.controlLine}>
+              <NumberField.Group>
+                <NumberField.DecrementButton />
+                <NumberField.Input />
+                <NumberField.IncrementButton />
+              </NumberField.Group>
             </div>
-            <div className={styles.settingGrid}>
-              <div>
-                <Label>
-                  {t('memory.highWatermark', {
-                    percent: Math.round(policy.highWatermarkRatio * 100),
-                  })}
-                </Label>
-                <Slider
-                  minValue={0.5}
-                  maxValue={0.95}
-                  step={0.05}
-                  value={policy.highWatermarkRatio}
-                  isDisabled={disabled || !policy.enableChatMemorySummary}
-                  onChange={(value) => updatePolicy({ highWatermarkRatio: toScalar(value) })}
-                />
-              </div>
-              <div>
-                <Label>
-                  {t('memory.lowWatermark', {
-                    percent: Math.round(policy.lowWatermarkRatio * 100),
-                  })}
-                </Label>
-                <Slider
-                  minValue={0.1}
-                  maxValue={0.8}
-                  step={0.05}
-                  value={policy.lowWatermarkRatio}
-                  isDisabled={disabled || !policy.enableChatMemorySummary}
-                  onChange={(value) => updatePolicy({ lowWatermarkRatio: toScalar(value) })}
-                />
-              </div>
-            </div>
-            <div className={styles.settingGrid}>
-              <NumberField
-                value={policy.longTermMemoryLimit}
-                minValue={1}
-                maxValue={50}
-                step={1}
-                isDisabled={disabled || !policy.enableLongTermMemory}
-                onChange={(value) => updatePolicy({ longTermMemoryLimit: Number(value) })}
-              >
-                <Label>{t('memory.recallLimit')}</Label>
-                <div className={styles.controlLine}>
-                  <NumberField.Group>
-                    <NumberField.DecrementButton />
-                    <NumberField.Input />
-                    <NumberField.IncrementButton />
-                  </NumberField.Group>
-                </div>
-              </NumberField>
-              <div>
-                <Label>
-                  {t('memory.scoreThreshold', {
-                    percent: Math.round(policy.longTermMemoryScoreThreshold * 100),
-                  })}
-                </Label>
-                <div className={styles.controlLine}>
-                  <Slider
-                    minValue={0}
-                    maxValue={1}
-                    step={0.05}
-                    value={policy.longTermMemoryScoreThreshold}
-                    isDisabled={disabled || !policy.enableLongTermMemory}
-                    onChange={(value) =>
-                      updatePolicy({ longTermMemoryScoreThreshold: toScalar(value) })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-            <FormField
-              label={t('memory.summaryPrompt')}
-              value={policy.summaryPrompt ?? ''}
-              isDisabled={disabled || !policy.enableChatMemorySummary}
-              onChange={(value) => updatePolicy({ summaryPrompt: value || undefined })}
-            >
-              <TextArea rows={3} placeholder={t('memory.summaryPlaceholder')} />
-            </FormField>
-          </div>
-        ) : null}
-      </AppForm.Section>
+          </NumberField>
+          <Slider
+            minValue={0}
+            maxValue={1}
+            step={0.05}
+            value={policy.longTermMemoryScoreThreshold}
+            formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
+            isDisabled={disabled || !policy.enableLongTermMemory}
+            onChange={(value) => updatePolicy({ longTermMemoryScoreThreshold: toScalar(value) })}
+          >
+            <Label>{t('memory.scoreThreshold')}</Label>
+            <Slider.Output />
+            <Slider.Track>
+              <Slider.Fill />
+              <Slider.Thumb />
+            </Slider.Track>
+          </Slider>
+        </div>
+        <FormField
+          label={t('memory.summaryPrompt')}
+          value={policy.summaryPrompt}
+          isDisabled={disabled || !policy.enableChatMemorySummary}
+          onChange={(value) => updatePolicy({ summaryPrompt: value })}
+        >
+          <TextArea rows={3} placeholder={t('memory.summaryPlaceholder')} />
+        </FormField>
+      </div>
       <PresetRestoreConfirmDialog
         isOpen={restoreOpen}
         onOpenChange={setRestoreOpen}

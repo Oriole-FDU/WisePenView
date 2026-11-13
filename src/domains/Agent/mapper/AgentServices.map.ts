@@ -21,10 +21,10 @@ const AGENT_SPEC_FALLBACK: AgentSpec = {
   autoGenerateTitle: true,
   modelPolicy: { defaultModelId: '', defaultProviderId: '', allowRequestOverride: true },
   toolAndSkillPolicy: {
-    enableUseTool: true,
-    toolSelectionDefaultEnabled: true,
+    enableUseTool: false,
+    toolSelectionDefaultEnabled: false,
     toolSelectionOverrides: {},
-    enableUseSkill: true,
+    enableUseSkill: false,
     onDemandSkillIds: [],
     skillMatchTopK: 10,
   },

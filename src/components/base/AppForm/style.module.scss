@@ -6,7 +6,7 @@
 }
 
 .section[data-variant='editor'] {
-  padding: 0 clamp(var(--space-xl), 6%, 96px);
+  padding: 0 var(--app-form-section-inline-padding, clamp(var(--space-xl), 6%, 96px));
   scroll-margin-top: var(--space-sm);
 }
 
@@ -16,14 +16,14 @@
 
 .section[data-variant='editor'] .sectionInner {
   width: min(100%, 800px);
-  margin: 0;
-  padding: 30px 0 42px;
-  border-bottom: 1px solid var(--border);
+  margin: var(--app-form-section-inner-margin, 0);
+  padding: var(--app-form-section-padding-top, 30px) 0 var(--app-form-section-padding-bottom, 42px);
+  border-bottom: var(--app-form-section-divider, 1px solid var(--border));
 }
 
 .section[data-variant='editor']:last-child .sectionInner {
   border-bottom: 0;
-  padding-bottom: 72px;
+  padding-bottom: var(--app-form-section-last-padding-bottom, 72px);
 }
 
 .sectionHeader {
@@ -31,7 +31,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-md-plus);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--app-form-section-header-gap, var(--space-lg));
 }
 
 .sectionCopy {
@@ -47,7 +47,8 @@
 .sectionTitle {
   margin: 0;
   color: var(--foreground);
-  font-size: var(--font-size-heading-3);
+  font-size: var(--app-form-section-title-size, var(--font-size-heading-3));
+  font-weight: var(--font-weight-semibold);
   line-height: 1.3;
 }
 
@@ -66,15 +67,17 @@
 
 .row {
   display: flex;
-  min-height: 68px;
-  align-items: center;
+  min-height: var(--app-form-row-min-height, 68px);
+  align-items: var(--app-form-row-align, center);
   justify-content: space-between;
-  gap: var(--space-lg);
-  border-top: 1px solid var(--separator);
+  flex-direction: var(--app-form-row-direction, row);
+  gap: var(--app-form-row-gap, var(--space-lg));
+  padding-block: var(--app-form-row-padding-block, 0);
+  border-top: var(--app-form-row-divider, 1px solid var(--separator));
 }
 
 .row:last-child {
-  border-bottom: 1px solid var(--separator);
+  border-bottom: var(--app-form-row-divider, 1px solid var(--separator));
 }
 
 .rowCopy {
@@ -89,7 +92,7 @@
 
 .rowTitle strong {
   display: block;
-  font-size: var(--font-size-heading-5);
+  font-size: var(--app-form-row-title-size, var(--font-size-heading-5));
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-md);
 }
@@ -104,6 +107,7 @@
 
 .rowControl {
   flex: 0 0 auto;
+  width: var(--app-form-row-control-width, auto);
 }
 
 .anchorNav {
@@ -182,11 +186,12 @@
 
 @media (max-width: breakpoints.$breakpoint-md) {
   .section[data-variant='editor'] {
-    padding: 0 15px;
+    padding: 0 var(--app-form-section-inline-padding, 15px);
   }
 
   .section[data-variant='editor'] .sectionInner {
-    padding-block: var(--space-lg) 34px;
+    padding-block: var(--app-form-section-padding-top, var(--space-lg))
+      var(--app-form-section-padding-bottom, 34px);
   }
 
   .sectionHeader {

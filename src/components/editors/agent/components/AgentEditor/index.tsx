@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 
-import AppForm from '@/components/base/AppForm';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import type { AgentAsset, AgentSpec } from '@/domains/Agent';
 import type { ChatModel, ToolOption } from '@/domains/ChatConfig';
@@ -9,11 +8,10 @@ import type { SkillSummary } from '@/domains/Skill';
 import type { AgentDraft } from '../../model';
 import styles from '../../style.module.scss';
 import { useAgentAssetsController } from './controllers/useAgentAssetsController';
+import AdvancedSettingsSection from './sections/AdvancedSettingsSection';
 import AssetsSection from './sections/AssetsSection';
 import BasicInfoSection from './sections/BasicInfoSection';
 import CapabilitiesSection from './sections/CapabilitiesSection';
-import MemorySection from './sections/MemorySection';
-import ModelSection from './sections/ModelSection';
 import SystemPromptSection from './sections/SystemPromptSection';
 
 interface AgentEditorProps {
@@ -31,14 +29,6 @@ interface AgentEditorProps {
   onSystemPromptChange: (systemPrompt: string) => void;
 }
 
-const anchorSections = [
-  ['agent-info', 'basic'],
-  ['prompt', 'prompt'],
-  ['model', 'model'],
-  ['capabilities', 'capabilities'],
-  ['memory', 'memory'],
-  ['assets', 'assets'],
-] as const;
 const AGENT_SCROLL_CONTAINER_ID = 'agent-editor-scroll';
 
 export default function AgentEditor({
@@ -62,68 +52,59 @@ export default function AgentEditor({
     resourceId,
     t,
   });
-  const anchors = anchorSections.map(([id, key]) => ({
-    id,
-    label: t(`agent:page.anchor.${key}`),
-  }));
-
   return (
-    <div className={styles.page}>
-      <AppForm.AnchorNav
-        title={t('agent:navigation.title')}
-        ariaLabel={t('agent:navigation.aria')}
-        items={anchors}
-        scrollContainerId={AGENT_SCROLL_CONTAINER_ID}
-      />
-      <main id={AGENT_SCROLL_CONTAINER_ID} className={styles.content}>
-        <BasicInfoSection
-          name={draft.name}
-          description={draft.description}
-          spec={draft.spec}
-          disabled={readOnly}
-          onNameChange={onNameChange}
-          onDescriptionChange={onDescriptionChange}
-          onSpecChange={onSpecChange}
+    <div className={styles.frame}>
+      <div className={styles.page}>
+        <main id={AGENT_SCROLL_CONTAINER_ID} className={styles.content}>
+          <BasicInfoSection
+            name={draft.name}
+            description={draft.description}
+            disabled={readOnly}
+            onNameChange={onNameChange}
+            onDescriptionChange={onDescriptionChange}
+          />
+          <SystemPromptSection
+            markdown={draft.spec.systemPrompt}
+            disabled={readOnly}
+            onMarkdownChange={onSystemPromptChange}
+          />
+          <CapabilitiesSection
+            mode="basic"
+            spec={draft.spec}
+            tools={tools}
+            skills={skills}
+            disabled={readOnly}
+            onChange={onSpecChange}
+          />
+          <AssetsSection
+            assets={assets.assets}
+            disabled={readOnly}
+            uploading={assets.uploadLoading}
+            onUpload={assets.uploadAssets}
+            onDelete={assets.requestDeleteAsset}
+          />
+          <AdvancedSettingsSection
+            spec={draft.spec}
+            models={models}
+            tools={tools}
+            skills={skills}
+            disabled={readOnly}
+            onChange={onSpecChange}
+          />
+        </main>
+        <AppAlertDialog
+          type="danger"
+          isOpen={assets.deleteAssetId !== null}
+          onOpenChange={(open) => {
+            if (!open) assets.closeDeleteAsset();
+          }}
+          title={t('agent:page.deleteAsset.title')}
+          description={t('agent:page.deleteAsset.description')}
+          confirmText={t('common:actions.delete')}
+          isConfirmLoading={assets.deleteLoading}
+          onConfirm={assets.confirmDeleteAsset}
         />
-        <SystemPromptSection
-          markdown={draft.spec.systemPrompt}
-          disabled={readOnly}
-          onMarkdownChange={onSystemPromptChange}
-        />
-        <ModelSection
-          spec={draft.spec}
-          models={models}
-          disabled={readOnly}
-          onChange={onSpecChange}
-        />
-        <CapabilitiesSection
-          spec={draft.spec}
-          tools={tools}
-          skills={skills}
-          disabled={readOnly}
-          onChange={onSpecChange}
-        />
-        <MemorySection spec={draft.spec} disabled={readOnly} onChange={onSpecChange} />
-        <AssetsSection
-          assets={assets.assets}
-          disabled={readOnly}
-          uploading={assets.uploadLoading}
-          onUpload={assets.uploadAssets}
-          onDelete={assets.requestDeleteAsset}
-        />
-      </main>
-      <AppAlertDialog
-        type="danger"
-        isOpen={assets.deleteAssetId !== null}
-        onOpenChange={(open) => {
-          if (!open) assets.closeDeleteAsset();
-        }}
-        title={t('agent:page.deleteAsset.title')}
-        description={t('agent:page.deleteAsset.description')}
-        confirmText={t('common:actions.delete')}
-        isConfirmLoading={assets.deleteLoading}
-        onConfirm={assets.confirmDeleteAsset}
-      />
+      </div>
     </div>
   );
 }
