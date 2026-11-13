@@ -1,3 +1,5 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+
 .navContainer {
   --app-header-nav-item-height: 36px;
   --app-header-nav-item-gap: 0.2px;
@@ -45,6 +47,19 @@
   padding-inline: var(--sidebar-block-inset, var(--space-xs));
 }
 
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-header-nav-item-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menuItemSlot {
+  min-width: 0;
+}
+
 .indicator {
   position: absolute;
   left: var(--sidebar-block-inset, var(--space-md));
@@ -80,7 +95,7 @@
   }
 }
 
-.menuItem:global(.list-box-item) {
+.menuItem {
   position: relative;
   z-index: var(--app-z-index-raised);
   box-sizing: border-box;
@@ -92,19 +107,20 @@
   gap: var(--space-xs);
   border-radius: var(--app-radius-sidebar-item);
   padding: 0 var(--space-xs) 0 var(--app-header-nav-item-pad-left);
+  border: 0;
   color: var(--muted);
+  font: inherit;
   cursor: pointer;
   outline: none;
   background: transparent;
+  text-decoration: none;
   transition:
     color var(--main-sidebar-motion-duration, var(--motion-duration-slow))
       var(--main-sidebar-motion-ease, var(--motion-ease-emphasized)),
     font-weight var(--main-sidebar-motion-duration, var(--motion-duration-slow))
       var(--main-sidebar-motion-ease, var(--motion-ease-standard));
 
-  &:hover:not([data-nav-active='true']),
-  &[data-hovered]:not([data-nav-active='true']),
-  &[data-focused]:not([data-nav-active='true']) {
+  &:hover:not([data-nav-active='true']) {
     color: var(--foreground);
     background: var(--item-hover);
     transition:
@@ -112,44 +128,29 @@
       background var(--motion-duration-fast) var(--motion-ease-standard);
   }
 
-  &[data-disabled] {
+  &:disabled {
     color: var(--text-disabled);
     cursor: not-allowed;
     background: transparent;
   }
+
+  &:focus-visible {
+    @include focusRing.appFocusRingInset();
+  }
 }
 
-.menuItem:is([data-selected='true'], [aria-selected='true']) {
-  color: var(--accent-text-strong);
-  background: var(--item-selected);
-  font-weight: var(--font-weight-semibold);
-}
-
-.menuItem:is([data-selected='true'], [aria-selected='true']):hover,
-.menuItem:is([data-selected='true'], [aria-selected='true'])[data-hovered],
-.menuItem:is([data-selected='true'], [aria-selected='true'])[data-focused],
-.menuItem:is([data-selected='true'], [aria-selected='true'])[data-focus-visible] {
-  color: var(--accent-text-strong);
-  background: var(--item-selected-hover);
-  font-weight: var(--font-weight-semibold);
-}
-
-/* 路由选中态，与 ListBox selection 解耦 */
+/* 路由选中态由 data-nav-active 表达，背景由滑动指示器承接。 */
 .menuItemActive,
 .menuItem[data-nav-active='true'],
 .menuItemActive:hover,
-.menuItemActive[data-hovered],
-.menuItemActive[data-focused],
-.menuItemActive[data-focus-visible],
+.menuItemActive:focus-visible,
 .menuItem[data-nav-active='true']:hover,
-.menuItem[data-nav-active='true'][data-hovered],
-.menuItem[data-nav-active='true'][data-focused],
-.menuItem[data-nav-active='true'][data-focus-visible] {
+.menuItem[data-nav-active='true']:focus-visible {
   color: var(--accent-text-strong);
   font-weight: var(--font-weight-semibold);
 }
 
-.menuItem:global(.list-box-item).menuItemCollapsed {
+.menuItem.menuItemCollapsed {
   width: var(--app-header-nav-rail-item-width);
   justify-content: center;
   padding: 0;

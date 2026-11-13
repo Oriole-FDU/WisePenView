@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 import { useCurrentRouteHandle } from '@/bootstrap/router';
 import type { HeaderNavItem } from '@/components/business/Sidebar/_common/header/HeaderNav/index.type';
@@ -10,7 +9,7 @@ import { useOpenResource } from '@/hooks/useOpenResource';
 import { useAppAuth } from '@/layouts/App/_context';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { APP_SIDEBAR_HEADER_ITEMS, type AppSidebarNavigateItem } from './appSidebarNavigation';
+import { APP_SIDEBAR_HEADER_ITEMS } from './appSidebarNavigation';
 
 interface UseAppSidebarHeaderNavOptions {
   onNavigate?: () => void;
@@ -25,7 +24,6 @@ export function useAppSidebarHeaderNav({
   onNavigate,
 }: UseAppSidebarHeaderNavOptions = {}): AppSidebarHeaderNavResult {
   const { t } = useTranslation('shell');
-  const navigate = useNavigate();
   const appAuth = useAppAuth();
   const noteService = useNoteService();
   const openResource = useOpenResource();
@@ -52,15 +50,6 @@ export function useAppSidebarHeaderNav({
     }
   );
 
-  const handleNavItemPress = (item: AppSidebarNavigateItem) => {
-    if (!appAuth.isAuthenticated) {
-      appAuth.requireLogin();
-      return;
-    }
-    navigate(item.to);
-    onNavigate?.();
-  };
-
   const handleCreateNote = () => {
     if (!appAuth.isAuthenticated) {
       appAuth.requireLogin();
@@ -85,13 +74,14 @@ export function useAppSidebarHeaderNav({
       };
     }
 
-    // navigate 类型的菜单项负责跳转到指定页面。
+    // 已登录时渲染真实链接；未登录时保留按钮动作，由登录守卫接管。
     return {
       key: item.key,
       name: t(item.labelKey),
       icon: item.icon,
       toolId: item.toolId,
-      onPress: () => handleNavItemPress(item),
+      href: appAuth.isAuthenticated ? item.to : undefined,
+      onPress: appAuth.isAuthenticated ? onNavigate : appAuth.requireLogin,
     };
   });
 

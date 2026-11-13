@@ -9,7 +9,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { ADMIN_PAGE_CONFIGS } from '@/views/admin/pages';
 
@@ -32,7 +32,6 @@ const PAGE_ICONS = {
 
 function AdminHeaderNav({ collapsed, labelsHidden = false }: AdminHeaderNavProps) {
   const { t } = useTranslation('admin');
-  const navigate = useNavigate();
   const location = useLocation();
 
   const mainItems = MAIN_PAGE_KEYS.map((pageKey) => {
@@ -41,7 +40,7 @@ function AdminHeaderNav({ collapsed, labelsHidden = false }: AdminHeaderNavProps
       key: page.path,
       name: t(page.titleKey),
       icon: PAGE_ICONS[pageKey],
-      onPress: () => navigate(page.path),
+      href: page.path,
     };
   });
 
@@ -51,7 +50,7 @@ function AdminHeaderNav({ collapsed, labelsHidden = false }: AdminHeaderNavProps
       key: page.path,
       name: t(page.titleKey),
       icon: PAGE_ICONS[pageKey],
-      onPress: () => navigate(page.path),
+      href: page.path,
     };
   });
 
