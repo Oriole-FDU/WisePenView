@@ -59,7 +59,7 @@ function SidebarViewTab({ id, label, icon: Icon, selected, toolId }: SidebarView
     >
       <span className={styles.tabTooltipTrigger}>
         <span className={styles.tabContent}>
-          <Icon size={18} aria-hidden="true" />
+          <Icon size={16} aria-hidden="true" />
           <span className={styles.tabLabel}>
             <span className={styles.tabLabelInner}>{label}</span>
           </span>
