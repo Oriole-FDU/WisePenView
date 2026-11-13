@@ -212,7 +212,6 @@ function ProviderSettingsSection() {
                           <AppIconButton
                             icon={<Unlink size={13} aria-hidden="true" />}
                             size="sm"
-                            className={styles.unlinkButton}
                             label={t('ai.models.unbindAria', { name: model.displayName })}
                             onClick={() => setUnbindTarget({ model, provider })}
                           />
