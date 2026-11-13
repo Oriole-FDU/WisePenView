@@ -4,21 +4,17 @@ import styles from './style.module.scss';
 function AuthBackground() {
   return (
     <div className={styles.root} aria-hidden>
-      <div className={`${styles.blob} ${styles.blobPrimary} ${styles.pulse}`} />
-      <div className={`${styles.blob} ${styles.blobAccent} ${styles.pulse} ${styles.delay1}`} />
-      <div className={`${styles.blob} ${styles.blobBlend} ${styles.pulse} ${styles.delay2}`} />
+      <div className={`${styles.blob} ${styles.blobPrimary}`} />
+      <div className={`${styles.blob} ${styles.blobAccent}`} />
+      <div className={`${styles.blob} ${styles.blobBlend}`} />
 
+      <div className={`${styles.dot} ${styles.dotSm} ${styles.dotPrimary} ${styles.dotTopLeft}`} />
+      <div className={`${styles.dot} ${styles.dotMd} ${styles.dotFocus} ${styles.dotTopRight}`} />
       <div
-        className={`${styles.dot} ${styles.dotSm} ${styles.dotPrimary} ${styles.float} ${styles.dotTopLeft}`}
+        className={`${styles.dot} ${styles.dotSm} ${styles.dotPrimaryHover} ${styles.dotBottomLeft}`}
       />
       <div
-        className={`${styles.dot} ${styles.dotMd} ${styles.dotFocus} ${styles.float} ${styles.dotTopRight} ${styles.delay05}`}
-      />
-      <div
-        className={`${styles.dot} ${styles.dotSm} ${styles.dotPrimaryHover} ${styles.float} ${styles.dotBottomLeft} ${styles.delay1}`}
-      />
-      <div
-        className={`${styles.dot} ${styles.dotMd} ${styles.dotPrimarySoft} ${styles.float} ${styles.dotBottomRight} ${styles.delay15}`}
+        className={`${styles.dot} ${styles.dotMd} ${styles.dotPrimarySoft} ${styles.dotBottomRight}`}
       />
 
       <svg
