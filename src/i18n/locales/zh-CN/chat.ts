@@ -57,9 +57,10 @@ const zhCNChat = {
     agentPicker: {
       title: 'Agent',
       trigger: '选择 Agent',
+      triggerAria: '当前 Agent：{{name}}，打开 Agent 菜单',
       currentDraft: '当前草稿',
-      defaultAgent: '无 Agent',
-      selectAgentTooltip: '请选择 Agent',
+      defaultMode: '默认聊天',
+      defaultAgent: '默认 Agent',
       loadingAria: '正在加载 Agent 列表',
       selectFromGroup: '从组内选择',
       groupModalTitle: '从小组选择 Agent',
