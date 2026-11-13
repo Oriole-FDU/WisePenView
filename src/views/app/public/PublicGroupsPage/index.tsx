@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import { Select } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import PageHeader from '@/components/base/PageHeader';
@@ -155,9 +155,7 @@ function PublicGroupsPage() {
           ))}
         </div>
       ) : (
-        <div className={styles.emptyState}>
-          <Empty description={t('list.empty')} />
-        </div>
+        <EmptyState className={styles.contentState} title={t('list.empty')} />
       )}
 
       {error ? null : (

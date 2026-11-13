@@ -3,7 +3,7 @@ import { type CSSProperties, type RefObject, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CommandGroup, CommandItem } from '@/components/_shadcn';
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceService } from '@/domains';
 import type { SearchHitItem, SearchResultPage } from '@/domains/Resource';
@@ -281,9 +281,10 @@ function ResourceSearchResults({
           disabled
           className={styles.emptyState}
         >
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={t('search.noResults', { ns: 'resource' })}
+          <EmptyState
+            title={t('search.noResults', { ns: 'resource' })}
+            showIcon={false}
+            size="compact"
           />
         </CommandItem>
       )}

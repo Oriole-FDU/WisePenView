@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import type { editor as MonacoEditor } from 'monaco-editor';
 import type { RefObject } from 'react';
 
-import { Empty } from '@/components/base/Feedback';
+import { EmptyState } from '@/components/base/Feedback';
 import Markdown, { type MarkdownResourceResolver } from '@/components/base/Markdown';
 import { Tabs } from '@/components/base/Tabs';
 import SkillEditor from '@/components/editors/skill/components/SkillEditor';
@@ -90,11 +90,7 @@ function SkillEditorPanel({
 
   if (!selectedFile) {
     return (
-      <Empty
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-        description={t('preview.selectFile')}
-        className={styles.emptyBlock}
-      />
+      <EmptyState title={t('preview.selectFile')} showIcon={false} className={styles.emptyBlock} />
     );
   }
 
@@ -151,9 +147,9 @@ function SkillEditorPanel({
             onEditorMount={onEditorMount}
           />
         ) : (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={t('preview.unsupported')}
+          <EmptyState
+            title={t('preview.unsupported')}
+            showIcon={false}
             className={styles.emptyBlock}
           />
         )}

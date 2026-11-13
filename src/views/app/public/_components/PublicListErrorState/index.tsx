@@ -2,7 +2,7 @@ import { RotateCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { ResultState } from '@/components/base/Feedback';
+import { ErrorState } from '@/components/base/Feedback';
 
 interface PublicListErrorStateProps {
   className?: string;
@@ -21,19 +21,17 @@ function PublicListErrorState({
   const { t } = useTranslation('common');
 
   return (
-    <div className={className} role="alert">
-      <ResultState
-        status="error"
-        title={title}
-        subTitle={description}
-        extra={
-          <AppButton variant="primary" onPress={onRetry}>
-            <RotateCw size={16} aria-hidden />
-            {t('actions.retry')}
-          </AppButton>
-        }
-      />
-    </div>
+    <ErrorState
+      className={className}
+      title={title}
+      description={description}
+      action={
+        <AppButton variant="primary" size="sm" onPress={onRetry}>
+          <RotateCw size={16} aria-hidden />
+          {t('actions.retry')}
+        </AppButton>
+      }
+    />
   );
 }
 

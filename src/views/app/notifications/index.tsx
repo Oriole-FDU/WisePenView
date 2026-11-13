@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppButton, AppPressable } from '@/components/base/Button';
-import { EmptyState, ResultState, Spin } from '@/components/base/Feedback';
+import { EmptyState, ErrorState, ResultState, Spin } from '@/components/base/Feedback';
 import PageHeader from '@/components/base/PageHeader';
 import { useMessageService } from '@/domains';
 import type { UserMessage } from '@/domains/Message';
@@ -192,12 +192,11 @@ function NotificationsPage() {
       <div className={styles.pageBody}>
         {messagesRequest.error ? (
           <div className={styles.pageState}>
-            <ResultState
-              status="error"
+            <ErrorState
               title={t('page.loadFailed')}
-              subTitle={parseErrorMessage(messagesRequest.error)}
-              extra={
-                <AppButton variant="primary" onPress={handleRefreshMessages}>
+              description={parseErrorMessage(messagesRequest.error)}
+              action={
+                <AppButton variant="primary" size="sm" onPress={handleRefreshMessages}>
                   <RotateCw size={16} />
                   {t('page.refresh')}
                 </AppButton>

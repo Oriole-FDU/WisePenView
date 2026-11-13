@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import type { DataNode } from '@/components/base/Tree';
 import Tree from '@/components/base/Tree';
 import { useDriveService, useGroupService } from '@/domains';
@@ -503,7 +503,7 @@ function DriveNavigator({
     return (
       <div className={styles.wrapper}>
         <div className={styles.stateBlock}>
-          <Empty description={emptyText ?? t('navigator.empty')} />
+          <EmptyState title={emptyText ?? t('navigator.empty')} size="compact" />
         </div>
       </div>
     );

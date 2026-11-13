@@ -3,7 +3,7 @@ import { FolderPlus, Plus, Upload } from 'lucide-react';
 import type { RefObject } from 'react';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { Empty } from '@/components/base/Feedback';
+import { EmptyState } from '@/components/base/Feedback';
 import type { DataNode } from '@/components/base/Tree';
 import SkillFileTree from '@/components/editors/skill/components/SkillFileTree';
 import type { SkillFileNode } from '@/domains/Skill';
@@ -100,9 +100,10 @@ function SkillFileTreePanel({
           onMoveFile={fileActions.handleMoveFile}
         />
         {files.length === 0 && !fileActions.pendingCreate ? (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={t(canEdit ? 'fileTree.emptyEditable' : 'fileTree.empty')}
+          <EmptyState
+            title={t(canEdit ? 'fileTree.emptyEditable' : 'fileTree.empty')}
+            showIcon={false}
+            size="compact"
             className={styles.emptyBlock}
           />
         ) : null}

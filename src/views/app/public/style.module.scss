@@ -53,8 +53,7 @@ $public-grid-two-column-breakpoint: 664px;
   min-width: 0;
 }
 
-.loading,
-.errorState {
+.loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,9 +62,14 @@ $public-grid-two-column-breakpoint: 664px;
   margin-top: var(--space-xl);
 }
 
-.emptyState {
-  padding: 60px 0;
-  text-align: center;
+.errorState,
+.contentState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
+  margin-top: var(--space-lg);
 }
 
 @container public-page (width < #{$public-grid-two-column-breakpoint}) {

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { Empty, Spin } from '@/components/base/Feedback';
+import { EmptyState, Spin } from '@/components/base/Feedback';
 import PageHeader from '@/components/base/PageHeader';
 import CourseCard from '@/components/business/CourseCard';
 import { useCourseService, useUserService } from '@/domains';
@@ -123,9 +123,7 @@ function PublicCoursesPage() {
           ))}
         </div>
       ) : (
-        <div className={styles.emptyState}>
-          <Empty description={t('list.empty')} />
-        </div>
+        <EmptyState className={styles.contentState} title={t('list.empty')} />
       )}
 
       {courseError ? null : (
