@@ -1,5 +1,7 @@
 import { useDebounceFn } from 'ahooks';
 import {
+  Bell,
+  BookOpen,
   Bot,
   FolderHeart,
   Gauge,
@@ -219,6 +221,20 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
       keywords: ['group', '团队', '小组'],
       icon: Users,
       onSelect: () => handleNavigate(APP_ROUTE_PATH.GROUPS),
+    },
+    {
+      id: 'courses',
+      label: t('navigation.courses', { ns: 'shell' }),
+      keywords: ['course', '学习', '课程'],
+      icon: BookOpen,
+      onSelect: () => handleNavigate(APP_ROUTE_PATH.COURSES),
+    },
+    {
+      id: 'notifications',
+      label: t('navigation.notifications', { ns: 'shell' }),
+      keywords: ['notification', 'message', '消息', '通知'],
+      icon: Bell,
+      onSelect: () => handleNavigate(APP_ROUTE_PATH.NOTIFICATIONS),
     },
     {
       id: 'favorites',
