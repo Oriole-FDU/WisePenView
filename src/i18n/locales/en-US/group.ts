@@ -1,7 +1,6 @@
 const enUSGroup = {
   list: {
     title: 'My Groups',
-    subtitle: 'Manage groups and collaboration',
     join: 'Join group',
     create: 'Create group',
     navigationAria: 'Groups and courses',

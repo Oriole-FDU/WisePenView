@@ -17,7 +17,7 @@ function Usage() {
 
   return (
     <>
-      <PageHeader title={t('usage.title')} subtitle={t('usage.subtitle')} />
+      <PageHeader title={t('usage.title')} />
       <Card className={layout.usagePanel}>
         <Card.Content className={layout.usageContent}>
           <ComputeWallet targetType={WALLET_TARGET_TYPE.USER} canRecharge surface="plain" />

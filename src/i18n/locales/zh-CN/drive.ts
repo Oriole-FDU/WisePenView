@@ -1,7 +1,6 @@
 const zhCNDrive = {
   page: {
     title: '我的云盘',
-    subtitle: '管理个人文件',
     backToDrive: '返回云盘',
     viewAria: '云盘视图',
     tabs: {

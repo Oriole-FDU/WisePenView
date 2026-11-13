@@ -1,7 +1,6 @@
 const enUSProfile = {
   account: {
     title: 'Account',
-    subtitle: 'Manage account information',
     sectionTitle: 'Account details',
     changePassword: 'Change password',
     username: 'Username',
@@ -11,11 +10,9 @@ const enUSProfile = {
   },
   usage: {
     title: 'Credits & Usage',
-    subtitle: 'View credit balance, top-up history, and quota usage',
   },
   ai: {
     title: 'AI Services',
-    subtitle: 'Manage custom model providers and Web Search keys',
     loading: 'Loading configuration...',
     emptyValue: 'Not set',
     byok: {
@@ -126,7 +123,6 @@ const enUSProfile = {
   },
   appearance: {
     title: 'Appearance & Language',
-    subtitle: 'Set interface language, display mode, and theme',
     language: 'Interface language',
     languageAria: 'Select interface language',
     mode: 'Color mode',

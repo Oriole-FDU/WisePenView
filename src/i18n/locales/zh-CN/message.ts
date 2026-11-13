@@ -1,7 +1,6 @@
 const zhCNMessage = {
   page: {
     title: '消息通知',
-    subtitle: '查看站内通知',
     back: '返回通知',
     backToList: '返回通知列表',
     refresh: '刷新',

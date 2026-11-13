@@ -1,7 +1,6 @@
 const zhCNGroup = {
   list: {
     title: '我的小组',
-    subtitle: '管理小组与协作',
     join: '加入小组',
     create: '新建小组',
     navigationAria: '小组与课程',

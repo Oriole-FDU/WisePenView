@@ -34,7 +34,6 @@ function GroupDetail() {
   const [walletRefreshVersion, setWalletRefreshVersion] = useState(0);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const displayConfig = getGroupDisplayConfig(group.groupType, currentUserRole);
-  const ownerName = group.ownerInfo?.realName?.trim() || group.ownerInfo?.nickname?.trim() || '-';
   const isFilesPage = useMatch(`${APP_ROUTE_PATH.GROUPS}/:groupId/files/*`) != null;
   const isMembersPage = useMatch(`${APP_ROUTE_PATH.GROUPS}/:groupId/members`) != null;
   const isWalletPage = useMatch(`${APP_ROUTE_PATH.GROUPS}/:groupId/wallet`) != null;
@@ -87,11 +86,6 @@ function GroupDetail() {
           />
         }
         title={group.groupName}
-        subtitle={
-          <>
-            <span>{t('detail.creator')}</span> {ownerName}
-          </>
-        }
         actions={
           <>
             {group.groupType === GROUP_TYPE.ADVANCED ? (

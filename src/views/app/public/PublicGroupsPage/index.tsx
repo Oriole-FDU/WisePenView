@@ -86,7 +86,6 @@ function PublicGroupsPage() {
     <div className={styles.publicPage}>
       <PageHeader
         title={t('list.title')}
-        subtitle={t('list.subtitle')}
         actions={
           <div className={styles.actionsRow}>
             <AppButton variant="secondary" onPress={() => setCreateModalOpen(true)}>

@@ -7,7 +7,6 @@ const enUSCourse = {
   },
   list: {
     title: 'My Courses',
-    subtitle: 'Manage courses and learning',
     join: 'Join course',
     create: 'Create course',
     loading: 'Loading courses',

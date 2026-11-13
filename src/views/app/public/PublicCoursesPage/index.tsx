@@ -70,7 +70,6 @@ function PublicCoursesPage() {
     <div className={styles.publicPage}>
       <PageHeader
         title={t('list.title')}
-        subtitle={t('list.subtitle')}
         actions={
           canCreateCourse || canJoinCourse ? (
             <div className={styles.actionsRow}>

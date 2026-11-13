@@ -175,7 +175,6 @@ function NotificationsPage() {
       <PageHeader
         titleId="notifications-title"
         title={t('page.title')}
-        subtitle={t('page.subtitle')}
         actions={
           <AppButton
             size="sm"

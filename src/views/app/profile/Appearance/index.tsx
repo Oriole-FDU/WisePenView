@@ -140,7 +140,7 @@ function SchemeOption({ option }: SchemeOptionProps) {
 function AppearanceHeader() {
   const { t } = useTranslation('profile');
 
-  return <PageHeader title={t('appearance.title')} subtitle={t('appearance.subtitle')} />;
+  return <PageHeader title={t('appearance.title')} />;
 }
 
 function Appearance() {

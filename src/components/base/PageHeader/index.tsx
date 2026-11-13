@@ -1,4 +1,4 @@
-import { Heading, Paragraph } from '@heroui/react';
+import { Heading } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
@@ -6,7 +6,6 @@ import styles from './style.module.scss';
 
 interface PageHeaderProps {
   title: ReactNode;
-  subtitle?: ReactNode;
   actions?: ReactNode;
   leading?: ReactNode;
   titleId?: string;
@@ -17,7 +16,6 @@ interface PageHeaderProps {
 
 function PageHeader({
   title,
-  subtitle,
   actions,
   leading,
   titleId,
@@ -33,11 +31,6 @@ function PageHeader({
           <Heading level={1} id={titleId} className={styles.title}>
             {title}
           </Heading>
-          {subtitle ? (
-            <Paragraph size="sm" color="muted" className={styles.subtitle}>
-              {subtitle}
-            </Paragraph>
-          ) : null}
         </div>
       </div>
       {actions ? <div className={clsx(styles.actions, actionsClassName)}>{actions}</div> : null}

@@ -22,10 +22,7 @@
 }
 
 .content {
-  display: flex;
   min-width: 0;
-  flex-direction: column;
-  gap: var(--space-xs);
 }
 
 .title {
@@ -35,14 +32,6 @@
   font-weight: var(--font-weight-semibold);
   line-height: 1.25;
   letter-spacing: 0;
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-sm);
 }
 
 .actions {

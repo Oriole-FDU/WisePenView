@@ -1,7 +1,6 @@
 const zhCNProfile = {
   account: {
     title: '账号管理',
-    subtitle: '管理账号信息',
     sectionTitle: '账号',
     changePassword: '修改密码',
     username: '用户名',
@@ -11,11 +10,9 @@ const zhCNProfile = {
   },
   usage: {
     title: '余额与用量',
-    subtitle: '查看计算点余额、充值记录与配额用量',
   },
   ai: {
     title: 'AI 服务',
-    subtitle: '管理自定义模型供应商与 Web Search 密钥',
     loading: '正在加载配置…',
     emptyValue: '未设置',
     byok: {
@@ -116,7 +113,6 @@ const zhCNProfile = {
   },
   appearance: {
     title: '外观与语言',
-    subtitle: '设置界面语言、显示模式与主题',
     language: '界面语言',
     languageAria: '选择界面语言',
     mode: '明暗模式',

@@ -12,7 +12,7 @@ function AISettings() {
 
   return (
     <>
-      <PageHeader title={t('ai.title')} subtitle={t('ai.subtitle')} />
+      <PageHeader title={t('ai.title')} />
       <div className={styles.page}>
         <ProviderSettingsSection />
         <ModelSettingsSection />
