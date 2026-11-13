@@ -16,7 +16,7 @@ const enUSMessage = {
     loadingMore: 'Loading more notifications...',
     showMessage: 'Show message',
     hideMessage: 'Hide message',
-    markAllAsRead: 'Mark all as read',
+    markLoadedAsRead: 'Mark loaded as read',
     readStatus: {
       read: 'Read',
       unread: 'Unread',

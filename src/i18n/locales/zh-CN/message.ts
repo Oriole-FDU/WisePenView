@@ -16,7 +16,7 @@ const zhCNMessage = {
     loadingMore: '正在加载更多通知...',
     showMessage: '查看详情',
     hideMessage: '收起详情',
-    markAllAsRead: '全部标为已读',
+    markLoadedAsRead: '已加载通知标为已读',
     readStatus: {
       read: '已读',
       unread: '未读',
