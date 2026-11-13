@@ -58,6 +58,7 @@ const zhCNProfile = {
       providerModelName: 'Provider 模型名',
       providerModelNamePlaceholder: '例如：gpt-4o-mini',
       bind: '绑定',
+      addFirst: '先添加模型',
       bindTitle: '绑定模型 Provider',
       bindDescription: '当前供应商可以绑定多个模型；这里填写该供应商侧实际模型名。',
       scope: {
