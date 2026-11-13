@@ -14,7 +14,6 @@ const zhCNGroup = {
     managed: '我管理的',
     loading: '正在加载小组列表',
     loadFailed: '获取小组列表失败',
-    loadFailedHint: '请检查网络连接后重试，当前筛选条件会保留。',
     empty: '暂无小组',
     summary: '{{start}} - {{end}} / 共 {{total}} 条',
     previous: '上一页',

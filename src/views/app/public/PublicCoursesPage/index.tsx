@@ -107,7 +107,6 @@ function PublicCoursesPage() {
       ) : courseError ? (
         <PublicListErrorState
           className={styles.errorState}
-          description={t('list.loadFailedHint')}
           title={t('list.loadFailed')}
           onRetry={courseRequest.refresh}
         />

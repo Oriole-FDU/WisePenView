@@ -12,7 +12,6 @@ const enUSCourse = {
     create: 'Create course',
     loading: 'Loading courses',
     loadFailed: 'Failed to load courses',
-    loadFailedHint: 'Check your connection and retry. Your current filters will be kept.',
     empty: 'No courses yet',
     progress: '{{read}} / {{total}} completed',
     pendingAssignments: '{{count}} assignments remaining',

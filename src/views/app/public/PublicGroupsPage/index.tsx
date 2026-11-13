@@ -139,7 +139,6 @@ function PublicGroupsPage() {
       ) : error ? (
         <PublicListErrorState
           className={styles.errorState}
-          description={t('list.loadFailedHint')}
           title={t('list.loadFailed')}
           onRetry={refresh}
         />

@@ -12,7 +12,6 @@ const zhCNCourse = {
     create: '新建课程',
     loading: '正在加载课程列表',
     loadFailed: '获取课程列表失败',
-    loadFailedHint: '请检查网络连接后重试，当前筛选条件会保留。',
     empty: '暂无课程',
     progress: '已完成 {{read}} / {{total}}',
     pendingAssignments: '有 {{count}} 项作业待完成',
