@@ -38,6 +38,8 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const unmountedRef = useUnmountedRef();
   const creatingSessionRef = useRef<{
     locationKey: string;
+    draftVersion?: number;
+    draftAgentId?: string;
     promise: Promise<ChatSession | undefined>;
   } | null>(null);
   const [newChatSessionId, setNewChatSessionId] = useState<string>();
@@ -48,12 +50,12 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
 
   const { runAsync: runCreateSession } = useApi(
     (params?: CreateSessionRequest) => chatSessionService.createSession(params),
-    { manual: true }
+    { manual: true, showErrorToast: false }
   );
   const { runAsync: runSetSessionAgent } = useApi(
     (params: { sessionId: string; agentId?: string | null }) =>
       chatSessionService.setSessionAgent(params),
-    { manual: true }
+    { manual: true, showErrorToast: false }
   );
 
   const requireAuth = (): boolean => {
@@ -65,7 +67,7 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const panelTitle =
     currentSession?.title || t(currentSessionId ? 'session.untitled' : 'panel.newChat');
 
-  /** 按需解析当前会话：未建立会话时先创建并同步 agent，再返回可发送的会话 ID。 */
+  /** 调试会话只复用相同 Agent 和草稿版本；切换模式或版本时创建独立会话。 */
   const ensureSession = useMemoizedFn(
     async (agentParams?: CreateSessionRequest): Promise<string | undefined> => {
       if (unmountedRef.current) return;
@@ -76,31 +78,59 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
         });
       }
       let targetSessionId = currentSessionId;
-      let targetSession = currentSession;
-      if (!targetSessionId) {
-        if (creatingSessionRef.current?.locationKey !== locationKey) {
+      let targetSession =
+        currentSession ??
+        (targetSessionId && agentParams
+          ? await chatSessionService.getSession(targetSessionId)
+          : undefined);
+      if (unmountedRef.current || routeLatest.current.locationKey !== locationKey) return;
+
+      const draftVersion = agentParams?.draftVersion;
+      const draftAgentId = draftVersion !== undefined ? agentParams?.agentId : undefined;
+      const matchesDraft = (session: ChatSession) =>
+        session.isDraftDebug &&
+        session.agentId === draftAgentId &&
+        session.agentVersion === draftVersion;
+      const needsSeparateSession =
+        agentParams &&
+        (draftVersion !== undefined
+          ? !targetSession || !matchesDraft(targetSession)
+          : targetSession?.isDraftDebug);
+      if (!targetSessionId || needsSeparateSession) {
+        const pending = creatingSessionRef.current;
+        if (
+          pending?.locationKey === locationKey &&
+          (pending.draftVersion !== draftVersion || pending.draftAgentId !== draftAgentId)
+        )
+          return;
+        if (pending?.locationKey !== locationKey) {
           const promise = runCreateSession(agentParams).then(async (createdSession) => {
             if (unmountedRef.current || routeLatest.current.locationKey !== locationKey) return;
+            if (draftVersion !== undefined && !matchesDraft(createdSession)) {
+              throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_DRAFT_DEBUG_UNAVAILABLE);
+            }
             setNewChatSessionId(createdSession.id);
-            pendingHistoryRefreshRef.current = createdSession.id;
+            pendingHistoryRefreshRef.current = createdSession.isDraftDebug
+              ? undefined
+              : createdSession.id;
             await selectSession(createdSession.id, true);
-            requestChatSessionHistoryRefresh();
+            if (!createdSession.isDraftDebug) requestChatSessionHistoryRefresh();
             return createdSession;
           });
-          creatingSessionRef.current = { locationKey, promise };
+          creatingSessionRef.current = { locationKey, draftAgentId, draftVersion, promise };
           const clearPending = () => {
             if (creatingSessionRef.current?.promise === promise) creatingSessionRef.current = null;
           };
           void promise.then(clearPending, clearPending);
         }
-        const createdSession = await creatingSessionRef.current.promise;
+        const createdSession = await creatingSessionRef.current?.promise;
         if (!createdSession) return;
         targetSessionId = createdSession.id;
         targetSession = createdSession;
       }
       if (unmountedRef.current || routeLatest.current.sessionId !== targetSessionId) return;
       const targetLocationKey = routeLatest.current.locationKey;
-      if (agentParams) {
+      if (agentParams && draftVersion === undefined) {
         const sessionAgentMatched =
           targetSession != null &&
           (agentParams.agentId == null

@@ -17,6 +17,7 @@ const enUSChat = {
     },
     contextMismatch:
       'The selected context belongs to another resource. Remove it and select it again from the current resource.',
+    draftDebugUnavailable: 'Agent draft debugging could not start. Your message was not sent.',
   },
   input: {
     placeholder: 'Ask a question or add a file',
@@ -30,6 +31,7 @@ const enUSChat = {
     sendFailed: 'Failed to send: {{error}}',
     attachmentUploading: 'Attachments are still uploading. Try again in a moment.',
     attachmentUploadFailed: 'Remove failed attachment uploads before sending.',
+    reattachAfterSessionChange: 'The chat changed. Add your attachments again before sending.',
     uploadMenu: {
       trigger: 'Upload attachments',
       title: 'Attachments',

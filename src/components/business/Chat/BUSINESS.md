@@ -12,7 +12,7 @@
 - 聊天历史可分页加载；替换会话历史前清空旧消息，较旧页与当前消息依 message ID 去重。切换会话或请求版本变更后完成的旧请求不套用。依据：[useChatHistory](../../../domains/ChatSession/session/useChatHistory.ts) 的 `replaceHistory`、`prependHistory`、`mergeMessages`。
 - 有活动 turn 时，前端查询 active turn 并恢复 SSE；同一 session／stream lifecycle 的重复恢复会合并，避免重复连接。取消时同时停止前端 stream 并调用后端 cancel API。依据：[useChatTurn](../../../domains/ChatTurn/runtime/useChatTurn.ts) 的 `resumeTurnStream`、[useChatTurnController](_controllers/useChatTurnController.ts) 的 `cancel`。
 - 工具调用进入 `approval-requested` 时须明确允许或拒绝；所有待审批项有决定后，前端以结果恢复同一轮对话。关闭审批视窗不会隐式批准或拒绝。依据：[useChatToolApproval](_controllers/useChatToolApproval.ts) 的 `decide`、[listToolApprovalRequests](_controllers/toolApprovalModel.ts)、[ToolApprovalDialog](ToolApprovalDialog/index.tsx) 的 `handleOpenChange`。
-- Agent 编辑器的草稿调试与传送前确认流程由 [Agent editor workflow](../../editors/agent/BUSINESS.md) 拥有。
+- Agent 编辑器的保存确认由 [Agent editor workflow](../../editors/agent/BUSINESS.md) 拥有。Chat 仅在选中 `CURRENT_DRAFT` 时请求草稿会话，并确认后端返回调试标记和相同 Agent、版本后才发送。普通会话、旧版本调试会话均不会改绑为新草稿；从调试切回已发布 Agent 时也需要独立的普通会话。依据：[useChatSessionController](_controllers/useChatSessionController.ts) 和 [useChatTurnController](_controllers/useChatTurnController.ts)。
 
 ## 语音输入
 

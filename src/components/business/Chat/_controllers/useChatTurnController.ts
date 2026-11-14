@@ -103,7 +103,14 @@ export function useChatTurnController({
     setCurrentModel(targetModel);
     const selectedAgent = opts?.selectedAgent;
     let agentParams: CreateSessionRequest | undefined;
-    if (selectedAgent?.resourceId) {
+    if (selectedAgent?.source === 'CURRENT_DRAFT') {
+      const { resourceId: agentId, agentVersion: draftVersion } = selectedAgent;
+      if (!agentId || draftVersion === undefined) {
+        toast.danger(t('panel.draftDebugUnavailable'));
+        return false;
+      }
+      agentParams = { agentId, draftVersion };
+    } else if (selectedAgent?.resourceId) {
       agentParams = {
         agentId: selectedAgent.resourceId,
       };
@@ -119,6 +126,14 @@ export function useChatTurnController({
       return false;
     }
     if (!targetSessionId) return false;
+    if (
+      currentSessionId &&
+      currentSessionId !== targetSessionId &&
+      opts?.activeAttachments?.length
+    ) {
+      toast.warning(t('input.reattachAfterSessionChange'));
+      return false;
+    }
 
     const frontendState = readFrontendStates({ resourceId });
     if (frontendState.resourceMismatch) {
