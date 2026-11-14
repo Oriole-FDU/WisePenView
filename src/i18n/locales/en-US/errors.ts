@@ -112,6 +112,9 @@ const enUSErrors = {
       'The selection contains multiple mounts of the same resource. Handle them one at a time.',
     '204': 'Pages folder was not found.',
     '205': 'Notes folder was not found.',
+    '206': 'Agent draft debugging could not start. Your message was not sent.',
+    '207':
+      'These attachments belong to this chat. Remove them before switching agents or draft versions.',
     '999': 'Operation failed. Please try again later.',
     '1000': 'System error.',
     '1001': 'Request error.',

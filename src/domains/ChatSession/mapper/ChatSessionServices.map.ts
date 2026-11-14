@@ -30,10 +30,12 @@ const mapCreateSessionRequest = (params?: CreateSessionRequest): CreateSessionAp
   const title = params?.title;
   const hasTitle = title !== undefined;
   const agentId = params?.agentId;
+  const draftVersion = params?.draftVersion;
 
   return {
     ...(hasTitle ? { title } : {}),
     ...(agentId !== undefined ? { agent_id: agentId } : {}),
+    ...(draftVersion !== undefined ? { draft_version: draftVersion } : {}),
   };
 };
 
@@ -45,6 +47,7 @@ const mapSessionFromApi = (data: ChatSessionApi): ChatSession => ({
   updatedAt: data.updated_at,
   agentId: data.agent_id,
   agentVersion: data.agent_version,
+  isDraftDebug: data.is_draft_debug ?? false,
 });
 
 const mapSetSessionAgentRequest = (params: SetSessionAgentRequest): SetSessionAgentApiRequest => ({

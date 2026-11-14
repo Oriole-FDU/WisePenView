@@ -9,6 +9,7 @@ import { generateThumbnail } from '@/utils/file/upload';
 import { createUuid } from '@/utils/random/createUuid';
 
 import type { LocalAttachmentPayload } from '../../../send.type';
+import type { ChatInputProps } from '../index.type';
 import { ChatInputFileContext, type ChatInputFileContextValue } from './ChatInputFileContext';
 import { selectChatInputSelectedModel } from './ChatInputStore';
 import { useChatInputStoreApi } from './useChatInputStore';
@@ -22,7 +23,7 @@ export function ChatInputFileProvider({
   getUploadSessionId,
 }: {
   children: ReactNode;
-  getUploadSessionId: () => Promise<string | undefined>;
+  getUploadSessionId: ChatInputProps['getUploadSessionId'];
 }) {
   const { t } = useTranslation('chat');
   const chatSessionService = useChatSessionService();
@@ -49,8 +50,10 @@ export function ChatInputFileProvider({
       status: 'uploading',
     });
     try {
-      const sessionVersion = store.getState().sessionVersion;
-      const sessionId = await getUploadSessionId();
+      const { sessionVersion, selectedAgent, activeAttachments } = store.getState();
+      const sessionId = await getUploadSessionId(selectedAgent, {
+        hasAttachments: activeAttachments.length > 0,
+      });
       if (!sessionId || store.getState().sessionVersion !== sessionVersion) {
         removePendingAttachmentUpload(id);
         return null;

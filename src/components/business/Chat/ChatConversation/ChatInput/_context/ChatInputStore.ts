@@ -274,13 +274,11 @@ export function createChatInputStore(): ChatInputStoreApi {
             const nextScope = sessionId ?? NEW_CHAT_TOOL_SELECTION_SCOPE;
             if (nextScope === state.toolSelectionScope) return {};
 
-            const shouldPromoteDraft =
-              promoteDraft &&
-              sessionId !== undefined &&
-              state.toolSelectionScope === NEW_CHAT_TOOL_SELECTION_SCOPE;
-            const selectedTools = shouldPromoteDraft
-              ? state.selectedTools
-              : (state.toolSelectionsByScope[nextScope] ?? []);
+            const preserveInput = promoteDraft && sessionId !== undefined;
+            const selectedTools =
+              preserveInput && state.toolSelectionScope === NEW_CHAT_TOOL_SELECTION_SCOPE
+                ? state.selectedTools
+                : (state.toolSelectionsByScope[nextScope] ?? []);
             const toolSelectionsByScope = {
               ...state.toolSelectionsByScope,
               [nextScope]: selectedTools,
@@ -290,8 +288,8 @@ export function createChatInputStore(): ChatInputStoreApi {
             }
 
             return {
-              // 草稿升级为正式会话时保留附件；真正切换会话时丢弃旧输入与晚到的上传。
-              ...(!shouldPromoteDraft && {
+              // 为当前输入新建会话时保留正文与上传；切到其他会话时清空输入，跳过晚到的上传结果。
+              ...(!preserveInput && {
                 sessionVersion: state.sessionVersion + 1,
                 value: '',
                 activeAttachments: [],
