@@ -68,7 +68,10 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const panelTitle =
     currentSession?.title || t(currentSessionId ? 'session.untitled' : 'panel.newChat');
 
-  /** 上传和发送按同一个 Agent 选项选择会话。 */
+  /**
+   * 上传和发送按同一个 Agent 选项选择会话。没有可复用的会话时，先创建再返回 ID；
+   * 普通会话可同步 Agent，调试会话只复用相同 Agent、相同草稿版本的会话。
+   */
   const ensureSession = useMemoizedFn(
     async (
       selectedAgent?: ChatAgentOption,

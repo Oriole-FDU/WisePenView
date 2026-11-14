@@ -288,7 +288,7 @@ export function createChatInputStore(): ChatInputStoreApi {
             }
 
             return {
-              // 草稿升级为正式会话时保留附件；真正切换会话时丢弃旧输入与晚到的上传。
+              // 为当前输入新建会话时保留正文与上传；切到其他会话时清空输入，跳过晚到的上传结果。
               ...(!preserveInput && {
                 sessionVersion: state.sessionVersion + 1,
                 value: '',
