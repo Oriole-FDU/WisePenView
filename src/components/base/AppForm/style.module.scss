@@ -195,6 +195,39 @@
   }
 
   .anchorNav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: var(--space-xs) var(--space-sm);
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .anchorNav > h2,
+  .anchorGroup > h2 {
+    display: none;
+  }
+
+  .anchorGroup {
+    display: contents;
+  }
+
+  .anchorGroup + .anchorGroup {
+    margin-top: 0;
+  }
+
+  .anchorNav button {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 32px;
+    margin: 0;
+    padding: 0 var(--space-sm);
+    white-space: nowrap;
+  }
+
+  .anchorNav button::before {
     display: none;
   }
 }
