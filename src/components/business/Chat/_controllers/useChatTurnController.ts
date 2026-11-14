@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useChatTurnService } from '@/domains';
 import type { ChatModel } from '@/domains/ChatConfig';
-import type { CreateSessionRequest } from '@/domains/ChatSession';
 import { useChatTurn } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
@@ -16,12 +15,13 @@ import { parseErrorMessage } from '@/utils/error';
 import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
 import { hasRenderableChatContent } from './chatTurnModel';
+import type { useChatSessionController } from './useChatSessionController';
 import { useChatToolApproval } from './useChatToolApproval';
 import { useChatTurnHistory } from './useChatTurnHistory';
 
 interface UseChatTurnControllerOptions {
   /** 会话域提供的按需建会话能力，用于发送前确保存在目标会话 */
-  ensureSession: (agentParams?: CreateSessionRequest) => Promise<string | undefined>;
+  ensureSession: ReturnType<typeof useChatSessionController>['ensureSession'];
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
   resourceChat?: ChatProps['resourceChat'];
@@ -101,39 +101,16 @@ export function useChatTurnController({
       return false;
     }
     setCurrentModel(targetModel);
-    const selectedAgent = opts?.selectedAgent;
-    let agentParams: CreateSessionRequest | undefined;
-    if (selectedAgent?.source === 'CURRENT_DRAFT') {
-      const { resourceId: agentId, agentVersion: draftVersion } = selectedAgent;
-      if (!agentId || draftVersion === undefined) {
-        toast.danger(t('panel.draftDebugUnavailable'));
-        return false;
-      }
-      agentParams = { agentId, draftVersion };
-    } else if (selectedAgent?.resourceId) {
-      agentParams = {
-        agentId: selectedAgent.resourceId,
-      };
-    } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
-      agentParams = { agentId: null };
-    }
-
     let targetSessionId: string | undefined;
     try {
-      targetSessionId = await ensureSession(agentParams);
+      targetSessionId = await ensureSession(opts?.selectedAgent, {
+        hasAttachments: Boolean(opts?.activeAttachments?.length),
+      });
     } catch (error) {
       toast.danger(parseErrorMessage(error));
       return false;
     }
     if (!targetSessionId) return false;
-    if (
-      currentSessionId &&
-      currentSessionId !== targetSessionId &&
-      opts?.activeAttachments?.length
-    ) {
-      toast.warning(t('input.reattachAfterSessionChange'));
-      return false;
-    }
 
     const frontendState = readFrontendStates({ resourceId });
     if (frontendState.resourceMismatch) {

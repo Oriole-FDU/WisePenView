@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useChatSessionService } from '@/domains';
+import type { ChatAgentOption } from '@/domains/ChatConfig';
 import {
   type ChatSession,
   type CreateSessionRequest,
@@ -67,9 +68,12 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const panelTitle =
     currentSession?.title || t(currentSessionId ? 'session.untitled' : 'panel.newChat');
 
-  /** 调试会话只复用相同 Agent 和草稿版本；切换模式或版本时创建独立会话。 */
+  /** 上传和发送按同一个 Agent 选项选择会话。 */
   const ensureSession = useMemoizedFn(
-    async (agentParams?: CreateSessionRequest): Promise<string | undefined> => {
+    async (
+      selectedAgent?: ChatAgentOption,
+      { hasAttachments = false } = {}
+    ): Promise<string | undefined> => {
       if (unmountedRef.current) return;
       if (!appAuth.isAuthenticated) {
         appAuth.requireLogin();
@@ -77,6 +81,19 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
           reason: t('input.loginRequired'),
         });
       }
+      let agentParams: CreateSessionRequest | undefined;
+      if (selectedAgent?.source === 'CURRENT_DRAFT') {
+        const { resourceId: agentId, agentVersion: draftVersion } = selectedAgent;
+        if (!agentId || draftVersion === undefined) {
+          throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_DRAFT_DEBUG_UNAVAILABLE);
+        }
+        agentParams = { agentId, draftVersion };
+      } else if (selectedAgent?.resourceId) {
+        agentParams = { agentId: selectedAgent.resourceId };
+      } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
+        agentParams = { agentId: null };
+      }
+
       let targetSessionId = currentSessionId;
       let targetSession =
         currentSession ??
@@ -96,6 +113,9 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
         (draftVersion !== undefined
           ? !targetSession || !matchesDraft(targetSession)
           : targetSession?.isDraftDebug);
+      if (needsSeparateSession && hasAttachments) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_ATTACHMENTS_SESSION_MISMATCH);
+      }
       if (!targetSessionId || needsSeparateSession) {
         const pending = creatingSessionRef.current;
         if (

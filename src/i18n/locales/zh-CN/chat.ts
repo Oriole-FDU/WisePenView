@@ -16,7 +16,6 @@ const zhCNChat = {
       close: '关闭会话列表',
     },
     contextMismatch: '所选上下文属于其他资源，请移除后在当前资源中重新选择',
-    draftDebugUnavailable: '未能启动 Agent 草稿调试，消息未发送',
   },
   input: {
     placeholder: '输入问题，或添加文件',
@@ -30,7 +29,6 @@ const zhCNChat = {
     sendFailed: '发送失败：{{error}}',
     attachmentUploading: '附件仍在上传中，请稍后再发送',
     attachmentUploadFailed: '存在上传失败的附件，请移除后再发送',
-    reattachAfterSessionChange: '已切换会话，请重新添加附件后再发送',
     uploadMenu: {
       trigger: '上传附件',
       title: '附件',
