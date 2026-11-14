@@ -411,6 +411,7 @@
 @media (max-width: breakpoints.$breakpoint-md) {
   .editorBody {
     grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .editorContent {

@@ -202,6 +202,7 @@ function AppFormAnchorNav({
     .map((item) => item.id)
     .join('\u001f');
   const navigationStateRef = useRef<AnchorNavigationState>({ type: 'idle' });
+  const navRef = useRef<HTMLElement>(null);
 
   /**
    * @wisepen-manual-effect
@@ -289,6 +290,21 @@ function AppFormAnchorNav({
     };
   }, [activationOffset, itemIdsKey, scrollContainerId, scrollContainerRef, scrollOffset]);
 
+  /**
+   * @wisepen-manual-effect
+   * 执行时机：当前锚点变化后，让窄屏横向章节导航跟随可见。
+   * 不可替代原因：当前锚点由滚动容器计算，导航自身的横向滚动位置只能通过 DOM 同步。
+   * cleanup：没有订阅或异步任务，无需清理。
+   */
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || nav.scrollWidth <= nav.clientWidth) return;
+    nav.querySelector<HTMLElement>('[aria-current="location"]')?.scrollIntoView({
+      block: 'nearest',
+      inline: 'center',
+    });
+  }, [activeId]);
+
   const handleNavigate = (id: string) => {
     const root =
       scrollContainerRef?.current ??
@@ -309,7 +325,7 @@ function AppFormAnchorNav({
   };
 
   return (
-    <nav className={clsx(styles.anchorNav, className)} aria-label={ariaLabel}>
+    <nav ref={navRef} className={clsx(styles.anchorNav, className)} aria-label={ariaLabel}>
       {title ? <h2>{title}</h2> : null}
       {items.map((entry) => {
         if (isAnchorGroup(entry)) {
