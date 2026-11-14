@@ -19,7 +19,7 @@ const enUSChat = {
       'The selected context belongs to another resource. Remove it and select it again from the current resource.',
   },
   input: {
-    placeholder: 'What can I help you with today?',
+    placeholder: 'Ask a question or add a file',
     loginRequired: 'Sign in to use chat',
     disclaimer: 'AI-generated content may be inaccurate. Please verify important information.',
     removeContext: 'Remove context',

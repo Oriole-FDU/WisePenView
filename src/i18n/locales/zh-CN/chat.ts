@@ -18,7 +18,7 @@ const zhCNChat = {
     contextMismatch: '所选上下文属于其他资源，请移除后在当前资源中重新选择',
   },
   input: {
-    placeholder: '今天能帮你做些什么？',
+    placeholder: '输入问题，或添加文件',
     loginRequired: '请先登录后使用聊天',
     disclaimer: 'AI 内容仅供参考，请仔细甄别',
     removeContext: '移除上下文',
