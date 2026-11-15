@@ -62,7 +62,7 @@ function Register() {
   /** 邀请链接携带的邀请码，用于初始化表单 */
   const linkedInviteCode = readRegisterInviteCode(location.search);
 
-  const { run: submitLogin } = useApi(
+  const { loading: loginLoading, run: submitLogin } = useApi(
     (values: RegisterRequest) =>
       authService.login({
         account: values.username,
@@ -79,7 +79,7 @@ function Register() {
     }
   );
 
-  const { loading, run: submitRegister } = useApi(
+  const { loading: registerLoading, run: submitRegister } = useApi(
     async (values: RegisterRequest) => {
       await authService.register(values);
       return values;
@@ -200,7 +200,9 @@ function Register() {
     formValues.confirmPassword.length > 0 ||
     (formValues.inviteCode.length > 0 && formValues.inviteCode !== linkedInviteCode) ||
     agreement;
-  const leaveGuard = useUnsavedChangesGuard(hasDraft && !loading);
+  /** 注册成功后还会自动登录，两个请求结束前都视为同一次提交流程。 */
+  const submissionPending = registerLoading || loginLoading;
+  const leaveGuard = useUnsavedChangesGuard(hasDraft && !submissionPending);
 
   return (
     <div className={auth.authContainer}>
@@ -303,7 +305,7 @@ function Register() {
             size="lg"
             type="submit"
             className={auth.submitButton}
-            isDisabled={loading}
+            isDisabled={submissionPending}
           >
             {t('register.submit')}
           </AppButton>
