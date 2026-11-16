@@ -8,7 +8,7 @@
 
 - Agent 以 Resource ID 作为资源识别；详情合并 Resource 信息与 Agent 版本 bundle。已发布版本取自 Agent 信息的 `agentInfo.version`，默认草稿版本为 `publishedVersion + 1`；若请求指定正版本，bundle 提供该版本的状态、Spec 与资产。依据：[AgentServices](service/AgentServices.impl.ts) 的 `getAgentDetail`、[AgentServicesMap](mapper/AgentServices.map.ts) 的 `mapAgentDetail`、[Agent entity](entity/agent.ts) 的 `AgentDetail`。
 - `AgentSpec` 包含 system prompt、模型策略、Tool／Skill 策略与记忆策略；API 响应允许各策略字段为 null，mapper 将缺失值补成前端编辑默认值。请求使用严格嵌套对象，新增未知字段会被拒绝。依据：[AgentServicesMap](mapper/AgentServices.map.ts) 的 `mapSpec`、`AGENT_SPEC_FALLBACK`、[Agent API schema](apis/AgentApi.schema.ts)。
-- 保存草稿通过两个请求分别更新 Agent 基本资料的 `name`／`description` 与指定 draft version 的 Spec，service 使用 `Promise.all`；两者不是原子事务，部分成功可能留待重新读取确认。依据：[AgentServices](service/AgentServices.impl.ts) 的 `saveAgentDraft`、[AgentServicesMap](mapper/AgentServices.map.ts) 的 `mapSaveAgentDraftRequests`。
+- 保存草稿时并行更新 Agent 基本资料的 `name`／`description` 和指定草稿版本的 Spec。如果一个请求失败，service 等两个请求都结束后才报告第一个错误，避免旧请求覆盖重试时保存的内容。两次写入不是原子事务，单个请求成功的内容可能已经保存。依据：[AgentServices](service/AgentServices.impl.ts) 的 `saveAgentDraft`、[AgentServicesMap](mapper/AgentServices.map.ts) 的 `mapSaveAgentDraftRequests`。
 - Agent asset 使用 Skill 共享的版本资产上传流程；文件扩展名映射为 MD、Python、JSON、YAML、TOML，其余映射为 TEXT。上传、取消与删除都带 resource ID 及 draft version；PUT 失败时以 ticket 的 assetId／objectKey 双识别取消候选，不删除既有资产，取消失败也不覆盖原上传错误。依据：[AgentServices](service/AgentServices.impl.ts) 的 `uploadAsset`、`deleteAssets`、[AgentServicesMap](mapper/AgentServices.map.ts) 的 `resolveAssetResourceType`、[共享资产 Schema](../_shared/apis/versionAssetApi.schema.ts)。
 
 ## 尚未由前端证明的事项
