@@ -9,9 +9,9 @@ import {
   type ResourcePermissionOverview,
   type ResourcePermissionSubject,
 } from '@/domains/ResourceAccess';
-import type { TagTreeNode } from '@/domains/Tag';
 import { getTagPermissionPresetValues, type TagPermissionPresetKey } from '@/domains/Tag';
 import i18n from '@/i18n';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { TAG_PERMISSION_PRESETS } from './tagPermissionPreset';
 
@@ -28,7 +28,7 @@ export interface ResourcePermissionPolicy {
   groupSubject?: ResourcePermissionSubject;
   primaryTagId?: string;
   supportedActions: ResourceAction[];
-  inheritedActions: ResourceAction[];
+  inheritedActions: ResourceAction[] | undefined;
   activeActions: ResourceAction[];
   selectedKey: ResourcePermissionPresetKey;
   selectedOption: ResourcePermissionPresetOption;
@@ -164,12 +164,6 @@ export const areResourcePermissionActionsEqualByOptions = (
     actionOptions.filter((option) => option.supported).map((option) => option.action)
   );
 
-export const resolveTagInheritedResourceActions = (
-  tag: TagTreeNode | undefined,
-  supportedActions: ResourceAction[]
-): ResourceAction[] =>
-  filterSupportedResourcePermissionActions(tag?.grantedActions, supportedActions);
-
 const findCurrentGroupSubject = (
   overview: ResourcePermissionOverview | undefined,
   groupId: string | undefined
@@ -192,23 +186,29 @@ export const resolveResourcePermissionPolicy = ({
     overview?.supportedActions ?? getSupportedResourcePermissionActions(resourceType);
   const groupSubject = findCurrentGroupSubject(overview, groupId);
   const primaryTagId = groupSubject?.primaryTagId ?? fallbackTagId;
-  const normalizedInheritedActions = filterSupportedResourcePermissionActions(
-    inheritedActions ?? groupSubject?.inheritedActions ?? groupSubject?.effectiveActions,
-    supportedActions
-  );
+  const knownInheritedActions =
+    inheritedActions ??
+    (groupSubject?.inheritance?.status === 'ready' ? groupSubject.inheritance.actions : undefined);
+  const normalizedInheritedActions =
+    knownInheritedActions === undefined
+      ? undefined
+      : filterSupportedResourcePermissionActions(knownInheritedActions, supportedActions);
   const overrideActions =
     groupSubject?.source === 'resourceOverride'
       ? filterSupportedResourcePermissionActions(groupSubject.editableActions, supportedActions)
       : undefined;
   const isOverrideDifferent = Boolean(
     overrideActions &&
-    !areResourcePermissionActionsEqual(
-      overrideActions,
-      normalizedInheritedActions,
-      supportedActions
-    )
+    (normalizedInheritedActions === undefined ||
+      !areResourcePermissionActionsEqual(
+        overrideActions,
+        normalizedInheritedActions,
+        supportedActions
+      ))
   );
-  const activeActions = isOverrideDifferent ? (overrideActions ?? []) : normalizedInheritedActions;
+  const activeActions = isOverrideDifferent
+    ? (overrideActions ?? [])
+    : (normalizedInheritedActions ?? []);
   const selectedKey: ResourcePermissionPresetKey = isOverrideDifferent
     ? resolveResourcePermissionPresetKey(activeActions, supportedActions)
     : 'inherit';
@@ -229,9 +229,12 @@ export const resolveResourcePermissionPolicy = ({
 
 export const buildResourceOverrideActions = (
   actions: ResourceAction[],
-  inheritedActions: ResourceAction[],
+  inheritedActions: ResourceAction[] | undefined,
   supportedActions: ResourceAction[]
 ): ResourceAction[] | null => {
+  if (inheritedActions === undefined) {
+    throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'inheritedActions' });
+  }
   const normalizedActions = filterSupportedResourcePermissionActions(actions, supportedActions);
   if (areResourcePermissionActionsEqual(normalizedActions, inheritedActions, supportedActions)) {
     return null;

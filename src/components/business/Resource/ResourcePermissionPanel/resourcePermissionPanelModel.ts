@@ -48,7 +48,9 @@ export const getSubjectActionsForDisplay = (
   subject: ResourcePermissionSubject
 ): ResourceAction[] => {
   if (subject.source === 'tag') {
-    return subject.inheritedActions ?? subject.effectiveActions;
+    return subject.inheritance?.status === 'ready'
+      ? subject.inheritance.actions
+      : subject.effectiveActions;
   }
   return subject.readonly ? subject.effectiveActions : subject.editableActions;
 };
@@ -70,11 +72,11 @@ export const updateSubjectActions = (
     const nextActions = filterResourcePermissionActionsByOptions(actions, options);
     if (
       subject.source === 'resourceOverride' &&
-      Array.isArray(subject.inheritedActions) &&
-      areResourcePermissionActionsEqualByOptions(nextActions, subject.inheritedActions, options)
+      subject.inheritance?.status === 'ready' &&
+      areResourcePermissionActionsEqualByOptions(nextActions, subject.inheritance.actions, options)
     ) {
       const inheritedActions = filterResourcePermissionActionsByOptions(
-        subject.inheritedActions,
+        subject.inheritance.actions,
         options
       );
       return {
@@ -84,7 +86,6 @@ export const updateSubjectActions = (
         description: '',
         editableActions: inheritedActions,
         effectiveActions: inheritedActions,
-        inheritedActions,
       };
     }
     if (subject.source === 'tag') {
@@ -103,6 +104,38 @@ export const updateSubjectActions = (
       effectiveActions: nextActions,
     };
   });
+
+/** 查询负责最新补全资料；本地修改只覆盖动作与明确移除的用户。 */
+export const applyResourcePermissionSubjectDrafts = (
+  subjects: ResourcePermissionSubject[],
+  drafts: ReadonlyMap<string, ResourcePermissionSubject | null>
+): ResourcePermissionSubject[] => {
+  const remainingDrafts = new Map(drafts);
+  const result = subjects.flatMap((subject) => {
+    const key = getSubjectRenderKey(subject);
+    const draft = remainingDrafts.get(key);
+    remainingDrafts.delete(key);
+    if (draft === null) return [];
+    if (!draft) return [subject];
+    const actions =
+      draft.source === 'tag' && subject.inheritance?.status === 'ready'
+        ? subject.inheritance.actions
+        : draft.editableActions;
+    return [
+      {
+        ...subject,
+        id: draft.id,
+        source: draft.source,
+        editableActions: actions,
+        effectiveActions: actions,
+      },
+    ];
+  });
+  remainingDrafts.forEach((draft) => {
+    if (draft) result.push(draft);
+  });
+  return result;
+};
 
 export const createSpecifiedUserSubject = (
   user: SpecifiedUserCandidate,

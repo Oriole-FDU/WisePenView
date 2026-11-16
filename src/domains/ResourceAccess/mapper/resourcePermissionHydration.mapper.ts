@@ -96,6 +96,7 @@ const mergePermissionSubjectInheritedActions = (
     inheritedActions,
     actionOptions
   );
+  const inheritance = { status: 'ready', actions: normalizedInheritedActions } as const;
 
   if (subject.source === 'resourceOverride') {
     const matchesTag = arePermissionActionsEqualByOptions(
@@ -111,7 +112,7 @@ const mergePermissionSubjectInheritedActions = (
         description: '',
         editableActions: normalizedInheritedActions,
         effectiveActions: normalizedInheritedActions,
-        inheritedActions: normalizedInheritedActions,
+        inheritance,
       };
     }
   }
@@ -122,13 +123,13 @@ const mergePermissionSubjectInheritedActions = (
       description: '',
       editableActions: normalizedInheritedActions,
       effectiveActions: normalizedInheritedActions,
-      inheritedActions: normalizedInheritedActions,
+      inheritance,
     };
   }
 
   return {
     ...subject,
-    inheritedActions: normalizedInheritedActions,
+    inheritance,
   };
 };
 
@@ -138,14 +139,21 @@ const mergeResourcePermissionSubject = (
   hydration: ResourcePermissionHydration,
   actionOptions: ResourcePermissionActionOption[]
 ): ResourcePermissionSubject => {
+  const groupInfo = subject.groupId ? hydration.groupInfoById.get(subject.groupId) : undefined;
+  const inheritedActions = hydration.inheritedActionsBySubjectId.get(subject.id);
   const withMetadata = mergePermissionSubjectMetadata(
     subject,
     subject.userId ? hydration.userInfoById.get(subject.userId) : undefined,
-    subject.groupId ? hydration.groupInfoById.get(subject.groupId) : undefined
+    groupInfo ?? undefined
   );
   return mergePermissionSubjectInheritedActions(
-    withMetadata,
-    hydration.inheritedActionsBySubjectId.get(subject.id),
+    {
+      ...withMetadata,
+      groupInfoStatus:
+        groupInfo === null ? 'failed' : groupInfo ? 'ready' : subject.groupInfoStatus,
+      inheritance: inheritedActions === null ? { status: 'failed' } : subject.inheritance,
+    },
+    inheritedActions ?? undefined,
     actionOptions
   );
 };

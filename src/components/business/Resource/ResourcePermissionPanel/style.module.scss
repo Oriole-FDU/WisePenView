@@ -42,6 +42,17 @@
   white-space: nowrap;
 }
 
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
 .subjectList {
   flex: 1;
   min-height: 0;
@@ -263,6 +274,8 @@
 
 .stateText {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
   min-height: 220px;
   align-items: center;
   justify-content: center;

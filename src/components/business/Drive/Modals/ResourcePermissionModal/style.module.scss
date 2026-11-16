@@ -36,6 +36,8 @@
 
 .state {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
   min-height: 180px;
   align-items: center;
   justify-content: center;
