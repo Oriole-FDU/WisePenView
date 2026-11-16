@@ -47,43 +47,24 @@ const mergePermissionSubjectMetadata = (
   userInfo: ResourcePermissionUserInfo | undefined,
   groupInfo: ResourcePermissionGroupInfo | undefined
 ): ResourcePermissionSubject => {
-  let nextSubject = subject;
-  if (userInfo) {
-    const nextName = resolvePermissionUserDisplayName(userInfo, subject.name);
-    const nextAvatar = userInfo.avatar?.trim() || subject.avatar;
-    if (nextSubject.name !== nextName || nextSubject.avatar !== nextAvatar) {
-      nextSubject = {
-        ...nextSubject,
-        name: nextName,
-        avatar: nextAvatar,
-      };
-    }
-  }
-
-  if (groupInfo) {
-    const groupName = groupInfo.groupName.trim();
-    const groupDescription = groupInfo.groupDesc.trim();
-    const nextName = groupName || nextSubject.name;
-    const nextDescription =
-      nextSubject.source === 'resourceOverride' && groupDescription
+  const withUser = userInfo
+    ? {
+        ...subject,
+        name: resolvePermissionUserDisplayName(userInfo, subject.name),
+        avatar: userInfo.avatar?.trim() || subject.avatar,
+      }
+    : subject;
+  if (!groupInfo) return withUser;
+  const groupDescription = groupInfo.groupDesc.trim();
+  return {
+    ...withUser,
+    name: groupInfo.groupName.trim() || withUser.name,
+    description:
+      subject.source === 'resourceOverride' && groupDescription
         ? groupDescription
-        : nextSubject.description;
-    const nextAvatar = groupInfo.groupCoverUrl.trim() || nextSubject.avatar;
-    if (
-      nextSubject.name !== nextName ||
-      nextSubject.description !== nextDescription ||
-      nextSubject.avatar !== nextAvatar
-    ) {
-      nextSubject = {
-        ...nextSubject,
-        name: nextName,
-        description: nextDescription,
-        avatar: nextAvatar,
-      };
-    }
-  }
-
-  return nextSubject;
+        : withUser.description,
+    avatar: groupInfo.groupCoverUrl.trim() || withUser.avatar,
+  };
 };
 
 const mergePermissionSubjectInheritedActions = (

@@ -68,7 +68,7 @@ export const useResourcePermissionPanelController = ({
       }),
     {
       ready: Boolean(resourceId && resourceType),
-      refreshDeps: [resourceId, resourceType, groupHydrationLimit],
+      refreshDeps: [groupHydrationLimit],
       showErrorToast: false,
     }
   );
@@ -143,10 +143,7 @@ export const useResourcePermissionPanelController = ({
     changedSubject: ResourcePermissionSubject,
     action: ResourcePermissionActionOption['action']
   ) => {
-    const currentSubjects = subjects;
-    const currentSelectedSubject = currentSubjects.find(
-      (subject) => subject.id === changedSubject.id
-    );
+    const currentSelectedSubject = subjects.find((subject) => subject.id === changedSubject.id);
     if (!currentSelectedSubject || currentSelectedSubject.readonly) return;
     const currentActions = getSubjectActionsForDisplay(currentSelectedSubject);
     const nextActions = updateResourceActionSelection(
@@ -155,16 +152,8 @@ export const useResourcePermissionPanelController = ({
       !currentActions.includes(action),
       getSupportedActionsFromOptions(actionOptions)
     );
-    const nextSubjects = updateSubjectActions(
-      currentSubjects,
-      currentSelectedSubject.id,
-      nextActions,
-      actionOptions
-    );
-    const nextSubject = nextSubjects.find(
-      (subject) => getSubjectRenderKey(subject) === getSubjectRenderKey(currentSelectedSubject)
-    );
-    if (nextSubject) commitSubjectDraft(getSubjectRenderKey(currentSelectedSubject), nextSubject);
+    const nextSubject = updateSubjectActions(currentSelectedSubject, nextActions, actionOptions);
+    commitSubjectDraft(getSubjectRenderKey(currentSelectedSubject), nextSubject);
   };
 
   const addSpecifiedUserCandidate = (user: SpecifiedUserCandidate) => {

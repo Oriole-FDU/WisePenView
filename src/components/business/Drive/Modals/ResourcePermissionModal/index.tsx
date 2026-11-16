@@ -11,7 +11,6 @@ import ResourcePermissionActionIcon from '@/components/business/Drive/common/res
 import {
   buildResourceOverrideActions,
   buildResourcePermissionActionKeySet,
-  buildResourcePermissionActionOptions,
   filterResourcePermissionActionsByOptions,
   getResourcePermissionActionLabel,
   getResourcePermissionPresetActions,
@@ -108,7 +107,6 @@ function ResourcePermissionEditor({
         overview,
         groupId,
         fallbackTagId: target.fallbackTagId,
-        resourceType: target.resourceType,
       });
       const tagId = initialPolicy.primaryTagId;
       let inheritedActions = initialPolicy.inheritedActions;
@@ -124,20 +122,12 @@ function ResourcePermissionEditor({
         groupId,
         fallbackTagId: target.fallbackTagId,
         inheritedActions,
-        resourceType: target.resourceType,
       });
 
       return { overview, policy };
     },
     {
       ready: Boolean(isOpen && target && groupId),
-      refreshDeps: [
-        isOpen,
-        target?.resourceId,
-        target?.resourceType,
-        target?.fallbackTagId,
-        groupId,
-      ],
       showErrorToast: false,
     }
   );
@@ -146,10 +136,7 @@ function ResourcePermissionEditor({
   const selectedActions = actionDraft ?? policy?.activeActions ?? [];
   const permissionUnknown = Boolean(policy && policy.inheritedActions === undefined);
   const groupInfoIncomplete = policy?.groupSubject?.groupInfoStatus === 'failed';
-  const rawActionOptions = data?.overview.actionOptions.length
-    ? data.overview.actionOptions
-    : buildResourcePermissionActionOptions(policy?.supportedActions ?? []);
-  const actionOptions = rawActionOptions.map((option) => ({
+  const actionOptions = (data?.overview.actionOptions ?? []).map((option) => ({
     ...option,
     label: getResourcePermissionActionLabel(option.action),
   }));
