@@ -25,6 +25,7 @@
 - 审批提交按三条路径续跑：本地 `open / connecting` 时只调用 JSON respond；本地断流但 `/active` 返回 turn ID 时 respond 后 resume；无 active turn 时才调用 recover 开 SSE。审批请求体复用 recovery Schema，不改后端字段。依据：[resolveContinuation](runtime/resolveContinuation.ts)、[Runtime](runtime/useChatTurnRuntime.ts) 的 `submitToolApprovals`；过程见 [续跑时序](../../../docs/chat-turn-respond-sequence.md)。
 - Runtime 合并同一会话、同一 stream lifecycle 的并发 resume；stop 或切换会话使请求和 turn 去重失效，返回原会话仍可重连；旧生命周期的迟到结果不能建立新连接。
 - `stopLocalStream` 只中止前端订阅，不调用后端 cancel；后端 turn 仍可能存活并在后续页面恢复。后端终止由独立 Service `cancelTurn` 执行。依据：[ChatTurnServices](service/ChatTurnServices.impl.ts)。
+- 审批的 recover / resume 分支在续跑流建立后即完成提交，Runtime 继续持有消息泵；不等待整条 SSE 结束，避免下一次工具审批被上一批提交锁阻塞。建立前错误允许审批重试，建立后流错误关闭本地连接并提示。
 - 会话身份、历史分页和审批弹窗状态均不属于 Runtime；关闭审批弹窗不等于提交允许或拒绝。
 
 ## 证据限制

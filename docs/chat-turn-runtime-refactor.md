@@ -247,6 +247,7 @@ History 切会话 cleanup：**只** `stopLocalStream`，不 cancel 后端（与�
 
 - 已拆为 `useChatTurnRuntime` 与 `useChatMessagePipeline`，旧 `useChatTurn`、`recoverTurn`、`resumeTurnStream` 和 SDK 整包导出均已删除。
 - 本地状态直接由开流入口、transport 建连与泵结束结果维护，无需 SDK status 投影。兼容 `status` 由 Runtime 映射，UI busy 统一消费 `uiBusy`。
+- 审批续跑在连接建立后即释放提交态，完整 SSE 生命周期仍由 Runtime 管理；同一流后续出现的新审批可继续提交。
 - Controller 已分组，模型字段为 `model.lastSentModel`；审批提交态独立，流仍活跃时可提交，失败可重试。旧会话提交完成不能改写新会话审批态。
 - `/respond` 在本分支补齐 checked JSON Contract，复用 recovery 请求 Schema，与本地后端 `chat/api/endpoints/chat.py` 的 `ChatRecoverRequest → R.success()` 对齐。
 - 续跑状态组合与生命周期验证使用仓库外一次性脚本，不新增常驻测试；真实 AI SDK Chat/transport 配合模拟服务覆盖建连、取消、断流、迟到结果、会话往返与草稿升级。

@@ -93,7 +93,8 @@ export function useChatTurnRuntime({
 
   const runStream = async (
     targetSessionId: string,
-    pump: (onOpen: () => void) => Promise<'idle' | 'closed'>
+    pump: (onOpen: () => void) => Promise<'idle' | 'closed'>,
+    onConnected?: () => void
   ) => {
     const generation = generationRef.current;
     const originSessionId = sessionId;
@@ -102,6 +103,7 @@ export function useChatTurnRuntime({
       const localStream = await pump(() => {
         if (isCurrent(generation, targetSessionId, originSessionId)) {
           updateStream({ sessionId: targetSessionId, localStream: 'open', lastError: null });
+          onConnected?.();
         }
       });
       if (isCurrent(generation, targetSessionId, originSessionId)) {
@@ -123,8 +125,13 @@ export function useChatTurnRuntime({
     if (stateRef.current.localStream === 'open' || stateRef.current.localStream === 'connecting')
       return Promise.resolve();
     const targetSessionId = sessionId;
-    const request = { sessionId, generation, promise: Promise.resolve() };
-    request.promise = (async () => {
+    let markConnected: () => void = () => undefined;
+    const promise = new Promise<void>((resolve) => {
+      markConnected = resolve;
+    });
+    const request = { sessionId, generation, promise };
+    resumeRequestRef.current = request;
+    void (async () => {
       try {
         const turnId = await getActiveTurnId(targetSessionId);
         if (!isCurrent(generation, targetSessionId, targetSessionId) || !turnId) return;
@@ -141,8 +148,10 @@ export function useChatTurnRuntime({
         )
           return;
         resumedTurnRef.current = { sessionId: targetSessionId, turnId, generation };
-        await runStream(targetSessionId, (onOpen) =>
-          pipeline.resumeStream(targetSessionId, onOpen)
+        await runStream(
+          targetSessionId,
+          (onOpen) => pipeline.resumeStream(targetSessionId, onOpen),
+          markConnected
         );
       } catch (error) {
         if (!isCurrent(generation, targetSessionId, targetSessionId)) return;
@@ -150,6 +159,8 @@ export function useChatTurnRuntime({
         captureException(error, { detector: 'application-handled', operation: 'chat.resume' });
         if (error instanceof Error) latestOnError.current?.(error);
       } finally {
+        // 无 active、取消或建连失败也必须释放等待者；连接后的泵继续由 Runtime 管理。
+        markConnected();
         // 仅合并在途请求，完成或失败后允许重新查询；旧请求不能清除新生命周期的缓存。
         if (resumeRequestRef.current === request) {
           resumeRequestRef.current = null;
@@ -157,7 +168,6 @@ export function useChatTurnRuntime({
         }
       }
     })();
-    resumeRequestRef.current = request;
     return request.promise;
   };
 
@@ -200,7 +210,29 @@ export function useChatTurnRuntime({
       });
       if (action === 'recover') {
         invalidateResumeState();
-        await runStream(sessionId, (onOpen) => pipeline.pumpSend(undefined, requestBody, onOpen));
+        await new Promise<void>((resolve, reject) => {
+          let connected = false;
+          void runStream(
+            sessionId,
+            (onOpen) => pipeline.pumpSend(undefined, requestBody, onOpen),
+            () => {
+              connected = true;
+              resolve();
+            }
+          )
+            .then(resolve)
+            .catch((error: unknown) => {
+              if (!connected) {
+                reject(error);
+                return;
+              }
+              captureException(error, {
+                detector: 'application-handled',
+                operation: 'chat.stream',
+              });
+              if (error instanceof Error) latestOnError.current?.(error);
+            });
+        });
       } else {
         await respondChatTurn(requestBody);
         if (action === 'respond_and_resume' && isCurrent(generation, sessionId, sessionId)) {
