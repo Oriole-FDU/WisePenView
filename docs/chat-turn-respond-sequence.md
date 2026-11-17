@@ -1,6 +1,7 @@
 # Chat Turn：respond / recover 时序
 
-> 对应实现：`useChatTurnRuntime.submitToolApprovals`、后端 `POST /chat/completions/respond|recover`  
+> 对应实现：`useChatTurnRuntime.submitToolApprovals`、后端 `POST /chat/completions/respond|recover`
+>
 > 目的：讲清「为什么审批时不能再一律走 recover」。
 
 ## 一句话

@@ -236,11 +236,11 @@ History 切会话 cleanup：**只** `stopLocalStream`，不 cancel 后端（与�
 
 ## 10. 建议阅读顺序（落地后）
 
-1. 本方案  
-2. `chat-turn-respond-sequence.md`  
-3. `resolveContinuation.ts`  
-4. `useChatTurnRuntime.ts` → `submitToolApprovals`  
-5. `useChatMessagePipeline.ts`  
+1. 本方案
+2. `chat-turn-respond-sequence.md`
+3. `resolveContinuation.ts`
+4. `useChatTurnRuntime.ts` → `submitToolApprovals`
+5. `useChatMessagePipeline.ts`
 6. `useChatTurnController.ts` / `useChatToolApproval.ts`
 
 ## 11. View 落地说明
