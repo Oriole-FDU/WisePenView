@@ -19,6 +19,7 @@ export const createChatTurnServices = (): IChatTurnService => ({
   recoverChatStream: (request, signal) => streamChatRecoveryApi(request, signal),
   reconnectChatStream: (sessionId, signal) =>
     reconnectChatStreamApi({ session_id: sessionId }, signal),
+  respondChatTurn: (request) => ChatTurnApi.respondChatTurn(request),
   getActiveTurnId,
   cancelTurn,
 });
