@@ -52,12 +52,15 @@ export function useChatTurnController({
   const resourceChatContext = resourceChat?.context;
   const clearResourceChatContext = resourceChat?.clearContext;
 
-  const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
+  // 最近一次通过发送门禁并交给 Runtime 的模型，用于本地显示，不推断历史消息模型。
+  const [lastSentModel, setLastSentModel] = useState<ChatModel | null>(null);
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
   const {
     messages,
     status,
+    localStream,
+    uiBusy,
     setMessages,
     sendTurnMessage,
     submitToolApprovals,
@@ -65,7 +68,7 @@ export function useChatTurnController({
     resumeLocalStream,
   } = useChatTurnRuntime({
     sessionId: currentSessionId ?? '',
-    model: currentModel?.modelId,
+    model: lastSentModel?.modelId,
     respondChatTurn: chatTurnService.respondChatTurn,
     getActiveTurnId: chatTurnService.getActiveTurnId,
     streamChatCompletion: chatTurnService.streamChatCompletion,
@@ -83,6 +86,7 @@ export function useChatTurnController({
     isNewlyCreatedSession,
     clearNewlyCreatedSession,
   });
+  const cancelling = Boolean(currentSessionId && cancellingSessionId === currentSessionId);
   const approval = useChatToolApproval({
     sessionId: currentSessionId,
     messages,
@@ -91,12 +95,18 @@ export function useChatTurnController({
 
   /** 发送一轮消息：校验登录与资源上下文，必要时先建立会话，再把前端状态随消息提交。 */
   const send = async (text: string, opts?: SendOptions): Promise<boolean> => {
-    if (unmountedRef.current || routeLatest.current.locationKey !== locationKey) return false;
+    if (
+      unmountedRef.current ||
+      routeLatest.current.locationKey !== locationKey ||
+      uiBusy ||
+      cancelling
+    )
+      return false;
     if (!appAuth.isAuthenticated) {
       appAuth.requireLogin();
       return false;
     }
-    const targetModel = opts?.model ?? currentModel;
+    const targetModel = opts?.model ?? lastSentModel;
     if (!targetModel) return false;
     const sendBlockedReason = resourceStateProvider?.getBlockedReason?.();
     if (sendBlockedReason) {
@@ -107,7 +117,6 @@ export function useChatTurnController({
       toast.warning(t('panel.contextMismatch'));
       return false;
     }
-    setCurrentModel(targetModel);
     const selectedAgent = opts?.selectedAgent;
     let agentParams: CreateSessionRequest | undefined;
     if (selectedAgent?.resourceId) {
@@ -152,6 +161,7 @@ export function useChatTurnController({
         ? Array.from(new Set([...(selectedSkillIds ?? []), ...(resourceSkillIds ?? [])]))
         : undefined;
 
+    setLastSentModel(targetModel);
     void sendTurnMessage(text, {
       model: targetModel.modelId,
       providerId: targetModel.providerId,
@@ -192,15 +202,13 @@ export function useChatTurnController({
   };
 
   return {
-    approval,
-    cancel,
-    cancelling: cancellingSessionId === currentSessionId,
-    currentModel,
-    hasRenderableChatContent: hasRenderableChatContent(messages),
-    history,
-    isEmpty: messages.length === 0,
     messages,
-    send,
-    status,
+    stream: { status, localStream, uiBusy, stopLocalStream, resumeLocalStream },
+    turn: { send, submitToolApprovals, cancel, cancelling },
+    history,
+    approval,
+    model: { lastSentModel },
+    hasRenderableChatContent: hasRenderableChatContent(messages),
+    isEmpty: messages.length === 0,
   };
 }

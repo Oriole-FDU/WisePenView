@@ -39,7 +39,7 @@ export interface SendTurnMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
-export interface UseChatTurnOptions {
+export interface UseChatTurnRuntimeOptions {
   sessionId: string;
   model?: string;
   respondChatTurn: (request: ChatRecoverApiRequest) => Promise<void>;

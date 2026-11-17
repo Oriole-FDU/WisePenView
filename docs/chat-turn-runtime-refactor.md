@@ -1,6 +1,7 @@
 # ChatTurn Runtime 重构方案：显式 status + 做薄 Message
 
-> 状态：设计稿（LGTM 后落地）  
+> 状态：View 已落地；浏览器与真实后端联调待验证
+>
 > 相关：[`chat-turn-respond-sequence.md`](./chat-turn-respond-sequence.md)、[`ChatTurn/BUSINESS.md`](../src/domains/ChatTurn/BUSINESS.md)、[`Chat/BUSINESS.md`](../src/components/business/Chat/BUSINESS.md)
 
 ## 1. 目标
@@ -208,12 +209,12 @@ History 切会话 cleanup：**只** `stopLocalStream`，不 cancel 后端（与�
 
 ## 7. 验收标准
 
-- [ ] 业务代码（Controller / Approval / Conversation）**零处**直接读 SDK `chat.status` 做协议或 UI busy（测试可 grep）
-- [ ] `resolveContinuation` 与 [`chat-turn-respond-sequence.md`](./chat-turn-respond-sequence.md) 三条路径一致
-- [ ] Message Pipeline 文件内无 `respondChatTurn` / `getActiveTurnId` 分支
-- [ ] 切 session 后再回原 session，必要时仍可 resume（去重可失效）
-- [ ] 用户取消 = 前端 stop + 后端 cancel；切会话 = 仅前端 stop
-- [ ] 审批关闭仍不隐式决策；streaming/open 时可提交审批
+- [x] 业务代码（Controller / Approval / Conversation）**零处**直接读 SDK `chat.status` 做协议或 UI busy（测试可 grep）
+- [x] `resolveContinuation` 与 [`chat-turn-respond-sequence.md`](./chat-turn-respond-sequence.md) 三条路径一致
+- [x] Message Pipeline 文件内无 `respondChatTurn` / `getActiveTurnId` 分支
+- [x] 切 session 后再回原 session，必要时仍可 resume（去重可失效）
+- [x] 用户取消 = 前端 stop + 后端 cancel；切会话 = 仅前端 stop
+- [x] 审批关闭仍不隐式决策；streaming/open 时可提交审批
 - [ ] 现有发送 / 历史 / 流式渲染 / 审批主路径手测通过
 
 ## 8. 明确不做
@@ -241,3 +242,13 @@ History 切会话 cleanup：**只** `stopLocalStream`，不 cancel 后端（与�
 4. `useChatTurnRuntime.ts` → `submitToolApprovals`  
 5. `useChatMessagePipeline.ts`  
 6. `useChatTurnController.ts` / `useChatToolApproval.ts`
+
+## 11. View 落地说明
+
+- 已拆为 `useChatTurnRuntime` 与 `useChatMessagePipeline`，旧 `useChatTurn`、`recoverTurn`、`resumeTurnStream` 和 SDK 整包导出均已删除。
+- 本地状态直接由开流入口、transport 建连与泵结束结果维护，无需 SDK status 投影。兼容 `status` 由 Runtime 映射，UI busy 统一消费 `uiBusy`。
+- Controller 已分组，模型字段为 `model.lastSentModel`；审批提交态独立，流仍活跃时可提交，失败可重试。旧会话提交完成不能改写新会话审批态。
+- `/respond` 在本分支补齐 checked JSON Contract，复用 recovery 请求 Schema，与本地后端 `chat/api/endpoints/chat.py` 的 `ChatRecoverRequest → R.success()` 对齐。
+- 续跑状态组合与生命周期验证使用仓库外一次性脚本，不新增常驻测试；真实 AI SDK Chat/transport 配合模拟服务覆盖建连、取消、断流、迟到结果、会话往返与草稿升级。
+- WisePenBot 仍有独立 `useChatTurn.ts`，本次按 View 优先范围不修改相邻仓库，需由 Bot 后续跟版。
+- 未启动开发服务或浏览器，发送、分页、流式渲染和审批的真实服务端主路径仍需联调验收。

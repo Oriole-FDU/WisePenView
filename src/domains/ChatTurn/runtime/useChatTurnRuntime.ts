@@ -9,7 +9,7 @@ import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type {
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
-  UseChatTurnOptions,
+  UseChatTurnRuntimeOptions,
 } from '../service/index.type';
 import { type LocalStream, resolveContinuation } from './resolveContinuation';
 import { useChatMessagePipeline } from './useChatMessagePipeline';
@@ -32,7 +32,7 @@ export function useChatTurnRuntime({
   recoverChatStream,
   reconnectChatStream,
   onError,
-}: UseChatTurnOptions) {
+}: UseChatTurnRuntimeOptions) {
   const pipeline = useChatMessagePipeline({
     streamChatCompletion,
     recoverChatStream,

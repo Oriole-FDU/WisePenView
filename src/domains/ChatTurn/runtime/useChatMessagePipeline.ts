@@ -12,7 +12,7 @@ import {
   pickChatCompletionApiRequest,
   pickChatRecoverApiRequest,
 } from '../apis/ChatStreamApi.schema';
-import type { SendTurnMessageOptions, UseChatTurnOptions } from '../service/index.type';
+import type { SendTurnMessageOptions, UseChatTurnRuntimeOptions } from '../service/index.type';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
@@ -27,7 +27,7 @@ async function fetchChatCompletion(
   input: RequestInfo | URL,
   init: RequestInit | undefined,
   streamApi: Pick<
-    UseChatTurnOptions,
+    UseChatTurnRuntimeOptions,
     'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
   >
 ): Promise<Response> {
@@ -95,7 +95,7 @@ interface PumpOperation {
 }
 
 type PipelineOptions = Pick<
-  UseChatTurnOptions,
+  UseChatTurnRuntimeOptions,
   'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
 >;
 

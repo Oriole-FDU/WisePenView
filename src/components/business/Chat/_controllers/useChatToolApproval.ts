@@ -25,12 +25,13 @@ export function useChatToolApproval({
     sessionId,
     decisions: {} as Record<string, boolean>,
     submitting: false,
+    lifecycle: {},
   });
   if (state.sessionId !== sessionId) {
-    setState({ sessionId, decisions: {}, submitting: false });
+    setState({ sessionId, decisions: {}, submitting: false, lifecycle: {} });
   }
-  const latestSessionId = useLatest(sessionId);
-  const submissionRef = useRef<string | null>(null);
+  const latestState = useLatest(state);
+  const submissionRef = useRef<{ lifecycle: object } | null>(null);
   const requests = listToolApprovalRequests(messages);
   const decisions = state.sessionId === sessionId ? state.decisions : {};
   const submitting = state.sessionId === sessionId && state.submitting;
@@ -39,29 +40,30 @@ export function useChatToolApproval({
     : undefined;
 
   const decide = (toolCallId: string, approved: boolean) => {
-    if (!sessionId || submissionRef.current === sessionId) return;
+    if (!sessionId || submissionRef.current?.lifecycle === state.lifecycle) return;
     const pendingToolCallIds = requests.map((request) => request.toolCallId);
     if (!pendingToolCallIds.includes(toolCallId)) return;
 
     const nextDecisions = { ...decisions, [toolCallId]: approved };
-    setState({ sessionId, decisions: nextDecisions, submitting: false });
+    setState({ ...state, decisions: nextDecisions, submitting: false });
     if (pendingToolCallIds.some((pendingId) => nextDecisions[pendingId] === undefined)) return;
 
     const toolApprovalStatus = pendingToolCallIds.map((pendingId) => ({
       tool_call_id: pendingId,
       approved: nextDecisions[pendingId],
     }));
-    submissionRef.current = sessionId;
-    setState({ sessionId, decisions: nextDecisions, submitting: true });
+    const submission = { lifecycle: state.lifecycle };
+    submissionRef.current = submission;
+    setState({ ...state, decisions: nextDecisions, submitting: true });
     void submitApprovals(toolApprovalStatus)
       .catch((error: unknown) => {
-        if (latestSessionId.current !== sessionId) return;
+        if (latestState.current.lifecycle !== submission.lifecycle) return;
         toast.danger(parseErrorMessage(error));
-        setState({ sessionId, decisions: {}, submitting: false });
+        setState({ ...state, decisions: {}, submitting: false });
       })
       .finally(() => {
-        if (submissionRef.current === sessionId) submissionRef.current = null;
-        if (latestSessionId.current !== sessionId) return;
+        if (submissionRef.current === submission) submissionRef.current = null;
+        if (latestState.current.lifecycle !== submission.lifecycle) return;
         // 成功决定保留到会话结束，避免消息尚未更新时重新弹出同一审批。
         setState((current) => ({ ...current, submitting: false }));
       });

@@ -58,11 +58,11 @@ function Chat({
       return false;
     }
     const guarded = hostAgentPort?.interceptSend?.(text, opts);
-    if (!guarded) return turn.send(text, opts);
+    if (!guarded) return turn.turn.send(text, opts);
     const pendingLocationKey = locationKeyLatest.current;
     return guarded.then((accepted) => {
       if (!accepted || locationKeyLatest.current !== pendingLocationKey) return false;
-      return turn.send(text, opts);
+      return turn.turn.send(text, opts);
     });
   };
 

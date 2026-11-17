@@ -6,5 +6,5 @@ export type {
   IChatTurnService,
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
-  UseChatTurnOptions,
+  UseChatTurnRuntimeOptions,
 } from './service/index.type';

@@ -8,7 +8,7 @@
 
 ## Runtime 状态与消息管线边界
 
-以下为 [Runtime 重构方案](../../../docs/chat-turn-runtime-refactor.md) 约定的领域边界。
+领域边界由 [Runtime](runtime/useChatTurnRuntime.ts) 与 [Message Pipeline](runtime/useChatMessagePipeline.ts) 实现，设计背景见 [重构方案](../../../docs/chat-turn-runtime-refactor.md)。
 
 | 状态轴                                           | 所有者                 | 语义                                                 |
 | ------------------------------------------------ | ---------------------- | ---------------------------------------------------- |
@@ -22,7 +22,7 @@
 ## 流式生命周期
 
 - 新消息、工具结果恢复和断线重连使用三个独立 checked SSE Contract；重连只携带 session ID，不把会话历史伪装成新的 completion 请求。依据：[ChatStreamApi](apis/ChatStreamApi.contract.ts)。
-- 审批提交按三条路径续跑：本地 `open / connecting` 时只调用 JSON respond；本地断流但 `/active` 返回 turn ID 时 respond 后 resume；无 active turn 时才调用 recover 开 SSE。审批请求体复用 recovery Schema，不改后端字段。依据：[续跑时序](../../../docs/chat-turn-respond-sequence.md)。
+- 审批提交按三条路径续跑：本地 `open / connecting` 时只调用 JSON respond；本地断流但 `/active` 返回 turn ID 时 respond 后 resume；无 active turn 时才调用 recover 开 SSE。审批请求体复用 recovery Schema，不改后端字段。依据：[resolveContinuation](runtime/resolveContinuation.ts)、[Runtime](runtime/useChatTurnRuntime.ts) 的 `submitToolApprovals`；过程见 [续跑时序](../../../docs/chat-turn-respond-sequence.md)。
 - Runtime 合并同一会话、同一 stream lifecycle 的并发 resume；stop 或切换会话使请求和 turn 去重失效，返回原会话仍可重连；旧生命周期的迟到结果不能建立新连接。
 - `stopLocalStream` 只中止前端订阅，不调用后端 cancel；后端 turn 仍可能存活并在后续页面恢复。后端终止由独立 Service `cancelTurn` 执行。依据：[ChatTurnServices](service/ChatTurnServices.impl.ts)。
 - 会话身份、历史分页和审批弹窗状态均不属于 Runtime；关闭审批弹窗不等于提交允许或拒绝。
