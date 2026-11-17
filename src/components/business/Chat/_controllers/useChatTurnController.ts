@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useChatTurnService } from '@/domains';
 import type { ChatModel } from '@/domains/ChatConfig';
 import type { CreateSessionRequest } from '@/domains/ChatSession';
-import { useChatTurn } from '@/domains/ChatTurn';
+import { useChatTurnRuntime } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -61,9 +61,9 @@ export function useChatTurnController({
     setMessages,
     sendTurnMessage,
     submitToolApprovals,
-    stop,
-    resumeTurnStream,
-  } = useChatTurn({
+    stopLocalStream,
+    resumeLocalStream,
+  } = useChatTurnRuntime({
     sessionId: currentSessionId ?? '',
     model: currentModel?.modelId,
     respondChatTurn: chatTurnService.respondChatTurn,
@@ -78,8 +78,8 @@ export function useChatTurnController({
 
   const history = useChatTurnHistory({
     setMessages,
-    resumeTurnStream,
-    stop,
+    resumeLocalStream,
+    stopLocalStream,
     isNewlyCreatedSession,
     clearNewlyCreatedSession,
   });
@@ -181,7 +181,7 @@ export function useChatTurnController({
     if (!targetSessionId || cancellingSessionId === targetSessionId) return;
 
     setCancellingSessionId(targetSessionId);
-    void stop();
+    stopLocalStream();
     try {
       await chatTurnService.cancelTurn(targetSessionId);
     } catch (error) {
