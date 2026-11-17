@@ -1,6 +1,11 @@
 import { executeApiContract } from '@/apis/executeApiContract';
 
-import { CancelChatTurnApiContract, GetActiveChatTurnApiContract } from './ChatTurnApi.contract';
+import type { ChatRecoverApiRequest } from './ChatStreamApi.schema';
+import {
+  CancelChatTurnApiContract,
+  GetActiveChatTurnApiContract,
+  RespondChatTurnApiContract,
+} from './ChatTurnApi.contract';
 import type {
   ActiveChatTurnApiRequest,
   ActiveChatTurnApiResponse,
@@ -15,4 +20,8 @@ async function cancelTurn(request: CancelChatTurnApiRequest): Promise<void> {
   await executeApiContract(CancelChatTurnApiContract, request);
 }
 
-export const ChatTurnApi = { cancelTurn, getActiveTurn };
+async function respondChatTurn(request: ChatRecoverApiRequest): Promise<void> {
+  await executeApiContract(RespondChatTurnApiContract, request);
+}
+
+export const ChatTurnApi = { cancelTurn, getActiveTurn, respondChatTurn };

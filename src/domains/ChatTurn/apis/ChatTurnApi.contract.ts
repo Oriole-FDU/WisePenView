@@ -1,6 +1,7 @@
 import { defineApiContract } from '@/apis/contract';
 import { EmptyApiResponseSchema } from '@/apis/schema';
 
+import { ChatRecoverApiRequestSchema } from './ChatStreamApi.schema';
 import {
   ActiveChatTurnApiRequestSchema,
   ActiveChatTurnApiResponseSchema,
@@ -24,5 +25,15 @@ export const CancelChatTurnApiContract = defineApiContract({
   requestPlacement: 'body',
   transport: 'json',
   request: CancelChatTurnApiRequestSchema,
+  response: EmptyApiResponseSchema,
+});
+
+export const RespondChatTurnApiContract = defineApiContract({
+  name: 'RespondChatTurnApi',
+  method: 'POST',
+  endpoint: '/chat/completions/respond',
+  requestPlacement: 'body',
+  transport: 'json',
+  request: ChatRecoverApiRequestSchema,
   response: EmptyApiResponseSchema,
 });

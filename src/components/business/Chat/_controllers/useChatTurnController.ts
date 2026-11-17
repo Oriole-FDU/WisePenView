@@ -55,18 +55,26 @@ export function useChatTurnController({
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
-  const { messages, status, setMessages, sendTurnMessage, recoverTurn, stop, resumeTurnStream } =
-    useChatTurn({
-      sessionId: currentSessionId ?? '',
-      model: currentModel?.modelId,
-      getActiveTurnId: chatTurnService.getActiveTurnId,
-      streamChatCompletion: chatTurnService.streamChatCompletion,
-      recoverChatStream: chatTurnService.recoverChatStream,
-      reconnectChatStream: chatTurnService.reconnectChatStream,
-      onError: (error) => {
-        toast.danger(parseErrorMessage(error));
-      },
-    });
+  const {
+    messages,
+    status,
+    setMessages,
+    sendTurnMessage,
+    submitToolApprovals,
+    stop,
+    resumeTurnStream,
+  } = useChatTurn({
+    sessionId: currentSessionId ?? '',
+    model: currentModel?.modelId,
+    respondChatTurn: chatTurnService.respondChatTurn,
+    getActiveTurnId: chatTurnService.getActiveTurnId,
+    streamChatCompletion: chatTurnService.streamChatCompletion,
+    recoverChatStream: chatTurnService.recoverChatStream,
+    reconnectChatStream: chatTurnService.reconnectChatStream,
+    onError: (error) => {
+      toast.danger(parseErrorMessage(error));
+    },
+  });
 
   const history = useChatTurnHistory({
     setMessages,
@@ -78,8 +86,7 @@ export function useChatTurnController({
   const approval = useChatToolApproval({
     sessionId: currentSessionId,
     messages,
-    status,
-    recover: recoverTurn,
+    submitApprovals: submitToolApprovals,
   });
 
   /** 发送一轮消息：校验登录与资源上下文，必要时先建立会话，再把前端状态随消息提交。 */

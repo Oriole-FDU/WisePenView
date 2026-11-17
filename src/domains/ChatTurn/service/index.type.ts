@@ -42,6 +42,7 @@ export interface SendTurnMessageOptions {
 export interface UseChatTurnOptions {
   sessionId: string;
   model?: string;
+  respondChatTurn: (request: ChatRecoverApiRequest) => Promise<void>;
   getActiveTurnId: (sessionId: string) => Promise<string | null>;
   streamChatCompletion: (
     request: ChatCompletionApiRequest,
@@ -56,6 +57,7 @@ export interface IChatTurnService {
   streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
   recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
+  respondChatTurn(request: ChatRecoverApiRequest): Promise<void>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
 }

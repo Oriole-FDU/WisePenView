@@ -20,6 +20,7 @@ import type {
   UseChatTurnOptions,
 } from '../service/index.type';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
+import { resolveContinuation } from './resolveContinuation';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
 
@@ -105,6 +106,7 @@ export const useChatTurn = ({
   sessionId,
   model,
   getActiveTurnId,
+  respondChatTurn,
   streamChatCompletion,
   recoverChatStream,
   reconnectChatStream,
@@ -243,11 +245,11 @@ export const useChatTurn = ({
     await chat.sendMessage({ text: query, metadata }, { body: requestBody });
   };
 
-  const recoverTurn = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
+  const submitToolApprovals = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
     try {
       if (!sessionId) {
         throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '恢复聊天时缺少 session_id',
+          reason: '提交工具审批时缺少 session_id',
         });
       }
       const requestBody: ChatRecoverApiRequest = {
@@ -255,11 +257,27 @@ export const useChatTurn = ({
         client_tool_results: [],
         tool_approval_status: toolApprovalStatus,
       };
-      await chat.sendMessage(undefined, { body: requestBody });
+      const localStream =
+        chat.status === 'streaming'
+          ? 'open'
+          : chat.status === 'submitted'
+            ? 'connecting'
+            : 'closed';
+      const activeTurnId = localStream === 'closed' ? await getActiveTurnId(sessionId) : null;
+      if (latestSessionId.current !== sessionId) return;
+      const action = resolveContinuation({ localStream, activeTurnId });
+      if (action === 'recover') {
+        await chat.sendMessage(undefined, { body: requestBody });
+      } else {
+        await respondChatTurn(requestBody);
+        if (action === 'respond_and_resume' && latestSessionId.current === sessionId) {
+          await resumeTurnStream();
+        }
+      }
     } catch (error) {
       captureException(error, {
         detector: 'application-handled',
-        operation: 'chat.recover',
+        operation: 'chat.submitApprovals',
       });
       throw error;
     }
@@ -268,7 +286,7 @@ export const useChatTurn = ({
   return {
     ...chat,
     sendTurnMessage,
-    recoverTurn,
+    submitToolApprovals,
     resumeTurnStream,
   };
 };
