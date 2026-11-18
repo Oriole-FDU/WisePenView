@@ -19,7 +19,8 @@ function ChatConversation({
   onSend,
   welcomeConfig,
 }: ChatConversationProps) {
-  const { cancel, cancelling, currentModel, history, isEmpty, messages, status } = turn;
+  const { cancel, cancelling, connectActive, currentModel, history, isEmpty, messages, status } =
+    turn;
   const {
     closeSessionBar,
     currentSessionId,
@@ -30,7 +31,7 @@ function ChatConversation({
   } = session;
 
   const generating = status === 'submitted' || status === 'streaming';
-  const sending = cancelling || generating;
+  const sending = cancelling || connectActive || generating;
   const isWelcome = isEmpty && !history.loadingInitial;
   const showWelcome = isWelcome && !sessionBarOpen;
   const welcomeMode = useWelcomeScreenStore((state) => state.welcomeMode);
