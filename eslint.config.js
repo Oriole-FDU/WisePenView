@@ -487,6 +487,14 @@ const nativeErrorRestrictedSyntaxRules = [
   },
 ];
 
+const domainClientErrorRestrictedSyntaxRules = [
+  {
+    selector: "NewExpression[callee.name='WisePenError']",
+    message:
+      'Domain 内禁止直接 new WisePenError；请使用 createClientError。网络/HTTP 边界（apis、domains/_shared/apis）除外。',
+  },
+];
+
 export default defineConfig([
   globalIgnores([
     'dist',
@@ -641,6 +649,23 @@ export default defineConfig([
         'error',
         ...projectRestrictedSyntaxRules,
         ...nativeErrorRestrictedSyntaxRules,
+      ],
+    },
+  },
+  {
+    // Domain 业务代码新建错误必须走 createClientError；传输边界与 mock 模拟 API 错误除外。
+    files: ['src/domains/**/*.{ts,tsx}'],
+    ignores: [
+      'src/domains/_shared/apis/**/*.{ts,tsx}',
+      'src/domains/_shared/mock/**/*.{ts,tsx}',
+      'src/domains/*/mock/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...projectRestrictedSyntaxRules,
+        ...nativeErrorRestrictedSyntaxRules,
+        ...domainClientErrorRestrictedSyntaxRules,
       ],
     },
   },
