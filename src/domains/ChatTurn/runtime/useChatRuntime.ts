@@ -16,6 +16,7 @@ import type { UseChatTurnControlResult } from './control/useChatTurnControl';
 import { useChatTurnControl } from './control/useChatTurnControl';
 import type { UseChatHistoryResult } from './history/useChatHistory';
 import { useChatHistory } from './history/useChatHistory';
+import { hasRenderableChatContent } from './message/chatTurnModel';
 import { useChatMessage } from './message/useChatMessage';
 
 export interface UseChatRuntimeOptions {
@@ -154,6 +155,7 @@ export function useChatRuntime({
   return {
     approval,
     messages: message.messages,
+    renderable: hasRenderableChatContent(message.messages),
     status: message.status,
     stopConnect: control.stopConnect,
     send: control.send,
