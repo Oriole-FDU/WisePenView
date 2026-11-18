@@ -1,26 +1,21 @@
 import { useLatest } from 'ahooks';
 import { useRef, useState } from 'react';
 
-import type { PageResult } from '@/domains/_shared/entity/page';
+import { useChatTurnService } from '@/domains';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
-import type { ChatMessageLoadingActions } from '../control/useChatMessageControl';
+import type { ChatMessagesWriter } from '../message/useChatMessage';
+import type { HistoryLoadingActions } from './useHistoryLoadingFsm';
 
-export interface UseChatHistoryDataOptions {
+const DEFAULT_HISTORY_PAGE_SIZE = 100;
+
+export interface UseHistoryDataOptions {
   sessionId: string | null;
-  pageSize: number;
-  loadPage: (
-    sessionId: string,
-    page: number,
-    size: number
-  ) => Promise<PageResult<WisePenUIMessage>>;
-  setMessages: (
-    messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
-  ) => void;
-  loading: ChatMessageLoadingActions;
+  setMessages: ChatMessagesWriter;
+  loading: HistoryLoadingActions;
 }
 
-export interface UseChatHistoryDataResult {
+export interface UseHistoryDataResult {
   canLoadMore: boolean;
   replaceHistory: (targetSessionId: string) => Promise<boolean>;
   prependHistory: () => Promise<void>;
@@ -39,13 +34,15 @@ function mergeMessages(
   });
 }
 
-export function useChatHistoryData({
+/**
+ * History 分页游标与 messages 写入；loading 相位由同模块 fsm 提供。
+ */
+export function useHistoryData({
   sessionId,
-  pageSize,
-  loadPage,
   setMessages,
   loading,
-}: UseChatHistoryDataOptions): UseChatHistoryDataResult {
+}: UseHistoryDataOptions): UseHistoryDataResult {
+  const { listHistoryMessages } = useChatTurnService();
   const sessionIdRef = useLatest(sessionId);
   const loadingRef = useLatest(loading);
   const requestVersionRef = useRef(0);
@@ -69,7 +66,7 @@ export function useChatHistoryData({
     setMessages([]);
 
     try {
-      const payload = await loadPage(targetSessionId, 1, pageSize);
+      const payload = await listHistoryMessages(targetSessionId, 1, DEFAULT_HISTORY_PAGE_SIZE);
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current
@@ -107,7 +104,11 @@ export function useChatHistoryData({
     const nextPage = page + 1;
 
     try {
-      const payload = await loadPage(targetSessionId, nextPage, pageSize);
+      const payload = await listHistoryMessages(
+        targetSessionId,
+        nextPage,
+        DEFAULT_HISTORY_PAGE_SIZE
+      );
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current

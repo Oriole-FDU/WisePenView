@@ -1,7 +1,6 @@
-import { useChat } from '@ai-sdk/react';
 import { useLatest } from 'ahooks';
-import { type ChatStatus, DefaultChatTransport } from 'ai';
-import { useMemo, useRef } from 'react';
+import type { ChatStatus } from 'ai';
+import { useRef } from 'react';
 
 import { useChatTurnService } from '@/domains';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
@@ -10,18 +9,10 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
-import type {
-  IChatTurnService,
-  SendTurnMessageOptions,
-  ToolApprovalStatusRequest,
-} from '../service/index.type';
-import { useChatControl } from './control/useChatControl';
-import { useChatData } from './data/useChatData';
-import type { UseChatTurnHistoryResult } from './useChatTurnHistory';
-import { useChatTurnHistory } from './useChatTurnHistory';
-
-const CHAT_STREAM_THROTTLE_MS = 50;
-const DEFAULT_HISTORY_PAGE_SIZE = 100;
+import type { SendTurnMessageOptions, ToolApprovalStatusRequest } from '../service/index.type';
+import type { UseChatHistoryResult } from './history/useChatHistory';
+import { useChatHistory } from './history/useChatHistory';
+import { useChatMessage } from './message/useChatMessage';
 
 export interface UseChatRuntimeOptions {
   sessionId: string;
@@ -39,41 +30,14 @@ export interface UseChatRuntimeResult {
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
   resumeTurn: () => Promise<void>;
   cancelTurn: () => Promise<void>;
-  history: UseChatTurnHistoryResult;
+  history: UseChatHistoryResult;
 }
 
-function isChatRecoverRequest(
-  body: Record<string, unknown> | undefined
-): body is ChatRecoverApiRequest {
-  return (
-    typeof body?.session_id === 'string' &&
-    Array.isArray(body.client_tool_results) &&
-    Array.isArray(body.tool_approval_status)
-  );
-}
-
-const createChatTransport = (fetchChatCompletion: IChatTurnService['fetchChatCompletion']) =>
-  new DefaultChatTransport<WisePenUIMessage>({
-    api: '/chat/completions',
-    fetch: fetchChatCompletion,
-    prepareSendMessagesRequest: ({ body }) => {
-      if (isChatRecoverRequest(body)) {
-        return { api: '/chat/completions/recover', body };
-      }
-      return { body: body ?? {} };
-    },
-    prepareReconnectToStreamRequest: ({ body }) => {
-      const sessionId = body?.session_id;
-      if (typeof sessionId !== 'string' || sessionId === '') {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '重连聊天流时缺少 session_id',
-        });
-      }
-      const params = new URLSearchParams({ session_id: sessionId });
-      return { api: `/chat/completions/stream?${params.toString()}` };
-    },
-  });
-
+/**
+ * ChatTurn Runtime 组装根：message（权威源）+ history（分页写入）+ submit/recover 映射。
+ *
+ * 不外泄 setMessages / 散落流 API；Controller / UI 只消费本契约。
+ */
 export function useChatRuntime({
   sessionId,
   model,
@@ -82,67 +46,32 @@ export function useChatRuntime({
   onError,
 }: UseChatRuntimeOptions): UseChatRuntimeResult {
   const chatTurnService = useChatTurnService();
-
-  /**
-   * @wisepen-manual-memo
-   * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
-   * 收益：仅在服务传输函数变化时重建，稳定聊天会话与重连逻辑。
-   * 失效条件：fetchChatCompletion 引用变化。
-   */
-  const chatTransport = useMemo(
-    () => createChatTransport(chatTurnService.fetchChatCompletion),
-    [chatTurnService.fetchChatCompletion]
-  );
-
-  // --- 应下沉 Pipeline：唯一 useChat 实例与 messages 视图 ---
-  const chat = useChat<WisePenUIMessage>({
-    experimental_throttle: CHAT_STREAM_THROTTLE_MS,
-    onError: (error) => {
-      captureException(error, {
-        detector: 'application-handled',
-        operation: 'chat.stream',
-      });
-      onError?.(error);
-    },
-    transport: chatTransport,
-  });
-
-  // --- Control：message loading 状态机；后续切会话 / 停流下沉至此 ---
-  const control = useChatControl();
-
-  // --- Data：历史分页写入同一份 messages；经 Runtime 编排后对外暴露 ---
-  const data = useChatData({
-    sessionId: sessionId || null,
-    pageSize: DEFAULT_HISTORY_PAGE_SIZE,
-    loadPage: chatTurnService.listHistoryMessages,
-    setMessages: chat.setMessages,
-    loading: control.message,
-  });
+  const message = useChatMessage({ onError });
 
   const resumeRequestRef = useRef<{
     sessionId: string;
-    resumeStream: typeof chat.resumeStream;
+    resumeStream: typeof message.resumeStream;
     promise: Promise<void>;
   } | null>(null);
   const resumedTurnRef = useRef<{
     sessionId: string;
     turnId: string;
-    resumeStream: typeof chat.resumeStream;
+    resumeStream: typeof message.resumeStream;
   } | null>(null);
   const latestSessionId = useLatest(sessionId);
-  const latestResumeStream = useLatest(chat.resumeStream);
+  const latestResumeStream = useLatest(message.resumeStream);
   const latestGetActiveTurnId = useLatest(chatTurnService.getActiveTurnId);
   const latestOnError = useLatest(onError);
 
   const stopLocalStream = () => {
-    void chat.stop();
+    void message.stop();
   };
 
   const resumeTurn = (): Promise<void> => {
     if (!sessionId) return Promise.resolve();
 
     const targetSessionId = sessionId;
-    const targetResumeStream = chat.resumeStream;
+    const targetResumeStream = message.resumeStream;
     const existingRequest = resumeRequestRef.current;
     if (
       existingRequest?.sessionId === targetSessionId &&
@@ -233,7 +162,7 @@ export function useChatRuntime({
       createdAt: new Date().toISOString(),
       ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
     };
-    await chat.sendMessage({ text: query, metadata }, { body: requestBody });
+    await message.sendMessage({ text: query, metadata }, { body: requestBody });
   };
 
   /** 本步薄委托 recover；审批续跑矩阵（respond / resume / recover）留给后续 Phase。 */
@@ -249,7 +178,7 @@ export function useChatRuntime({
         client_tool_results: [],
         tool_approval_status: toolApprovalStatus,
       };
-      await chat.sendMessage(undefined, { body: requestBody });
+      await message.sendMessage(undefined, { body: requestBody });
     } catch (error) {
       captureException(error, {
         detector: 'application-handled',
@@ -265,14 +194,10 @@ export function useChatRuntime({
     await chatTurnService.cancelTurn(sessionId);
   };
 
-  /**
-   * 临时内聚：目标归属 UI/Controller 的历史分页态。
-   * 本步为行为不回归继续由 Runtime 返回；切会话 stop 仍走内部 cleanup。
-   */
-  const history = useChatTurnHistory({
-    history: data.history,
-    loadingInitial: control.message.loadingInitial,
-    loadingMore: control.message.loadingMore,
+  // --- History：fsm + data + 切会话生命周期内聚；经 message.setMessages 写入权威源 ---
+  const history = useChatHistory({
+    sessionId: sessionId || null,
+    setMessages: message.setMessages,
     resumeTurnStream: resumeTurn,
     stop: stopLocalStream,
     isNewlyCreatedSession,
@@ -280,8 +205,8 @@ export function useChatRuntime({
   });
 
   return {
-    messages: chat.messages,
-    status: chat.status,
+    messages: message.messages,
+    status: message.status,
     stopLocalStream,
     submitTurn,
     submitToolApprovals,

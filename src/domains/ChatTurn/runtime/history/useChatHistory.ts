@@ -6,19 +6,21 @@ import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { UseChatHistoryDataResult } from './data/useChatHistoryData';
+import type { ChatMessagesWriter } from '../message/useChatMessage';
+import { useHistoryData } from './useHistoryData';
+import { useHistoryLoadingFsm } from './useHistoryLoadingFsm';
 
-export interface UseChatTurnHistoryOptions {
-  history: UseChatHistoryDataResult;
-  loadingInitial: boolean;
-  loadingMore: boolean;
+export interface UseChatHistoryOptions {
+  sessionId: string | null;
+  /** 由 Runtime 从 useChatMessage 注入的写端口。 */
+  setMessages: ChatMessagesWriter;
   resumeTurnStream: () => Promise<void>;
   stop: () => void;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
 }
 
-export interface UseChatTurnHistoryResult {
+export interface UseChatHistoryResult {
   canLoadMore: boolean;
   loadMore: () => Promise<void>;
   loadingInitial: boolean;
@@ -26,35 +28,41 @@ export interface UseChatTurnHistoryResult {
 }
 
 /**
- * 历史生命周期：会话切换时触发 hydrate / 清空 / 流恢复。
+ * History 内聚入口：fsm + data + 会话切换生命周期。
  *
- * 分页游标与 messages 写入由 data.history + useChat 负责；本模块只编排时机。
+ * 对外只暴露分页态与 loadMore；setMessages / loading 动作不泄漏到 Runtime 组装根。
  */
-export function useChatTurnHistory({
-  history,
-  loadingInitial,
-  loadingMore,
+export function useChatHistory({
+  sessionId,
+  setMessages,
   resumeTurnStream,
   stop,
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
-}: UseChatTurnHistoryOptions): UseChatTurnHistoryResult {
+}: UseChatHistoryOptions): UseChatHistoryResult {
+  const loading = useHistoryLoadingFsm();
+  const data = useHistoryData({
+    sessionId,
+    setMessages,
+    loading,
+  });
+
   const appAuth = useAppAuth();
   const { sessionId: currentSessionId } = useChatSessionRoute();
   const routeLatest = useLatest({ sessionId: currentSessionId });
-  const historyLatest = useLatest(history);
+  const dataLatest = useLatest(data);
 
-  const loadHistoryMessages = async (sessionId: string): Promise<boolean> => {
+  const loadHistoryMessages = async (targetSessionId: string): Promise<boolean> => {
     try {
-      return await historyLatest.current.replaceHistory(sessionId);
+      return await dataLatest.current.replaceHistory(targetSessionId);
     } catch (error) {
       toast.danger(parseErrorMessage(error));
-      historyLatest.current.clearConversation();
+      dataLatest.current.clearConversation();
       return false;
     }
   };
   const historyActionsLatest = useLatest({
-    clearConversation: () => historyLatest.current.clearConversation(),
+    clearConversation: () => dataLatest.current.clearConversation(),
     loadHistoryMessages,
     resumeTurnStream,
   });
@@ -65,7 +73,7 @@ export function useChatTurnHistory({
       return;
     }
     try {
-      await historyLatest.current.prependHistory();
+      await dataLatest.current.prependHistory();
     } catch (error) {
       toast.danger(parseErrorMessage(error));
     }
@@ -114,9 +122,9 @@ export function useChatTurnHistory({
   ]);
 
   return {
-    canLoadMore: history.canLoadMore,
+    canLoadMore: data.canLoadMore,
     loadMore,
-    loadingInitial,
-    loadingMore,
+    loadingInitial: loading.loadingInitial,
+    loadingMore: loading.loadingMore,
   };
 }
