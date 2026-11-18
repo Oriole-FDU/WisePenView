@@ -1,7 +1,14 @@
 import { useState } from 'react';
 
+import { captureException } from '@/observability';
+import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+
 import { mapChatTurnRequest, mapOutgoingUserMessageMetadata } from '../../mapper/chatTurn.mapper';
-import type { IChatTurnService, SendTurnMessageOptions } from '../../service/index.type';
+import type {
+  IChatTurnService,
+  SendTurnMessageOptions,
+  ToolApprovalStatusRequest,
+} from '../../service/index.type';
 import type { UseChatMessageResult } from '../message/useChatMessage';
 import { runNewStreamConnect } from './runNewStreamConnect';
 import type { UseConnectFsmResult } from './useConnectFsm';
@@ -13,6 +20,7 @@ export interface UseConnectActionsOptions {
   connect: UseConnectFsmResult;
   message: UseChatMessageResult;
   clearResumedTurn: () => void;
+  resumeTurn: () => Promise<void>;
 }
 
 export interface UseConnectActionsResult {
@@ -23,12 +31,13 @@ export interface UseConnectActionsResult {
   cancelling: boolean;
   /** 用户 stop / cancel：中止泵并标 closed，保留同 session 再 resume 的空间。 */
   stopConnect: () => void;
+  /** 审批续跑：按连接相位选 respond / respond+resume / recover。 */
+  submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
 }
 
 /**
- * 本地流开停动作：send 开 completion 流，cancel/stop 关流。
- *
- * 属于 connect 生命周期，不做审批续跑选路；开流事务复用 runNewStreamConnect。
+ * 本地流开停与审批续跑：send 开 completion 流，cancel/stop 关流，
+ * submitToolApprovals 按相位选 respond / resume / recover；开流事务复用 runNewStreamConnect。
  */
 export function useConnectActions({
   sessionId,
@@ -37,6 +46,7 @@ export function useConnectActions({
   connect,
   message,
   clearResumedTurn,
+  resumeTurn,
 }: UseConnectActionsOptions): UseConnectActionsResult {
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
@@ -81,10 +91,60 @@ export function useConnectActions({
     }
   };
 
+  const submitToolApprovals = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
+    if (!sessionId) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: '恢复聊天时缺少 session_id',
+      });
+    }
+
+    const command = { sessionId, toolApprovalStatus };
+
+    try {
+      // 连接仍活着：只 respond，不新开 SSE。
+      if (connect.isLive()) {
+        await chatTurnService.respondTurn(command);
+        return;
+      }
+
+      const activeTurnId = await chatTurnService.getActiveTurnId(sessionId);
+      // 查询期间连接可能又活了；按最新 connect 相位重判。
+      const action = connect.resolveContinuation(activeTurnId);
+
+      if (action === 'respond') {
+        await chatTurnService.respondTurn(command);
+        return;
+      }
+
+      if (action === 'respond_resume') {
+        await chatTurnService.respondTurn(command);
+        await resumeTurn();
+        return;
+      }
+
+      await runNewStreamConnect({
+        connect,
+        onClosed: clearResumedTurn,
+        run: async () => {
+          const response = await chatTurnService.recoverChatStream(command);
+          connect.markOpen();
+          await message.pumpSend({ response });
+        },
+      });
+    } catch (error) {
+      captureException(error, {
+        detector: 'application-handled',
+        operation: 'chat.approval',
+      });
+      throw error;
+    }
+  };
+
   return {
     send,
     cancel,
     cancelling: cancellingSessionId === sessionId,
     stopConnect,
+    submitToolApprovals,
   };
 }
