@@ -2,166 +2,64 @@
 
 > Canonical owner：`src/domains/ChatTurn`
 
-```mermaid
-flowchart TB
-  subgraph S1["入口源"]
-    LH["listHistoryMessages<br/>GET listHistoryMessages<br/>ChatTurnApi"]
-    API["Service 协议 HTTP<br/>completions recover stream respond cancel active"]
-    MAP["mapper chatTurn<br/>mapChatTurnRequest<br/>mapToolApprovalRequest"]
-    UMETA["mapUserMessageMetadata<br/>乐观 user 气泡<br/>非 wire"]
-    NORM["normalizeChatSseResponse<br/>service chatSseNormalizer"]
-  end
+## 范围
 
-  subgraph S2["运行时 Domain 到 UI 唯一入口"]
-    subgraph M["runtime/message 消息泵加权威源"]
-      PUMP["PumpChatTransport<br/>不发 HTTP 只消费已取流"]
-      UC["useChat ai-sdk<br/>解析 append 本地 stop"]
-      UM["useChatMessage<br/>messages setMessages pumpSend pumpResume stop<br/>泵内组乐观 user metadata"]
-      CTM["chatTurnModel<br/>hasRenderableChatContent"]
-    end
+本文件拥有单轮流式对话的协议、消息、历史、连接、审批与前端运行时边界。会话身份、标题和附件上传归 [ChatSession](../ChatSession/BUSINESS.md)；模型、Provider、Tool 与输入能力归 [ChatConfig](../ChatConfig/BUSINESS.md)；用户输入和页面门禁归 [Chat workflow](../../components/business/Chat/BUSINESS.md)。
 
-    subgraph Hist["runtime/history 内聚模块"]
-      HFSM["useHistoryLoadingFsm"]
-      HDATA["useHistoryData 写 setMessages"]
-      UH["useChatHistory<br/>hydrate clear resume loadMore<br/>只消费 isNewSession 布尔"]
-    end
+## 模块边界
 
-    subgraph Conn["runtime/connect 本地流生命周期"]
-      CFSM["useConnectFsm<br/>idle connecting open closed<br/>resolveContinuation"]
-      RESUME["useConnectResume<br/>resume 合并 turn 去重 切 session 作废"]
-      NEW["runNewStreamConnect<br/>开新 SSE 连接事务"]
-      ACT["useConnectActions<br/>send cancel stopConnect<br/>submitToolApprovals<br/>只传领域命令"]
-    end
+| 模块               | 负责                                                                | 不负责                           |
+| ------------------ | ------------------------------------------------------------------- | -------------------------------- |
+| API / Service      | checked 协议、DTO mapper、SSE 事件归一化、active turn 与历史读取    | React 状态、UI toast、连接相位   |
+| `runtime/message`  | 唯一 `useChat` 实例、消息权威源、把已取得的 SSE `Response` 泵入 SDK | 发起 HTTP、选择审批协议          |
+| `runtime/history`  | 当前 session 的历史分页、加载相位、陈旧响应防护                     | session 路由、后台 turn 生命周期 |
+| `runtime/connect`  | send、cancel、resume、审批续跑选路与本地连接                        | 会话创建、资源上下文、模型选择   |
+| `runtime/approval` | 从消息派生待审批项、收集决定并触发提交                              | respond / recover 细节           |
+| `useChatRuntime`   | 组合上述能力，形成组件唯一消费入口                                  | 内联协议或业务选路               |
 
-    subgraph Appr["runtime/approval"]
-      UAP["useChatToolApproval<br/>pending decide submitting"]
-      APM["toolApprovalModel"]
-    end
+数据流：
 
-    UCR["useChatRuntime<br/>组装根只接线<br/>对外 renderable<br/>不外泄 setMessages 与 SDK 流 API"]
-  end
-
-  subgraph S3["Session 域"]
-    USC["useChatSessionController<br/>ensureSession<br/>拥有 isNewSession 意图<br/>syncNewSessionHistoryRefresh"]
-  end
-
-  subgraph S4["组件消费"]
-    CHAT["Chat<br/>直连 useChatRuntime<br/>handleSend 门禁载荷 toast<br/>顶层桥接 session.isNewSession<br/>与 runtime.renderable"]
-    HDR["ChatHeader"]
-    CONV["ChatConversation<br/>消费 turn 视图"]
-    LIST["ChatMessageList"]
-    UMUI["UserMessage"]
-    AM["AssistantMessage"]
-    CIN["ChatInput"]
-    BAR["ChatSessionBar"]
-    TAD["ToolApprovalDialog"]
-  end
-
-  subgraph S5["派生 间接"]
-    SSF["StreamingScrollFollower"]
-    WSH["WelcomeScreenHost"]
-    MHN["MessageHistoryNavigator"]
-    SYNC["syncNewSessionHistoryRefresh<br/>消费 runtime.renderable"]
-  end
-
-  LH -->|loadPage| HDATA
-  ACT -->|SendTurnCommand| API
-  ACT -->|SubmitToolApprovalsCommand| API
-  RESUME -->|reconnect| API
-  API --> MAP
-  MAP -->|DTO| API
-  API -->|有SSE| NORM
-  NORM -->|Response| ACT
-  NORM -->|Response| RESUME
-  CFSM --> UCR
-  RESUME --> UCR
-  ACT --> UCR
-  UAP --> UCR
-  UH --> UCR
-  NEW -->|send与recover| ACT
-  ACT -->|submitToolApprovals| UAP
-  PUMP --> UC
-  UC --> UM
-  HFSM --> UH
-  HDATA --> UH
-  UM -->|setMessages| UH
-  UM -->|pumpResume| RESUME
-  UM -->|pumpSend stop| ACT
-  ACT -->|turn query+options| UM
-  UM --> UMETA
-  UM -->|messages| APM
-  APM -->|派生 pending| UAP
-  UM -->|status| UAP
-  UM -->|messages status| UCR
-  UM -->|messages| CTM
-  CTM -->|派生 renderable| UCR
-  USC -->|isNewSession| UH
-
-  UCR --> CHAT
-  USC -->|ensureSession isNewSession| CHAT
-  CHAT -->|onSend| CONV
-  CHAT -->|turn视图| CONV
-  CHAT --> TAD
-  CHAT --> HDR
-  CHAT -->|renderable| SYNC
-  CONV --> LIST
-  CONV --> CIN
-  CONV --> BAR
-  LIST --> UMUI
-  LIST --> AM
-  LIST --> SSF
-  CONV --> WSH
-  LIST --> MHN
-
-  classDef changed fill:#fff3cd,stroke:#e0a800,color:#856404
-
-  class UM,ACT,UMETA,M changed
+```text
+Chat -> useChatRuntime
+  -> connect -> ChatTurnService -> checked API / SSE
+  -> message(useChat + PumpChatTransport) -> messages/status
+  -> history -> message.setMessages
+  -> approval -> connect.submitToolApprovals
 ```
 
-## 关键边界
+## 发送与恢复
 
-1. **`pumpSend`**：入参由预组 `userMessage: { text, metadata }` 改为 `turn?: { query, options }`；泵内调 `mapUserMessageMetadata`。
-2. **`useConnectActions.send`**：删除对 `mapUserMessageMetadata` 的调用；开流后只传领域意图 `turn`。
-3. **对称**：wire DTO → Service；乐观 UI 泵载荷 → message。
+1. `send` 创建本次操作的 `AbortController`，先取得 SSE `Response`，确认操作仍是当前操作后才标记连接 open，并把响应体泵入消息运行时。
+2. 历史加载成功后再查询并恢复 active turn；同一 session 的并发 resume 共用一个 Promise。session 或 epoch 变化的迟到结果不会写入新会话。
+3. 用户取消先停止本地连接，再请求后端 cancel。切换会话只停止本地连接；后台 turn 可在后续页面通过 active turn / reconnect 恢复。
+4. 页面卸载或 session 切换会中止当前 send / resume、停止消息泵并清零连接相位；它不能替代后端 cancel。
 
-## 关键文件
+## 工具审批
 
-```
-ChatTurn/runtime/message/
-  useChatMessage.ts             # pumpSend 组乐观 user metadata
+审批请求来自消息中的 `approval-requested` tool part。同一批请求全部有决定后，按当前本地连接状态选择：
 
-ChatTurn/runtime/connect/
-  useConnectActions.ts          # send 只传 turn；不再调 mapUserMessageMetadata
+| 本地连接          | active turn | 动作                  |
+| ----------------- | ----------- | --------------------- |
+| open / connecting | 不额外查询  | respond               |
+| 非 live           | 有          | respond，然后 resume  |
+| 非 live           | 无          | recover，并泵入新 SSE |
 
-ChatTurn/mapper/
-  chatTurn.mapper.ts            # mapUserMessageMetadata 注明由泵调用
-```
+提交失败会重新暴露待审批项并沿 Chat 的 `onError` 反馈；当前没有持久化审批提交的 exactly-once 保证。
 
-## 边界（现状）
+## 状态与失败边界
 
-| 层                 | 职责                                                                 |
-| ------------------ | -------------------------------------------------------------------- |
-| **Service**        | 发送 / 审批 wire DTO 组装；SSE 归一化；协议 HTTP                     |
-| **message**        | 泵与 messages 权威源；乐观 user 气泡 metadata                        |
-| **connect**        | 相位 FSM、resume、开流事务、send/cancel/stop、审批续跑选路；只传意图 |
-| **useChatRuntime** | 组装接线；不内联开停流与审批选路                                     |
-| **approval**       | 扫 pending → decide → 交 `submitToolApprovals`；不碰连接编排         |
-| **history**        | 同 v14                                                               |
+- 连接相位为 `idle / connecting / open / closed`。现有 `useFsm` 只保存当前 phase，`transitionTo` 不校验迁移表；安全依赖调用点约束与 operation/epoch 校验，而不是类型或状态机本身。
+- 历史 `replace` 与 `prepend` 共用加载 FSM；版本号、session 最新值和 finally 中的条件清理用于阻止旧请求覆盖或错误结束新加载。
+- SSE 非 2xx 在 API 边界转为领域错误；事件内容必须经过事件大小限制、JSON 解析、基础 Schema 和已知事件归一化。当前基础 SSE Schema 允许任意非空 `type`，已知事件字段不完整时可能直到 AI SDK 解析才失败。
+- `useChat` 的 `ChatStatus` 仍是消息流和 UI busy 的事实来源；ChatTurn 没有另建一套全局 turn store。
+- 当前没有真实后端联调证据覆盖断流、重连、取消、审批超时和坏事件；mock、静态检查或 CI 通过不能替代这些验证。
 
-## 发送与审批路径
+## 关键实现
 
-```
-Chat.handleSend → runtime.send
-  → SendTurnCommand → Service.mapChatTurnRequest → stream
-  → pumpSend({ turn: { query, options } }) → mapUserMessageMetadata
-
-runtime.submitToolApprovals
-  → SubmitToolApprovalsCommand → Service.mapToolApprovalRequest
-  → respond | respond+resume | recover → pumpSend({ response })
-```
-
-## 已知张力
-
-- SessionController、按 session key 重建组件以及 SDK `status` 仍由既有链路承担。
-
-图约定：S2 内 `message` → history / connect / approval / 组装根 为**能力供给**；`isNewSession` 为 Session → History 意图（组装根只接线，不拥有）；子域 → `useChatRuntime` 为组装接线。自上而下：协议入口 → Runtime 子域 → Session 意图 → Chat → UI。
+- [ChatTurn service](service/ChatTurnServices.impl.ts)
+- [SSE normalizer](service/chatSseNormalizer.ts)
+- [Message runtime](runtime/message/useChatMessage.ts)
+- [History runtime](runtime/history/useChatHistory.ts)
+- [Connect actions](runtime/connect/useConnectActions.ts)
+- [Connect resume](runtime/connect/useConnectResume.ts)
+- [Approval runtime](runtime/approval/useChatToolApproval.ts)
