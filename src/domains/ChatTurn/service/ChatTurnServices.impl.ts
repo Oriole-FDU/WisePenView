@@ -1,6 +1,10 @@
 import { ChatTurnApi } from '@domain-apis';
 
 import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
+import {
+  mapListHistoryMessagesFromApi,
+  mapListHistoryMessagesRequest,
+} from '../mapper/chatHistory.mapper';
 import type { IChatTurnService } from './index.type';
 
 const streamChatCompletion = (
@@ -23,10 +27,16 @@ const cancelTurn = async (sessionId: string): Promise<void> => {
   await ChatTurnApi.cancelTurn({ session_id: sessionId });
 };
 
+const listHistoryMessages = async (sessionId: string, page: number, size: number) =>
+  mapListHistoryMessagesFromApi(
+    await ChatTurnApi.listHistoryMessages(mapListHistoryMessagesRequest({ sessionId, page, size }))
+  );
+
 export const createChatTurnServices = (): IChatTurnService => ({
   streamChatCompletion,
   recoverChatStream,
   reconnectChatStream,
   getActiveTurnId,
   cancelTurn,
+  listHistoryMessages,
 });

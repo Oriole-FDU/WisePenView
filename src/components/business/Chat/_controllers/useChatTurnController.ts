@@ -17,7 +17,6 @@ import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
 import { hasRenderableChatContent } from './chatTurnModel';
 import { useChatToolApproval } from './useChatToolApproval';
-import { useChatTurnHistory } from './useChatTurnHistory';
 
 interface UseChatTurnControllerOptions {
   /** 会话域提供的按需建会话能力，用于发送前确保存在目标会话 */
@@ -31,9 +30,8 @@ interface UseChatTurnControllerOptions {
 /**
  * 对话域组合根：当前会话的一轮对话生命周期。
  *
- * Chat 运行时（消息列表、运行状态、当前轮次）只能存在一个实例，因此由本 Controller 独占；
- * 历史分页与工具审批各自维护独立状态，以 `history` / `approval` 命名空间输出，
- * 本 Controller 只负责持有运行时、发送取消和模型选择。
+ * messages / history 由 ChatTurn Runtime 独占；本 Controller 注入流式传输能力，
+ * 再编排发送/取消与工具审批，以 `history` / `approval` 命名空间输出。
  */
 export function useChatTurnController({
   ensureSession,
@@ -55,26 +53,20 @@ export function useChatTurnController({
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
-  const { messages, status, setMessages, sendTurnMessage, recoverTurn, stop, resumeTurnStream } =
-    useChatTurn({
-      sessionId: currentSessionId ?? '',
-      model: currentModel?.modelId,
-      getActiveTurnId: chatTurnService.getActiveTurnId,
-      streamChatCompletion: chatTurnService.streamChatCompletion,
-      recoverChatStream: chatTurnService.recoverChatStream,
-      reconnectChatStream: chatTurnService.reconnectChatStream,
-      onError: (error) => {
-        toast.danger(parseErrorMessage(error));
-      },
-    });
-
-  const history = useChatTurnHistory({
-    setMessages,
-    resumeTurnStream,
-    stop,
+  const { messages, status, sendTurnMessage, recoverTurn, stop, history } = useChatTurn({
+    sessionId: currentSessionId ?? '',
+    model: currentModel?.modelId,
+    getActiveTurnId: chatTurnService.getActiveTurnId,
+    streamChatCompletion: chatTurnService.streamChatCompletion,
+    recoverChatStream: chatTurnService.recoverChatStream,
+    reconnectChatStream: chatTurnService.reconnectChatStream,
     isNewlyCreatedSession,
     clearNewlyCreatedSession,
+    onError: (error) => {
+      toast.danger(parseErrorMessage(error));
+    },
   });
+
   const approval = useChatToolApproval({
     sessionId: currentSessionId,
     messages,

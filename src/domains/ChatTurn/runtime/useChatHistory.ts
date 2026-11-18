@@ -2,8 +2,7 @@ import { useLatest } from 'ahooks';
 import { useRef, useState } from 'react';
 
 import type { PageResult } from '@/domains/_shared/entity/page';
-
-import type { WisePenUIMessage } from '../entity/message';
+import type { WisePenUIMessage } from '@/domains/ChatSession';
 
 interface UseChatHistoryOptions {
   sessionId: string | null;
@@ -30,6 +29,7 @@ function mergeMessages(
   });
 }
 
+/** 历史分页写入同一份 messages：首屏 replace、上翻 prepend、按 id 去重。 */
 export function useChatHistory({
   sessionId,
   pageSize,

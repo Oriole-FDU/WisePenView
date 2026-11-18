@@ -11,6 +11,8 @@ import {
   ChatRecoverApiRequestSchema,
   ChatRespondApiRequestSchema,
   ChatStreamReconnectApiRequestSchema,
+  ListHistoryMessagesApiRequestSchema,
+  ListHistoryMessagesApiResponseSchema,
 } from './ChatTurnApi.schema';
 
 export const GetActiveChatTurnApiContract = defineApiContract({
@@ -71,4 +73,14 @@ export const ChatReconnectStreamApiContract = defineApiContract({
   transport: 'sse',
   request: ChatStreamReconnectApiRequestSchema,
   response: z.string(),
+});
+
+export const ListHistoryMessagesApiContract = defineApiContract({
+  name: 'ListHistoryMessagesApi',
+  method: 'GET',
+  endpoint: '/chat/session/listHistoryMessages',
+  requestPlacement: 'query',
+  transport: 'json',
+  request: ListHistoryMessagesApiRequestSchema,
+  response: ListHistoryMessagesApiResponseSchema,
 });

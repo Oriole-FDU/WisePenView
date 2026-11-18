@@ -1,3 +1,5 @@
+import type { PageResult } from '@/domains/_shared/entity/page';
+import type { WisePenUIMessage } from '@/domains/ChatSession';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
 import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
@@ -49,6 +51,10 @@ export interface UseChatTurnOptions {
   ) => Promise<Response>;
   recoverChatStream: (request: ChatRecoverApiRequest, signal?: AbortSignal) => Promise<Response>;
   reconnectChatStream: (sessionId: string, signal?: AbortSignal) => Promise<Response>;
+  /** 新建会话标记：跳过首屏历史 hydrate */
+  isNewlyCreatedSession: (sessionId: string) => boolean;
+  /** 会话切换 cleanup 时清除新建标记 */
+  clearNewlyCreatedSession: (sessionId: string) => void;
   onError?: (error: Error) => void;
 }
 
@@ -58,4 +64,9 @@ export interface IChatTurnService {
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
+  listHistoryMessages(
+    sessionId: string,
+    page: number,
+    size: number
+  ): Promise<PageResult<WisePenUIMessage>>;
 }

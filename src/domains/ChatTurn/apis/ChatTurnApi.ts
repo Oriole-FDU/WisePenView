@@ -8,6 +8,7 @@ import {
   ChatRecoverStreamApiContract,
   ChatRespondApiContract,
   GetActiveChatTurnApiContract,
+  ListHistoryMessagesApiContract,
 } from './ChatTurnApi.contract';
 import type {
   ActiveChatTurnApiRequest,
@@ -17,6 +18,8 @@ import type {
   ChatRecoverApiRequest,
   ChatRespondApiRequest,
   ChatStreamReconnectApiRequest,
+  ListHistoryMessagesApiRequest,
+  ListHistoryMessagesApiResponse,
 } from './ChatTurnApi.schema';
 
 function getActiveTurn(request: ActiveChatTurnApiRequest): Promise<ActiveChatTurnApiResponse> {
@@ -52,9 +55,16 @@ function reconnectChatStream(
   return executeSseApiContract(ChatReconnectStreamApiContract, request, { signal });
 }
 
+function listHistoryMessages(
+  request: ListHistoryMessagesApiRequest
+): Promise<ListHistoryMessagesApiResponse> {
+  return executeApiContract(ListHistoryMessagesApiContract, request);
+}
+
 export const ChatTurnApi = {
   cancelTurn,
   getActiveTurn,
+  listHistoryMessages,
   reconnectChatStream,
   respondTurn,
   streamChatCompletion,
