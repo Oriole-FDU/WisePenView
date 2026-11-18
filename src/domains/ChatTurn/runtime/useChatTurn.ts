@@ -8,11 +8,11 @@ import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSessio
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
+import type { ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
 import {
   pickChatCompletionApiRequest,
   pickChatRecoverApiRequest,
-} from '../apis/ChatStreamApi.schema';
+} from '../apis/ChatTurnApi.schema';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type {
   SendTurnMessageOptions,

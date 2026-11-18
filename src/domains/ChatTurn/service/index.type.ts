@@ -1,6 +1,6 @@
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
-import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
+import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
 
 interface ChatSelectedResourceContext {
   resourceId: string;
