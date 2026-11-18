@@ -9,7 +9,7 @@ import {
   mapListHistoryMessagesFromApi,
   mapListHistoryMessagesRequest,
 } from '../mapper/chatHistory.mapper';
-import { normalizeChatSseResponse } from '../runtime/chatSseNormalizer';
+import { normalizeChatSseResponse } from './chatSseNormalizer';
 import type { IChatTurnService } from './index.type';
 
 const streamChatCompletion = async (
