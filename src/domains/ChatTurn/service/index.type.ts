@@ -17,11 +17,10 @@ interface ChatUploadedAttachmentContext {
 }
 
 export interface ToolApprovalStatusRequest {
-  tool_call_id: string;
+  toolCallId: string;
   approved: boolean;
 }
 
-/** 审批续跑领域命令：Runtime 只传意图，DTO 由 Service/mapper 组装。 */
 export interface SubmitToolApprovalsCommand {
   sessionId: string;
   toolApprovalStatus: ToolApprovalStatusRequest[];

@@ -76,7 +76,6 @@ function mapToolInvocation(data: Record<string, unknown>): ToolInvocationState |
         state: 'approval-requested',
         input: data.input,
         approval: {
-          // 挂起会话历史只返回状态，审批 ID 与工具调用 ID 按后端契约相同。
           id: approvalId,
           ...(typeof approval?.signature === 'string' ? { signature: approval.signature } : {}),
         },
@@ -197,7 +196,6 @@ function mapAttachmentSnapshot(value: unknown): MessageAttachmentSnapshot | null
   };
 }
 
-/** 历史 metadata / 模型字段占位：后端透出后即可回放附件与模型图标。 */
 function mapMessageMetadata(data: {
   metadata?: unknown;
   createdAt?: unknown;

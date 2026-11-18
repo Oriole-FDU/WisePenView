@@ -22,7 +22,6 @@ export interface UseHistoryLoadingFsmResult extends HistoryLoadingActions {
   loadingMore: boolean;
 }
 
-/** History 分页加载相位：replace / prepend 互斥，由 history/data 驱动。 */
 export function useHistoryLoadingFsm(): UseHistoryLoadingFsmResult {
   const fsm = useFsm<HistoryLoadingPhase>(HISTORY_LOADING_PHASE.idle);
 

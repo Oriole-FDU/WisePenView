@@ -57,10 +57,6 @@ function isToolExecutionDeniedEvent(
   return value.type === 'data-tool-execution-denied' && typeof value.toolCallId === 'string';
 }
 
-/**
- * 后端为高危工具发送扁平 data-* 事件，AI SDK 6 要求 data-* 使用 data 字段。
- * 在传输边界转换成 SDK 标准工具事件，审批说明统一由前端文案展示。
- */
 export function normalizeChatSseData(data: string): string[] {
   if (data === '[DONE]') return [data];
 

@@ -34,9 +34,6 @@ function mergeMessages(
   });
 }
 
-/**
- * History 分页游标与 messages 写入；loading 相位由同模块 fsm 提供。
- */
 export function useHistoryData({
   sessionId,
   setMessages,

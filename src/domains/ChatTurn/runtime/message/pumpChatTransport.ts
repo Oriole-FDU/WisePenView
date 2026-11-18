@@ -8,10 +8,6 @@ import {
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-/**
- * 不发 HTTP 的 ChatTransport：只消费上层已取得的 SSE body。
- * 协议选路（completions / recover / stream）留在 Service，本类只做泵。
- */
 export class PumpChatTransport<UI_MESSAGE extends UIMessage> implements ChatTransport<UI_MESSAGE> {
   private pendingSendBody: ReadableStream<Uint8Array> | null = null;
   private pendingReconnectBody: ReadableStream<Uint8Array> | null = null;

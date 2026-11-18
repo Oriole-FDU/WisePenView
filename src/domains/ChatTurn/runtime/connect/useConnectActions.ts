@@ -23,22 +23,13 @@ export interface UseConnectActionsOptions {
 }
 
 export interface UseConnectActionsResult {
-  /** 协议级发送：已有 sessionId + 载荷后开泵；不含 UI 门禁。 */
   send: (query: string, options?: SendTurnMessageOptions) => Promise<void>;
-  /** 本地 stopConnect + 后端 cancel；自带 cancelling 互斥。 */
   cancel: () => Promise<void>;
   cancelling: boolean;
-  /** 用户 stop / cancel：中止泵并标 closed，保留同 session 再 resume 的空间。 */
   stopConnect: () => void;
-  /** 审批续跑：按连接相位选 respond / respond+resume / recover。 */
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
 }
 
-/**
- * 本地流开停与审批续跑：send 开 completion 流，cancel/stop 关流，
- * submitToolApprovals 按相位选 respond / resume / recover；开流事务复用 runNewStreamConnect。
- * 发送/审批 wire DTO 由 Service 组装；乐观 user 气泡由 message 泵组装；本层只传领域意图。
- */
 export function useConnectActions({
   sessionId,
   model,
@@ -98,14 +89,12 @@ export function useConnectActions({
     const command = { sessionId, toolApprovalStatus };
 
     try {
-      // 连接仍活着：只 respond，不新开 SSE。
       if (connect.isLive()) {
         await chatTurnService.respondTurn(command);
         return;
       }
 
       const activeTurnId = await chatTurnService.getActiveTurnId(sessionId);
-      // 查询期间连接可能又活了；按最新 connect 相位重判。
       const action = connect.resolveContinuation(activeTurnId);
 
       if (action === 'respond') {

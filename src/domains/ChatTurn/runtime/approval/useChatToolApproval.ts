@@ -10,8 +10,8 @@ export interface UseChatToolApprovalOptions {
   sessionId?: string;
   messages: readonly WisePenUIMessage[];
   status: ChatStatus;
-  /** Runtime 审批提交：待审批项全部有结论后用它续跑同一轮对话 */
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
+  onError?: (error: Error) => void;
 }
 
 export interface UseChatToolApprovalResult {
@@ -20,16 +20,12 @@ export interface UseChatToolApprovalResult {
   submitting: boolean;
 }
 
-/**
- * 审批域：一轮对话中工具审批请求的挂起状态与决定。
- *
- * 只读消息与运行状态，决定收敛后交给 Runtime；不持有会话与历史，不拼 recover body。
- */
 export function useChatToolApproval({
   sessionId,
   messages,
   status,
   submitToolApprovals,
+  onError,
 }: UseChatToolApprovalOptions): UseChatToolApprovalResult {
   const [decisions, setDecisions] = useState<Record<string, boolean>>({});
 
@@ -37,11 +33,10 @@ export function useChatToolApproval({
   const pendingRequest = sessionId
     ? requests.find((request) => decisions[request.toolCallId] === undefined)
     : undefined;
-  const running = status === 'submitted' || status === 'streaming';
+  const streamBusy = status === 'submitted' || status === 'streaming';
 
-  /** 记录审批决定；待审批项全部有结论后，用该结论恢复同一轮对话。 */
   const decide = (toolCallId: string, approved: boolean) => {
-    if (!sessionId || running) return;
+    if (!sessionId || streamBusy) return;
 
     const pendingToolCallIds = requests.map((request) => request.toolCallId);
     if (!pendingToolCallIds.includes(toolCallId)) return;
@@ -50,22 +45,26 @@ export function useChatToolApproval({
     setDecisions(nextDecisions);
     if (pendingToolCallIds.some((pendingId) => nextDecisions[pendingId] === undefined)) return;
 
-    const toolApprovalStatus = pendingToolCallIds.map((pendingId) => ({
-      tool_call_id: pendingId,
+    const toolApprovalStatus: ToolApprovalStatusRequest[] = pendingToolCallIds.map((pendingId) => ({
+      toolCallId: pendingId,
       approved: nextDecisions[pendingId] ?? false,
     }));
-    void submitToolApprovals(toolApprovalStatus).finally(() => {
-      setDecisions((current) =>
-        Object.fromEntries(
-          Object.entries(current).filter(([id]) => !pendingToolCallIds.includes(id))
-        )
-      );
-    });
+    void submitToolApprovals(toolApprovalStatus)
+      .catch((error) => {
+        if (error instanceof Error) onError?.(error);
+      })
+      .finally(() => {
+        setDecisions((current) =>
+          Object.fromEntries(
+            Object.entries(current).filter(([id]) => !pendingToolCallIds.includes(id))
+          )
+        );
+      });
   };
 
   return {
     decide,
     pending: pendingRequest,
-    submitting: running,
+    submitting: streamBusy,
   };
 }

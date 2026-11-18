@@ -45,7 +45,8 @@ function Chat({
   const clearResourceChatContext = resourceChat?.clearContext;
 
   const runtime = useChatRuntime({
-    sessionId: sessionId ?? '',
+    // 未登录时不下发 session，History 清对话；鉴权门禁留在壳层。
+    sessionId: isAuthenticated && sessionId ? sessionId : '',
     model: currentModel?.modelId,
     isNewSession: session.isNewSession,
     onError: (error) => {

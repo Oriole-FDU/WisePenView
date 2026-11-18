@@ -17,7 +17,6 @@ import { useChatMessage } from './message/useChatMessage';
 export interface UseChatRuntimeOptions {
   sessionId: string;
   model?: string;
-  /** 壳层认定的「本页刚创建」会话；为 true 时 History 跳过首载。 */
   isNewSession: boolean;
   onError?: (error: Error) => void;
 }
@@ -25,7 +24,6 @@ export interface UseChatRuntimeOptions {
 export interface UseChatRuntimeResult {
   approval: UseChatToolApprovalResult;
   messages: WisePenUIMessage[];
-  /** 消息列表是否存在可渲染内容（非空文本/思考，或工具调用）。 */
   renderable: boolean;
   status: ChatStatus;
   stopConnect: UseConnectActionsResult['stopConnect'];
@@ -37,10 +35,6 @@ export interface UseChatRuntimeResult {
   history: UseChatHistoryResult;
 }
 
-/**
- * ChatTurn Runtime 组装根：connect（开停流 + resume + 审批续跑）+ message 泵 + history + approval；
- * 组装根只接线，不内联 send/cancel/审批选路。
- */
 export function useChatRuntime({
   sessionId,
   model,
@@ -68,7 +62,6 @@ export function useChatRuntime({
     resumeTurn,
   });
 
-  /** 切会话：中止旧泵并作废 resume 世代；不标 closed（后台 turn 仍可恢复）。 */
   const releaseSession = () => {
     message.stop();
     invalidateResume();
@@ -78,8 +71,9 @@ export function useChatRuntime({
     sessionId: sessionId || null,
     isNewSession,
     setMessages: message.setMessages,
-    resumeTurnStream: resumeTurn,
+    resumeTurn,
     stop: releaseSession,
+    onError,
   });
 
   const approval = useChatToolApproval({
@@ -87,6 +81,7 @@ export function useChatRuntime({
     messages: message.messages,
     status: message.status,
     submitToolApprovals,
+    onError,
   });
 
   return {

@@ -8,7 +8,6 @@ export interface ToolApprovalRequest {
   input: unknown;
 }
 
-/** 按消息顺序收集待审批工具，同一调用只进入一次审批队列。 */
 export function listToolApprovalRequests(
   messages: readonly WisePenUIMessage[]
 ): ToolApprovalRequest[] {

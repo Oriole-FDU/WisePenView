@@ -24,7 +24,6 @@ function mapClientToolCapability(
   };
 }
 
-/** 发送选项 → 本地乐观 user 气泡 metadata（附件快照）；由 message 泵调用，非 wire。 */
 export function mapUserMessageMetadata(options?: SendTurnMessageOptions): ChatMessageMetadata {
   const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
     .filter((attachment) => attachment.enabled)
@@ -50,14 +49,16 @@ export function mapUserMessageMetadata(options?: SendTurnMessageOptions): ChatMe
   };
 }
 
-/** 审批领域命令 → respond / recover 共用请求体。 */
 export function mapToolApprovalRequest(
   command: SubmitToolApprovalsCommand
 ): ChatRecoverApiRequest & ChatRespondApiRequest {
   return {
     session_id: command.sessionId,
     client_tool_results: [],
-    tool_approval_status: command.toolApprovalStatus,
+    tool_approval_status: command.toolApprovalStatus.map((item) => ({
+      tool_call_id: item.toolCallId,
+      approved: item.approved,
+    })),
   };
 }
 

@@ -15,15 +15,10 @@ export interface UseConnectResumeOptions {
 
 export interface UseConnectResumeResult {
   resumeTurn: () => Promise<void>;
-  /** stop / 流错误后清除 turn 去重，允许再次 resume。 */
   clearResumedTurn: () => void;
-  /** 切会话时由 Runtime 显式调用：作废 in-flight / 去重并复位连接态。 */
   invalidateResume: () => void;
 }
 
-/**
- * resume 请求合并、turn 去重与迟到结果丢弃；连接态交给 connect FSM。
- */
 export function useConnectResume({
   sessionId,
   connect,
@@ -33,7 +28,6 @@ export function useConnectResume({
   const { getActiveTurnId, reconnectChatStream } = useChatTurnService();
   const inFlightRef = useRef<{ sessionId: string; promise: Promise<void> } | null>(null);
   const resumedTurnRef = useRef<{ sessionId: string; turnId: string } | null>(null);
-  /** invalidate 时递增；与 sessionId 一起判定旧 async 是否作废。 */
   const resumeEpochRef = useRef(0);
   const latestSessionId = useLatest(sessionId);
 
