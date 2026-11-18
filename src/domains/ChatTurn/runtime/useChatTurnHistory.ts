@@ -6,10 +6,10 @@ import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { UseChatHistoryResult } from './useChatHistory';
+import type { UseChatHistoryDataResult } from './data/useChatHistoryData';
 
 export interface UseChatTurnHistoryOptions {
-  history: UseChatHistoryResult;
+  history: UseChatHistoryDataResult;
   loadingInitial: boolean;
   loadingMore: boolean;
   resumeTurnStream: () => Promise<void>;
@@ -28,7 +28,7 @@ export interface UseChatTurnHistoryResult {
 /**
  * 历史生命周期：会话切换时触发 hydrate / 清空 / 流恢复。
  *
- * 分页游标与 messages 写入由 useChatHistory + useChat 负责；本模块只编排时机。
+ * 分页游标与 messages 写入由 data.history + useChat 负责；本模块只编排时机。
  */
 export function useChatTurnHistory({
   history,

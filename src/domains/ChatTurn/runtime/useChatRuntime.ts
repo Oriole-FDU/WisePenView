@@ -16,7 +16,7 @@ import type {
   ToolApprovalStatusRequest,
 } from '../service/index.type';
 import { useChatControl } from './control/useChatControl';
-import { useChatHistory } from './useChatHistory';
+import { useChatData } from './data/useChatData';
 import type { UseChatTurnHistoryResult } from './useChatTurnHistory';
 import { useChatTurnHistory } from './useChatTurnHistory';
 
@@ -110,8 +110,8 @@ export function useChatRuntime({
   // --- Control：message loading 状态机；后续切会话 / 停流下沉至此 ---
   const control = useChatControl();
 
-  // --- 应下沉 Pipeline：历史分页写入同一份 messages ---
-  const historyStore = useChatHistory({
+  // --- Data：历史分页写入同一份 messages；经 Runtime 编排后对外暴露 ---
+  const data = useChatData({
     sessionId: sessionId || null,
     pageSize: DEFAULT_HISTORY_PAGE_SIZE,
     loadPage: chatTurnService.listHistoryMessages,
@@ -270,7 +270,7 @@ export function useChatRuntime({
    * 本步为行为不回归继续由 Runtime 返回；切会话 stop 仍走内部 cleanup。
    */
   const history = useChatTurnHistory({
-    history: historyStore,
+    history: data.history,
     loadingInitial: control.message.loadingInitial,
     loadingMore: control.message.loadingMore,
     resumeTurnStream: resumeTurn,

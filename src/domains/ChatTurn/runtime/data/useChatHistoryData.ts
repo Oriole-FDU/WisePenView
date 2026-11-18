@@ -4,9 +4,9 @@ import { useRef, useState } from 'react';
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
-import type { ChatMessageLoadingActions } from './control/useChatMessageControl';
+import type { ChatMessageLoadingActions } from '../control/useChatMessageControl';
 
-export interface UseChatHistoryOptions {
+export interface UseChatHistoryDataOptions {
   sessionId: string | null;
   pageSize: number;
   loadPage: (
@@ -20,7 +20,7 @@ export interface UseChatHistoryOptions {
   loading: ChatMessageLoadingActions;
 }
 
-export interface UseChatHistoryResult {
+export interface UseChatHistoryDataResult {
   canLoadMore: boolean;
   replaceHistory: (targetSessionId: string) => Promise<boolean>;
   prependHistory: () => Promise<void>;
@@ -39,13 +39,13 @@ function mergeMessages(
   });
 }
 
-export function useChatHistory({
+export function useChatHistoryData({
   sessionId,
   pageSize,
   loadPage,
   setMessages,
   loading,
-}: UseChatHistoryOptions): UseChatHistoryResult {
+}: UseChatHistoryDataOptions): UseChatHistoryDataResult {
   const sessionIdRef = useLatest(sessionId);
   const loadingRef = useLatest(loading);
   const requestVersionRef = useRef(0);
