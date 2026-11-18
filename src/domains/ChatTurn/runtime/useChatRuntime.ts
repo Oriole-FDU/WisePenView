@@ -16,9 +16,10 @@ import {
 } from '../apis/ChatTurnApi.schema';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type {
+  IChatTurnService,
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
-  UseChatTurnOptions,
+  UseChatRuntimeOptions,
 } from '../service/index.type';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
 import { useChatHistory } from './useChatHistory';
@@ -27,19 +28,22 @@ import { useChatTurnHistory } from './useChatTurnHistory';
 const CHAT_STREAM_THROTTLE_MS = 50;
 const DEFAULT_HISTORY_PAGE_SIZE = 100;
 
+type ChatStreamApi = Pick<
+  IChatTurnService,
+  'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
+>;
+
 function resolveChatApiUrl(input: RequestInfo | URL): string {
   return typeof input === 'string' || input instanceof URL
     ? new URL(input.toString(), buildApiUrl('/')).toString()
     : input.url;
 }
 
+// --- 应下沉 Service：transport 路由与 recover/completions 选路 ---
 async function fetchChatCompletion(
   input: RequestInfo | URL,
   init: RequestInit | undefined,
-  streamApi: Pick<
-    UseChatTurnOptions,
-    'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
-  >
+  streamApi: ChatStreamApi
 ): Promise<Response> {
   const requestUrl = new URL(resolveChatApiUrl(input));
   const rawBody = typeof init?.body === 'string' ? JSON.parse(init.body) : {};
@@ -72,12 +76,7 @@ function isChatRecoverRequest(
   );
 }
 
-const createChatTransport = (
-  streamApi: Pick<
-    UseChatTurnOptions,
-    'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
-  >
-) =>
+const createChatTransport = (streamApi: ChatStreamApi) =>
   new DefaultChatTransport<WisePenUIMessage>({
     api: '/chat/completions',
     fetch: (input, init) => fetchChatCompletion(input, init, streamApi),
@@ -100,24 +99,20 @@ const createChatTransport = (
   });
 
 /**
- * Chat 消息运行时：唯一组装 messages 的模块。
+ * ChatTurn Domain→UI 聚合入口。
  *
- * 1) 持有 useChat（SSE 增量）与 useChatHistory（历史 hydrate），写入同一份列表
- * 2) 编排会话切换时的历史加载与流恢复
- * 3) 对上只暴露聚合后的 messages / status / history UI 态，不外泄 setMessages
+ * 对外：按用户意图暴露 submit / cancel / resume / 消息视图；不外泄 setMessages 与散落流 API。
+ * 对内：暂内聚 useChat + 历史写入/切会话编排（后续拆 Service 控制面与 Message Pipeline）。
  */
-export const useChatTurn = ({
+export const useChatRuntime = ({
   sessionId,
   model,
-  getActiveTurnId,
-  streamChatCompletion,
-  recoverChatStream,
-  reconnectChatStream,
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
   onError,
-}: UseChatTurnOptions) => {
+}: UseChatRuntimeOptions) => {
   const chatTurnService = useChatTurnService();
+
   /**
    * @wisepen-manual-memo
    * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
@@ -125,9 +120,20 @@ export const useChatTurn = ({
    * 失效条件：streamChatCompletion、recoverChatStream 或 reconnectChatStream 引用变化。
    */
   const chatTransport = useMemo(
-    () => createChatTransport({ streamChatCompletion, recoverChatStream, reconnectChatStream }),
-    [recoverChatStream, reconnectChatStream, streamChatCompletion]
+    () =>
+      createChatTransport({
+        streamChatCompletion: chatTurnService.streamChatCompletion,
+        recoverChatStream: chatTurnService.recoverChatStream,
+        reconnectChatStream: chatTurnService.reconnectChatStream,
+      }),
+    [
+      chatTurnService.recoverChatStream,
+      chatTurnService.reconnectChatStream,
+      chatTurnService.streamChatCompletion,
+    ]
   );
+
+  // --- 应下沉 Pipeline：唯一 useChat 实例与 messages 视图 ---
   const chat = useChat<WisePenUIMessage>({
     experimental_throttle: CHAT_STREAM_THROTTLE_MS,
     onError: (error) => {
@@ -139,12 +145,15 @@ export const useChatTurn = ({
     },
     transport: chatTransport,
   });
+
+  // --- 应下沉 Pipeline：历史分页写入同一份 messages ---
   const historyStore = useChatHistory({
     sessionId: sessionId || null,
     pageSize: DEFAULT_HISTORY_PAGE_SIZE,
     loadPage: chatTurnService.listHistoryMessages,
     setMessages: chat.setMessages,
   });
+
   const resumeRequestRef = useRef<{
     sessionId: string;
     resumeStream: typeof chat.resumeStream;
@@ -157,10 +166,14 @@ export const useChatTurn = ({
   } | null>(null);
   const latestSessionId = useLatest(sessionId);
   const latestResumeStream = useLatest(chat.resumeStream);
-  const latestActiveTurnId = useLatest(getActiveTurnId);
+  const latestGetActiveTurnId = useLatest(chatTurnService.getActiveTurnId);
   const latestOnError = useLatest(onError);
 
-  const resumeTurnStream = (): Promise<void> => {
+  const stopLocalStream = () => {
+    void chat.stop();
+  };
+
+  const resumeTurn = (): Promise<void> => {
     if (!sessionId) return Promise.resolve();
 
     const targetSessionId = sessionId;
@@ -175,7 +188,7 @@ export const useChatTurn = ({
 
     const promise = (async () => {
       try {
-        const turnId = await latestActiveTurnId.current(targetSessionId);
+        const turnId = await latestGetActiveTurnId.current(targetSessionId);
         if (
           latestSessionId.current !== targetSessionId ||
           latestResumeStream.current !== targetResumeStream
@@ -225,7 +238,8 @@ export const useChatTurn = ({
     return promise;
   };
 
-  const sendTurnMessage = async (query: string, options?: SendTurnMessageOptions) => {
+  // --- 应下沉 Service：submit / recover 请求映射 ---
+  const submitTurn = async (query: string, options?: SendTurnMessageOptions) => {
     const requestBody = mapChatTurnRequest({
       defaultSessionId: sessionId,
       defaultModel: model,
@@ -257,7 +271,8 @@ export const useChatTurn = ({
     await chat.sendMessage({ text: query, metadata }, { body: requestBody });
   };
 
-  const recoverTurn = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
+  /** 本步薄委托 recover；审批续跑矩阵（respond / resume / recover）留给后续 Phase。 */
+  const submitToolApprovals = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
     try {
       if (!sessionId) {
         throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
@@ -279,21 +294,36 @@ export const useChatTurn = ({
     }
   };
 
+  const cancelTurn = async (): Promise<void> => {
+    if (!sessionId) return;
+    stopLocalStream();
+    await chatTurnService.cancelTurn(sessionId);
+  };
+
+  /**
+   * 临时内聚：目标归属 UI/Controller 的历史分页态。
+   * 本步为行为不回归继续由 Runtime 返回；切会话 stop 仍走内部 cleanup。
+   */
   const history = useChatTurnHistory({
     history: historyStore,
-    resumeTurnStream,
-    stop: chat.stop,
+    resumeTurnStream: resumeTurn,
+    stop: stopLocalStream,
     isNewlyCreatedSession,
     clearNewlyCreatedSession,
   });
 
   return {
     messages: chat.messages,
+    /**
+     * 兼容出口：后续改为 Runtime 派生 uiBusy / localStream。
+     * Controller 不得用其做协议选路（respond/recover）。
+     */
     status: chat.status,
-    stop: chat.stop,
-    sendTurnMessage,
-    recoverTurn,
-    resumeTurnStream,
+    stopLocalStream,
+    submitTurn,
+    submitToolApprovals,
+    resumeTurn,
+    cancelTurn,
     history,
   };
 };

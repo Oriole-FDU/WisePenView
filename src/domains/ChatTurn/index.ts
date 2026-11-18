@@ -1,8 +1,8 @@
-export { useChatTurn } from './runtime/useChatTurn';
+export { useChatRuntime } from './runtime/useChatRuntime';
 export type {
   ClientToolCapability,
   IChatTurnService,
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
-  UseChatTurnOptions,
+  UseChatRuntimeOptions,
 } from './service/index.type';

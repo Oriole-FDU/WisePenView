@@ -10,20 +10,20 @@ interface UseChatToolApprovalOptions {
   sessionId?: string;
   messages: readonly WisePenUIMessage[];
   status: ChatStatus;
-  /** Chat 运行时的恢复能力：待审批项全部有结论后用它续跑同一轮对话 */
-  recover: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
+  /** Runtime 审批提交：待审批项全部有结论后用它续跑同一轮对话 */
+  submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
 }
 
 /**
  * 审批域：一轮对话中工具审批请求的挂起状态与决定。
  *
- * 只读消息与运行状态，决定收敛后交给传入的 recover 续跑；不持有会话与历史。
+ * 只读消息与运行状态，决定收敛后交给 Runtime；不持有会话与历史，不拼 recover body。
  */
 export function useChatToolApproval({
   sessionId,
   messages,
   status,
-  recover,
+  submitToolApprovals,
 }: UseChatToolApprovalOptions) {
   const [decisions, setDecisions] = useState<Record<string, boolean>>({});
 
@@ -48,7 +48,7 @@ export function useChatToolApproval({
       tool_call_id: pendingId,
       approved: nextDecisions[pendingId] ?? false,
     }));
-    void recover(toolApprovalStatus).finally(() => {
+    void submitToolApprovals(toolApprovalStatus).finally(() => {
       setDecisions((current) =>
         Object.fromEntries(
           Object.entries(current).filter(([id]) => !pendingToolCallIds.includes(id))

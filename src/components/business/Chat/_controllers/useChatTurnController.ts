@@ -3,10 +3,9 @@ import { useLatest, useUnmountedRef } from 'ahooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useChatTurnService } from '@/domains';
 import type { ChatModel } from '@/domains/ChatConfig';
 import type { CreateSessionRequest } from '@/domains/ChatSession';
-import { useChatTurn } from '@/domains/ChatTurn';
+import { useChatRuntime } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -28,10 +27,9 @@ interface UseChatTurnControllerOptions {
 }
 
 /**
- * 对话域组合根：当前会话的一轮对话生命周期。
+ * 对话 UI 组合根：门禁、审批交互与历史分页 UI。
  *
- * messages / history 由 ChatTurn Runtime 独占；本 Controller 注入流式传输能力，
- * 再编排发送/取消与工具审批，以 `history` / `approval` 命名空间输出。
+ * ChatTurn 业务能力只通过 useChatRuntime 消费；不注入散落流 API，不拼 recover body。
  */
 export function useChatTurnController({
   ensureSession,
@@ -42,7 +40,6 @@ export function useChatTurnController({
 }: UseChatTurnControllerOptions) {
   const { t } = useTranslation(['chat', 'common']);
   const appAuth = useAppAuth();
-  const chatTurnService = useChatTurnService();
   const { sessionId: currentSessionId, locationKey } = useChatSessionRoute();
   const routeLatest = useLatest({ sessionId: currentSessionId, locationKey });
   const unmountedRef = useUnmountedRef();
@@ -53,25 +50,23 @@ export function useChatTurnController({
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
-  const { messages, status, sendTurnMessage, recoverTurn, stop, history } = useChatTurn({
-    sessionId: currentSessionId ?? '',
-    model: currentModel?.modelId,
-    getActiveTurnId: chatTurnService.getActiveTurnId,
-    streamChatCompletion: chatTurnService.streamChatCompletion,
-    recoverChatStream: chatTurnService.recoverChatStream,
-    reconnectChatStream: chatTurnService.reconnectChatStream,
-    isNewlyCreatedSession,
-    clearNewlyCreatedSession,
-    onError: (error) => {
-      toast.danger(parseErrorMessage(error));
-    },
-  });
+  const { messages, status, submitTurn, submitToolApprovals, cancelTurn, history } = useChatRuntime(
+    {
+      sessionId: currentSessionId ?? '',
+      model: currentModel?.modelId,
+      isNewlyCreatedSession,
+      clearNewlyCreatedSession,
+      onError: (error) => {
+        toast.danger(parseErrorMessage(error));
+      },
+    }
+  );
 
   const approval = useChatToolApproval({
     sessionId: currentSessionId,
     messages,
     status,
-    recover: recoverTurn,
+    submitToolApprovals,
   });
 
   /** 发送一轮消息：校验登录与资源上下文，必要时先建立会话，再把前端状态随消息提交。 */
@@ -137,7 +132,7 @@ export function useChatTurnController({
         ? Array.from(new Set([...(selectedSkillIds ?? []), ...(resourceSkillIds ?? [])]))
         : undefined;
 
-    void sendTurnMessage(text, {
+    void submitTurn(text, {
       model: targetModel.modelId,
       providerId: targetModel.providerId,
       sessionId: targetSessionId,
@@ -166,9 +161,8 @@ export function useChatTurnController({
     if (!targetSessionId || cancellingSessionId === targetSessionId) return;
 
     setCancellingSessionId(targetSessionId);
-    void stop();
     try {
-      await chatTurnService.cancelTurn(targetSessionId);
+      await cancelTurn();
     } catch (error) {
       toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
     } finally {
