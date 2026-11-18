@@ -11,6 +11,7 @@ import ResourcePermissionActionIcon from '@/components/business/Drive/common/res
 import { buildResourcePermissionActionKeySet } from '@/components/business/Drive/common/resourcePermissionPolicy';
 import UserSearchCombobox from '@/components/business/UserSearchCombobox';
 import {
+  canEditResourcePermissionSubject,
   type ResourcePermissionActionOption,
   type ResourcePermissionSource,
   type ResourcePermissionSubject,
@@ -33,6 +34,7 @@ interface SubjectPermissionPopoverProps {
     subject: ResourcePermissionSubject,
     action: ResourcePermissionActionOption['action']
   ) => void;
+  editingDisabled: boolean;
 }
 
 const sourceLabelKeyMap: Record<ResourcePermissionSource, string> = {
@@ -56,7 +58,13 @@ const formatActionSummary = (
   t: TFunction<'resource'>
 ): string => {
   if (subject.source === 'owner') return t('permission.summary.all');
-  if (subject.source === 'tag') return t('permission.summary.inherited');
+  if (subject.source === 'tag') {
+    return t(
+      subject.inheritance?.status === 'ready'
+        ? 'permission.summary.inherited'
+        : 'permission.summary.unknown'
+    );
+  }
   const actions = subject.effectiveActions;
   if (actions.length === 0) {
     return t('permission.summary.none');
@@ -71,8 +79,14 @@ function SubjectPermissionPopover({
   subject,
   actionOptions,
   onActionToggle,
+  editingDisabled,
 }: SubjectPermissionPopoverProps) {
   const { t } = useTranslation('resource');
+  const isDisabled =
+    subject.readonly ||
+    editingDisabled ||
+    !canEditResourcePermissionSubject(subject) ||
+    actionOptions.length === 0;
   const selectedActionKeys = buildResourcePermissionActionKeySet(
     getSubjectActionsForDisplay(subject),
     actionOptions
@@ -82,7 +96,7 @@ function SubjectPermissionPopover({
       variant="ghost"
       size="sm"
       className={styles.permissionButton}
-      isDisabled={subject.readonly || actionOptions.length === 0}
+      isDisabled={isDisabled}
       aria-label={t('permission.subjectAria', { name: subject.name })}
     >
       <span className={styles.permissionTriggerText}>
@@ -94,7 +108,7 @@ function SubjectPermissionPopover({
     </AppButton>
   );
 
-  if (subject.readonly || actionOptions.length === 0) {
+  if (isDisabled) {
     return trigger;
   }
 
@@ -149,7 +163,7 @@ function PermissionPanelSkeleton() {
   );
 }
 
-function ResourcePermissionPanel({
+function ResourcePermissionPanelContent({
   resourceId,
   resourceType,
   onSuccess,
@@ -160,18 +174,25 @@ function ResourcePermissionPanel({
     addSpecifiedUserCandidate,
     canLoadMoreGroups,
     error,
+    editingDisabled,
     existingSpecifiedUserIds,
     handleActionToggle,
     handleRemoveSpecifiedUser,
     handleUserSearchEmpty,
     handleUserSearchError,
     inheritedSubjects,
+    hasUnknownActions,
+    hasFailedActions,
+    hasFailedGroupInfo,
     isUpdating,
     loadMoreGroups,
     loading,
     loadingMoreGroups,
     newUserKeyword,
     permissionOverview,
+    refreshPermissionOverview,
+    retrySave,
+    saveError,
     queryUserCandidates,
     setNewUserKeyword,
     shouldShowInviteDivider,
@@ -226,6 +247,7 @@ function ResourcePermissionPanel({
               subject={displaySubject}
               actionOptions={actionOptions}
               onActionToggle={handleActionToggle}
+              editingDisabled={editingDisabled}
             />
             {subject.source === 'specifiedUser' ? (
               <AppIconButton
@@ -233,6 +255,7 @@ function ResourcePermissionPanel({
                 label={t('permission.removeCollaborator')}
                 size="sm"
                 variant="danger"
+                isDisabled={editingDisabled}
                 onPress={() => handleRemoveSpecifiedUser(subject)}
               />
             ) : null}
@@ -248,10 +271,52 @@ function ResourcePermissionPanel({
         {loading ? (
           <PermissionPanelSkeleton />
         ) : error ? (
-          <div className={styles.stateText}>{parseErrorMessage(error)}</div>
+          <div className={styles.stateText} role="alert">
+            {parseErrorMessage(error)}
+            <AppButton variant="secondary" onPress={refreshPermissionOverview}>
+              {t('actions.retry', { ns: 'common' })}
+            </AppButton>
+          </div>
         ) : permissionOverview ? (
           <div className={styles.shell}>
             <section className={styles.subjectPane} aria-label={t('permission.collaborator')}>
+              {hasUnknownActions || hasFailedGroupInfo ? (
+                <div className={styles.notice} role="status">
+                  <span>
+                    {t(
+                      hasFailedActions
+                        ? 'permission.incomplete.actions'
+                        : hasUnknownActions
+                          ? 'permission.incomplete.unloaded'
+                          : 'permission.incomplete.groupInfo'
+                    )}
+                  </span>
+                  {hasFailedActions || hasFailedGroupInfo ? (
+                    <AppButton
+                      variant="ghost"
+                      size="sm"
+                      isDisabled={isUpdating || loadingMoreGroups}
+                      aria-busy={loadingMoreGroups || undefined}
+                      onPress={refreshPermissionOverview}
+                    >
+                      {t('actions.retry', { ns: 'common' })}
+                    </AppButton>
+                  ) : null}
+                </div>
+              ) : null}
+              {saveError ? (
+                <div className={styles.notice} role="alert">
+                  <span>{parseErrorMessage(saveError)}</span>
+                  <AppButton
+                    variant="ghost"
+                    size="sm"
+                    isDisabled={editingDisabled}
+                    onPress={retrySave}
+                  >
+                    {t('actions.retry', { ns: 'common' })}
+                  </AppButton>
+                </div>
+              ) : null}
               <div
                 className={styles.subjectList}
                 role="list"
@@ -281,6 +346,7 @@ function ResourcePermissionPanel({
               </div>
               <div className={styles.addRow}>
                 <UserSearchCombobox
+                  disabled={editingDisabled}
                   value={newUserKeyword}
                   onValueChange={setNewUserKeyword}
                   onSelect={addSpecifiedUserCandidate}
@@ -301,6 +367,12 @@ function ResourcePermissionPanel({
         )}
       </div>
     </div>
+  );
+}
+
+function ResourcePermissionPanel(props: ResourcePermissionPanelProps) {
+  return (
+    <ResourcePermissionPanelContent key={`${props.resourceType}:${props.resourceId}`} {...props} />
   );
 }
 

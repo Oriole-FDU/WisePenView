@@ -213,6 +213,8 @@ export const mapResourcePermissionOverviewFromApi = (
       primaryTagId: bind.primaryTagId,
       effectiveActions: [],
       editableActions: [],
+      groupInfoStatus: 'unloaded',
+      inheritance: { status: 'unloaded' },
     });
   }
 
@@ -231,6 +233,8 @@ export const mapResourcePermissionOverviewFromApi = (
       primaryTagId: primaryTag?.tagId,
       effectiveActions: filteredActions,
       editableActions: filteredActions,
+      groupInfoStatus: 'unloaded',
+      inheritance: primaryTag?.tagId ? { status: 'unloaded' } : undefined,
     });
   }
 

@@ -3,7 +3,7 @@ import { ResourceItemApi } from '@domain-apis';
 import type { ResourceAction } from '@/domains/_shared/access';
 import type { IAgentService } from '@/domains/Agent';
 import type { IDocumentService } from '@/domains/Document';
-import type { GroupBaseInfo, IGroupService } from '@/domains/Group';
+import type { IGroupService } from '@/domains/Group';
 import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { INoteService } from '@/domains/Note';
 import type { ISkillService } from '@/domains/Skill';
@@ -66,6 +66,7 @@ const collectPermissionGroupIds = (
   const groupIds: string[] = [];
   const seenGroupIds = new Set<string>();
   const normalizedLimit = normalizePermissionGroupHydrationLimit(limit);
+  if (normalizedLimit === 0) return groupIds;
 
   for (const subject of overview.subjects) {
     const groupId = subject.groupId;
@@ -115,45 +116,48 @@ const loadResourcePermissionOverview = async (
 const loadPermissionGroupInfo = async (
   groupIds: string[],
   groupService: ResourceAccessServicesDeps['groupService']
-): Promise<ReadonlyMap<string, ResourcePermissionGroupInfo>> => {
+): Promise<ReadonlyMap<string, ResourcePermissionGroupInfo | null>> => {
   if (groupIds.length === 0) return new Map();
 
   const groupInfos = await runWithConcurrency(
     groupIds,
     PERMISSION_OVERVIEW_HYDRATION_CONCURRENCY,
-    (groupId) => groupService.fetchGroupBaseInfo(groupId).catch(() => undefined)
+    async (groupId): Promise<readonly [string, ResourcePermissionGroupInfo | null]> => {
+      try {
+        const info = await groupService.fetchGroupBaseInfo(groupId);
+        return [
+          groupId,
+          {
+            groupId,
+            groupName: info.groupName,
+            groupDesc: info.groupDesc,
+            groupCoverUrl: info.groupCoverUrl,
+          },
+        ];
+      } catch {
+        return [groupId, null];
+      }
+    }
   );
-  return new Map(
-    groupInfos
-      .filter((groupInfo): groupInfo is GroupBaseInfo => Boolean(groupInfo?.groupId))
-      .map((groupInfo) => [
-        groupInfo.groupId,
-        {
-          groupId: groupInfo.groupId,
-          groupName: groupInfo.groupName,
-          groupDesc: groupInfo.groupDesc,
-          groupCoverUrl: groupInfo.groupCoverUrl,
-        },
-      ])
-  );
+  return new Map(groupInfos);
 };
 
 const loadPermissionInheritedActions = async (
   overview: ResourcePermissionOverview,
   groupIds: string[],
   tagService: ResourceAccessServicesDeps['tagService']
-): Promise<ReadonlyMap<string, ResourceAction[]>> => {
+): Promise<ReadonlyMap<string, ResourceAction[] | null>> => {
   const groupIdSet = new Set(groupIds);
   const subjectsByGroupId = new Map<string, ResourcePermissionOverview['subjects']>();
   overview.subjects.forEach((subject) => {
-    if (!subject.groupId || !subject.primaryTagId || !groupIdSet.has(subject.groupId)) return;
+    if (!subject.groupId || !subject.inheritance || !groupIdSet.has(subject.groupId)) return;
     const subjects = subjectsByGroupId.get(subject.groupId) ?? [];
     subjects.push(subject);
     subjectsByGroupId.set(subject.groupId, subjects);
   });
   if (subjectsByGroupId.size === 0) return new Map();
 
-  const inheritedActionsBySubjectId = new Map<string, ResourceAction[]>();
+  const inheritedActionsBySubjectId = new Map<string, ResourceAction[] | null>();
   await runWithConcurrency(
     Array.from(subjectsByGroupId.entries()),
     PERMISSION_OVERVIEW_HYDRATION_CONCURRENCY,
@@ -161,14 +165,11 @@ const loadPermissionInheritedActions = async (
       const grantedActionsByTagId = await tagService
         .getTagGrantedActions(groupId)
         .catch(() => undefined);
-      if (!grantedActionsByTagId) return;
       subjects.forEach((subject) => {
         const inheritedActions = subject.primaryTagId
-          ? grantedActionsByTagId.get(subject.primaryTagId)
+          ? grantedActionsByTagId?.get(subject.primaryTagId)
           : undefined;
-        if (inheritedActions) {
-          inheritedActionsBySubjectId.set(subject.id, inheritedActions);
-        }
+        inheritedActionsBySubjectId.set(subject.id, inheritedActions ?? null);
       });
     }
   );
