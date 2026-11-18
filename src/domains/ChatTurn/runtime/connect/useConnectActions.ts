@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { mapChatTurnRequest, mapOutgoingUserMessageMetadata } from '../../mapper/chatTurn.mapper';
 import type {
   IChatTurnService,
   SendTurnMessageOptions,
@@ -38,6 +37,7 @@ export interface UseConnectActionsResult {
 /**
  * 本地流开停与审批续跑：send 开 completion 流，cancel/stop 关流，
  * submitToolApprovals 按相位选 respond / resume / recover；开流事务复用 runNewStreamConnect。
+ * 发送/审批 wire DTO 由 Service 组装；乐观 user 气泡由 message 泵组装；本层只传领域意图。
  */
 export function useConnectActions({
   sessionId,
@@ -57,23 +57,20 @@ export function useConnectActions({
   };
 
   const send = async (query: string, options?: SendTurnMessageOptions) => {
-    const requestBody = mapChatTurnRequest({
-      defaultSessionId: sessionId,
-      defaultModel: model,
-      query,
-      options,
-    });
-    const metadata = mapOutgoingUserMessageMetadata(options);
-
     await runNewStreamConnect({
       connect,
       onClosed: clearResumedTurn,
       run: async () => {
-        const response = await chatTurnService.streamChatCompletion(requestBody);
+        const response = await chatTurnService.streamChatCompletion({
+          sessionId,
+          model,
+          query,
+          options,
+        });
         connect.markOpen();
         await message.pumpSend({
           response,
-          userMessage: { text: query, metadata },
+          turn: { query, options },
         });
       },
     });

@@ -5,7 +5,9 @@ import { useState } from 'react';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { ChatMessageMetadata, WisePenUIMessage } from '../../entity/message';
+import type { WisePenUIMessage } from '../../entity/message';
+import { mapUserMessageMetadata } from '../../mapper/chatTurn.mapper';
+import type { SendTurnMessageOptions } from '../../service/index.type';
 import { PumpChatTransport } from './pumpChatTransport';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
@@ -15,15 +17,16 @@ export type ChatMessagesWriter = (
   messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
 ) => void;
 
-export interface PumpUserMessage {
-  text: string;
-  metadata?: ChatMessageMetadata;
-}
-
 export interface PumpSendOptions {
   response: Response;
-  /** 新 turn 时插入本地 user 气泡；recover 等无用户句时可省略。 */
-  userMessage?: PumpUserMessage;
+  /**
+   * 新 turn：query + 发送选项 → 泵内组乐观 user 气泡（含附件快照 metadata）；
+   * recover 等无用户句时可省略。
+   */
+  turn?: {
+    query: string;
+    options?: SendTurnMessageOptions;
+  };
 }
 
 export interface PumpResumeOptions {
@@ -78,10 +81,13 @@ export function useChatMessage({ onError }: UseChatMessageOptions = {}): UseChat
     transport,
   });
 
-  const pumpSend = async ({ response, userMessage }: PumpSendOptions): Promise<void> => {
+  const pumpSend = async ({ response, turn }: PumpSendOptions): Promise<void> => {
     transport.armSend(requireSseBody(response, 'pumpSend'));
-    if (userMessage) {
-      await chat.sendMessage({ text: userMessage.text, metadata: userMessage.metadata });
+    if (turn) {
+      await chat.sendMessage({
+        text: turn.query,
+        metadata: mapUserMessageMetadata(turn.options),
+      });
       return;
     }
     await chat.sendMessage(undefined);

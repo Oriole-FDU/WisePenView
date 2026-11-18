@@ -24,10 +24,8 @@ function mapClientToolCapability(
   };
 }
 
-/** 发送选项 → 本地乐观 user 气泡 metadata（附件快照）。 */
-export function mapOutgoingUserMessageMetadata(
-  options?: SendTurnMessageOptions
-): ChatMessageMetadata {
+/** 发送选项 → 本地乐观 user 气泡 metadata（附件快照）；由 message 泵调用，非 wire。 */
+export function mapUserMessageMetadata(options?: SendTurnMessageOptions): ChatMessageMetadata {
   const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
     .filter((attachment) => attachment.enabled)
     .map((attachment) => ({

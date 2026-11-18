@@ -1,19 +1,28 @@
 import { ChatTurnApi } from '@domain-apis';
 
-import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
 import {
   mapListHistoryMessagesFromApi,
   mapListHistoryMessagesRequest,
 } from '../mapper/chatHistory.mapper';
-import { mapToolApprovalRequest } from '../mapper/chatTurn.mapper';
+import { mapChatTurnRequest, mapToolApprovalRequest } from '../mapper/chatTurn.mapper';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
-import type { IChatTurnService, SubmitToolApprovalsCommand } from './index.type';
+import type { IChatTurnService, SendTurnCommand, SubmitToolApprovalsCommand } from './index.type';
 
 const streamChatCompletion = async (
-  request: ChatCompletionApiRequest,
+  command: SendTurnCommand,
   signal?: AbortSignal
 ): Promise<Response> =>
-  normalizeChatSseResponse(await ChatTurnApi.streamChatCompletion(request, signal));
+  normalizeChatSseResponse(
+    await ChatTurnApi.streamChatCompletion(
+      mapChatTurnRequest({
+        defaultSessionId: command.sessionId,
+        defaultModel: command.model,
+        query: command.query,
+        options: command.options,
+      }),
+      signal
+    )
+  );
 
 const recoverChatStream = async (
   command: SubmitToolApprovalsCommand,

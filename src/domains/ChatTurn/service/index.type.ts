@@ -1,7 +1,6 @@
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
-import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
 import type { WisePenUIMessage } from '../entity/message';
 
 interface ChatSelectedResourceContext {
@@ -47,8 +46,16 @@ export interface SendTurnMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
+/** 发送回合领域命令：Runtime 只传意图，completion DTO 由 Service/mapper 组装。 */
+export interface SendTurnCommand {
+  sessionId: string;
+  model?: string;
+  query: string;
+  options?: SendTurnMessageOptions;
+}
+
 export interface IChatTurnService {
-  streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
+  streamChatCompletion(command: SendTurnCommand, signal?: AbortSignal): Promise<Response>;
   recoverChatStream(command: SubmitToolApprovalsCommand, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
   respondTurn(command: SubmitToolApprovalsCommand): Promise<void>;

@@ -14,6 +14,7 @@ export { useChatRuntime } from './runtime/useChatRuntime';
 export type {
   ClientToolCapability,
   IChatTurnService,
+  SendTurnCommand,
   SendTurnMessageOptions,
   SubmitToolApprovalsCommand,
   ToolApprovalStatusRequest,
