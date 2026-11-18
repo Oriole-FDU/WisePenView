@@ -65,9 +65,16 @@ export function useChatTurnController({
   const clearResourceChatContext = resourceChat?.clearContext;
 
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
-  const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
-  const { approval, messages, status, submitTurn, cancelTurn, history } = useChatRuntime({
+  const {
+    approval,
+    messages,
+    status,
+    send: runtimeSend,
+    cancel: runtimeCancel,
+    cancelling,
+    history,
+  } = useChatRuntime({
     sessionId: currentSessionId ?? '',
     model: currentModel?.modelId,
     isNewlyCreatedSession,
@@ -140,7 +147,7 @@ export function useChatTurnController({
         ? Array.from(new Set([...(selectedSkillIds ?? []), ...(resourceSkillIds ?? [])]))
         : undefined;
 
-    void submitTurn(text, {
+    void runtimeSend(text, {
       model: targetModel.modelId,
       providerId: targetModel.providerId,
       sessionId: targetSessionId,
@@ -165,23 +172,17 @@ export function useChatTurnController({
   };
 
   const cancel = async (): Promise<void> => {
-    const targetSessionId = currentSessionId;
-    if (!targetSessionId || cancellingSessionId === targetSessionId) return;
-
-    setCancellingSessionId(targetSessionId);
     try {
-      await cancelTurn();
+      await runtimeCancel();
     } catch (error) {
       toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
-    } finally {
-      setCancellingSessionId((sessionId) => (sessionId === targetSessionId ? null : sessionId));
     }
   };
 
   return {
     approval,
     cancel,
-    cancelling: cancellingSessionId === currentSessionId,
+    cancelling,
     currentModel,
     hasRenderableChatContent: hasRenderableChatContent(messages),
     history,

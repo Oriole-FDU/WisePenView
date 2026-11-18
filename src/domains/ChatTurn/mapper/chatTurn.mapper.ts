@@ -1,4 +1,5 @@
 import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
+import type { ChatMessageMetadata } from '../entity/message';
 import type { ClientToolCapability, SendTurnMessageOptions } from '../service/index.type';
 
 function unique(values?: readonly string[]): string[] {
@@ -12,6 +13,34 @@ function mapClientToolCapability(
     name: capability.name,
     description: capability.description,
     input_schema: capability.inputSchema,
+  };
+}
+
+/** 发送选项 → 本地乐观 user 气泡 metadata（附件快照）。 */
+export function mapOutgoingUserMessageMetadata(
+  options?: SendTurnMessageOptions
+): ChatMessageMetadata {
+  const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
+    .filter((attachment) => attachment.enabled)
+    .map((attachment) => ({
+      attachmentId: attachment.attachmentId,
+      filename: attachment.filename,
+      kind: 'temporary' as const,
+      available: true,
+    }));
+  const resourceAttachmentSnapshots = (options?.selectedResources ?? [])
+    .filter((resource) => resource.enabled)
+    .map((resource) => ({
+      attachmentId: resource.resourceId,
+      filename: resource.resourceName,
+      kind: 'resource' as const,
+      available: true,
+    }));
+  const selectedAttachments = [...resourceAttachmentSnapshots, ...uploadedAttachmentSnapshots];
+
+  return {
+    createdAt: new Date().toISOString(),
+    ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
   };
 }
 

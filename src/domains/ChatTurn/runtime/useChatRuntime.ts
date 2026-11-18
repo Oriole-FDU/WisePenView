@@ -5,13 +5,15 @@ import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatRecoverApiRequest, ChatRespondApiRequest } from '../apis/ChatTurnApi.schema';
-import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
-import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
-import type { SendTurnMessageOptions, ToolApprovalStatusRequest } from '../service/index.type';
+import type { WisePenUIMessage } from '../entity/message';
+import type { ToolApprovalStatusRequest } from '../service/index.type';
 import type { UseChatToolApprovalResult } from './approval/useChatToolApproval';
 import { useChatToolApproval } from './approval/useChatToolApproval';
+import { runNewStreamConnect } from './connect/runNewStreamConnect';
 import { useConnectFsm } from './connect/useConnectFsm';
 import { useResumeLifecycle } from './connect/useResumeLifecycle';
+import type { UseChatTurnControlResult } from './control/useChatTurnControl';
+import { useChatTurnControl } from './control/useChatTurnControl';
 import type { UseChatHistoryResult } from './history/useChatHistory';
 import { useChatHistory } from './history/useChatHistory';
 import { useChatMessage } from './message/useChatMessage';
@@ -28,11 +30,12 @@ export interface UseChatRuntimeResult {
   approval: UseChatToolApprovalResult;
   messages: WisePenUIMessage[];
   status: ChatStatus;
-  stopConnect: () => void;
-  submitTurn: (query: string, options?: SendTurnMessageOptions) => Promise<void>;
+  stopConnect: UseChatTurnControlResult['stopConnect'];
+  send: UseChatTurnControlResult['send'];
+  cancel: UseChatTurnControlResult['cancel'];
+  cancelling: boolean;
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
   resumeTurn: () => Promise<void>;
-  cancelTurn: () => Promise<void>;
   history: UseChatHistoryResult;
 }
 
@@ -48,7 +51,7 @@ function buildApprovalRequest(
 }
 
 /**
- * ChatTurn Runtime 组装根：connect FSM 调度 + Service 协议 + message 泵 + history + approval。
+ * ChatTurn Runtime 组装根：connect FSM + control + message 泵 + history + approval。
  */
 export function useChatRuntime({
   sessionId,
@@ -68,68 +71,19 @@ export function useChatRuntime({
     onError,
   });
 
-  /** 用户 stop / cancel：中止泵并标 closed，保留同 session 再 resume 的空间。 */
-  const stopConnect = () => {
-    message.stop();
-    connect.markClosed();
-    clearResumedTurn();
-  };
+  const control = useChatTurnControl({
+    sessionId,
+    model,
+    chatTurnService,
+    connect,
+    message,
+    clearResumedTurn,
+  });
 
   /** 切会话：中止旧泵并作废 resume 世代，连接复位 idle。 */
   const releaseSession = () => {
     message.stop();
     invalidateResume();
-  };
-
-  const pumpOutgoing = async (run: () => Promise<void>) => {
-    connect.beginConnect();
-    try {
-      await run();
-      connect.markIdleIfOpen();
-    } catch (error) {
-      connect.markClosed();
-      clearResumedTurn();
-      throw error;
-    }
-  };
-
-  const submitTurn = async (query: string, options?: SendTurnMessageOptions) => {
-    const requestBody = mapChatTurnRequest({
-      defaultSessionId: sessionId,
-      defaultModel: model,
-      query,
-      options,
-    });
-    const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
-      .filter((attachment) => attachment.enabled)
-      .map((attachment) => ({
-        attachmentId: attachment.attachmentId,
-        filename: attachment.filename,
-        kind: 'temporary' as const,
-        available: true,
-      }));
-    const resourceAttachmentSnapshots = (options?.selectedResources ?? [])
-      .filter((resource) => resource.enabled)
-      .map((resource) => ({
-        attachmentId: resource.resourceId,
-        filename: resource.resourceName,
-        kind: 'resource' as const,
-        available: true,
-      }));
-    const selectedAttachments = [...resourceAttachmentSnapshots, ...uploadedAttachmentSnapshots];
-    const metadata: ChatMessageMetadata = {
-      createdAt: new Date().toISOString(),
-      ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
-    };
-
-    await pumpOutgoing(async () => {
-      const response = await chatTurnService.streamChatCompletion(requestBody);
-      connect.markOpen();
-      await message.pumpSend({
-        response,
-        userMessage: { text: query, metadata },
-      });
-    });
   };
 
   const submitToolApprovals = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
@@ -163,10 +117,14 @@ export function useChatRuntime({
         return;
       }
 
-      await pumpOutgoing(async () => {
-        const response = await chatTurnService.recoverChatStream(requestBody);
-        connect.markOpen();
-        await message.pumpSend({ response });
+      await runNewStreamConnect({
+        connect,
+        onClosed: clearResumedTurn,
+        run: async () => {
+          const response = await chatTurnService.recoverChatStream(requestBody);
+          connect.markOpen();
+          await message.pumpSend({ response });
+        },
       });
     } catch (error) {
       captureException(error, {
@@ -175,12 +133,6 @@ export function useChatRuntime({
       });
       throw error;
     }
-  };
-
-  const cancelTurn = async (): Promise<void> => {
-    if (!sessionId) return;
-    stopConnect();
-    await chatTurnService.cancelTurn(sessionId);
   };
 
   const history = useChatHistory({
@@ -203,11 +155,12 @@ export function useChatRuntime({
     approval,
     messages: message.messages,
     status: message.status,
-    stopConnect,
-    submitTurn,
+    stopConnect: control.stopConnect,
+    send: control.send,
+    cancel: control.cancel,
+    cancelling: control.cancelling,
     submitToolApprovals,
     resumeTurn,
-    cancelTurn,
     history,
   };
 }
