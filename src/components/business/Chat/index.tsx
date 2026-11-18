@@ -13,7 +13,6 @@ import { useAppAuth } from '@/layouts/App/_context';
 import { captureException } from '@/observability';
 import { parseErrorMessage } from '@/utils/error';
 
-import { hasRenderableChatContent } from './_controllers/chatTurnModel';
 import { useChatSessionController } from './_controllers/useChatSessionController';
 import ChatConversation from './ChatConversation';
 import type { ChatConversationTurn } from './ChatConversation/index.type';
@@ -48,8 +47,7 @@ function Chat({
   const runtime = useChatRuntime({
     sessionId: sessionId ?? '',
     model: currentModel?.modelId,
-    isNewlyCreatedSession: session.isNewlyCreatedSession,
-    clearNewlyCreatedSession: session.clearNewlyCreatedSession,
+    isNewSession: session.isNewSession,
     onError: (error) => {
       toast.danger(parseErrorMessage(error));
     },
@@ -57,7 +55,6 @@ function Chat({
 
   const { syncNewSessionHistoryRefresh } = session;
   const pendingToolApproval = runtime.approval.pending;
-  const renderable = hasRenderableChatContent(runtime.messages);
 
   /**
    * @wisepen-manual-effect
@@ -66,8 +63,8 @@ function Chat({
    * cleanup：没有订阅或延迟任务，无需清理。
    */
   useEffect(() => {
-    syncNewSessionHistoryRefresh(renderable);
-  }, [syncNewSessionHistoryRefresh, renderable]);
+    syncNewSessionHistoryRefresh(runtime.renderable);
+  }, [syncNewSessionHistoryRefresh, runtime.renderable]);
 
   /**
    * 发送处维护：登录、宿主守卫、资源门禁、ensureSession、载荷拼装与 toast，

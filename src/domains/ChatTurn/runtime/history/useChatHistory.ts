@@ -12,12 +12,14 @@ import { useHistoryLoadingFsm } from './useHistoryLoadingFsm';
 
 export interface UseChatHistoryOptions {
   sessionId: string | null;
+  /**
+   * 壳层认定的「本页刚创建」会话：只挂空会话，不请求历史（本地会立刻首写）。
+   */
+  isNewSession: boolean;
   /** 由 Runtime 从 useChatMessage 注入的写端口。 */
   setMessages: ChatMessagesWriter;
   resumeTurnStream: () => Promise<void>;
   stop: () => void;
-  isNewlyCreatedSession: (sessionId: string) => boolean;
-  clearNewlyCreatedSession: (sessionId: string) => void;
 }
 
 export interface UseChatHistoryResult {
@@ -31,14 +33,14 @@ export interface UseChatHistoryResult {
  * History 内聚入口：fsm + data + 会话切换生命周期。
  *
  * 对外只暴露分页态与 loadMore；setMessages / loading 动作不泄漏到 Runtime 组装根。
+ * 是否跳过首载由壳层用 isNewSession 声明；History 只消费布尔意图。
  */
 export function useChatHistory({
   sessionId,
+  isNewSession,
   setMessages,
   resumeTurnStream,
   stop,
-  isNewlyCreatedSession,
-  clearNewlyCreatedSession,
 }: UseChatHistoryOptions): UseChatHistoryResult {
   const loading = useHistoryLoadingFsm();
   const data = useHistoryData({
@@ -81,7 +83,7 @@ export function useChatHistory({
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：当前会话 ID 首次可用或发生切换时加载历史，并在历史成功后检查 active turn。
+   * 执行时机：当前会话 ID 首次可用或发生切换时加载历史；isNewSession 时跳过首载并检查 active turn。
    * 不可替代原因：历史加载和 SSE 重连都是异步外部副作用，必须按顺序写入当前 Chat 运行时。
    * cleanup：标记本次会话加载失效；调用方注入的 stop（Runtime.releaseSession）中止旧泵并 invalidate resume；
    * 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
@@ -97,7 +99,6 @@ export function useChatHistory({
       return;
     }
     const targetSessionId = currentSessionId;
-    const isNewSession = isNewlyCreatedSession(targetSessionId);
     let cancelled = false;
     void (async () => {
       if (isNewSession) return;
@@ -108,15 +109,13 @@ export function useChatHistory({
     })();
     return () => {
       cancelled = true;
-      clearNewlyCreatedSession(targetSessionId);
       void stop();
     };
   }, [
     appAuth.isAuthenticated,
-    clearNewlyCreatedSession,
     currentSessionId,
     historyActionsLatest,
-    isNewlyCreatedSession,
+    isNewSession,
     routeLatest,
     stop,
   ]);

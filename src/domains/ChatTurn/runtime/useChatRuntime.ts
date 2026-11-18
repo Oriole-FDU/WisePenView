@@ -21,14 +21,16 @@ import { useChatMessage } from './message/useChatMessage';
 export interface UseChatRuntimeOptions {
   sessionId: string;
   model?: string;
-  isNewlyCreatedSession: (sessionId: string) => boolean;
-  clearNewlyCreatedSession: (sessionId: string) => void;
+  /** 壳层认定的「本页刚创建」会话；为 true 时 History 跳过首载。 */
+  isNewSession: boolean;
   onError?: (error: Error) => void;
 }
 
 export interface UseChatRuntimeResult {
   approval: UseChatToolApprovalResult;
   messages: WisePenUIMessage[];
+  /** 消息列表是否存在可渲染内容（非空文本/思考，或工具调用）。 */
+  renderable: boolean;
   status: ChatStatus;
   stopConnect: UseChatTurnControlResult['stopConnect'];
   send: UseChatTurnControlResult['send'];
@@ -56,8 +58,7 @@ function buildApprovalRequest(
 export function useChatRuntime({
   sessionId,
   model,
-  isNewlyCreatedSession,
-  clearNewlyCreatedSession,
+  isNewSession,
   onError,
 }: UseChatRuntimeOptions): UseChatRuntimeResult {
   const chatTurnService = useChatTurnService();
@@ -137,11 +138,10 @@ export function useChatRuntime({
 
   const history = useChatHistory({
     sessionId: sessionId || null,
+    isNewSession,
     setMessages: message.setMessages,
     resumeTurnStream: resumeTurn,
     stop: releaseSession,
-    isNewlyCreatedSession,
-    clearNewlyCreatedSession,
   });
 
   const approval = useChatToolApproval({
