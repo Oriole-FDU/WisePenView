@@ -1,5 +1,5 @@
 import type { ChatModel } from '@/domains/ChatConfig';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { WisePenUIMessage } from '@/domains/ChatTurn';
 
 export interface AssistantMessageProps {
   message: WisePenUIMessage;
