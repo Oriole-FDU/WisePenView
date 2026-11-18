@@ -9,11 +9,10 @@ import { parseErrorMessage } from '@/utils/error';
 import type { UseChatHistoryResult } from './useChatHistory';
 
 export interface UseChatTurnHistoryOptions {
-  /** useChatHistory 产出的分页态与写入操作 */
   history: UseChatHistoryResult;
-  /** 历史加载成功后接续后台 turn 的流 */
+  loadingInitial: boolean;
+  loadingMore: boolean;
   resumeTurnStream: () => Promise<void>;
-  /** 会话切换时中止旧 Chat 的客户端连接 */
   stop: () => void;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
@@ -33,6 +32,8 @@ export interface UseChatTurnHistoryResult {
  */
 export function useChatTurnHistory({
   history,
+  loadingInitial,
+  loadingMore,
   resumeTurnStream,
   stop,
   isNewlyCreatedSession,
@@ -115,7 +116,7 @@ export function useChatTurnHistory({
   return {
     canLoadMore: history.canLoadMore,
     loadMore,
-    loadingInitial: history.loadingInitial,
-    loadingMore: history.loadingMore,
+    loadingInitial,
+    loadingMore,
   };
 }

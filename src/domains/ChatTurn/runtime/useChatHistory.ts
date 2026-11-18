@@ -4,6 +4,8 @@ import { useRef, useState } from 'react';
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
+import type { ChatMessageLoadingActions } from './control/useChatMessageControl';
+
 export interface UseChatHistoryOptions {
   sessionId: string | null;
   pageSize: number;
@@ -15,12 +17,11 @@ export interface UseChatHistoryOptions {
   setMessages: (
     messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
   ) => void;
+  loading: ChatMessageLoadingActions;
 }
 
 export interface UseChatHistoryResult {
   canLoadMore: boolean;
-  loadingMore: boolean;
-  loadingInitial: boolean;
   replaceHistory: (targetSessionId: string) => Promise<boolean>;
   prependHistory: () => Promise<void>;
   clearConversation: () => void;
@@ -38,26 +39,22 @@ function mergeMessages(
   });
 }
 
-/** 历史分页写入同一份 messages：首屏 replace、上翻 prepend、按 id 去重。 */
 export function useChatHistory({
   sessionId,
   pageSize,
   loadPage,
   setMessages,
+  loading,
 }: UseChatHistoryOptions): UseChatHistoryResult {
   const sessionIdRef = useLatest(sessionId);
+  const loadingRef = useLatest(loading);
   const requestVersionRef = useRef(0);
-  const loadingMoreRef = useRef(false);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [loadingInitial, setLoadingInitial] = useState(false);
 
   const clearConversation = () => {
     requestVersionRef.current += 1;
-    loadingMoreRef.current = false;
-    setLoadingMore(false);
-    setLoadingInitial(false);
+    loadingRef.current.resetLoading();
     setPage(1);
     setTotalPage(1);
     setMessages([]);
@@ -66,9 +63,7 @@ export function useChatHistory({
   const replaceHistory = async (targetSessionId: string): Promise<boolean> => {
     const requestVersion = requestVersionRef.current + 1;
     requestVersionRef.current = requestVersion;
-    loadingMoreRef.current = false;
-    setLoadingMore(false);
-    setLoadingInitial(true);
+    loadingRef.current.beginReplaceLoad();
     setPage(1);
     setTotalPage(1);
     setMessages([]);
@@ -98,19 +93,18 @@ export function useChatHistory({
         requestVersion === requestVersionRef.current &&
         targetSessionId === sessionIdRef.current
       ) {
-        setLoadingInitial(false);
+        loadingRef.current.endReplaceLoad();
       }
     }
   };
 
   const prependHistory = async (): Promise<void> => {
     const targetSessionId = sessionIdRef.current;
-    if (!targetSessionId || loadingMoreRef.current || page >= totalPage) return;
+    if (!targetSessionId || page >= totalPage) return;
+    if (!loadingRef.current.beginPrependLoad()) return;
 
     const requestVersion = requestVersionRef.current;
     const nextPage = page + 1;
-    loadingMoreRef.current = true;
-    setLoadingMore(true);
 
     try {
       const payload = await loadPage(targetSessionId, nextPage, pageSize);
@@ -128,16 +122,13 @@ export function useChatHistory({
         requestVersion === requestVersionRef.current &&
         targetSessionId === sessionIdRef.current
       ) {
-        loadingMoreRef.current = false;
-        setLoadingMore(false);
+        loadingRef.current.endPrependLoad();
       }
     }
   };
 
   return {
     canLoadMore: Boolean(sessionId) && page < totalPage,
-    loadingMore,
-    loadingInitial,
     replaceHistory,
     prependHistory,
     clearConversation,

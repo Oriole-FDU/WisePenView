@@ -4,6 +4,7 @@ export * from './code/codeHighlight';
 export * from './error';
 export * from './file';
 export * from './format';
+export * from './fsm';
 export * from './html/sanitizeHtml';
 export * from './image';
 export * from './markdown';

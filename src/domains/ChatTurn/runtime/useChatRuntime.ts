@@ -15,6 +15,7 @@ import type {
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
 } from '../service/index.type';
+import { useChatControl } from './control/useChatControl';
 import { useChatHistory } from './useChatHistory';
 import type { UseChatTurnHistoryResult } from './useChatTurnHistory';
 import { useChatTurnHistory } from './useChatTurnHistory';
@@ -22,26 +23,16 @@ import { useChatTurnHistory } from './useChatTurnHistory';
 const CHAT_STREAM_THROTTLE_MS = 50;
 const DEFAULT_HISTORY_PAGE_SIZE = 100;
 
-/**
- * Domain→UI 聚合入口选项。
- * Controller 只传会话上下文与门禁回调；不注入散落流 API / setMessages。
- */
 export interface UseChatRuntimeOptions {
   sessionId: string;
   model?: string;
-  /** 新建会话标记：跳过首屏历史 hydrate */
   isNewlyCreatedSession: (sessionId: string) => boolean;
-  /** 会话切换 cleanup 时清除新建标记 */
   clearNewlyCreatedSession: (sessionId: string) => void;
   onError?: (error: Error) => void;
 }
 
 export interface UseChatRuntimeResult {
   messages: WisePenUIMessage[];
-  /**
-   * 兼容出口：后续改为 Runtime 派生 uiBusy / localStream。
-   * Controller 不得用其做协议选路（respond/recover）。
-   */
   status: ChatStatus;
   stopLocalStream: () => void;
   submitTurn: (query: string, options?: SendTurnMessageOptions) => Promise<void>;
@@ -82,12 +73,7 @@ const createChatTransport = (fetchChatCompletion: IChatTurnService['fetchChatCom
       return { api: `/chat/completions/stream?${params.toString()}` };
     },
   });
-/**
- * ChatTurn Domain→UI 聚合入口。
- *
- * 对外：按用户意图暴露 submit / cancel / resume / 消息视图；不外泄 setMessages 与散落流 API。
- * 对内：暂内聚 useChat + 历史写入/切会话编排（后续拆 Service 控制面与 Message Pipeline）。
- */
+
 export function useChatRuntime({
   sessionId,
   model,
@@ -121,12 +107,16 @@ export function useChatRuntime({
     transport: chatTransport,
   });
 
+  // --- Control：message loading 状态机；后续切会话 / 停流下沉至此 ---
+  const control = useChatControl();
+
   // --- 应下沉 Pipeline：历史分页写入同一份 messages ---
   const historyStore = useChatHistory({
     sessionId: sessionId || null,
     pageSize: DEFAULT_HISTORY_PAGE_SIZE,
     loadPage: chatTurnService.listHistoryMessages,
     setMessages: chat.setMessages,
+    loading: control.message,
   });
 
   const resumeRequestRef = useRef<{
@@ -281,6 +271,8 @@ export function useChatRuntime({
    */
   const history = useChatTurnHistory({
     history: historyStore,
+    loadingInitial: control.message.loadingInitial,
+    loadingMore: control.message.loadingMore,
     resumeTurnStream: resumeTurn,
     stop: stopLocalStream,
     isNewlyCreatedSession,
