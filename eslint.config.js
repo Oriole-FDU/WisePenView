@@ -603,10 +603,26 @@ export default defineConfig([
     },
   },
   {
-    // 本轮只在 ChatTurn 边界启用文件头和类型注释约束，避免把存量问题混入重构提交。
+    // 类型感知规则只用于会改变运行行为的异步风险；warning 暴露问题，暂不阻塞 CI。
+    files: ['src/**/*.{ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/await-thenable': 'warn',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/no-misused-promises': 'warn',
+    },
+  },
+  {
+    // ChatTurn 作为新契约试点；规则先在边界验证，再按告警价值决定是否扩大。
     files: ['src/domains/ChatTurn/**/*.{ts,tsx}'],
     plugins: { wisepen: wisePenPlugin },
     rules: {
+      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
       'wisepen/no-type-comments': 'warn',
       'wisepen/require-hook-file-header': 'warn',
     },
@@ -701,12 +717,12 @@ export default defineConfig([
     // ChatInput 与富文本工具栏依赖底层 textarea/input 的特殊组合行为，单独留白名单。
     files: [
       'src/components/business/Chat/ChatConversation/ChatInput/index.tsx',
-      'src/components/business/Note/CustomBlockNote/ui/toolbar/components/FileButtons.tsx',
-      'src/components/business/Note/CustomBlockNote/ui/toolbar/components/LinkButton.tsx',
+      'src/components/editors/note/CustomBlockNote/ui/toolbar/components/FileButtons.tsx',
+      'src/components/editors/note/CustomBlockNote/ui/toolbar/components/LinkButton.tsx',
       'src/components/business/Resource/FavoriteCollectionPicker/CollectionPickerModal.tsx',
       'src/components/business/UserSearchCombobox/index.tsx',
       'src/views/app/course/CourseEditorPage/_components/CourseEditorDateFields/index.tsx',
-      'src/views/resource/agent/_components/AgentEditor/sections/MemorySection/index.tsx',
+      'src/components/editors/agent/components/AgentEditor/sections/MemorySection/index.tsx',
     ],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({ allowInputPrimitive: true }),
