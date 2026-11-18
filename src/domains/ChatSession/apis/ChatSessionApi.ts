@@ -4,7 +4,6 @@ import {
   CreateSessionApiContract,
   DeleteSessionApiContract,
   InitTemporaryAttachmentUploadApiContract,
-  ListHistoryMessagesApiContract,
   ListSessionsApiContract,
   RenameSessionApiContract,
   SetSessionAgentApiContract,
@@ -15,8 +14,6 @@ import type {
   DeleteSessionApiRequest,
   InitTemporaryAttachmentUploadApiRequest,
   InitTemporaryAttachmentUploadApiResponse,
-  ListHistoryMessagesApiRequest,
-  ListHistoryMessagesApiResponse,
   ListSessionsApiRequest,
   ListSessionsApiResponse,
   RenameSessionApiRequest,
@@ -49,12 +46,6 @@ function listSessions(request: ListSessionsApiRequest): Promise<ListSessionsApiR
   return executeApiContract(ListSessionsApiContract, request);
 }
 
-function listHistoryMessages(
-  request: ListHistoryMessagesApiRequest
-): Promise<ListHistoryMessagesApiResponse> {
-  return executeApiContract(ListHistoryMessagesApiContract, request);
-}
-
 export const ChatSessionApi = {
   initTemporaryAttachmentUpload,
   createSession,
@@ -62,5 +53,4 @@ export const ChatSessionApi = {
   renameSession,
   deleteSession,
   listSessions,
-  listHistoryMessages,
 };

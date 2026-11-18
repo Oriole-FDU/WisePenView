@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-import { NonEmptyStringSchema, ObjectIdStringSchema, OpaqueIdSchema } from '@/apis/schema';
+import {
+  IsoDateTimeSchema,
+  NonEmptyStringSchema,
+  ObjectIdStringSchema,
+  OpaqueIdSchema,
+} from '@/apis/schema';
 
 export const ActiveChatTurnApiRequestSchema = z.strictObject({
   session_id: OpaqueIdSchema,
@@ -105,6 +110,75 @@ export const pickChatCompletionApiRequest = (value: unknown): ChatCompletionApiR
 export const pickChatRecoverApiRequest = (value: unknown): ChatRecoverApiRequest =>
   pickKnownFields(value, RECOVER_KEYS) as ChatRecoverApiRequest;
 
+export const ListHistoryMessagesApiRequestSchema = z.strictObject({
+  session_id: OpaqueIdSchema,
+  page: z.number().int().min(1).optional(),
+  size: z.number().int().min(1).max(100).optional(),
+});
+
+const NullPartFields = {
+  text: z.null(),
+  state: z.null(),
+  toolCallId: z.null(),
+  input: z.null(),
+  output: z.null(),
+};
+
+export const UIMessagePartApiSchema = z.union([
+  z.object({
+    type: z.literal('text'),
+    text: z.string(),
+    state: z.enum(['streaming', 'done']),
+    toolCallId: z.null(),
+    input: z.null(),
+    output: z.null(),
+  }),
+  z.object({
+    type: z.literal('reasoning'),
+    text: z.string(),
+    state: z.enum(['streaming', 'done']),
+    toolCallId: z.null(),
+    input: z.null(),
+    output: z.null(),
+  }),
+  z.object({ type: z.literal('step-start'), ...NullPartFields }),
+  z.object({
+    type: z.string().regex(/^tool-.+$/),
+    text: z.null(),
+    state: z.enum([
+      'input-streaming',
+      'input-available',
+      'approval-requested',
+      'approval-responded',
+      'output-available',
+      'output-error',
+      'output-denied',
+    ]),
+    toolCallId: NonEmptyStringSchema,
+    input: z.unknown(),
+    output: z.unknown().nullable(),
+  }),
+]);
+
+export const UIMessageApiSchema = z.object({
+  id: OpaqueIdSchema,
+  role: z.enum(['system', 'user', 'assistant']),
+  parts: z.array(UIMessagePartApiSchema),
+  createdAt: IsoDateTimeSchema.nullable(),
+  metadata: z.record(z.string(), z.unknown()).nullable(),
+});
+
+const HistoryPageResponseSchema = <ItemSchema extends z.ZodType>(itemSchema: ItemSchema) =>
+  z.object({
+    list: z.array(itemSchema),
+    total: z.number().int().nonnegative(),
+    page: z.number().int().min(1),
+    size: z.number().int().min(1),
+    total_page: z.number().int().nonnegative(),
+  });
+
+export const ListHistoryMessagesApiResponseSchema = HistoryPageResponseSchema(UIMessageApiSchema);
+
 export type ActiveChatTurnApiRequest = z.infer<typeof ActiveChatTurnApiRequestSchema>;
 export type ActiveChatTurnApiResponse = z.infer<typeof ActiveChatTurnApiResponseSchema>;
 export type CancelChatTurnApiRequest = z.infer<typeof CancelChatTurnApiRequestSchema>;
@@ -113,3 +187,6 @@ export type ChatCompletionApiRequest = z.infer<typeof ChatCompletionApiRequestSc
 export type ChatRecoverApiRequest = z.infer<typeof ChatRecoverApiRequestSchema>;
 export type ChatRespondApiRequest = z.infer<typeof ChatRespondApiRequestSchema>;
 export type ChatStreamReconnectApiRequest = z.infer<typeof ChatStreamReconnectApiRequestSchema>;
+export type ListHistoryMessagesApiRequest = z.infer<typeof ListHistoryMessagesApiRequestSchema>;
+export type ListHistoryMessagesApiResponse = z.infer<typeof ListHistoryMessagesApiResponseSchema>;
+export type UIMessageApi = z.infer<typeof UIMessageApiSchema>;

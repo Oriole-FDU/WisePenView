@@ -4,6 +4,7 @@ import { DefaultChatTransport } from 'ai';
 import { useMemo, useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
+import { useChatTurnService } from '@/domains';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
@@ -20,8 +21,11 @@ import type {
   UseChatTurnOptions,
 } from '../service/index.type';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
+import { useChatHistory } from './useChatHistory';
+import { useChatTurnHistory } from './useChatTurnHistory';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
+const DEFAULT_HISTORY_PAGE_SIZE = 100;
 
 function resolveChatApiUrl(input: RequestInfo | URL): string {
   return typeof input === 'string' || input instanceof URL
@@ -96,10 +100,11 @@ const createChatTransport = (
   });
 
 /**
- * 对 useChat 的薄封装：
- * 1) 统一请求地址到 /chat/completions
- * 2) 统一补齐后端 ChatRequest 字段
- * 3) 保留 useChat 原始能力（messages、status、stop 等）
+ * Chat 消息运行时：唯一组装 messages 的模块。
+ *
+ * 1) 持有 useChat（SSE 增量）与 useChatHistory（历史 hydrate），写入同一份列表
+ * 2) 编排会话切换时的历史加载与流恢复
+ * 3) 对上只暴露聚合后的 messages / status / history UI 态，不外泄 setMessages
  */
 export const useChatTurn = ({
   sessionId,
@@ -108,8 +113,11 @@ export const useChatTurn = ({
   streamChatCompletion,
   recoverChatStream,
   reconnectChatStream,
+  isNewlyCreatedSession,
+  clearNewlyCreatedSession,
   onError,
 }: UseChatTurnOptions) => {
+  const chatTurnService = useChatTurnService();
   /**
    * @wisepen-manual-memo
    * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
@@ -130,6 +138,12 @@ export const useChatTurn = ({
       onError?.(error);
     },
     transport: chatTransport,
+  });
+  const historyStore = useChatHistory({
+    sessionId: sessionId || null,
+    pageSize: DEFAULT_HISTORY_PAGE_SIZE,
+    loadPage: chatTurnService.listHistoryMessages,
+    setMessages: chat.setMessages,
   });
   const resumeRequestRef = useRef<{
     sessionId: string;
@@ -265,10 +279,21 @@ export const useChatTurn = ({
     }
   };
 
+  const history = useChatTurnHistory({
+    history: historyStore,
+    resumeTurnStream,
+    stop: chat.stop,
+    isNewlyCreatedSession,
+    clearNewlyCreatedSession,
+  });
+
   return {
-    ...chat,
+    messages: chat.messages,
+    status: chat.status,
+    stop: chat.stop,
     sendTurnMessage,
     recoverTurn,
     resumeTurnStream,
+    history,
   };
 };
