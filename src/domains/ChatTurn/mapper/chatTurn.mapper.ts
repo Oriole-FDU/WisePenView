@@ -1,5 +1,14 @@
-import type { ChatCompletionApiRequest } from '../apis/ChatStreamApi.schema';
-import type { ClientToolCapability, SendTurnMessageOptions } from '../service/index.type';
+import type {
+  ChatCompletionApiRequest,
+  ChatRecoverApiRequest,
+  ChatRespondApiRequest,
+} from '../apis/ChatTurnApi.schema';
+import type { ChatMessageMetadata } from '../entity/message';
+import type {
+  ClientToolCapability,
+  SendTurnMessageOptions,
+  SubmitToolApprovalsCommand,
+} from '../service/index.type';
 
 function unique(values?: readonly string[]): string[] {
   return Array.from(new Set(values ?? []));
@@ -12,6 +21,44 @@ function mapClientToolCapability(
     name: capability.name,
     description: capability.description,
     input_schema: capability.inputSchema,
+  };
+}
+
+export function mapUserMessageMetadata(options?: SendTurnMessageOptions): ChatMessageMetadata {
+  const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
+    .filter((attachment) => attachment.enabled)
+    .map((attachment) => ({
+      attachmentId: attachment.attachmentId,
+      filename: attachment.filename,
+      kind: 'temporary' as const,
+      available: true,
+    }));
+  const resourceAttachmentSnapshots = (options?.selectedResources ?? [])
+    .filter((resource) => resource.enabled)
+    .map((resource) => ({
+      attachmentId: resource.resourceId,
+      filename: resource.resourceName,
+      kind: 'resource' as const,
+      available: true,
+    }));
+  const selectedAttachments = [...resourceAttachmentSnapshots, ...uploadedAttachmentSnapshots];
+
+  return {
+    createdAt: new Date().toISOString(),
+    ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
+  };
+}
+
+export function mapToolApprovalRequest(
+  command: SubmitToolApprovalsCommand
+): ChatRecoverApiRequest & ChatRespondApiRequest {
+  return {
+    session_id: command.sessionId,
+    client_tool_results: [],
+    tool_approval_status: command.toolApprovalStatus.map((item) => ({
+      tool_call_id: item.toolCallId,
+      approved: item.approved,
+    })),
   };
 }
 

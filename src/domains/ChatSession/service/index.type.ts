@@ -1,7 +1,5 @@
 import type { PageResult } from '@/domains/_shared/entity/page';
 
-import type { WisePenUIMessage } from '../entity/message';
-
 export interface UploadAttachmentParams {
   sessionId: string;
   file: File;
@@ -19,7 +17,6 @@ export interface IChatSessionService {
   renameSession(params: RenameSessionRequest): Promise<ChatSession>;
   deleteSession(params: DeleteSessionRequest): Promise<void>;
   listSessions(params?: ListSessionsRequest): Promise<PageResult<ChatSession>>;
-  listHistoryMessages(params: ListHistoryMessagesRequest): Promise<PageResult<WisePenUIMessage>>;
   uploadAttachment(params: UploadAttachmentParams): Promise<UploadAttachmentResult>;
 }
 
@@ -53,12 +50,6 @@ export interface DeleteSessionRequest {
 }
 
 export interface ListSessionsRequest {
-  page?: number;
-  size?: number;
-}
-
-export interface ListHistoryMessagesRequest {
-  sessionId: string;
   page?: number;
   size?: number;
 }
