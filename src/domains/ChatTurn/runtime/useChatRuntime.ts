@@ -3,24 +3,18 @@ import { useLatest } from 'ahooks';
 import { type ChatStatus, DefaultChatTransport } from 'ai';
 import { useMemo, useRef } from 'react';
 
-import { buildApiUrl } from '@/apis/buildApiUrl';
 import { useChatTurnService } from '@/domains';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
-import {
-  pickChatCompletionApiRequest,
-  pickChatRecoverApiRequest,
-} from '../apis/ChatTurnApi.schema';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type {
   IChatTurnService,
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
 } from '../service/index.type';
-import { normalizeChatSseResponse } from './chatSseNormalizer';
 import { useChatHistory } from './useChatHistory';
 import type { UseChatTurnHistoryResult } from './useChatTurnHistory';
 import { useChatTurnHistory } from './useChatTurnHistory';
@@ -57,44 +51,6 @@ export interface UseChatRuntimeResult {
   history: UseChatTurnHistoryResult;
 }
 
-type ChatStreamApi = Pick<
-  IChatTurnService,
-  'streamChatCompletion' | 'recoverChatStream' | 'reconnectChatStream'
->;
-
-function resolveChatApiUrl(input: RequestInfo | URL): string {
-  return typeof input === 'string' || input instanceof URL
-    ? new URL(input.toString(), buildApiUrl('/')).toString()
-    : input.url;
-}
-
-// --- 应下沉 Service：transport 路由与 recover/completions 选路 ---
-async function fetchChatCompletion(
-  input: RequestInfo | URL,
-  init: RequestInit | undefined,
-  streamApi: ChatStreamApi
-): Promise<Response> {
-  const requestUrl = new URL(resolveChatApiUrl(input));
-  const rawBody = typeof init?.body === 'string' ? JSON.parse(init.body) : {};
-
-  const response = requestUrl.pathname.endsWith('/chat/completions/recover')
-    ? await streamApi.recoverChatStream(
-        pickChatRecoverApiRequest(rawBody),
-        init?.signal ?? undefined
-      )
-    : requestUrl.pathname.endsWith('/chat/completions/stream')
-      ? await streamApi.reconnectChatStream(
-          requestUrl.searchParams.get('session_id') ?? '',
-          init?.signal ?? undefined
-        )
-      : await streamApi.streamChatCompletion(
-          pickChatCompletionApiRequest(rawBody),
-          init?.signal ?? undefined
-        );
-
-  return normalizeChatSseResponse(response);
-}
-
 function isChatRecoverRequest(
   body: Record<string, unknown> | undefined
 ): body is ChatRecoverApiRequest {
@@ -105,10 +61,10 @@ function isChatRecoverRequest(
   );
 }
 
-const createChatTransport = (streamApi: ChatStreamApi) =>
+const createChatTransport = (fetchChatCompletion: IChatTurnService['fetchChatCompletion']) =>
   new DefaultChatTransport<WisePenUIMessage>({
     api: '/chat/completions',
-    fetch: (input, init) => fetchChatCompletion(input, init, streamApi),
+    fetch: fetchChatCompletion,
     prepareSendMessagesRequest: ({ body }) => {
       if (isChatRecoverRequest(body)) {
         return { api: '/chat/completions/recover', body };
@@ -126,7 +82,6 @@ const createChatTransport = (streamApi: ChatStreamApi) =>
       return { api: `/chat/completions/stream?${params.toString()}` };
     },
   });
-
 /**
  * ChatTurn Domain→UI 聚合入口。
  *
@@ -146,20 +101,11 @@ export function useChatRuntime({
    * @wisepen-manual-memo
    * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
    * 收益：仅在服务传输函数变化时重建，稳定聊天会话与重连逻辑。
-   * 失效条件：streamChatCompletion、recoverChatStream 或 reconnectChatStream 引用变化。
+   * 失效条件：fetchChatCompletion 引用变化。
    */
   const chatTransport = useMemo(
-    () =>
-      createChatTransport({
-        streamChatCompletion: chatTurnService.streamChatCompletion,
-        recoverChatStream: chatTurnService.recoverChatStream,
-        reconnectChatStream: chatTurnService.reconnectChatStream,
-      }),
-    [
-      chatTurnService.recoverChatStream,
-      chatTurnService.reconnectChatStream,
-      chatTurnService.streamChatCompletion,
-    ]
+    () => createChatTransport(chatTurnService.fetchChatCompletion),
+    [chatTurnService.fetchChatCompletion]
   );
 
   // --- 应下沉 Pipeline：唯一 useChat 实例与 messages 视图 ---

@@ -45,6 +45,7 @@ export interface IChatTurnService {
   streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
   recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
+  fetchChatCompletion(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
   listHistoryMessages(
