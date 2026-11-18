@@ -41,20 +41,6 @@ export interface SendTurnMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
-/**
- * Domain→UI 聚合入口选项。
- * Controller 只传会话上下文与门禁回调；不注入散落流 API / setMessages。
- */
-export interface UseChatRuntimeOptions {
-  sessionId: string;
-  model?: string;
-  /** 新建会话标记：跳过首屏历史 hydrate */
-  isNewlyCreatedSession: (sessionId: string) => boolean;
-  /** 会话切换 cleanup 时清除新建标记 */
-  clearNewlyCreatedSession: (sessionId: string) => void;
-  onError?: (error: Error) => void;
-}
-
 export interface IChatTurnService {
   streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
   recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;

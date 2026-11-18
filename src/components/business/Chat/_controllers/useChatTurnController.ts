@@ -1,11 +1,12 @@
 import { toast } from '@heroui/react';
 import { useLatest, useUnmountedRef } from 'ahooks';
+import type { ChatStatus } from 'ai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ChatModel } from '@/domains/ChatConfig';
-import type { CreateSessionRequest } from '@/domains/ChatSession';
-import { useChatRuntime } from '@/domains/ChatTurn';
+import type { CreateSessionRequest, WisePenUIMessage } from '@/domains/ChatSession';
+import { useChatRuntime, type UseChatRuntimeResult } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -15,15 +16,29 @@ import { parseErrorMessage } from '@/utils/error';
 import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
 import { hasRenderableChatContent } from './chatTurnModel';
+import type { UseChatToolApprovalResult } from './useChatToolApproval';
 import { useChatToolApproval } from './useChatToolApproval';
 
-interface UseChatTurnControllerOptions {
+export interface UseChatTurnControllerOptions {
   /** 会话域提供的按需建会话能力，用于发送前确保存在目标会话 */
   ensureSession: (agentParams?: CreateSessionRequest) => Promise<string | undefined>;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
   resourceChat?: ChatProps['resourceChat'];
   resourceId?: string;
+}
+
+export interface UseChatTurnControllerResult {
+  approval: UseChatToolApprovalResult;
+  cancel: () => Promise<void>;
+  cancelling: boolean;
+  currentModel: ChatModel | null;
+  hasRenderableChatContent: boolean;
+  history: UseChatRuntimeResult['history'];
+  isEmpty: boolean;
+  messages: WisePenUIMessage[];
+  send: (text: string, opts?: SendOptions) => Promise<boolean>;
+  status: ChatStatus;
 }
 
 /**
@@ -37,7 +52,7 @@ export function useChatTurnController({
   clearNewlyCreatedSession,
   resourceChat,
   resourceId,
-}: UseChatTurnControllerOptions) {
+}: UseChatTurnControllerOptions): UseChatTurnControllerResult {
   const { t } = useTranslation(['chat', 'common']);
   const appAuth = useAppAuth();
   const { sessionId: currentSessionId, locationKey } = useChatSessionRoute();

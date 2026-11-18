@@ -4,14 +4,21 @@ import { useState } from 'react';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 import type { ToolApprovalStatusRequest } from '@/domains/ChatTurn';
 
+import type { ToolApprovalRequest } from './toolApprovalModel';
 import { listToolApprovalRequests } from './toolApprovalModel';
 
-interface UseChatToolApprovalOptions {
+export interface UseChatToolApprovalOptions {
   sessionId?: string;
   messages: readonly WisePenUIMessage[];
   status: ChatStatus;
   /** Runtime 审批提交：待审批项全部有结论后用它续跑同一轮对话 */
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
+}
+
+export interface UseChatToolApprovalResult {
+  decide: (toolCallId: string, approved: boolean) => void;
+  pending: ToolApprovalRequest | undefined;
+  submitting: boolean;
 }
 
 /**
@@ -24,7 +31,7 @@ export function useChatToolApproval({
   messages,
   status,
   submitToolApprovals,
-}: UseChatToolApprovalOptions) {
+}: UseChatToolApprovalOptions): UseChatToolApprovalResult {
   const [decisions, setDecisions] = useState<Record<string, boolean>>({});
 
   const requests = listToolApprovalRequests(messages);

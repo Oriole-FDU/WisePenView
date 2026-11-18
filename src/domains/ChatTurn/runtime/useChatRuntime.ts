@@ -1,6 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import { useLatest } from 'ahooks';
-import { DefaultChatTransport } from 'ai';
+import { type ChatStatus, DefaultChatTransport } from 'ai';
 import { useMemo, useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
@@ -19,14 +19,43 @@ import type {
   IChatTurnService,
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
-  UseChatRuntimeOptions,
 } from '../service/index.type';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
 import { useChatHistory } from './useChatHistory';
+import type { UseChatTurnHistoryResult } from './useChatTurnHistory';
 import { useChatTurnHistory } from './useChatTurnHistory';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
 const DEFAULT_HISTORY_PAGE_SIZE = 100;
+
+/**
+ * Domain→UI 聚合入口选项。
+ * Controller 只传会话上下文与门禁回调；不注入散落流 API / setMessages。
+ */
+export interface UseChatRuntimeOptions {
+  sessionId: string;
+  model?: string;
+  /** 新建会话标记：跳过首屏历史 hydrate */
+  isNewlyCreatedSession: (sessionId: string) => boolean;
+  /** 会话切换 cleanup 时清除新建标记 */
+  clearNewlyCreatedSession: (sessionId: string) => void;
+  onError?: (error: Error) => void;
+}
+
+export interface UseChatRuntimeResult {
+  messages: WisePenUIMessage[];
+  /**
+   * 兼容出口：后续改为 Runtime 派生 uiBusy / localStream。
+   * Controller 不得用其做协议选路（respond/recover）。
+   */
+  status: ChatStatus;
+  stopLocalStream: () => void;
+  submitTurn: (query: string, options?: SendTurnMessageOptions) => Promise<void>;
+  submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
+  resumeTurn: () => Promise<void>;
+  cancelTurn: () => Promise<void>;
+  history: UseChatTurnHistoryResult;
+}
 
 type ChatStreamApi = Pick<
   IChatTurnService,
@@ -104,13 +133,13 @@ const createChatTransport = (streamApi: ChatStreamApi) =>
  * 对外：按用户意图暴露 submit / cancel / resume / 消息视图；不外泄 setMessages 与散落流 API。
  * 对内：暂内聚 useChat + 历史写入/切会话编排（后续拆 Service 控制面与 Message Pipeline）。
  */
-export const useChatRuntime = ({
+export function useChatRuntime({
   sessionId,
   model,
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
   onError,
-}: UseChatRuntimeOptions) => {
+}: UseChatRuntimeOptions): UseChatRuntimeResult {
   const chatTurnService = useChatTurnService();
 
   /**
@@ -314,10 +343,6 @@ export const useChatRuntime = ({
 
   return {
     messages: chat.messages,
-    /**
-     * 兼容出口：后续改为 Runtime 派生 uiBusy / localStream。
-     * Controller 不得用其做协议选路（respond/recover）。
-     */
     status: chat.status,
     stopLocalStream,
     submitTurn,
@@ -326,4 +351,4 @@ export const useChatRuntime = ({
     cancelTurn,
     history,
   };
-};
+}

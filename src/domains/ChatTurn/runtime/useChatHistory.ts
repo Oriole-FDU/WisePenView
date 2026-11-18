@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
-interface UseChatHistoryOptions {
+export interface UseChatHistoryOptions {
   sessionId: string | null;
   pageSize: number;
   loadPage: (
@@ -15,6 +15,15 @@ interface UseChatHistoryOptions {
   setMessages: (
     messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
   ) => void;
+}
+
+export interface UseChatHistoryResult {
+  canLoadMore: boolean;
+  loadingMore: boolean;
+  loadingInitial: boolean;
+  replaceHistory: (targetSessionId: string) => Promise<boolean>;
+  prependHistory: () => Promise<void>;
+  clearConversation: () => void;
 }
 
 function mergeMessages(
@@ -35,7 +44,7 @@ export function useChatHistory({
   pageSize,
   loadPage,
   setMessages,
-}: UseChatHistoryOptions) {
+}: UseChatHistoryOptions): UseChatHistoryResult {
   const sessionIdRef = useLatest(sessionId);
   const requestVersionRef = useRef(0);
   const loadingMoreRef = useRef(false);

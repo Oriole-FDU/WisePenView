@@ -6,24 +6,24 @@ import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
-interface ChatTurnHistoryStore {
-  canLoadMore: boolean;
-  loadingMore: boolean;
-  loadingInitial: boolean;
-  replaceHistory: (sessionId: string) => Promise<boolean>;
-  prependHistory: () => Promise<void>;
-  clearConversation: () => void;
-}
+import type { UseChatHistoryResult } from './useChatHistory';
 
 export interface UseChatTurnHistoryOptions {
   /** useChatHistory 产出的分页态与写入操作 */
-  history: ChatTurnHistoryStore;
+  history: UseChatHistoryResult;
   /** 历史加载成功后接续后台 turn 的流 */
   resumeTurnStream: () => Promise<void>;
   /** 会话切换时中止旧 Chat 的客户端连接 */
   stop: () => void;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
+}
+
+export interface UseChatTurnHistoryResult {
+  canLoadMore: boolean;
+  loadMore: () => Promise<void>;
+  loadingInitial: boolean;
+  loadingMore: boolean;
 }
 
 /**
@@ -37,7 +37,7 @@ export function useChatTurnHistory({
   stop,
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
-}: UseChatTurnHistoryOptions) {
+}: UseChatTurnHistoryOptions): UseChatTurnHistoryResult {
   const appAuth = useAppAuth();
   const { sessionId: currentSessionId } = useChatSessionRoute();
   const routeLatest = useLatest({ sessionId: currentSessionId });
