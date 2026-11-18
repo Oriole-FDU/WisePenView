@@ -136,18 +136,23 @@ export function useConnectActions({
     }
 
     const command = { sessionId, toolApprovalStatus };
-    const operation = beginOperation(sessionId);
+    let operation: ReturnType<typeof beginOperation> | null = null;
 
     try {
-      // 活连接：只 respond，不新开 SSE
+      // 活连接：只 respond；不能登记新 operation 覆盖仍在消费 SSE 的 send。
       if (connect.isLive()) {
         await chatTurnService.respondTurn(command);
         return;
       }
 
+      const currentOperation = beginOperation(sessionId);
+      operation = currentOperation;
       // 查询期间连接可能又活了；按最新相位分流
-      const activeTurnId = await chatTurnService.getActiveTurnId(sessionId, operation.signal);
-      if (!operation.isCurrent()) return;
+      const activeTurnId = await chatTurnService.getActiveTurnId(
+        sessionId,
+        currentOperation.signal
+      );
+      if (!currentOperation.isCurrent()) return;
       const action = connect.resolveContinuation(activeTurnId);
 
       if (action === 'respond') {
@@ -158,7 +163,7 @@ export function useConnectActions({
       // 有活跃 turn：先 respond，再 resume 接上旧流
       if (action === 'respond_resume') {
         await chatTurnService.respondTurn(command);
-        if (!operation.isCurrent()) return;
+        if (!currentOperation.isCurrent()) return;
         cancelResume();
         await resumeTurn();
         return;
@@ -167,10 +172,13 @@ export function useConnectActions({
       // 无活跃 turn：recover 开新流并泵入
       await runNewStreamConnect({
         connect,
-        shouldApply: operation.isCurrent,
+        shouldApply: currentOperation.isCurrent,
         run: async () => {
-          const response = await chatTurnService.recoverChatStream(command, operation.signal);
-          if (!operation.isCurrent()) {
+          const response = await chatTurnService.recoverChatStream(
+            command,
+            currentOperation.signal
+          );
+          if (!currentOperation.isCurrent()) {
             void response.body?.cancel();
             return;
           }
@@ -179,14 +187,14 @@ export function useConnectActions({
         },
       });
     } catch (error) {
-      if (!operation.isCurrent()) return;
+      if (operation && !operation.isCurrent()) return;
       captureException(error, {
         detector: 'application-handled',
         operation: 'chat.approval',
       });
       throw error;
     } finally {
-      operation.finish();
+      operation?.finish();
     }
   };
 

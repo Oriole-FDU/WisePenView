@@ -69,9 +69,6 @@ export interface WelcomePromptCardsBlock {
 
 export type WelcomeStarterBlock = WelcomeQuestionsBlock | WelcomePromptCardsBlock;
 
-/** @deprecated 使用 WelcomeStarterBlock */
-export type WelcomeConfigurableBlock = WelcomeStarterBlock;
-
 /**
  * Hero（Logo + 主文案）配置；可序列化，便于静态 / 接口 / Agent 共用。
  * 需要完全自定义 DOM 时仍用 Host 的 `hero` ReactNode 插槽。
@@ -116,6 +113,3 @@ export interface WelcomeStarterProps {
   hero?: ReactNode;
   layoutMode?: WelcomeLayoutMode;
 }
-
-/** @deprecated 使用 WelcomeStarterProps */
-export type WelcomeConfigurableProps = WelcomeStarterProps;

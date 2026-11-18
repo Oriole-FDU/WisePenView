@@ -19,7 +19,6 @@ export interface UseConnectResumeOptions {
 export interface UseConnectResumeResult {
   resumeTurn: () => Promise<void>;
   cancelResume: () => void;
-  invalidateResume: () => void;
 }
 
 export function useConnectResume({
@@ -42,11 +41,6 @@ export function useConnectResume({
     const inFlight = inFlightRef.current;
     inFlightRef.current = null;
     inFlight?.controller.abort();
-  };
-
-  const invalidateResume = () => {
-    cancelResume();
-    connect.reset();
   };
 
   const resumeTurn = (): Promise<void> => {
@@ -118,5 +112,5 @@ export function useConnectResume({
     return promise;
   };
 
-  return { resumeTurn, cancelResume, invalidateResume };
+  return { resumeTurn, cancelResume };
 }

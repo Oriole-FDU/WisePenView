@@ -124,6 +124,15 @@ export function useHistoryData({
       setMessages((currentMessages) => mergeMessages(payload.list, currentMessages));
       setPage(payload.page ?? nextPage);
       setTotalPage(payload.totalPage ?? totalPage);
+    } catch (error) {
+      // 已切走或开始新一轮替换时，旧翻页错误不应提示到当前会话。
+      if (
+        requestVersion !== requestVersionRef.current ||
+        targetSessionId !== sessionIdRef.current
+      ) {
+        return;
+      }
+      throw error;
     } finally {
       if (
         requestVersion === requestVersionRef.current &&

@@ -30,13 +30,10 @@ export interface UseChatRuntimeResult {
   messages: WisePenUIMessage[];
   renderable: boolean;
   status: ChatStatus;
-  stopConnect: UseConnectActionsResult['stopConnect'];
   send: UseConnectActionsResult['send'];
   cancel: UseConnectActionsResult['cancel'];
   cancelling: boolean;
   connectActive: boolean;
-  submitToolApprovals: UseConnectActionsResult['submitToolApprovals'];
-  resumeTurn: () => Promise<void>;
   history: UseChatHistoryResult;
 }
 
@@ -50,7 +47,7 @@ export function useChatRuntime({
   const message = useChatMessage({ onError });
   const connect = useConnectFsm();
 
-  const { resumeTurn, cancelResume, invalidateResume } = useConnectResume({
+  const { resumeTurn, cancelResume } = useConnectResume({
     sessionId,
     connect,
     pumpResume: message.pumpResume,
@@ -69,8 +66,8 @@ export function useChatRuntime({
     });
 
   const releaseSession = useMemoizedFn(() => {
-    message.stop();
-    invalidateResume();
+    stopConnect();
+    connect.reset();
   });
 
   const history = useChatHistory({
@@ -95,13 +92,10 @@ export function useChatRuntime({
     messages: message.messages,
     renderable: hasRenderableChatContent(message.messages),
     status: message.status,
-    stopConnect,
     send,
     cancel,
     cancelling,
     connectActive,
-    submitToolApprovals,
-    resumeTurn,
     history,
   };
 }
