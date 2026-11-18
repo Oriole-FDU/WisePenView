@@ -1,11 +1,11 @@
 import type { ChatStatus } from 'ai';
 
 import { useChatTurnService } from '@/domains';
-import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatRecoverApiRequest, ChatRespondApiRequest } from '../apis/ChatTurnApi.schema';
+import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type { SendTurnMessageOptions, ToolApprovalStatusRequest } from '../service/index.type';
 import { useConnectFsm } from './connect/useConnectFsm';

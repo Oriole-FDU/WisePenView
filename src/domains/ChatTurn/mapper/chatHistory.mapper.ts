@@ -1,16 +1,16 @@
 import type { DynamicToolUIPart, ToolUIPart, UITool, UIToolInvocation } from 'ai';
 
 import type { PageResult } from '@/domains/_shared/entity/page';
-import type {
-  ChatMessageMetadata,
-  MessageAttachmentSnapshot,
-  WisePenUIMessage,
-} from '@/domains/ChatSession';
 
 import type {
   ListHistoryMessagesApiRequest,
   ListHistoryMessagesApiResponse,
 } from '../apis/ChatTurnApi.schema';
+import type {
+  ChatMessageMetadata,
+  MessageAttachmentSnapshot,
+  WisePenUIMessage,
+} from '../entity/message';
 
 type WisePenMessagePart = WisePenUIMessage['parts'][number];
 type ParsedToolPart = ToolUIPart | DynamicToolUIPart;

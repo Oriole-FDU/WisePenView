@@ -2,10 +2,10 @@ import { useChat } from '@ai-sdk/react';
 import { type ChatStatus } from 'ai';
 import { useState } from 'react';
 
-import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
+import type { ChatMessageMetadata, WisePenUIMessage } from '../../entity/message';
 import { PumpChatTransport } from './pumpChatTransport';
 
 const CHAT_STREAM_THROTTLE_MS = 50;

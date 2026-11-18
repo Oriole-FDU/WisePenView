@@ -2,8 +2,8 @@ import { useLatest } from 'ahooks';
 import { useRef, useState } from 'react';
 
 import { useChatTurnService } from '@/domains';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
 
+import type { WisePenUIMessage } from '../../entity/message';
 import type { ChatMessagesWriter } from '../message/useChatMessage';
 import type { HistoryLoadingActions } from './useHistoryLoadingFsm';
 

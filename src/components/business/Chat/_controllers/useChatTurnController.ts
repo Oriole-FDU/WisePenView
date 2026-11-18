@@ -5,8 +5,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ChatModel } from '@/domains/ChatConfig';
-import type { CreateSessionRequest, WisePenUIMessage } from '@/domains/ChatSession';
-import { useChatRuntime, type UseChatRuntimeResult } from '@/domains/ChatTurn';
+import type { CreateSessionRequest } from '@/domains/ChatSession';
+import {
+  useChatRuntime,
+  type UseChatRuntimeResult,
+  type WisePenUIMessage,
+} from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';

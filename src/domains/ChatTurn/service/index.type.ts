@@ -1,5 +1,4 @@
 import type { PageResult } from '@/domains/_shared/entity/page';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
 import type {
@@ -7,6 +6,7 @@ import type {
   ChatRecoverApiRequest,
   ChatRespondApiRequest,
 } from '../apis/ChatTurnApi.schema';
+import type { WisePenUIMessage } from '../entity/message';
 
 interface ChatSelectedResourceContext {
   resourceId: string;
