@@ -252,9 +252,7 @@ function ResourcePermissionEditor({
             variant="primary"
             isDisabled={saveDisabled}
             aria-busy={saving || undefined}
-            onPress={() => {
-              if (!saveDisabled) runSave();
-            }}
+            onPress={runSave}
           >
             {t('actions.save', { ns: 'common' })}
           </AppButton>

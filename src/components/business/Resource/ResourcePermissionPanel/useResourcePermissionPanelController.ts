@@ -121,8 +121,7 @@ export const useResourcePermissionPanelController = ({
   const hasUnknownActions = !subjects.every(canEditResourcePermissionSubject);
   const hasFailedActions = subjects.some((subject) => subject.inheritance?.status === 'failed');
   const hasFailedGroupInfo = subjects.some((subject) => subject.groupInfoStatus === 'failed');
-  const editingDisabled =
-    loading || saving || Boolean(error) || !permissionOverview || hasUnknownActions;
+  const editingDisabled = loading || saving || Boolean(error) || !permissionOverview;
 
   const persistPermissionSubjects = (nextSubjects: ResourcePermissionSubject[]) => {
     if (editingDisabled || savePendingRef.current) return;
@@ -144,7 +143,13 @@ export const useResourcePermissionPanelController = ({
     action: ResourcePermissionActionOption['action']
   ) => {
     const currentSelectedSubject = subjects.find((subject) => subject.id === changedSubject.id);
-    if (!currentSelectedSubject || currentSelectedSubject.readonly) return;
+    if (
+      !currentSelectedSubject ||
+      currentSelectedSubject.readonly ||
+      !canEditResourcePermissionSubject(currentSelectedSubject)
+    ) {
+      return;
+    }
     const currentActions = getSubjectActionsForDisplay(currentSelectedSubject);
     const nextActions = updateResourceActionSelection(
       currentActions,

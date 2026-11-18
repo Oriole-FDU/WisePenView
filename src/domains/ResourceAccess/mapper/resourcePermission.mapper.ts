@@ -12,10 +12,8 @@ import type {
 } from '@/domains/Resource/apis/ResourceCoreApi.schema';
 import type { UserDisplayBase } from '@/domains/User';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { getSupportedResourcePermissionActions } from '../enum';
-import { canEditResourcePermissionSubject } from '../permissionPolicy';
 import type {
   ResourcePermissionActionOption,
   ResourcePermissionOverview,
@@ -115,9 +113,6 @@ export const mapChangeResourceActionPermissionRequest = (
 export const mapChangeResourceActionPermissionRequestFromSubjects = (
   params: UpdateResourcePermissionSubjectsRequest
 ): ChangeResourceActionPermissionApiContractRequest => {
-  if (!params.subjects.every(canEditResourcePermissionSubject)) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'subjects' });
-  }
   const overrideGrantedActions: Record<string, ResourceAction[] | null> = {};
   const specifiedUsersGrantedActions: Record<string, ResourceAction[]> = {};
 

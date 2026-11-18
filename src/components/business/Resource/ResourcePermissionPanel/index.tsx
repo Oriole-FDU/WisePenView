@@ -11,6 +11,7 @@ import ResourcePermissionActionIcon from '@/components/business/Drive/common/res
 import { buildResourcePermissionActionKeySet } from '@/components/business/Drive/common/resourcePermissionPolicy';
 import UserSearchCombobox from '@/components/business/UserSearchCombobox';
 import {
+  canEditResourcePermissionSubject,
   type ResourcePermissionActionOption,
   type ResourcePermissionSource,
   type ResourcePermissionSubject,
@@ -81,6 +82,11 @@ function SubjectPermissionPopover({
   editingDisabled,
 }: SubjectPermissionPopoverProps) {
   const { t } = useTranslation('resource');
+  const isDisabled =
+    subject.readonly ||
+    editingDisabled ||
+    !canEditResourcePermissionSubject(subject) ||
+    actionOptions.length === 0;
   const selectedActionKeys = buildResourcePermissionActionKeySet(
     getSubjectActionsForDisplay(subject),
     actionOptions
@@ -90,7 +96,7 @@ function SubjectPermissionPopover({
       variant="ghost"
       size="sm"
       className={styles.permissionButton}
-      isDisabled={subject.readonly || editingDisabled || actionOptions.length === 0}
+      isDisabled={isDisabled}
       aria-label={t('permission.subjectAria', { name: subject.name })}
     >
       <span className={styles.permissionTriggerText}>
@@ -102,7 +108,7 @@ function SubjectPermissionPopover({
     </AppButton>
   );
 
-  if (subject.readonly || editingDisabled || actionOptions.length === 0) {
+  if (isDisabled) {
     return trigger;
   }
 

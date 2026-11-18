@@ -209,8 +209,8 @@ const zhCNResource = {
     loadingMoreGroups: '加载中...',
     incomplete: {
       groupInfo: '部分小组资料加载失败，已保留已知权限。',
-      actions: '部分标签权限读取失败，重试成功后才能修改权限。',
-      unloaded: '权限尚未完整加载，请先加载其余小组后再修改。',
+      actions: '部分标签权限读取失败，相关小组暂不可编辑，请重试。',
+      unloaded: '部分小组权限尚未加载，加载后可编辑对应小组。',
     },
     removeCollaborator: '移除协作者',
     userPlaceholder: '完整用户名或邮箱',

@@ -209,8 +209,8 @@ const enUSResource = {
     loadingMoreGroups: 'Loading...',
     incomplete: {
       groupInfo: 'Some group details could not be loaded. Known permissions are preserved.',
-      actions: 'Some tag permissions could not be loaded. Retry before editing permissions.',
-      unloaded: 'Load the remaining groups before editing permissions.',
+      actions: 'Some tag permissions could not be loaded. Retry to edit the affected groups.',
+      unloaded: 'Load the remaining groups to edit their permissions.',
     },
     removeCollaborator: 'Remove collaborator',
     userPlaceholder: 'Full username or email',
