@@ -6,14 +6,14 @@ import { captureException } from '@/observability';
 
 import type { UseConnectFsmResult } from './useConnectFsm';
 
-export interface UseResumeLifecycleOptions {
+export interface UseConnectResumeOptions {
   sessionId: string;
   connect: UseConnectFsmResult;
   pumpResume: (options: { response: Response }) => Promise<void>;
   onError?: (error: Error) => void;
 }
 
-export interface UseResumeLifecycleResult {
+export interface UseConnectResumeResult {
   resumeTurn: () => Promise<void>;
   /** stop / 流错误后清除 turn 去重，允许再次 resume。 */
   clearResumedTurn: () => void;
@@ -24,12 +24,12 @@ export interface UseResumeLifecycleResult {
 /**
  * resume 请求合并、turn 去重与迟到结果丢弃；连接态交给 connect FSM。
  */
-export function useResumeLifecycle({
+export function useConnectResume({
   sessionId,
   connect,
   pumpResume,
   onError,
-}: UseResumeLifecycleOptions): UseResumeLifecycleResult {
+}: UseConnectResumeOptions): UseConnectResumeResult {
   const { getActiveTurnId, reconnectChatStream } = useChatTurnService();
   const inFlightRef = useRef<{ sessionId: string; promise: Promise<void> } | null>(null);
   const resumedTurnRef = useRef<{ sessionId: string; turnId: string } | null>(null);

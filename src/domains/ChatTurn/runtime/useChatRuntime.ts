@@ -4,16 +4,15 @@ import { useChatTurnService } from '@/domains';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { ChatRecoverApiRequest, ChatRespondApiRequest } from '../apis/ChatTurnApi.schema';
 import type { WisePenUIMessage } from '../entity/message';
 import type { ToolApprovalStatusRequest } from '../service/index.type';
 import type { UseChatToolApprovalResult } from './approval/useChatToolApproval';
 import { useChatToolApproval } from './approval/useChatToolApproval';
 import { runNewStreamConnect } from './connect/runNewStreamConnect';
+import type { UseConnectActionsResult } from './connect/useConnectActions';
+import { useConnectActions } from './connect/useConnectActions';
 import { useConnectFsm } from './connect/useConnectFsm';
-import { useResumeLifecycle } from './connect/useResumeLifecycle';
-import type { UseChatTurnControlResult } from './control/useChatTurnControl';
-import { useChatTurnControl } from './control/useChatTurnControl';
+import { useConnectResume } from './connect/useConnectResume';
 import type { UseChatHistoryResult } from './history/useChatHistory';
 import { useChatHistory } from './history/useChatHistory';
 import { hasRenderableChatContent } from './message/chatTurnModel';
@@ -33,28 +32,18 @@ export interface UseChatRuntimeResult {
   /** 消息列表是否存在可渲染内容（非空文本/思考，或工具调用）。 */
   renderable: boolean;
   status: ChatStatus;
-  stopConnect: UseChatTurnControlResult['stopConnect'];
-  send: UseChatTurnControlResult['send'];
-  cancel: UseChatTurnControlResult['cancel'];
+  stopConnect: UseConnectActionsResult['stopConnect'];
+  send: UseConnectActionsResult['send'];
+  cancel: UseConnectActionsResult['cancel'];
   cancelling: boolean;
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
   resumeTurn: () => Promise<void>;
   history: UseChatHistoryResult;
 }
 
-function buildApprovalRequest(
-  sessionId: string,
-  toolApprovalStatus: ToolApprovalStatusRequest[]
-): ChatRecoverApiRequest & ChatRespondApiRequest {
-  return {
-    session_id: sessionId,
-    client_tool_results: [],
-    tool_approval_status: toolApprovalStatus,
-  };
-}
-
 /**
- * ChatTurn Runtime 组装根：connect FSM + control + message 泵 + history + approval。
+ * ChatTurn Runtime 组装根：connect（开停流 + resume）+ message 泵 + history + approval；
+ * 组装根只做审批续跑选路，不内联 send/cancel。
  */
 export function useChatRuntime({
   sessionId,
@@ -66,14 +55,14 @@ export function useChatRuntime({
   const message = useChatMessage({ onError });
   const connect = useConnectFsm();
 
-  const { resumeTurn, clearResumedTurn, invalidateResume } = useResumeLifecycle({
+  const { resumeTurn, clearResumedTurn, invalidateResume } = useConnectResume({
     sessionId,
     connect,
     pumpResume: message.pumpResume,
     onError,
   });
 
-  const control = useChatTurnControl({
+  const { stopConnect, send, cancel, cancelling } = useConnectActions({
     sessionId,
     model,
     chatTurnService,
@@ -82,7 +71,7 @@ export function useChatRuntime({
     clearResumedTurn,
   });
 
-  /** 切会话：中止旧泵并作废 resume 世代，连接复位 idle。 */
+  /** 切会话：中止旧泵并作废 resume 世代；不标 closed（后台 turn 仍可恢复）。 */
   const releaseSession = () => {
     message.stop();
     invalidateResume();
@@ -95,12 +84,12 @@ export function useChatRuntime({
       });
     }
 
-    const requestBody = buildApprovalRequest(sessionId, toolApprovalStatus);
+    const command = { sessionId, toolApprovalStatus };
 
     try {
       // 连接仍活着：只 respond，不新开 SSE。
       if (connect.isLive()) {
-        await chatTurnService.respondTurn(requestBody);
+        await chatTurnService.respondTurn(command);
         return;
       }
 
@@ -109,12 +98,12 @@ export function useChatRuntime({
       const action = connect.resolveContinuation(activeTurnId);
 
       if (action === 'respond') {
-        await chatTurnService.respondTurn(requestBody);
+        await chatTurnService.respondTurn(command);
         return;
       }
 
       if (action === 'respond_resume') {
-        await chatTurnService.respondTurn(requestBody);
+        await chatTurnService.respondTurn(command);
         await resumeTurn();
         return;
       }
@@ -123,7 +112,7 @@ export function useChatRuntime({
         connect,
         onClosed: clearResumedTurn,
         run: async () => {
-          const response = await chatTurnService.recoverChatStream(requestBody);
+          const response = await chatTurnService.recoverChatStream(command);
           connect.markOpen();
           await message.pumpSend({ response });
         },
@@ -157,10 +146,10 @@ export function useChatRuntime({
     messages: message.messages,
     renderable: hasRenderableChatContent(message.messages),
     status: message.status,
-    stopConnect: control.stopConnect,
-    send: control.send,
-    cancel: control.cancel,
-    cancelling: control.cancelling,
+    stopConnect,
+    send,
+    cancel,
+    cancelling,
     submitToolApprovals,
     resumeTurn,
     history,

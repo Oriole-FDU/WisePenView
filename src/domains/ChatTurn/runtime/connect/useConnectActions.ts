@@ -2,11 +2,11 @@ import { useState } from 'react';
 
 import { mapChatTurnRequest, mapOutgoingUserMessageMetadata } from '../../mapper/chatTurn.mapper';
 import type { IChatTurnService, SendTurnMessageOptions } from '../../service/index.type';
-import { runNewStreamConnect } from '../connect/runNewStreamConnect';
-import type { UseConnectFsmResult } from '../connect/useConnectFsm';
 import type { UseChatMessageResult } from '../message/useChatMessage';
+import { runNewStreamConnect } from './runNewStreamConnect';
+import type { UseConnectFsmResult } from './useConnectFsm';
 
-export interface UseChatTurnControlOptions {
+export interface UseConnectActionsOptions {
   sessionId: string;
   model?: string;
   chatTurnService: IChatTurnService;
@@ -15,7 +15,7 @@ export interface UseChatTurnControlOptions {
   clearResumedTurn: () => void;
 }
 
-export interface UseChatTurnControlResult {
+export interface UseConnectActionsResult {
   /** 协议级发送：已有 sessionId + 载荷后开泵；不含 UI 门禁。 */
   send: (query: string, options?: SendTurnMessageOptions) => Promise<void>;
   /** 本地 stopConnect + 后端 cancel；自带 cancelling 互斥。 */
@@ -26,18 +26,18 @@ export interface UseChatTurnControlResult {
 }
 
 /**
- * 回合控制：用户发起的 send / cancel / stop。
+ * 本地流开停动作：send 开 completion 流，cancel/stop 关流。
  *
- * 调度 connect + Service 取流 + message 泵；不持有审批与历史，不做 UI 门禁。
+ * 属于 connect 生命周期，不做审批续跑选路；开流事务复用 runNewStreamConnect。
  */
-export function useChatTurnControl({
+export function useConnectActions({
   sessionId,
   model,
   chatTurnService,
   connect,
   message,
   clearResumedTurn,
-}: UseChatTurnControlOptions): UseChatTurnControlResult {
+}: UseConnectActionsOptions): UseConnectActionsResult {
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
   const stopConnect = () => {

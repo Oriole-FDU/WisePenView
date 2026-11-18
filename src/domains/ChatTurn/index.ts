@@ -15,5 +15,6 @@ export type {
   ClientToolCapability,
   IChatTurnService,
   SendTurnMessageOptions,
+  SubmitToolApprovalsCommand,
   ToolApprovalStatusRequest,
 } from './service/index.type';

@@ -1,6 +1,14 @@
-import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
+import type {
+  ChatCompletionApiRequest,
+  ChatRecoverApiRequest,
+  ChatRespondApiRequest,
+} from '../apis/ChatTurnApi.schema';
 import type { ChatMessageMetadata } from '../entity/message';
-import type { ClientToolCapability, SendTurnMessageOptions } from '../service/index.type';
+import type {
+  ClientToolCapability,
+  SendTurnMessageOptions,
+  SubmitToolApprovalsCommand,
+} from '../service/index.type';
 
 function unique(values?: readonly string[]): string[] {
   return Array.from(new Set(values ?? []));
@@ -41,6 +49,17 @@ export function mapOutgoingUserMessageMetadata(
   return {
     createdAt: new Date().toISOString(),
     ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
+  };
+}
+
+/** 审批领域命令 → respond / recover 共用请求体。 */
+export function mapToolApprovalRequest(
+  command: SubmitToolApprovalsCommand
+): ChatRecoverApiRequest & ChatRespondApiRequest {
+  return {
+    session_id: command.sessionId,
+    client_tool_results: [],
+    tool_approval_status: command.toolApprovalStatus,
   };
 }
 

@@ -1,16 +1,13 @@
 import { ChatTurnApi } from '@domain-apis';
 
-import type {
-  ChatCompletionApiRequest,
-  ChatRecoverApiRequest,
-  ChatRespondApiRequest,
-} from '../apis/ChatTurnApi.schema';
+import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
 import {
   mapListHistoryMessagesFromApi,
   mapListHistoryMessagesRequest,
 } from '../mapper/chatHistory.mapper';
+import { mapToolApprovalRequest } from '../mapper/chatTurn.mapper';
 import { normalizeChatSseResponse } from './chatSseNormalizer';
-import type { IChatTurnService } from './index.type';
+import type { IChatTurnService, SubmitToolApprovalsCommand } from './index.type';
 
 const streamChatCompletion = async (
   request: ChatCompletionApiRequest,
@@ -19,18 +16,20 @@ const streamChatCompletion = async (
   normalizeChatSseResponse(await ChatTurnApi.streamChatCompletion(request, signal));
 
 const recoverChatStream = async (
-  request: ChatRecoverApiRequest,
+  command: SubmitToolApprovalsCommand,
   signal?: AbortSignal
 ): Promise<Response> =>
-  normalizeChatSseResponse(await ChatTurnApi.streamChatRecovery(request, signal));
+  normalizeChatSseResponse(
+    await ChatTurnApi.streamChatRecovery(mapToolApprovalRequest(command), signal)
+  );
 
 const reconnectChatStream = async (sessionId: string, signal?: AbortSignal): Promise<Response> =>
   normalizeChatSseResponse(
     await ChatTurnApi.reconnectChatStream({ session_id: sessionId }, signal)
   );
 
-const respondTurn = async (request: ChatRespondApiRequest): Promise<void> => {
-  await ChatTurnApi.respondTurn(request);
+const respondTurn = async (command: SubmitToolApprovalsCommand): Promise<void> => {
+  await ChatTurnApi.respondTurn(mapToolApprovalRequest(command));
 };
 
 const getActiveTurnId = async (sessionId: string): Promise<string | null> =>

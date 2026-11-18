@@ -1,11 +1,7 @@
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
-import type {
-  ChatCompletionApiRequest,
-  ChatRecoverApiRequest,
-  ChatRespondApiRequest,
-} from '../apis/ChatTurnApi.schema';
+import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
 import type { WisePenUIMessage } from '../entity/message';
 
 interface ChatSelectedResourceContext {
@@ -24,6 +20,12 @@ interface ChatUploadedAttachmentContext {
 export interface ToolApprovalStatusRequest {
   tool_call_id: string;
   approved: boolean;
+}
+
+/** 审批续跑领域命令：Runtime 只传意图，DTO 由 Service/mapper 组装。 */
+export interface SubmitToolApprovalsCommand {
+  sessionId: string;
+  toolApprovalStatus: ToolApprovalStatusRequest[];
 }
 
 export interface ClientToolCapability {
@@ -47,9 +49,9 @@ export interface SendTurnMessageOptions {
 
 export interface IChatTurnService {
   streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
-  recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
+  recoverChatStream(command: SubmitToolApprovalsCommand, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
-  respondTurn(request: ChatRespondApiRequest): Promise<void>;
+  respondTurn(command: SubmitToolApprovalsCommand): Promise<void>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
   listHistoryMessages(
