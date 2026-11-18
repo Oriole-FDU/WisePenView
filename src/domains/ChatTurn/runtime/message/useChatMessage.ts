@@ -1,3 +1,6 @@
+/**
+ * 持有 AI SDK 消息列表，并向外提供 send / resume 泵入口。
+ */
 import { useChat } from '@ai-sdk/react';
 import { type ChatStatus } from 'ai';
 import { useState } from 'react';
@@ -12,17 +15,12 @@ import { PumpChatTransport } from './pumpChatTransport';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
 
-/** History 写入 messages 的窄端口；与 AI SDK setMessages 同形。 */
 export type ChatMessagesWriter = (
   messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
 ) => void;
 
 export interface PumpSendOptions {
   response: Response;
-  /**
-   * 新 turn：query + 发送选项 → 泵内组乐观 user 气泡（含附件快照 metadata）；
-   * recover 等无用户句时可省略。
-   */
   turn?: {
     query: string;
     options?: SendTurnMessageOptions;

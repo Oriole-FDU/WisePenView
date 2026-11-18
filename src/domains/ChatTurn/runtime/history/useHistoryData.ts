@@ -1,3 +1,6 @@
+/**
+ * 历史消息分页数据：整页替换、向前翻页与清空。
+ */
 import { useLatest } from 'ahooks';
 import { useRef, useState } from 'react';
 
@@ -55,6 +58,7 @@ export function useHistoryData({
   };
 
   const replaceHistory = async (targetSessionId: string): Promise<boolean> => {
+    // 抬版本并清空当前列表，开始首屏加载
     const requestVersion = requestVersionRef.current + 1;
     requestVersionRef.current = requestVersion;
     loadingRef.current.beginReplaceLoad();
@@ -64,6 +68,7 @@ export function useHistoryData({
 
     try {
       const payload = await listHistoryMessages(targetSessionId, 1, DEFAULT_HISTORY_PAGE_SIZE);
+      // 版本或 session 已变：丢弃陈旧响应
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current
@@ -75,6 +80,7 @@ export function useHistoryData({
       setTotalPage(payload.totalPage ?? 1);
       return true;
     } catch (error) {
+      // 已切走则吞掉错误，避免误报
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current
@@ -83,6 +89,7 @@ export function useHistoryData({
       }
       throw error;
     } finally {
+      // 仅当前请求结束 loading
       if (
         requestVersion === requestVersionRef.current &&
         targetSessionId === sessionIdRef.current
@@ -93,6 +100,7 @@ export function useHistoryData({
   };
 
   const prependHistory = async (): Promise<void> => {
+    // 无更多页或正在 prepend 则跳过
     const targetSessionId = sessionIdRef.current;
     if (!targetSessionId || page >= totalPage) return;
     if (!loadingRef.current.beginPrependLoad()) return;
@@ -106,6 +114,7 @@ export function useHistoryData({
         nextPage,
         DEFAULT_HISTORY_PAGE_SIZE
       );
+      // 陈旧响应丢弃
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current

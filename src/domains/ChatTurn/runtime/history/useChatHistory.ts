@@ -1,3 +1,6 @@
+/**
+ * 按会话加载与翻页历史消息，并在首载后触发 resume。
+ */
 import { useLatest } from 'ahooks';
 import { useEffect } from 'react';
 
@@ -48,6 +51,7 @@ export function useChatHistory({
     try {
       return await dataLatest.current.replaceHistory(targetSessionId);
     } catch (error) {
+      // 首载失败：上报并清空，避免脏列表残留
       reportError(error);
       dataLatest.current.clearConversation();
       return false;
@@ -77,6 +81,7 @@ export function useChatHistory({
    */
   useEffect(() => {
     const actions = historyActionsLatest.current;
+    // 无 session：清空对话
     if (!sessionId) {
       actions.clearConversation();
       return;
@@ -84,6 +89,7 @@ export function useChatHistory({
     const targetSessionId = sessionId;
     let cancelled = false;
     void (async () => {
+      // 新建会话跳过首载；否则先历史再 resume
       if (isNewSession) return;
       const loaded = await actions.loadHistoryMessages(targetSessionId);
       if (!loaded || cancelled) return;

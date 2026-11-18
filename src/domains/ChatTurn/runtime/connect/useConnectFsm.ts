@@ -1,3 +1,6 @@
+/**
+ * 维护 Chat 流连接相位，并据此判定审批续传动作。
+ */
 import { useFsm } from '@/utils/fsm';
 
 export const CONNECT_PHASE = {

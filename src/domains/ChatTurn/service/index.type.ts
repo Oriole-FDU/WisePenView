@@ -45,7 +45,6 @@ export interface SendTurnMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
-/** 发送回合领域命令：Runtime 只传意图，completion DTO 由 Service/mapper 组装。 */
 export interface SendTurnCommand {
   sessionId: string;
   model?: string;

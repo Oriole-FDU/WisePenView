@@ -1,3 +1,6 @@
+/**
+ * 按会话恢复未完成 turn：合并 in-flight、防陈旧写入。
+ */
 import { useLatest } from 'ahooks';
 import { useRef } from 'react';
 
@@ -66,6 +69,7 @@ export function useConnectResume({
 
       connect.beginConnect();
       try {
+        // 查询活跃 turn；无则回 idle
         const turnId = await getActiveTurnId(targetSessionId);
         if (isStale()) return;
         if (!turnId) {
@@ -73,12 +77,14 @@ export function useConnectResume({
           return;
         }
 
+        // 同一 turn 已 resume 过则跳过，避免重复泵入
         const resumed = resumedTurnRef.current;
         if (resumed?.sessionId === targetSessionId && resumed.turnId === turnId) {
           connect.markIdle();
           return;
         }
 
+        // 记下 turn，重连并泵入；成功后若仍 open 则回 idle
         resumedTurnRef.current = { sessionId: targetSessionId, turnId };
         const response = await reconnectChatStream(targetSessionId);
         if (isStale()) return;
@@ -88,6 +94,7 @@ export function useConnectResume({
         if (isStale()) return;
         connect.markIdleIfOpen();
       } catch (error) {
+        // 陈旧错误忽略；否则关连接并上报
         if (isStale()) return;
         connect.markClosed();
         resumedTurnRef.current = null;
@@ -101,7 +108,7 @@ export function useConnectResume({
       }
     })();
 
-    // 保留已完成 promise，同 session 内合并重复 resume；切 session 由 invalidate 清空。
+    // 保留已完成 promise，同 session 内合并重复 resume；切 session 由 invalidate 清空
     inFlightRef.current = { sessionId: targetSessionId, promise };
     return promise;
   };

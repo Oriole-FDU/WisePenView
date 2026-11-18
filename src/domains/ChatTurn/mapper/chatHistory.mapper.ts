@@ -57,12 +57,14 @@ function mapToolInvocation(data: Record<string, unknown>): ToolInvocationState |
       : {}),
   };
 
+  // 按 tool 调用状态拼 UIToolInvocation；非法态返回 null
   switch (data.state) {
     case 'input-streaming':
       return { ...details, state: 'input-streaming', input: data.input };
     case 'input-available':
       return { ...details, state: 'input-available', input: data.input };
     case 'approval-requested': {
+      // approval.id 缺失时回退 toolCallId（与后端约定一致）
       const approval = getRecord(data.approval);
       const approvalId =
         typeof approval?.id === 'string'
@@ -202,6 +204,7 @@ function mapMessageMetadata(data: {
   created_at?: unknown;
 }): ChatMessageMetadata | undefined {
   const rawMetadata = getRecord(data.metadata);
+  // 兼容 camel / snake 两种 createdAt 线
   const rawCreatedAt = data.createdAt ?? data.created_at;
   const createdAt = typeof rawCreatedAt === 'string' ? rawCreatedAt : undefined;
   const selectedAttachments = Array.isArray(rawMetadata?.selectedAttachments)

@@ -1,3 +1,6 @@
+/**
+ * 编排单会话 ChatTurn 运行时：消息、连接、历史与工具审批。
+ */
 import type { ChatStatus } from 'ai';
 
 import { useChatTurnService } from '@/domains';

@@ -1,3 +1,6 @@
+/**
+ * 历史加载相位：首屏替换与向前翻页互斥。
+ */
 import { useFsm } from '@/utils/fsm';
 
 export const HISTORY_LOADING_PHASE = {

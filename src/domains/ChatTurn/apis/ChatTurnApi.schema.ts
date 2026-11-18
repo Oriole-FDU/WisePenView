@@ -54,7 +54,6 @@ export const ToolApprovalStatusSubmissionApiSchema = z.strictObject({
   approved: z.boolean(),
 });
 
-/** 后端 ChatRecoverRequest；respond / recover 共用同一请求体。 */
 export const ChatRecoverApiRequestSchema = z
   .strictObject({
     session_id: OpaqueIdSchema,
