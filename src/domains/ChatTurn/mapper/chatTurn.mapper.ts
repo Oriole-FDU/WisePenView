@@ -1,4 +1,4 @@
-import type { ChatCompletionApiRequest } from '../apis/ChatStreamApi.schema';
+import type { ChatCompletionApiRequest } from '../apis/ChatTurnApi.schema';
 import type { ClientToolCapability, SendTurnMessageOptions } from '../service/index.type';
 
 function unique(values?: readonly string[]): string[] {

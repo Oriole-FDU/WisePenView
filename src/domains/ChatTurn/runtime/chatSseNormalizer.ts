@@ -2,7 +2,7 @@ import { type EventSourceMessage, EventSourceParserStream } from 'eventsource-pa
 
 import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
 
-import { ChatSseEventDataApiSchema } from '../apis/ChatStreamApi.schema';
+import { ChatSseEventDataApiSchema } from '../apis/ChatTurnApi.schema';
 
 const CHAT_SSE_MAX_EVENT_SIZE = 8 * 1024 * 1024;
 

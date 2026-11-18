@@ -1,9 +1,4 @@
-import {
-  ChatTurnApi,
-  reconnectChatStream as reconnectChatStreamApi,
-  streamChatCompletion as streamChatCompletionApi,
-  streamChatRecovery as streamChatRecoveryApi,
-} from '@domain-apis';
+import { ChatTurnApi } from '@domain-apis';
 
 import type { IChatTurnService } from './index.type';
 
@@ -15,10 +10,10 @@ const cancelTurn = async (sessionId: string): Promise<void> => {
 };
 
 export const createChatTurnServices = (): IChatTurnService => ({
-  streamChatCompletion: (request, signal) => streamChatCompletionApi(request, signal),
-  recoverChatStream: (request, signal) => streamChatRecoveryApi(request, signal),
+  streamChatCompletion: (request, signal) => ChatTurnApi.streamChatCompletion(request, signal),
+  recoverChatStream: (request, signal) => ChatTurnApi.streamChatRecovery(request, signal),
   reconnectChatStream: (sessionId, signal) =>
-    reconnectChatStreamApi({ session_id: sessionId }, signal),
+    ChatTurnApi.reconnectChatStream({ session_id: sessionId }, signal),
   getActiveTurnId,
   cancelTurn,
 });
