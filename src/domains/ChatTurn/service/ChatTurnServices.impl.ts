@@ -1,11 +1,9 @@
 import { ChatTurnApi } from '@domain-apis';
 
-import { buildApiUrl } from '@/apis/buildApiUrl';
-
-import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
-import {
-  pickChatCompletionApiRequest,
-  pickChatRecoverApiRequest,
+import type {
+  ChatCompletionApiRequest,
+  ChatRecoverApiRequest,
+  ChatRespondApiRequest,
 } from '../apis/ChatTurnApi.schema';
 import {
   mapListHistoryMessagesFromApi,
@@ -14,41 +12,26 @@ import {
 import { normalizeChatSseResponse } from '../runtime/chatSseNormalizer';
 import type { IChatTurnService } from './index.type';
 
-const streamChatCompletion = (
+const streamChatCompletion = async (
   request: ChatCompletionApiRequest,
   signal?: AbortSignal
-): Promise<Response> => ChatTurnApi.streamChatCompletion(request, signal);
+): Promise<Response> =>
+  normalizeChatSseResponse(await ChatTurnApi.streamChatCompletion(request, signal));
 
-const recoverChatStream = (
+const recoverChatStream = async (
   request: ChatRecoverApiRequest,
   signal?: AbortSignal
-): Promise<Response> => ChatTurnApi.streamChatRecovery(request, signal);
+): Promise<Response> =>
+  normalizeChatSseResponse(await ChatTurnApi.streamChatRecovery(request, signal));
 
-const reconnectChatStream = (sessionId: string, signal?: AbortSignal): Promise<Response> =>
-  ChatTurnApi.reconnectChatStream({ session_id: sessionId }, signal);
+const reconnectChatStream = async (sessionId: string, signal?: AbortSignal): Promise<Response> =>
+  normalizeChatSseResponse(
+    await ChatTurnApi.reconnectChatStream({ session_id: sessionId }, signal)
+  );
 
-function resolveChatApiUrl(input: RequestInfo | URL): string {
-  return typeof input === 'string' || input instanceof URL
-    ? new URL(input.toString(), buildApiUrl('/')).toString()
-    : input.url;
-}
-
-async function fetchChatCompletion(
-  input: RequestInfo | URL,
-  init?: RequestInit
-): Promise<Response> {
-  const requestUrl = new URL(resolveChatApiUrl(input));
-  const rawBody = typeof init?.body === 'string' ? JSON.parse(init.body) : {};
-  const signal = init?.signal ?? undefined;
-
-  const response = requestUrl.pathname.endsWith('/chat/completions/recover')
-    ? await recoverChatStream(pickChatRecoverApiRequest(rawBody), signal)
-    : requestUrl.pathname.endsWith('/chat/completions/stream')
-      ? await reconnectChatStream(requestUrl.searchParams.get('session_id') ?? '', signal)
-      : await streamChatCompletion(pickChatCompletionApiRequest(rawBody), signal);
-
-  return normalizeChatSseResponse(response);
-}
+const respondTurn = async (request: ChatRespondApiRequest): Promise<void> => {
+  await ChatTurnApi.respondTurn(request);
+};
 
 const getActiveTurnId = async (sessionId: string): Promise<string | null> =>
   (await ChatTurnApi.getActiveTurn({ session_id: sessionId })).turn_id;
@@ -66,7 +49,7 @@ export const createChatTurnServices = (): IChatTurnService => ({
   streamChatCompletion,
   recoverChatStream,
   reconnectChatStream,
-  fetchChatCompletion,
+  respondTurn,
   getActiveTurnId,
   cancelTurn,
   listHistoryMessages,

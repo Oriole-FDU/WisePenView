@@ -1,14 +1,12 @@
 import { useChat } from '@ai-sdk/react';
-import { type ChatStatus, DefaultChatTransport } from 'ai';
-import { useMemo } from 'react';
+import { type ChatStatus } from 'ai';
+import { useState } from 'react';
 
-import { useChatTurnService } from '@/domains';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { ChatRecoverApiRequest } from '../../apis/ChatTurnApi.schema';
-import type { IChatTurnService } from '../../service/index.type';
+import { PumpChatTransport } from './pumpChatTransport';
 
 const CHAT_STREAM_THROTTLE_MS = 50;
 
@@ -17,70 +15,56 @@ export type ChatMessagesWriter = (
   messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
 ) => void;
 
+export interface PumpUserMessage {
+  text: string;
+  metadata?: ChatMessageMetadata;
+}
+
+export interface PumpSendOptions {
+  response: Response;
+  /** 新 turn 时插入本地 user 气泡；recover 等无用户句时可省略。 */
+  userMessage?: PumpUserMessage;
+}
+
+export interface PumpResumeOptions {
+  response: Response;
+}
+
 export interface UseChatMessageOptions {
   onError?: (error: Error) => void;
 }
 
 export interface UseChatMessageResult {
   messages: WisePenUIMessage[];
+  /** 过渡期保留；业务续跑真源应为 Runtime connect FSM，不得作为协议分支依据。 */
   status: ChatStatus;
   /** 供 History 写入；不经 Runtime 组装根外泄到 Controller / UI。 */
   setMessages: ChatMessagesWriter;
-  sendMessage: ReturnType<typeof useChat<WisePenUIMessage>>['sendMessage'];
-  resumeStream: ReturnType<typeof useChat<WisePenUIMessage>>['resumeStream'];
-  stop: ReturnType<typeof useChat<WisePenUIMessage>>['stop'];
+  /** 将 Service 已取得的 SSE 泵入 messages（completions / recover）。 */
+  pumpSend: (options: PumpSendOptions) => Promise<void>;
+  /** 将 Service 已取得的 SSE 泵入 messages（reconnect / stream 订阅）。 */
+  pumpResume: (options: PumpResumeOptions) => Promise<void>;
+  /** 仅中止本地读流，不等于后端 cancel。 */
+  stop: () => void;
 }
 
-function isChatRecoverRequest(
-  body: Record<string, unknown> | undefined
-): body is ChatRecoverApiRequest {
-  return (
-    typeof body?.session_id === 'string' &&
-    Array.isArray(body.client_tool_results) &&
-    Array.isArray(body.tool_approval_status)
-  );
+function requireSseBody(response: Response, operation: string): ReadableStream<Uint8Array> {
+  if (!response.body) {
+    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+      reason: `${operation} 响应缺少 SSE body`,
+    });
+  }
+  return response.body;
 }
-
-const createChatTransport = (fetchChatCompletion: IChatTurnService['fetchChatCompletion']) =>
-  new DefaultChatTransport<WisePenUIMessage>({
-    api: '/chat/completions',
-    fetch: fetchChatCompletion,
-    prepareSendMessagesRequest: ({ body }) => {
-      if (isChatRecoverRequest(body)) {
-        return { api: '/chat/completions/recover', body };
-      }
-      return { body: body ?? {} };
-    },
-    prepareReconnectToStreamRequest: ({ body }) => {
-      const sessionId = body?.session_id;
-      if (typeof sessionId !== 'string' || sessionId === '') {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '重连聊天流时缺少 session_id',
-        });
-      }
-      const params = new URLSearchParams({ session_id: sessionId });
-      return { api: `/chat/completions/stream?${params.toString()}` };
-    },
-  });
 
 /**
- * 唯一 useChat / Chat 实例与 messages 权威源。
+ * 唯一 useChat 实例与 messages 权威源；对外只暴露泵与数据面。
  *
- * Runtime 组装时把 setMessages 注入 History；流式读写与历史写入落同一份列表。
+ * 协议 HTTP 由 Service 完成后再 pump；不外泄 sendMessage / resumeStream。
  */
 export function useChatMessage({ onError }: UseChatMessageOptions = {}): UseChatMessageResult {
-  const chatTurnService = useChatTurnService();
-
-  /**
-   * @wisepen-manual-memo
-   * 为什么：DefaultChatTransport 会持有底层 fetch，重复创建会让 useChat 误判传输实例变化。
-   * 收益：仅在服务传输函数变化时重建，稳定聊天会话与重连逻辑。
-   * 失效条件：fetchChatCompletion 引用变化。
-   */
-  const chatTransport = useMemo(
-    () => createChatTransport(chatTurnService.fetchChatCompletion),
-    [chatTurnService.fetchChatCompletion]
-  );
+  // 跨渲染保持同一 PumpChatTransport，供 arm 与 useChat 共享，避免 Chat 会话重建。
+  const [transport] = useState(() => new PumpChatTransport<WisePenUIMessage>());
 
   const chat = useChat<WisePenUIMessage>({
     experimental_throttle: CHAT_STREAM_THROTTLE_MS,
@@ -91,15 +75,31 @@ export function useChatMessage({ onError }: UseChatMessageOptions = {}): UseChat
       });
       onError?.(error);
     },
-    transport: chatTransport,
+    transport,
   });
+
+  const pumpSend = async ({ response, userMessage }: PumpSendOptions): Promise<void> => {
+    transport.armSend(requireSseBody(response, 'pumpSend'));
+    if (userMessage) {
+      await chat.sendMessage({ text: userMessage.text, metadata: userMessage.metadata });
+      return;
+    }
+    await chat.sendMessage(undefined);
+  };
+
+  const pumpResume = async ({ response }: PumpResumeOptions): Promise<void> => {
+    transport.armReconnect(requireSseBody(response, 'pumpResume'));
+    await chat.resumeStream();
+  };
 
   return {
     messages: chat.messages,
     status: chat.status,
     setMessages: chat.setMessages,
-    sendMessage: chat.sendMessage,
-    resumeStream: chat.resumeStream,
-    stop: chat.stop,
+    pumpSend,
+    pumpResume,
+    stop: () => {
+      void chat.stop();
+    },
   };
 }

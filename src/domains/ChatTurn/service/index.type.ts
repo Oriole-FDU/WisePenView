@@ -2,7 +2,11 @@ import type { PageResult } from '@/domains/_shared/entity/page';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
-import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
+import type {
+  ChatCompletionApiRequest,
+  ChatRecoverApiRequest,
+  ChatRespondApiRequest,
+} from '../apis/ChatTurnApi.schema';
 
 interface ChatSelectedResourceContext {
   resourceId: string;
@@ -45,7 +49,7 @@ export interface IChatTurnService {
   streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
   recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
-  fetchChatCompletion(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+  respondTurn(request: ChatRespondApiRequest): Promise<void>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
   listHistoryMessages(

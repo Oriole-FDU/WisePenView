@@ -1,15 +1,15 @@
-import { useLatest } from 'ahooks';
 import type { ChatStatus } from 'ai';
-import { useRef } from 'react';
 
 import { useChatTurnService } from '@/domains';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
+import type { ChatRecoverApiRequest, ChatRespondApiRequest } from '../apis/ChatTurnApi.schema';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type { SendTurnMessageOptions, ToolApprovalStatusRequest } from '../service/index.type';
+import { useConnectFsm } from './connect/useConnectFsm';
+import { useResumeLifecycle } from './connect/useResumeLifecycle';
 import type { UseChatHistoryResult } from './history/useChatHistory';
 import { useChatHistory } from './history/useChatHistory';
 import { useChatMessage } from './message/useChatMessage';
@@ -25,7 +25,7 @@ export interface UseChatRuntimeOptions {
 export interface UseChatRuntimeResult {
   messages: WisePenUIMessage[];
   status: ChatStatus;
-  stopLocalStream: () => void;
+  stopConnect: () => void;
   submitTurn: (query: string, options?: SendTurnMessageOptions) => Promise<void>;
   submitToolApprovals: (toolApprovalStatus: ToolApprovalStatusRequest[]) => Promise<void>;
   resumeTurn: () => Promise<void>;
@@ -33,10 +33,19 @@ export interface UseChatRuntimeResult {
   history: UseChatHistoryResult;
 }
 
+function buildApprovalRequest(
+  sessionId: string,
+  toolApprovalStatus: ToolApprovalStatusRequest[]
+): ChatRecoverApiRequest & ChatRespondApiRequest {
+  return {
+    session_id: sessionId,
+    client_tool_results: [],
+    tool_approval_status: toolApprovalStatus,
+  };
+}
+
 /**
- * ChatTurn Runtime 组装根：message（权威源）+ history（分页写入）+ submit/recover 映射。
- *
- * 不外泄 setMessages / 散落流 API；Controller / UI 只消费本契约。
+ * ChatTurn Runtime 组装根：connect FSM 调度 + Service 协议 + message 泵 + history。
  */
 export function useChatRuntime({
   sessionId,
@@ -47,92 +56,40 @@ export function useChatRuntime({
 }: UseChatRuntimeOptions): UseChatRuntimeResult {
   const chatTurnService = useChatTurnService();
   const message = useChatMessage({ onError });
+  const connect = useConnectFsm();
 
-  const resumeRequestRef = useRef<{
-    sessionId: string;
-    resumeStream: typeof message.resumeStream;
-    promise: Promise<void>;
-  } | null>(null);
-  const resumedTurnRef = useRef<{
-    sessionId: string;
-    turnId: string;
-    resumeStream: typeof message.resumeStream;
-  } | null>(null);
-  const latestSessionId = useLatest(sessionId);
-  const latestResumeStream = useLatest(message.resumeStream);
-  const latestGetActiveTurnId = useLatest(chatTurnService.getActiveTurnId);
-  const latestOnError = useLatest(onError);
+  const { resumeTurn, clearResumedTurn, invalidateResume } = useResumeLifecycle({
+    sessionId,
+    connect,
+    pumpResume: message.pumpResume,
+    onError,
+  });
 
-  const stopLocalStream = () => {
-    void message.stop();
+  /** 用户 stop / cancel：中止泵并标 closed，保留同 session 再 resume 的空间。 */
+  const stopConnect = () => {
+    message.stop();
+    connect.markClosed();
+    clearResumedTurn();
   };
 
-  const resumeTurn = (): Promise<void> => {
-    if (!sessionId) return Promise.resolve();
+  /** 切会话：中止旧泵并作废 resume 世代，连接复位 idle。 */
+  const releaseSession = () => {
+    message.stop();
+    invalidateResume();
+  };
 
-    const targetSessionId = sessionId;
-    const targetResumeStream = message.resumeStream;
-    const existingRequest = resumeRequestRef.current;
-    if (
-      existingRequest?.sessionId === targetSessionId &&
-      existingRequest.resumeStream === targetResumeStream
-    ) {
-      return existingRequest.promise;
+  const pumpOutgoing = async (run: () => Promise<void>) => {
+    connect.beginConnect();
+    try {
+      await run();
+      connect.markIdleIfOpen();
+    } catch (error) {
+      connect.markClosed();
+      clearResumedTurn();
+      throw error;
     }
-
-    const promise = (async () => {
-      try {
-        const turnId = await latestGetActiveTurnId.current(targetSessionId);
-        if (
-          latestSessionId.current !== targetSessionId ||
-          latestResumeStream.current !== targetResumeStream
-        ) {
-          return;
-        }
-        if (!turnId) return;
-
-        const resumedTurn = resumedTurnRef.current;
-        if (
-          resumedTurn?.sessionId === targetSessionId &&
-          resumedTurn.turnId === turnId &&
-          resumedTurn.resumeStream === targetResumeStream
-        ) {
-          return;
-        }
-        // 先记录目标 turn，再建立连接，避免重复生命周期同时发起两条 SSE。
-        resumedTurnRef.current = {
-          sessionId: targetSessionId,
-          turnId,
-          resumeStream: targetResumeStream,
-        };
-        await targetResumeStream({ body: { session_id: targetSessionId } });
-      } catch (error) {
-        if (
-          latestSessionId.current !== targetSessionId ||
-          latestResumeStream.current !== targetResumeStream
-        ) {
-          return;
-        }
-        captureException(error, {
-          detector: 'application-handled',
-          operation: 'chat.resume',
-        });
-        if (error instanceof Error) {
-          latestOnError.current?.(error);
-        }
-      }
-    })();
-
-    // 保留已完成请求，当前会话生命周期内不再次查询 active；会话切换后由 sessionId 区分请求。
-    resumeRequestRef.current = {
-      sessionId: targetSessionId,
-      resumeStream: targetResumeStream,
-      promise,
-    };
-    return promise;
   };
 
-  // --- 应下沉 Service：submit / recover 请求映射 ---
   const submitTurn = async (query: string, options?: SendTurnMessageOptions) => {
     const requestBody = mapChatTurnRequest({
       defaultSessionId: sessionId,
@@ -140,7 +97,6 @@ export function useChatRuntime({
       query,
       options,
     });
-    // 仅用于当次会话 UI；历史回放待后端 listHistoryMessages 透出 metadata
     const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
       .filter((attachment) => attachment.enabled)
       .map((attachment) => ({
@@ -162,27 +118,57 @@ export function useChatRuntime({
       createdAt: new Date().toISOString(),
       ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
     };
-    await message.sendMessage({ text: query, metadata }, { body: requestBody });
+
+    await pumpOutgoing(async () => {
+      const response = await chatTurnService.streamChatCompletion(requestBody);
+      connect.markOpen();
+      await message.pumpSend({
+        response,
+        userMessage: { text: query, metadata },
+      });
+    });
   };
 
-  /** 本步薄委托 recover；审批续跑矩阵（respond / resume / recover）留给后续 Phase。 */
   const submitToolApprovals = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
+    if (!sessionId) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: '恢复聊天时缺少 session_id',
+      });
+    }
+
+    const requestBody = buildApprovalRequest(sessionId, toolApprovalStatus);
+
     try {
-      if (!sessionId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '恢复聊天时缺少 session_id',
-        });
+      // 连接仍活着：只 respond，不新开 SSE。
+      if (connect.isLive()) {
+        await chatTurnService.respondTurn(requestBody);
+        return;
       }
-      const requestBody: ChatRecoverApiRequest = {
-        session_id: sessionId,
-        client_tool_results: [],
-        tool_approval_status: toolApprovalStatus,
-      };
-      await message.sendMessage(undefined, { body: requestBody });
+
+      const activeTurnId = await chatTurnService.getActiveTurnId(sessionId);
+      // 查询期间连接可能又活了；按最新 connect 相位重判。
+      const action = connect.resolveContinuation(activeTurnId);
+
+      if (action === 'respond') {
+        await chatTurnService.respondTurn(requestBody);
+        return;
+      }
+
+      if (action === 'respond_resume') {
+        await chatTurnService.respondTurn(requestBody);
+        await resumeTurn();
+        return;
+      }
+
+      await pumpOutgoing(async () => {
+        const response = await chatTurnService.recoverChatStream(requestBody);
+        connect.markOpen();
+        await message.pumpSend({ response });
+      });
     } catch (error) {
       captureException(error, {
         detector: 'application-handled',
-        operation: 'chat.recover',
+        operation: 'chat.approval',
       });
       throw error;
     }
@@ -190,16 +176,15 @@ export function useChatRuntime({
 
   const cancelTurn = async (): Promise<void> => {
     if (!sessionId) return;
-    stopLocalStream();
+    stopConnect();
     await chatTurnService.cancelTurn(sessionId);
   };
 
-  // --- History：fsm + data + 切会话生命周期内聚；经 message.setMessages 写入权威源 ---
   const history = useChatHistory({
     sessionId: sessionId || null,
     setMessages: message.setMessages,
     resumeTurnStream: resumeTurn,
-    stop: stopLocalStream,
+    stop: releaseSession,
     isNewlyCreatedSession,
     clearNewlyCreatedSession,
   });
@@ -207,7 +192,7 @@ export function useChatRuntime({
   return {
     messages: message.messages,
     status: message.status,
-    stopLocalStream,
+    stopConnect,
     submitTurn,
     submitToolApprovals,
     resumeTurn,

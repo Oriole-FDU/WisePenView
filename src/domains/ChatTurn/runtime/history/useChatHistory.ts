@@ -83,8 +83,8 @@ export function useChatHistory({
    * @wisepen-manual-effect
    * 执行时机：当前会话 ID 首次可用或发生切换时加载历史，并在历史成功后检查 active turn。
    * 不可替代原因：历史加载和 SSE 重连都是异步外部副作用，必须按顺序写入当前 Chat 运行时。
-   * cleanup：标记本次会话加载失效并中止旧 Chat 的客户端连接，配合 Runtime 丢弃旧请求结果；
-   * stop 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
+   * cleanup：标记本次会话加载失效；调用方注入的 stop（Runtime.releaseSession）中止旧泵并 invalidate resume；
+   * 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
    */
   useEffect(() => {
     const actions = historyActionsLatest.current;
