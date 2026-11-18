@@ -57,9 +57,16 @@
 }
 
 .warning {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
   border: 1px solid var(--warning-border);
   background: var(--warning-soft);
   color: var(--foreground);
+
+  > button {
+    align-self: flex-end;
+  }
 }
 
 .inheritHint {
