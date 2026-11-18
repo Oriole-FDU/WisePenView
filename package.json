@@ -21,8 +21,8 @@
     "package:desktop": "pnpm build && pnpm build:electron && electron-builder",
     "package:desktop:unsigned": "pnpm build && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "package:desktop:unsigned:dev": "pnpm build:dev && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
-    "lint": "eslint . --max-warnings 0 --cache --cache-strategy content",
-    "lint:fix": "eslint . --fix --max-warnings 0",
+    "lint": "eslint . --cache --cache-strategy content",
+    "lint:fix": "eslint . --fix",
     "format:check": "prettier --check \"**/*.{js,jsx,mjs,cjs,ts,tsx,json,md,scss}\" \".github/**/*.{yml,yaml}\"",
     "typecheck": "tsc -b",
     "test": "node --test \"tests/**/*.test.mjs\" \"scripts/observability/*.test.mjs\"",
@@ -172,7 +172,7 @@
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx}": [
-      "eslint --fix --max-warnings 0 --no-warn-ignored",
+      "eslint --fix --no-warn-ignored",
       "prettier --write"
     ],
     "*.{jsx,json,md,scss}": "prettier --write"

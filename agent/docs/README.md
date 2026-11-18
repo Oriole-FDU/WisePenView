@@ -6,6 +6,7 @@
 
 - 常驻入口：仓库根目录 `AGENTS.md`
 - AI 开发基建说明：`agent/README.md`
+- 本文：专题索引与阅读路由
 - 验证矩阵：`agent/docs/verification.md`
 - 提交规范：`agent/docs/commit.md`
 - 发布与分支：`agent/docs/release.md`
@@ -41,3 +42,7 @@
 - `color-system.md`：颜色阶、语义 token 和主题。
 
 跨层任务按 `view/component -> service -> api -> entity/enum` 读取，存在字段转换时再读 `domain-mapper.md`；涉及拆分时先读 `architecture-guidelines.md`，涉及业务知识时再读 `business-knowledge.md`。修改完成后删除旧实现和无效兼容层。
+
+## 历史说明
+
+- `dag-domain-refactor-review.md`：2026-10-31 的领域重构审查快照，只用于追溯当时的决定、风险和证据。它不覆盖当前代码；现行规则回到对应专题和 `BUSINESS.md`。

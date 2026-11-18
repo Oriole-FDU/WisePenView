@@ -15,7 +15,6 @@ import type {
   CreateSessionRequest,
   DeleteSessionRequest,
   IChatSessionService,
-  ListHistoryMessagesRequest,
   ListSessionsRequest,
   RenameSessionRequest,
   SetSessionAgentRequest,
@@ -68,13 +67,6 @@ const listSessions = async (params?: ListSessionsRequest) => {
   return page;
 };
 
-const listHistoryMessages = async (params: ListHistoryMessagesRequest) =>
-  ChatSessionServicesMap.mapListHistoryMessagesFromApi(
-    await ChatSessionApi.listHistoryMessages(
-      ChatSessionServicesMap.mapListHistoryMessagesRequest(params)
-    )
-  );
-
 const uploadAttachment = async ({
   sessionId,
   file,
@@ -111,6 +103,5 @@ export const createChatSessionServices = (): IChatSessionService => ({
   renameSession,
   deleteSession,
   listSessions,
-  listHistoryMessages,
   uploadAttachment,
 });

@@ -7,8 +7,6 @@ import {
   DeleteSessionApiRequestSchema,
   InitTemporaryAttachmentUploadApiRequestSchema,
   InitTemporaryAttachmentUploadApiResponseSchema,
-  ListHistoryMessagesApiRequestSchema,
-  ListHistoryMessagesApiResponseSchema,
   ListSessionsApiRequestSchema,
   ListSessionsApiResponseSchema,
   RenameSessionApiRequestSchema,
@@ -65,16 +63,6 @@ export const ListSessionsApiContract = defineApiContract({
   transport: 'json',
   request: ListSessionsApiRequestSchema,
   response: ListSessionsApiResponseSchema,
-});
-
-export const ListHistoryMessagesApiContract = defineApiContract({
-  name: 'ListHistoryMessagesApi',
-  method: 'GET',
-  endpoint: '/chat/session/listHistoryMessages',
-  requestPlacement: 'query',
-  transport: 'json',
-  request: ListHistoryMessagesApiRequestSchema,
-  response: ListHistoryMessagesApiResponseSchema,
 });
 
 export const InitTemporaryAttachmentUploadApiContract = defineApiContract({

@@ -1,58 +1,30 @@
 # WisePenView Agent 规约
 
-这是 WisePenView 的常驻 agent 入口。先读本文件，再根据任务类型读取 `agent/docs`、`agent/skills` 或 `agent/workflows` 中的相关内容；不要一次性预读全部文档。
+本文件是常驻入口，只保存跨任务稳定的约束。详细规则按任务读取，同一规则不在多个文档重复定义。
 
 ## 项目事实
 
 - 技术栈：Vite、React 19、TypeScript strict、SCSS CSS Modules、HeroUI、ahooks、zustand；运行版本以 `.nvmrc` 和 `package.json#packageManager` 为准。
 - 注释和 commit message 使用简体中文，commit message 遵循中文 Conventional Commit。
 
-## 贡献约定
+## 阅读顺序
+
+- 本文件：跨任务入口和文档路由。
+- `agent/README.md`：AI 开发基建、Skill、Workflow 与模板如何协作。
+- `agent/docs/README.md`：按任务类型查找架构与编码专题。
+- 触及领域行为时，同时读取对应 `BUSINESS.md`；业务规则以离代码最近的 canonical owner 为准。
+- `agent/docs/dag-domain-refactor-review.md` 是冻结的历史审查，不是现行契约。
+
+## 硬约束
 
 - 新写文档、注释和提交信息使用简体中文；外部原文引用保持原貌。
 - 代码标识符、接口字段和 URL 不参与字形转换。
+- 保留用户已有改动；不覆盖无关工作区文件，不重写已有 Git 历史。
+- 依赖方向与模块边界以 `agent/docs/` 的专题规则为准。新增规则优先落到类型、lint、脚本或测试；无法确定性校验时才写散文档。
+- 修改契约、状态生命周期或异步副作用时，必须区分已确认行为、合理推断和待运行态验证的假设。
 - 任务交付不默认新增持久化测试；一次性验证执行后可丢弃，新增常驻测试必须说明长期风险与维护收益，不能仅以本次修改需要验证为由。
-- 既有繁体内容在触及对应文件时顺手规范，不再发起无边界的批量替换。
 
-## 任务路由
+## 验证与提交
 
-- Bug 或缺陷：先读 `agent/workflows/bug-to-pr.md`，需要重复执行时读 `agent/skills/bug-fix/SKILL.md`。
-- 创建分支和 PR：读 `agent/skills/pr-create/SKILL.md` 与 `agent/templates/pull-request.md`。
-- 处理 PR Review：读 `agent/workflows/review-to-patch.md` 与 `agent/skills/pr-review-followup/SKILL.md`。
-- CI 失败：读 `agent/skills/ci-failure/SKILL.md`。
-- 发布或版本任务：读 `agent/workflows/release.md` 与 `agent/docs/release.md`。
-- 可观测性、OTel、异常捕获或私有源码映射：读 `agent/docs/observability.md`。
-- 编码与架构：按 `agent/docs/README.md` 定位 Domain、Component、Layout、路由、状态等专题；Layout 任务先读 `agent/docs/layout.md`。
-- 表单设计与实现：先读 `agent/docs/forms.md`，复用现有字段、校验和离开保护契约。
-- Context 的组成、归属和消费：`agent/docs/context.md`。
-- 验证和提交：分别读 `agent/docs/verification.md`、`agent/docs/commit.md`。
-
-## 工作边界
-
-- 修改前必须查看 `git status --short`，不得覆盖或回滚用户已有改动。
-- 先用 `rg` 查找同域、同类型实现，保持改动范围贴近任务。
-- `scripts/` 只收录项目必需、覆盖面足够广且需要长期复用的脚本。新增前先检查现有入口；不能说明必要性、覆盖范围和长期用途时，不加入该目录。
-- `scripts/` 不用于存放单个 Bug 或组件的局部自测、单测。此类验证可在仓库外或本地临时目录编写并执行，记录验证结果，但不纳入代码提交。
-- 不确定接口字段、权限边界或后端契约时先确认，不用 fallback 掩盖不确定性。
-- 未经用户明确要求，不启动 `pnpm dev`、`pnpm mock`，不进入浏览器或可视化调试。
-- 外部写操作（push、创建 PR、发送 Review 回复、修改 GitHub 设置）必须得到用户明确授权。
-
-## 验证和交付
-
-- 按 `agent/docs/verification.md` 选择并记录检查；代码任务至少运行 `pnpm lint`。
-- 只有用户明确要求时才运行运行态验证，并记录浏览器、窗口尺寸和场景。
-- 交付说明必须包含：改动、原因、验证结果、未验证项和剩余风险。
-
-## Git 与 PR
-
-- 分支与提交格式遵循 `agent/docs/commit.md`；默认基于 `main`。
-- 除非用户特别说明，PR 默认提交到 `main`。
-- PR 必须说明问题、根因、变更、验证、未验证项和 Review 重点。
-- Review 修改应回到原 PR 分支，逐条对应评论并重新验证，不新开无关 PR。
-
-## 文档和 Codex 配置
-
-- 流程位于 `agent/workflows`；可复用 Skill 位于 `agent/skills`。
-- 项目级 `.codex` 只放安全、可共享的环境设置，不放模型、审批策略、沙箱权限、个人路径或密钥；当前仓库不提交项目级 Codex 配置文件。
-- 个人偏好、默认审批、MCP 和凭据放在 `~/.codex` 或组织级配置中。
-- 涉及 Codex、OpenAI API 或 Codex 配置时，优先查阅官方 OpenAI 文档。
+- 按 `agent/docs/verification.md` 选择最小充分验证，并在交付中只记录实际执行过的命令与结果。
+- Commit 格式、分支和暂存范围以 `agent/docs/commit.md` 为准。

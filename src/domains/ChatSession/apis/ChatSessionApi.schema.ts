@@ -43,62 +43,6 @@ const OptionalPageSchema = z.strictObject({
 
 export const ListSessionsApiRequestSchema = OptionalPageSchema;
 
-export const ListHistoryMessagesApiRequestSchema = OptionalPageSchema.extend({
-  session_id: OpaqueIdSchema,
-});
-
-const NullPartFields = {
-  text: z.null(),
-  state: z.null(),
-  toolCallId: z.null(),
-  input: z.null(),
-  output: z.null(),
-};
-
-export const UIMessagePartApiSchema = z.union([
-  z.object({
-    type: z.literal('text'),
-    text: z.string(),
-    state: z.enum(['streaming', 'done']),
-    toolCallId: z.null(),
-    input: z.null(),
-    output: z.null(),
-  }),
-  z.object({
-    type: z.literal('reasoning'),
-    text: z.string(),
-    state: z.enum(['streaming', 'done']),
-    toolCallId: z.null(),
-    input: z.null(),
-    output: z.null(),
-  }),
-  z.object({ type: z.literal('step-start'), ...NullPartFields }),
-  z.object({
-    type: z.string().regex(/^tool-.+$/),
-    text: z.null(),
-    state: z.enum([
-      'input-streaming',
-      'input-available',
-      'approval-requested',
-      'approval-responded',
-      'output-available',
-      'output-error',
-      'output-denied',
-    ]),
-    toolCallId: NonEmptyStringSchema,
-    input: z.unknown(),
-    output: z.unknown().nullable(),
-  }),
-]);
-
-export const UIMessageApiSchema = z.object({
-  id: OpaqueIdSchema,
-  role: z.enum(['system', 'user', 'assistant']),
-  parts: z.array(UIMessagePartApiSchema),
-  createdAt: IsoDateTimeSchema.nullable(),
-  metadata: z.record(z.string(), z.unknown()).nullable(),
-});
-
 export const PythonPageResponseSchema = <ItemSchema extends z.ZodType>(itemSchema: ItemSchema) =>
   z.object({
     list: z.array(itemSchema),
@@ -109,7 +53,6 @@ export const PythonPageResponseSchema = <ItemSchema extends z.ZodType>(itemSchem
   });
 
 export const ListSessionsApiResponseSchema = PythonPageResponseSchema(ChatSessionApiSchema);
-export const ListHistoryMessagesApiResponseSchema = PythonPageResponseSchema(UIMessageApiSchema);
 
 export const InitTemporaryAttachmentUploadApiRequestSchema = z.strictObject({
   session_id: OpaqueIdSchema,
@@ -139,9 +82,6 @@ export type RenameSessionApiRequest = z.infer<typeof RenameSessionApiRequestSche
 export type DeleteSessionApiRequest = z.infer<typeof DeleteSessionApiRequestSchema>;
 export type ListSessionsApiRequest = z.infer<typeof ListSessionsApiRequestSchema>;
 export type ListSessionsApiResponse = z.infer<typeof ListSessionsApiResponseSchema>;
-export type ListHistoryMessagesApiRequest = z.infer<typeof ListHistoryMessagesApiRequestSchema>;
-export type ListHistoryMessagesApiResponse = z.infer<typeof ListHistoryMessagesApiResponseSchema>;
-export type UIMessageApi = z.infer<typeof UIMessageApiSchema>;
 export type InitTemporaryAttachmentUploadApiRequest = z.infer<
   typeof InitTemporaryAttachmentUploadApiRequestSchema
 >;

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useMessageScroller, useMessageScrollerVisibility } from '@/components/_shadcn';
 import { AppPressable } from '@/components/base/Button';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { WisePenUIMessage } from '@/domains/ChatTurn';
 
 import styles from './style.module.scss';
 

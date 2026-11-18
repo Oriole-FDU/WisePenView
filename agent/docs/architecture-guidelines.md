@@ -9,7 +9,7 @@
 - 超过 400 行：warning，先检查职责边界，不要求为行数机械拆分。
 - 超过 600 行：error，必须拆分或在 ESLint 配置中为明确不适合拆分的代码文件登记例外及原因。
 - 计入空行与注释，文件结尾的换行不额外增加一行；400／600 行本身不超过门槛。
-- 当前检查范围为 `src/components/editors/skill` 与 Resource、Tag、Image、Document、Auth、User、Group、Wallet 八个 domain；按业务域逐批扩大，合并前完成业务知识与架构行为两次审查。
+- 当前检查范围以 `eslint.config.js` 为准：`src/components/editors/skill` 与 Resource、Tag、Image、Document、Auth、User、Group、Wallet 八个 domain；按业务域逐批扩大，合并前完成业务知识与架构行为两次审查。
 - 生成代码文件、第三方 `_shadcn`、fixture、snapshot、样式与 build output 不纳入检查。
 
 warning 与 error 都应逐项审查。处理方式是创建稳定责任边界并拆分，或保留在原代码文件并说明 ESLint 例外理由。审查时至少回答：代码文件能否用一句话说明责任？同一组状态与行为是否共同维护不变量？一次更改是否经常跨越不相关的行为域？

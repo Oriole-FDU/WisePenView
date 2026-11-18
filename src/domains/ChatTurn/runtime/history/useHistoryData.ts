@@ -1,21 +1,28 @@
+/**
+ * 历史消息分页数据：整页替换、向前翻页与清空。
+ */
 import { useLatest } from 'ahooks';
 import { useRef, useState } from 'react';
 
-import type { PageResult } from '@/domains/_shared/entity/page';
+import { useChatTurnService } from '@/domains';
 
-import type { WisePenUIMessage } from '../entity/message';
+import type { WisePenUIMessage } from '../../entity/message';
+import type { ChatMessagesWriter } from '../message/useChatMessage';
+import type { HistoryLoadingActions } from './useHistoryLoadingFsm';
 
-interface UseChatHistoryOptions {
+const DEFAULT_HISTORY_PAGE_SIZE = 100;
+
+export interface UseHistoryDataOptions {
   sessionId: string | null;
-  pageSize: number;
-  loadPage: (
-    sessionId: string,
-    page: number,
-    size: number
-  ) => Promise<PageResult<WisePenUIMessage>>;
-  setMessages: (
-    messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
-  ) => void;
+  setMessages: ChatMessagesWriter;
+  loading: HistoryLoadingActions;
+}
+
+export interface UseHistoryDataResult {
+  canLoadMore: boolean;
+  replaceHistory: (targetSessionId: string) => Promise<boolean>;
+  prependHistory: () => Promise<void>;
+  clearConversation: () => void;
 }
 
 function mergeMessages(
@@ -30,42 +37,38 @@ function mergeMessages(
   });
 }
 
-export function useChatHistory({
+export function useHistoryData({
   sessionId,
-  pageSize,
-  loadPage,
   setMessages,
-}: UseChatHistoryOptions) {
+  loading,
+}: UseHistoryDataOptions): UseHistoryDataResult {
+  const { listHistoryMessages } = useChatTurnService();
   const sessionIdRef = useLatest(sessionId);
+  const loadingRef = useLatest(loading);
   const requestVersionRef = useRef(0);
-  const loadingMoreRef = useRef(false);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [loadingInitial, setLoadingInitial] = useState(false);
 
   const clearConversation = () => {
     requestVersionRef.current += 1;
-    loadingMoreRef.current = false;
-    setLoadingMore(false);
-    setLoadingInitial(false);
+    loadingRef.current.resetLoading();
     setPage(1);
     setTotalPage(1);
     setMessages([]);
   };
 
   const replaceHistory = async (targetSessionId: string): Promise<boolean> => {
+    // 抬版本并清空当前列表，开始首屏加载
     const requestVersion = requestVersionRef.current + 1;
     requestVersionRef.current = requestVersion;
-    loadingMoreRef.current = false;
-    setLoadingMore(false);
-    setLoadingInitial(true);
+    loadingRef.current.beginReplaceLoad();
     setPage(1);
     setTotalPage(1);
     setMessages([]);
 
     try {
-      const payload = await loadPage(targetSessionId, 1, pageSize);
+      const payload = await listHistoryMessages(targetSessionId, 1, DEFAULT_HISTORY_PAGE_SIZE);
+      // 版本或 session 已变：丢弃陈旧响应
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current
@@ -77,6 +80,7 @@ export function useChatHistory({
       setTotalPage(payload.totalPage ?? 1);
       return true;
     } catch (error) {
+      // 已切走则吞掉错误，避免误报
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current
@@ -85,26 +89,32 @@ export function useChatHistory({
       }
       throw error;
     } finally {
+      // 仅当前请求结束 loading
       if (
         requestVersion === requestVersionRef.current &&
         targetSessionId === sessionIdRef.current
       ) {
-        setLoadingInitial(false);
+        loadingRef.current.endReplaceLoad();
       }
     }
   };
 
   const prependHistory = async (): Promise<void> => {
+    // 无更多页或正在 prepend 则跳过
     const targetSessionId = sessionIdRef.current;
-    if (!targetSessionId || loadingMoreRef.current || page >= totalPage) return;
+    if (!targetSessionId || page >= totalPage) return;
+    if (!loadingRef.current.beginPrependLoad()) return;
 
     const requestVersion = requestVersionRef.current;
     const nextPage = page + 1;
-    loadingMoreRef.current = true;
-    setLoadingMore(true);
 
     try {
-      const payload = await loadPage(targetSessionId, nextPage, pageSize);
+      const payload = await listHistoryMessages(
+        targetSessionId,
+        nextPage,
+        DEFAULT_HISTORY_PAGE_SIZE
+      );
+      // 陈旧响应丢弃
       if (
         requestVersion !== requestVersionRef.current ||
         targetSessionId !== sessionIdRef.current
@@ -114,21 +124,27 @@ export function useChatHistory({
       setMessages((currentMessages) => mergeMessages(payload.list, currentMessages));
       setPage(payload.page ?? nextPage);
       setTotalPage(payload.totalPage ?? totalPage);
+    } catch (error) {
+      // 已切走或开始新一轮替换时，旧翻页错误不应提示到当前会话。
+      if (
+        requestVersion !== requestVersionRef.current ||
+        targetSessionId !== sessionIdRef.current
+      ) {
+        return;
+      }
+      throw error;
     } finally {
       if (
         requestVersion === requestVersionRef.current &&
         targetSessionId === sessionIdRef.current
       ) {
-        loadingMoreRef.current = false;
-        setLoadingMore(false);
+        loadingRef.current.endPrependLoad();
       }
     }
   };
 
   return {
     canLoadMore: Boolean(sessionId) && page < totalPage,
-    loadingMore,
-    loadingInitial,
     replaceHistory,
     prependHistory,
     clearConversation,
