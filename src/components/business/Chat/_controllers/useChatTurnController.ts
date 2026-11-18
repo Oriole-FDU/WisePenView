@@ -20,8 +20,6 @@ import { parseErrorMessage } from '@/utils/error';
 import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
 import { hasRenderableChatContent } from './chatTurnModel';
-import type { UseChatToolApprovalResult } from './useChatToolApproval';
-import { useChatToolApproval } from './useChatToolApproval';
 
 export interface UseChatTurnControllerOptions {
   /** 会话域提供的按需建会话能力，用于发送前确保存在目标会话 */
@@ -33,7 +31,7 @@ export interface UseChatTurnControllerOptions {
 }
 
 export interface UseChatTurnControllerResult {
-  approval: UseChatToolApprovalResult;
+  approval: UseChatRuntimeResult['approval'];
   cancel: () => Promise<void>;
   cancelling: boolean;
   currentModel: ChatModel | null;
@@ -46,7 +44,7 @@ export interface UseChatTurnControllerResult {
 }
 
 /**
- * 对话 UI 组合根：门禁、审批交互与历史分页 UI。
+ * 对话 UI 组合根：门禁与发送编排。
  *
  * ChatTurn 业务能力只通过 useChatRuntime 消费；不注入散落流 API，不拼 recover body。
  */
@@ -69,23 +67,14 @@ export function useChatTurnController({
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
   const [cancellingSessionId, setCancellingSessionId] = useState<string | null>(null);
 
-  const { messages, status, submitTurn, submitToolApprovals, cancelTurn, history } = useChatRuntime(
-    {
-      sessionId: currentSessionId ?? '',
-      model: currentModel?.modelId,
-      isNewlyCreatedSession,
-      clearNewlyCreatedSession,
-      onError: (error) => {
-        toast.danger(parseErrorMessage(error));
-      },
-    }
-  );
-
-  const approval = useChatToolApproval({
-    sessionId: currentSessionId,
-    messages,
-    status,
-    submitToolApprovals,
+  const { approval, messages, status, submitTurn, cancelTurn, history } = useChatRuntime({
+    sessionId: currentSessionId ?? '',
+    model: currentModel?.modelId,
+    isNewlyCreatedSession,
+    clearNewlyCreatedSession,
+    onError: (error) => {
+      toast.danger(parseErrorMessage(error));
+    },
   });
 
   /** 发送一轮消息：校验登录与资源上下文，必要时先建立会话，再把前端状态随消息提交。 */

@@ -1,6 +1,6 @@
 import { getToolName, isToolUIPart } from 'ai';
 
-import type { WisePenUIMessage } from '@/domains/ChatTurn';
+import type { WisePenUIMessage } from '../../entity/message';
 
 export interface ToolApprovalRequest {
   toolCallId: string;

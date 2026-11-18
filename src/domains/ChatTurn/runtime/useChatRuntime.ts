@@ -8,6 +8,8 @@ import type { ChatRecoverApiRequest, ChatRespondApiRequest } from '../apis/ChatT
 import type { ChatMessageMetadata, WisePenUIMessage } from '../entity/message';
 import { mapChatTurnRequest } from '../mapper/chatTurn.mapper';
 import type { SendTurnMessageOptions, ToolApprovalStatusRequest } from '../service/index.type';
+import type { UseChatToolApprovalResult } from './approval/useChatToolApproval';
+import { useChatToolApproval } from './approval/useChatToolApproval';
 import { useConnectFsm } from './connect/useConnectFsm';
 import { useResumeLifecycle } from './connect/useResumeLifecycle';
 import type { UseChatHistoryResult } from './history/useChatHistory';
@@ -23,6 +25,7 @@ export interface UseChatRuntimeOptions {
 }
 
 export interface UseChatRuntimeResult {
+  approval: UseChatToolApprovalResult;
   messages: WisePenUIMessage[];
   status: ChatStatus;
   stopConnect: () => void;
@@ -45,7 +48,7 @@ function buildApprovalRequest(
 }
 
 /**
- * ChatTurn Runtime 组装根：connect FSM 调度 + Service 协议 + message 泵 + history。
+ * ChatTurn Runtime 组装根：connect FSM 调度 + Service 协议 + message 泵 + history + approval。
  */
 export function useChatRuntime({
   sessionId,
@@ -189,7 +192,15 @@ export function useChatRuntime({
     clearNewlyCreatedSession,
   });
 
+  const approval = useChatToolApproval({
+    sessionId,
+    messages: message.messages,
+    status: message.status,
+    submitToolApprovals,
+  });
+
   return {
+    approval,
     messages: message.messages,
     status: message.status,
     stopConnect,
