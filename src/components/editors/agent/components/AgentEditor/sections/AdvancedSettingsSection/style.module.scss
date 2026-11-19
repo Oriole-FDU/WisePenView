@@ -1,0 +1,65 @@
+@use '@/styles/mixins/focusRing' as focusRing;
+
+.titleTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--app-radius-menu-item);
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.indicator {
+  flex: 0 0 auto;
+  color: currentColor;
+  opacity: 0.55;
+  transition:
+    transform var(--motion-duration-mid) var(--motion-ease-fluid),
+    opacity var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.titleTrigger:hover .indicator,
+.titleTrigger:focus-visible .indicator,
+.titleTrigger[aria-expanded='true'] .indicator {
+  opacity: 1;
+}
+
+.titleTrigger[aria-expanded='true'] .indicator {
+  transform: rotate(90deg);
+}
+
+.indicator {
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: var(--motion-duration-reduced);
+  }
+}
+
+.titleTrigger:focus-visible {
+  @include focusRing.appFocusRing();
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: var(--space-lg);
+  padding-top: var(--space-md);
+}
+
+.group {
+  min-width: 0;
+}
+
+.group h3 {
+  margin: 0 0 var(--space-xs);
+  color: var(--foreground);
+  font-size: var(--font-size-heading-5);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-sm);
+}

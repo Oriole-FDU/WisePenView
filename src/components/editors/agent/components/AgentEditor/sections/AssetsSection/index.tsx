@@ -1,16 +1,16 @@
-import { Table } from '@heroui/react';
-import { Trash2, Upload } from 'lucide-react';
+import { FileText, Trash2, Upload } from 'lucide-react';
 import { type DragEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
-import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { HiddenFileInput } from '@/components/base/Input';
 import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
+import SettingsListPanel from '../../shared/SettingsListPanel';
 import styles from './style.module.scss';
+
 interface Props {
   assets: AgentAsset[];
   disabled: boolean;
@@ -18,6 +18,7 @@ interface Props {
   onUpload: (files: File[]) => void;
   onDelete: (id: string) => void;
 }
+
 const isFileDrag = (event: DragEvent<HTMLElement>) =>
   Array.from(event.dataTransfer.types).includes('Files');
 
@@ -32,6 +33,8 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
     dragCounterRef.current = 0;
     setIsDragOver(false);
   };
+
+  const openFilePicker = () => ref.current?.click();
 
   const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
     if (!isFileDrag(event)) return;
@@ -72,22 +75,7 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
   };
 
   return (
-    <AppForm.Section
-      id="assets"
-      title={t('assets.title')}
-      variant="editor"
-      actions={
-        <AppButton
-          size="sm"
-          variant="secondary"
-          isDisabled={uploadDisabled}
-          onPress={() => ref.current?.click()}
-        >
-          <Upload size={14} />
-          {t('assets.upload')}
-        </AppButton>
-      }
-    >
+    <AppForm.Section id="assets" title={t('assets.title')} variant="editor">
       <div
         className={styles.dropZone}
         data-drag-over={isDragOver}
@@ -96,55 +84,52 @@ export default function AssetsSection({ assets, disabled, uploading, onUpload, o
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <Table variant="secondary">
-          <Table.ScrollContainer>
-            <Table.Content aria-label={t('assets.tableAria')}>
-              <Table.Header>
-                <Table.Column isRowHeader>{t('assets.file')}</Table.Column>
-                <Table.Column>{t('assets.typeAndSize')}</Table.Column>
-                <Table.Column>{t('assets.status')}</Table.Column>
-                <Table.Column>{t('assets.actions')}</Table.Column>
-              </Table.Header>
-              <Table.Body
-                items={assets}
-                renderEmptyState={() => <div className={styles.empty}>{t('assets.empty')}</div>}
-              >
-                {(asset) => (
-                  <Table.Row id={asset.id}>
-                    <Table.Cell>
-                      <strong>{asset.name}</strong>
-                    </Table.Cell>
-                    <Table.Cell>
-                      {asset.assetResourceType} · {formatFileSize(asset.size)}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {asset.uploadStatus === 'AVAILABLE'
-                        ? t('assets.available')
-                        : t('assets.uploading')}
-                    </Table.Cell>
-                    <Table.Cell>
-                      <AppIconButton
-                        icon={<Trash2 size={14} aria-hidden="true" />}
-                        label={t('assets.delete', { name: asset.name })}
-                        size="sm"
-                        isDisabled={disabled}
-                        onPress={() => onDelete(asset.id)}
-                      />
-                    </Table.Cell>
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table.Content>
-          </Table.ScrollContainer>
-        </Table>
+        <SettingsListPanel
+          heading={<strong>{t('assets.listTitle')}</strong>}
+          action={
+            <AppIconButton
+              icon={<Upload size={15} aria-hidden="true" />}
+              label={t('assets.upload')}
+              size="sm"
+              isDisabled={uploadDisabled}
+              onPress={openFilePicker}
+            />
+          }
+          isEmpty={assets.length === 0}
+          emptyText={t('assets.empty')}
+        >
+          {assets.map((asset) => (
+            <div key={asset.id} className={styles.assetRow}>
+              <span className={styles.assetIcon}>
+                <FileText size={14} aria-hidden="true" />
+              </span>
+              <span className={styles.assetCopy}>
+                <strong>{asset.name}</strong>
+                <small>
+                  {asset.assetResourceType} · {formatFileSize(asset.size)} ·{' '}
+                  {asset.uploadStatus === 'AVAILABLE'
+                    ? t('assets.available')
+                    : t('assets.uploading')}
+                </small>
+              </span>
+              <AppIconButton
+                icon={<Trash2 size={14} aria-hidden="true" />}
+                label={t('assets.delete', { name: asset.name })}
+                size="sm"
+                isDisabled={disabled}
+                onPress={() => onDelete(asset.id)}
+              />
+            </div>
+          ))}
+        </SettingsListPanel>
         {isDragOver ? <div className={styles.dropHint}>{t('assets.drop')}</div> : null}
       </div>
       <HiddenFileInput
         ref={ref}
         multiple
-        onChange={(e) => {
-          onUpload(Array.from(e.target.files ?? []));
-          e.target.value = '';
+        onChange={(event) => {
+          onUpload(Array.from(event.target.files ?? []));
+          event.target.value = '';
         }}
       />
     </AppForm.Section>

@@ -1,71 +1,10 @@
-.tabs {
-  display: block;
-}
-.tabList {
-  width: auto;
-}
-.tab {
-  width: auto;
-  min-width: 88px;
-  color: var(--muted);
-  font-family: var(--app-font-family);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-sm);
-}
-.tab[data-selected='true'] {
-  color: var(--accent-soft-foreground);
-}
-.presetButton {
-  font-family: var(--app-font-family);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-sm);
-}
-.guided {
-  display: grid;
-  gap: 0;
-}
-.groupHead,
-.soulHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md-plus);
-}
-.groupHead strong,
-.soulHead strong {
-  font-size: var(--font-size-heading-5);
-}
-.groupHead {
-  margin-bottom: var(--space-sm);
-}
-.promptField,
-.presetField {
-  padding: 18px 0;
-  border-top: 1px solid var(--separator);
-}
-.soulHead {
-  min-height: 68px;
-  margin-top: 10px;
-  border-top: 1px solid var(--separator);
-  border-bottom: 1px solid var(--separator);
-}
-.editorHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+.markdown {
+  min-height: clamp(280px, 42vh, 420px);
+  line-height: 1.65;
 }
 
-.editorHead span {
-  color: var(--success-text);
-  font-size: var(--font-size-xs);
-}
-.editorHead span[data-compatible='false'] {
-  color: var(--warning-text);
-}
-.markdown {
-  min-height: 560px;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+@container agent-editor (max-width: 520px) {
+  .markdown {
+    min-height: 280px;
+  }
 }

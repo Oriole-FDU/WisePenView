@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type { ChatAgentOption } from '@/domains/ChatConfig';
 
 import type { SendOptions } from './send.type';
@@ -39,6 +41,8 @@ export interface ChatProps {
   };
   /** 宿主注入的 Agent 端口，面板只做转发 */
   hostAgentPort?: ChatHostAgentPort;
+  /** 会话标题旁的宿主状态标识，例如 Agent 调试。 */
+  titleMeta?: ReactNode;
   showCollapseButton?: boolean;
   onCollapsePanel?: () => void;
 }

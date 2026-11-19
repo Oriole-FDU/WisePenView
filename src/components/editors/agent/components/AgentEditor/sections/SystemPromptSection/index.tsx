@@ -3,65 +3,33 @@ import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
-import { FormField, Switch, TextArea } from '@/components/base/Input';
-import { Tabs } from '@/components/base/Tabs';
+import { FormField, TextArea } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
-import type { GuidedPromptFields, SoulFieldKey } from '../../../../guidedPrompt';
-import {
-  buildGuidedPrompt,
-  getDefaultGuidedPromptFields,
-  parseGuidedPrompt,
-  setSoulEnabled,
-  syncGuidedPrompt,
-} from '../../../../guidedPrompt';
-import PresetRestoreConfirmDialog from '../../shared/PresetRestoreConfirmDialog';
+import { buildInstructionTemplate } from './instructionTemplate';
 import styles from './style.module.scss';
+
 interface Props {
   markdown: string;
   disabled: boolean;
   onMarkdownChange: (value: string) => void;
 }
-type PromptMode = 'guided' | 'free';
-const textFields: Array<{
-  key: keyof GuidedPromptFields;
-  rows?: number;
-}> = [
-  { key: 'overview' },
-  { key: 'context' },
-  { key: 'workflow' },
-  { key: 'outputFormat' },
-  { key: 'exampleOutput', rows: 7 },
-  { key: 'qualityChecks' },
-  { key: 'whenToAsk' },
-];
-const soulFields: SoulFieldKey[] = [
-  'soulStyle',
-  'soulInitiative',
-  'soulTaste',
-  'soulTruth',
-  'soulBoundaries',
-];
 
 export default function SystemPromptSection({ markdown, disabled, onMarkdownChange }: Props) {
   const { t } = useTranslation('agent');
-  const [mode, setMode] = useState<PromptMode>(() =>
-    parseGuidedPrompt(markdown).compatible ? 'guided' : 'free'
-  );
-  const [promptResetOpen, setPromptResetOpen] = useState(false);
-  const [restoreOpen, setRestoreOpen] = useState(false);
-  const defaultFields = getDefaultGuidedPromptFields();
-  const parsed = parseGuidedPrompt(markdown, defaultFields);
-  const fields = parsed.compatible ? parsed.fields : defaultFields;
-  const update = (next: GuidedPromptFields) => onMarkdownChange(syncGuidedPrompt(markdown, next));
-  const requestMode = (nextMode: PromptMode) => {
-    if (nextMode === mode) return;
-    if (nextMode === 'free' || parsed.compatible) {
-      setMode(nextMode);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const insertTemplate = () => {
+    onMarkdownChange(buildInstructionTemplate());
+    setConfirmOpen(false);
+  };
+  const requestTemplate = () => {
+    if (markdown.trim()) {
+      setConfirmOpen(true);
       return;
     }
-    setPromptResetOpen(true);
+    insertTemplate();
   };
+
   return (
     <>
       <AppForm.Section
@@ -69,158 +37,29 @@ export default function SystemPromptSection({ markdown, disabled, onMarkdownChan
         title={t('prompt.title')}
         variant="editor"
         actions={
-          <Tabs
-            className={styles.tabs}
-            selectedKey={mode}
-            onSelectionChange={(key) => {
-              const nextMode = String(key);
-              if (nextMode === 'guided' || nextMode === 'free') requestMode(nextMode);
-            }}
-          >
-            <Tabs.ListContainer>
-              <Tabs.List className={styles.tabList} aria-label={t('prompt.modeAria')}>
-                <Tabs.Tab id="guided" className={styles.tab}>
-                  {t('prompt.guided')}
-                  <Tabs.Indicator />
-                </Tabs.Tab>
-                <Tabs.Tab id="free" className={styles.tab}>
-                  {t('prompt.free')}
-                  <Tabs.Indicator />
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs.ListContainer>
-          </Tabs>
+          <AppButton size="sm" variant="secondary" isDisabled={disabled} onPress={requestTemplate}>
+            {t('prompt.useTemplate')}
+          </AppButton>
         }
       >
-        {mode === 'free' ? (
-          <div>
-            <div className={styles.editorHead}>
-              <strong>{t('prompt.markdownLabel')}</strong>
-              <span data-compatible={parsed.compatible}>
-                {parsed.compatible ? t('prompt.compatible') : t('prompt.incompatible')}
-              </span>
-            </div>
-            <FormField
-              aria-label="System Prompt Markdown"
-              value={markdown}
-              isDisabled={disabled}
-              onChange={onMarkdownChange}
-            >
-              <TextArea className={styles.markdown} />
-            </FormField>
-          </div>
-        ) : (
-          <div className={styles.guided}>
-            <div className={styles.groupHead}>
-              <div>
-                <strong>{t('prompt.guidedTitle')}</strong>
-              </div>
-              <AppButton
-                className={styles.presetButton}
-                size="sm"
-                variant="secondary"
-                isDisabled={disabled}
-                onPress={() => setRestoreOpen(true)}
-              >
-                {t('prompt.restore')}
-              </AppButton>
-            </div>
-            {textFields.map((field) => (
-              <div key={field.key} className={styles.promptField}>
-                <FormField
-                  label={t(`prompt.field.${field.key}.label`)}
-                  help={{
-                    label: t('prompt.fieldHelpLabel', {
-                      label: t(`prompt.field.${field.key}.label`),
-                    }),
-                    content: t(`prompt.field.${field.key}.description`),
-                  }}
-                  value={String(fields[field.key])}
-                  isDisabled={disabled}
-                  onChange={(value) => update({ ...fields, [field.key]: value })}
-                >
-                  <TextArea rows={field.rows ?? 4} />
-                </FormField>
-              </div>
-            ))}
-            <div className={styles.soulHead}>
-              <div>
-                <strong>{t('prompt.soulTitle')}</strong>
-              </div>
-              <Switch
-                size="md"
-                aria-label={t('prompt.soulAria')}
-                isSelected={parsed.soulEnabled}
-                isDisabled={disabled}
-                onChange={(selected) =>
-                  onMarkdownChange(setSoulEnabled(markdown, fields, selected))
-                }
-              />
-            </div>
-            {parsed.soulEnabled ? (
-              <>
-                <div className={styles.promptField}>
-                  <FormField
-                    label={t('prompt.field.soulRole.label')}
-                    help={{
-                      label: t('prompt.fieldHelpLabel', {
-                        label: t('prompt.field.soulRole.label'),
-                      }),
-                      content: t('prompt.field.soulRole.description'),
-                    }}
-                    value={fields.soulRole}
-                    isDisabled={disabled}
-                    onChange={(value) => update({ ...fields, soulRole: value })}
-                  >
-                    <TextArea rows={4} />
-                  </FormField>
-                </div>
-                {soulFields.map((field) => (
-                  <div key={field} className={styles.presetField}>
-                    <FormField
-                      label={t(`prompt.field.${field}.label`)}
-                      help={{
-                        label: t('prompt.fieldHelpLabel', {
-                          label: t(`prompt.field.${field}.label`),
-                        }),
-                        content: t(`prompt.field.${field}.description`),
-                      }}
-                      value={fields[field]}
-                      isDisabled={disabled}
-                      onChange={(value) => update({ ...fields, [field]: value })}
-                    >
-                      <TextArea rows={3} />
-                    </FormField>
-                  </div>
-                ))}
-              </>
-            ) : null}
-          </div>
-        )}
+        <FormField
+          label={t('prompt.label')}
+          value={markdown}
+          isDisabled={disabled}
+          onChange={onMarkdownChange}
+        >
+          <TextArea className={styles.markdown} rows={18} placeholder={t('prompt.placeholder')} />
+        </FormField>
       </AppForm.Section>
-      <PresetRestoreConfirmDialog
-        isOpen={restoreOpen}
-        onOpenChange={setRestoreOpen}
-        title={t('prompt.restoreTitle')}
-        description={t('prompt.restoreDescription')}
-        onConfirm={() => {
-          onMarkdownChange(buildGuidedPrompt(getDefaultGuidedPromptFields(), true));
-          setRestoreOpen(false);
-        }}
-      />
       <AppAlertDialog
-        type="danger"
-        isOpen={promptResetOpen}
-        onOpenChange={setPromptResetOpen}
-        title={t('page.promptReset.title')}
-        description={t('page.promptReset.description')}
-        cancelText={t('page.promptReset.cancel')}
-        confirmText={t('page.promptReset.confirm')}
-        onConfirm={() => {
-          onMarkdownChange(buildGuidedPrompt(getDefaultGuidedPromptFields(), true));
-          setMode('guided');
-          setPromptResetOpen(false);
-        }}
+        type="warning"
+        isOpen={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title={t('prompt.templateConfirmTitle')}
+        description={t('prompt.templateConfirmDescription')}
+        cancelText={t('common:actions.cancel')}
+        confirmText={t('prompt.replaceWithTemplate')}
+        onConfirm={insertTemplate}
       />
     </>
   );

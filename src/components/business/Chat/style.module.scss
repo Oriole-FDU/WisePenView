@@ -112,6 +112,20 @@
   overflow: hidden;
 }
 
+.headerTitle {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.headerTitleText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .conversationPanel {
   flex: 1;
   min-height: 0;

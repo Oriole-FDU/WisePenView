@@ -10,11 +10,12 @@ import FieldHelp from '@/components/base/FieldHelp';
 import { Autocomplete, SearchField } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 
+import SettingsListPanel from '../../../shared/SettingsListPanel';
 import styles from './style.module.scss';
 
-export type CapabilityPolicyKind = 'tool' | 'skill';
+type CapabilityPolicyKind = 'tool' | 'skill';
 
-export interface CapabilityPolicyOption {
+interface CapabilityPolicyOption {
   id: string;
   name: string;
   internalName?: string;
@@ -26,7 +27,7 @@ export interface CapabilityPolicyOption {
 interface Props {
   kind: CapabilityPolicyKind;
   title: string;
-  description: string;
+  description?: string;
   addLabel: string;
   searchPlaceholder: string;
   emptyText: string;
@@ -85,13 +86,17 @@ export default function CapabilityPolicyPanel({
   const remove = (id: string) => onChange(selectedIds.filter((item) => item !== id));
 
   return (
-    <div className={styles.block}>
-      <div className={styles.panel}>
-        <header className={styles.header}>
-          <div className={styles.heading}>
+    <>
+      <SettingsListPanel
+        heading={
+          <>
             <strong>{title}</strong>
-            <FieldHelp label={t('capabilities.helpLabel', { title })} content={description} />
-          </div>
+            {description ? (
+              <FieldHelp label={t('capabilities.helpLabel', { title })} content={description} />
+            ) : null}
+          </>
+        }
+        action={
           <AppIconButton
             icon={<Plus size={15} aria-hidden="true" />}
             label={addLabel}
@@ -99,38 +104,34 @@ export default function CapabilityPolicyPanel({
             isDisabled={disabled}
             onPress={() => setIsPickerOpen(true)}
           />
-        </header>
-
-        <div className={styles.selectedList}>
-          {selectedOptions.length === 0 ? (
-            <div className={styles.selectedEmpty}>{selectedEmptyText}</div>
-          ) : (
-            selectedOptions.map((option) => (
-              <div key={option.id} className={styles.selectedRow}>
-                <span className={styles.selectedIcon}>
-                  <Icon size={14} />
-                </span>
-                <span className={styles.selectedCopy}>
-                  <span className={styles.selectedTitle}>
-                    <strong>{option.name}</strong>
-                    {option.internalName ? <small>{option.internalName}</small> : null}
-                  </span>
-                  <span className={styles.selectedDescription} title={option.description}>
-                    {option.description || t('common.noDescription')}
-                  </span>
-                </span>
-                <AppIconButton
-                  icon={<Trash2 size={14} aria-hidden="true" />}
-                  label={t('capabilities.remove', { name: option.name })}
-                  size="sm"
-                  isDisabled={disabled}
-                  onPress={() => remove(option.id)}
-                />
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+        }
+        isEmpty={selectedOptions.length === 0}
+        emptyText={selectedEmptyText}
+      >
+        {selectedOptions.map((option) => (
+          <div key={option.id} className={styles.selectedRow}>
+            <span className={styles.selectedIcon}>
+              <Icon size={14} />
+            </span>
+            <span className={styles.selectedCopy}>
+              <span className={styles.selectedTitle}>
+                <strong>{option.name}</strong>
+                {option.internalName ? <small>{option.internalName}</small> : null}
+              </span>
+              <span className={styles.selectedDescription} title={option.description}>
+                {option.description || t('common.noDescription')}
+              </span>
+            </span>
+            <AppIconButton
+              icon={<Trash2 size={14} aria-hidden="true" />}
+              label={t('capabilities.remove', { name: option.name })}
+              size="sm"
+              isDisabled={disabled}
+              onPress={() => remove(option.id)}
+            />
+          </div>
+        ))}
+      </SettingsListPanel>
       <AppModal
         isOpen={isPickerOpen}
         onOpenChange={setIsPickerOpen}
@@ -188,6 +189,6 @@ export default function CapabilityPolicyPanel({
           </Autocomplete.Filter>
         </div>
       </AppModal>
-    </div>
+    </>
   );
 }

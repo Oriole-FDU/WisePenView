@@ -62,7 +62,6 @@ function AgentEditorContent() {
       data={version.data}
       disabledVersionKeys={version.disabledVersionKeys}
       isOwner={version.isOwner}
-      resourceId={resourceId}
       versionItems={version.versionItems}
       versionLoading={version.versionLoading}
       viewingVersion={version.viewingVersion}

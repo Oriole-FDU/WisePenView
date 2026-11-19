@@ -13,11 +13,13 @@ import {
 } from '@/layouts/WorkspaceRightPanelLayout';
 
 interface ResourceWorkspacePanelActionsProps {
+  chatAvailable: boolean;
   inlineCommentAvailable: boolean;
   interactAvailable: boolean;
 }
 
 function ResourceWorkspacePanelActions({
+  chatAvailable,
   inlineCommentAvailable,
   interactAvailable,
 }: ResourceWorkspacePanelActionsProps) {
@@ -62,7 +64,7 @@ function ResourceWorkspacePanelActions({
     chat: {
       icon: Bot,
       label: chatLabel,
-      disabled: false,
+      disabled: !chatAvailable,
     },
   };
 
@@ -88,6 +90,7 @@ function ResourceWorkspacePanelActions({
   return (
     <>
       {WORKSPACE_PANEL_IDS.map((panelId) => {
+        if (panelId === 'chat' && !chatAvailable) return null;
         const meta = triggerMeta[panelId];
         const Icon = meta.icon;
         const label = meta.disabled && meta.unavailableLabel ? meta.unavailableLabel : meta.label;
