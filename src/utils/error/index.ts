@@ -5,6 +5,7 @@ export {
   type FrontendNetworkErrorCode,
 } from './codes';
 export { createClientError } from './createClientError';
+export { notifyError, notifyErrorMessage } from './notifyError';
 export { parseErrorMessage } from './parseErrorMessage';
 export {
   isWisePenError,
