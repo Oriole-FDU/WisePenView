@@ -114,7 +114,7 @@ try {
       }),
     {
       code: 100,
-      source: 'client',
+      source: 'domain',
       direction: 'request',
       endpoint: '/auth/login',
       contract: 'LoginApi',
@@ -126,7 +126,7 @@ try {
 
   expectContractError(() => parseApiRequest(LoginApiContract, { password: 'secret' }), {
     code: 100,
-    source: 'client',
+    source: 'domain',
     direction: 'request',
     endpoint: '/auth/login',
     contract: 'LoginApi',
@@ -165,7 +165,7 @@ try {
       }),
     {
       code: 100,
-      source: 'client',
+      source: 'domain',
       direction: 'request',
       endpoint: '/auth/register',
       contract: 'RegisterApi',
