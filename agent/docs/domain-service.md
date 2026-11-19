@@ -100,7 +100,23 @@ src/domains/<Domain>/
 - `src/domains/_registry/_context/useServices.ts`
 - `src/domains/index.ts`
 
-## 六、检查清单
+## 六、目录与命名校验
+
+`pnpm lint` 会先执行 `scripts/check-domain-structure.mjs`，再用 `wisepen/domain-conventions` 检查文件命名和公共导入边界。当前 warning 阶段先暴露存量耦合，不阻塞 CI。
+
+- `src/domains/<Domain>` 根目录使用 PascalCase，并必须包含 `index.ts` 与 `BUSINESS.md`。
+- Domain 根目录不放其它源码；顶层分组目录限定为 `apis`、`constants`、`entity`、`enum`、`mapper`、`mock`、`model`、`runtime`、`service`、`session`、`utils`、`validation`。
+- Domain 只承载 TypeScript 逻辑，不允许 `.tsx`、组件、样式和 Store。
+- `service` 必须包含 `index.type.ts` 与 `<Domain>Services.impl.ts`；额外逻辑 helper 使用 camelCase。
+- `apis/*.contract.ts` 与 `apis/*.schema.ts` 必须成对存在，公共 API 契约继续由 `pnpm check:api-contracts` 校验。
+- `mapper` 使用 `<Capability>Services.map.ts` 或 `<capability>.mapper.ts`；`mock` 使用 `<Capability>Api.mock.ts` 或 camelCase fixture。
+- `runtime`、`session`、`model`、`validation`、`utils` 使用 camelCase 文件；Hook 使用 `useXxx.ts`。类名仍可使用 PascalCase，但文件名不使用 PascalCase。
+- Domain 外只能从 `@/domains/<Domain>` 导入公共类型和运行时入口。`src/domains/_registry` 是装配白名单；`_shared` 继续作为共享基础设施入口。
+- 跨 Domain 或 UI 层直接深入 `service / mapper / apis / runtime / session / model / validation / utils` 会产生 warning，应先通过 domain 根出口暴露稳定契约。
+
+以 [ChatTurn](../../src/domains/ChatTurn/BUSINESS.md) 为基准形态：API 三元组、service 接口与实现、mapper 边界、按能力拆分的 runtime，以及受控根出口应同时成立。
+
+## 七、检查清单
 
 - [ ] 调用侧通过 `useXxxService()` 获取能力。
 - [ ] service 实现导出 `createXxxServices` 工厂。
@@ -110,3 +126,4 @@ src/domains/<Domain>/
 - [ ] 没有为字段同名且语义一致的请求或响应保留机械 mapper。
 - [ ] 错误向上抛出。
 - [ ] 未新增 `any`。
+- [ ] Domain 根出口、目录归属和逻辑文件命名符合结构检查。

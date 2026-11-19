@@ -27,6 +27,8 @@ PR CI 固定执行 commitlint、格式检查、lint、核心行为回归、类�
 
 本地可用 `pnpm verify:ci` 并行执行与 CI 相同的格式、lint、契约检查、类型检查和构建步骤。
 
+ESLint error 阻塞 CI，warning 只暴露风险、不阻塞 CI。新增 warning 必须能说明它防止的错误或维护性问题；不得用批量 `void`、`eslint-disable` 或扩大 ignore 把告警清零。
+
 `pnpm check:api-contracts` 直接禁止领域代码绕过统一请求契约：不允许 unchecked、直接 transport 或直接 fetch 调用，不维护迁移白名单。Contract 总数仅输出统计，不作为固定数量门禁。
 
 ## 测试保留原则

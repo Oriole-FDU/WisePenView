@@ -21,7 +21,7 @@
 
 ## 三、副作用治理
 
-项目默认禁止直接使用 `useEffect` 组织业务逻辑。
+项目禁止直接使用 `useEffect` 组织业务逻辑。`wisepen/no-use-effect` 会把所有 `useEffect` 和 `React.useEffect` 调用标记为 warning，注释、标记或说明不能豁免。
 
 优先方案：
 
@@ -30,19 +30,19 @@
 - 生命周期语义使用 `useMount`、`useUnmount` 或已有领域 Hook。
 - 订阅、长连接、协同会话等复杂逻辑优先封装为领域 Hook。
 
-必须使用 effect 时：
+处理要求：
 
-- 直接使用 React `useEffect`，不使用 wrapper 或 alias 绕过 React Hooks 检查。
-- `useEffect` 上方必须写 JSDoc 风格中文注释。
-- 注释必须包含 `@wisepen-manual-effect` 标记，并说明执行时机、为什么不能用事件驱动或状态派生实现、cleanup 的作用。该标记只放行本项目的 effect 治理规则，不是通用 `eslint-disable`。
+- 新代码不得新增 `useEffect`，也不得使用 wrapper、alias 或 `React.useEffect` 绕过检查。
+- 已有调用先作为 warning 暴露，按事件驱动、渲染期派生、`useApi`、生命周期 Hook 或领域 Hook 逐步迁移。
+- 不把用途说明写到“不可替代原因”里来换取例外；该字段不再具有审批或豁免作用。
 - 禁止使用 `useUpdateEffect` 规避首次执行；它仍是 effect，不能解决错误的数据流设计。
 
 ## 四、useMemo 与 useCallback
 
-业务代码默认禁止 `useMemo` 和 `useCallback`，ESLint 会同时拦截命名导入和
-`React.useMemo` / `React.useCallback` 属性调用。React 函数组件应先保证没有缓存也能正确工作。
+业务代码禁止默认使用 `useMemo` 和 `useCallback`。`wisepen/no-memoization` 会把所有命名调用和
+`React.useMemo` / `React.useCallback` 属性调用标记为 warning，注释和说明不能豁免。
 
-确有必要时直接使用 React `useMemo` 或 `useCallback`，但标准 manual JSDoc 只负责审批和说明，不豁免 React Hooks 规则。
+React 函数组件应先保证没有缓存也能正确工作。`useMemo` / `useCallback` 的身份稳定本身不产生性能收益，只有影响 effect、Context、ref、memo child 或第三方引用契约时才有行为价值。
 
 只有以下情况才允许使用 `useMemo` 或 `useCallback`：
 
@@ -50,11 +50,13 @@
 - 第三方命令式 API 明确把引用身份作为注册、取消注册或资源生命周期契约。
 - 缓存值是其它已批准 memoization 的必要依赖，且无法通过移动对象创建位置消除。
 
-例外要求：
+审查要求：
 
-- 每个调用点上方必须紧邻中文 JSDoc，并包含 `@wisepen-manual-memo` 标记，以及“为什么：”“收益：”“失效条件：”三项说明。该标记只放行本项目的 memo 治理规则，不是通用 `eslint-disable`。
-- `useMemo` / `useCallback` 只是性能优化，删除后行为必须保持正确。
-- `useMemoizedFn` 只用于“稳定函数身份 + 始终读取最新闭包”的真实命令式契约，不得替代普通事件函数。
+- 每个 warning 都要判断它保护的是计算、effect 依赖、Context 身份、ref 生命周期还是第三方引用契约。
+- 没有明确的引用身份契约或可重复基准时，删除 `useMemo` / `useCallback`，恢复普通计算或普通函数。
+- 删除缓存后行为必须保持正确；只是“看起来更快”不构成保留理由。
+- `wisepen/no-memoized-fn` 会把所有 `useMemoizedFn` 和 `ahooks.useMemoizedFn` 调用标记为 warning，注释不能豁免。
+- 只有在第三方或 imperative API 明确要求函数引用永久稳定，同时回调又必须读取最新闭包时，才保留 `useMemoizedFn`；不得替代普通事件函数。
 
 不要缓存：
 
@@ -140,10 +142,11 @@ store/version -> 子组件声明式输入 -> 子组件请求
 ## 十、检查清单
 
 - [ ] Hooks 调用位置合法。
-- [ ] 没有未经审批或可由事件、派生状态替代的 `useEffect`。
-- [ ] 必要副作用使用 `useEffect`，并写清带 `@wisepen-manual-effect` 标记的 JSDoc。
+- [ ] 没有可由事件、派生状态、`useApi`、生命周期 Hook 或领域 Hook 替代的 `useEffect`。
+- [ ] 新增代码没有 `useEffect`，存量调用已记录为 warning 并进入迁移。
 - [ ] 没有 `useUpdateEffect`。
-- [ ] 没有未经审批的 `useMemo` / `useCallback`；获批例外有带标记的 why 注释，且 React Hooks 检查通过。
+- [ ] `useMemo` / `useCallback` 已进入 warning 审查；保留项能说明具体的计算、effect、Context、ref 或第三方引用契约。
+- [ ] `useMemoizedFn` 仅用于同时需要永久稳定引用和最新闭包的契约，存量调用进入 warning 审查。
 - [ ] JSX key 稳定唯一。
 - [ ] state 更新保持不可变。
 - [ ] 未新增 `any`。

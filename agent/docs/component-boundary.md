@@ -82,15 +82,31 @@ PageName/
 └── config/
 ```
 
-## 六、收敛规则
+## 六、命名与入口校验
+
+`eslint-rules/component-conventions.js` 注册 `wisepen/component-conventions`，由 `pnpm lint` 校验组件目录、入口、导出和辅助文件命名。当前处于 warning 阶段，用于先暴露存量迁移和新代码风险，不阻塞 CI。
+
+- 新增 React 组件必须位于 `PascalCase` 文件夹，并以 `index.tsx` 作为唯一入口；组件导出名必须是 `PascalCase`。仅在当前页面使用的私有组件也遵循同一规则。
+- 组件目录名必须与 `index.tsx` 的主导出一致，例如 `OrderSummary/index.tsx` 应主导出 `OrderSummary`；不一致的历史组件登记在 `componentNames` 基线。
+- 组件目录根部只放入口、公共类型和样式等稳定模块文件。逻辑、Hook 和 helper 放在组件目录下的 `hooks/`、`controllers/`、`utils/` 等分组目录，或使用 `camelCase.ts` 直接放在组件目录根部。
+- 组件公共类型拆出时统一使用 `index.type.ts`；单个组件私有样式拆出时统一使用 `style.module.scss`。项目使用 SCSS CSS Modules，因此不以 `index.css` 作为组件样式契约。类型和样式文件按实际需要创建，不生成空占位文件。
+- `index.ts`、`index.type.ts`、`style.module.scss`、`*.stories.tsx`、`*.test.tsx` 和 `*.spec.tsx` 是保留文件名；组件实现不能继续使用同级 `Foo.tsx`。
+- `_components`、`components`、`hooks`、`controllers`、`utils`、`_context`、`_store` 等小写分组目录只承载组织或逻辑；分组内若新增组件，仍须下沉到 `PascalCase/index.tsx`。
+- 存量扁平组件、目录与导出名不一致和技术入口登记在 `eslint-rules/component-conventions.js` 的 `componentConventionBaseline` 中。迁移时只删除对应基线项，不把新违规追加到基线；基线为空后再删除该兼容层。
+- 未登记的新 `Foo.tsx`、非 `PascalCase` 组件目录、非 `PascalCase` 组件导出、组件根部的 `PascalCase.ts` 辅助文件，以及非 `style.module.scss` 的组件私有 CSS Module 都会产生 lint warning。迁移稳定后再提升为 error。
+
+## 七、收敛规则
 
 - 修改组件时，若当前任务天然涉及归属边界，优先向最小复用范围收敛。
 - 不要在 `components` 中继续扩大业务组件规模。
 - 遇到归属不确定时，先按“最小复用范围”放置。
 
-## 七、检查清单
+## 八、检查清单
 
 - [ ] 新组件放置位置符合复用范围。
+- [ ] 新组件使用 `PascalCase/index.tsx`，主导出为 `PascalCase`。
+- [ ] 组件目录根部没有新增 `Foo.tsx`、`Foo.module.scss` 或 `Foo.type.ts`。
+- [ ] 拆出的公共类型和私有样式分别使用 `index.type.ts` 与 `style.module.scss`。
 - [ ] 新组件落在 `base` 或 `business` 的正确一层，`base` 没有反向依赖 `business`。
 - [ ] 业务组件没有无理由进入 `src/components`。
 - [ ] 组件 Props 没有承载整条业务链路。
