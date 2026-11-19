@@ -33,7 +33,7 @@ import { ServicesContext } from './ServicesContext';
 
 /** 内部 hook，供 useXxxService 复用；必须在 ServicesProvider 内使用 */
 function useServicesContext(): ServicesContextValue {
-  return useRequiredContext(ServicesContext, 'ServicesProvider');
+  return useRequiredContext(ServicesContext);
 }
 
 export const useAdminService = (): IAdminService => useServicesContext().adminService;

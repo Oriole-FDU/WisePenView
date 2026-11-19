@@ -197,10 +197,7 @@ export function addMockResource(
 }
 export function getMockResource(resourceId: string): ResourceItemApi {
   const item = mockResources.get(resourceId);
-  if (!item)
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING, {
-      resourceId,
-    });
+  if (!item) throw createDomainError(FRONTEND_DOMAIN_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING);
   return item;
 }
 

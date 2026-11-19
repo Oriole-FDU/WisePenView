@@ -95,7 +95,7 @@ export const WalletApi: typeof WalletApiContract = {
       tokenCount <= 0 ||
       (isGroupInflow ? balance : groupBalance) < tokenCount
     ) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'tokenCount' });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
     const amount = isGroupInflow ? -tokenCount : tokenCount;
     balance += amount;

@@ -99,9 +99,7 @@ function DriveTab() {
     getPathTagId: () => {
       const target = importTargetRef.current;
       if (!target) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: 'Markdown 导入目标不存在',
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       return resolveContainerMountTagId(target);
     },
@@ -221,9 +219,7 @@ function DriveTab() {
   useApi(
     async () => {
       if (!noteTarget) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: '笔记创建目标不存在',
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       const { resourceId } = await noteService.createNote({
         title: t('create.defaultNoteTitle'),

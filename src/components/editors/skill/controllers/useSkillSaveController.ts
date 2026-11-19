@@ -147,16 +147,10 @@ export function useSkillSaveController({
       for (const snapshot of snapshots) {
         const result = resultByKey.get(snapshot.editorKey);
         if (result && !result.error) continue;
-        captureException(
-          result?.error ??
-            createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-              reason: 'Skill 保存结果缺失',
-            }),
-          {
-            detector: 'application-handled',
-            operation: 'skill.save',
-          }
-        );
+        captureException(result?.error ?? createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE), {
+          detector: 'application-handled',
+          operation: 'skill.save',
+        });
       }
       setExecutionItems((current) =>
         current.flatMap((item) => {

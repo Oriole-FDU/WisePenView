@@ -52,21 +52,15 @@ export function createFrontendStateRegistry(
     const keys = new Set<string>();
     for (const entry of entries) {
       if (entry.key === 'time' || entry.key === 'locale') {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: `frontend_state ${entry.key} 只能在读取时生成`,
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       if (keys.has(entry.key)) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: `frontend_state 重复 key: ${entry.key}`,
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       keys.add(entry.key);
       for (const [otherSource, states] of sources) {
         if (otherSource !== source && states.entries.some((item) => item.key === entry.key)) {
-          throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-            reason: `frontend_state ${entry.key} 已由 ${otherSource} 写入`,
-          });
+          throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
         }
       }
     }

@@ -39,13 +39,10 @@ function mapRecognitionCredentialFromApi(
   try {
     websocketUrl = new URL(websocketUrlValue);
   } catch (error) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CREDENTIAL_INVALID, undefined, error);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CREDENTIAL_INVALID, { cause: error });
   }
   if (websocketUrl.protocol !== 'wss:' || websocketUrl.hostname !== 'iat-api.xfyun.cn') {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CREDENTIAL_INVALID, {
-      protocol: websocketUrl.protocol,
-      hostname: websocketUrl.hostname,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CREDENTIAL_INVALID);
   }
 
   return {

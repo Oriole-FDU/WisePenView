@@ -68,9 +68,7 @@ function DriveCreateModal({
         }
         case 'folder':
           if (!parent) {
-            throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-              reason: t('create.targetMissing'),
-            });
+            throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
           }
           createdId = (await driveService.createFolder({ parent, name: title.trim() })).tagId;
           requestDriveRefresh();

@@ -183,9 +183,7 @@ export const createTagServices = (): ITagService => {
       nodes.some((node) => !node) ||
       parentIds.size > 1
     ) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, {
-        field: 'orderedTagIds',
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
 
     try {

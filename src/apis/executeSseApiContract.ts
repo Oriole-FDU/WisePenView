@@ -20,9 +20,7 @@ export async function executeSseApiContract<Request, ResponseData>(
   init?: Pick<RequestInit, 'signal'>
 ): Promise<Response> {
   if (contract.transport !== 'sse') {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-      reason: `${contract.name} 不是 SSE Contract`,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   const request = parseApiRequest(contract, value);
   await awaitAddrReady();

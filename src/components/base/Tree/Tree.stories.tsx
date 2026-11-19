@@ -43,9 +43,7 @@ export const LoadFailureRetry: Story = {
       onLoadError={(error) => console.error('示例懒加载失败', error)}
       loadData={async (node) => {
         if (node.key === 'loading') {
-          return Promise.reject(
-            createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, { reason: '模拟加载失败' })
-          );
+          return Promise.reject(createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE));
         }
       }}
     />

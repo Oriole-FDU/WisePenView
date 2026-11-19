@@ -155,9 +155,7 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
     async (type: CreateResourceType): Promise<PrepareCreateResult> => {
       const root = await driveService.getRoot();
       if (!root.canMountResources || !root.tagId) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: '个人云盘根目录不可挂载资源',
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
 
       if (type !== 'note') return { kind: 'modal', type, root };

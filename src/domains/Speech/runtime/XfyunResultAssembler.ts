@@ -18,9 +18,7 @@ export class XfyunResultAssembler {
 
   append(result: unknown): string {
     if (!isRecord(result) || typeof result.sn !== 'number') {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, {
-        reason: '讯飞语音识别结果缺少分片序号',
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID);
     }
 
     if (result.pgs === 'rpl') {
@@ -29,9 +27,7 @@ export class XfyunResultAssembler {
         typeof result.rg[0] !== 'number' ||
         typeof result.rg[1] !== 'number'
       ) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, {
-          reason: '讯飞语音识别替换结果缺少有效范围',
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID);
       }
 
       const [start, end] = result.rg;

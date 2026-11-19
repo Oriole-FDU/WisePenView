@@ -10,8 +10,8 @@ export {
   type FrontendDomainErrorCode,
   type FrontendNetworkErrorCode,
 } from './codes';
-export { createComponentError } from './createComponentError';
-export { createDomainError } from './createDomainError';
+export { createComponentError, type CreateComponentErrorOptions } from './createComponentError';
+export { createDomainError, type CreateDomainErrorOptions } from './createDomainError';
 /** @deprecated 使用 createDomainError / createComponentError */
 export { createClientError } from './createClientError';
 export { reportError } from './reportError';

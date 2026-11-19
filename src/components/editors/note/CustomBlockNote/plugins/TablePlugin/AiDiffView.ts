@@ -71,9 +71,7 @@ function renderTableCellContent(
     if (!isRecord(inline) || typeof inline.type !== 'string') continue;
     const owner = registry.inlinePlugins.get(inline.type);
     if (!owner) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-        reason: `AI Diff 表格候选缺少 inline owner：${inline.type}`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     paragraph.appendChild(owner.aiDiff.renderAiContent(inline, registry));
   }

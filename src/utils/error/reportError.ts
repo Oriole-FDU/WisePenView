@@ -27,11 +27,7 @@ export interface ReportErrorInput {
 
 const normalizeError = (error: unknown): Error => {
   if (error instanceof Error) return error;
-  return createComponentError(
-    FRONTEND_COMPONENT_ERROR.INTERNAL_STATE,
-    { reason: '错误报告收到非 Error 值' },
-    error
-  );
+  return createComponentError(FRONTEND_COMPONENT_ERROR.INTERNAL_STATE, { cause: error });
 };
 
 export const reportError = ({ error, level }: ReportErrorInput): void => {

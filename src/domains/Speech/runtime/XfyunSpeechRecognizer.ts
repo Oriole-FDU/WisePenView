@@ -54,10 +54,8 @@ function encodeBase64(buffer: ArrayBuffer): string {
 function readProviderError(payload: UnknownRecord): WisePenError | null {
   if (payload.code === 0) return null;
   const code = typeof payload.code === 'number' ? payload.code : 'unknown';
-  const message = typeof payload.message === 'string' ? payload.message : '未知错误';
   return createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_PROVIDER_FAILED, {
     providerCode: code,
-    providerMessage: message,
   });
 }
 
@@ -108,7 +106,7 @@ export class XfyunSpeechRecognizer {
         };
       } catch (error) {
         this.fail(
-          createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_FAILED, undefined, error)
+          createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_FAILED, { cause: error })
         );
       }
     });
@@ -177,7 +175,7 @@ export class XfyunSpeechRecognizer {
       this.fail(
         isWisePenError(error)
           ? error
-          : createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_START_FAILED, undefined, error)
+          : createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_START_FAILED, { cause: error })
       );
     }
   }
@@ -201,7 +199,7 @@ export class XfyunSpeechRecognizer {
       this.fail(
         isWisePenError(error)
           ? error
-          : createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, undefined, error)
+          : createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, { cause: error })
       );
     }
   }

@@ -229,9 +229,7 @@ export class NoteInlineCommentSession {
       thread = this.threadsById.get(threadId);
     }
     if (!thread) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-        reason: `新建批注 ${threadId} 未出现在资源批注列表中`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     return thread;
   }
@@ -244,9 +242,7 @@ export class NoteInlineCommentSession {
       item = this.findItem(threadId, itemId);
     }
     if (!item) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-        reason: `新建批注消息 ${itemId} 未出现在资源批注列表中`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     return item;
   }

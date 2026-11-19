@@ -103,15 +103,14 @@ function OfficeEditorHost({
             createDomainError(
               FRONTEND_DOMAIN_ERROR.OFFICE_LOAD_FAILED,
               { errorCode: 'unknown' },
-              event
+              { cause: event }
             )
           )
         }
-        onLoadComponentError={(errorCode, errorDescription) => {
+        onLoadComponentError={(errorCode) => {
           handleError(
             createDomainError(FRONTEND_DOMAIN_ERROR.OFFICE_LOAD_FAILED, {
               errorCode,
-              errorDescription,
             })
           );
         }}

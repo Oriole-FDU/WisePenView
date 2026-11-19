@@ -8,7 +8,7 @@ const emptySubscribe = () => () => {};
 const emptySnapshot = () => null;
 
 export function useResourceEditor() {
-  const context = useRequiredContext(ResourceEditorContext, 'ResourceEditorProvider');
+  const context = useRequiredContext(ResourceEditorContext);
   const editor = useSyncExternalStore(context.host.subscribe, context.host.getSnapshot);
   const snapshot = useSyncExternalStore(
     editor?.subscribe ?? emptySubscribe,

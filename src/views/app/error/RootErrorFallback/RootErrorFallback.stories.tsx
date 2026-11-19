@@ -14,9 +14,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    error: createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-      story: 'RootErrorFallback',
-    }),
+    error: createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE),
     resetErrorBoundary: () => undefined,
   },
 };

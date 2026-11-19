@@ -117,9 +117,7 @@ export function useDrawioEditorSession({
       return;
     }
     if (message.event === 'error') {
-      const error = createDomainError(FRONTEND_DOMAIN_ERROR.DRAWIO_SAVE_FAILED, {
-        detail: message.message,
-      });
+      const error = createDomainError(FRONTEND_DOMAIN_ERROR.DRAWIO_SAVE_FAILED);
       captureException(error, {
         detector: 'application-handled',
         operation: 'drawio.save',

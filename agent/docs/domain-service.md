@@ -60,10 +60,12 @@ export const createXxxServices = (deps?: XxxServiceDeps): IXxxService => ({
 ## 三、错误处理
 
 - Service 只抛错，不做 UI 提示。
-- Domain 校验错误使用 `createDomainError(code, meta?, cause?)`（`source: domain`，码段 100–499）。
-- Component / View 本地失败使用 `createComponentError(code, meta?, cause?)`（`source: component`，码段 500–899）。
+- Domain 校验错误使用 `createDomainError(code, { cause })`（`source: domain`，码段 100–499）。
+  仅带 i18n 文案占位符的错误码可改用 `createDomainError(code, meta, { cause })`，插值字段必须与错误码严格匹配。
+- Component / View 本地失败使用 `createComponentError(code, { cause })`（`source: component`，码段 500–899）。
 - 主动创建的错误不得使用原生 `Error`；网络、HTTP、API 边界按来源创建 `WisePenError`（`network` / `http` / `api`）。
 - 捕获已有错误仅为补充上下文时，应通过 `cause` 保留原异常；无需补充时直接向上抛出。
+- 不得把错误码、资源 ID、操作名等诊断上下文塞入 `meta`；这些内容当前不会进入用户文案或异常上报。
 - UI 层向用户报告错误只有一种契约：先创建错误对象，再 `reportError({ error, level })`；禁止 `reportError({ error: createDomainError(...) })` 内联写法。文案由内部按错误码解析。禁止业务代码直接调用 `toast.danger` 或错误路径中的 `toast.warning`。
 - 内联展示把 `error` 传给 Feedback（`ErrorState` 必填；`ResultState` 有 error 时不用再拼 `subTitle`）。禁止业务导入或调用 `parseErrorMessage`。
 - 网络、HTTP、API 边界只归一化 `code`、`serverMsg` 和 `cause`，不在传输层查 i18n 或拼接用户文案。

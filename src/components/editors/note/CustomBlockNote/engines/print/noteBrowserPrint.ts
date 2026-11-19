@@ -370,9 +370,7 @@ export async function printNotePdfViaBrowser(
 ): Promise<void> {
   const proseMirrorRoot = getProseMirrorRoot(editor);
   if (!proseMirrorRoot) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, {
-      reason: '无法获取编辑器内容',
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED);
   }
 
   if (window.desktop?.savePdfFromHtml) {
@@ -384,7 +382,7 @@ export async function printNotePdfViaBrowser(
       return;
     } catch (error) {
       if (isWisePenError(error)) throw error;
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, undefined, error);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, { cause: error });
     }
   }
 
@@ -398,9 +396,7 @@ export async function printNotePdfViaBrowser(
   const doc = iframe.contentDocument;
   if (!win || !doc) {
     iframe.remove();
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, {
-      reason: '无法创建打印区域',
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED);
   }
 
   const removeFrame = () => {
@@ -428,6 +424,6 @@ export async function printNotePdfViaBrowser(
   } catch (error) {
     removeFrame();
     if (isWisePenError(error)) throw error;
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, undefined, error);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, { cause: error });
   }
 }

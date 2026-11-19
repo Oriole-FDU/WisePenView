@@ -71,9 +71,7 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
       if (unmountedRef.current) return;
       if (!appAuth.isAuthenticated) {
         appAuth.requireLogin();
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: t('input.loginRequired'),
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       let targetSessionId = currentSessionId;
       let targetSession = currentSession;

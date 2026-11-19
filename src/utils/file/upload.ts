@@ -8,24 +8,13 @@ export function fileToBase64(file: File): Promise<{ mimeType: string; base64: st
       const [header, base64] = dataUrl.split(',');
       const mimeType = header.match(/data:(.+);base64/)?.[1] || file.type;
       if (!base64) {
-        reject(
-          createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED, {
-            fileName: file.name,
-            reason: 'base64 解析失败',
-          })
-        );
+        reject(createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED));
         return;
       }
       resolve({ mimeType, base64 });
     };
     reader.onerror = () =>
-      reject(
-        createDomainError(
-          FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED,
-          { fileName: file.name },
-          reader.error
-        )
-      );
+      reject(createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED, { cause: reader.error }));
     reader.readAsDataURL(file);
   });
 }
@@ -42,12 +31,7 @@ export function generateThumbnail(file: File, size: number): Promise<string> {
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         URL.revokeObjectURL(url);
-        reject(
-          createDomainError(FRONTEND_DOMAIN_ERROR.IMAGE_THUMBNAIL_FAILED, {
-            fileName: file.name,
-            reason: 'canvas 初始化失败',
-          })
-        );
+        reject(createDomainError(FRONTEND_DOMAIN_ERROR.IMAGE_THUMBNAIL_FAILED));
         return;
       }
 
@@ -61,13 +45,7 @@ export function generateThumbnail(file: File, size: number): Promise<string> {
 
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(
-        createDomainError(
-          FRONTEND_DOMAIN_ERROR.IMAGE_THUMBNAIL_FAILED,
-          { fileName: file.name },
-          undefined
-        )
-      );
+      reject(createDomainError(FRONTEND_DOMAIN_ERROR.IMAGE_THUMBNAIL_FAILED));
     };
 
     img.src = url;

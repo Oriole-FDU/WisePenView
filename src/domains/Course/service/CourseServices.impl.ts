@@ -36,7 +36,7 @@ const parseCourseResourceCursor = (cursor?: string): number => {
   if (!cursor) return 1;
   const page = Number(cursor);
   if (!Number.isInteger(page) || page < 1) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'cursor' });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
   }
   return page;
 };
@@ -70,7 +70,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
   const getCourseDetail = async (courseId: string) => {
     const group = await groupService.fetchGroupInfo(courseId);
     if (group.groupType !== GROUP_TYPE.ADVANCED) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_NOT_FOUND, { courseId });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_NOT_FOUND);
     }
     const role = await groupService.fetchMyRoleInGroup(courseId);
     return CourseServicesMap.mapGroupToCourseDetail(group, role);
@@ -128,20 +128,17 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
       tagService.getTagTree(courseId),
     ]);
     if (group.groupType !== GROUP_TYPE.ADVANCED) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_NOT_FOUND, { courseId });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_NOT_FOUND);
     }
     const outlineRootTagId = CourseServicesMap.parseCourseMeta(
       group.groupMetaInfo
     ).outlineRootTagId;
     if (!outlineRootTagId) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, { courseId });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND);
     }
     const outlineRoot = findTag(tags, outlineRootTagId);
     if (!outlineRoot) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, {
-        courseId,
-        outlineRootTagId,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND);
     }
     return outlineRoot;
   };
@@ -163,7 +160,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     const outlineRoot = await getCourseOutlineRoot(courseId);
     const tag = findTag(outlineRoot.children ?? [], nodeId);
     if (!tag) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, { nodeId });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND);
     }
     const page = parseCourseResourceCursor(cursor);
     const result = await resourceService.getGroupResources({
@@ -214,7 +211,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
       const group = await groupService.fetchGroupInfo(courseId);
       targetParentId = CourseServicesMap.parseCourseMeta(group.groupMetaInfo).outlineRootTagId;
       if (!targetParentId) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_NOT_FOUND, { courseId });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_NOT_FOUND);
       }
     }
     return tagService.addTag({ groupId: courseId, parentId: targetParentId, tagName: name });
@@ -228,9 +225,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     const tags = await tagService.getTagTree(courseId);
     const tag = findTag(tags, tagId);
     if (!tag) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, {
-        nodeId: tagId,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND);
     }
     await tagService.updateTag({
       groupId: courseId,
@@ -254,9 +249,7 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
       findTag(outlineRoot.children ?? [], targetNodeId)
     );
     if (!targetTag) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, {
-        nodeId: targetNodeId,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND);
     }
 
     await resourceService.mountResourcesToGroup({

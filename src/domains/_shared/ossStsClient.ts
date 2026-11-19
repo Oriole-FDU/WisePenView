@@ -116,13 +116,13 @@ export const createOssStsClientManager = <Key>(
     } catch (error) {
       if (isWisePenError(error)) throw error;
       if (!isOssAuthExpiredError(error)) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_OPERATION_FAILED, undefined, error);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_OPERATION_FAILED, { cause: error });
       }
       try {
         return await operation(await getClient(key, { forceRefresh: true }));
       } catch (retryError) {
         if (isWisePenError(retryError)) throw retryError;
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_OPERATION_FAILED, undefined, retryError);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_OPERATION_FAILED, { cause: retryError });
       }
     }
   };

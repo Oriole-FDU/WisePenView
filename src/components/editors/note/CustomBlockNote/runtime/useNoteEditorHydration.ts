@@ -29,9 +29,7 @@ function splitAiDiffPreviewBlocks(
     const { 'ai-content': aiContent, children, ...block } = snapshot;
     if (Object.prototype.hasOwnProperty.call(snapshot, 'ai-content')) {
       if (aiContent === undefined) {
-        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-          reason: `AI Diff Mock 的 ai-content 不能为 undefined：${snapshot.id}`,
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       aiContentByBlockId.set(snapshot.id, aiContent);
     }
@@ -59,9 +57,7 @@ function initializeAiDiffPreview(params: {
 
   aiContentByBlockId.forEach((_aiContent, blockId) => {
     if (!editor.getBlock(blockId)) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-        reason: `AI Diff Mock 正文块初始化失败：${blockId}`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
   });
 

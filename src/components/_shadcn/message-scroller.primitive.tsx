@@ -1802,9 +1802,7 @@ function useMessageScrollerContext() {
   const context = React.useContext(MessageScrollerContext);
 
   if (!context) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-      reason: 'useMessageScroller must be used within a MessageScroller.',
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
 
   return context;
@@ -1814,9 +1812,7 @@ function useMessageScrollerItemContext() {
   const context = React.useContext(MessageScrollerItemContext);
 
   if (!context) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-      reason: 'MessageScrollerItem must be used within a MessageScroller.',
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
 
   return context;

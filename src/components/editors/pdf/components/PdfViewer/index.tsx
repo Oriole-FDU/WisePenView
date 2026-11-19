@@ -66,7 +66,7 @@ function PdfViewer({ resourceId, sourceUrl, config, className, onLoadError }: Pd
           onLoadError?.(
             isWisePenError(error)
               ? error
-              : createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_LOAD_FAILED, undefined, error)
+              : createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_LOAD_FAILED, { cause: error })
           );
         });
         if (typeof cleanup === 'function') {
@@ -96,7 +96,7 @@ function PdfViewer({ resourceId, sourceUrl, config, className, onLoadError }: Pd
       onLoadError?.(
         isWisePenError(error)
           ? error
-          : createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_LOAD_FAILED, undefined, error)
+          : createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_LOAD_FAILED, { cause: error })
       );
     }
   };

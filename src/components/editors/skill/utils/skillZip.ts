@@ -146,7 +146,7 @@ export async function parseSkillZip(
   try {
     zip = await JSZip.loadAsync(zipFile);
   } catch (error) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_ZIP_READ_FAILED, undefined, error);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_ZIP_READ_FAILED, { cause: error });
   }
   const candidates: ZipEntryCandidate[] = [];
 
@@ -174,11 +174,7 @@ export async function parseSkillZip(
           size: contentBlob.size,
         };
       } catch (error) {
-        throw createDomainError(
-          FRONTEND_DOMAIN_ERROR.SKILL_ZIP_READ_FAILED,
-          { path: entry.entryPath },
-          error
-        );
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_ZIP_READ_FAILED, { cause: error });
       }
     })
   );

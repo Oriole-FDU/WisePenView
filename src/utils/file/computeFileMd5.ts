@@ -37,7 +37,7 @@ export const computeFileMd5 = (file: File): Promise<string> => {
 
     fileReader.onerror = () =>
       reject(
-        createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED, undefined, fileReader.error)
+        createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED, { cause: fileReader.error })
       );
     loadNext();
   });

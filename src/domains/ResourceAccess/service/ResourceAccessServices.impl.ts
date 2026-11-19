@@ -95,9 +95,7 @@ const loadResourceInfo = (
     case 'html':
       return deps.htmlPageService.getResourceAccessInfo(params.resourceId);
     default:
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-        reason: `不支持权限概览的资源类型：${params.resourceType}`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
 };
 

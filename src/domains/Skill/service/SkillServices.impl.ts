@@ -339,16 +339,17 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     }
 
     const missingAssetIdResult = results.find((result) => !result.assetId);
-    if (missingAssetIdResult || results.length !== assets.length) {
+    if (missingAssetIdResult) {
       throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
-        fileName: missingAssetIdResult?.name,
+        fileName: missingAssetIdResult.name,
       });
+    }
+    if (results.length !== assets.length) {
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     const missingObjectKeyResult = results.find((result) => !result.objectKey);
     if (missingObjectKeyResult) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_FILE_OBJECT_KEY_MISSING, {
-        fileName: missingObjectKeyResult.name,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
     }
     const movedAssets: MoveSkillAssetResult[] = results.flatMap((result) =>
       result.assetId && result.objectKey

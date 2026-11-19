@@ -59,9 +59,7 @@ function updateBlock(
     update as Parameters<CustomBlockNoteEditor['updateBlock']>[1]
   ) as unknown as Record<string, unknown>;
   if (!updated) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-      reason: `AI Diff block 更新未生效：${String(block.id ?? '')}`,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   return updated;
 }

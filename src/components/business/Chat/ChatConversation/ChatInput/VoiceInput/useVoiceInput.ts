@@ -35,22 +35,20 @@ function stopStream(stream: MediaStream | null): void {
 function mapMicrophoneError(error: unknown): Error {
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError') {
-      return createDomainError(
-        FRONTEND_DOMAIN_ERROR.MICROPHONE_PERMISSION_DENIED,
-        undefined,
-        error
-      );
+      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_PERMISSION_DENIED, {
+        cause: error,
+      });
     }
     if (error.name === 'NotFoundError') {
-      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_NOT_FOUND, undefined, error);
+      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_NOT_FOUND, { cause: error });
     }
     if (error.name === 'NotReadableError') {
-      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_BUSY, undefined, error);
+      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_BUSY, { cause: error });
     }
   }
   return isWisePenError(error)
     ? error
-    : createDomainError(FRONTEND_DOMAIN_ERROR.VOICE_INPUT_START_FAILED, undefined, error);
+    : createDomainError(FRONTEND_DOMAIN_ERROR.VOICE_INPUT_START_FAILED, { cause: error });
 }
 
 export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputProps {

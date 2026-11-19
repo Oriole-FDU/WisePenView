@@ -97,12 +97,12 @@ const decodeResourceCursor = (value: string): ResourceCursor => {
       !Number.isInteger((parsed as ResourceCursor).page) ||
       !Number.isInteger((parsed as ResourceCursor).pageSize)
     ) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'cursor' });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
     return parsed as ResourceCursor;
   } catch (error) {
     if (error instanceof Error && error.name === 'WisePenError') throw error;
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'cursor' }, error);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { cause: error });
   }
 };
 
@@ -193,7 +193,7 @@ export const createDriveServices = (
     const resolvedSize = normalizePageSize(pageSize, defaultPageSize);
     const cursorState = cursor ? decodeResourceCursor(cursor) : undefined;
     if (cursorState && cursorState.parentId !== parent.id) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'cursor' });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
 
     const includeFolders = !cursor && kinds.includes('folder');
@@ -325,10 +325,7 @@ export const createDriveServices = (
         Object.prototype.hasOwnProperty.call(bind.tags ?? {}, mountTagId)
     );
     if (!tagBind) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.DRIVE_RESOURCE_TAG_INFO_MISSING, {
-        resourceId: resource.resourceId,
-        tagId: mountTagId,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.DRIVE_RESOURCE_TAG_INFO_MISSING);
     }
     const path = await getMountPath({ location });
     const parent = path.at(-1);
@@ -361,7 +358,7 @@ export const createDriveServices = (
 
   const assertActionScope = (nodes: DriveMutableNode[]): DriveNodeScope => {
     if (nodes.length === 0) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'nodes' });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
     const [first] = nodes;
     if (nodes.some((node) => !sameScope(node.scope, first.scope))) {
@@ -647,7 +644,7 @@ export const createDriveServices = (
   }: CreateFolderParams) => {
     const tagName = name.trim();
     if (!tagName) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'name' });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
     if (parent.type === 'folder' && parent.systemType) {
       throw createDomainError(FRONTEND_DOMAIN_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
@@ -669,7 +666,7 @@ export const createDriveServices = (
   const renameNode: IDriveService['renameNode'] = async ({ node, newName }: RenameNodeParams) => {
     const name = newName.trim();
     if (!name) {
-      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION, { field: 'newName' });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     }
     const groupId = getGroupId(node.scope);
     if (node.type === 'folder') {

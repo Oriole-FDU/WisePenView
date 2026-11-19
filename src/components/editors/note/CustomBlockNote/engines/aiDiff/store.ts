@@ -27,9 +27,7 @@ export function readAllAiContent(doc: Y.Doc): ReadonlyMap<string, unknown> {
 
 export function setBlockAiContent(doc: Y.Doc, blockId: string, aiContent: unknown): void {
   if (aiContent === undefined) {
-    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
-      reason: `AI-content 不能写入 undefined：${blockId}`,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   getAiContentStore(doc).set(blockId, aiContent);
 }

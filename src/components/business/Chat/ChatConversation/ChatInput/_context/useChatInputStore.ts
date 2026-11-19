@@ -6,7 +6,7 @@ import type { ChatInputStoreState } from './ChatInputStore';
 import { ChatInputStoreContext } from './ChatInputStoreContext';
 
 export function useChatInputStoreApi() {
-  return useRequiredContext(ChatInputStoreContext, 'ChatInputStoreProvider');
+  return useRequiredContext(ChatInputStoreContext);
 }
 
 export function useChatInputStore<T>(selector: (state: ChatInputStoreState) => T): T {
