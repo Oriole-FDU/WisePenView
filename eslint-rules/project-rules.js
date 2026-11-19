@@ -426,8 +426,6 @@ const noLegacyErrorReportApiRule = {
       requireFields: 'reportError 强契约要求同时提供 error 与 level。',
       forbiddenInlineFactory:
         '先 createDomainError / createComponentError 赋给变量，再 reportError({ error, level })；禁止在参数里内联创建。',
-      forbiddenLegacyFactory:
-        '请使用 createDomainError / createComponentError，不要再使用 createClientError。',
     },
   },
   create(context) {
@@ -439,15 +437,10 @@ const noLegacyErrorReportApiRule = {
       'notifyErrorMessage',
       'resolveErrorMessage',
       'parseErrorMessage',
-      'createClientError',
       'FRONTEND_CLIENT_ERROR',
     ]);
-    const bannedCallNames = new Set(['notifyError', 'notifyErrorMessage', 'createClientError']);
-    const errorFactoryNames = new Set([
-      'createDomainError',
-      'createComponentError',
-      'createClientError',
-    ]);
+    const bannedCallNames = new Set(['notifyError', 'notifyErrorMessage']);
+    const errorFactoryNames = new Set(['createDomainError', 'createComponentError']);
     const requiredKeys = new Set(['error', 'level']);
 
     const readPropertyName = (property) => {
@@ -490,22 +483,14 @@ const noLegacyErrorReportApiRule = {
           const imported =
             specifier.imported.type === 'Identifier' ? specifier.imported.name : null;
           if (imported && bannedImportNames.has(imported)) {
-            context.report({
-              node: specifier,
-              messageId:
-                imported === 'createClientError' ? 'forbiddenLegacyFactory' : 'forbiddenImport',
-            });
+            context.report({ node: specifier, messageId: 'forbiddenImport' });
           }
         }
       },
       CallExpression(node) {
         if (node.callee.type !== 'Identifier') return;
         if (bannedCallNames.has(node.callee.name)) {
-          context.report({
-            node,
-            messageId:
-              node.callee.name === 'createClientError' ? 'forbiddenLegacyFactory' : 'forbiddenCall',
-          });
+          context.report({ node, messageId: 'forbiddenCall' });
           return;
         }
         if (node.callee.name !== 'reportError') return;
@@ -555,7 +540,6 @@ const noDirectWisePenErrorRule = {
       /\/src\/domains\/_shared\/mock\//,
       /\/src\/utils\/error\/createDomainError\.ts$/,
       /\/src\/utils\/error\/createComponentError\.ts$/,
-      /\/src\/utils\/error\/createClientError\.ts$/,
     ];
     if (allowedPathPatterns.some((pattern) => pattern.test(filename))) return {};
 
