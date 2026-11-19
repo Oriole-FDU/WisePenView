@@ -1,3 +1,4 @@
+import { useUnmount } from 'ahooks';
 import { type ReactNode, useEffect, useState } from 'react';
 
 import { clearFrontendStates, FRONTEND_STATE_SOURCE } from '@/frontendState';
@@ -33,13 +34,7 @@ export function ChatInputStoreProvider({
     }
   }, [promoteDraftToolSelection, sessionId, store]);
 
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：输入区实例卸载时清除未发送的资源引用。
-   * 不可替代原因：资源引用在应用级模块，需与输入区实例同步结束。
-   * cleanup：移除输入区写入的资源引用。
-   */
-  useEffect(() => () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.INPUT }), []);
+  useUnmount(() => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.INPUT }));
 
   return <ChatInputStoreContext.Provider value={store}>{children}</ChatInputStoreContext.Provider>;
 }

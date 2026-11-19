@@ -1,3 +1,4 @@
+import { useUnmount } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 
 import { useEditorSurface } from '../../_context';
@@ -51,13 +52,7 @@ export default function EditorPresentationBinding(presentation: EditorPresentati
   useEffect(() => {
     unregister.current = onPresentationChange(reported);
   });
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：展示绑定挂载时建立注销生命周期。
-   * 不可替代原因：上报产生的注销函数必须对应最后一次展示。
-   * cleanup：仅撤销当前绑定的最新上报，旧绑定不能清理新绑定。
-   */
-  useEffect(() => () => unregister.current?.(), []);
+  useUnmount(() => unregister.current?.());
 
   return (
     <>

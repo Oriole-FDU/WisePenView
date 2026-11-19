@@ -74,13 +74,7 @@ function CourseLearningLayoutContent() {
     });
     return () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.RESOURCE, revision });
   }, [openResourceId, openResourceType, openResourceViewer]);
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：离开课程学习页面时清理未发送的选区。
-   * 不可替代原因：课程本地状态卸载时，共享模块仍按标签存在。
-   * cleanup：移除该课程的选区。
-   */
-  useEffect(() => () => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION }), []);
+  useUnmount(() => clearFrontendStates({ source: FRONTEND_STATE_SOURCE.SELECTION }));
   /**
    * @wisepen-manual-effect
    * 执行时机：课程离开可承载资源面板的节点时。

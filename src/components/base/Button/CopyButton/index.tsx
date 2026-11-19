@@ -1,6 +1,7 @@
 import { toast } from '@heroui/react';
+import { useUnmount } from 'ahooks';
 import { Check, Copy } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
@@ -15,17 +16,9 @@ function CopyButton({ text, label, className, isDisabled }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：组件卸载时取消尚未执行的恢复计时器。
-   * 不可替代原因：计时器属于浏览器副作用，需要在生命周期结束时清理。
-   * cleanup：清除恢复 copied 状态的定时器。
-   */
-  useEffect(() => {
-    return () => {
-      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    };
-  }, []);
+  useUnmount(() => {
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+  });
 
   const handleCopy = async () => {
     if (!(await copyText(text))) {

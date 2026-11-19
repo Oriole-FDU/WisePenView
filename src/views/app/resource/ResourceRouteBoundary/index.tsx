@@ -1,5 +1,4 @@
 import { useMount, useUnmount } from 'ahooks';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -107,13 +106,7 @@ function ResourceRouteBoundary() {
   const chatContext = useResourceChatContextStore((state) => state.context);
   useMount(() => openPanel('chat'));
   useUnmount(closePanel);
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：离开资源视图时结束未发送的选区。
-   * 不可替代原因：聊天上下文按标签存在，卸载不会自动清理它。
-   * cleanup：移除当前资源的选区和匹配信息。
-   */
-  useEffect(() => () => resourceChatContextActions.clearContext(), []);
+  useUnmount(() => resourceChatContextActions.clearContext());
 
   const navigateResourceHash = (hash: string) => {
     void navigate(
