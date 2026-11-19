@@ -1,24 +1,8 @@
 export const projectRestrictedProperties = [
   {
-    object: 'React',
-    property: 'useEffect',
-    message: '请命名导入 useEffect，并在调用点写带 @wisepen-manual-effect 标记的完整中文 JSDoc。',
-  },
-  {
-    object: 'React',
-    property: 'useCallback',
-    message: '请命名导入 useCallback，并在调用点写带 @wisepen-manual-memo 标记的中文 JSDoc。',
-  },
-  {
-    object: 'React',
-    property: 'useMemo',
-    message: '请命名导入 useMemo，并在调用点写带 @wisepen-manual-memo 标记的中文 JSDoc。',
-  },
-  {
     object: 'ahooks',
     property: 'useUpdateEffect',
-    message:
-      '项目禁止 ahooks.useUpdateEffect；请改为事件驱动、渲染期派生、useApi 或有带 @wisepen-manual-effect 标记完整说明的 useEffect。',
+    message: '项目禁止 ahooks.useUpdateEffect；请改为事件驱动、渲染期派生、useApi 或领域 Hook。',
   },
 ];
 

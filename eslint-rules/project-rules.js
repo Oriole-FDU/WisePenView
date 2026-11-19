@@ -1,100 +1,97 @@
 import { componentConventionRule } from './component-conventions.js';
 import { domainConventionRule } from './domain-conventions.js';
 
-const requireManualEffectJSDocRule = {
+const noUseEffectRule = {
   meta: {
     type: 'problem',
     docs: {
-      description: '要求 useEffect 说明执行时机、不可替代原因和 cleanup',
+      description: '默认禁止 useEffect',
     },
     schema: [],
     messages: {
-      missing:
-        'useEffect 上方必须紧邻中文 JSDoc，并包含 @wisepen-manual-effect、“执行时机：”“不可替代原因：”“cleanup：”。',
+      forbidden:
+        '项目默认禁止 useEffect；请改为事件驱动、渲染期派生、useApi、生命周期 Hook 或领域 Hook。注释不能豁免该规则。',
     },
   },
   create(context) {
-    const sourceCode = context.sourceCode;
     return {
       CallExpression(node) {
-        if (node.callee.type !== 'Identifier' || node.callee.name !== 'useEffect') return;
-        const statement = node.parent?.type === 'ExpressionStatement' ? node.parent : node;
-        const comment = sourceCode.getCommentsBefore(statement).at(-1);
-        const isAdjacent =
-          comment?.loc?.end.line != null &&
-          statement.loc?.start.line != null &&
-          statement.loc.start.line - comment.loc.end.line <= 1;
-        const commentText = comment?.value ?? '';
-        const isValid =
-          comment?.type === 'Block' &&
-          commentText.startsWith('*') &&
-          isAdjacent &&
-          ['@wisepen-manual-effect', '执行时机：', '不可替代原因：', 'cleanup：'].every((field) =>
-            commentText.includes(field)
-          );
-        if (!isValid) {
-          context.report({ node, messageId: 'missing' });
+        const isNamedUseEffect =
+          node.callee.type === 'Identifier' && node.callee.name === 'useEffect';
+        const isReactUseEffect =
+          node.callee.type === 'MemberExpression' &&
+          !node.callee.computed &&
+          node.callee.object.type === 'Identifier' &&
+          node.callee.object.name === 'React' &&
+          node.callee.property.type === 'Identifier' &&
+          node.callee.property.name === 'useEffect';
+        if (isNamedUseEffect || isReactUseEffect) {
+          context.report({ node, messageId: 'forbidden' });
         }
       },
     };
   },
 };
 
-const requireManualMemoJSDocRule = {
+const noMemoizedFnRule = {
   meta: {
     type: 'problem',
     docs: {
-      description: '要求 useMemo/useCallback 说明必要性、收益和失效条件',
+      description: '默认禁止 useMemoizedFn，所有调用只暴露为 warning',
     },
     schema: [],
     messages: {
-      missing:
-        'useMemo/useCallback 上方必须紧邻中文 JSDoc，并包含 @wisepen-manual-memo、“为什么：”“收益：”“失效条件：”。',
+      forbidden:
+        'useMemoizedFn 会隐藏依赖关系并固化函数身份；仅第三方引用契约且必须读取最新闭包时使用。请优先使用普通函数或 useCallback，注释不能豁免。',
     },
   },
   create(context) {
-    const sourceCode = context.sourceCode;
-    const statementTypes = new Set([
-      'ExpressionStatement',
-      'VariableDeclaration',
-      'ReturnStatement',
-      'AssignmentExpression',
-    ]);
-
-    const getStatement = (node) => {
-      let current = node;
-      while (current.parent && !statementTypes.has(current.parent.type)) {
-        current = current.parent;
-      }
-      return current.parent ?? node;
-    };
-
     return {
       CallExpression(node) {
-        if (
-          node.callee.type !== 'Identifier' ||
-          !['useMemo', 'useCallback'].includes(node.callee.name)
-        ) {
-          return;
+        const isNamedUseMemoizedFn =
+          node.callee.type === 'Identifier' && node.callee.name === 'useMemoizedFn';
+        const isAhooksUseMemoizedFn =
+          node.callee.type === 'MemberExpression' &&
+          !node.callee.computed &&
+          node.callee.object.type === 'Identifier' &&
+          node.callee.object.name === 'ahooks' &&
+          node.callee.property.type === 'Identifier' &&
+          node.callee.property.name === 'useMemoizedFn';
+        if (isNamedUseMemoizedFn || isAhooksUseMemoizedFn) {
+          context.report({ node, messageId: 'forbidden' });
         }
+      },
+    };
+  },
+};
 
-        const statement = getStatement(node);
-        const comment = sourceCode.getCommentsBefore(statement).at(-1);
-        const isAdjacent =
-          comment?.loc?.end.line != null &&
-          statement.loc?.start.line != null &&
-          statement.loc.start.line - comment.loc.end.line <= 1;
-        const commentText = comment?.value ?? '';
-        const isValid =
-          comment?.type === 'Block' &&
-          commentText.startsWith('*') &&
-          isAdjacent &&
-          ['@wisepen-manual-memo', '为什么：', '收益：', '失效条件：'].every((field) =>
-            commentText.includes(field)
-          );
-
-        if (!isValid) {
-          context.report({ node, messageId: 'missing' });
+const noMemoizationRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: '默认禁止 useMemo/useCallback，所有调用只暴露为 warning',
+    },
+    schema: [],
+    messages: {
+      forbidden:
+        '项目默认禁止 useMemo/useCallback；只有可验证的计算瓶颈、引用身份契约或第三方依赖要求时使用。请优先普通计算或普通函数，注释不能豁免。',
+    },
+  },
+  create(context) {
+    return {
+      CallExpression(node) {
+        const isNamedMemoizationCall =
+          node.callee.type === 'Identifier' &&
+          ['useMemo', 'useCallback'].includes(node.callee.name);
+        const isReactMemoizationCall =
+          node.callee.type === 'MemberExpression' &&
+          !node.callee.computed &&
+          node.callee.object.type === 'Identifier' &&
+          node.callee.object.name === 'React' &&
+          node.callee.property.type === 'Identifier' &&
+          ['useMemo', 'useCallback'].includes(node.callee.property.name);
+        if (isNamedMemoizationCall || isReactMemoizationCall) {
+          context.report({ node, messageId: 'forbidden' });
         }
       },
     };
@@ -453,9 +450,10 @@ export const wisePenPlugin = {
     'no-direct-error-toast': noDirectErrorToastRule,
     'no-direct-wise-pen-error': noDirectWisePenErrorRule,
     'no-hardcoded-frontend-route': noHardcodedFrontendRouteRule,
+    'no-memoized-fn': noMemoizedFnRule,
+    'no-memoization': noMemoizationRule,
     'no-type-comments': noTypeCommentsRule,
     'require-hook-file-header': requireHookFileHeaderRule,
-    'require-manual-effect-jsdoc': requireManualEffectJSDocRule,
-    'require-manual-memo-jsdoc': requireManualMemoJSDocRule,
+    'no-use-effect': noUseEffectRule,
   },
 };
