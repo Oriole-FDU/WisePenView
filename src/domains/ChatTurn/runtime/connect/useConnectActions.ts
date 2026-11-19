@@ -201,7 +201,7 @@ export function useConnectActions({
   return {
     send,
     cancel,
-    cancelling: cancellingSessionId !== null,
+    cancelling: cancellingSessionId === sessionId,
     connectActive: connect.phase === 'connecting' || connect.phase === 'open',
     stopConnect,
     submitToolApprovals,
