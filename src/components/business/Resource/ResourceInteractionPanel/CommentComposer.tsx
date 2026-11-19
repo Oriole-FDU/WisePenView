@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ErrorState } from '@/components/base/Feedback';
 import { CommentInput, type CommentInputImage } from '@/components/base/Input';
 import { useImageService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
 
 import styles from './style.module.scss';
@@ -24,7 +24,7 @@ function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: Comment
   const imageService = useImageService();
   const [content, setContent] = useState('');
   const [pendingImages, setPendingImages] = useState<CommentInputImage[]>([]);
-  const [submitError, setSubmitError] = useState<string>();
+  const [submitError, setSubmitError] = useState<unknown>();
   const canSubmit = Boolean(content.trim()) || pendingImages.length > 0;
 
   const appendImages = (files: File[]) => {
@@ -66,12 +66,12 @@ function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: Comment
       await onSubmit(content.trim() || IMAGE_ONLY_CONTENT, imageUrls);
       setContent('');
       setPendingImages(failedImages);
-      setSubmitError(failedUpload ? parseErrorMessage(failedUpload.reason) : undefined);
+      setSubmitError(failedUpload ? failedUpload.reason : undefined);
     },
     {
       manual: true,
       showErrorToast: false,
-      onErrorEffect: (error) => setSubmitError(parseErrorMessage(error)),
+      onErrorEffect: (error) => setSubmitError(error),
     }
   );
 
@@ -102,7 +102,7 @@ function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: Comment
         onSubmit={() => void submitComment()}
       />
 
-      {submitError ? <p className={styles.errorText}>{submitError}</p> : null}
+      {submitError != null ? <ErrorState size="compact" error={submitError} /> : null}
     </div>
   );
 }

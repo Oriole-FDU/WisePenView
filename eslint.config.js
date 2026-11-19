@@ -61,8 +61,9 @@ export default defineConfig([
     },
     rules: {
       'wisepen/no-arbitrary-throw': 'warn',
-      'wisepen/no-direct-error-toast': 'warn',
-      'wisepen/no-direct-wise-pen-error': 'warn',
+      'wisepen/no-direct-error-toast': 'error',
+      'wisepen/no-direct-wise-pen-error': 'error',
+      'wisepen/no-legacy-error-report-api': 'error',
     },
   },
   {

@@ -112,7 +112,21 @@ const enUSErrors = {
       'The selection contains multiple mounts of the same resource. Handle them one at a time.',
     '204': 'Pages folder was not found.',
     '205': 'Notes folder was not found.',
-    '999': 'Operation failed. Please try again later.',
+    '499': 'Operation failed, please try again later',
+
+    // Component 500–899
+    '500': 'Validation failed',
+    '501': 'Copy failed. Please copy manually.',
+    '502': 'Access denied',
+    '503': 'Token is missing',
+    '504': 'Link is invalid or has expired',
+    '505': 'User info is not loaded. Please try again later.',
+    '506': 'Group info is missing',
+    '507': 'Copy failed. Please copy manually.',
+    '508': 'Copy failed. Please copy manually.',
+    '590': 'Page entered an invalid state. Refresh and try again.',
+    '899': 'Operation failed, please try again later',
+
     '1000': 'System error.',
     '1001': 'Request error.',
     '1111': 'Invalid request parameter.',

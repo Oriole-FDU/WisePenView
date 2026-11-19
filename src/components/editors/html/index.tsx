@@ -9,7 +9,6 @@ import EditorPresentationBinding from '@/components/editors/_runtime/EditorPrese
 import { isHtmlPageReady, useHtmlPageService, useResourceInteractionService } from '@/domains';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -121,17 +120,21 @@ function HtmlPageContent() {
     },
   };
 
-  const renderUnavailable = (title: string, subTitle?: string, retry?: () => void) => (
+  const renderUnavailable = (
+    title: string,
+    options?: { error?: unknown; subTitle?: string; retry?: () => void }
+  ) => (
     <div className={styles.middleOverlay}>
       <div className={styles.middleOverlayInner}>
         <ResultState
           status="warning"
           title={title}
-          subTitle={subTitle}
+          error={options?.error}
+          subTitle={options?.subTitle}
           extra={
             <div className={styles.actions}>
-              {retry ? (
-                <AppButton variant="secondary" onPress={retry}>
+              {options?.retry ? (
+                <AppButton variant="secondary" onPress={options.retry}>
                   {t('html.retry')}
                 </AppButton>
               ) : null}
@@ -149,7 +152,7 @@ function HtmlPageContent() {
   if (!resourceId) {
     body = renderUnavailable(t('html.cannotOpen'));
   } else if (infoError) {
-    body = renderUnavailable(t('html.cannotOpen'), parseErrorMessage(infoError), refreshInfo);
+    body = renderUnavailable(t('html.cannotOpen'), { error: infoError, retry: refreshInfo });
   } else if (infoLoading && !info) {
     body = (
       <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">
@@ -160,22 +163,25 @@ function HtmlPageContent() {
       </div>
     );
   } else if (!info) {
-    body = renderUnavailable(t('html.cannotOpen'), t('html.emptyInfo'), refreshInfo);
+    body = renderUnavailable(t('html.cannotOpen'), {
+      subTitle: t('html.emptyInfo'),
+      retry: refreshInfo,
+    });
   } else if (!ready) {
     const generationFailed =
       info.versionInfo?.status === 'FAILED' ||
       info.versionInfo?.status === 'REGISTERING_RES_TIMEOUT';
     body = renderUnavailable(
       generationFailed ? t('html.generationFailed') : t('html.notGenerated'),
-      generationFailed ? undefined : t('html.notGeneratedHint'),
-      refreshInfo
+      generationFailed
+        ? { retry: refreshInfo }
+        : { subTitle: t('html.notGeneratedHint'), retry: refreshInfo }
     );
   } else if (contentError) {
-    body = renderUnavailable(
-      t('html.contentFailed'),
-      parseErrorMessage(contentError),
-      refreshContent
-    );
+    body = renderUnavailable(t('html.contentFailed'), {
+      error: contentError,
+      retry: refreshContent,
+    });
   } else if (contentLoading || content == null) {
     body = (
       <div className={styles.middleOverlay} aria-busy="true" aria-live="polite">

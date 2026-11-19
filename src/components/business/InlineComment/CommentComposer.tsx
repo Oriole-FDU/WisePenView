@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ErrorState } from '@/components/base/Feedback';
 import { CommentInput, type CommentInputImage } from '@/components/base/Input';
 import { useImageService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
 
 import type { InlineCommentProps, InlineCommentSubmitPayload } from './index.type';
@@ -25,7 +25,7 @@ function CommentComposer({ placeholder, imageUpload, onCancel, onSubmit }: Comme
   const [content, setContent] = useState('');
   const [pendingImages, setPendingImages] = useState<CommentInputImage[]>([]);
   const [idempotencyKey, setIdempotencyKey] = useState(createUuid);
-  const [submitError, setSubmitError] = useState<string>();
+  const [submitError, setSubmitError] = useState<unknown>();
   const canSubmit = Boolean(content.trim()) || pendingImages.length > 0;
 
   const appendImages = (files: File[]) => {
@@ -67,7 +67,7 @@ function CommentComposer({ placeholder, imageUpload, onCancel, onSubmit }: Comme
     {
       manual: true,
       showErrorToast: false,
-      onErrorEffect: (error) => setSubmitError(parseErrorMessage(error)),
+      onErrorEffect: (error) => setSubmitError(error),
     }
   );
 
@@ -101,7 +101,7 @@ function CommentComposer({ placeholder, imageUpload, onCancel, onSubmit }: Comme
         onSubmit={() => void submitComment()}
       />
 
-      {submitError ? <p className={styles.errorText}>{submitError}</p> : null}
+      {submitError != null ? <ErrorState size="compact" error={submitError} /> : null}
     </div>
   );
 }

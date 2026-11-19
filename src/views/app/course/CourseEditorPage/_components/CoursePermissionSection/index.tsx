@@ -31,7 +31,6 @@ function CoursePermissionSection({
     refresh,
   } = useApi(() => groupService.fetchGroupResConfig(courseId), {
     refreshDeps: [courseId],
-    getErrorMessage: () => t('editor.permissions.loadFailed'),
   });
 
   const handlePermissionSuccess = () => {

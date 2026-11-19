@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,10 +6,10 @@ import { useSpeechService } from '@/domains';
 import { resolveXfyunSpeechLanguage, XfyunSpeechRecognizer } from '@/domains/Speech';
 import { useApi } from '@/hooks/useApi';
 import {
-  createClientError,
-  FRONTEND_CLIENT_ERROR,
+  createDomainError,
+  FRONTEND_DOMAIN_ERROR,
   isWisePenError,
-  parseErrorMessage,
+  reportError,
 } from '@/utils/error';
 
 import { useChatInputStoreApi } from '../_context';
@@ -36,22 +35,22 @@ function stopStream(stream: MediaStream | null): void {
 function mapMicrophoneError(error: unknown): Error {
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError') {
-      return createClientError(
-        FRONTEND_CLIENT_ERROR.MICROPHONE_PERMISSION_DENIED,
+      return createDomainError(
+        FRONTEND_DOMAIN_ERROR.MICROPHONE_PERMISSION_DENIED,
         undefined,
         error
       );
     }
     if (error.name === 'NotFoundError') {
-      return createClientError(FRONTEND_CLIENT_ERROR.MICROPHONE_NOT_FOUND, undefined, error);
+      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_NOT_FOUND, undefined, error);
     }
     if (error.name === 'NotReadableError') {
-      return createClientError(FRONTEND_CLIENT_ERROR.MICROPHONE_BUSY, undefined, error);
+      return createDomainError(FRONTEND_DOMAIN_ERROR.MICROPHONE_BUSY, undefined, error);
     }
   }
   return isWisePenError(error)
     ? error
-    : createClientError(FRONTEND_CLIENT_ERROR.VOICE_INPUT_START_FAILED, undefined, error);
+    : createDomainError(FRONTEND_DOMAIN_ERROR.VOICE_INPUT_START_FAILED, undefined, error);
 }
 
 export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputProps {
@@ -78,10 +77,10 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
 
     try {
       if (!globalThis.isSecureContext) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.VOICE_INPUT_HTTPS_REQUIRED);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.VOICE_INPUT_HTTPS_REQUIRED);
       }
       if (!navigator.mediaDevices?.getUserMedia) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.VOICE_INPUT_UNSUPPORTED);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.VOICE_INPUT_UNSUPPORTED);
       }
 
       mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -133,7 +132,7 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
           streamRef.current = null;
           originalValueRef.current = '';
           setState('idle');
-          toast.danger(parseErrorMessage(error));
+          reportError({ error, level: 'danger' });
         },
       });
       recognizerRef.current = recognizer;
@@ -148,7 +147,7 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
       store.getState().setValue(originalValueRef.current);
       originalValueRef.current = '';
       setState('idle');
-      toast.danger(parseErrorMessage(mapMicrophoneError(error)));
+      reportError({ error: mapMicrophoneError(error), level: 'danger' });
     }
   }
 

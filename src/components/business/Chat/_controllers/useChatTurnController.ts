@@ -11,7 +11,7 @@ import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { captureException } from '@/observability';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
@@ -64,7 +64,7 @@ export function useChatTurnController({
       recoverChatStream: chatTurnService.recoverChatStream,
       reconnectChatStream: chatTurnService.reconnectChatStream,
       onError: (error) => {
-        toast.danger(parseErrorMessage(error));
+        reportError({ error, level: 'danger' });
       },
     });
 
@@ -115,7 +115,7 @@ export function useChatTurnController({
     try {
       targetSessionId = await ensureSession(agentParams);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      reportError({ error, level: 'danger' });
       return false;
     }
     if (!targetSessionId) return false;
@@ -159,7 +159,7 @@ export function useChatTurnController({
         detector: 'application-handled',
         operation: 'chat.send',
       });
-      toast.danger(parseErrorMessage(error));
+      reportError({ error, level: 'danger' });
     });
 
     frontendState.finishSend();
@@ -178,7 +178,7 @@ export function useChatTurnController({
     try {
       await chatTurnService.cancelTurn(targetSessionId);
     } catch (error) {
-      toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
+      reportError({ error, level: 'danger' });
     } finally {
       setCancellingSessionId((sessionId) => (sessionId === targetSessionId ? null : sessionId));
     }

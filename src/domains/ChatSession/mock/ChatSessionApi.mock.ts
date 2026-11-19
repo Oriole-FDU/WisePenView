@@ -1,5 +1,5 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { ChatSessionApi as ChatSessionApiContract } from '../apis/ChatSessionApi';
 import type {
@@ -118,7 +118,7 @@ const mockHistoryMessagesBySessionId: Record<string, MessageResponse[]> = mockSe
 
 const requireSession = (id: string) => {
   const session = mockSessions.find((item) => item.id === id);
-  if (!session) throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_CREATE_SESSION_FAILED);
+  if (!session) throw createDomainError(FRONTEND_DOMAIN_ERROR.CHAT_CREATE_SESSION_FAILED);
   return session;
 };
 export const ChatSessionApi: typeof ChatSessionApiContract = {

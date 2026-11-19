@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR, isWisePenError } from '@/utils/error';
 
 import { collectNotePrintStyles } from '../../registry';
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
@@ -370,7 +370,7 @@ export async function printNotePdfViaBrowser(
 ): Promise<void> {
   const proseMirrorRoot = getProseMirrorRoot(editor);
   if (!proseMirrorRoot) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_EXPORT_FAILED, {
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, {
       reason: '无法获取编辑器内容',
     });
   }
@@ -384,7 +384,7 @@ export async function printNotePdfViaBrowser(
       return;
     } catch (error) {
       if (isWisePenError(error)) throw error;
-      throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_EXPORT_FAILED, undefined, error);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, undefined, error);
     }
   }
 
@@ -398,7 +398,7 @@ export async function printNotePdfViaBrowser(
   const doc = iframe.contentDocument;
   if (!win || !doc) {
     iframe.remove();
-    throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_EXPORT_FAILED, {
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, {
       reason: '无法创建打印区域',
     });
   }
@@ -428,6 +428,6 @@ export async function printNotePdfViaBrowser(
   } catch (error) {
     removeFrame();
     if (isWisePenError(error)) throw error;
-    throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_EXPORT_FAILED, undefined, error);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_EXPORT_FAILED, undefined, error);
   }
 }

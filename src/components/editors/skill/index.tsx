@@ -14,7 +14,6 @@ import EditorPresentationBinding from '@/components/editors/_runtime/EditorPrese
 import type { EditorPresentation } from '@/components/editors/editor.type';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { SkillServicesMap } from '@/domains/Skill';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -303,7 +302,7 @@ function SkillEditorContent() {
           <ResultState
             status="warning"
             title={t('page.openFailed')}
-            subTitle={parseErrorMessage(resource.error)}
+            error={resource.error}
             extra={
               <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
                 <AppButton variant="secondary">{t('page.backToDrive')}</AppButton>

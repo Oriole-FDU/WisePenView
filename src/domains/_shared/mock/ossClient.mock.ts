@@ -1,5 +1,5 @@
 import type { OssPresignedPutParams } from '@/domains/_shared/apis/ossPresignedPut';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { OssReadClient } from '../apis/ossClient';
 
@@ -8,7 +8,7 @@ export const mockUploadCallbacks = new Map<string, () => void>();
 export const createOssClient = (): OssReadClient => ({
   async get(objectKey) {
     const content = mockObjects.get(objectKey);
-    if (!content) throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_CONTENT_NOT_LOADED);
+    if (!content) throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_CONTENT_NOT_LOADED);
     return { content };
   },
 });

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useNoteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import { usePendingNoteImportStore } from '../_store/usePendingNoteImportStore';
 
@@ -49,7 +49,7 @@ export function useMarkdownNoteImport({
   const { loading: importing, run: importMarkdownNote } = useApi(
     async (file: File) => {
       if (!isMarkdownFile(file.name)) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_UNSUPPORTED_TYPE);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_UNSUPPORTED_TYPE);
       }
 
       const title = resolveNoteTitle(file.name, t('title.untitled'));
@@ -59,7 +59,7 @@ export function useMarkdownNoteImport({
         pathTagId: getPathTagId?.(),
       });
       if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
       }
 
       usePendingNoteImportStore.getState().setPendingImport(resourceId, {

@@ -6,7 +6,7 @@ import type * as Y from 'yjs';
 
 import { usePendingNoteImportStore } from '@/components/editors/note/_store/usePendingNoteImportStore';
 import type { NoteAiDiffPreviewData } from '@/domains/Note';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR, reportError } from '@/utils/error';
 
 import { getAiContentStore } from '../engines/aiDiff/store';
 import { importNoteMarkdown } from '../engines/markdown/markdownImport';
@@ -29,7 +29,7 @@ function splitAiDiffPreviewBlocks(
     const { 'ai-content': aiContent, children, ...block } = snapshot;
     if (Object.prototype.hasOwnProperty.call(snapshot, 'ai-content')) {
       if (aiContent === undefined) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
           reason: `AI Diff Mock 的 ai-content 不能为 undefined：${snapshot.id}`,
         });
       }
@@ -59,7 +59,7 @@ function initializeAiDiffPreview(params: {
 
   aiContentByBlockId.forEach((_aiContent, blockId) => {
     if (!editor.getBlock(blockId)) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
         reason: `AI Diff Mock 正文块初始化失败：${blockId}`,
       });
     }
@@ -125,7 +125,7 @@ export function useNoteEditorHydration({
       toast.success(t('import.success', { fileName: pendingImport.sourceFileName }));
     } catch (error) {
       usePendingNoteImportStore.getState().removePendingImport(resourceId);
-      toast.danger(t('import.failed', { message: parseErrorMessage(error) }));
+      reportError({ error, level: 'danger' });
     }
   });
 

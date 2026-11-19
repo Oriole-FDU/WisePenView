@@ -2,12 +2,12 @@ import type { AxiosRequestConfig } from 'axios';
 
 import { type ApiContract, parseApiRequest, parseApiResponse } from '@/apis/contract';
 import { apiDelete, apiGet, apiGetText, apiPatch, apiPost, apiPut } from '@/apis/request';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 const assertSupportedPlacement = (contract: ApiContract<unknown, unknown>): void => {
   const methodHasNoBody = contract.method === 'GET' || contract.method === 'DELETE';
   if (methodHasNoBody && contract.requestPlacement === 'body') {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
       reason: `${contract.name} 的 ${contract.method} 请求不允许 body`,
     });
   }
@@ -21,7 +21,7 @@ const assertSupportedTransport = (contract: ApiContract<unknown, unknown>): void
   ) {
     return;
   }
-  throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+  throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
     reason: `${contract.name} 的 ${contract.transport} transport 不能由 executeApiContract 执行`,
   });
 };
@@ -72,7 +72,7 @@ export async function executeApiContract<Request, Response>(
   const parseResponse = (payload: unknown): Response => parseApiResponse(contract, payload);
   if (contract.transport === 'text') {
     if (contract.method !== 'GET') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
         reason: `${contract.name} 的文本 transport 仅支持 GET`,
       });
     }

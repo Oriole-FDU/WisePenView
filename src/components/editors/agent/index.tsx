@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -31,7 +30,7 @@ function AgentEditorContent() {
           <ResultState
             status="warning"
             title={t('agent:page.openFailed')}
-            subTitle={parseErrorMessage(version.error)}
+            error={version.error}
             extra={
               <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
                 <AppButton variant="secondary">{t('agent:page.backToDrive')}</AppButton>

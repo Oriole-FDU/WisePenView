@@ -1,6 +1,6 @@
 import type * as Y from 'yjs';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 const AI_CONTENT_STORE_MAP = 'ai-content-store';
 export const AI_DIFF_ACTION_ORIGIN = Symbol('ai-diff-action');
@@ -27,7 +27,7 @@ export function readAllAiContent(doc: Y.Doc): ReadonlyMap<string, unknown> {
 
 export function setBlockAiContent(doc: Y.Doc, blockId: string, aiContent: unknown): void {
   if (aiContent === undefined) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
       reason: `AI-content 不能写入 undefined：${blockId}`,
     });
   }

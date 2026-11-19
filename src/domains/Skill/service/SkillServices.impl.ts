@@ -4,7 +4,7 @@ import type { AssetUploadTicketApiResponse } from '@/domains/_shared/apis/versio
 import { createOssStsClientManager } from '@/domains/_shared/ossStsClient';
 import type { IResourceService } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import { SkillServicesMap } from '../mapper/SkillServices.map';
@@ -137,7 +137,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
       mountTargetTagId: pathTagId,
     });
     if (!resourceId) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_CREATE_RESOURCE_ID_MISSING);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_CREATE_RESOURCE_ID_MISSING);
     }
     return resourceId;
   };
@@ -145,7 +145,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
   const forkSkill: ISkillService['forkSkill'] = async (params) => {
     const resourceId = await SkillApi.forkSkill(params);
     if (!resourceId) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_COPY_RESOURCE_ID_MISSING);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_COPY_RESOURCE_ID_MISSING);
     }
     return resourceId;
   };
@@ -188,14 +188,14 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
     targetVersion?: number
   ) => {
     if (!objectKey) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
     }
     return readAssetContent(resourceId, objectKey, targetVersion);
   };
 
   const loadAssetBlob = async (resourceId: string, objectKey: string, targetVersion?: number) => {
     if (!objectKey) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
     }
     return readAssetBlob(resourceId, objectKey, targetVersion);
   };
@@ -256,7 +256,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
           const ticket = tickets[index];
           try {
             if (!ticket?.assetId) {
-              throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
+              throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
                 fileName: request.name,
               });
             }
@@ -319,7 +319,7 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
         let nextContent = content;
         if (nextContent === undefined) {
           if (!objectKey) {
-            throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
+            throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_FILE_OBJECT_KEY_MISSING);
           }
           nextContent = await readAssetBlob(resourceId, objectKey, draftVersion);
         }
@@ -340,13 +340,13 @@ export const createSkillServices = (deps: SkillServicesDeps): ISkillService => {
 
     const missingAssetIdResult = results.find((result) => !result.assetId);
     if (missingAssetIdResult || results.length !== assets.length) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_UPLOAD_ASSET_ID_MISSING, {
         fileName: missingAssetIdResult?.name,
       });
     }
     const missingObjectKeyResult = results.find((result) => !result.objectKey);
     if (missingObjectKeyResult) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_FILE_OBJECT_KEY_MISSING, {
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_FILE_OBJECT_KEY_MISSING, {
         fileName: missingObjectKeyResult.name,
       });
     }

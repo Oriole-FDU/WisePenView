@@ -29,7 +29,7 @@ import type { DriveResourceLocation, FolderNode, RootNode } from '@/domains/Driv
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
 import {
@@ -99,7 +99,7 @@ function DriveTab() {
     getPathTagId: () => {
       const target = importTargetRef.current;
       if (!target) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
           reason: 'Markdown 导入目标不存在',
         });
       }
@@ -221,7 +221,7 @@ function DriveTab() {
   useApi(
     async () => {
       if (!noteTarget) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
           reason: '笔记创建目标不存在',
         });
       }
@@ -230,7 +230,7 @@ function DriveTab() {
         pathTagId: resolveContainerMountTagId(noteTarget),
       });
       if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
       }
       return {
         resourceId,

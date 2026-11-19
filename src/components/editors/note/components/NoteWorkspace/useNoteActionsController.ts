@@ -6,7 +6,7 @@ import { type RefObject, useEffect, useState } from 'react';
 import type { NoteBodyEditorHandle } from '@/components/editors/note/CustomBlockNote/index.type';
 import type { NoteSelectionSnapshot, NoteSessionStatus } from '@/domains/Note';
 import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import { useEditorSurface } from '../../../_context';
 import {
@@ -86,7 +86,7 @@ export function useNoteActionsController({
         defaultFileName: `${sanitizeDownloadFileName(title, untitledTitle)}.pdf`,
       });
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      reportError({ error: err, level: 'danger' });
     } finally {
       setExportPending(false);
     }
@@ -109,7 +109,7 @@ export function useNoteActionsController({
       });
       toast.success(t('export.markdownStarted'));
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      reportError({ error: err, level: 'danger' });
     } finally {
       setExportPending(false);
     }
@@ -131,7 +131,7 @@ export function useNoteActionsController({
       });
       toast.success(t('export.docxStarted'));
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      reportError({ error: err, level: 'danger' });
     } finally {
       setExportPending(false);
     }

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { copyText } from '@/utils/browser/copyText';
+import { createComponentError, FRONTEND_COMPONENT_ERROR, reportError } from '@/utils/error';
 
 import type { CopyButtonProps } from './index.type';
 
@@ -22,7 +23,8 @@ function CopyButton({ text, label, className, isDisabled }: CopyButtonProps) {
 
   const handleCopy = async () => {
     if (!(await copyText(text))) {
-      toast.danger(t('copy.failed'));
+      const error = createComponentError(FRONTEND_COMPONENT_ERROR.COPY_FAILED);
+      reportError({ error, level: 'danger' });
       return;
     }
 

@@ -7,6 +7,7 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
+import { ErrorState } from '@/components/base/Feedback';
 import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
 import { buildResourcePermissionActionKeySet } from '@/components/business/Drive/common/resourcePermissionPolicy';
 import UserSearchCombobox from '@/components/business/UserSearchCombobox';
@@ -15,7 +16,6 @@ import {
   type ResourcePermissionSource,
   type ResourcePermissionSubject,
 } from '@/domains/ResourceAccess';
-import { parseErrorMessage } from '@/utils/error';
 
 import type { ResourcePermissionPanelProps } from './index.type';
 import {
@@ -248,7 +248,7 @@ function ResourcePermissionPanel({
         {loading ? (
           <PermissionPanelSkeleton />
         ) : error ? (
-          <div className={styles.stateText}>{parseErrorMessage(error)}</div>
+          <ErrorState size="compact" error={error} />
         ) : permissionOverview ? (
           <div className={styles.shell}>
             <section className={styles.subjectPane} aria-label={t('permission.collaborator')}>

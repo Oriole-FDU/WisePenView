@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { type Key, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,7 +10,7 @@ import { GUIDE_ACTION_ID, GUIDE_TOOL_ID, GUIDE_TOUR_ID } from '@/constants/tour'
 import { useDriveService } from '@/domains';
 import { buildDriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 import {
   buildDrivePath,
   buildDriveSystemFolderPath,
@@ -180,7 +179,7 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
             loading={isTrashPending}
             onCurrentNodeChange={handleTrashNodeChange}
             onPathError={(error) => {
-              toast.danger(parseErrorMessage(error));
+              reportError({ error, level: 'danger' });
               navigate(DRIVE_TRASH_PATH, { replace: true });
             }}
           />

@@ -13,7 +13,7 @@ import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -100,8 +100,8 @@ function OfficeEditorHost({
         events_onDocumentStateChange={(event) => dispatch({ type: 'modified', event })}
         events_onError={(event) =>
           handleError(
-            createClientError(
-              FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED,
+            createDomainError(
+              FRONTEND_DOMAIN_ERROR.OFFICE_LOAD_FAILED,
               { errorCode: 'unknown' },
               event
             )
@@ -109,7 +109,7 @@ function OfficeEditorHost({
         }
         onLoadComponentError={(errorCode, errorDescription) => {
           handleError(
-            createClientError(FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED, {
+            createDomainError(FRONTEND_DOMAIN_ERROR.OFFICE_LOAD_FAILED, {
               errorCode,
               errorDescription,
             })
@@ -207,7 +207,7 @@ function OfficeEditorContent() {
             <ResultState
               status="warning"
               title={t('office.loadFailed')}
-              subTitle={parseErrorMessage(error)}
+              error={error}
               extra={
                 <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
                   <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>
@@ -268,11 +268,7 @@ function OfficeEditorContent() {
           <div className={styles.loadingOverlay} aria-busy={!editorError} aria-live="polite">
             {editorError ? (
               <div className={styles.middleOverlayInner}>
-                <ResultState
-                  status="warning"
-                  title={t('office.loadFailed')}
-                  subTitle={parseErrorMessage(editorError)}
-                />
+                <ResultState status="warning" title={t('office.loadFailed')} error={editorError} />
               </div>
             ) : (
               <div className={styles.middleOverlayLoading}>

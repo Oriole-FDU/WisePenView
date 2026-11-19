@@ -11,6 +11,7 @@ import { useUserService } from '@/domains';
 import type { UserInviteRecord } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
+import { createComponentError, FRONTEND_COMPONENT_ERROR, reportError } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format';
 import { buildRegisterInvitePath } from '@/utils/navigation/appRoute';
 
@@ -57,7 +58,8 @@ function UserInviteModal({ isOpen, onOpenChange, inviteCode }: UserInviteModalPr
   const handleCopyCode = async () => {
     const copied = await copyText(inviteCode ?? '');
     if (!copied) {
-      toast.danger(t('userMenu.inviteCopyFailed'));
+      const error = createComponentError(FRONTEND_COMPONENT_ERROR.INVITE_COPY_FAILED);
+      reportError({ error, level: 'danger' });
       return;
     }
 
@@ -68,7 +70,8 @@ function UserInviteModal({ isOpen, onOpenChange, inviteCode }: UserInviteModalPr
   const handleCopyLink = async () => {
     const copied = await copyText(inviteUrl);
     if (!copied) {
-      toast.danger(t('userMenu.inviteCopyFailed'));
+      const error = createComponentError(FRONTEND_COMPONENT_ERROR.INVITE_COPY_FAILED);
+      reportError({ error, level: 'danger' });
       return;
     }
 

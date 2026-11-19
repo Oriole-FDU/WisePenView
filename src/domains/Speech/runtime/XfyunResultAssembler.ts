@@ -1,4 +1,4 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 function readSegmentText(words: unknown): string {
@@ -18,7 +18,7 @@ export class XfyunResultAssembler {
 
   append(result: unknown): string {
     if (!isRecord(result) || typeof result.sn !== 'number') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID, {
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, {
         reason: '讯飞语音识别结果缺少分片序号',
       });
     }
@@ -29,7 +29,7 @@ export class XfyunResultAssembler {
         typeof result.rg[0] !== 'number' ||
         typeof result.rg[1] !== 'number'
       ) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID, {
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, {
           reason: '讯飞语音识别替换结果缺少有效范围',
         });
       }

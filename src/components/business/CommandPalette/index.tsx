@@ -33,7 +33,7 @@ import type { RootNode } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import ResourceSearchResults from './ResourceSearchResults';
@@ -155,7 +155,7 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
     async (type: CreateResourceType): Promise<PrepareCreateResult> => {
       const root = await driveService.getRoot();
       if (!root.canMountResources || !root.tagId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE, {
           reason: '个人云盘根目录不可挂载资源',
         });
       }
@@ -165,7 +165,7 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
       const title = t('create.defaultNoteTitle', { ns: 'drive' });
       const result = await noteService.createNote({ title, pathTagId: root.tagId });
       if (!result.resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
       }
       return { kind: 'note', resourceId: result.resourceId, title, root };
     },

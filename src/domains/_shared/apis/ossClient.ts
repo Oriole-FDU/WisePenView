@@ -1,7 +1,7 @@
 import OSS from 'ali-oss';
 
 import type { OssStsTokenApi } from '@/domains/_shared/apis/ossStsApi.schema';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 export interface OssReadClient {
   get(objectKey: string): Promise<{ content?: unknown }>;
@@ -15,7 +15,7 @@ export const createOssClient = (token: OssStsTokenApi): OssReadClient => {
     !token.bucket ||
     (!token.region && !token.endpoint)
   ) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_CREDENTIAL_INVALID);
   }
 
   return new OSS({

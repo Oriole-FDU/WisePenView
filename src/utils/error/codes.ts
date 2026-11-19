@@ -10,10 +10,9 @@ export const FRONTEND_NETWORK_ERROR = {
   UNKNOWN: 99,
 } as const;
 
-/** 前端 Service/客户端校验错误码（100–999） */
-export const FRONTEND_CLIENT_ERROR = {
+/** Domain Service / mapper 业务错误码（100–499） */
+export const FRONTEND_DOMAIN_ERROR = {
   VALIDATION: 100,
-  UNKNOWN: 999,
   IMAGE_FILE_TOO_LARGE: 101,
   DOCUMENT_FILE_TOO_LARGE: 102,
   DOCUMENT_UNSUPPORTED_TYPE: 103,
@@ -113,10 +112,35 @@ export const FRONTEND_CLIENT_ERROR = {
   DRAWIO_SAVE_FAILED: 203,
   DRIVE_PAGE_TAG_NOT_FOUND: 204,
   DRIVE_NOTE_TAG_NOT_FOUND: 205,
+  UNKNOWN: 499,
 } as const;
+
+/** Component / View 本地交互错误码（500–899） */
+export const FRONTEND_COMPONENT_ERROR = {
+  VALIDATION: 500,
+  COPY_FAILED: 501,
+  UNAUTHORIZED: 502,
+  AUTH_TOKEN_MISSING: 503,
+  AUTH_TOKEN_INVALID: 504,
+  USER_NOT_LOADED: 505,
+  GROUP_ID_MISSING: 506,
+  INVITE_COPY_FAILED: 507,
+  PAGE_COPY_FAILED: 508,
+  INTERNAL_STATE: 590,
+  UNKNOWN: 899,
+} as const;
+
+/** @deprecated 使用 FRONTEND_DOMAIN_ERROR */
+export const FRONTEND_CLIENT_ERROR = FRONTEND_DOMAIN_ERROR;
 
 export type FrontendNetworkErrorCode =
   (typeof FRONTEND_NETWORK_ERROR)[keyof typeof FRONTEND_NETWORK_ERROR];
 
-export type FrontendClientErrorCode =
-  (typeof FRONTEND_CLIENT_ERROR)[keyof typeof FRONTEND_CLIENT_ERROR];
+export type FrontendDomainErrorCode =
+  (typeof FRONTEND_DOMAIN_ERROR)[keyof typeof FRONTEND_DOMAIN_ERROR];
+
+export type FrontendComponentErrorCode =
+  (typeof FRONTEND_COMPONENT_ERROR)[keyof typeof FRONTEND_COMPONENT_ERROR];
+
+/** @deprecated 使用 FrontendDomainErrorCode */
+export type FrontendClientErrorCode = FrontendDomainErrorCode;

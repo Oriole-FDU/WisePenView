@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { INoteService } from '@/domains/Note';
 import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR, reportError } from '@/utils/error';
 
 import {
   type DrawioEditorCommand,
@@ -49,7 +49,7 @@ export function useDrawioEditorSession({
         plainText: extractDrawioPlainText(xml),
       }),
   });
-  const createFailure = () => createClientError(FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED);
+  const createFailure = () => createDomainError(FRONTEND_DOMAIN_ERROR.DRAWIO_SAVE_FAILED);
   const [session] = useState(() =>
     createDrawioSaveSession({
       initialXml,
@@ -73,7 +73,7 @@ export function useDrawioEditorSession({
     return () => session.dispose();
   }, [session]);
 
-  const notifyFailure = (error: unknown) => toast.danger(parseErrorMessage(error));
+  const notifyFailure = (error: unknown) => reportError({ error, level: 'danger' });
   const requestSave = () => {
     if (!canEdit || !editorLoaded) {
       const error = createFailure();
@@ -117,7 +117,7 @@ export function useDrawioEditorSession({
       return;
     }
     if (message.event === 'error') {
-      const error = createClientError(FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED, {
+      const error = createDomainError(FRONTEND_DOMAIN_ERROR.DRAWIO_SAVE_FAILED, {
         detail: message.message,
       });
       captureException(error, {

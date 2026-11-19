@@ -8,7 +8,7 @@ import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { useAppAuth } from '@/layouts/App/_context';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import { APP_SIDEBAR_HEADER_ITEMS, type AppSidebarNavigateItem } from './appSidebarNavigation';
 
@@ -36,7 +36,7 @@ export function useAppSidebarHeaderNav({
       const title = t('navigation.defaultNoteTitle');
       const result = await noteService.createNote({ title });
       if (!result.resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
       }
       return { resourceId: result.resourceId, title };
     },

@@ -4,7 +4,7 @@ import type {
   GetMyGroupMemberInfoApiResponse,
 } from '@/domains/Group/apis/GroupApi.contract';
 import type { GroupTokenInfoApi } from '@/domains/Group/apis/GroupApi.schema';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApi): UserGroupQuota => {
   const base = item.groupDisplayBase;
@@ -14,7 +14,7 @@ const mapUserGroupQuotaFromApi = (item: GroupTokenInfoApi): UserGroupQuota => {
     groupType !== GROUP_TYPE.ADVANCED &&
     groupType !== GROUP_TYPE.PUBLIC
   ) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
   }
 
   return {

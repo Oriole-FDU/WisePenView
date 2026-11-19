@@ -4,14 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, ResultState, Spin } from '@/components/base/Feedback';
 import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useCourseService } from '@/domains';
 import { COURSE_ROLE } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/_context';
-import { parseErrorMessage } from '@/utils/error';
 import { buildCourseLearningPath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 
@@ -39,10 +38,19 @@ function CourseHomeTab() {
   if (error || !data) {
     return (
       <div className={styles.state}>
-        <span>{error ? parseErrorMessage(error) : t('common.notFound')}</span>
-        <AppButton variant="secondary" onPress={refresh}>
-          {t('common.retry')}
-        </AppButton>
+        {error ? (
+          <ErrorState
+            title={t('common.loadFailed')}
+            error={error}
+            action={
+              <AppButton variant="secondary" onPress={refresh}>
+                {t('common.retry')}
+              </AppButton>
+            }
+          />
+        ) : (
+          <ResultState status="404" title={t('common.notFound')} />
+        )}
       </div>
     );
   }

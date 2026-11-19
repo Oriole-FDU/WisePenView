@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +9,7 @@ import { useDriveService, useGroupService } from '@/domains';
 import { buildDriveNodeScope, type DriveNode, type DriveNodeScope } from '@/domains/Drive';
 import type { IGroupService } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import {
   buildDriveTreeData,
@@ -389,7 +388,7 @@ function DriveNavigator({
       ]);
     } catch (err) {
       scopePageStateRef.current.loading = false;
-      toast.danger(parseErrorMessage(err));
+      reportError({ error: err, level: 'danger' });
     }
   }
 

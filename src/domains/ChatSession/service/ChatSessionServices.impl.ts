@@ -1,6 +1,6 @@
 import { ChatSessionApi, putOssPresignedUrl } from '@domain-apis';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { computeFileMd5 } from '@/utils/file/computeFileMd5';
 import { parseExtension } from '@/utils/file/parseExtension';
 
@@ -89,13 +89,13 @@ const uploadAttachment = async ({
     enable_library: Boolean(saveToLibrary),
   });
   if (!response?.attachment_id) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_ATTACHMENT_UPLOAD_INIT_FAILED);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.CHAT_ATTACHMENT_UPLOAD_INIT_FAILED);
   }
   if (response.flash_uploaded) {
     return { attachmentId: response.attachment_id, filename: file.name };
   }
   if (!response.put_url) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_ATTACHMENT_UPLOAD_INIT_FAILED);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.CHAT_ATTACHMENT_UPLOAD_INIT_FAILED);
   }
   await putOssPresignedUrl({
     putUrl: response.put_url,

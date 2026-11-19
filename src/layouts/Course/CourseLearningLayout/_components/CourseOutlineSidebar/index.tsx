@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, Spin } from '@/components/base/Feedback';
 import { FormField, Input } from '@/components/base/Input';
 import Tree, {
   type DataNode,
@@ -17,7 +17,6 @@ import AppFormDialog from '@/components/business/AppFormDialog';
 import { UploadDocumentModal } from '@/components/business/Drive/Modals';
 import type { CourseOutlineContainerNode, CourseOutlineNode } from '@/domains/Course';
 import ResourceLayoutHeader from '@/layouts/Resource/ResourceLayout/ResourceLayoutHeader';
-import { parseErrorMessage } from '@/utils/error';
 
 import { type CourseOutlineResourcePageState, findOutlineNode } from '../../model';
 import styles from '../../style.module.scss';
@@ -314,10 +313,16 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
           {props.loading ? <Spin tip={t('sidebar.loading')} /> : null}
           {props.error ? (
             <div className={styles.outlineState}>
-              <span>{parseErrorMessage(props.error)}</span>
-              <AppButton variant="secondary" size="sm" onPress={props.onRetry}>
-                {t('common.retry')}
-              </AppButton>
+              <ErrorState
+                size="compact"
+                title={t('common.loadFailed')}
+                error={props.error}
+                action={
+                  <AppButton variant="secondary" size="sm" onPress={props.onRetry}>
+                    {t('common.retry')}
+                  </AppButton>
+                }
+              />
             </div>
           ) : null}
           {isEmpty ? createChapterRow : null}

@@ -1,8 +1,8 @@
 import type { ZodType } from 'zod';
 
 import {
-  createClientError,
-  FRONTEND_CLIENT_ERROR,
+  createDomainError,
+  FRONTEND_DOMAIN_ERROR,
   FRONTEND_NETWORK_ERROR,
   WisePenError,
 } from '@/utils/error';
@@ -48,8 +48,8 @@ export const parseApiRequest = <Request, Response>(
   const result = contract.request.safeParse(value);
   if (result.success) return result.data;
 
-  throw createClientError(
-    FRONTEND_CLIENT_ERROR.VALIDATION,
+  throw createDomainError(
+    FRONTEND_DOMAIN_ERROR.VALIDATION,
     {
       direction: 'request',
       endpoint: contract.endpoint,

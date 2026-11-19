@@ -1,7 +1,7 @@
 import { normalizeResourceActions } from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import type { EnumKey } from '@/utils/type/enum';
 
@@ -138,7 +138,7 @@ const mapFetchMyRoleInGroupFromApi = (
 ): EnumKey<typeof ROLE> | null => {
   if (data < 0) return null;
   const role = ROLE.getOption(data);
-  if (!role) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ROLE_FETCH_FAILED);
+  if (!role) throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_ROLE_FETCH_FAILED);
   return role.key;
 };
 

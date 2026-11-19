@@ -8,7 +8,6 @@ import { NoteEditorSession } from '@/components/editors/note/CustomBlockNote/Not
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useNoteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -17,7 +16,7 @@ import type { EditorSurfaceProps } from '../editor.type';
 import NoteWorkspace from './components/NoteWorkspace';
 import styles from './style.module.scss';
 
-function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
+function NoteOpenFailure({ error, subTitle }: { error?: unknown; subTitle?: string }) {
   const { t } = useTranslation('note');
   return (
     <>
@@ -27,6 +26,7 @@ function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
           <ResultState
             status="warning"
             title={t('workspace.openFailed')}
+            error={error}
             subTitle={subTitle}
             extra={
               <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
@@ -87,7 +87,7 @@ function NoteEditorContent() {
     return <NoteOpenFailure />;
   }
   if (error && !noteInfoDisplay) {
-    return <NoteOpenFailure subTitle={parseErrorMessage(error)} />;
+    return <NoteOpenFailure error={error} />;
   }
   if (loading && !noteInfoDisplay) {
     return <NoteInfoLoading />;

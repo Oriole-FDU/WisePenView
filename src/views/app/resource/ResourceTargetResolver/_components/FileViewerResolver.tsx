@@ -5,7 +5,6 @@ import { useDocumentService } from '@/domains';
 import { resolveResourceViewer, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
-import { parseErrorMessage } from '@/utils/error';
 
 import type { ResourceTargetResolverProps } from '../index.type';
 import styles from '../style.module.scss';
@@ -45,7 +44,7 @@ export default function FileViewerResolver({
       <UnsupportedResource
         {...target}
         resourceType={RESOURCE_KIND.FILE}
-        message={parseErrorMessage(error)}
+        error={error}
         onClose={onClose}
       />
     );

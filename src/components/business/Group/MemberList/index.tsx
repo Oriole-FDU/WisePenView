@@ -7,7 +7,7 @@ import { useGroupService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
 import { useApiPagination } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { MemberListProps } from './index.type';
@@ -63,7 +63,6 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       defaultCurrent: 1,
       defaultPageSize,
       refreshDeps: [groupId],
-      getErrorMessage: () => t('member.loadFailed'),
     }
   );
 
@@ -215,8 +214,8 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
     } catch (err) {
       setSavingRowId(null);
       setErrorRowId(rowId);
-      setInlineErrorMessage(parseErrorMessage(err));
-      toast.danger(parseErrorMessage(err));
+      setInlineErrorMessage(null);
+      reportError({ error: err, level: 'danger' });
     }
   };
 

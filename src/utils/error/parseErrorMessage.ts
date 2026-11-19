@@ -42,7 +42,11 @@ const translateByCode = (code: number, meta?: Record<string, unknown>): string |
   return translated;
 };
 
-/** 从 err 解析出提示文案：i18n(code) → serverMsg → unknown */
+/**
+ * 模块内部：从 err 解析提示文案（i18n(code) → serverMsg → unknown）。
+ * Toast 走 reportError；内联展示走 Feedback（ErrorState / ResultState / ErrorText）。
+ * 业务代码不得直接导入本函数。
+ */
 export const parseErrorMessage = (err: unknown): string => {
   const code = extractErrorCode(err);
   if (code !== undefined) {

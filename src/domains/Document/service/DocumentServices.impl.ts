@@ -1,6 +1,6 @@
 import { DocumentApi, putOssPresignedUrl } from '@domain-apis';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { computeFileMd5 } from '@/utils/file/computeFileMd5';
 import { parseExtension } from '@/utils/file/parseExtension';
 
@@ -24,11 +24,11 @@ const DOCUMENT_MAX_FILE_BYTES = 100 * 1024 * 1024;
 
 const assertDocumentUploadAllowed = (file: File): DocumentAllowedExtension => {
   if (file.size > DOCUMENT_MAX_FILE_BYTES) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_FILE_TOO_LARGE);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_FILE_TOO_LARGE);
   }
   const ext = parseExtension(file.name);
   if (!isAllowedExtension(ext)) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_UNSUPPORTED_TYPE);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_UNSUPPORTED_TYPE);
   }
   return ext;
 };
@@ -36,7 +36,7 @@ const assertDocumentUploadAllowed = (file: File): DocumentAllowedExtension => {
 const initUpload = async (body: UploadDocApiRequest): Promise<UploadDocApiResponse> => {
   const res = await DocumentApi.uploadDoc(body);
   if (res == null) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_UPLOAD_INIT_EMPTY);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_UPLOAD_INIT_EMPTY);
   }
   return res;
 };
@@ -72,7 +72,7 @@ const uploadDocument = async (params: UploadDocumentParams): Promise<string> => 
     init.callbackHeader == null ||
     init.callbackHeader === ''
   ) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_UPLOAD_URL_INVALID);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_UPLOAD_URL_INVALID);
   }
 
   await putOssPresignedUrl({

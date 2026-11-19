@@ -5,9 +5,9 @@ import { type RefObject, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
+import { ErrorState } from '@/components/base/Feedback';
 import { useResourceCommentService } from '@/domains';
 import type { ResourceComment } from '@/domains/ResourceComment';
-import { parseErrorMessage } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
 import ResourceCommentItem from './ResourceCommentItem';
@@ -230,9 +230,7 @@ function ResourceCommentThread({
               aria-hidden
             />
           ) : null}
-          {repliesError ? (
-            <p className={styles.errorText}>{parseErrorMessage(repliesError)}</p>
-          ) : null}
+          {repliesError ? <ErrorState size="compact" error={repliesError} /> : null}
           {replyPageData && !repliesNoMore ? (
             <AppButton
               variant="ghost"

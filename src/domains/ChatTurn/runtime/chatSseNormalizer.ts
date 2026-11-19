@@ -1,6 +1,6 @@
 import { type EventSourceMessage, EventSourceParserStream } from 'eventsource-parser/stream';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import { ChatSseEventDataApiSchema } from '../apis/ChatStreamApi.schema';
 
@@ -68,16 +68,16 @@ export function normalizeChatSseData(data: string): string[] {
   try {
     parsed = JSON.parse(data);
   } catch (error) {
-    throw createClientError(
-      FRONTEND_CLIENT_ERROR.VALIDATION,
+    throw createDomainError(
+      FRONTEND_DOMAIN_ERROR.VALIDATION,
       { reason: '聊天流事件不是合法 JSON' },
       error
     );
   }
   const validation = ChatSseEventDataApiSchema.safeParse(parsed);
   if (!validation.success) {
-    throw createClientError(
-      FRONTEND_CLIENT_ERROR.VALIDATION,
+    throw createDomainError(
+      FRONTEND_DOMAIN_ERROR.VALIDATION,
       {
         reason: '聊天流事件契约不匹配',
         issues: validation.error.issues.map((issue) => ({

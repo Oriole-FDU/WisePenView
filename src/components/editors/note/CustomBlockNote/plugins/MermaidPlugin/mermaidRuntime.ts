@@ -1,7 +1,7 @@
 import type { Mermaid } from 'mermaid';
 
 import i18n from '@/i18n';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 /** Mermaid 源码最大长度，避免超大图表触发高耗时解析和布局计算。 */
 export const NOTE_MERMAID_SOURCE_MAX_LENGTH = 50_000;
@@ -59,7 +59,7 @@ async function getNoteMermaid(): Promise<Mermaid> {
 
 export async function renderNoteMermaidDiagram(id: string, source: string): Promise<string> {
   if (source.length > NOTE_MERMAID_SOURCE_MAX_LENGTH) {
-    const error = createClientError(FRONTEND_CLIENT_ERROR.VALIDATION);
+    const error = createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
     error.message = i18n.t('mermaid.sourceTooLong', {
       ns: 'note',
       maxLength: NOTE_MERMAID_SOURCE_MAX_LENGTH.toLocaleString(),

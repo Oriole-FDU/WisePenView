@@ -28,19 +28,19 @@ const nativeErrorRestrictedSyntaxRules = [
   {
     selector: "NewExpression[callee.name='Error']",
     message:
-      '禁止直接创建原生 Error；客户端错误使用 createClientError，网络、HTTP、API 边界使用 WisePenError。',
+      '禁止直接创建原生 Error；Domain 用 createDomainError，Component 用 createComponentError，网络、HTTP、API 边界使用 WisePenError。',
   },
   {
     selector: "CallExpression[callee.name='Error']",
     message:
-      '禁止直接创建原生 Error；客户端错误使用 createClientError，网络、HTTP、API 边界使用 WisePenError。',
+      '禁止直接创建原生 Error；Domain 用 createDomainError，Component 用 createComponentError，网络、HTTP、API 边界使用 WisePenError。',
   },
 ];
 
 const domainWisePenErrorRestrictedSyntaxRule = {
   selector: "NewExpression[callee.name='WisePenError']",
   message:
-    'Domain 内禁止直接 new WisePenError；请使用 createClientError。网络/HTTP 边界（apis、domains/_shared/apis）除外。',
+    'Domain 内禁止直接 new WisePenError；请使用 createDomainError。网络/HTTP 边界（apis、domains/_shared/apis）除外。',
 };
 
 export const clientRuntimeRestrictedSyntaxRules = [

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, Spin } from '@/components/base/Feedback';
 import ListBox from '@/components/base/ListBox';
 import { Tabs } from '@/components/base/Tabs';
 import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
@@ -32,7 +32,7 @@ import {
   type ResourcePermissionOverview,
 } from '@/domains/ResourceAccess';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { ResourcePermissionModalProps } from './index.type';
 import styles from './style.module.scss';
@@ -97,7 +97,7 @@ function ResourcePermissionModal({
   } = useApi(
     async (): Promise<ResourcePermissionModalData> => {
       if (!target || !groupId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING);
       }
 
       const overview = await resourceAccessService.getResourcePermissionOverview({
@@ -276,7 +276,9 @@ function ResourcePermissionModal({
           <Spin size="large" tip={t('permission.editor.loading')} />
         </div>
       ) : error ? (
-        <div className={styles.state}>{parseErrorMessage(error)}</div>
+        <div className={styles.state}>
+          <ErrorState size="compact" error={error} />
+        </div>
       ) : policy ? (
         <div className={styles.content}>
           <Tabs

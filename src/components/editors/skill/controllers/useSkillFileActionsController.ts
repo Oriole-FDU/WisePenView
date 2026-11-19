@@ -10,7 +10,7 @@ import type {
 import { useSkillService } from '@/domains';
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR, reportError } from '@/utils/error';
 
 import type {
   ApplySkillMoveOptions,
@@ -231,7 +231,8 @@ export function useSkillFileActionsController({
     if (!skill || !canEditTree) return;
     const moveResult = moveTreeNode(files, dragId, dropId, dropPosition);
     if (!moveResult) {
-      toast.danger(parseErrorMessage(createClientError(FRONTEND_CLIENT_ERROR.SKILL_MOVE_CONFLICT)));
+      const error = createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_MOVE_CONFLICT);
+      reportError({ error, level: 'danger' });
       return;
     }
     const remotePathMoves = moveResult.movedFiles.filter(
@@ -301,7 +302,7 @@ export function useSkillFileActionsController({
           findFileByPathAndName(files, file.path, file.name)
         );
         if (conflicts.length > 0) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_IMPORT_CONFLICT, {
+          throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_ZIP_IMPORT_CONFLICT, {
             fileNames: conflicts
               .slice(0, 3)
               .map((file) => file.name)
@@ -325,7 +326,7 @@ export function useSkillFileActionsController({
         onLocalFilesAdded(nextTree, nextFiles, (mainFile ?? nextFiles[0])?.id);
         toast.success(t('toast.zipImported'));
       } catch (error) {
-        toast.danger(parseErrorMessage(error));
+        reportError({ error, level: 'danger' });
       }
       return;
     }
@@ -348,7 +349,7 @@ export function useSkillFileActionsController({
       );
       onLocalFilesAdded(nextTree, nextFiles, nextFiles.at(-1)?.id);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      reportError({ error, level: 'danger' });
     }
   };
 

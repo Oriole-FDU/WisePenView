@@ -13,7 +13,7 @@ import { useChatConfigService } from '@/domains';
 import { mapChatInputToolSelectionOverrides } from '@/domains/ChatConfig';
 import { useApi } from '@/hooks/useApi';
 import { useAppAuth } from '@/layouts/App/_context';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import { useChatInputFiles, useChatInputStore, useChatInputStoreApi } from '../_context';
 import {
@@ -133,7 +133,7 @@ export function useChatInputController({
       if (sendAccepted === false || store.getState().sessionVersion !== sessionVersion) return;
       clearAfterSend();
     } catch (err) {
-      toast.danger(t('input.sendFailed', { error: parseErrorMessage(err) }));
+      reportError({ error: err, level: 'danger' });
     }
   }
 
