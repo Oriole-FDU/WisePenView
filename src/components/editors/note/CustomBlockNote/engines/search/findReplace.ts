@@ -117,7 +117,7 @@ export function applyNoteReplaceOperations(
   operations: readonly NoteReplaceOperation[],
   replacement: string
 ): Transaction {
-  const sortedOperations = [...operations].sort(compareOperationsDescending);
+  const sortedOperations = operations.toSorted(compareOperationsDescending);
   for (const operation of sortedOperations) {
     if (operation.kind === 'inlineText') {
       tr.insertText(replacement, operation.from, operation.to);

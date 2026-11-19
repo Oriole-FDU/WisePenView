@@ -145,7 +145,7 @@ export const orderDriveFolderNodes = (nodes: FolderNode[]): FolderNode[] => {
     node.systemType
       ? DRIVE_SYSTEM_FOLDER_DEFINITIONS[node.systemType].order
       : NON_SYSTEM_FOLDER_ORDER;
-  return [...nodes].sort((left, right) => getOrder(left) - getOrder(right));
+  return nodes.toSorted((left, right) => getOrder(left) - getOrder(right));
 };
 
 export const mapResourceItemToChildNode = (

@@ -126,7 +126,7 @@ export function sortTableRows<T extends object, C>(
     options?.locale
   );
 
-  return [...rows].sort((a, b) => {
+  return rows.toSorted((a, b) => {
     const pinnedCompare = comparePinnedRows(a, b, options);
     if (pinnedCompare !== 0) return pinnedCompare;
     return compare(a, b);
@@ -158,8 +158,8 @@ export function sortFolderTreeRows<T extends object, C>(
   };
 
   const sortLevel = (levelRows: T[]): T[] =>
-    [...levelRows]
-      .sort((a, b) => {
+    levelRows
+      .toSorted((a, b) => {
         const pinnedCompare = comparePinnedRows(a, b, options);
         if (pinnedCompare !== 0) return pinnedCompare;
         return compare(a, b);

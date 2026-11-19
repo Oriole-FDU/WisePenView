@@ -110,7 +110,7 @@ function getSlashMenuGroupOrderIndex(group: string) {
 }
 
 export function sortSuggestionItemsForDisplay(items: DefaultReactSuggestionItem[]) {
-  return [...items].sort(compareSlashMenuItems);
+  return items.toSorted(compareSlashMenuItems);
 }
 
 /** 对已按展示顺序排列的菜单项分组，并附带全局起始索引。 */
