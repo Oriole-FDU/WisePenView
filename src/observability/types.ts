@@ -20,7 +20,7 @@ export type ExceptionDetector =
 export type ExceptionOperation =
   | 'chat.send'
   | 'chat.stream'
-  | 'chat.recover'
+  | 'chat.submitApprovals'
   | 'chat.resume'
   | 'office.sdk'
   | 'drawio.save'
