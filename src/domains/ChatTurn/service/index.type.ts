@@ -1,6 +1,7 @@
+import type { PageResult } from '@/domains/_shared/entity/page';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
-import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
+import type { WisePenUIMessage } from '../entity/message';
 
 interface ChatSelectedResourceContext {
   resourceId: string;
@@ -16,8 +17,13 @@ interface ChatUploadedAttachmentContext {
 }
 
 export interface ToolApprovalStatusRequest {
-  tool_call_id: string;
+  toolCallId: string;
   approved: boolean;
+}
+
+export interface SubmitToolApprovalsCommand {
+  sessionId: string;
+  toolApprovalStatus: ToolApprovalStatusRequest[];
 }
 
 export interface ClientToolCapability {
@@ -39,23 +45,23 @@ export interface SendTurnMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
-export interface UseChatTurnOptions {
+export interface SendTurnCommand {
   sessionId: string;
   model?: string;
-  getActiveTurnId: (sessionId: string) => Promise<string | null>;
-  streamChatCompletion: (
-    request: ChatCompletionApiRequest,
-    signal?: AbortSignal
-  ) => Promise<Response>;
-  recoverChatStream: (request: ChatRecoverApiRequest, signal?: AbortSignal) => Promise<Response>;
-  reconnectChatStream: (sessionId: string, signal?: AbortSignal) => Promise<Response>;
-  onError?: (error: Error) => void;
+  query: string;
+  options?: SendTurnMessageOptions;
 }
 
 export interface IChatTurnService {
-  streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
-  recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
+  streamChatCompletion(command: SendTurnCommand, signal?: AbortSignal): Promise<Response>;
+  recoverChatStream(command: SubmitToolApprovalsCommand, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
-  getActiveTurnId(sessionId: string): Promise<string | null>;
+  respondTurn(command: SubmitToolApprovalsCommand): Promise<void>;
+  getActiveTurnId(sessionId: string, signal?: AbortSignal): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
+  listHistoryMessages(
+    sessionId: string,
+    page: number,
+    size: number
+  ): Promise<PageResult<WisePenUIMessage>>;
 }

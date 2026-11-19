@@ -31,19 +31,7 @@
 
 CI 通过不能代替业务审查。迁移盘点、审查结论与覆盖进度记录在 PR，不能把一次性验收记录留在治理规范或 BUSINESS.md 中。后续批次沿用上述检查项，按业务域追加；批量之间不要求重构无关的大文件。
 
-## 五、覆盖路线与迭代数
-
-以目前 19 个一级业务域（不含 `_registry`、`_shared`）估算，业务知识盘点与迁移预计分 **5 轮**。每轮先确认是否存在需要长期保存的知识，没有内容的域只在 PR 记录无需创建的原因，不创建空文档或空索引：
-
-1. **第 1 轮**：Drive、Skill domain、Skill editor workflow，确定 domain 与 editor 流程的文档粒度。
-2. **第 2 轮**：Resource、Tag、Image、Document；先处理跨页面共用的资源与标签规则，再补文档与图片生命周期。
-3. **第 3 轮**：Auth、User、UserVerification、UserTask、UserTour、Group、Wallet；集中确认账号、认证、任务、导览、邀请、反馈、群组、权限与资产归属边界。
-4. **第 4 轮**：ChatSession、ChatTurn、ChatConfig、Agent、Course、Message；整理会话、流式轮次、模型配置、代理、课程与消息状态及跨域引用。
-5. **第 5 轮**：Note、Speech、ResourceInteraction、ResourceComment、ResourceFavorite、InlineComment、Admin，并做一次全局索引、重复规则与断链审查。
-
-上述轮次只估算业务知识覆盖。大型代码文件按各批次的 ESLint 告警量逐项拆分或审查，不承诺五轮清零全仓告警。第 5 轮追加全局索引、重复知识与断链审查。
-
-## 六、反模式
+## 五、反模式
 
 - 把 API 字段表、通用 React 规范或一次性 PR 摘要写成 BUSINESS.md。
 - 在根索引重复完整业务规则。

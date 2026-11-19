@@ -6,11 +6,6 @@ export { AgentApi } from '@/domains/Agent/apis/AgentApi';
 export { AuthApi } from '@/domains/Auth/apis/AuthApi';
 export { ChatConfigApi } from '@/domains/ChatConfig/apis/ChatConfigApi';
 export { ChatSessionApi } from '@/domains/ChatSession/apis/ChatSessionApi';
-export {
-  reconnectChatStream,
-  streamChatCompletion,
-  streamChatRecovery,
-} from '@/domains/ChatTurn/apis/ChatStreamApi';
 export { ChatTurnApi } from '@/domains/ChatTurn/apis/ChatTurnApi';
 export { DocumentApi } from '@/domains/Document/apis/DocumentApi';
 export { GroupApi, GroupMemberApi, GroupResConfigApi } from '@/domains/Group/apis/GroupApi';

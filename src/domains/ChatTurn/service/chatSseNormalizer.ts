@@ -2,7 +2,7 @@ import { type EventSourceMessage, EventSourceParserStream } from 'eventsource-pa
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { ChatSseEventDataApiSchema } from '../apis/ChatStreamApi.schema';
+import { ChatSseEventDataApiSchema } from '../apis/ChatTurnApi.schema';
 
 const CHAT_SSE_MAX_EVENT_SIZE = 8 * 1024 * 1024;
 
@@ -57,13 +57,11 @@ function isToolExecutionDeniedEvent(
   return value.type === 'data-tool-execution-denied' && typeof value.toolCallId === 'string';
 }
 
-/**
- * 后端为高危工具发送扁平 data-* 事件，AI SDK 6 要求 data-* 使用 data 字段。
- * 在传输边界转换成 SDK 标准工具事件，审批说明统一由前端文案展示。
- */
 export function normalizeChatSseData(data: string): string[] {
+  // [DONE] 原样放行
   if (data === '[DONE]') return [data];
 
+  // JSON 解析 + schema 校验
   let parsed: unknown;
   try {
     parsed = JSON.parse(data);
@@ -91,6 +89,7 @@ export function normalizeChatSseData(data: string): string[] {
   const event = getRecord(parsed);
   if (!event) return [data];
 
+  // 审批请求：拆成协议事件 + data 事件（SDK 与 UI 各吃一份）
   if (isToolApprovalRequestEvent(event)) {
     return [
       JSON.stringify({
@@ -110,6 +109,7 @@ export function normalizeChatSseData(data: string): string[] {
     ];
   }
 
+  // 执行错误 / 拒绝 → tool-output-*
   if (isToolExecutionErrorEvent(event)) {
     return [
       JSON.stringify({
@@ -129,6 +129,7 @@ export function normalizeChatSseData(data: string): string[] {
     ];
   }
 
+  // 其它事件透传
   return [data];
 }
 
@@ -141,10 +142,12 @@ function encodeSseMessage(message: EventSourceMessage, data: string): string {
 }
 
 export function normalizeChatSseResponse(response: Response): Response {
+  // 非 SSE 原样返回
   if (!response.body || !response.headers.get('content-type')?.includes('text/event-stream')) {
     return response;
   }
 
+  // 解码 → 拆事件 → 规范化 data → 重新编码
   const normalizedBody = response.body
     .pipeThrough(new TextDecoderStream())
     .pipeThrough(

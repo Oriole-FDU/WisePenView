@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 import type { ChatModel } from '@/domains/ChatConfig';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { WisePenUIMessage } from '@/domains/ChatTurn';
 
 import AssistantMessage from './Assistant';
 import UserMessage from './User';
