@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import useInfiniteScroll from 'ahooks/es/useInfiniteScroll';
 import type {
   Data as UseInfiniteScrollData,
@@ -21,7 +20,7 @@ import type {
 } from 'ahooks/es/useRequest/src/types';
 
 import { captureException } from '@/observability';
-import { isWisePenError, parseErrorMessage } from '@/utils/error';
+import { isWisePenError, notifyError } from '@/utils/error';
 
 interface UseApiErrorOptions<TParams extends unknown[]> {
   getErrorMessage?: (error: Error, params: TParams) => string;
@@ -67,7 +66,11 @@ const notifyApiError = <TParams extends unknown[]>(
 ): void => {
   const { getErrorMessage, onErrorEffect, showErrorToast = true } = options;
   if (showErrorToast && !isUnauthorizedError(error)) {
-    toast.danger(getErrorMessage ? getErrorMessage(error, params) : parseErrorMessage(error));
+    notifyError(error, {
+      message: getErrorMessage ? getErrorMessage(error, params) : undefined,
+    });
+  } else {
+    captureException(error, { detector: 'error-consumed' });
   }
   onErrorEffect?.(error, params);
 };
@@ -78,8 +81,8 @@ const handleApiError = <TParams extends unknown[]>(
   params: TParams,
   options: UseApiErrorHandlerOptions<TParams>
 ): void => {
-  captureException(error, { detector: 'error-consumed' });
   if (options.onError) {
+    captureException(error, { detector: 'error-consumed' });
     options.onError(error, params);
     return;
   }
