@@ -7,6 +7,9 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import { componentConventionRule } from './eslint-rules/component-conventions.js';
+import { domainConventionRule } from './eslint-rules/domain-conventions.js';
+
 const ahooksUpdateEffectImportRule = {
   name: 'ahooks',
   importNames: ['useUpdateEffect'],
@@ -616,6 +619,8 @@ const noDirectWisePenErrorRule = {
 
 const wisePenPlugin = {
   rules: {
+    'component-conventions': componentConventionRule,
+    'domain-conventions': domainConventionRule,
     'max-lines-error': fileLengthRule(600),
     'no-arbitrary-throw': noArbitraryThrowRule,
     'no-direct-error-toast': noDirectErrorToastRule,
@@ -770,6 +775,8 @@ export default defineConfig([
       'no-restricted-syntax': ['error', ...projectRestrictedSyntaxRules],
       'wisepen/require-manual-effect-jsdoc': 'error',
       'wisepen/require-manual-memo-jsdoc': 'error',
+      'wisepen/component-conventions': 'warn',
+      'wisepen/domain-conventions': 'warn',
     },
   },
   {
