@@ -15,6 +15,7 @@ const allowedDirectories = new Set([
   'mock',
   'model',
   'runtime',
+  'runtimeV2',
   'service',
   'session',
   'utils',
