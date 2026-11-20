@@ -8,6 +8,7 @@ import type {
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
 } from '../service/index.type';
+import { ConnectActions } from './connect/connectActions';
 import { createConnectFsm } from './connect/connectFsm';
 import { ConnectResume } from './connect/connectResume';
 import { HistoryData } from './history/historyData';
@@ -26,8 +27,6 @@ export interface ChatTurnRuntimeOptions {
 export class ChatTurnRuntime implements ChatTurnRuntimePort {
   readonly sessionId: string;
   private phase: LifecyclePhase = LIFECYCLE_PHASE.created;
-  private readonly service: IChatTurnService;
-  private readonly model?: string;
   private readonly onError?: (error: Error) => void;
   private readonly listeners = new Set<() => void>();
   private readonly message: ChatMessage;
@@ -35,12 +34,11 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
   private readonly historyLoading = createHistoryLoadingFsm();
   private readonly history: HistoryData;
   private readonly resume: ConnectResume;
+  private readonly actions: ConnectActions;
   private cancelling = false;
 
   constructor(options: ChatTurnRuntimeOptions) {
     this.sessionId = options.sessionId;
-    this.service = options.service;
-    this.model = options.model;
     this.onError = options.onError;
 
     this.message = new ChatMessage({
@@ -63,6 +61,19 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
       message: this.message,
       onError: options.onError,
       isDisposed: () => this.phase === LIFECYCLE_PHASE.disposed,
+    });
+
+    this.actions = new ConnectActions({
+      sessionId: options.sessionId,
+      model: options.model,
+      service: options.service,
+      connect: this.connect,
+      message: this.message,
+      resume: this.resume,
+      onCancellingChange: (cancelling) => {
+        this.cancelling = cancelling;
+        this.emit();
+      },
     });
   }
 
@@ -124,6 +135,7 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
       return;
     }
     this.setPhase(LIFECYCLE_PHASE.disposing);
+    this.actions.dispose();
     this.resume.dispose();
     this.history.dispose();
     this.message.dispose();
@@ -132,25 +144,19 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
     this.listeners.clear();
   }
 
-  async send(_query: string, _options?: SendTurnMessageOptions): Promise<void> {
+  async send(query: string, options?: SendTurnMessageOptions): Promise<void> {
     this.requirePhase([LIFECYCLE_PHASE.ready], 'send');
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'ChatTurnRuntime.send 尚未接线',
-    });
+    await this.actions.send(query, options);
   }
 
   async cancel(): Promise<void> {
     this.requirePhase([LIFECYCLE_PHASE.ready], 'cancel');
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'ChatTurnRuntime.cancel 尚未接线',
-    });
+    await this.actions.cancel();
   }
 
-  async submitToolApprovals(_statuses: ToolApprovalStatusRequest[]): Promise<void> {
+  async submitToolApprovals(statuses: ToolApprovalStatusRequest[]): Promise<void> {
     this.requirePhase([LIFECYCLE_PHASE.ready], 'submitToolApprovals');
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'ChatTurnRuntime.submitToolApprovals 尚未接线',
-    });
+    await this.actions.submitToolApprovals(statuses);
   }
 
   async loadMore(): Promise<void> {
