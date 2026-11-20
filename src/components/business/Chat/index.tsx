@@ -1,14 +1,21 @@
-import { useLatest } from 'ahooks';
-import { memo, useEffect } from 'react';
+import { toast } from '@heroui/react';
+import { useLatest, useUnmountedRef } from 'ahooks';
+import { memo, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ChatProps } from '@/components/business/Chat/index.type';
-import { useFrontendStateValue } from '@/frontendState';
+import type { ChatModel } from '@/domains/ChatConfig';
+import type { CreateSessionRequest } from '@/domains/ChatSession';
+import { useChatTurn } from '@/domains/ChatTurn';
+import { readFrontendStates, useFrontendStateValue } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
+import { captureException } from '@/observability';
+import { parseErrorMessage } from '@/utils/error';
 
 import { useChatSessionController } from './_controllers/useChatSessionController';
-import { useChatTurnController } from './_controllers/useChatTurnController';
 import ChatConversation from './ChatConversation';
+import type { ChatConversationTurn } from './ChatConversation/index.type';
 import ChatHeader from './ChatHeader';
 import type { SendOptions } from './send.type';
 import styles from './style.module.scss';
@@ -23,20 +30,32 @@ function Chat({
   showCollapseButton = true,
   onCollapsePanel,
 }: ChatProps) {
+  const { t } = useTranslation(['chat', 'common']);
   const { isAuthenticated, requireLogin } = useAppAuth();
-  const { locationKey } = useChatSessionRoute();
+  const { sessionId, locationKey } = useChatSessionRoute();
+  const routeLatest = useLatest({ sessionId, locationKey });
   const locationKeyLatest = useLatest(locationKey);
+  const unmountedRef = useUnmountedRef();
   const selectedText = useFrontendStateValue('selected_text');
   const session = useChatSessionController({ resourceChat });
-  const turn = useChatTurnController({
-    ensureSession: session.ensureSession,
-    isNewlyCreatedSession: session.isNewlyCreatedSession,
-    clearNewlyCreatedSession: session.clearNewlyCreatedSession,
-    resourceChat,
-    resourceId,
+  const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
+
+  const resourceStateProvider = resourceChat?.provider;
+  const resourceChatContext = resourceChat?.context;
+  const clearResourceChatContext = resourceChat?.clearContext;
+
+  const chatTurn = useChatTurn({
+    // 未登录时不下发 session，History 清对话；鉴权门禁留在壳层。
+    sessionId: isAuthenticated && sessionId ? sessionId : '',
+    model: currentModel?.modelId,
+    isNewSession: session.isNewSession,
+    onError: (error) => {
+      toast.danger(parseErrorMessage(error));
+    },
   });
+
   const { syncNewSessionHistoryRefresh } = session;
-  const pendingToolApproval = turn.approval.pending;
+  const pendingToolApproval = chatTurn.approval.pending;
 
   /**
    * @wisepen-manual-effect
@@ -45,25 +64,128 @@ function Chat({
    * cleanup：没有订阅或延迟任务，无需清理。
    */
   useEffect(() => {
-    syncNewSessionHistoryRefresh(turn.hasRenderableChatContent);
-  }, [syncNewSessionHistoryRefresh, turn.hasRenderableChatContent]);
+    syncNewSessionHistoryRefresh(chatTurn.renderable);
+  }, [syncNewSessionHistoryRefresh, chatTurn.renderable]);
 
   /**
-   * 发送前先过登录，再交给宿主的发送前置守卫；守卫挂起期间路由已切换时放弃发送，
-   * 避免守卫的结论落到过期会话。未命中守卫则直接发送。
+   * 发送处维护：登录、宿主守卫、资源门禁、ensureSession、载荷拼装与 toast，
+   * 最后落到 chatTurn.send。
    */
-  const handleSend = (text: string, opts?: SendOptions) => {
+  const handleSend = async (text: string, opts?: SendOptions): Promise<boolean> => {
     if (!isAuthenticated) {
       requireLogin();
       return false;
     }
+
     const guarded = hostAgentPort?.interceptSend?.(text, opts);
-    if (!guarded) return turn.send(text, opts);
-    const pendingLocationKey = locationKeyLatest.current;
-    return guarded.then((accepted) => {
+    if (guarded) {
+      const pendingLocationKey = locationKeyLatest.current;
+      const accepted = await guarded;
       if (!accepted || locationKeyLatest.current !== pendingLocationKey) return false;
-      return turn.send(text, opts);
-    });
+    }
+
+    if (unmountedRef.current || routeLatest.current.locationKey !== locationKey) return false;
+
+    const targetModel = opts?.model ?? currentModel;
+    if (!targetModel) return false;
+
+    const sendBlockedReason = resourceStateProvider?.getBlockedReason?.();
+    if (sendBlockedReason) {
+      toast.warning(sendBlockedReason);
+      return false;
+    }
+    if (resourceChatContext && resourceChatContext.providerKey !== resourceStateProvider?.key) {
+      toast.warning(t('panel.contextMismatch'));
+      return false;
+    }
+
+    setCurrentModel(targetModel);
+
+    const selectedAgent = opts?.selectedAgent;
+    let agentParams: CreateSessionRequest | undefined;
+    if (selectedAgent?.resourceId) {
+      agentParams = { agentId: selectedAgent.resourceId };
+    } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
+      agentParams = { agentId: null };
+    }
+
+    let targetSessionId: string | undefined;
+    try {
+      targetSessionId = await session.ensureSession(agentParams);
+    } catch (error) {
+      toast.danger(parseErrorMessage(error));
+      return false;
+    }
+    if (!targetSessionId) return false;
+
+    const frontendState = readFrontendStates({ resourceId });
+    if (frontendState.resourceMismatch) {
+      toast.warning(t('panel.contextMismatch'));
+      return false;
+    }
+    const selectedResourceState = frontendState.states.find(
+      (state) => state.key === 'selected_resources'
+    );
+    const selectedResources =
+      selectedResourceState?.key === 'selected_resources'
+        ? selectedResourceState.value.map((resource) => ({
+            resourceId: resource.resource_id,
+            resourceName: resource.resource_name,
+            resourceType: resource.resource_type,
+            enabled: true,
+          }))
+        : undefined;
+
+    const selectedSkillIds = opts?.selectedSkills?.map((skill) => skill.skillId);
+    const resourceSkillIds = resourceStateProvider?.onDemandSkillIds;
+    const onDemandSkillIds =
+      selectedSkillIds !== undefined || resourceSkillIds !== undefined
+        ? Array.from(new Set([...(selectedSkillIds ?? []), ...(resourceSkillIds ?? [])]))
+        : undefined;
+
+    void chatTurn
+      .send(text, {
+        model: targetModel.modelId,
+        providerId: targetModel.providerId,
+        sessionId: targetSessionId,
+        frontendStates: frontendState.states,
+        selectedResources,
+        uploadedAttachments: opts?.activeAttachments,
+        toolSelectionOverrides: opts?.toolSelectionOverrides,
+        onDemandSkillIds,
+      })
+      .catch((error) => {
+        captureException(error, {
+          detector: 'application-handled',
+          operation: 'chat.send',
+        });
+        toast.danger(parseErrorMessage(error));
+      });
+
+    frontendState.finishSend();
+    if (resourceChatContext) {
+      clearResourceChatContext?.(resourceChatContext);
+    }
+    return true;
+  };
+
+  const handleCancel = async (): Promise<void> => {
+    try {
+      await chatTurn.cancel();
+    } catch (error) {
+      toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
+    }
+  };
+
+  const turn: ChatConversationTurn = {
+    cancel: handleCancel,
+    cancelling: chatTurn.cancelling,
+    connectActive: chatTurn.connectActive,
+    currentModel,
+    history: chatTurn.history,
+    isEmpty: chatTurn.messages.length === 0,
+    messages: chatTurn.messages,
+    status: chatTurn.status,
   };
 
   const handleCollapsePanel = () => {
@@ -106,8 +228,10 @@ function Chat({
           key={pendingToolApproval.toolCallId}
           name={pendingToolApproval.name}
           input={pendingToolApproval.input}
-          submitting={turn.approval.submitting}
-          onDecision={(approved) => turn.approval.decide(pendingToolApproval.toolCallId, approved)}
+          submitting={chatTurn.approval.submitting}
+          onDecision={(approved) =>
+            chatTurn.approval.decide(pendingToolApproval.toolCallId, approved)
+          }
         />
       ) : null}
     </>

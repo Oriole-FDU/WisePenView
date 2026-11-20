@@ -42,6 +42,9 @@ release
 docs/*
 !docs/drive-refactor/
 !docs/drive-refactor/**
+!docs/chat-turn-respond-sequence.md
+!docs/chat-turn-runtime-v2/
+!docs/chat-turn-runtime-v2/**
 
 CLAUDE.md
 

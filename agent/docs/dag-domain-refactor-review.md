@@ -1,5 +1,7 @@
 # DAG 前序领域重构审查
 
+> **状态：历史审查快照，不是现行契约。** 下文只记录 2026-10-31 基线上的判断与待决策项；现行架构规则见 `agent/docs/` 专题，业务规则见对应 `BUSINESS.md`。
+>
 > 审查日期：2026-10-31
 >
 > 审查基线：`refactor/schema-contract-roadmap` 的 `6239e192b`，相对 `origin/main` 的 `5f444bf4e` 共 45 个未 push commit、414 个文件。
