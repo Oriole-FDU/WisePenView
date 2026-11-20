@@ -4,11 +4,8 @@
 import type { ChatStatus } from 'ai';
 
 import type { WisePenUIMessage } from '../../entity/message';
-import {
-  listToolApprovalRequests,
-  type ToolApprovalRequest,
-} from '../../runtime/approval/toolApprovalModel';
 import type { ToolApprovalStatusRequest } from '../../service/index.type';
+import { listToolApprovalRequests, type ToolApprovalRequest } from './toolApprovalModel';
 
 export type { ToolApprovalRequest };
 
