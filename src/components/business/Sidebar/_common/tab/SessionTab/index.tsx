@@ -1,5 +1,5 @@
 import { ListBoxSection } from '@heroui/react';
-import { useInfiniteScroll, useMemoizedFn } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { clsx } from 'clsx';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { useChatSessionService } from '@/domains';
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { buildChatPath } from '@/utils/navigation/appRoute';
@@ -35,7 +36,7 @@ const useSessionTab = () => {
     noMore: noMoreSessions,
     loadMore: loadMoreSessions,
     reloadAsync: reloadSessions,
-  } = useInfiniteScroll<PageResult<ChatSession>>(
+  } = useApiInfiniteScroll<PageResult<ChatSession>>(
     async (current) =>
       chatSessionService.listSessions({
         page: Math.floor((current?.list.length ?? 0) / SESSION_PAGE_SIZE) + 1,
