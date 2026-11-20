@@ -1,6 +1,6 @@
 # 阶段 2：Router（假 Runtime）
 
-> 目标：多 session 缓存与唯一 focus；假 Runtime 单测。  
+> 目标：多 session 缓存与唯一 focus；假 Runtime 单测。
 > 已决：后台**不停泵**；超限 **dispose**；`MAX_CACHED_RUNTIMES = 5`（可调 3–5）。
 
 ---

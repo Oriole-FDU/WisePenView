@@ -1,6 +1,6 @@
 # 阶段 3：整合与组件消费
 
-> 前置：阶段 1/2 完成。真 Runtime 作工厂；`useChatRuntimeV2` 消费 active。  
+> 前置：阶段 1/2 完成。真 Runtime 作工厂；`useChatRuntimeV2` 消费 active。
 > Send 经 Router/Hook 只打到 focus 实例。
 
 ---
@@ -38,7 +38,7 @@ flowchart LR
 
 ## 3. 验证
 
-静态：lint / typecheck。  
+静态：lint / typecheck。
 运行态：A streaming 切 B 回 A（消息应已在后台增长）；新建；审批三路径；cancel；登出；超限后再进需重新 bootstrap。
 
 脚手架测试不默认保留。
