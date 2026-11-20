@@ -8,6 +8,7 @@ import type {
   SendTurnMessageOptions,
   ToolApprovalStatusRequest,
 } from '../service/index.type';
+import { ToolApproval } from './approval/toolApproval';
 import { ConnectActions } from './connect/connectActions';
 import { createConnectFsm } from './connect/connectFsm';
 import { ConnectResume } from './connect/connectResume';
@@ -35,6 +36,7 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
   private readonly history: HistoryData;
   private readonly resume: ConnectResume;
   private readonly actions: ConnectActions;
+  private readonly approval: ToolApproval;
   private cancelling = false;
 
   constructor(options: ChatTurnRuntimeOptions) {
@@ -75,6 +77,14 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
         this.emit();
       },
     });
+
+    this.approval = new ToolApproval({
+      getMessages: () => this.message.messages,
+      getStatus: () => this.message.status,
+      submitToolApprovals: (statuses) => this.actions.submitToolApprovals(statuses),
+      onError: options.onError,
+      onChange: () => this.emit(),
+    });
   }
 
   get lifecycle(): LifecyclePhase {
@@ -97,6 +107,8 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
       canLoadMore: this.history.canLoadMore,
       cancelling: this.cancelling,
       connectActive: connectPhase === 'connecting' || connectPhase === 'open',
+      pendingApproval: this.approval.pending,
+      approvalSubmitting: this.approval.submitting,
     };
   }
 
@@ -137,6 +149,7 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
     this.setPhase(LIFECYCLE_PHASE.disposing);
     this.actions.dispose();
     this.resume.dispose();
+    this.approval.dispose();
     this.history.dispose();
     this.message.dispose();
     this.connect.reset();
@@ -157,6 +170,11 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
   async submitToolApprovals(statuses: ToolApprovalStatusRequest[]): Promise<void> {
     this.requirePhase([LIFECYCLE_PHASE.ready], 'submitToolApprovals');
     await this.actions.submitToolApprovals(statuses);
+  }
+
+  decideApproval(toolCallId: string, approved: boolean): void {
+    this.requirePhase([LIFECYCLE_PHASE.ready], 'decideApproval');
+    this.approval.decide(toolCallId, approved);
   }
 
   async loadMore(): Promise<void> {

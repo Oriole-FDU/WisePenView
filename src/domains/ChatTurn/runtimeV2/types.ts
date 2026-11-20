@@ -3,6 +3,7 @@ import type { ChatStatus } from 'ai';
 
 import type { WisePenUIMessage } from '../entity/message';
 import type { SendTurnMessageOptions, ToolApprovalStatusRequest } from '../service/index.type';
+import type { ToolApprovalRequest } from './approval/toolApproval';
 import type { ConnectPhase } from './connect/connectFsm';
 import type { LifecyclePhase } from './lifecycle';
 
@@ -16,6 +17,8 @@ export interface RuntimeView {
   canLoadMore: boolean;
   cancelling: boolean;
   connectActive: boolean;
+  pendingApproval: ToolApprovalRequest | undefined;
+  approvalSubmitting: boolean;
 }
 
 export interface ChatTurnRuntimePort {
@@ -29,6 +32,7 @@ export interface ChatTurnRuntimePort {
   send(query: string, options?: SendTurnMessageOptions): Promise<void>;
   cancel(): Promise<void>;
   submitToolApprovals(statuses: ToolApprovalStatusRequest[]): Promise<void>;
+  decideApproval(toolCallId: string, approved: boolean): void;
   loadMore(): Promise<void>;
 
   getView(): RuntimeView;
