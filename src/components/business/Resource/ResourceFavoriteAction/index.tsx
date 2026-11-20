@@ -1,10 +1,9 @@
-import { toast } from '@heroui/react';
 import { useState } from 'react';
 
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
 import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import ResourceFavoriteButton from './ResourceFavoriteButton';
 
@@ -31,7 +30,7 @@ function ResourceFavoriteAction({
   });
 
   const notifySuccess = () => {
-    void Promise.resolve(onSuccess?.()).catch((error) => toast.danger(parseErrorMessage(error)));
+    void Promise.resolve(onSuccess?.()).catch((error) => reportError({ error, level: 'danger' }));
   };
 
   const { loading: loadingUnfavorite, run: unfavorite } = useApi(

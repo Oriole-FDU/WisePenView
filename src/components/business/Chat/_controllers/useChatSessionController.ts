@@ -12,7 +12,7 @@ import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { ChatProps } from '../index.type';
 
@@ -71,9 +71,7 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
       if (unmountedRef.current) return;
       if (!appAuth.isAuthenticated) {
         appAuth.requireLogin();
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: t('input.loginRequired'),
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       let targetSessionId = currentSessionId;
       let targetSession = currentSession;

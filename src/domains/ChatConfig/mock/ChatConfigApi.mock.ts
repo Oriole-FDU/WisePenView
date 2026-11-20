@@ -1,5 +1,5 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { ChatConfigApi as ChatConfigApiContract } from '../apis/ChatConfigApi';
 import type { ModelResponse, ProviderApiResponse } from '../apis/ChatModelApi.schema';
@@ -67,7 +67,7 @@ const tools: ToolApiResponse[] = [
 
 const requireTool = (name: string) => {
   const tool = tools.find((item) => item.name === name);
-  if (!tool) throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION);
+  if (!tool) throw createDomainError(FRONTEND_DOMAIN_ERROR.VALIDATION);
   return tool;
 };
 

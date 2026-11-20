@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { createComponentError, FRONTEND_COMPONENT_ERROR } from '@/utils/error';
+
 import { AppButton } from '../Button';
 import { EmptyState, ErrorState, LoadingState, ResultState, Spin } from './index';
 
@@ -16,17 +18,26 @@ export const EmptySimple: Story = {
   render: () => <EmptyState title="暂无数据" showIcon={false} />,
 };
 export const ErrorBlock: Story = {
-  render: () => (
-    <ErrorState
-      title="加载失败"
-      description="请检查网络连接后重试。"
-      action={
-        <AppButton variant="primary" size="sm">
-          重试
-        </AppButton>
-      }
-    />
-  ),
+  render: () => {
+    const error = createComponentError(FRONTEND_COMPONENT_ERROR.UNKNOWN);
+    return (
+      <ErrorState
+        title="加载失败"
+        error={error}
+        action={
+          <AppButton variant="primary" size="sm">
+            重试
+          </AppButton>
+        }
+      />
+    );
+  },
+};
+export const ErrorCompact: Story = {
+  render: () => {
+    const error = createComponentError(FRONTEND_COMPONENT_ERROR.UNKNOWN);
+    return <ErrorState size="compact" error={error} />;
+  },
 };
 export const ResultPage: Story = {
   render: () => <ResultState status="500" title="加载失败" subTitle="请稍后重试。" />,

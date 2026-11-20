@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import { History, Save } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
@@ -22,7 +21,7 @@ import type { ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -133,11 +132,7 @@ function VersionModal({
           <span>{t('drawio.versionsLoading')}</span>
         </div>
       ) : error ? (
-        <ResultState
-          status="warning"
-          title={t('drawio.versionsFailed')}
-          subTitle={parseErrorMessage(error)}
-        />
+        <ResultState status="warning" title={t('drawio.versionsFailed')} error={error} />
       ) : !versions || versions.list.length === 0 ? (
         <ResultState status="info" title={t('drawio.versionsEmpty')} />
       ) : (
@@ -268,7 +263,7 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
           variant="primary"
           isDisabled={!editorLoaded || saveState === 'saved' || saveState === 'saving'}
           onPress={() =>
-            void requestSave().catch((error) => toast.danger(parseErrorMessage(error)))
+            void requestSave().catch((error) => reportError({ error, level: 'danger' }))
           }
           aria-label={t('actions.save', { ns: 'common' })}
         >
@@ -390,7 +385,7 @@ function DrawioEditorContent() {
           <ResultState
             status="warning"
             title={t('drawio.loadFailed')}
-            subTitle={parseErrorMessage(error)}
+            error={error}
             extra={
               <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
                 <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>

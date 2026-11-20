@@ -3,12 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { COURSE_ASSIGNMENT_STATUS } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/_context';
-import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { buildCourseAssignmentPath } from '@/utils/navigation/appRoute';
 
@@ -36,10 +35,15 @@ function CourseAssignmentsPage() {
       ) : null}
       {error ? (
         <div className={styles.state}>
-          <span>{parseErrorMessage(error)}</span>
-          <AppButton variant="secondary" onPress={refresh}>
-            {t('common.retry')}
-          </AppButton>
+          <ErrorState
+            title={t('common.loadFailed')}
+            error={error}
+            action={
+              <AppButton variant="secondary" onPress={refresh}>
+                {t('common.retry')}
+              </AppButton>
+            }
+          />
         </div>
       ) : null}
       {!loading && !error && data?.length === 0 ? (

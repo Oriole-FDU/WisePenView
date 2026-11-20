@@ -7,6 +7,7 @@ export interface ResourceTargetResolverProps {
 }
 
 export interface UnsupportedResourceProps extends ResourceTarget {
+  error?: unknown;
   message?: string;
   onClose: () => void;
 }

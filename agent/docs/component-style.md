@@ -54,7 +54,8 @@ ComponentName/
 - 业务弹窗不要自行给 modal header/footer 添加 divider、`border-top` 或 `border-bottom`。
 - 操作成功后通常先调用 `onSuccess?.()`，再关闭弹窗。
 - 异步提交使用 `useApi(fn, { manual: true })`。
-- 错误提示使用 HeroUI `toast` 和 `parseErrorMessage(err)`。
+- 错误提示统一两步：先 `const error = createComponentError(code)`，再 `reportError({ error, level })`；禁止在 `reportError` 参数里内联创建。成功或普通提示仍可直接使用 HeroUI `toast`。
+- 内联错误把 `error` 传给 `ErrorState`（必填）或 `ResultState`；文案由 Feedback 解析。禁止业务导入 `parseErrorMessage`。`ResultState` 无 error 时才用 `subTitle`。
 
 ## 四、Popover 约定
 

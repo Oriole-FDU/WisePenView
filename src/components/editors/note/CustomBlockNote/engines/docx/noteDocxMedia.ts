@@ -1,4 +1,4 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 export type NoteDocxImageType = 'bmp' | 'gif' | 'jpg' | 'png';
 
@@ -34,12 +34,7 @@ async function readBlobSize(blob: Blob): Promise<{ width: number; height: number
       return await new Promise((resolve, reject) => {
         const image = new Image();
         image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
-        image.onerror = () =>
-          reject(
-            createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-              reason: '图片尺寸读取失败',
-            })
-          );
+        image.onerror = () => reject(createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE));
         image.src = url;
       });
     } finally {
@@ -51,7 +46,7 @@ async function readBlobSize(blob: Blob): Promise<{ width: number; height: number
 async function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
   if (!blob) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, { reason: '图片转码失败' });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   return blob;
 }
@@ -64,9 +59,7 @@ async function renderImageElementToPng(image: HTMLImageElement): Promise<Blob> {
   canvas.height = height;
   const context = canvas.getContext('2d');
   if (!context) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: '无法创建图片画布',
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   context.fillStyle = '#ffffff';
   context.fillRect(0, 0, width, height);
@@ -80,8 +73,7 @@ async function blobToPng(blob: Blob): Promise<{ blob: Blob; width: number; heigh
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {
       const element = new Image();
       element.onload = () => resolve(element);
-      element.onerror = () =>
-        reject(createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, { reason: '图片加载失败' }));
+      element.onerror = () => reject(createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE));
       element.src = url;
     });
     const pngBlob = await renderImageElementToPng(image);

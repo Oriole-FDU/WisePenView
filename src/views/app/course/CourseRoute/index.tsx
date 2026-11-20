@@ -7,7 +7,6 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { CourseProvider } from '@/layouts/Course/_context';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import CourseTourScope from './CourseTourScope';
@@ -37,7 +36,8 @@ function CourseRoute() {
         <ResultState
           status="error"
           title={t('common.loadFailed')}
-          subTitle={error ? parseErrorMessage(error) : t('common.notFound')}
+          error={error}
+          subTitle={t('common.notFound')}
           extra={
             <div className={styles.resultActions}>
               <AppButton variant="ghost" onPress={() => navigate(APP_ROUTE_PATH.COURSES)}>

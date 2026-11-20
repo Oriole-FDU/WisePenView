@@ -2,7 +2,7 @@ import type { BlockSpecs, ExtensionFactoryInstance } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import type { EditorProps } from '@tiptap/pm/view';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type {
   NoteBlockPlugin,
@@ -25,9 +25,6 @@ export interface CreateNotePluginRegistryOptions {
 type DOMEventHandlers = NonNullable<EditorProps['handleDOMEvents']>;
 type DOMEventName = keyof DOMEventHandlers;
 type DOMEventHandler = NonNullable<DOMEventHandlers[DOMEventName]>;
-
-const createRegistryError = (reason: string) =>
-  createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, { reason });
 
 function flattenPluginTree(root: NotePluginBundle): NotePluginNode[] {
   const nodes: NotePluginNode[] = [];
@@ -53,12 +50,12 @@ function sortByDependencies<T extends { id: string; dependencies?: readonly stri
   const visit = (item: T) => {
     if (visited.has(item.id)) return;
     if (visiting.has(item.id)) {
-      throw createRegistryError(`Note 插件依赖存在环：${item.id}`);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     visiting.add(item.id);
     for (const dependencyId of item.dependencies ?? []) {
       if (!availableIds.has(dependencyId)) {
-        throw createRegistryError(`Note 插件 ${item.id} 缺少依赖：${dependencyId}`);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       const dependency = byId.get(dependencyId);
       if (dependency) visit(dependency);
@@ -81,7 +78,7 @@ export function createNotePluginRegistry(
   const seenIds = new Set<string>();
   for (const item of allItems) {
     if (seenIds.has(item.id)) {
-      throw createRegistryError(`Note 插件 id 重复：${item.id}`);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     seenIds.add(item.id);
   }
@@ -97,37 +94,33 @@ export function createNotePluginRegistry(
 
   for (const plugin of sortedContentPlugins) {
     const executableCapabilities = [
-      ['Markdown 导入', plugin.capabilities.markdownImport, plugin.markdownImport],
-      ['Markdown 导出', plugin.capabilities.markdownExport, plugin.markdownExport],
-      ['AI Diff', plugin.capabilities.aiDiff, plugin.aiDiff],
-      ['纯文本', plugin.capabilities.plainText, plugin.plainText],
-      ['查找替换', plugin.capabilities.findReplace, plugin.findReplace],
-      ['打印', plugin.capabilities.print, plugin.print],
+      [plugin.capabilities.markdownImport, plugin.markdownImport],
+      [plugin.capabilities.markdownExport, plugin.markdownExport],
+      [plugin.capabilities.aiDiff, plugin.aiDiff],
+      [plugin.capabilities.plainText, plugin.plainText],
+      [plugin.capabilities.findReplace, plugin.findReplace],
+      [plugin.capabilities.print, plugin.print],
     ] as const;
-    for (const [name, declaration, implementation] of executableCapabilities) {
+    for (const [declaration, implementation] of executableCapabilities) {
       const needsImplementation =
         declaration.support === 'custom' || declaration.support === 'inherited';
       if (needsImplementation && !implementation) {
-        throw createRegistryError(
-          `Note 插件 ${plugin.id} 的 ${name}：声明为 ${declaration.support}，但未提供实现`
-        );
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       if (!needsImplementation && implementation) {
-        throw createRegistryError(`Note 插件 ${plugin.id} 提供了 ${name} 实现，但未声明为 custom`);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
     }
 
     const owners = plugin.kind === 'block' ? blockPlugins : inlinePlugins;
     const currentOwner = owners.get(plugin.type);
     if (currentOwner) {
-      throw createRegistryError(
-        `Note ${plugin.kind} type ${plugin.type} 存在多个 owner：${currentOwner.id}、${plugin.id}`
-      );
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     owners.set(plugin.type, plugin as never);
     if (plugin.kind === 'block' && plugin.insertion?.default) {
       if (defaultBlock) {
-        throw createRegistryError(`Note 默认插入 block 存在多个 owner：${plugin.id}`);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       defaultBlock = plugin.insertion;
     }
@@ -146,11 +139,11 @@ export function createNotePluginRegistry(
 
 export function createDefaultNoteBlock(registry: NotePluginRegistry): Record<string, unknown> {
   if (!registry.defaultBlock) {
-    throw createRegistryError('Note registry 缺少默认插入 block owner');
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   const block = registry.defaultBlock.createEmpty();
   if (block.type !== 'paragraph') {
-    throw createRegistryError('Note 默认插入 block 必须是 paragraph');
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   return block;
 }
@@ -239,9 +232,7 @@ export function collectNoteEditorProps(registry: NotePluginRegistry): Partial<Ed
       }
       const previousContributor = seenScalarKeys.get(String(key));
       if (previousContributor) {
-        throw createRegistryError(
-          `Note editorProps.${String(key)} 存在多个 owner：${previousContributor}、${contributor?.id ?? 'unknown'}`
-        );
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       seenScalarKeys.set(String(key), contributor?.id ?? 'unknown');
       (merged as Record<string, unknown>)[key] = value;

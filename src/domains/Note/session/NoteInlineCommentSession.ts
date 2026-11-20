@@ -1,5 +1,5 @@
 import type { IInlineCommentService, InlineCommentItem } from '@/domains/InlineComment';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { NoteInlineCommentDraft, NoteInlineCommentThread } from '../entity/inlineComment';
 import { NoteInlineCommentServicesMap } from '../mapper/NoteInlineCommentServices.map';
@@ -229,9 +229,7 @@ export class NoteInlineCommentSession {
       thread = this.threadsById.get(threadId);
     }
     if (!thread) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `新建批注 ${threadId} 未出现在资源批注列表中`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     return thread;
   }
@@ -244,9 +242,7 @@ export class NoteInlineCommentSession {
       item = this.findItem(threadId, itemId);
     }
     if (!item) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `新建批注消息 ${itemId} 未出现在资源批注列表中`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     return item;
   }

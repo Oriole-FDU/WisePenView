@@ -1,4 +1,4 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import styles from '../../engines/aiDiff/style.module.scss';
@@ -87,9 +87,7 @@ function renderInlineChildren(content: unknown, registry: NotePluginRegistry): D
     if (!isRecord(inline) || typeof inline.type !== 'string') continue;
     const owner = registry.inlinePlugins.get(inline.type);
     if (!owner) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `AI Diff 候选内容缺少 inline owner：${inline.type}`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     fragment.appendChild(owner.aiDiff.renderAiContent(inline, registry));
   }
@@ -104,9 +102,7 @@ function renderInlineRange(
 ): DocumentFragment {
   const slicedContent = sliceInlineContentByTextRange(content, from, to);
   if (!slicedContent) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `AI Diff 无法按文本范围渲染 inline content：${from}-${to}`,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   return renderInlineChildren(slicedContent, registry);
 }

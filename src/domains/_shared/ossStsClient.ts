@@ -2,7 +2,7 @@ import { createOssClient } from '@domain-apis';
 
 import type { OssStsTokenApi } from '@/domains/_shared/apis/ossStsApi.schema';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
-import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR, isWisePenError } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import type { OssReadClient } from './apis/ossClient';
@@ -85,10 +85,10 @@ export const createOssStsClientManager = <Key>(
       .loadToken(key)
       .then((token) => {
         if (!token) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
+          throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_CREDENTIAL_INVALID);
         }
         if (requestGeneration !== cacheGeneration) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.AUTH_SESSION_CHANGED);
+          throw createDomainError(FRONTEND_DOMAIN_ERROR.AUTH_SESSION_CHANGED);
         }
 
         const client = createOssClient(token);
@@ -116,13 +116,13 @@ export const createOssStsClientManager = <Key>(
     } catch (error) {
       if (isWisePenError(error)) throw error;
       if (!isOssAuthExpiredError(error)) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.OSS_OPERATION_FAILED, undefined, error);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_OPERATION_FAILED, { cause: error });
       }
       try {
         return await operation(await getClient(key, { forceRefresh: true }));
       } catch (retryError) {
         if (isWisePenError(retryError)) throw retryError;
-        throw createClientError(FRONTEND_CLIENT_ERROR.OSS_OPERATION_FAILED, undefined, retryError);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.OSS_OPERATION_FAILED, { cause: retryError });
       }
     }
   };

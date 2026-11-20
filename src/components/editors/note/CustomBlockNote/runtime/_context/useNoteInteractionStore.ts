@@ -6,7 +6,7 @@ import type { NoteInteractionStoreState } from '../noteInteractionStore';
 import { NoteInteractionStoreContext } from './NoteInteractionStoreContext';
 
 export function useNoteInteractionStoreApi() {
-  return useRequiredContext(NoteInteractionStoreContext, 'NoteInteractionStoreProvider');
+  return useRequiredContext(NoteInteractionStoreContext);
 }
 
 export function useNoteInteractionStore<T>(selector: (state: NoteInteractionStoreState) => T): T {

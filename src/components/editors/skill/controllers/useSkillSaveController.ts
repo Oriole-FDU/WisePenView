@@ -6,7 +6,7 @@ import { useSkillService } from '@/domains';
 import type { SkillDetail, UploadSkillAssetResult } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
 import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { SkillSaveQueueItem } from '../components/SkillSaveQueueDock/index.type';
 import { resolveSkillSavePhase } from '../model';
@@ -133,13 +133,10 @@ export function useSkillSaveController({
           operation: 'skill.save',
         });
         onFileSaveFailed(snapshots);
-        const errorMessage = parseErrorMessage(error);
         const snapshotKeys = new Set(snapshots.map((snapshot) => snapshot.editorKey));
         setExecutionItems((current) =>
           current.map((item) =>
-            snapshotKeys.has(item.id)
-              ? { ...item, phase: 'failed', errorMessage, progress: 0 }
-              : item
+            snapshotKeys.has(item.id) ? { ...item, phase: 'failed', progress: 0 } : item
           )
         );
         throw error;
@@ -150,16 +147,10 @@ export function useSkillSaveController({
       for (const snapshot of snapshots) {
         const result = resultByKey.get(snapshot.editorKey);
         if (result && !result.error) continue;
-        captureException(
-          result?.error ??
-            createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-              reason: 'Skill 保存结果缺失',
-            }),
-          {
-            detector: 'application-handled',
-            operation: 'skill.save',
-          }
-        );
+        captureException(result?.error ?? createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE), {
+          detector: 'application-handled',
+          operation: 'skill.save',
+        });
       }
       setExecutionItems((current) =>
         current.flatMap((item) => {
@@ -172,9 +163,7 @@ export function useSkillSaveController({
               ...item,
               phase: 'failed',
               progress: 0,
-              errorMessage: result?.error
-                ? parseErrorMessage(result.error)
-                : t('queue.resultMissing'),
+              ...(result?.error ? {} : { errorMessage: t('queue.resultMissing') }),
             },
           ];
         })
@@ -185,7 +174,7 @@ export function useSkillSaveController({
         return !result || Boolean(result.error);
       });
       if (failedResults.length > 0) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_BATCH_SAVE_FAILED, {
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_BATCH_SAVE_FAILED, {
           failedCount: failedResults.length,
         });
       }
@@ -210,7 +199,7 @@ export function useSkillSaveController({
       };
       setExecutionItems((current) => replaceQueueItems(current, [queueItem]));
       if (!snapshot.name || !snapshot.description) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_CONFIG_REQUIRED);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SKILL_CONFIG_REQUIRED);
       }
       await skillService.updateSkillInfo(skill.resourceId, snapshot.name, snapshot.description);
       onConfigSaved(snapshot);
@@ -223,7 +212,7 @@ export function useSkillSaveController({
         if (result?.options?.showToast !== false) toast.success(t('toast.configUpdated'));
         if (result?.options?.refresh) refreshSkill();
       },
-      onErrorEffect: (error) => {
+      onErrorEffect: (_error) => {
         onConfigSaveFailed();
         setExecutionItems((current) =>
           current.map((item) =>
@@ -232,7 +221,6 @@ export function useSkillSaveController({
                   ...item,
                   phase: 'failed',
                   progress: 0,
-                  errorMessage: parseErrorMessage(error),
                 }
               : item
           )

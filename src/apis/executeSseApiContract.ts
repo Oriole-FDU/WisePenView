@@ -1,7 +1,7 @@
 import { buildApiUrl } from '@/apis/buildApiUrl';
 import { type ApiContract, parseApiRequest } from '@/apis/contract';
 import { applyXDeveloperHeader, awaitAddrReady, notifyAddrFailure } from '@/apis/runtime';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 const toQueryString = (value: Record<string, unknown>): string => {
   const params = new URLSearchParams();
@@ -20,9 +20,7 @@ export async function executeSseApiContract<Request, ResponseData>(
   init?: Pick<RequestInit, 'signal'>
 ): Promise<Response> {
   if (contract.transport !== 'sse') {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `${contract.name} 不是 SSE Contract`,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
   const request = parseApiRequest(contract, value);
   await awaitAddrReady();

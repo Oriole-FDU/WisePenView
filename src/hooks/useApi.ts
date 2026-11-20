@@ -20,10 +20,9 @@ import type {
 } from 'ahooks/es/useRequest/src/types';
 
 import { captureException } from '@/observability';
-import { isWisePenError, notifyError } from '@/utils/error';
+import { isWisePenError, reportError } from '@/utils/error';
 
 interface UseApiErrorOptions<TParams extends unknown[]> {
-  getErrorMessage?: (error: Error, params: TParams) => string;
   onErrorEffect?: (error: Error, params: TParams) => void;
   showErrorToast?: boolean;
 }
@@ -64,11 +63,9 @@ const notifyApiError = <TParams extends unknown[]>(
   params: TParams,
   options: UseApiErrorOptions<TParams>
 ): void => {
-  const { getErrorMessage, onErrorEffect, showErrorToast = true } = options;
+  const { onErrorEffect, showErrorToast = true } = options;
   if (showErrorToast && !isUnauthorizedError(error)) {
-    notifyError(error, {
-      message: getErrorMessage ? getErrorMessage(error, params) : undefined,
-    });
+    reportError({ error, level: 'danger' });
   } else {
     captureException(error, { detector: 'error-consumed' });
   }
@@ -93,18 +90,11 @@ export function useApi<TData, TParams extends unknown[]>(
   service: UseRequestService<TData, TParams>,
   options: UseApiOptions<TData, TParams> = {}
 ): UseApiResult<TData, TParams> {
-  const {
-    getErrorMessage,
-    onError,
-    onErrorEffect,
-    showErrorToast = true,
-    ...restOptions
-  } = options;
+  const { onError, onErrorEffect, showErrorToast = true, ...restOptions } = options;
   const request = useRequest<TData, TParams>(service, {
     ...restOptions,
     onError: (error, params) =>
       handleApiError(error, params, {
-        getErrorMessage,
         onError,
         onErrorEffect,
         showErrorToast,
@@ -126,18 +116,11 @@ export function useApiPagination<
   service: UsePaginationService<TData, TParams>,
   options: UseApiPaginationOptions<TData, TParams> = {}
 ): PaginationResult<TData, TParams> {
-  const {
-    getErrorMessage,
-    onError,
-    onErrorEffect,
-    showErrorToast = true,
-    ...restOptions
-  } = options;
+  const { onError, onErrorEffect, showErrorToast = true, ...restOptions } = options;
   return usePagination<TData, TParams>(service, {
     ...restOptions,
     onError: (error, params) =>
       handleApiError(error, params, {
-        getErrorMessage,
         onError,
         onErrorEffect,
         showErrorToast,
@@ -149,18 +132,11 @@ export function useApiInfiniteScroll<TData extends UseInfiniteScrollData>(
   service: UseInfiniteScrollService<TData>,
   options: UseApiInfiniteScrollOptions<TData> = {}
 ) {
-  const {
-    getErrorMessage,
-    onError,
-    onErrorEffect,
-    showErrorToast = true,
-    ...restOptions
-  } = options;
+  const { onError, onErrorEffect, showErrorToast = true, ...restOptions } = options;
   return useInfiniteScroll<TData>(service, {
     ...restOptions,
     onError: (error) =>
       handleApiError(error, [], {
-        getErrorMessage,
         onError,
         onErrorEffect,
         showErrorToast,

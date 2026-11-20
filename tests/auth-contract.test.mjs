@@ -100,39 +100,34 @@ try {
       )
     );
   };
+  const expectRequestValidationError = (run) => {
+    let thrown;
+    try {
+      run();
+    } catch (error) {
+      thrown = error;
+    }
+    assert(thrown instanceof Error);
+    assert.equal(thrown.code, 100);
+    assert.equal(thrown.source, 'domain');
+    assert.equal(thrown.meta, undefined);
+    assert(thrown.cause instanceof Error);
+  };
 
   assert.deepEqual(parseApiRequest(LoginApiContract, { account: 'alice', password: 'secret' }), {
     account: 'alice',
     password: 'secret',
   });
-  expectContractError(
-    () =>
-      parseApiRequest(LoginApiContract, {
-        account: 'alice',
-        password: 'secret',
-        ignored: true,
-      }),
-    {
-      code: 100,
-      source: 'client',
-      direction: 'request',
-      endpoint: '/auth/login',
-      contract: 'LoginApi',
-      path: '$',
-      issueCode: 'unrecognized_keys',
-    }
+  expectRequestValidationError(() =>
+    parseApiRequest(LoginApiContract, {
+      account: 'alice',
+      password: 'secret',
+      ignored: true,
+    })
   );
   assert.equal(parseApiResponse(LoginApiContract, 'session-id'), 'session-id');
 
-  expectContractError(() => parseApiRequest(LoginApiContract, { password: 'secret' }), {
-    code: 100,
-    source: 'client',
-    direction: 'request',
-    endpoint: '/auth/login',
-    contract: 'LoginApi',
-    path: 'account',
-    issueCode: 'invalid_type',
-  });
+  expectRequestValidationError(() => parseApiRequest(LoginApiContract, { password: 'secret' }));
   expectContractError(() => parseApiResponse(LoginApiContract, ''), {
     code: 16,
     source: 'http',
@@ -156,22 +151,12 @@ try {
     parseApiRequest(RegisterApiContract, { username: 'alice', password: 'secret' }),
     { username: 'alice', password: 'secret' }
   );
-  expectContractError(
-    () =>
-      parseApiRequest(RegisterApiContract, {
-        username: 'alice',
-        password: 'secret',
-        inviteCode: null,
-      }),
-    {
-      code: 100,
-      source: 'client',
-      direction: 'request',
-      endpoint: '/auth/register',
-      contract: 'RegisterApi',
-      path: 'inviteCode',
-      issueCode: 'invalid_type',
-    }
+  expectRequestValidationError(() =>
+    parseApiRequest(RegisterApiContract, {
+      username: 'alice',
+      password: 'secret',
+      inviteCode: null,
+    })
   );
 
   assert.equal(parseApiResponse(LogoutApiContract, null), null);
@@ -187,7 +172,7 @@ try {
     });
   }
 
-  console.log('API response envelope 契约离线检查通过');
+  console.log('API 请求/响应契约离线检查通过');
 } finally {
   await rm(tempDir, { recursive: true, force: true });
 }

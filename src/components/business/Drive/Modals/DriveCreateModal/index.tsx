@@ -10,7 +10,7 @@ import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useAgentService, useDriveService, useNoteService, useSkillService } from '@/domains';
 import { validateReservedName } from '@/domains/Drive/validation/validateReservedName';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { DriveCreateModalProps } from './index.type';
 import styles from './style.module.scss';
@@ -61,16 +61,14 @@ function DriveCreateModal({
             pathTagId,
           });
           if (!result.resourceId) {
-            throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+            throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
           }
           createdId = result.resourceId;
           break;
         }
         case 'folder':
           if (!parent) {
-            throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-              reason: t('create.targetMissing'),
-            });
+            throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
           }
           createdId = (await driveService.createFolder({ parent, name: title.trim() })).tagId;
           requestDriveRefresh();

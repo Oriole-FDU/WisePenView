@@ -11,6 +11,7 @@ export default function UnsupportedResource({
   resourceType,
   resourceId,
   viewer,
+  error,
   message,
   onClose,
 }: UnsupportedResourceProps) {
@@ -20,7 +21,10 @@ export default function UnsupportedResource({
     ? t('renderer.resourceType', { type: resourceType })
     : undefined;
   const readableViewer = viewer ? t('renderer.viewer', { viewer }) : undefined;
-  const subTitle = message ?? [readableType, readableViewer].filter(Boolean).join('，');
+  const subTitle =
+    error == null
+      ? (message ?? [readableType, readableViewer].filter(Boolean).join('，'))
+      : undefined;
 
   return (
     <ResourceLayout header={false}>
@@ -29,6 +33,7 @@ export default function UnsupportedResource({
           <ResultState
             status="warning"
             title={resourceId ? t('renderer.unsupported') : t('renderer.cannotOpen')}
+            error={error}
             subTitle={subTitle || undefined}
             extra={
               <AppButton variant="secondary" onPress={onClose}>

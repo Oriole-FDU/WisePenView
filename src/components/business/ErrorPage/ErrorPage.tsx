@@ -9,6 +9,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { ResultState } from '@/components/base/Feedback';
 import { getSupportErrorId } from '@/observability';
 import { copyText } from '@/utils/browser/copyText';
+import { createComponentError, FRONTEND_COMPONENT_ERROR, reportError } from '@/utils/error';
 
 import { buildErrorDetail } from './errorDetail';
 import { buildAppErrorInfo } from './errorInfo';
@@ -43,14 +44,16 @@ function ErrorPage({
       return;
     }
 
-    toast.danger(t('page.copyFailed'));
+    const copyError = createComponentError(FRONTEND_COMPONENT_ERROR.PAGE_COPY_FAILED);
+    reportError({ error: copyError, level: 'danger' });
   };
 
   return (
     <ResultState
       status={errorInfo.status}
       title={errorInfo.title}
-      subTitle={errorInfo.subTitle}
+      error={errorInfo.useErrorObject ? error : undefined}
+      subTitle={errorInfo.useErrorObject ? undefined : errorInfo.subTitle}
       extra={
         <ErrorPageActions>
           <AppButton variant="primary" size={actionSize} onPress={handleRetry}>

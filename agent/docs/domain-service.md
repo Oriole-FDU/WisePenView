@@ -18,7 +18,7 @@ Service 应负责：
 - 编排一个或多个 API 调用。
 - 在 API 契约与业务语义不一致时调用 mapper 完成转换；语义一致时直接使用已校验的 API 数据。
 - 做必要的客户端业务校验。
-- 抛出 `WisePenError`；客户端校验使用 `createClientError` 创建。
+- 抛出 `WisePenError`；Domain 校验使用 `createDomainError` 创建。
 - 管理领域内缓存、session 或跨请求状态，前提是职责清晰。
 
 Service 不应负责：
@@ -60,15 +60,17 @@ export const createXxxServices = (deps?: XxxServiceDeps): IXxxService => ({
 ## 三、错误处理
 
 - Service 只抛错，不做 UI 提示。
-- 客户端业务校验错误使用 `createClientError(code, meta?, cause?)`。
-- 主动创建的错误不得使用原生 `Error`；网络、HTTP、API 边界按来源创建 `WisePenError`。
+- Domain 校验错误使用 `createDomainError(code, { cause })`（`source: domain`，码段 100–499）。
+  仅带 i18n 文案占位符的错误码可改用 `createDomainError(code, meta, { cause })`，插值字段必须与错误码严格匹配。
+- Component / View 本地失败使用 `createComponentError(code, { cause })`（`source: component`，码段 500–899）。
+- 主动创建的错误不得使用原生 `Error`；网络、HTTP、API 边界按来源创建 `WisePenError`（`network` / `http` / `api`）。
 - 捕获已有错误仅为补充上下文时，应通过 `cause` 保留原异常；无需补充时直接向上抛出。
-- UI 层 catch 后使用 HeroUI `toast` 和 `parseErrorMessage(err)`。
-- `parseErrorMessage` 只接收一个 `unknown` 参数，不传 fallback 文案。
-- 网络、HTTP、API 边界只归一化 `code`、`serverMsg` 和 `cause`，不在传输层查 i18n 或拼接用户文案；文案解析只发生在 `parseErrorMessage`。
+- 不得把错误码、资源 ID、操作名等诊断上下文塞入 `meta`；这些内容当前不会进入用户文案或异常上报。
+- UI 层向用户报告错误只有一种契约：先创建错误对象，再 `reportError({ error, level })`；禁止 `reportError({ error: createDomainError(...) })` 内联写法。文案由内部按错误码解析。禁止业务代码直接调用 `toast.danger` 或错误路径中的 `toast.warning`。
+- 内联展示把 `error` 传给 Feedback（`ErrorState` 必填；`ResultState` 有 error 时不用再拼 `subTitle`）。禁止业务导入或调用 `parseErrorMessage`。
+- 网络、HTTP、API 边界只归一化 `code`、`serverMsg` 和 `cause`，不在传输层查 i18n 或拼接用户文案。
 - Domain Service 只创建或抛出错误，不负责遥测。仅在 View/Controller、SDK callback 或批量结果层
   已经消费故障、且该故障需要排查时调用 `captureException`，并显式提供 operation。
-- `createClientError` 不会自动上报；请求层已记录的最终请求失败不会在业务 catch 中重复上报。
 
 ## 四、请求触发
 

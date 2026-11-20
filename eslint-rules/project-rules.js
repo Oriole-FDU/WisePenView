@@ -281,7 +281,7 @@ const noArbitraryThrowRule = {
     schema: [],
     messages: {
       forbidden:
-        '禁止抛出字面量或未登记的错误构造器；新错误请使用 createClientError，API 传输边界使用 WisePenError，重抛时保留原错误对象。',
+        '禁止抛出字面量或未登记的错误构造器；新错误请使用 createDomainError / createComponentError，API 传输边界使用 WisePenError，重抛时保留原错误对象。',
     },
   },
   create(context) {
@@ -348,11 +348,12 @@ const noDirectErrorToastRule = {
     schema: [],
     messages: {
       forbidden:
-        '错误提示必须通过 useApi 或 notifyError / notifyErrorMessage 统一处理，不要在业务代码直接调用 toast.danger 或错误路径中的 toast.warning。',
+        '错误提示必须通过 useApi 或 reportError 统一处理，不要在业务代码直接调用 toast.danger 或错误路径中的 toast.warning。',
     },
   },
   create(context) {
     const sourceCode = context.sourceCode;
+    const filename = context.filename.replaceAll('\\', '/');
     const isToastMethod = (node, method) =>
       node.type === 'MemberExpression' &&
       !node.computed &&
@@ -391,7 +392,7 @@ const noDirectErrorToastRule = {
     return {
       CallExpression(node) {
         if (node.callee.type !== 'MemberExpression') return;
-        if (context.filename.endsWith('/src/utils/error/notifyError.ts')) return;
+        if (filename.endsWith('/src/utils/error/reportError.ts')) return;
         if (isToastMethod(node.callee, 'danger')) {
           context.report({ node, messageId: 'forbidden' });
           return;
@@ -400,9 +401,119 @@ const noDirectErrorToastRule = {
           isToastMethod(node.callee, 'warning') &&
           (isErrorHandlingContext(node) ||
             (node.arguments[0] != null &&
-              sourceCode.getText(node.arguments[0]).includes('parseErrorMessage')))
+              /(?:parse|resolve)ErrorMessage/.test(sourceCode.getText(node.arguments[0]))))
         ) {
           context.report({ node, messageId: 'forbidden' });
+        }
+      },
+    };
+  },
+};
+
+const noLegacyErrorReportApiRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: '禁止使用已废弃的错误提示 API，统一收束到 reportError',
+    },
+    schema: [],
+    messages: {
+      forbiddenImport:
+        '请使用 reportError；notifyError / notifyErrorMessage / parseErrorMessage / resolveErrorMessage 不再作为业务入口。内联展示把 error 传给 Feedback。',
+      forbiddenCall:
+        '请使用 reportError 统一报告错误；不要直接调用 notifyError / notifyErrorMessage。',
+      requireObjectArg: 'reportError 必须传入参数对象：reportError({ error, level })。',
+      requireFields: 'reportError 强契约要求同时提供 error 与 level。',
+      forbiddenInlineFactory:
+        '先 createDomainError / createComponentError 赋给变量，再 reportError({ error, level })；禁止在参数里内联创建。',
+    },
+  },
+  create(context) {
+    const filename = context.filename.replaceAll('\\', '/');
+    if (filename.includes('/src/utils/error/')) return {};
+
+    const bannedImportNames = new Set([
+      'notifyError',
+      'notifyErrorMessage',
+      'resolveErrorMessage',
+      'parseErrorMessage',
+      'FRONTEND_CLIENT_ERROR',
+    ]);
+    const bannedCallNames = new Set(['notifyError', 'notifyErrorMessage']);
+    const errorFactoryNames = new Set(['createDomainError', 'createComponentError']);
+    const requiredKeys = new Set(['error', 'level']);
+
+    const readPropertyName = (property) => {
+      if (property.type !== 'Property' || property.computed) return null;
+      if (property.key.type === 'Identifier') return property.key.name;
+      if (property.key.type === 'Literal' && typeof property.key.value === 'string') {
+        return property.key.value;
+      }
+      return null;
+    };
+
+    const isInlineErrorFactory = (value) =>
+      value?.type === 'CallExpression' &&
+      value.callee.type === 'Identifier' &&
+      errorFactoryNames.has(value.callee.name);
+
+    return {
+      ImportDeclaration(node) {
+        if (typeof node.source.value !== 'string') return;
+        const source = node.source.value;
+
+        // 禁止 deep-import parseErrorMessage；仅 Feedback 与 reportError 可消费
+        if (
+          source === '@/utils/error/parseErrorMessage' ||
+          source.endsWith('/utils/error/parseErrorMessage')
+        ) {
+          const allowParse =
+            /\/src\/components\/base\/Feedback\//.test(filename) ||
+            /\/src\/utils\/error\/reportError\.ts$/.test(filename);
+          if (!allowParse) {
+            context.report({ node, messageId: 'forbiddenImport' });
+            return;
+          }
+        }
+
+        // 公共 barrel：禁止业务导入已废弃符号
+        if (source !== '@/utils/error') return;
+        for (const specifier of node.specifiers) {
+          if (specifier.type !== 'ImportSpecifier') continue;
+          const imported =
+            specifier.imported.type === 'Identifier' ? specifier.imported.name : null;
+          if (imported && bannedImportNames.has(imported)) {
+            context.report({ node: specifier, messageId: 'forbiddenImport' });
+          }
+        }
+      },
+      CallExpression(node) {
+        if (node.callee.type !== 'Identifier') return;
+        if (bannedCallNames.has(node.callee.name)) {
+          context.report({ node, messageId: 'forbiddenCall' });
+          return;
+        }
+        if (node.callee.name !== 'reportError') return;
+        const [firstArg] = node.arguments;
+        if (!firstArg || firstArg.type !== 'ObjectExpression' || node.arguments.length !== 1) {
+          context.report({ node, messageId: 'requireObjectArg' });
+          return;
+        }
+        const keys = new Set();
+        for (const property of firstArg.properties) {
+          const name = readPropertyName(property);
+          if (name) keys.add(name);
+          if (
+            name === 'error' &&
+            property.type === 'Property' &&
+            !property.shorthand &&
+            isInlineErrorFactory(property.value)
+          ) {
+            context.report({ node: property.value, messageId: 'forbiddenInlineFactory' });
+          }
+        }
+        if (![...requiredKeys].every((key) => keys.has(key))) {
+          context.report({ node, messageId: 'requireFields' });
         }
       },
     };
@@ -413,12 +524,12 @@ const noDirectWisePenErrorRule = {
   meta: {
     type: 'problem',
     docs: {
-      description: '客户端代码统一通过 createClientError 创建错误',
+      description: '客户端代码统一通过 createDomainError / createComponentError 创建错误',
     },
     schema: [],
     messages: {
       forbidden:
-        '客户端代码禁止直接 new WisePenError；请使用 createClientError。网络、HTTP、API 边界除外。',
+        '禁止直接 new WisePenError；Domain 用 createDomainError，Component 用 createComponentError。网络、HTTP、API 边界除外。',
     },
   },
   create(context) {
@@ -427,7 +538,8 @@ const noDirectWisePenErrorRule = {
       /\/src\/apis\//,
       /\/src\/domains\/_shared\/apis\//,
       /\/src\/domains\/_shared\/mock\//,
-      /\/src\/utils\/error\/createClientError\.ts$/,
+      /\/src\/utils\/error\/createDomainError\.ts$/,
+      /\/src\/utils\/error\/createComponentError\.ts$/,
     ];
     if (allowedPathPatterns.some((pattern) => pattern.test(filename))) return {};
 
@@ -449,6 +561,7 @@ export const wisePenPlugin = {
     'no-arbitrary-throw': noArbitraryThrowRule,
     'no-direct-error-toast': noDirectErrorToastRule,
     'no-direct-wise-pen-error': noDirectWisePenErrorRule,
+    'no-legacy-error-report-api': noLegacyErrorReportApiRule,
     'no-hardcoded-frontend-route': noHardcodedFrontendRouteRule,
     'no-memoized-fn': noMemoizedFnRule,
     'no-memoization': noMemoizationRule,

@@ -5,13 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppButton, AppPressable } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, ResultState, Spin } from '@/components/base/Feedback';
 import { UploadZone } from '@/components/base/Input';
 import { useCourseService } from '@/domains';
 import { COURSE_ASSIGNMENT_STATUS } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/_context';
-import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { buildCourseAssignmentPath } from '@/utils/navigation/appRoute';
 
@@ -65,10 +64,19 @@ function CourseAssignmentDetailPage() {
   if (error || !data) {
     return (
       <div className={styles.state}>
-        <span>{error ? parseErrorMessage(error) : t('common.notFound')}</span>
-        <AppButton variant="secondary" onPress={refresh}>
-          {t('common.retry')}
-        </AppButton>
+        {error ? (
+          <ErrorState
+            title={t('common.loadFailed')}
+            error={error}
+            action={
+              <AppButton variant="secondary" onPress={refresh}>
+                {t('common.retry')}
+              </AppButton>
+            }
+          />
+        ) : (
+          <ResultState status="404" title={t('common.notFound')} />
+        )}
       </div>
     );
   }

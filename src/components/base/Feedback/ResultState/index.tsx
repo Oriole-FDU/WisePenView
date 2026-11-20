@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import { CircleAlert, CircleCheck, Info, SearchX, ShieldAlert } from 'lucide-react';
 
+import { parseErrorMessage } from '@/utils/error/parseErrorMessage';
+
 import type { FeedbackStatus, ResultStateProps } from './index.type';
 import styles from './style.module.scss';
 
@@ -27,18 +29,20 @@ const STATUS_CLASS_MAP = {
 function ResultState({
   status = 'info',
   title,
+  error,
   subTitle,
   extra,
   children,
   className,
 }: ResultStateProps) {
   const Icon = STATUS_ICON_MAP[status];
+  const resolvedSubTitle = error == null ? subTitle : parseErrorMessage(error);
 
   return (
     <section className={clsx(styles.resultState, STATUS_CLASS_MAP[status], className)}>
       <Icon className={styles.icon} size={56} strokeWidth={1.7} aria-hidden="true" />
       <h1 className={styles.title}>{title}</h1>
-      {subTitle ? <p className={styles.subtitle}>{subTitle}</p> : null}
+      {resolvedSubTitle ? <p className={styles.subtitle}>{resolvedSubTitle}</p> : null}
       {extra ? <div className={styles.extra}>{extra}</div> : null}
       {children ? <div className={styles.content}>{children}</div> : null}
     </section>

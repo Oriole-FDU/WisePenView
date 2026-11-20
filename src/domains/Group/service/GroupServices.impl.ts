@@ -3,7 +3,7 @@ import { GroupApi, GroupMemberApi, GroupResConfigApi } from '@domain-apis';
 import { normalizeResourceActions } from '@/domains/_shared/access';
 import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig, ROLE } from '@/domains/Group';
 import { DEFAULT_MEMBER_ACTIONS, GROUP_TYPE } from '@/domains/Group';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { GroupQuotaInfo, UserGroupQuota } from '../entity/quota';
@@ -46,7 +46,7 @@ const fetchGroupBaseInfo = async (groupId: string): Promise<GroupBaseInfo> => {
 
 const getGroupWalletInfo = async (params: GetGroupWalletInfoRequest): Promise<number> => {
   const { groupId } = params;
-  if (!groupId) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ID_REQUIRED);
+  if (!groupId) throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_ID_REQUIRED);
   const data = await GroupApi.getGroupDetailInfo({ groupId });
   return data.tokenBalance;
 };
@@ -93,7 +93,7 @@ const fetchMyRoleInGroup = async (groupId: string): Promise<EnumKey<typeof ROLE>
   const data = await GroupMemberApi.getMyRole(groupId);
   const role = GroupServicesMap.mapFetchMyRoleInGroupFromApi(data);
   if (!role) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ROLE_FETCH_FAILED);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_ROLE_FETCH_FAILED);
   }
   return role;
 };

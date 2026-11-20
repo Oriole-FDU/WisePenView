@@ -1,10 +1,10 @@
-import { toast } from '@heroui/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useInfiniteScroll } from 'ahooks';
 import { type Key, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
+import { ErrorState } from '@/components/base/Feedback';
 import { Tabs } from '@/components/base/Tabs';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
@@ -18,7 +18,7 @@ import {
 import type { ResourceItem } from '@/domains/Resource';
 import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
 import ResourceCommentThread from './ResourceCommentThread';
@@ -87,7 +87,7 @@ function ResourceInteractionPanel({
 
   const notifyResourceChanged = () => {
     void Promise.resolve(onResourceChanged?.())
-      .catch((error) => toast.danger(parseErrorMessage(error)))
+      .catch((error) => reportError({ error, level: 'danger' }))
       .finally(refreshInteraction);
   };
 
@@ -195,7 +195,7 @@ function ResourceInteractionPanel({
       }
       return liked;
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      reportError({ error, level: 'danger' });
       return wasLiked;
     } finally {
       setPendingLikeIds((current) => {
@@ -301,9 +301,7 @@ function ResourceInteractionPanel({
             />
           </div>
 
-          {commentsError ? (
-            <p className={styles.errorText}>{parseErrorMessage(commentsError)}</p>
-          ) : null}
+          {commentsError ? <ErrorState size="compact" error={commentsError} /> : null}
           {commentsLoading && !commentPageData?.list.length ? (
             <p className={styles.mutedText}>{t('resource:comment.loading')}</p>
           ) : null}

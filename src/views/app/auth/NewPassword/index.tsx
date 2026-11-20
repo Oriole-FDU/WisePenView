@@ -1,4 +1,4 @@
-import { Form, toast } from '@heroui/react';
+import { Form } from '@heroui/react';
 import { useMount } from 'ahooks';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import { useAuthService } from '@/domains';
 import type { NewPasswordRequest } from '@/domains/Auth';
 import { useApi } from '@/hooks/useApi';
 import { useFormValidation } from '@/hooks/useFormValidation';
+import { createComponentError, FRONTEND_COMPONENT_ERROR, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { validateConfirmPasswordField, validatePasswordField } from '../_common/passwordValidation';
@@ -97,7 +98,8 @@ function NewPassword() {
     event.preventDefault();
     if (!validation.validateForm()) return;
     if (!token) {
-      toast.danger(t('newPassword.tokenMissing'));
+      const error = createComponentError(FRONTEND_COMPONENT_ERROR.AUTH_TOKEN_MISSING);
+      reportError({ error, level: 'danger' });
       return;
     }
     submitNewPassword(formValues);

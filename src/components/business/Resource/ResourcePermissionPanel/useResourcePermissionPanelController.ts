@@ -10,7 +10,7 @@ import {
   type ResourcePermissionSubject,
 } from '@/domains/ResourceAccess';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import type { ResourcePermissionPanelProps } from './index.type';
 import {
@@ -113,7 +113,7 @@ export const useResourcePermissionPanelController = ({
         onSuccess?.();
       })
       .catch((err) => {
-        toast.danger(parseErrorMessage(err));
+        reportError({ error: err, level: 'danger' });
         refreshPermissionOverview();
       })
       .finally(() => {
@@ -176,7 +176,7 @@ export const useResourcePermissionPanelController = ({
   };
 
   const handleUserSearchError = (err: unknown) => {
-    toast.danger(parseErrorMessage(err));
+    reportError({ error: err, level: 'danger' });
   };
 
   const handleRemoveSpecifiedUser = (subject: ResourcePermissionSubject) => {

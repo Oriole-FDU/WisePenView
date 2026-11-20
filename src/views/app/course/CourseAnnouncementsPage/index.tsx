@@ -3,11 +3,10 @@ import { Bell, Pin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { Spin } from '@/components/base/Feedback';
+import { ErrorState, Spin } from '@/components/base/Feedback';
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/_context';
-import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import sharedStyles from '../_styles/contextPage.module.scss';
@@ -35,10 +34,15 @@ function CourseAnnouncementsPage() {
         </div>
       ) : error ? (
         <div className={sharedStyles.state}>
-          <span>{parseErrorMessage(error)}</span>
-          <AppButton variant="secondary" onPress={refresh}>
-            {t('common.retry')}
-          </AppButton>
+          <ErrorState
+            title={t('common.loadFailed')}
+            error={error}
+            action={
+              <AppButton variant="secondary" onPress={refresh}>
+                {t('common.retry')}
+              </AppButton>
+            }
+          />
         </div>
       ) : announcements.length > 0 ? (
         <div className={styles.announcementFeed}>

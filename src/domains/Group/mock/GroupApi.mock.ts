@@ -1,5 +1,5 @@
 import { mockPage, mockResponse } from '@/domains/_shared/mock/response';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type {
   GroupApi as GroupApiContract,
@@ -48,7 +48,7 @@ type MockUserDisplay = {
 const normalizeIdentityType = (value: number | null | undefined): 1 | 2 | 3 | null => {
   if (value == null) return null;
   if (value === 1 || value === 2 || value === 3) return value;
-  throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+  throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
 };
 
 const normalizeUserDisplay = (value: MockUserDisplay | null | undefined) => {
@@ -67,14 +67,14 @@ const normalizeUserDisplay = (value: MockUserDisplay | null | undefined) => {
 
 const normalizeGroupType = (value: number): GroupTypeApi => {
   if (value === 1 || value === 2 || value === 3) return value;
-  throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+  throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
 };
 
 const toEpochMillis = (value: string | null | undefined): number | null => {
   if (!value) return null;
   const timestamp = Date.parse(value);
   if (!Number.isFinite(timestamp)) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
   }
   return timestamp;
 };
@@ -115,7 +115,7 @@ const normalizeMember = (
   joinTime:
     toEpochMillis(member.joinTime) ??
     (() => {
-      throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
     })(),
   tokenLimit: member.tokenLimit,
   tokenUsed: member.tokenUsed,
@@ -135,7 +135,7 @@ const members = new Map<string, GroupMemberDetailApi[]>(
 );
 const normalizeRole = (value: number): GroupRoleApi => {
   if (value === 0 || value === 1 || value === 2 || value === -1) return value;
-  throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+  throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
 };
 
 const roles = new Map<string, GroupRoleApi>(
@@ -145,7 +145,7 @@ const configs = new Map<string, GetGroupConfigApiResponse>();
 
 export const getMockGroup = (id: string): GroupDetailApi => {
   const group = groups.get(id);
-  if (!group) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+  if (!group) throw createDomainError(FRONTEND_DOMAIN_ERROR.GROUP_INFO_FETCH_FAILED);
   return group;
 };
 

@@ -1,6 +1,6 @@
 import SparkMD5 from 'spark-md5';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 const CHUNK_SIZE = 2 * 1024 * 1024;
 
@@ -23,7 +23,7 @@ export const computeFileMd5 = (file: File): Promise<string> => {
     fileReader.onload = (e) => {
       const result = e.target?.result;
       if (!(result instanceof ArrayBuffer)) {
-        reject(createClientError(FRONTEND_CLIENT_ERROR.FILE_READ_FAILED));
+        reject(createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED));
         return;
       }
       spark.append(result);
@@ -37,7 +37,7 @@ export const computeFileMd5 = (file: File): Promise<string> => {
 
     fileReader.onerror = () =>
       reject(
-        createClientError(FRONTEND_CLIENT_ERROR.FILE_READ_FAILED, undefined, fileReader.error)
+        createDomainError(FRONTEND_DOMAIN_ERROR.FILE_READ_FAILED, { cause: fileReader.error })
       );
     loadNext();
   });

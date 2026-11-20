@@ -1,6 +1,6 @@
 import {
-  createClientError,
-  FRONTEND_CLIENT_ERROR,
+  createDomainError,
+  FRONTEND_DOMAIN_ERROR,
   isWisePenError,
   type WisePenError,
 } from '@/utils/error';
@@ -54,10 +54,8 @@ function encodeBase64(buffer: ArrayBuffer): string {
 function readProviderError(payload: UnknownRecord): WisePenError | null {
   if (payload.code === 0) return null;
   const code = typeof payload.code === 'number' ? payload.code : 'unknown';
-  const message = typeof payload.message === 'string' ? payload.message : '未知错误';
-  return createClientError(FRONTEND_CLIENT_ERROR.SPEECH_PROVIDER_FAILED, {
+  return createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_PROVIDER_FAILED, {
     providerCode: code,
-    providerMessage: message,
   });
 }
 
@@ -84,7 +82,7 @@ export class XfyunSpeechRecognizer {
 
   start(): Promise<void> {
     if (recognitionActive) {
-      return Promise.reject(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_ALREADY_ACTIVE));
+      return Promise.reject(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_ALREADY_ACTIVE));
     }
     recognitionActive = true;
     this.ownsActiveSlot = true;
@@ -100,15 +98,15 @@ export class XfyunSpeechRecognizer {
         socket.onopen = () => void this.handleSocketOpen();
         socket.onmessage = (event) => this.handleSocketMessage(event);
         socket.onerror = () =>
-          this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_FAILED));
+          this.fail(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_FAILED));
         socket.onclose = () => {
           if (!this.terminated) {
-            this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_CLOSED));
+            this.fail(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_CLOSED));
           }
         };
       } catch (error) {
         this.fail(
-          createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_FAILED, undefined, error)
+          createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_FAILED, { cause: error })
         );
       }
     });
@@ -121,7 +119,7 @@ export class XfyunSpeechRecognizer {
     this.releaseAudioCapture();
     this.sendEndFrame();
     this.finishTimer = window.setTimeout(
-      () => this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_FINISH_TIMEOUT)),
+      () => this.fail(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_FINISH_TIMEOUT)),
       FINISH_TIMEOUT_MS
     );
   }
@@ -131,7 +129,7 @@ export class XfyunSpeechRecognizer {
     const reject = this.startReject;
     this.releaseAll();
     this.setState('idle');
-    reject?.(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CANCELED));
+    reject?.(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CANCELED));
   }
 
   private async handleSocketOpen(): Promise<void> {
@@ -139,7 +137,7 @@ export class XfyunSpeechRecognizer {
       const audioContext = new AudioContext();
       this.audioContext = audioContext;
       if (audioContext.sampleRate < IFLYTEK_AUDIO_CONFIG.sampleRate) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_SAMPLE_RATE_UNSUPPORTED);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_SAMPLE_RATE_UNSUPPORTED);
       }
       await audioContext.audioWorklet.addModule(this.options.processorModuleUrl);
       if (this.terminated) return;
@@ -177,7 +175,7 @@ export class XfyunSpeechRecognizer {
       this.fail(
         isWisePenError(error)
           ? error
-          : createClientError(FRONTEND_CLIENT_ERROR.SPEECH_START_FAILED, undefined, error)
+          : createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_START_FAILED, { cause: error })
       );
     }
   }
@@ -186,7 +184,7 @@ export class XfyunSpeechRecognizer {
     try {
       const payload: unknown = JSON.parse(String(event.data));
       if (!isRecord(payload)) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID);
       }
 
       const providerError = readProviderError(payload);
@@ -201,7 +199,7 @@ export class XfyunSpeechRecognizer {
       this.fail(
         isWisePenError(error)
           ? error
-          : createClientError(FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID, undefined, error)
+          : createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_RESPONSE_INVALID, { cause: error })
       );
     }
   }
@@ -209,7 +207,7 @@ export class XfyunSpeechRecognizer {
   private sendAudioFrame(buffer: ArrayBuffer): void {
     const socket = this.socket;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-      this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_UNAVAILABLE));
+      this.fail(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_UNAVAILABLE));
       return;
     }
     const status = this.sentFirstFrame ? 1 : 0;
@@ -221,7 +219,7 @@ export class XfyunSpeechRecognizer {
   private sendEndFrame(): void {
     const socket = this.socket;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-      this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_UNAVAILABLE));
+      this.fail(createDomainError(FRONTEND_DOMAIN_ERROR.SPEECH_CONNECTION_UNAVAILABLE));
       return;
     }
 
@@ -263,12 +261,12 @@ export class XfyunSpeechRecognizer {
 
   private fail(error: Error): void {
     if (this.terminated) return;
-    const notifyError = this.started;
+    const shouldEmitError = this.started;
     const reject = this.startReject;
     this.releaseAll();
     this.setState('idle');
     reject?.(error);
-    if (notifyError) this.options.onError?.(error);
+    if (shouldEmitError) this.options.onError?.(error);
   }
 
   private setState(state: XfyunSpeechRecognizerState): void {

@@ -7,7 +7,6 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import { useGroupService } from '@/domains';
 import type { Group, GroupResConfig } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { type GroupCurrentUserRole, GroupProvider } from './_context';
@@ -50,7 +49,8 @@ function GroupRoute() {
         <ResultState
           status="error"
           title={t('detail.loadFailed')}
-          subTitle={error ? parseErrorMessage(error) : t('detail.notFound')}
+          error={error}
+          subTitle={t('detail.notFound')}
           extra={
             <div className={styles.resultActions}>
               <AppButton variant="ghost" onPress={() => navigate(APP_ROUTE_PATH.GROUPS)}>

@@ -4,7 +4,6 @@ import type { Block as BlockNoteBlock } from '@blocknote/core';
 import { en, zh } from '@blocknote/core/locales';
 import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
-import { toast } from '@heroui/react';
 import { useDebounceFn, useLatest, useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { type KeyboardEvent, type Ref, useEffect, useImperativeHandle, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +13,7 @@ import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStor
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
-import { parseErrorMessage } from '@/utils/error';
+import { reportError } from '@/utils/error';
 
 import styles from './style.module.scss';
 
@@ -145,7 +144,7 @@ function NoteTitle({
           if (saveVersion === saveVersionRef.current) {
             emitSaveStatus('failed');
           }
-          toast.danger(parseErrorMessage(error));
+          reportError({ error, level: 'danger' });
         }
       );
     },

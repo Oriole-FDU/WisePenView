@@ -8,12 +8,12 @@ import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { ErrorState } from '@/components/base/Feedback';
 import { EmojiPicker } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import type { InlineCommentItem, InlineCommentReactionGroup } from '@/domains/InlineComment';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import CommentComposer from './CommentComposer';
@@ -445,7 +445,7 @@ function InlineComment({
         {loading && threads.length === 0 ? (
           <p className={styles.stateText}>{t('inlineComment.loading')}</p>
         ) : null}
-        {error ? <p className={styles.errorText}>{parseErrorMessage(error)}</p> : null}
+        {error ? <ErrorState size="compact" error={error} /> : null}
         {!loading && !error && threads.length === 0 && !draft ? (
           <p className={styles.stateText}>{t('inlineComment.empty')}</p>
         ) : null}
@@ -541,7 +541,7 @@ function InlineComment({
         {loading && resolvedThreads.length === 0 ? (
           <p className={styles.stateText}>{t('inlineComment.historyLoading')}</p>
         ) : null}
-        {error ? <p className={styles.errorText}>{parseErrorMessage(error)}</p> : null}
+        {error ? <ErrorState size="compact" error={error} /> : null}
         {!loading && !error && resolvedThreads.length === 0 ? (
           <p className={styles.stateText}>{t('inlineComment.historyEmpty')}</p>
         ) : null}

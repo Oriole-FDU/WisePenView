@@ -10,7 +10,6 @@ import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -128,7 +127,7 @@ function PdfEditorContent() {
             <ResultState
               status="warning"
               title={t('pdf.cannotOpen')}
-              subTitle={parseErrorMessage(docInfoError)}
+              error={docInfoError}
               extra={
                 <Link to={APP_ROUTE_PATH.DRIVE_PERSONAL}>
                   <AppButton variant="secondary">{t('viewer.backToDrive')}</AppButton>
@@ -193,7 +192,7 @@ function PdfEditorContent() {
               <ResultState
                 status="warning"
                 title={t('pdf.previewFailed')}
-                subTitle={parseErrorMessage(viewerError)}
+                error={viewerError}
                 extra={
                   <AppButton
                     variant="secondary"

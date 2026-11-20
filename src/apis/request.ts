@@ -8,7 +8,7 @@ import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
 
 /**
  * 业务码非 200 时抛出统一错误。
- * 传输层只归一化 code 与后端文案，用户可见提示统一由 parseErrorMessage 按 code 解析。
+ * 传输层只归一化 code 与后端文案，用户可见提示由 reportError 按 code 解析。
  */
 function checkResponse(res: ApiResponse<unknown>): void {
   if (res.code !== 200) {

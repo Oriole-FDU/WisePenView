@@ -61,8 +61,9 @@ export default defineConfig([
     },
     rules: {
       'wisepen/no-arbitrary-throw': 'warn',
-      'wisepen/no-direct-error-toast': 'warn',
-      'wisepen/no-direct-wise-pen-error': 'warn',
+      'wisepen/no-direct-error-toast': 'error',
+      'wisepen/no-direct-wise-pen-error': 'error',
+      'wisepen/no-legacy-error-report-api': 'error',
     },
   },
   {
@@ -178,7 +179,7 @@ export default defineConfig([
     },
   },
   {
-    // Domain 业务代码新建错误必须走 createClientError；传输边界与 mock 模拟 API 错误除外。
+    // Domain 业务代码新建错误必须走 createDomainError；传输边界与 mock 模拟 API 错误除外。
     files: ['src/domains/**/*.{ts,tsx}'],
     ignores: [
       'src/domains/_shared/apis/**/*.{ts,tsx}',

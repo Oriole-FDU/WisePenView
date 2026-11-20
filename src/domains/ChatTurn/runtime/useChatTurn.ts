@@ -6,7 +6,7 @@ import { useMemo, useRef } from 'react';
 import { buildApiUrl } from '@/apis/buildApiUrl';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import type { ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
 import {
@@ -86,9 +86,7 @@ const createChatTransport = (
     prepareReconnectToStreamRequest: ({ body }) => {
       const sessionId = body?.session_id;
       if (typeof sessionId !== 'string' || sessionId === '') {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '重连聊天流时缺少 session_id',
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       const params = new URLSearchParams({ session_id: sessionId });
       return { api: `/chat/completions/stream?${params.toString()}` };
@@ -246,9 +244,7 @@ export const useChatTurn = ({
   const recoverTurn = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
     try {
       if (!sessionId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: '恢复聊天时缺少 session_id',
-        });
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
       }
       const requestBody: ChatRecoverApiRequest = {
         session_id: sessionId,

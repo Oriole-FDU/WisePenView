@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
+
 import Tree, { type DataNode } from './index';
 
 const treeData: DataNode[] = [
@@ -40,7 +42,9 @@ export const LoadFailureRetry: Story = {
       treeData={treeData}
       onLoadError={(error) => console.error('示例懒加载失败', error)}
       loadData={async (node) => {
-        if (node.key === 'loading') return Promise.reject('模拟加载失败');
+        if (node.key === 'loading') {
+          return Promise.reject(createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE));
+        }
       }}
     />
   ),

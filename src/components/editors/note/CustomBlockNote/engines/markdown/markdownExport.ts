@@ -6,7 +6,7 @@ import type {
 } from '@blocknote/core';
 
 import { AI_DIFF_DISPLAY_MODE, type AiDiffDisplayMode } from '@/domains/Note';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import type { NotePluginRegistry } from '../../registry/types';
@@ -30,9 +30,7 @@ function projectMarkdownInlineContent(
     const type = typeof inline.type === 'string' ? inline.type : '';
     const owner = registry.inlinePlugins.get(type);
     if (!owner) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `Note inline type 缺少 owner：${type || 'unknown'}`,
-      });
+      throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
     }
     const next = owner.markdownExport
       ? owner.markdownExport.project(inline, { aiDiffDisplayMode })
@@ -56,9 +54,7 @@ function projectMarkdownBlock(
   const type = typeof block.type === 'string' ? block.type : '';
   const owner = registry.blockPlugins.get(type);
   if (!owner) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `Note block type 缺少 owner：${type || 'unknown'}`,
-    });
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE);
   }
 
   const inlineProjection = projectMarkdownInlineContent(block.content, registry, aiDiffDisplayMode);

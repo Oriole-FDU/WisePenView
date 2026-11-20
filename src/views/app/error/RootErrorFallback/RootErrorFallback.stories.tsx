@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 
 import RootErrorFallback from './index';
 
@@ -14,9 +14,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    error: createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      story: 'RootErrorFallback',
-    }),
+    error: createDomainError(FRONTEND_DOMAIN_ERROR.INTERNAL_STATE),
     resetErrorBoundary: () => undefined,
   },
 };

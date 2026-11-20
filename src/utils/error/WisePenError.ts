@@ -1,4 +1,4 @@
-export type WisePenErrorSource = 'network' | 'http' | 'api' | 'client';
+export type WisePenErrorSource = 'network' | 'http' | 'api' | 'domain' | 'component';
 
 export interface WisePenErrorOptions {
   code: number;
@@ -9,7 +9,7 @@ export interface WisePenErrorOptions {
   cause?: unknown;
 }
 
-/** 统一的前端错误类型：网络 / HTTP / 后端业务 / 客户端校验 */
+/** 统一的前端错误类型：网络 / HTTP / 后端业务 / Domain / Component */
 export class WisePenError extends Error {
   readonly code: number;
   readonly source: WisePenErrorSource;

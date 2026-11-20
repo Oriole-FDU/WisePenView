@@ -1,6 +1,6 @@
 import { ResourceServicesMap } from '@/domains/Resource/mapper/ResourceServices.map';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR } from '@/utils/error';
 import { normalizeNonNegativeNumber } from '@/utils/normalize/normalizeNumber';
 
 import type {
@@ -63,7 +63,7 @@ const mapListPendingDocsFromApi = (data: ListPendingDocsApiResponse): PendingDoc
 
 const readDocumentVersionInfoFromApi = (data: GetDocInfoApiResponse): DocumentVersionInfoApi => {
   if (data.documentVersionInfo == null) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_VERSION_INFO_MISSING);
+    throw createDomainError(FRONTEND_DOMAIN_ERROR.DOCUMENT_VERSION_INFO_MISSING);
   }
   return data.documentVersionInfo;
 };

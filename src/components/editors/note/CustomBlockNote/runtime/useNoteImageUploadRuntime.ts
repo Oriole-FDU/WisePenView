@@ -1,11 +1,10 @@
 import type { useCreateBlockNote } from '@blocknote/react';
-import { toast } from '@heroui/react';
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 
 import { useImageService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createDomainError, FRONTEND_DOMAIN_ERROR, reportError } from '@/utils/error';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
@@ -78,10 +77,10 @@ export function useNoteImageUploadRuntime({
 
     try {
       if (readOnly) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD);
       }
       if (!file.type.startsWith('image/')) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
+        throw createDomainError(FRONTEND_DOMAIN_ERROR.IMAGE_ONLY);
       }
 
       assertImageProxyUploadLimit(file);
@@ -93,7 +92,7 @@ export function useNoteImageUploadRuntime({
       return publicUrl;
     } catch (error) {
       markUploadFailed(blockId);
-      toast.danger(parseErrorMessage(error));
+      reportError({ error, level: 'danger' });
       throw error;
     }
   });

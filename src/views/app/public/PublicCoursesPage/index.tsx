@@ -38,7 +38,6 @@ function PublicCoursesPage() {
     {
       refreshDeps: [query.page, query.size],
       loadingDelay: 160,
-      getErrorMessage: () => t('list.loadFailed'),
       showErrorToast: false,
     }
   );
@@ -106,6 +105,7 @@ function PublicCoursesPage() {
       ) : courseError ? (
         <PublicListErrorState
           className={styles.errorState}
+          error={courseError}
           title={t('list.loadFailed')}
           onRetry={courseRequest.refresh}
         />

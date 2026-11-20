@@ -12,7 +12,7 @@ import { useImageService, useUserService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
 import { IDENTITY, USER_STATUS } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createComponentError, FRONTEND_COMPONENT_ERROR, reportError } from '@/utils/error';
 import { IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/image/uploadLimit';
 
 import type { AccountHeaderProps } from './index.type';
@@ -78,7 +78,7 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
       assertImageProxyUploadLimit(file);
       setAvatarFile(file);
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      reportError({ error: err, level: 'danger' });
       setAvatarFile(null);
     }
   };
@@ -89,7 +89,8 @@ function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
       return;
     }
     if (!user) {
-      toast.danger(t('header.userNotLoaded'));
+      const error = createComponentError(FRONTEND_COMPONENT_ERROR.USER_NOT_LOADED);
+      reportError({ error, level: 'danger' });
       return;
     }
     runUpdateAvatar(avatarFile, user);

@@ -8,7 +8,7 @@ import AppModal from '@/components/base/AppModal';
 import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
-import { EmptyState, Spin } from '@/components/base/Feedback';
+import { EmptyState, ErrorState, Spin } from '@/components/base/Feedback';
 import { Autocomplete, SearchField } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import { Tabs } from '@/components/base/Tabs';
@@ -19,7 +19,6 @@ import {
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import TagPermissionActionEditor from '@/components/business/Drive/PermissionActionEditor';
 import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
-import { parseErrorMessage } from '@/utils/error';
 
 import type { TagMountPermissionModalProps, TagPermissionModalProps } from './index.type';
 import styles from './style.module.scss';
@@ -82,7 +81,11 @@ const TagPolicyModalBase = ({
     }
 
     if (groupMemberError) {
-      return <div className={styles.memberState}>{parseErrorMessage(groupMemberError)}</div>;
+      return (
+        <div className={styles.memberState}>
+          <ErrorState size="compact" error={groupMemberError} />
+        </div>
+      );
     }
 
     if (memberOptions.length === 0) {

@@ -6,17 +6,19 @@ import { ErrorState } from '@/components/base/Feedback';
 
 interface PublicListErrorStateProps {
   className?: string;
+  error: unknown;
   onRetry: () => void;
   title: string;
 }
 
 /** 公开课程与小组列表共用同一套页内失败与恢复入口。 */
-function PublicListErrorState({ className, onRetry, title }: PublicListErrorStateProps) {
+function PublicListErrorState({ className, error, onRetry, title }: PublicListErrorStateProps) {
   const { t } = useTranslation('common');
 
   return (
     <ErrorState
       className={className}
+      error={error}
       title={title}
       action={
         <AppButton variant="primary" size="sm" onPress={onRetry}>
