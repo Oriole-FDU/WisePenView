@@ -6,16 +6,16 @@
 
 本文件拥有单轮流式对话的协议、消息、历史、连接、审批与前端运行时边界。会话身份、标题和附件上传归 [ChatSession](../ChatSession/BUSINESS.md)；模型、Provider、Tool 与输入能力归 [ChatConfig](../ChatConfig/BUSINESS.md)；用户输入和页面门禁归 [Chat workflow](../../components/business/Chat/BUSINESS.md)。
 
-多 session Runtime 改造计划与名词见 [runtimeV2 docs](../../../docs/chat-turn-runtime-v2/README.md)。协议选路见 [respond / recover 时序](../../../docs/chat-turn-respond-sequence.md)。
+多 session Runtime 设计与名词见 [chat-turn-runtime-v2 docs](../../../docs/chat-turn-runtime-v2/README.md)（目录名保留历史；实现已落在 `runtime/`）。协议选路见 [respond / recover 时序](../../../docs/chat-turn-respond-sequence.md)。
 
 ## 模块边界
 
-| 模块                   | 负责                                                                   | 不负责                         |
-| ---------------------- | ---------------------------------------------------------------------- | ------------------------------ |
-| API / Service          | checked 协议、DTO mapper、SSE 事件归一化、active turn 与历史读取       | React 状态、UI toast、连接相位 |
-| `runtimeV2` 单 Runtime | 固定 `sessionId` 的 Chat + Pump、connect、history、approval、lifecycle | session 路由、多实例调度       |
-| `runtimeV2/router`     | Map 缓存、唯一 focus、上限 dispose、登出 clear                         | 发 HTTP、拼装发送载荷          |
-| `runtimeV2/react`      | `useChatRuntime`：focus + 订阅 Runtime View                            | 登录门禁、ensureSession        |
+| 模块                 | 负责                                                                   | 不负责                         |
+| -------------------- | ---------------------------------------------------------------------- | ------------------------------ |
+| API / Service        | checked 协议、DTO mapper、SSE 事件归一化、active turn 与历史读取       | React 状态、UI toast、连接相位 |
+| `runtime` 单 Runtime | 固定 `sessionId` 的 Chat + Pump、connect、history、approval、lifecycle | session 路由、多实例调度       |
+| `runtime/router`     | Map 缓存、唯一 focus、上限 dispose、登出 clear                         | 发 HTTP、拼装发送载荷          |
+| `runtime/react`      | `useChatRuntime`：focus + 订阅 Runtime View                            | 登录门禁、ensureSession        |
 
 数据流：
 
@@ -60,6 +60,6 @@ Chat -> useChatRuntime
 
 - [ChatTurn service](service/ChatTurnServices.impl.ts)
 - [SSE normalizer](service/chatSseNormalizer.ts)
-- [ChatTurnRuntime](runtimeV2/chatTurnRuntime.ts)
-- [Router](runtimeV2/router/chatTurnRuntimeRouter.ts)
-- [useChatRuntime](runtimeV2/react/useChatRuntime.ts)
+- [ChatTurnRuntime](runtime/chatTurnRuntime.ts)
+- [Router](runtime/router/chatTurnRuntimeRouter.ts)
+- [useChatRuntime](runtime/react/useChatRuntime.ts)

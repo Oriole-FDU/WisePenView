@@ -92,24 +92,22 @@ route.sessionId ──focus──► Router.activeSessionId ──UI──► Ru
 
 ## 6. 目录与符号（已决）
 
-| 路径 / 符号                           | 含义                                         |
-| ------------------------------------- | -------------------------------------------- |
-| `runtime/`                            | V1，切流前保留                               |
-| `runtimeV2/`                          | V2 根目录                                    |
-| `runtimeV2/ChatTurnRuntime.ts`        | 单 session 实例                              |
-| `runtimeV2/router/`                   | Router 单例                                  |
-| `runtimeV2/react/useChatRuntimeV2.ts` | Consumer Hook                                |
-| `ChatTurnRuntimePort`（或等价）       | Router 依赖端口；阶段 2 Fake / 阶段 1 真实现 |
+| 路径 / 符号                       | 含义                                      |
+| --------------------------------- | ----------------------------------------- |
+| `runtime/`                        | 现行实现根目录                            |
+| `runtime/chatTurnRuntime.ts`      | 单 session 实例（类名 `ChatTurnRuntime`） |
+| `runtime/router/`                 | Router 单例                               |
+| `runtime/react/useChatRuntime.ts` | Consumer Hook                             |
+| `ChatTurnRuntimePort`（或等价）   | Router 依赖的 Runtime 端口                |
 
 ---
 
-## 7. 废弃意图（切流后）
+## 7. 已落地变更（相对旧 hook runtime）
 
-| 旧概念                                   | 说明                                  |
-| ---------------------------------------- | ------------------------------------- |
-| `useChatRuntime` 随 `sessionId` teardown | 改由 Router focus；失焦不停泵         |
-| 跨 session 的 `latestSessionId` 陈旧防护 | 单 Instance 内不再需要                |
-| 组件匿名 `useChat`                       | 改为 Runtime 持有的 `Chat`            |
-| 正式用语 **evict**                       | 改用 dispose / unload                 |
-| 正式用语 **Runtime Snapshot**            | 改用 **Runtime View**                 |
-| Runtime 内 **Controller** 后缀           | 改用 connect/history/message/approval |
+| 旧概念                                   | 现行                                                    |
+| ---------------------------------------- | ------------------------------------------------------- |
+| `useChatRuntime` 随 `sessionId` teardown | Router focus；失焦不停泵                                |
+| 跨 session 的 `latestSessionId` 陈旧防护 | 单 Instance 内不再需要                                  |
+| 组件匿名 `useChat`                       | Runtime 持有的 `Chat`                                   |
+| 正式用语 evict / Snapshot / Controller   | dispose、Runtime View、connect/history/message/approval |
+| 目录名 `runtimeV2/`                      | 已并回 `runtime/`                                       |

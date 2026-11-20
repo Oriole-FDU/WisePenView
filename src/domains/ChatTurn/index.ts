@@ -4,9 +4,9 @@ export type {
   ToolApprovalRequestData,
   WisePenUIMessage,
 } from './entity/message';
-export type { ToolApprovalRequest } from './runtimeV2/approval/toolApprovalModel';
-export type { UseChatRuntimeOptions, UseChatRuntimeResult } from './runtimeV2/react/useChatRuntime';
-export { useChatRuntime } from './runtimeV2/react/useChatRuntime';
+export type { ToolApprovalRequest } from './runtime/approval/toolApprovalModel';
+export type { UseChatRuntimeOptions, UseChatRuntimeResult } from './runtime/react/useChatRuntime';
+export { useChatRuntime } from './runtime/react/useChatRuntime';
 export type {
   ClientToolCapability,
   IChatTurnService,

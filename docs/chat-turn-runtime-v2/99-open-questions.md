@@ -16,7 +16,7 @@
 | 子系统命名     | 沿用 `connect` / `history` / `message` / `approval`，不叫 Controller            |
 | UI 投影        | 叫 **Runtime View**（不用 Snapshot）                                            |
 | 缓存上限       | `MAX_CACHED_RUNTIMES` **3–5**（含 active）；后台可持续拉流，用个数限资源        |
-| 目录/类名      | `runtimeV2/`、`ChatTurnRuntime`、`useChatRuntimeV2`                             |
+| 目录/类名      | 实现落在 `runtime/`；hook 名 `useChatRuntime`                                   |
 | 淘汰用语       | 用 **dispose / unload**，不用 evict                                             |
 | Pump           | 仍按次 arm（新开 SSE 时）；与 focus 切换无关                                    |
 

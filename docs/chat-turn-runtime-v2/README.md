@@ -1,7 +1,6 @@
 # ChatTurn Runtime V2 改造计划
 
-> 状态：**已落地（Chat 消费 runtimeV2；V1 已删）**  
-> 目标目录：`src/domains/ChatTurn/runtimeV2/`  
+> 状态：**已落地**（实现目录为 `src/domains/ChatTurn/runtime/`；本 docs 目录名保留改造过程）  
 > 协议权威：[respond / recover 时序](../chat-turn-respond-sequence.md)  
 > 业务边界：[ChatTurn BUSINESS](../../src/domains/ChatTurn/BUSINESS.md)
 
