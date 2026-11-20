@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { Tabs } from '@/components/base/Tabs';
 import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
+import { renderMermaidDiagram } from '@/utils/mermaid';
 
 import { CodeBlockFrame, HighlightedCode } from '../CodeBlock';
-import { renderMermaidDiagram } from './mermaidRuntime';
 import styles from './style.module.scss';
 
 type MermaidView = 'code' | 'graph';

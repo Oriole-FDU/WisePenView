@@ -1,5 +1,7 @@
 import type { Mermaid } from 'mermaid';
 
+export const MERMAID_SOURCE_MAX_LENGTH = 50_000;
+
 let mermaidPromise: Promise<Mermaid> | null = null;
 
 function preserveSvgCanvasSize(svgMarkup: string): string {
@@ -41,6 +43,7 @@ async function getMermaid(): Promise<Mermaid> {
         securityLevel: 'strict',
         htmlLabels: false,
         theme: 'neutral',
+        maxTextSize: MERMAID_SOURCE_MAX_LENGTH,
         fontFamily:
           "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       });
