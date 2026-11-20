@@ -157,6 +157,12 @@ export class ChatTurnRuntime implements ChatTurnRuntimePort {
     this.listeners.clear();
   }
 
+  isStreaming(): boolean {
+    if (this.connect.isLive()) return true;
+    const status = this.message.status;
+    return status === 'submitted' || status === 'streaming';
+  }
+
   async send(query: string, options?: SendTurnMessageOptions): Promise<void> {
     this.requirePhase([LIFECYCLE_PHASE.ready], 'send');
     await this.actions.send(query, options);

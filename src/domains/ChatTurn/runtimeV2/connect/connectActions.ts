@@ -53,7 +53,7 @@ export class ConnectActions {
           const response = await this.options.service.streamChatCompletion(
             {
               sessionId: this.options.sessionId,
-              model: this.options.model,
+              model: sendOptions?.model ?? this.options.model,
               query,
               options: sendOptions,
             },

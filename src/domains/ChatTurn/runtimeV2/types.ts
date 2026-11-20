@@ -28,6 +28,7 @@ export interface ChatTurnRuntimePort {
 
   bootstrap(options: { isNewSession: boolean }): Promise<void>;
   dispose(): void;
+  isStreaming(): boolean;
 
   send(query: string, options?: SendTurnMessageOptions): Promise<void>;
   cancel(): Promise<void>;
