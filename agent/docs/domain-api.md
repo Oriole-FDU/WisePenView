@@ -35,7 +35,7 @@ API 层禁止：
 - `requestPlacement` 只能是 `body`、`query`、`none`。GET 与 DELETE 不得声明 body；历史接口同时需要 query 与 body 时，在 body Contract 上用 `queryKeys` 明确列出 query 字段，执行器会拆分传输。
 - API 方法统一调用 `executeApiContract`，不重复手写 `parseApiRequest`、transport 和 `parseApiResponse`。解析失败必须 fail-fast，不把缺失字段、错误类型或意外 `null` 继续传给 mapper 或 service。
 - 所有 REST 调用必须使用 checked Contract；`pnpm check:api-contracts` 锁定 Contract、特殊 transport 与直接 `fetch` 的数量，新增绕过契约的调用会失败。
-- 契约违约诊断只记录 endpoint、contract、字段路径和 issue code，不记录原始请求或响应正文。
+- 响应契约违约诊断只记录 endpoint、contract、字段路径和 issue code，不记录原始请求或响应正文。
 - 历史 `apis/*Api.type.ts` 在迁移时同步删除；同一 wire 声明只能保留一个事实源。
 - 普通接口使用 `transport: 'json'`；裸文本使用 `'text'`；`FormData` 使用 `'multipart'`；SSE 使用 `'sse'` 并提供独立事件归一化器。特殊 transport 不得退回领域层裸 `fetch`。
 - 接口字段、枚举或响应结构需要结合 Java 实现、mapper 与业务语义确认；无法从代码得到稳定结论时，先向用户确认，不要盲猜。
