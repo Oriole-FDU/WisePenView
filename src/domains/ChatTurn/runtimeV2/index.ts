@@ -1,3 +1,4 @@
+export { ChatTurnRuntime, type ChatTurnRuntimeOptions } from './chatTurnRuntime';
 export {
   CONNECT_PHASE,
   type ConnectFsm,
