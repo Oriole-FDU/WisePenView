@@ -1,5 +1,6 @@
 /**
- * 组件消费入口：向 Router focus 当前 session，订阅 Runtime View。
+ * 组件消费入口：向 Router focus 当前 session，订阅 active Runtime 的 View。
+ * Runtime 是 Router 内部单位；本 hook 对外只暴露 Turn 面。
  */
 import { useLatest } from 'ahooks';
 import type { ChatStatus } from 'ai';
@@ -30,14 +31,14 @@ const EMPTY_VIEW: RuntimeView = {
   approvalSubmitting: false,
 };
 
-export interface UseChatRuntimeOptions {
+export interface UseChatTurnOptions {
   sessionId: string;
   model?: string;
   isNewSession: boolean;
   onError?: (error: Error) => void;
 }
 
-export interface UseChatRuntimeResult {
+export interface UseChatTurnResult {
   approval: {
     decide: (toolCallId: string, approved: boolean) => void;
     pending: ToolApprovalRequest | undefined;
@@ -58,12 +59,12 @@ export interface UseChatRuntimeResult {
   };
 }
 
-export function useChatRuntime({
+export function useChatTurn({
   sessionId,
   model,
   isNewSession,
   onError,
-}: UseChatRuntimeOptions): UseChatRuntimeResult {
+}: UseChatTurnOptions): UseChatTurnResult {
   const service = useChatTurnService();
   const sessionKey = sessionId || null;
   const serviceLatest = useLatest(service);

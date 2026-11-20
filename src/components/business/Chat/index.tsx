@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { ChatProps } from '@/components/business/Chat/index.type';
 import type { ChatModel } from '@/domains/ChatConfig';
 import type { CreateSessionRequest } from '@/domains/ChatSession';
-import { useChatRuntime } from '@/domains/ChatTurn';
+import { useChatTurn } from '@/domains/ChatTurn';
 import { readFrontendStates, useFrontendStateValue } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
@@ -44,7 +44,7 @@ function Chat({
   const resourceChatContext = resourceChat?.context;
   const clearResourceChatContext = resourceChat?.clearContext;
 
-  const runtime = useChatRuntime({
+  const chatTurn = useChatTurn({
     // 未登录时不下发 session，History 清对话；鉴权门禁留在壳层。
     sessionId: isAuthenticated && sessionId ? sessionId : '',
     model: currentModel?.modelId,
@@ -55,7 +55,7 @@ function Chat({
   });
 
   const { syncNewSessionHistoryRefresh } = session;
-  const pendingToolApproval = runtime.approval.pending;
+  const pendingToolApproval = chatTurn.approval.pending;
 
   /**
    * @wisepen-manual-effect
@@ -64,12 +64,12 @@ function Chat({
    * cleanup：没有订阅或延迟任务，无需清理。
    */
   useEffect(() => {
-    syncNewSessionHistoryRefresh(runtime.renderable);
-  }, [syncNewSessionHistoryRefresh, runtime.renderable]);
+    syncNewSessionHistoryRefresh(chatTurn.renderable);
+  }, [syncNewSessionHistoryRefresh, chatTurn.renderable]);
 
   /**
    * 发送处维护：登录、宿主守卫、资源门禁、ensureSession、载荷拼装与 toast，
-   * 最后落到 runtime.send。
+   * 最后落到 chatTurn.send。
    */
   const handleSend = async (text: string, opts?: SendOptions): Promise<boolean> => {
     if (!isAuthenticated) {
@@ -143,7 +143,7 @@ function Chat({
         ? Array.from(new Set([...(selectedSkillIds ?? []), ...(resourceSkillIds ?? [])]))
         : undefined;
 
-    void runtime
+    void chatTurn
       .send(text, {
         model: targetModel.modelId,
         providerId: targetModel.providerId,
@@ -171,7 +171,7 @@ function Chat({
 
   const handleCancel = async (): Promise<void> => {
     try {
-      await runtime.cancel();
+      await chatTurn.cancel();
     } catch (error) {
       toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
     }
@@ -179,13 +179,13 @@ function Chat({
 
   const turn: ChatConversationTurn = {
     cancel: handleCancel,
-    cancelling: runtime.cancelling,
-    connectActive: runtime.connectActive,
+    cancelling: chatTurn.cancelling,
+    connectActive: chatTurn.connectActive,
     currentModel,
-    history: runtime.history,
-    isEmpty: runtime.messages.length === 0,
-    messages: runtime.messages,
-    status: runtime.status,
+    history: chatTurn.history,
+    isEmpty: chatTurn.messages.length === 0,
+    messages: chatTurn.messages,
+    status: chatTurn.status,
   };
 
   const handleCollapsePanel = () => {
@@ -228,9 +228,9 @@ function Chat({
           key={pendingToolApproval.toolCallId}
           name={pendingToolApproval.name}
           input={pendingToolApproval.input}
-          submitting={runtime.approval.submitting}
+          submitting={chatTurn.approval.submitting}
           onDecision={(approved) =>
-            runtime.approval.decide(pendingToolApproval.toolCallId, approved)
+            chatTurn.approval.decide(pendingToolApproval.toolCallId, approved)
           }
         />
       ) : null}

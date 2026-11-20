@@ -9,8 +9,8 @@ export {
 } from './connect/connectFsm';
 export { runNewStreamConnect } from './connect/runNewStreamConnect';
 export { isLifecycleAllowed, LIFECYCLE_PHASE, type LifecyclePhase } from './lifecycle';
-export type { UseChatRuntimeOptions, UseChatRuntimeResult } from './react/useChatRuntime';
-export { useChatRuntime } from './react/useChatRuntime';
+export type { UseChatTurnOptions, UseChatTurnResult } from './react/useChatTurn';
+export { useChatTurn } from './react/useChatTurn';
 export {
   chatTurnRuntimeRouter,
   createChatTurnRuntimeRouterForTest,

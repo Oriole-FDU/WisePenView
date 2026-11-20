@@ -15,12 +15,12 @@
 | API / Service        | checked 协议、DTO mapper、SSE 事件归一化、active turn 与历史读取       | React 状态、UI toast、连接相位 |
 | `runtime` 单 Runtime | 固定 `sessionId` 的 Chat + Pump、connect、history、approval、lifecycle | session 路由、多实例调度       |
 | `runtime/router`     | Map 缓存、唯一 focus、上限 dispose、登出 clear                         | 发 HTTP、拼装发送载荷          |
-| `runtime/react`      | `useChatRuntime`：focus + 订阅 Runtime View                            | 登录门禁、ensureSession        |
+| `runtime/react`      | `useChatTurn`：focus + 订阅 active View（对外不暴露 Runtime）          | 登录门禁、ensureSession        |
 
 数据流：
 
 ```text
-Chat -> useChatRuntime
+Chat -> useChatTurn
   -> chatTurnRuntimeRouter.focus(sessionId)
   -> ChatTurnRuntime
        -> connect -> ChatTurnService -> checked API / SSE
@@ -62,4 +62,4 @@ Chat -> useChatRuntime
 - [SSE normalizer](service/chatSseNormalizer.ts)
 - [ChatTurnRuntime](runtime/chatTurnRuntime.ts)
 - [Router](runtime/router/chatTurnRuntimeRouter.ts)
-- [useChatRuntime](runtime/react/useChatRuntime.ts)
+- [useChatTurn](runtime/react/useChatTurn.ts)

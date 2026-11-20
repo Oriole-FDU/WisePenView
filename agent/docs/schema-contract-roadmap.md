@@ -33,7 +33,7 @@
 
 | ID  | 未完成项                    | 当前阻塞               | 完成条件                                                                                             | 证据                                                                                                                                   |
 | --- | --------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| V1  | Chat SSE 正式后端运行态回归 | 需要明确授权的联调环境 | 覆盖正常断流、重连、active turn、取消、工具审批、坏 JSON、超限事件和终止；确认不重复连接且失败可观测 | [useChatRuntime.ts](../../src/domains/ChatTurn/runtime/useChatRuntime.ts)、[ChatTurn BUSINESS](../../src/domains/ChatTurn/BUSINESS.md) |
+| V1  | Chat SSE 正式后端运行态回归 | 需要明确授权的联调环境 | 覆盖正常断流、重连、active turn、取消、工具审批、坏 JSON、超限事件和终止；确认不重复连接且失败可观测 | [useChatTurn.ts](../../src/domains/ChatTurn/runtime/react/useChatTurn.ts)、[ChatTurn BUSINESS](../../src/domains/ChatTurn/BUSINESS.md) |
 
 ## 五、需要业务或后端先确认
 

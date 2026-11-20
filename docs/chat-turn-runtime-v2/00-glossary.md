@@ -51,7 +51,7 @@
 
 | 名词                  | 标记     | 定义                                                                                                                                 |
 | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **Consumer Hook**     | `[已决]` | `useChatRuntimeV2`：按 route `focus(sessionId)`，订阅 Active 的 View                                                                 |
+| **Consumer Hook**     | `[已决]` | `useChatTurn`：按 route `focus(sessionId)`，订阅 Active 的 View（对外不叫 Runtime）                                                  |
 | **Runtime View**      | `[已决]` | Runtime 的只读投影（原称 Snapshot）：供 React 订阅的 status/connect/history/approval 等；**≠ Instance**                              |
 | **Send 路径**         | `[已决]` | 发送交给 Router（或经 Hook 落到 active Runtime）；Router **只向当前 focus 的实例**发。不存在「options.sessionId 写到另一个 Runtime」 |
 | **Shell / Chat 壳层** | `[沿用]` | 登录、ensureSession、资源门禁、载荷拼装；不拥有 Runtime 生命周期                                                                     |
@@ -92,22 +92,22 @@ route.sessionId ──focus──► Router.activeSessionId ──UI──► Ru
 
 ## 6. 目录与符号（已决）
 
-| 路径 / 符号                       | 含义                                      |
-| --------------------------------- | ----------------------------------------- |
-| `runtime/`                        | 现行实现根目录                            |
-| `runtime/chatTurnRuntime.ts`      | 单 session 实例（类名 `ChatTurnRuntime`） |
-| `runtime/router/`                 | Router 单例                               |
-| `runtime/react/useChatRuntime.ts` | Consumer Hook                             |
-| `ChatTurnRuntimePort`（或等价）   | Router 依赖的 Runtime 端口                |
+| 路径 / 符号                     | 含义                                      |
+| ------------------------------- | ----------------------------------------- |
+| `runtime/`                      | 现行实现根目录                            |
+| `runtime/chatTurnRuntime.ts`    | 单 session 实例（类名 `ChatTurnRuntime`） |
+| `runtime/router/`               | Router 单例                               |
+| `runtime/react/useChatTurn.ts`  | Consumer Hook                             |
+| `ChatTurnRuntimePort`（或等价） | Router 依赖的 Runtime 端口                |
 
 ---
 
 ## 7. 已落地变更（相对旧 hook runtime）
 
-| 旧概念                                   | 现行                                                    |
-| ---------------------------------------- | ------------------------------------------------------- |
-| `useChatRuntime` 随 `sessionId` teardown | Router focus；失焦不停泵                                |
-| 跨 session 的 `latestSessionId` 陈旧防护 | 单 Instance 内不再需要                                  |
-| 组件匿名 `useChat`                       | Runtime 持有的 `Chat`                                   |
-| 正式用语 evict / Snapshot / Controller   | dispose、Runtime View、connect/history/message/approval |
-| 目录名 `runtimeV2/`                      | 已并回 `runtime/`                                       |
+| 旧概念                                                        | 现行                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------- |
+| `useChatTurn`（旧名 `useChatRuntime`）随 `sessionId` teardown | Router focus；失焦不停泵                                |
+| 跨 session 的 `latestSessionId` 陈旧防护                      | 单 Instance 内不再需要                                  |
+| 组件匿名 `useChat`                                            | Runtime 持有的 `Chat`                                   |
+| 正式用语 evict / Snapshot / Controller                        | dispose、Runtime View、connect/history/message/approval |
+| 目录名 `runtimeV2/`                                           | 已并回 `runtime/`                                       |

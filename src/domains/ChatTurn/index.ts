@@ -5,8 +5,8 @@ export type {
   WisePenUIMessage,
 } from './entity/message';
 export type { ToolApprovalRequest } from './runtime/approval/toolApprovalModel';
-export type { UseChatRuntimeOptions, UseChatRuntimeResult } from './runtime/react/useChatRuntime';
-export { useChatRuntime } from './runtime/react/useChatRuntime';
+export type { UseChatTurnOptions, UseChatTurnResult } from './runtime/react/useChatTurn';
+export { useChatTurn } from './runtime/react/useChatTurn';
 export type {
   ClientToolCapability,
   IChatTurnService,

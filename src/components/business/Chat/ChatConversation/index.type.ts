@@ -1,7 +1,7 @@
 import type { ChatStatus } from 'ai';
 
 import type { ChatAgentOption, ChatModel } from '@/domains/ChatConfig';
-import type { UseChatRuntimeResult, WisePenUIMessage } from '@/domains/ChatTurn';
+import type { UseChatTurnResult, WisePenUIMessage } from '@/domains/ChatTurn';
 
 import type { useChatSessionController } from '../_controllers/useChatSessionController';
 import type { SendOptions } from '../send.type';
@@ -12,7 +12,7 @@ export interface ChatConversationTurn {
   cancelling: boolean;
   connectActive: boolean;
   currentModel: ChatModel | null;
-  history: UseChatRuntimeResult['history'];
+  history: UseChatTurnResult['history'];
   isEmpty: boolean;
   messages: WisePenUIMessage[];
   status: ChatStatus;
