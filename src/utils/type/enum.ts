@@ -63,15 +63,12 @@ export function defineEnum<const Mapping extends Readonly<Record<string, string 
 ): EnumDefinition<MappedEnumOptions<Mapping>, Mapping>;
 export function defineEnum(input: readonly string[] | Readonly<Record<string, string | number>>) {
   if (isIdentityEnumInput(input)) {
-    const options = input.map((value) => ({
-      key: value,
-      value,
-    })) as unknown as readonly EnumOption[];
+    const options = input.map((value) => ({ key: value, value }));
     const values = Object.fromEntries(input.map((value) => [value, value]));
     return createEnumDefinition(options, values);
   }
 
   const entries = Object.entries(input);
-  const options = entries.map(([key, value]) => ({ key, value })) as readonly EnumOption[];
+  const options = entries.map(([key, value]) => ({ key, value }));
   return createEnumDefinition(options, input);
 }
