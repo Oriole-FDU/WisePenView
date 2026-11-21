@@ -62,18 +62,12 @@ function createAnchorHighlightExtension() {
               if (!tr.docChanged || !previous.blockId) return previous;
               return {
                 blockId: previous.blockId,
-                decorations: buildAnchorHighlightDecorations(
-                  tr.doc as unknown as PMNode,
-                  previous.blockId
-                ),
+                decorations: buildAnchorHighlightDecorations(tr.doc, previous.blockId),
               };
             }
             return {
               blockId: meta.blockId,
-              decorations: buildAnchorHighlightDecorations(
-                tr.doc as unknown as PMNode,
-                meta.blockId
-              ),
+              decorations: buildAnchorHighlightDecorations(tr.doc, meta.blockId),
             };
           },
         },
