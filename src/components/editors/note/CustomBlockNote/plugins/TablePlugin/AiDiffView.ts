@@ -28,11 +28,26 @@ export interface TableContentLike {
   headerCols?: number;
 }
 
-export function readTableContent(block: Record<string, unknown>): TableContentLike | null {
-  if (!isRecord(block.content)) return null;
+export function readTableContent(block: unknown): TableContentLike | null {
+  if (!isRecord(block) || !isRecord(block.content)) return null;
   const content = block.content;
-  if (!Array.isArray(content.rows) || !Array.isArray(content.columnWidths)) return null;
-  return content as unknown as TableContentLike;
+  const rows = content.rows;
+  const columnWidths = content.columnWidths;
+  if (
+    !Array.isArray(rows) ||
+    !rows.every((row) => isRecord(row) && Array.isArray(row.cells)) ||
+    !Array.isArray(columnWidths) ||
+    !columnWidths.every((width) => width === undefined || typeof width === 'number')
+  ) {
+    return null;
+  }
+
+  return {
+    rows,
+    columnWidths,
+    headerRows: typeof content.headerRows === 'number' ? content.headerRows : undefined,
+    headerCols: typeof content.headerCols === 'number' ? content.headerCols : undefined,
+  };
 }
 
 function readCell(cell: unknown): TableCellLike {
