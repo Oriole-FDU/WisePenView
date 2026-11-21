@@ -147,7 +147,7 @@ export function createInlineCommentExtension(params: {
               : mapAnchorRanges(previous.ranges, tr);
             return {
               ranges,
-              decorations: buildDecorations({ doc: newState.doc as unknown as PMNode, ranges }),
+              decorations: buildDecorations({ doc: newState.doc, ranges }),
             };
           },
         },
@@ -171,7 +171,7 @@ export function createInlineCommentExtension(params: {
             if (!binding) return;
             session.setThreadAnchorReferences(
               collectThreadAnchorReferences({
-                doc: view.state.doc as unknown as PMNode,
+                doc: view.state.doc,
                 fragment,
                 binding,
                 registry,

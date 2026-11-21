@@ -625,7 +625,7 @@ function createAiDiffExtension(
               blockNodes?: readonly { node: PMNode; pos: number }[]
             ) =>
               buildDecorations({
-                doc: newState.doc as unknown as PMNode,
+                doc: newState.doc,
                 editorSchema: editor.schema as unknown as {
                   blockSchema: unknown;
                   inlineContentSchema: unknown;

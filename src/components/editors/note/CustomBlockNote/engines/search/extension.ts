@@ -86,7 +86,7 @@ function createSearchExtension(registry: NotePluginRegistry) {
             const meta: SearchExtensionMeta | undefined = tr.getMeta(searchPluginKey);
             if (!meta) {
               if (tr.docChanged && previous.query.trim().length > 0) {
-                const doc = newState.doc as unknown as PMNode;
+                const doc = newState.doc;
                 const matches = collectFindReplaceMatches(doc, previous.query, registry);
                 const activeIndex = clampActiveIndex(previous.activeIndex, matches.length);
                 return {
@@ -99,7 +99,7 @@ function createSearchExtension(registry: NotePluginRegistry) {
               return previous;
             }
             const decorations = buildSearchDecorations(
-              newState.doc as unknown as PMNode,
+              newState.doc,
               meta.matches,
               meta.activeIndex
             );
