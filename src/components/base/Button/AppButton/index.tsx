@@ -10,6 +10,8 @@ function AppButton({
   disablePressScale = false,
   ...props
 }: AppButtonProps) {
+  'use memo';
+
   return (
     <HeroButton
       variant={variant}
