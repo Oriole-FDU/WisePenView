@@ -211,15 +211,10 @@ export default defineConfig([
     },
   },
   {
-    // ChatInput 与富文本工具栏依赖底层 textarea/input 的特殊组合行为，单独留白名单。
+    // 仅为仍需要底层 TextField 组合的组件保留精确例外。
     files: [
-      'src/components/business/Chat/ChatConversation/ChatInput/index.tsx',
-      'src/components/editors/note/CustomBlockNote/ui/toolbar/components/FileButtons.tsx',
-      'src/components/editors/note/CustomBlockNote/ui/toolbar/components/LinkButton.tsx',
       'src/components/business/Resource/FavoriteCollectionPicker/CollectionPickerModal.tsx',
       'src/components/business/UserSearchCombobox/index.tsx',
-      'src/views/app/course/CourseEditorPage/_components/CourseEditorDateFields/index.tsx',
-      'src/components/editors/agent/components/AgentEditor/sections/MemorySection/index.tsx',
     ],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({ allowInputPrimitive: true }),
