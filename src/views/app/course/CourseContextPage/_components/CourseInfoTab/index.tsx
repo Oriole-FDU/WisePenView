@@ -9,7 +9,11 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { PieChart } from '@/components/base/Chart';
-import { formatCoursePeriodRange, getCoursePeriodTimeRange } from '@/domains/Course';
+import {
+  formatCoursePeriodRange,
+  getCourseAssessmentTotal,
+  getCoursePeriodTimeRange,
+} from '@/domains/Course';
 import { useCourseContext } from '@/layouts/Course/_context';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
@@ -45,10 +49,7 @@ function CourseInfoTab() {
           .join(' · ')
       : finalAssessment.deadline
     : undefined;
-  const assessmentTotal = course.assessmentItems.reduce(
-    (sum, item) => sum + (Number.isFinite(item.weight) ? Math.max(0, item.weight) : 0),
-    0
-  );
+  const assessmentTotal = getCourseAssessmentTotal(course.assessmentItems);
 
   return (
     <div className={styles.infoPage}>
