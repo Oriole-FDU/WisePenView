@@ -10,3 +10,8 @@ export type {
   UploadSkillAssetRequest,
   UploadSkillAssetResult,
 } from './service/index.type';
+export {
+  normalizeSkillDirectoryPath,
+  resolveSkillFileLanguage,
+  SKILL_ROOT_PATH,
+} from './utils/skillFile';
