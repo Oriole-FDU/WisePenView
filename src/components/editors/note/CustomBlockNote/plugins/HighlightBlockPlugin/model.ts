@@ -70,8 +70,8 @@ function readEnumValue<T extends string>(value: unknown, values: readonly T[], f
   return typeof value === 'string' && values.includes(value as T) ? (value as T) : fallback;
 }
 
-export function readHighlightBlockProps(block: Record<string, unknown>): HighlightBlockProps {
-  const props = isRecord(block.props) ? block.props : {};
+export function readHighlightBlockProps(block: unknown): HighlightBlockProps {
+  const props = isRecord(block) && isRecord(block.props) ? block.props : {};
   return {
     icon:
       typeof props.icon === 'string' && props.icon.trim()
