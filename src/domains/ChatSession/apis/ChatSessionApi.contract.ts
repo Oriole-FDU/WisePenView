@@ -5,6 +5,7 @@ import {
   ChatSessionApiSchema,
   CreateSessionApiRequestSchema,
   DeleteSessionApiRequestSchema,
+  GetSessionApiRequestSchema,
   InitTemporaryAttachmentUploadApiRequestSchema,
   InitTemporaryAttachmentUploadApiResponseSchema,
   ListHistoryMessagesApiRequestSchema,
@@ -22,6 +23,16 @@ export const CreateSessionApiContract = defineApiContract({
   requestPlacement: 'body',
   transport: 'json',
   request: CreateSessionApiRequestSchema,
+  response: ChatSessionApiSchema,
+});
+
+export const GetSessionApiContract = defineApiContract({
+  name: 'GetSessionApi',
+  method: 'GET',
+  endpoint: '/chat/session/getSession',
+  requestPlacement: 'query',
+  transport: 'json',
+  request: GetSessionApiRequestSchema,
   response: ChatSessionApiSchema,
 });
 

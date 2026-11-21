@@ -138,12 +138,14 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
       created_at: now,
       updated_at: now,
       agent_id: params.agent_id ?? null,
-      agent_version: params.agent_id ? 1 : null,
+      agent_version: params.agent_id ? (params.draft_version ?? 1) : null,
+      is_draft_debug: params.draft_version !== undefined,
     };
     mockSessions.unshift(session);
     mockHistoryMessagesBySessionId[session.id] = [];
     return mockResponse(session);
   },
+  getSession: async ({ session_id }) => mockResponse(requireSession(session_id)),
   setSessionAgent: async (params) => {
     const session = requireSession(params.session_id);
     Object.assign(session, {
@@ -164,7 +166,9 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
     delete mockHistoryMessagesBySessionId[session_id];
   },
   listSessions: ({ page = 1, size = 20 }) => {
-    const rows = [...mockSessions].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+    const rows = mockSessions
+      .filter((session) => !session.is_draft_debug)
+      .sort((a, b) => b.updated_at.localeCompare(a.updated_at));
     return mockResponse({
       list: rows.slice((page - 1) * size, page * size),
       page,

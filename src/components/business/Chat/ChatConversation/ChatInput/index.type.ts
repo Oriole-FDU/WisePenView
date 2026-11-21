@@ -4,7 +4,10 @@ import type { SendOptions } from '../../send.type';
 
 export interface ChatInputProps {
   onSend: (text: string, opts?: SendOptions) => boolean | void | Promise<boolean | void>;
-  getUploadSessionId: () => Promise<string | undefined>;
+  getUploadSessionId: (
+    selectedAgent: ChatAgentOption,
+    opts: { hasAttachments: boolean }
+  ) => Promise<string | undefined>;
   sending: boolean;
   sessionId?: string;
   promoteDraftToolSelection: boolean;

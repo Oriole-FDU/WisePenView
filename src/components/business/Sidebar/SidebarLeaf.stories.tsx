@@ -25,6 +25,7 @@ const session: ChatSession = {
   id: 'storybook-session',
   userId: 'storybook-user',
   title: 'Storybook 会话',
+  isDraftDebug: false,
   createdAt: '2026-09-08T09:00:00Z',
   updatedAt: '2026-09-08T09:00:00Z',
 };

@@ -15,12 +15,16 @@ export const ChatSessionApiSchema = z.object({
   updated_at: IsoDateTimeSchema,
   agent_id: OpaqueIdSchema.nullable(),
   agent_version: z.number().int().positive().nullable(),
+  is_draft_debug: z.boolean().optional(),
 });
 
 export const CreateSessionApiRequestSchema = z.strictObject({
   title: NullableStringSchema.optional(),
   agent_id: OpaqueIdSchema.nullable().optional(),
+  draft_version: z.number().int().positive().optional(),
 });
+
+export const GetSessionApiRequestSchema = z.strictObject({ session_id: OpaqueIdSchema });
 
 export const SetSessionAgentApiRequestSchema = z.strictObject({
   session_id: OpaqueIdSchema,
@@ -134,6 +138,7 @@ export const InitTemporaryAttachmentUploadApiResponseSchema = z.object({
 
 export type ChatSessionApi = z.infer<typeof ChatSessionApiSchema>;
 export type CreateSessionApiRequest = z.infer<typeof CreateSessionApiRequestSchema>;
+export type GetSessionApiRequest = z.infer<typeof GetSessionApiRequestSchema>;
 export type SetSessionAgentApiRequest = z.infer<typeof SetSessionAgentApiRequestSchema>;
 export type RenameSessionApiRequest = z.infer<typeof RenameSessionApiRequestSchema>;
 export type DeleteSessionApiRequest = z.infer<typeof DeleteSessionApiRequestSchema>;

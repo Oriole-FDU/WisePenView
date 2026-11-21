@@ -6,13 +6,13 @@
 
 ## 规则
 
-- 新对话在首次发送消息或上传附件时按需建立后端 session；只上传附件、尚未发送消息也可能建立会话。建立前检查登录，若本次指定的 Agent ID 或版本与 session 不符，先更新 session Agent。建立完成后以后端 session ID 更新路由，再要求侧栏历史刷新。依据：[useChatSessionController](_controllers/useChatSessionController.ts) 的 `ensureSession`、`syncNewSessionHistoryRefresh`、[useChatTurnController](_controllers/useChatTurnController.ts) 的 `send`、[ChatConversation](ChatConversation/index.tsx) 的 `getUploadSessionId`、[ChatInputFileProvider](ChatConversation/ChatInput/_context/ChatInputFileProvider.tsx) 的 `uploadAndAddAttachment`。
+- 首次发送或上传附件时，按输入区选中的 Agent 选择或新建会话；调试时还匹配草稿版本。为本次输入新建会话后保留正文和上传任务；已添加的临时附件属于原会话，不能带到其他会话。依据：[useChatSessionController](_controllers/useChatSessionController.ts) 的 `ensureSession`、[useChatTurnController](_controllers/useChatTurnController.ts) 的 `send`、[ChatInputFileProvider](ChatConversation/ChatInput/_context/ChatInputFileProvider.tsx) 的 `uploadAndAddAttachment`。
 - 选取其他会话或开始新对话会清除资源对话上下文与新建会话暂存标记。会话切换时输入 store 的 session version 用来让旧输入非同步工作失效；草稿升级则保留同一版本。依据：[useChatSessionController](_controllers/useChatSessionController.ts) 的 `handleSelectSession`、`startNewChat`、[createChatInputStore](ChatConversation/ChatInput/_context/ChatInputStore.ts) 的 `sessionVersion` 与 `setToolSelectionSession`。
 - 传送需登录、选到模型、完成附件上传，且没有资源上下文阻挡或不相符状态；必要时先确保 session，再将前端状态、选用资源、启用附件、Skill／Tool 选择送交 Chat transport。输入层等待送出 callback 接受，且会话版本未变时才清空输入与附件；turn controller 启动非同步传送后即返回接受，不等待 stream 完成，也不保证后端成功或失败时恢复草稿。依据：[useChatInputController](ChatConversation/ChatInput/useChatInputController/index.ts) 的 `handleSend`、[createChatInputStore](ChatConversation/ChatInput/_context/ChatInputStore.ts) 的 `clearAfterSend`、[useChatTurnController](_controllers/useChatTurnController.ts) 的 `send`、[useChatTurn](../../../domains/ChatTurn/runtime/useChatTurn.ts) 的 `sendTurnMessage`。
 - 聊天历史可分页加载；替换会话历史前清空旧消息，较旧页与当前消息依 message ID 去重。切换会话或请求版本变更后完成的旧请求不套用。依据：[useChatHistory](../../../domains/ChatSession/session/useChatHistory.ts) 的 `replaceHistory`、`prependHistory`、`mergeMessages`。
 - 有活动 turn 时，前端查询 active turn 并恢复 SSE；同一 session／stream lifecycle 的重复恢复会合并，避免重复连接。取消时同时停止前端 stream 并调用后端 cancel API。依据：[useChatTurn](../../../domains/ChatTurn/runtime/useChatTurn.ts) 的 `resumeTurnStream`、[useChatTurnController](_controllers/useChatTurnController.ts) 的 `cancel`。
 - 工具调用进入 `approval-requested` 时须明确允许或拒绝；所有待审批项有决定后，前端以结果恢复同一轮对话。关闭审批视窗不会隐式批准或拒绝。依据：[useChatToolApproval](_controllers/useChatToolApproval.ts) 的 `decide`、[listToolApprovalRequests](_controllers/toolApprovalModel.ts)、[ToolApprovalDialog](ToolApprovalDialog/index.tsx) 的 `handleOpenChange`。
-- Agent 编辑器的草稿调试与传送前确认流程由 [Agent editor workflow](../../editors/agent/BUSINESS.md) 拥有。
+- Agent 编辑器的保存确认由 [Agent editor workflow](../../editors/agent/BUSINESS.md) 拥有。Chat 仅在选中 `CURRENT_DRAFT` 时请求草稿会话，并确认后端返回调试标记和相同 Agent、版本后才发送。普通会话、旧版本调试会话均不会改绑为新草稿；从调试切回已发布 Agent 时也需要独立的普通会话。依据：[useChatSessionController](_controllers/useChatSessionController.ts) 和 [useChatTurnController](_controllers/useChatTurnController.ts)。
 
 ## 语音输入
 

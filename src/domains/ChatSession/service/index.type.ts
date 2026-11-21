@@ -15,6 +15,7 @@ export interface UploadAttachmentResult {
 
 export interface IChatSessionService {
   createSession(params?: CreateSessionRequest): Promise<ChatSession>;
+  getSession(sessionId: string): Promise<ChatSession>;
   setSessionAgent(params: SetSessionAgentRequest): Promise<ChatSession>;
   renameSession(params: RenameSessionRequest): Promise<ChatSession>;
   deleteSession(params: DeleteSessionRequest): Promise<void>;
@@ -28,10 +29,9 @@ export interface RenameSessionRequest {
   newTitle?: string;
 }
 
-export interface CreateSessionRequest {
-  title?: string;
-  agentId?: string | null;
-}
+export type CreateSessionRequest = { title?: string } & (
+  { agentId?: string | null; draftVersion?: never } | { agentId: string; draftVersion: number }
+);
 
 export interface SetSessionAgentRequest {
   sessionId: string;
@@ -46,6 +46,7 @@ export interface ChatSession {
   updatedAt: string;
   agentId?: string | null;
   agentVersion?: number | null;
+  isDraftDebug: boolean;
 }
 
 export interface DeleteSessionRequest {

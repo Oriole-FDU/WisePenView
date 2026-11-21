@@ -33,6 +33,15 @@ const createSession = async (params?: CreateSessionRequest): Promise<ChatSession
   return session;
 };
 
+const getSession = async (sessionId: string): Promise<ChatSession> => {
+  const snapshot = getSessionCacheSnapshot();
+  const session = ChatSessionServicesMap.mapSessionFromApi(
+    await ChatSessionApi.getSession({ session_id: sessionId })
+  );
+  cacheSessions([session], snapshot);
+  return session;
+};
+
 const setSessionAgent = async (params: SetSessionAgentRequest): Promise<ChatSession> => {
   const snapshot = getSessionCacheSnapshot();
   const data = await ChatSessionApi.setSessionAgent(
@@ -107,6 +116,7 @@ const uploadAttachment = async ({
 
 export const createChatSessionServices = (): IChatSessionService => ({
   createSession,
+  getSession,
   setSessionAgent,
   renameSession,
   deleteSession,

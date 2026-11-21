@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useChatSessionService } from '@/domains';
+import type { ChatAgentOption } from '@/domains/ChatConfig';
 import {
   type ChatSession,
   type CreateSessionRequest,
@@ -38,6 +39,8 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const unmountedRef = useUnmountedRef();
   const creatingSessionRef = useRef<{
     locationKey: string;
+    draftVersion?: number;
+    draftAgentId?: string;
     promise: Promise<ChatSession | undefined>;
   } | null>(null);
   const [newChatSessionId, setNewChatSessionId] = useState<string>();
@@ -48,12 +51,12 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
 
   const { runAsync: runCreateSession } = useApi(
     (params?: CreateSessionRequest) => chatSessionService.createSession(params),
-    { manual: true }
+    { manual: true, showErrorToast: false }
   );
   const { runAsync: runSetSessionAgent } = useApi(
     (params: { sessionId: string; agentId?: string | null }) =>
       chatSessionService.setSessionAgent(params),
-    { manual: true }
+    { manual: true, showErrorToast: false }
   );
 
   const requireAuth = (): boolean => {
@@ -65,9 +68,15 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   const panelTitle =
     currentSession?.title || t(currentSessionId ? 'session.untitled' : 'panel.newChat');
 
-  /** 按需解析当前会话：未建立会话时先创建并同步 agent，再返回可发送的会话 ID。 */
+  /**
+   * 上传和发送按同一个 Agent 选项选择会话。没有可复用的会话时，先创建再返回 ID；
+   * 普通会话可同步 Agent，调试会话只复用相同 Agent、相同草稿版本的会话。
+   */
   const ensureSession = useMemoizedFn(
-    async (agentParams?: CreateSessionRequest): Promise<string | undefined> => {
+    async (
+      selectedAgent?: ChatAgentOption,
+      { hasAttachments = false } = {}
+    ): Promise<string | undefined> => {
       if (unmountedRef.current) return;
       if (!appAuth.isAuthenticated) {
         appAuth.requireLogin();
@@ -75,32 +84,76 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
           reason: t('input.loginRequired'),
         });
       }
+      let agentParams: CreateSessionRequest | undefined;
+      if (selectedAgent?.source === 'CURRENT_DRAFT') {
+        const { resourceId: agentId, agentVersion: draftVersion } = selectedAgent;
+        if (!agentId || draftVersion === undefined) {
+          throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_DRAFT_DEBUG_UNAVAILABLE);
+        }
+        agentParams = { agentId, draftVersion };
+      } else if (selectedAgent?.resourceId) {
+        agentParams = { agentId: selectedAgent.resourceId };
+      } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
+        agentParams = { agentId: null };
+      }
+
       let targetSessionId = currentSessionId;
-      let targetSession = currentSession;
-      if (!targetSessionId) {
-        if (creatingSessionRef.current?.locationKey !== locationKey) {
+      let targetSession =
+        currentSession ??
+        (targetSessionId && agentParams
+          ? await chatSessionService.getSession(targetSessionId)
+          : undefined);
+      if (unmountedRef.current || routeLatest.current.locationKey !== locationKey) return;
+
+      const draftVersion = agentParams?.draftVersion;
+      const draftAgentId = draftVersion !== undefined ? agentParams?.agentId : undefined;
+      const matchesDraft = (session: ChatSession) =>
+        session.isDraftDebug &&
+        session.agentId === draftAgentId &&
+        session.agentVersion === draftVersion;
+      const needsSeparateSession =
+        agentParams &&
+        (draftVersion !== undefined
+          ? !targetSession || !matchesDraft(targetSession)
+          : targetSession?.isDraftDebug);
+      if (needsSeparateSession && hasAttachments) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_ATTACHMENTS_SESSION_MISMATCH);
+      }
+      if (!targetSessionId || needsSeparateSession) {
+        const pending = creatingSessionRef.current;
+        if (
+          pending?.locationKey === locationKey &&
+          (pending.draftVersion !== draftVersion || pending.draftAgentId !== draftAgentId)
+        )
+          return;
+        if (pending?.locationKey !== locationKey) {
           const promise = runCreateSession(agentParams).then(async (createdSession) => {
             if (unmountedRef.current || routeLatest.current.locationKey !== locationKey) return;
+            if (draftVersion !== undefined && !matchesDraft(createdSession)) {
+              throw createClientError(FRONTEND_CLIENT_ERROR.CHAT_DRAFT_DEBUG_UNAVAILABLE);
+            }
             setNewChatSessionId(createdSession.id);
-            pendingHistoryRefreshRef.current = createdSession.id;
+            pendingHistoryRefreshRef.current = createdSession.isDraftDebug
+              ? undefined
+              : createdSession.id;
             await selectSession(createdSession.id, true);
-            requestChatSessionHistoryRefresh();
+            if (!createdSession.isDraftDebug) requestChatSessionHistoryRefresh();
             return createdSession;
           });
-          creatingSessionRef.current = { locationKey, promise };
+          creatingSessionRef.current = { locationKey, draftAgentId, draftVersion, promise };
           const clearPending = () => {
             if (creatingSessionRef.current?.promise === promise) creatingSessionRef.current = null;
           };
           void promise.then(clearPending, clearPending);
         }
-        const createdSession = await creatingSessionRef.current.promise;
+        const createdSession = await creatingSessionRef.current?.promise;
         if (!createdSession) return;
         targetSessionId = createdSession.id;
         targetSession = createdSession;
       }
       if (unmountedRef.current || routeLatest.current.sessionId !== targetSessionId) return;
       const targetLocationKey = routeLatest.current.locationKey;
-      if (agentParams) {
+      if (agentParams && draftVersion === undefined) {
         const sessionAgentMatched =
           targetSession != null &&
           (agentParams.agentId == null
