@@ -61,11 +61,14 @@ export function useFormValidation<TValues extends object, TField extends keyof T
     });
   };
 
-  const changeValues = (patch: Partial<TValues>, revalidateFields: readonly TField[] = []) => {
-    const nextValues = Object.assign({}, valuesRef.current, patch) as TValues;
+  const commitValues = (nextValues: TValues, revalidateFields: readonly TField[]) => {
     valuesRef.current = nextValues;
     setValuesState(nextValues);
     revalidateVisibleFields(nextValues, revalidateFields, touchedFields, submitAttempted);
+  };
+
+  const changeValues = (patch: Partial<TValues>, revalidateFields: readonly TField[] = []) => {
+    commitValues({ ...valuesRef.current, ...patch }, revalidateFields);
   };
 
   const changeField = <K extends TField>(
@@ -73,7 +76,9 @@ export function useFormValidation<TValues extends object, TField extends keyof T
     value: TValues[K],
     dependentFields: readonly TField[] = []
   ) => {
-    changeValues({ [field]: value } as unknown as Partial<TValues>, [field, ...dependentFields]);
+    const nextValues = { ...valuesRef.current };
+    nextValues[field] = value;
+    commitValues(nextValues, [field, ...dependentFields]);
   };
 
   const blurField = (field: TField) => {
