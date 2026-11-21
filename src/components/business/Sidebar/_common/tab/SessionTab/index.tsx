@@ -1,7 +1,6 @@
 import { ListBoxSection } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import { clsx } from 'clsx';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,6 +26,7 @@ const useSessionTab = () => {
   const sessionItems = useSidebarSessionHistoryStore((state) => state.sessionItems);
   const setSessionPageResult = useSidebarSessionHistoryStore((state) => state.setSessionPageResult);
   const removeSession = useSidebarSessionHistoryStore((state) => state.removeSession);
+  const refreshVersion = useChatSessionHistoryRefreshStore((state) => state.refreshVersion);
   const navigate = useNavigate();
 
   const {
@@ -43,7 +43,7 @@ const useSessionTab = () => {
         size: SESSION_PAGE_SIZE,
       }),
     {
-      manual: true,
+      reloadDeps: [refreshVersion],
       isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
       onSuccess: (payload) => {
         setSessionPageResult(payload, payload.page > 1);
@@ -83,7 +83,6 @@ const useSessionTab = () => {
 
 function SessionTab() {
   const { t } = useTranslation('chat');
-  const refreshVersion = useChatSessionHistoryRefreshStore((state) => state.refreshVersion);
   const {
     handleDeleted,
     hasMoreSessions,
@@ -96,16 +95,6 @@ function SessionTab() {
     currentSessionId,
   } = useSessionTab();
   const selectedKeys = currentSessionId ? [`session-${currentSessionId}`] : [];
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：组件挂载或外部刷新版本递增时重新加载会话列表。
-   * 不可替代原因：列表数据来自服务端，刷新版本是父组件可声明的同步信号。
-   * cleanup：请求由 ahooks 管理，无额外订阅需要清理。
-   */
-  useEffect(() => {
-    void refresh();
-  }, [refresh, refreshVersion]);
 
   if (!sessionListLoading && sessionItems.length === 0) {
     return <div className={styles.sessionEmptyState}>{t('session.empty')}</div>;
