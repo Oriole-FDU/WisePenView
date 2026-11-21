@@ -1,6 +1,6 @@
 import '@blocknote/mantine/style.css';
 
-import type { Block as BlockNoteBlock } from '@blocknote/core';
+import type { PartialBlock as BlockNotePartialBlock } from '@blocknote/core';
 import { en, zh } from '@blocknote/core/locales';
 import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
@@ -78,12 +78,12 @@ const DEFAULT_HEADING_BLOCK = [
     content: [],
     children: [],
   },
-] as unknown as BlockNoteBlock[];
+] satisfies BlockNotePartialBlock[];
 
 function toHeadingBlockFromTitle(
   title: string | undefined,
   untitledTitle: string
-): BlockNoteBlock[] {
+): BlockNotePartialBlock[] {
   const trimmedTitle = title?.trim();
   if (trimmedTitle === untitledTitle || !trimmedTitle) {
     return DEFAULT_HEADING_BLOCK;
@@ -92,7 +92,7 @@ function toHeadingBlockFromTitle(
     {
       ...DEFAULT_HEADING_BLOCK[0],
       content: [{ type: 'text', text: trimmedTitle, styles: {} }],
-    } as BlockNoteBlock,
+    },
   ];
 }
 
