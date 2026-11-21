@@ -317,9 +317,7 @@ function CustomSideMenu({
   const blockIsEmpty = isBlockEmpty(block);
   const showBlockMenu = !blockIsEmpty || isHighlightBlock(block);
   const owner = notePluginRegistry.blockPlugins.get(block.type);
-  const ownerSideMenuState = owner?.sideMenu?.inspect?.(
-    block as unknown as Record<string, unknown>
-  );
+  const ownerSideMenuState = owner?.sideMenu?.inspect?.(block);
   const isStructured = ownerSideMenuState?.variant === 'structured';
   const SelectedBlockIcon = selectedBlockType?.icon ?? owner?.sideMenu?.icon;
   const canUseTextColor = blockSupportsTextColor(block, editor);
@@ -461,7 +459,7 @@ function CustomSideMenu({
   };
 
   const applyContentAction = (actionId: string) => {
-    const update = owner?.sideMenu?.apply?.(block as unknown as Record<string, unknown>, actionId);
+    const update = owner?.sideMenu?.apply?.(block, actionId);
     if (!update) return;
     editor.updateBlock(block, toBlockUpdate(update));
     closeMenu();

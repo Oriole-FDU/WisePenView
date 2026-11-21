@@ -253,9 +253,9 @@ interface NoteSideMenuState {
 
 interface NoteBlockSideMenu {
   icon?: LucideIcon;
-  inspect?: (block: Record<string, unknown>) => NoteSideMenuState;
+  inspect?: (block: unknown) => NoteSideMenuState;
   apply?: (
-    block: Record<string, unknown>,
+    block: unknown,
     actionId: string
   ) => { type?: string; props?: Record<string, unknown>; content?: unknown } | null;
 }
