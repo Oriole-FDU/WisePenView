@@ -171,9 +171,7 @@ export const normalizeMockResource = (
 };
 
 export const mockResources = new Map<string, ResourceItemApi>(
-  (
-    structuredClone(mockdata) as unknown as ((typeof mockdata)[number] & Record<string, unknown>)[]
-  ).map((item) => [item.resourceId, normalizeMockResource(item)])
+  structuredClone(mockdata).map((item) => [item.resourceId, normalizeMockResource(item)])
 );
 export function addMockResource(
   resourceName: string,
