@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
+import GroupPolicyShellCard from '@/components/business/Group/GroupPolicyShellCard';
 
-import GroupPolicyShellCard from '../GroupPolicyShellCard';
 import styles from '../style.module.scss';
 
 interface GroupMountPermissionModalProps {
