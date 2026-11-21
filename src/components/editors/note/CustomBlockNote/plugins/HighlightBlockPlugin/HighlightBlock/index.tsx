@@ -21,7 +21,7 @@ type HighlightBlockRenderProps = ReactCustomBlockRenderProps<typeof highlightBlo
 function HighlightIconPicker({ block, editor }: HighlightBlockRenderProps) {
   const { t } = useTranslation('note');
   const [open, setOpen] = useState(false);
-  const props = readHighlightBlockProps(block as unknown as Record<string, unknown>);
+  const props = readHighlightBlockProps(block);
 
   const handleSelect = useMemoizedFn((emojiId: string) => {
     const icon = emojiId.trim();
@@ -65,7 +65,7 @@ function HighlightIconPicker({ block, editor }: HighlightBlockRenderProps) {
 function HighlightBlockView({ block, editor, contentRef }: HighlightBlockRenderProps) {
   const { t } = useTranslation('note');
   const readOnly = useNoteEditorReadOnlyContext();
-  const props = readHighlightBlockProps(block as unknown as Record<string, unknown>);
+  const props = readHighlightBlockProps(block);
 
   return (
     <div
@@ -94,7 +94,7 @@ function HighlightBlockView({ block, editor, contentRef }: HighlightBlockRenderP
 }
 
 function HighlightBlockToExternalHTML({ block, contentRef }: HighlightBlockRenderProps) {
-  const props = readHighlightBlockProps(block as unknown as Record<string, unknown>);
+  const props = readHighlightBlockProps(block);
   return (
     <div
       className={styles.root}
