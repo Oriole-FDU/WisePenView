@@ -8,7 +8,12 @@ import type {
   SkillPendingCreate,
 } from '@/components/editors/skill/components/SkillFileTree/index.type';
 import { useSkillService } from '@/domains';
-import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
+import {
+  normalizeSkillDirectoryPath,
+  SKILL_ROOT_PATH,
+  type SkillDetail,
+  type SkillFileNode,
+} from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
@@ -34,8 +39,6 @@ import {
   MAIN_SKILL_FILE_NAME,
   moveTreeNode,
   type MoveTreeNodeResult,
-  normalizeDirectoryPath,
-  ROOT_PATH,
 } from '../utils/skillFileTree';
 import { parseSkillZip } from '../utils/skillZip';
 
@@ -155,13 +158,13 @@ export function useSkillFileActionsController({
 
   const resolveCreateParent = () => {
     const node = selectedTreeNode ?? (selectedFileId ? selectedFile : null);
-    if (!node) return { parentFolderId: undefined, parentPath: ROOT_PATH };
+    if (!node) return { parentFolderId: undefined, parentPath: SKILL_ROOT_PATH };
     if (node.kind === 'folder') {
-      return { parentFolderId: node.id, parentPath: normalizeDirectoryPath(node.path) };
+      return { parentFolderId: node.id, parentPath: normalizeSkillDirectoryPath(node.path) };
     }
-    const filePath = normalizeDirectoryPath(node.path);
+    const filePath = normalizeSkillDirectoryPath(node.path);
     return {
-      parentFolderId: filePath === ROOT_PATH ? undefined : `folder:${filePath}`,
+      parentFolderId: filePath === SKILL_ROOT_PATH ? undefined : `folder:${filePath}`,
       parentPath: filePath,
     };
   };
@@ -270,7 +273,7 @@ export function useSkillFileActionsController({
     const parentFolder = pendingCreate?.parentFolderId
       ? findFile(files, pendingCreate.parentFolderId)
       : null;
-    const parentPath = parentFolder?.kind === 'folder' ? parentFolder.path : ROOT_PATH;
+    const parentPath = parentFolder?.kind === 'folder' ? parentFolder.path : SKILL_ROOT_PATH;
     if (kind === 'folder') {
       const folder = createLocalFolderNode(name, parentPath);
       onLocalFolderAdded(appendTreeNode(files, pendingCreate?.parentFolderId, folder), folder.id);
@@ -320,7 +323,8 @@ export function useSkillFileActionsController({
         );
         const mainFile = nextFiles.find(
           (file) =>
-            file.name === MAIN_SKILL_FILE_NAME && normalizeDirectoryPath(file.path) === ROOT_PATH
+            file.name === MAIN_SKILL_FILE_NAME &&
+            normalizeSkillDirectoryPath(file.path) === SKILL_ROOT_PATH
         );
         onLocalFilesAdded(nextTree, nextFiles, (mainFile ?? nextFiles[0])?.id);
         toast.success(t('toast.zipImported'));

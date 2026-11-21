@@ -2,16 +2,16 @@
  * 通用计算点钱包：个人余额走 /user/wallet；小组余额走 groupService.getGroupWalletInfo。
  * 点卡充值仅个人（redeemVoucher）；小组余额由组长通过「token 划拨」转入。
  * 交易明细 Tab：全部 / 收入 / 支出。
- * 数据请求使用 ahooks（不使用 useEffect）。
+ * 数据请求使用统一 API hooks。
  */
 import { toast } from '@heroui/react';
-import { usePagination, useUnmount } from 'ahooks';
+import { useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGroupService, useWalletService } from '@/domains';
 import { WALLET_BUSINESS_TYPE, WALLET_TARGET_TYPE } from '@/domains/Wallet';
-import { useApi } from '@/hooks/useApi';
+import { useApi, useApiPagination } from '@/hooks/useApi';
 
 import RechargeModal from '../RechargeModal';
 import type { ComputeWalletProps } from './index.type';
@@ -117,7 +117,7 @@ function ComputeWallet({
     data: txData,
     loading: loadingTx,
     pagination: { current: page = 1, total = 0, onChange: onTxPageChange },
-  } = usePagination(
+  } = useApiPagination(
     async ({ current, pageSize }) => {
       const tab = txTabRef.current;
       const gid =

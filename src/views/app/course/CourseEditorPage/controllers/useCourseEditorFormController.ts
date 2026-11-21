@@ -4,7 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { useCourseService, useImageService } from '@/domains';
-import type { CourseAssessmentItem, CourseDetail, CourseMeeting } from '@/domains/Course';
+import {
+  type CourseAssessmentItem,
+  type CourseDetail,
+  type CourseMeeting,
+  getCourseAssessmentTotal,
+} from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { useFormValidation } from '@/hooks/useFormValidation';
 import { parseErrorMessage } from '@/utils/error';
@@ -14,7 +19,7 @@ import {
   mapCourseDetailToEditorForm,
   mapCourseEditorFormToUpdateRequest,
 } from '../courseEditorForm.mapper';
-import { type CourseEditorForm, getCourseAssessmentTotal } from '../model';
+import type { CourseEditorForm } from '../model';
 
 interface UseCourseEditorFormControllerParams {
   course: CourseDetail;

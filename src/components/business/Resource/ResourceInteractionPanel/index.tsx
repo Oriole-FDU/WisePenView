@@ -1,6 +1,5 @@
 import { toast } from '@heroui/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useInfiniteScroll } from 'ahooks';
 import { type Key, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +16,7 @@ import {
 } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
-import { useApi } from '@/hooks/useApi';
+import { useApi, useApiInfiniteScroll } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
@@ -114,7 +113,7 @@ function ResourceInteractionPanel({
     loadMore: loadMoreComments,
     reloadAsync: reloadComments,
     mutate: mutateComments,
-  } = useInfiniteScroll<CommentListPage>(
+  } = useApiInfiniteScroll<CommentListPage>(
     async (current) => {
       const nextPage = Math.floor((current?.list.length ?? 0) / COMMENT_PAGE_SIZE) + 1;
       const data = await commentService.listComments({
@@ -130,6 +129,7 @@ function ResourceInteractionPanel({
       };
     },
     {
+      showErrorToast: false,
       reloadDeps: [resourceId, sortBy],
       isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
     }

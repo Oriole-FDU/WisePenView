@@ -1,8 +1,8 @@
-import { useInfiniteScroll } from 'ahooks';
 import { useEffect } from 'react';
 
 import { useResourceFavoriteService } from '@/domains';
 import type { FavoriteItem } from '@/domains/ResourceFavorite';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 
 const PAGE_SIZE = 20;
 
@@ -15,7 +15,7 @@ interface FavoriteResourcesPage {
 export function useFavoriteResources(collectionId: string) {
   const favoriteService = useResourceFavoriteService();
   const { data, loading, loadingMore, noMore, loadMore, reload, mutate } =
-    useInfiniteScroll<FavoriteResourcesPage>(
+    useApiInfiniteScroll<FavoriteResourcesPage>(
       async (current) => {
         const nextPage = Math.floor((current?.list.length ?? 0) / PAGE_SIZE) + 1;
         const result = await favoriteService.listFavoritedResources({

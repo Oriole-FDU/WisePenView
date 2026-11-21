@@ -21,3 +21,4 @@ export {
   isCourseWeekPattern,
 } from './enum';
 export type * from './service/index.type';
+export { getCourseAssessmentTotal } from './utils/assessment';

@@ -2,63 +2,10 @@ import Editor, { type OnMount } from '@monaco-editor/react';
 import { useLatest } from 'ahooks';
 
 import { Spin } from '@/components/base/Feedback';
+import { resolveSkillFileLanguage } from '@/domains/Skill';
 
 import type { SkillEditorProps } from './index.type';
 import styles from './style.module.scss';
-
-function fileExtToLanguage(name: string): string {
-  const ext = name.split('.').pop()?.toLowerCase();
-  switch (ext) {
-    case 'md':
-      return 'markdown';
-    case 'py':
-      return 'python';
-    case 'js':
-      return 'javascript';
-    case 'ts':
-      return 'typescript';
-    case 'tsx':
-      return 'typescript';
-    case 'json':
-      return 'json';
-    case 'yml':
-    case 'yaml':
-      return 'yaml';
-    case 'html':
-      return 'html';
-    case 'css':
-      return 'css';
-    case 'less':
-      return 'less';
-    case 'sh':
-    case 'bash':
-    case 'zsh':
-      return 'shell';
-    case 'ps1':
-      return 'powershell';
-    case 'bat':
-    case 'cmd':
-      return 'bat';
-    case 'ini':
-    case 'env':
-      return 'ini';
-    case 'xml':
-      return 'xml';
-    case 'java':
-      return 'java';
-    case 'go':
-      return 'go';
-    case 'rs':
-      return 'rust';
-    case 'rb':
-      return 'ruby';
-    case 'pl':
-      return 'perl';
-    default:
-      if (name.toLowerCase() === 'dockerfile') return 'dockerfile';
-      return 'plaintext';
-  }
-}
 
 function SkillEditor({
   content,
@@ -83,7 +30,7 @@ function SkillEditor({
       height="100%"
       path={modelPath}
       saveViewState
-      language={fileExtToLanguage(fileName)}
+      language={resolveSkillFileLanguage(fileName)}
       value={content}
       onChange={(value, event) => {
         if (!event.isFlush) onChange?.(value ?? '');

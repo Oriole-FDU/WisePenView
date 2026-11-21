@@ -14,8 +14,11 @@ import type {
 import type { SkillDetail, SkillFileNode, SkillSummary } from '../entity/skill';
 import type { SkillVersionStatus } from '../enum';
 import { SKILL_VERSION_STATUS } from '../enum';
-
-const ROOT_PATH = '/';
+import {
+  normalizeSkillDirectoryPath,
+  resolveSkillFileLanguage,
+  SKILL_ROOT_PATH,
+} from '../utils/skillFile';
 
 function formatVersion(version: number): string {
   return `v${version}.0`;
@@ -26,37 +29,20 @@ function mapStatus(raw: string | undefined): SkillVersionStatus {
   return SKILL_VERSION_STATUS.DRAFT;
 }
 
-function resolveLanguage(name: string): string {
-  const ext = name.split('.').pop()?.toLowerCase();
-  if (ext === 'py') return 'python';
-  if (ext === 'json') return 'json';
-  if (ext === 'yaml' || ext === 'yml') return 'yaml';
-  if (ext === 'toml') return 'toml';
-  if (ext === 'md') return 'markdown';
-  return 'plaintext';
-}
-
-function normalizeDirectoryPath(path?: string): string {
-  const trimmed = path?.trim();
-  if (!trimmed || trimmed === ROOT_PATH) return ROOT_PATH;
-  const withLeadingSlash = trimmed.startsWith(ROOT_PATH) ? trimmed : `${ROOT_PATH}${trimmed}`;
-  return withLeadingSlash.endsWith(ROOT_PATH) ? withLeadingSlash.slice(0, -1) : withLeadingSlash;
-}
-
 function getOrCreateFolder(
   roots: SkillFileNode[],
   foldersByPath: Map<string, SkillFileNode>,
   folderPath: string
 ): SkillFileNode {
-  const normalizedPath = normalizeDirectoryPath(folderPath);
+  const normalizedPath = normalizeSkillDirectoryPath(folderPath);
   const existing = foldersByPath.get(normalizedPath);
   if (existing) return existing;
 
   const parentPath =
-    normalizedPath.lastIndexOf(ROOT_PATH) <= 0
-      ? ROOT_PATH
-      : normalizedPath.slice(0, normalizedPath.lastIndexOf(ROOT_PATH));
-  const folderName = normalizedPath.slice(normalizedPath.lastIndexOf(ROOT_PATH) + 1);
+    normalizedPath.lastIndexOf(SKILL_ROOT_PATH) <= 0
+      ? SKILL_ROOT_PATH
+      : normalizedPath.slice(0, normalizedPath.lastIndexOf(SKILL_ROOT_PATH));
+  const folderName = normalizedPath.slice(normalizedPath.lastIndexOf(SKILL_ROOT_PATH) + 1);
   const folderNode: SkillFileNode = {
     id: `folder:${normalizedPath}`,
     name: folderName,
@@ -66,7 +52,7 @@ function getOrCreateFolder(
   };
   foldersByPath.set(normalizedPath, folderNode);
 
-  if (parentPath === ROOT_PATH) {
+  if (parentPath === SKILL_ROOT_PATH) {
     roots.push(folderNode);
   } else {
     const parent = getOrCreateFolder(roots, foldersByPath, parentPath);
@@ -79,11 +65,11 @@ function getOrCreateFolder(
 function assetToFileNode(asset: SkillAssetApiInfo): SkillFileNode {
   const name = asset.name ?? '';
   return {
-    id: asset.id ?? `${normalizeDirectoryPath(asset.path)}:${name}`,
+    id: asset.id ?? `${normalizeSkillDirectoryPath(asset.path)}:${name}`,
     name,
-    path: normalizeDirectoryPath(asset.path),
+    path: normalizeSkillDirectoryPath(asset.path),
     kind: 'file',
-    language: resolveLanguage(name),
+    language: resolveSkillFileLanguage(name),
     objectKey: asset.objectKey ?? undefined,
     uploadStatus: asset.uploadStatus,
     size: normalizeNonNegativeNumber(asset.size),
@@ -107,7 +93,7 @@ function mapSkillFilesFromApi(bundle?: SkillVersionBundleApiResponse): SkillFile
 
   for (const asset of bundle?.assets ?? []) {
     const fileNode = assetToFileNode(asset);
-    if (fileNode.path === ROOT_PATH) {
+    if (fileNode.path === SKILL_ROOT_PATH) {
       roots.push(fileNode);
     } else {
       const folder = getOrCreateFolder(roots, foldersByPath, fileNode.path);
