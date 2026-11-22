@@ -8,20 +8,6 @@ export type NoteSaveStatus = 'saving' | 'saved' | 'waiting';
 const SAVE_SETTLE_DELAY_MS = 600;
 const OUTBOUND_CHECK_INTERVAL_MS = 100;
 
-/** y-websocket 运行时混入 Observable 的 on/off；这里只声明保存状态所需事件。 */
-type YWebSocketObservable = {
-  on: (name: string, fn: (...args: unknown[]) => void) => void;
-  off: (name: string, fn: (...args: unknown[]) => void) => void;
-};
-
-function parseStatusPayload(arg: unknown): string {
-  if (typeof arg === 'string') return arg;
-  if (arg && typeof arg === 'object' && 'status' in arg) {
-    return String((arg as { status: unknown }).status);
-  }
-  return '';
-}
-
 /** 观察本地 Yjs 更新及 WebSocket 发送队列，提供正文自动保存状态。 */
 export class NoteSaveStatusObserver {
   private _status: NoteSaveStatus = 'saving';
@@ -33,10 +19,8 @@ export class NoteSaveStatusObserver {
 
   attach(doc: Y.Doc, provider: WisepenProvider): void {
     this._provider = provider;
-    const observable = provider as unknown as YWebSocketObservable;
 
-    const onStatus = (...args: unknown[]) => {
-      const status = parseStatusPayload(args[0]);
+    const onStatus = provider.on('status', ({ status }) => {
       if (status === 'connected') {
         this.updateStatus('saving');
         if (this._hasPendingLocalUpdate) {
@@ -48,16 +32,16 @@ export class NoteSaveStatusObserver {
         this.clearSettleTimer();
         this.updateStatus('waiting');
       }
-    };
+    });
 
-    const onSync = (...args: unknown[]) => {
-      if (args[0] === false) return;
+    const onSync = provider.on('sync', (synced) => {
+      if (!synced) return;
       if (this._hasPendingLocalUpdate) {
         this.scheduleSettle();
         return;
       }
       this.updateStatus('saved');
-    };
+    });
 
     const onDocumentUpdate = (
       _update: Uint8Array,
@@ -78,13 +62,11 @@ export class NoteSaveStatusObserver {
       this.scheduleSettle();
     };
 
-    observable.on('status', onStatus);
-    observable.on('sync', onSync);
     doc.on('update', onDocumentUpdate);
 
     this._detachFns.push(() => {
-      observable.off('status', onStatus);
-      observable.off('sync', onSync);
+      provider.off('status', onStatus);
+      provider.off('sync', onSync);
       doc.off('update', onDocumentUpdate);
     });
   }

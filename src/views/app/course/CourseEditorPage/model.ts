@@ -52,9 +52,3 @@ export const createAssessmentEditorItem = (
   ...item,
   editorId: createUuid(),
 });
-
-export const getCourseAssessmentTotal = (items: CourseAssessmentEditorItem[]) =>
-  items.reduce(
-    (sum, item) => sum + (Number.isFinite(item.weight) ? Math.max(0, item.weight) : 0),
-    0
-  );

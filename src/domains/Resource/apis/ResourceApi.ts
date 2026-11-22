@@ -1,4 +1,5 @@
 import { executeApiContract } from '@/apis/executeApiContract';
+import { serializeQueryParams } from '@/apis/serializeQueryParams';
 
 import {
   ChangeResourceActionPermissionApiContract,
@@ -29,28 +30,11 @@ async function getResourceBaseInfo(
   return executeApiContract(GetResourceBaseInfoApiContract, req);
 }
 
-const serializeListResourcesQuery = (params: Record<string, unknown>): string => {
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-    if (Array.isArray(value)) {
-      value.forEach((item) => {
-        if (item !== undefined && item !== null && String(item) !== '') {
-          searchParams.append(key, String(item));
-        }
-      });
-      return;
-    }
-    searchParams.append(key, String(value));
-  });
-  return searchParams.toString();
-};
-
 async function listResources(
   req: ListResourcesApiContractRequest
 ): Promise<ListResourcesApiContractResponse> {
   return executeApiContract(ListResourcesApiContract, req, {
-    paramsSerializer: serializeListResourcesQuery,
+    paramsSerializer: serializeQueryParams,
   });
 }
 
@@ -76,7 +60,7 @@ async function globalSearch(
   req: GlobalSearchResourcesApiContractRequest
 ): Promise<GlobalSearchResourcesApiContractResponse> {
   return executeApiContract(GlobalSearchResourcesApiContract, req, {
-    paramsSerializer: serializeListResourcesQuery,
+    paramsSerializer: serializeQueryParams,
   });
 }
 

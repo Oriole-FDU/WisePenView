@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Tabs } from '@/components/base/Tabs';
 import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
 
-import styles from '../style.module.scss';
+import styles from './style.module.scss';
 
 interface GroupPolicyShellCardProps {
   title: string;
@@ -18,6 +18,7 @@ const POLICY_SCOPE_OPTIONS = [
 
 function GroupPolicyShellCard({ title }: GroupPolicyShellCardProps) {
   const { t } = useTranslation('group');
+
   return (
     <section className={styles.personnelCard} aria-label={title}>
       <div className={styles.personnelHeader}>

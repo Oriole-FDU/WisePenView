@@ -2,20 +2,6 @@ import type { WisepenProvider } from './WisepenProvider';
 
 export type NoteSessionStatus = 'connecting' | 'connected' | 'disconnected';
 
-/** y-websocket 运行时混入 Observable 的 on/off；类型声明不完整，仅描述本类订阅所需形状 */
-type YWebSocketObservable = {
-  on: (name: string, fn: (...args: unknown[]) => void) => void;
-  off: (name: string, fn: (...args: unknown[]) => void) => void;
-};
-
-function parseStatusPayload(arg: unknown): string {
-  if (typeof arg === 'string') return arg;
-  if (arg && typeof arg === 'object' && 'status' in arg) {
-    return String((arg as { status: unknown }).status);
-  }
-  return '';
-}
-
 /**
  * 轻量观察者：监听 WisepenProvider 的 status/sync 事件，维护三态状态，
  * 并暴露 subscribe/getSnapshot 供 useSyncExternalStore 消费。
@@ -26,10 +12,7 @@ export class NoteStatusObserver {
   private readonly _detachFns: Array<() => void> = [];
 
   attach(provider: WisepenProvider): void {
-    const observable = provider as unknown as YWebSocketObservable;
-
-    const onStatus = (...args: unknown[]) => {
-      const status = parseStatusPayload(args[0]);
+    const onStatus = provider.on('status', ({ status }) => {
       if (status === 'connected') {
         this.updateStatus('connecting');
         return;
@@ -37,20 +20,17 @@ export class NoteStatusObserver {
       if (status === 'disconnected') {
         this.updateStatus('disconnected');
       }
-    };
+    });
 
-    const onSync = (...args: unknown[]) => {
-      if (args[0] !== false) {
+    const onSync = provider.on('sync', (synced) => {
+      if (synced) {
         this.updateStatus('connected');
       }
-    };
-
-    observable.on('status', onStatus);
-    observable.on('sync', onSync);
+    });
 
     this._detachFns.push(() => {
-      observable.off('status', onStatus);
-      observable.off('sync', onSync);
+      provider.off('status', onStatus);
+      provider.off('sync', onSync);
     });
   }
 

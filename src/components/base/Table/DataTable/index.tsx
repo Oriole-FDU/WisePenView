@@ -16,6 +16,12 @@ import {
   resolveReadonlyColumnWidthClass,
 } from '../shared/TableBase/columnWidth';
 import { sortTableRows } from '../shared/TableBase/tableSort';
+import {
+  resolveTableMaxBodyHeight,
+  TABLE_LOAD_MORE_THRESHOLD_PX,
+  TABLE_VIRTUAL_ROW_ESTIMATE_SIZE,
+  TABLE_VIRTUAL_ROW_OVERSCAN,
+} from '../shared/TableBase/tableViewport';
 import TableBodyState from '../shared/TableBodyState';
 import TablePaginationFooter from '../shared/TablePaginationFooter';
 import { renderSortableColumnLabel } from '../shared/TableSortHeader/renderSortableColumnLabel';
@@ -25,19 +31,9 @@ import type { DataTableProps, DataTableRowContext } from './index.type';
 import DataTableLoadingSkeleton from './parts/LoadingSkeleton';
 import styles from './style.module.scss';
 
-const LOAD_MORE_THRESHOLD_PX = 48;
-const VIRTUAL_ROW_ESTIMATE_SIZE = 60;
-const VIRTUAL_ROW_OVERSCAN = 8;
 function getRowTextValue<T extends object>(row: T, rowKey: keyof T & string): string {
   const value = row[rowKey];
   return value == null ? '' : String(value);
-}
-
-function resolveMaxBodyHeight(value: number | string | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  return typeof value === 'number' ? `${value}px` : value;
 }
 
 function DataTable<T extends object>({
@@ -101,7 +97,7 @@ function DataTable<T extends object>({
 
     const container = event.currentTarget;
     const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distanceToBottom > LOAD_MORE_THRESHOLD_PX) {
+    if (distanceToBottom > TABLE_LOAD_MORE_THRESHOLD_PX) {
       return;
     }
 
@@ -113,7 +109,7 @@ function DataTable<T extends object>({
     if (!maxBodyHeight) {
       return {};
     }
-    const resolved = resolveMaxBodyHeight(maxBodyHeight);
+    const resolved = resolveTableMaxBodyHeight(maxBodyHeight);
     return {
       style: { maxHeight: resolved } as CSSProperties,
     };
@@ -137,8 +133,8 @@ function DataTable<T extends object>({
     enabled: virtualized,
     count: sortedItems.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => VIRTUAL_ROW_ESTIMATE_SIZE,
-    overscan: VIRTUAL_ROW_OVERSCAN,
+    estimateSize: () => TABLE_VIRTUAL_ROW_ESTIMATE_SIZE,
+    overscan: TABLE_VIRTUAL_ROW_OVERSCAN,
   });
   const virtualRows = rowVirtualizer.getVirtualItems();
   const renderedRows = virtualized

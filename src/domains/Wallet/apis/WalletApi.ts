@@ -1,4 +1,5 @@
 import { executeApiContract } from '@/apis/executeApiContract';
+import { serializeQueryParams } from '@/apis/serializeQueryParams';
 
 import {
   GetUserWalletInfoApiContract,
@@ -14,23 +15,6 @@ import {
 
 /** User Wallet API: /user/wallet/* */
 
-const serializeWalletTransactionsQuery = (params: Record<string, unknown>): string => {
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-    if (Array.isArray(value)) {
-      value.forEach((item) => {
-        if (item !== undefined && item !== null && String(item) !== '') {
-          searchParams.append(key, String(item));
-        }
-      });
-      return;
-    }
-    searchParams.append(key, String(value));
-  });
-  return searchParams.toString();
-};
-
 function getUserWalletInfo(): Promise<GetUserWalletInfoApiContractResponse> {
   return executeApiContract(GetUserWalletInfoApiContract, undefined);
 }
@@ -43,7 +27,7 @@ function listTransactions(
   req: ListTransactionsApiContractRequest
 ): Promise<ListTransactionsApiContractResponse> {
   return executeApiContract(ListTransactionsApiContract, req, {
-    paramsSerializer: serializeWalletTransactionsQuery,
+    paramsSerializer: serializeQueryParams,
   });
 }
 

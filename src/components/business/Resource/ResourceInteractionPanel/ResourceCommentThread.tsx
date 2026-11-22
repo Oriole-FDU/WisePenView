@@ -1,5 +1,4 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useInfiniteScroll } from 'ahooks';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { type RefObject, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { useResourceCommentService } from '@/domains';
 import type { ResourceComment } from '@/domains/ResourceComment';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
@@ -71,7 +71,7 @@ function ResourceCommentThread({
     reload: reloadReplies,
     reloadAsync: reloadRepliesAsync,
     mutate: mutateReplies,
-  } = useInfiniteScroll<ReplyListPage>(
+  } = useApiInfiniteScroll<ReplyListPage>(
     async (current) => {
       const nextPage = Math.floor((current?.list.length ?? 0) / REPLY_PAGE_SIZE) + 1;
       const data = await commentService.listReplies({
@@ -87,6 +87,7 @@ function ResourceCommentThread({
     },
     {
       manual: true,
+      showErrorToast: false,
       isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
     }
   );

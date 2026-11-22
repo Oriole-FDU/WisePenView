@@ -1,4 +1,4 @@
-import { useInfiniteScroll, useKeyPress } from 'ahooks';
+import { useKeyPress } from 'ahooks';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
@@ -6,6 +6,7 @@ import { AppPressable } from '@/components/base/Button';
 import { useChatSessionService } from '@/domains';
 import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import styles from '../../style.module.scss';
@@ -32,7 +33,7 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
     loadingMore,
     noMore,
     loadMore,
-  } = useInfiniteScroll<PageResult<ChatSession>>(
+  } = useApiInfiniteScroll<PageResult<ChatSession>>(
     (current) =>
       chatSessionService.listSessions({
         page: Math.floor((current?.list.length ?? 0) / SESSION_PAGE_SIZE) + 1,

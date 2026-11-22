@@ -1,8 +1,12 @@
 /* eslint-disable max-lines -- 文件树的路径、节点和移动算法共享同一树结构不变量。 */
 import type { SkillFileDropPosition } from '@/components/editors/skill/components/SkillFileTree/index.type';
-import type { SkillFileNode } from '@/domains/Skill';
+import {
+  normalizeSkillDirectoryPath,
+  resolveSkillFileLanguage,
+  SKILL_ROOT_PATH,
+  type SkillFileNode,
+} from '@/domains/Skill';
 
-export const ROOT_PATH = '/';
 export const MAIN_SKILL_FILE_NAME = 'SKILL.md';
 
 const LOCAL_FILE_ID_PREFIX = 'local-file:';
@@ -47,23 +51,18 @@ export function findFile(nodes: SkillFileNode[], id: string): SkillFileNode | nu
   return null;
 }
 
-export function normalizeDirectoryPath(path?: string): string {
-  const trimmed = path?.trim();
-  if (!trimmed || trimmed === ROOT_PATH) return ROOT_PATH;
-  const withLeadingSlash = trimmed.startsWith(ROOT_PATH) ? trimmed : `${ROOT_PATH}${trimmed}`;
-  return withLeadingSlash.endsWith(ROOT_PATH) ? withLeadingSlash.slice(0, -1) : withLeadingSlash;
-}
-
 export function joinDirectoryPath(parentPath: string, name: string): string {
-  const normalizedParent = normalizeDirectoryPath(parentPath);
-  return normalizedParent === ROOT_PATH ? `${ROOT_PATH}${name}` : `${normalizedParent}/${name}`;
+  const normalizedParent = normalizeSkillDirectoryPath(parentPath);
+  return normalizedParent === SKILL_ROOT_PATH
+    ? `${SKILL_ROOT_PATH}${name}`
+    : `${normalizedParent}/${name}`;
 }
 
 export function getParentDirectoryPath(path: string): string {
-  const normalizedPath = normalizeDirectoryPath(path);
-  if (normalizedPath === ROOT_PATH) return ROOT_PATH;
-  const lastSlashIndex = normalizedPath.lastIndexOf(ROOT_PATH);
-  return lastSlashIndex <= 0 ? ROOT_PATH : normalizedPath.slice(0, lastSlashIndex);
+  const normalizedPath = normalizeSkillDirectoryPath(path);
+  if (normalizedPath === SKILL_ROOT_PATH) return SKILL_ROOT_PATH;
+  const lastSlashIndex = normalizedPath.lastIndexOf(SKILL_ROOT_PATH);
+  return lastSlashIndex <= 0 ? SKILL_ROOT_PATH : normalizedPath.slice(0, lastSlashIndex);
 }
 
 export function getFirstFile(nodes: SkillFileNode[]): SkillFileNode | null {
@@ -99,7 +98,7 @@ export function findRootMainSkillFile(nodes: SkillFileNode[]): SkillFileNode | n
       (node) =>
         node.kind === 'file' &&
         node.name === MAIN_SKILL_FILE_NAME &&
-        normalizeDirectoryPath(node.path) === ROOT_PATH
+        normalizeSkillDirectoryPath(node.path) === SKILL_ROOT_PATH
     ) ?? null
   );
 }
@@ -134,7 +133,7 @@ export function isRemoteAssetId(id: string): boolean {
     id &&
     !id.startsWith(LOCAL_FILE_ID_PREFIX) &&
     !id.startsWith(LOCAL_FOLDER_ID_PREFIX) &&
-    !id.includes(ROOT_PATH) &&
+    !id.includes(SKILL_ROOT_PATH) &&
     !id.includes(':')
   );
 }
@@ -160,10 +159,10 @@ export function findFileByPathAndName(
   path: string,
   name: string
 ): SkillFileNode | null {
-  const normalizedPath = normalizeDirectoryPath(path);
+  const normalizedPath = normalizeSkillDirectoryPath(path);
   return (
     collectFileNodes(nodes).find(
-      (node) => normalizeDirectoryPath(node.path) === normalizedPath && node.name === name
+      (node) => normalizeSkillDirectoryPath(node.path) === normalizedPath && node.name === name
     ) ?? null
   );
 }
@@ -273,13 +272,13 @@ export function appendFileNodeByPath(
   nodes: SkillFileNode[],
   fileNode: SkillFileNode
 ): SkillFileNode[] {
-  const normalizedPath = normalizeDirectoryPath(fileNode.path);
-  if (normalizedPath === ROOT_PATH) return appendTreeNode(nodes, undefined, fileNode);
+  const normalizedPath = normalizeSkillDirectoryPath(fileNode.path);
+  if (normalizedPath === SKILL_ROOT_PATH) return appendTreeNode(nodes, undefined, fileNode);
   return appendFileNodeIntoFolderPath(
     nodes,
-    normalizedPath.split(ROOT_PATH).filter(Boolean),
+    normalizedPath.split(SKILL_ROOT_PATH).filter(Boolean),
     fileNode,
-    ROOT_PATH
+    SKILL_ROOT_PATH
   );
 }
 
@@ -294,7 +293,8 @@ function appendFileNodeIntoFolderPath(
   const folderPath = joinDirectoryPath(parentPath, folderName);
   let folderFound = false;
   const nextNodes = nodes.map((node) => {
-    if (node.kind !== 'folder' || normalizeDirectoryPath(node.path) !== folderPath) return node;
+    if (node.kind !== 'folder' || normalizeSkillDirectoryPath(node.path) !== folderPath)
+      return node;
     folderFound = true;
     return {
       ...node,
@@ -377,7 +377,7 @@ function updateMovedNodePaths(
   idMap: Map<string, string>,
   movedFiles: MoveTreeNodeResult['movedFiles']
 ): SkillFileNode {
-  const normalizedParentPath = normalizeDirectoryPath(parentPath);
+  const normalizedParentPath = normalizeSkillDirectoryPath(parentPath);
   if (node.kind === 'file') {
     const nextNode = { ...node, path: normalizedParentPath };
     movedFiles.push({ previous: node, next: nextNode });
@@ -401,19 +401,19 @@ function resolveMoveParentPath(
   dropPosition: SkillFileDropPosition
 ): string {
   if (dropPosition === 'inside' && dropNode.kind === 'folder')
-    return normalizeDirectoryPath(dropNode.path);
-  if (dropNode.kind === 'file') return normalizeDirectoryPath(dropNode.path);
+    return normalizeSkillDirectoryPath(dropNode.path);
+  if (dropNode.kind === 'file') return normalizeSkillDirectoryPath(dropNode.path);
   return getParentDirectoryPath(dropNode.path);
 }
 
 function getDirectChildren(nodes: SkillFileNode[], parentPath: string): SkillFileNode[] {
-  const normalizedParentPath = normalizeDirectoryPath(parentPath);
+  const normalizedParentPath = normalizeSkillDirectoryPath(parentPath);
   const result: SkillFileNode[] = [];
   function walk(items: SkillFileNode[]) {
     for (const item of items) {
       const itemParentPath =
         item.kind === 'file'
-          ? normalizeDirectoryPath(item.path)
+          ? normalizeSkillDirectoryPath(item.path)
           : getParentDirectoryPath(item.path);
       if (itemParentPath === normalizedParentPath) result.push(item);
       if (item.children) walk(item.children);
@@ -453,19 +453,19 @@ export function moveTreeNode(
   };
 }
 
-export function createLocalFileNode(name: string, path = ROOT_PATH): SkillFileNode {
-  const normalizedPath = normalizeDirectoryPath(path);
+export function createLocalFileNode(name: string, path = SKILL_ROOT_PATH): SkillFileNode {
+  const normalizedPath = normalizeSkillDirectoryPath(path);
   return {
     id: `local-file:${Date.now()}:${normalizedPath}:${name}`,
     name,
     path: normalizedPath,
     kind: 'file',
-    language: name.endsWith('.py') ? 'python' : 'markdown',
+    language: resolveSkillFileLanguage(name),
     content: '',
   };
 }
 
-export function createLocalFolderNode(name: string, parentPath = ROOT_PATH): SkillFileNode {
+export function createLocalFolderNode(name: string, parentPath = SKILL_ROOT_PATH): SkillFileNode {
   const path = joinDirectoryPath(parentPath, name);
   return { id: `folder:${path}`, name, path, kind: 'folder', children: [] };
 }

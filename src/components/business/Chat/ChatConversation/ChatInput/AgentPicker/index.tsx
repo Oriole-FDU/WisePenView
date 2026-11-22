@@ -1,5 +1,5 @@
 import { Description, Header, Label, Separator, Skeleton } from '@heroui/react';
-import { useInfiniteScroll, useLatest } from 'ahooks';
+import { useLatest } from 'ahooks';
 import { Bot, BotOff, ChevronDown, Folder } from 'lucide-react';
 import type { Key } from 'react';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,7 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useChatConfigService } from '@/domains';
 import type { PageResult } from '@/domains/_shared/entity/page';
 import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatConfig';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.scss';
@@ -77,7 +78,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
     loadingMore: loadingMorePersonal,
     noMore: noMorePersonal,
     loadMore: loadMorePersonal,
-  } = useInfiniteScroll<AgentPageState>(
+  } = useApiInfiniteScroll<AgentPageState>(
     async (current) =>
       chatConfigService.listChatInputAgents({
         scope: 'PERSONAL',
