@@ -88,39 +88,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          SCAN_ROOT="$(mktemp -d)"
-          trap 'rm -rf "$SCAN_ROOT"' EXIT
-          CHANGED_COUNT=0
-          shopt -s nocasematch
-
-          while IFS= read -r -d '' FILE; do
-            case "$FILE" in
-              *.cjs|*.css|*.html|*.js|*.jsx|*.mjs|*.scss|*.ts|*.tsx) ;;
-              *) continue ;;
-            esac
-
-            mkdir -p "$SCAN_ROOT/$(dirname "$FILE")"
-            git show "${HEAD_SHA}:${FILE}" > "$SCAN_ROOT/$FILE"
-            CHANGED_COUNT=$((CHANGED_COUNT + 1))
-          done < <(git diff --name-only -z --diff-filter=ACMRTUXB "${BASE_SHA}...${HEAD_SHA}" --)
-
-          if [ "$CHANGED_COUNT" -eq 0 ]; then
-            echo '{"changedFiles":0,"totalFindings":0}'
-            exit 0
-          fi
-
-          echo "Scanning ${CHANGED_COUNT} changed source files with the latest Modern Web Guidance rules"
-          SCAN_RESULT="$(pnpm --silent dlx modern-web-guidance@latest legacy-scan "$SCAN_ROOT" --json)"
-          printf '%s\n' "$SCAN_RESULT"
-          printf '%s\n' "$SCAN_RESULT" | node -e '
-            const { totalFindings } = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
-            if (totalFindings > 0) {
-              console.error(`::error::Modern Web Guidance found ${totalFindings} finding(s) in changed source files.`);
-              process.exitCode = 1;
-            }
-          '
+        run: node scripts/check-modern-web-diff.mjs
 
       # 恢复 ESLint 文件级缓存；缓存键只跟随依赖与配置，源码变化由内容哈希失效。
       - name: Restore ESLint cache
