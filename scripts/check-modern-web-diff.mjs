@@ -1,14 +1,11 @@
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
 const zeroSha = '0000000000000000000000000000000000000000';
-const [baseArg, headArg] = process.argv.slice(2);
-const requestedBase = baseArg || process.env.BASE_SHA || '';
-const requestedHead = headArg || process.env.HEAD_SHA || 'HEAD';
-const head = requestedHead === zeroSha ? 'HEAD' : requestedHead;
+const head = process.env.HEAD_SHA || 'HEAD';
+const requestedBase = process.env.BASE_SHA || '';
 const base =
   requestedBase && requestedBase !== zeroSha
     ? requestedBase
@@ -37,41 +34,39 @@ const changedFiles = execFileSync(
 
 if (changedFiles.length === 0) {
   console.log(JSON.stringify({ changedFiles: 0, totalFindings: 0 }));
-  process.exit(0);
-}
+} else {
+  const scanRoot = await mkdtemp(path.join(os.tmpdir(), 'modern-web-diff-'));
 
-const scanRoot = mkdtempSync(path.join(os.tmpdir(), 'modern-web-diff-'));
+  try {
+    for (const file of changedFiles) {
+      const target = path.join(scanRoot, file);
+      await mkdir(path.dirname(target), { recursive: true });
+      const source = execFileSync('git', ['show', `${head}:${file}`]);
+      await writeFile(target, source);
+    }
 
-try {
-  for (const file of changedFiles) {
-    const target = path.join(scanRoot, file);
-    await mkdir(path.dirname(target), { recursive: true });
-    const source = execFileSync('git', ['show', `${head}:${file}`]);
-    await writeFile(target, source);
+    console.log(
+      `Scanning ${changedFiles.length} changed source files with the latest Modern Web Guidance rules`
+    );
+    const output = execFileSync(
+      'pnpm',
+      ['--silent', 'dlx', 'modern-web-guidance@latest', 'legacy-scan', scanRoot, '--json'],
+      { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
+    );
+    const result = JSON.parse(output);
+
+    if (!Number.isInteger(result.totalFindings)) {
+      throw new Error('Modern Web Guidance returned JSON without a valid totalFindings count.');
+    }
+
+    console.log(JSON.stringify({ ...result, changedFiles: changedFiles.length }, null, 2));
+    if (result.totalFindings > 0) {
+      console.error(
+        `::error::Modern Web Guidance found ${result.totalFindings} finding(s) in changed source files.`
+      );
+      process.exitCode = 1;
+    }
+  } finally {
+    await rm(scanRoot, { recursive: true, force: true });
   }
-
-  const output = execFileSync(
-    'pnpm',
-    [
-      '--silent',
-      'dlx',
-      'modern-web-guidance@latest',
-      'legacy-scan',
-      scanRoot,
-      '--json',
-      '--skill-version',
-      '2026_11_10-47b4c80e',
-    ],
-    { encoding: 'utf8' }
-  );
-  const jsonStart = output.indexOf('{');
-  const jsonEnd = output.lastIndexOf('}');
-  const result = JSON.parse(output.slice(jsonStart, jsonEnd + 1));
-
-  console.log(JSON.stringify({ changedFiles: changedFiles.length, ...result }, null, 2));
-  if (result.totalFindings > 0) {
-    process.exitCode = 1;
-  }
-} finally {
-  rmSync(scanRoot, { recursive: true, force: true });
 }

@@ -30,6 +30,7 @@
     "check:api-contracts": "node scripts/check-api-contracts.mjs",
     "check:boundaries": "node scripts/check-domain-boundaries.mjs",
     "check:domain-structure": "node scripts/check-domain-structure.mjs",
+    "check:modern-web-diff": "node scripts/check-modern-web-diff.mjs",
     "check:z-index": "node scripts/check-z-index-tokens.mjs",
     "check:radius": "node scripts/check-radius-tokens.mjs",
     "check:spacing": "node scripts/check-spacing-tokens.mjs",
