@@ -33,10 +33,17 @@ export const createAgentServices = (): IAgentService => ({
   },
   async saveAgentDraft(request) {
     const requests = AgentServicesMap.mapSaveAgentDraftRequests(request);
-    await Promise.all([
+    const saves = [
       AgentApi.changeAgentInfo(requests.info),
       AgentApi.updateAgentSpec(requests.spec),
-    ]);
+    ];
+    try {
+      await Promise.all(saves);
+    } catch (error) {
+      // 等同次保存的另一支请求结束，避免重试时旧请求覆盖新值。
+      await Promise.allSettled(saves);
+      throw error;
+    }
   },
   async publishVersion(resourceId) {
     await AgentApi.publishAgentVersion({ resourceId });
