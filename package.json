@@ -134,7 +134,7 @@
     "lint-staged": "^16.3.3",
     "prettier": "^3.7.4",
     "sass-embedded": "^1.105.2",
-    "storybook": "^10.5.8",
+    "storybook": "^10.6.2",
     "tailwindcss": "^4.3.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
