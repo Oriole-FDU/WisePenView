@@ -1,5 +1,7 @@
 import { Highlighter } from 'lucide-react';
 
+import { isRecord } from '@/utils/type/typeGuards';
+
 import { createBlockKeyboardNavigationExtension } from '../../engines/editor/keyboardNavigation';
 import { projectInlinePlainText } from '../../engines/plainText';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
@@ -39,10 +41,7 @@ export function createHighlightBlockPlugin(
     sideMenu: {
       icon: Highlighter,
       inspect: (block) => {
-        const props =
-          typeof block.props === 'object' && block.props !== null
-            ? (block.props as Record<string, unknown>)
-            : {};
+        const props = isRecord(block) && isRecord(block.props) ? block.props : {};
         return {
           attributes: {
             'highlight-color':

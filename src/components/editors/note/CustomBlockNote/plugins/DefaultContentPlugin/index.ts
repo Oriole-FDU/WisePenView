@@ -8,6 +8,7 @@ import {
 import { Image as ImageIcon } from 'lucide-react';
 
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import { projectInlinePlainText } from '../../engines/plainText';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
@@ -220,11 +221,8 @@ export function createDefaultContentPlugin(
             ...(type === 'heading'
               ? {
                   sideMenu: {
-                    inspect(block: Record<string, unknown>) {
-                      const props =
-                        typeof block.props === 'object' && block.props !== null
-                          ? (block.props as Record<string, unknown>)
-                          : {};
+                    inspect(block) {
+                      const props = isRecord(block) && isRecord(block.props) ? block.props : {};
                       return { attributes: { level: String(props.level ?? 1) } };
                     },
                   },
