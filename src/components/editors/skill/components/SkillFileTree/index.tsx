@@ -111,6 +111,8 @@ function buildPendingNode(
           }}
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
+              event.preventDefault();
+              if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
               const value = event.currentTarget.value.trim();
               if (value) onCommitCreate(value, pendingCreate.kind);
               else onCancelCreate();

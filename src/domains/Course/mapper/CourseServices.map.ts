@@ -88,7 +88,7 @@ const sortCourseOutlineResources = <T extends { resourceId: string }>(
   const resourceOrder = getCourseOutlineResourceOrder(tagMetaInfo);
   if (resourceOrder.length === 0) return resources;
   const orderIndex = new Map(resourceOrder.map((resourceId, index) => [resourceId, index]));
-  return [...resources].sort((left, right) => {
+  return resources.toSorted((left, right) => {
     const leftIndex = orderIndex.get(left.resourceId);
     const rightIndex = orderIndex.get(right.resourceId);
     if (leftIndex === undefined && rightIndex === undefined) return 0;

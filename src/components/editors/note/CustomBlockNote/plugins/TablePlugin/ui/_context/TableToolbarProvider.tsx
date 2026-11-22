@@ -189,7 +189,7 @@ export function TableToolbarProvider({ children }: { children: ReactNode }) {
     if (!state?.mergeAction) return;
     const tableHandles = getTableHandles(editor);
     if (state.mergeAction === 'split') {
-      const splitCells = [...state.splitCells].sort((a, b) =>
+      const splitCells = state.splitCells.toSorted((a, b) =>
         a.row === b.row ? b.col - a.col : b.row - a.row
       );
       for (const cell of splitCells) {

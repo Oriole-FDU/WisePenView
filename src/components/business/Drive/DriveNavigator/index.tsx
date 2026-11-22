@@ -165,10 +165,10 @@ function DriveNavigator({
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const scopePageStateRef = useRef({ page: 0, hasMore: false, loading: false });
-  const renderableTypeKey = [...renderableTypes].sort().join('\u0001');
-  const selectableTypeKey = [...selectableTypes].sort().join('\u0001');
-  const disabledNodeIdKey = [...(disabledNodeIds ?? [])].sort().join('\u0001');
-  const excludedGroupIdKey = [...(excludedGroupIds ?? [])].sort().join('\u0001');
+  const renderableTypeKey = renderableTypes.toSorted().join('\u0001');
+  const selectableTypeKey = selectableTypes.toSorted().join('\u0001');
+  const disabledNodeIdKey = (disabledNodeIds ?? []).toSorted().join('\u0001');
+  const excludedGroupIdKey = (excludedGroupIds ?? []).toSorted().join('\u0001');
   const excludedGroupIdSet = buildSetFromStableKey(excludedGroupIdKey);
 
   const renderableTypeSet = buildSetFromStableKey<DriveItemKind>(renderableTypeKey);

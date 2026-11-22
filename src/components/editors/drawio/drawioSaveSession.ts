@@ -53,12 +53,7 @@ export function createDrawioSaveSession(options: DrawioSaveSessionOptions) {
     task.reject(error);
   };
   const begin = () => {
-    let resolve!: () => void;
-    let reject!: (error: unknown) => void;
-    const promise = new Promise<void>((success, failure) => {
-      resolve = success;
-      reject = failure;
-    });
+    const { promise, resolve, reject } = Promise.withResolvers<void>();
     const task = {
       promise,
       resolve,

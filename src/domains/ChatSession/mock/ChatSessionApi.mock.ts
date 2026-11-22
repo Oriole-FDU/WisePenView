@@ -164,7 +164,7 @@ export const ChatSessionApi: typeof ChatSessionApiContract = {
     delete mockHistoryMessagesBySessionId[session_id];
   },
   listSessions: ({ page = 1, size = 20 }) => {
-    const rows = [...mockSessions].sort((a, b) => b.updated_at.localeCompare(a.updated_at));
+    const rows = mockSessions.toSorted((a, b) => b.updated_at.localeCompare(a.updated_at));
     return mockResponse({
       list: rows.slice((page - 1) * size, page * size),
       page,
