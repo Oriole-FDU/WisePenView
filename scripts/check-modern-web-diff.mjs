@@ -3,10 +3,13 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-const { BASE_SHA: base, HEAD_SHA: head } = process.env;
-if (!base || !head) {
-  throw new Error('BASE_SHA and HEAD_SHA are required.');
-}
+const zeroSha = '0000000000000000000000000000000000000000';
+const head = process.env.HEAD_SHA || 'HEAD';
+const requestedBase = process.env.BASE_SHA || '';
+const base =
+  requestedBase && requestedBase !== zeroSha
+    ? requestedBase
+    : execFileSync('git', ['rev-parse', '--verify', `${head}^`], { encoding: 'utf8' }).trim();
 
 const sourceExtensions = new Set([
   '.cjs',
