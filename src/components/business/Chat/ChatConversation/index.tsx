@@ -19,7 +19,8 @@ function ChatConversation({
   onSend,
   welcomeConfig,
 }: ChatConversationProps) {
-  const { cancel, cancelling, currentModel, history, isEmpty, messages, status } = turn;
+  const { history, isEmpty, messages, stream, model, turn: actions } = turn;
+  const { cancel, cancelling } = actions;
   const {
     closeSessionBar,
     currentSessionId,
@@ -29,7 +30,7 @@ function ChatConversation({
     sessionBarOpen,
   } = session;
 
-  const generating = status === 'submitted' || status === 'streaming';
+  const generating = stream.uiBusy;
   const sending = cancelling || generating;
   const isWelcome = isEmpty && !history.loadingInitial;
   const showWelcome = isWelcome && !sessionBarOpen;
@@ -67,7 +68,7 @@ function ChatConversation({
             loadingMoreHistory={history.loadingMore}
             onLoadMoreHistory={history.loadMore}
             generating={generating}
-            model={currentModel}
+            model={model.lastSentModel}
             fullWidth={fullWidth}
           />
         </div>

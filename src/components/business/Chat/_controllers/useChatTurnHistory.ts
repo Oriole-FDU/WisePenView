@@ -17,9 +17,9 @@ interface UseChatTurnHistoryOptions {
     messages: WisePenUIMessage[] | ((messages: WisePenUIMessage[]) => WisePenUIMessage[])
   ) => void;
   /** 历史加载成功后接续后台 turn 的流 */
-  resumeTurnStream: () => Promise<void>;
+  resumeLocalStream: () => Promise<void>;
   /** 会话切换时中止旧 Chat 的客户端连接 */
-  stop: () => void;
+  stopLocalStream: () => void;
   isNewlyCreatedSession: (sessionId: string) => boolean;
   clearNewlyCreatedSession: (sessionId: string) => void;
 }
@@ -31,8 +31,8 @@ interface UseChatTurnHistoryOptions {
  */
 export function useChatTurnHistory({
   setMessages,
-  resumeTurnStream,
-  stop,
+  resumeLocalStream,
+  stopLocalStream,
   isNewlyCreatedSession,
   clearNewlyCreatedSession,
 }: UseChatTurnHistoryOptions) {
@@ -72,7 +72,7 @@ export function useChatTurnHistory({
   const historyActionsLatest = useLatest({
     clearConversation,
     loadHistoryMessages,
-    resumeTurnStream,
+    resumeLocalStream,
   });
 
   const loadMore = async () => {
@@ -92,7 +92,7 @@ export function useChatTurnHistory({
    * 执行时机：当前会话 ID 首次可用或发生切换时加载历史，并在历史成功后检查 active turn。
    * 不可替代原因：历史加载和 SSE 重连都是异步外部副作用，必须按顺序写入当前 Chat 运行时。
    * cleanup：标记本次会话加载失效并中止旧 Chat 的客户端连接，配合 useChatHistory 与
-   * useChatTurn 丢弃旧请求结果；stop 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
+   * useChatTurnRuntime 丢弃旧请求结果；stopLocalStream 不调用后端 cancel，后台 turn 仍可被后续页面恢复。
    */
   useEffect(() => {
     const actions = historyActionsLatest.current;
@@ -112,12 +112,12 @@ export function useChatTurnHistory({
       const loaded = await actions.loadHistoryMessages(targetSessionId);
       if (!loaded || cancelled) return;
       if (routeLatest.current.sessionId !== targetSessionId) return;
-      await actions.resumeTurnStream();
+      await actions.resumeLocalStream();
     })();
     return () => {
       cancelled = true;
       clearNewlyCreatedSession(targetSessionId);
-      void stop();
+      stopLocalStream();
     };
   }, [
     appAuth.isAuthenticated,
@@ -126,7 +126,7 @@ export function useChatTurnHistory({
     historyActionsLatest,
     isNewlyCreatedSession,
     routeLatest,
-    stop,
+    stopLocalStream,
   ]);
 
   return {
