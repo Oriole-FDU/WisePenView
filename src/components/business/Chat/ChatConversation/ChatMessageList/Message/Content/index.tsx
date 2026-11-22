@@ -1,7 +1,7 @@
 import Markdown from '@/components/base/Markdown';
-import { useNoteLinkResolver } from '@/components/business/Chat/_controllers/useNoteLinkResolver';
 
 import styles from './style.module.scss';
+import { useNoteLinkResolver } from './useNoteLinkResolver';
 
 interface MessageContentProps {
   content: string;

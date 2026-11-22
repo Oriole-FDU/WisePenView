@@ -1,14 +1,13 @@
 import { getToolName, isToolUIPart } from 'ai';
 
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { WisePenUIMessage } from '../../entity/message';
 
-interface ToolApprovalRequest {
+export interface ToolApprovalRequest {
   toolCallId: string;
   name: string;
   input: unknown;
 }
 
-/** 按消息顺序收集待审批工具，同一调用只进入一次审批队列。 */
 export function listToolApprovalRequests(
   messages: readonly WisePenUIMessage[]
 ): ToolApprovalRequest[] {

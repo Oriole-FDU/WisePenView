@@ -1,3 +1,6 @@
+/**
+ * 提供 Chat 消息内笔记链接的识别、定位与资源打开能力。
+ */
 import { useMemoizedFn } from 'ahooks';
 import { useMemo } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';

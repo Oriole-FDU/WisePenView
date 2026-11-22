@@ -1,3 +1,6 @@
+/**
+ * 维护 Chat 页面中的会话身份、会话切换与按需创建流程。
+ */
 import { useLatest, useMemoizedFn, useUnmountedRef } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +26,7 @@ interface UseChatSessionControllerOptions {
 /**
  * 会话域：当前会话身份、会话列表浮层，以及新建与会话切换流程。
  *
- * 只输出会话身份和意图方法；对话内容、发送与审批属于 turn 域。
+ * 对外给出身份、isNewSession 意图与操作方法；对话内容、发送与审批属于 turn 域。
  */
 export function useChatSessionController({ resourceChat }: UseChatSessionControllerOptions) {
   const { t } = useTranslation(['chat', 'common']);
@@ -41,7 +44,6 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
     promise: Promise<ChatSession | undefined>;
   } | null>(null);
   const [newChatSessionId, setNewChatSessionId] = useState<string>();
-  const newSessionIdLatest = useLatest(newChatSessionId);
   const pendingHistoryRefreshRef = useRef<string | undefined>(undefined);
   const [sessionBarOpen, setSessionBarOpen] = useState(false);
   const clearResourceChatContext = resourceChat?.clearContext;
@@ -118,20 +120,13 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
     }
   );
 
-  const isNewlyCreatedSession = useMemoizedFn(
-    (sessionId: string) => newSessionIdLatest.current === sessionId
-  );
-
   /**
-   * 释放新建会话标记：同时清掉待刷新标记，避免会话切换后残留到下一次进入。
-   * 由 turn 域在会话切换清理时调用。
+   * 路由已离开「本页刚创建」会话时，在渲染期收敛标记。
+   * 避免侧栏等绕过本 controller 切走后，再次进入同一 id 仍被当成新会话。
    */
-  const clearNewlyCreatedSession = useMemoizedFn((sessionId: string) => {
-    setNewChatSessionId((id) => (id === sessionId ? undefined : id));
-    if (pendingHistoryRefreshRef.current === sessionId) {
-      pendingHistoryRefreshRef.current = undefined;
-    }
-  });
+  if (newChatSessionId != null && currentSessionId !== newChatSessionId) {
+    setNewChatSessionId(undefined);
+  }
 
   /**
    * 新建会话收到首个可渲染内容后通知侧栏刷新列表。
@@ -144,6 +139,9 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
     requestChatSessionHistoryRefresh();
     pendingHistoryRefreshRef.current = undefined;
   });
+
+  /** 当前路由会话是否为本页刚创建的空会话。 */
+  const isNewSession = currentSessionId != null && currentSessionId === newChatSessionId;
 
   const toggleSessionBar = () => {
     if (!requireAuth()) return;
@@ -177,11 +175,10 @@ export function useChatSessionController({ resourceChat }: UseChatSessionControl
   };
 
   return {
-    clearNewlyCreatedSession,
     closeSessionBar,
     currentSessionId,
     ensureSession,
-    isNewlyCreatedSession,
+    isNewSession,
     panelTitle,
     promoteDraftToolSelection:
       currentSessionId !== undefined && currentSessionId === newChatSessionId,

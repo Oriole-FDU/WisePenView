@@ -7,7 +7,7 @@ import {
   type ToolUIPart,
 } from 'ai';
 
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { WisePenUIMessage } from '@/domains/ChatTurn';
 
 export type RenderableToolPart = ToolUIPart | DynamicToolUIPart;
 
@@ -26,7 +26,6 @@ export interface TraceReasoningItem {
   key: string;
   content: string;
   streaming: boolean;
-  /** 后端历史 metadata 透出的推理耗时（秒） */
   durationSeconds?: number;
 }
 
@@ -38,12 +37,10 @@ export interface TraceToolItem {
 
 export type TraceItem = TraceReasoningItem | TraceToolItem;
 
-/** 助手消息按顺序切分出的渲染片段：正文与过程（思考 / 工具调用）交替 */
 export type AssistantSegment =
   | { kind: 'text'; key: string; text: string; streaming: boolean }
   | { kind: 'trace'; key: string; items: TraceItem[] };
 
-/** 过程行的当前提示文案，key 为 chat 命名空间下的 i18n key */
 export interface TraceHeadline {
   key: string;
   options?: Record<string, string | number>;
@@ -182,7 +179,6 @@ export function describeTraceItem(
 }
 
 interface BuildAssistantSegmentsOptions {
-  /** 当前助手消息是否仍在流式输出 */
   streaming: boolean;
   reasoningDurationSeconds?: number;
 }
