@@ -32,6 +32,11 @@ export interface UpdateResourcePermissionSubjectsRequest {
 export type ResourcePermissionSubjectKind = 'owner' | 'group' | 'user';
 export type ResourcePermissionSource = 'owner' | 'tag' | 'resourceOverride' | 'specifiedUser';
 
+export type ResourcePermissionLoadStatus = 'unloaded' | 'ready' | 'failed';
+
+export type ResourcePermissionInheritance =
+  { status: 'ready'; actions: ResourceAction[] } | { status: 'unloaded' | 'failed' };
+
 export interface ResourcePermissionActionOption {
   action: ResourceAction;
   key: string;
@@ -51,7 +56,8 @@ export interface ResourcePermissionSubject {
   userId?: string;
   effectiveActions: ResourceAction[];
   editableActions: ResourceAction[];
-  inheritedActions?: ResourceAction[];
+  groupInfoStatus?: ResourcePermissionLoadStatus;
+  inheritance?: ResourcePermissionInheritance;
   readonly?: boolean;
 }
 
@@ -84,6 +90,7 @@ export interface ResourcePermissionGroupInfo {
 /** 二次查询结果交给 ResourceAccess mapper 做确定性归并。 */
 export interface ResourcePermissionHydration {
   userInfoById: ReadonlyMap<string, ResourcePermissionUserInfo>;
-  groupInfoById: ReadonlyMap<string, ResourcePermissionGroupInfo>;
-  inheritedActionsBySubjectId: ReadonlyMap<string, ResourceAction[]>;
+  /** null 表示查询失败；没有条目表示尚未查询。 */
+  groupInfoById: ReadonlyMap<string, ResourcePermissionGroupInfo | null>;
+  inheritedActionsBySubjectId: ReadonlyMap<string, ResourceAction[] | null>;
 }

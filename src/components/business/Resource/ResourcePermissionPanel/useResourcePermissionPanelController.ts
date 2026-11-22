@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useResourceAccessService, useUserService } from '@/domains';
 import { updateResourceActionSelection } from '@/domains/_shared/access';
 import {
+  canEditResourcePermissionSubject,
   type ResourcePermissionActionOption,
-  type ResourcePermissionOverview,
   type ResourcePermissionSubject,
 } from '@/domains/ResourceAccess';
 import { useApi } from '@/hooks/useApi';
@@ -14,8 +14,10 @@ import { parseErrorMessage } from '@/utils/error';
 
 import type { ResourcePermissionPanelProps } from './index.type';
 import {
+  applyResourcePermissionSubjectDrafts,
   createSpecifiedUserSubject,
   getSubjectActionsForDisplay,
+  getSubjectRenderKey,
   getSupportedActionsFromOptions,
   localizePermissionActionOptions,
   type SpecifiedUserCandidate,
@@ -46,21 +48,12 @@ export const useResourcePermissionPanelController = ({
   const { t } = useTranslation('resource');
   const resourceAccessService = useResourceAccessService();
   const userService = useUserService();
-  const updateQueueRef = useRef<Promise<void>>(Promise.resolve());
-  const latestSubjectsRef = useRef<ResourcePermissionSubject[]>([]);
-  const [subjectDrafts, setSubjectDrafts] = useState<ResourcePermissionSubject[] | null>(null);
-  const [groupHydrationState, setGroupHydrationState] = useState<{
-    resourceId: string;
-    resourceType: string;
-    limit: number;
-  } | null>(null);
+  const savePendingRef = useRef(false);
+  const [subjectDrafts, setSubjectDrafts] = useState(
+    () => new Map<string, ResourcePermissionSubject | null>()
+  );
+  const [groupHydrationLimit, setGroupHydrationLimit] = useState(GROUP_PERMISSION_PAGE_SIZE);
   const [newUserKeyword, setNewUserKeyword] = useState('');
-  const [pendingUpdateCount, setPendingUpdateCount] = useState(0);
-  const groupHydrationLimit =
-    groupHydrationState?.resourceId === resourceId &&
-    groupHydrationState.resourceType === resourceType
-      ? groupHydrationState.limit
-      : GROUP_PERMISSION_PAGE_SIZE;
   const {
     data: permissionOverview,
     loading,
@@ -75,14 +68,14 @@ export const useResourcePermissionPanelController = ({
       }),
     {
       ready: Boolean(resourceId && resourceType),
-      refreshDeps: [resourceId, resourceType, groupHydrationLimit],
-      onSuccess: (overview: ResourcePermissionOverview) => {
-        latestSubjectsRef.current = overview.subjects;
-        setSubjectDrafts(overview.subjects);
-      },
+      refreshDeps: [groupHydrationLimit],
+      showErrorToast: false,
     }
   );
-  const subjects = subjectDrafts ?? permissionOverview?.subjects ?? [];
+  const subjects = applyResourcePermissionSubjectDrafts(
+    permissionOverview?.subjects ?? [],
+    subjectDrafts
+  );
   const actionOptions = localizePermissionActionOptions(
     permissionOverview?.actionOptions ?? EMPTY_ACTION_OPTIONS
   );
@@ -101,41 +94,62 @@ export const useResourcePermissionPanelController = ({
       .filter((userId): userId is string => Boolean(userId))
   );
 
-  const persistPermissionSubjects = (nextSubjects: ResourcePermissionSubject[]) => {
-    setPendingUpdateCount((count) => count + 1);
-    updateQueueRef.current = updateQueueRef.current
-      .catch(() => undefined)
-      .then(async () => {
-        await resourceAccessService.updateResourcePermissionSubjects({
-          resourceId,
-          subjects: nextSubjects,
-        });
-        onSuccess?.();
-      })
-      .catch((err) => {
-        toast.danger(parseErrorMessage(err));
-        refreshPermissionOverview();
-      })
-      .finally(() => {
-        setPendingUpdateCount((count) => Math.max(0, count - 1));
+  const {
+    loading: saving,
+    error: saveError,
+    run: saveSubjects,
+  } = useApi(
+    async (nextSubjects: ResourcePermissionSubject[]) => {
+      await resourceAccessService.updateResourcePermissionSubjects({
+        resourceId,
+        subjects: nextSubjects,
       });
+    },
+    {
+      manual: true,
+      onSuccess: () => {
+        onSuccess?.();
+      },
+      onErrorEffect: () => {
+        refreshPermissionOverview();
+      },
+      onFinally: () => {
+        savePendingRef.current = false;
+      },
+    }
+  );
+  const hasUnknownActions = !subjects.every(canEditResourcePermissionSubject);
+  const hasFailedActions = subjects.some((subject) => subject.inheritance?.status === 'failed');
+  const hasFailedGroupInfo = subjects.some((subject) => subject.groupInfoStatus === 'failed');
+  const editingDisabled = loading || saving || Boolean(error) || !permissionOverview;
+
+  const persistPermissionSubjects = (nextSubjects: ResourcePermissionSubject[]) => {
+    if (editingDisabled || savePendingRef.current) return;
+    savePendingRef.current = true;
+    saveSubjects(nextSubjects);
   };
 
-  const commitSubjectDrafts = (nextSubjects: ResourcePermissionSubject[]) => {
-    latestSubjectsRef.current = nextSubjects;
-    setSubjectDrafts(nextSubjects);
-    persistPermissionSubjects(nextSubjects);
+  const commitSubjectDraft = (key: string, subject: ResourcePermissionSubject | null) => {
+    if (editingDisabled || savePendingRef.current) return;
+    const nextDrafts = new Map(subjectDrafts).set(key, subject);
+    setSubjectDrafts(nextDrafts);
+    persistPermissionSubjects(
+      applyResourcePermissionSubjectDrafts(permissionOverview?.subjects ?? [], nextDrafts)
+    );
   };
 
   const handleActionToggle = (
     changedSubject: ResourcePermissionSubject,
     action: ResourcePermissionActionOption['action']
   ) => {
-    const currentSubjects = latestSubjectsRef.current;
-    const currentSelectedSubject = currentSubjects.find(
-      (subject) => subject.id === changedSubject.id
-    );
-    if (!currentSelectedSubject || currentSelectedSubject.readonly) return;
+    const currentSelectedSubject = subjects.find((subject) => subject.id === changedSubject.id);
+    if (
+      !currentSelectedSubject ||
+      currentSelectedSubject.readonly ||
+      !canEditResourcePermissionSubject(currentSelectedSubject)
+    ) {
+      return;
+    }
     const currentActions = getSubjectActionsForDisplay(currentSelectedSubject);
     const nextActions = updateResourceActionSelection(
       currentActions,
@@ -143,17 +157,13 @@ export const useResourcePermissionPanelController = ({
       !currentActions.includes(action),
       getSupportedActionsFromOptions(actionOptions)
     );
-    const nextSubjects = updateSubjectActions(
-      currentSubjects,
-      currentSelectedSubject.id,
-      nextActions,
-      actionOptions
-    );
-    commitSubjectDrafts(nextSubjects);
+    const nextSubject = updateSubjectActions(currentSelectedSubject, nextActions, actionOptions);
+    commitSubjectDraft(getSubjectRenderKey(currentSelectedSubject), nextSubject);
   };
 
   const addSpecifiedUserCandidate = (user: SpecifiedUserCandidate) => {
-    const currentSubjects = latestSubjectsRef.current;
+    if (editingDisabled || savePendingRef.current) return;
+    const currentSubjects = subjects;
     const userId = user.userId.trim();
     if (!userId) {
       toast.warning(t('permission.feedback.invalidUser'));
@@ -164,7 +174,7 @@ export const useResourcePermissionPanelController = ({
       return;
     }
     const nextSubject = createSpecifiedUserSubject({ ...user, userId }, t);
-    commitSubjectDrafts([...currentSubjects, nextSubject]);
+    commitSubjectDraft(getSubjectRenderKey(nextSubject), nextSubject);
     setNewUserKeyword('');
   };
 
@@ -181,21 +191,14 @@ export const useResourcePermissionPanelController = ({
 
   const handleRemoveSpecifiedUser = (subject: ResourcePermissionSubject) => {
     if (subject.source !== 'specifiedUser') return;
-    const nextSubjects = latestSubjectsRef.current.filter(
-      (currentSubject) => currentSubject.id !== subject.id
-    );
-    commitSubjectDrafts(nextSubjects);
+    commitSubjectDraft(getSubjectRenderKey(subject), null);
   };
 
   const queryUserCandidates = (keyword: string) =>
     userService.queryUserSearchCandidates({ keyword, size: 6 });
 
   const loadMoreGroups = () => {
-    setGroupHydrationState({
-      resourceId,
-      resourceType,
-      limit: groupHydrationLimit + GROUP_PERMISSION_PAGE_SIZE,
-    });
+    setGroupHydrationLimit((limit) => limit + GROUP_PERMISSION_PAGE_SIZE);
   };
 
   return {
@@ -203,18 +206,25 @@ export const useResourcePermissionPanelController = ({
     addSpecifiedUserCandidate,
     canLoadMoreGroups,
     error,
+    editingDisabled,
     existingSpecifiedUserIds,
     handleActionToggle,
     handleRemoveSpecifiedUser,
     handleUserSearchEmpty,
     handleUserSearchError,
     inheritedSubjects: visibleInheritedSubjects,
-    isUpdating: pendingUpdateCount > 0,
+    hasUnknownActions,
+    hasFailedActions,
+    hasFailedGroupInfo,
+    isUpdating: saving,
     loadMoreGroups,
     loading: loading && !permissionOverview,
     loadingMoreGroups: loading && Boolean(permissionOverview),
     newUserKeyword,
     permissionOverview,
+    refreshPermissionOverview,
+    retrySave: () => persistPermissionSubjects(subjects),
+    saveError,
     queryUserCandidates,
     setNewUserKeyword,
     shouldShowInviteDivider:

@@ -11,13 +11,11 @@ import ResourcePermissionActionIcon from '@/components/business/Drive/common/res
 import {
   buildResourceOverrideActions,
   buildResourcePermissionActionKeySet,
-  buildResourcePermissionActionOptions,
   filterResourcePermissionActionsByOptions,
   getResourcePermissionActionLabel,
   getResourcePermissionPresetActions,
   resolveResourcePermissionPolicy,
   resolveResourcePermissionPresetKey,
-  resolveTagInheritedResourceActions,
   RESOURCE_PERMISSION_PRESETS,
   type ResourcePermissionPresetKey,
 } from '@/components/business/Drive/common/resourcePermissionPolicy';
@@ -66,6 +64,7 @@ const resolveSelectedPresetKey = (
   policy: ResourcePermissionModalData['policy']
 ): ResourcePermissionPresetKey => {
   if (
+    policy.inheritedActions !== undefined &&
     areResourcePermissionActionsEqual(
       selectedActions,
       policy.inheritedActions,
@@ -77,7 +76,7 @@ const resolveSelectedPresetKey = (
   return resolveResourcePermissionPresetKey(selectedActions, policy.supportedActions);
 };
 
-function ResourcePermissionModal({
+function ResourcePermissionEditor({
   isOpen,
   groupId,
   target,
@@ -87,7 +86,7 @@ function ResourcePermissionModal({
   const { t } = useTranslation(['resource', 'common']);
   const resourceAccessService = useResourceAccessService();
   const tagService = useTagService();
-  const [selectedActions, setSelectedActions] = useState<ResourceAction[]>([]);
+  const [actionDraft, setSelectedActions] = useState<ResourceAction[] | null>(null);
 
   const {
     data,
@@ -108,18 +107,14 @@ function ResourcePermissionModal({
         overview,
         groupId,
         fallbackTagId: target.fallbackTagId,
-        resourceType: target.resourceType,
       });
       const tagId = initialPolicy.primaryTagId;
       let inheritedActions = initialPolicy.inheritedActions;
 
-      if (tagId) {
-        let tag = tagService.getRawTagById(tagId, groupId);
-        if (!tag) {
-          await tagService.getRawTagTree(groupId);
-          tag = tagService.getRawTagById(tagId, groupId);
-        }
-        inheritedActions = resolveTagInheritedResourceActions(tag, overview.supportedActions);
+      // 仅主挂载缺失时使用 Drive 提供的标签；已有主标签查询失败不能改读旧缓存。
+      if (tagId && !initialPolicy.groupSubject?.primaryTagId) {
+        const actionsByTag = await tagService.getTagGrantedActions(groupId).catch(() => undefined);
+        inheritedActions = actionsByTag?.get(tagId);
       }
 
       const policy = resolveResourcePermissionPolicy({
@@ -127,31 +122,21 @@ function ResourcePermissionModal({
         groupId,
         fallbackTagId: target.fallbackTagId,
         inheritedActions,
-        resourceType: target.resourceType,
       });
 
       return { overview, policy };
     },
     {
       ready: Boolean(isOpen && target && groupId),
-      refreshDeps: [
-        isOpen,
-        target?.resourceId,
-        target?.resourceType,
-        target?.fallbackTagId,
-        groupId,
-      ],
-      onSuccess: ({ policy }) => {
-        setSelectedActions(policy.activeActions);
-      },
+      showErrorToast: false,
     }
   );
 
   const policy = data?.policy;
-  const rawActionOptions = data?.overview.actionOptions.length
-    ? data.overview.actionOptions
-    : buildResourcePermissionActionOptions(policy?.supportedActions ?? []);
-  const actionOptions = rawActionOptions.map((option) => ({
+  const selectedActions = actionDraft ?? policy?.activeActions ?? [];
+  const permissionUnknown = Boolean(policy && policy.inheritedActions === undefined);
+  const groupInfoIncomplete = policy?.groupSubject?.groupInfoStatus === 'failed';
+  const actionOptions = (data?.overview.actionOptions ?? []).map((option) => ({
     ...option,
     label: getResourcePermissionActionLabel(option.action),
   }));
@@ -168,7 +153,9 @@ function ResourcePermissionModal({
 
   const { loading: saving, run: runSave } = useApi(
     async () => {
-      if (!target || !groupId || !policy) return;
+      if (!target || !groupId || !policy) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING);
+      }
       const overrideActions = buildResourceOverrideActions(
         selectedActions,
         policy.inheritedActions,
@@ -192,16 +179,17 @@ function ResourcePermissionModal({
       },
     }
   );
+  const saveDisabled = saving || loading || Boolean(error) || !policy || permissionUnknown;
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
       if (saving) return;
-      setSelectedActions([]);
       onOpenChange(false);
     }
   };
 
   const handleSelectionChange = (keys: Selection) => {
+    if (permissionUnknown || loading || saving) return;
     if (keys === 'all') {
       setSelectedActions(
         filterResourcePermissionActionsByOptions(
@@ -233,7 +221,7 @@ function ResourcePermissionModal({
   };
 
   const handlePresetChange = (key: ResourcePermissionPresetKey) => {
-    if (!policy || key === 'custom') return;
+    if (!policy || !policy.inheritedActions || key === 'custom' || loading || saving) return;
     if (key === 'inherit') {
       setSelectedActions(policy.inheritedActions);
       return;
@@ -262,77 +250,126 @@ function ResourcePermissionModal({
           </AppButton>
           <AppButton
             variant="primary"
-            isDisabled={saving || loading || Boolean(error) || !policy}
+            isDisabled={saveDisabled}
             aria-busy={saving || undefined}
-            onPress={() => runSave()}
+            onPress={runSave}
           >
             {t('actions.save', { ns: 'common' })}
           </AppButton>
         </>
       }
     >
-      {loading ? (
+      {loading && !data ? (
         <div className={styles.state} aria-busy="true">
           <Spin size="large" tip={t('permission.editor.loading')} />
         </div>
       ) : error ? (
-        <div className={styles.state}>{parseErrorMessage(error)}</div>
+        <div className={styles.state} role="alert">
+          {parseErrorMessage(error)}
+          <AppButton variant="secondary" onPress={refreshPermission}>
+            {t('actions.retry', { ns: 'common' })}
+          </AppButton>
+        </div>
       ) : policy ? (
         <div className={styles.content}>
-          <Tabs
-            variant="secondary"
-            aria-label={t('permission.editor.basedOnPreset')}
-            className={styles.presetTabs}
-            selectedKey={selectedPresetKey}
-            onSelectionChange={(key) =>
-              handlePresetChange(String(key) as ResourcePermissionPresetKey)
-            }
-          >
-            <Tabs.ListContainer className={styles.presetTabsListContainer}>
-              <Tabs.List
-                className={styles.presetTabsList}
-                aria-label={t('permission.editor.basedOnPreset')}
+          {permissionUnknown || groupInfoIncomplete ? (
+            <div className={styles.warning} role="status">
+              <span>
+                {t(
+                  permissionUnknown
+                    ? 'permission.incomplete.actions'
+                    : 'permission.incomplete.groupInfo'
+                )}
+              </span>
+              <AppButton
+                variant="ghost"
+                size="sm"
+                isDisabled={loading || saving}
+                aria-busy={loading || undefined}
+                onPress={refreshPermission}
               >
-                {RESOURCE_PERMISSION_PRESETS.map((preset) => (
-                  <Tabs.Tab key={preset.key} id={preset.key} className={styles.presetTab}>
-                    {preset.label}
-                    <Tabs.Indicator />
-                  </Tabs.Tab>
+                {t('actions.retry', { ns: 'common' })}
+              </AppButton>
+            </div>
+          ) : null}
+          {permissionUnknown && !policy.isResourceOverride ? null : (
+            <>
+              <Tabs
+                isDisabled={permissionUnknown || loading || saving}
+                variant="secondary"
+                aria-label={t('permission.editor.basedOnPreset')}
+                className={styles.presetTabs}
+                selectedKey={selectedPresetKey}
+                onSelectionChange={(key) =>
+                  handlePresetChange(String(key) as ResourcePermissionPresetKey)
+                }
+              >
+                <Tabs.ListContainer className={styles.presetTabsListContainer}>
+                  <Tabs.List
+                    className={styles.presetTabsList}
+                    aria-label={t('permission.editor.basedOnPreset')}
+                  >
+                    {RESOURCE_PERMISSION_PRESETS.map((preset) => (
+                      <Tabs.Tab key={preset.key} id={preset.key} className={styles.presetTab}>
+                        {preset.label}
+                        <Tabs.Indicator />
+                      </Tabs.Tab>
+                    ))}
+                  </Tabs.List>
+                </Tabs.ListContainer>
+              </Tabs>
+              {!permissionUnknown ? (
+                <div className={draftInconsistent ? styles.warning : styles.inheritHint}>
+                  {draftInconsistent
+                    ? t('permission.editor.inconsistent')
+                    : t('permission.editor.inherited')}
+                </div>
+              ) : null}
+              <ListBox
+                aria-label={t('permission.editor.actionsAria')}
+                disabledKeys={
+                  permissionUnknown || loading || saving
+                    ? actionOptions.map((option) => option.key)
+                    : []
+                }
+                selectionMode="multiple"
+                selectedKeys={selectedActionKeys}
+                onSelectionChange={handleSelectionChange}
+                className={styles.actionList}
+              >
+                {actionOptions.map((option) => (
+                  <ListBox.Item id={option.key} key={option.key} textValue={option.label}>
+                    <span className={styles.actionLabel}>
+                      <ResourcePermissionActionIcon
+                        action={option.action}
+                        className={styles.actionIcon}
+                      />
+                      <span className={styles.actionText}>{option.label}</span>
+                    </span>
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
                 ))}
-              </Tabs.List>
-            </Tabs.ListContainer>
-          </Tabs>
-          <div className={draftInconsistent ? styles.warning : styles.inheritHint}>
-            {draftInconsistent
-              ? t('permission.editor.inconsistent')
-              : t('permission.editor.inherited')}
-          </div>
-          <ListBox
-            aria-label={t('permission.editor.actionsAria')}
-            selectionMode="multiple"
-            selectedKeys={selectedActionKeys}
-            onSelectionChange={handleSelectionChange}
-            className={styles.actionList}
-          >
-            {actionOptions.map((option) => (
-              <ListBox.Item id={option.key} key={option.key} textValue={option.label}>
-                <span className={styles.actionLabel}>
-                  <ResourcePermissionActionIcon
-                    action={option.action}
-                    className={styles.actionIcon}
-                  />
-                  <span className={styles.actionText}>{option.label}</span>
-                </span>
-                <ListBox.ItemIndicator />
-              </ListBox.Item>
-            ))}
-          </ListBox>
+              </ListBox>
+            </>
+          )}
         </div>
       ) : (
         <div className={styles.state}>{t('permission.editor.empty')}</div>
       )}
     </AppModal>
   );
+}
+
+function ResourcePermissionModal(props: ResourcePermissionModalProps) {
+  const { target, groupId, isOpen } = props;
+  const sessionKey = JSON.stringify([
+    isOpen,
+    groupId,
+    target?.resourceId,
+    target?.resourceType,
+    target?.fallbackTagId,
+  ]);
+  return <ResourcePermissionEditor key={sessionKey} {...props} />;
 }
 
 export default ResourcePermissionModal;

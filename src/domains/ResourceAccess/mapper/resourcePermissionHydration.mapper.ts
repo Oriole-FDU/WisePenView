@@ -47,43 +47,24 @@ const mergePermissionSubjectMetadata = (
   userInfo: ResourcePermissionUserInfo | undefined,
   groupInfo: ResourcePermissionGroupInfo | undefined
 ): ResourcePermissionSubject => {
-  let nextSubject = subject;
-  if (userInfo) {
-    const nextName = resolvePermissionUserDisplayName(userInfo, subject.name);
-    const nextAvatar = userInfo.avatar?.trim() || subject.avatar;
-    if (nextSubject.name !== nextName || nextSubject.avatar !== nextAvatar) {
-      nextSubject = {
-        ...nextSubject,
-        name: nextName,
-        avatar: nextAvatar,
-      };
-    }
-  }
-
-  if (groupInfo) {
-    const groupName = groupInfo.groupName.trim();
-    const groupDescription = groupInfo.groupDesc.trim();
-    const nextName = groupName || nextSubject.name;
-    const nextDescription =
-      nextSubject.source === 'resourceOverride' && groupDescription
+  const withUser = userInfo
+    ? {
+        ...subject,
+        name: resolvePermissionUserDisplayName(userInfo, subject.name),
+        avatar: userInfo.avatar?.trim() || subject.avatar,
+      }
+    : subject;
+  if (!groupInfo) return withUser;
+  const groupDescription = groupInfo.groupDesc.trim();
+  return {
+    ...withUser,
+    name: groupInfo.groupName.trim() || withUser.name,
+    description:
+      subject.source === 'resourceOverride' && groupDescription
         ? groupDescription
-        : nextSubject.description;
-    const nextAvatar = groupInfo.groupCoverUrl.trim() || nextSubject.avatar;
-    if (
-      nextSubject.name !== nextName ||
-      nextSubject.description !== nextDescription ||
-      nextSubject.avatar !== nextAvatar
-    ) {
-      nextSubject = {
-        ...nextSubject,
-        name: nextName,
-        description: nextDescription,
-        avatar: nextAvatar,
-      };
-    }
-  }
-
-  return nextSubject;
+        : withUser.description,
+    avatar: groupInfo.groupCoverUrl.trim() || withUser.avatar,
+  };
 };
 
 const mergePermissionSubjectInheritedActions = (
@@ -96,6 +77,7 @@ const mergePermissionSubjectInheritedActions = (
     inheritedActions,
     actionOptions
   );
+  const inheritance = { status: 'ready', actions: normalizedInheritedActions } as const;
 
   if (subject.source === 'resourceOverride') {
     const matchesTag = arePermissionActionsEqualByOptions(
@@ -111,7 +93,7 @@ const mergePermissionSubjectInheritedActions = (
         description: '',
         editableActions: normalizedInheritedActions,
         effectiveActions: normalizedInheritedActions,
-        inheritedActions: normalizedInheritedActions,
+        inheritance,
       };
     }
   }
@@ -122,13 +104,13 @@ const mergePermissionSubjectInheritedActions = (
       description: '',
       editableActions: normalizedInheritedActions,
       effectiveActions: normalizedInheritedActions,
-      inheritedActions: normalizedInheritedActions,
+      inheritance,
     };
   }
 
   return {
     ...subject,
-    inheritedActions: normalizedInheritedActions,
+    inheritance,
   };
 };
 
@@ -138,14 +120,21 @@ const mergeResourcePermissionSubject = (
   hydration: ResourcePermissionHydration,
   actionOptions: ResourcePermissionActionOption[]
 ): ResourcePermissionSubject => {
+  const groupInfo = subject.groupId ? hydration.groupInfoById.get(subject.groupId) : undefined;
+  const inheritedActions = hydration.inheritedActionsBySubjectId.get(subject.id);
   const withMetadata = mergePermissionSubjectMetadata(
     subject,
     subject.userId ? hydration.userInfoById.get(subject.userId) : undefined,
-    subject.groupId ? hydration.groupInfoById.get(subject.groupId) : undefined
+    groupInfo ?? undefined
   );
   return mergePermissionSubjectInheritedActions(
-    withMetadata,
-    hydration.inheritedActionsBySubjectId.get(subject.id),
+    {
+      ...withMetadata,
+      groupInfoStatus:
+        groupInfo === null ? 'failed' : groupInfo ? 'ready' : subject.groupInfoStatus,
+      inheritance: inheritedActions === null ? { status: 'failed' } : subject.inheritance,
+    },
+    inheritedActions ?? undefined,
     actionOptions
   );
 };
