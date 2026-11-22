@@ -35,6 +35,11 @@ const changedFiles = execFileSync(
   .split('\0')
   .filter((file) => sourceExtensions.has(path.extname(file).toLowerCase()));
 
+if (changedFiles.length === 0) {
+  console.log(JSON.stringify({ changedFiles: 0, totalFindings: 0 }));
+  process.exit(0);
+}
+
 const scanRoot = mkdtempSync(path.join(os.tmpdir(), 'modern-web-diff-'));
 
 try {
@@ -43,11 +48,6 @@ try {
     await mkdir(path.dirname(target), { recursive: true });
     const source = execFileSync('git', ['show', `${head}:${file}`]);
     await writeFile(target, source);
-  }
-
-  if (changedFiles.length === 0) {
-    console.log(JSON.stringify({ changedFiles: 0, totalFindings: 0 }));
-    process.exit(0);
   }
 
   const output = execFileSync(
