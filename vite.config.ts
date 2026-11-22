@@ -28,7 +28,9 @@ export default defineConfig(({ mode }) => {
     createPublicAppConfig({ ...env, MODE: mode });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`[vite] ${message.replace(/^\[config\]\s*/, '')} 请检查 .env.${mode}`);
+    throw new Error(`[vite] ${message.replace(/^\[config\]\s*/, '')} 请检查 .env.${mode}`, {
+      cause: error,
+    });
   }
 
   return {
