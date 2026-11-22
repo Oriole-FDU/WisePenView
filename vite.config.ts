@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react({
         babel: {
-          plugins: [['babel-plugin-react-compiler', { compilationMode: 'annotation' }]],
+          plugins: ['babel-plugin-react-compiler'],
         },
       }),
       tailwindcss(),
