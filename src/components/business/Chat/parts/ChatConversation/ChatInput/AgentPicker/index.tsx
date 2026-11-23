@@ -1,185 +1,48 @@
-import { Description, Header, Label, Separator, Skeleton } from '@heroui/react';
-import { useInfiniteScroll, useLatest } from 'ahooks';
+import { Description, Header, Label, Separator } from '@heroui/react';
 import { Bot, BotOff, ChevronDown, Folder } from 'lucide-react';
-import type { Key } from 'react';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import AppModal from '@/components/base/AppModal';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
-import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
-import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
-import { useChatConfigService } from '@/domains';
-import type { PageResult } from '@/domains/_shared/entity/page';
-import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatConfig';
+import type { ChatAgentOption } from '@/domains/ChatConfig';
 
-import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import type { AgentPickerProps, GroupAgentPickerModalProps } from './index.type';
+import GroupAgentPickerModal from './GroupAgentPickerModal';
+import type { AgentPickerProps } from './index.type';
+import AgentMenuSkeleton from './MenuSkeleton';
 import styles from './style.module.scss';
+import {
+  LOAD_MORE_PERSONAL_ACTION,
+  SELECT_FROM_GROUP_ACTION,
+  useAgentPicker,
+} from './useAgentPicker';
 
-const AGENT_SKELETON_ROWS = [0, 1] as const;
-const AGENT_PAGE_SIZE = 30;
-const LOAD_MORE_PERSONAL_ACTION = 'agent-action:load-more-personal';
-const SELECT_FROM_GROUP_ACTION = 'agent-action:select-from-group';
-
-interface AgentPageState extends PageResult<ChatAgentOption> {
-  list: ChatAgentOption[];
-}
-
-function mergeAgentOptions(
-  agents: ChatAgentOption[],
-  injectedAgents: ChatAgentOption[] = []
-): ChatAgentOption[] {
-  const seen = new Set<string>();
-  return [...injectedAgents, ...agents].filter((agent) => {
-    if (seen.has(agent.agentId)) return false;
-    seen.add(agent.agentId);
-    return true;
-  });
-}
-
-function AgentMenuSkeleton({ ariaLabel }: { ariaLabel: string }) {
-  return (
-    <div className={styles.popoverPanelAgentSkeleton} aria-busy="true" aria-label={ariaLabel}>
-      <Skeleton className={styles.popoverSkeletonSection} />
-      <div className={styles.popoverSkeletonList}>
-        {AGENT_SKELETON_ROWS.map((row) => (
-          <div key={row} className={styles.popoverSkeletonRow}>
-            <Skeleton className={styles.popoverSkeletonIcon} />
-            <Skeleton
-              className={`${styles.popoverSkeletonLabel} ${row === 0 ? styles.popoverSkeletonLabelWide : ''}`}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
+function renderAgentIcon(agent: ChatAgentOption, size: number) {
+  return agent.isDefault ? (
+    <BotOff size={size} aria-hidden="true" />
+  ) : (
+    <Bot size={size} aria-hidden="true" />
   );
 }
 
 function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   const { t } = useTranslation('chat');
-  const chatConfigService = useChatConfigService();
-  const store = useChatInputStoreApi();
-  const selectedAgent = useChatInputStore((state) => state.selectedAgent);
-  const agentOpen = useChatInputStore((state) => state.agentOpen);
-  const { setAgentOpen, setSelectedAgent } = store.getState();
-  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const {
-    data: personalPage,
-    loading: loadingPersonal,
-    loadingMore: loadingMorePersonal,
-    noMore: noMorePersonal,
-    loadMore: loadMorePersonal,
-  } = useInfiniteScroll<AgentPageState>(
-    async (current) =>
-      chatConfigService.listChatInputAgents({
-        scope: 'PERSONAL',
-        page: Math.floor((current?.list.length ?? 0) / AGENT_PAGE_SIZE) + 1,
-        size: AGENT_PAGE_SIZE,
-      }),
-    {
-      manual: !agentOpen,
-      reloadDeps: [agentOpen],
-      isNoMore: (page) => Boolean(page && (page.total === 0 || page.list.length >= page.total)),
-    }
-  );
-  const showSkeleton = personalPage == null && loadingPersonal;
-  const personalAgents = personalPage?.list ?? [];
-  // 保持列表顺序；选中项只补充来源信息，不在点击后移到列表前面。
-  const displayAgents = mergeAgentOptions(
-    [
-      buildDefaultPersonalAgent(),
-      ...personalAgents.map((agent) =>
-        agent.agentId === selectedAgent.agentId ? selectedAgent : agent
-      ),
-      selectedAgent,
-    ],
-    injectedAgents
-  );
-  const hasMorePersonalAgents = Boolean(personalPage) && !noMorePersonal;
-  const injectedAgentKey = JSON.stringify(injectedAgents ?? []);
-  const preferredAgentKey = JSON.stringify(preferredAgent ?? null);
-  const injectedAgentsLatest = useLatest(injectedAgents);
-  const preferredAgentLatest = useLatest(preferredAgent);
-  const skeleton = <AgentMenuSkeleton ariaLabel={t('input.agentPicker.loadingAria')} />;
-
-  const syncPreferredAgent = () => {
-    const injectedAgentIds = new Set(
-      (injectedAgentsLatest.current ?? []).map((agent) => agent.agentId)
-    );
-    const currentPreferredAgent = preferredAgentLatest.current;
-    const currentAgent = store.getState().selectedAgent;
-    if (currentAgent.source === 'CURRENT_DRAFT' && !injectedAgentIds.has(currentAgent.agentId)) {
-      setSelectedAgent(buildDefaultPersonalAgent());
-      return;
-    }
-    if (!currentPreferredAgent) return;
-    if (!currentAgent.isDefault && currentAgent.source !== 'CURRENT_DRAFT') return;
-    if (currentAgent.agentId === currentPreferredAgent.agentId) {
-      if (currentAgent.source === 'CURRENT_DRAFT' && currentAgent !== currentPreferredAgent) {
-        setSelectedAgent(currentPreferredAgent);
-      }
-      return;
-    }
-    setSelectedAgent(currentPreferredAgent);
-  };
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：外部注入的 Agent 集合或首选 Agent 变化时校正聊天输入 store。
-   * 不可替代原因：选中 Agent 保存在独立 Zustand store，不能由当前组件 JSX 直接派生。
-   * cleanup：没有订阅或异步任务，无需清理。
-   */
-  useEffect(syncPreferredAgent, [
-    injectedAgentKey,
-    injectedAgentsLatest,
-    preferredAgentKey,
-    preferredAgentLatest,
+    agentOpen,
+    setAgentOpen,
+    selectedAgent,
+    groupModalOpen,
+    setGroupModalOpen,
+    showSkeleton,
+    displayAgents,
+    hasMorePersonalAgents,
+    loadingMorePersonal,
+    agentTooltip,
+    getAgentLabel,
+    handleMenuAction,
     setSelectedAgent,
-    store,
-  ]);
-
-  const handleSelect = (agent: ChatAgentOption) => {
-    setSelectedAgent(agent);
-    setAgentOpen(false);
-  };
-
-  const handleOpenGroupModal = () => {
-    setAgentOpen(false);
-    setGroupModalOpen(true);
-  };
-
-  const getAgentLabel = (agent: ChatAgentOption): string =>
-    agent.isDefault ? t('input.agentPicker.defaultAgent') : agent.label;
-
-  const agentTooltip = selectedAgent.isDefault
-    ? t('input.agentPicker.selectAgentTooltip')
-    : getAgentLabel(selectedAgent);
-
-  const renderAgentIcon = (agent: ChatAgentOption, size: number) =>
-    agent.isDefault ? (
-      <BotOff size={size} aria-hidden="true" />
-    ) : (
-      <Bot size={size} aria-hidden="true" />
-    );
-
-  const handleMenuAction = (key: Key) => {
-    if (key === LOAD_MORE_PERSONAL_ACTION) {
-      loadMorePersonal();
-      return;
-    }
-    if (key === SELECT_FROM_GROUP_ACTION) {
-      handleOpenGroupModal();
-      return;
-    }
-    const agent = displayAgents.find((item) => item.agentId === key);
-    if (agent) {
-      handleSelect(agent);
-    }
-  };
+  } = useAgentPicker({ injectedAgents, preferredAgent });
 
   return (
     <>
@@ -200,7 +63,7 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
         <GuideAnchor id={GUIDE_TOOL_ID.chatAgentOpen} asChild>
           <Dropdown.Popover className={styles.popoverPanelAgent} placement="top">
             {showSkeleton ? (
-              skeleton
+              <AgentMenuSkeleton ariaLabel={t('input.agentPicker.loadingAria')} />
             ) : (
               <Dropdown.Menu
                 aria-label={t('input.agentPicker.trigger')}
@@ -267,88 +130,6 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
         onSelect={setSelectedAgent}
       />
     </>
-  );
-}
-
-function GroupAgentPickerModal({
-  open,
-  selectedAgentId,
-  onOpenChange,
-  onSelect,
-}: GroupAgentPickerModalProps) {
-  if (!open) return null;
-  return (
-    <GroupAgentPickerModalContent
-      selectedAgentId={selectedAgentId}
-      onOpenChange={onOpenChange}
-      onSelect={onSelect}
-    />
-  );
-}
-
-function GroupAgentPickerModalContent({
-  selectedAgentId,
-  onOpenChange,
-  onSelect,
-}: Omit<GroupAgentPickerModalProps, 'open'>) {
-  const { t } = useTranslation(['chat', 'common']);
-  const selectedResourceId = selectedAgentId.startsWith('agent-')
-    ? selectedAgentId.slice('agent-'.length)
-    : selectedAgentId;
-
-  const handleSelectionChange = (items: DriveSelectionItem[]) => {
-    const item = items[0];
-    if (!item?.resourceId || item.kind !== 'resource') return;
-    onSelect({
-      agentId: `agent-${item.resourceId}`,
-      agentType: 'GROUP',
-      label: item.label,
-      source: 'RESOURCE',
-      resourceId: item.resourceId,
-      groupId: item.groupId,
-      groupName: item.scopeLabel,
-    });
-    onOpenChange(false);
-  };
-
-  return (
-    <AppModal
-      isOpen
-      onOpenChange={onOpenChange}
-      title={t('input.agentPicker.groupModalTitle')}
-      size="md"
-      contentMode="dialog"
-      footer={false}
-    >
-      <AppModal.DeferredContent
-        fallback={
-          <AppModal.Body>
-            <div className={styles.agentGroupModalBody}>
-              <div className={styles.agentGroupModalHint}>{t('input.agentPicker.groupHint')}</div>
-              <div className={styles.agentGroupModalTree} />
-            </div>
-          </AppModal.Body>
-        }
-      >
-        {() => (
-          <AppModal.Body>
-            <div className={styles.agentGroupModalBody}>
-              <div className={styles.agentGroupModalHint}>{t('input.agentPicker.groupHint')}</div>
-              <div className={styles.agentGroupModalTree}>
-                <DriveNavigator
-                  scopeMode="public"
-                  resourceType="AGENT"
-                  selectableTypes={['resource']}
-                  initialSelectedIds={[selectedResourceId]}
-                  dimUnselectableNodes={false}
-                  onChange={handleSelectionChange}
-                />
-              </div>
-            </div>
-          </AppModal.Body>
-        )}
-      </AppModal.DeferredContent>
-    </AppModal>
   );
 }
 

@@ -1,0 +1,24 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.agentGroupModalBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.agentGroupModalHint {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.agentGroupModalTree {
+  min-height: 240px;
+  max-height: min(52vh, 460px);
+  overflow: auto;
+  padding: var(--space-xs);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover);
+  background: var(--background);
+  @include scrollbar.appSubtleScrollbar();
+}
