@@ -26,9 +26,9 @@ function AppNavigationLayout() {
   const appAuth = useAppAuth();
   const historySnapshot = useSyncExternalStore(subscribeHistory, getHistorySnapshot, () => 0);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const appGuideActions = createGuideActions({
-    openChat: () => workspaceRightPanelActions.openPanel('chat'),
-  });
+  const [appGuideActions] = useState(() =>
+    createGuideActions({ openChat: () => workspaceRightPanelActions.openPanel('chat') })
+  );
 
   useKeyPress(
     ['ctrl.k', 'meta.k'],

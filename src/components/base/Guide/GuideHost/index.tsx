@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import {
   GUIDE_TOUR_CODE,
   GUIDE_TOURS,
-  type GuideToolId,
+  type GuideStepConfig,
   type GuideTourConfig,
   type GuideTourId,
 } from '@/constants/tour';
@@ -45,7 +45,7 @@ function getGuideZIndex(): number {
 }
 
 interface GuideTargetBindingState {
-  toolKey: string;
+  step: GuideStepConfig;
   allTargetsPresent: boolean;
 }
 
@@ -60,13 +60,7 @@ function guideTargetBindingReducer(
  * 响应式布局可能替换或卸载任意一个高亮目标。
  * Joyride 只在渲染时读取 target，必须用节点身份变化触发重渲染，才能把气泡重新绑到新锚点。
  */
-function useGuideTargetBinding(
-  toolId: GuideToolId | undefined,
-  spotlightToolIds: readonly GuideToolId[],
-  enabled: boolean
-): boolean {
-  const targetToolIds = toolId ? [toolId, ...spotlightToolIds.filter((id) => id !== toolId)] : [];
-  const toolKey = targetToolIds.join('|');
+function useGuideTargetBinding(step: GuideStepConfig | undefined, enabled: boolean): boolean {
   const [binding, setBinding] = useReducer(guideTargetBindingReducer, null);
 
   /**
@@ -76,12 +70,14 @@ function useGuideTargetBinding(
    * cleanup：取消动画帧，步骤结束、目标切换或组件卸载后停止轮询。
    */
   useEffect(() => {
-    if (!enabled || targetToolIds.length === 0) return undefined;
+    if (!enabled || !step) return undefined;
+    const { toolId, spotlightToolIds = [] } = step;
+    const targetToolIds = [toolId, ...spotlightToolIds.filter((id) => id !== toolId)];
 
     let currentTargets = targetToolIds.map((id) => findGuideTarget(id));
     const syncBinding = () =>
       setBinding({
-        toolKey,
+        step,
         allTargetsPresent: currentTargets.every(Boolean),
       });
 
@@ -98,9 +94,9 @@ function useGuideTargetBinding(
 
     frameId = window.requestAnimationFrame(checkTarget);
     return () => window.cancelAnimationFrame(frameId);
-  }, [enabled, targetToolIds, toolKey]);
+  }, [enabled, step]);
 
-  return enabled && binding && binding.toolKey === toolKey ? binding.allTargetsPresent : false;
+  return enabled && binding && binding.step === step ? binding.allTargetsPresent : false;
 }
 
 interface GuidePlayerProps {
@@ -309,11 +305,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
   const spotlightToolIds =
     activeStepConfig?.spotlightToolIds ?? (activeStepConfig ? [activeStepConfig.toolId] : []);
 
-  const allGuideTargetsPresent = useGuideTargetBinding(
-    activeStepConfig?.toolId,
-    spotlightToolIds,
-    run
-  );
+  const allGuideTargetsPresent = useGuideTargetBinding(activeStepConfig, run);
 
   /**
    * @wisepen-manual-effect
@@ -323,9 +315,8 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
    * cleanup：清除重试计时器并移除 resize 监听。
    */
   useEffect(() => {
-    const stepId = activeStepConfig?.id;
-    const prepare = activeStepConfig?.prepare;
-    if (!run || !stepId) return undefined;
+    if (!run || !activeStepConfig) return undefined;
+    const { id: stepId, prepare, toolId, spotlightToolIds = [toolId] } = activeStepConfig;
 
     if (allGuideTargetsPresent) {
       seenTargetStepRef.current = stepId;
@@ -358,7 +349,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
       window.clearTimeout(timer);
       window.removeEventListener('resize', scheduleRecovery);
     };
-  }, [actions, activeStepConfig, allGuideTargetsPresent, run, spotlightToolIds]);
+  }, [actions, activeStepConfig, allGuideTargetsPresent, run]);
 
   if (!run) return null;
   return (
