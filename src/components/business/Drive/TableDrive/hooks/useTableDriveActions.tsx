@@ -7,7 +7,7 @@ import {
   DRIVE_DOCUMENT_FILE_ACCEPT,
   getSupportedDriveDocumentFiles,
   useDriveDocumentUpload,
-} from '@/components/business/Drive/common/useDriveDocumentUpload';
+} from '@/components/business/Drive/hooks/useDriveDocumentUpload';
 import {
   DriveCreateModal,
   type DriveCreateType,
@@ -37,7 +37,7 @@ import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
 import type { DriveTableRow, TableDriveActionConfig } from '../index.type';
 import type { CreateMenuItem } from '../parts/CreateMenu/index.type';
 
-interface UseTableDriveActionsControllerParams {
+interface UseTableDriveActionsParams {
   currentNodeId: string;
   currentRows: DriveTableRow[];
   selectedActionTargets: DriveActionTarget[];
@@ -51,7 +51,7 @@ interface UseTableDriveActionsControllerParams {
   onNodeActionSuccess: () => void;
 }
 
-interface UseTableDriveActionsControllerReturn {
+interface UseTableDriveActionsResult {
   showCreateMenu: boolean;
   showUploadToGroup: boolean;
   showManagePermission: boolean;
@@ -82,7 +82,7 @@ const DEFAULT_TOOLBAR_CONFIG: Required<NonNullable<TableDriveActionConfig['toolb
   canManageTagPermission: false,
 };
 
-export function useTableDriveActionsController({
+export function useTableDriveActions({
   currentNodeId,
   currentRows,
   selectedActionTargets,
@@ -94,7 +94,7 @@ export function useTableDriveActionsController({
   mountTagId,
   isTrashView,
   onNodeActionSuccess,
-}: UseTableDriveActionsControllerParams): UseTableDriveActionsControllerReturn {
+}: UseTableDriveActionsParams): UseTableDriveActionsResult {
   const { t } = useTranslation('drive');
   const openResource = useOpenResource();
   const groupId = scope.type === 'group' ? scope.groupId : undefined;

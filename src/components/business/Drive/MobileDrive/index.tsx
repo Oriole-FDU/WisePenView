@@ -9,8 +9,8 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
 import { resolveDriveFolderVariant, resolveDriveScope } from '../common/driveComponentModel';
-import { useOpenDriveNode } from '../common/useOpenDriveNode';
-import { useTableDriveNavigationController } from '../TableDrive/controllers';
+import { useDriveNavigation } from '../hooks/useDriveNavigation';
+import { useOpenDriveNode } from '../hooks/useOpenDriveNode';
 import type { DriveTableRow, TableDriveProps } from '../TableDrive/index.type';
 import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/tableConfig';
 import styles from './style.module.scss';
@@ -32,7 +32,7 @@ function MobileDrive({
 }: TableDriveProps) {
   const { t } = useTranslation('drive');
   const resolvedScope = resolveDriveScope(scope, groupId, rootId);
-  const navigation = useTableDriveNavigationController({
+  const navigation = useDriveNavigation({
     initialNodeId,
     scope: resolvedScope.scope,
     ready: !externalLoading,

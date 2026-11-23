@@ -33,6 +33,7 @@ import { getDriveRuntime } from '@/runtime/drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
+import { useSidebarDriveTree } from './hooks/useSidebarDriveTree';
 import {
   getSidebarExistingFolderNames,
   isSidebarNodeInTrash,
@@ -44,7 +45,6 @@ import type { SidebarDriveCreateAction } from './SidebarDriveNodeTitle';
 import SidebarDriveNodeTitle from './SidebarDriveNodeTitle';
 import SidebarDriveScopeSwitcher from './SidebarDriveScopeSwitcher';
 import styles from './style.module.scss';
-import { useSidebarDriveTreeController } from './useSidebarDriveTreeController';
 
 interface SidebarDriveCreateTarget {
   type: DriveCreateType;
@@ -202,7 +202,7 @@ function DriveTab() {
     selectedKeys,
     treeData,
     treeLoading,
-  } = useSidebarDriveTreeController({
+  } = useSidebarDriveTree({
     scope,
     buildTreeData: buildChildrenData,
     onOpenResource: (node) => {

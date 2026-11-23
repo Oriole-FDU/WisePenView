@@ -27,6 +27,8 @@ export interface DriveLoadingNode {
 
 export type DriveViewNode = DriveNode | DriveLoadingNode;
 
+export type DriveRow = DriveViewNode & { children?: DriveRow[] };
+
 export type DriveActionTarget = Extract<DriveNode, { type: 'folder' | 'resource' | 'link' }>;
 
 export type DriveFolderVariant = Exclude<DriveSystemFolderType, 'trash'> | undefined;

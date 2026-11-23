@@ -6,25 +6,25 @@ import type { DriveTreeRuntime, DriveTreeSnapshot } from '@/runtime/drive';
 
 import {
   type DriveActionTarget,
+  type DriveRow,
   isDriveActionTarget,
   isDriveSystemFolderNode,
 } from '../../common/driveComponentModel';
-import type { DriveRow } from '../index.type';
 import { buildDriveTableRowMap, toDriveTableRow } from '../tableConfig';
 
-interface UseTableDriveInteractionControllerParams {
+interface UseTableDriveInteractionParams {
   runtime: DriveTreeRuntime;
   snapshot: DriveTreeSnapshot;
   dataSource: DriveRow[];
   t: TFunction<'drive' | 'resource' | 'common'>;
 }
 
-export function useTableDriveInteractionController({
+export function useTableDriveInteraction({
   runtime,
   snapshot,
   dataSource,
   t,
-}: UseTableDriveInteractionControllerParams) {
+}: UseTableDriveInteractionParams) {
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
   const lastSortClickRef = useRef<{ column: string; time: number } | null>(null);
 

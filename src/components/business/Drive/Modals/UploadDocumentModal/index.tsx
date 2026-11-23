@@ -10,7 +10,7 @@ import {
   DRIVE_DOCUMENT_FILE_ACCEPT,
   getSupportedDriveDocumentFiles,
   useDriveDocumentUpload,
-} from '@/components/business/Drive/common/useDriveDocumentUpload';
+} from '@/components/business/Drive/hooks/useDriveDocumentUpload';
 
 import type { UploadDocumentModalProps } from './index.type';
 import styles from './style.module.scss';

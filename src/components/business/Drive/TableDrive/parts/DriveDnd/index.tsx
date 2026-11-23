@@ -1,20 +1,19 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { clsx } from 'clsx';
-import {
-  cloneElement,
-  type DragEvent,
-  type MouseEventHandler,
-  type ReactElement,
-  type ReactNode,
-  type Ref,
-} from 'react';
+import { cloneElement, type MouseEventHandler, type ReactElement, type Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 
 import { resolveDriveFolderVariant } from '../../../common/driveComponentModel';
-import type { DriveTableRow } from '../../index.type';
-import styles from '../../style.module.scss';
+import type {
+  DriveDndRowProps,
+  DriveDragOverlayProps,
+  DriveDroppableBreadcrumbProps,
+  ExternalFileDroppableBreadcrumbProps,
+  ExternalFileDropTargetProps,
+} from './index.type';
+import styles from './style.module.scss';
 
 const ROW_DND_IGNORE_TARGET_SELECTOR = [
   'a',
@@ -37,13 +36,6 @@ interface DriveDndRowElementProps {
   className?: string;
   onMouseDownCapture?: MouseEventHandler<HTMLElement>;
   ref?: Ref<HTMLElement>;
-}
-
-interface DriveDndRowProps {
-  row: DriveTableRow;
-  draggableDisabled: boolean;
-  droppableDisabled: boolean;
-  children: ReactElement;
 }
 
 function assignRef<T>(ref: Ref<T> | undefined, value: T | null): void {
@@ -107,19 +99,6 @@ export function DriveDndRow({
   );
 }
 
-interface DriveDroppableBreadcrumbProps {
-  targetNodeId: string;
-  disabled: boolean;
-  children: ReactNode;
-}
-
-interface ExternalFileDropHandlers {
-  onDragEnter: (event: DragEvent<HTMLElement>) => void;
-  onDragOver: (event: DragEvent<HTMLElement>) => void;
-  onDragLeave: (event: DragEvent<HTMLElement>) => void;
-  onDrop: (event: DragEvent<HTMLElement>) => void;
-}
-
 export function DriveDroppableBreadcrumb({
   targetNodeId,
   disabled,
@@ -140,20 +119,6 @@ export function DriveDroppableBreadcrumb({
       {children}
     </span>
   );
-}
-
-interface ExternalFileDroppableBreadcrumbProps {
-  nodeId: string;
-  isActive: boolean;
-  handlers: ExternalFileDropHandlers;
-  children: ReactNode;
-}
-
-interface ExternalFileDropHandlers {
-  onDragEnter: (event: DragEvent<HTMLElement>) => void;
-  onDragOver: (event: DragEvent<HTMLElement>) => void;
-  onDragLeave: (event: DragEvent<HTMLElement>) => void;
-  onDrop: (event: DragEvent<HTMLElement>) => void;
 }
 
 /** 原生文件拖入的面包屑容器，不参与 dnd-kit 的内部节点移动。 */
@@ -178,9 +143,15 @@ export function ExternalFileDroppableBreadcrumb({
   );
 }
 
-interface DriveDragOverlayProps {
-  row: DriveTableRow;
-  count: number;
+export function ExternalFileDropTarget({ isActive, children }: ExternalFileDropTargetProps) {
+  return (
+    <span
+      className={styles.externalFileDropTarget}
+      data-drop-target={isActive ? 'true' : undefined}
+    >
+      {children}
+    </span>
+  );
 }
 
 export function DriveDragOverlay({ row, count }: DriveDragOverlayProps) {

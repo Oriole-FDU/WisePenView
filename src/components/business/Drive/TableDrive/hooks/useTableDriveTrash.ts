@@ -4,17 +4,13 @@ import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
 import { getDriveRuntime } from '@/runtime/drive';
 
-interface UseTableDriveTrashControllerParams {
+interface UseTableDriveTrashParams {
   currentNodeId: string;
   pathNodes: DriveNode[];
   scope: DriveNodeScope;
 }
 
-export function useTableDriveTrashController({
-  currentNodeId,
-  pathNodes,
-  scope,
-}: UseTableDriveTrashControllerParams) {
+export function useTableDriveTrash({ currentNodeId, pathNodes, scope }: UseTableDriveTrashParams) {
   const { t } = useTranslation(['drive', 'table']);
   const driveRuntime = getDriveRuntime();
   const canOpenTrash = scope.type === 'personal';

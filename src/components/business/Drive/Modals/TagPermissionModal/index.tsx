@@ -21,6 +21,7 @@ import TagPermissionActionEditor from '@/components/business/Drive/PermissionAct
 import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
 import { parseErrorMessage } from '@/utils/error';
 
+import { useTagPermissionModal } from './hooks/useTagPermissionModal';
 import type { TagMountPermissionModalProps, TagPermissionModalProps } from './index.type';
 import styles from './style.module.scss';
 import {
@@ -30,7 +31,6 @@ import {
   type PersonnelPolicyConfig,
   type TagPolicyModalMode,
 } from './tagPermissionModalModel';
-import { useTagPermissionModalController } from './useTagPermissionModalController';
 
 interface TagPolicyModalBaseProps extends TagPermissionModalProps {
   mode: TagPolicyModalMode;
@@ -62,7 +62,7 @@ const TagPolicyModalBase = ({
     setGrantedActions,
     showTagTree,
     tagRefreshSeed,
-  } = useTagPermissionModalController({
+  } = useTagPermissionModal({
     isOpen,
     groupId,
     initialTagId,

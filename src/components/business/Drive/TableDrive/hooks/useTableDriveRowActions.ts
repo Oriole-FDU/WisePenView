@@ -12,7 +12,7 @@ import {
 import { type DriveActionTarget, isDriveActionTarget } from '../../common/driveComponentModel';
 import type { DriveTableRow } from '../index.type';
 
-interface UseTableDriveRowActionsControllerParams {
+interface UseTableDriveRowActionsParams {
   groupId?: string;
   isEditMode: boolean;
   isTrashView: boolean;
@@ -27,7 +27,7 @@ interface UseTableDriveRowActionsControllerParams {
   onOpenResourcePermission: (target: ResourcePermissionModalTarget) => void;
 }
 
-export function useTableDriveRowActionsController({
+export function useTableDriveRowActions({
   groupId,
   isEditMode,
   isTrashView,
@@ -40,7 +40,7 @@ export function useTableDriveRowActionsController({
   onOpenTagAccessPermission,
   onOpenTagMountPermission,
   onOpenResourcePermission,
-}: UseTableDriveRowActionsControllerParams) {
+}: UseTableDriveRowActionsParams) {
   const { t } = useTranslation(['drive', 'resource', 'common']);
 
   return (row: DriveTableRow): FolderTableRowAction<DriveTableRow>[] => {

@@ -8,7 +8,7 @@ import type { TagTreeNode } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { TagPermissionModalProps } from './index.type';
+import type { TagPermissionModalProps } from '../index.type';
 import {
   buildFormFromTag,
   buildMemberOptions,
@@ -23,14 +23,14 @@ import {
   selectionToUserIds,
   type TagPermissionFormValues,
   type TagPolicyModalMode,
-} from './tagPermissionModalModel';
+} from '../tagPermissionModalModel';
 
-interface TagPolicyModalControllerProps extends TagPermissionModalProps {
+interface TagPermissionModalHookProps extends TagPermissionModalProps {
   mode: TagPolicyModalMode;
   t: TFunction<'resource'>;
 }
 
-export const useTagPermissionModalController = ({
+export const useTagPermissionModal = ({
   isOpen,
   groupId,
   initialTagId,
@@ -38,7 +38,7 @@ export const useTagPermissionModalController = ({
   onOpenChange,
   onSuccess,
   t,
-}: TagPolicyModalControllerProps) => {
+}: TagPermissionModalHookProps) => {
   const groupService = useGroupService();
   const tagService = useTagService();
   const [permissionForm, setPermissionForm] =

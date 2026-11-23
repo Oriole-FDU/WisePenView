@@ -8,19 +8,18 @@ import {
 } from '@/runtime/drive';
 import { notifyError } from '@/utils/error';
 
-import type { DriveViewNode } from '../../common/driveComponentModel';
-import type { DriveRow } from '../index.type';
+import type { DriveRow, DriveViewNode } from '../common/driveComponentModel';
 
 const DRIVE_BROWSER_RESOURCE_PAGE_SIZE = 50;
 
-interface UseTableDriveNavigationControllerParams {
+interface UseDriveNavigationParams {
   initialNodeId?: string;
   scope: DriveNodeScope;
   ready?: boolean;
   onPathError?: (error: unknown) => void;
 }
 
-interface UseTableDriveNavigationControllerReturn {
+interface UseDriveNavigationResult {
   runtime: DriveTreeRuntime;
   snapshot: DriveTreeSnapshot;
   currentNodeId: string;
@@ -41,12 +40,12 @@ interface UseTableDriveNavigationControllerReturn {
 const isContainer = (node: DriveViewNode): node is DriveContainerNode =>
   node.type === 'root' || node.type === 'folder';
 
-export function useTableDriveNavigationController({
+export function useDriveNavigation({
   initialNodeId,
   scope,
   ready = true,
   onPathError,
-}: UseTableDriveNavigationControllerParams): UseTableDriveNavigationControllerReturn {
+}: UseDriveNavigationParams): UseDriveNavigationResult {
   const handleRuntimeError = (error: unknown, runtime: DriveTreeRuntime) => {
     if (onPathError) {
       onPathError(error);

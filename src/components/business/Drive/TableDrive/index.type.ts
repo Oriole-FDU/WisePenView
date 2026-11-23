@@ -4,9 +4,6 @@ import type { FolderTableRow } from '@/components/base/Table';
 
 import type { DriveScope, DriveViewNode } from '../common/driveComponentModel';
 
-/** TableDrive 行类型：真实节点或组件分页占位节点，可选挂 children。 */
-export type DriveRow = DriveViewNode & { children?: DriveRow[] };
-
 /** FolderTable 展示行：保留原始节点，避免展示字段污染领域模型。 */
 export type DriveTableRow = FolderTableRow & {
   node: DriveViewNode;

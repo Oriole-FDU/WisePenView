@@ -1,11 +1,11 @@
 import { type DragEvent, useRef, useState } from 'react';
 
-import { useDriveDocumentUpload } from '@/components/business/Drive/common/useDriveDocumentUpload';
+import { useDriveDocumentUpload } from '@/components/business/Drive/hooks/useDriveDocumentUpload';
 import type { DriveNode } from '@/domains/Drive';
 
 import type { DriveTableRow } from '../index.type';
 
-interface UseTableDriveExternalDndControllerParams {
+interface UseTableDriveExternalDndParams {
   pathTagId?: string;
   isTrashView: boolean;
   rowMap: Map<string, DriveTableRow>;
@@ -35,13 +35,13 @@ type ExternalFileDropTarget =
   BackgroundFileDropTarget | RowFileDropTarget | BreadcrumbFileDropTarget;
 
 /** 处理文件管理器拖入的原生拖放事件，与 Drive 内部节点移动保持隔离。 */
-export function useTableDriveExternalDndController({
+export function useTableDriveExternalDnd({
   pathTagId,
   isTrashView,
   rowMap,
   pathNodes,
   onUploadSuccess,
-}: UseTableDriveExternalDndControllerParams) {
+}: UseTableDriveExternalDndParams) {
   const { queueDocuments } = useDriveDocumentUpload({ pathTagId, onSuccess: onUploadSuccess });
   const [activeDropTarget, setActiveDropTarget] = useState<ExternalFileDropTarget | null>(null);
   const fileDragDepthRef = useRef(0);

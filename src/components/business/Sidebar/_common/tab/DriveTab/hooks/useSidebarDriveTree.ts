@@ -10,7 +10,7 @@ import type { DriveContainerNode, DriveNodeScope } from '@/domains/Drive';
 import { DRIVE_TREE_MODE, DRIVE_TREE_SURFACE, useDriveTree } from '@/runtime/drive';
 import { notifyError } from '@/utils/error';
 
-import { isSidebarResourceNode } from './sidebarDriveModel';
+import { isSidebarResourceNode } from '../sidebarDriveModel';
 
 const SIDEBAR_DRIVE_RESOURCE_PAGE_SIZE = 50;
 
@@ -19,7 +19,7 @@ interface SidebarDriveTreeControls {
   handleLoadMore: (parentNodeId: string) => void;
 }
 
-interface UseSidebarDriveTreeControllerOptions {
+interface UseSidebarDriveTreeOptions {
   scope: DriveNodeScope;
   buildTreeData: (
     nodes: DriveViewNode[],
@@ -32,11 +32,11 @@ interface UseSidebarDriveTreeControllerOptions {
 const isContainer = (node: DriveViewNode | undefined): node is DriveContainerNode =>
   node?.type === 'root' || node?.type === 'folder';
 
-export function useSidebarDriveTreeController({
+export function useSidebarDriveTree({
   scope,
   buildTreeData,
   onOpenResource,
-}: UseSidebarDriveTreeControllerOptions) {
+}: UseSidebarDriveTreeOptions) {
   const { t } = useTranslation('drive');
   const { runtime, snapshot } = useDriveTree(
     {

@@ -2,7 +2,7 @@
 
 ## 问题
 
-Drive 的目录读取、分页、展开恢复、选择、拖拽和多 service 写入曾同时散落在 domain service、页面 controller 与各树组件中。组件既负责交互，又拼装分页和刷新时序；domain service 同时承担查询、节点规则和跨 domain 写操作，导致任何一个目录行为都需要跨三层修改。
+Drive 的目录读取、分页、展开恢复、选择、拖拽和多 service 写入曾同时散落在 domain service、页面级状态编排层与各树组件中。组件既负责交互，又拼装分页和刷新时序；domain service 同时承担查询、节点规则和跨 domain 写操作，导致任何一个目录行为都需要跨三层修改。
 
 ## 目标分层
 
@@ -39,4 +39,6 @@ API 与 mapper
 2. 一个目录请求的生命周期由 runtime 持有，组件卸载不丢 scope 级展开缓存。
 3. 分页缓存按 scope、父节点、cursor 与查询配置隔离，并受 TTL 控制。
 4. 数据变更由 runtime 业务操作发出 scope 级失效，不再维护全局 refresh version。
-5. 旧 controller、分页 hook 与刷新总线在迁移后删除，不保留兼容双路径。
+5. 组件私有逻辑放在 `hooks/useXxx.ts`；跨组件状态和行为进入 runtime，不建立 controller 层。
+6. 旧分页 hook 与刷新总线在迁移后删除，不保留兼容双路径。
+7. 可见 UI 放在 `parts/PascalCase/index.tsx`，类型和样式与组件同级；只服务该 part 的 Hook 与 part 同级，Drive 共享 Hook 放在 `Drive/hooks`，共享部件放在 `Drive/parts`。

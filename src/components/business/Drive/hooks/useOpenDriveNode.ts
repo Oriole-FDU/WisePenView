@@ -1,10 +1,10 @@
 import type { ResourceViewer } from '@/domains/Resource';
 import { useOpenResource } from '@/hooks/useOpenResource';
 
-import type { DriveViewNode } from './driveComponentModel';
+import type { DriveViewNode } from '../common/driveComponentModel';
 
 export interface UseOpenDriveNodeParams {
-  /** 进入 root / folder 等容器型节点（通常由浏览 controller 提供） */
+  /** 进入 root / folder 等容器型节点（通常由 Drive navigation hook 提供） */
   enterFolder: (nodeId: string) => void;
 }
 

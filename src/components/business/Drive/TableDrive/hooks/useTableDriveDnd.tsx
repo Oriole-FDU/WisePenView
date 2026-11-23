@@ -22,7 +22,7 @@ import {
 import type { DriveTableRow } from '../index.type';
 import { DriveDndRow, DriveDroppableBreadcrumb } from '../parts/DriveDnd';
 
-interface UseTableDriveDndControllerParams {
+interface UseTableDriveDndParams {
   runtime: DriveTreeRuntime;
   snapshot: DriveTreeSnapshot;
   rowMap: Map<string, DriveTableRow>;
@@ -59,7 +59,7 @@ function buildDriveNodeMap(
   return nodeMap;
 }
 
-export function useTableDriveDndController({
+export function useTableDriveDnd({
   runtime,
   snapshot,
   rowMap,
@@ -67,7 +67,7 @@ export function useTableDriveDndController({
   checkedRowKeys,
   onMoveSuccess,
   onMoveError,
-}: UseTableDriveDndControllerParams) {
+}: UseTableDriveDndParams) {
   const { t } = useTranslation('drive');
   const driveRuntime = getDriveRuntime();
   const draggingRowKeys = snapshot.draggingNodeIds;
