@@ -111,7 +111,7 @@ const useDriveExpansionCache = create<DriveExpansionState>()(
         }),
     }),
     {
-      name: 'drive-tree-expansion',
+      name: 'sidebar-drive-expansion',
       storage: createStoreJSONStorage('session'),
       version: 1,
       migrate: () => DEFAULT_DRIVE_EXPANSION_STATE,

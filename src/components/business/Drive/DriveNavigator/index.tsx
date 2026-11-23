@@ -16,6 +16,7 @@ import {
 } from '@/components/business/Drive/common/driveComponentModel';
 import type { DriveNode } from '@/domains/Drive';
 import {
+  buildDriveNavigatorTreeKey,
   type DriveNavigatorRequest,
   type DriveTreeSnapshot,
   useDriveNavigator,
@@ -32,10 +33,6 @@ const DEFAULT_SELECTABLE_TYPES: DriveItemKind[] = ['folder'];
 const DEFAULT_RESOURCE_PREVIEW_LIMIT = 8;
 const DEFAULT_SELECTABLE_RESOURCE_PAGE_SIZE = 50;
 const GROUP_SCOPE_LOAD_MORE_NODE_ID = 'group-scope-load-more';
-const TREE_KEY_SEPARATOR = '\u001f';
-
-const buildNavigatorTreeKey = (scopeRootId: string, nodeId: string): string =>
-  `${scopeRootId}${TREE_KEY_SEPARATOR}${nodeId}`;
 
 const isContainer = (node: DriveViewNode): boolean =>
   node.type === 'root' || node.type === 'folder';
@@ -116,7 +113,7 @@ function DriveNavigator({
               }
             : node.type === 'loading'
               ? () => {
-                  const treeKey = buildNavigatorTreeKey(node.scope.rootId, node.parentId);
+                  const treeKey = buildDriveNavigatorTreeKey(node.scope, node.parentId);
                   void runtime.loadMore(treeKey).catch((error: unknown) => {
                     notifyError(error);
                   });
@@ -136,7 +133,7 @@ function DriveNavigator({
         dimUnselectableNodes,
         interactiveLoadingNodes: true,
         disabledNodeIds: new Set(disabledNodeIds),
-        getTreeKey: (node) => buildNavigatorTreeKey(node.scope.rootId, node.id),
+        getTreeKey: (node) => buildDriveNavigatorTreeKey(node.scope, node.id),
         renderTitle,
         isNodeSelectable,
         isNodeDisabled,
@@ -237,7 +234,7 @@ function DriveNavigator({
     }
   };
 
-  if (snapshot.loading && treeData.length === 0) {
+  if (snapshot.loading && !snapshot.initialized) {
     return (
       <div className={styles.wrapper}>
         <div className={styles.stateBlock}>

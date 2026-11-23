@@ -22,7 +22,7 @@ import {
   LAYOUT_HEIGHT_DENSITY,
 } from '@/constants/layoutScale';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
-import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
+import type { ResourceViewer } from '@/domains/Resource';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
@@ -134,7 +134,7 @@ function TableDrive({
     dataSource: navigation.dataSource,
     t,
   });
-  const { isDetailPanelCollapsed, setIsDetailPanelCollapsed } = interaction;
+  const navigationRuntime = navigation.runtime;
 
   /**
    * @wisepen-manual-effect
@@ -145,11 +145,11 @@ function TableDrive({
   useEffect(
     () =>
       registerGuideActionHandler(GUIDE_ACTION_ID.openDetails, {
-        isOpen: () => !isDetailPanelCollapsed,
-        open: () => setIsDetailPanelCollapsed(false),
-        close: () => setIsDetailPanelCollapsed(true),
+        isOpen: () => !navigationRuntime.getSnapshot().detailPanelCollapsed,
+        open: () => navigationRuntime.setDetailPanelCollapsed(false),
+        close: () => navigationRuntime.setDetailPanelCollapsed(true),
       }),
-    [isDetailPanelCollapsed, setIsDetailPanelCollapsed]
+    [navigationRuntime]
   );
 
   // 封装一个通用的节点操作成功回调，清理选中状态并刷新列表

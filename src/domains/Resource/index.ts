@@ -20,6 +20,13 @@ export {
   TAG_QUERY_LOGIC_MODE,
 } from './enum';
 export { ResourceServicesMap } from './mapper/ResourceServices.map';
+export {
+  resolveResourceKind,
+  RESOURCE_KIND,
+  RESOURCE_VIEWER,
+  type ResourceKind,
+  type ResourceViewer,
+} from './model/resourceTarget';
 export type {
   GetGroupResourceRequest,
   GetUserResourcesRequest,

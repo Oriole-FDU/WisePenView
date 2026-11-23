@@ -7,7 +7,7 @@ import {
   RESOURCE_KIND,
   RESOURCE_VIEWER,
   type ResourceViewer,
-} from '@/domains/Resource/model/resourceTarget';
+} from '@/domains/Resource';
 
 import { type DriveActionTarget, isDriveActionTarget } from '../../common/driveComponentModel';
 import type { DriveTableRow } from '../index.type';

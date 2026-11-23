@@ -10,7 +10,7 @@ import {
   type ResourceAction,
 } from '@/domains/_shared/access';
 import type { ResourceItem } from '@/domains/Resource';
-import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource';
 import type { UserDisplayBase } from '@/domains/User';
 import { useApi } from '@/hooks/useApi';
 import { formatFileSize } from '@/utils/format/formatFileSize';

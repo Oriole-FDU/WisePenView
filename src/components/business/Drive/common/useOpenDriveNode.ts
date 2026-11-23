@@ -1,4 +1,4 @@
-import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
+import type { ResourceViewer } from '@/domains/Resource';
 import { useOpenResource } from '@/hooks/useOpenResource';
 
 import type { DriveViewNode } from './driveComponentModel';

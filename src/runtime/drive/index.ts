@@ -12,6 +12,7 @@ export type { DriveTreeFocusOptions, DriveTreeRuntime } from './DriveTreeRuntime
 export { getDriveRuntime } from './getDriveRuntime';
 export type { DriveResourceCreationRequest } from './model/DriveResourceCreation';
 export {
+  buildDriveNavigatorTreeKey,
   DRIVE_TREE_MODE,
   DRIVE_TREE_SURFACE,
   type DriveTreeLoadConfig,

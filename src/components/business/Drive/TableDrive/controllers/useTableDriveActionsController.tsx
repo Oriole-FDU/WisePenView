@@ -27,7 +27,7 @@ import {
   useMarkdownNoteImport,
 } from '@/components/editors/note/hooks/useMarkdownNoteImport';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
-import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { RESOURCE_KIND } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { getDriveRuntime } from '@/runtime/drive';

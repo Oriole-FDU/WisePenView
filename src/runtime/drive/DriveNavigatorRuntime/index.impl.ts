@@ -5,6 +5,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import type { DriveTreeRuntime } from '../DriveTreeRuntime/index.type';
 import { getDriveRuntime } from '../getDriveRuntime';
 import {
+  buildDriveNavigatorTreeKey,
   DRIVE_TREE_MODE,
   DRIVE_TREE_SURFACE,
   type DriveTreeSnapshot,
@@ -18,10 +19,6 @@ import type {
 } from './index.type';
 
 const GROUP_SCOPE_PAGE_SIZE = 20;
-const TREE_KEY_SEPARATOR = '\u001f';
-
-export const buildDriveNavigatorTreeKey = (scope: DriveNodeScope, nodeId: string): string =>
-  `${scope.rootId}${TREE_KEY_SEPARATOR}${nodeId}`;
 
 export const buildNavigatorRuntimeKey = (request: DriveNavigatorRequest): string =>
   [
@@ -29,6 +26,7 @@ export const buildNavigatorRuntimeKey = (request: DriveNavigatorRequest): string
     request.scope.rootId,
     request.resourceType?.trim().toLowerCase() ?? '',
     request.pageSize,
+    request.showResources ? 'resources' : 'folders',
     request.multiple ? 'multiple' : 'single',
     request.renderableTypes.toSorted().join(','),
     request.selectableTypes.toSorted().join(','),
@@ -60,6 +58,7 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
   private scopePage = 0;
   private disposed = false;
   private error: unknown;
+  private initializePromise: Promise<void> | null = null;
   private cachedSnapshot: DriveNavigatorSnapshot;
 
   constructor(request: DriveNavigatorRequest) {
@@ -90,8 +89,26 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
     this.attachedTrees.clear();
   }
 
-  async initialize(): Promise<void> {
+  initialize(): Promise<void> {
     this.assertAlive();
+    if (this.initialized) return Promise.resolve();
+    if (this.initializePromise) return this.initializePromise;
+    this.initializePromise = this.runInitialize().finally(() => {
+      this.initializePromise = null;
+    });
+    return this.initializePromise;
+  }
+
+  refresh(): Promise<void> {
+    this.assertAlive();
+    if (this.initializePromise) return this.initializePromise;
+    this.initializePromise = this.runInitialize().finally(() => {
+      this.initializePromise = null;
+    });
+    return this.initializePromise;
+  }
+
+  private async runInitialize(): Promise<void> {
     this.reset();
     this.loading = true;
     this.error = undefined;
@@ -130,13 +147,14 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
     }
   }
 
-  refresh(): Promise<void> {
-    return this.initialize();
-  }
-
   async loadMoreScopes(): Promise<void> {
     this.assertAlive();
-    if (this.loadingMoreScopes || !this.hasMoreScopes || this.request.scopeMode === 'single') {
+    if (
+      this.loading ||
+      this.loadingMoreScopes ||
+      !this.hasMoreScopes ||
+      this.request.scopeMode === 'single'
+    ) {
       return;
     }
     this.loadingMoreScopes = true;
@@ -190,8 +208,8 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
     this.expandedTreeKeys = new Set(keys);
     this.attachedTrees.forEach(({ runtime }, rootId) => {
       const expandedNodeIds = keys
-        .filter((key) => key.startsWith(`${rootId}${TREE_KEY_SEPARATOR}`))
-        .map((key) => key.slice(rootId.length + TREE_KEY_SEPARATOR.length));
+        .filter((key) => key.startsWith(`${rootId}\u001f`))
+        .map((key) => key.slice(rootId.length + 1));
       runtime.setExpandedNodeIds(expandedNodeIds);
     });
     this.emit();
@@ -244,6 +262,7 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
       },
     });
     const unsubscribe = runtime.subscribe(() => {
+      this.pruneSelection();
       this.applyInitialSelection();
       this.emit();
     });
@@ -305,7 +324,15 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
     this.scopePage = 0;
     this.hasMoreScopes = false;
     this.initialSelectionPending = true;
+    this.initialized = false;
     this.error = undefined;
+  }
+
+  private pruneSelection(): void {
+    const availableKeys = this.buildNodeByTreeKey();
+    this.selectedTreeKeys = new Set(
+      [...this.selectedTreeKeys].filter((key) => availableKeys.has(key))
+    );
   }
 
   private applyInitialSelection(): void {
@@ -394,10 +421,14 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
   }
 
   private buildSnapshot(): DriveNavigatorSnapshot {
+    const treeSnapshots = this.buildTreeSnapshots();
+    const treeError = [...treeSnapshots.values()]
+      .map((snapshot) => snapshot.error)
+      .find((error) => error !== undefined);
     return {
       key: this.key,
       scopeEntries: this.scopeEntries,
-      treeSnapshots: this.buildTreeSnapshots(),
+      treeSnapshots,
       nodeByTreeKey: this.buildNodeByTreeKey(),
       selectedTreeKeys: this.selectedTreeKeys,
       expandedTreeKeys: this.expandedTreeKeys,
@@ -405,7 +436,7 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
       loadingMoreScopes: this.loadingMoreScopes,
       hasMoreScopes: this.hasMoreScopes,
       initialized: this.initialized,
-      error: this.error,
+      error: this.error ?? treeError,
     };
   }
 

@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import type { FolderTableColumn } from '@/components/base/Table';
-import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { resolveResourceKind, RESOURCE_KIND } from '@/domains/Resource';
 import type { UserDisplayBase } from '@/domains/User';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 

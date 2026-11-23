@@ -19,8 +19,7 @@ import {
   type DriveContainerNode,
   type DriveResourceNode,
 } from '@/domains/Drive';
-import { type ResourceItem } from '@/domains/Resource';
-import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { RESOURCE_KIND, type ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { getDriveRuntime } from '@/runtime/drive';
