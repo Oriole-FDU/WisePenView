@@ -40,7 +40,7 @@ function MobileDrive({
   });
   const handleEnterFolder = (nodeId: string) => {
     onCurrentNodeChange?.(nodeId);
-    navigation.enterFolder(nodeId);
+    void navigation.enterFolder(nodeId);
   };
   const openDriveNode = useOpenDriveNode({ enterFolder: handleEnterFolder });
   const rows = navigation.dataSource.map((node) => toDriveTableRow(node, t));
@@ -103,7 +103,9 @@ function MobileDrive({
           loading={navigation.loading}
           breadcrumb={breadcrumb}
           expandedRowKeys={navigation.expandedRowKeys}
-          onExpandedChange={navigation.handleExpandedChange}
+          onExpandedChange={(keys) => {
+            void navigation.handleExpandedChange(keys);
+          }}
           onRowActivate={handleActivateNode}
           renderEntryIcon={(row) => (
             <EntryIcon

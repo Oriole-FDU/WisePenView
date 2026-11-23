@@ -6,14 +6,13 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { toast } from '@heroui/react';
-import { type ReactElement, type ReactNode, useRef, useState } from 'react';
+import { type ReactElement, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { useDriveService } from '@/domains';
 import type { DriveNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { type DriveTreeRuntime, type DriveTreeSnapshot, getDriveRuntime } from '@/runtime/drive';
 
 import {
   type DriveViewNode,
@@ -24,6 +23,8 @@ import type { DriveTableRow } from '../index.type';
 import { DriveDndRow, DriveDroppableBreadcrumb } from '../parts/DriveDnd';
 
 interface UseTableDriveDndControllerParams {
+  runtime: DriveTreeRuntime;
+  snapshot: DriveTreeSnapshot;
   rowMap: Map<string, DriveTableRow>;
   pathNodes: DriveNode[];
   checkedRowKeys: Set<string>;
@@ -59,6 +60,8 @@ function buildDriveNodeMap(
 }
 
 export function useTableDriveDndController({
+  runtime,
+  snapshot,
   rowMap,
   pathNodes,
   checkedRowKeys,
@@ -66,10 +69,9 @@ export function useTableDriveDndController({
   onMoveError,
 }: UseTableDriveDndControllerParams) {
   const { t } = useTranslation('drive');
-  const driveService = useDriveService();
-  const [draggingRowKeys, setDraggingRowKeys] = useState<Set<string>>(new Set());
-  const [activeDragRowId, setActiveDragRowId] = useState<string | null>(null);
-  const draggingRowKeysRef = useRef<Set<string>>(new Set());
+  const driveRuntime = getDriveRuntime();
+  const draggingRowKeys = snapshot.draggingNodeIds;
+  const activeDragRowId = snapshot.activeDragNodeId;
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { distance: 8 },
@@ -81,9 +83,7 @@ export function useTableDriveDndController({
   const draggingCount = draggingRowKeys.size;
 
   const clearDragState = () => {
-    draggingRowKeysRef.current = new Set();
-    setDraggingRowKeys(new Set());
-    setActiveDragRowId(null);
+    runtime.endDrag();
   };
 
   const { loading: movingByDrag, run: runMoveRowsByDrag } = useApi(
@@ -104,9 +104,7 @@ export function useTableDriveDndController({
       if (!target || !isDriveMoveTarget(target)) {
         return { requestedCount: 0, affectedCount: 0 };
       }
-      const result = await driveService.moveNodes({ nodes, target });
-      requestDriveRefresh();
-      return result;
+      return driveRuntime.moveNodes({ nodes, target });
     },
     {
       manual: true,
@@ -142,15 +140,12 @@ export function useTableDriveDndController({
     });
     if (sourceRowIds.length === 0) return;
 
-    const nextDraggingRowKeys = new Set(sourceRowIds);
-    draggingRowKeysRef.current = nextDraggingRowKeys;
-    setDraggingRowKeys(nextDraggingRowKeys);
-    setActiveDragRowId(row.id);
+    runtime.beginDrag(sourceRowIds, row.id);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const targetNodeId = event.over?.data.current?.targetNodeId;
-    const sourceRowIds = [...draggingRowKeysRef.current];
+    const sourceRowIds = [...runtime.getSnapshot().draggingNodeIds];
     const targetNode =
       typeof targetNodeId === 'string' ? driveNodeMap.get(targetNodeId) : undefined;
 

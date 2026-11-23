@@ -24,11 +24,12 @@ import {
   MARKDOWN_NOTE_FILE_ACCEPT,
   useMarkdownNoteImport,
 } from '@/components/editors/note/hooks/useMarkdownNoteImport';
-import { useGroupService, useNoteService } from '@/domains';
+import { useGroupService } from '@/domains';
 import type { DriveResourceLocation, FolderNode, RootNode } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
+import { getDriveRuntime } from '@/runtime/drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
@@ -53,7 +54,7 @@ interface SidebarDriveCreateTarget {
 function DriveTab() {
   const { t } = useTranslation('drive');
   const groupService = useGroupService();
-  const noteService = useNoteService();
+  const driveRuntime = getDriveRuntime();
   const scope = useSidebarDriveScopeStore((state) => state.scope);
   const groupId = getDriveScopeGroupId(scope);
   const openResource = useOpenResource();
@@ -109,6 +110,7 @@ function DriveTab() {
       const target = importTargetRef.current;
       importTargetRef.current = null;
       if (!target) return;
+      driveRuntime.notifyChanged(scope);
       openResource({
         resourceId,
         resourceType: RESOURCE_KIND.NOTE,
@@ -197,13 +199,11 @@ function DriveTab() {
     handleLoadData,
     handleSelect,
     nodeMap,
-    refreshTree,
     selectedKeys,
     treeData,
     treeLoading,
   } = useSidebarDriveTreeController({
     scope,
-    rootDisplayName,
     buildTreeData: buildChildrenData,
     onOpenResource: (node) => {
       openResource({
@@ -225,13 +225,16 @@ function DriveTab() {
           reason: '笔记创建目标不存在',
         });
       }
-      const { resourceId } = await noteService.createNote({
-        title: t('create.defaultNoteTitle'),
-        pathTagId: resolveContainerMountTagId(noteTarget),
-      });
-      if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+      const pathTagId = resolveContainerMountTagId(noteTarget);
+      if (!pathTagId) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING);
       }
+      const resourceId = await driveRuntime.createResource({
+        type: 'note',
+        title: t('create.defaultNoteTitle'),
+        pathTagId,
+        scope: noteTarget.scope,
+      });
       return {
         resourceId,
         target: noteTarget,
@@ -299,7 +302,7 @@ function DriveTab() {
           onOpenChange={(open) => {
             if (!open) setUploadDocumentPathTagId(undefined);
           }}
-          onSuccess={refreshTree}
+          onSuccess={() => driveRuntime.notifyChanged(scope)}
         />
       ) : null}
       {driveCreateTarget ? (
@@ -317,7 +320,6 @@ function DriveTab() {
             const target = driveCreateTarget.target;
             if (type === 'folder') {
               setDriveCreateTarget(null);
-              refreshTree();
               return;
             }
             setDriveCreateTarget(null);
@@ -335,7 +337,7 @@ function DriveTab() {
         onOpenChange={(open) => {
           if (!open) setRenameTarget(null);
         }}
-        onSuccess={refreshTree}
+        onSuccess={() => undefined}
       />
       {isDeleteTargetInTrash ? (
         <TrashDeleteModal
@@ -344,7 +346,7 @@ function DriveTab() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          onSuccess={refreshTree}
+          onSuccess={() => undefined}
         />
       ) : (
         <DriveDeleteModal
@@ -353,7 +355,7 @@ function DriveTab() {
           onOpenChange={(open) => {
             if (!open) setDeleteTarget(null);
           }}
-          onSuccess={refreshTree}
+          onSuccess={() => undefined}
         />
       )}
     </div>

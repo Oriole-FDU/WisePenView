@@ -6,10 +6,9 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import StepDots from '@/components/base/StepDots';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { useDriveService } from '@/domains';
 import type { DriveNode, FolderNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 
 import type { DriveSelectionItem } from '../../common/driveComponentModel';
 import type { UploadFileToGroupModalProps } from './index.type';
@@ -22,7 +21,7 @@ function UploadFileToGroupModal({
   onSuccess,
 }: UploadFileToGroupModalProps) {
   const { t } = useTranslation(['drive', 'common']);
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const [step, setStep] = useState(0);
   const [navRefreshKey, setNavRefreshKey] = useState(0);
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
@@ -55,8 +54,7 @@ function UploadFileToGroupModal({
 
   const { loading: submitting, run: runUploadToGroup } = useApi(
     async ({ resourceIds, target }: { resourceIds: string[]; target: FolderNode }) => {
-      await driveService.addResourcesToGroup({ resourceIds, target });
-      requestDriveRefresh();
+      await driveRuntime.addResourcesToGroup({ resourceIds, target });
       return resourceIds.length;
     },
     {

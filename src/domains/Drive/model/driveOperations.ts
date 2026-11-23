@@ -10,6 +10,48 @@ import type {
 
 export type GetDriveTagAncestors = (tagId: string, groupId?: string) => string[];
 
+export interface CreateFolderParams {
+  parent: DriveContainerNode;
+  name: string;
+}
+
+export interface RenameNodeParams {
+  node: DriveMutableNode;
+  newName: string;
+}
+
+export interface SetPersonalResourcesLocationParams {
+  resourceIds: string[];
+  target: DriveContainerNode;
+}
+
+export interface AddResourcesToGroupParams {
+  resourceIds: string[];
+  target: FolderNode;
+}
+
+export interface MoveNodesParams {
+  nodes: DriveMutableNode[];
+  target: DriveContainerNode;
+}
+
+export interface MoveNodesToTrashParams {
+  nodes: DriveMutableNode[];
+}
+
+export interface RemoveNodesFromGroupParams {
+  nodes: DriveMutableNode[];
+}
+
+export interface DeleteTrashedNodesParams {
+  nodes: DriveMutableNode[];
+}
+
+export interface DriveBatchOperationResult {
+  requestedCount: number;
+  affectedCount: number;
+}
+
 export const normalizeDriveIds = (ids: string[]): string[] =>
   Array.from(new Set(ids.map((id) => id.trim()).filter(Boolean)));
 

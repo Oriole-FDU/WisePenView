@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { useDriveService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 
 interface UseTableDriveTrashControllerParams {
   currentNodeId: string;
@@ -16,10 +16,10 @@ export function useTableDriveTrashController({
   scope,
 }: UseTableDriveTrashControllerParams) {
   const { t } = useTranslation(['drive', 'table']);
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const canOpenTrash = scope.type === 'personal';
   const { data: trashFolder } = useApi(
-    () => driveService.getSystemFolder({ scope, type: 'trash' }),
+    () => driveRuntime.getSystemFolder({ scope, type: 'trash' }),
     {
       ready: canOpenTrash,
       refreshDeps: [scope.type],

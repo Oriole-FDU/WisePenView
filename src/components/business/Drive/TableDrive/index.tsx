@@ -128,7 +128,12 @@ function TableDrive({
   });
 
   // 初始化交互控制器
-  const interaction = useTableDriveInteractionController({ dataSource: navigation.dataSource, t });
+  const interaction = useTableDriveInteractionController({
+    runtime: navigation.runtime,
+    snapshot: navigation.snapshot,
+    dataSource: navigation.dataSource,
+    t,
+  });
   const { isDetailPanelCollapsed, setIsDetailPanelCollapsed } = interaction;
 
   /**
@@ -150,16 +155,19 @@ function TableDrive({
   // 封装一个通用的节点操作成功回调，清理选中状态并刷新列表
   const handleNodeActionSuccess = () => {
     interaction.clearChecked();
-    navigation.refresh();
   };
 
   // 初始化拖拽控制器
   const dnd = useTableDriveDndController({
+    runtime: navigation.runtime,
+    snapshot: navigation.snapshot,
     rowMap: interaction.rowMap,
     pathNodes: navigation.pathNodes,
     checkedRowKeys: interaction.selectedActionTargetKeys,
     onMoveSuccess: handleNodeActionSuccess,
-    onMoveError: navigation.refresh,
+    onMoveError: () => {
+      void navigation.refresh();
+    },
   });
 
   // 封装一个通用的进入目录回调，清理选中状态并刷新列表
@@ -168,7 +176,7 @@ function TableDrive({
     interaction.clearSelectedRow();
     dnd.clearDragState();
     onCurrentNodeChange?.(nodeId);
-    navigation.enterFolder(nodeId);
+    void navigation.enterFolder(nodeId);
   };
 
   // 封装一个通用的点击节点回调，清理选中状态并刷新列表
@@ -194,7 +202,9 @@ function TableDrive({
     isTrashView: trash.isTrashView,
     rowMap: interaction.rowMap,
     pathNodes: navigation.pathNodes,
-    onUploadSuccess: navigation.refresh,
+    onUploadSuccess: () => {
+      void navigation.refresh();
+    },
   });
 
   const actionsController = useTableDriveActionsController({
@@ -205,7 +215,9 @@ function TableDrive({
     scope: resolvedScope.scope,
     actions,
     disabled: externalLoading,
-    refresh: navigation.refresh,
+    refresh: () => {
+      void navigation.refresh();
+    },
     mountTagId,
     isTrashView: trash.isTrashView,
     onNodeActionSuccess: handleNodeActionSuccess,
@@ -369,7 +381,9 @@ function TableDrive({
                   breadcrumb={breadcrumb}
                   toolbar={toolbar}
                   expandedRowKeys={navigation.expandedRowKeys}
-                  onExpandedChange={navigation.handleExpandedChange}
+                  onExpandedChange={(keys) => {
+                    void navigation.handleExpandedChange(keys);
+                  }}
                   selectedRowKey={interaction.selectedRow?.id}
                   onRowSelect={handleRowSelect}
                   onRowActivate={handleActivateNode}

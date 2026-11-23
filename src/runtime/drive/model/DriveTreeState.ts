@@ -52,6 +52,7 @@ export interface DriveTreeSnapshot {
   readonly selectedNodeIds: ReadonlySet<string>;
   readonly checkedNodeIds: ReadonlySet<string>;
   readonly draggingNodeIds: ReadonlySet<string>;
+  readonly activeDragNodeId: string | null;
   readonly loadingNodeIds: ReadonlySet<string>;
   readonly loadingMoreNodeIds: ReadonlySet<string>;
   readonly initialized: boolean;

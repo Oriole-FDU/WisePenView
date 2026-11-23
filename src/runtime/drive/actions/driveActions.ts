@@ -27,6 +27,8 @@ import {
 } from '@/domains/Drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
+import type { DriveResourceCreationRequest } from '../model/DriveResourceCreation';
+
 export interface DriveActions {
   createFolder(params: CreateFolderParams): Promise<FolderNode>;
   renameNode(params: RenameNodeParams): Promise<void>;
@@ -38,6 +40,7 @@ export interface DriveActions {
   moveNodesToTrash(params: MoveNodesToTrashParams): Promise<DriveBatchOperationResult>;
   removeNodesFromGroup(params: RemoveNodesFromGroupParams): Promise<DriveBatchOperationResult>;
   deleteTrashedNodes(params: DeleteTrashedNodesParams): Promise<DriveBatchOperationResult>;
+  createResource(params: DriveResourceCreationRequest): Promise<string>;
 }
 
 const getGroupId = (scope: DriveNodeScope): string | undefined =>
@@ -46,7 +49,8 @@ const getGroupId = (scope: DriveNodeScope): string | undefined =>
 export const createDriveActions = (
   notifyScopeChanged: (scope: DriveNodeScope) => void
 ): DriveActions => {
-  const { driveService, resourceService, tagService } = getServices();
+  const { agentService, driveService, noteService, resourceService, skillService, tagService } =
+    getServices();
 
   const getTagAncestors = (tagId: string, groupId?: string): string[] => {
     const ancestors: string[] = [];
@@ -290,6 +294,44 @@ export const createDriveActions = (
     return { requestedCount: ids.length, affectedCount };
   };
 
+  const createResource: DriveActions['createResource'] = async (params) => {
+    switch (params.type) {
+      case 'note':
+      case 'drawio': {
+        const result = await noteService.createNote({
+          title: params.title,
+          resourceType: params.type === 'drawio' ? 'DRAWIO' : 'NOTE',
+          pathTagId: params.pathTagId,
+        });
+        if (!result.resourceId) {
+          throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+        }
+        notify(params.scope);
+        return result.resourceId;
+      }
+      case 'agent': {
+        const resourceId = await agentService.createAgent(
+          params.title,
+          params.name,
+          params.description,
+          params.pathTagId
+        );
+        notify(params.scope);
+        return resourceId;
+      }
+      case 'skill': {
+        const resourceId = await skillService.createSkill(
+          params.title,
+          params.name,
+          params.description,
+          params.pathTagId
+        );
+        notify(params.scope);
+        return resourceId;
+      }
+    }
+  };
+
   return {
     createFolder,
     renameNode,
@@ -299,5 +341,6 @@ export const createDriveActions = (
     moveNodesToTrash,
     removeNodesFromGroup,
     deleteTrashedNodes,
+    createResource,
   };
 };

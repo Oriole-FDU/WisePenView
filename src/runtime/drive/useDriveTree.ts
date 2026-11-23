@@ -9,7 +9,7 @@ import type { DriveTreeRequest, DriveTreeSnapshot } from './model/DriveTreeState
 export interface UseDriveTreeOptions {
   initialNodeId?: string;
   ready?: boolean;
-  onError?: (error: unknown) => void;
+  onError?: (error: unknown, runtime: DriveTreeRuntime) => void;
 }
 
 export interface UseDriveTreeResult {
@@ -37,7 +37,7 @@ export function useDriveTree(
       ready,
       refreshDeps: [runtime, initialNodeId],
       showErrorToast: false,
-      onErrorEffect: (error) => onError?.(error),
+      onErrorEffect: (error) => onError?.(error, runtime),
     }
   );
 

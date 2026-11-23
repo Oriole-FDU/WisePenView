@@ -8,7 +8,6 @@ import {
   getSupportedDriveDocumentFiles,
   useDriveDocumentUpload,
 } from '@/components/business/Drive/common/useDriveDocumentUpload';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import {
   DriveCreateModal,
   type DriveCreateType,
@@ -27,12 +26,11 @@ import {
   MARKDOWN_NOTE_FILE_ACCEPT,
   useMarkdownNoteImport,
 } from '@/components/editors/note/hooks/useMarkdownNoteImport';
-import { useDriveService, useNoteService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { getDriveRuntime } from '@/runtime/drive';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
@@ -100,8 +98,7 @@ export function useTableDriveActionsController({
   const { t } = useTranslation('drive');
   const openResource = useOpenResource();
   const groupId = scope.type === 'group' ? scope.groupId : undefined;
-  const noteService = useNoteService();
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const toolbarConfig = { ...DEFAULT_TOOLBAR_CONFIG, ...actions?.toolbar };
 
   const selectedNodes = selectedActionTargets;
@@ -109,11 +106,10 @@ export function useTableDriveActionsController({
     async () => {
       if (selectedNodes.length === 0) return;
       if (scope.type === 'group') {
-        await driveService.removeNodesFromGroup({ nodes: selectedNodes });
+        await driveRuntime.removeNodesFromGroup({ nodes: selectedNodes });
       } else {
-        await driveService.moveNodesToTrash({ nodes: selectedNodes });
+        await driveRuntime.moveNodesToTrash({ nodes: selectedNodes });
       }
-      requestDriveRefresh();
     },
     {
       manual: true,
@@ -178,20 +174,19 @@ export function useTableDriveActionsController({
 
   const { loading: creatingNote, run: runCreateNote } = useApi(
     async () => {
-      const { resourceId } = await noteService.createNote({
+      if (!mountTagId || !currentContainer) return undefined;
+      return driveRuntime.createResource({
+        type: 'note',
         title: t('create.defaultNoteTitle'),
         pathTagId: mountTagId,
+        scope: currentContainer.scope,
       });
-      if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-      }
-      return resourceId;
     },
     {
       manual: true,
       onSuccess: (resourceId) => {
+        if (!resourceId) return;
         useNewNoteStore.getState().setNewNoteResourceId(resourceId);
-        refresh();
         openResource({
           resourceId,
           resourceType: RESOURCE_KIND.NOTE,
@@ -204,11 +199,9 @@ export function useTableDriveActionsController({
   const handleDriveCreateSuccess = (createdId: string, type: DriveCreateType) => {
     if (type === 'folder') {
       setDriveCreateType(null);
-      refresh();
       return;
     }
     setDriveCreateType(null);
-    refresh();
     openResource({
       resourceId: createdId,
       resourceType: type,

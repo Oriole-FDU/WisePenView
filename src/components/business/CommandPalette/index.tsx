@@ -28,11 +28,12 @@ import {
 } from '@/components/_shadcn';
 import { Spin } from '@/components/base/Feedback';
 import { DriveCreateModal, type DriveCreateType } from '@/components/business/Drive/Modals';
-import { useDriveService, useNoteService } from '@/domains';
+import { useNoteService } from '@/domains';
 import type { RootNode } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
+import { getDriveRuntime } from '@/runtime/drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
@@ -85,7 +86,7 @@ const matchesQuery = (query: string, ...values: string[]): boolean => {
 function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
   const { t } = useTranslation(['shell', 'drive', 'profile', 'resource']);
   const navigate = useNavigate();
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const noteService = useNoteService();
   const openResource = useOpenResource();
   const [query, setQuery] = useState('');
@@ -153,7 +154,7 @@ function CommandPalette({ isOpen, onOpenChange }: CommandPaletteProps) {
 
   const { loading: preparingCreate, run: prepareCreate } = useApi(
     async (type: CreateResourceType): Promise<PrepareCreateResult> => {
-      const root = await driveService.getRoot();
+      const root = await driveRuntime.getRoot();
       if (!root.canMountResources || !root.tagId) {
         throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
           reason: '个人云盘根目录不可挂载资源',

@@ -46,7 +46,6 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
   private readonly dataCache: DriveTreeDataCache;
   private readonly listeners = new Set<(snapshot: DriveTreeSnapshot) => void>();
   private readonly scope: DriveNodeScope;
-  private references = 0;
   private disposed = false;
   private operationVersion = 0;
 
@@ -59,12 +58,14 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
   private selectedNodeIds = new Set<string>();
   private checkedNodeIds = new Set<string>();
   private draggingNodeIds = new Set<string>();
+  private activeDragNodeId: string | null = null;
   private loadingNodeIds = new Set<string>();
   private loadingMoreNodeIds = new Set<string>();
   private loading = false;
   private initialized = false;
   private detailPanelCollapsed = true;
   private error: unknown;
+  private cachedSnapshot: DriveTreeSnapshot;
 
   constructor(request: DriveTreeRequest, dataCache: DriveTreeDataCache) {
     this.request = request;
@@ -73,9 +74,14 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
     this.dataCache = dataCache;
     this.currentNodeId = request.scope.rootId;
     this.expandedNodeIds = new Set(getDriveExpandedNodeIds(request.scope.rootId));
+    this.cachedSnapshot = this.buildSnapshot();
   }
 
   getSnapshot(): DriveTreeSnapshot {
+    return this.cachedSnapshot;
+  }
+
+  private buildSnapshot(): DriveTreeSnapshot {
     const nodeById = new Map<string, DriveNode>();
     this.pathNodes.forEach((node) => nodeById.set(node.id, node));
     this.childrenByParent.forEach((nodes) => {
@@ -101,6 +107,7 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
       selectedNodeIds: this.selectedNodeIds,
       checkedNodeIds: this.checkedNodeIds,
       draggingNodeIds: this.draggingNodeIds,
+      activeDragNodeId: this.activeDragNodeId,
       loadingNodeIds: this.loadingNodeIds,
       loadingMoreNodeIds: this.loadingMoreNodeIds,
       initialized: this.initialized,
@@ -117,19 +124,15 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
     };
   }
 
-  retain(): void {
-    this.assertAlive();
-    this.references += 1;
-  }
-
-  release(): void {
-    this.references = Math.max(0, this.references - 1);
+  hasSubscribers(): boolean {
+    return this.listeners.size > 0;
   }
 
   dispose(): void {
     this.disposed = true;
     this.listeners.clear();
     this.draggingNodeIds.clear();
+    this.activeDragNodeId = null;
   }
 
   async focus(nodeId: string, options?: DriveTreeFocusOptions): Promise<void> {
@@ -168,11 +171,10 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
       this.loading = false;
       this.emit();
     } catch (error) {
-      if (version === this.operationVersion) {
-        this.loading = false;
-        this.error = error;
-        this.emit();
-      }
+      if (version !== this.operationVersion) return;
+      this.loading = false;
+      this.error = error;
+      this.emit();
       throw error;
     }
   }
@@ -195,6 +197,7 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
 
   async loadMore(parentId: string): Promise<void> {
     this.assertAlive();
+    const version = this.operationVersion;
     const pageState = this.pageByParent.get(parentId);
     const parent = this.findNode(parentId);
     if (
@@ -209,6 +212,7 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
     this.emit();
     try {
       const result = await this.loadChildrenPage(parent, pageState.nextCursor, false);
+      this.assertCurrent(version);
       const nextPageState = toDrivePageState(result);
       this.pageByParent = new Map(this.pageByParent).set(parentId, nextPageState);
       this.childrenByParent = new Map(this.childrenByParent).set(parentId, [
@@ -217,6 +221,7 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
       ]);
       this.error = undefined;
     } catch (error) {
+      if (version !== this.operationVersion) return;
       this.error = error;
       throw error;
     } finally {
@@ -277,14 +282,16 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
     this.emit();
   }
 
-  beginDrag(nodeIds: Iterable<string>): void {
+  beginDrag(nodeIds: Iterable<string>, activeNodeId: string): void {
     this.draggingNodeIds = new Set(nodeIds);
+    this.activeDragNodeId = activeNodeId;
     this.emit();
   }
 
   endDrag(): void {
-    if (this.draggingNodeIds.size === 0) return;
+    if (this.draggingNodeIds.size === 0 && this.activeDragNodeId === null) return;
     this.draggingNodeIds = new Set();
+    this.activeDragNodeId = null;
     this.emit();
   }
 
@@ -400,9 +407,9 @@ export class DriveTreeRuntime implements DriveTreeRuntimeContract {
 
   private emit(): void {
     if (this.disposed) return;
-    const snapshot = this.getSnapshot();
+    this.cachedSnapshot = this.buildSnapshot();
     for (const listener of this.listeners) {
-      listener(snapshot);
+      listener(this.cachedSnapshot);
     }
   }
 }

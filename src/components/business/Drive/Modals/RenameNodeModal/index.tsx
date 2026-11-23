@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { FormField, Input } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { useDriveService } from '@/domains';
-import { validateReservedName } from '@/domains/Drive/validation/validateReservedName';
+import { validateReservedName } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { RenameNodeModalProps } from './index.type';
@@ -21,15 +20,14 @@ function getDefaultName(node: DriveActionTarget | null): string {
 
 function RenameNodeModalContent({ isOpen, node, onOpenChange, onSuccess }: RenameNodeModalProps) {
   const { t } = useTranslation('drive');
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const [name, setName] = useState(getDefaultName(node));
   const [nameError, setNameError] = useState('');
 
   const { loading, run: runRenameNode } = useApi(
     async (trimmed: string) => {
       if (!node) return;
-      await driveService.renameNode({ node, newName: trimmed });
-      requestDriveRefresh();
+      await driveRuntime.renameNode({ node, newName: trimmed });
     },
     {
       manual: true,

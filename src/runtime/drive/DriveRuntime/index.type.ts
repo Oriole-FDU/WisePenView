@@ -1,5 +1,4 @@
 import type {
-  DriveContainerNode,
   DriveNodeScope,
   DriveResourceLocation,
   DriveResourceNode,
@@ -10,7 +9,12 @@ import type {
 import type { ResourceItem } from '@/domains/Resource';
 
 import type { DriveActions } from '../actions/driveActions';
+import type {
+  DriveNavigatorRequest,
+  DriveNavigatorRuntime,
+} from '../DriveNavigatorRuntime/index.type';
 import type { DriveTreeRuntime } from '../DriveTreeRuntime/index.type';
+import type { DriveResourceCreationRequest } from '../model/DriveResourceCreation';
 import type { DriveTreeRequest } from '../model/DriveTreeState';
 
 export interface GetDriveRootParams {
@@ -39,14 +43,14 @@ export interface ResolveDriveResourceNodeParams {
 
 export interface DriveRuntime extends DriveActions {
   acquireTree(request: DriveTreeRequest): DriveTreeRuntime;
-  releaseTree(runtime: DriveTreeRuntime): void;
+  acquireNavigator(request: DriveNavigatorRequest): DriveNavigatorRuntime;
 
   getRoot(params?: GetDriveRootParams): Promise<RootNode>;
   getSystemFolder(params: GetDriveSystemFolderParams): Promise<FolderNode>;
   getNodePath(params: GetDriveNodePathParams): Promise<Array<RootNode | FolderNode>>;
   getMountPath(params: GetDriveMountPathParams): Promise<Array<RootNode | FolderNode>>;
   resolveResourceNode(params: ResolveDriveResourceNodeParams): Promise<DriveResourceNode>;
-  loadChildrenOnce(parent: DriveContainerNode): Promise<void>;
+  createResource(params: DriveResourceCreationRequest): Promise<string>;
 
   /** 操作完成后通知对应作用域：清数据缓存，并让相关已挂载树重新对齐。 */
   notifyChanged(scope?: DriveNodeScope): void;

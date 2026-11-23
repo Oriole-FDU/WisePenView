@@ -16,9 +16,8 @@ export interface DriveTreeRuntime {
 
   getSnapshot(): DriveTreeSnapshot;
   subscribe(listener: (snapshot: DriveTreeSnapshot) => void): () => void;
+  hasSubscribers(): boolean;
 
-  retain(): void;
-  release(): void;
   dispose(): void;
 
   focus(nodeId: string, options?: DriveTreeFocusOptions): Promise<void>;
@@ -36,7 +35,7 @@ export interface DriveTreeRuntime {
   clearChecked(): void;
   setDetailPanelCollapsed(collapsed: boolean): void;
 
-  beginDrag(nodeIds: Iterable<string>): void;
+  beginDrag(nodeIds: Iterable<string>, activeNodeId: string): void;
   endDrag(): void;
 
   findNode(nodeId: string): DriveNode | undefined;

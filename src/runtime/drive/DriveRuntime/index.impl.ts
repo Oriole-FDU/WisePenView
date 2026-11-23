@@ -4,7 +4,6 @@ import type {
   CreateFolderParams,
   DeleteTrashedNodesParams,
   DriveBatchOperationResult,
-  DriveContainerNode,
   DriveNodeScope,
   FolderNode,
   MoveNodesParams,
@@ -16,8 +15,17 @@ import type {
 
 import { createDriveActions, type DriveActions } from '../actions/driveActions';
 import { DriveTreeDataCache } from '../data/driveTreeCache';
+import {
+  buildNavigatorRuntimeKey,
+  DriveNavigatorRuntime,
+} from '../DriveNavigatorRuntime/index.impl';
+import type {
+  DriveNavigatorRequest,
+  DriveNavigatorRuntime as DriveNavigatorRuntimeContract,
+} from '../DriveNavigatorRuntime/index.type';
 import { DriveTreeRuntime } from '../DriveTreeRuntime/index.impl';
 import type { DriveTreeRuntime as DriveTreeRuntimeContract } from '../DriveTreeRuntime/index.type';
+import type { DriveResourceCreationRequest } from '../model/DriveResourceCreation';
 import { buildDriveTreeKey, type DriveTreeRequest } from '../model/DriveTreeState';
 import type {
   DriveRuntime as DriveRuntimeContract,
@@ -29,14 +37,21 @@ import type {
 } from './index.type';
 
 const DRIVE_TREE_POOL_CAPACITY = 16;
+const DRIVE_NAVIGATOR_POOL_CAPACITY = 8;
 
 type TreePoolEntry = {
   runtime: DriveTreeRuntime;
   lastUsedAt: number;
 };
 
+type NavigatorPoolEntry = {
+  runtime: DriveNavigatorRuntime;
+  lastUsedAt: number;
+};
+
 export class DriveRuntime implements DriveRuntimeContract {
   private readonly treePool = new Map<string, TreePoolEntry>();
+  private readonly navigatorPool = new Map<string, NavigatorPoolEntry>();
   private readonly dataCache = new DriveTreeDataCache();
   private readonly actions: DriveActions;
 
@@ -63,10 +78,20 @@ export class DriveRuntime implements DriveRuntimeContract {
     return runtime;
   }
 
-  releaseTree(runtime: DriveTreeRuntimeContract): void {
-    runtime.release();
-    const entry = this.treePool.get(runtime.key);
-    if (entry) entry.lastUsedAt = Date.now();
+  acquireNavigator(request: DriveNavigatorRequest): DriveNavigatorRuntimeContract {
+    const key = buildNavigatorRuntimeKey(request);
+    const existing = this.navigatorPool.get(key);
+    if (existing) {
+      existing.lastUsedAt = Date.now();
+      return existing.runtime;
+    }
+    this.ensureNavigatorCapacity();
+    const runtime = new DriveNavigatorRuntime(request);
+    this.navigatorPool.set(key, {
+      runtime,
+      lastUsedAt: Date.now(),
+    });
+    return runtime;
   }
 
   getRoot(params?: GetDriveRootParams) {
@@ -87,12 +112,6 @@ export class DriveRuntime implements DriveRuntimeContract {
 
   resolveResourceNode(params: ResolveDriveResourceNodeParams) {
     return getDriveService().resolveResourceNode(params);
-  }
-
-  async loadChildrenOnce(parent: DriveContainerNode): Promise<void> {
-    const scopeTree = this.findMountedTree(parent.scope);
-    if (!scopeTree) return;
-    await scopeTree.loadChildren(parent);
   }
 
   createFolder(params: CreateFolderParams): Promise<FolderNode> {
@@ -129,6 +148,10 @@ export class DriveRuntime implements DriveRuntimeContract {
     return this.actions.deleteTrashedNodes(params);
   }
 
+  createResource(params: DriveResourceCreationRequest): Promise<string> {
+    return this.actions.createResource(params);
+  }
+
   notifyChanged(scope?: DriveNodeScope): void {
     if (scope) {
       this.dataCache.invalidateScope(scope.rootId);
@@ -146,13 +169,8 @@ export class DriveRuntime implements DriveRuntimeContract {
     this.dataCache.clear();
     this.treePool.forEach(({ runtime }) => runtime.dispose());
     this.treePool.clear();
-  }
-
-  private findMountedTree(scope: DriveNodeScope): DriveTreeRuntime | undefined {
-    for (const { runtime } of this.treePool.values()) {
-      if (runtime.request.scope.rootId === scope.rootId) return runtime;
-    }
-    return undefined;
+    this.navigatorPool.forEach(({ runtime }) => runtime.dispose());
+    this.navigatorPool.clear();
   }
 
   private ensureCapacity(): void {
@@ -160,6 +178,7 @@ export class DriveRuntime implements DriveRuntimeContract {
     let victimKey: string | undefined;
     let victimUsedAt = Number.POSITIVE_INFINITY;
     for (const [key, entry] of this.treePool) {
+      if (entry.runtime.hasSubscribers()) continue;
       if (entry.lastUsedAt < victimUsedAt) {
         victimKey = key;
         victimUsedAt = entry.lastUsedAt;
@@ -168,6 +187,23 @@ export class DriveRuntime implements DriveRuntimeContract {
     if (!victimKey) return;
     const victim = this.treePool.get(victimKey);
     this.treePool.delete(victimKey);
+    victim?.runtime.dispose();
+  }
+
+  private ensureNavigatorCapacity(): void {
+    if (this.navigatorPool.size < DRIVE_NAVIGATOR_POOL_CAPACITY) return;
+    let victimKey: string | undefined;
+    let victimUsedAt = Number.POSITIVE_INFINITY;
+    for (const [key, entry] of this.navigatorPool) {
+      if (entry.runtime.hasSubscribers()) continue;
+      if (entry.lastUsedAt < victimUsedAt) {
+        victimKey = key;
+        victimUsedAt = entry.lastUsedAt;
+      }
+    }
+    if (!victimKey) return;
+    const victim = this.navigatorPool.get(victimKey);
+    this.navigatorPool.delete(victimKey);
     victim?.runtime.dispose();
   }
 }

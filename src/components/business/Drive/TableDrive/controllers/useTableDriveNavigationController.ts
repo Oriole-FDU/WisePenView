@@ -1,11 +1,17 @@
-import { useRef, useState } from 'react';
-
 import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
-import { findTreeNodeById } from '@/utils/tree/findTreeNodeById';
+import {
+  DRIVE_TREE_MODE,
+  DRIVE_TREE_SURFACE,
+  type DriveTreeRuntime,
+  type DriveTreeSnapshot,
+  useDriveTree,
+} from '@/runtime/drive';
+import { notifyError } from '@/utils/error';
 
 import type { DriveViewNode } from '../../common/driveComponentModel';
-import { useDriveBrowserController } from '../../common/useDriveBrowserController';
 import type { DriveRow } from '../index.type';
+
+const DRIVE_BROWSER_RESOURCE_PAGE_SIZE = 50;
 
 interface UseTableDriveNavigationControllerParams {
   initialNodeId?: string;
@@ -15,6 +21,8 @@ interface UseTableDriveNavigationControllerParams {
 }
 
 interface UseTableDriveNavigationControllerReturn {
+  runtime: DriveTreeRuntime;
+  snapshot: DriveTreeSnapshot;
   currentNodeId: string;
   dataSource: DriveRow[];
   totalCount: number;
@@ -25,9 +33,9 @@ interface UseTableDriveNavigationControllerReturn {
   expandedRowKeys: string[];
   loadMore: () => void;
   loadMoreChildren: (nodeId: string) => Promise<void>;
-  enterFolder: (nodeId: string) => void;
+  enterFolder: (nodeId: string) => Promise<void>;
   handleExpandedChange: (keys: string[]) => Promise<void>;
-  refresh: () => void;
+  refresh: () => Promise<void>;
 }
 
 const isContainer = (node: DriveViewNode): node is DriveContainerNode =>
@@ -39,83 +47,94 @@ export function useTableDriveNavigationController({
   ready = true,
   onPathError,
 }: UseTableDriveNavigationControllerParams): UseTableDriveNavigationControllerReturn {
-  const expandedRowKeysRef = useRef<string[]>([]);
-  const loadedLocationKeyRef = useRef<string | undefined>(undefined);
-  const [expandedState, setExpandedState] = useState<{ locationKey: string; keys: string[] }>({
-    locationKey: '',
-    keys: [],
-  });
-  const browser = useDriveBrowserController({
-    initialNodeId,
-    scope,
-    ready,
-    onPathError,
-    getExpandedNodeIdsToRestore: (nextLocationKey) =>
-      loadedLocationKeyRef.current === nextLocationKey ? new Set(expandedRowKeysRef.current) : null,
-    onExpandedNodeIdsRestored: (nextLocationKey, nodeIds) => {
-      loadedLocationKeyRef.current = nextLocationKey;
-      expandedRowKeysRef.current = nodeIds;
-      setExpandedState({ locationKey: nextLocationKey, keys: nodeIds });
-    },
-  });
-  const locationKey = `${scope.rootId}\u0000${initialNodeId ?? ''}\u0000${browser.currentNodeId}`;
-  const expandedRowKeys = expandedState.locationKey === locationKey ? expandedState.keys : [];
-
-  const updateExpandedRowKeys = (updater: string[] | ((keys: string[]) => string[])) => {
-    const baseKeys = expandedState.locationKey === locationKey ? expandedRowKeysRef.current : [];
-    const nextKeys = typeof updater === 'function' ? updater(baseKeys) : updater;
-    expandedRowKeysRef.current = nextKeys;
-    setExpandedState({ locationKey, keys: nextKeys });
+  const handleRuntimeError = (error: unknown, runtime: DriveTreeRuntime) => {
+    if (onPathError) {
+      onPathError(error);
+      return;
+    }
+    notifyError(error);
+    if (runtime.getSnapshot().currentNodeId !== scope.rootId) {
+      void runtime.focus(scope.rootId);
+    }
   };
+  const { runtime, snapshot } = useDriveTree(
+    {
+      scope,
+      surface: DRIVE_TREE_SURFACE.browser,
+      mode: DRIVE_TREE_MODE.browse,
+      load: { pageSize: DRIVE_BROWSER_RESOURCE_PAGE_SIZE },
+    },
+    {
+      initialNodeId,
+      ready,
+      onError: handleRuntimeError,
+    }
+  );
+  const dataSource = (snapshot.childrenByParent.get(snapshot.currentNodeId) ?? []).map((row) =>
+    attachChildren(row as DriveRow, snapshot.childrenByParent)
+  );
+  const currentPage = snapshot.pageByParent.get(snapshot.currentNodeId);
+  const expandedRowKeys = [...snapshot.expandedNodeIds].filter(
+    (nodeId) => snapshot.childrenByParent.has(nodeId) || snapshot.nodeById.has(nodeId)
+  );
 
   const updateExpandedRow = async (expanded: boolean, record: DriveRow) => {
     if (!expanded || !isContainer(record)) {
-      updateExpandedRowKeys((keys) => keys.filter((key) => key !== record.id));
+      runtime.collapseNode(record.id);
       return;
     }
-    if (!browser.childrenMap.has(record.id)) await browser.loadChildren(record);
-    updateExpandedRowKeys((keys) => (keys.includes(record.id) ? keys : [...keys, record.id]));
+    await runtime.expandNode(record.id);
   };
 
-  const dataSource = browser.rows.map((row) =>
-    attachChildren(row as DriveRow, browser.childrenMap)
-  );
   const handleExpandedChange = async (keys: string[]) => {
-    const addedKey = keys.find((key) => !expandedRowKeys.includes(key));
+    const addedKey = keys.find((key) => !snapshot.expandedNodeIds.has(key));
     if (addedKey) {
-      const row = findTreeNodeById(dataSource, addedKey);
+      const row = findDriveRow(dataSource, addedKey);
       if (row) await updateExpandedRow(true, row);
       return;
     }
-    const removedKey = expandedRowKeys.find((key) => !keys.includes(key));
+    const removedKey = [...snapshot.expandedNodeIds].find((key) => !keys.includes(key));
     if (!removedKey) return;
-    const row = findTreeNodeById(dataSource, removedKey);
+    const row = findDriveRow(dataSource, removedKey);
     if (row) await updateExpandedRow(false, row);
   };
 
   return {
-    currentNodeId: browser.currentNodeId,
+    runtime,
+    snapshot,
+    currentNodeId: snapshot.currentNodeId,
     dataSource,
-    totalCount: browser.totalCount,
-    pathNodes: browser.pathNodes,
-    loading: browser.loading,
-    loadingMore: browser.loadingMore,
-    hasMore: browser.hasMore,
-    loadMore: browser.loadMore,
-    loadMoreChildren: async (nodeId) => {
-      const node = findTreeNodeById(dataSource, nodeId);
-      if (node && isContainer(node)) await browser.loadMoreChildren(node);
+    totalCount: currentPage?.total ?? dataSource.length,
+    pathNodes: [...snapshot.pathNodes],
+    loading: !ready || snapshot.loading || !snapshot.initialized,
+    loadingMore: snapshot.loadingMoreNodeIds.has(snapshot.currentNodeId),
+    hasMore: Boolean(currentPage?.hasMore),
+    loadMore: () => {
+      void runtime.loadMore(snapshot.currentNodeId);
     },
+    loadMoreChildren: (nodeId) => runtime.loadMore(nodeId),
     expandedRowKeys,
-    enterFolder: browser.enterFolder,
+    enterFolder: (nodeId) => runtime.focus(nodeId),
     handleExpandedChange,
-    refresh: browser.refresh,
+    refresh: runtime.refresh,
   };
 }
 
-function attachChildren(row: DriveRow, map: Map<string, DriveViewNode[]>): DriveRow {
+function attachChildren(
+  row: DriveRow,
+  childrenByParent: DriveTreeSnapshot['childrenByParent']
+): DriveRow {
   if (!isContainer(row)) return row;
-  const cached = map.get(row.id) as DriveRow[] | undefined;
+  const cached = childrenByParent.get(row.id);
   if (!cached) return row;
-  return { ...row, children: cached.map((child) => attachChildren(child, map)) };
+  return { ...row, children: cached.map((child) => attachChildren(child, childrenByParent)) };
+}
+
+function findDriveRow(rows: readonly DriveRow[], nodeId: string): DriveRow | undefined {
+  for (const row of rows) {
+    if (row.id === nodeId) return row;
+    const child = row.children ? findDriveRow(row.children, nodeId) : undefined;
+    if (child) return child;
+  }
+  return undefined;
 }

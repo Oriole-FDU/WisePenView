@@ -2,6 +2,8 @@ import { type SortDescriptor } from '@heroui/react';
 import type { TFunction } from 'i18next';
 import { useRef, useState } from 'react';
 
+import type { DriveTreeRuntime, DriveTreeSnapshot } from '@/runtime/drive';
+
 import {
   type DriveActionTarget,
   isDriveActionTarget,
@@ -11,22 +13,25 @@ import type { DriveRow } from '../index.type';
 import { buildDriveTableRowMap, toDriveTableRow } from '../tableConfig';
 
 interface UseTableDriveInteractionControllerParams {
+  runtime: DriveTreeRuntime;
+  snapshot: DriveTreeSnapshot;
   dataSource: DriveRow[];
   t: TFunction<'drive' | 'resource' | 'common'>;
 }
 
 export function useTableDriveInteractionController({
+  runtime,
+  snapshot,
   dataSource,
   t,
 }: UseTableDriveInteractionControllerParams) {
-  const [checkedRowKeys, setCheckedRowKeys] = useState<Set<string>>(new Set());
-  const [selectedRowId, setSelectedRowId] = useState<string>();
-  const [isDetailPanelCollapsed, setIsDetailPanelCollapsed] = useState(true);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>();
   const lastSortClickRef = useRef<{ column: string; time: number } | null>(null);
 
   const rows = dataSource.map((node) => toDriveTableRow(node, t));
   const rowMap = buildDriveTableRowMap(rows);
+  const checkedRowKeys = snapshot.checkedNodeIds;
+  const selectedRowId = snapshot.selectedNodeIds.values().next().value as string | undefined;
   const selectedRow = selectedRowId ? rowMap.get(selectedRowId) : undefined;
   const selectedActionTargets: DriveActionTarget[] = [];
   checkedRowKeys.forEach((rowId) => {
@@ -41,8 +46,15 @@ export function useTableDriveInteractionController({
     [...rowMap.values()].filter((row) => isDriveSystemFolderNode(row.node)).map((row) => row.id)
   );
 
-  const clearChecked = () => setCheckedRowKeys(new Set());
-  const clearSelectedRow = () => setSelectedRowId(undefined);
+  const clearChecked = () => runtime.clearChecked();
+  const clearSelectedRow = () => runtime.selectNode(null);
+  const setCheckedRowKeys = (keys: Set<string>) => runtime.setCheckedNodeIds(keys);
+  const setSelectedRowId = (rowId?: string) => runtime.selectNode(rowId ?? null);
+  const setIsDetailPanelCollapsed = (next: boolean | ((collapsed: boolean) => boolean)) => {
+    runtime.setDetailPanelCollapsed(
+      typeof next === 'function' ? next(snapshot.detailPanelCollapsed) : next
+    );
+  };
   const handleSortChange = (descriptor: SortDescriptor) => {
     const now = Date.now();
     const column = String(descriptor.column);
@@ -62,7 +74,7 @@ export function useTableDriveInteractionController({
     clearSelectedRow,
     clearChecked,
     handleSortChange,
-    isDetailPanelCollapsed,
+    isDetailPanelCollapsed: snapshot.detailPanelCollapsed,
     rowMap,
     rows,
     selectedActionTargets,

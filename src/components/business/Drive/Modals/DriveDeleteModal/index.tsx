@@ -2,9 +2,8 @@ import { toast } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import type { DriveDeleteModalProps } from './index.type';
@@ -23,7 +22,7 @@ function DriveDeleteModal({
   onError,
 }: DriveDeleteModalProps) {
   const { t } = useTranslation('drive');
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const isGroupNode = Boolean(groupId && node);
   const isGroupResource = Boolean(groupId && node && node.type !== 'folder');
 
@@ -31,11 +30,10 @@ function DriveDeleteModal({
     async () => {
       if (!node) return;
       if (node.scope.type === 'group') {
-        await driveService.removeNodesFromGroup({ nodes: [node] });
+        await driveRuntime.removeNodesFromGroup({ nodes: [node] });
       } else {
-        await driveService.moveNodesToTrash({ nodes: [node] });
+        await driveRuntime.moveNodesToTrash({ nodes: [node] });
       }
-      requestDriveRefresh();
     },
     {
       manual: true,
