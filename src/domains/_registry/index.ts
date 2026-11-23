@@ -39,5 +39,5 @@ export {
   useWalletService,
 } from './_context';
 export { ServicesProvider } from './_context';
-export { getChatTurnService, getServices } from './getServices';
+export { getChatSessionService, getChatTurnService, getServices } from './getServices';
 export type { ServicesContextValue } from './registry.types';

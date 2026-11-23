@@ -5,6 +5,7 @@
  */
 export type { ServicesContextValue } from './_registry';
 export {
+  getChatSessionService,
   getChatTurnService,
   getServices,
   ServicesProvider,
