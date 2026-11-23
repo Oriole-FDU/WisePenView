@@ -9,24 +9,16 @@ import { useChatComposer } from './useChatComposer';
 
 /** 对话区：持有 composer（发送/建会话/取消），其余为投影与本地交互。 */
 function ChatConversation({
-  contextPreview,
+  view,
+  session,
+  host,
   fullWidth,
-  messages,
-  status,
-  isEmpty,
-  currentSessionId,
-  sessionBarOpen,
-  canLoadMoreHistory,
-  loadingInitialHistory,
-  loadingMoreHistory,
-  onCloseSessionBar,
-  onSelectSession,
-  onClearContext,
-  resourceId,
-  resourceChat,
-  hostAgentPort,
   welcomeConfig,
 }: ChatConversationProps) {
+  const { messages, status, canLoadMoreHistory, loadingInitialHistory, loadingMoreHistory } = view;
+  const { sessionId, sessionBarOpen, onCloseSessionBar, onSelectSession } = session;
+  const { resourceId, resourceChat, hostAgentPort, contextPreview } = host ?? {};
+
   const {
     currentModel,
     cancelling,
@@ -36,7 +28,7 @@ function ChatConversation({
     onCancel,
     onLoadMoreHistory,
   } = useChatComposer({
-    sessionId: currentSessionId,
+    sessionId,
     messages,
     resourceId,
     resourceChat,
@@ -45,7 +37,7 @@ function ChatConversation({
 
   const generating = status === 'submitted' || status === 'streaming';
   const sending = cancelling || generating;
-  const isWelcome = isEmpty && !loadingInitialHistory;
+  const isWelcome = messages.length === 0 && !loadingInitialHistory;
   const showWelcome = isWelcome && !sessionBarOpen;
   const resolvedWelcomeConfig = welcomeConfig ?? NEW_CHAT_WELCOME_CONFIG;
   const welcomeMode = welcomeModeFromBlockCount(resolvedWelcomeConfig.blocks.length);
@@ -73,7 +65,7 @@ function ChatConversation({
         <div className={styles.messageViewport}>
           <ChatMessageList
             messages={messages}
-            resetKey={currentSessionId}
+            resetKey={sessionId}
             canLoadMoreHistory={canLoadMoreHistory}
             loadingInitialHistory={loadingInitialHistory}
             loadingMoreHistory={loadingMoreHistory}
@@ -93,11 +85,11 @@ function ChatConversation({
                 onSend={onSend}
                 getUploadSessionId={() => ensureSession()}
                 sending={sending}
-                sessionId={currentSessionId}
+                sessionId={sessionId}
                 promoteDraftToolSelection={promoteDraftToolSelection}
                 onCancel={cancelling ? undefined : onCancel}
                 contextPreview={contextPreview}
-                onClearContext={onClearContext}
+                onClearContext={resourceChat?.clearContext}
                 injectedAgents={hostAgentPort?.injectedAgents}
                 preferredAgent={hostAgentPort?.preferredAgent}
                 fullWidth={fullWidth}
@@ -117,7 +109,7 @@ function ChatConversation({
   return (
     <div className={styles.panelBody}>
       <ChatInputStoreProvider
-        sessionId={currentSessionId}
+        sessionId={sessionId}
         promoteDraftToolSelection={promoteDraftToolSelection}
       >
         {conversationBody}
@@ -125,7 +117,7 @@ function ChatConversation({
 
       {sessionBarOpen ? (
         <ChatSessionBar
-          activeSessionId={currentSessionId}
+          activeSessionId={sessionId}
           onClose={onCloseSessionBar}
           onSelectSession={onSelectSession}
         />

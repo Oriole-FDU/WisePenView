@@ -57,22 +57,26 @@ function Chat({
         ) : null}
 
         <ChatConversation
-          resourceId={resourceId}
-          resourceChat={resourceChat}
-          hostAgentPort={hostAgentPort}
-          contextPreview={resourceChat?.context ? selectedText : undefined}
           fullWidth={isFullWidth}
-          messages={messages}
-          status={status}
-          isEmpty={messages.length === 0}
-          currentSessionId={currentSessionId}
-          sessionBarOpen={chrome.sessionBarOpen}
-          canLoadMoreHistory={canLoadMoreHistory}
-          loadingInitialHistory={focusing}
-          loadingMoreHistory={loadingMoreHistory}
-          onCloseSessionBar={chrome.closeSessionBar}
-          onSelectSession={chrome.handleSelectSession}
-          onClearContext={resourceChat?.clearContext}
+          view={{
+            messages,
+            status,
+            canLoadMoreHistory,
+            loadingInitialHistory: focusing,
+            loadingMoreHistory,
+          }}
+          session={{
+            sessionId: currentSessionId,
+            sessionBarOpen: chrome.sessionBarOpen,
+            onCloseSessionBar: chrome.closeSessionBar,
+            onSelectSession: chrome.handleSelectSession,
+          }}
+          host={{
+            resourceId,
+            resourceChat,
+            hostAgentPort,
+            contextPreview: resourceChat?.context ? selectedText : undefined,
+          }}
         />
       </div>
       <ChatToolApproval sessionId={currentSessionId} messages={messages} status={status} />
