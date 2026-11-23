@@ -1,17 +1,24 @@
-import { parseJsonEventStream, type ParseResult } from '@ai-sdk/provider-utils';
 import { Chat } from '@ai-sdk/react';
-import { type ChatTransport, type UIMessageChunk, uiMessageChunkSchema } from 'ai';
+import {
+  type ChatTransport,
+  isToolUIPart,
+  parseJsonEventStream,
+  type UIMessageChunk,
+  uiMessageChunkSchema,
+} from 'ai';
 
 import { getChatTurnService } from '@/domains';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import type { ChatRecoverApiRequest } from '@/domains/ChatTurn/apis/ChatTurnApi.schema';
 import {
   pickChatCompletionApiRequest,
   pickChatRecoverApiRequest,
 } from '@/domains/ChatTurn/apis/ChatTurnApi.schema';
+import { mapChatTurnRequest } from '@/domains/ChatTurn/mapper/chatTurn.mapper';
 import { normalizeChatSseResponse } from '@/domains/ChatTurn/runtime/chatSseNormalizer';
 import type { IChatTurnService } from '@/domains/ChatTurn/service/index.type';
 import { captureException } from '@/observability';
+import type { ExceptionOperation } from '@/observability/types';
 import {
   createClientError,
   FRONTEND_CLIENT_ERROR,
@@ -22,6 +29,7 @@ import {
 import type {
   SessionApprovalDecision,
   SessionBootstrapKind,
+  SessionPhase,
   SessionSendOptions,
   SessionVisibility,
 } from '../_common';
@@ -59,14 +67,19 @@ export class SessionRuntime implements SessionRuntimeContract {
       },
       onError: (error) => {
         if (this.cleaned) return;
-        const convertedError = toWisePenError(error, 'SessionRuntime 流错误');
-        captureException(convertedError, {
-          detector: 'application-handled',
-          operation: 'chat.stream',
-        });
+        this.reportError(error, 'SessionRuntime 流错误', 'chat.stream');
+      },
+      onFinish: ({ isAbort, isError, messages }) => {
+        if (this.cleaned || isError) return;
+        if (isAbort) {
+          if (isInFlightPhase(this.state.phase)) {
+            this.updateState({ phase: 'idle', error: undefined });
+          }
+          return;
+        }
         this.updateState({
-          phase: 'error',
-          error: convertedError,
+          phase: hasPendingToolApproval(messages) ? 'hanged' : 'idle',
+          error: undefined,
         });
       },
     });
@@ -142,11 +155,75 @@ export class SessionRuntime implements SessionRuntimeContract {
     this.chat.stop();
   }
 
-  async send(_query: string, _options?: SessionSendOptions): Promise<void> {}
+  async send(query: string, options?: SessionSendOptions): Promise<void> {
+    this.assertAlive();
+    if (this.state.phase !== 'idle' && this.state.phase !== 'error') {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: `当前 phase=${this.state.phase}，不能 send`,
+      });
+    }
 
-  async cancel(): Promise<void> {}
+    this.updateState({ phase: 'sending', error: undefined });
+    try {
+      const requestBody = mapChatTurnRequest({
+        defaultSessionId: this.state.sessionId,
+        query,
+        options,
+      });
+      const metadata = buildSendMessageMetadata(options);
+      await this.chat.sendMessage({ text: query, metadata }, { body: requestBody });
+      this.assertAlive();
+    } catch (error) {
+      if (this.cleaned) return;
+      throw this.reportError(error, 'SessionRuntime send 失败', 'chat.send');
+    }
+  }
 
-  async approve(_decisions: SessionApprovalDecision[]): Promise<void> {}
+  async cancel(): Promise<void> {
+    this.assertAlive();
+    if (this.state.phase !== 'streaming' && this.state.phase !== 'sending') return;
+
+    this.updateState({ phase: 'canceling' });
+    this.chat.stop();
+    try {
+      await this.chatTurnService.cancelTurn(this.state.sessionId);
+      this.assertAlive();
+      // stop/onFinish 可能已收口；仅当仍停在 canceling 时再落到 idle
+      if (this.getSnapshot().phase === 'canceling') {
+        this.updateState({ phase: 'idle', error: undefined });
+      }
+    } catch (error) {
+      if (this.cleaned) return;
+      throw this.reportError(error, 'SessionRuntime cancel 失败', 'chat.cancel');
+    }
+  }
+
+  async approve(decisions: SessionApprovalDecision[]): Promise<void> {
+    this.assertAlive();
+    if (this.state.phase !== 'hanged') {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: `当前 phase=${this.state.phase}，不能 approve`,
+      });
+    }
+
+    const requestBody: ChatRecoverApiRequest = {
+      session_id: this.state.sessionId,
+      client_tool_results: [],
+      tool_approval_status: decisions.map((decision) => ({
+        tool_call_id: decision.toolCallId,
+        approved: decision.approved,
+      })),
+    };
+
+    this.updateState({ phase: 'streaming', error: undefined });
+    try {
+      await this.chat.sendMessage(undefined, { body: requestBody });
+      this.assertAlive();
+    } catch (error) {
+      if (this.cleaned) return;
+      throw this.reportError(error, 'SessionRuntime approve 失败', 'chat.recover');
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Chat transport（替换 Chat 底层 I/O）
@@ -167,6 +244,11 @@ export class SessionRuntime implements SessionRuntimeContract {
           pickChatCompletionApiRequest(requestBody),
           abortSignal ?? undefined
         );
+
+    if (!this.cleaned && this.state.phase === 'sending') {
+      this.updateState({ phase: 'streaming' });
+    }
+
     return toUiMessageChunkStream(response);
   }
 
@@ -189,6 +271,19 @@ export class SessionRuntime implements SessionRuntimeContract {
   // 私有方法
   // ---------------------------------------------------------------------------
 
+  private reportError(error: unknown, reason: string, operation: ExceptionOperation): WisePenError {
+    const convertedError = toWisePenError(error, reason);
+    captureException(convertedError, {
+      detector: 'application-handled',
+      operation,
+    });
+    this.updateState({
+      phase: 'error',
+      error: convertedError,
+    });
+    return convertedError;
+  }
+
   private updateState(update: SessionRuntimeStateUpdate): void {
     this.state.update(update);
     const snapshot = this.state.snapshot();
@@ -203,6 +298,44 @@ export class SessionRuntime implements SessionRuntimeContract {
       reason: 'SessionRuntime 已 cleanup',
     });
   }
+}
+
+function isInFlightPhase(phase: SessionPhase): boolean {
+  return phase === 'sending' || phase === 'streaming' || phase === 'canceling';
+}
+
+function hasPendingToolApproval(messages: readonly WisePenUIMessage[]): boolean {
+  for (const message of messages) {
+    for (const part of message.parts) {
+      if (isToolUIPart(part) && part.state === 'approval-requested') return true;
+    }
+  }
+  return false;
+}
+
+function buildSendMessageMetadata(options?: SessionSendOptions): ChatMessageMetadata {
+  const uploadedAttachmentSnapshots = (options?.uploadedAttachments ?? [])
+    .filter((attachment) => attachment.enabled)
+    .map((attachment) => ({
+      attachmentId: attachment.attachmentId,
+      filename: attachment.filename,
+      kind: 'temporary' as const,
+      available: true,
+    }));
+  const resourceAttachmentSnapshots = (options?.selectedResources ?? [])
+    .filter((resource) => resource.enabled)
+    .map((resource) => ({
+      attachmentId: resource.resourceId,
+      filename: resource.resourceName,
+      kind: 'resource' as const,
+      available: true,
+    }));
+  const selectedAttachments = [...resourceAttachmentSnapshots, ...uploadedAttachmentSnapshots];
+
+  return {
+    createdAt: new Date().toISOString(),
+    ...(selectedAttachments.length > 0 ? { selectedAttachments } : {}),
+  };
 }
 
 function isChatRecoverRequest(
@@ -227,8 +360,8 @@ function toUiMessageChunkStream(response: Response): ReadableStream<UIMessageChu
     stream: normalized.body,
     schema: uiMessageChunkSchema,
   }).pipeThrough(
-    new TransformStream<ParseResult<UIMessageChunk>, UIMessageChunk>({
-      async transform(chunk, controller) {
+    new TransformStream({
+      transform(chunk, controller) {
         if (!chunk.success) throw chunk.error;
         controller.enqueue(chunk.value);
       },
