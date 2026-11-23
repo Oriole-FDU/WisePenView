@@ -4,27 +4,21 @@ import type { WisePenUIMessage } from '@/domains/ChatSession';
 
 import type {
   SessionApprovalDecision,
-  SessionBootstrapStatus,
-  SessionPhase,
+  SessionBootstrapKind,
   SessionSendOptions,
   SessionVisibility,
 } from '../_common';
+import type { SessionRuntimeSnapshot } from '../model/SessionRuntimeState';
 
-export interface SessionRuntimeState {
-  readonly sessionId: string;
-  readonly visibility: SessionVisibility;
-  readonly phase: SessionPhase;
-  readonly bootstrapStatus: SessionBootstrapStatus;
-  readonly error: Error | undefined;
-}
+export type { SessionRuntimeSnapshot as SessionRuntimeState } from '../model/SessionRuntimeState';
 
 export interface SessionRuntime {
   readonly chat: Chat<WisePenUIMessage>;
 
-  getSnapshot(): SessionRuntimeState;
-  subscribe(listener: (state: SessionRuntimeState) => void): () => void;
+  getSnapshot(): SessionRuntimeSnapshot;
+  subscribe(listener: (state: SessionRuntimeSnapshot) => void): () => void;
 
-  bootstrap(): Promise<void>;
+  bootstrap(kind: SessionBootstrapKind): Promise<void>;
   setVisibility(visibility: SessionVisibility): void;
   cleanup(): Promise<void>;
 

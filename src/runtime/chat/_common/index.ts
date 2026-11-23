@@ -1,7 +1,8 @@
 export type {
   SessionApprovalDecision,
+  SessionBootstrapKind,
   SessionSelectedResource,
   SessionSendOptions,
   SessionUploadedAttachment,
 } from './intent';
-export type { SessionBootstrapStatus, SessionPhase, SessionVisibility } from './sessionState';
+export type { SessionPhase, SessionVisibility } from './sessionState';

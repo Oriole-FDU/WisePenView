@@ -22,6 +22,7 @@ export type ExceptionOperation =
   | 'chat.stream'
   | 'chat.recover'
   | 'chat.resume'
+  | 'chat.bootstrap'
   | 'office.sdk'
   | 'drawio.save'
   | 'skill.save';

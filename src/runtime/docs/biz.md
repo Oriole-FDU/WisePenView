@@ -119,7 +119,13 @@ Runtime 把后端生命周期收成前端产品态。对内可有 bootstrap；�
 
 ### Bootstrap（内部）
 
+冷启动分两种，由 `SessionBootstrapKind` 固化：
+
+- `createSession`：新建空白会话，不拉历史、不续流，直接 `idle` + ready
+- `loadSession`：已有会话进入池内
+
 ```text
+loadSession:
 load history
     │
     ▼
@@ -129,7 +135,7 @@ load history
     └── 或 idle / hanged / error
 ```
 
-`check active`、reconnect、recover、从哪类存储拉数，都是 bootstrap 内部步骤，对 Component 不可见。Bootstrap 结束后会话处于上表产品态之一。
+`check active`、reconnect、recover、从哪类存储拉数，都是 `loadSession` 内部步骤，对 Component 不可见。Bootstrap 结束后会话处于上表产品态之一。
 
 之后：
 

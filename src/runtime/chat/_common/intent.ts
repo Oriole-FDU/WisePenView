@@ -1,5 +1,7 @@
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
+export type SessionBootstrapKind = 'createSession' | 'loadSession';
+
 export interface SessionApprovalDecision {
   toolCallId: string;
   approved: boolean;
