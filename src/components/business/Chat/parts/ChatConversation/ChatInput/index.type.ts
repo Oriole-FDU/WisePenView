@@ -2,6 +2,22 @@ import type { ChatAgentOption } from '@/domains/ChatConfig';
 
 import type { SendOptions } from '../../../index.type';
 
+export interface LocalAttachmentPayload {
+  attachmentId: string;
+  filename: string;
+  enabled: boolean;
+  kind?: 'file' | 'image';
+  thumbnailUrl?: string;
+}
+
+export interface LocalAttachmentUpload {
+  id: string;
+  filename: string;
+  status: 'uploading' | 'failed';
+  kind?: 'file' | 'image';
+  thumbnailUrl?: string;
+}
+
 export interface ChatInputProps {
   onSend: (text: string, opts?: SendOptions) => boolean | void | Promise<boolean | void>;
   getUploadSessionId: () => Promise<string | undefined>;

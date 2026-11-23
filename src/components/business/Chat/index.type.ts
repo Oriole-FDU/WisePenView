@@ -1,20 +1,6 @@
 import type { CapabilitySkillSelection, ChatAgentOption, ChatModel } from '@/domains/ChatConfig';
 
-export interface LocalAttachmentPayload {
-  attachmentId: string;
-  filename: string;
-  enabled: boolean;
-  kind?: 'file' | 'image';
-  thumbnailUrl?: string;
-}
-
-export interface LocalAttachmentUpload {
-  id: string;
-  filename: string;
-  status: 'uploading' | 'failed';
-  kind?: 'file' | 'image';
-  thumbnailUrl?: string;
-}
+import type { LocalAttachmentPayload } from './parts/ChatConversation/ChatInput/index.type';
 
 /** ChatConversation、ChatInput 与 Chat 面板共用的发送载荷。 */
 export interface SendOptions {
