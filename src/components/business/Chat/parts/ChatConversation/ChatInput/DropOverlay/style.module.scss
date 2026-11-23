@@ -1,0 +1,49 @@
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--app-z-index-dock);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--accent);
+  border-radius: calc(var(--app-radius-content) - var(--space-2xs));
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent-soft));
+  color: var(--accent-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.98);
+  transition:
+    opacity var(--motion-duration-mid) var(--motion-ease-fluid),
+    transform var(--motion-duration-mid) var(--motion-ease-fluid),
+    visibility 0s linear var(--motion-duration-mid),
+    background-color var(--motion-duration-mid) var(--motion-ease-standard);
+
+  &[data-visible='true'] {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition:
+      opacity var(--motion-duration-mid) var(--motion-ease-fluid),
+      transform var(--motion-duration-mid) var(--motion-ease-fluid),
+      visibility 0s linear 0s,
+      background-color var(--motion-duration-mid) var(--motion-ease-standard);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: var(--motion-duration-reduced);
+    transform: none;
+
+    &[data-visible='true'] {
+      transform: none;
+    }
+  }
+}
+
+.dropOverlayLabel {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--app-radius-menu-item);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}

@@ -1,0 +1,109 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+@use '@/styles/mixins/breakpoints' as breakpoints;
+
+.container {
+  flex-shrink: 0;
+  padding: var(--chat-input-container-padding-block, var(--space-sm)) 0 var(--space-2xs);
+  background: transparent;
+}
+
+.inputCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--chat-input-card-padding-block, var(--space-sm)) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--app-radius-content);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  container-type: inline-size;
+  container-name: chat-input;
+  transition:
+    border-color var(--motion-duration-mid),
+    box-shadow var(--motion-duration-mid);
+
+  &:focus-within {
+    border-color: var(--accent-softer);
+    box-shadow: var(--card-shadow);
+  }
+
+  &.inputCardDragOver {
+    [data-slot='attachment-actions'],
+    .contextAttachmentClear {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+
+.contextAttachment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  padding: var(--space-xs) var(--space-sm);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--app-radius-content);
+  background: var(--surface-secondary);
+}
+
+.contextAttachmentPreview {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.contextAttachmentClear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.textarea {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: calc(1.6em + 16px);
+  max-height: var(--chat-input-textarea-max-height, calc(16em + 16px));
+  overflow-y: auto;
+  resize: none !important;
+  field-sizing: content;
+  border: none !important;
+  box-shadow: var(--shadow-none) !important;
+  background: transparent !important;
+  padding: var(--space-xs) 0 !important;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--foreground);
+  @include scrollbar.appSubtleScrollbar();
+
+  &::placeholder {
+    color: var(--field-placeholder);
+  }
+}
+
+.footerTip {
+  text-align: center;
+  margin-top: var(--space-xs);
+  color: var(--text-disabled);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+@media (max-width: breakpoints.$breakpoint-sm) {
+  .container {
+    padding-inline: var(--space-sm);
+  }
+}

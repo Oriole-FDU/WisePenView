@@ -1,8 +1,13 @@
 /**
  * domains - 业务 Domain Service 统一对外入口（barrel）
+ *
+ * Component / Hook：useXxxService()；Runtime 等命令式代码：getServices() / getXxxService()。
  */
 export type { ServicesContextValue } from './_registry';
 export {
+  getChatSessionService,
+  getChatTurnService,
+  getServices,
   ServicesProvider,
   useAdminService,
   useAgentService,

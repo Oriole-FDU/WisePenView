@@ -1,0 +1,47 @@
+.popoverPanelAgentSkeleton {
+  min-height: 96px;
+}
+
+.popoverSkeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+  min-height: 100%;
+}
+
+.popoverSkeletonSection {
+  width: 56px;
+  height: 12px;
+  margin: var(--space-xs) var(--space-xs) var(--space-2xs);
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding: var(--space-2xs) var(--space-xs);
+}
+
+.popoverSkeletonIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabel {
+  flex: 1;
+  min-width: 0;
+  height: 12px;
+  max-width: 72%;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabelWide {
+  max-width: 88%;
+}

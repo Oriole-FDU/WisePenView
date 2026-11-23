@@ -1,0 +1,270 @@
+@use '../_styles/iconTone' as iconTone;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0;
+  line-height: var(--line-height-sm);
+  text-align: start;
+  text-transform: none;
+}
+
+.sectionReveal {
+  /* 静态展示，避免空状态「助手面板」式入场动画 */
+}
+
+.featureGrid {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &[data-columns='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &[data-columns='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &:has(> .featureGridItem:first-child:nth-last-child(2)) {
+    max-width: 22rem;
+    margin-inline: auto;
+  }
+}
+
+.featureGridItem {
+  min-width: 0;
+}
+
+.featureTile {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--welcome-surface-radius);
+  background: transparent;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard);
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--welcome-hover-border);
+      background: var(--welcome-hover-bg);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+.featureTileBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.featureIconOrb {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-top: var(--space-2xs);
+  border-radius: var(--welcome-icon-radius);
+  @include iconTone.welcomeIconToneAccent();
+  @include iconTone.welcomeIconToneVariants();
+
+  :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.featureTileTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+  text-wrap: balance;
+}
+
+.featureTileDescription {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  text-wrap: balance;
+}
+
+.cardGrid {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &[data-columns='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &[data-columns='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.cardGridItem {
+  min-width: 0;
+}
+
+.promptCardButton {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--welcome-surface-radius);
+  }
+
+  @media (hover: hover) {
+    &:hover .promptCard {
+      border-color: var(--welcome-hover-border);
+      background: var(--welcome-hover-bg);
+    }
+  }
+}
+
+.promptCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--welcome-surface-radius);
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+
+  /* HeroUI Card 默认底色的覆盖 */
+  --card-bg: transparent;
+  --heroui-card-bg: transparent;
+  text-align: start;
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease-standard),
+    border-color var(--motion-duration-fast) var(--motion-ease-standard);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.cardIcon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--welcome-icon-radius);
+  @include iconTone.welcomeIconToneAccent();
+  @include iconTone.welcomeIconToneVariants();
+
+  :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.cardTitle {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardDescription {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+}
+
+.cardContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  padding: 0;
+}
+
+.cardPromptPreview {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--text-tertiary, var(--muted));
+  font-size: var(--font-size-2xs, var(--font-size-xs));
+  line-height: var(--line-height-xs);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 640px) {
+  .cardGrid[data-columns='2'],
+  .cardGrid[data-columns='3'],
+  .featureGrid[data-columns='2'],
+  .featureGrid[data-columns='3'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promptCard {
+    transition: none;
+  }
+}

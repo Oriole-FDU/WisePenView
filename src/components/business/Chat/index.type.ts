@@ -1,6 +1,15 @@
-import type { ChatAgentOption } from '@/domains/ChatConfig';
+import type { CapabilitySkillSelection, ChatAgentOption, ChatModel } from '@/domains/ChatConfig';
 
-import type { SendOptions } from './send.type';
+import type { LocalAttachmentPayload } from './parts/ChatConversation/ChatInput/index.type';
+
+/** ChatConversation、ChatInput 与 Chat 面板共用的发送载荷。 */
+export interface SendOptions {
+  model?: ChatModel;
+  selectedAgent?: ChatAgentOption;
+  activeAttachments?: LocalAttachmentPayload[];
+  selectedSkills?: CapabilitySkillSelection[];
+  toolSelectionOverrides?: Record<string, boolean>;
+}
 
 /** 面板布局：panel = 贴合窗口右缘的侧栏面板；page = 铺满内容区的整页模式 */
 export type ChatLayout = 'panel' | 'page';

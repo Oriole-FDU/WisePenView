@@ -1,0 +1,27 @@
+@mixin welcomeTransparentScrollbar() {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &::-webkit-scrollbar {
+    width: var(--scrollbar-size, 8px);
+    height: var(--scrollbar-size, 8px);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 0;
+    border-radius: var(--app-radius-scrollbar);
+    background: transparent;
+  }
+
+  &:hover {
+    scrollbar-color: transparent transparent;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+}
