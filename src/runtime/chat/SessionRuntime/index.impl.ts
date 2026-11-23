@@ -156,7 +156,8 @@ export class SessionRuntime implements SessionRuntimeContract {
     body,
     abortSignal,
   }: ChatSendMessagesOptions): Promise<ReadableStream<UIMessageChunk>> {
-    const requestBody = body ?? {};
+    // AI SDK 将 body 标成 object；此处收窄为可索引记录再分流
+    const requestBody = (body ?? {}) as Record<string, unknown>;
     const response = isChatRecoverRequest(requestBody)
       ? await this.chatTurnService.recoverChatStream(
           pickChatRecoverApiRequest(requestBody),
@@ -172,7 +173,7 @@ export class SessionRuntime implements SessionRuntimeContract {
   private async reconnectToStream({
     body,
   }: ChatReconnectToStreamOptions): Promise<ReadableStream<UIMessageChunk> | null> {
-    const sessionId = body?.session_id;
+    const sessionId = (body as Record<string, unknown> | undefined)?.session_id;
     if (typeof sessionId !== 'string' || sessionId === '') {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
         reason: '重连聊天流时缺少 session_id',
