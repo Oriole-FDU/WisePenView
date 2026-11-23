@@ -1,4 +1,4 @@
-import ToolApprovalDialog from '../ToolApprovalDialog';
+import ToolApprovalDialog from './Dialog';
 import type { ChatToolApprovalProps } from './index.type';
 import { useChatToolApproval } from './useChatToolApproval';
 
