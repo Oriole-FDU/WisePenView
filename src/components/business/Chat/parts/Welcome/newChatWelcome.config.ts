@@ -1,4 +1,4 @@
-import type { WelcomeScreenConfig } from '../WelcomeConfigurable/Starter/index.type';
+import type { WelcomeScreenConfig } from './Starter/index.type';
 
 /**
  * 主 Chat 新建对话当前 Welcome 配置（仅 Hero；需要 starter 时改 blocks 或传 welcomeConfig）。

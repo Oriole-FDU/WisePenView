@@ -8,7 +8,7 @@ import { WorkspacePanelHeader } from '@/components/business/WorkspacePanel';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
-import styles from '../style.module.scss';
+import styles from '../../style.module.scss';
 import type { ChatHeaderProps } from './index.type';
 
 function ChatHeader({

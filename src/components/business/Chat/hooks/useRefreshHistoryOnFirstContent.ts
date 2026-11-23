@@ -1,8 +1,17 @@
+import { isReasoningUIPart, isTextUIPart, isToolUIPart } from 'ai';
 import { useEffect } from 'react';
 
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
-import { hasRenderableChatContent } from '../model/chatTurnModel';
+/** 判定消息列表是否存在可渲染内容：文本/思考有非空文本，或存在工具调用。 */
+function hasRenderableChatContent(messages: readonly WisePenUIMessage[]): boolean {
+  return messages.some((message) =>
+    message.parts.some((part) => {
+      if (isTextUIPart(part) || isReasoningUIPart(part)) return part.text.trim().length > 0;
+      return isToolUIPart(part);
+    })
+  );
+}
 
 /**
  * 新建会话首个可渲染内容到达后，触发侧栏历史刷新。
@@ -10,7 +19,7 @@ import { hasRenderableChatContent } from '../model/chatTurnModel';
  */
 export function useRefreshHistoryOnFirstContent(
   sessionId: string | undefined,
-  messages: WisePenUIMessage[],
+  messages: readonly WisePenUIMessage[],
   pendingSessionIdRef: { current: string | undefined },
   requestRefresh: () => void
 ): void {

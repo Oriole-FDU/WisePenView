@@ -1,6 +1,6 @@
 import type { ChatAgentOption } from '@/domains/ChatConfig';
 
-import type { SendOptions } from '../../send.type';
+import type { SendOptions } from '../../../index.type';
 
 export interface ChatInputProps {
   onSend: (text: string, opts?: SendOptions) => boolean | void | Promise<boolean | void>;
@@ -19,4 +19,8 @@ export interface ChatInputProps {
   useExternalStore?: boolean;
 }
 
-export type { LocalAttachmentPayload, LocalAttachmentUpload, SendOptions } from '../../send.type';
+export type {
+  LocalAttachmentPayload,
+  LocalAttachmentUpload,
+  SendOptions,
+} from '../../../index.type';

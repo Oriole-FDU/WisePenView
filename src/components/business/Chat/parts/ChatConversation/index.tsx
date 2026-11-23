@@ -1,38 +1,48 @@
-import styles from '../style.module.scss';
-import { NEW_CHAT_WELCOME_CONFIG } from '../welcome';
-import { useWelcomeScreenStore, WelcomeScreenHost } from '../WelcomeConfigurable';
+import { useChatComposer } from '../../hooks/useChatComposer';
+import styles from '../../style.module.scss';
+import { NEW_CHAT_WELCOME_CONFIG, useWelcomeScreenStore, WelcomeScreenHost } from '../Welcome';
 import ChatInput from './ChatInput';
 import { ChatInputStoreProvider } from './ChatInput/_context';
 import ChatMessageList from './ChatMessageList';
 import ChatSessionBar from './ChatSessionBar';
 import type { ChatConversationProps } from './index.type';
 
-/** 对话区：只渲染投影与本地交互，不持有业务状态。 */
+/** 对话区：持有 composer（发送/建会话/取消），其余为投影与本地交互。 */
 function ChatConversation({
-  injectedAgents,
-  preferredAgent,
   contextPreview,
   fullWidth,
   messages,
   status,
   isEmpty,
-  currentModel,
-  cancelling,
   currentSessionId,
   sessionBarOpen,
-  promoteDraftToolSelection,
   canLoadMoreHistory,
   loadingInitialHistory,
   loadingMoreHistory,
-  onLoadMoreHistory,
-  onCancel,
   onCloseSessionBar,
   onSelectSession,
-  getUploadSessionId,
   onClearContext,
-  onSend,
+  resourceId,
+  resourceChat,
+  hostAgentPort,
   welcomeConfig,
 }: ChatConversationProps) {
+  const {
+    currentModel,
+    cancelling,
+    promoteDraftToolSelection,
+    ensureSession,
+    onSend,
+    onCancel,
+    onLoadMoreHistory,
+  } = useChatComposer({
+    sessionId: currentSessionId,
+    messages,
+    resourceId,
+    resourceChat,
+    hostAgentPort,
+  });
+
   const generating = status === 'submitted' || status === 'streaming';
   const sending = cancelling || generating;
   const isWelcome = isEmpty && !loadingInitialHistory;
@@ -83,15 +93,15 @@ function ChatConversation({
             <div className={styles.inputColumn}>
               <ChatInput
                 onSend={onSend}
-                getUploadSessionId={getUploadSessionId}
+                getUploadSessionId={() => ensureSession()}
                 sending={sending}
                 sessionId={currentSessionId}
                 promoteDraftToolSelection={promoteDraftToolSelection}
                 onCancel={cancelling ? undefined : onCancel}
                 contextPreview={contextPreview}
                 onClearContext={onClearContext}
-                injectedAgents={injectedAgents}
-                preferredAgent={preferredAgent}
+                injectedAgents={hostAgentPort?.injectedAgents}
+                preferredAgent={hostAgentPort?.preferredAgent}
                 fullWidth={fullWidth}
                 useExternalStore
               />

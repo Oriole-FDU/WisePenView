@@ -1,6 +1,6 @@
 /**
- * WelcomeConfigurable：可配置 Welcome 屏（Title + starter blocks）。
- * 新建对话只改 Chat/welcome 里的配置，组件从本目录取。
+ * Welcome part：可配置 Welcome 屏（Title + starter blocks）与新建对话配置。
+ * 改配置改本目录 `newChatWelcome.config.ts`。
  */
 export { default as WelcomeStarter } from './Starter';
 /** @deprecated 使用 WelcomeStarter */
@@ -17,6 +17,7 @@ export {
 } from './_store';
 export { default as WelcomeScreenHost } from './Host';
 export type { WelcomeScreenHostProps } from './Host/index.type';
+export { NEW_CHAT_WELCOME_CONFIG } from './newChatWelcome.config';
 export type {
   WelcomeConfigurableBlock,
   WelcomeConfigurableProps,
