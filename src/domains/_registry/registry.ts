@@ -128,6 +128,7 @@ const servicesValue: ServicesContextValue = {
   walletService: walletService,
 };
 
+/** 仅供 getServices 使用；业务侧请走 @/domains 的 getServices / getXxxService。 */
 export function getContextValue(): ServicesContextValue {
   return servicesValue;
 }
