@@ -1,7 +1,15 @@
+import { parseJsonEventStream, type ParseResult } from '@ai-sdk/provider-utils';
 import { Chat } from '@ai-sdk/react';
+import { type ChatTransport, type UIMessageChunk, uiMessageChunkSchema } from 'ai';
 
 import { getChatTurnService } from '@/domains';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
+import type { ChatRecoverApiRequest } from '@/domains/ChatTurn/apis/ChatTurnApi.schema';
+import {
+  pickChatCompletionApiRequest,
+  pickChatRecoverApiRequest,
+} from '@/domains/ChatTurn/apis/ChatTurnApi.schema';
+import { normalizeChatSseResponse } from '@/domains/ChatTurn/runtime/chatSseNormalizer';
 import type { IChatTurnService } from '@/domains/ChatTurn/service/index.type';
 import { captureException } from '@/observability';
 import {
@@ -22,10 +30,14 @@ import {
   SessionRuntimeState,
   type SessionRuntimeStateUpdate,
 } from '../model/SessionRuntimeState';
-import { createChatTransport } from './createChatTransport';
 import type { SessionRuntime as SessionRuntimeContract } from './index.type';
 
 const HISTORY_PAGE_SIZE = 100;
+
+type ChatSendMessagesOptions = Parameters<ChatTransport<WisePenUIMessage>['sendMessages']>[0];
+type ChatReconnectToStreamOptions = Parameters<
+  ChatTransport<WisePenUIMessage>['reconnectToStream']
+>[0];
 
 export class SessionRuntime implements SessionRuntimeContract {
   readonly chat: Chat<WisePenUIMessage>;
@@ -41,7 +53,10 @@ export class SessionRuntime implements SessionRuntimeContract {
     this.chatTurnService = getChatTurnService();
     this.chat = new Chat<WisePenUIMessage>({
       id: sessionId,
-      transport: createChatTransport(this.chatTurnService),
+      transport: {
+        sendMessages: (options) => this.sendMessages(options),
+        reconnectToStream: (options) => this.reconnectToStream(options),
+      },
       onError: (error) => {
         if (this.cleaned) return;
         const convertedError = toWisePenError(error, 'SessionRuntime 流错误');
@@ -134,6 +149,42 @@ export class SessionRuntime implements SessionRuntimeContract {
   async approve(_decisions: SessionApprovalDecision[]): Promise<void> {}
 
   // ---------------------------------------------------------------------------
+  // Chat transport（替换 Chat 底层 I/O）
+  // ---------------------------------------------------------------------------
+
+  private async sendMessages({
+    body,
+    abortSignal,
+  }: ChatSendMessagesOptions): Promise<ReadableStream<UIMessageChunk>> {
+    const requestBody = body ?? {};
+    const response = isChatRecoverRequest(requestBody)
+      ? await this.chatTurnService.recoverChatStream(
+          pickChatRecoverApiRequest(requestBody),
+          abortSignal ?? undefined
+        )
+      : await this.chatTurnService.streamChatCompletion(
+          pickChatCompletionApiRequest(requestBody),
+          abortSignal ?? undefined
+        );
+    return toUiMessageChunkStream(response);
+  }
+
+  private async reconnectToStream({
+    body,
+  }: ChatReconnectToStreamOptions): Promise<ReadableStream<UIMessageChunk> | null> {
+    const sessionId = body?.session_id;
+    if (typeof sessionId !== 'string' || sessionId === '') {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: '重连聊天流时缺少 session_id',
+      });
+    }
+
+    const response = await this.chatTurnService.reconnectChatStream(sessionId);
+    if (response.status === 204) return null;
+    return toUiMessageChunkStream(response);
+  }
+
+  // ---------------------------------------------------------------------------
   // 私有方法
   // ---------------------------------------------------------------------------
 
@@ -151,6 +202,37 @@ export class SessionRuntime implements SessionRuntimeContract {
       reason: 'SessionRuntime 已 cleanup',
     });
   }
+}
+
+function isChatRecoverRequest(
+  body: Record<string, unknown> | undefined
+): body is ChatRecoverApiRequest {
+  return (
+    typeof body?.session_id === 'string' &&
+    Array.isArray(body.client_tool_results) &&
+    Array.isArray(body.tool_approval_status)
+  );
+}
+
+function toUiMessageChunkStream(response: Response): ReadableStream<UIMessageChunk> {
+  const normalized = normalizeChatSseResponse(response);
+  if (!normalized.body) {
+    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+      reason: '聊天流响应体为空',
+    });
+  }
+
+  return parseJsonEventStream({
+    stream: normalized.body,
+    schema: uiMessageChunkSchema,
+  }).pipeThrough(
+    new TransformStream<ParseResult<UIMessageChunk>, UIMessageChunk>({
+      async transform(chunk, controller) {
+        if (!chunk.success) throw chunk.error;
+        controller.enqueue(chunk.value);
+      },
+    })
+  );
 }
 
 function toWisePenError(error: unknown, reason: string): WisePenError {
