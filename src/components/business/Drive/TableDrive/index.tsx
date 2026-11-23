@@ -23,6 +23,7 @@ import {
   resolveDriveFolderVariant,
   resolveDriveScope,
 } from '../common/driveComponentModel';
+import type { DriveBrowserProps } from '../DriveBrowser/index.type';
 import { useDriveNavigation } from '../hooks/useDriveNavigation';
 import { useOpenDriveNode } from '../hooks/useOpenDriveNode';
 import {
@@ -34,7 +35,7 @@ import {
   useTableDriveRowActions,
   useTableDriveTrash,
 } from './hooks';
-import type { DriveTableRow, TableDriveProps } from './index.type';
+import type { DriveTableRow } from './index.type';
 import DriveDetailPanel from './parts/DriveDetailPanel';
 import {
   DriveDragOverlay,
@@ -68,7 +69,7 @@ function TableDrive({
   scope,
   breadcrumbExtra,
   actions,
-}: TableDriveProps) {
+}: DriveBrowserProps) {
   const { t } = useTranslation(['drive', 'resource', 'common']);
   const { heightDensity } = useViewportLayoutScale();
   const driveFrameCssVars = getDriveFrameCssVars(heightDensity === LAYOUT_HEIGHT_DENSITY.SHORT);

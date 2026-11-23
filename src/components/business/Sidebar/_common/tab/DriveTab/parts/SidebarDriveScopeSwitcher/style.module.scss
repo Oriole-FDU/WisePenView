@@ -1,0 +1,43 @@
+@use '../_styles/actionButton' as actionButton;
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.nodeActionBtn {
+  @include actionButton.nodeActionButton;
+}
+
+.scopeMenuPanel {
+  width: 240px;
+  max-height: 340px;
+}
+
+.scopeList {
+  max-height: 260px;
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.scopeHint {
+  padding: var(--space-xs);
+  color: var(--muted);
+  font-size: var(--font-size-sm, var(--font-size-xs));
+}
+
+.scopeLoadMoreButton {
+  width: 100%;
+  padding: var(--space-xs);
+  color: var(--accent-text);
+  text-align: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+
+  &:disabled {
+    color: var(--muted);
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
+}

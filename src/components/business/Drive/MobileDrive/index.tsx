@@ -11,8 +11,9 @@ import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
 import { resolveDriveFolderVariant, resolveDriveScope } from '../common/driveComponentModel';
 import { useDriveNavigation } from '../hooks/useDriveNavigation';
 import { useOpenDriveNode } from '../hooks/useOpenDriveNode';
-import type { DriveTableRow, TableDriveProps } from '../TableDrive/index.type';
+import type { DriveTableRow } from '../TableDrive/index.type';
 import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/tableConfig';
+import type { MobileDriveProps } from './index.type';
 import styles from './style.module.scss';
 
 function getMobileRowMeta(row: DriveTableRow) {
@@ -29,7 +30,7 @@ function MobileDrive({
   onCurrentNodeChange,
   onPathError,
   scope,
-}: TableDriveProps) {
+}: MobileDriveProps) {
   const { t } = useTranslation('drive');
   const resolvedScope = resolveDriveScope(scope, groupId, rootId);
   const navigation = useDriveNavigation({

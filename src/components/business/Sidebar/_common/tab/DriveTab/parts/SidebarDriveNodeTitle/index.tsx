@@ -9,40 +9,24 @@ import {
   SquareMinus,
   Trash2,
 } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
-import type {
-  DriveActionTarget,
-  DriveViewNode,
-} from '@/components/business/Drive/common/driveComponentModel';
+import type { DriveViewNode } from '@/components/business/Drive/common/driveComponentModel';
 import {
   getDriveNodeLabel,
   resolveDriveFolderVariant,
 } from '@/components/business/Drive/common/driveComponentModel';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
-import type { FolderNode, RootNode } from '@/domains/Drive';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
+import type { SidebarDriveCreateAction, SidebarDriveNodeTitleProps } from './index.type';
 import styles from './style.module.scss';
 
-export type SidebarDriveCreateAction =
-  'folder' | 'note' | 'importNote' | 'drawio' | 'skill' | 'agent' | 'upload';
-
-interface SidebarDriveNodeTitleProps {
-  node: DriveViewNode;
-  rootDisplayName?: string;
-  scopeSwitcher?: ReactNode;
-  onCreateNode: (node: RootNode | FolderNode, action: SidebarDriveCreateAction) => void;
-  onCollapseAll?: () => void;
-  onLoadMoreNode?: () => void;
-  onRenameNode: (node: DriveActionTarget) => void;
-  onDeleteNode: (node: DriveActionTarget) => void;
-}
+export type { SidebarDriveCreateAction } from './index.type';
 
 function stopTreeAction(event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>): void {
   event.stopPropagation();

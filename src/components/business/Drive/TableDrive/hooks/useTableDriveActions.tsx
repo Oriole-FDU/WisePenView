@@ -34,7 +34,8 @@ import { getDriveRuntime } from '@/runtime/drive';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
-import type { DriveTableRow, TableDriveActionConfig } from '../index.type';
+import type { DriveBrowserActionConfig } from '../../DriveBrowser/index.type';
+import type { DriveTableRow } from '../index.type';
 import type { CreateMenuItem } from '../parts/CreateMenu/index.type';
 
 interface UseTableDriveActionsParams {
@@ -43,7 +44,7 @@ interface UseTableDriveActionsParams {
   selectedActionTargets: DriveActionTarget[];
   pathNodes: DriveNode[];
   scope: DriveNodeScope;
-  actions?: TableDriveActionConfig;
+  actions?: DriveBrowserActionConfig;
   disabled?: boolean;
   refresh: () => void;
   mountTagId: string | undefined;
@@ -72,7 +73,7 @@ interface UseTableDriveActionsResult {
   ModalHost: ReactElement;
 }
 
-const DEFAULT_TOOLBAR_CONFIG: Required<NonNullable<TableDriveActionConfig['toolbar']>> = {
+const DEFAULT_TOOLBAR_CONFIG: Required<NonNullable<DriveBrowserActionConfig['toolbar']>> = {
   canCreateFolder: true,
   canCreateNote: true,
   canCreateDrawio: true,

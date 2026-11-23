@@ -7,40 +7,19 @@ import {
   TAG_PERMISSION_ACTION_PRESET_OPTIONS,
   TAG_PERMISSION_ACTION_ROWS,
   TAG_PERMISSION_RESOURCE_STRATEGIES,
-  type TagPermissionResourceStrategy,
 } from '@/components/business/Drive/common/tagPermissionPreset';
 import ResourcePermissionActionIcon from '@/components/business/Drive/parts/ResourcePermissionActionIcon';
 import { normalizeResourceActions, type ResourceAction } from '@/domains/_shared/access';
 import {
   buildTagPermissionListActionSelectionPatch,
   isTagPermissionListActionSelected,
-  type TagPermissionPresetKey,
 } from '@/domains/Tag';
 
+import type { ActionPresetKey, TagPermissionActionEditorProps } from './index.type';
 import styles from './style.module.scss';
 
-type ActionPresetKey = Exclude<TagPermissionPresetKey, 'custom'>;
 type PresetTabKey = ActionPresetKey | 'custom';
 const PRESET_TAB_KEYS: PresetTabKey[] = ['private', 'readonly', 'shared', 'custom'];
-
-interface TagPermissionActionEditorProps {
-  ariaLabel: string;
-  actions: ResourceAction[];
-  isDisabled?: boolean;
-  labels: {
-    actionHeader: string;
-    applicable: (strategy: TagPermissionResourceStrategy) => string;
-    basedOnPreset: string;
-    currentPreset: (preset: string) => string;
-    customPreset: string;
-    disabled: (strategy: TagPermissionResourceStrategy, action: string) => string;
-    enabled: (strategy: TagPermissionResourceStrategy, action: string) => string;
-    getActionLabel: (action: ResourceAction) => string;
-    getPresetLabel: (preset: ActionPresetKey) => string;
-    toggleHeader: string;
-  };
-  onActionsChange: (actions: ResourceAction[]) => void;
-}
 
 function TagPermissionActionEditor({
   ariaLabel,

@@ -11,13 +11,14 @@ import { buildDriveNodeScope } from '@/domains/Drive';
 import type { Group } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 
-import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
+import { useSidebarDriveScopeStore } from '../../_store/useSidebarDriveScopeStore';
+import type { SidebarDriveScopeSwitcherProps } from './index.type';
 import styles from './style.module.scss';
 
 const PERSONAL_SCOPE_KEY = '__personal__';
 const GROUP_SCOPE_PAGE_SIZE = 20;
 
-function SidebarDriveScopeSwitcher() {
+function SidebarDriveScopeSwitcher(_props: SidebarDriveScopeSwitcherProps) {
   const { t } = useTranslation('drive');
   const groupService = useGroupService();
   const activeScope = useSidebarDriveScopeStore((state) => state.scope);

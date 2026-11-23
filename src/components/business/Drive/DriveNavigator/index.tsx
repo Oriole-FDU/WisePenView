@@ -24,8 +24,8 @@ import {
 import { notifyError } from '@/utils/error';
 
 import { buildDriveTreeData } from '../common/buildDriveTreeData';
-import DriveNavigatorNodeTitle from './DriveNavigatorNodeTitle';
 import type { DriveNavigatorProps } from './index.type';
+import DriveNavigatorNodeTitle from './parts/DriveNavigatorNodeTitle';
 import styles from './style.module.scss';
 
 const DEFAULT_RENDERABLE_TYPES: DriveItemKind[] = ['root', 'folder', 'resource', 'link'];

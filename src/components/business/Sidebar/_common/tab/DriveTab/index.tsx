@@ -34,6 +34,10 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { useSidebarDriveScopeStore } from './_store/useSidebarDriveScopeStore';
 import { useSidebarDriveTree } from './hooks/useSidebarDriveTree';
+import type { DriveTabProps } from './index.type';
+import type { SidebarDriveCreateAction } from './parts/SidebarDriveNodeTitle';
+import SidebarDriveNodeTitle from './parts/SidebarDriveNodeTitle';
+import SidebarDriveScopeSwitcher from './parts/SidebarDriveScopeSwitcher';
 import {
   getSidebarExistingFolderNames,
   isSidebarNodeInTrash,
@@ -41,9 +45,6 @@ import {
   SIDEBAR_RENDERABLE_TYPES,
   SIDEBAR_SELECTABLE_TYPES,
 } from './sidebarDriveModel';
-import type { SidebarDriveCreateAction } from './SidebarDriveNodeTitle';
-import SidebarDriveNodeTitle from './SidebarDriveNodeTitle';
-import SidebarDriveScopeSwitcher from './SidebarDriveScopeSwitcher';
 import styles from './style.module.scss';
 
 interface SidebarDriveCreateTarget {
@@ -51,7 +52,7 @@ interface SidebarDriveCreateTarget {
   target: RootNode | FolderNode;
 }
 
-function DriveTab() {
+function DriveTab(_props: DriveTabProps) {
   const { t } = useTranslation('drive');
   const groupService = useGroupService();
   const driveRuntime = getDriveRuntime();
