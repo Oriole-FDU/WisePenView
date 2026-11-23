@@ -1,5 +1,5 @@
 import { useKeyPress } from 'ahooks';
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { createGuideActions, GuideHost } from '@/components/base/Guide';
@@ -26,16 +26,9 @@ function AppNavigationLayout() {
   const appAuth = useAppAuth();
   const historySnapshot = useSyncExternalStore(subscribeHistory, getHistorySnapshot, () => 0);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  /**
-   * @wisepen-manual-memo
-   * 为什么：动作适配器内部保存待关闭菜单，布局每次渲染都重建会丢掉上一步的清理状态。
-   * 收益：整个登录会话复用同一份 Guide 动作实例。
-   * 失效条件：注入的 openChat 来源变化时需要重新创建。
-   */
-  const appGuideActions = useMemo(
-    () => createGuideActions({ openChat: () => workspaceRightPanelActions.openPanel('chat') }),
-    []
-  );
+  const appGuideActions = createGuideActions({
+    openChat: () => workspaceRightPanelActions.openPanel('chat'),
+  });
 
   useKeyPress(
     ['ctrl.k', 'meta.k'],
