@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
-import type { StoreApi } from 'zustand/vanilla';
 
-import type { ChatInputStoreState } from '../../ChatConversation/ChatInput/_context/ChatInputStore';
 import type { WelcomePromptPickMeta, WelcomeScreenConfig } from '../Starter/index.type';
 
 export interface WelcomeScreenHostProps {
@@ -9,12 +7,6 @@ export interface WelcomeScreenHostProps {
   config: WelcomeScreenConfig;
   /** 默认按 config.hero 渲染 WelcomeTitle；传 ReactNode 可整体替换；传 null 关闭标题区 */
   hero?: ReactNode | null;
-  /** 点击 starter 时写入 Chat 输入框，默认 true（需在 ChatInputStoreProvider 内） */
-  prefillChatInput?: boolean;
-  /** 额外处理点选；在 prefillChatInput 之后调用 */
+  /** 点选 starter；由装配方（如 Conversation）决定是否写入输入框 */
   onPromptPick?: (prompt: string, meta: WelcomePromptPickMeta) => void;
-}
-
-export interface WelcomeScreenHostBodyProps extends WelcomeScreenHostProps {
-  chatInputStore: StoreApi<ChatInputStoreState> | null;
 }

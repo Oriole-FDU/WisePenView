@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import type { ChatAgentOption } from '@/domains/ChatConfig';
 
 import type { SendOptions } from '../../../index.type';
@@ -18,6 +20,11 @@ export interface LocalAttachmentUpload {
   thumbnailUrl?: string;
 }
 
+/** 旁路预填入口（如 Welcome 点选），不暴露 store。 */
+export interface ChatInputHandle {
+  setValue: (value: string) => void;
+}
+
 export interface ChatInputProps {
   onSend: (text: string, opts?: SendOptions) => boolean | void | Promise<boolean | void>;
   getUploadSessionId: () => Promise<string | undefined>;
@@ -31,6 +38,5 @@ export interface ChatInputProps {
   preferredAgent?: ChatAgentOption | null;
   /** 全宽页默认可展示模型名；窄宽时自动仅图标（与侧栏一致） */
   fullWidth: boolean;
-  /** 由外层 ChatConversation 提供 ChatInputStoreProvider 时为 true */
-  useExternalStore?: boolean;
+  handleRef?: Ref<ChatInputHandle | null>;
 }

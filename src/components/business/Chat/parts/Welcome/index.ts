@@ -4,5 +4,9 @@
 export { default as WelcomeScreenHost } from './Host';
 export type { WelcomeScreenHostProps } from './Host/index.type';
 export { NEW_CHAT_WELCOME_CONFIG } from './newChatWelcome.config';
-export type { WelcomeLayoutMode, WelcomeScreenConfig } from './Starter/index.type';
+export type {
+  WelcomeLayoutMode,
+  WelcomePromptPickMeta,
+  WelcomeScreenConfig,
+} from './Starter/index.type';
 export { welcomeModeFromBlockCount } from './welcomeMode';

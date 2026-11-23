@@ -1,13 +1,15 @@
+import { useRef } from 'react';
+
 import { NEW_CHAT_WELCOME_CONFIG, welcomeModeFromBlockCount, WelcomeScreenHost } from '../Welcome';
+import type { ChatInputHandle } from './ChatInput';
 import ChatInput from './ChatInput';
-import { ChatInputStoreProvider } from './ChatInput/_context';
 import ChatMessageList from './ChatMessageList';
 import ChatSessionBar from './ChatSessionBar';
 import type { ChatConversationProps } from './index.type';
 import styles from './style.module.scss';
 import { useChatComposer } from './useChatComposer';
 
-/** 对话区：持有 composer（发送/建会话/取消），其余为投影与本地交互。 */
+/** 对话区：composer + 输入自持 store；Welcome 点选经 input handle 预填。 */
 function ChatConversation({
   view,
   session,
@@ -18,6 +20,7 @@ function ChatConversation({
   const { messages, status, canLoadMoreHistory, loadingInitialHistory, loadingMoreHistory } = view;
   const { sessionId, sessionBarOpen, onCloseSessionBar, onSelectSession } = session;
   const { resourceId, resourceChat, hostAgentPort, contextPreview } = host ?? {};
+  const chatInputRef = useRef<ChatInputHandle>(null);
 
   const {
     currentModel,
@@ -50,13 +53,16 @@ function ChatConversation({
       aria-hidden={!showWelcome}
     >
       <div className={styles.welcomeSlotInner}>
-        <WelcomeScreenHost config={resolvedWelcomeConfig} />
+        <WelcomeScreenHost
+          config={resolvedWelcomeConfig}
+          onPromptPick={(prompt) => chatInputRef.current?.setValue(prompt)}
+        />
       </div>
     </div>
   );
 
-  const conversationBody = (
-    <>
+  return (
+    <div className={styles.panelBody}>
       <div
         className={styles.conversationPanel}
         data-welcome={isWelcome ? 'true' : 'false'}
@@ -82,6 +88,7 @@ function ChatConversation({
           <div className={styles.footerSlot}>
             <div className={styles.inputColumn}>
               <ChatInput
+                handleRef={chatInputRef}
                 onSend={onSend}
                 getUploadSessionId={() => ensureSession()}
                 sending={sending}
@@ -93,7 +100,6 @@ function ChatConversation({
                 injectedAgents={hostAgentPort?.injectedAgents}
                 preferredAgent={hostAgentPort?.preferredAgent}
                 fullWidth={fullWidth}
-                useExternalStore
               />
             </div>
           </div>
@@ -103,17 +109,6 @@ function ChatConversation({
       </div>
 
       {fullWidth ? null : renderWelcomeSlot()}
-    </>
-  );
-
-  return (
-    <div className={styles.panelBody}>
-      <ChatInputStoreProvider
-        sessionId={sessionId}
-        promoteDraftToolSelection={promoteDraftToolSelection}
-      >
-        {conversationBody}
-      </ChatInputStoreProvider>
 
       {sessionBarOpen ? (
         <ChatSessionBar

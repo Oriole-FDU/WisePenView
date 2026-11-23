@@ -1,9 +1,8 @@
-import { useChatInputStoreApi } from '../../ChatConversation/ChatInput/_context';
 import WelcomeStarter from '../Starter';
 import type { WelcomePromptPickMeta } from '../Starter/index.type';
 import WelcomeTitle from '../Title';
 import { welcomeModeFromBlockCount } from '../welcomeMode';
-import type { WelcomeScreenHostBodyProps, WelcomeScreenHostProps } from './index.type';
+import type { WelcomeScreenHostProps } from './index.type';
 
 function resolveHero(
   hero: WelcomeScreenHostProps['hero'],
@@ -22,20 +21,16 @@ function resolveHero(
   return <WelcomeTitle {...heroConfig} />;
 }
 
-function WelcomeScreenHostBody({
-  config,
-  hero,
-  chatInputStore,
-  onPromptPick,
-}: WelcomeScreenHostBodyProps) {
+/**
+ * Welcome 屏：读 config 渲染 Title + Starter。
+ * 不感知 ChatInput；点选仅通过 onPromptPick 上抛。
+ */
+function WelcomeScreenHost({ config, hero, onPromptPick }: WelcomeScreenHostProps) {
   const showHero = config.showHero !== false;
   const heroNode = resolveHero(hero, showHero, config.hero);
   const layoutMode = welcomeModeFromBlockCount(config.blocks.length);
 
   const handlePromptPick = (prompt: string, meta: WelcomePromptPickMeta) => {
-    if (chatInputStore) {
-      chatInputStore.getState().setValue(prompt);
-    }
     onPromptPick?.(prompt, meta);
   };
 
@@ -47,21 +42,6 @@ function WelcomeScreenHostBody({
       onPromptPick={handlePromptPick}
     />
   );
-}
-
-function WelcomeScreenHostWithInputPrefill(props: WelcomeScreenHostProps) {
-  const chatInputStore = useChatInputStoreApi();
-  return <WelcomeScreenHostBody {...props} chatInputStore={chatInputStore} />;
-}
-
-/**
- * Welcome 屏：读 config 渲染 Title + Starter；点选可预填 Chat 输入框。
- */
-function WelcomeScreenHost(props: WelcomeScreenHostProps) {
-  if (props.prefillChatInput === false) {
-    return <WelcomeScreenHostBody {...props} chatInputStore={null} />;
-  }
-  return <WelcomeScreenHostWithInputPrefill {...props} />;
 }
 
 export default WelcomeScreenHost;

@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import { X } from 'lucide-react';
-import { useRef } from 'react';
+import { useImperativeHandle, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppPressable } from '@/components/base/Button';
@@ -13,7 +13,7 @@ import { ChatInputFileProvider, ChatInputStoreProvider, useChatInputStoreApi } f
 import AttachmentStrip from './AttachmentStrip';
 import DocumentPickerModal from './DocumentPickerModal';
 import DropOverlay from './DropOverlay';
-import type { ChatInputProps } from './index.type';
+import type { ChatInputHandle, ChatInputProps } from './index.type';
 import InputToolbar from './InputToolbar';
 import OtherSkillModal from './OtherSkillModal';
 import styles from './style.module.scss';
@@ -30,7 +30,8 @@ function ChatInputContent({
   injectedAgents,
   preferredAgent,
   fullWidth,
-}: ChatInputProps) {
+  handleRef,
+}: Omit<ChatInputProps, 'getUploadSessionId' | 'sessionId' | 'promoteDraftToolSelection'>) {
   const { t } = useTranslation('chat');
   const { isAuthenticated } = useAppAuth();
   const inputCardRef = useRef<HTMLDivElement>(null);
@@ -42,6 +43,14 @@ function ChatInputContent({
   });
   const modelIconOnly = useCompactModelTrigger(fullWidth, inputCardRef);
   useChatInputGuideActions(store);
+
+  useImperativeHandle(
+    handleRef,
+    (): ChatInputHandle => ({
+      setValue: (value) => store.getState().setValue(value),
+    }),
+    [store]
+  );
 
   return (
     <div
@@ -97,25 +106,25 @@ function ChatInputContent({
   );
 }
 
-function ChatInput({ useExternalStore = false, ...props }: ChatInputProps) {
-  const content = (
-    <ChatInputFileProvider getUploadSessionId={props.getUploadSessionId}>
-      <ChatInputContent {...props} />
-    </ChatInputFileProvider>
-  );
-
-  if (useExternalStore) {
-    return content;
-  }
-
+/** 输入区自持 store；旁路预填走 `handleRef.setValue`，不抬升 Provider。 */
+function ChatInput({
+  handleRef,
+  getUploadSessionId,
+  sessionId,
+  promoteDraftToolSelection,
+  ...props
+}: ChatInputProps) {
   return (
     <ChatInputStoreProvider
-      sessionId={props.sessionId}
-      promoteDraftToolSelection={props.promoteDraftToolSelection}
+      sessionId={sessionId}
+      promoteDraftToolSelection={promoteDraftToolSelection}
     >
-      {content}
+      <ChatInputFileProvider getUploadSessionId={getUploadSessionId}>
+        <ChatInputContent {...props} handleRef={handleRef} />
+      </ChatInputFileProvider>
     </ChatInputStoreProvider>
   );
 }
 
 export default ChatInput;
+export type { ChatInputHandle } from './index.type';
