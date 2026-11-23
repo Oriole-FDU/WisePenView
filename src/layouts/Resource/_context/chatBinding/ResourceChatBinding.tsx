@@ -46,7 +46,9 @@ export function ResourceChatPanel({
 }) {
   const store = useResourceChatBinding();
   const registered = useStore(store, (state) => state.binding);
-  const binding = registered?.resourceId === target?.resourceId ? registered : undefined;
+  const resourceId = target?.resourceId;
+  const registeredResourceId = registered?.resourceId;
+  const binding = registeredResourceId === resourceId ? registered : undefined;
   const provider =
     binding?.provider ??
     (target?.resourceId && target.resourceType
@@ -58,7 +60,7 @@ export function ResourceChatPanel({
       : undefined);
   return (
     <Chat
-      resourceId={target?.resourceId}
+      resourceId={resourceId}
       showHeader
       showCollapseButton={showCollapseButton}
       resourceChat={{ provider, context, clearContext }}
