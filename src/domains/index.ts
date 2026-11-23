@@ -3,6 +3,9 @@
  */
 export type { ServicesContextValue } from './_registry';
 export {
+  getDriveService,
+  getGroupService,
+  getServices,
   ServicesProvider,
   useAdminService,
   useAgentService,
