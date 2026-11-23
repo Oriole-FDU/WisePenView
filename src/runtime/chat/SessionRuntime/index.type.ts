@@ -25,4 +25,7 @@ export interface SessionRuntime {
   send(query: string, options?: SessionSendOptions): Promise<void>;
   cancel(): Promise<void>;
   approve(decisions: SessionApprovalDecision[]): Promise<void>;
+
+  /** 上翻更早历史；首屏由 bootstrap 写入 */
+  loadMoreHistory(): Promise<void>;
 }

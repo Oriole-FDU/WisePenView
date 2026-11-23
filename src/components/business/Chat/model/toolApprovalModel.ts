@@ -2,7 +2,7 @@ import { getToolName, isToolUIPart } from 'ai';
 
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
-interface ToolApprovalRequest {
+export interface ToolApprovalRequest {
   toolCallId: string;
   name: string;
   input: unknown;

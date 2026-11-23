@@ -104,7 +104,12 @@ export class SessionRuntime implements SessionRuntimeContract {
     this.assertAlive();
     try {
       if (kind === 'createSession') {
-        this.updateState({ phase: 'idle' });
+        this.updateState({
+          phase: 'idle',
+          historyPage: 1,
+          historyTotalPage: 1,
+          historyLoadingMore: false,
+        });
         return;
       }
 
@@ -115,6 +120,11 @@ export class SessionRuntime implements SessionRuntimeContract {
       );
       this.assertAlive();
       this.chat.messages = history.list;
+      this.updateState({
+        historyPage: history.page ?? 1,
+        historyTotalPage: history.totalPage ?? 1,
+        historyLoadingMore: false,
+      });
 
       const activeTurnId = await this.chatTurnService.getActiveTurnId(this.state.sessionId);
       this.assertAlive();
@@ -225,6 +235,34 @@ export class SessionRuntime implements SessionRuntimeContract {
     }
   }
 
+  async loadMoreHistory(): Promise<void> {
+    this.assertAlive();
+    if (this.state.historyLoadingMore || this.state.historyPage >= this.state.historyTotalPage) {
+      return;
+    }
+
+    const nextPage = this.state.historyPage + 1;
+    this.updateState({ historyLoadingMore: true });
+    try {
+      const history = await this.chatTurnService.listHistoryMessages(
+        this.state.sessionId,
+        nextPage,
+        HISTORY_PAGE_SIZE
+      );
+      this.assertAlive();
+      this.chat.messages = mergeMessages(history.list, this.chat.messages);
+      this.updateState({
+        historyPage: history.page ?? nextPage,
+        historyTotalPage: history.totalPage ?? this.state.historyTotalPage,
+        historyLoadingMore: false,
+      });
+    } catch (error) {
+      if (this.cleaned) return;
+      this.updateState({ historyLoadingMore: false });
+      throw this.reportError(error, 'SessionRuntime 加载更多历史失败', 'chat.bootstrap');
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Chat transport（替换 Chat 底层 I/O）
   // ---------------------------------------------------------------------------
@@ -298,6 +336,18 @@ export class SessionRuntime implements SessionRuntimeContract {
       reason: 'SessionRuntime 已 cleanup',
     });
   }
+}
+
+function mergeMessages(
+  olderMessages: readonly WisePenUIMessage[],
+  newerMessages: readonly WisePenUIMessage[]
+): WisePenUIMessage[] {
+  const seenIds = new Set<string>();
+  return [...olderMessages, ...newerMessages].filter((message) => {
+    if (seenIds.has(message.id)) return false;
+    seenIds.add(message.id);
+    return true;
+  });
 }
 
 function isInFlightPhase(phase: SessionPhase): boolean {

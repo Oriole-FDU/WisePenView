@@ -12,6 +12,7 @@ import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
+import { getChatRouter } from '@/runtime/chat';
 import { buildChatPath } from '@/utils/navigation/appRoute';
 
 import { useSidebarSessionHistoryStore } from './_store/useSidebarSessionHistoryStore';
@@ -57,6 +58,7 @@ const useSessionTab = () => {
   const hasMoreSessions = Boolean(sessionPageData) && !noMoreSessions;
 
   const handleDeleted = useMemoizedFn((sessionId: string) => {
+    void getChatRouter().notifySessionDeleted(sessionId);
     if (currentSessionId === sessionId) {
       void selectRouteSession(undefined, true);
     }

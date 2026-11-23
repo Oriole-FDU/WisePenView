@@ -2,7 +2,7 @@ import type { Chat } from '@ai-sdk/react';
 
 import type { CreateSessionRequest, WisePenUIMessage } from '@/domains/ChatSession';
 
-import type { SessionApprovalDecision, SessionSendOptions } from '../_common';
+import type { ChatRouterSendRequest, SessionApprovalDecision } from '../_common';
 import type { SessionRuntimeSnapshot } from '../model/SessionRuntimeState';
 
 export type ChatRouterSnapshot = {
@@ -22,13 +22,21 @@ export interface ChatRouter {
   /** 显式新建空白会话并成为前台 */
   createSession(params?: CreateSessionRequest): Promise<void>;
 
+  /** 离开前台（新建空白对话）；池内实例保留为 background */
+  leaveSession(): void;
+
   /**
    * 列表删除等入口在清掉持久化后通知：dispose 池内实例；
    * 若恰为前台则清空前台指向。
    */
   notifySessionDeleted(sessionId: string): Promise<void>;
 
-  send(query: string, options?: SessionSendOptions): Promise<void>;
+  /**
+   * 发送到当前前台会话。
+   * 若尚无前台（新建空白对话），先 lazy create 再发。
+   */
+  send(query: string, request?: ChatRouterSendRequest): Promise<void>;
   cancel(): Promise<void>;
   approve(decisions: SessionApprovalDecision[]): Promise<void>;
+  loadMoreHistory(): Promise<void>;
 }

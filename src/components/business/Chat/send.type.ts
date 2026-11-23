@@ -16,7 +16,7 @@ export interface LocalAttachmentUpload {
   thumbnailUrl?: string;
 }
 
-/** ChatConversation、ChatInput 与 Chat controller 共用的发送载荷。 */
+/** ChatConversation、ChatInput 与 Chat 面板共用的发送载荷。 */
 export interface SendOptions {
   model?: ChatModel;
   selectedAgent?: ChatAgentOption;

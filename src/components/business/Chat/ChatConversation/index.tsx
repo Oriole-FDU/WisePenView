@@ -7,31 +7,35 @@ import ChatMessageList from './ChatMessageList';
 import ChatSessionBar from './ChatSessionBar';
 import type { ChatConversationProps } from './index.type';
 
-/** 对话区：把对话域与会话域拆成消息列表、输入区和会话浮层，自身不持有业务状态。 */
+/** 对话区：只渲染投影与本地交互，不持有业务状态。 */
 function ChatConversation({
   injectedAgents,
   preferredAgent,
   contextPreview,
   fullWidth,
-  session,
-  turn,
+  messages,
+  status,
+  isEmpty,
+  currentModel,
+  cancelling,
+  currentSessionId,
+  sessionBarOpen,
+  promoteDraftToolSelection,
+  canLoadMoreHistory,
+  loadingInitialHistory,
+  loadingMoreHistory,
+  onLoadMoreHistory,
+  onCancel,
+  onCloseSessionBar,
+  onSelectSession,
+  getUploadSessionId,
   onClearContext,
   onSend,
   welcomeConfig,
 }: ChatConversationProps) {
-  const { cancel, cancelling, currentModel, history, isEmpty, messages, status } = turn;
-  const {
-    closeSessionBar,
-    currentSessionId,
-    ensureSession,
-    promoteDraftToolSelection,
-    selectSession,
-    sessionBarOpen,
-  } = session;
-
   const generating = status === 'submitted' || status === 'streaming';
   const sending = cancelling || generating;
-  const isWelcome = isEmpty && !history.loadingInitial;
+  const isWelcome = isEmpty && !loadingInitialHistory;
   const showWelcome = isWelcome && !sessionBarOpen;
   const welcomeMode = useWelcomeScreenStore((state) => state.welcomeMode);
 
@@ -62,10 +66,10 @@ function ChatConversation({
           <ChatMessageList
             messages={messages}
             resetKey={currentSessionId}
-            canLoadMoreHistory={history.canLoadMore}
-            loadingInitialHistory={history.loadingInitial}
-            loadingMoreHistory={history.loadingMore}
-            onLoadMoreHistory={history.loadMore}
+            canLoadMoreHistory={canLoadMoreHistory}
+            loadingInitialHistory={loadingInitialHistory}
+            loadingMoreHistory={loadingMoreHistory}
+            onLoadMoreHistory={onLoadMoreHistory}
             generating={generating}
             model={currentModel}
             fullWidth={fullWidth}
@@ -79,11 +83,11 @@ function ChatConversation({
             <div className={styles.inputColumn}>
               <ChatInput
                 onSend={onSend}
-                getUploadSessionId={ensureSession}
+                getUploadSessionId={getUploadSessionId}
                 sending={sending}
                 sessionId={currentSessionId}
                 promoteDraftToolSelection={promoteDraftToolSelection}
-                onCancel={cancelling ? undefined : cancel}
+                onCancel={cancelling ? undefined : onCancel}
                 contextPreview={contextPreview}
                 onClearContext={onClearContext}
                 injectedAgents={injectedAgents}
@@ -114,8 +118,8 @@ function ChatConversation({
       {sessionBarOpen ? (
         <ChatSessionBar
           activeSessionId={currentSessionId}
-          onClose={closeSessionBar}
-          onSelectSession={selectSession}
+          onClose={onCloseSessionBar}
+          onSelectSession={onSelectSession}
         />
       ) : null}
     </div>

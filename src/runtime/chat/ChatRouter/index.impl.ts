@@ -1,7 +1,8 @@
-import type { CreateSessionRequest } from '@/domains/ChatSession';
+import { getChatSessionService } from '@/domains';
+import type { CreateSessionRequest, IChatSessionService } from '@/domains/ChatSession';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { SessionApprovalDecision, SessionSendOptions } from '../_common';
+import type { ChatRouterSendRequest, SessionApprovalDecision } from '../_common';
 import type { SessionRuntimeSnapshot } from '../model/SessionRuntimeState';
 import type { SessionCoordinator } from '../SessionCoordinator/index.type';
 import type { SessionRuntime } from '../SessionRuntime/index.type';
@@ -9,17 +10,24 @@ import type { ChatRouter as ChatRouterContract, ChatRouterSnapshot } from './ind
 
 export class ChatRouter implements ChatRouterContract {
   private readonly coordinator: SessionCoordinator;
+  private readonly chatSessionService: IChatSessionService;
 
   private foreground: SessionRuntime | null = null;
   private unsubscribeForeground: (() => void) | null = null;
   private readonly listeners = new Set<(snapshot: ChatRouterSnapshot) => void>();
+  private cachedSnapshot: ChatRouterSnapshot = {
+    sessionId: null,
+    chat: null,
+    runtime: null,
+  };
 
   constructor(coordinator: SessionCoordinator) {
     this.coordinator = coordinator;
+    this.chatSessionService = getChatSessionService();
   }
 
   getSnapshot(): ChatRouterSnapshot {
-    return this.buildSnapshot();
+    return this.cachedSnapshot;
   }
 
   subscribe(listener: (snapshot: ChatRouterSnapshot) => void): () => void {
@@ -47,6 +55,12 @@ export class ChatRouter implements ChatRouterContract {
     this.setForeground(runtime);
   }
 
+  leaveSession(): void {
+    if (!this.foreground) return;
+    this.foreground.setVisibility('background');
+    this.clearForeground();
+  }
+
   async notifySessionDeleted(sessionId: string): Promise<void> {
     const wasForeground = this.foreground?.getSnapshot().sessionId === sessionId;
     await this.coordinator.dispose(sessionId);
@@ -55,12 +69,19 @@ export class ChatRouter implements ChatRouterContract {
     }
   }
 
-  async send(query: string, options?: SessionSendOptions): Promise<void> {
+  async send(query: string, request?: ChatRouterSendRequest): Promise<void> {
+    const { create, ...sendOptions } = request ?? {};
+
     if (!this.foreground) {
-      await this.createSession();
+      await this.createSession(create);
+    } else if (create && 'agentId' in create) {
+      await this.chatSessionService.setSessionAgent({
+        sessionId: this.foreground.getSnapshot().sessionId,
+        agentId: create.agentId,
+      });
     }
-    const runtime = this.requireForeground();
-    await runtime.send(query, options);
+
+    await this.requireForeground().send(query, sendOptions);
   }
 
   async cancel(): Promise<void> {
@@ -69,6 +90,10 @@ export class ChatRouter implements ChatRouterContract {
 
   async approve(decisions: SessionApprovalDecision[]): Promise<void> {
     await this.requireForeground().approve(decisions);
+  }
+
+  async loadMoreHistory(): Promise<void> {
+    await this.requireForeground().loadMoreHistory();
   }
 
   // ---------------------------------------------------------------------------
@@ -120,9 +145,27 @@ export class ChatRouter implements ChatRouterContract {
   }
 
   private emit(): void {
-    const snapshot = this.buildSnapshot();
+    const next = this.buildSnapshot();
+    if (isSameRouterSnapshot(this.cachedSnapshot, next)) return;
+    this.cachedSnapshot = next;
     for (const listener of this.listeners) {
-      listener(snapshot);
+      listener(next);
     }
   }
+}
+
+function isSameRouterSnapshot(left: ChatRouterSnapshot, right: ChatRouterSnapshot): boolean {
+  if (left.sessionId !== right.sessionId) return false;
+  if (left.chat !== right.chat) return false;
+  if (left.runtime === right.runtime) return true;
+  if (!left.runtime || !right.runtime) return false;
+  return (
+    left.runtime.sessionId === right.runtime.sessionId &&
+    left.runtime.visibility === right.runtime.visibility &&
+    left.runtime.phase === right.runtime.phase &&
+    left.runtime.error === right.runtime.error &&
+    left.runtime.historyPage === right.runtime.historyPage &&
+    left.runtime.historyTotalPage === right.runtime.historyTotalPage &&
+    left.runtime.historyLoadingMore === right.runtime.historyLoadingMore
+  );
 }
