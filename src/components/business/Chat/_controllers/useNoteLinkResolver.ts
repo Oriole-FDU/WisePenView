@@ -1,5 +1,4 @@
 import { useMemoizedFn } from 'ahooks';
-import { useMemo } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
 
 import type { MarkdownResourceResolver } from '@/components/base/Markdown';
@@ -53,12 +52,5 @@ export function useNoteLinkResolver(): MarkdownResourceResolver {
     return true;
   });
 
-  /**
-   * @wisepen-manual-memo
-   * 为什么：resolver 会作为 Markdown 上下文值下发，身份变化会让该消息的渲染树整体重渲染。
-   * 收益：只有分发依赖（当前位置、打开资源能力、派发函数）变化时才更新 resolver 身份。
-   * 失效条件：把渲染期易变值（如时间戳或每帧变化的位置）纳入 resolver 时，需要改为按需读取。
-   */
-  const resolver = useMemo(() => ({ onLinkClick, resolveUrl }), [onLinkClick, resolveUrl]);
-  return resolver;
+  return { onLinkClick, resolveUrl };
 }

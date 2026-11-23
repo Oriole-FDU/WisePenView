@@ -1,5 +1,3 @@
-import { memo } from 'react';
-
 import type { ChatModel } from '@/domains/ChatConfig';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
@@ -18,4 +16,4 @@ function Message({ message, model, streaming, fullWidth }: MessageProps) {
   return <AssistantMessage message={message} model={model} streaming={streaming} />;
 }
 
-export default memo(Message);
+export default Message;

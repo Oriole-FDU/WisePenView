@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useReducer } from 'react';
 
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 
@@ -68,31 +68,22 @@ export function useSkillWorkspaceDraftController(skill?: SkillDetail, accountId?
   const hasFileDrafts = dirtyFileIds.size > 0;
   const hasUnsavedChanges = hasFileDrafts || isConfigDirty;
 
-  /**
-   * @wisepen-manual-memo
-   * 为什么：缓存恢复需要按当前资源作用域重建工作区状态。
-   * 收益：保持缓存 Controller 的恢复回调稳定，避免重复读取 IndexedDB。
-   * 失效条件：工作区 reducer 的 dispatch 引用发生变化。
-   */
-  const restoreCachedWorkspace = useCallback(
-    (workspace: SkillWorkspaceDraftState) => {
-      dispatch({
-        type: 'replace',
-        state: {
-          ...workspace,
-          resourceKey,
-          savingFileRevisions: {},
-          savingConfigRevision: null,
-          configDirty:
-            workspace.configDirty ??
-            (workspace.configName !== workspace.savedConfigName ||
-              workspace.configDescription !== workspace.savedConfigDescription),
-          pendingIntent: null,
-        },
-      });
-    },
-    [resourceKey]
-  );
+  const restoreCachedWorkspace = (workspace: SkillWorkspaceDraftState) => {
+    dispatch({
+      type: 'replace',
+      state: {
+        ...workspace,
+        resourceKey,
+        savingFileRevisions: {},
+        savingConfigRevision: null,
+        configDirty:
+          workspace.configDirty ??
+          (workspace.configName !== workspace.savedConfigName ||
+            workspace.configDescription !== workspace.savedConfigDescription),
+        pendingIntent: null,
+      },
+    });
+  };
 
   const { clearDraftCache } = useSkillWorkspaceCacheController({
     accountId: normalizedAccountId,

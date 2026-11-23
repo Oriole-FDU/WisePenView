@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 const COLLAPSE_MS = 200;
 const COLLAPSE_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
@@ -14,22 +14,14 @@ export function useCollapseHeight(open: boolean) {
   const elementRef = useRef<HTMLDivElement | null>(null);
   const openRef = useRef(open);
 
-  /**
-   * @wisepen-manual-memo
-   * 为什么：ref 回调的身份是 React 的挂载契约，身份变化时 React 会先以 null 卸载再重新挂载，
-   * 直接把刚写好的折叠高度重置成 auto；而展开/收起恰好发生在组件重渲染期间。
-   * 收益：回调只在面板挂载、卸载时执行，可以在元素后挂载当帧补齐初始高度，同时不打断收起动画。
-   * 失效条件：改用 useRef 对象或让回调依赖 open 时，元素后挂载不会再执行初始化，
-   * 折叠态会一直保持 auto 高度而始终展开。
-   */
-  const attachPanel = useCallback((element: HTMLDivElement | null) => {
+  const attachPanel = (element: HTMLDivElement | null) => {
     elementRef.current = element;
     if (!element) return;
 
     element.style.overflow = 'hidden';
     element.style.transition = 'none';
     element.style.height = openRef.current ? 'auto' : '0px';
-  }, []);
+  };
 
   useLayoutEffect(() => {
     const element = elementRef.current;

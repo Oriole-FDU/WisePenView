@@ -1,7 +1,7 @@
 import './style.module.scss';
 
 import { useMount } from 'ahooks';
-import { useEffect, useMemo, useReducer, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useJoyride } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { useLocation } from 'react-router-dom';
 import {
   GUIDE_TOUR_CODE,
   GUIDE_TOURS,
-  type GuideToolId,
+  type GuideStepConfig,
   type GuideTourConfig,
   type GuideTourId,
 } from '@/constants/tour';
@@ -45,7 +45,7 @@ function getGuideZIndex(): number {
 }
 
 interface GuideTargetBindingState {
-  toolKey: string;
+  step: GuideStepConfig;
   allTargetsPresent: boolean;
 }
 
@@ -60,22 +60,7 @@ function guideTargetBindingReducer(
  * 响应式布局可能替换或卸载任意一个高亮目标。
  * Joyride 只在渲染时读取 target，必须用节点身份变化触发重渲染，才能把气泡重新绑到新锚点。
  */
-function useGuideTargetBinding(
-  toolId: GuideToolId | undefined,
-  spotlightToolIds: readonly GuideToolId[],
-  enabled: boolean
-): boolean {
-  /**
-   * @wisepen-manual-memo
-   * 为什么：目标列表用于逐帧比较节点身份，每次渲染新建数组会让检查 effect 反复重启。
-   * 收益：同一步骤内保持连续的目标检查循环。
-   * 失效条件：步骤目标或高亮目标变化时必须重建。
-   */
-  const targetToolIds = useMemo(() => {
-    if (!toolId) return [];
-    return [toolId, ...spotlightToolIds.filter((id) => id !== toolId)];
-  }, [spotlightToolIds, toolId]);
-  const toolKey = targetToolIds.join('|');
+function useGuideTargetBinding(step: GuideStepConfig | undefined, enabled: boolean): boolean {
   const [binding, setBinding] = useReducer(guideTargetBindingReducer, null);
 
   /**
@@ -85,12 +70,14 @@ function useGuideTargetBinding(
    * cleanup：取消动画帧，步骤结束、目标切换或组件卸载后停止轮询。
    */
   useEffect(() => {
-    if (!enabled || targetToolIds.length === 0) return undefined;
+    if (!enabled || !step) return undefined;
+    const { toolId, spotlightToolIds = [] } = step;
+    const targetToolIds = [toolId, ...spotlightToolIds.filter((id) => id !== toolId)];
 
     let currentTargets = targetToolIds.map((id) => findGuideTarget(id));
     const syncBinding = () =>
       setBinding({
-        toolKey,
+        step,
         allTargetsPresent: currentTargets.every(Boolean),
       });
 
@@ -107,9 +94,9 @@ function useGuideTargetBinding(
 
     frameId = window.requestAnimationFrame(checkTarget);
     return () => window.cancelAnimationFrame(frameId);
-  }, [enabled, targetToolIds, toolKey]);
+  }, [enabled, step]);
 
-  return enabled && binding && binding.toolKey === toolKey ? binding.allTargetsPresent : false;
+  return enabled && binding && binding.step === step ? binding.allTargetsPresent : false;
 }
 
 interface GuidePlayerProps {
@@ -127,16 +114,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
   const backAttempts = useRef(0);
   const seenTargetStepRef = useRef<string | null>(null);
 
-  /**
-   * @wisepen-manual-memo
-   * 为什么：Joyride 用 steps 引用判断步骤有没有换；每次渲染新建数组会把正在播放的步骤打回起点。
-   * 收益：文案和准备动作不变时，不重建 steps 引用。
-   * 失效条件：指引或语言变化时必须重建，否则气泡文案会停在旧语言。
-   */
-  const steps = useMemo(
-    () => compileGuideSteps(tour, (key) => t(key), actions),
-    [actions, tour, t]
-  );
+  const steps = compileGuideSteps(tour, (key) => t(key), actions);
 
   const {
     controls,
@@ -324,22 +302,10 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
   const activeStepConfig = activeStep
     ? tour.steps.find((item) => item.id === activeStep.id)
     : undefined;
-  /**
-   * @wisepen-manual-memo
-   * 为什么：同一配置对象在步骤内引用稳定，而默认目标需要按配置生成数组；每次渲染新建数组会让遮罩反复重挂并重置测量。
-   * 收益：同一指引步骤内复用同一份高亮目标，避免无意义的重渲染与位置跳动。
-   * 失效条件：切换步骤或步骤配置的高亮目标变化时必须重建。
-   */
-  const spotlightToolIds = useMemo(
-    () => activeStepConfig?.spotlightToolIds ?? (activeStepConfig ? [activeStepConfig.toolId] : []),
-    [activeStepConfig]
-  );
+  const spotlightToolIds =
+    activeStepConfig?.spotlightToolIds ?? (activeStepConfig ? [activeStepConfig.toolId] : []);
 
-  const allGuideTargetsPresent = useGuideTargetBinding(
-    activeStepConfig?.toolId,
-    spotlightToolIds,
-    run
-  );
+  const allGuideTargetsPresent = useGuideTargetBinding(activeStepConfig, run);
 
   /**
    * @wisepen-manual-effect
@@ -349,9 +315,8 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
    * cleanup：清除重试计时器并移除 resize 监听。
    */
   useEffect(() => {
-    const stepId = activeStepConfig?.id;
-    const prepare = activeStepConfig?.prepare;
-    if (!run || !stepId) return undefined;
+    if (!run || !activeStepConfig) return undefined;
+    const { id: stepId, prepare, toolId, spotlightToolIds = [toolId] } = activeStepConfig;
 
     if (allGuideTargetsPresent) {
       seenTargetStepRef.current = stepId;
@@ -384,7 +349,7 @@ function GuidePlayer({ tour, actions, onFinished }: GuidePlayerProps) {
       window.clearTimeout(timer);
       window.removeEventListener('resize', scheduleRecovery);
     };
-  }, [actions, activeStepConfig, allGuideTargetsPresent, run, spotlightToolIds]);
+  }, [actions, activeStepConfig, allGuideTargetsPresent, run]);
 
   if (!run) return null;
   return (
