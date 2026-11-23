@@ -11,8 +11,8 @@ import { captureException } from '@/observability';
 import { buildSessionSendPayload, getChatRouter } from '@/runtime/chat';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
-import type { ChatHostAgentPort, ChatProps, SendOptions } from '../index.type';
-import { useChatGuards } from './useChatGuards';
+import { useChatGuards } from '../../hooks/useChatGuards';
+import type { ChatHostAgentPort, ChatProps, SendOptions } from '../../index.type';
 import { useRefreshHistoryOnFirstContent } from './useRefreshHistoryOnFirstContent';
 
 type UseChatComposerParams = {
@@ -25,7 +25,7 @@ type UseChatComposerParams = {
 
 /**
  * 输入区编排：发送、建会话、取消、模型与新建草稿标记。
- * 挂在 ChatConversation / 发送按钮附近，避免根组件堆积 I/O。
+ * Conversation part 私有；根 hooks 不放仅服务本 part 的编排。
  */
 export function useChatComposer({
   sessionId,

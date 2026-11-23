@@ -1,11 +1,11 @@
-import { useChatComposer } from '../../hooks/useChatComposer';
-import { NEW_CHAT_WELCOME_CONFIG, useWelcomeScreenStore, WelcomeScreenHost } from '../Welcome';
+import { NEW_CHAT_WELCOME_CONFIG, welcomeModeFromBlockCount, WelcomeScreenHost } from '../Welcome';
 import ChatInput from './ChatInput';
 import { ChatInputStoreProvider } from './ChatInput/_context';
 import ChatMessageList from './ChatMessageList';
 import ChatSessionBar from './ChatSessionBar';
 import type { ChatConversationProps } from './index.type';
 import styles from './style.module.scss';
+import { useChatComposer } from './useChatComposer';
 
 /** 对话区：持有 composer（发送/建会话/取消），其余为投影与本地交互。 */
 function ChatConversation({
@@ -47,7 +47,8 @@ function ChatConversation({
   const sending = cancelling || generating;
   const isWelcome = isEmpty && !loadingInitialHistory;
   const showWelcome = isWelcome && !sessionBarOpen;
-  const welcomeMode = useWelcomeScreenStore((state) => state.welcomeMode);
+  const resolvedWelcomeConfig = welcomeConfig ?? NEW_CHAT_WELCOME_CONFIG;
+  const welcomeMode = welcomeModeFromBlockCount(resolvedWelcomeConfig.blocks.length);
 
   const renderWelcomeSlot = () => (
     <div
@@ -57,10 +58,7 @@ function ChatConversation({
       aria-hidden={!showWelcome}
     >
       <div className={styles.welcomeSlotInner}>
-        <WelcomeScreenHost
-          config={welcomeConfig ?? NEW_CHAT_WELCOME_CONFIG}
-          syncLayoutWithShell={showWelcome}
-        />
+        <WelcomeScreenHost config={resolvedWelcomeConfig} />
       </div>
     </div>
   );

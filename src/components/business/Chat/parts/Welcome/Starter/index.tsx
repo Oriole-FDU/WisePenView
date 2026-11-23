@@ -5,7 +5,7 @@ import { useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { AppPressable } from '@/components/base/Button';
 
-import { welcomeModeFromBlockCount } from '../_store/welcomeScreenState';
+import { welcomeModeFromBlockCount } from '../welcomeMode';
 import type {
   WelcomeIconTone,
   WelcomePromptCardItem,

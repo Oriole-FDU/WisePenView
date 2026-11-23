@@ -18,9 +18,3 @@ export interface ChatInputProps {
   /** 由外层 ChatConversation 提供 ChatInputStoreProvider 时为 true */
   useExternalStore?: boolean;
 }
-
-export type {
-  LocalAttachmentPayload,
-  LocalAttachmentUpload,
-  SendOptions,
-} from '../../../index.type';

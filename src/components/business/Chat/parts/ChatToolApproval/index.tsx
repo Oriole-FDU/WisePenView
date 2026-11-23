@@ -1,6 +1,6 @@
-import { useChatToolApproval } from '../../hooks/useChatToolApproval';
 import ToolApprovalDialog from '../ToolApprovalDialog';
 import type { ChatToolApprovalProps } from './index.type';
+import { useChatToolApproval } from './useChatToolApproval';
 
 /** 挂在 Chat 根旁路：有待批工具时弹出审批对话框。 */
 function ChatToolApproval({ sessionId, messages, status }: ChatToolApprovalProps) {

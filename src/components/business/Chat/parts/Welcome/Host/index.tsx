@@ -1,8 +1,8 @@
 import { useChatInputStoreApi } from '../../ChatConversation/ChatInput/_context';
-import { useWelcomeScreenOrchestration, useWelcomeScreenStore } from '../_store/welcomeScreenState';
 import WelcomeStarter from '../Starter';
 import type { WelcomePromptPickMeta } from '../Starter/index.type';
 import WelcomeTitle from '../Title';
+import { welcomeModeFromBlockCount } from '../welcomeMode';
 import type { WelcomeScreenHostBodyProps, WelcomeScreenHostProps } from './index.type';
 
 function resolveHero(
@@ -24,17 +24,13 @@ function resolveHero(
 
 function WelcomeScreenHostBody({
   config,
-  syncLayoutWithShell = false,
   hero,
   chatInputStore,
   onPromptPick,
 }: WelcomeScreenHostBodyProps) {
-  const layoutMode = useWelcomeScreenStore((state) => state.welcomeMode);
-
-  useWelcomeScreenOrchestration(syncLayoutWithShell ? config : null);
-
   const showHero = config.showHero !== false;
   const heroNode = resolveHero(hero, showHero, config.hero);
+  const layoutMode = welcomeModeFromBlockCount(config.blocks.length);
 
   const handlePromptPick = (prompt: string, meta: WelcomePromptPickMeta) => {
     if (chatInputStore) {
@@ -46,7 +42,7 @@ function WelcomeScreenHostBody({
   return (
     <WelcomeStarter
       config={config}
-      layoutMode={syncLayoutWithShell ? layoutMode : undefined}
+      layoutMode={layoutMode}
       hero={heroNode}
       onPromptPick={handlePromptPick}
     />
@@ -59,8 +55,7 @@ function WelcomeScreenHostWithInputPrefill(props: WelcomeScreenHostProps) {
 }
 
 /**
- * Welcome 屏装配：Title + Starter + 可选壳层 layout 同步 + Chat 输入预填。
- * 不同场景传入不同 config 即可复用；纯 blocks 也可用 WelcomeStarter。
+ * Welcome 屏：读 config 渲染 Title + Starter；点选可预填 Chat 输入框。
  */
 function WelcomeScreenHost(props: WelcomeScreenHostProps) {
   if (props.prefillChatInput === false) {
