@@ -7,15 +7,10 @@ import { AppButton } from '@/components/base/Button';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { type ChatAgentOption } from '@/domains/ChatConfig';
-import type { ResourceSkillSummary } from '@/domains/Resource';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
+import type { SkillSelectionOption } from './index.type';
 import styles from './style.module.scss';
-
-interface SkillSelectionOption {
-  skill: ResourceSkillSummary;
-  sourceAgent: ChatAgentOption | null;
-}
 
 function OtherSkillModal() {
   const open = useChatInputStore((state) => state.otherSkillModalOpen);

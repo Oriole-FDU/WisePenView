@@ -8,16 +8,12 @@ import { useMessageScroller, useMessageScrollerVisibility } from '@/components/_
 import { AppPressable } from '@/components/base/Button';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
+import type { MessageHistoryNavigatorProps } from './index.type';
 import styles from './style.module.scss';
 
 const PREVIEW_LENGTH = 28;
 const OPEN_DELAY_MS = 24;
 const CLOSE_DELAY_MS = 140;
-
-interface MessageHistoryNavigatorProps {
-  messages: readonly WisePenUIMessage[];
-  scrollAnchorOffsetRatio: number;
-}
 
 interface UserMessageAnchor {
   id: string;

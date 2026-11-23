@@ -8,10 +8,11 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
-import { buildSkillMenuSections, type ChatInputCapabilityOptions } from '@/domains/ChatConfig';
+import { buildSkillMenuSections } from '@/domains/ChatConfig';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.scss';
+import type { SkillMenuProps } from './index.type';
 
 const SKILL_SKELETON_PRIMARY_ROWS = [0, 1] as const;
 const SKILL_SKELETON_TOOL_ROWS = [0, 1, 2, 3, 4, 5] as const;
@@ -42,11 +43,6 @@ function SkillMenuSkeleton({ ariaLabel }: { ariaLabel: string }) {
       </div>
     </div>
   );
-}
-
-interface SkillMenuProps {
-  options?: ChatInputCapabilityOptions;
-  loading: boolean;
 }
 
 function SkillMenu({ options, loading }: SkillMenuProps) {

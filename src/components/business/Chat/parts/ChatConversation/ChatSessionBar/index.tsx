@@ -8,13 +8,8 @@ import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
+import type { ChatSessionBarProps } from './index.type';
 import styles from './style.module.scss';
-
-interface ChatSessionBarProps {
-  activeSessionId?: string | null;
-  onClose: () => void;
-  onSelectSession: (session: ChatSession) => void;
-}
 
 const SESSION_PAGE_SIZE = 20;
 

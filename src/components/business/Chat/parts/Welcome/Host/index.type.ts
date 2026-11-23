@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+import type { StoreApi } from 'zustand/vanilla';
 
+import type { ChatInputStoreState } from '../../ChatConversation/ChatInput/_context/ChatInputStore';
 import type { WelcomePromptPickMeta, WelcomeScreenConfig } from '../Starter/index.type';
 
 export interface WelcomeScreenHostProps {
@@ -13,4 +15,8 @@ export interface WelcomeScreenHostProps {
   prefillChatInput?: boolean;
   /** 额外处理点选；在 prefillChatInput 之后调用 */
   onPromptPick?: (prompt: string, meta: WelcomePromptPickMeta) => void;
+}
+
+export interface WelcomeScreenHostBodyProps extends WelcomeScreenHostProps {
+  chatInputStore: StoreApi<ChatInputStoreState> | null;
 }

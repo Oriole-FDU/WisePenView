@@ -5,8 +5,9 @@ import { useChatConfigService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
+import type { ModelPickerProps } from './index.type';
 
-function ModelPicker({ iconOnly = false }: { iconOnly?: boolean }) {
+function ModelPicker({ iconOnly = false }: ModelPickerProps) {
   const chatConfigService = useChatConfigService();
   const store = useChatInputStoreApi();
   const { availableModels, modelOpen, selectedModelId } = useChatInputStore(

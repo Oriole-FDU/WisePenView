@@ -1,15 +1,6 @@
-import type { ChatStatus } from 'ai';
-
-import type { WisePenUIMessage } from '@/domains/ChatSession';
-
-import { useChatToolApproval } from '../hooks/useChatToolApproval';
-import ToolApprovalDialog from './ToolApprovalDialog';
-
-type ChatToolApprovalProps = {
-  sessionId: string | undefined;
-  messages: readonly WisePenUIMessage[];
-  status: ChatStatus;
-};
+import { useChatToolApproval } from '../../hooks/useChatToolApproval';
+import ToolApprovalDialog from '../ToolApprovalDialog';
+import type { ChatToolApprovalProps } from './index.type';
 
 /** 挂在 Chat 根旁路：有待批工具时弹出审批对话框。 */
 function ChatToolApproval({ sessionId, messages, status }: ChatToolApprovalProps) {

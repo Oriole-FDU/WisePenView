@@ -18,11 +18,7 @@ import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatC
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.scss';
-
-interface AgentPickerProps {
-  injectedAgents?: ChatAgentOption[];
-  preferredAgent?: ChatAgentOption | null;
-}
+import type { AgentPickerProps, GroupAgentPickerModalProps } from './index.type';
 
 const AGENT_SKELETON_ROWS = [0, 1] as const;
 const AGENT_PAGE_SIZE = 30;
@@ -272,13 +268,6 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
       />
     </>
   );
-}
-
-interface GroupAgentPickerModalProps {
-  open: boolean;
-  selectedAgentId: string;
-  onOpenChange: (open: boolean) => void;
-  onSelect: (agent: ChatAgentOption) => void;
 }
 
 function GroupAgentPickerModal({
