@@ -1,0 +1,86 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.popoverPanelAgent {
+  width: 240px;
+  max-height: 280px;
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.popoverPanelAgentSkeleton {
+  min-height: 96px;
+}
+
+.listItemText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.popoverSkeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+  min-height: 100%;
+}
+
+.popoverSkeletonSection {
+  width: 56px;
+  height: 12px;
+  margin: var(--space-xs) var(--space-xs) var(--space-2xs);
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding: var(--space-2xs) var(--space-xs);
+}
+
+.popoverSkeletonIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabel {
+  flex: 1;
+  min-width: 0;
+  height: 12px;
+  max-width: 72%;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabelWide {
+  max-width: 88%;
+}
+
+.agentGroupModalBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.agentGroupModalHint {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+}
+
+.agentGroupModalTree {
+  min-height: 240px;
+  max-height: min(52vh, 460px);
+  overflow: auto;
+  padding: var(--space-xs);
+  border: 1px solid var(--border-light);
+  border-radius: var(--app-radius-popover);
+  background: var(--background);
+  @include scrollbar.appSubtleScrollbar();
+}

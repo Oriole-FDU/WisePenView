@@ -21,7 +21,7 @@ import {
 } from '@/frontendState';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import styles from '../style.module.scss';
+import styles from './style.module.scss';
 
 function getUploadAttachmentState(status: 'uploading' | 'failed') {
   if (status === 'failed') return 'error';

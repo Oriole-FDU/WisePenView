@@ -17,8 +17,8 @@ import type { PageResult } from '@/domains/_shared/entity/page';
 import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatConfig';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import styles from '../style.module.scss';
 import type { AgentPickerProps, GroupAgentPickerModalProps } from './index.type';
+import styles from './style.module.scss';
 
 const AGENT_SKELETON_ROWS = [0, 1] as const;
 const AGENT_PAGE_SIZE = 30;

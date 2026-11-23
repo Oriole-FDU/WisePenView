@@ -1,0 +1,81 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.toolButtonWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.skillMenuBadge {
+  position: absolute;
+  top: -5px;
+  right: -4px;
+  z-index: var(--app-z-index-raised);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--space-2xs);
+  border-radius: var(--app-radius-pill);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.popoverPanelScrollable {
+  width: min(320px, calc(100vw - var(--space-xl, 32px)));
+  max-height: min(360px, 70vh);
+  overflow-y: auto;
+  @include scrollbar.appSubtleScrollbar();
+}
+
+.listItemText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.popoverSkeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+  min-height: 100%;
+}
+
+.popoverSkeletonSection {
+  width: 56px;
+  height: 12px;
+  margin: var(--space-xs) var(--space-xs) var(--space-2xs);
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  padding: var(--space-2xs) var(--space-xs);
+}
+
+.popoverSkeletonIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabel {
+  flex: 1;
+  min-width: 0;
+  height: 12px;
+  max-width: 72%;
+  border-radius: var(--app-radius-inline);
+}
+
+.popoverSkeletonLabelWide {
+  max-width: 88%;
+}

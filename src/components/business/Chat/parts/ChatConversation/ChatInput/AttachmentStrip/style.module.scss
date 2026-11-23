@@ -1,0 +1,23 @@
+@use '@/styles/mixins/scrollbar' as scrollbar;
+
+.attachmentStripShell {
+  width: 100%;
+  min-width: 0;
+
+  .attachmentArea {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--space-xs);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-block: var(--space-2xs) var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+    @include scrollbar.appSubtleScrollbar();
+  }
+}
+
+.chatAttachment {
+  max-width: min(260px, 78vw);
+}

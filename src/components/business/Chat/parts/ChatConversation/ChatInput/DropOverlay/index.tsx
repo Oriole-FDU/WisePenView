@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import styles from '../style.module.scss';
 import type { DropOverlayProps } from './index.type';
+import styles from './style.module.scss';
 
 function DropOverlay({ visible }: DropOverlayProps) {
   const { t } = useTranslation('chat');

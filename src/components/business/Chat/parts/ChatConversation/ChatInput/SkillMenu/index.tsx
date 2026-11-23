@@ -11,8 +11,8 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { buildSkillMenuSections } from '@/domains/ChatConfig';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
-import styles from '../style.module.scss';
 import type { SkillMenuProps } from './index.type';
+import styles from './style.module.scss';
 
 const SKILL_SKELETON_PRIMARY_ROWS = [0, 1] as const;
 const SKILL_SKELETON_TOOL_ROWS = [0, 1, 2, 3, 4, 5] as const;
