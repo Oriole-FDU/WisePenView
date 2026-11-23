@@ -19,6 +19,21 @@ export {
   mapTagToFolderNode,
   resolveDriveSystemFolderType,
 } from './model/driveNode';
+export {
+  assertDriveActionScope,
+  assertNoSystemDriveFolder,
+  assertSingleDriveResourceMount,
+  assertValidDriveMoveTarget,
+  buildDriveResourceUnmountRounds,
+  getDriveResourceIds,
+  getDriveTargetTagId,
+  groupDriveResourcesById,
+  isDriveNodeInsideFolder,
+  isDriveResourceNode,
+  normalizeDriveActionNodes,
+  normalizeDriveIds,
+  sameDriveScope,
+} from './model/driveOperations';
 export type {
   AddResourcesToGroupParams,
   CreateDriveServiceOptions,

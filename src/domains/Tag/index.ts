@@ -24,3 +24,4 @@ export type {
   TagCreateRequest,
   TagUpdateRequest,
 } from './service/index.type';
+export { normalizeTagGroupId } from './utils/normalizeTagGroupId';
