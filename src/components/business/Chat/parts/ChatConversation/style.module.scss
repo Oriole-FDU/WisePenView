@@ -1,0 +1,212 @@
+.panelBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.conversationPanel {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 0;
+  /* 作为容器查询参照，让输入区侧边距按面板实宽收缩（cqi）而不是跟随视口 */
+  container-type: inline-size;
+}
+
+.messageViewport {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+  --chat-footer-scroll-offset: 0px;
+  transition: opacity var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.composerCluster {
+  z-index: var(--app-z-index-raised);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.welcomeSlot {
+  display: grid;
+  grid-template-rows: 1fr;
+  position: absolute;
+  z-index: var(--app-z-index-raised);
+  top: 50%;
+  right: var(
+    --chat-message-inline-padding-end,
+    var(--chat-message-inline-padding, var(--space-lg))
+  );
+  left: var(--chat-message-inline-padding, var(--space-lg));
+  transform: translateY(-50%);
+  opacity: 1;
+  margin-bottom: 0;
+  pointer-events: none;
+  transition:
+    grid-template-rows var(--motion-duration-emphasis) var(--motion-ease-fluid),
+    transform var(--motion-duration-emphasis) var(--motion-ease-fluid),
+    opacity var(--motion-duration-mid) var(--motion-ease-standard),
+    margin-bottom var(--motion-duration-emphasis) var(--motion-ease-fluid);
+}
+
+.welcomeSlot:has([data-welcome-starters='focused']),
+.welcomeSlot[data-welcome-mode='focused'] {
+  transform: translateY(calc(-50% - var(--chat-welcome-composer-lift, 2.75rem)));
+}
+
+.welcomeSlot:has([data-welcome-starters='rich']),
+.welcomeSlot[data-welcome-mode='rich'] {
+  top: var(--space-md);
+  bottom: var(--chat-welcome-scroll-bottom, 11.5rem);
+  height: auto;
+  transform: none;
+  overflow: hidden;
+}
+
+.welcomeSlotInner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.welcomeSlotInner:has([data-welcome-starters='rich']),
+.welcomeSlot[data-welcome-mode='rich'] .welcomeSlotInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.welcomeSlot[data-visible='false'] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+.footerSlot {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: var(--app-z-index-raised);
+  width: 100%;
+  min-width: 0;
+  margin-top: calc(-1 * var(--space-lg));
+  padding: var(--space-lg) var(--chat-content-inline-padding, var(--space-lg)) var(--space-xs);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--chat-footer-bg, var(--surface)) 0%, transparent) 0%,
+    var(--chat-footer-bg, var(--surface)) 20%
+  );
+  transition:
+    margin-top var(--motion-duration-emphasis) var(--motion-ease-fluid),
+    padding-top var(--motion-duration-emphasis) var(--motion-ease-fluid),
+    background var(--motion-duration-slow) var(--motion-ease-standard);
+}
+
+.inputColumn {
+  width: 100%;
+  max-width: var(--chat-input-max-width);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.composerBottomSpacer {
+  flex: 0 1 0;
+  min-height: 0;
+  transition: flex-grow var(--motion-duration-emphasis) var(--motion-ease-fluid);
+}
+
+.conversationPanel[data-welcome='true'] {
+  .footerSlot {
+    margin-top: 0;
+    padding-top: 0;
+    background: transparent;
+  }
+}
+
+.conversationPanel[data-welcome='false'] {
+  .composerBottomSpacer {
+    flex-grow: 0;
+  }
+}
+
+/* 祖先 panel 的 page 布局：通过 data 属性跨模块命中，避免回引根样式文件 */
+:global([data-chat-layout='page']) {
+  .conversationPanel {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    padding: 0;
+  }
+
+  .messageViewport {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .conversationPanel[data-welcome='true'] {
+    .messageViewport {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .welcomeSlot {
+      position: static;
+      width: 100%;
+      max-width: var(--chat-input-max-width);
+      margin-inline: auto;
+      margin-bottom: var(--space-lg);
+      transform: none;
+    }
+
+    .composerBottomSpacer {
+      flex-grow: 1;
+    }
+  }
+
+  .conversationPanel[data-welcome='true']:has([data-welcome-starters='rich']),
+  .conversationPanel[data-welcome='true']:has(.welcomeSlot[data-welcome-mode='rich']) {
+    .messageViewport {
+      flex: 0 0 0;
+    }
+
+    .welcomeSlot {
+      flex: 1 1 auto;
+      min-height: 0;
+      margin-bottom: var(--space-md);
+      overflow: hidden;
+    }
+
+    .welcomeSlotInner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .composerBottomSpacer {
+      flex-grow: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .messageViewport,
+  .welcomeSlot,
+  .footerSlot,
+  .composerBottomSpacer {
+    transition: none;
+  }
+}

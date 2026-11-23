@@ -1,0 +1,9 @@
+@use '@/styles/mixins/desktopTitleBar' as titleBar;
+
+/* 与 Workspace 顶栏同高、同垂直居中；右侧留白给固定窗口按钮 */
+.titleBarInsetEnd {
+  @include titleBar.desktopTitleBarChrome();
+  padding-right: var(--desktop-window-controls-width, 116px);
+  padding-left: var(--space-sm);
+  @include titleBar.desktopTitleBarEndNoDragHole();
+}

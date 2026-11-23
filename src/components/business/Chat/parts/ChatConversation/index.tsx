@@ -1,11 +1,11 @@
 import { useChatComposer } from '../../hooks/useChatComposer';
-import styles from '../../style.module.scss';
 import { NEW_CHAT_WELCOME_CONFIG, useWelcomeScreenStore, WelcomeScreenHost } from '../Welcome';
 import ChatInput from './ChatInput';
 import { ChatInputStoreProvider } from './ChatInput/_context';
 import ChatMessageList from './ChatMessageList';
 import ChatSessionBar from './ChatSessionBar';
 import type { ChatConversationProps } from './index.type';
+import styles from './style.module.scss';
 
 /** 对话区：持有 composer（发送/建会话/取消），其余为投影与本地交互。 */
 function ChatConversation({

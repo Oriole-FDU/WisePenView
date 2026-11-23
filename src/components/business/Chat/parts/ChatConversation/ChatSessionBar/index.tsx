@@ -8,7 +8,7 @@ import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import styles from '../../../style.module.scss';
+import styles from './style.module.scss';
 
 interface ChatSessionBarProps {
   activeSessionId?: string | null;
