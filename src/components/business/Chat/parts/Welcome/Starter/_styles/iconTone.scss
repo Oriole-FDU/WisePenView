@@ -1,0 +1,62 @@
+@mixin welcomeIconToneAqua() {
+  color: var(--wisepen-aqua-11);
+  background: var(--wisepen-aqua-3);
+}
+
+@mixin welcomeIconToneMist() {
+  color: var(--wisepen-mist-11);
+  background: var(--wisepen-mist-3);
+}
+
+@mixin welcomeIconToneFloral() {
+  color: var(--wisepen-floral-11);
+  background: var(--wisepen-floral-3);
+}
+
+@mixin welcomeIconToneSunset() {
+  color: var(--wisepen-sunset-11);
+  background: var(--wisepen-sunset-3);
+}
+
+@mixin welcomeIconToneEmerald() {
+  color: var(--wisepen-emerald-11);
+  background: var(--wisepen-emerald-3);
+}
+
+@mixin welcomeIconToneLavender() {
+  color: var(--wisepen-lavender-11);
+  background: var(--wisepen-lavender-3);
+}
+
+@mixin welcomeIconToneAccent() {
+  color: var(--palette-accent-11);
+  background: var(--palette-accent-3);
+}
+
+@mixin welcomeIconToneVariants() {
+  &[data-tone='teal'] {
+    @include welcomeIconToneAqua();
+  }
+
+  &[data-tone='green'] {
+    @include welcomeIconToneEmerald();
+  }
+
+  &[data-tone='sky'] {
+    @include welcomeIconToneMist();
+  }
+
+  &[data-tone='violet'],
+  &[data-tone='indigo'] {
+    @include welcomeIconToneLavender();
+  }
+
+  &[data-tone='orange'],
+  &[data-tone='amber'] {
+    @include welcomeIconToneSunset();
+  }
+
+  &[data-tone='rose'] {
+    @include welcomeIconToneFloral();
+  }
+}
