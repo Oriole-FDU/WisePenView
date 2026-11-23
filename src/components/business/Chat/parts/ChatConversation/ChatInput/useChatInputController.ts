@@ -15,13 +15,13 @@ import { useApi } from '@/hooks/useApi';
 import { useAppAuth } from '@/layouts/App/_context';
 import { parseErrorMessage } from '@/utils/error';
 
-import { useChatInputFiles, useChatInputStore, useChatInputStoreApi } from '../_context';
+import { useChatInputFiles, useChatInputStore, useChatInputStoreApi } from './_context';
 import {
   selectChatInputCompletionState,
   selectChatInputSelectedModel,
-} from '../_context/ChatInputStore';
-import type { ChatInputProps } from '../index.type';
-import { useVoiceInput } from '../VoiceInput/useVoiceInput';
+} from './_context/ChatInputStore';
+import type { ChatInputProps } from './index.type';
+import { useVoiceInput } from './VoiceInput/useVoiceInput';
 
 interface UseChatInputControllerOptions {
   onSend: ChatInputProps['onSend'];
