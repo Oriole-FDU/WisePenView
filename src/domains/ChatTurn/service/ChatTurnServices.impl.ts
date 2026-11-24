@@ -20,6 +20,9 @@ const recoverChatStream = (
 const reconnectChatStream = (sessionId: string, signal?: AbortSignal): Promise<Response> =>
   ChatTurnApi.reconnectChatStream({ session_id: sessionId }, signal);
 
+const respondTurn = (request: Parameters<typeof ChatTurnApi.respondTurn>[0]): Promise<void> =>
+  ChatTurnApi.respondTurn(request);
+
 const getActiveTurnId = async (sessionId: string): Promise<string | null> =>
   (await ChatTurnApi.getActiveTurn({ session_id: sessionId })).turn_id;
 
@@ -36,6 +39,7 @@ export const createChatTurnServices = (): IChatTurnService => ({
   streamChatCompletion,
   recoverChatStream,
   reconnectChatStream,
+  respondTurn,
   getActiveTurnId,
   cancelTurn,
   listHistoryMessages,

@@ -7,7 +7,7 @@ import { parseErrorMessage } from '@/utils/error';
 
 /**
  * 路由 sessionId → ChatRouter 前台对齐。
- * 驱动变量为 `sessionId`；竞态由 effect cleanup 的 cancelled 门闩处理。
+ * 驱动变量为 `sessionId`；Router 的 route intent 阻止迟到 focus 覆盖较新的前台。
  */
 export function useSyncChatRouteForeground(sessionId: string | undefined): boolean {
   const router = useChatRouter();
@@ -17,7 +17,7 @@ export function useSyncChatRouteForeground(sessionId: string | undefined): boole
    * @wisepen-manual-effect
    * 执行时机：路由 sessionId 变化时对齐 runtime 前台。
    * 不可替代原因：URL 身份与池内 runtime 的 focus/leave 是跨层副作用。
-   * cleanup：标记本次对齐失效，避免过期 focus 回写。
+   * cleanup：退出当前会话并阻止过期请求更新 focusing。
    */
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +47,7 @@ export function useSyncChatRouteForeground(sessionId: string | undefined): boole
     void syncForeground();
     return () => {
       cancelled = true;
+      router.leaveSession({ sessionId });
     };
   }, [router, sessionId]);
 

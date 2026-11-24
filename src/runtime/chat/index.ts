@@ -8,8 +8,8 @@ export type {
 } from './_common';
 export { buildSessionSendPayload } from './buildSessionSendPayload';
 export type { ChatRouter, ChatRouterSnapshot } from './ChatRouter/index.type';
-export { getChatRouter } from './getChatRouter';
-export type { SessionRuntimeSnapshot } from './model/SessionRuntimeState';
+export { ChatRuntimeProvider } from './ChatRuntimeProvider';
 export type { AcquireSessionOptions, SessionCoordinator } from './SessionCoordinator/index.type';
-export type { SessionRuntime, SessionRuntimeState } from './SessionRuntime/index.type';
-export { useChatRouterSnapshot } from './useChatRouterSnapshot';
+export type { SessionRuntimeSnapshot } from './SessionRuntime/index.type';
+export type { SessionRuntime } from './SessionRuntime/index.type';
+export { useChatRouter, useChatRouterSnapshot } from './useChatRouter';

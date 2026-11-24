@@ -1,6 +1,7 @@
 import { toast } from '@heroui/react';
-import { useMemoizedFn } from 'ahooks';
+import { useLatest, useMemoizedFn } from 'ahooks';
 import { useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import type { ChatModel } from '@/domains/ChatConfig';
@@ -8,7 +9,7 @@ import type { CreateSessionRequest, WisePenUIMessage } from '@/domains/ChatSessi
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { captureException } from '@/observability';
-import { buildSessionSendPayload, getChatRouter } from '@/runtime/chat';
+import { buildSessionSendPayload, useChatRouter } from '@/runtime/chat';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import { useChatGuards } from '../../hooks/useChatGuards';
@@ -40,26 +41,26 @@ export function useChatComposer({
     (state) => state.requestRefresh
   );
   const { locationKey, locationKeyLatest, requireAuth, isRouteLive } = useChatGuards();
-  const router = getChatRouter();
+  const sessionIdLatest = useLatest(sessionId);
+  const router = useChatRouter();
 
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
-  const [cancelling, setCancelling] = useState(false);
-  /** 本面板创建的草稿会话；路由离开后在渲染期对齐清掉。 */
-  const [draftSessionId, setDraftSessionId] = useState<string>();
+  const [draftSession, setDraftSession] = useState<{ id: string; locationKey: string }>();
   const pendingHistoryRefreshRef = useRef<string | undefined>(undefined);
+  const sendingLocationRef = useRef<string | undefined>(undefined);
   const creatingSessionRef = useRef<{
     locationKey: string;
     promise: Promise<string | undefined>;
   } | null>(null);
 
-  if (draftSessionId !== undefined && sessionId !== draftSessionId) {
-    setDraftSessionId(undefined);
+  if (draftSession && sessionId !== draftSession.id && locationKey !== draftSession.locationKey) {
+    setDraftSession(undefined);
   }
 
   const resourceStateProvider = resourceChat?.provider;
   const resourceChatContext = resourceChat?.context;
   const clearResourceChatContext = resourceChat?.clearContext;
-  const promoteDraftToolSelection = sessionId !== undefined && sessionId === draftSessionId;
+  const promoteDraftToolSelection = draftSession !== undefined && sessionId === draftSession.id;
 
   useRefreshHistoryOnFirstContent(
     sessionId,
@@ -68,13 +69,18 @@ export function useChatComposer({
     requestChatSessionHistoryRefresh
   );
 
-  const bindCreatedSessionToRoute = useMemoizedFn(async (createdSessionId: string) => {
-    if (!isRouteLive(locationKey)) return;
-    setDraftSessionId(createdSessionId);
-    pendingHistoryRefreshRef.current = createdSessionId;
-    await selectSession(createdSessionId, true);
-    requestChatSessionHistoryRefresh();
-  });
+  const bindCreatedSessionToRoute = useMemoizedFn(
+    async (createdSessionId: string, startedLocationKey: string) => {
+      if (!isRouteLive(startedLocationKey)) return;
+      flushSync(() => setDraftSession({ id: createdSessionId, locationKey: startedLocationKey }));
+      pendingHistoryRefreshRef.current = createdSessionId;
+      await selectSession(createdSessionId, true);
+      requestChatSessionHistoryRefresh();
+      if (sessionIdLatest.current === createdSessionId && isRouteLive(locationKeyLatest.current)) {
+        return locationKeyLatest.current;
+      }
+    }
+  );
 
   const ensureSession = useMemoizedFn(async (): Promise<string | undefined> => {
     if (!isRouteLive(locationKey)) return;
@@ -86,12 +92,13 @@ export function useChatComposer({
     if (sessionId) return sessionId;
 
     if (creatingSessionRef.current?.locationKey !== locationKey) {
+      const startedLocationKey = locationKey;
       const promise = (async () => {
-        await router.createSession();
-        const createdSessionId = router.getSnapshot().sessionId;
+        const createdSessionId = await router.createSession();
         if (!createdSessionId) return;
-        await bindCreatedSessionToRoute(createdSessionId);
-        return createdSessionId;
+        if ((await bindCreatedSessionToRoute(createdSessionId, startedLocationKey)) !== undefined) {
+          return createdSessionId;
+        }
       })();
       creatingSessionRef.current = { locationKey, promise };
       const clearPending = () => {
@@ -104,6 +111,7 @@ export function useChatComposer({
 
   const send = async (text: string, opts?: SendOptions): Promise<boolean> => {
     const startedLocationKey = locationKey;
+    if (sendingLocationRef.current === startedLocationKey) return false;
     if (!isRouteLive(startedLocationKey) || !requireAuth()) return false;
 
     const targetModel = opts?.model ?? currentModel;
@@ -141,21 +149,20 @@ export function useChatComposer({
       return false;
     }
 
+    sendingLocationRef.current = startedLocationKey;
+    let boundLocationKey: string | undefined;
     try {
-      if (sessionId && router.getSnapshot().sessionId !== sessionId) {
-        await router.focusSession(sessionId);
-      }
-      if (!isRouteLive(startedLocationKey)) return false;
-      const hadForeground = Boolean(router.getSnapshot().sessionId);
       await router.send(text, {
+        sessionId,
         create,
         ...payload.options,
+        onSessionCreated: async (createdSessionId) => {
+          boundLocationKey = await bindCreatedSessionToRoute(createdSessionId, startedLocationKey);
+          if (boundLocationKey && sendingLocationRef.current === startedLocationKey) {
+            sendingLocationRef.current = boundLocationKey;
+          }
+        },
       });
-      if (!isRouteLive(startedLocationKey)) return false;
-      const createdSessionId = router.getSnapshot().sessionId;
-      if (!hadForeground && createdSessionId) {
-        await bindCreatedSessionToRoute(createdSessionId);
-      }
     } catch (error) {
       captureException(error, {
         detector: 'application-handled',
@@ -163,8 +170,13 @@ export function useChatComposer({
       });
       toast.danger(parseErrorMessage(error));
       return false;
+    } finally {
+      if (sendingLocationRef.current === (boundLocationKey ?? startedLocationKey)) {
+        sendingLocationRef.current = undefined;
+      }
     }
 
+    if (!isRouteLive(boundLocationKey ?? startedLocationKey)) return false;
     payload.finishSend();
     if (resourceChatContext) clearResourceChatContext?.(resourceChatContext);
     return true;
@@ -181,21 +193,18 @@ export function useChatComposer({
   };
 
   const onCancel = async () => {
-    if (!sessionId || cancelling) return;
-    setCancelling(true);
+    if (!sessionId || !isRouteLive(locationKey)) return;
     try {
-      await router.cancel();
+      await router.cancel(sessionId);
     } catch (error) {
       toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
-    } finally {
-      setCancelling(false);
     }
   };
 
   const onLoadMoreHistory = async () => {
-    if (!requireAuth()) return;
+    if (!sessionId || !isRouteLive(locationKey) || !requireAuth()) return;
     try {
-      await router.loadMoreHistory();
+      await router.loadMoreHistory(sessionId);
     } catch (error) {
       toast.danger(parseErrorMessage(error));
     }
@@ -203,7 +212,6 @@ export function useChatComposer({
 
   return {
     currentModel,
-    cancelling,
     promoteDraftToolSelection,
     ensureSession,
     onSend,

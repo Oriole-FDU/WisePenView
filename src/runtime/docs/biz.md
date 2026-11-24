@@ -27,7 +27,7 @@
 | ----------- | -------------------------------------- |
 | `idle`      | 可接受新 query                         |
 | `sending`   | 已发出 query，尚未进入稳定的流式或终态 |
-| `streaming` | 正在接收助手增量                       |
+| `streaming` | 正在生成、重连或等待重新取消           |
 | `canceling` | 已请求取消，等待收敛                   |
 | `hanged`    | 等待审批（tool approval）              |
 | `error`     | 不可恢复错误（对应该会话当前回合）     |
@@ -39,7 +39,7 @@ Foreground 与 background 均可处于上述 phase。Background 下即使后端�
 ```text
 idle --query--> sending --> streaming | hanged | error
 
-streaming --cancel--> canceling --> idle | error
+streaming --cancel--> canceling --> idle | streaming
 streaming --(后端要求审批)--> hanged
 
 hanged --approve--> streaming
@@ -115,8 +115,7 @@ Component 不编排 `ensureSession` 再 `completion`。
 
 Runtime 把后端生命周期收成前端产品态。对内可有 bootstrap；对外在 bootstrap 结束后只呈现：
 
-`idle` | `streaming` | `hanged` | `error`  
-（在途还有 `sending` / `canceling`，见上表。）
+`idle` | `streaming` | `hanged` | `error`（在途还有 `sending` / `canceling`，见上表。）
 
 ### Bootstrap（内部）
 
@@ -141,7 +140,7 @@ load history
 之后：
 
 - `streaming` 随数据流自然进入 `hanged` / `error` / `idle`
-- `cancel`：`streaming → canceling → idle | error`
+- `cancel`：等待后端确认后结束本地流。请求失败且回合可能仍在运行时，可以再次取消。
 - `idle` 上 `query`（经 Router send）：进入 `sending`，再进入后续 phase
 
 被 Coordinator 驱逐的 runtime 走 `cleanup`，不自动 `cancel` 后端。

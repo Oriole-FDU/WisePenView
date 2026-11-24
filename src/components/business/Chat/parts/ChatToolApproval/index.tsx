@@ -3,11 +3,11 @@ import type { ChatToolApprovalProps } from './index.type';
 import { useChatToolApproval } from './useChatToolApproval';
 
 /** 挂在 Chat 根旁路：有待批工具时弹出审批对话框。 */
-function ChatToolApproval({ sessionId, messages, status }: ChatToolApprovalProps) {
+function ChatToolApproval({ sessionId, phase, messages }: ChatToolApprovalProps) {
   const { pendingToolApproval, approvalSubmitting, handleApprovalDecision } = useChatToolApproval({
     sessionId,
+    phase,
     messages,
-    status,
   });
 
   if (!pendingToolApproval) return null;

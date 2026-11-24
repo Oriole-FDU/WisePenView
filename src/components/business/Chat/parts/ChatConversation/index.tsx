@@ -17,14 +17,13 @@ function ChatConversation({
   fullWidth,
   welcomeConfig,
 }: ChatConversationProps) {
-  const { messages, status, canLoadMoreHistory, loadingInitialHistory, loadingMoreHistory } = view;
+  const { messages, phase, canLoadMoreHistory, loadingInitialHistory, loadingMoreHistory } = view;
   const { sessionId, sessionBarOpen, onCloseSessionBar, onSelectSession } = session;
   const { resourceId, resourceChat, hostAgentPort, contextPreview } = host ?? {};
   const chatInputRef = useRef<ChatInputHandle>(null);
 
   const {
     currentModel,
-    cancelling,
     promoteDraftToolSelection,
     ensureSession,
     onSend,
@@ -38,7 +37,8 @@ function ChatConversation({
     hostAgentPort,
   });
 
-  const generating = status === 'submitted' || status === 'streaming';
+  const generating = phase === 'sending' || phase === 'streaming';
+  const cancelling = phase === 'canceling';
   const sending = cancelling || generating;
   const isWelcome = messages.length === 0 && !loadingInitialHistory;
   const showWelcome = isWelcome && !sessionBarOpen;

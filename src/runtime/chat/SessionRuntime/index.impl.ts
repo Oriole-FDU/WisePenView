@@ -7,9 +7,13 @@ import {
   uiMessageChunkSchema,
 } from 'ai';
 
+import { parseApiErrorBody } from '@/apis/apiError';
 import { getChatTurnService } from '@/domains';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
-import type { ChatRecoverApiRequest } from '@/domains/ChatTurn/apis/ChatTurnApi.schema';
+import type {
+  ChatRecoverApiRequest,
+  ChatRespondApiRequest,
+} from '@/domains/ChatTurn/apis/ChatTurnApi.schema';
 import {
   pickChatCompletionApiRequest,
   pickChatRecoverApiRequest,
@@ -22,202 +26,260 @@ import type { ExceptionOperation } from '@/observability/types';
 import {
   createClientError,
   FRONTEND_CLIENT_ERROR,
+  FRONTEND_NETWORK_ERROR,
   isWisePenError,
-  type WisePenError,
+  WisePenError,
 } from '@/utils/error';
+import { createUuid } from '@/utils/random';
+import { isRecord } from '@/utils/type/typeGuards';
 
 import type {
   SessionApprovalDecision,
   SessionBootstrapKind,
-  SessionPhase,
   SessionSendOptions,
   SessionVisibility,
 } from '../_common';
-import {
-  type SessionRuntimeSnapshot,
-  SessionRuntimeState,
-  type SessionRuntimeStateUpdate,
-} from '../model/SessionRuntimeState';
-import type { SessionRuntime as SessionRuntimeContract } from './index.type';
+import type {
+  SessionRuntime,
+  SessionRuntimeSnapshot,
+  SessionRuntimeSnapshotUpdate,
+} from './index.type';
 
 const HISTORY_PAGE_SIZE = 100;
 
 type ChatSendMessagesOptions = Parameters<ChatTransport<WisePenUIMessage>['sendMessages']>[0];
-type ChatReconnectToStreamOptions = Parameters<
-  ChatTransport<WisePenUIMessage>['reconnectToStream']
->[0];
 
-export class SessionRuntime implements SessionRuntimeContract {
-  readonly chat: Chat<WisePenUIMessage>;
+export function createSessionRuntime(sessionId: string): SessionRuntime {
+  const chatTurnService: IChatTurnService = getChatTurnService();
+  const listeners = new Set<() => void>();
+  let snapshot: SessionRuntimeSnapshot = {
+    sessionId,
+    visibility: 'background',
+    phase: 'idle',
+    error: undefined,
+    historyPage: 1,
+    historyTotalPage: 1,
+    historyLoadingMore: false,
+  };
+  let cleaned = false;
+  let refreshPromise: Promise<void> | null = null;
+  let streamTask: Promise<void> | undefined;
+  let reconnectAbort: AbortController | undefined;
 
-  private readonly state: SessionRuntimeState;
-  private readonly chatTurnService: IChatTurnService;
+  const updateState = (update: SessionRuntimeSnapshotUpdate): void => {
+    snapshot = { ...snapshot, ...update };
+    for (const listener of listeners) listener();
+  };
 
-  private cleaned = false;
-  private readonly listeners = new Set<(state: SessionRuntimeSnapshot) => void>();
+  function reportError(
+    error: unknown,
+    reason: string,
+    operation: ExceptionOperation
+  ): WisePenError {
+    const convertedError = toWisePenError(error, reason);
+    captureException(convertedError, { detector: 'application-handled', operation });
+    return convertedError;
+  }
 
-  constructor(sessionId: string) {
-    this.state = new SessionRuntimeState(sessionId);
-    this.chatTurnService = getChatTurnService();
-    this.chat = new Chat<WisePenUIMessage>({
-      id: sessionId,
-      transport: {
-        sendMessages: (options) => this.sendMessages(options),
-        reconnectToStream: (options) => this.reconnectToStream(options),
-      },
-      onError: (error) => {
-        if (this.cleaned) return;
-        this.reportError(error, 'SessionRuntime 流错误', 'chat.stream');
-      },
-      onFinish: ({ isAbort, isError, messages }) => {
-        if (this.cleaned || isError) return;
-        if (isAbort) {
-          if (isInFlightPhase(this.state.phase)) {
-            this.updateState({ phase: 'idle', error: undefined });
-          }
-          return;
-        }
-        this.updateState({
-          phase: hasPendingToolApproval(messages) ? 'hanged' : 'idle',
-          error: undefined,
-        });
-      },
+  const chat = new Chat<WisePenUIMessage>({
+    id: sessionId,
+    transport: {
+      sendMessages,
+      reconnectToStream,
+    },
+  });
+
+  function assertAlive(): void {
+    if (!cleaned) return;
+    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+      reason: 'SessionRuntime 已 cleanup',
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // 接口方法
-  // ---------------------------------------------------------------------------
-
-  getSnapshot(): SessionRuntimeSnapshot {
-    return this.state.snapshot();
+  function settledPhase() {
+    if (hasPendingToolApproval(chat.lastMessage)) return 'hanged';
+    return chat.status === 'error' ? 'error' : 'idle';
   }
 
-  subscribe(listener: (state: SessionRuntimeSnapshot) => void): () => void {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
+  function startStream(
+    phase: 'sending' | 'streaming',
+    operation: ExceptionOperation,
+    run: () => Promise<void>
+  ): Promise<void> {
+    const task = Promise.resolve().then(async () => {
+      try {
+        assertAlive();
+        chat.clearError();
+        await run();
+        if (chat.status === 'error') throw chat.error;
+      } catch (cause) {
+        if (cleaned) throw cause;
+        const error = reportError(cause, '聊天流请求失败', operation);
+        if (snapshot.phase !== 'canceling') {
+          updateState({
+            phase: hasPendingToolApproval(chat.lastMessage) ? 'hanged' : 'error',
+            error,
+          });
+        }
+        throw error;
+      } finally {
+        streamTask = undefined;
+        reconnectAbort = undefined;
+      }
+
+      if (!cleaned && snapshot.phase !== 'canceling') {
+        updateState({ phase: settledPhase(), error: undefined });
+      }
+    });
+    streamTask = task;
+    updateState({ phase, error: undefined });
+    return task;
   }
 
-  async bootstrap(kind: SessionBootstrapKind): Promise<void> {
-    this.assertAlive();
+  async function refreshSession(): Promise<void> {
+    assertAlive();
+    const messages = chat.messages;
     try {
-      if (kind === 'createSession') {
-        this.updateState({
-          phase: 'idle',
-          historyPage: 1,
-          historyTotalPage: 1,
-          historyLoadingMore: false,
-        });
+      const [history, activeTurnId] = await Promise.all([
+        chatTurnService.listHistoryMessages(sessionId, 1, HISTORY_PAGE_SIZE),
+        chatTurnService.getActiveTurnId(sessionId),
+      ]);
+      assertAlive();
+      if (streamTask || snapshot.phase === 'canceling' || chat.messages !== messages) {
         return;
       }
-
-      const history = await this.chatTurnService.listHistoryMessages(
-        this.state.sessionId,
-        1,
-        HISTORY_PAGE_SIZE
-      );
-      this.assertAlive();
-      this.chat.messages = history.list;
-      this.updateState({
-        historyPage: history.page ?? 1,
-        historyTotalPage: history.totalPage ?? 1,
-        historyLoadingMore: false,
-      });
-
-      const activeTurnId = await this.chatTurnService.getActiveTurnId(this.state.sessionId);
-      this.assertAlive();
-
+      replaceLatestHistory(history);
       if (activeTurnId) {
-        this.updateState({ phase: 'streaming' });
-        await this.chat.resumeStream({ body: { session_id: this.state.sessionId } });
-        this.assertAlive();
+        void startStream('streaming', 'chat.bootstrap', () => chat.resumeStream()).catch(
+          () => undefined
+        );
         return;
       }
 
-      this.updateState({ phase: 'idle' });
+      updateState({
+        phase: hasPendingToolApproval(chat.lastMessage) ? 'hanged' : 'idle',
+        error: undefined,
+      });
     } catch (error) {
-      if (this.cleaned) return;
-      const convertedError = toWisePenError(error, 'SessionRuntime bootstrap 失败');
-      captureException(convertedError, {
-        detector: 'application-handled',
-        operation: 'chat.bootstrap',
+      if (cleaned) return;
+      throw reportError(error, '同步会话历史失败', 'chat.bootstrap');
+    }
+  }
+
+  function replaceLatestHistory(
+    history: Awaited<ReturnType<IChatTurnService['listHistoryMessages']>>
+  ): void {
+    const firstLatestId = history.list[0]?.id;
+    const start = chat.messages.findIndex((message) => message.id === firstLatestId);
+    // 保留服务端分页边界之前的历史；最新一页覆盖客户端的临时消息。
+    chat.messages = start > 0 ? [...chat.messages.slice(0, start), ...history.list] : history.list;
+    updateState({
+      historyPage: start > 0 ? Math.min(snapshot.historyPage, history.totalPage) : history.page,
+      historyTotalPage: history.totalPage,
+    });
+  }
+
+  async function bootstrap(kind: SessionBootstrapKind): Promise<void> {
+    if (kind === 'loadSession') await refresh();
+  }
+
+  function refresh(): Promise<void> {
+    if (refreshPromise) return refreshPromise;
+    refreshPromise = refreshSession().finally(() => {
+      refreshPromise = null;
+    });
+    return refreshPromise;
+  }
+
+  function getSnapshot(): SessionRuntimeSnapshot {
+    return snapshot;
+  }
+
+  function subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  }
+
+  function setVisibility(visibility: SessionVisibility): void {
+    assertAlive();
+    if (snapshot.visibility === visibility) return;
+    updateState({ visibility });
+  }
+
+  async function cleanup(): Promise<void> {
+    if (cleaned) return;
+    cleaned = true;
+    listeners.clear();
+    reconnectAbort?.abort();
+    await chat.stop();
+  }
+
+  async function send(query: string, options?: SessionSendOptions): Promise<void> {
+    assertAlive();
+    if (streamTask || (snapshot.phase !== 'idle' && snapshot.phase !== 'error')) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: `当前 phase=${snapshot.phase}，不能 send`,
       });
-      this.updateState({
-        phase: 'error',
-        error: convertedError,
-      });
+    }
+
+    const requestBody = mapChatTurnRequest({ defaultSessionId: sessionId, query, options });
+    const messageId = createUuid();
+    await startStream('sending', 'chat.send', async () => {
+      await chat.sendMessage(
+        {
+          id: messageId,
+          role: 'user',
+          parts: [{ type: 'text', text: query }],
+          metadata: buildSendMessageMetadata(options),
+        },
+        { body: requestBody }
+      );
+      if (
+        chat.status === 'error' &&
+        snapshot.phase === 'sending' &&
+        chat.lastMessage?.id === messageId
+      ) {
+        chat.messages = chat.messages.slice(0, -1);
+      }
+    });
+  }
+
+  async function cancel(): Promise<void> {
+    assertAlive();
+    if (snapshot.phase !== 'streaming' && snapshot.phase !== 'sending') return;
+
+    updateState({ phase: 'canceling' });
+    try {
+      await chatTurnService.cancelTurn(sessionId);
+    } catch (error) {
+      if (cleaned) return;
+      const convertedError = reportError(error, '取消会话回合失败', 'chat.cancel');
+      const canRetry =
+        Boolean(streamTask) ||
+        (await chatTurnService.getActiveTurnId(sessionId).catch(() => undefined)) !== null;
+      if (cleaned) return;
+      updateState({ phase: canRetry ? 'streaming' : settledPhase(), error: convertedError });
       throw convertedError;
     }
+
+    if (cleaned) return;
+    reconnectAbort?.abort();
+    await chat.stop();
+    await streamTask?.catch(() => undefined);
+    if (!cleaned) updateState({ phase: 'idle', error: undefined });
   }
 
-  setVisibility(visibility: SessionVisibility): void {
-    this.assertAlive();
-    if (this.state.visibility === visibility) return;
-    this.updateState({ visibility });
-  }
-
-  async cleanup(): Promise<void> {
-    if (this.cleaned) return;
-    this.cleaned = true;
-    this.listeners.clear();
-    this.chat.stop();
-  }
-
-  async send(query: string, options?: SessionSendOptions): Promise<void> {
-    this.assertAlive();
-    if (this.state.phase !== 'idle' && this.state.phase !== 'error') {
+  async function approve(decisions: SessionApprovalDecision[]): Promise<void> {
+    assertAlive();
+    const previousPhase = snapshot.phase;
+    if (previousPhase !== 'streaming' && previousPhase !== 'hanged') {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `当前 phase=${this.state.phase}，不能 send`,
+        reason: `当前 phase=${previousPhase}，不能 approve`,
       });
     }
 
-    this.updateState({ phase: 'sending', error: undefined });
-    try {
-      const requestBody = mapChatTurnRequest({
-        defaultSessionId: this.state.sessionId,
-        query,
-        options,
-      });
-      const metadata = buildSendMessageMetadata(options);
-      await this.chat.sendMessage({ text: query, metadata }, { body: requestBody });
-      this.assertAlive();
-    } catch (error) {
-      if (this.cleaned) return;
-      throw this.reportError(error, 'SessionRuntime send 失败', 'chat.send');
-    }
-  }
-
-  async cancel(): Promise<void> {
-    this.assertAlive();
-    if (this.state.phase !== 'streaming' && this.state.phase !== 'sending') return;
-
-    this.updateState({ phase: 'canceling' });
-    this.chat.stop();
-    try {
-      await this.chatTurnService.cancelTurn(this.state.sessionId);
-      this.assertAlive();
-      // stop/onFinish 可能已收口；仅当仍停在 canceling 时再落到 idle
-      if (this.getSnapshot().phase === 'canceling') {
-        this.updateState({ phase: 'idle', error: undefined });
-      }
-    } catch (error) {
-      if (this.cleaned) return;
-      throw this.reportError(error, 'SessionRuntime cancel 失败', 'chat.cancel');
-    }
-  }
-
-  async approve(decisions: SessionApprovalDecision[]): Promise<void> {
-    this.assertAlive();
-    if (this.state.phase !== 'hanged') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `当前 phase=${this.state.phase}，不能 approve`,
-      });
-    }
-
-    const requestBody: ChatRecoverApiRequest = {
-      session_id: this.state.sessionId,
+    const requestBody: ChatRespondApiRequest = {
+      session_id: sessionId,
       client_tool_results: [],
       tool_approval_status: decisions.map((decision) => ({
         tool_call_id: decision.toolCallId,
@@ -225,142 +287,141 @@ export class SessionRuntime implements SessionRuntimeContract {
       })),
     };
 
-    this.updateState({ phase: 'streaming', error: undefined });
-    try {
-      await this.chat.sendMessage(undefined, { body: requestBody });
-      this.assertAlive();
-    } catch (error) {
-      if (this.cleaned) return;
-      throw this.reportError(error, 'SessionRuntime approve 失败', 'chat.recover');
-    }
-  }
-
-  async loadMoreHistory(): Promise<void> {
-    this.assertAlive();
-    if (this.state.historyLoadingMore || this.state.historyPage >= this.state.historyTotalPage) {
+    if (previousPhase === 'streaming') {
+      try {
+        await chatTurnService.respondTurn(requestBody);
+      } catch (error) {
+        throw reportError(error, '提交工具审批失败', 'chat.recover');
+      }
       return;
     }
 
-    const nextPage = this.state.historyPage + 1;
-    this.updateState({ historyLoadingMore: true });
+    await startStream('streaming', 'chat.recover', () =>
+      chat.sendMessage(undefined, { body: requestBody })
+    );
+  }
+
+  async function loadMoreHistory(): Promise<void> {
+    assertAlive();
+    if (snapshot.historyLoadingMore || snapshot.historyPage >= snapshot.historyTotalPage) return;
+
+    const nextPage = snapshot.historyPage + 1;
+    updateState({ historyLoadingMore: true });
     try {
-      const history = await this.chatTurnService.listHistoryMessages(
-        this.state.sessionId,
+      const history = await chatTurnService.listHistoryMessages(
+        sessionId,
         nextPage,
         HISTORY_PAGE_SIZE
       );
-      this.assertAlive();
-      this.chat.messages = mergeMessages(history.list, this.chat.messages);
-      this.updateState({
-        historyPage: history.page ?? nextPage,
-        historyTotalPage: history.totalPage ?? this.state.historyTotalPage,
+      assertAlive();
+      if (nextPage !== snapshot.historyPage + 1) {
+        updateState({ historyLoadingMore: false });
+        return;
+      }
+      chat.messages = mergeMessages(history.list, chat.messages);
+      updateState({
+        historyPage: history.page,
+        historyTotalPage: history.totalPage,
         historyLoadingMore: false,
       });
     } catch (error) {
-      if (this.cleaned) return;
-      this.updateState({ historyLoadingMore: false });
-      throw this.reportError(error, 'SessionRuntime 加载更多历史失败', 'chat.bootstrap');
+      if (cleaned) return;
+      updateState({ historyLoadingMore: false });
+      throw reportError(error, '加载更多历史失败', 'chat.bootstrap');
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Chat transport（替换 Chat 底层 I/O）
-  // ---------------------------------------------------------------------------
-
-  private async sendMessages({
+  async function sendMessages({
     body,
     abortSignal,
   }: ChatSendMessagesOptions): Promise<ReadableStream<UIMessageChunk>> {
-    // AI SDK 将 body 标成 object；此处收窄为可索引记录再分流
-    const requestBody = (body ?? {}) as Record<string, unknown>;
-    const response = isChatRecoverRequest(requestBody)
-      ? await this.chatTurnService.recoverChatStream(
-          pickChatRecoverApiRequest(requestBody),
-          abortSignal ?? undefined
-        )
-      : await this.chatTurnService.streamChatCompletion(
-          pickChatCompletionApiRequest(requestBody),
-          abortSignal ?? undefined
-        );
-
-    if (!this.cleaned && this.state.phase === 'sending') {
-      this.updateState({ phase: 'streaming' });
-    }
-
-    return toUiMessageChunkStream(response);
-  }
-
-  private async reconnectToStream({
-    body,
-  }: ChatReconnectToStreamOptions): Promise<ReadableStream<UIMessageChunk> | null> {
-    const sessionId = (body as Record<string, unknown> | undefined)?.session_id;
-    if (typeof sessionId !== 'string' || sessionId === '') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: '重连聊天流时缺少 session_id',
+    assertAlive();
+    const requestBody = isRecord(body) ? body : {};
+    let response: Response;
+    try {
+      response = isChatRecoverRequest(requestBody)
+        ? await chatTurnService.recoverChatStream(
+            pickChatRecoverApiRequest(requestBody),
+            abortSignal ?? undefined
+          )
+        : await chatTurnService.streamChatCompletion(
+            pickChatCompletionApiRequest(requestBody),
+            abortSignal ?? undefined
+          );
+    } catch (error) {
+      if (abortSignal?.aborted || isWisePenError(error)) throw error;
+      throw new WisePenError({
+        code: FRONTEND_NETWORK_ERROR.NETWORK,
+        source: 'network',
+        serverMsg: error instanceof Error ? error.message : '网络请求失败',
+        cause: error,
       });
     }
 
-    const response = await this.chatTurnService.reconnectChatStream(sessionId);
-    if (response.status === 204) return null;
-    return toUiMessageChunkStream(response);
+    const stream = await toUiMessageChunkStream(response);
+    assertAlive();
+    if (snapshot.phase === 'sending') updateState({ phase: 'streaming' });
+    return stream;
   }
 
-  // ---------------------------------------------------------------------------
-  // 私有方法
-  // ---------------------------------------------------------------------------
+  async function reconnectToStream(): Promise<ReadableStream<UIMessageChunk> | null> {
+    // AI SDK 在收到重连响应后才创建自己的 AbortController。
+    const controller = new AbortController();
+    reconnectAbort = controller;
+    const { signal } = controller;
+    try {
+      const response = await chatTurnService.reconnectChatStream(sessionId, signal);
+      signal.throwIfAborted();
 
-  private reportError(error: unknown, reason: string, operation: ExceptionOperation): WisePenError {
-    const convertedError = toWisePenError(error, reason);
-    captureException(convertedError, {
-      detector: 'application-handled',
-      operation,
-    });
-    this.updateState({
-      phase: 'error',
-      error: convertedError,
-    });
-    return convertedError;
-  }
-
-  private updateState(update: SessionRuntimeStateUpdate): void {
-    this.state.update(update);
-    const snapshot = this.state.snapshot();
-    for (const listener of this.listeners) {
-      listener(snapshot);
+      if (
+        response.status === 204 ||
+        ((!response.ok || !isEventStream(response)) &&
+          !(await chatTurnService.getActiveTurnId(sessionId)))
+      ) {
+        void response.body?.cancel();
+        const history = await chatTurnService.listHistoryMessages(sessionId, 1, HISTORY_PAGE_SIZE);
+        signal.throwIfAborted();
+        replaceLatestHistory(history);
+        return null;
+      }
+      return await toUiMessageChunkStream(response);
+    } catch (error) {
+      if (signal.aborted) return null;
+      throw error;
     }
   }
 
-  private assertAlive(): void {
-    if (!this.cleaned) return;
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'SessionRuntime 已 cleanup',
-    });
-  }
+  return {
+    chat,
+    getSnapshot,
+    subscribe,
+    bootstrap,
+    refresh,
+    setVisibility,
+    cleanup,
+    send,
+    cancel,
+    approve,
+    loadMoreHistory,
+  };
 }
 
 function mergeMessages(
   olderMessages: readonly WisePenUIMessage[],
   newerMessages: readonly WisePenUIMessage[]
 ): WisePenUIMessage[] {
-  const seenIds = new Set<string>();
-  return [...olderMessages, ...newerMessages].filter((message) => {
-    if (seenIds.has(message.id)) return false;
-    seenIds.add(message.id);
-    return true;
-  });
-}
-
-function isInFlightPhase(phase: SessionPhase): boolean {
-  return phase === 'sending' || phase === 'streaming' || phase === 'canceling';
-}
-
-function hasPendingToolApproval(messages: readonly WisePenUIMessage[]): boolean {
-  for (const message of messages) {
-    for (const part of message.parts) {
-      if (isToolUIPart(part) && part.state === 'approval-requested') return true;
-    }
+  const messagesById = new Map<string, WisePenUIMessage>();
+  for (const message of [...olderMessages, ...newerMessages]) {
+    messagesById.set(message.id, message);
   }
-  return false;
+  return [...messagesById.values()];
+}
+
+function hasPendingToolApproval(message: WisePenUIMessage | undefined): boolean {
+  return (
+    message?.parts.some((part) => isToolUIPart(part) && part.state === 'approval-requested') ??
+    false
+  );
 }
 
 function buildSendMessageMetadata(options?: SessionSendOptions): ChatMessageMetadata {
@@ -388,17 +449,34 @@ function buildSendMessageMetadata(options?: SessionSendOptions): ChatMessageMeta
   };
 }
 
-function isChatRecoverRequest(
-  body: Record<string, unknown> | undefined
-): body is ChatRecoverApiRequest {
+function isChatRecoverRequest(body: Record<string, unknown>): body is ChatRecoverApiRequest {
   return (
-    typeof body?.session_id === 'string' &&
+    typeof body.session_id === 'string' &&
     Array.isArray(body.client_tool_results) &&
     Array.isArray(body.tool_approval_status)
   );
 }
 
-function toUiMessageChunkStream(response: Response): ReadableStream<UIMessageChunk> {
+function isEventStream(response: Response): boolean {
+  return response.headers.get('content-type')?.includes('text/event-stream') ?? false;
+}
+
+async function toUiMessageChunkStream(response: Response): Promise<ReadableStream<UIMessageChunk>> {
+  if (!response.ok || !isEventStream(response)) {
+    const errorBody: unknown = await response.json().catch(() => undefined);
+    const apiError = parseApiErrorBody(errorBody);
+    throw new WisePenError({
+      code:
+        apiError?.code ??
+        (response.ok ? FRONTEND_NETWORK_ERROR.INVALID_RESPONSE : FRONTEND_NETWORK_ERROR.HTTP),
+      source: apiError?.code === undefined ? 'http' : 'api',
+      serverMsg:
+        apiError?.message ??
+        (response.ok ? '响应不是聊天事件流' : response.statusText || `HTTP ${response.status}`),
+      meta: { httpStatus: response.status },
+    });
+  }
+
   const normalized = normalizeChatSseResponse(response);
   if (!normalized.body) {
     throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
@@ -412,7 +490,13 @@ function toUiMessageChunkStream(response: Response): ReadableStream<UIMessageChu
   }).pipeThrough(
     new TransformStream({
       transform(chunk, controller) {
-        if (!chunk.success) throw chunk.error;
+        if (!chunk.success) {
+          throw createClientError(
+            FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+            { reason: '聊天流数据校验失败' },
+            chunk.error
+          );
+        }
         controller.enqueue(chunk.value);
       },
     })

@@ -42,7 +42,7 @@ export async function executeSseApiContract<Request, ResponseData>(
       body: contract.requestPlacement === 'body' ? JSON.stringify(request) : undefined,
     });
   } catch (error) {
-    notifyAddrFailure();
+    if (!init?.signal?.aborted) notifyAddrFailure();
     throw error;
   }
 }

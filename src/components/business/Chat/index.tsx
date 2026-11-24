@@ -29,7 +29,7 @@ function Chat({
   const selectedText = useFrontendStateValue('selected_text');
 
   const focusing = useSyncChatRouteForeground(currentSessionId);
-  const { messages, status, canLoadMoreHistory, loadingMoreHistory } = useChatView();
+  const { messages, phase, canLoadMoreHistory, loadingMoreHistory } = useChatView(currentSessionId);
   const chrome = useChatSessionChrome({
     currentSessionId,
     selectSession,
@@ -60,7 +60,7 @@ function Chat({
           fullWidth={isFullWidth}
           view={{
             messages,
-            status,
+            phase,
             canLoadMoreHistory,
             loadingInitialHistory: focusing,
             loadingMoreHistory,
@@ -79,7 +79,12 @@ function Chat({
           }}
         />
       </div>
-      <ChatToolApproval sessionId={currentSessionId} messages={messages} status={status} />
+      <ChatToolApproval
+        key={currentSessionId}
+        sessionId={currentSessionId}
+        phase={phase}
+        messages={messages}
+      />
     </>
   );
 }

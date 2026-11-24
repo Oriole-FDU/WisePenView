@@ -32,11 +32,10 @@ export interface SessionSendOptions {
   onDemandSkillIds?: string[];
 }
 
-/**
- * Router.send 意图。
- * send 始终打当前前台；仅当还没有前台（新建空白对话首发）时用 create 做 lazy create。
- */
 export type ChatRouterSendRequest = SessionSendOptions & {
-  /** 无前台时带到 createSession；已有前台时用于同步 agent */
+  /** 发起发送时 URL 指向的会话；空白对话在发送前创建。 */
+  sessionId: string | undefined;
   create?: CreateSessionRequest;
+  /** lazy create 完成后、发送开始前绑定新的 session 路由 */
+  onSessionCreated?: (sessionId: string) => Promise<void>;
 };

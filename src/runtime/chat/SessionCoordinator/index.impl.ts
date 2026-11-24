@@ -2,123 +2,186 @@ import { getChatSessionService } from '@/domains';
 import type { CreateSessionRequest, IChatSessionService } from '@/domains/ChatSession';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { SessionRuntime } from '../SessionRuntime/index.impl';
-import type { SessionRuntime as SessionRuntimeContract } from '../SessionRuntime/index.type';
-import type {
-  AcquireSessionOptions,
-  SessionCoordinator as SessionCoordinatorContract,
-} from './index.type';
+import { createSessionRuntime } from '../SessionRuntime/index.impl';
+import type { SessionRuntime } from '../SessionRuntime/index.type';
+import type { AcquireSessionOptions, SessionCoordinator } from './index.type';
 
-/** 本轮暂定容量；具体数字与 LFU 参数文档标明可后续调整 */
-const DEFAULT_POOL_CAPACITY = 8;
+const POOL_CAPACITY = 8;
 
 type PoolEntry = {
   runtime: SessionRuntime;
-  freq: number;
+  frequency: number;
   lastUsedAt: number;
 };
 
-export class SessionCoordinator implements SessionCoordinatorContract {
-  private readonly pool = new Map<string, PoolEntry>();
-  private readonly capacity: number;
-  private readonly chatSessionService: IChatSessionService;
+export function createSessionCoordinator(): SessionCoordinator {
+  const chatSessionService: IChatSessionService = getChatSessionService();
+  const pool = new Map<string, PoolEntry>();
+  const pending = new Map<string, { token: symbol; promise: Promise<SessionRuntime> }>();
+  const reservations = new Set<symbol>();
+  let reservationQueue = Promise.resolve();
+  let cleaned = false;
 
-  constructor(capacity = DEFAULT_POOL_CAPACITY) {
-    this.capacity = capacity;
-    this.chatSessionService = getChatSessionService();
+  function assertAlive(): void {
+    if (!cleaned) return;
+    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+      reason: 'SessionCoordinator 已 cleanup',
+    });
   }
 
-  has(sessionId: string): boolean {
-    return this.pool.has(sessionId);
+  function touch(entry: PoolEntry): void {
+    entry.frequency += 1;
+    entry.lastUsedAt = Date.now();
   }
 
-  async createSession(
+  function pickLfuVictim(retainSessionIds: ReadonlySet<string>): string | null {
+    let victimId: string | null = null;
+    let victim: PoolEntry | null = null;
+    for (const [sessionId, entry] of pool) {
+      if (
+        retainSessionIds.has(sessionId) ||
+        entry.runtime.getSnapshot().visibility === 'foreground'
+      ) {
+        continue;
+      }
+      if (
+        !victim ||
+        entry.frequency < victim.frequency ||
+        (entry.frequency === victim.frequency && entry.lastUsedAt < victim.lastUsedAt)
+      ) {
+        victimId = sessionId;
+        victim = entry;
+      }
+    }
+    return victimId;
+  }
+
+  async function dispose(sessionId: string): Promise<void> {
+    const entry = pool.get(sessionId);
+    const initialization = pending.get(sessionId);
+    pool.delete(sessionId);
+    pending.delete(sessionId);
+    await entry?.runtime.cleanup();
+    await initialization?.promise.catch(() => undefined);
+  }
+
+  function reserveCapacity(token: symbol, retainSessionIds: ReadonlySet<string>): Promise<void> {
+    const reservation = reservationQueue.then(async () => {
+      while (pool.size + reservations.size >= POOL_CAPACITY) {
+        const victimId = pickLfuVictim(retainSessionIds);
+        if (!victimId) break;
+        await dispose(victimId);
+      }
+      reservations.add(token);
+    });
+    reservationQueue = reservation.catch(() => undefined);
+    return reservation;
+  }
+
+  function initialize(
+    sessionId: string,
+    kind: 'createSession' | 'loadSession',
+    retainSessionIds: ReadonlySet<string>
+  ): Promise<SessionRuntime> {
+    const existing = pool.get(sessionId);
+    if (existing) return Promise.resolve(existing.runtime);
+
+    const existingInitialization = pending.get(sessionId);
+    if (existingInitialization) return existingInitialization.promise;
+
+    const token = Symbol(sessionId);
+    const initialization = reserveCapacity(token, retainSessionIds)
+      .then(async () => {
+        assertAlive();
+        if (pending.get(sessionId)?.token !== token) {
+          throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+            reason: 'SessionRuntime 已被 dispose',
+          });
+        }
+        const runtime = createSessionRuntime(sessionId);
+        try {
+          await runtime.bootstrap(kind);
+          assertAlive();
+          if (pending.get(sessionId)?.token !== token) {
+            throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+              reason: 'SessionRuntime 已被 dispose',
+            });
+          }
+          pool.set(sessionId, {
+            runtime,
+            frequency: 1,
+            lastUsedAt: Date.now(),
+          });
+          return runtime;
+        } catch (error) {
+          await runtime.cleanup();
+          throw error;
+        }
+      })
+      .finally(() => {
+        reservations.delete(token);
+        if (pending.get(sessionId)?.token === token) pending.delete(sessionId);
+      });
+    pending.set(sessionId, { token, promise: initialization });
+    return initialization;
+  }
+
+  async function createSession(
     params?: CreateSessionRequest,
     options?: AcquireSessionOptions
-  ): Promise<SessionRuntimeContract> {
-    const session = await this.chatSessionService.createSession(params);
-    const retainIds = new Set<string>([session.id]);
+  ): Promise<SessionRuntime> {
+    assertAlive();
+    const session = await chatSessionService.createSession(params);
+    assertAlive();
+    const retainIds = new Set([session.id]);
     if (options?.retainSessionId) retainIds.add(options.retainSessionId);
-    await this.ensureCapacity(retainIds);
-
-    const runtime = new SessionRuntime(session.id);
-    await runtime.bootstrap('createSession');
-    this.pool.set(session.id, {
-      runtime,
-      freq: 1,
-      lastUsedAt: Date.now(),
-    });
-    return runtime;
+    return initialize(session.id, 'createSession', retainIds);
   }
 
-  async acquire(
+  async function acquire(
     sessionId: string,
     options?: AcquireSessionOptions
-  ): Promise<SessionRuntimeContract> {
+  ): Promise<SessionRuntime> {
+    assertAlive();
     if (sessionId === '') {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
         reason: 'acquire 缺少 sessionId',
       });
     }
 
-    const existing = this.pool.get(sessionId);
+    const existing = pool.get(sessionId);
     if (existing) {
-      this.touch(existing);
+      touch(existing);
+      await existing.runtime.refresh();
+      assertAlive();
+      if (pool.get(sessionId)?.runtime !== existing.runtime) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+          reason: 'SessionRuntime 已被 dispose',
+        });
+      }
       return existing.runtime;
     }
 
-    const retainIds = new Set<string>([sessionId]);
+    const retainIds = new Set([sessionId]);
     if (options?.retainSessionId) retainIds.add(options.retainSessionId);
-
-    await this.ensureCapacity(retainIds);
-
-    const runtime = new SessionRuntime(sessionId);
-    await runtime.bootstrap('loadSession');
-    this.pool.set(sessionId, {
-      runtime,
-      freq: 1,
-      lastUsedAt: Date.now(),
-    });
+    const runtime = await initialize(sessionId, 'loadSession', retainIds);
+    assertAlive();
+    const entry = pool.get(sessionId);
+    if (entry?.runtime !== runtime) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: 'SessionRuntime 已被 dispose',
+      });
+    }
+    touch(entry);
     return runtime;
   }
 
-  async dispose(sessionId: string): Promise<void> {
-    const entry = this.pool.get(sessionId);
-    if (!entry) return;
-    this.pool.delete(sessionId);
-    await entry.runtime.cleanup();
+  async function cleanup(): Promise<void> {
+    if (cleaned) return;
+    cleaned = true;
+    const sessionIds = new Set([...pool.keys(), ...pending.keys()]);
+    await Promise.all([...sessionIds].map(dispose));
   }
 
-  private touch(entry: PoolEntry): void {
-    entry.freq += 1;
-    entry.lastUsedAt = Date.now();
-  }
-
-  private async ensureCapacity(retainIds: ReadonlySet<string>): Promise<void> {
-    while (this.pool.size >= this.capacity) {
-      const victimId = this.pickLfuVictim(retainIds);
-      if (!victimId) return;
-      await this.dispose(victimId);
-    }
-  }
-
-  /** 频率最低优先；同频取最久未用。retainIds 内不可驱逐。 */
-  private pickLfuVictim(retainIds: ReadonlySet<string>): string | null {
-    let victimId: string | null = null;
-    let victim: PoolEntry | null = null;
-
-    for (const [sessionId, entry] of this.pool) {
-      if (retainIds.has(sessionId)) continue;
-      if (
-        !victim ||
-        entry.freq < victim.freq ||
-        (entry.freq === victim.freq && entry.lastUsedAt < victim.lastUsedAt)
-      ) {
-        victimId = sessionId;
-        victim = entry;
-      }
-    }
-
-    return victimId;
-  }
+  return { createSession, acquire, dispose, cleanup };
 }
