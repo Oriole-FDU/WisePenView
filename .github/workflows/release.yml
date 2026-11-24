@@ -44,7 +44,7 @@ jobs:
 
           git fetch origin main --tags
           TARGET_SHA="$(git rev-parse origin/main)"
-          VERSION="$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")"
+          VERSION="$(git show "${TARGET_SHA}:package.json" | node -p "JSON.parse(require('node:fs').readFileSync(0, 'utf8')).version")"
           TAG="v${VERSION}"
 
           if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
