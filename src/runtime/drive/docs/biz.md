@@ -29,6 +29,14 @@
 
 Table、Sidebar 与 Navigator 共用同一个 `DriveTreeRuntime`。single 只放入当前 scope 的根；all/public 放入多个 scope 的根，并在同一张表中维护 scope 分页、跨 scope 选择与展开。节点 key 由 scope root 与 node ID 组成，避免并列多个云盘时节点 ID 冲突。
 
+### 内部边界
+
+- `DriveTreeLoader`：只负责 root、路径、子节点分页、group scope 分页和页缓存，不持有 UI 状态。
+- `DriveTreeNodeStore`：只保存节点、children、page、当前路径和 scope 根。
+- `DriveTreeLoadCoordinator`：编排初始化、refresh、scope 分页和失效重载，不按 scope 创建独立 runtime。
+- `DriveTreeSelection`、`DriveTreeExpansion`、`DriveTreeInteractionState`：分别持有选择、展开和拖拽/详情栏状态。
+- `DriveTreeRuntime`：作为唯一公共入口装配以上能力，并发布快照。
+
 ## 业务操作
 
 `DriveRuntime` 编排以下跨 service 操作，并在成功后通知受影响 scope：
@@ -40,3 +48,5 @@ Table、Sidebar 与 Navigator 共用同一个 `DriveTreeRuntime`。single 只放
 - 把个人资源挂载到小组，或调整个人资源位置。
 
 节点去重、系统目录保护、同 scope 约束与防环规则由 Drive domain 的纯规则模块拥有；具体 Tag、Resource、Note、Agent、Skill 调用时序由 runtime 拥有。
+
+`driveActions` 按命令族拆为节点创建/重命名、移动/挂载、删除/卸载和资源创建；总入口只负责创建共享 service context 并装配命令。
