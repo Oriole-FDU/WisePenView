@@ -1,6 +1,6 @@
 # Chat 业务模型
 
-分层准则见 [principle.md](./principle.md)。本文约定用户心智、产品态、Router / Coordinator / SessionRuntime 契约。
+分层准则见 [principle.md](./principle.md)。本文约定用户心智，以及 ChatRouter、SessionCoordinator 与 SessionRuntime 的职责边界。
 
 ## 用户心智
 
@@ -54,6 +54,18 @@ foreground <-> background：保留 phase；仅改 visibility
 - `cancel` 只在 `streaming`（及实现上与之等价的在途态）被消费。
 - `approve` 之后直接进入 `streaming`，不经额外的用户可见 `sending`。
 
+## React 接入与运行时所有权
+
+`AppLayout` 下的 `ChatRuntimeProvider` 创建并持有唯一的 ChatRouter。Router 内部创建并持有 SessionCoordinator；Coordinator 以闭包创建并保存各 session 的 SessionRuntime。React 组件通过 `useChatRouter` 发出操作，通过 `useChatRouterSnapshot` 订阅当前 Router 快照，不直接创建或持有运行时实例。
+
+```text
+AppLayout
+└── ChatRuntimeProvider
+    └── ChatRouter
+        └── SessionCoordinator
+            └── session runtimes (closure-owned)
+```
+
 ## ChatRouter（对话窄门）
 
 ChatRouter 是对话 Component 的唯一交互点。它维护「当前前台」指向，并把前台 SessionRuntime 的可消费面交给 View。
@@ -61,21 +73,10 @@ ChatRouter 是对话 Component 的唯一交互点。它维护「当前前台」�
 ### 给 View 的能力
 
 - **消息与流式投影**：持续更新的 messages（及渲染所需 status）
-- **意图**：至少包括 `send`、`cancel`；审批类意图（如 `approve`）同样经此收口
+- **意图**：包括 `send`、`cancel` 和审批响应，均经 Router 收口
 - **切会话**：View「索取」某 session 进入前台时，由 Router 完成 `b → f` / `f → b`，并替换当前句柄
 
-### 与 `useChat` 的约定
-
-Vercel AI SDK（本仓库 `ai` / `@ai-sdk/react`）支持外部持有 `Chat`，View 用 `useChat({ chat })` 订阅；同一 `Chat` 可被多处 hook 订阅。
-
-约定：
-
-1. SessionRuntime（或其管理对象）持有 AI SDK `Chat` 实例。
-2. ChatRouter 向 View 提供**当前前台**的 `Chat`（或等价句柄）；切前台时替换。
-3. View 用 `useChat({ chat })` 消费 `messages` / 流式更新，以及 SDK 侧的 `status` 快照。
-4. `send` / `cancel`（及审批）走 Router 包装后的意图，便于夹带 create 时序、鉴权等；Component 不直接调裸 `sendMessage` 拼 BE body。
-
-Coordinator 如何把实例交给 Router（单例、Context、注入）是实现细节，本文只要求：**Router 持有当前前台 runtime 引用，切换时替换 chat 句柄**。
+React 订阅通过 `useChatRouter` 与 `useChatRouterSnapshot` 完成。View 不直接调用 AI SDK 的发送接口拼接后端请求；发送、取消与审批都由 Router 转发给对应 SessionRuntime。
 
 产品 `phase` 与 AI SDK `status`（`submitted` / `streaming` / `ready` / `error`）可以映射，但对外产品话语以本文 `phase` 为准；`recover` 等词不对 Component 出现。
 
@@ -145,9 +146,12 @@ load history
 
 被 Coordinator 驱逐的 runtime 走 `cleanup`，不自动 `cancel` 后端。
 
+## 工具审批
+
+活跃 SessionRuntime 收到工具审批决定时调用 `respondTurn`；处于 `hanged` 的 session 则通过 SSE recovery 发送审批决定并恢复后续流。审批 UI 只表达用户决定，不负责选择底层 API 或编排恢复时序。
+
 ## 本轮明确不做
 
 - 侧栏 / 列表上的运行态徽章
 - Component 读取非前台 session 的 phase 或消息投影
-- 旧 component / `_controllers` 兼容迁移说明
-- 池容量具体数字、LFU 参数、DI / Context 选型
+- 池容量具体数字与 LFU 参数
