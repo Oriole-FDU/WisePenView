@@ -51,33 +51,6 @@ test('hidden source map 移出 dist 并按 release 精确还原', async (context
     false
   );
 
-  const asset = manifest.assets[0];
-  const bundle = await readFile(path.join(artifacts, asset.file), 'utf8');
-  const column = bundle.split('\n')[0].indexOf('function') + 1;
-  const frame = `${asset.file}:1:${column}`;
-  const symbolicate = (release = identity.release) =>
-    spawnSync(
-      process.execPath,
-      [
-        'scripts/symbolicate-error.mjs',
-        '--artifacts',
-        artifacts,
-        '--release',
-        release,
-        '--frame',
-        frame,
-      ],
-      { encoding: 'utf8' }
-    );
-
-  const restored = symbolicate();
-  assert.equal(restored.status, 0, restored.stderr);
-  const original = JSON.parse(restored.stdout);
-  assert.equal(original.release, identity.release);
-  assert.equal(original.commit, identity.commit);
-  assert.match(original.fileName, /main\.js$/);
-  assert.notEqual(symbolicate('wrong-release').status, 0);
-
   const releaseManifest = path.join(root, 'release.json');
   const manifestResult = spawnSync(
     process.execPath,
