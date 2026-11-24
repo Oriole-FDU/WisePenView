@@ -3,19 +3,12 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isDriveTrashFolderNode } from '@/components/business/Drive/common/driveComponentModel';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import {
   DriveDeleteModal,
   MoveNodeModal,
   TrashDeleteModal,
 } from '@/components/business/Drive/Modals';
-import {
-  useDocumentService,
-  useDriveService,
-  useNoteService,
-  useResourceService,
-  useSkillService,
-} from '@/domains';
+import { useDocumentService, useNoteService, useResourceService, useSkillService } from '@/domains';
 import {
   RESOURCE_ACTION,
   type ResourceAction,
@@ -26,10 +19,10 @@ import {
   type DriveContainerNode,
   type DriveResourceNode,
 } from '@/domains/Drive';
-import { type ResourceItem } from '@/domains/Resource';
-import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
+import { RESOURCE_KIND, type ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
+import { getDriveRuntime } from '@/runtime/drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import ResourceTargetModal from './ResourceTargetModal';
@@ -72,7 +65,7 @@ function ResourceToolbarOperations({
   onResourceChanged,
 }: ResourceToolbarOperationsProps) {
   const { t } = useTranslation(['resource', 'drive']);
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const noteService = useNoteService();
   const documentService = useDocumentService();
   const skillService = useSkillService();
@@ -99,7 +92,7 @@ function ResourceToolbarOperations({
 
   const { data: node, loading: resolvingNode } = useApi<DriveResourceNode, []>(
     () =>
-      driveService.resolveResourceNode({
+      driveRuntime.resolveResourceNode({
         resource: resourceInfo!,
         location: driveLocation!,
       }),
@@ -119,7 +112,7 @@ function ResourceToolbarOperations({
     }
   );
   const { data: parentPath, loading: locatingParentPath } = useApi(
-    () => driveService.getMountPath({ location: driveLocation! }),
+    () => driveRuntime.getMountPath({ location: driveLocation! }),
     {
       ready: Boolean(driveLocation && !groupId),
       refreshDeps: [driveLocation?.scope.rootId, driveLocation?.mountTagId, groupId],
@@ -168,10 +161,10 @@ function ResourceToolbarOperations({
       if (target.type !== 'folder') {
         throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING);
       }
-      await driveService.addResourcesToGroup({ resourceIds: [targetResourceId], target });
+      await driveRuntime.addResourcesToGroup({ resourceIds: [targetResourceId], target });
       return;
     }
-    await driveService.setPersonalResourcesLocation({
+    await driveRuntime.setPersonalResourcesLocation({
       resourceIds: [targetResourceId],
       target,
     });
@@ -188,7 +181,6 @@ function ResourceToolbarOperations({
           .catch(() => undefined);
         throw error;
       }
-      requestDriveRefresh();
       return { newResourceId, target };
     },
     {
@@ -210,8 +202,7 @@ function ResourceToolbarOperations({
   const { loading: linking, run: runCreateLink } = useApi(
     async (target: DriveContainerNode) => {
       if (!node || target.type !== 'folder' || target.scope.type !== 'group') return;
-      await driveService.addResourcesToGroup({ resourceIds: [node.resourceId], target });
-      requestDriveRefresh();
+      await driveRuntime.addResourcesToGroup({ resourceIds: [node.resourceId], target });
     },
     {
       manual: true,
@@ -225,8 +216,7 @@ function ResourceToolbarOperations({
   const { loading: sharing, run: runShare } = useApi(
     async (target: DriveContainerNode) => {
       if (target.type !== 'folder' || target.scope.type !== 'group') return;
-      await driveService.addResourcesToGroup({ resourceIds: [resourceId], target });
-      requestDriveRefresh();
+      await driveRuntime.addResourcesToGroup({ resourceIds: [resourceId], target });
     },
     {
       manual: true,

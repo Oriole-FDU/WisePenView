@@ -7,8 +7,8 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
-import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
 import { buildResourcePermissionActionKeySet } from '@/components/business/Drive/common/resourcePermissionPolicy';
+import ResourcePermissionActionIcon from '@/components/business/Drive/parts/ResourcePermissionActionIcon';
 import UserSearchCombobox from '@/components/business/UserSearchCombobox';
 import {
   type ResourcePermissionActionOption,

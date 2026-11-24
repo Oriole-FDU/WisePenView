@@ -6,10 +6,9 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { useAgentService, useDriveService, useNoteService, useSkillService } from '@/domains';
-import { validateReservedName } from '@/domains/Drive/validation/validateReservedName';
+import { validateReservedName } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveCreateModalProps } from './index.type';
@@ -26,10 +25,7 @@ function DriveCreateModal({
   onSuccess,
 }: DriveCreateModalProps) {
   const { t } = useTranslation(['drive', 'common']);
-  const agentService = useAgentService();
-  const driveService = useDriveService();
-  const noteService = useNoteService();
-  const skillService = useSkillService();
+  const driveRuntime = getDriveRuntime();
   const [title, setTitle] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -44,44 +40,37 @@ function DriveCreateModal({
 
   const { loading, run: runCreate } = useApi(
     async () => {
+      if (!parent) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+          reason: t('create.targetMissing'),
+        });
+      }
+      if (type !== 'folder' && !pathTagId) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING);
+      }
       let createdId: string;
       switch (type) {
         case 'agent':
-          createdId = await agentService.createAgent(
-            title.trim(),
-            name.trim() || undefined,
-            description.trim() || undefined,
-            pathTagId
-          );
-          break;
-        case 'drawio': {
-          const result = await noteService.createNote({
-            title: title.trim() || t('create.defaultDrawioTitle'),
-            resourceType: 'DRAWIO',
-            pathTagId,
-          });
-          if (!result.resourceId) {
-            throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
-          }
-          createdId = result.resourceId;
-          break;
-        }
-        case 'folder':
-          if (!parent) {
-            throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-              reason: t('create.targetMissing'),
-            });
-          }
-          createdId = (await driveService.createFolder({ parent, name: title.trim() })).tagId;
-          requestDriveRefresh();
-          break;
         case 'skill':
-          createdId = await skillService.createSkill(
-            title.trim(),
-            name.trim() || undefined,
-            description.trim() || undefined,
-            pathTagId
-          );
+          createdId = await driveRuntime.createResource({
+            type,
+            title: title.trim(),
+            name: name.trim() || undefined,
+            description: description.trim() || undefined,
+            pathTagId: pathTagId!,
+            scope: parent.scope,
+          });
+          break;
+        case 'drawio':
+          createdId = await driveRuntime.createResource({
+            type,
+            title: title.trim() || t('create.defaultDrawioTitle'),
+            pathTagId: pathTagId!,
+            scope: parent.scope,
+          });
+          break;
+        case 'folder':
+          createdId = (await driveRuntime.createFolder({ parent, name: title.trim() })).tagId;
           break;
       }
       await onSuccess(createdId, type);

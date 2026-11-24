@@ -1,16 +1,17 @@
 import { Label } from '@heroui/react';
 import { CloudUpload, FileInput, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import Dropdown from '@/components/base/Dropdown';
-import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
+import { GuideAnchor } from '@/components/base/Guide';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
-import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
+import { GUIDE_TOOL_ID } from '@/constants/tour';
 
-import styles from './index.module.scss';
 import type { CreateMenuItem, CreateMenuProps } from './index.type';
+import styles from './style.module.scss';
+import { useCreateMenuGuide } from './useCreateMenuGuide';
 
 function CreateMenuIcon({ id }: { id: CreateMenuItem['id'] }) {
   switch (id) {
@@ -43,21 +44,7 @@ function CreateMenu({ disabled = false, items, onSelect }: CreateMenuProps) {
   const { t } = useTranslation('drive');
   const [open, setOpen] = useState(false);
 
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：新建菜单挂载或展开状态变化时注册引导动作。
-   * 不可替代原因：引导层直接修改菜单 open 状态，不通过模拟点击触发按钮。
-   * cleanup：撤销动作处理器。
-   */
-  useEffect(
-    () =>
-      registerGuideActionHandler(GUIDE_ACTION_ID.openCreateMenu, {
-        isOpen: () => open,
-        open: () => setOpen(true),
-        close: () => setOpen(false),
-      }),
-    [open]
-  );
+  useCreateMenuGuide({ open, setOpen });
 
   if (items.length === 0) {
     return null;

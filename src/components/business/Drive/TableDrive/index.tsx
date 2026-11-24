@@ -1,18 +1,10 @@
-import {
-  DndContext,
-  DragOverlay,
-  type Modifier,
-  type Modifiers,
-  pointerWithin,
-} from '@dnd-kit/core';
-import { PanelRightClose, PanelRightOpen, Trash2 } from 'lucide-react';
-import { type CSSProperties, type ReactNode, useEffect } from 'react';
+import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
+import { Trash2 } from 'lucide-react';
+import { type CSSProperties, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppBreadcrumb from '@/components/base/AppBreadcrumb';
-import { AppButton } from '@/components/base/Button';
-import AppIconButton from '@/components/base/Button/AppIconButton';
-import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide';
+import { GuideAnchor } from '@/components/base/Guide';
 import { FolderTable } from '@/components/base/Table';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import {
@@ -21,8 +13,8 @@ import {
   DRIVE_LAYOUT_CHROME_HEIGHT_SHORT,
   LAYOUT_HEIGHT_DENSITY,
 } from '@/constants/layoutScale';
-import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
-import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
+import { GUIDE_TOOL_ID } from '@/constants/tour';
+import type { ResourceViewer } from '@/domains/Resource';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
@@ -31,24 +23,30 @@ import {
   resolveDriveFolderVariant,
   resolveDriveScope,
 } from '../common/driveComponentModel';
-import { useOpenDriveNode } from '../common/useOpenDriveNode';
+import type { DriveBrowserProps } from '../DriveBrowser/index.type';
+import { useDriveNavigation } from '../hooks/useDriveNavigation';
+import { useOpenDriveNode } from '../hooks/useOpenDriveNode';
 import {
-  useTableDriveActionsController,
-  useTableDriveDndController,
-  useTableDriveExternalDndController,
-  useTableDriveInteractionController,
-  useTableDriveNavigationController,
-  useTableDriveRowActionsController,
-  useTableDriveTrashController,
-} from './controllers';
-import type { DriveTableRow, TableDriveProps } from './index.type';
-import CreateMenu from './parts/CreateMenu';
+  useDriveDetailGuide,
+  useTableDriveActions,
+  useTableDriveDnd,
+  useTableDriveExternalDnd,
+  useTableDriveInteraction,
+  useTableDriveRowActions,
+  useTableDriveTrash,
+} from './hooks';
+import type { DriveTableRow } from './index.type';
 import DriveDetailPanel from './parts/DriveDetailPanel';
-import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './parts/DriveDnd';
+import {
+  DriveDragOverlay,
+  ExternalFileDroppableBreadcrumb,
+  ExternalFileDropTarget,
+} from './parts/DriveDnd';
+import { driveDragOverlayModifiers } from './parts/DriveDnd/attachDragOverlayToCursor';
+import DriveSelectionActions from './parts/DriveSelectionActions';
+import DriveToolbar from './parts/DriveToolbar';
 import styles from './style.module.scss';
 import { buildDriveTableColumns, isDrivePinnedFirstRow } from './tableConfig';
-
-const DRIVE_DRAG_OVERLAY_CURSOR_OFFSET = { x: 12, y: 12 };
 
 const getDriveFrameCssVars = (isShort: boolean): CSSProperties => {
   const chromeHeight = isShort
@@ -61,46 +59,6 @@ const getDriveFrameCssVars = (isShort: boolean): CSSProperties => {
   } as CSSProperties;
 };
 
-function getDragActivatorCoordinates(event: Event | null): { x: number; y: number } | null {
-  if (
-    !event ||
-    !('clientX' in event) ||
-    !('clientY' in event) ||
-    typeof event.clientX !== 'number' ||
-    typeof event.clientY !== 'number'
-  ) {
-    return null;
-  }
-
-  return { x: event.clientX, y: event.clientY };
-}
-
-const attachDriveDragOverlayToCursor: Modifier = ({
-  activatorEvent,
-  activeNodeRect,
-  transform,
-}) => {
-  const activatorCoordinates = getDragActivatorCoordinates(activatorEvent);
-  if (!activatorCoordinates || !activeNodeRect) return transform;
-
-  // DragOverlay 默认沿用整行的拖拽起点，这里改为让小提示固定跟随鼠标。
-  return {
-    ...transform,
-    x:
-      transform.x +
-      activatorCoordinates.x -
-      activeNodeRect.left +
-      DRIVE_DRAG_OVERLAY_CURSOR_OFFSET.x,
-    y:
-      transform.y +
-      activatorCoordinates.y -
-      activeNodeRect.top +
-      DRIVE_DRAG_OVERLAY_CURSOR_OFFSET.y,
-  };
-};
-
-const driveDragOverlayModifiers: Modifiers = [attachDriveDragOverlayToCursor];
-
 function TableDrive({
   groupId,
   rootId,
@@ -111,7 +69,7 @@ function TableDrive({
   scope,
   breadcrumbExtra,
   actions,
-}: TableDriveProps) {
+}: DriveBrowserProps) {
   const { t } = useTranslation(['drive', 'resource', 'common']);
   const { heightDensity } = useViewportLayoutScale();
   const driveFrameCssVars = getDriveFrameCssVars(heightDensity === LAYOUT_HEIGHT_DENSITY.SHORT);
@@ -120,7 +78,7 @@ function TableDrive({
   const resolvedScope = resolveDriveScope(scope, groupId, rootId);
 
   // 初始化导航控制器
-  const navigation = useTableDriveNavigationController({
+  const navigation = useDriveNavigation({
     initialNodeId,
     scope: resolvedScope.scope,
     ready: !externalLoading,
@@ -128,38 +86,30 @@ function TableDrive({
   });
 
   // 初始化交互控制器
-  const interaction = useTableDriveInteractionController({ dataSource: navigation.dataSource, t });
-  const { isDetailPanelCollapsed, setIsDetailPanelCollapsed } = interaction;
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：详情栏折叠状态变化时注册引导动作。
-   * 不可替代原因：引导层直接调用详情栏状态 setter，不依赖按钮模拟点击。
-   * cleanup：撤销动作处理器。
-   */
-  useEffect(
-    () =>
-      registerGuideActionHandler(GUIDE_ACTION_ID.openDetails, {
-        isOpen: () => !isDetailPanelCollapsed,
-        open: () => setIsDetailPanelCollapsed(false),
-        close: () => setIsDetailPanelCollapsed(true),
-      }),
-    [isDetailPanelCollapsed, setIsDetailPanelCollapsed]
-  );
+  const interaction = useTableDriveInteraction({
+    runtime: navigation.runtime,
+    snapshot: navigation.snapshot,
+    dataSource: navigation.dataSource,
+    t,
+  });
+  useDriveDetailGuide(navigation.runtime);
 
   // 封装一个通用的节点操作成功回调，清理选中状态并刷新列表
   const handleNodeActionSuccess = () => {
     interaction.clearChecked();
-    navigation.refresh();
   };
 
   // 初始化拖拽控制器
-  const dnd = useTableDriveDndController({
+  const dnd = useTableDriveDnd({
+    runtime: navigation.runtime,
+    snapshot: navigation.snapshot,
     rowMap: interaction.rowMap,
     pathNodes: navigation.pathNodes,
     checkedRowKeys: interaction.selectedActionTargetKeys,
     onMoveSuccess: handleNodeActionSuccess,
-    onMoveError: navigation.refresh,
+    onMoveError: () => {
+      void navigation.refresh();
+    },
   });
 
   // 封装一个通用的进入目录回调，清理选中状态并刷新列表
@@ -168,7 +118,7 @@ function TableDrive({
     interaction.clearSelectedRow();
     dnd.clearDragState();
     onCurrentNodeChange?.(nodeId);
-    navigation.enterFolder(nodeId);
+    void navigation.enterFolder(nodeId);
   };
 
   // 封装一个通用的点击节点回调，清理选中状态并刷新列表
@@ -182,22 +132,24 @@ function TableDrive({
   };
 
   // 初始化回收站控制器
-  const trash = useTableDriveTrashController({
+  const trash = useTableDriveTrash({
     currentNodeId: navigation.currentNodeId,
     pathNodes: navigation.pathNodes,
     scope: resolvedScope.scope,
   });
 
   const mountTagId = resolveCurrentFolderTagId(navigation.currentNodeId, navigation.pathNodes);
-  const externalDnd = useTableDriveExternalDndController({
+  const externalDnd = useTableDriveExternalDnd({
     pathTagId: mountTagId,
     isTrashView: trash.isTrashView,
     rowMap: interaction.rowMap,
     pathNodes: navigation.pathNodes,
-    onUploadSuccess: navigation.refresh,
+    onUploadSuccess: () => {
+      void navigation.refresh();
+    },
   });
 
-  const actionsController = useTableDriveActionsController({
+  const driveActions = useTableDriveActions({
     currentNodeId: navigation.currentNodeId,
     currentRows: interaction.rows,
     selectedActionTargets: interaction.selectedActionTargets,
@@ -205,7 +157,9 @@ function TableDrive({
     scope: resolvedScope.scope,
     actions,
     disabled: externalLoading,
-    refresh: navigation.refresh,
+    refresh: () => {
+      void navigation.refresh();
+    },
     mountTagId,
     isTrashView: trash.isTrashView,
     onNodeActionSuccess: handleNodeActionSuccess,
@@ -237,28 +191,25 @@ function TableDrive({
     }
   };
 
-  const resolveRowActions = useTableDriveRowActionsController({
+  const resolveRowActions = useTableDriveRowActions({
     groupId: resolvedScope.groupId,
     isEditMode,
     isTrashView: trash.isTrashView,
-    showManagePermission: actionsController.showManagePermission,
+    showManagePermission: driveActions.showManagePermission,
     onEnterFolder: handleEnterFolder,
     onOpenNode: handleActivateNode,
-    onRename: actionsController.setRenameTarget,
-    onMoveNodes: actionsController.setMoveNodes,
-    onDelete: actionsController.setDeleteTarget,
-    onOpenTagAccessPermission: actionsController.openTagAccessPermission,
-    onOpenTagMountPermission: actionsController.openTagMountPermission,
-    onOpenResourcePermission: actionsController.openResourcePermission,
+    onRename: driveActions.setRenameTarget,
+    onMoveNodes: driveActions.setMoveNodes,
+    onDelete: driveActions.setDeleteTarget,
+    onOpenTagAccessPermission: driveActions.openTagAccessPermission,
+    onOpenTagMountPermission: driveActions.openTagMountPermission,
+    onOpenResourcePermission: driveActions.openResourcePermission,
   });
 
   const renderNameContent = (content: ReactNode, row: DriveTableRow) => (
-    <span
-      className={styles.externalFileDropTarget}
-      data-drop-target={externalDnd.activeDropRowId === row.id ? 'true' : undefined}
-    >
+    <ExternalFileDropTarget isActive={externalDnd.activeDropRowId === row.id}>
       {dnd.renderNameContent(content, row)}
-    </span>
+    </ExternalFileDropTarget>
   );
 
   const breadcrumb = (() => {
@@ -286,67 +237,27 @@ function TableDrive({
   })();
 
   const toolbar = (
-    <div className={styles.toolbarActions}>
-      {!isEditMode && actionsController.showCreateMenu ? (
-        <CreateMenu
-          items={actionsController.createMenuItems}
-          onSelect={actionsController.handleCreateMenuSelect}
-        />
-      ) : null}
-      {!isEditMode && actionsController.showUploadToGroup ? (
-        <AppButton variant="secondary" size="sm" onPress={actionsController.openUploadToGroup}>
-          {t('table.addFromPersonal')}
-        </AppButton>
-      ) : null}
-      <GuideAnchor id={GUIDE_TOOL_ID.driveDetails}>
-        <AppIconButton
-          icon={
-            interaction.isDetailPanelCollapsed ? (
-              <PanelRightOpen size={16} aria-hidden="true" />
-            ) : (
-              <PanelRightClose size={16} aria-hidden="true" />
-            )
-          }
-          label={
-            interaction.isDetailPanelCollapsed
-              ? t('table.expandDetails')
-              : t('table.collapseDetails')
-          }
-          size="sm"
-          className={styles.detailPanelToggle}
-          onPress={() => interaction.setIsDetailPanelCollapsed((collapsed) => !collapsed)}
-        />
-      </GuideAnchor>
-    </div>
+    <DriveToolbar
+      showCreateMenu={!isEditMode && driveActions.showCreateMenu}
+      createMenuItems={driveActions.createMenuItems}
+      onSelectCreate={driveActions.handleCreateMenuSelect}
+      showUploadToGroup={!isEditMode && driveActions.showUploadToGroup}
+      onOpenUploadToGroup={driveActions.openUploadToGroup}
+      detailPanelCollapsed={interaction.isDetailPanelCollapsed}
+      onToggleDetailPanel={() => interaction.setIsDetailPanelCollapsed((collapsed) => !collapsed)}
+    />
   );
 
-  const selectionFooter = (() => {
-    if (!isEditMode) return null;
-    return (
-      <div className={styles.selectionActions}>
-        <AppButton variant="secondary" size="sm" onPress={interaction.clearChecked}>
-          {t('table.clearSelection')}
-        </AppButton>
-        {interaction.canMoveSelection ? (
-          <AppButton
-            variant="secondary"
-            size="sm"
-            onPress={() => actionsController.setMoveNodes(interaction.selectedActionTargets)}
-          >
-            {t('table.move')}
-          </AppButton>
-        ) : null}
-        <AppButton
-          variant="danger"
-          size="sm"
-          isDisabled={actionsController.batchDeleting}
-          onPress={actionsController.runBatchDelete}
-        >
-          {trash.isTrashView ? t('delete.permanent') : t('actions.delete', { ns: 'common' })}
-        </AppButton>
-      </div>
-    );
-  })();
+  const selectionFooter = isEditMode ? (
+    <DriveSelectionActions
+      canMove={interaction.canMoveSelection}
+      isTrashView={trash.isTrashView}
+      deleting={driveActions.batchDeleting}
+      onClear={interaction.clearChecked}
+      onMove={() => driveActions.setMoveNodes(interaction.selectedActionTargets)}
+      onDelete={driveActions.runBatchDelete}
+    />
+  ) : null;
 
   return (
     <DndContext
@@ -369,7 +280,9 @@ function TableDrive({
                   breadcrumb={breadcrumb}
                   toolbar={toolbar}
                   expandedRowKeys={navigation.expandedRowKeys}
-                  onExpandedChange={navigation.handleExpandedChange}
+                  onExpandedChange={(keys) => {
+                    void navigation.handleExpandedChange(keys);
+                  }}
                   selectedRowKey={interaction.selectedRow?.id}
                   onRowSelect={handleRowSelect}
                   onRowActivate={handleActivateNode}
@@ -436,7 +349,7 @@ function TableDrive({
             </aside>
           </div>
         </div>
-        {actionsController.ModalHost}
+        {driveActions.ModalHost}
       </main>
       <DragOverlay modifiers={driveDragOverlayModifiers}>
         {dnd.activeDragRow && dnd.draggingCount > 0 ? (

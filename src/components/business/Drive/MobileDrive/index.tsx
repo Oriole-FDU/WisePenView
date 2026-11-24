@@ -9,10 +9,11 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 
 import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
 import { resolveDriveFolderVariant, resolveDriveScope } from '../common/driveComponentModel';
-import { useOpenDriveNode } from '../common/useOpenDriveNode';
-import { useTableDriveNavigationController } from '../TableDrive/controllers';
-import type { DriveTableRow, TableDriveProps } from '../TableDrive/index.type';
+import { useDriveNavigation } from '../hooks/useDriveNavigation';
+import { useOpenDriveNode } from '../hooks/useOpenDriveNode';
+import type { DriveTableRow } from '../TableDrive/index.type';
 import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/tableConfig';
+import type { MobileDriveProps } from './index.type';
 import styles from './style.module.scss';
 
 function getMobileRowMeta(row: DriveTableRow) {
@@ -29,10 +30,10 @@ function MobileDrive({
   onCurrentNodeChange,
   onPathError,
   scope,
-}: TableDriveProps) {
+}: MobileDriveProps) {
   const { t } = useTranslation('drive');
   const resolvedScope = resolveDriveScope(scope, groupId, rootId);
-  const navigation = useTableDriveNavigationController({
+  const navigation = useDriveNavigation({
     initialNodeId,
     scope: resolvedScope.scope,
     ready: !externalLoading,
@@ -40,7 +41,7 @@ function MobileDrive({
   });
   const handleEnterFolder = (nodeId: string) => {
     onCurrentNodeChange?.(nodeId);
-    navigation.enterFolder(nodeId);
+    void navigation.enterFolder(nodeId);
   };
   const openDriveNode = useOpenDriveNode({ enterFolder: handleEnterFolder });
   const rows = navigation.dataSource.map((node) => toDriveTableRow(node, t));
@@ -103,7 +104,9 @@ function MobileDrive({
           loading={navigation.loading}
           breadcrumb={breadcrumb}
           expandedRowKeys={navigation.expandedRowKeys}
-          onExpandedChange={navigation.handleExpandedChange}
+          onExpandedChange={(keys) => {
+            void navigation.handleExpandedChange(keys);
+          }}
           onRowActivate={handleActivateNode}
           renderEntryIcon={(row) => (
             <EntryIcon

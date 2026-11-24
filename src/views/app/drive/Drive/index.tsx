@@ -8,9 +8,9 @@ import PageHeader from '@/components/base/PageHeader';
 import { Tabs } from '@/components/base/Tabs';
 import DriveBrowser from '@/components/business/Drive/DriveBrowser';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID, GUIDE_TOUR_ID } from '@/constants/tour';
-import { useDriveService } from '@/domains';
 import { buildDriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 import { parseErrorMessage } from '@/utils/error';
 import {
   buildDrivePath,
@@ -35,7 +35,7 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
   const { t } = useTranslation('drive');
   const navigate = useNavigate();
   const { folderId } = useParams();
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const driveScope = buildDriveNodeScope();
   const [previewViewMode, setPreviewViewMode] = useState<DriveViewMode | null>(null);
   const activeViewMode = previewViewMode ?? viewMode;
@@ -62,7 +62,7 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
   }, []);
 
   const { data: trashFolder } = useApi(
-    () => driveService.getSystemFolder({ scope: driveScope, type: 'trash' }),
+    () => driveRuntime.getSystemFolder({ scope: driveScope, type: 'trash' }),
     {
       ready: isTrashView && !activeFolderId,
       refreshDeps: [activeViewMode, activeFolderId],

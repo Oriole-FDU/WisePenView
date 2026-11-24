@@ -5,14 +5,15 @@ import {
   getDriveNodeLabel,
   getDriveScopeGroupId,
 } from '@/components/business/Drive/common/driveComponentModel';
-import { useDriveService, useGroupService } from '@/domains';
+import { useGroupService } from '@/domains';
 import type { DriveResourceLocation } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
+import { getDriveRuntime } from '@/runtime/drive';
 import { buildDrivePath } from '@/utils/navigation/driveRoute';
 
 export function useResourceBreadcrumb(resourceId?: string, driveLocation?: DriveResourceLocation) {
   const { t } = useTranslation('workspace');
-  const driveService = useDriveService();
+  const driveRuntime = getDriveRuntime();
   const groupService = useGroupService();
   const scope = driveLocation?.scope;
   const groupId = scope ? getDriveScopeGroupId(scope) : undefined;
@@ -22,7 +23,7 @@ export function useResourceBreadcrumb(resourceId?: string, driveLocation?: Drive
     async () => {
       const activeLocation = driveLocation!;
       const [pathNodes, group] = await Promise.all([
-        driveService.getMountPath({ location: activeLocation }),
+        driveRuntime.getMountPath({ location: activeLocation }),
         groupId ? groupService.fetchGroupBaseInfo(groupId) : Promise.resolve(undefined),
       ]);
 

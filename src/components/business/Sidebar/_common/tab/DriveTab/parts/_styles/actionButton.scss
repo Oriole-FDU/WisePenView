@@ -1,0 +1,21 @@
+@mixin nodeActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition:
+    color var(--motion-duration-fast) var(--motion-ease-standard),
+    background-color var(--motion-duration-fast) var(--motion-ease-standard);
+
+  &:hover:not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+    color: var(--foreground);
+    background: var(--surface-tertiary);
+  }
+}

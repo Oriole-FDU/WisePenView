@@ -1,0 +1,11 @@
+.toolbarActions {
+  position: relative;
+  z-index: var(--app-z-index-elevated);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.detailPanelToggle {
+  flex: 0 0 auto;
+}
