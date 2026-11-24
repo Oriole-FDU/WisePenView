@@ -43,3 +43,4 @@ API 与 mapper
 7. 可见 UI 放在 `parts/PascalCase/index.tsx`，类型和样式与组件同级；只服务该 part 的 Hook 与 part 同级，Drive 共享 Hook 放在 `Drive/hooks`，共享部件放在 `Drive/parts`。
 8. Navigator 不是独立 runtime：`scopeMode` 只决定进入同一 Node Store 的根节点数量，single/all/public 都是同一 `DriveTreeRuntime` 的配置。
 9. 不建立 `DriveForestRuntime` 或 `DriveScopeRuntime`。多 scope 是节点来源，不是多套运行状态；分页、展开、选择和加载集合全部按节点 key 共用一张状态表。
+10. 不按相似行数抽 common，按重复的不变量和操作后置条件识别：节点去重、作用域校验、资源/目录分组等纯规则进入 Drive domain；成功失效与批量结果等命令协议进入 `driveActionRules`；只出现一次的命令流程保持原处。

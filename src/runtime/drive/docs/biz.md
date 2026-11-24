@@ -50,3 +50,5 @@ Table、Sidebar 与 Navigator 共用同一个 `DriveTreeRuntime`。single 只放
 节点去重、系统目录保护、同 scope 约束与防环规则由 Drive domain 的纯规则模块拥有；具体 Tag、Resource、Note、Agent、Skill 调用时序由 runtime 拥有。
 
 `driveActions` 按命令族拆为节点创建/重命名、移动/挂载、删除/卸载和资源创建；总入口只负责创建共享 service context 并装配命令。
+
+批次命令共用 `prepareDriveActionNodes` 完成去重、后代裁剪、系统目录与同 scope 校验，并直接得到资源/目录分组；runtime 只补充命令特有规则。scope 类型守卫、成功通知与批量结果由 `driveActionRules` 统一。

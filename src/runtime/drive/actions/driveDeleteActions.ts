@@ -1,48 +1,37 @@
 import {
-  assertDriveActionScope,
-  assertNoSystemDriveFolder,
   buildDriveResourceUnmountRounds,
   type DeleteTrashedNodesParams,
-  type FolderNode,
+  getDriveFolderTagIds,
   getDriveResourceIds,
   isDriveNodeInsideFolder,
-  isDriveResourceNode,
   type MoveNodesToTrashParams,
-  normalizeDriveActionNodes,
-  normalizeDriveIds,
+  prepareDriveActionNodes,
   type RemoveNodesFromGroupParams,
 } from '@/domains/Drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveActionContext } from './driveActionContext';
+import { completeDriveBatch, requireDriveScope } from './driveActionRules';
 import type { DriveActions } from './index.type';
 
 export const createDriveDeleteActions = (
   context: DriveActionContext
 ): Pick<DriveActions, 'moveNodesToTrash' | 'removeNodesFromGroup' | 'deleteTrashedNodes'> => {
-  const { getTagAncestors, notify, services } = context;
+  const { getTagAncestors, services } = context;
   const { driveService, resourceService, tagService } = services;
 
-  const prepareNodes = (
-    nodes: MoveNodesToTrashParams['nodes'] | RemoveNodesFromGroupParams['nodes']
-  ) => {
-    const normalizedNodes = normalizeDriveActionNodes(nodes, getTagAncestors);
-    assertNoSystemDriveFolder(normalizedNodes);
-    return normalizedNodes;
-  };
-
-  const splitNodes = (nodes: DeleteTrashedNodesParams['nodes']) => ({
-    resources: nodes.filter(isDriveResourceNode),
-    folders: nodes.filter((node): node is FolderNode => node.type === 'folder'),
-  });
-
   const moveNodesToTrash = async ({ nodes }: MoveNodesToTrashParams) => {
-    const normalizedNodes = prepareNodes(nodes);
-    const scope = assertDriveActionScope(normalizedNodes);
-    if (scope.type !== 'personal') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
-    }
-    const { resources, folders } = splitNodes(normalizedNodes);
+    const {
+      nodes: normalizedNodes,
+      scope,
+      resources,
+      folders,
+    } = prepareDriveActionNodes(nodes, getTagAncestors);
+    const personalScope = requireDriveScope(
+      scope,
+      'personal',
+      FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE
+    );
     let affectedCount = 0;
     if (resources.length > 0) {
       affectedCount += await resourceService.movePersonalResourcesToTrash({
@@ -50,23 +39,27 @@ export const createDriveDeleteActions = (
       });
     }
     if (folders.length > 0) {
-      const trash = await driveService.getSystemFolder({ scope, type: 'trash' });
-      const ids = normalizeDriveIds(folders.map((folder) => folder.tagId));
+      const trash = await driveService.getSystemFolder({ scope: personalScope, type: 'trash' });
+      const ids = getDriveFolderTagIds(folders);
       await tagService.moveTags({ targetTagIds: ids, newParentId: trash.tagId });
       affectedCount += ids.length;
     }
-    notify(scope);
-    return { requestedCount: normalizedNodes.length, affectedCount };
+    return completeDriveBatch(context, personalScope, normalizedNodes.length, affectedCount);
   };
 
   const removeNodesFromGroup = async ({ nodes }: RemoveNodesFromGroupParams) => {
-    const normalizedNodes = prepareNodes(nodes);
-    const scope = assertDriveActionScope(normalizedNodes);
-    if (scope.type !== 'group') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
-    }
-    const groupId = scope.groupId;
-    const { resources, folders } = splitNodes(normalizedNodes);
+    const {
+      nodes: normalizedNodes,
+      scope,
+      resources,
+      folders,
+    } = prepareDriveActionNodes(nodes, getTagAncestors);
+    const groupScope = requireDriveScope(
+      scope,
+      'group',
+      FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE
+    );
+    const groupId = groupScope.groupId;
     let affectedCount = 0;
 
     for (const resourceSourceTagMap of buildDriveResourceUnmountRounds(resources)) {
@@ -76,40 +69,42 @@ export const createDriveDeleteActions = (
       });
     }
     if (folders.length > 0) {
-      const ids = normalizeDriveIds(folders.map((folder) => folder.tagId));
+      const ids = getDriveFolderTagIds(folders);
       await tagService.removeTags({ groupId, targetTagIds: ids });
       affectedCount += ids.length;
     }
-    notify(scope);
-    return { requestedCount: normalizedNodes.length, affectedCount };
+    return completeDriveBatch(context, groupScope, normalizedNodes.length, affectedCount);
   };
 
   const deleteTrashedNodes = async ({ nodes }: DeleteTrashedNodesParams) => {
-    const normalizedNodes = normalizeDriveActionNodes(nodes, getTagAncestors);
-    assertNoSystemDriveFolder(normalizedNodes);
-    const scope = assertDriveActionScope(normalizedNodes);
-    if (scope.type !== 'personal') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
-    }
-    const trash = await driveService.getSystemFolder({ scope, type: 'trash' });
+    const {
+      nodes: normalizedNodes,
+      scope,
+      resources,
+      folders,
+    } = prepareDriveActionNodes(nodes, getTagAncestors);
+    const personalScope = requireDriveScope(
+      scope,
+      'personal',
+      FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE
+    );
+    const trash = await driveService.getSystemFolder({ scope: personalScope, type: 'trash' });
     if (normalizedNodes.some((node) => !isDriveNodeInsideFolder(node, trash, getTagAncestors))) {
       throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
     }
-    const { resources, folders: trashedFolders } = splitNodes(normalizedNodes);
-    const folders = trashedFolders.filter((folder) => folder.id !== trash.id);
+    const deletableFolders = folders.filter((folder) => folder.id !== trash.id);
     let affectedCount = 0;
     const resourceIds = getDriveResourceIds(resources);
     if (resourceIds.length > 0) {
       await resourceService.removeResources({ resourceIds });
       affectedCount += resourceIds.length;
     }
-    if (folders.length > 0) {
-      const tagIds = normalizeDriveIds(folders.map((folder) => folder.tagId));
+    if (deletableFolders.length > 0) {
+      const tagIds = getDriveFolderTagIds(deletableFolders);
       await tagService.removeTags({ targetTagIds: tagIds });
       affectedCount += tagIds.length;
     }
-    notify(scope);
-    return { requestedCount: normalizedNodes.length, affectedCount };
+    return completeDriveBatch(context, personalScope, normalizedNodes.length, affectedCount);
   };
 
   return { moveNodesToTrash, removeNodesFromGroup, deleteTrashedNodes };

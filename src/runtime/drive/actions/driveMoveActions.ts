@@ -1,43 +1,39 @@
 import {
   type AddResourcesToGroupParams,
-  assertDriveActionScope,
-  assertNoSystemDriveFolder,
   assertSingleDriveResourceMount,
   assertValidDriveMoveTarget,
-  type FolderNode,
+  getDriveFolderTagIds,
   getDriveResourceIds,
   getDriveTargetTagId,
-  isDriveResourceNode,
   type MoveNodesParams,
-  normalizeDriveActionNodes,
   normalizeDriveIds,
+  prepareDriveActionNodes,
   sameDriveScope,
   type SetPersonalResourcesLocationParams,
 } from '@/domains/Drive';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveActionContext } from './driveActionContext';
+import { completeDriveBatch, requireDriveScope } from './driveActionRules';
 import type { DriveActions } from './index.type';
 
 export const createDriveMoveActions = (
   context: DriveActionContext
 ): Pick<DriveActions, 'moveNodes' | 'setPersonalResourcesLocation' | 'addResourcesToGroup'> => {
-  const { getGroupId, getTagAncestors, notify, services } = context;
+  const { getGroupId, getTagAncestors, services } = context;
   const { resourceService, tagService } = services;
 
-  const normalizeNodes = (nodes: MoveNodesParams['nodes']) =>
-    normalizeDriveActionNodes(nodes, getTagAncestors);
-
   const moveNodes = async ({ nodes, target }: MoveNodesParams) => {
-    const normalizedNodes = normalizeNodes(nodes);
-    assertNoSystemDriveFolder(normalizedNodes);
-    const scope = assertDriveActionScope(normalizedNodes);
+    const {
+      nodes: normalizedNodes,
+      scope,
+      resources,
+      folders,
+    } = prepareDriveActionNodes(nodes, getTagAncestors);
     if (!sameDriveScope(scope, target.scope)) {
       throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
     }
     const groupId = getGroupId(scope);
-    const resources = normalizedNodes.filter(isDriveResourceNode);
-    const folders = normalizedNodes.filter((node): node is FolderNode => node.type === 'folder');
     assertValidDriveMoveTarget(folders, target);
     if (groupId) assertSingleDriveResourceMount(resources);
     const movingResources = resources.filter((node) => node.mountTagId !== target.tagId);
@@ -64,13 +60,12 @@ export const createDriveMoveActions = (
       }
     }
     if (movingFolders.length > 0) {
-      const ids = normalizeDriveIds(movingFolders.map((folder) => folder.tagId));
+      const ids = getDriveFolderTagIds(movingFolders);
       await tagService.moveTags({ groupId, targetTagIds: ids, newParentId: targetTagId });
       affectedCount += ids.length;
     }
 
-    notify(scope);
-    return { requestedCount: normalizedNodes.length, affectedCount };
+    return completeDriveBatch(context, scope, normalizedNodes.length, affectedCount);
   };
 
   const setPersonalResourcesLocation = async ({
@@ -78,9 +73,11 @@ export const createDriveMoveActions = (
     target,
   }: SetPersonalResourcesLocationParams) => {
     const ids = normalizeDriveIds(resourceIds);
-    if (target.scope.type !== 'personal') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
-    }
+    const personalScope = requireDriveScope(
+      target.scope,
+      'personal',
+      FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE
+    );
     const targetTagId = getDriveTargetTagId(target);
     let affectedCount = 0;
     if (ids.length > 0) {
@@ -89,25 +86,25 @@ export const createDriveMoveActions = (
         targetPathTagId: targetTagId,
       });
     }
-    notify(target.scope);
-    return { requestedCount: ids.length, affectedCount };
+    return completeDriveBatch(context, personalScope, ids.length, affectedCount);
   };
 
   const addResourcesToGroup = async ({ resourceIds, target }: AddResourcesToGroupParams) => {
-    if (target.scope.type !== 'group') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
-    }
+    const groupScope = requireDriveScope(
+      target.scope,
+      'group',
+      FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE
+    );
     const ids = normalizeDriveIds(resourceIds);
     let affectedCount = 0;
     if (ids.length > 0) {
       affectedCount = await resourceService.mountResourcesToGroup({
         resourceIds: ids,
-        groupId: target.scope.groupId,
+        groupId: groupScope.groupId,
         targetTagId: target.tagId,
       });
     }
-    notify(target.scope);
-    return { requestedCount: ids.length, affectedCount };
+    return completeDriveBatch(context, groupScope, ids.length, affectedCount);
   };
 
   return { moveNodes, setPersonalResourcesLocation, addResourcesToGroup };

@@ -52,16 +52,23 @@ export interface DriveBatchOperationResult {
   affectedCount: number;
 }
 
+export interface PreparedDriveActionNodes {
+  nodes: DriveMutableNode[];
+  scope: DriveNodeScope;
+  resources: DriveResourceNode[];
+  folders: FolderNode[];
+}
+
 export const normalizeDriveIds = (ids: string[]): string[] =>
   Array.from(new Set(ids.map((id) => id.trim()).filter(Boolean)));
 
-export const isDriveResourceNode = (node: DriveMutableNode): node is DriveResourceNode =>
+const isDriveResourceNode = (node: DriveMutableNode): node is DriveResourceNode =>
   node.type === 'resource' || node.type === 'link';
 
 export const sameDriveScope = (left: DriveNodeScope, right: DriveNodeScope): boolean =>
   left.rootId === right.rootId;
 
-export const assertDriveActionScope = (nodes: DriveMutableNode[]): DriveNodeScope => {
+const assertDriveActionScope = (nodes: DriveMutableNode[]): DriveNodeScope => {
   if (nodes.length === 0) {
     throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'nodes' });
   }
@@ -72,7 +79,7 @@ export const assertDriveActionScope = (nodes: DriveMutableNode[]): DriveNodeScop
   return first.scope;
 };
 
-export const assertNoSystemDriveFolder = (nodes: DriveMutableNode[]): void => {
+const assertNoSystemDriveFolder = (nodes: DriveMutableNode[]): void => {
   if (nodes.some((node) => node.type === 'folder' && node.systemType)) {
     throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_SELECTION_CONTAINS_SYSTEM_FOLDER);
   }
@@ -90,7 +97,7 @@ export const isDriveNodeInsideFolder = (
   return getTagAncestors(node.mountTagId, groupId).includes(folder.tagId);
 };
 
-export const normalizeDriveActionNodes = (
+const normalizeDriveActionNodes = (
   nodes: DriveMutableNode[],
   getTagAncestors: GetDriveTagAncestors
 ): DriveMutableNode[] => {
@@ -102,9 +109,28 @@ export const normalizeDriveActionNodes = (
   );
 };
 
-export const groupDriveResourcesById = (
-  nodes: DriveResourceNode[]
-): Map<string, DriveResourceNode[]> => {
+const partitionDriveActionNodes = (
+  nodes: DriveMutableNode[]
+): Pick<PreparedDriveActionNodes, 'resources' | 'folders'> => ({
+  resources: nodes.filter(isDriveResourceNode),
+  folders: nodes.filter((node): node is FolderNode => node.type === 'folder'),
+});
+
+export const prepareDriveActionNodes = (
+  nodes: DriveMutableNode[],
+  getTagAncestors: GetDriveTagAncestors
+): PreparedDriveActionNodes => {
+  const normalizedNodes = normalizeDriveActionNodes(nodes, getTagAncestors);
+  assertNoSystemDriveFolder(normalizedNodes);
+  const scope = assertDriveActionScope(normalizedNodes);
+  return {
+    nodes: normalizedNodes,
+    scope,
+    ...partitionDriveActionNodes(normalizedNodes),
+  };
+};
+
+const groupDriveResourcesById = (nodes: DriveResourceNode[]): Map<string, DriveResourceNode[]> => {
   const groups = new Map<string, DriveResourceNode[]>();
   nodes.forEach((node) => {
     const group = groups.get(node.resourceId) ?? [];
@@ -179,3 +205,6 @@ export const assertValidDriveMoveTarget = (
 
 export const getDriveResourceIds = (nodes: DriveResourceNode[]): string[] =>
   normalizeDriveIds(nodes.map((node) => node.resourceId));
+
+export const getDriveFolderTagIds = (folders: FolderNode[]): string[] =>
+  normalizeDriveIds(folders.map((folder) => folder.tagId));
