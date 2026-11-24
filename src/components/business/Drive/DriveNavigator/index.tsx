@@ -16,9 +16,10 @@ import {
 } from '@/components/business/Drive/common/driveComponentModel';
 import type { DriveNode } from '@/domains/Drive';
 import {
-  buildDriveForestTreeKey,
-  type DriveForestRequest,
-  type DriveTreeSnapshot,
+  buildDriveNodeKey,
+  DRIVE_TREE_MODE,
+  DRIVE_TREE_SURFACE,
+  type DriveTreeRequest,
   useDriveNavigator,
 } from '@/runtime/drive';
 import { notifyError } from '@/utils/error';
@@ -66,15 +67,18 @@ function DriveNavigator({
   const effectiveResourceLimit =
     showsResources && !selectsResources ? resourcePreviewLimit : undefined;
   const resourcePageSize = effectiveResourceLimit ?? DEFAULT_SELECTABLE_RESOURCE_PAGE_SIZE;
-  const request: DriveForestRequest = {
+  const request: DriveTreeRequest = {
     scope: resolvedScope.scope,
+    surface: DRIVE_TREE_SURFACE.navigator,
+    mode: DRIVE_TREE_MODE.select,
     scopeMode,
     excludedGroupIds,
-    resourceType,
-    renderableTypes,
+    load: {
+      resourceType,
+      pageSize: resourcePageSize,
+      kinds: showsResources ? ['folder', 'resource', 'link'] : ['folder'],
+    },
     selectableTypes,
-    showResources: showsResources,
-    pageSize: resourcePageSize,
     multiple,
     initialSelectedIds,
     disabledNodeIds,
@@ -83,8 +87,8 @@ function DriveNavigator({
   const { runtime, snapshot } = useDriveNavigator(request, {
     onError: (error) => notifyError(error),
   });
-  const nodeByTreeKey = new Map(
-    [...snapshot.nodeByTreeKey.entries()].filter(([, node]) => renderableTypes.includes(node.type))
+  const nodeByKey = new Map(
+    [...snapshot.nodeByKey.entries()].filter(([, node]) => renderableTypes.includes(node.type))
   );
   const rootLabelByRootId = new Map(
     snapshot.scopeEntries.map((entry) => [
@@ -93,9 +97,6 @@ function DriveNavigator({
         (entry.scope.type === 'group' ? t('navigator.groupDrive') : t('navigator.personalDrive')),
     ])
   );
-
-  const getTreeSnapshot = (node: DriveNode): DriveTreeSnapshot | undefined =>
-    snapshot.treeSnapshots.get(node.scope.rootId);
 
   const renderTitle = (node: DriveViewNode) => {
     const isScopeLoadMore =
@@ -113,7 +114,7 @@ function DriveNavigator({
               }
             : node.type === 'loading'
               ? () => {
-                  const treeKey = buildDriveForestTreeKey(node.scope, node.parentId);
+                  const treeKey = buildDriveNodeKey(node.scope, node.parentId);
                   void runtime.loadMore(treeKey).catch((error: unknown) => {
                     notifyError(error);
                   });
@@ -133,21 +134,22 @@ function DriveNavigator({
         dimUnselectableNodes,
         interactiveLoadingNodes: true,
         disabledNodeIds: new Set(disabledNodeIds),
-        getTreeKey: (node) => buildDriveForestTreeKey(node.scope, node.id),
+        getTreeKey: (node) => buildDriveNodeKey(node.scope, node.id),
         renderTitle,
         isNodeSelectable,
         isNodeDisabled,
       },
-      nodeByTreeKey
+      nodeByKey
     );
 
-  const appendPageLoadMore = (parent: DriveViewNode, tree: DriveTreeSnapshot) => {
+  const appendPageLoadMore = (parent: DriveViewNode) => {
     if (!isContainer(parent)) return [];
-    const page = tree.pageByParent.get(parent.id);
+    const parentKey = buildDriveNodeKey(parent.scope, parent.id);
+    const page = snapshot.pageByKey.get(parentKey);
     if (!page?.hasMore) return [];
     const loaded =
-      tree.childrenByParent
-        .get(parent.id)
+      snapshot.childrenByKey
+        .get(parentKey)
         ?.filter((node) => node.type === 'resource' || node.type === 'link').length ?? 0;
     return [
       buildDriveLoadingNode(
@@ -161,14 +163,12 @@ function DriveNavigator({
   const buildTreeNode = (node: DriveViewNode): DataNode => {
     const [treeNode] = buildNodes([node]);
     if (!treeNode || node.type === 'loading') return treeNode;
-    const tree = getTreeSnapshot(node);
-    if (!tree) return treeNode;
-    const children = tree?.childrenByParent.get(node.id);
+    const children = snapshot.childrenByKey.get(buildDriveNodeKey(node.scope, node.id));
     if (!children) return treeNode;
     return {
       ...treeNode,
-      children: buildNodes([...children, ...appendPageLoadMore(node, tree)]).map((child) => {
-        const childNode = snapshot.nodeByTreeKey.get(String(child.key));
+      children: buildNodes([...children, ...appendPageLoadMore(node)]).map((child) => {
+        const childNode = snapshot.nodeByKey.get(String(child.key));
         return childNode ? buildTreeNode(childNode) : child;
       }),
     };
@@ -209,8 +209,7 @@ function DriveNavigator({
   const handleLoadData = async (treeNode: DataNode): Promise<void> => {
     const key = String(treeNode.key);
     try {
-      await runtime.loadChildren(key);
-      runtime.setExpandedKeys([...snapshot.expandedTreeKeys, key]);
+      await runtime.expandNode(key);
     } catch (error) {
       notifyError(error);
     }
@@ -262,8 +261,8 @@ function DriveNavigator({
         disabled={disabled}
         selectable
         multiple={multiple}
-        selectedKeys={[...snapshot.selectedTreeKeys]}
-        expandedKeys={[...snapshot.expandedTreeKeys]}
+        selectedKeys={[...snapshot.selectedKeys]}
+        expandedKeys={[...snapshot.expandedKeys]}
         expandAction="click"
         onSelect={handleSelect}
         onExpand={handleExpand}

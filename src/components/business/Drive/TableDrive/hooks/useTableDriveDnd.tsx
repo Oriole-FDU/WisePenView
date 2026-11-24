@@ -12,7 +12,12 @@ import { useTranslation } from 'react-i18next';
 import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import type { DriveNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
-import { type DriveTreeRuntime, type DriveTreeSnapshot, getDriveRuntime } from '@/runtime/drive';
+import {
+  buildDriveNodeKey,
+  type DriveTreeRuntime,
+  type DriveTreeSnapshot,
+  getDriveRuntime,
+} from '@/runtime/drive';
 
 import {
   type DriveViewNode,
@@ -70,8 +75,20 @@ export function useTableDriveDnd({
 }: UseTableDriveDndParams) {
   const { t } = useTranslation('drive');
   const driveRuntime = getDriveRuntime();
-  const draggingRowKeys = snapshot.draggingNodeIds;
-  const activeDragRowId = snapshot.activeDragNodeId;
+  const primaryScope = snapshot.request.scope;
+  const draggingRowKeys = new Set(
+    [...snapshot.draggingKeys]
+      .map((nodeKey) => snapshot.nodeByKey.get(nodeKey))
+      .filter(
+        (node): node is NonNullable<typeof node> => node?.scope.rootId === primaryScope.rootId
+      )
+      .map((node) => node.id)
+  );
+  const activeDragNode = snapshot.activeDragKey
+    ? snapshot.nodeByKey.get(snapshot.activeDragKey)
+    : undefined;
+  const activeDragRowId =
+    activeDragNode?.scope.rootId === primaryScope.rootId ? activeDragNode.id : undefined;
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { distance: 8 },
@@ -140,12 +157,20 @@ export function useTableDriveDnd({
     });
     if (sourceRowIds.length === 0) return;
 
-    runtime.beginDrag(sourceRowIds, row.id);
+    runtime.beginDrag(
+      sourceRowIds.map((sourceRowId) => buildDriveNodeKey(primaryScope, sourceRowId)),
+      buildDriveNodeKey(primaryScope, row.id)
+    );
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const targetNodeId = event.over?.data.current?.targetNodeId;
-    const sourceRowIds = [...runtime.getSnapshot().draggingNodeIds];
+    const sourceRowIds = [...runtime.getSnapshot().draggingKeys]
+      .map((nodeKey) => snapshot.nodeByKey.get(nodeKey))
+      .filter(
+        (node): node is NonNullable<typeof node> => node?.scope.rootId === primaryScope.rootId
+      )
+      .map((node) => node.id);
     const targetNode =
       typeof targetNodeId === 'string' ? driveNodeMap.get(targetNodeId) : undefined;
 

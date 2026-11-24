@@ -1,4 +1,4 @@
-import type { DriveContainerNode, DriveNode, DriveNodeScope, RootNode } from '@/domains/Drive';
+import type { DriveNodeScope } from '@/domains/Drive';
 
 export const DRIVE_TREE_MODE = {
   browse: 'browse',
@@ -16,18 +16,12 @@ export const DRIVE_TREE_SURFACE = {
 export type DriveTreeSurface = (typeof DRIVE_TREE_SURFACE)[keyof typeof DRIVE_TREE_SURFACE];
 
 export type DriveTreeResourceKind = 'folder' | 'resource' | 'link';
+export type DriveTreeNodeKind = 'root' | DriveTreeResourceKind;
 
 export interface DriveTreeLoadConfig {
   kinds?: readonly DriveTreeResourceKind[];
   resourceType?: string;
   pageSize?: number;
-}
-
-export interface DriveTreeRequest {
-  scope: DriveNodeScope;
-  surface: DriveTreeSurface;
-  mode: DriveTreeMode;
-  load?: DriveTreeLoadConfig;
 }
 
 export interface DriveTreePageState {
@@ -36,41 +30,15 @@ export interface DriveTreePageState {
   nextCursor?: string;
 }
 
-export interface DriveTreeSnapshot {
-  readonly key: string;
-  readonly scope: DriveNodeScope;
-  readonly surface: DriveTreeSurface;
-  readonly mode: DriveTreeMode;
-  readonly currentNodeId: string;
-  readonly root: RootNode | null;
-  readonly currentContainer: DriveContainerNode | null;
-  readonly pathNodes: readonly DriveNode[];
-  readonly nodeById: ReadonlyMap<string, DriveNode>;
-  readonly childrenByParent: ReadonlyMap<string, readonly DriveNode[]>;
-  readonly pageByParent: ReadonlyMap<string, DriveTreePageState>;
-  readonly expandedNodeIds: ReadonlySet<string>;
-  readonly selectedNodeIds: ReadonlySet<string>;
-  readonly checkedNodeIds: ReadonlySet<string>;
-  readonly draggingNodeIds: ReadonlySet<string>;
-  readonly activeDragNodeId: string | null;
-  readonly loadingNodeIds: ReadonlySet<string>;
-  readonly loadingMoreNodeIds: ReadonlySet<string>;
-  readonly initialized: boolean;
-  readonly loading: boolean;
-  readonly detailPanelCollapsed: boolean;
-  readonly error: unknown;
-}
+const DRIVE_NODE_KEY_SEPARATOR = '\u001f';
 
-export const buildDriveTreeKey = (request: DriveTreeRequest): string => {
-  const kinds = request.load?.kinds?.toSorted().join(',') ?? 'all';
-  const resourceType = request.load?.resourceType?.trim().toLowerCase() ?? '';
-  const pageSize = request.load?.pageSize ?? '';
-  return [request.surface, request.mode, request.scope.rootId, kinds, resourceType, pageSize].join(
-    '|'
-  );
+export const buildDriveNodeKey = (scope: DriveNodeScope, nodeId: string): string =>
+  `${scope.rootId}${DRIVE_NODE_KEY_SEPARATOR}${nodeId}`;
+
+export const getDriveNodeIdFromKey = (nodeKey: string): string => {
+  const separatorIndex = nodeKey.indexOf(DRIVE_NODE_KEY_SEPARATOR);
+  return separatorIndex >= 0 ? nodeKey.slice(separatorIndex + 1) : nodeKey;
 };
 
-const DRIVE_FOREST_TREE_KEY_SEPARATOR = '\u001f';
-
-export const buildDriveForestTreeKey = (scope: DriveNodeScope, nodeId: string): string =>
-  `${scope.rootId}${DRIVE_FOREST_TREE_KEY_SEPARATOR}${nodeId}`;
+export const isDriveNodeKeyInScope = (nodeKey: string, scopeRootId: string): boolean =>
+  nodeKey.startsWith(`${scopeRootId}${DRIVE_NODE_KEY_SEPARATOR}`);

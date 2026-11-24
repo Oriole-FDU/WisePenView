@@ -11,8 +11,8 @@ Component
   只负责渲染、动画、布局、虚拟列表与事件适配
         │
         ▼
-DriveRuntime / DriveTreeRuntime / DriveForestRuntime
-  多树生命周期、数据与 UI 状态、分页缓存、scope 隔离、业务操作编排
+DriveRuntime / DriveTreeRuntime
+  节点集合生命周期、数据与 UI 状态、分页缓存、scope 隔离、业务操作编排
         │
         ▼
 DriveService 与其它 Domain Service
@@ -24,14 +24,13 @@ API 与 mapper
 
 ## 职责
 
-| 层                   | 负责                                                              | 不负责                                             |
-| -------------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
-| Component            | 布局、样式、动画、虚拟列表、输入控件、把用户手势转成 runtime 意图 | 拼分页、恢复展开态、串联多个 service、操作全局刷新 |
-| DriveTreeRuntime     | 单棵树的位置、路径、子节点、分页、展开、选择、详情栏和拖拽状态    | 视觉组件、弹窗表单                                 |
-| DriveForestRuntime   | 多 scope 树组合、scope 分页、跨树键与选择规则                     | i18n 文案和树组件渲染                              |
-| DriveRuntime         | 多树池、数据缓存、scope 失效、创建/移动/删除/复制等业务操作       | API DTO、节点映射细节                              |
-| Drive domain service | 目录查询、节点映射、系统目录和 scope 语义                         | 页面状态、缓存池、UI 提示、跨视图刷新              |
-| 其它 Domain Service  | Tag、Resource、Note、Agent、Skill 等原子能力                      | Drive 树的先后顺序和生命周期                       |
+| 层                   | 负责                                                                  | 不负责                                             |
+| -------------------- | --------------------------------------------------------------------- | -------------------------------------------------- |
+| Component            | 布局、样式、动画、虚拟列表、输入控件、把用户手势转成 runtime 意图     | 拼分页、恢复展开态、串联多个 service、操作全局刷新 |
+| DriveTreeRuntime     | 一份按节点 key 归一化的集合、路径、分页、展开、选择、详情栏和拖拽状态 | 视觉组件、弹窗表单、按 scope 复制状态机            |
+| DriveRuntime         | 多树池、数据缓存、scope 失效、创建/移动/删除/复制等业务操作           | API DTO、节点映射细节                              |
+| Drive domain service | 目录查询、节点映射、系统目录和 scope 语义                             | 页面状态、缓存池、UI 提示、跨视图刷新              |
+| 其它 Domain Service  | Tag、Resource、Note、Agent、Skill 等原子能力                          | Drive 树的先后顺序和生命周期                       |
 
 ## 约束
 
@@ -42,4 +41,5 @@ API 与 mapper
 5. 组件私有逻辑放在 `hooks/useXxx.ts`；跨组件状态和行为进入 runtime，不建立 controller 层。
 6. 旧分页 hook 与刷新总线在迁移后删除，不保留兼容双路径。
 7. 可见 UI 放在 `parts/PascalCase/index.tsx`，类型和样式与组件同级；只服务该 part 的 Hook 与 part 同级，Drive 共享 Hook 放在 `Drive/hooks`，共享部件放在 `Drive/parts`。
-8. Navigator 不是独立树模型：单 scope 对应只有一棵树的 forest，多 scope 对应组合多个 `DriveTreeRuntime`；不得再复制一套树状态。
+8. Navigator 不是独立 runtime：`scopeMode` 只决定进入同一 Node Store 的根节点数量，single/all/public 都是同一 `DriveTreeRuntime` 的配置。
+9. 不建立 `DriveForestRuntime` 或 `DriveScopeRuntime`。多 scope 是节点来源，不是多套运行状态；分页、展开、选择和加载集合全部按节点 key 共用一张状态表。

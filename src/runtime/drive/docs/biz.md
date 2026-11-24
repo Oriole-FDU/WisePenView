@@ -2,11 +2,12 @@
 
 分层准则见 [principle.md](./principle.md)。
 
-## 多树模型
+## 节点集合模型
 
-- 每棵树由 `surface + mode + scope + kinds + resourceType + pageSize` 唯一标识。
+- 每个运行实例由 `surface + mode + scopeMode + scope + kinds + resourceType + pageSize` 唯一标识。
 - `surface` 区分主浏览、侧栏树与选择器；`mode` 区分浏览与选择语义。
-- 同一 scope 的树共享展开缓存，但各自的当前路径、选择、详情栏和拖拽会话独立。
+- `scopeMode` 为 `single` 时只装载当前 scope；`all` 装载个人盘与所有可访问小组盘；`public` 只装载小组盘。
+- 同一运行实例中的节点统一使用 `scopeRootId + nodeId` 作为 key；scope 只解释节点来自哪里，不再拥有独立 runtime。
 - runtime 池只回收没有订阅者的树；已挂载树不会因容量淘汰而突然失效。
 
 ## 数据缓存
@@ -18,7 +19,7 @@
 
 ## 状态
 
-单棵树维护：
+`DriveTreeRuntime` 维护一个节点集合，不区分调用方最终画出来是一棵树还是多棵树，也不按 scope 拆分状态机：
 
 - 当前目录、完整路径与已加载节点索引；
 - 每个父节点的已加载子节点与下一页 cursor；
@@ -26,7 +27,7 @@
 - 拖拽源、当前拖拽节点、节点加载与加载更多集合；
 - 初始化、错误与最后操作状态。
 
-单 scope 页面直接使用一棵 `DriveTreeRuntime`。Navigator 在 single 模式同样是单树 forest；只有 all/public 模式才额外维护 scope 列表、scope 分页、跨树 key 与跨树选择。树 key 由 scope root 与 node ID 组成，避免并列多个云盘时节点 ID 冲突。
+Table、Sidebar 与 Navigator 共用同一个 `DriveTreeRuntime`。single 只放入当前 scope 的根；all/public 放入多个 scope 的根，并在同一张表中维护 scope 分页、跨 scope 选择与展开。节点 key 由 scope root 与 node ID 组成，避免并列多个云盘时节点 ID 冲突。
 
 ## 业务操作
 

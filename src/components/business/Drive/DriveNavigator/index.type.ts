@@ -4,13 +4,13 @@ import type { DriveNode } from '@/domains/Drive';
 
 import type { DriveItemKind, DriveScope, DriveSelectionItem } from '../common/driveComponentModel';
 
-export type DriveForestScopeMode = 'single' | 'all' | 'public';
+export type DriveNavigatorScopeMode = 'single' | 'all' | 'public';
 
 export interface DriveNavigatorProps {
   rootId?: string;
   scope?: DriveScope;
   groupId?: string;
-  scopeMode?: DriveForestScopeMode;
+  scopeMode?: DriveNavigatorScopeMode;
   /** 多 scope 模式下不展示的组 ID。 */
   excludedGroupIds?: string[];
   /** 仅加载指定资源类型，使用 Resource 列表接口的 resourceType 语义。 */

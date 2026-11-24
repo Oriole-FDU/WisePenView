@@ -9,10 +9,8 @@ import type {
 import type { ResourceItem } from '@/domains/Resource';
 
 import type { DriveActions } from '../actions/driveActions';
-import type { DriveForestRequest, DriveForestRuntime } from '../DriveForestRuntime/index.type';
-import type { DriveTreeRuntime } from '../DriveTreeRuntime/index.type';
+import type { DriveTreeRequest, DriveTreeRuntime } from '../DriveTreeRuntime/index.type';
 import type { DriveResourceCreationRequest } from '../model/DriveResourceCreation';
-import type { DriveTreeRequest } from '../model/DriveTreeState';
 
 export interface GetDriveRootParams {
   rootId?: string;
@@ -40,7 +38,6 @@ export interface ResolveDriveResourceNodeParams {
 
 export interface DriveRuntime extends DriveActions {
   acquireTree(request: DriveTreeRequest): DriveTreeRuntime;
-  acquireForest(request: DriveForestRequest): DriveForestRuntime;
 
   getRoot(params?: GetDriveRootParams): Promise<RootNode>;
   getSystemFolder(params: GetDriveSystemFolderParams): Promise<FolderNode>;

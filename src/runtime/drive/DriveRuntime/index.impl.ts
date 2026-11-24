@@ -15,15 +15,12 @@ import type {
 
 import { createDriveActions, type DriveActions } from '../actions/driveActions';
 import { DriveTreeDataCache } from '../data/driveTreeCache';
-import { buildForestRuntimeKey, DriveForestRuntime } from '../DriveForestRuntime/index.impl';
+import { buildDriveTreeRuntimeKey, DriveTreeRuntime } from '../DriveTreeRuntime/index.impl';
 import type {
-  DriveForestRequest,
-  DriveForestRuntime as DriveForestRuntimeContract,
-} from '../DriveForestRuntime/index.type';
-import { DriveTreeRuntime } from '../DriveTreeRuntime/index.impl';
-import type { DriveTreeRuntime as DriveTreeRuntimeContract } from '../DriveTreeRuntime/index.type';
+  DriveTreeRequest,
+  DriveTreeRuntime as DriveTreeRuntimeContract,
+} from '../DriveTreeRuntime/index.type';
 import type { DriveResourceCreationRequest } from '../model/DriveResourceCreation';
-import { buildDriveTreeKey, type DriveTreeRequest } from '../model/DriveTreeState';
 import type {
   DriveRuntime as DriveRuntimeContract,
   GetDriveMountPathParams,
@@ -34,21 +31,14 @@ import type {
 } from './index.type';
 
 const DRIVE_TREE_POOL_CAPACITY = 16;
-const DRIVE_FOREST_POOL_CAPACITY = 8;
 
 type TreePoolEntry = {
   runtime: DriveTreeRuntime;
   lastUsedAt: number;
 };
 
-type NavigatorPoolEntry = {
-  runtime: DriveForestRuntime;
-  lastUsedAt: number;
-};
-
 export class DriveRuntime implements DriveRuntimeContract {
   private readonly treePool = new Map<string, TreePoolEntry>();
-  private readonly forestPool = new Map<string, NavigatorPoolEntry>();
   private readonly dataCache = new DriveTreeDataCache();
   private readonly actions: DriveActions;
 
@@ -59,7 +49,7 @@ export class DriveRuntime implements DriveRuntimeContract {
   }
 
   acquireTree(request: DriveTreeRequest): DriveTreeRuntimeContract {
-    const key = buildDriveTreeKey(request);
+    const key = buildDriveTreeRuntimeKey(request);
     const existing = this.treePool.get(key);
     if (existing) {
       existing.lastUsedAt = Date.now();
@@ -69,22 +59,6 @@ export class DriveRuntime implements DriveRuntimeContract {
     this.ensureCapacity();
     const runtime = new DriveTreeRuntime(request, this.dataCache);
     this.treePool.set(key, {
-      runtime,
-      lastUsedAt: Date.now(),
-    });
-    return runtime;
-  }
-
-  acquireForest(request: DriveForestRequest): DriveForestRuntimeContract {
-    const key = buildForestRuntimeKey(request);
-    const existing = this.forestPool.get(key);
-    if (existing) {
-      existing.lastUsedAt = Date.now();
-      return existing.runtime;
-    }
-    this.ensureNavigatorCapacity();
-    const runtime = new DriveForestRuntime(request);
-    this.forestPool.set(key, {
       runtime,
       lastUsedAt: Date.now(),
     });
@@ -156,9 +130,7 @@ export class DriveRuntime implements DriveRuntimeContract {
       this.dataCache.clear();
     }
     this.treePool.forEach(({ runtime }) => {
-      if (!scope || runtime.request.scope.rootId === scope.rootId) {
-        runtime.markInvalidated(scope?.rootId ?? runtime.request.scope.rootId);
-      }
+      runtime.markInvalidated(scope?.rootId);
     });
   }
 
@@ -166,8 +138,6 @@ export class DriveRuntime implements DriveRuntimeContract {
     this.dataCache.clear();
     this.treePool.forEach(({ runtime }) => runtime.dispose());
     this.treePool.clear();
-    this.forestPool.forEach(({ runtime }) => runtime.dispose());
-    this.forestPool.clear();
   }
 
   private ensureCapacity(): void {
@@ -184,23 +154,6 @@ export class DriveRuntime implements DriveRuntimeContract {
     if (!victimKey) return;
     const victim = this.treePool.get(victimKey);
     this.treePool.delete(victimKey);
-    victim?.runtime.dispose();
-  }
-
-  private ensureNavigatorCapacity(): void {
-    if (this.forestPool.size < DRIVE_FOREST_POOL_CAPACITY) return;
-    let victimKey: string | undefined;
-    let victimUsedAt = Number.POSITIVE_INFINITY;
-    for (const [key, entry] of this.forestPool) {
-      if (entry.runtime.hasSubscribers()) continue;
-      if (entry.lastUsedAt < victimUsedAt) {
-        victimKey = key;
-        victimUsedAt = entry.lastUsedAt;
-      }
-    }
-    if (!victimKey) return;
-    const victim = this.forestPool.get(victimKey);
-    this.forestPool.delete(victimKey);
     victim?.runtime.dispose();
   }
 }

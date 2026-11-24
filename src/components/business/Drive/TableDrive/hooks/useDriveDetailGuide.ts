@@ -14,7 +14,7 @@ export function useDriveDetailGuide(runtime: DriveTreeRuntime): void {
   useEffect(
     () =>
       registerGuideActionHandler(GUIDE_ACTION_ID.openDetails, {
-        isOpen: () => !runtime.getSnapshot().detailPanelCollapsed,
+        isOpen: () => runtime.getSnapshot().detailPanelCollapsed === false,
         open: () => runtime.setDetailPanelCollapsed(false),
         close: () => runtime.setDetailPanelCollapsed(true),
       }),

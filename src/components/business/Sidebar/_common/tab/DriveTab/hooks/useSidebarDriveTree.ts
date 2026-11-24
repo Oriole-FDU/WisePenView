@@ -7,7 +7,12 @@ import {
   type DriveViewNode,
 } from '@/components/business/Drive/common/driveComponentModel';
 import type { DriveContainerNode, DriveNodeScope } from '@/domains/Drive';
-import { DRIVE_TREE_MODE, DRIVE_TREE_SURFACE, useDriveTree } from '@/runtime/drive';
+import {
+  buildDriveNodeKey,
+  DRIVE_TREE_MODE,
+  DRIVE_TREE_SURFACE,
+  useDriveTree,
+} from '@/runtime/drive';
 import { notifyError } from '@/utils/error';
 
 import { isSidebarResourceNode } from '../sidebarDriveModel';
@@ -49,10 +54,14 @@ export function useSidebarDriveTree({
       onError: (error) => notifyError(error),
     }
   );
-  const nodeMap = new Map(snapshot.nodeById);
+  const nodeMap = new Map(
+    [...snapshot.nodeByKey.entries()]
+      .filter(([, node]) => node.scope.rootId === scope.rootId)
+      .map(([, node]): [string, DriveViewNode] => [node.id, node])
+  );
 
   const handleLoadMore = (parentNodeId: string): void => {
-    void runtime.loadMore(parentNodeId).catch((error: unknown) => {
+    void runtime.loadMore(buildDriveNodeKey(scope, parentNodeId)).catch((error: unknown) => {
       notifyError(error);
     });
   };
@@ -62,8 +71,9 @@ export function useSidebarDriveTree({
   };
 
   const getChildren = (node: DriveContainerNode): DriveViewNode[] => {
-    const children = [...(snapshot.childrenByParent.get(node.id) ?? [])];
-    const page = snapshot.pageByParent.get(node.id);
+    const nodeKey = buildDriveNodeKey(node.scope, node.id);
+    const children = [...(snapshot.childrenByKey.get(nodeKey) ?? [])];
+    const page = snapshot.pageByKey.get(nodeKey);
     if (!page?.hasMore) return children;
     const loaded = children.filter(
       (child) => child.type === 'resource' || child.type === 'link'
@@ -81,7 +91,7 @@ export function useSidebarDriveTree({
   const buildNode = (node: DriveViewNode, controls: SidebarDriveTreeControls): DataNode => {
     const [treeNode] = buildTreeData([node], nodeMap, controls);
     if (!treeNode || !isContainer(node)) return treeNode;
-    const children = snapshot.childrenByParent.get(node.id);
+    const children = snapshot.childrenByKey.get(buildDriveNodeKey(node.scope, node.id));
     if (!children) return treeNode;
     return {
       ...treeNode,
@@ -90,9 +100,9 @@ export function useSidebarDriveTree({
   };
 
   const treeControlsForRender = treeControls;
-  const root = snapshot.root;
+  const root = snapshot.nodeByKey.get(snapshot.primaryRootKey);
   const treeData =
-    root == null
+    root?.type !== 'root'
       ? []
       : [
           {
@@ -100,21 +110,27 @@ export function useSidebarDriveTree({
             children: undefined,
             isLeaf: true,
           },
-          ...(snapshot.childrenByParent.get(root.id) ?? []).map((node) =>
+          ...(snapshot.childrenByKey.get(snapshot.primaryRootKey) ?? []).map((node) =>
             buildNode(node, treeControlsForRender)
           ),
         ];
-  const expandedKeys = [...snapshot.expandedNodeIds].filter((nodeId) =>
-    isContainer(snapshot.nodeById.get(nodeId))
-  );
-  const selectedKeys = [...snapshot.selectedNodeIds];
+  const expandedKeys = [...snapshot.expandedKeys]
+    .map((nodeKey) => snapshot.nodeByKey.get(nodeKey))
+    .filter(
+      (node): node is NonNullable<typeof node> =>
+        isContainer(node) && node.scope.rootId === scope.rootId
+    )
+    .map((node) => node.id);
+  const selectedKeys = [...snapshot.selectedKeys]
+    .map((nodeKey) => snapshot.nodeByKey.get(nodeKey))
+    .filter((node): node is NonNullable<typeof node> => node?.scope.rootId === scope.rootId)
+    .map((node) => node.id);
 
   const handleLoadData = async (treeNode: DataNode): Promise<void> => {
-    const node = snapshot.nodeById.get(String(treeNode.key));
+    const node = nodeMap.get(String(treeNode.key));
     if (!isContainer(node)) return;
     try {
-      await runtime.loadChildren(node);
-      await runtime.expandNode(node.id);
+      await runtime.expandNode(buildDriveNodeKey(node.scope, node.id));
     } catch (error) {
       notifyError(error);
     }
@@ -124,12 +140,12 @@ export function useSidebarDriveTree({
     const key = String(info.node.key);
     const node = nodeMap.get(key);
     if (!isSidebarResourceNode(node)) return;
-    runtime.selectNode(key);
+    runtime.selectNode(buildDriveNodeKey(node.scope, node.id));
     onOpenResource(node);
   };
 
   const handleExpand = (nextKeys: Key[], info: { node: DataNode; expanded: boolean }) => {
-    runtime.setExpandedNodeIds(nextKeys.map(String));
+    runtime.setExpandedKeys(nextKeys.map((key) => buildDriveNodeKey(scope, String(key))));
     if (info.expanded && info.node.children === undefined) {
       void handleLoadData(info.node);
     }

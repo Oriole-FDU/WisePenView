@@ -1,5 +1,6 @@
 import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
 import {
+  buildDriveNodeKey,
   DRIVE_TREE_MODE,
   DRIVE_TREE_SURFACE,
   type DriveTreeRuntime,
@@ -52,7 +53,7 @@ export function useDriveNavigation({
       return;
     }
     notifyError(error);
-    if (runtime.getSnapshot().currentNodeId !== scope.rootId) {
+    if (runtime.getSnapshot().currentNode?.id !== scope.rootId) {
       void runtime.focus(scope.rootId);
     }
   };
@@ -69,30 +70,35 @@ export function useDriveNavigation({
       onError: handleRuntimeError,
     }
   );
-  const dataSource = (snapshot.childrenByParent.get(snapshot.currentNodeId) ?? []).map((row) =>
-    attachChildren(row as DriveRow, snapshot.childrenByParent)
+  const currentNodeKey = snapshot.currentNodeKey ?? snapshot.primaryRootKey;
+  const dataSource = (snapshot.childrenByKey.get(currentNodeKey) ?? []).map((row) =>
+    attachChildren(row as DriveRow, snapshot.childrenByKey)
   );
-  const currentPage = snapshot.pageByParent.get(snapshot.currentNodeId);
-  const expandedRowKeys = [...snapshot.expandedNodeIds].filter(
-    (nodeId) => snapshot.childrenByParent.has(nodeId) || snapshot.nodeById.has(nodeId)
-  );
+  const currentPage = snapshot.pageByKey.get(currentNodeKey);
+  const expandedRowKeys = [...snapshot.expandedKeys]
+    .filter((nodeKey) => snapshot.childrenByKey.has(nodeKey) || snapshot.nodeByKey.has(nodeKey))
+    .map((nodeKey) => snapshot.nodeByKey.get(nodeKey))
+    .filter((node): node is DriveNode => node?.scope.rootId === scope.rootId)
+    .map((node) => node.id);
 
   const updateExpandedRow = async (expanded: boolean, record: DriveRow) => {
+    const nodeKey = buildDriveNodeKey(scope, record.id);
     if (!expanded || !isContainer(record)) {
-      runtime.collapseNode(record.id);
+      runtime.collapseNode(nodeKey);
       return;
     }
-    await runtime.expandNode(record.id);
+    await runtime.expandNode(nodeKey);
   };
 
   const handleExpandedChange = async (keys: string[]) => {
-    const addedKey = keys.find((key) => !snapshot.expandedNodeIds.has(key));
+    const expandedNodeIds = new Set(expandedRowKeys);
+    const addedKey = keys.find((key) => !expandedNodeIds.has(key));
     if (addedKey) {
       const row = findDriveRow(dataSource, addedKey);
       if (row) await updateExpandedRow(true, row);
       return;
     }
-    const removedKey = [...snapshot.expandedNodeIds].find((key) => !keys.includes(key));
+    const removedKey = expandedRowKeys.find((key) => !keys.includes(key));
     if (!removedKey) return;
     const row = findDriveRow(dataSource, removedKey);
     if (row) await updateExpandedRow(false, row);
@@ -101,32 +107,34 @@ export function useDriveNavigation({
   return {
     runtime,
     snapshot,
-    currentNodeId: snapshot.currentNodeId,
+    currentNodeId: snapshot.currentNode?.id ?? scope.rootId,
     dataSource,
     totalCount: currentPage?.total ?? dataSource.length,
-    pathNodes: [...snapshot.pathNodes],
-    loading: !ready || snapshot.loading || !snapshot.initialized,
-    loadingMore: snapshot.loadingMoreNodeIds.has(snapshot.currentNodeId),
+    pathNodes: snapshot.pathNodeKeys
+      .map((nodeKey) => snapshot.nodeByKey.get(nodeKey))
+      .filter((node): node is DriveNode => Boolean(node)),
+    loading: !ready || snapshot.loading || !snapshot.initialized || !snapshot.currentNode,
+    loadingMore: snapshot.loadingMoreKeys.has(currentNodeKey),
     hasMore: Boolean(currentPage?.hasMore),
     loadMore: () => {
-      void runtime.loadMore(snapshot.currentNodeId);
+      void runtime.loadMore(currentNodeKey);
     },
-    loadMoreChildren: (nodeId) => runtime.loadMore(nodeId),
+    loadMoreChildren: (nodeId) => runtime.loadMore(buildDriveNodeKey(scope, nodeId)),
     expandedRowKeys,
     enterFolder: (nodeId) => runtime.focus(nodeId),
     handleExpandedChange,
-    refresh: runtime.refresh,
+    refresh: () => runtime.refresh(),
   };
 }
 
 function attachChildren(
   row: DriveRow,
-  childrenByParent: DriveTreeSnapshot['childrenByParent']
+  childrenByKey: DriveTreeSnapshot['childrenByKey']
 ): DriveRow {
   if (!isContainer(row)) return row;
-  const cached = childrenByParent.get(row.id);
+  const cached = childrenByKey.get(buildDriveNodeKey(row.scope, row.id));
   if (!cached) return row;
-  return { ...row, children: cached.map((child) => attachChildren(child, childrenByParent)) };
+  return { ...row, children: cached.map((child) => attachChildren(child, childrenByKey)) };
 }
 
 function findDriveRow(rows: readonly DriveRow[], nodeId: string): DriveRow | undefined {

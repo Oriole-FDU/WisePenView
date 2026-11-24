@@ -2,9 +2,12 @@ import { useSyncExternalStore } from 'react';
 
 import { useApi } from '@/hooks/useApi';
 
-import type { DriveTreeRuntime } from './DriveTreeRuntime/index.type';
+import type {
+  DriveTreeRequest,
+  DriveTreeRuntime,
+  DriveTreeSnapshot,
+} from './DriveTreeRuntime/index.type';
 import { getDriveRuntime } from './getDriveRuntime';
-import type { DriveTreeRequest, DriveTreeSnapshot } from './model/DriveTreeState';
 
 export interface UseDriveTreeOptions {
   initialNodeId?: string;
@@ -28,18 +31,12 @@ export function useDriveTree(
     () => runtime.getSnapshot()
   );
 
-  useApi(
-    () =>
-      runtime.focus(initialNodeId ?? runtime.request.scope.rootId, {
-        restoreExpanded: true,
-      }),
-    {
-      ready,
-      refreshDeps: [runtime, initialNodeId],
-      showErrorToast: false,
-      onErrorEffect: (error) => onError?.(error, runtime),
-    }
-  );
+  useApi(() => runtime.focus(initialNodeId ?? runtime.request.scope.rootId), {
+    ready,
+    refreshDeps: [runtime, initialNodeId],
+    showErrorToast: false,
+    onErrorEffect: (error) => onError?.(error, runtime),
+  });
 
   return { runtime, snapshot };
 }
