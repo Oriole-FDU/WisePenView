@@ -16,8 +16,8 @@ import {
 } from '@/components/business/Drive/common/driveComponentModel';
 import type { DriveNode } from '@/domains/Drive';
 import {
-  buildDriveNavigatorTreeKey,
-  type DriveNavigatorRequest,
+  buildDriveForestTreeKey,
+  type DriveForestRequest,
   type DriveTreeSnapshot,
   useDriveNavigator,
 } from '@/runtime/drive';
@@ -66,7 +66,7 @@ function DriveNavigator({
   const effectiveResourceLimit =
     showsResources && !selectsResources ? resourcePreviewLimit : undefined;
   const resourcePageSize = effectiveResourceLimit ?? DEFAULT_SELECTABLE_RESOURCE_PAGE_SIZE;
-  const request: DriveNavigatorRequest = {
+  const request: DriveForestRequest = {
     scope: resolvedScope.scope,
     scopeMode,
     excludedGroupIds,
@@ -113,7 +113,7 @@ function DriveNavigator({
               }
             : node.type === 'loading'
               ? () => {
-                  const treeKey = buildDriveNavigatorTreeKey(node.scope, node.parentId);
+                  const treeKey = buildDriveForestTreeKey(node.scope, node.parentId);
                   void runtime.loadMore(treeKey).catch((error: unknown) => {
                     notifyError(error);
                   });
@@ -133,7 +133,7 @@ function DriveNavigator({
         dimUnselectableNodes,
         interactiveLoadingNodes: true,
         disabledNodeIds: new Set(disabledNodeIds),
-        getTreeKey: (node) => buildDriveNavigatorTreeKey(node.scope, node.id),
+        getTreeKey: (node) => buildDriveForestTreeKey(node.scope, node.id),
         renderTitle,
         isNodeSelectable,
         isNodeDisabled,

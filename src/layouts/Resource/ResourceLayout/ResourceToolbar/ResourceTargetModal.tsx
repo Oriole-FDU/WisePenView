@@ -6,7 +6,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import type { DriveSelectionItem } from '@/components/business/Drive/common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
-import type { DriveNavigatorScopeMode } from '@/components/business/Drive/DriveNavigator/index.type';
+import type { DriveForestScopeMode } from '@/components/business/Drive/DriveNavigator/index.type';
 import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
 
 import styles from './ResourceTargetModal.module.scss';
@@ -15,7 +15,7 @@ interface ResourceTargetModalProps {
   isOpen: boolean;
   title: string;
   hint: string;
-  scopeMode?: DriveNavigatorScopeMode;
+  scopeMode?: DriveForestScopeMode;
   scope: DriveNodeScope;
   excludedGroupIds?: string[];
   submitting: boolean;

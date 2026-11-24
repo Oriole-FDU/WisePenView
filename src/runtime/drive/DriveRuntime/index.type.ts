@@ -9,10 +9,7 @@ import type {
 import type { ResourceItem } from '@/domains/Resource';
 
 import type { DriveActions } from '../actions/driveActions';
-import type {
-  DriveNavigatorRequest,
-  DriveNavigatorRuntime,
-} from '../DriveNavigatorRuntime/index.type';
+import type { DriveForestRequest, DriveForestRuntime } from '../DriveForestRuntime/index.type';
 import type { DriveTreeRuntime } from '../DriveTreeRuntime/index.type';
 import type { DriveResourceCreationRequest } from '../model/DriveResourceCreation';
 import type { DriveTreeRequest } from '../model/DriveTreeState';
@@ -43,7 +40,7 @@ export interface ResolveDriveResourceNodeParams {
 
 export interface DriveRuntime extends DriveActions {
   acquireTree(request: DriveTreeRequest): DriveTreeRuntime;
-  acquireNavigator(request: DriveNavigatorRequest): DriveNavigatorRuntime;
+  acquireForest(request: DriveForestRequest): DriveForestRuntime;
 
   getRoot(params?: GetDriveRootParams): Promise<RootNode>;
   getSystemFolder(params: GetDriveSystemFolderParams): Promise<FolderNode>;

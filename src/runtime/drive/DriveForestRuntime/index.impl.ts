@@ -5,22 +5,22 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import type { DriveTreeRuntime } from '../DriveTreeRuntime/index.type';
 import { getDriveRuntime } from '../getDriveRuntime';
 import {
-  buildDriveNavigatorTreeKey,
+  buildDriveForestTreeKey,
   DRIVE_TREE_MODE,
   DRIVE_TREE_SURFACE,
   type DriveTreeSnapshot,
 } from '../model/DriveTreeState';
 import type {
-  DriveNavigatorRequest,
-  DriveNavigatorRuntime as DriveNavigatorRuntimeContract,
-  DriveNavigatorScopeEntry,
-  DriveNavigatorSelectOptions,
-  DriveNavigatorSnapshot,
+  DriveForestRequest,
+  DriveForestRuntime as DriveForestRuntimeContract,
+  DriveForestScopeEntry,
+  DriveForestSelectOptions,
+  DriveForestSnapshot,
 } from './index.type';
 
 const GROUP_SCOPE_PAGE_SIZE = 20;
 
-export const buildNavigatorRuntimeKey = (request: DriveNavigatorRequest): string =>
+export const buildForestRuntimeKey = (request: DriveForestRequest): string =>
   [
     request.scopeMode,
     request.scope.rootId,
@@ -41,13 +41,13 @@ type AttachedTree = {
   unsubscribe: () => void;
 };
 
-export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
+export class DriveForestRuntime implements DriveForestRuntimeContract {
   readonly key: string;
-  readonly request: DriveNavigatorRequest;
+  readonly request: DriveForestRequest;
 
-  private readonly listeners = new Set<(snapshot: DriveNavigatorSnapshot) => void>();
+  private readonly listeners = new Set<(snapshot: DriveForestSnapshot) => void>();
   private readonly attachedTrees = new Map<string, AttachedTree>();
-  private scopeEntries: DriveNavigatorScopeEntry[] = [];
+  private scopeEntries: DriveForestScopeEntry[] = [];
   private selectedTreeKeys = new Set<string>();
   private expandedTreeKeys = new Set<string>();
   private loading = false;
@@ -59,19 +59,19 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
   private disposed = false;
   private error: unknown;
   private initializePromise: Promise<void> | null = null;
-  private cachedSnapshot: DriveNavigatorSnapshot;
+  private cachedSnapshot: DriveForestSnapshot;
 
-  constructor(request: DriveNavigatorRequest) {
+  constructor(request: DriveForestRequest) {
     this.request = request;
-    this.key = buildNavigatorRuntimeKey(request);
+    this.key = buildForestRuntimeKey(request);
     this.cachedSnapshot = this.buildSnapshot();
   }
 
-  getSnapshot(): DriveNavigatorSnapshot {
+  getSnapshot(): DriveForestSnapshot {
     return this.cachedSnapshot;
   }
 
-  subscribe(listener: (snapshot: DriveNavigatorSnapshot) => void): () => void {
+  subscribe(listener: (snapshot: DriveForestSnapshot) => void): () => void {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
@@ -118,9 +118,7 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
         await this.attachScope(this.request.scope);
         const root = this.scopeEntries[0]?.root;
         if (root) {
-          this.expandedTreeKeys = new Set([
-            buildDriveNavigatorTreeKey(this.request.scope, root.id),
-          ]);
+          this.expandedTreeKeys = new Set([buildDriveForestTreeKey(this.request.scope, root.id)]);
         }
       } else {
         const groups = await this.fetchScopeGroups(1);
@@ -221,7 +219,7 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
     clickedSelected,
     isNodeSelectable,
     isNodeDisabled,
-  }: DriveNavigatorSelectOptions): DriveNode[] {
+  }: DriveForestSelectOptions): DriveNode[] {
     this.initialSelectionPending = false;
     const normalized = this.normalizeSelectableKeys([...keys], isNodeSelectable, isNodeDisabled);
     const nextKeys = this.request.multiple
@@ -414,13 +412,13 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
     this.attachedTrees.forEach(({ runtime }) => {
       const snapshot = runtime.getSnapshot();
       snapshot.nodeById.forEach((node) => {
-        result.set(buildDriveNavigatorTreeKey(node.scope, node.id), node);
+        result.set(buildDriveForestTreeKey(node.scope, node.id), node);
       });
     });
     return result;
   }
 
-  private buildSnapshot(): DriveNavigatorSnapshot {
+  private buildSnapshot(): DriveForestSnapshot {
     const treeSnapshots = this.buildTreeSnapshots();
     const treeError = [...treeSnapshots.values()]
       .map((snapshot) => snapshot.error)
@@ -451,7 +449,7 @@ export class DriveNavigatorRuntime implements DriveNavigatorRuntimeContract {
   private assertAlive(): void {
     if (!this.disposed) return;
     throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'DriveNavigatorRuntime 已销毁',
+      reason: 'DriveForestRuntime 已销毁',
     });
   }
 }

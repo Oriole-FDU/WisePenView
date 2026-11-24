@@ -2,11 +2,11 @@ import type { DriveNode, DriveNodeScope, RootNode } from '@/domains/Drive';
 
 import type { DriveTreeSnapshot } from '../model/DriveTreeState';
 
-export type DriveNavigatorScopeMode = 'single' | 'all' | 'public';
+export type DriveForestScopeMode = 'single' | 'all' | 'public';
 
-export interface DriveNavigatorRequest {
+export interface DriveForestRequest {
   scope: DriveNodeScope;
-  scopeMode: DriveNavigatorScopeMode;
+  scopeMode: DriveForestScopeMode;
   excludedGroupIds?: readonly string[];
   resourceType?: string;
   renderableTypes: readonly ('root' | 'folder' | 'resource' | 'link')[];
@@ -19,15 +19,15 @@ export interface DriveNavigatorRequest {
   refreshTrigger?: number | string;
 }
 
-export interface DriveNavigatorScopeEntry {
+export interface DriveForestScopeEntry {
   scope: DriveNodeScope;
   groupName?: string;
   root: RootNode | null;
 }
 
-export interface DriveNavigatorSnapshot {
+export interface DriveForestSnapshot {
   readonly key: string;
-  readonly scopeEntries: readonly DriveNavigatorScopeEntry[];
+  readonly scopeEntries: readonly DriveForestScopeEntry[];
   readonly treeSnapshots: ReadonlyMap<string, DriveTreeSnapshot>;
   readonly nodeByTreeKey: ReadonlyMap<string, DriveNode>;
   readonly selectedTreeKeys: ReadonlySet<string>;
@@ -39,23 +39,23 @@ export interface DriveNavigatorSnapshot {
   readonly error: unknown;
 }
 
-export type DriveNavigatorNodeSelectability = {
+export type DriveForestNodeSelectability = {
   isNodeSelectable?: (node: DriveNode) => boolean;
   isNodeDisabled?: (node: DriveNode) => boolean;
 };
 
-export interface DriveNavigatorSelectOptions extends DriveNavigatorNodeSelectability {
+export interface DriveForestSelectOptions extends DriveForestNodeSelectability {
   keys: readonly string[];
   clickedKey?: string;
   clickedSelected?: boolean;
 }
 
-export interface DriveNavigatorRuntime {
+export interface DriveForestRuntime {
   readonly key: string;
-  readonly request: DriveNavigatorRequest;
+  readonly request: DriveForestRequest;
 
-  getSnapshot(): DriveNavigatorSnapshot;
-  subscribe(listener: (snapshot: DriveNavigatorSnapshot) => void): () => void;
+  getSnapshot(): DriveForestSnapshot;
+  subscribe(listener: (snapshot: DriveForestSnapshot) => void): () => void;
   hasSubscribers(): boolean;
   dispose(): void;
 
@@ -66,6 +66,6 @@ export interface DriveNavigatorRuntime {
   loadMore(treeKey: string): Promise<void>;
 
   setExpandedKeys(keys: readonly string[]): void;
-  select(options: DriveNavigatorSelectOptions): DriveNode[];
+  select(options: DriveForestSelectOptions): DriveNode[];
   findNode(treeKey: string): DriveNode | undefined;
 }

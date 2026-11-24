@@ -26,7 +26,7 @@
 - 拖拽源、当前拖拽节点、节点加载与加载更多集合；
 - 初始化、错误与最后操作状态。
 
-Navigator 额外维护 scope 列表、scope 分页、跨树 key 与跨树选择。树 key 由 scope root 与 node ID 组成，避免并列多个云盘时节点 ID 冲突。
+单 scope 页面直接使用一棵 `DriveTreeRuntime`。Navigator 在 single 模式同样是单树 forest；只有 all/public 模式才额外维护 scope 列表、scope 分页、跨树 key 与跨树选择。树 key 由 scope root 与 node ID 组成，避免并列多个云盘时节点 ID 冲突。
 
 ## 业务操作
 

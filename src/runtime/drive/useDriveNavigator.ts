@@ -3,27 +3,27 @@ import { useSyncExternalStore } from 'react';
 import { useApi } from '@/hooks/useApi';
 
 import type {
-  DriveNavigatorRequest,
-  DriveNavigatorRuntime,
-  DriveNavigatorSnapshot,
-} from './DriveNavigatorRuntime/index.type';
+  DriveForestRequest,
+  DriveForestRuntime,
+  DriveForestSnapshot,
+} from './DriveForestRuntime/index.type';
 import { getDriveRuntime } from './getDriveRuntime';
 
 export interface UseDriveNavigatorOptions {
   ready?: boolean;
-  onError?: (error: unknown, runtime: DriveNavigatorRuntime) => void;
+  onError?: (error: unknown, runtime: DriveForestRuntime) => void;
 }
 
 export interface UseDriveNavigatorResult {
-  runtime: DriveNavigatorRuntime;
-  snapshot: DriveNavigatorSnapshot;
+  runtime: DriveForestRuntime;
+  snapshot: DriveForestSnapshot;
 }
 
 export function useDriveNavigator(
-  request: DriveNavigatorRequest,
+  request: DriveForestRequest,
   { ready = true, onError }: UseDriveNavigatorOptions = {}
 ): UseDriveNavigatorResult {
-  const runtime = getDriveRuntime().acquireNavigator(request);
+  const runtime = getDriveRuntime().acquireForest(request);
   const snapshot = useSyncExternalStore(
     (onStoreChange) => runtime.subscribe(onStoreChange),
     () => runtime.getSnapshot(),

@@ -70,7 +70,7 @@ export const buildDriveTreeKey = (request: DriveTreeRequest): string => {
   );
 };
 
-const DRIVE_NAVIGATOR_TREE_KEY_SEPARATOR = '\u001f';
+const DRIVE_FOREST_TREE_KEY_SEPARATOR = '\u001f';
 
-export const buildDriveNavigatorTreeKey = (scope: DriveNodeScope, nodeId: string): string =>
-  `${scope.rootId}${DRIVE_NAVIGATOR_TREE_KEY_SEPARATOR}${nodeId}`;
+export const buildDriveForestTreeKey = (scope: DriveNodeScope, nodeId: string): string =>
+  `${scope.rootId}${DRIVE_FOREST_TREE_KEY_SEPARATOR}${nodeId}`;
