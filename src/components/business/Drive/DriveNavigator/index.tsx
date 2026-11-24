@@ -20,11 +20,11 @@ import {
   DRIVE_TREE_MODE,
   DRIVE_TREE_SURFACE,
   type DriveTreeRequest,
-  useDriveNavigator,
 } from '@/runtime/drive';
 import { notifyError } from '@/utils/error';
 
 import { buildDriveTreeData } from '../common/buildDriveTreeData';
+import { useNavigatorDriveTree } from './hooks/useNavigatorDriveTree';
 import type { DriveNavigatorProps } from './index.type';
 import DriveNavigatorNodeTitle from './parts/DriveNavigatorNodeTitle';
 import styles from './style.module.scss';
@@ -84,7 +84,7 @@ function DriveNavigator({
     disabledNodeIds,
     refreshTrigger,
   };
-  const { runtime, snapshot } = useDriveNavigator(request, {
+  const { runtime, snapshot } = useNavigatorDriveTree(request, {
     onError: (error) => notifyError(error),
   });
   const nodeByKey = new Map(

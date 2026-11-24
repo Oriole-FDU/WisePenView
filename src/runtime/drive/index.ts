@@ -24,5 +24,4 @@ export {
   getDriveNodeIdFromKey,
   isDriveNodeKeyInScope,
 } from './model/DriveTreeState';
-export { useDriveNavigator, type UseDriveNavigatorOptions } from './useDriveNavigator';
 export { useDriveTree, type UseDriveTreeOptions, type UseDriveTreeResult } from './useDriveTree';
