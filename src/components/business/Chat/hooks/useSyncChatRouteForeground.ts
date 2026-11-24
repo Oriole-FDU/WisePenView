@@ -2,14 +2,15 @@ import { toast } from '@heroui/react';
 import { useEffect, useState } from 'react';
 
 import { captureException } from '@/observability';
-import { getChatRouter } from '@/runtime/chat';
+import { useChatRouter } from '@/runtime/chat';
 import { parseErrorMessage } from '@/utils/error';
 
 /**
  * 路由 sessionId → ChatRouter 前台对齐。
- * 驱动变量仅为 `sessionId`；router 经单例读取，竞态由 effect cleanup 的 cancelled 门闩处理。
+ * 驱动变量为 `sessionId`；竞态由 effect cleanup 的 cancelled 门闩处理。
  */
 export function useSyncChatRouteForeground(sessionId: string | undefined): boolean {
+  const router = useChatRouter();
   const [focusing, setFocusing] = useState(false);
 
   /**
@@ -19,7 +20,6 @@ export function useSyncChatRouteForeground(sessionId: string | undefined): boole
    * cleanup：标记本次对齐失效，避免过期 focus 回写。
    */
   useEffect(() => {
-    const router = getChatRouter();
     let cancelled = false;
 
     const syncForeground = async () => {
@@ -48,7 +48,7 @@ export function useSyncChatRouteForeground(sessionId: string | undefined): boole
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [router, sessionId]);
 
   return focusing;
 }
