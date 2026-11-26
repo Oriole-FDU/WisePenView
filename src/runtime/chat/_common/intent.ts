@@ -1,4 +1,3 @@
-import type { CreateSessionRequest } from '@/domains/ChatSession';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
 export interface SessionApprovalDecision {
@@ -29,11 +28,3 @@ export interface SessionSendOptions {
   toolSelectionOverrides?: Record<string, boolean>;
   onDemandSkillIds?: string[];
 }
-
-export type ChatRouterSendRequest = SessionSendOptions & {
-  /** 发起发送时 URL 指向的会话；空白对话在发送前创建。 */
-  sessionId: string | undefined;
-  create?: CreateSessionRequest;
-  /** lazy create 完成后、发送开始前绑定新的 session 路由 */
-  onSessionCreated?: (sessionId: string) => Promise<void>;
-};

@@ -1,5 +1,4 @@
 export type {
-  ChatRouterSendRequest,
   SessionApprovalDecision,
   SessionSelectedResource,
   SessionSendOptions,

@@ -1,14 +1,13 @@
 import { Chat } from '@ai-sdk/react';
 import {
   type ChatTransport,
-  isToolUIPart,
   parseJsonEventStream,
   type UIMessageChunk,
   uiMessageChunkSchema,
 } from 'ai';
 
 import { parseApiErrorBody } from '@/apis/apiError';
-import { getChatTurnService } from '@/domains';
+import { getChatSessionService, getChatTurnService } from '@/domains';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
 import type {
   ChatRecoverApiRequest,
@@ -34,6 +33,7 @@ import { createUuid } from '@/utils/random';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import type { SessionApprovalDecision, SessionSendOptions } from '../_common';
+import { getSessionPhase } from '../_common/sessionState';
 import type {
   SessionRuntime,
   SessionRuntimeSnapshot,
@@ -44,12 +44,17 @@ const HISTORY_PAGE_SIZE = 100;
 
 type ChatSendMessagesOptions = Parameters<ChatTransport<WisePenUIMessage>['sendMessages']>[0];
 
-export function createSessionRuntime(sessionId: string): SessionRuntime {
+export function createSessionRuntime(sessionId: string, newSession: boolean): SessionRuntime {
   const chatTurnService: IChatTurnService = getChatTurnService();
   const listeners = new Set<() => void>();
+  const chat = new Chat<WisePenUIMessage>({
+    id: sessionId,
+    transport: { sendMessages, reconnectToStream },
+  });
   let snapshot: SessionRuntimeSnapshot = {
-    sessionId,
-    phase: 'idle',
+    chat,
+    operation: null,
+    initialHistory: newSession ? 'ready' : 'loading',
     historyPage: 1,
     historyTotalPage: 1,
     historyLoadingMore: false,
@@ -58,11 +63,16 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
   let refreshPromise: Promise<void> | null = null;
   let streamTask: Promise<void> | undefined;
   let reconnectAbort: AbortController | undefined;
+  let pendingUserMessageId: string | undefined;
 
-  const updateState = (update: SessionRuntimeSnapshotUpdate): void => {
-    snapshot = { ...snapshot, ...update };
+  function notify(): void {
     for (const listener of listeners) listener();
-  };
+  }
+
+  function updateState(update: SessionRuntimeSnapshotUpdate): void {
+    snapshot = { ...snapshot, ...update };
+    notify();
+  }
 
   function reportError(
     error: unknown,
@@ -74,14 +84,6 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     return convertedError;
   }
 
-  const chat = new Chat<WisePenUIMessage>({
-    id: sessionId,
-    transport: {
-      sendMessages,
-      reconnectToStream,
-    },
-  });
-
   function assertAlive(): void {
     if (!cleaned) return;
     throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
@@ -89,13 +91,16 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     });
   }
 
-  function settledPhase() {
-    if (hasPendingToolApproval(chat.lastMessage)) return 'hanged';
-    return chat.status === 'error' ? 'error' : 'idle';
+  function phase() {
+    return getSessionPhase(snapshot.operation, chat.status, chat.lastMessage);
+  }
+
+  function isBusy(): boolean {
+    return Boolean(streamTask || refreshPromise || snapshot.operation === 'canceling');
   }
 
   function startStream(
-    phase: 'sending' | 'streaming',
+    kind: 'resuming' | null,
     operation: ExceptionOperation,
     run: () => Promise<void>
   ): Promise<void> {
@@ -107,24 +112,17 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
         if (chat.status === 'error') throw chat.error;
       } catch (cause) {
         if (cleaned) throw cause;
-        const error = reportError(cause, '聊天流请求失败', operation);
-        if (snapshot.phase !== 'canceling') {
-          updateState({
-            phase: hasPendingToolApproval(chat.lastMessage) ? 'hanged' : 'error',
-          });
-        }
-        throw error;
+        throw reportError(cause, '聊天流请求失败', operation);
       } finally {
         streamTask = undefined;
         reconnectAbort = undefined;
-      }
-
-      if (!cleaned && snapshot.phase !== 'canceling') {
-        updateState({ phase: settledPhase() });
+        if (!cleaned && snapshot.operation !== 'canceling' && snapshot.operation !== 'canceled') {
+          updateState({ operation: null });
+        }
       }
     });
     streamTask = task;
-    updateState({ phase });
+    if (kind) updateState({ operation: kind });
     return task;
   }
 
@@ -137,22 +135,21 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
         chatTurnService.getActiveTurnId(sessionId),
       ]);
       assertAlive();
-      if (streamTask || snapshot.phase === 'canceling' || chat.messages !== messages) {
+      if (streamTask || snapshot.operation === 'canceling' || chat.messages !== messages) {
         return;
       }
+      chat.clearError();
       replaceLatestHistory(history);
       if (activeTurnId) {
-        void startStream('streaming', 'chat.bootstrap', () => chat.resumeStream()).catch(
+        void startStream('resuming', 'chat.bootstrap', () => chat.resumeStream()).catch(
           () => undefined
         );
-        return;
+      } else if (snapshot.operation === 'retry-cancel' || snapshot.operation === 'canceled') {
+        updateState({ operation: null });
       }
-
-      updateState({
-        phase: hasPendingToolApproval(chat.lastMessage) ? 'hanged' : 'idle',
-      });
     } catch (error) {
       if (cleaned) return;
+      if (snapshot.initialHistory !== 'ready') updateState({ initialHistory: 'error' });
       throw reportError(error, '同步会话历史失败', 'chat.bootstrap');
     }
   }
@@ -165,17 +162,21 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     // 保留服务端分页边界之前的历史；最新一页覆盖客户端的临时消息。
     chat.messages = start > 0 ? [...chat.messages.slice(0, start), ...history.list] : history.list;
     updateState({
+      initialHistory: 'ready',
       historyPage: start > 0 ? Math.min(snapshot.historyPage, history.totalPage) : history.page,
       historyTotalPage: history.totalPage,
     });
   }
 
-  function refresh(): Promise<void> {
-    if (streamTask || snapshot.phase === 'canceling') return Promise.resolve();
+  function refresh({ revalidate = false } = {}): Promise<void> {
+    if (streamTask || snapshot.operation === 'canceling') return Promise.resolve();
     if (refreshPromise) return refreshPromise;
+    if (!revalidate && snapshot.initialHistory === 'ready') return Promise.resolve();
     refreshPromise = refreshSession().finally(() => {
       refreshPromise = null;
+      notify();
     });
+    if (snapshot.initialHistory === 'error') updateState({ initialHistory: 'loading' });
     return refreshPromise;
   }
 
@@ -196,41 +197,57 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     await chat.stop();
   }
 
-  async function send(query: string, options?: SessionSendOptions): Promise<void> {
+  async function send(
+    query: string,
+    options?: SessionSendOptions,
+    agentId?: string | null
+  ): Promise<void> {
     assertAlive();
-    if (streamTask || (snapshot.phase !== 'idle' && snapshot.phase !== 'error')) {
+    const currentPhase = phase();
+    if (streamTask || (currentPhase !== 'idle' && currentPhase !== 'error')) {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `当前 phase=${snapshot.phase}，不能 send`,
+        reason: `当前 phase=${currentPhase}，不能 send`,
       });
     }
 
     const requestBody = mapChatTurnRequest({ defaultSessionId: sessionId, query, options });
     const messageId = createUuid();
-    await startStream('sending', 'chat.send', async () => {
-      await chat.sendMessage(
-        {
-          id: messageId,
-          role: 'user',
-          parts: [{ type: 'text', text: query }],
-          metadata: buildSendMessageMetadata(options),
-        },
-        { body: requestBody }
-      );
-      if (
-        chat.status === 'error' &&
-        snapshot.phase === 'sending' &&
-        chat.lastMessage?.id === messageId
-      ) {
-        chat.messages = chat.messages.slice(0, -1);
+    await startStream(null, 'chat.send', async () => {
+      if (agentId !== undefined) {
+        await getChatSessionService().setSessionAgent({ sessionId, agentId });
+        assertAlive();
+      }
+
+      pendingUserMessageId = messageId;
+      try {
+        await chat.sendMessage(
+          {
+            id: messageId,
+            role: 'user',
+            parts: [{ type: 'text', text: query }],
+            metadata: buildSendMessageMetadata(options),
+          },
+          { body: requestBody }
+        );
+        if (
+          chat.status === 'error' &&
+          pendingUserMessageId === messageId &&
+          chat.lastMessage?.id === messageId
+        ) {
+          chat.messages = chat.messages.slice(0, -1);
+        }
+      } finally {
+        pendingUserMessageId = undefined;
       }
     });
   }
 
   async function cancel(): Promise<void> {
     assertAlive();
-    if (snapshot.phase !== 'streaming' && snapshot.phase !== 'sending') return;
+    const currentPhase = phase();
+    if (currentPhase !== 'streaming' && currentPhase !== 'sending') return;
 
-    updateState({ phase: 'canceling' });
+    updateState({ operation: 'canceling' });
     try {
       await chatTurnService.cancelTurn(sessionId);
     } catch (error) {
@@ -240,7 +257,7 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
         Boolean(streamTask) ||
         (await chatTurnService.getActiveTurnId(sessionId).catch(() => undefined)) !== null;
       if (cleaned) return;
-      updateState({ phase: canRetry ? 'streaming' : settledPhase() });
+      updateState({ operation: canRetry ? 'retry-cancel' : null });
       throw convertedError;
     }
 
@@ -248,12 +265,16 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     reconnectAbort?.abort();
     await chat.stop();
     await streamTask?.catch(() => undefined);
-    if (!cleaned) updateState({ phase: 'idle' });
+    if (!cleaned) {
+      // 取消已由后端确认，历史消息里的审批请求不再可操作。
+      chat.clearError();
+      updateState({ operation: 'canceled' });
+    }
   }
 
   async function approve(decisions: SessionApprovalDecision[]): Promise<void> {
     assertAlive();
-    const previousPhase = snapshot.phase;
+    const previousPhase = phase();
     if (previousPhase !== 'streaming' && previousPhase !== 'hanged') {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
         reason: `当前 phase=${previousPhase}，不能 approve`,
@@ -278,7 +299,7 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
       return;
     }
 
-    await startStream('streaming', 'chat.recover', () =>
+    await startStream('resuming', 'chat.recover', () =>
       chat.sendMessage(undefined, { body: requestBody })
     );
   }
@@ -342,7 +363,8 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
 
     const stream = await toUiMessageChunkStream(response);
     assertAlive();
-    if (snapshot.phase === 'sending') updateState({ phase: 'streaming' });
+    pendingUserMessageId = undefined;
+    if (snapshot.operation === 'canceled') updateState({ operation: null });
     return stream;
   }
 
@@ -374,9 +396,9 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
   }
 
   return {
-    chat,
     getSnapshot,
     subscribe,
+    isBusy,
     refresh,
     cleanup,
     send,
@@ -395,13 +417,6 @@ function mergeMessages(
     messagesById.set(message.id, message);
   }
   return [...messagesById.values()];
-}
-
-function hasPendingToolApproval(message: WisePenUIMessage | undefined): boolean {
-  return (
-    message?.parts.some((part) => isToolUIPart(part) && part.state === 'approval-requested') ??
-    false
-  );
 }
 
 function buildSendMessageMetadata(options?: SessionSendOptions): ChatMessageMetadata {

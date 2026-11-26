@@ -1,7 +1,7 @@
 import { getToolName, isToolUIPart } from 'ai';
 import { useState } from 'react';
 
-import { useChatRouter } from '@/runtime/chat';
+import { useChatSessions } from '@/runtime/chat';
 import { notifyError } from '@/utils/error';
 
 import type { ChatToolApprovalProps } from './index.type';
@@ -31,9 +31,9 @@ function listToolApprovalRequests(message: ChatToolApprovalProps['messages'][num
   return requests;
 }
 
-/** 高危工具审批：收集待批请求，批量回写 Router.approve。 */
+/** 高危工具审批：收集并提交同一回合的审批决定。 */
 export function useChatToolApproval({ sessionId, phase, messages }: ChatToolApprovalProps) {
-  const router = useChatRouter();
+  const sessions = useChatSessions();
   const [approvalDecisions, setApprovalDecisions] = useState<Record<string, boolean>>({});
   const [submittingToolCallIds, setSubmittingToolCallIds] = useState<ReadonlySet<string>>();
   const approvalRequests =
@@ -59,13 +59,14 @@ export function useChatToolApproval({ sessionId, phase, messages }: ChatToolAppr
 
     const submittedIds = new Set(pendingToolCallIds);
     setSubmittingToolCallIds(submittedIds);
-    void router
-      .approve(
-        sessionId,
-        pendingToolCallIds.map((pendingId) => ({
-          toolCallId: pendingId,
-          approved: nextDecisions[pendingId] ?? false,
-        }))
+    void sessions
+      .withSession(sessionId, (runtime) =>
+        runtime.approve(
+          pendingToolCallIds.map((pendingId) => ({
+            toolCallId: pendingId,
+            approved: nextDecisions[pendingId] ?? false,
+          }))
+        )
       )
       .catch((error: unknown) => {
         setApprovalDecisions((current) =>
