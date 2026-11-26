@@ -33,12 +33,7 @@ import {
 import { createUuid } from '@/utils/random';
 import { isRecord } from '@/utils/type/typeGuards';
 
-import type {
-  SessionApprovalDecision,
-  SessionBootstrapKind,
-  SessionSendOptions,
-  SessionVisibility,
-} from '../_common';
+import type { SessionApprovalDecision, SessionSendOptions } from '../_common';
 import type {
   SessionRuntime,
   SessionRuntimeSnapshot,
@@ -54,9 +49,7 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
   const listeners = new Set<() => void>();
   let snapshot: SessionRuntimeSnapshot = {
     sessionId,
-    visibility: 'background',
     phase: 'idle',
-    error: undefined,
     historyPage: 1,
     historyTotalPage: 1,
     historyLoadingMore: false,
@@ -118,7 +111,6 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
         if (snapshot.phase !== 'canceling') {
           updateState({
             phase: hasPendingToolApproval(chat.lastMessage) ? 'hanged' : 'error',
-            error,
           });
         }
         throw error;
@@ -128,11 +120,11 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
       }
 
       if (!cleaned && snapshot.phase !== 'canceling') {
-        updateState({ phase: settledPhase(), error: undefined });
+        updateState({ phase: settledPhase() });
       }
     });
     streamTask = task;
-    updateState({ phase, error: undefined });
+    updateState({ phase });
     return task;
   }
 
@@ -158,7 +150,6 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
 
       updateState({
         phase: hasPendingToolApproval(chat.lastMessage) ? 'hanged' : 'idle',
-        error: undefined,
       });
     } catch (error) {
       if (cleaned) return;
@@ -179,11 +170,8 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     });
   }
 
-  async function bootstrap(kind: SessionBootstrapKind): Promise<void> {
-    if (kind === 'loadSession') await refresh();
-  }
-
   function refresh(): Promise<void> {
+    if (streamTask || snapshot.phase === 'canceling') return Promise.resolve();
     if (refreshPromise) return refreshPromise;
     refreshPromise = refreshSession().finally(() => {
       refreshPromise = null;
@@ -198,12 +186,6 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
   function subscribe(listener: () => void): () => void {
     listeners.add(listener);
     return () => listeners.delete(listener);
-  }
-
-  function setVisibility(visibility: SessionVisibility): void {
-    assertAlive();
-    if (snapshot.visibility === visibility) return;
-    updateState({ visibility });
   }
 
   async function cleanup(): Promise<void> {
@@ -258,7 +240,7 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
         Boolean(streamTask) ||
         (await chatTurnService.getActiveTurnId(sessionId).catch(() => undefined)) !== null;
       if (cleaned) return;
-      updateState({ phase: canRetry ? 'streaming' : settledPhase(), error: convertedError });
+      updateState({ phase: canRetry ? 'streaming' : settledPhase() });
       throw convertedError;
     }
 
@@ -266,7 +248,7 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     reconnectAbort?.abort();
     await chat.stop();
     await streamTask?.catch(() => undefined);
-    if (!cleaned) updateState({ phase: 'idle', error: undefined });
+    if (!cleaned) updateState({ phase: 'idle' });
   }
 
   async function approve(decisions: SessionApprovalDecision[]): Promise<void> {
@@ -395,9 +377,7 @@ export function createSessionRuntime(sessionId: string): SessionRuntime {
     chat,
     getSnapshot,
     subscribe,
-    bootstrap,
     refresh,
-    setVisibility,
     cleanup,
     send,
     cancel,

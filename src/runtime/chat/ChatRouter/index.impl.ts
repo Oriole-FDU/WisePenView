@@ -8,10 +8,10 @@ import type { SessionRuntime } from '../SessionRuntime/index.type';
 import type { ChatRouter, ChatRouterSnapshot } from './index.type';
 
 export function createChatRouter(): ChatRouter {
-  const coordinator = createSessionCoordinator();
   const chatSessionService: IChatSessionService = getChatSessionService();
   const listeners = new Set<() => void>();
   let foreground: SessionRuntime | null = null;
+  const coordinator = createSessionCoordinator(() => foreground?.getSnapshot().sessionId);
   let unsubscribeForeground: (() => void) | null = null;
   let routeIntent: { sessionId?: string } = {};
   let cleaned = false;
@@ -43,24 +43,11 @@ export function createChatRouter(): ChatRouter {
     for (const listener of listeners) listener();
   }
 
-  function clearForeground(): void {
+  function setForeground(runtime: SessionRuntime | null): void {
+    if (foreground === runtime) return;
     unsubscribeForeground?.();
-    unsubscribeForeground = null;
-    foreground = null;
-    emit();
-  }
-
-  function setForeground(runtime: SessionRuntime): void {
-    if (foreground === runtime) {
-      runtime.setVisibility('foreground');
-      return;
-    }
-
-    unsubscribeForeground?.();
-    foreground?.setVisibility('background');
     foreground = runtime;
-    runtime.setVisibility('foreground');
-    unsubscribeForeground = runtime.subscribe(emit);
+    unsubscribeForeground = runtime?.subscribe(emit) ?? null;
     emit();
   }
 
@@ -93,8 +80,7 @@ export function createChatRouter(): ChatRouter {
     const intent = { sessionId };
     routeIntent = intent;
     if (getForeground(sessionId)) return;
-    const retainSessionId = foreground?.getSnapshot().sessionId;
-    const runtime = await coordinator.acquire(sessionId, { retainSessionId });
+    const runtime = await coordinator.acquire(sessionId);
     if (cleaned || intent !== routeIntent) return;
     setForeground(runtime);
   }
@@ -102,8 +88,7 @@ export function createChatRouter(): ChatRouter {
   async function createSession(): Promise<string | undefined> {
     assertAlive();
     const intent = routeIntent;
-    const retainSessionId = foreground?.getSnapshot().sessionId;
-    const runtime = await coordinator.createSession(undefined, { retainSessionId });
+    const runtime = await coordinator.createSession();
     if (cleaned || intent !== routeIntent) return;
     const sessionId = runtime.getSnapshot().sessionId;
     routeIntent = { sessionId };
@@ -114,15 +99,12 @@ export function createChatRouter(): ChatRouter {
   function leaveSession(route?: { sessionId: string | undefined }): void {
     if (route && routeIntent.sessionId !== route.sessionId) return;
     routeIntent = {};
-    if (!foreground) return;
-    const previous = foreground;
-    clearForeground();
-    previous.setVisibility('background');
+    setForeground(null);
   }
 
   async function notifySessionDeleted(sessionId: string): Promise<void> {
     if (routeIntent.sessionId === sessionId) routeIntent = {};
-    if (getForeground(sessionId)) clearForeground();
+    if (getForeground(sessionId)) setForeground(null);
     await coordinator.dispose(sessionId);
   }
 
@@ -130,10 +112,9 @@ export function createChatRouter(): ChatRouter {
     assertAlive();
     const { sessionId, create, onSessionCreated, ...sendOptions } = request;
     const intent = routeIntent;
-    const retainSessionId = foreground?.getSnapshot().sessionId;
     const targetRuntime = sessionId
-      ? (getForeground(sessionId) ?? (await coordinator.acquire(sessionId, { retainSessionId })))
-      : await coordinator.createSession(create, { retainSessionId });
+      ? (getForeground(sessionId) ?? (await coordinator.acquire(sessionId)))
+      : await coordinator.createSession(create);
     assertAlive();
 
     if (!sessionId && intent === routeIntent) {
@@ -168,7 +149,7 @@ export function createChatRouter(): ChatRouter {
     cleaned = true;
     routeIntent = {};
     listeners.clear();
-    clearForeground();
+    setForeground(null);
     await coordinator.cleanup();
   }
 

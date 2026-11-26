@@ -16,10 +16,7 @@
 
 ## 状态模型
 
-每个已被 Runtime 持有的 session，用两维描述：
-
-- `visibility`：`foreground` | `background`
-- `phase`：`idle` | `sending` | `streaming` | `canceling` | `hanged` | `error`
+Router 持有当前前台会话，SessionRuntime 持有各会话的回合状态 `phase`。
 
 含义：
 
@@ -32,7 +29,7 @@
 | `hanged`    | 等待审批（tool approval）              |
 | `error`     | 不可恢复错误（对应该会话当前回合）     |
 
-Foreground 与 background 均可处于上述 phase。Background 下即使后端仍在 streaming，UI **不保证**实时感知；切回 foreground 时由 Runtime bootstrap 对齐。
+切换前台时保留回合状态。切回仍在本地接收串流的会话时直接显示现有串流；其余会话同步历史和活跃回合。
 
 ### 转移
 
@@ -43,14 +40,11 @@ streaming --cancel--> canceling --> idle | streaming
 streaming --(后端要求审批)--> hanged
 
 hanged --approve--> streaming
-
-foreground <-> background：保留 phase；仅改 visibility
 ```
 
 说明：
 
 - `create` 新前台：原 foreground 变 background（phase 不变）；新 session 进入 foreground 且 `idle`（显式新建空白会话时）。
-- `f ↔ b` 与 phase 正交，各类 phase 在切换时原样保留。
 - `cancel` 只在 `streaming`（及实现上与之等价的在途态）被消费。
 - `approve` 之后直接进入 `streaming`，不经额外的用户可见 `sending`。
 
@@ -74,7 +68,7 @@ ChatRouter 是对话 Component 的唯一交互点。它维护「当前前台」�
 
 - **消息与流式投影**：持续更新的 messages（及渲染所需 status）
 - **意图**：包括 `send`、`cancel` 和审批响应，均经 Router 收口
-- **切会话**：View「索取」某 session 进入前台时，由 Router 完成 `b → f` / `f → b`，并替换当前句柄
+- **切会话**：Router 切换前台会话并更新订阅。
 
 React 订阅通过 `useChatRouter` 与 `useChatRouterSnapshot` 完成。View 不直接调用 AI SDK 的发送接口拼接后端请求；发送、取消与审批都由 Router 转发给对应 SessionRuntime。
 
@@ -88,7 +82,7 @@ Coordinator 管理多路 SessionRuntime 的生命周期，是池的调度器，�
 
 - 按需创建 / 取用 runtime
 - 前台切换时与 Router 协作（池内命中或冷启动后再交给 Router）
-- 池有上限时按 LFU（或同等策略）驱逐
+- 池达到容量时按 LFU 驱逐，前台会话由 Router 指定。
 - `cleanup`：销毁前端 runtime 实例
 
 `cleanup` **不等于** `cancel`：不处理后端回合，只清前端实例与订阅。
@@ -119,13 +113,10 @@ Runtime 把后端生命周期收成前端产品态。对内可有 bootstrap；�
 
 ### Bootstrap（内部）
 
-冷启动分两种，由 `SessionBootstrapKind` 固化：
-
-- `createSession`：新建空白会话，不拉历史、不续流，直接 `idle` + ready
-- `loadSession`：已有会话进入池内
+新建空白会话直接进入 `idle`。已有会话由 `refresh` 同步历史与活跃回合。
 
 ```text
-loadSession:
+refresh:
 load history
     │
     ▼
@@ -134,8 +125,6 @@ load history
     ├── 进入 streaming（含续流）
     └── 或 idle / hanged / error
 ```
-
-`check active`、reconnect、recover、从哪类存储拉数，都是 `loadSession` 内部步骤，对 Component 不可见。Bootstrap 结束后会话处于上表产品态之一。
 
 之后：
 

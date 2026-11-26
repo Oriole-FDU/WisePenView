@@ -4,7 +4,7 @@ import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { createSessionRuntime } from '../SessionRuntime/index.impl';
 import type { SessionRuntime } from '../SessionRuntime/index.type';
-import type { AcquireSessionOptions, SessionCoordinator } from './index.type';
+import type { SessionCoordinator } from './index.type';
 
 const POOL_CAPACITY = 8;
 
@@ -14,7 +14,9 @@ type PoolEntry = {
   lastUsedAt: number;
 };
 
-export function createSessionCoordinator(): SessionCoordinator {
+export function createSessionCoordinator(
+  getForegroundSessionId: () => string | undefined
+): SessionCoordinator {
   const chatSessionService: IChatSessionService = getChatSessionService();
   const pool = new Map<string, PoolEntry>();
   const pending = new Map<string, { token: symbol; promise: Promise<SessionRuntime> }>();
@@ -34,16 +36,12 @@ export function createSessionCoordinator(): SessionCoordinator {
     entry.lastUsedAt = Date.now();
   }
 
-  function pickLfuVictim(retainSessionIds: ReadonlySet<string>): string | null {
+  function pickLfuVictim(): string | null {
+    const foregroundSessionId = getForegroundSessionId();
     let victimId: string | null = null;
     let victim: PoolEntry | null = null;
     for (const [sessionId, entry] of pool) {
-      if (
-        retainSessionIds.has(sessionId) ||
-        entry.runtime.getSnapshot().visibility === 'foreground'
-      ) {
-        continue;
-      }
+      if (sessionId === foregroundSessionId) continue;
       if (
         !victim ||
         entry.frequency < victim.frequency ||
@@ -65,10 +63,10 @@ export function createSessionCoordinator(): SessionCoordinator {
     await initialization?.promise.catch(() => undefined);
   }
 
-  function reserveCapacity(token: symbol, retainSessionIds: ReadonlySet<string>): Promise<void> {
+  function reserveCapacity(token: symbol): Promise<void> {
     const reservation = reservationQueue.then(async () => {
       while (pool.size + reservations.size >= POOL_CAPACITY) {
-        const victimId = pickLfuVictim(retainSessionIds);
+        const victimId = pickLfuVictim();
         if (!victimId) break;
         await dispose(victimId);
       }
@@ -78,11 +76,7 @@ export function createSessionCoordinator(): SessionCoordinator {
     return reservation;
   }
 
-  function initialize(
-    sessionId: string,
-    kind: 'createSession' | 'loadSession',
-    retainSessionIds: ReadonlySet<string>
-  ): Promise<SessionRuntime> {
+  function initialize(sessionId: string, kind: 'new' | 'existing'): Promise<SessionRuntime> {
     const existing = pool.get(sessionId);
     if (existing) return Promise.resolve(existing.runtime);
 
@@ -90,7 +84,7 @@ export function createSessionCoordinator(): SessionCoordinator {
     if (existingInitialization) return existingInitialization.promise;
 
     const token = Symbol(sessionId);
-    const initialization = reserveCapacity(token, retainSessionIds)
+    const initialization = reserveCapacity(token)
       .then(async () => {
         assertAlive();
         if (pending.get(sessionId)?.token !== token) {
@@ -100,7 +94,7 @@ export function createSessionCoordinator(): SessionCoordinator {
         }
         const runtime = createSessionRuntime(sessionId);
         try {
-          await runtime.bootstrap(kind);
+          if (kind === 'existing') await runtime.refresh();
           assertAlive();
           if (pending.get(sessionId)?.token !== token) {
             throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
@@ -126,22 +120,14 @@ export function createSessionCoordinator(): SessionCoordinator {
     return initialization;
   }
 
-  async function createSession(
-    params?: CreateSessionRequest,
-    options?: AcquireSessionOptions
-  ): Promise<SessionRuntime> {
+  async function createSession(params?: CreateSessionRequest): Promise<SessionRuntime> {
     assertAlive();
     const session = await chatSessionService.createSession(params);
     assertAlive();
-    const retainIds = new Set([session.id]);
-    if (options?.retainSessionId) retainIds.add(options.retainSessionId);
-    return initialize(session.id, 'createSession', retainIds);
+    return initialize(session.id, 'new');
   }
 
-  async function acquire(
-    sessionId: string,
-    options?: AcquireSessionOptions
-  ): Promise<SessionRuntime> {
+  async function acquire(sessionId: string): Promise<SessionRuntime> {
     assertAlive();
     if (sessionId === '') {
       throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
@@ -162,9 +148,7 @@ export function createSessionCoordinator(): SessionCoordinator {
       return existing.runtime;
     }
 
-    const retainIds = new Set([sessionId]);
-    if (options?.retainSessionId) retainIds.add(options.retainSessionId);
-    const runtime = await initialize(sessionId, 'loadSession', retainIds);
+    const runtime = await initialize(sessionId, 'existing');
     assertAlive();
     const entry = pool.get(sessionId);
     if (entry?.runtime !== runtime) {
