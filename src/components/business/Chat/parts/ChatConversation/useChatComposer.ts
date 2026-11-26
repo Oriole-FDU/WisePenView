@@ -3,12 +3,12 @@ import { useMemoizedFn } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useChatSessionService } from '@/domains';
 import type { ChatModel } from '@/domains/ChatConfig';
-import type { CreateSessionRequest, WisePenUIMessage } from '@/domains/ChatSession';
-import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
+import type { WisePenUIMessage } from '@/domains/ChatSession';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { captureException } from '@/observability';
-import { buildSessionSendPayload, getChatRouter } from '@/runtime/chat';
+import { buildSessionSendPayload, useChatSessions } from '@/runtime/chat';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import { useChatGuards } from '../../hooks/useChatGuards';
@@ -35,31 +35,32 @@ export function useChatComposer({
   hostAgentPort,
 }: UseChatComposerParams) {
   const { t } = useTranslation(['chat', 'common']);
-  const { selectSession } = useChatSessionRoute();
   const requestChatSessionHistoryRefresh = useChatSessionHistoryRefreshStore(
     (state) => state.requestRefresh
   );
-  const { locationKey, locationKeyLatest, requireAuth, isRouteLive } = useChatGuards();
-  const router = getChatRouter();
+  const {
+    locationKey,
+    composerKey,
+    isDraftPromotion,
+    selectSession,
+    requireAuth,
+    isRouteLive,
+    isComposerLive,
+  } = useChatGuards();
+  const sessions = useChatSessions();
+  const chatSessionService = useChatSessionService();
 
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
-  const [cancelling, setCancelling] = useState(false);
-  /** 本面板创建的草稿会话；路由离开后在渲染期对齐清掉。 */
-  const [draftSessionId, setDraftSessionId] = useState<string>();
   const pendingHistoryRefreshRef = useRef<string | undefined>(undefined);
+  const sendingComposerKeys = useRef(new Set<string>());
   const creatingSessionRef = useRef<{
     locationKey: string;
-    promise: Promise<string | undefined>;
+    promise: Promise<{ id: string; agentId?: string | null }>;
   } | null>(null);
-
-  if (draftSessionId !== undefined && sessionId !== draftSessionId) {
-    setDraftSessionId(undefined);
-  }
 
   const resourceStateProvider = resourceChat?.provider;
   const resourceChatContext = resourceChat?.context;
   const clearResourceChatContext = resourceChat?.clearContext;
-  const promoteDraftToolSelection = sessionId !== undefined && sessionId === draftSessionId;
 
   useRefreshHistoryOnFirstContent(
     sessionId,
@@ -68,13 +69,38 @@ export function useChatComposer({
     requestChatSessionHistoryRefresh
   );
 
-  const bindCreatedSessionToRoute = useMemoizedFn(async (createdSessionId: string) => {
-    if (!isRouteLive(locationKey)) return;
-    setDraftSessionId(createdSessionId);
-    pendingHistoryRefreshRef.current = createdSessionId;
-    await selectSession(createdSessionId, true);
+  async function bindCreatedSessionToRoute(createdSessionId: string, startedLocationKey: string) {
     requestChatSessionHistoryRefresh();
-  });
+    if (!isRouteLive(startedLocationKey)) return;
+    pendingHistoryRefreshRef.current = createdSessionId;
+    await selectSession(createdSessionId, 'promote-draft');
+  }
+
+  function createDraftSession(agentId?: string | null) {
+    if (creatingSessionRef.current?.locationKey === locationKey) {
+      return creatingSessionRef.current.promise;
+    }
+
+    const promise = (async () => {
+      const { id } = await chatSessionService.createSession(
+        agentId === undefined ? undefined : { agentId }
+      );
+      return sessions.withSession(
+        id,
+        async () => {
+          await bindCreatedSessionToRoute(id, locationKey);
+          return { id, agentId };
+        },
+        { newSession: true }
+      );
+    })();
+    creatingSessionRef.current = { locationKey, promise };
+    const clearPending = () => {
+      if (creatingSessionRef.current?.promise === promise) creatingSessionRef.current = null;
+    };
+    void promise.then(clearPending, clearPending);
+    return promise;
+  }
 
   const ensureSession = useMemoizedFn(async (): Promise<string | undefined> => {
     if (!isRouteLive(locationKey)) return;
@@ -85,26 +111,13 @@ export function useChatComposer({
     }
     if (sessionId) return sessionId;
 
-    if (creatingSessionRef.current?.locationKey !== locationKey) {
-      const promise = (async () => {
-        await router.createSession();
-        const createdSessionId = router.getSnapshot().sessionId;
-        if (!createdSessionId) return;
-        await bindCreatedSessionToRoute(createdSessionId);
-        return createdSessionId;
-      })();
-      creatingSessionRef.current = { locationKey, promise };
-      const clearPending = () => {
-        if (creatingSessionRef.current?.promise === promise) creatingSessionRef.current = null;
-      };
-      void promise.then(clearPending, clearPending);
-    }
-    return creatingSessionRef.current.promise;
+    const { id } = await createDraftSession();
+    if (isComposerLive(composerKey, id)) return id;
   });
 
   const send = async (text: string, opts?: SendOptions): Promise<boolean> => {
-    const startedLocationKey = locationKey;
-    if (!isRouteLive(startedLocationKey) || !requireAuth()) return false;
+    if (sendingComposerKeys.current.has(composerKey)) return false;
+    if (!isRouteLive(locationKey) || !requireAuth()) return false;
 
     const targetModel = opts?.model ?? currentModel;
     if (!targetModel) return false;
@@ -120,11 +133,11 @@ export function useChatComposer({
     setCurrentModel(targetModel);
 
     const selectedAgent = opts?.selectedAgent;
-    let create: CreateSessionRequest | undefined;
+    let agentId: string | null | undefined;
     if (selectedAgent?.resourceId) {
-      create = { agentId: selectedAgent.resourceId };
+      agentId = selectedAgent.resourceId;
     } else if (selectedAgent?.isDefault || selectedAgent?.source === 'DEFAULT') {
-      create = { agentId: null };
+      agentId = null;
     }
 
     const payload = buildSessionSendPayload({
@@ -141,21 +154,15 @@ export function useChatComposer({
       return false;
     }
 
+    sendingComposerKeys.current.add(composerKey);
     try {
-      if (sessionId && router.getSnapshot().sessionId !== sessionId) {
-        await router.focusSession(sessionId);
-      }
-      if (!isRouteLive(startedLocationKey)) return false;
-      const hadForeground = Boolean(router.getSnapshot().sessionId);
-      await router.send(text, {
-        create,
-        ...payload.options,
-      });
-      if (!isRouteLive(startedLocationKey)) return false;
-      const createdSessionId = router.getSnapshot().sessionId;
-      if (!hadForeground && createdSessionId) {
-        await bindCreatedSessionToRoute(createdSessionId);
-      }
+      const target = sessionId ? { id: sessionId } : await createDraftSession(agentId);
+      await sessions.withSession(
+        target.id,
+        (runtime) =>
+          runtime.send(text, payload.options, agentId === target.agentId ? undefined : agentId),
+        { newSession: !sessionId }
+      );
     } catch (error) {
       captureException(error, {
         detector: 'application-handled',
@@ -163,8 +170,11 @@ export function useChatComposer({
       });
       toast.danger(parseErrorMessage(error));
       return false;
+    } finally {
+      sendingComposerKeys.current.delete(composerKey);
     }
 
+    if (!isComposerLive(composerKey)) return false;
     payload.finishSend();
     if (resourceChatContext) clearResourceChatContext?.(resourceChatContext);
     return true;
@@ -173,29 +183,25 @@ export function useChatComposer({
   const onSend = (text: string, opts?: SendOptions) => {
     const guarded = hostAgentPort?.interceptSend?.(text, opts);
     if (!guarded) return send(text, opts);
-    const pendingLocationKey = locationKeyLatest.current;
     return guarded.then((accepted) => {
-      if (!accepted || !isRouteLive(pendingLocationKey)) return false;
+      if (!accepted || !isRouteLive(locationKey)) return false;
       return send(text, opts);
     });
   };
 
   const onCancel = async () => {
-    if (!sessionId || cancelling) return;
-    setCancelling(true);
+    if (!sessionId || !isRouteLive(locationKey)) return;
     try {
-      await router.cancel();
+      await sessions.withSession(sessionId, (runtime) => runtime.cancel());
     } catch (error) {
       toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
-    } finally {
-      setCancelling(false);
     }
   };
 
   const onLoadMoreHistory = async () => {
-    if (!requireAuth()) return;
+    if (!sessionId || !isRouteLive(locationKey) || !requireAuth()) return;
     try {
-      await router.loadMoreHistory();
+      await sessions.withSession(sessionId, (runtime) => runtime.loadMoreHistory());
     } catch (error) {
       toast.danger(parseErrorMessage(error));
     }
@@ -203,8 +209,7 @@ export function useChatComposer({
 
   return {
     currentModel,
-    cancelling,
-    promoteDraftToolSelection,
+    promoteDraftToolSelection: isDraftPromotion,
     ensureSession,
     onSend,
     onCancel,

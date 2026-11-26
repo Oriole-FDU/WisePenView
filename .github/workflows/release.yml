@@ -1,38 +1,28 @@
-name: 自动发布版本
+name: 发布版本
 
-# 触发时机：
-# - PR 合并到 main 后，如果 package.json 已更新则直接发布；否则自动创建补丁版本 PR，
-#   等轻量版 Code Quality & Build Gate 通过后合并并发布。main 受 ruleset 保护，版本提交不能直接推送。
-# - 版本 PR 使用 RELEASE_TOKEN 创建，避免 GITHUB_TOKEN 创建的 PR 进入 Actions 人工审批。
-# - 支持手动触发，用于补发当前 package.json 版本。
+# 仅发布 package.json 中尚未打标签的显式版本。自动补丁版本 PR 已退役。
 on:
   pull_request_target:
     types: [closed]
     branches: ['main']
   workflow_dispatch:
 
-# 创建版本分支与 PR、读取 CI 状态、合并 PR、创建标签和 Release 所需权限
 permissions:
-  actions: read
-  checks: read
   contents: write
-  pull-requests: write
 
-# 发布任务串行执行，避免并发合并 PR 时生成重复版本
 concurrency:
   group: release-main
   cancel-in-progress: false
 
 jobs:
   release:
-    name: 自动升级版本并发布
+    name: 发布显式版本
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request_target' &&
-       github.event.pull_request.merged == true &&
-       startsWith(github.event.pull_request.head.ref, 'chore/release-') == false)
+       github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository
@@ -47,216 +37,43 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      - name: 同步 main 最新状态
-        run: |
-          set -euo pipefail
-          git fetch origin main --tags
-          git reset --hard origin/main
-
-      - name: 解析发布动作
+      - name: 解析显式版本
         id: release
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          SOURCE_PR: ${{ github.event.pull_request.number }}
-          PR_MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
           set -euo pipefail
 
-          CURRENT_VERSION="$(node -p "require('./package.json').version")"
-          TAG="v${CURRENT_VERSION}"
-          TARGET_SHA="$(git rev-parse HEAD)"
-          echo "当前版本：${CURRENT_VERSION}"
-
-          set_release_outputs() {
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "action=release" >> "$GITHUB_OUTPUT"
-            echo "version=${CURRENT_VERSION}" >> "$GITHUB_OUTPUT"
-            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-            echo "target_sha=${TARGET_SHA}" >> "$GITHUB_OUTPUT"
-          }
-
-          set_skip_output() {
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "$1" | tee -a "$GITHUB_STEP_SUMMARY"
-          }
-
-          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
-            if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
-              set_skip_output "标签 ${TAG} 已存在，跳过发布"
-            else
-              set_release_outputs
-            fi
-            exit 0
-          fi
-
-          # 同一源 PR 重跑时，避免再次生成补丁版本
-          if [ -n "$(git log --grep="^Release-PR: #${SOURCE_PR}$" --format=%H -n 1)" ]; then
-            echo "检测到 PR #${SOURCE_PR} 已生成版本提交"
-            if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
-              set_skip_output "PR #${SOURCE_PR} 的版本 ${TAG} 已发布，跳过"
-            else
-              set_release_outputs
-            fi
-            exit 0
-          fi
+          git fetch origin main --tags
+          TARGET_SHA="$(git rev-parse origin/main)"
+          VERSION="$(git show "${TARGET_SHA}:package.json" | node -p "JSON.parse(require('node:fs').readFileSync(0, 'utf8')).version")"
+          TAG="v${VERSION}"
 
           if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
-            # PR 已显式升级版本时，标签会指向该 PR 的合并提交，重跑可直接跳过
-            if [ -n "${PR_MERGE_SHA}" ] && [ "$(git rev-list -n 1 "${TAG}")" = "${PR_MERGE_SHA}" ]; then
-              set_skip_output "标签 ${TAG} 已指向 PR #${SOURCE_PR} 的合并提交，跳过"
-            else
-              echo "skip=false" >> "$GITHUB_OUTPUT"
-              echo "action=bump" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            set_release_outputs
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "标签 ${TAG} 已存在，跳过发布" | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
 
-      - name: 创建补丁版本 PR
-        id: bump
-        if: steps.release.outputs.action == 'bump' && steps.release.outputs.skip != 'true'
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-          SOURCE_PR: ${{ github.event.pull_request.number }}
-        run: |
-          set -euo pipefail
-
-          if [ -z "${RELEASE_TOKEN}" ]; then
-            echo "::error::未配置 RELEASE_TOKEN。请使用有仓库写权限的细粒度令牌，并授予 Contents 与 Pull requests 写权限。"
-            exit 1
-          fi
-
-          NEW_VERSION="$(node scripts/bump-patch-version.mjs)"
-          # 极端情况下目标标签已存在时继续递增，保证发布幂等
-          while git rev-parse --verify --quiet "refs/tags/v${NEW_VERSION}" >/dev/null; do
-            NEW_VERSION="$(node scripts/bump-patch-version.mjs)"
-          done
-
-          TITLE="chore(release): 自动升级版本号到 ${NEW_VERSION}"
-          BRANCH="chore/release-pr-${SOURCE_PR}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "${BRANCH}"
-          git add package.json
-          # 该提交只改版本号，版本 PR 使用轻量门禁，不重复执行完整构建
-          git commit --no-verify -m "${TITLE}" -m "Release-PR: #${SOURCE_PR}"
-          HEAD_SHA="$(git rev-parse HEAD)"
-          # 使用用户令牌推送，PR 关联的 pull_request 工作流才会自动运行
-          git push --force \
-            "https://x-access-token:${RELEASE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
-            "HEAD:${BRANCH}"
-
-          PR_NUMBER="$(gh pr list --head "${BRANCH}" --state open --json number --jq '.[0].number // empty')"
-          if [ -z "${PR_NUMBER}" ]; then
-            if ! PR_URL="$(gh pr create \
-              --base main \
-              --head "${BRANCH}" \
-              --title "${TITLE}" \
-              --body "由 #${SOURCE_PR} 合并后自动生成的补丁版本更新。")"; then
-              echo "::error::无法创建补丁版本 PR，请确认 RELEASE_TOKEN 具有 Contents 与 Pull requests 写权限"
-              exit 1
-            fi
-            PR_NUMBER="${PR_URL##*/}"
-          fi
-
-          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
-          echo "title=${TITLE}" >> "$GITHUB_OUTPUT"
-          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
-          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
-          echo "已创建补丁版本 PR #${PR_NUMBER}：${TITLE}" | tee -a "$GITHUB_STEP_SUMMARY"
-
-      - name: 等待补丁版本 CI 并自动合并
-        id: merge
-        if: steps.release.outputs.action == 'bump' && steps.release.outputs.skip != 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SOURCE_PR: ${{ github.event.pull_request.number }}
-          BRANCH: ${{ steps.bump.outputs.branch }}
-          HEAD_SHA: ${{ steps.bump.outputs.head_sha }}
-          PR_NUMBER: ${{ steps.bump.outputs.pr_number }}
-          TITLE: ${{ steps.bump.outputs.title }}
-        run: |
-          set -euo pipefail
-
-          RUN_ID=""
-          for _ in $(seq 1 30); do
-            RUN_ID="$(gh run list \
-              --workflow ci.yml \
-              --branch "${BRANCH}" \
-              --commit "${HEAD_SHA}" \
-              --event pull_request \
-              --limit 1 \
-              --json databaseId \
-              --jq '.[0].databaseId // empty')"
-            if [ -n "${RUN_ID}" ]; then
-              break
-            fi
-            sleep 2
-          done
-
-          if [ -z "${RUN_ID}" ]; then
-            echo "::error::未找到补丁版本 PR 的 CI 运行，请确认 RELEASE_TOKEN 属于仓库协作者"
-            exit 1
-          fi
-
-          gh run watch "${RUN_ID}" --exit-status --compact --interval 10
-
-          MERGED_SHA=""
-          for _ in $(seq 1 12); do
-            if gh pr merge "${PR_NUMBER}" \
-              --squash \
-              --subject "${TITLE}" \
-              --body "Release-PR: #${SOURCE_PR}"; then
-              for _ in $(seq 1 12); do
-                MERGED_SHA="$(gh pr view "${PR_NUMBER}" --json mergeCommit --jq '.mergeCommit.oid // empty')"
-                if [ -n "${MERGED_SHA}" ]; then
-                  break
-                fi
-                sleep 2
-              done
-              break
-            fi
-            sleep 5
-          done
-
-          if [ -z "${MERGED_SHA}" ]; then
-            echo "::error::补丁版本 PR #${PR_NUMBER} 未能自动合并，请检查分支保护与仓库 Actions 权限"
-            exit 1
-          fi
-
-          echo "merge_sha=${MERGED_SHA}" >> "$GITHUB_OUTPUT"
-          echo "已自动合并补丁版本 PR #${PR_NUMBER}，提交 ${MERGED_SHA}" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "target_sha=${TARGET_SHA}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: 创建标签与 GitHub Release
         if: steps.release.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ACTION: ${{ steps.release.outputs.action }}
-          VERSION: ${{ steps.bump.outputs.version || steps.release.outputs.version }}
-          TAG: ${{ format('v{0}', steps.bump.outputs.version || steps.release.outputs.version) }}
-          TARGET_SHA: ${{ steps.merge.outputs.merge_sha || steps.release.outputs.target_sha }}
+          TARGET_SHA: ${{ steps.release.outputs.target_sha }}
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
           set -euo pipefail
 
-          git fetch origin main --tags
           if ! git merge-base --is-ancestor "${TARGET_SHA}" origin/main; then
             echo "::error::发布提交 ${TARGET_SHA} 不在 main 上"
             exit 1
           fi
 
-          if [ "${ACTION}" = "bump" ]; then
-            MERGED_VERSION="$(git show "${TARGET_SHA}:package.json" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")"
-            if [ "${MERGED_VERSION}" != "${VERSION}" ]; then
-              echo "::error::补丁版本 PR 合并后的版本为 ${MERGED_VERSION}，预期 ${VERSION}"
-              exit 1
-            fi
-          fi
-
           if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
-            echo "标签 ${TAG} 已存在，跳过发布" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "标签 ${TAG} 已存在，跳过发布"
             exit 0
           fi
 

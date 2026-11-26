@@ -21,20 +21,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 自动版本 PR 只改 version 字段，跳过完整构建，仅执行轻量版本校验。
-      - name: Detect Release PR
-        id: release_pr
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        run: |
-          set -euo pipefail
-          IS_RELEASE_PR=false
-          if [ "${EVENT_NAME}" = "pull_request" ] && [[ "${HEAD_REF}" == chore/release-* ]]; then
-            IS_RELEASE_PR=true
-          fi
-          echo "is_release_pr=${IS_RELEASE_PR}" >> "$GITHUB_OUTPUT"
-
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
@@ -42,32 +28,22 @@ jobs:
 
       # pnpm/action-setup 从 package.json 的 packageManager 读取唯一版本。
       - name: Install pnpm
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         uses: pnpm/action-setup@v4
 
       # 设置 Node.js，并将缓存机制切换为 pnpm
       - name: Setup Node.js
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      - name: Setup Node.js for Release PR
-        if: steps.release_pr.outputs.is_release_pr == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-
       # 严格依赖安装
       # --frozen-lockfile 等价于 npm ci，它严格读取 pnpm-lock.yaml，绝不自动更新依赖
       - name: Install Dependencies
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         run: pnpm install --frozen-lockfile
 
       # 直接复用已安装的 commitlint，避免 Action 额外拉取镜像；PR 与 main push 都会校验。
       - name: Validate Commits
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         env:
           BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           AFTER_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -84,7 +60,6 @@ jobs:
           fi
 
       - name: Modern Web Guidance diff scan
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -92,7 +67,6 @@ jobs:
 
       # 恢复 ESLint 文件级缓存；缓存键只跟随依赖与配置，源码变化由内容哈希失效。
       - name: Restore ESLint cache
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         uses: actions/cache@v4
         with:
           path: .eslintcache
@@ -101,7 +75,6 @@ jobs:
             eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.js', '.nvmrc') }}-
 
       - name: Check whitespace errors
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         env:
           BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           AFTER_SHA: ${{ github.sha }}
@@ -120,37 +93,15 @@ jobs:
       # 各检查互不依赖，并行执行以缩短关键路径；
       # 类型检查与 Vite 构建拆开，避免串行等待。
       - name: Static Checks, Type Check & Build
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         run: pnpm verify:ci
 
       - name: Verify Build Artifact
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         run: test -s dist/index.html
 
       - name: Upload Build Artifact
-        if: steps.release_pr.outputs.is_release_pr != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: wisepenview-dist-${{ github.sha }}
           path: dist/
           if-no-files-found: error
           retention-days: 7
-
-      - name: Validate Patch Version PR
-        if: steps.release_pr.outputs.is_release_pr == 'true'
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          BASE_PACKAGE: ${{ runner.temp }}/base-package.json
-        run: |
-          set -euo pipefail
-
-          CHANGED_FILES="$(git diff --name-only "${BASE_SHA}...${HEAD_SHA}")"
-          if [ "${CHANGED_FILES}" != "package.json" ]; then
-            echo "::error::自动版本 PR 只能修改 package.json，实际变更：${CHANGED_FILES:-<无>}"
-            exit 1
-          fi
-
-          git diff --check "${BASE_SHA}...${HEAD_SHA}"
-          git show "${BASE_SHA}:package.json" > "${BASE_PACKAGE}"
-          node scripts/check-release-pr.mjs "${BASE_PACKAGE}" package.json

@@ -1,124 +1,128 @@
-import { getChatSessionService } from '@/domains';
-import type { CreateSessionRequest, IChatSessionService } from '@/domains/ChatSession';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { SessionRuntime } from '../SessionRuntime/index.impl';
-import type { SessionRuntime as SessionRuntimeContract } from '../SessionRuntime/index.type';
-import type {
-  AcquireSessionOptions,
-  SessionCoordinator as SessionCoordinatorContract,
-} from './index.type';
+import { createSessionRuntime } from '../SessionRuntime/index.impl';
+import type { SessionRuntime } from '../SessionRuntime/index.type';
 
-/** 本轮暂定容量；具体数字与 LFU 参数文档标明可后续调整 */
-const DEFAULT_POOL_CAPACITY = 8;
+const POOL_CAPACITY = 8;
 
 type PoolEntry = {
   runtime: SessionRuntime;
-  freq: number;
-  lastUsedAt: number;
+  operations: number;
+  unsubscribe: () => void;
 };
 
-export class SessionCoordinator implements SessionCoordinatorContract {
-  private readonly pool = new Map<string, PoolEntry>();
-  private readonly capacity: number;
-  private readonly chatSessionService: IChatSessionService;
+type SessionActions = Pick<SessionRuntime, 'send' | 'cancel' | 'approve' | 'loadMoreHistory'>;
 
-  constructor(capacity = DEFAULT_POOL_CAPACITY) {
-    this.capacity = capacity;
-    this.chatSessionService = getChatSessionService();
+export function createSessionCoordinator() {
+  const pool = new Map<string, PoolEntry>();
+  const subscribers = new Map<string, Set<() => void>>();
+  let closed = false;
+
+  function notify(sessionId: string): void {
+    subscribers.get(sessionId)?.forEach((listener) => listener());
   }
 
-  has(sessionId: string): boolean {
-    return this.pool.has(sessionId);
+  function getSnapshot(sessionId: string) {
+    return pool.get(sessionId)?.runtime.getSnapshot();
   }
 
-  async createSession(
-    params?: CreateSessionRequest,
-    options?: AcquireSessionOptions
-  ): Promise<SessionRuntimeContract> {
-    const session = await this.chatSessionService.createSession(params);
-    const retainIds = new Set<string>([session.id]);
-    if (options?.retainSessionId) retainIds.add(options.retainSessionId);
-    await this.ensureCapacity(retainIds);
-
-    const runtime = new SessionRuntime(session.id);
-    await runtime.bootstrap('createSession');
-    this.pool.set(session.id, {
-      runtime,
-      freq: 1,
-      lastUsedAt: Date.now(),
-    });
-    return runtime;
-  }
-
-  async acquire(
-    sessionId: string,
-    options?: AcquireSessionOptions
-  ): Promise<SessionRuntimeContract> {
-    if (sessionId === '') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: 'acquire 缺少 sessionId',
-      });
-    }
-
-    const existing = this.pool.get(sessionId);
-    if (existing) {
-      this.touch(existing);
-      return existing.runtime;
-    }
-
-    const retainIds = new Set<string>([sessionId]);
-    if (options?.retainSessionId) retainIds.add(options.retainSessionId);
-
-    await this.ensureCapacity(retainIds);
-
-    const runtime = new SessionRuntime(sessionId);
-    await runtime.bootstrap('loadSession');
-    this.pool.set(sessionId, {
-      runtime,
-      freq: 1,
-      lastUsedAt: Date.now(),
-    });
-    return runtime;
-  }
-
-  async dispose(sessionId: string): Promise<void> {
-    const entry = this.pool.get(sessionId);
+  async function dispose(sessionId: string): Promise<void> {
+    const entry = pool.get(sessionId);
     if (!entry) return;
-    this.pool.delete(sessionId);
+    pool.delete(sessionId);
+    entry.unsubscribe();
+    notify(sessionId);
     await entry.runtime.cleanup();
   }
 
-  private touch(entry: PoolEntry): void {
-    entry.freq += 1;
-    entry.lastUsedAt = Date.now();
-  }
-
-  private async ensureCapacity(retainIds: ReadonlySet<string>): Promise<void> {
-    while (this.pool.size >= this.capacity) {
-      const victimId = this.pickLfuVictim(retainIds);
-      if (!victimId) return;
-      await this.dispose(victimId);
+  function evictIdleSessions(): void {
+    for (const [sessionId, entry] of pool) {
+      if (pool.size <= POOL_CAPACITY) return;
+      if (subscribers.has(sessionId) || entry.operations > 0 || entry.runtime.isBusy()) continue;
+      void dispose(sessionId);
     }
   }
 
-  /** 频率最低优先；同频取最久未用。retainIds 内不可驱逐。 */
-  private pickLfuVictim(retainIds: ReadonlySet<string>): string | null {
-    let victimId: string | null = null;
-    let victim: PoolEntry | null = null;
+  function getOrCreate(sessionId: string, newSession = false): PoolEntry {
+    if (closed) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+        reason: '会话池已释放',
+      });
+    }
+    const existing = pool.get(sessionId);
+    if (existing) {
+      pool.delete(sessionId);
+      pool.set(sessionId, existing);
+      return existing;
+    }
 
-    for (const [sessionId, entry] of this.pool) {
-      if (retainIds.has(sessionId)) continue;
-      if (
-        !victim ||
-        entry.freq < victim.freq ||
-        (entry.freq === victim.freq && entry.lastUsedAt < victim.lastUsedAt)
-      ) {
-        victimId = sessionId;
-        victim = entry;
+    const runtime = createSessionRuntime(sessionId, newSession);
+    const entry = {
+      runtime,
+      operations: 0,
+      unsubscribe: runtime.subscribe(() => {
+        notify(sessionId);
+        evictIdleSessions();
+      }),
+    };
+    pool.set(sessionId, entry);
+    return entry;
+  }
+
+  function subscribe(
+    sessionId: string,
+    listener: () => void,
+    onLoadError: (error: unknown) => void
+  ): () => void {
+    const entry = getOrCreate(sessionId);
+    const listeners = subscribers.get(sessionId) ?? new Set<() => void>();
+    const first = listeners.size === 0;
+    listeners.add(listener);
+    subscribers.set(sessionId, listeners);
+    listener();
+
+    if (first && entry.operations === 0) {
+      void entry.runtime.refresh({ revalidate: true }).catch((error: unknown) => {
+        if (listeners.size > 0 && pool.get(sessionId) === entry) onLoadError(error);
+      });
+    }
+    evictIdleSessions();
+
+    return () => {
+      listeners.delete(listener);
+      if (listeners.size === 0) subscribers.delete(sessionId);
+      evictIdleSessions();
+    };
+  }
+
+  async function withSession<T>(
+    sessionId: string,
+    run: (runtime: SessionActions) => Promise<T>,
+    { newSession = false } = {}
+  ): Promise<T> {
+    const entry = getOrCreate(sessionId, newSession);
+    entry.operations += 1;
+    notify(sessionId);
+    evictIdleSessions();
+    try {
+      await entry.runtime.refresh();
+      if (pool.get(sessionId) !== entry) {
+        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
+          reason: '会话运行时已释放',
+        });
       }
+      return await run(entry.runtime);
+    } finally {
+      entry.operations -= 1;
+      evictIdleSessions();
     }
-
-    return victimId;
   }
+
+  async function cleanup(): Promise<void> {
+    closed = true;
+    subscribers.clear();
+    await Promise.all([...pool.keys()].map(dispose));
+  }
+
+  return { getSnapshot, subscribe, withSession, dispose, cleanup };
 }

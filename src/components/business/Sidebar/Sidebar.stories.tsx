@@ -11,6 +11,7 @@ import {
   type AppNavigationContextValue,
   AppNavigationProvider,
 } from '@/layouts/AppNavigation/_context';
+import { ChatRuntimeProvider } from '@/runtime/chat';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import UserFeedbackModal from './_common/footer/UserFeedbackModal';
@@ -36,7 +37,9 @@ function SidebarStoryFrame({ children }: { children: ReactNode }) {
     <ServicesProvider>
       <AppAuthProvider mode="authenticated">
         <AppNavigationProvider value={appNavigationValue}>
-          <MemoryRouter>{children}</MemoryRouter>
+          <ChatRuntimeProvider>
+            <MemoryRouter>{children}</MemoryRouter>
+          </ChatRuntimeProvider>
         </AppNavigationProvider>
       </AppAuthProvider>
     </ServicesProvider>
@@ -69,7 +72,9 @@ function AppSidebarStory() {
     <ServicesProvider>
       <AppAuthProvider mode="authenticated">
         <AppNavigationProvider value={appNavigationValue}>
-          <RouterProvider router={router} />
+          <ChatRuntimeProvider>
+            <RouterProvider router={router} />
+          </ChatRuntimeProvider>
         </AppNavigationProvider>
       </AppAuthProvider>
     </ServicesProvider>

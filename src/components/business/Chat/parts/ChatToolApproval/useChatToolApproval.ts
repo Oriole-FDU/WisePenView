@@ -1,9 +1,10 @@
-import type { ChatStatus } from 'ai';
 import { getToolName, isToolUIPart } from 'ai';
 import { useState } from 'react';
 
-import type { WisePenUIMessage } from '@/domains/ChatSession';
-import { getChatRouter } from '@/runtime/chat';
+import { useChatSessions } from '@/runtime/chat';
+import { notifyError } from '@/utils/error';
+
+import type { ChatToolApprovalProps } from './index.type';
 
 interface ToolApprovalRequest {
   toolCallId: string;
@@ -11,65 +12,70 @@ interface ToolApprovalRequest {
   input: unknown;
 }
 
-/** 按消息顺序收集待审批工具，同一调用只进入一次审批队列。 */
-function listToolApprovalRequests(messages: readonly WisePenUIMessage[]): ToolApprovalRequest[] {
+function listToolApprovalRequests(message: ChatToolApprovalProps['messages'][number] | undefined) {
   const requests: ToolApprovalRequest[] = [];
   const seenIds = new Set<string>();
 
-  for (const message of messages) {
-    for (const part of message.parts) {
-      if (!isToolUIPart(part) || part.state !== 'approval-requested') continue;
-      if (seenIds.has(part.toolCallId)) continue;
+  for (const part of message?.parts ?? []) {
+    if (!isToolUIPart(part) || part.state !== 'approval-requested') continue;
+    if (seenIds.has(part.toolCallId)) continue;
 
-      seenIds.add(part.toolCallId);
-      requests.push({
-        toolCallId: part.toolCallId,
-        name: part.title?.trim() || getToolName(part),
-        input: part.input,
-      });
-    }
+    seenIds.add(part.toolCallId);
+    requests.push({
+      toolCallId: part.toolCallId,
+      name: part.title?.trim() || getToolName(part),
+      input: part.input,
+    });
   }
 
   return requests;
 }
 
-type UseChatToolApprovalParams = {
-  sessionId: string | undefined;
-  messages: readonly WisePenUIMessage[];
-  status: ChatStatus;
-};
-
-/** 高危工具审批：收集待批请求，批量回写 Router.approve。 */
-export function useChatToolApproval({ sessionId, messages, status }: UseChatToolApprovalParams) {
+/** 高危工具审批：收集并提交同一回合的审批决定。 */
+export function useChatToolApproval({ sessionId, phase, messages }: ChatToolApprovalProps) {
+  const sessions = useChatSessions();
   const [approvalDecisions, setApprovalDecisions] = useState<Record<string, boolean>>({});
-  const approvalRequests = listToolApprovalRequests(messages);
-  const approvalSubmitting = status === 'submitted' || status === 'streaming';
-  const pendingToolApproval = sessionId
-    ? approvalRequests.find((request) => approvalDecisions[request.toolCallId] === undefined)
-    : undefined;
+  const [submittingToolCallIds, setSubmittingToolCallIds] = useState<ReadonlySet<string>>();
+  const approvalRequests =
+    phase === 'streaming' || phase === 'hanged' ? listToolApprovalRequests(messages.at(-1)) : [];
+  const approvalSubmitting = approvalRequests.some((request) =>
+    submittingToolCallIds?.has(request.toolCallId)
+  );
+  const pendingToolApproval =
+    approvalRequests.find((request) => approvalDecisions[request.toolCallId] === undefined) ??
+    (approvalSubmitting ? approvalRequests.at(-1) : undefined);
 
   const handleApprovalDecision = (toolCallId: string, approved: boolean) => {
     if (!sessionId || approvalSubmitting) return;
     const pendingToolCallIds = approvalRequests.map((request) => request.toolCallId);
     if (!pendingToolCallIds.includes(toolCallId)) return;
 
-    const nextDecisions = { ...approvalDecisions, [toolCallId]: approved };
+    const nextDecisions = Object.fromEntries(
+      Object.entries(approvalDecisions).filter(([id]) => pendingToolCallIds.includes(id))
+    );
+    nextDecisions[toolCallId] = approved;
     setApprovalDecisions(nextDecisions);
     if (pendingToolCallIds.some((pendingId) => nextDecisions[pendingId] === undefined)) return;
 
-    void getChatRouter()
-      .approve(
-        pendingToolCallIds.map((pendingId) => ({
-          toolCallId: pendingId,
-          approved: nextDecisions[pendingId] ?? false,
-        }))
+    const submittedIds = new Set(pendingToolCallIds);
+    setSubmittingToolCallIds(submittedIds);
+    void sessions
+      .withSession(sessionId, (runtime) =>
+        runtime.approve(
+          pendingToolCallIds.map((pendingId) => ({
+            toolCallId: pendingId,
+            approved: nextDecisions[pendingId] ?? false,
+          }))
+        )
       )
-      .finally(() => {
+      .catch((error: unknown) => {
         setApprovalDecisions((current) =>
-          Object.fromEntries(
-            Object.entries(current).filter(([id]) => !pendingToolCallIds.includes(id))
-          )
+          Object.fromEntries(Object.entries(current).filter(([id]) => !submittedIds.has(id)))
         );
+        notifyError(error);
+      })
+      .finally(() => {
+        setSubmittingToolCallIds((current) => (current === submittedIds ? undefined : current));
       });
   };
 

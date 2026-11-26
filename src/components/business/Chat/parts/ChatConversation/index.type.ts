@@ -1,14 +1,13 @@
-import type { ChatStatus } from 'ai';
-
 import type { ChatSession, WisePenUIMessage } from '@/domains/ChatSession';
+import type { SessionPhase } from '@/runtime/chat';
 
 import type { ChatHostAgentPort, ChatProps } from '../../index.type';
 import type { WelcomeScreenConfig } from '../Welcome/Starter/index.type';
 
-/** 消息与历史加载投影（来自壳层 useChatView + route foreground） */
+/** 当前会话的消息、回合状态与历史加载进度。 */
 export interface ChatConversationViewPort {
   messages: readonly WisePenUIMessage[];
-  status: ChatStatus;
+  phase: SessionPhase;
   canLoadMoreHistory: boolean;
   loadingInitialHistory: boolean;
   loadingMoreHistory: boolean;

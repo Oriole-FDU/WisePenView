@@ -2,7 +2,11 @@ import type { PageResult } from '@/domains/_shared/entity/page';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 import type { FrontendStateEntry } from '@/frontendState/definitions';
 
-import type { ChatCompletionApiRequest, ChatRecoverApiRequest } from '../apis/ChatTurnApi.schema';
+import type {
+  ChatCompletionApiRequest,
+  ChatRecoverApiRequest,
+  ChatRespondApiRequest,
+} from '../apis/ChatTurnApi.schema';
 
 interface ChatSelectedResourceContext {
   resourceId: string;
@@ -15,11 +19,6 @@ interface ChatUploadedAttachmentContext {
   attachmentId: string;
   filename: string;
   enabled: boolean;
-}
-
-export interface ToolApprovalStatusRequest {
-  tool_call_id: string;
-  approved: boolean;
 }
 
 export interface ClientToolCapability {
@@ -41,27 +40,11 @@ export interface SendTurnMessageOptions {
   clientToolCapabilities?: ClientToolCapability[];
 }
 
-export interface UseChatTurnOptions {
-  sessionId: string;
-  model?: string;
-  getActiveTurnId: (sessionId: string) => Promise<string | null>;
-  streamChatCompletion: (
-    request: ChatCompletionApiRequest,
-    signal?: AbortSignal
-  ) => Promise<Response>;
-  recoverChatStream: (request: ChatRecoverApiRequest, signal?: AbortSignal) => Promise<Response>;
-  reconnectChatStream: (sessionId: string, signal?: AbortSignal) => Promise<Response>;
-  /** 新建会话标记：跳过首屏历史 hydrate */
-  isNewlyCreatedSession: (sessionId: string) => boolean;
-  /** 会话切换 cleanup 时清除新建标记 */
-  clearNewlyCreatedSession: (sessionId: string) => void;
-  onError?: (error: Error) => void;
-}
-
 export interface IChatTurnService {
   streamChatCompletion(request: ChatCompletionApiRequest, signal?: AbortSignal): Promise<Response>;
   recoverChatStream(request: ChatRecoverApiRequest, signal?: AbortSignal): Promise<Response>;
   reconnectChatStream(sessionId: string, signal?: AbortSignal): Promise<Response>;
+  respondTurn(request: ChatRespondApiRequest): Promise<void>;
   getActiveTurnId(sessionId: string): Promise<string | null>;
   cancelTurn(sessionId: string): Promise<void>;
   listHistoryMessages(

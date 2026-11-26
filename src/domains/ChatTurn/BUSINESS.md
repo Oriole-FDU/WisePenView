@@ -9,9 +9,9 @@
 ## 流式生命周期
 
 - 新消息、工具结果恢复和断线重连使用三个独立 checked SSE Contract；重连只携带 session ID，不把会话历史伪装成新的 completion 请求。依据：[ChatStreamApi](apis/ChatStreamApi.contract.ts)、[ChatTurnApi](apis/ChatTurnApi.contract.ts)。
-- 恢复前先查询 active turn；同一 session 和同一 stream lifecycle 的重复恢复会合并，避免并发建立两条 SSE。切换 session 后迟到的结果失效。依据：[useChatTurn](runtime/useChatTurn.ts) 的 `resumeTurnStream`。
-- 停止前端 stream 与调用后端 cancel 是不同动作；后台 turn 仍可能存活并可在后续页面恢复。依据：[ChatTurnServices](service/ChatTurnServices.impl.ts)、[useChatTurn](runtime/useChatTurn.ts)。
-- 工具审批结果通过 recovery Contract 提交；前端不会把关闭审批视窗解释成允许或拒绝。依据：[ChatStreamApi schema](apis/ChatStreamApi.schema.ts)、[useChatTurn](runtime/useChatTurn.ts) 的 `recoverTurn`。
+- Runtime 加载已有 session 时会对齐 active turn，并在需要时通过 SSE 接续。切换 session 后，旧 session 的迟到结果不得覆盖当前状态。依据：[SessionRuntime](../../runtime/chat/SessionRuntime/index.impl.ts)。
+- 停止前端 stream 与调用后端 cancel 是不同动作；后台 turn 仍可能存活并可在后续页面恢复。依据：[ChatTurnServices](service/ChatTurnServices.impl.ts)、[SessionRuntime](../../runtime/chat/SessionRuntime/index.impl.ts)。
+- 当前活跃回合收到审批决定时调用 `respondTurn`；若加载的回合已挂起，则通过 SSE recovery 提交审批决定并接续流。依据：[ChatTurnApi](apis/ChatTurnApi.ts)、[SessionRuntime](../../runtime/chat/SessionRuntime/index.impl.ts)。
 
 ## 证据限制
 
