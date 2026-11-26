@@ -6,7 +6,7 @@ import { useChatGuards } from './useChatGuards';
 
 type UseChatSessionChromeParams = {
   currentSessionId: string | undefined;
-  selectSession: (sessionId?: string, replace?: boolean) => void | Promise<void>;
+  selectSession: (sessionId?: string) => void | Promise<void>;
   clearResourceChatContext?: () => void;
   onCollapsePanel?: () => void;
 };

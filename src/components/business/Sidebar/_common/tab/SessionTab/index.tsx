@@ -61,7 +61,7 @@ const useSessionTab = () => {
   const handleDeleted = useMemoizedFn((sessionId: string) => {
     void chatRouter.notifySessionDeleted(sessionId);
     if (currentSessionId === sessionId) {
-      void selectRouteSession(undefined, true);
+      void selectRouteSession(undefined, 'replace');
     }
     removeSession(sessionId);
   });

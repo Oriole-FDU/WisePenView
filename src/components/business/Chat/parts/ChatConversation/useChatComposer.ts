@@ -1,12 +1,10 @@
 import { toast } from '@heroui/react';
-import { useLatest, useMemoizedFn } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import type { ChatModel } from '@/domains/ChatConfig';
 import type { CreateSessionRequest, WisePenUIMessage } from '@/domains/ChatSession';
-import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
 import { captureException } from '@/observability';
 import { buildSessionSendPayload, useChatRouter } from '@/runtime/chat';
@@ -36,31 +34,31 @@ export function useChatComposer({
   hostAgentPort,
 }: UseChatComposerParams) {
   const { t } = useTranslation(['chat', 'common']);
-  const { selectSession } = useChatSessionRoute();
   const requestChatSessionHistoryRefresh = useChatSessionHistoryRefreshStore(
     (state) => state.requestRefresh
   );
-  const { locationKey, locationKeyLatest, requireAuth, isRouteLive } = useChatGuards();
-  const sessionIdLatest = useLatest(sessionId);
+  const {
+    locationKey,
+    composerKey,
+    isDraftPromotion,
+    selectSession,
+    requireAuth,
+    isRouteLive,
+    isComposerLive,
+  } = useChatGuards();
   const router = useChatRouter();
 
   const [currentModel, setCurrentModel] = useState<ChatModel | null>(null);
-  const [draftSession, setDraftSession] = useState<{ id: string; locationKey: string }>();
   const pendingHistoryRefreshRef = useRef<string | undefined>(undefined);
-  const sendingLocationRef = useRef<string | undefined>(undefined);
+  const sendingComposerKeys = useRef(new Set<string>());
   const creatingSessionRef = useRef<{
     locationKey: string;
     promise: Promise<string | undefined>;
   } | null>(null);
 
-  if (draftSession && sessionId !== draftSession.id && locationKey !== draftSession.locationKey) {
-    setDraftSession(undefined);
-  }
-
   const resourceStateProvider = resourceChat?.provider;
   const resourceChatContext = resourceChat?.context;
   const clearResourceChatContext = resourceChat?.clearContext;
-  const promoteDraftToolSelection = draftSession !== undefined && sessionId === draftSession.id;
 
   useRefreshHistoryOnFirstContent(
     sessionId,
@@ -69,18 +67,12 @@ export function useChatComposer({
     requestChatSessionHistoryRefresh
   );
 
-  const bindCreatedSessionToRoute = useMemoizedFn(
-    async (createdSessionId: string, startedLocationKey: string) => {
-      if (!isRouteLive(startedLocationKey)) return;
-      flushSync(() => setDraftSession({ id: createdSessionId, locationKey: startedLocationKey }));
-      pendingHistoryRefreshRef.current = createdSessionId;
-      await selectSession(createdSessionId, true);
-      requestChatSessionHistoryRefresh();
-      if (sessionIdLatest.current === createdSessionId && isRouteLive(locationKeyLatest.current)) {
-        return locationKeyLatest.current;
-      }
-    }
-  );
+  async function bindCreatedSessionToRoute(createdSessionId: string, startedLocationKey: string) {
+    if (!isRouteLive(startedLocationKey)) return;
+    pendingHistoryRefreshRef.current = createdSessionId;
+    await selectSession(createdSessionId, 'promote-draft');
+    requestChatSessionHistoryRefresh();
+  }
 
   const ensureSession = useMemoizedFn(async (): Promise<string | undefined> => {
     if (!isRouteLive(locationKey)) return;
@@ -96,7 +88,8 @@ export function useChatComposer({
       const promise = (async () => {
         const createdSessionId = await router.createSession();
         if (!createdSessionId) return;
-        if ((await bindCreatedSessionToRoute(createdSessionId, startedLocationKey)) !== undefined) {
+        await bindCreatedSessionToRoute(createdSessionId, startedLocationKey);
+        if (isComposerLive(startedLocationKey, createdSessionId)) {
           return createdSessionId;
         }
       })();
@@ -110,9 +103,8 @@ export function useChatComposer({
   });
 
   const send = async (text: string, opts?: SendOptions): Promise<boolean> => {
-    const startedLocationKey = locationKey;
-    if (sendingLocationRef.current === startedLocationKey) return false;
-    if (!isRouteLive(startedLocationKey) || !requireAuth()) return false;
+    if (sendingComposerKeys.current.has(composerKey)) return false;
+    if (!isRouteLive(locationKey) || !requireAuth()) return false;
 
     const targetModel = opts?.model ?? currentModel;
     if (!targetModel) return false;
@@ -149,19 +141,14 @@ export function useChatComposer({
       return false;
     }
 
-    sendingLocationRef.current = startedLocationKey;
-    let boundLocationKey: string | undefined;
+    sendingComposerKeys.current.add(composerKey);
     try {
       await router.send(text, {
         sessionId,
         create,
         ...payload.options,
-        onSessionCreated: async (createdSessionId) => {
-          boundLocationKey = await bindCreatedSessionToRoute(createdSessionId, startedLocationKey);
-          if (boundLocationKey && sendingLocationRef.current === startedLocationKey) {
-            sendingLocationRef.current = boundLocationKey;
-          }
-        },
+        onSessionCreated: (createdSessionId) =>
+          bindCreatedSessionToRoute(createdSessionId, locationKey),
       });
     } catch (error) {
       captureException(error, {
@@ -171,12 +158,10 @@ export function useChatComposer({
       toast.danger(parseErrorMessage(error));
       return false;
     } finally {
-      if (sendingLocationRef.current === (boundLocationKey ?? startedLocationKey)) {
-        sendingLocationRef.current = undefined;
-      }
+      sendingComposerKeys.current.delete(composerKey);
     }
 
-    if (!isRouteLive(boundLocationKey ?? startedLocationKey)) return false;
+    if (!isComposerLive(composerKey)) return false;
     payload.finishSend();
     if (resourceChatContext) clearResourceChatContext?.(resourceChatContext);
     return true;
@@ -185,9 +170,8 @@ export function useChatComposer({
   const onSend = (text: string, opts?: SendOptions) => {
     const guarded = hostAgentPort?.interceptSend?.(text, opts);
     if (!guarded) return send(text, opts);
-    const pendingLocationKey = locationKeyLatest.current;
     return guarded.then((accepted) => {
-      if (!accepted || !isRouteLive(pendingLocationKey)) return false;
+      if (!accepted || !isRouteLive(locationKey)) return false;
       return send(text, opts);
     });
   };
@@ -212,7 +196,7 @@ export function useChatComposer({
 
   return {
     currentModel,
-    promoteDraftToolSelection,
+    promoteDraftToolSelection: isDraftPromotion,
     ensureSession,
     onSend,
     onCancel,
