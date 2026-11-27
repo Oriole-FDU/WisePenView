@@ -113,6 +113,8 @@ export const FRONTEND_CLIENT_ERROR = {
   DRAWIO_SAVE_FAILED: 203,
   DRIVE_PAGE_TAG_NOT_FOUND: 204,
   DRIVE_NOTE_TAG_NOT_FOUND: 205,
+  ACCESS_DENIED: 206,
+  USER_MESSAGE: 997,
 } as const;
 
 export type FrontendNetworkErrorCode =

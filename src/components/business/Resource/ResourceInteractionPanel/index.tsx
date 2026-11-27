@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useInfiniteScroll } from 'ahooks';
 import { type Key, useEffect, useRef, useState } from 'react';
@@ -18,7 +17,7 @@ import {
 import type { ResourceItem } from '@/domains/Resource';
 import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, parseErrorMessage, reportError } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
 import ResourceCommentThread from './ResourceCommentThread';
@@ -87,7 +86,10 @@ function ResourceInteractionPanel({
 
   const notifyResourceChanged = () => {
     void Promise.resolve(onResourceChanged?.())
-      .catch((error) => toast.danger(parseErrorMessage(error)))
+      .catch((error) => {
+        const reportedError = createError(error);
+        reportError(reportedError);
+      })
       .finally(refreshInteraction);
   };
 
@@ -195,7 +197,8 @@ function ResourceInteractionPanel({
       }
       return liked;
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
       return wasLiked;
     } finally {
       setPendingLikeIds((current) => {

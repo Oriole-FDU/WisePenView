@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 import { buildInvitePath } from '@/utils/navigation/appRoute';
 
 import type { InviteUserModalProps } from './index.type';
@@ -40,7 +41,12 @@ function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalPr
       return;
     }
 
-    toast.danger(t('member.invite.copyFailed'));
+    const error = createError({
+      code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+      source: 'client',
+      meta: { message: t('member.invite.copyFailed') },
+    });
+    reportError(error);
   };
 
   const handleCopyLink = async () => {
@@ -51,7 +57,12 @@ function InviteUserModal({ isOpen, onOpenChange, inviteCode }: InviteUserModalPr
       return;
     }
 
-    toast.danger(t('member.invite.copyFailed'));
+    const error = createError({
+      code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+      source: 'client',
+      meta: { message: t('member.invite.copyFailed') },
+    });
+    reportError(error);
   };
 
   return (

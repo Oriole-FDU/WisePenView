@@ -11,7 +11,7 @@ import {
   isDocumentTerminalStatus,
 } from '@/domains/Document';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 import { parseExtension } from '@/utils/file/parseExtension';
 import { createUuid } from '@/utils/random/createUuid';
 
@@ -89,7 +89,17 @@ export function useDriveDocumentUpload({ pathTagId, onSuccess }: UseDriveDocumen
     window.setTimeout(() => {
       void settleUploadedDocument(documentId, uploadId).catch((error: unknown) => {
         removeQueuedUpload(uploadId);
-        toast.warning(t('upload.feedback.statusUnknown', { message: parseErrorMessage(error) }));
+        const reportedError = createError({
+          code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+          source: 'client',
+          meta: {
+            message: t('upload.feedback.statusUnknown', {
+              message: parseErrorMessage(error),
+            }),
+          },
+          cause: error,
+        });
+        reportError(reportedError, 'warning');
       });
     }, UPLOAD_STATUS_SYNC_DELAY_MS);
   };

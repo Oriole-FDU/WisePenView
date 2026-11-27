@@ -10,7 +10,7 @@ import type {
 import { useSkillService } from '@/domains';
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
-import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 
 import type {
   ApplySkillMoveOptions,
@@ -231,11 +231,11 @@ export function useSkillFileActionsController({
     if (!skill || !canEditTree) return;
     const moveResult = moveTreeNode(files, dragId, dropId, dropPosition);
     if (!moveResult) {
-      toast.danger(
-        parseErrorMessage(
-          createError({ code: FRONTEND_CLIENT_ERROR.SKILL_MOVE_CONFLICT, source: 'client' })
-        )
-      );
+      const reportedError = createError({
+        code: FRONTEND_CLIENT_ERROR.SKILL_MOVE_CONFLICT,
+        source: 'client',
+      });
+      reportError(reportedError);
       return;
     }
     const remotePathMoves = moveResult.movedFiles.filter(
@@ -333,7 +333,8 @@ export function useSkillFileActionsController({
         onLocalFilesAdded(nextTree, nextFiles, (mainFile ?? nextFiles[0])?.id);
         toast.success(t('toast.zipImported'));
       } catch (error) {
-        toast.danger(parseErrorMessage(error));
+        const reportedError = createError(error);
+        reportError(reportedError);
       }
       return;
     }
@@ -356,7 +357,8 @@ export function useSkillFileActionsController({
       );
       onLocalFilesAdded(nextTree, nextFiles, nextFiles.at(-1)?.id);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     }
   };
 

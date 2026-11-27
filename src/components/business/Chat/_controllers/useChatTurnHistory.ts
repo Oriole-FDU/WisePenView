@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useLatest } from 'ahooks';
 import { useEffect } from 'react';
 
@@ -7,7 +6,7 @@ import { useChatHistory, type WisePenUIMessage } from '@/domains/ChatSession';
 import { useApi } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 
 const HISTORY_PAGE_SIZE = 100;
 
@@ -64,7 +63,8 @@ export function useChatTurnHistory({
     try {
       return await replaceHistory(sessionId);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
       clearConversation();
       return false;
     }
@@ -83,7 +83,8 @@ export function useChatTurnHistory({
     try {
       await prependHistory();
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     }
   };
 

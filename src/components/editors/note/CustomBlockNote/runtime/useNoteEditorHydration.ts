@@ -6,7 +6,7 @@ import type * as Y from 'yjs';
 
 import { usePendingNoteImportStore } from '@/components/editors/note/_store/usePendingNoteImportStore';
 import type { NoteAiDiffPreviewData } from '@/domains/Note';
-import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 
 import { getAiContentStore } from '../engines/aiDiff/store';
 import { importNoteMarkdown } from '../engines/markdown/markdownImport';
@@ -133,7 +133,15 @@ export function useNoteEditorHydration({
       toast.success(t('import.success', { fileName: pendingImport.sourceFileName }));
     } catch (error) {
       usePendingNoteImportStore.getState().removePendingImport(resourceId);
-      toast.danger(t('import.failed', { message: parseErrorMessage(error) }));
+      const reportedError = createError({
+        code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+        source: 'client',
+        meta: {
+          message: t('import.failed', { message: parseErrorMessage(error) }),
+        },
+        cause: error,
+      });
+      reportError(reportedError);
     }
   });
 

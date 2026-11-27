@@ -8,7 +8,7 @@ import { FormField, Input, Select, TextArea, UploadZone } from '@/components/bas
 import ListBox from '@/components/base/ListBox';
 import { FEEDBACK_TYPE, type FeedbackType, useImageService, useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 import {
   assertImageProxyUploadLimit,
   IMAGE_UPLOAD_MAX_SIZE_LABEL,
@@ -76,7 +76,8 @@ function UserFeedbackModal({ isOpen, onOpenChange }: UserFeedbackModalProps) {
       assertImageProxyUploadLimit(file);
       updateFormValue('image', file);
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      const reportedError = createError(err);
+      reportError(reportedError);
     }
   };
 

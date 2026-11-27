@@ -1,9 +1,8 @@
-import { toast } from '@heroui/react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DriveContainerNode, DriveNode } from '@/domains/Drive';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 
 import { buildDriveLoadingNode, type DriveViewNode } from './driveComponentModel';
 
@@ -109,7 +108,8 @@ export function useDrivePagedTreeChildren({
       setNodeChildren(parent.id, children);
       return children;
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      const reportedError = createError(err);
+      reportError(reportedError);
       setNodeChildren(parent.id, []);
       return [];
     }
@@ -146,7 +146,8 @@ export function useDrivePagedTreeChildren({
       setNodeChildren(parent.id, nextChildren);
       return nextChildren;
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      const reportedError = createError(err);
+      reportError(reportedError);
       setNodeChildren(parent.id, currentChildren);
       return currentChildren;
     } finally {

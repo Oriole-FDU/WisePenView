@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,12 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSpeechService } from '@/domains';
 import { resolveXfyunSpeechLanguage, XfyunSpeechRecognizer } from '@/domains/Speech';
 import { useApi } from '@/hooks/useApi';
-import {
-  createError,
-  FRONTEND_CLIENT_ERROR,
-  isWisePenError,
-  parseErrorMessage,
-} from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, isWisePenError, reportError } from '@/utils/error';
 
 import { useChatInputStoreApi } from '../_context';
 import type { VoiceInputProps, VoiceInputState } from './index.type';
@@ -151,7 +145,8 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
           streamRef.current = null;
           originalValueRef.current = '';
           setState('idle');
-          toast.danger(parseErrorMessage(error));
+          const reportedError = createError(error);
+          reportError(reportedError);
         },
       });
       recognizerRef.current = recognizer;
@@ -166,7 +161,8 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
       store.getState().setValue(originalValueRef.current);
       originalValueRef.current = '';
       setState('idle');
-      toast.danger(parseErrorMessage(mapMicrophoneError(error)));
+      const reportedError = createError(mapMicrophoneError(error));
+      reportError(reportedError);
     }
   }
 

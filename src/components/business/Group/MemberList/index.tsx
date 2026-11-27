@@ -7,7 +7,7 @@ import { useGroupService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
 import { useApiPagination } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, parseErrorMessage, reportError } from '@/utils/error';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { MemberListProps } from './index.type';
@@ -215,7 +215,8 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       setSavingRowId(null);
       setErrorRowId(rowId);
       setInlineErrorMessage(parseErrorMessage(err));
-      toast.danger(parseErrorMessage(err));
+      const reportedError = createError(err);
+      reportError(reportedError);
     }
   };
 

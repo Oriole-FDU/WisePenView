@@ -145,19 +145,17 @@ export function useSkillSaveController({
       for (const snapshot of snapshots) {
         const result = resultByKey.get(snapshot.editorKey);
         if (result && !result.error) continue;
-        reportError(
-          createError(
-            result?.error ??
-              createError({
-                code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
-                source: 'client',
-                meta: {
-                  reason: 'Skill 保存结果缺失',
-                },
-              })
-          ),
-          'silence'
+        const error = createError(
+          result?.error ??
+            createError({
+              code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+              source: 'client',
+              meta: {
+                reason: 'Skill 保存结果缺失',
+              },
+            })
         );
+        reportError(error, 'silence');
       }
       setExecutionItems((current) =>
         current.flatMap((item) => {

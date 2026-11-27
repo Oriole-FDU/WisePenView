@@ -9,6 +9,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { ResultState } from '@/components/base/Feedback';
 import { getSupportErrorId } from '@/observability';
 import { copyText } from '@/utils/browser/copyText';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 
 import { buildErrorDetail } from './errorDetail';
 import { buildAppErrorInfo } from './errorInfo';
@@ -43,7 +44,12 @@ function ErrorPage({
       return;
     }
 
-    toast.danger(t('page.copyFailed'));
+    const reportedError = createError({
+      code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+      source: 'client',
+      meta: { message: t('page.copyFailed') },
+    });
+    reportError(reportedError);
   };
 
   return (

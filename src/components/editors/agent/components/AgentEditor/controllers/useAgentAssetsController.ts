@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useAgentService } from '@/domains';
 import type { AgentAsset } from '@/domains/Agent';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 
 interface UseAgentAssetsControllerOptions {
   assets: AgentAsset[];
@@ -29,7 +29,8 @@ export function useAgentAssetsController({
       const latest = await agentService.getAgentDetail(resourceId, draftVersion);
       setAssetOverride(latest.assets);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     }
   };
 

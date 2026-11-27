@@ -11,7 +11,7 @@ import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import { useGroupService, useImageService } from '@/domains';
 import { type EditGroupRequest, type Group, GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
@@ -124,7 +124,8 @@ function GroupProfileSection({ group, groupId, canEdit, onSuccess }: GroupProfil
       assertImageProxyUploadLimit(file);
       setModalCoverFile(file);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
       setModalCoverFile(null);
     }
   };

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { HiddenFileInput } from '@/components/base/Input';
 import { useChatSessionService } from '@/domains';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 import { generateThumbnail } from '@/utils/file/upload';
 import { createUuid } from '@/utils/random/createUuid';
 
@@ -82,7 +82,15 @@ export function ChatInputFileProvider({
       if (!uploadStillSelected) return null;
 
       setPendingAttachmentUploadFailed(id);
-      toast.danger(t('input.attachments.uploadFailed', { error: parseErrorMessage(err) }));
+      const reportedError = createError({
+        code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+        source: 'client',
+        meta: {
+          message: t('input.attachments.uploadFailed', { error: parseErrorMessage(err) }),
+        },
+        cause: err,
+      });
+      reportError(reportedError);
       return null;
     }
   }

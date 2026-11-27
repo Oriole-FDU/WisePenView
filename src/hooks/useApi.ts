@@ -75,7 +75,8 @@ const handleApiError = <TParams extends unknown[]>(
   options: UseApiErrorHandlerOptions<TParams>
 ): void => {
   if (options.onError) {
-    reportError(createError(error), 'silence');
+    const normalizedError = createError(error);
+    reportError(normalizedError, 'silence');
     options.onError(error, params);
     return;
   }

@@ -13,6 +13,7 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { useUserVerificationService } from '@/domains';
 import type { ConfirmEmailVerifyRequest } from '@/domains/UserVerification';
 import { useApi } from '@/hooks/useApi';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import auth from '../_common/style.module.scss';
@@ -43,7 +44,14 @@ function VerifyEmail() {
 
   const onVerify = () => {
     if (loading || !token) {
-      if (!token) toast.danger(t('verifyEmail.invalidToken'));
+      if (!token) {
+        const error = createError({
+          code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+          source: 'client',
+          meta: { message: t('verifyEmail.invalidToken') },
+        });
+        reportError(error);
+      }
       return;
     }
     runVerify(token);

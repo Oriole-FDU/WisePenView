@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { INoteService } from '@/domains/Note';
-import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 
 import {
   type DrawioEditorCommand,
@@ -73,7 +73,10 @@ export function useDrawioEditorSession({
     return () => session.dispose();
   }, [session]);
 
-  const notifyFailure = (error: unknown) => toast.danger(parseErrorMessage(error));
+  const notifyFailure = (error: unknown) => {
+    const reportedError = createError(error);
+    reportError(reportedError);
+  };
   const requestSave = () => {
     if (!canEdit || !editorLoaded) {
       const error = createFailure();

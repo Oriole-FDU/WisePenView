@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { clsx } from 'clsx';
 import { CheckCheck, ChevronDown, ChevronUp, ExternalLink, RotateCw } from 'lucide-react';
@@ -12,7 +11,7 @@ import PageHeader from '@/components/base/PageHeader';
 import { useMessageService } from '@/domains';
 import type { UserMessage } from '@/domains/Message';
 import { useApi, useApiInfiniteScroll } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, parseErrorMessage, reportError } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 import { extractMarkdownPlainText } from '@/utils/markdown/extractMarkdownPlainText';
 import { buildNotificationPath } from '@/utils/navigation/appRoute';
@@ -73,7 +72,10 @@ function NotificationsPage() {
       target: messageListRef,
       isNoMore: (data) => Boolean(data && data.page >= data.totalPage),
       showErrorToast: false,
-      onErrorEffect: (error) => toast.warning(parseErrorMessage(error)),
+      onErrorEffect: (error) => {
+        const reportedError = createError(error);
+        reportError(reportedError, 'warning');
+      },
     }
   );
 
@@ -136,7 +138,8 @@ function NotificationsPage() {
       await readMessages([message.messageId]);
       markLoadedMessageAsRead(message.messageId);
     } catch (error: unknown) {
-      toast.warning(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError, 'warning');
     }
   };
 
@@ -155,7 +158,8 @@ function NotificationsPage() {
       await readMessages(unreadMessages.map((message) => message.messageId));
       markLoadedMessagesAsRead();
     } catch (error: unknown) {
-      toast.warning(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError, 'warning');
     }
   };
 

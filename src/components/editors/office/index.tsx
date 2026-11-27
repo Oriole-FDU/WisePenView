@@ -76,7 +76,8 @@ function OfficeEditorHost({
     (context, editor) => prepareOfficeExit(editor, context)
   );
   const handleError = (nextError: unknown) => {
-    reportError(createError(nextError), 'silence');
+    const error = createError(nextError);
+    reportError(error, 'silence');
     dispatch({ type: 'error', error: nextError });
     onError(nextError);
   };

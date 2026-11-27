@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { FormField, Input, Select, TextArea } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import AppFormDialog from '@/components/business/AppFormDialog';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 
 import type {
   AnnouncementDeliveryScope,
@@ -117,7 +117,8 @@ function CreateAnnouncementModal({ isOpen, onOpenChange, onSubmit }: CreateAnnou
       reset();
       onOpenChange(false);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     } finally {
       setSubmitting(false);
     }

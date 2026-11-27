@@ -7,7 +7,7 @@ import { useCourseService, useImageService } from '@/domains';
 import type { CourseAssessmentItem, CourseDetail, CourseMeeting } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { useFormValidation } from '@/hooks/useFormValidation';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
 import {
@@ -146,7 +146,8 @@ export function useCourseEditorFormController({
       assertImageProxyUploadLimit(file);
       setModalCoverFile(file);
     } catch (error: unknown) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     }
   };
 

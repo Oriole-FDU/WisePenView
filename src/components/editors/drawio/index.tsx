@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import { History, Save } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
@@ -22,7 +21,7 @@ import type { ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, parseErrorMessage, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -268,7 +267,10 @@ function DrawioViewConnected({ resourceId, data, onRefreshDrawioInfo }: DrawioVi
           variant="primary"
           isDisabled={!editorLoaded || saveState === 'saved' || saveState === 'saving'}
           onPress={() =>
-            void requestSave().catch((error) => toast.danger(parseErrorMessage(error)))
+            void requestSave().catch((error) => {
+              const reportedError = createError(error);
+              reportError(reportedError);
+            })
           }
           aria-label={t('actions.save', { ns: 'common' })}
         >

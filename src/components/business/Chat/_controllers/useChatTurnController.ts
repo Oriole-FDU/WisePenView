@@ -10,7 +10,7 @@ import { useChatTurn } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
-import { createError, parseErrorMessage, reportError } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 
 import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
@@ -63,7 +63,8 @@ export function useChatTurnController({
       recoverChatStream: chatTurnService.recoverChatStream,
       reconnectChatStream: chatTurnService.reconnectChatStream,
       onError: (error) => {
-        toast.danger(parseErrorMessage(error));
+        const reportedError = createError(error);
+        reportError(reportedError);
       },
     });
 
@@ -114,7 +115,8 @@ export function useChatTurnController({
     try {
       targetSessionId = await ensureSession(agentParams);
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
       return false;
     }
     if (!targetSessionId) return false;
@@ -154,8 +156,8 @@ export function useChatTurnController({
       toolSelectionOverrides: opts?.toolSelectionOverrides,
       onDemandSkillIds,
     }).catch((error) => {
-      reportError(createError(error), 'silence');
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     });
 
     frontendState.finishSend();
@@ -174,7 +176,15 @@ export function useChatTurnController({
     try {
       await chatTurnService.cancelTurn(targetSessionId);
     } catch (error) {
-      toast.danger(t('input.cancelFailed', { error: parseErrorMessage(error) }));
+      const reportedError = createError({
+        code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+        source: 'client',
+        meta: {
+          message: t('input.cancelFailed', { error: parseErrorMessage(error) }),
+        },
+        cause: error,
+      });
+      reportError(reportedError);
     } finally {
       setCancellingSessionId((sessionId) => (sessionId === targetSessionId ? null : sessionId));
     }
