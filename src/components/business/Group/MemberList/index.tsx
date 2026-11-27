@@ -63,7 +63,6 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
       defaultCurrent: 1,
       defaultPageSize,
       refreshDeps: [groupId],
-      getErrorMessage: () => t('member.loadFailed'),
     }
   );
 

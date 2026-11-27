@@ -43,7 +43,6 @@ function SidebarDriveScopeSwitcher() {
         );
         setGroupTotalPage(result.totalPage);
       },
-      getErrorMessage: () => t('sidebar.loadGroupsFailed'),
     }
   );
   const hasMoreGroups = groupPage < groupTotalPage;

@@ -10,7 +10,7 @@ import type {
 import { useSkillService } from '@/domains';
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type {
   ApplySkillMoveOptions,
@@ -231,7 +231,11 @@ export function useSkillFileActionsController({
     if (!skill || !canEditTree) return;
     const moveResult = moveTreeNode(files, dragId, dropId, dropPosition);
     if (!moveResult) {
-      toast.danger(parseErrorMessage(createClientError(FRONTEND_CLIENT_ERROR.SKILL_MOVE_CONFLICT)));
+      toast.danger(
+        parseErrorMessage(
+          createError({ code: FRONTEND_CLIENT_ERROR.SKILL_MOVE_CONFLICT, source: 'client' })
+        )
+      );
       return;
     }
     const remotePathMoves = moveResult.movedFiles.filter(
@@ -301,11 +305,15 @@ export function useSkillFileActionsController({
           findFileByPathAndName(files, file.path, file.name)
         );
         if (conflicts.length > 0) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_IMPORT_CONFLICT, {
-            fileNames: conflicts
-              .slice(0, 3)
-              .map((file) => file.name)
-              .join('、'),
+          throw createError({
+            code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_IMPORT_CONFLICT,
+            source: 'client',
+            meta: {
+              fileNames: conflicts
+                .slice(0, 3)
+                .map((file) => file.name)
+                .join('、'),
+            },
           });
         }
         const nextFiles = parsedFiles.map((file) => ({

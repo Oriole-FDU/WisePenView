@@ -6,7 +6,7 @@ import { isAccessControlScope } from '@/domains/_shared/access';
 import type { GroupMember } from '@/domains/Group';
 import type { TagTreeNode } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { TagPermissionModalProps } from './index.type';
 import {
@@ -155,7 +155,8 @@ export const useTagPermissionModalController = ({
   const { loading: saving, run: runSavePermission } = useApi(
     async (values: TagPermissionFormValues) => {
       if (!selectedTag?.tagId) return;
-      if (!groupId) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_ID_REQUIRED);
+      if (!groupId)
+        throw createError({ code: FRONTEND_CLIENT_ERROR.GROUP_ID_REQUIRED, source: 'client' });
       if (mode === 'access') {
         await tagService.updateTag({
           groupId,

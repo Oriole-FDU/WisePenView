@@ -1,4 +1,4 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type {
   IssueRecognitionCredentialApiRequest,
@@ -19,7 +19,7 @@ function mapIssueRecognitionCredentialRequest(
   params: IssueRecognitionCredentialRequest
 ): IssueRecognitionCredentialApiRequest {
   if (!Number.isInteger(params.eosMs) || params.eosMs < 1000 || params.eosMs > 10000) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_EOS_INVALID);
+    throw createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_EOS_INVALID, source: 'client' });
   }
   return { provider: 'IFLYTEK', options: { eos_ms: params.eosMs } };
 }
@@ -29,8 +29,12 @@ function mapRecognitionCredentialFromApi(
   params: IssueRecognitionCredentialRequest
 ): SpeechRecognitionCredential {
   if (response.provider !== 'IFLYTEK') {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_PROVIDER_UNSUPPORTED, {
-      provider: response.provider,
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SPEECH_PROVIDER_UNSUPPORTED,
+      source: 'client',
+      meta: {
+        provider: response.provider,
+      },
     });
   }
 
@@ -39,12 +43,20 @@ function mapRecognitionCredentialFromApi(
   try {
     websocketUrl = new URL(websocketUrlValue);
   } catch (error) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CREDENTIAL_INVALID, undefined, error);
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SPEECH_CREDENTIAL_INVALID,
+      source: 'client',
+      cause: error,
+    });
   }
   if (websocketUrl.protocol !== 'wss:' || websocketUrl.hostname !== 'iat-api.xfyun.cn') {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CREDENTIAL_INVALID, {
-      protocol: websocketUrl.protocol,
-      hostname: websocketUrl.hostname,
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SPEECH_CREDENTIAL_INVALID,
+      source: 'client',
+      meta: {
+        protocol: websocketUrl.protocol,
+        hostname: websocketUrl.hostname,
+      },
     });
   }
 

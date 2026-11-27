@@ -1,6 +1,6 @@
 import type * as Y from 'yjs';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import type { CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
@@ -59,8 +59,12 @@ function updateBlock(
     update as Parameters<CustomBlockNoteEditor['updateBlock']>[1]
   ) as unknown as Record<string, unknown>;
   if (!updated) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `AI Diff block 更新未生效：${String(block.id ?? '')}`,
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+      source: 'client',
+      meta: {
+        reason: `AI Diff block 更新未生效：${String(block.id ?? '')}`,
+      },
     });
   }
   return updated;

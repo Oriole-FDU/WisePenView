@@ -7,7 +7,7 @@ import { useSpeechService } from '@/domains';
 import { resolveXfyunSpeechLanguage, XfyunSpeechRecognizer } from '@/domains/Speech';
 import { useApi } from '@/hooks/useApi';
 import {
-  createClientError,
+  createError,
   FRONTEND_CLIENT_ERROR,
   isWisePenError,
   parseErrorMessage,
@@ -36,22 +36,34 @@ function stopStream(stream: MediaStream | null): void {
 function mapMicrophoneError(error: unknown): Error {
   if (error instanceof DOMException) {
     if (error.name === 'NotAllowedError') {
-      return createClientError(
-        FRONTEND_CLIENT_ERROR.MICROPHONE_PERMISSION_DENIED,
-        undefined,
-        error
-      );
+      return createError({
+        code: FRONTEND_CLIENT_ERROR.MICROPHONE_PERMISSION_DENIED,
+        source: 'client',
+        cause: error,
+      });
     }
     if (error.name === 'NotFoundError') {
-      return createClientError(FRONTEND_CLIENT_ERROR.MICROPHONE_NOT_FOUND, undefined, error);
+      return createError({
+        code: FRONTEND_CLIENT_ERROR.MICROPHONE_NOT_FOUND,
+        source: 'client',
+        cause: error,
+      });
     }
     if (error.name === 'NotReadableError') {
-      return createClientError(FRONTEND_CLIENT_ERROR.MICROPHONE_BUSY, undefined, error);
+      return createError({
+        code: FRONTEND_CLIENT_ERROR.MICROPHONE_BUSY,
+        source: 'client',
+        cause: error,
+      });
     }
   }
   return isWisePenError(error)
     ? error
-    : createClientError(FRONTEND_CLIENT_ERROR.VOICE_INPUT_START_FAILED, undefined, error);
+    : createError({
+        code: FRONTEND_CLIENT_ERROR.VOICE_INPUT_START_FAILED,
+        source: 'client',
+        cause: error,
+      });
 }
 
 export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputProps {
@@ -78,10 +90,16 @@ export function useVoiceInput({ disabled }: UseVoiceInputOptions): VoiceInputPro
 
     try {
       if (!globalThis.isSecureContext) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.VOICE_INPUT_HTTPS_REQUIRED);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.VOICE_INPUT_HTTPS_REQUIRED,
+          source: 'client',
+        });
       }
       if (!navigator.mediaDevices?.getUserMedia) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.VOICE_INPUT_UNSUPPORTED);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.VOICE_INPUT_UNSUPPORTED,
+          source: 'client',
+        });
       }
 
       mediaStream = await navigator.mediaDevices.getUserMedia({

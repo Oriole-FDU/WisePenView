@@ -32,7 +32,7 @@ import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveActionTarget } from '../../common/driveComponentModel';
 import { resolveCurrentDriveContainer } from '../../common/driveComponentModel';
@@ -183,7 +183,10 @@ export function useTableDriveActionsController({
         pathTagId: mountTagId,
       });
       if (!resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.NOTE_CREATE_RESOURCE_ID_MISSING,
+          source: 'client',
+        });
       }
       return resourceId;
     },

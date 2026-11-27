@@ -30,7 +30,7 @@ import { type ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceHostContext } from '@/layouts/Resource/_context/host';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import ResourceTargetModal from './ResourceTargetModal';
 
@@ -145,7 +145,10 @@ function ResourceToolbarOperations({
         forkedResourceVersion: copyVersion,
       });
       if (!result.resourceId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_COPY_ID_MISSING);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.RESOURCE_COPY_ID_MISSING,
+          source: 'client',
+        });
       }
       return result.resourceId;
     }
@@ -166,7 +169,10 @@ function ResourceToolbarOperations({
   const mountResource = async (target: DriveContainerNode, targetResourceId: string) => {
     if (target.scope.type === 'group') {
       if (target.type !== 'folder') {
-        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING,
+          source: 'client',
+        });
       }
       await driveService.addResourcesToGroup({ resourceIds: [targetResourceId], target });
       return;

@@ -3,7 +3,7 @@ import {
   toggleMockCommentLike as toggleLikedCommentState,
 } from '@/domains/_shared/mock/commentLikeState.mock';
 import { mockResponse } from '@/domains/_shared/mock/response';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
 
 import type { CommentApi as CommentApiContract } from '../apis/CommentApi';
@@ -170,7 +170,8 @@ async function createMockComment(params: CreateCommentApiRequest): Promise<strin
 async function createMockReply(params: CreateReplyApiRequest): Promise<string> {
   const comments = getComments(params.resourceId);
   const target = comments.find((item) => item.commentId === params.replyTo && !item.deleted);
-  if (!target) throw createClientError(FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND);
+  if (!target)
+    throw createError({ code: FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND, source: 'client' });
   const rootCommentId = target.commentType === 'COMMENT' ? target.commentId : target.rootCommentId;
   const root = comments.find((item) => item.commentId === rootCommentId);
   if (root) root.replyCount += 1;
@@ -198,7 +199,7 @@ async function deleteMockComment(params: CommentItemActionApiRequest): Promise<v
   const comments = getComments(params.resourceId);
   const item = comments.find((comment) => comment.commentId === params.commentId);
   if (!item || item.deleted) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND);
+    throw createError({ code: FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND, source: 'client' });
   }
   item.deleted = true;
   item.content = '';
@@ -214,7 +215,7 @@ async function toggleMockCommentLike(params: CommentItemActionApiRequest): Promi
     (comment) => comment.commentId === params.commentId
   );
   if (!item || item.deleted) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND);
+    throw createError({ code: FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND, source: 'client' });
   }
   const liked = toggleLikedCommentState(params.resourceId, params.commentId);
   item.likeCount = Math.max(0, item.likeCount + (liked ? 1 : -1));

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useImageService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
@@ -78,10 +78,13 @@ export function useNoteImageUploadRuntime({
 
     try {
       if (readOnly) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD,
+          source: 'client',
+        });
       }
       if (!file.type.startsWith('image/')) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
+        throw createError({ code: FRONTEND_CLIENT_ERROR.IMAGE_ONLY, source: 'client' });
       }
 
       assertImageProxyUploadLimit(file);

@@ -13,7 +13,7 @@ import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -100,18 +100,23 @@ function OfficeEditorHost({
         events_onDocumentStateChange={(event) => dispatch({ type: 'modified', event })}
         events_onError={(event) =>
           handleError(
-            createClientError(
-              FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED,
-              { errorCode: 'unknown' },
-              event
-            )
+            createError({
+              code: FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED,
+              source: 'client',
+              meta: { errorCode: 'unknown' },
+              cause: event,
+            })
           )
         }
         onLoadComponentError={(errorCode, errorDescription) => {
           handleError(
-            createClientError(FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED, {
-              errorCode,
-              errorDescription,
+            createError({
+              code: FRONTEND_CLIENT_ERROR.OFFICE_LOAD_FAILED,
+              source: 'client',
+              meta: {
+                errorCode,
+                errorDescription,
+              },
             })
           );
         }}

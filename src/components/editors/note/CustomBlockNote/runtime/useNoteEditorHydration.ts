@@ -6,7 +6,7 @@ import type * as Y from 'yjs';
 
 import { usePendingNoteImportStore } from '@/components/editors/note/_store/usePendingNoteImportStore';
 import type { NoteAiDiffPreviewData } from '@/domains/Note';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import { getAiContentStore } from '../engines/aiDiff/store';
 import { importNoteMarkdown } from '../engines/markdown/markdownImport';
@@ -29,8 +29,12 @@ function splitAiDiffPreviewBlocks(
     const { 'ai-content': aiContent, children, ...block } = snapshot;
     if (Object.prototype.hasOwnProperty.call(snapshot, 'ai-content')) {
       if (aiContent === undefined) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-          reason: `AI Diff Mock 的 ai-content 不能为 undefined：${snapshot.id}`,
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+          source: 'client',
+          meta: {
+            reason: `AI Diff Mock 的 ai-content 不能为 undefined：${snapshot.id}`,
+          },
         });
       }
       aiContentByBlockId.set(snapshot.id, aiContent);
@@ -59,8 +63,12 @@ function initializeAiDiffPreview(params: {
 
   aiContentByBlockId.forEach((_aiContent, blockId) => {
     if (!editor.getBlock(blockId)) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `AI Diff Mock 正文块初始化失败：${blockId}`,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+        source: 'client',
+        meta: {
+          reason: `AI Diff Mock 正文块初始化失败：${blockId}`,
+        },
       });
     }
   });

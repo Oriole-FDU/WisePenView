@@ -1,7 +1,7 @@
 import type { ZodType } from 'zod';
 
 import {
-  createClientError,
+  createError,
   FRONTEND_CLIENT_ERROR,
   FRONTEND_NETWORK_ERROR,
   WisePenError,
@@ -48,16 +48,17 @@ export const parseApiRequest = <Request, Response>(
   const result = contract.request.safeParse(value);
   if (result.success) return result.data;
 
-  throw createClientError(
-    FRONTEND_CLIENT_ERROR.VALIDATION,
-    {
+  throw createError({
+    code: FRONTEND_CLIENT_ERROR.VALIDATION,
+    source: 'client',
+    meta: {
       direction: 'request',
       endpoint: contract.endpoint,
       contract: contract.name,
       issues: summarizeIssues(result.error.issues),
     },
-    result.error
-  );
+    cause: result.error,
+  });
 };
 
 /** 后端响应解包后立即校验消费契约，禁止非法 payload 继续进入 mapper。 */

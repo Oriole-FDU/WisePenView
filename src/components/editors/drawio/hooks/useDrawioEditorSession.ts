@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { INoteService } from '@/domains/Note';
 import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import {
   type DrawioEditorCommand,
@@ -49,7 +49,8 @@ export function useDrawioEditorSession({
         plainText: extractDrawioPlainText(xml),
       }),
   });
-  const createFailure = () => createClientError(FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED);
+  const createFailure = () =>
+    createError({ code: FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED, source: 'client' });
   const [session] = useState(() =>
     createDrawioSaveSession({
       initialXml,
@@ -117,8 +118,12 @@ export function useDrawioEditorSession({
       return;
     }
     if (message.event === 'error') {
-      const error = createClientError(FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED, {
-        detail: message.message,
+      const error = createError({
+        code: FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED,
+        source: 'client',
+        meta: {
+          detail: message.message,
+        },
       });
       captureException(error, {
         detector: 'application-handled',

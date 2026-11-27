@@ -1,4 +1,4 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ResourceItemApi, ResourceTypeApi } from '../apis/ResourceCoreApi.schema';
 import { ResourceTypeApiSchema } from '../apis/ResourceCoreApi.schema';
@@ -198,8 +198,12 @@ export function addMockResource(
 export function getMockResource(resourceId: string): ResourceItemApi {
   const item = mockResources.get(resourceId);
   if (!item)
-    throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING, {
-      resourceId,
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING,
+      source: 'client',
+      meta: {
+        resourceId,
+      },
     });
   return item;
 }

@@ -1,4 +1,4 @@
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import { addAiDiffDomListener } from '../../engines/aiDiff/domCleanup';
@@ -71,8 +71,12 @@ function renderTableCellContent(
     if (!isRecord(inline) || typeof inline.type !== 'string') continue;
     const owner = registry.inlinePlugins.get(inline.type);
     if (!owner) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `AI Diff 表格候选缺少 inline owner：${inline.type}`,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+        source: 'client',
+        meta: {
+          reason: `AI Diff 表格候选缺少 inline owner：${inline.type}`,
+        },
       });
     }
     paragraph.appendChild(owner.aiDiff.renderAiContent(inline, registry));

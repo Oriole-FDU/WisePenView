@@ -7,7 +7,7 @@ import {
 } from '@blocknote/core';
 import { Image as ImageIcon } from 'lucide-react';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { projectInlinePlainText } from '../../engines/plainText';
 import { collectInlineTextMatches } from '../../engines/search/findReplace';
@@ -68,8 +68,12 @@ function createDefaultBlockPlugin(
 ) {
   const spec = (defaultBlockSpecs as BlockSpecs)[type];
   if (!spec) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: `BlockNote 默认 block spec 不存在：${type}`,
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+      source: 'client',
+      meta: {
+        reason: `BlockNote 默认 block spec 不存在：${type}`,
+      },
     });
   }
   return {

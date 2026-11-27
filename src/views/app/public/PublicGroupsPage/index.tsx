@@ -47,7 +47,6 @@ function PublicGroupsPage() {
     {
       refreshDeps: [query.role, query.page, query.size],
       loadingDelay: 160,
-      getErrorMessage: () => t('list.loadFailed'),
       showErrorToast: false,
     }
   );
