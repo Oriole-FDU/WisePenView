@@ -1,6 +1,6 @@
 # 前端错误契约
 
-目标契约。`createError` / `reportError` 与 `lint/error.js` 已接入；调用点仍在迁移。可观测细节见 [`observability.md`](./observability.md)；迁移时同步改写 [`domain-service.md`](./domain-service.md) 等仍写旧入口的文档。
+本文阐述如何在前端创建、处理、消费、上报
 
 ## 1. 设计原则
 
@@ -51,7 +51,7 @@ reportError(error: WisePenError, toast?: ReportToast): string // 默认 'error'�
 
 禁止：`createClientError`；业务侧 `new WisePenError` / `captureException` / `toast.*(parseErrorMessage)`；Domain、API、共享工具内 `reportError`。
 
-需要一并收掉的现状：`createClientError` 自动上报、`notifyError` 与 toast 旁路、业务侧 `application-handled`、直接 `new WisePenError`。
+已收口：`createClientError` / `notifyError` / 错误 toast 旁路、业务侧 `application-handled` 与直接 `new WisePenError`。
 
 ## 3. 写法示范
 

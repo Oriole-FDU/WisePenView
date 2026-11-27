@@ -18,7 +18,7 @@
 - `domain-mapper.md`：按需映射、fallback、协议兼容和归一化。
 - `domain-service.md`：Service 编排、依赖注入和错误处理。
 - `domain-entity.md`：Entity、Enum、常量和类型边界。
-- `error.md`：前端唯一错误类型、`createError` / `reportError` 契约（目标规范，待落地）。
+- `error.md`：前端唯一错误类型、`createError` / `reportError` 契约与分层规则。
 
 推荐顺序：`domain-service.md -> domain-mapper.md -> domain-api.md -> domain-entity.md`；涉及抛错或错误消费时加读 `error.md`。
 

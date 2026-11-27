@@ -181,7 +181,7 @@ api -> views/components
 - `apiGet/apiPost/apiPut/apiPatch/apiDelete/apiGetText` 在 `src/observability/request.ts` 建立逻辑请求 span；
   HTTP、network、timeout、business、contract 和 canceled 在最终结果边界统一分类。
 - API 层不得直接调用 telemetry、OTel 或自行维护请求去重。
-- 客户端业务校验错误放到 service 层，通过 `createClientError` 抛出。
+- 客户端业务校验错误放到 service 层，通过 `createError` 创建并抛出；API 层不展示 toast。
 
 ## 五、检查清单
 
