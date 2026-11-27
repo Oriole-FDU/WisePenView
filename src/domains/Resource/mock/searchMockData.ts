@@ -215,7 +215,7 @@ function highlight(text: string, keyword: string): string {
 }
 
 /** 取关键词上下文摘要并高亮；正文未命中返回 null（对齐后端「仅标题命中时 highlightContent 为 null」） */
-function buildContentSnippet(content: string, keyword: string): string | null {
+export function buildContentSnippet(content: string, keyword: string): string | null {
   const lowerContent = content.toLowerCase();
   const lowerKeyword = keyword.toLowerCase();
   if (lowerKeyword === '' || !lowerContent.includes(lowerKeyword)) return null;

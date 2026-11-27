@@ -24,9 +24,7 @@ function CourseHomeTab() {
   const navigate = useNavigate();
   const location = useLocation();
   const canEditOutline = course.myRole === COURSE_ROLE.TEACHER;
-  const { data, loading, error, refresh } = useApi(() =>
-    courseService.getCourseHome(course.courseId)
-  );
+  const { data, loading, error, refresh } = useApi(() => courseService.getCourseHome(course));
 
   if (loading) {
     return (

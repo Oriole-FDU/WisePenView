@@ -1,3 +1,5 @@
+import { ResourceItemApi } from '@domain-apis';
+
 import { GROUP_TYPE, type IGroupService } from '@/domains/Group';
 import type { IResourceService } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR, TAG_QUERY_LOGIC_MODE } from '@/domains/Resource';
@@ -68,11 +70,13 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
   };
 
   const getCourseDetail = async (courseId: string) => {
-    const group = await groupService.fetchGroupInfo(courseId);
+    const [group, role] = await Promise.all([
+      groupService.fetchGroupBaseInfo(courseId),
+      groupService.fetchMyRoleInGroup(courseId),
+    ]);
     if (group.groupType !== GROUP_TYPE.ADVANCED) {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_NOT_FOUND, { courseId });
     }
-    const role = await groupService.fetchMyRoleInGroup(courseId);
     return CourseServicesMap.mapGroupToCourseDetail(group, role);
   };
 
@@ -122,20 +126,15 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     await groupService.deleteGroup({ groupId: courseId });
   };
 
-  const getCourseOutlineRoot = async (courseId: string): Promise<TagTreeNode> => {
-    const [group, tags] = await Promise.all([
-      groupService.fetchGroupInfo(courseId),
-      tagService.getTagTree(courseId),
-    ]);
-    if (group.groupType !== GROUP_TYPE.ADVANCED) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_NOT_FOUND, { courseId });
-    }
-    const outlineRootTagId = CourseServicesMap.parseCourseMeta(
-      group.groupMetaInfo
-    ).outlineRootTagId;
+  const readOutlineRoot = async (
+    courseId: string,
+    outlineRootTagId: string | undefined,
+    refresh?: boolean
+  ): Promise<TagTreeNode> => {
     if (!outlineRootTagId) {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, { courseId });
     }
+    const tags = await tagService.getTagTree(courseId, { refresh });
     const outlineRoot = findTag(tags, outlineRootTagId);
     if (!outlineRoot) {
       throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, {
@@ -146,8 +145,20 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     return outlineRoot;
   };
 
-  const getCourseOutline: ICourseService['getCourseOutline'] = async (courseId) => {
-    const outlineRoot = await getCourseOutlineRoot(courseId);
+  const getCourseOutlineRoot = async (courseId: string) => {
+    const group = await groupService.fetchGroupBaseInfo(courseId);
+    if (group.groupType !== GROUP_TYPE.ADVANCED) {
+      throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_NOT_FOUND, { courseId });
+    }
+    const { outlineRootTagId } = CourseServicesMap.parseCourseMeta(group.groupMetaInfo);
+    return readOutlineRoot(courseId, outlineRootTagId);
+  };
+
+  const getCourseOutline: ICourseService['getCourseOutline'] = async (
+    { courseId, outlineRootTagId },
+    refresh
+  ) => {
+    const outlineRoot = await readOutlineRoot(courseId, outlineRootTagId, refresh);
     const outlineTags = outlineRoot.children ?? [];
     return {
       courseId,
@@ -158,13 +169,9 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
   const loadCourseOutlineResources: ICourseService['loadCourseOutlineResources'] = async ({
     courseId,
     nodeId,
+    resourceOrder,
     cursor,
   }) => {
-    const outlineRoot = await getCourseOutlineRoot(courseId);
-    const tag = findTag(outlineRoot.children ?? [], nodeId);
-    if (!tag) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.COURSE_OUTLINE_NODE_NOT_FOUND, { nodeId });
-    }
     const page = parseCourseResourceCursor(cursor);
     const result = await resourceService.getGroupResources({
       groupId: courseId,
@@ -184,14 +191,41 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
         ? resolvedPage < resolvedTotalPage
         : resolvedPage * COURSE_RESOURCE_PAGE_SIZE < resolvedTotal;
     return {
-      list: CourseServicesMap.mapCourseOutlineResourceNodes(result.list, nodeId, tag.tagMetaInfo),
+      list: CourseServicesMap.mapCourseOutlineResourceNodes(result.list, nodeId, resourceOrder),
       total: resolvedTotal,
       ...(hasMore ? { nextCursor: String(resolvedPage + 1) } : {}),
     };
   };
 
-  const getCourseHome: ICourseService['getCourseHome'] = async (courseId) => {
-    const outline = await getCourseOutline(courseId);
+  const searchCourseResources: ICourseService['searchCourseResources'] = ({
+    courseId,
+    keyword,
+    cursor,
+  }) => ResourceItemApi.searchCourseResources({ groupId: courseId, keyword, cursor });
+
+  const getCourseOutlineResource: ICourseService['getCourseOutlineResource'] = async ({
+    courseId,
+    tagId,
+    resourceId,
+  }) => {
+    const resource = await ResourceItemApi.getCourseOutlineResource({
+      groupId: courseId,
+      tagId,
+      resourceId,
+    });
+    return {
+      nodeId: `${resource.tagId}:${resource.resourceId}`,
+      nodeType: 'RESOURCE',
+      title: resource.resourceName,
+      resourceId: resource.resourceId,
+      resourceType: resource.resourceType,
+      viewer: resource.resourceType === 'VIDEO' ? 'video' : undefined,
+      read: resource.read,
+    };
+  };
+
+  const getCourseHome: ICourseService['getCourseHome'] = async (course) => {
+    const outline = await getCourseOutline(course);
     return {
       progress: CourseServicesMap.calculateCourseOutlineProgress(outline.nodes),
       pendingAssignments: [],
@@ -200,8 +234,10 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
   };
 
   const getCourseOutlineEditor: ICourseService['getCourseOutlineEditor'] = async (courseId) => {
-    const outline = await getCourseOutline(courseId);
-    return CourseServicesMap.mapCourseOutlineEditorNodes(outline.nodes);
+    const root = await getCourseOutlineRoot(courseId);
+    return CourseServicesMap.mapCourseOutlineEditorNodes(
+      CourseServicesMap.mapCourseOutlineNodes(root.children ?? [])
+    );
   };
 
   const createCourseOutlineSection: ICourseService['createCourseOutlineSection'] = async ({
@@ -356,6 +392,8 @@ export const createCourseServices = (deps: CourseServicesDeps): ICourseService =
     listCourseAnnouncements: unavailable,
     getCourseOutline,
     loadCourseOutlineResources,
+    searchCourseResources,
+    getCourseOutlineResource,
     setResourceRead: ({ resourceId }) => resourceInteractionService.recordResourceRead(resourceId),
     listCourseMembers,
     createCourse,

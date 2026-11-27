@@ -176,6 +176,41 @@ export const GlobalSearchHitApiSchema = z.object({
 export const GlobalSearchResourcesApiResponseSchema =
   createPageResponseSchema(GlobalSearchHitApiSchema);
 
+export const CourseResourceSearchApiRequestSchema = z.strictObject({
+  groupId: JavaLongStringSchema,
+  keyword: NonBlankStringSchema.max(200),
+  cursor: NonEmptyStringSchema.max(512).optional(),
+  size: z.number().int().min(1).max(100).optional(),
+});
+
+const CourseResourceApiSchema = z.object({
+  resourceId: OpaqueIdSchema,
+  resourceType: ResourceTypeApiSchema,
+  resourceName: NonEmptyStringSchema,
+});
+
+export const CourseResourceSearchApiResponseSchema = z.object({
+  list: z.array(
+    CourseResourceApiSchema.extend({
+      tagIds: z.array(OpaqueIdSchema).min(1),
+      canView: z.boolean(),
+      highlightContent: NullableStringSchema,
+    })
+  ),
+  nextCursor: NullableStringSchema,
+});
+
+export const CourseOutlineResourceApiRequestSchema = z.strictObject({
+  groupId: JavaLongStringSchema,
+  tagId: OpaqueIdSchema,
+  resourceId: OpaqueIdSchema,
+});
+
+export const CourseOutlineResourceApiResponseSchema = CourseResourceApiSchema.extend({
+  tagId: OpaqueIdSchema,
+  read: z.boolean(),
+});
+
 export type ResourceTypeApi = z.infer<typeof ResourceTypeApiSchema>;
 export type ResourceTagInfoApi = z.infer<typeof ResourceTagInfoApiSchema>;
 export type ResourceBaseInfoApi = z.infer<typeof ResourceBaseInfoApiSchema>;

@@ -12,8 +12,12 @@ export const RESOURCE_TYPE = defineEnum([
   'PPTX',
   'XLS',
   'XLSX',
+  'IMAGE',
+  'VIDEO',
+  'AUDIO',
   'SKILL',
   'AGENT',
+  'QUESTIONNAIRE',
   'SINGLE_HTML_PAGE',
   'UNKNOWN',
 ] as const);

@@ -1,5 +1,5 @@
 import { normalizeResourceActions } from '@/domains/_shared/access';
-import type { Group, GroupBaseInfo, GroupMemberList, GroupResConfig } from '@/domains/Group';
+import type { Group, GroupMemberList, GroupResConfig } from '@/domains/Group';
 import { normalizeUserDisplayBaseFromApi } from '@/domains/User/mapper/userEnum.mapper';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
@@ -9,7 +9,6 @@ import type {
   AddGroupApiRequest,
   ChangeGroupApiRequest,
   ChangeGroupConfigApiRequest,
-  GetGroupBaseInfoApiResponse,
   GetGroupConfigApiResponse,
   GetMyRoleInGroupApiResponse,
   ListGroupApiRequest,
@@ -91,15 +90,6 @@ const mapFetchGroupListFromApi = (data: ListGroupApiResponse): FetchGroupListRes
   hasMore: data.page < data.totalPage,
 });
 
-const mapFetchGroupBaseInfoFromApi = (data: GetGroupBaseInfoApiResponse): GroupBaseInfo => ({
-  groupId: data.groupId,
-  groupName: data.groupName,
-  groupDesc: data.groupDesc,
-  groupCoverUrl: data.groupCoverUrl ?? '',
-  groupMetaInfo: parseGroupMetaInfo(data.groupMetaInfo),
-  groupType: data.groupType,
-});
-
 const mapFetchGroupResConfigFromApi = (data: GetGroupConfigApiResponse): GroupResConfig => {
   return {
     groupId: data.groupId,
@@ -146,7 +136,6 @@ export const GroupServicesMap = {
   mapFetchGroupListRequest,
   mapFetchGroupListFromApi,
   mapGroupFromApi,
-  mapFetchGroupBaseInfoFromApi,
   mapFetchGroupResConfigFromApi,
   mapUpdateGroupResConfigRequest,
   mapCreateGroupRequest,

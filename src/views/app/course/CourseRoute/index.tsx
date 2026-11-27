@@ -13,11 +13,10 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import CourseTourScope from './CourseTourScope';
 import styles from './style.module.scss';
 
-function CourseRoute() {
+function CourseRouteContent({ courseId }: { courseId: string }) {
   const { t } = useTranslation('course');
   const courseService = useCourseService();
   const navigate = useNavigate();
-  const { courseId = '' } = useParams<{ courseId: string }>();
   const { data, loading, error, refresh } = useApi(() => courseService.getCourseDetail(courseId), {
     ready: Boolean(courseId),
     refreshDeps: [courseId],
@@ -62,4 +61,7 @@ function CourseRoute() {
   );
 }
 
-export default CourseRoute;
+export default function CourseRoute() {
+  const { courseId = '' } = useParams<{ courseId: string }>();
+  return <CourseRouteContent key={courseId} courseId={courseId} />;
+}

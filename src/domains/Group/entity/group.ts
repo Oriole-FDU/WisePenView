@@ -50,20 +50,14 @@ export interface GroupBaseInfo {
   groupCoverUrl: string;
   groupMetaInfo: Record<string, unknown>;
   groupType: GroupType;
-}
-
-/** 小组结构（与 OpenAPI GroupDetailInfoResponse/GroupItemInfoResponse 对齐） */
-export interface Group {
-  groupId: string;
-  groupName: string;
-  groupDesc: string;
-  groupCoverUrl: string;
-  groupMetaInfo: Record<string, unknown>;
-  groupType: GroupType;
   ownerId?: string;
   ownerInfo?: GroupOwnerInfo;
   memberCount: number;
   createTime?: string;
+}
+
+/** 小组详情（与 OpenAPI GroupDetailInfoResponse 对齐） */
+export interface Group extends GroupBaseInfo {
   inviteCode?: string;
   tokenUsed?: number;
   tokenBalance?: number;

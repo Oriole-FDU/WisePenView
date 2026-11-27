@@ -1,3 +1,4 @@
+import { useDebounce } from 'ahooks';
 import { ArrowLeft, CheckCircle2, Circle, LoaderCircle, Plus, Search } from 'lucide-react';
 import type { Key, KeyboardEvent } from 'react';
 import { useState } from 'react';
@@ -19,10 +20,15 @@ import type { CourseOutlineContainerNode, CourseOutlineNode } from '@/domains/Co
 import ResourceLayoutHeader from '@/layouts/Resource/ResourceLayout/ResourceLayoutHeader';
 import { parseErrorMessage } from '@/utils/error';
 
-import { type CourseOutlineResourcePageState, findOutlineNode } from '../../model';
+import {
+  type CourseOutlineResourcePageState,
+  findOutlineNode,
+  type indexOutlineSections,
+} from '../../model';
 import styles from '../../style.module.scss';
 import CourseOutlineMoveModal from './CourseOutlineMoveModal';
 import CourseOutlineNodeTitle from './CourseOutlineNodeTitle';
+import CourseOutlineSearchResults from './CourseOutlineSearchResults';
 import CourseResourcePickerModal from './CourseResourcePickerModal';
 import {
   type CourseOutlineResourceTarget,
@@ -38,17 +44,18 @@ interface CourseOutlineSidebarProps {
   nodes: CourseOutlineNode[];
   allNodes: CourseOutlineNode[];
   selectedNodeId?: string;
-  searchQuery: string;
-  expandSearchResults: boolean;
+  sections: ReturnType<typeof indexOutlineSections>;
+  expandedKeys: string[];
+  onExpandedKeysChange: (keys: string[]) => void;
   loading: boolean;
   error?: Error;
   resourcePageStateMap: Map<string, CourseOutlineResourcePageState>;
-  onSearchQueryChange: (value: string) => void;
   onSelectNode: (nodeId: string) => void;
   onOpenCourseHome: () => void;
   onExpandNode: (nodeId: string) => void;
   onLoadMoreResources: (nodeId: string) => void;
-  onRefresh: () => void;
+  onRetryResources: (nodeId: string) => void;
+  onRefresh: (affectedTags?: string[]) => void;
   onRetry: () => void;
 }
 
@@ -62,11 +69,13 @@ interface CourseOutlineTreeActions {
   onDelete: (node: CourseOutlineContainerNode) => void;
   onMoveResource: (target: CourseOutlineResourceTarget) => void;
   onRemoveResource: (target: CourseOutlineResourceTarget) => void;
+  onExpandNode: (nodeId: string) => void;
   onLoadMoreResources: (nodeId: string) => void;
+  onRetryResources: (nodeId: string) => void;
 }
 
 interface CourseOutlineResourcePageTitleProps {
-  state: CourseOutlineResourcePageState;
+  state?: CourseOutlineResourcePageState;
   onLoadMore: () => void;
 }
 
@@ -75,23 +84,30 @@ function CourseOutlineResourcePageTitle({
   onLoadMore,
 }: CourseOutlineResourcePageTitleProps) {
   const { t } = useTranslation('course');
+  if (state?.loaded && !state.loading && !state.error && !state.nextCursor) {
+    return state.list.length === 0 ? <span>{t('outline.chapterEmpty')}</span> : null;
+  }
   return (
     <AppPressable
       className={styles.outlineLoadMore}
-      disabled={state.loading}
+      disabled={state?.loading}
       onClick={(event) => {
         event.stopPropagation();
-        if (!state.loading) onLoadMore();
+        onLoadMore();
       }}
     >
-      {state.loading ? <LoaderCircle size={14} className={styles.outlineLoadingIcon} /> : null}
+      {state?.loading ? <LoaderCircle size={14} className={styles.outlineLoadingIcon} /> : null}
       <span>
-        {state.loading
-          ? t('outline.loadingResources')
-          : t('outline.loadMoreResources', {
-              loaded: state.loadedCount,
-              total: state.total,
-            })}
+        {!state
+          ? t('outline.loadResources')
+          : state.loading
+            ? t('outline.loadingResources')
+            : state.error
+              ? t('common.retry')
+              : t('outline.loadMoreResources', {
+                  loaded: state.list.length,
+                  total: state.total,
+                })}
       </span>
     </AppPressable>
   );
@@ -113,11 +129,12 @@ const toTreeData = (
           <Circle size={13} className={styles.unreadIcon} aria-label="unread" />
         )
       ) : undefined;
+    const canEdit = editable && (node.nodeType !== 'RESOURCE' || node.currentTagIds !== undefined);
     const title = (
       <CourseOutlineNodeTitle
         node={node}
         parentId={parentId}
-        editable={editable}
+        editable={canEdit}
         readIndicator={readIndicator}
         canMoveContainer={actions.canMoveContainer}
         onCreateChild={actions.onCreateChild}
@@ -135,10 +152,13 @@ const toTreeData = (
       return {
         key: node.nodeId,
         isLeaf: true,
-        draggable: editable,
+        draggable: canEdit,
         title,
       };
     }
+    const page = resourcePageStateMap.get(node.nodeId);
+    const showPageRow =
+      !page || page.loading || page.error || page.nextCursor || page.list.length === 0;
     return {
       key: node.nodeId,
       isLeaf: false,
@@ -146,8 +166,7 @@ const toTreeData = (
       title,
       children: [
         ...toTreeData(node.children, editable, actions, resourcePageStateMap, node.nodeId),
-        ...(resourcePageStateMap.get(node.nodeId)?.loading ||
-        resourcePageStateMap.get(node.nodeId)?.nextCursor
+        ...(showPageRow
           ? [
               {
                 key: `course-outline-resource-page:${node.nodeId}`,
@@ -156,8 +175,12 @@ const toTreeData = (
                 draggable: false,
                 title: (
                   <CourseOutlineResourcePageTitle
-                    state={resourcePageStateMap.get(node.nodeId)!}
-                    onLoadMore={() => actions.onLoadMoreResources(node.nodeId)}
+                    state={page}
+                    onLoadMore={() => {
+                      if (!page) actions.onExpandNode(node.nodeId);
+                      else if (page.error) actions.onRetryResources(node.nodeId);
+                      else actions.onLoadMoreResources(node.nodeId);
+                    }}
                   />
                 ),
               },
@@ -169,6 +192,14 @@ const toTreeData = (
 
 function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
   const { t } = useTranslation('course');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
+  const keyword = searchQuery.trim();
+  const debouncedKeyword = useDebounce(isComposing ? '' : keyword, { wait: 250 });
+  const handleSearchResult = (nodeId: string) => {
+    setSearchQuery('');
+    props.onSelectNode(nodeId);
+  };
   const [isCreatingChapter, setIsCreatingChapter] = useState(false);
   const [chapterName, setChapterName] = useState('');
   const editor = useCourseOutlineEditingController({
@@ -176,6 +207,8 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
     nodes: props.allNodes,
     onMutated: props.onRefresh,
   });
+  const cloudMountTagId = editor.cloudMount.target?.nodeId;
+  const localUploadTagId = editor.localUpload.target?.nodeId;
   const treeActions: CourseOutlineTreeActions = {
     canMoveContainer: editor.sectionReorder.canMove,
     onCreateChild: (node) => editor.sectionDialog.openCreate(node.nodeId),
@@ -186,7 +219,9 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
     onDelete: editor.sectionDeletion.open,
     onMoveResource: editor.resourceMovement.open,
     onRemoveResource: editor.resourceRemoval.open,
+    onExpandNode: props.onExpandNode,
     onLoadMoreResources: props.onLoadMoreResources,
+    onRetryResources: props.onRetryResources,
   };
 
   const allowTreeDrop = ({ dragNode, dropNode, dropPosition }: TreeAllowDropInfo) => {
@@ -305,18 +340,34 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
             <Input
               aria-label={t('outline.searchPlaceholder')}
               placeholder={t('outline.searchPlaceholder')}
-              value={props.searchQuery}
-              onChange={(event) => props.onSearchQueryChange(event.target.value)}
+              value={searchQuery}
+              maxLength={200}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
             />
           </div>
         </div>
 
-        <div className={styles.outlineTree}>
+        {keyword ? (
+          <div className={styles.outlineTree}>
+            {!isComposing && debouncedKeyword === keyword ? (
+              <CourseOutlineSearchResults
+                key={keyword}
+                courseId={props.courseId}
+                keyword={keyword}
+                sections={props.sections}
+                onOpenNode={handleSearchResult}
+              />
+            ) : null}
+          </div>
+        ) : null}
+        <div className={styles.outlineTree} hidden={Boolean(keyword)}>
           {props.loading ? <Spin tip={t('sidebar.loading')} /> : null}
           {props.error ? (
             <div className={styles.outlineState}>
               <span>{parseErrorMessage(props.error)}</span>
-              <AppButton variant="secondary" size="sm" onPress={props.onRetry}>
+              <AppButton variant="secondary" size="sm" onPress={() => props.onRetry()}>
                 {t('common.retry')}
               </AppButton>
             </div>
@@ -336,8 +387,9 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
               allowDrop={allowTreeDrop}
               onDrop={handleTreeDrop}
               selectedKeys={props.selectedNodeId ? [props.selectedNodeId] : []}
-              defaultExpandAll={props.expandSearchResults}
-              onExpand={(_keys, info) => {
+              expandedKeys={props.expandedKeys}
+              onExpand={(keys, info) => {
+                props.onExpandedKeysChange(keys.map(String));
                 if (info.expanded) props.onExpandNode(String(info.node.key));
               }}
               onSelect={(_keys: Key[], info: { node: DataNode }) =>
@@ -391,28 +443,28 @@ function CourseOutlineSidebar(props: CourseOutlineSidebarProps) {
             onConfirm={editor.sectionDeletion.confirm}
           />
 
-          {editor.cloudMount.target ? (
+          {editor.cloudMount.target && cloudMountTagId ? (
             <CourseResourcePickerModal
               isOpen
               courseId={props.courseId}
-              targetNodeId={editor.cloudMount.target.nodeId}
+              targetNodeId={cloudMountTagId}
               targetName={editor.cloudMount.target.title}
               onOpenChange={(open) => {
                 if (!open) editor.cloudMount.close();
               }}
-              onSuccess={props.onRefresh}
+              onSuccess={() => props.onRefresh([cloudMountTagId])}
             />
           ) : null}
 
-          {editor.localUpload.target ? (
+          {localUploadTagId ? (
             <UploadDocumentModal
               isOpen
-              pathTagId={editor.localUpload.target.nodeId}
+              pathTagId={localUploadTagId}
               description={t('editor.outline.localUploadDescription')}
               onOpenChange={(open) => {
                 if (!open) editor.localUpload.close();
               }}
-              onSuccess={props.onRefresh}
+              onSuccess={() => props.onRefresh([localUploadTagId])}
             />
           ) : null}
 

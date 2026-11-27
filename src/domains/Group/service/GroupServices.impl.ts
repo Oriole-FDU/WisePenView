@@ -41,7 +41,7 @@ const fetchGroupInfo = async (groupId: string): Promise<Group> => {
 
 const fetchGroupBaseInfo = async (groupId: string): Promise<GroupBaseInfo> => {
   const data = await GroupApi.getGroupBaseInfo({ groupId });
-  return GroupServicesMap.mapFetchGroupBaseInfoFromApi(data);
+  return GroupServicesMap.mapGroupFromApi(data);
 };
 
 const getGroupWalletInfo = async (params: GetGroupWalletInfoRequest): Promise<number> => {
