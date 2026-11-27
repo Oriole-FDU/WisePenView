@@ -12,8 +12,7 @@ import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
-import { captureException } from '@/observability';
-import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
@@ -77,10 +76,7 @@ function OfficeEditorHost({
     (context, editor) => prepareOfficeExit(editor, context)
   );
   const handleError = (nextError: unknown) => {
-    captureException(nextError, {
-      detector: 'application-handled',
-      operation: 'office.sdk',
-    });
+    reportError(createError(nextError), 'silence');
     dispatch({ type: 'error', error: nextError });
     onError(nextError);
   };

@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSkillService } from '@/domains';
 import type { SkillDetail, UploadSkillAssetResult } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
-import { captureException } from '@/observability';
-import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 
 import type { SkillSaveQueueItem } from '../components/SkillSaveQueueDock/index.type';
 import { resolveSkillSavePhase } from '../model';
@@ -128,10 +127,6 @@ export function useSkillSaveController({
           }
         );
       } catch (error) {
-        captureException(error, {
-          detector: 'application-handled',
-          operation: 'skill.save',
-        });
         onFileSaveFailed(snapshots);
         const errorMessage = parseErrorMessage(error);
         const snapshotKeys = new Set(snapshots.map((snapshot) => snapshot.editorKey));
@@ -150,19 +145,18 @@ export function useSkillSaveController({
       for (const snapshot of snapshots) {
         const result = resultByKey.get(snapshot.editorKey);
         if (result && !result.error) continue;
-        captureException(
-          result?.error ??
-            createError({
-              code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
-              source: 'client',
-              meta: {
-                reason: 'Skill 保存结果缺失',
-              },
-            }),
-          {
-            detector: 'application-handled',
-            operation: 'skill.save',
-          }
+        reportError(
+          createError(
+            result?.error ??
+              createError({
+                code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+                source: 'client',
+                meta: {
+                  reason: 'Skill 保存结果缺失',
+                },
+              })
+          ),
+          'silence'
         );
       }
       setExecutionItems((current) =>

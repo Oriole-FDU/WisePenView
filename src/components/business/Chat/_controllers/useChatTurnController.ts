@@ -10,8 +10,7 @@ import { useChatTurn } from '@/domains/ChatTurn';
 import { readFrontendStates } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
-import { captureException } from '@/observability';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, parseErrorMessage, reportError } from '@/utils/error';
 
 import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../send.type';
@@ -155,10 +154,7 @@ export function useChatTurnController({
       toolSelectionOverrides: opts?.toolSelectionOverrides,
       onDemandSkillIds,
     }).catch((error) => {
-      captureException(error, {
-        detector: 'application-handled',
-        operation: 'chat.send',
-      });
+      reportError(createError(error), 'silence');
       toast.danger(parseErrorMessage(error));
     });
 

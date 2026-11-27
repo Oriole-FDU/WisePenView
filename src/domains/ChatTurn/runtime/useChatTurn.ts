@@ -5,7 +5,6 @@ import { useMemo, useRef } from 'react';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
 import type { ChatMessageMetadata, WisePenUIMessage } from '@/domains/ChatSession';
-import { captureException } from '@/observability';
 import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { ChatRecoverApiRequest } from '../apis/ChatStreamApi.schema';
@@ -127,10 +126,6 @@ export const useChatTurn = ({
   const chat = useChat<WisePenUIMessage>({
     experimental_throttle: CHAT_STREAM_THROTTLE_MS,
     onError: (error) => {
-      captureException(error, {
-        detector: 'application-handled',
-        operation: 'chat.stream',
-      });
       onError?.(error);
     },
     transport: chatTransport,
@@ -196,10 +191,6 @@ export const useChatTurn = ({
         ) {
           return;
         }
-        captureException(error, {
-          detector: 'application-handled',
-          operation: 'chat.resume',
-        });
         if (error instanceof Error) {
           latestOnError.current?.(error);
         }
@@ -248,29 +239,21 @@ export const useChatTurn = ({
   };
 
   const recoverTurn = async (toolApprovalStatus: ToolApprovalStatusRequest[]) => {
-    try {
-      if (!sessionId) {
-        throw createError({
-          code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
-          source: 'client',
-          meta: {
-            reason: '恢复聊天时缺少 session_id',
-          },
-        });
-      }
-      const requestBody: ChatRecoverApiRequest = {
-        session_id: sessionId,
-        client_tool_results: [],
-        tool_approval_status: toolApprovalStatus,
-      };
-      await chat.sendMessage(undefined, { body: requestBody });
-    } catch (error) {
-      captureException(error, {
-        detector: 'application-handled',
-        operation: 'chat.recover',
+    if (!sessionId) {
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+        source: 'client',
+        meta: {
+          reason: '恢复聊天时缺少 session_id',
+        },
       });
-      throw error;
     }
+    const requestBody: ChatRecoverApiRequest = {
+      session_id: sessionId,
+      client_tool_results: [],
+      tool_approval_status: toolApprovalStatus,
+    };
+    await chat.sendMessage(undefined, { body: requestBody });
   };
 
   return {
