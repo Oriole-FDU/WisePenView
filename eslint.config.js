@@ -177,13 +177,8 @@ export default defineConfig([
     },
   },
   {
-    // Domain 业务代码新建错误必须走 createClientError；传输边界与 mock 模拟 API 错误除外。
+    // Domain 内禁止 new WisePenError；一律 createError（含 _shared/apis 与 mock）。
     files: ['src/domains/**/*.{ts,tsx}'],
-    ignores: [
-      'src/domains/_shared/apis/**/*.{ts,tsx}',
-      'src/domains/_shared/mock/**/*.{ts,tsx}',
-      'src/domains/*/mock/**/*.{ts,tsx}',
-    ],
     rules: {
       'no-restricted-syntax': ['error', ...domainRestrictedSyntaxRules],
     },

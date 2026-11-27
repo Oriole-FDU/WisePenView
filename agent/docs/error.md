@@ -1,6 +1,6 @@
 # 前端错误契约
 
-目标契约，尚未落地。可观测细节见 [`observability.md`](./observability.md)；落地时同步改写 [`domain-service.md`](./domain-service.md) 等仍写旧入口的文档。
+目标契约。`createError` / `reportError` 与 `lint/error.js` 已接入；调用点仍在迁移。可观测细节见 [`observability.md`](./observability.md)；迁移时同步改写 [`domain-service.md`](./domain-service.md) 等仍写旧入口的文档。
 
 ## 1. 设计原则
 
