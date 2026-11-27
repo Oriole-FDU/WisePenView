@@ -1,11 +1,6 @@
 import type { ZodType } from 'zod';
 
-import {
-  createError,
-  FRONTEND_CLIENT_ERROR,
-  FRONTEND_NETWORK_ERROR,
-  WisePenError,
-} from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, FRONTEND_NETWORK_ERROR } from '@/utils/error';
 
 export type ApiHttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type ApiRequestPlacement = 'body' | 'query' | 'none';
@@ -71,7 +66,7 @@ export const parseApiResponse = <Request, Response>(
 
   const issues = summarizeIssues(result.error.issues);
   const issueSummary = issues.map((issue) => `${issue.path}:${issue.code}`).join(', ');
-  throw new WisePenError({
+  throw createError({
     code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
     source: 'http',
     message: `API 响应契约不匹配：${contract.name} (${issueSummary})`,

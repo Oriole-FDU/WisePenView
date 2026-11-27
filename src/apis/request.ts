@@ -4,7 +4,7 @@ import httpClient from '@/apis/_internal/httpClient';
 import type { ApiResponse } from '@/apis/api.type';
 import { isApiResponseEnvelope } from '@/apis/runtimeContract';
 import { type RequestObservation, startRequestObservation } from '@/observability/request';
-import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
+import { createError, FRONTEND_NETWORK_ERROR, isWisePenError } from '@/utils/error';
 
 /**
  * 业务码非 200 时抛出统一错误。
@@ -12,7 +12,7 @@ import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
  */
 function checkResponse(res: ApiResponse<unknown>): void {
   if (res.code !== 200) {
-    throw new WisePenError({
+    throw createError({
       code: res.code,
       source: 'api',
       serverMsg: res.msg ?? undefined,
@@ -22,7 +22,7 @@ function checkResponse(res: ApiResponse<unknown>): void {
 
 function unwrap(res: unknown): unknown {
   if (!isApiResponseEnvelope(res)) {
-    throw new WisePenError({
+    throw createError({
       code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
       source: 'http',
       message: 'API 响应契约无效',
@@ -39,7 +39,7 @@ function unwrap(res: unknown): unknown {
  */
 export function parseTextApiResponse(value: unknown): string {
   if (typeof value !== 'string') {
-    throw new WisePenError({
+    throw createError({
       code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
       source: 'http',
       message: 'API 文本响应契约无效',
@@ -55,7 +55,7 @@ export function parseTextApiResponse(value: unknown): string {
     checkResponse(parsed);
     return typeof parsed.data === 'string' ? parsed.data : value;
   } catch (error) {
-    if (error instanceof WisePenError) throw error;
+    if (isWisePenError(error)) throw error;
     return value;
   }
 }
