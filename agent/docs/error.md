@@ -85,3 +85,13 @@ const error = createError(err, {
 reportError(error, 'warning');
 reportError(error, 'silence'); // 只要上报
 ```
+
+## 4. Lint 检查
+
+只跑错误契约相关规则：
+
+```bash
+pnpm lint:error
+```
+
+有命中时退出码为 1。规则实现见 [`lint/error.js`](../../lint/error.js)。
