@@ -7,6 +7,10 @@ import { EmptyApiResponseSchema } from '@/apis/schema';
 
 import {
   ChangeResourceActionPermissionApiRequestSchema,
+  CourseOutlineResourceApiRequestSchema,
+  CourseOutlineResourceApiResponseSchema,
+  CourseResourceSearchApiRequestSchema,
+  CourseResourceSearchApiResponseSchema,
   GetResourceBaseInfoApiRequestSchema,
   GlobalSearchResourcesApiRequestSchema,
   GlobalSearchResourcesApiResponseSchema,
@@ -76,6 +80,39 @@ export const GlobalSearchResourcesApiContract = defineApiContract({
   request: GlobalSearchResourcesApiRequestSchema,
   response: GlobalSearchResourcesApiResponseSchema,
 });
+
+export const CourseResourceSearchApiContract = defineApiContract({
+  name: 'CourseResourceSearchApi',
+  method: 'GET',
+  endpoint: '/resource/search/searchCourseResources',
+  requestPlacement: 'query',
+  transport: 'json',
+  request: CourseResourceSearchApiRequestSchema,
+  response: CourseResourceSearchApiResponseSchema,
+});
+
+export const CourseOutlineResourceApiContract = defineApiContract({
+  name: 'CourseOutlineResourceApi',
+  method: 'GET',
+  endpoint: '/resource/item/getCourseOutlineResource',
+  requestPlacement: 'query',
+  transport: 'json',
+  request: CourseOutlineResourceApiRequestSchema,
+  response: CourseOutlineResourceApiResponseSchema,
+});
+
+export type CourseResourceSearchApiRequest = ApiContractRequest<
+  typeof CourseResourceSearchApiContract
+>;
+export type CourseResourceSearchApiResponse = ApiContractResponse<
+  typeof CourseResourceSearchApiContract
+>;
+export type CourseOutlineResourceApiRequest = ApiContractRequest<
+  typeof CourseOutlineResourceApiContract
+>;
+export type CourseOutlineResourceApiResponse = ApiContractResponse<
+  typeof CourseOutlineResourceApiContract
+>;
 
 export type GetResourceBaseInfoApiContractRequest = ApiContractRequest<
   typeof GetResourceBaseInfoApiContract

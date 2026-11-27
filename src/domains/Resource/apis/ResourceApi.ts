@@ -4,6 +4,10 @@ import {
   ChangeResourceActionPermissionApiContract,
   type ChangeResourceActionPermissionApiContractRequest,
   type ChangeResourceActionPermissionApiContractResponse,
+  CourseOutlineResourceApiContract,
+  type CourseOutlineResourceApiRequest,
+  CourseResourceSearchApiContract,
+  type CourseResourceSearchApiRequest,
   GetResourceBaseInfoApiContract,
   type GetResourceBaseInfoApiContractRequest,
   type GetResourceBaseInfoApiContractResponse,
@@ -87,4 +91,8 @@ export const ResourceItemApi = {
   changeResourceActionPermission,
   removeResources,
   globalSearch,
+  searchCourseResources: (req: CourseResourceSearchApiRequest) =>
+    executeApiContract(CourseResourceSearchApiContract, req),
+  getCourseOutlineResource: (req: CourseOutlineResourceApiRequest) =>
+    executeApiContract(CourseOutlineResourceApiContract, req),
 };

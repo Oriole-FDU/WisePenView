@@ -18,7 +18,7 @@ type SectionDialog =
 interface UseCourseOutlineEditingControllerOptions {
   courseId: string;
   nodes: CourseOutlineNode[];
-  onMutated: () => void;
+  onMutated: (affectedTags?: string[]) => void;
 }
 
 export const useCourseOutlineEditingController = ({
@@ -120,7 +120,7 @@ export const useCourseOutlineEditingController = ({
     },
     {
       manual: true,
-      onSuccess: onMutated,
+      onSuccess: () => onMutated(),
     }
   );
 
@@ -144,34 +144,39 @@ export const useCourseOutlineEditingController = ({
     },
     {
       manual: true,
-      onSuccess: () => {
+      onSuccess: (_, [{ target, targetNodeId }]) => {
         setMoveTarget(undefined);
-        onMutated();
+        onMutated([target.parentId, targetNodeId]);
         toast.success(t('editor.outline.saved'));
       },
-      onErrorEffect: () => {
-        onMutated();
+      onErrorEffect: (_, [{ target, targetNodeId }]) => {
+        onMutated([target.parentId, targetNodeId]);
       },
     }
   );
 
   const removeResourceRequest = useApi(
     async () => {
-      if (!removeTarget) return;
+      if (!removeTarget) return [];
+      const affectedTags = removeTarget.node.currentTagIds ?? [removeTarget.parentId];
       await courseService.removeCourseOutlineResource({
         courseId,
         resourceId: removeTarget.node.resourceId,
         sourceNodeId: removeTarget.parentId,
         mainTagId: removeTarget.node.mainTagId,
-        currentTagIds: removeTarget.node.currentTagIds ?? [removeTarget.parentId],
+        currentTagIds: affectedTags,
       });
+      return affectedTags;
     },
     {
       manual: true,
-      onSuccess: () => {
+      onSuccess: (affectedTags) => {
         setRemoveTarget(undefined);
-        onMutated();
+        onMutated(affectedTags);
         toast.success(t('editor.outline.saved'));
+      },
+      onErrorEffect: () => {
+        if (removeTarget) onMutated(removeTarget.node.currentTagIds ?? [removeTarget.parentId]);
       },
     }
   );

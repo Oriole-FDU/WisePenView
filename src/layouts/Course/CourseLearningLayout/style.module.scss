@@ -508,3 +508,42 @@
     grid-template-columns: 240px minmax(320px, 1fr);
   }
 }
+
+.outlineSearchResults {
+  padding: var(--space-xs);
+}
+
+.outlineSearchStatus:not(:empty) {
+  padding: var(--space-3xs) var(--space-xs);
+  color: var(--muted-foreground);
+}
+
+.outlineSearchList {
+  display: grid;
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.outlineSearchHit {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3xs);
+  padding: var(--space-xs);
+  overflow-wrap: anywhere;
+
+  button {
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+  }
+}
+
+.outlineSearchSnippet {
+  color: var(--muted-foreground);
+
+  :global(.wp-highlight) {
+    font-weight: 600;
+  }
+}

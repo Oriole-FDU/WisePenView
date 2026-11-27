@@ -116,6 +116,7 @@ interface CourseOutlineNodeBase {
 export interface CourseOutlineContainerNode extends CourseOutlineNodeBase {
   nodeType: 'CHAPTER' | 'SECTION';
   description?: string;
+  resourceOrder: string[];
   children: CourseOutlineNode[];
 }
 
@@ -131,6 +132,15 @@ export interface CourseOutlineResourceNode extends CourseOutlineNodeBase {
 }
 
 export type CourseOutlineNode = CourseOutlineContainerNode | CourseOutlineResourceNode;
+
+export interface CourseResourceSearchHit {
+  resourceId: string;
+  resourceType: string;
+  resourceName: string;
+  tagIds: string[];
+  canView: boolean;
+  highlightContent: string | null;
+}
 
 export interface CourseOutline {
   courseId: string;

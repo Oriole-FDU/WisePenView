@@ -3,7 +3,9 @@ import { PanelRightClose, PanelRightOpen, Video } from 'lucide-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
+import { Spin } from '@/components/base/Feedback';
 import { COURSE_ROLE } from '@/domains/Course';
 import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
 import {
@@ -21,6 +23,7 @@ import {
   WorkspacePanelPortal,
   WorkspaceRightPanelLayout,
 } from '@/layouts/WorkspaceRightPanelLayout';
+import { isWisePenError, parseErrorMessage } from '@/utils/error';
 
 import { useCourseContext } from '../_context';
 import CourseResourceHost from '../CourseResourceHost';
@@ -36,7 +39,7 @@ function CourseLearningLayoutContent() {
   const { t } = useTranslation('course');
   const { t: tResource } = useTranslation('resource');
   const { course } = useCourseContext();
-  const navigation = useCourseLearningNavigationController(course.courseId);
+  const navigation = useCourseLearningNavigationController(course);
   const { activePanelId, panelWidths, closePanel, togglePanel, setPanelWidth } =
     useWorkspaceRightPanel();
   // 课程学习页进入时收起右侧对话面板，宽度偏好仍由统一右栏 store 持久化。
@@ -121,19 +124,20 @@ function CourseLearningLayoutContent() {
         courseId={course.courseId}
         courseName={course.name}
         editable={course.myRole === COURSE_ROLE.TEACHER}
-        nodes={navigation.visibleNodes}
+        nodes={navigation.sidebarNodes}
+        sections={navigation.sections}
         allNodes={navigation.outlineNodes}
         selectedNodeId={selectedNode?.nodeId}
-        searchQuery={navigation.searchQuery}
-        expandSearchResults={Boolean(navigation.normalizedQuery)}
+        expandedKeys={navigation.expandedKeys}
+        onExpandedKeysChange={navigation.setExpandedKeys}
         loading={navigation.loading}
         error={navigation.error}
         resourcePageStateMap={navigation.resourcePageStateMap}
-        onSearchQueryChange={navigation.setSearchQuery}
         onSelectNode={navigation.openOutlineNode}
         onOpenCourseHome={navigation.openCourseHome}
         onExpandNode={navigation.expandOutlineNode}
         onLoadMoreResources={navigation.loadMoreOutlineResources}
+        onRetryResources={navigation.retryOutlineResources}
         onRefresh={navigation.refresh}
         onRetry={navigation.refresh}
       />
@@ -143,7 +147,22 @@ function CourseLearningLayoutContent() {
           ? null
           : workspaceHeader}
         <main className={styles.studyMain}>
-          {selectedNode ? (
+          {navigation.resourceLoading ? (
+            <div className={styles.emptyMain}>
+              <Spin tip={t('outline.loadingResources')} />
+            </div>
+          ) : navigation.resourceError ? (
+            <div className={styles.outlineState} role="status">
+              <span>
+                {isWisePenError(navigation.resourceError) && navigation.resourceError.code === 5411
+                  ? t('outline.resourceUnavailable')
+                  : parseErrorMessage(navigation.resourceError)}
+              </span>
+              <AppButton size="sm" variant="secondary" onPress={navigation.retryResource}>
+                {t('common.retry')}
+              </AppButton>
+            </div>
+          ) : selectedNode ? (
             selectedNode.nodeType === 'RESOURCE' ? (
               selectedNode.viewer === 'video' ? (
                 <div className={styles.resourceViewer}>
@@ -230,8 +249,9 @@ function CourseLearningLayoutContent() {
 }
 
 export default function CourseLearningLayout() {
+  const { course } = useCourseContext();
   return (
-    <ResourceEditorProvider>
+    <ResourceEditorProvider key={course.courseId + ':' + (course.outlineRootTagId ?? '')}>
       <CourseLearningLayoutContent />
     </ResourceEditorProvider>
   );

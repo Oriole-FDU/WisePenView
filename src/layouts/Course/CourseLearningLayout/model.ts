@@ -1,11 +1,16 @@
-import type { CourseOutlineNode, CourseOutlineResourceNode } from '@/domains/Course';
+import type {
+  CourseOutlineContainerNode,
+  CourseOutlineNode,
+  CourseOutlineResourceNode,
+} from '@/domains/Course';
 
 export interface CourseOutlineResourcePageState {
   loaded: boolean;
   loading: boolean;
-  loadedCount: number;
+  list: CourseOutlineResourceNode[];
   total: number;
   nextCursor?: string;
+  error?: { cause: unknown; cursor?: string };
 }
 
 export const findOutlineNode = (
@@ -48,67 +53,58 @@ export const findOutlineResourceByResourceId = (
   return undefined;
 };
 
-export const markCourseOutlineResourceRead = (
+export function attachOutlineResources(
   nodes: CourseOutlineNode[],
-  resourceId: string
-): CourseOutlineNode[] => {
-  let changed = false;
-  const nextNodes = nodes.map((node): CourseOutlineNode => {
-    if (node.nodeType === 'RESOURCE') {
-      if (node.resourceId !== resourceId || node.read) return node;
-      changed = true;
-      return { ...node, read: true };
-    }
-    const children = markCourseOutlineResourceRead(node.children, resourceId);
-    if (children === node.children) return node;
-    changed = true;
-    return { ...node, children };
-  });
-  return changed ? nextNodes : nodes;
-};
-
-export const appendCourseOutlineResources = (
-  nodes: CourseOutlineNode[],
-  nodeId: string,
-  resources: CourseOutlineResourceNode[]
-): CourseOutlineNode[] => {
-  let changed = false;
-  const nextNodes = nodes.map((node): CourseOutlineNode => {
+  pages: ReadonlyMap<string, CourseOutlineResourcePageState>,
+  markedRead: ReadonlySet<string>,
+  selectedResource?: CourseOutlineResourceNode,
+  selectedTagId?: string
+): CourseOutlineNode[] {
+  return nodes.map((node) => {
     if (node.nodeType === 'RESOURCE') return node;
-    if (node.nodeId === nodeId) {
-      const childContainers = node.children.filter((child) => child.nodeType !== 'RESOURCE');
-      const resourceById = new Map(
-        node.children
-          .filter((child): child is CourseOutlineResourceNode => child.nodeType === 'RESOURCE')
-          .map((child) => [child.resourceId, child] as const)
-      );
-      resources.forEach((resource) => resourceById.set(resource.resourceId, resource));
-      changed = resources.length > 0;
-      return changed ? { ...node, children: [...childContainers, ...resourceById.values()] } : node;
+    const page = pages.get(node.nodeId);
+    const resources = page?.list ?? [];
+    const children = attachOutlineResources(
+      node.children,
+      pages,
+      markedRead,
+      selectedResource,
+      selectedTagId
+    );
+    if (
+      selectedResource &&
+      selectedTagId === node.nodeId &&
+      !resources.some((resource) => resource.resourceId === selectedResource.resourceId)
+    ) {
+      children.push(selectedResource);
     }
-    const children = appendCourseOutlineResources(node.children, nodeId, resources);
-    if (children === node.children) return node;
-    changed = true;
+    children.push(
+      ...resources.map((resource) =>
+        !resource.read && markedRead.has(resource.resourceId)
+          ? { ...resource, read: true }
+          : resource
+      )
+    );
     return { ...node, children };
   });
-  return changed ? nextNodes : nodes;
-};
+}
 
-export const filterCourseOutline = (
-  nodes: CourseOutlineNode[],
-  normalizedQuery: string
-): CourseOutlineNode[] => {
-  if (!normalizedQuery) return nodes;
-  const filtered: CourseOutlineNode[] = [];
-  for (const node of nodes) {
-    if (node.nodeType === 'RESOURCE') {
-      if (node.title.toLocaleLowerCase().includes(normalizedQuery)) filtered.push(node);
-      continue;
+export function indexOutlineSections(nodes: CourseOutlineNode[]) {
+  const sections = new Map<string, { node: CourseOutlineContainerNode; path: string[] }>();
+  const visit = (children: CourseOutlineNode[], parents: string[]) => {
+    for (const node of children) {
+      if (node.nodeType === 'RESOURCE') continue;
+      const path = [...parents, node.nodeId];
+      sections.set(node.nodeId, { node, path });
+      visit(node.children, path);
     }
-    const children = filterCourseOutline(node.children, normalizedQuery);
-    if (node.title.toLocaleLowerCase().includes(normalizedQuery) || children.length > 0) {
-      filtered.push({ ...node, children });
-    }
-  }
-  return filtered;
+  };
+  visit(nodes, []);
+  return sections;
+}
+
+export const splitResourceNodeId = (nodeId: string) => {
+  const separator = nodeId.indexOf(':');
+  if (separator < 1 || separator === nodeId.length - 1) return undefined;
+  return { tagId: nodeId.slice(0, separator), resourceId: nodeId.slice(separator + 1) };
 };

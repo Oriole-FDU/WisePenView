@@ -1,142 +1,136 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { useCourseService } from '@/domains';
+import type { CourseOutlineNode, CourseOutlineReference } from '@/domains/Course';
 import { useApi } from '@/hooks/useApi';
 import { buildCourseLearningPath, buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 
 import {
-  appendCourseOutlineResources,
+  attachOutlineResources,
   collectOutlineResources,
-  type CourseOutlineResourcePageState,
-  filterCourseOutline,
   findOutlineNode,
   findOutlineResourceByResourceId,
-  markCourseOutlineResourceRead,
+  indexOutlineSections,
+  splitResourceNodeId,
 } from '../model';
+import { useCourseOutlinePages } from './useCourseOutlinePages';
 
-export const useCourseLearningNavigationController = (courseId: string) => {
+const NO_NODES: CourseOutlineNode[] = [];
+
+export const useCourseLearningNavigationController = (course: CourseOutlineReference) => {
   const courseService = useCourseService();
+  const { courseId } = course;
   const navigate = useNavigate();
   const location = useLocation();
   const { outlineNodeId = '' } = useParams<{ outlineNodeId: string }>();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [resourcePageStateMap, setResourcePageStateMap] = useState<
-    Map<string, CourseOutlineResourcePageState>
-  >(new Map());
-  const requestVersionRef = useRef(0);
-  const loadingNodeIdsRef = useRef<Set<string>>(new Set());
-  const request = useApi(() => courseService.getCourseOutline(courseId), {
-    ready: Boolean(courseId),
-    refreshDeps: [courseId],
-    onBefore: () => {
-      requestVersionRef.current += 1;
-      loadingNodeIdsRef.current.clear();
-      setResourcePageStateMap(new Map());
+  const [expansion, setExpansion] = useState<{ resourceKey?: string; keys: string[] }>({
+    keys: [],
+  });
+  const [markedRead, setMarkedRead] = useState(new Set<string>());
+  const refreshTags = useRef(new Set<string>());
+  const { pages, loadPage } = useCourseOutlinePages(courseId);
+
+  const outline = useApi((refresh?: boolean) => courseService.getCourseOutline(course, refresh), {
+    onSuccess: ({ nodes }) => {
+      refreshTags.current.forEach((nodeId) => {
+        const node = findOutlineNode(nodes, nodeId);
+        if (node && node.nodeType !== 'RESOURCE') loadPage(node, undefined, true);
+      });
+      refreshTags.current.clear();
     },
   });
-  const resourcePageRequest = useApi(
-    (nodeId: string, cursor?: string) =>
-      courseService.loadCourseOutlineResources({ courseId, nodeId, cursor }),
-    { manual: true }
+  const chapters = outline.data?.nodes ?? NO_NODES;
+  const sections = useMemo(() => indexOutlineSections(chapters), [chapters]);
+
+  const resourcePosition = splitResourceNodeId(outlineNodeId);
+  const resource = useApi(
+    async (nodeId: string) => {
+      const position = splitResourceNodeId(nodeId);
+      if (!position) return undefined;
+      const node = await courseService.getCourseOutlineResource({ courseId, ...position });
+      return { key: nodeId, node };
+    },
+    {
+      ready: Boolean(resourcePosition),
+      defaultParams: [outlineNodeId],
+      refreshDeps: [outlineNodeId],
+      refreshDepsAction: (): void => {
+        resource.run(outlineNodeId);
+      },
+      showErrorToast: false,
+    }
   );
-  const outlineNodes = request.data?.nodes ?? [];
-  const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
-  const visibleNodes = filterCourseOutline(outlineNodes, normalizedQuery);
-  const selectedNode = findOutlineNode(outlineNodes, outlineNodeId) ?? outlineNodes[0];
-  const selectedResources = selectedNode
-    ? selectedNode.nodeType === 'RESOURCE'
-      ? [selectedNode]
-      : collectOutlineResources(selectedNode.children)
-    : [];
+  const currentRequest = resource.params?.[0] === outlineNodeId;
+  const resourceError = currentRequest && !resource.loading ? resource.error : undefined;
+  const selectedResource =
+    resource.data?.key === outlineNodeId && !resourceError ? resource.data.node : undefined;
   const selectedUnreadResourceId =
-    selectedNode?.nodeType === 'RESOURCE' && !selectedNode.read ? selectedNode.resourceId : '';
+    selectedResource && !selectedResource.read && !markedRead.has(selectedResource.resourceId)
+      ? selectedResource.resourceId
+      : '';
 
-  useApi(() => courseService.setResourceRead({ resourceId: selectedUnreadResourceId }), {
-    ready: Boolean(selectedUnreadResourceId),
-    refreshDeps: [courseId, selectedUnreadResourceId],
-    onSuccess: () => {
-      request.mutate((outline) =>
-        outline
-          ? {
-              ...outline,
-              nodes: markCourseOutlineResourceRead(outline.nodes, selectedUnreadResourceId),
-            }
-          : outline
-      );
+  useApi(
+    async () => {
+      await courseService.setResourceRead({ resourceId: selectedUnreadResourceId });
+      return selectedUnreadResourceId;
     },
-  });
+    {
+      ready: Boolean(selectedUnreadResourceId),
+      refreshDeps: [selectedUnreadResourceId],
 
-  const loadResourcePage = async (nodeId: string, cursor?: string) => {
-    if (loadingNodeIdsRef.current.has(nodeId)) return;
-    const requestVersion = requestVersionRef.current;
-    loadingNodeIdsRef.current.add(nodeId);
-    setResourcePageStateMap((current) => {
-      const previous = current.get(nodeId);
-      return new Map(current).set(nodeId, {
-        loaded: previous?.loaded ?? false,
-        loading: true,
-        loadedCount: previous?.loadedCount ?? 0,
-        total: previous?.total ?? 0,
-        nextCursor: previous?.nextCursor,
-      });
+      onSuccess: (resourceId) => {
+        setMarkedRead((previous) => new Set(previous).add(resourceId));
+      },
+      showErrorToast: false,
+    }
+  );
+  const outlineNodes = useMemo(
+    () => attachOutlineResources(chapters, pages, markedRead),
+    [chapters, pages, markedRead]
+  );
+  const sidebarNodes = useMemo(
+    () =>
+      selectedResource
+        ? attachOutlineResources(
+            chapters,
+            pages,
+            markedRead,
+            selectedResource,
+            resourcePosition?.tagId
+          )
+        : outlineNodes,
+    [chapters, pages, markedRead, selectedResource, resourcePosition?.tagId, outlineNodes]
+  );
+  const selectedPath = resourcePosition && sections.get(resourcePosition.tagId)?.path;
+  if (selectedResource && selectedPath && expansion.resourceKey !== outlineNodeId) {
+    setExpansion({
+      resourceKey: outlineNodeId,
+      keys: [...new Set([...expansion.keys, ...selectedPath])],
     });
-    try {
-      const page = await resourcePageRequest.runAsync(nodeId, cursor);
-      if (requestVersion !== requestVersionRef.current) return;
-      request.mutate((outline) =>
-        outline
-          ? {
-              ...outline,
-              nodes: appendCourseOutlineResources(outline.nodes, nodeId, page.list),
-            }
-          : outline
-      );
-      setResourcePageStateMap((current) => {
-        const previous = current.get(nodeId);
-        return new Map(current).set(nodeId, {
-          loaded: true,
-          loading: false,
-          loadedCount: (previous?.loadedCount ?? 0) + page.list.length,
-          total: page.total,
-          nextCursor: page.nextCursor,
-        });
-      });
-    } catch {
-      // 错误提示由 useApi 统一处理。
-    } finally {
-      loadingNodeIdsRef.current.delete(nodeId);
-      if (requestVersion === requestVersionRef.current) {
-        setResourcePageStateMap((current) => {
-          const previous = current.get(nodeId);
-          if (!previous?.loading) return current;
-          return new Map(current).set(nodeId, { ...previous, loading: false });
-        });
-      }
-    }
-  };
+  } else if (!resourcePosition && expansion.resourceKey !== undefined) {
+    setExpansion({ keys: expansion.keys });
+  }
 
-  const expandOutlineNode = (nodeId: string) => {
-    const pageState = resourcePageStateMap.get(nodeId);
-    if (!pageState?.loaded && !pageState?.loading) void loadResourcePage(nodeId);
-  };
+  const selectedNode = resourcePosition
+    ? selectedResource
+    : outlineNodeId
+      ? findOutlineNode(outlineNodes, outlineNodeId)
+      : outlineNodes[0];
+  const selectedResources =
+    selectedNode && selectedNode.nodeType !== 'RESOURCE'
+      ? collectOutlineResources(selectedNode.children)
+      : [];
 
-  const loadMoreOutlineResources = (nodeId: string) => {
-    const pageState = resourcePageStateMap.get(nodeId);
-    if (pageState?.nextCursor && !pageState.loading) {
-      void loadResourcePage(nodeId, pageState.nextCursor);
-    }
-  };
-
-  const refreshOutline = () => {
-    const loadedNodeIds = [...resourcePageStateMap.entries()]
-      .filter(([, pageState]) => pageState.loaded)
-      .map(([nodeId]) => nodeId);
-    void request
-      .refreshAsync()
-      .then(() => loadedNodeIds.forEach((nodeId) => void loadResourcePage(nodeId)))
-      .catch(() => undefined);
+  const loadResources = (nodeId: string, action: 'first' | 'more' | 'retry') => {
+    const node = sections.get(nodeId)?.node;
+    if (!node) return;
+    const previous = pages.get(nodeId);
+    if (action === 'first' && (previous?.loaded || previous?.error)) return;
+    const cursor = action === 'retry' ? previous?.error?.cursor : previous?.nextCursor;
+    if (action === 'more' && !cursor) return;
+    loadPage(node, cursor, action === 'retry' && cursor === undefined);
   };
 
   const openOutlineNode = (nodeId: string) =>
@@ -149,22 +143,32 @@ export const useCourseLearningNavigationController = (courseId: string) => {
 
   return {
     outlineNodes,
-    visibleNodes,
+    sidebarNodes,
+    sections,
     selectedNode,
     selectedResources,
-    normalizedQuery,
-    searchQuery,
-    setSearchQuery,
-    loading: request.loading,
-    error: request.error,
-    resourcePageStateMap,
-    expandOutlineNode,
-    loadMoreOutlineResources,
-    refresh: refreshOutline,
+    expandedKeys: expansion.keys,
+    loading: outline.loading,
+    error: outline.error,
+    resourceLoading: Boolean(resourcePosition && !selectedResource && !resourceError),
+    resourceError,
+    resourcePageStateMap: pages,
+    setExpandedKeys: (keys: string[]) => setExpansion((previous) => ({ ...previous, keys })),
+    expandOutlineNode: (nodeId: string) => loadResources(nodeId, 'first'),
+    loadMoreOutlineResources: (nodeId: string) => loadResources(nodeId, 'more'),
+    retryOutlineResources: (nodeId: string) => loadResources(nodeId, 'retry'),
+    retryResource: resource.refresh,
+    refresh: (affectedTags?: string[]) => {
+      affectedTags?.forEach((nodeId) => {
+        if (pages.has(nodeId)) refreshTags.current.add(nodeId);
+      });
+      outline.run(true);
+      if (resourcePosition) resource.refresh();
+    },
     openOutlineNode,
     openResource: (resourceId: string) => {
-      const resource = findOutlineResourceByResourceId(outlineNodes, resourceId);
-      if (resource) void openOutlineNode(resource.nodeId);
+      const node = findOutlineResourceByResourceId(outlineNodes, resourceId);
+      if (node) void openOutlineNode(node.nodeId);
     },
     openCourseHome: () =>
       navigate(

@@ -11,6 +11,7 @@ import type {
   CourseOutline,
   CourseOutlineEditorNode,
   CourseOutlineResourceNode,
+  CourseResourceSearchHit,
   CourseSummary,
 } from '@/domains/Course/entity/course';
 
@@ -30,9 +31,12 @@ export interface SetCourseResourceReadRequest {
   resourceId: string;
 }
 
+export type CourseOutlineReference = Pick<CourseDetail, 'courseId' | 'outlineRootTagId'>;
+
 export interface LoadCourseOutlineResourcesRequest {
   courseId: string;
   nodeId: string;
+  resourceOrder: string[];
   cursor?: string;
 }
 
@@ -135,12 +139,22 @@ export interface SubmitCourseAssignmentRequest {
 export interface ICourseService {
   listMyCourses(params: ListMyCoursesRequest): Promise<CourseListPage>;
   getCourseDetail(courseId: string): Promise<CourseDetail>;
-  getCourseHome(courseId: string): Promise<CourseHomeSnapshot>;
+  getCourseHome(course: CourseOutlineReference): Promise<CourseHomeSnapshot>;
   listCourseAnnouncements(courseId: string): Promise<CourseAnnouncement[]>;
-  getCourseOutline(courseId: string): Promise<CourseOutline>;
+  getCourseOutline(course: CourseOutlineReference, refresh?: boolean): Promise<CourseOutline>;
   loadCourseOutlineResources(
     params: LoadCourseOutlineResourcesRequest
   ): Promise<CourseOutlineResourcePage>;
+  searchCourseResources(params: {
+    courseId: string;
+    keyword: string;
+    cursor?: string;
+  }): Promise<{ list: CourseResourceSearchHit[]; nextCursor: string | null }>;
+  getCourseOutlineResource(params: {
+    courseId: string;
+    tagId: string;
+    resourceId: string;
+  }): Promise<CourseOutlineResourceNode>;
   setResourceRead(params: SetCourseResourceReadRequest): Promise<void>;
   listCourseMembers(params: ListCourseMembersRequest): Promise<CourseMemberPage>;
   createCourse(params: CreateCourseRequest): Promise<string>;

@@ -83,9 +83,8 @@ const mapCourseOutlineResourceOrderMeta = (
 
 const sortCourseOutlineResources = <T extends { resourceId: string }>(
   resources: T[],
-  tagMetaInfo?: TagMetaInfo
+  resourceOrder: string[]
 ): T[] => {
-  const resourceOrder = getCourseOutlineResourceOrder(tagMetaInfo);
   if (resourceOrder.length === 0) return resources;
   const orderIndex = new Map(resourceOrder.map((resourceId, index) => [resourceId, index]));
   return resources.toSorted((left, right) => {
@@ -108,6 +107,7 @@ const mapCourseOutlineNodes = (tags: TagTreeNode[]): CourseOutlineNode[] => {
       title: tag.tagName,
       nodeType: depth === 0 ? ('CHAPTER' as const) : ('SECTION' as const),
       description: tag.tagDesc,
+      resourceOrder: getCourseOutlineResourceOrder(tag.tagMetaInfo),
       children: mapTags(tag.children ?? [], depth + 1),
     }));
 
@@ -117,14 +117,15 @@ const mapCourseOutlineNodes = (tags: TagTreeNode[]): CourseOutlineNode[] => {
 const mapCourseOutlineResourceNodes = (
   resources: ResourceItem[],
   tagId: string,
-  tagMetaInfo?: TagMetaInfo
+  resourceOrder: string[]
 ): CourseOutlineResourceNode[] =>
-  sortCourseOutlineResources(resources, tagMetaInfo).map((resource) => ({
+  sortCourseOutlineResources(resources, resourceOrder).map((resource) => ({
     nodeId: `${tagId}:${resource.resourceId}`,
     title: resource.resourceName,
     nodeType: 'RESOURCE',
     resourceId: resource.resourceId,
     resourceType: resource.resourceType ?? 'file',
+    viewer: resource.resourceType === 'VIDEO' ? 'video' : undefined,
     read: resource.myInteraction?.read ?? false,
     mainTagId: resource.mainTagId,
     currentTagIds: Object.keys(resource.currentTags ?? {}),

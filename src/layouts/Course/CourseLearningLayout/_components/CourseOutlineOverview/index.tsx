@@ -96,9 +96,11 @@ function CourseOutlineOverview({
           )}
         </section>
 
-        <p className={styles.resourceCount}>
-          {t('outline.resourceCount', { count: resources.length })}
-        </p>
+        {resources.length > 0 ? (
+          <p className={styles.resourceCount}>
+            {t('outline.resourceCount', { count: resources.length })}
+          </p>
+        ) : null}
         <div className={styles.resourceList}>
           {resources.map((resource) => (
             <AppPressable key={resource.nodeId} onClick={() => onOpenResource(resource.nodeId)}>
