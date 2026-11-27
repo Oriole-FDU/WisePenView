@@ -13,9 +13,7 @@ export type ExceptionDetector =
   | 'router-error'
   | 'window-error'
   | 'window-unhandled-rejection'
-  | 'error-created'
-  | 'error-consumed'
-  | 'application-handled';
+  | 'error-consumed';
 
 export type ExceptionOperation =
   | 'chat.send'

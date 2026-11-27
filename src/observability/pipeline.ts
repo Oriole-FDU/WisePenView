@@ -173,10 +173,7 @@ export const emitRequestEvent = (event: TelemetryEvent): boolean => {
 };
 
 const getSeverity = (observation: ExceptionObservation): 'WARN' | 'ERROR' =>
-  observation.detector === 'react-root-recoverable' ||
-  observation.detector === 'application-handled'
-    ? 'WARN'
-    : 'ERROR';
+  observation.detector === 'react-root-recoverable' ? 'WARN' : 'ERROR';
 
 export const recordExceptionObservation = (observation: ExceptionObservation): void => {
   const pipeline = activePipeline;

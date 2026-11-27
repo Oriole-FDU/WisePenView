@@ -165,7 +165,7 @@ test('异常进入统一聚合管线并过滤未提供的可选属性', async (c
 
   const error = new Error('render failed');
   telemetry.captureException(error, {
-    detector: 'application-handled',
+    detector: 'error-consumed',
     operation: 'chat.send',
   });
   assert.equal(logs.length, 1);
@@ -189,7 +189,7 @@ test('异常进入统一聚合管线并过滤未提供的可选属性', async (c
       code: telemetry.FRONTEND_NETWORK_ERROR.CANCELED,
       source: 'network',
     }),
-    { detector: 'application-handled', operation: 'chat.stream' }
+    { detector: 'error-consumed', operation: 'chat.stream' }
   );
   assert.equal(logs.length, 1);
 
