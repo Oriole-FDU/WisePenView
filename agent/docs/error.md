@@ -1,0 +1,89 @@
+# 前端错误契约
+
+目标契约（待落地）。可观测细节见 [`observability.md`](./observability.md)；落地时同步改 [`domain-service.md`](./domain-service.md) 等旧条文。
+
+## 1. 设计原则
+
+1. **一种错误**：业务面只有 `WisePenError`；可预期失败不用原生 `Error`。
+2. **两个入口**：`createError` 只创建/规范化且不上报；`reportError` 唯一负责上报 + 用户兜底（toast）。
+3. **抛与报互斥**：要么 `throw`，要么 `reportError`；禁止 report 后再 throw，禁止中间层报、外层再 toast。
+4. **在消费边界报**：谁发起对用户可见的操作（保存/发送/上传/点击），谁在其 catch 终点 `reportError`。不是出错语句旁，不是 App 根 Boundary；Service / API / 工具只抛不报。
+5. **文案与诊断分离**：用户文案只经 `parseErrorMessage`；`message` 仅作诊断。
+
+后续 ESLint / `scripts/` 至少拦：唯一创建/消费入口、domains 内 `reportError`、同 catch 既 report 又 throw。
+
+## 2. 契约规范
+
+### `WisePenError`
+
+| 字段        | 说明                                                          |
+| ----------- | ------------------------------------------------------------- |
+| `code`      | 网络 10–99，客户端 100–999，后端业务码原样带入                |
+| `source`    | `'network' \| 'http' \| 'api' \| 'client'`（不再另设 `type`） |
+| `message`   | 诊断文案；不是用户文案                                        |
+| `serverMsg` | 后端原文（若有）                                              |
+| `meta`      | 结构化上下文，可参与 i18n 插值                                |
+| `cause`     | 原始异常                                                      |
+
+`parseErrorMessage`：`i18n(code+meta) → serverMsg → 未知`。
+
+### API
+
+```ts
+createError(options: WisePenErrorOptions): WisePenError
+createError(error: unknown, defaults?: Omit<WisePenErrorOptions, 'cause'>): WisePenError
+
+type ReportToast = 'warning' | 'error' | 'info' | 'silence'
+reportError(error: WisePenError, toast?: ReportToast): string // 默认 'error'；返回 support ID
+```
+
+| API                               | 规则                                                                                            |
+| --------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `createError(options)`            | 主动创建；按真实来源填 `source`                                                                 |
+| `createError(unknown, defaults?)` | 已是 `WisePenError` → 原样返回；否则 `client` + `UNKNOWN`（可被 defaults 覆盖），`cause` 为原值 |
+| `reportError`                     | 只接受 `WisePenError`；`'silence'` 只上报；同一对象多次 report 去重；无 `message` 覆盖参数      |
+
+### 分层
+
+| 层                             | 做                               | 不做                                |
+| ------------------------------ | -------------------------------- | ----------------------------------- |
+| Service / Mapper / 工具 / API  | `createError` + `throw`          | `reportError`、toast                |
+| View / Controller / `useApi`   | 消费边界 `reportError` + 更新 UI | 手写 toast、直接 `captureException` |
+| 根 Boundary / `window.onerror` | 仅兜底无人 catch 的意外          | 业务主路径                          |
+
+禁止：`createClientError`；业务侧 `new WisePenError` / `captureException` / `toast.*(parseErrorMessage)`；Domain、API、共享工具内 `reportError`。
+
+现状债务（`createClientError` 自动上报、`notifyError` 与 toast 旁路、业务 `application-handled`、直接 `new WisePenError`）一并收束。
+
+## 3. 写法示范
+
+主动创建并上抛（Service / API）：
+
+```ts
+const error = createError({
+  code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND,
+  source: 'client',
+  meta: { nodeId },
+});
+throw error;
+```
+
+消费边界 catch（View / Controller）：
+
+```ts
+try {
+  await save();
+} catch (err) {
+  const error = createError(err);
+  reportError(error);
+}
+
+// 需要更具体的码或 toast 级别：
+const error = createError(err, {
+  code: FRONTEND_CLIENT_ERROR.DRAWIO_SAVE_FAILED,
+  source: 'client',
+  meta: { detail: '...' },
+});
+reportError(error, 'warning');
+reportError(error, 'silence'); // 只要上报
+```

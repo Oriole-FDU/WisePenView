@@ -18,8 +18,9 @@
 - `domain-mapper.md`：按需映射、fallback、协议兼容和归一化。
 - `domain-service.md`：Service 编排、依赖注入和错误处理。
 - `domain-entity.md`：Entity、Enum、常量和类型边界。
+- `error.md`：前端唯一错误类型、`createError` / `reportError` 契约（目标规范，待落地）。
 
-推荐顺序：`domain-service.md -> domain-mapper.md -> domain-api.md -> domain-entity.md`。
+推荐顺序：`domain-service.md -> domain-mapper.md -> domain-api.md -> domain-entity.md`；涉及抛错或错误消费时加读 `error.md`。
 
 ## Component 与 View 任务
 
@@ -37,6 +38,7 @@
 
 - `business-knowledge.md`：业务知识文件的唯一来源、迁移和分批审查。
 - `observability.md`：前端 OTel、异常捕获、HTTP 自动 span、隐私、聚合预算、构建身份和源码映射的当前实现。
+- `error.md`：业务错误的创建与消费契约；与 observability 的异常上报衔接，但不描述 OTel 实现细节。
 - `routing.md`：URL、页面级 Tab、面包屑和导航历史。
 - `store.md`：状态归属、注册、持久化和生命周期。
 - `color-system.md`：颜色阶、语义 token 和主题。
