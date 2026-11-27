@@ -1,16 +1,14 @@
 # 前端错误契约
 
-目标契约（待落地）。可观测细节见 [`observability.md`](./observability.md)；落地时同步改 [`domain-service.md`](./domain-service.md) 等旧条文。
+目标契约，尚未落地。可观测细节见 [`observability.md`](./observability.md)；落地时同步改写 [`domain-service.md`](./domain-service.md) 等仍写旧入口的文档。
 
 ## 1. 设计原则
 
 1. **一种错误**：业务面只有 `WisePenError`；可预期失败不用原生 `Error`。
-2. **两个入口**：`createError` 只创建/规范化且不上报；`reportError` 唯一负责上报 + 用户兜底（toast）。
-3. **抛与报互斥**：要么 `throw`，要么 `reportError`；禁止 report 后再 throw，禁止中间层报、外层再 toast。
-4. **在消费边界报**：谁发起对用户可见的操作（保存/发送/上传/点击），谁在其 catch 终点 `reportError`。不是出错语句旁，不是 App 根 Boundary；Service / API / 工具只抛不报。
-5. **文案与诊断分离**：用户文案只经 `parseErrorMessage`；`message` 仅作诊断。
-
-后续 ESLint / `scripts/` 至少拦：唯一创建/消费入口、domains 内 `reportError`、同 catch 既 report 又 throw。
+2. **两个入口**：`createError` 只负责创建和规范化，不上报；`reportError` 唯一负责上报和用户提示（toast）。
+3. **抛与报互斥**：要么 `throw`，要么 `reportError`。不要 report 完再 throw，也不要中间层报一次、外层再弹 toast。
+4. **在消费边界报**：谁发起对用户可见的操作（保存 / 发送 / 上传 / 点击），谁在自己的 catch 终点调用 `reportError`。不要在出错语句旁就近报，也不要丢给 App 根 Boundary；Service / API / 工具只抛不报。
+5. **文案与诊断分离**：用户文案只走 `parseErrorMessage`；`message` 只作诊断。
 
 ## 2. 契约规范
 
@@ -53,7 +51,7 @@ reportError(error: WisePenError, toast?: ReportToast): string // 默认 'error'�
 
 禁止：`createClientError`；业务侧 `new WisePenError` / `captureException` / `toast.*(parseErrorMessage)`；Domain、API、共享工具内 `reportError`。
 
-现状债务（`createClientError` 自动上报、`notifyError` 与 toast 旁路、业务 `application-handled`、直接 `new WisePenError`）一并收束。
+需要一并收掉的现状：`createClientError` 自动上报、`notifyError` 与 toast 旁路、业务侧 `application-handled`、直接 `new WisePenError`。
 
 ## 3. 写法示范
 
