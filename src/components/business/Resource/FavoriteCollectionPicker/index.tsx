@@ -1,11 +1,6 @@
-import CollectionPickerModal from './CollectionPickerModal';
-import { useFavoriteCollectionPickerController } from './useFavoriteCollectionPickerController';
-
-interface FavoriteCollectionPickerProps {
-  resourceId: string;
-  onOpenChange: (open: boolean) => void;
-  onConfirmed: (collectionIds: string[]) => void;
-}
+import { useFavoriteCollectionPickerController } from './_hooks/useFavoriteCollectionPickerController';
+import CollectionPickerModal from './_parts/CollectionPickerModal';
+import type { FavoriteCollectionPickerProps } from './index.type';
 
 function FavoriteCollectionPicker({
   resourceId,

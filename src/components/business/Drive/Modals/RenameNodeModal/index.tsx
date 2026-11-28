@@ -9,7 +9,7 @@ import { useDriveService } from '@/domains';
 import { validateReservedName } from '@/domains/Drive/validation/validateReservedName';
 import { useApi } from '@/hooks/useApi';
 
-import type { DriveActionTarget } from '../../common/driveComponentModel';
+import type { DriveActionTarget } from '../../_common/driveComponentModel';
 import type { RenameNodeModalProps } from './index.type';
 import styles from './style.module.scss';
 

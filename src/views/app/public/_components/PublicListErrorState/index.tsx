@@ -4,11 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/base/Button';
 import { ErrorState } from '@/components/base/Feedback';
 
-interface PublicListErrorStateProps {
-  className?: string;
-  onRetry: () => void;
-  title: string;
-}
+import type { PublicListErrorStateProps } from './index.type';
 
 /** 公开课程与小组列表共用同一套页内失败与恢复入口。 */
 function PublicListErrorState({ className, onRetry, title }: PublicListErrorStateProps) {

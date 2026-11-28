@@ -1,0 +1,62 @@
+import { useShallow } from 'zustand/react/shallow';
+
+import ModelSelector from '@/components/business/ModelSelector';
+import { useChatConfigService } from '@/domains';
+import { useApi } from '@/hooks/useApi';
+
+import { useChatInputStore, useChatInputStoreApi } from '../../_common/context';
+import type { ModelPickerProps } from './index.type';
+
+function ModelPicker({ iconOnly = false }: ModelPickerProps) {
+  const chatConfigService = useChatConfigService();
+  const store = useChatInputStoreApi();
+  const { availableModels, modelOpen, selectedModelId } = useChatInputStore(
+    useShallow((state) => ({
+      availableModels: state.availableModels,
+      modelOpen: state.modelOpen,
+      selectedModelId: state.selectedModelId,
+    }))
+  );
+  const { setModelOpen, setSelectedModelId } = store.getState();
+  const { loading } = useApi(() => chatConfigService.getModels(), {
+    onSuccess: (nextModels) => {
+      const state = store.getState();
+      state.setAvailableModels(nextModels);
+      if (nextModels.length === 0) {
+        if (state.selectedModelId) state.setSelectedModelId(null);
+        return;
+      }
+      const selectedExists = state.selectedModelId
+        ? nextModels.some((model) => model.id === state.selectedModelId)
+        : false;
+      if (!selectedExists) {
+        state.setSelectedModelId((nextModels.find((model) => model.isDefault) ?? nextModels[0]).id);
+      }
+    },
+  });
+  const selectedModel = (() => {
+    if (availableModels.length === 0) return null;
+    const explicitModel = selectedModelId
+      ? availableModels.find((model) => model.id === selectedModelId)
+      : undefined;
+    return explicitModel ?? availableModels.find((model) => model.isDefault) ?? availableModels[0];
+  })();
+
+  return (
+    <ModelSelector
+      models={availableModels}
+      selectedId={selectedModel?.id}
+      isOpen={modelOpen}
+      onOpenChange={setModelOpen}
+      onChange={(model) => {
+        setSelectedModelId(model.id);
+        setModelOpen(false);
+      }}
+      loading={loading}
+      placement="top"
+      triggerVariant={iconOnly ? 'icon' : 'default'}
+    />
+  );
+}
+
+export default ModelPicker;

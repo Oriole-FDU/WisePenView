@@ -11,7 +11,7 @@
 - 当前允许 pdf、doc、docx、ppt、pptx、xls、xlsx，扩展名按小写解析；文件上限为 100 MiB，等于上限允许，大于上限拒绝。格式与容量在计算 MD5 和初始化请求前校验。依据：[允许格式](service/index.type.ts)、[assertDocumentUploadAllowed](service/DocumentServices.impl.ts)。
 - 上传顺序是校验、计算 MD5、初始化上传、必要时 PUT 至 OSS。`pathTagId` 映射到初始化请求的 `mountTargetTagId`，不能在上传后另猜目标文件夹。依据：[uploadDocument](service/DocumentServices.impl.ts)、[mapUploadDocToApi](mapper/DocumentServices.map.ts)。
 - 初始化成功即调用 `onUploadInitialized`，让调用方关联后端 documentId。秒传直接返回 documentId，不执行 OSS PUT 或上传进度回调；非秒传必须具备有效 putUrl 与 callbackHeader 才可上传。依据：[uploadDocument](service/DocumentServices.impl.ts)、[UploadDocumentParams](service/index.type.ts)。
-- `uploadDocument` 返回只表示前端完成秒传分支或文件传输，不证明解析、资源注册完成；目前上传队列在传输后继续同步处理状态，收到 READY 才走完成回调。这是前端判定，不是对正式后端持久化或可用性的独立验证。依据：[DOCUMENT_PROCESS](enum/index.ts)、[useDriveDocumentUpload](../../components/business/Drive/common/useDriveDocumentUpload.ts) 的 `settleQueuedUpload`。
+- `uploadDocument` 返回只表示前端完成秒传分支或文件传输，不证明解析、资源注册完成；目前上传队列在传输后继续同步处理状态，收到 READY 才走完成回调。这是前端判定，不是对正式后端持久化或可用性的独立验证。依据：[DOCUMENT_PROCESS](enum/index.ts)、[useDriveDocumentUpload](../../components/business/Drive/_common/useDriveDocumentUpload.ts) 的 `settleQueuedUpload`。
 
 ## 状态与允许操作
 

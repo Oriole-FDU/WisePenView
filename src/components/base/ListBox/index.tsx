@@ -1,14 +1,15 @@
 import { ListBox as HeroListBox } from '@heroui/react';
 import { clsx } from 'clsx';
-import type { ComponentProps } from 'react';
 
-import overlayStyles from '@/components/base/Popover/shared/styles.module.scss';
+import overlayStyles from '@/components/base/_common/overlay/style.module.scss';
 
-function ListBoxRoot(props: ComponentProps<typeof HeroListBox>) {
+import type { ListBoxItemProps, ListBoxProps } from './index.type';
+
+function ListBoxRoot(props: ListBoxProps) {
   return <HeroListBox {...props} />;
 }
 
-function ListBoxItem({ className, ...props }: ComponentProps<typeof HeroListBox.Item>) {
+function ListBoxItem({ className, ...props }: ListBoxItemProps) {
   return <HeroListBox.Item className={clsx(overlayStyles.item, className)} {...props} />;
 }
 

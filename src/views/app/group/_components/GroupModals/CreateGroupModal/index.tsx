@@ -15,8 +15,8 @@ import {
   IMAGE_UPLOAD_MAX_SIZE_LABEL,
 } from '@/utils/image/uploadLimit';
 
-import styles from './index.module.scss';
 import type { CreateGroupModalProps } from './index.type';
+import styles from './style.module.scss';
 
 type CreateGroupFormValues = Omit<CreateGroupRequest, 'groupCoverUrl'> & {
   cover?: File | null;

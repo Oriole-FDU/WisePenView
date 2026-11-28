@@ -1,0 +1,40 @@
+import { Skeleton } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+
+import { AppButton } from '@/components/base/Button';
+import { formatMillionNumber } from '@/utils/format';
+
+import styles from '../../_common/style.module.scss';
+import type { WalletBalanceHeaderProps } from './index.type';
+
+function WalletBalanceHeader({
+  balance,
+  loading,
+  canRecharge,
+  onRecharge,
+}: WalletBalanceHeaderProps) {
+  const { i18n, t } = useTranslation('wallet');
+  const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
+  return (
+    <div className={styles.assetRow}>
+      <div className={styles.balanceBlock}>
+        <p className={styles.balanceLabel}>{t('balance.label')}</p>
+        {loading ? (
+          <Skeleton className={styles.balanceSkeleton} />
+        ) : (
+          <p className={styles.balanceValue}>
+            {formatMillionNumber(balance, locale)}
+            <span className={styles.unit}>{t('balance.unit')}</span>
+          </p>
+        )}
+      </div>
+      {canRecharge ? (
+        <AppButton variant="primary" onPress={onRecharge}>
+          {t('balance.recharge')}
+        </AppButton>
+      ) : null}
+    </div>
+  );
+}
+
+export default WalletBalanceHeader;

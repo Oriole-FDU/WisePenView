@@ -12,12 +12,8 @@ import { GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import { useCourseContext } from '@/layouts/Course/_context';
 
+import type { CourseMembersViewProps } from './index.type';
 import styles from './style.module.scss';
-
-interface CourseMembersViewProps {
-  courseId: string;
-  memberCount: number;
-}
 
 const TEACHER_MEMBER_MANAGEMENT_CONFIG = getGroupDisplayConfig(GROUP_TYPE.ADVANCED, 'OWNER');
 

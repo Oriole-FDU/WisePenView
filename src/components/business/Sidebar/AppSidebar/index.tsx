@@ -6,10 +6,10 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import UserProfile from '../_common/footer/UserProfile';
 import HeaderNav from '../_common/header/HeaderNav';
 import SidebarHeader from '../_common/header/SidebarHeader';
-import styles from '../_common/sidebarShell.module.scss';
+import styles from '../_common/style.module.scss';
 import AppSidebarTabs from '../_common/tab';
+import { useAppSidebarHeaderNav } from './_hooks/useAppSidebarHeaderNav';
 import type { AppSidebarProps } from './index.type';
-import { useAppSidebarHeaderNav } from './useAppSidebarHeaderNav';
 
 function AppSidebar({
   canGoBack,

@@ -6,23 +6,8 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { InlineInput } from '@/components/base/Input';
 
-import type { NoteFindResult } from '../../index.type';
+import type { FindBarProps } from './index.type';
 import styles from './style.module.scss';
-
-interface FindBarProps {
-  query: string;
-  replacement: string;
-  result: NoteFindResult | null;
-  replaced: number;
-  canReplace: boolean;
-  onQueryChange: (query: string) => void;
-  onReplacementChange: (replacement: string) => void;
-  onPrevious: () => void;
-  onNext: () => void;
-  onReplaceCurrent: () => void;
-  onReplaceAll: () => void;
-  onClose: () => void;
-}
 
 function FindBar({
   query,

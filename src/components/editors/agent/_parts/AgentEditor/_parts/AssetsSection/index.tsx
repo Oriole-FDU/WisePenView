@@ -1,0 +1,146 @@
+import { Table } from '@heroui/react';
+import { Trash2, Upload } from 'lucide-react';
+import { type DragEvent, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import AppForm from '@/components/base/AppForm';
+import { AppButton } from '@/components/base/Button';
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { HiddenFileInput } from '@/components/base/Input';
+import { formatFileSize } from '@/utils/format/formatFileSize';
+
+import type { Props } from './index.type';
+import styles from './style.module.scss';
+
+const isFileDrag = (event: DragEvent<HTMLElement>) =>
+  Array.from(event.dataTransfer.types).includes('Files');
+
+export default function AssetsSection({ assets, disabled, uploading, onUpload, onDelete }: Props) {
+  const { t } = useTranslation('agent');
+  const ref = useRef<HTMLInputElement>(null);
+  const dragCounterRef = useRef(0);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const uploadDisabled = disabled || uploading;
+
+  const resetDragState = () => {
+    dragCounterRef.current = 0;
+    setIsDragOver(false);
+  };
+
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
+    if (!isFileDrag(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (uploadDisabled) return;
+
+    dragCounterRef.current += 1;
+    if (dragCounterRef.current === 1) setIsDragOver(true);
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (!isFileDrag(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = uploadDisabled ? 'none' : 'copy';
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (!isFileDrag(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (uploadDisabled) return;
+
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) resetDragState();
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    if (!isFileDrag(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    resetDragState();
+    if (uploadDisabled) return;
+
+    const files = Array.from(event.dataTransfer.files);
+    if (files.length > 0) onUpload(files);
+  };
+
+  return (
+    <AppForm.Section
+      id="assets"
+      title={t('assets.title')}
+      variant="editor"
+      actions={
+        <AppButton
+          size="sm"
+          variant="secondary"
+          isDisabled={uploadDisabled}
+          onPress={() => ref.current?.click()}
+        >
+          <Upload size={14} />
+          {t('assets.upload')}
+        </AppButton>
+      }
+    >
+      <div
+        className={styles.dropZone}
+        data-drag-over={isDragOver}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <Table variant="secondary">
+          <Table.ScrollContainer>
+            <Table.Content aria-label={t('assets.tableAria')}>
+              <Table.Header>
+                <Table.Column isRowHeader>{t('assets.file')}</Table.Column>
+                <Table.Column>{t('assets.typeAndSize')}</Table.Column>
+                <Table.Column>{t('assets.status')}</Table.Column>
+                <Table.Column>{t('assets.actions')}</Table.Column>
+              </Table.Header>
+              <Table.Body
+                items={assets}
+                renderEmptyState={() => <div className={styles.empty}>{t('assets.empty')}</div>}
+              >
+                {(asset) => (
+                  <Table.Row id={asset.id}>
+                    <Table.Cell>
+                      <strong>{asset.name}</strong>
+                    </Table.Cell>
+                    <Table.Cell>
+                      {asset.assetResourceType} · {formatFileSize(asset.size)}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {asset.uploadStatus === 'AVAILABLE'
+                        ? t('assets.available')
+                        : t('assets.uploading')}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <AppIconButton
+                        icon={<Trash2 size={14} aria-hidden="true" />}
+                        label={t('assets.delete', { name: asset.name })}
+                        size="sm"
+                        isDisabled={disabled}
+                        onPress={() => onDelete(asset.id)}
+                      />
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
+        </Table>
+        {isDragOver ? <div className={styles.dropHint}>{t('assets.drop')}</div> : null}
+      </div>
+      <HiddenFileInput
+        ref={ref}
+        multiple
+        onChange={(e) => {
+          onUpload(Array.from(e.target.files ?? []));
+          e.target.value = '';
+        }}
+      />
+    </AppForm.Section>
+  );
+}

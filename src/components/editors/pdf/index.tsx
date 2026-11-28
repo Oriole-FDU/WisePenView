@@ -5,25 +5,17 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
-import PdfViewer from '@/components/editors/pdf/components/PdfViewer/index';
+import PdfViewer from '@/components/editors/pdf/_parts/PdfViewer/index';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useResourceInteractionService } from '@/domains';
-import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorRuntime } from '../_runtime/useEditorRuntime';
-import type { EditorSurfaceProps } from '../editor.type';
+import type { EditorSurfaceProps, PdfPresentationBindingProps } from './index.type';
 import styles from './style.module.scss';
-
-interface PdfPresentationBindingProps {
-  resourceInfo?: ResourceItem;
-  documentType?: string;
-  onPermissionSuccess?: () => void;
-  onResourceChanged?: () => unknown | Promise<unknown>;
-}
 
 function PdfPresentationBinding({
   resourceInfo,

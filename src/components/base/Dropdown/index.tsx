@@ -1,16 +1,16 @@
 import { Dropdown as HeroDropdown } from '@heroui/react';
 import { clsx } from 'clsx';
-import type { ComponentProps } from 'react';
 
-import overlayStyles from '@/components/base/Popover/shared/styles.module.scss';
+import overlayStyles from '@/components/base/_common/overlay/style.module.scss';
 
+import type { DropdownItemProps, DropdownPopoverProps, DropdownProps } from './index.type';
 import styles from './style.module.scss';
 
-function DropdownRoot(props: ComponentProps<typeof HeroDropdown>) {
+function DropdownRoot(props: DropdownProps) {
   return <HeroDropdown {...props} />;
 }
 
-function DropdownPopover({ className, ...props }: ComponentProps<typeof HeroDropdown.Popover>) {
+function DropdownPopover({ className, ...props }: DropdownPopoverProps) {
   return (
     <HeroDropdown.Popover
       className={clsx(
@@ -24,7 +24,7 @@ function DropdownPopover({ className, ...props }: ComponentProps<typeof HeroDrop
   );
 }
 
-function DropdownItem({ className, ...props }: ComponentProps<typeof HeroDropdown.Item>) {
+function DropdownItem({ className, ...props }: DropdownItemProps) {
   return <HeroDropdown.Item className={clsx(overlayStyles.item, className)} {...props} />;
 }
 

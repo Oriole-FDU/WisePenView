@@ -10,9 +10,12 @@ import { useApiPagination } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import type { EnumKey } from '@/utils/type/enum';
 
+import MemberListTable from './_parts/MemberListTable';
+import type {
+  MemberListInlineDraft,
+  MemberListInlineEditKind,
+} from './_parts/MemberListTable/index.type';
 import type { MemberListProps } from './index.type';
-import MemberListTable from './MemberListTable';
-import type { MemberListInlineDraft, MemberListInlineEditKind } from './MemberListTable/index.type';
 import {
   AssignQuotaModal,
   DeleteMemberModal,

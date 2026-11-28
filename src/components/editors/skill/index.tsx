@@ -20,19 +20,6 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { prepareDraftExit } from '../_runtime/draftExit';
 import { useEditorRuntime } from '../_runtime/useEditorRuntime';
-import type { EditorSurfaceProps } from '../editor.type';
-import SkillActionDialogs from './components/SkillActionDialogs';
-import SkillEditorPanel from './components/SkillEditorPanel';
-import SkillFileTreePanel from './components/SkillFileTreePanel';
-import { useSkillFileActionsController } from './controllers/useSkillFileActionsController';
-import { useSkillMarkdownPreviewController } from './controllers/useSkillMarkdownPreviewController';
-import {
-  SKILL_CONFIG_NODE_ID,
-  useSkillNavigationController,
-} from './controllers/useSkillNavigationController';
-import { useSkillResourceController } from './controllers/useSkillResourceController';
-import { useSkillSaveController } from './controllers/useSkillSaveController';
-import { useSkillWorkspaceDraftController } from './controllers/useSkillWorkspaceDraftController';
 import {
   canEditSkill,
   canPreviewSelectedSkillFile,
@@ -40,8 +27,21 @@ import {
   getDisabledSkillVersionKeys,
   getSkillConfigBadge,
   getSkillVersionItems,
-} from './model';
-import styles from './style.module.scss';
+} from './_common/model';
+import styles from './_common/style.module.scss';
+import { useSkillFileActionsController } from './_hooks/useSkillFileActionsController';
+import { useSkillMarkdownPreviewController } from './_hooks/useSkillMarkdownPreviewController';
+import {
+  SKILL_CONFIG_NODE_ID,
+  useSkillNavigationController,
+} from './_hooks/useSkillNavigationController';
+import { useSkillResourceController } from './_hooks/useSkillResourceController';
+import { useSkillSaveController } from './_hooks/useSkillSaveController';
+import { useSkillWorkspaceDraftController } from './_hooks/useSkillWorkspaceDraftController';
+import SkillActionDialogs from './_parts/SkillActionDialogs';
+import SkillEditorPanel from './_parts/SkillEditorPanel';
+import SkillFileTreePanel from './_parts/SkillFileTreePanel';
+import type { EditorSurfaceProps } from './index.type';
 
 function SkillEditorContent() {
   const {

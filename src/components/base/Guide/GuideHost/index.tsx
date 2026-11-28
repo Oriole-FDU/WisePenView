@@ -6,24 +6,17 @@ import { useTranslation } from 'react-i18next';
 import { useJoyride } from 'react-joyride';
 import { useLocation } from 'react-router-dom';
 
-import {
-  GUIDE_TOUR_CODE,
-  GUIDE_TOURS,
-  type GuideToolId,
-  type GuideTourConfig,
-  type GuideTourId,
-} from '@/constants/tour';
+import { GUIDE_TOUR_CODE, GUIDE_TOURS, type GuideToolId, type GuideTourId } from '@/constants/tour';
 import { useUserTourService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import { getActivePageTourId, subscribeActivePageTour } from '../activePageTourStore';
 import { compileGuideSteps } from '../compileGuideSteps';
 import { findGuideTarget } from '../findGuideTarget';
-import type { GuideActionPort } from '../guideActions';
 import GuideSpotlight from '../GuideSpotlight';
 import { useGuideTaskStore } from '../guideTaskStore';
 import GuideTooltip, { GuideArrow } from '../GuideTooltip';
-import type { GuideHostProps } from './index.type';
+import type { GuideHostProps, GuidePlayerProps } from './index.type';
 
 const GUIDE_Z_INDEX_FALLBACK = 1050;
 const SCOPE_TRANSITION_GAP_MS = 500;
@@ -110,12 +103,6 @@ function useGuideTargetBinding(
   }, [enabled, targetToolIds, toolKey]);
 
   return enabled && binding && binding.toolKey === toolKey ? binding.allTargetsPresent : false;
-}
-
-interface GuidePlayerProps {
-  tour: GuideTourConfig;
-  actions: GuideActionPort;
-  onFinished: () => void;
 }
 
 /** 当前一条指引。换一条时整段重挂，从第一步重新开始。 */

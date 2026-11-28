@@ -119,3 +119,29 @@ export interface WelcomeStarterProps {
 
 /** @deprecated 使用 WelcomeStarterProps */
 export type WelcomeConfigurableProps = WelcomeStarterProps;
+
+export type QuestionPillButtonProps = {
+  item: WelcomeQuestionItem;
+  variant: 'list' | 'bubbles' | 'pillWrap' | 'pillScroll';
+  onPick: () => void;
+};
+
+export type PillScrollStripProps = {
+  items: WelcomeQuestionsBlock['items'];
+  onPick: (item: WelcomeQuestionsBlock['items'][number]) => void;
+};
+
+export type WelcomeQuestionsSectionProps = {
+  block: WelcomeQuestionsBlock;
+  onPick: WelcomeStarterProps['onPromptPick'];
+};
+
+export type FeatureIconOrbProps = {
+  icon: NonNullable<WelcomePromptCardItem['icon']>;
+  tone: WelcomeIconTone | undefined;
+};
+
+export type WelcomePromptCardsSectionProps = {
+  block: WelcomePromptCardsBlock;
+  onPick: WelcomeStarterProps['onPromptPick'];
+};

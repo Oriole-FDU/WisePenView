@@ -10,7 +10,6 @@ import type { SupportedLanguage } from '@/i18n/resources';
 import {
   COLOR_SCHEME_OPTIONS,
   type ColorScheme,
-  type ColorSchemeOption,
   THEME_MODE_OPTIONS,
   type ThemeMode,
   useAppTheme,
@@ -18,6 +17,11 @@ import {
 } from '@/theme';
 
 import layout from '../style.module.scss';
+import type {
+  ColorSchemeSectionProps,
+  SchemeOptionProps,
+  ThemeModeSectionProps,
+} from './index.type';
 import styles from './style.module.scss';
 
 function LanguageSection() {
@@ -49,11 +53,6 @@ function LanguageSection() {
   );
 }
 
-type ThemeModeSectionProps = {
-  value: string;
-  onChange: (mode: ThemeMode) => void;
-};
-
 function ThemeModeSection({ value, onChange }: ThemeModeSectionProps) {
   const { t } = useTranslation('profile');
 
@@ -81,11 +80,6 @@ function ThemeModeSection({ value, onChange }: ThemeModeSectionProps) {
     </section>
   );
 }
-
-type ColorSchemeSectionProps = {
-  value: ColorScheme;
-  onChange: (scheme: ColorScheme) => void;
-};
 
 function ColorSchemeSection({ value, onChange }: ColorSchemeSectionProps) {
   const { t } = useTranslation('profile');
@@ -116,10 +110,6 @@ function ColorSchemeSection({ value, onChange }: ColorSchemeSectionProps) {
     </section>
   );
 }
-
-type SchemeOptionProps = {
-  option: ColorSchemeOption;
-};
 
 function SchemeOption({ option }: SchemeOptionProps) {
   const { t } = useTranslation('profile');

@@ -10,9 +10,9 @@ import {
 } from '@/domains/Resource/model/resourceTarget';
 import { useWorkspaceRightPanel } from '@/layouts/WorkspaceRightPanelLayout';
 
-import FileViewerResolver from './_components/FileViewerResolver';
-import ResourceEditorWorkspace from './_components/ResourceEditorWorkspace';
-import UnsupportedResource from './_components/UnsupportedResource';
+import FileViewerResolver from './_parts/FileViewerResolver';
+import ResourceEditorWorkspace from './_parts/ResourceEditorWorkspace';
+import UnsupportedResource from './_parts/UnsupportedResource';
 import type { ResourceTargetResolverProps } from './index.type';
 
 function ResourceTargetResolver({ target, onTargetChange, onClose }: ResourceTargetResolverProps) {

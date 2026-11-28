@@ -8,13 +8,8 @@ import { FormField, Input, TextArea } from '@/components/base/Input';
 import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
+import type { CreateCourseModalProps } from './index.type';
 import styles from './style.module.scss';
-
-interface CreateCourseModalProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCreated: (courseId: string) => void;
-}
 
 interface CourseCreateFormValues {
   name: string;

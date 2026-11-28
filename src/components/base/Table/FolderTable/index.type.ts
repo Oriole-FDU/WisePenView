@@ -1,3 +1,4 @@
+// 部分公开类型仍在组件入口，涉及复合组件、插件或泛型关系，待后续迁移。
 import type { SortDescriptor } from '@heroui/react';
 import type { DragEvent, ReactElement, ReactNode } from 'react';
 

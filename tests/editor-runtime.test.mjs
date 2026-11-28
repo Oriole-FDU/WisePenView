@@ -29,10 +29,10 @@ const [
   bundle('src/components/editors/_runtime/editorHost.ts'),
   bundle('src/components/editors/_runtime/draftExit.ts'),
   bundle('src/components/editors/_runtime/editorExitPrompt.ts'),
-  bundle('src/components/editors/office/officeSession.ts'),
-  bundle('src/components/editors/drawio/drawioSaveSession.ts'),
+  bundle('src/components/editors/office/_common/officeSession.ts'),
+  bundle('src/components/editors/drawio/_common/drawioSaveSession.ts'),
   bundle(
-    'src/views/app/resource/ResourceTargetResolver/_components/ResourceEditorWorkspace/workspacePresentationStore.ts'
+    'src/views/app/resource/ResourceTargetResolver/_parts/ResourceEditorWorkspace/_common/workspacePresentationStore.ts'
   ),
 ]);
 const { createEditorRuntime, waitForEditor } = runtimeModule;

@@ -1,3 +1,4 @@
+// TODO：该入口导出 BlockNote 插件或 spec，非独立组件，CodeBlockRenderContext 依赖本地运行值的 typeof 推导；需结合插件契约单独处理。
 import { codeBlockOptions } from '@blocknote/code-block';
 import { createCodeBlockSpec } from '@blocknote/core';
 import { createRoot } from 'react-dom/client';

@@ -1,3 +1,5 @@
+import type { TagPolicyModalMode } from './_common/tagPermissionModalModel';
+
 export interface TagPermissionModalProps {
   isOpen: boolean;
   groupId?: string;
@@ -7,3 +9,7 @@ export interface TagPermissionModalProps {
 }
 
 export type TagMountPermissionModalProps = TagPermissionModalProps;
+
+export interface TagPolicyModalBaseProps extends TagPermissionModalProps {
+  mode: TagPolicyModalMode;
+}

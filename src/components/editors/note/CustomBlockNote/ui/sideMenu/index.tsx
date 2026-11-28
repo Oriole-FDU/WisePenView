@@ -70,6 +70,7 @@ import {
 import { SlashMenuDropdownItems } from '@/components/editors/note/CustomBlockNote/ui/slashMenu/slashMenuView';
 import { copyText } from '@/utils/browser/copyText';
 
+import type { NoteSideMenuProps } from './index.type';
 import styles from './style.module.scss';
 
 type TextAlignment = 'left' | 'center' | 'right';
@@ -754,7 +755,7 @@ function CustomSideMenu({
   );
 }
 
-export default function NoteSideMenu({ plugins }: { plugins: readonly NoteContentPlugin[] }) {
+export default function NoteSideMenu({ plugins }: NoteSideMenuProps) {
   const readOnly = useNoteEditorReadOnlyContext();
   const editor = useBlockNoteEditor(blockNoteSchema);
   const [isPointerSelectingText, setIsPointerSelectingText] = useState(false);

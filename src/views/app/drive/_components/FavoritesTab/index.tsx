@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState, Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
-import FavoriteCollectionList from './components/FavoriteCollectionList';
-import FavoriteResourceTable from './components/FavoriteResourceTable';
-import DeleteCollectionModal from './DeleteCollectionModal';
-import EditCollectionModal from './EditCollectionModal';
-import { useFavoriteCollections } from './hooks/useFavoriteCollections';
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
+import { useFavoriteCollections } from './_hooks/useFavoriteCollections';
+import DeleteCollectionModal from './_parts/DeleteCollectionModal';
+import EditCollectionModal from './_parts/EditCollectionModal';
+import FavoriteCollectionList from './_parts/FavoriteCollectionList';
+import FavoriteResourceTable from './_parts/FavoriteResourceTable';
 
 function resolveDefaultCollection(
   collections: FavoriteCollection[]

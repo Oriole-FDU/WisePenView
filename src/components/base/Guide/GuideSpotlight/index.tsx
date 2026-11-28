@@ -1,9 +1,9 @@
 import { useId } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useGuideSpotlightFrame } from './_hooks/useGuideSpotlightFrame';
 import type { GuideSpotlightProps } from './index.type';
 import styles from './style.module.scss';
-import { useGuideSpotlightFrame } from './useGuideSpotlightFrame';
 
 const SPOTLIGHT_FEATHER = 1;
 

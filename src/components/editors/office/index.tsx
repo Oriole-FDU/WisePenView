@@ -1,4 +1,3 @@
-import type { Config } from '@onlyoffice/doceditor-types';
 import { DocumentEditor } from '@onlyoffice/document-editor-react';
 import { useMemoizedFn } from 'ahooks';
 import { useReducer, useState } from 'react';
@@ -10,7 +9,6 @@ import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useResourceInteractionService } from '@/domains';
-import type { ResourceItem } from '@/domains/Resource';
 import { useApi } from '@/hooks/useApi';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
@@ -18,24 +16,13 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
-import type { EditorSurfaceProps } from '../editor.type';
-import { isOfficeReadOnly, prepareOfficeExit, reduceOfficeSession } from './officeSession';
+import { isOfficeReadOnly, prepareOfficeExit, reduceOfficeSession } from './_common/officeSession';
+import type {
+  EditorSurfaceProps,
+  OfficeEditorHostProps,
+  OfficePresentationBindingProps,
+} from './index.type';
 import styles from './style.module.scss';
-
-interface OfficePresentationBindingProps {
-  resourceInfo?: ResourceItem;
-  documentType?: string;
-  onPermissionSuccess?: () => void;
-  onResourceChanged?: () => unknown | Promise<unknown>;
-}
-
-interface OfficeEditorHostProps {
-  config: Config;
-  documentServerUrl: string;
-  resourceName: string;
-  onReady: () => void;
-  onError: (error: unknown) => void;
-}
 
 function OfficePresentationBinding({
   resourceInfo,

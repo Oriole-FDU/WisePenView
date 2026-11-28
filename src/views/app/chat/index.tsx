@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { GuideScope } from '@/components/base/Guide';
 import Chat from '@/components/business/Chat';
 import { GUIDE_TOUR_ID } from '@/constants/tour';
-import { useMainShell } from '@/layouts/MainShell/_context';
+import { useMainShell } from '@/layouts/MainShell/_common/context';
 
 import styles from './style.module.scss';
 

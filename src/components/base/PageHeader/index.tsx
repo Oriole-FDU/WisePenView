@@ -1,18 +1,8 @@
 import { Heading } from '@heroui/react';
 import { clsx } from 'clsx';
-import type { ReactNode } from 'react';
 
+import type { PageHeaderProps } from './index.type';
 import styles from './style.module.scss';
-
-interface PageHeaderProps {
-  title: ReactNode;
-  actions?: ReactNode;
-  leading?: ReactNode;
-  titleId?: string;
-  className?: string;
-  contentClassName?: string;
-  actionsClassName?: string;
-}
 
 function PageHeader({
   title,

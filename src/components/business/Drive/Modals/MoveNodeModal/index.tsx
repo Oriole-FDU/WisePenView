@@ -6,7 +6,7 @@ import { useDriveService } from '@/domains';
 import type { DriveContainerNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
 
-import { type DriveActionTarget, getDriveScopeGroupId } from '../../common/driveComponentModel';
+import { type DriveActionTarget, getDriveScopeGroupId } from '../../_common/driveComponentModel';
 import DriveFolderPickerModal from '../DriveFolderPickerModal';
 import type { MoveNodeModalProps } from './index.type';
 

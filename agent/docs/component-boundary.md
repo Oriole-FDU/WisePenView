@@ -57,43 +57,13 @@ src/views/admin/<PageName>/
 
 ## 五、目录结构
 
-可复用组件推荐：
+组件内部目录、类型入口、样式归属与公共／私有导入边界统一遵循 [组件目录契约](component-structure.md)。该文档是唯一结构规范，页面私有组件和递归 part 同样适用；本文件只规定组件放置与复用范围。
 
-```text
-components/
-├── base/ComponentName/
-│   ├── index.tsx
-│   ├── index.type.ts
-│   └── style.module.scss
-└── business/ComponentName/
-    ├── index.tsx
-    ├── index.type.ts
-    └── style.module.scss
-```
+## 六、结构门禁
 
-页面私有组件推荐：
+组件专题在 `lint/contracts.js` 登记，使用 `pnpm lint:component` 检查，结构错误默认级别为 `error`，不以全量 warning 作为目标门禁。具体检查范围、当前覆盖与机械迁移步骤见 [组件目录契约的 Lint 检查](component-structure.md#4-lint-检查)。
 
-```text
-PageName/
-├── index.tsx
-├── style.module.scss
-├── components/
-├── hooks/
-└── config/
-```
-
-## 六、命名与入口校验
-
-`eslint-rules/component-conventions.js` 注册 `wisepen/component-conventions`，由 `pnpm lint` 校验组件目录、入口、导出和辅助文件命名。当前处于 warning 阶段，用于先暴露存量迁移和新代码风险，不阻塞 CI。
-
-- 新增 React 组件必须位于 `PascalCase` 文件夹，并以 `index.tsx` 作为唯一入口；组件导出名必须是 `PascalCase`。仅在当前页面使用的私有组件也遵循同一规则。
-- 组件目录名必须与 `index.tsx` 的主导出一致，例如 `OrderSummary/index.tsx` 应主导出 `OrderSummary`；不一致的历史组件登记在 `componentNames` 基线。
-- 组件目录根部只放入口、公共类型和样式等稳定模块文件。逻辑、Hook 和 helper 放在组件目录下的 `hooks/`、`controllers/`、`utils/` 等分组目录，或使用 `camelCase.ts` 直接放在组件目录根部。
-- 组件公共类型拆出时统一使用 `index.type.ts`；单个组件私有样式拆出时统一使用 `style.module.scss`。项目使用 SCSS CSS Modules，因此不以 `index.css` 作为组件样式契约。类型和样式文件按实际需要创建，不生成空占位文件。
-- `index.ts`、`index.type.ts`、`style.module.scss`、`*.stories.tsx`、`*.test.tsx` 和 `*.spec.tsx` 是保留文件名；组件实现不能继续使用同级 `Foo.tsx`。
-- `_components`、`components`、`hooks`、`controllers`、`utils`、`_context`、`_store` 等小写分组目录只承载组织或逻辑；分组内若新增组件，仍须下沉到 `PascalCase/index.tsx`。
-- 存量扁平组件、目录与导出名不一致和技术入口登记在 `eslint-rules/component-conventions.js` 的 `componentConventionBaseline` 中。迁移时只删除对应基线项，不把新违规追加到基线；基线为空后再删除该兼容层。
-- 未登记的新 `Foo.tsx`、非 `PascalCase` 组件目录、非 `PascalCase` 组件导出、组件根部的 `PascalCase.ts` 辅助文件，以及非 `style.module.scss` 的组件私有 CSS Module 都会产生 lint warning。迁移稳定后再提升为 error。
+目录契约由默认级别为 error 的 `wisepen/component-structure` 检查，旧 `component-conventions` 已删除。复杂历史组件在 `lint/component-todos.js` 的具名迁移清单中记录，只豁免明确历史诊断；不忽略整个目录、不追加新违规，迁移后删除对应项。行为内聚与状态归属仍需 Review，不能用目录检查代替。
 
 ## 七、收敛规则
 
@@ -104,9 +74,7 @@ PageName/
 ## 八、检查清单
 
 - [ ] 新组件放置位置符合复用范围。
-- [ ] 新组件使用 `PascalCase/index.tsx`，主导出为 `PascalCase`。
-- [ ] 组件目录根部没有新增 `Foo.tsx`、`Foo.module.scss` 或 `Foo.type.ts`。
-- [ ] 拆出的公共类型和私有样式分别使用 `index.type.ts` 与 `style.module.scss`。
+- [ ] 目录、类型、样式及私有依赖符合 [组件目录契约](component-structure.md)，历史诊断按具名清单逐项收敛。
 - [ ] 新组件落在 `base` 或 `business` 的正确一层，`base` 没有反向依赖 `business`。
 - [ ] 业务组件没有无理由进入 `src/components`。
 - [ ] 组件 Props 没有承载整条业务链路。

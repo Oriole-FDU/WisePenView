@@ -6,13 +6,8 @@ import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import ResourceFavoriteButton from './ResourceFavoriteButton';
-
-interface ResourceFavoriteActionProps {
-  resourceId: string;
-  onSuccess?: () => unknown | Promise<unknown>;
-  showLabel?: boolean;
-}
+import ResourceFavoriteButton from './_parts/ResourceFavoriteButton';
+import type { ResourceFavoriteActionProps } from './index.type';
 
 function ResourceFavoriteAction({
   resourceId,

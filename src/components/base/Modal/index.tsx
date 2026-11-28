@@ -4,7 +4,7 @@ import { type ComponentProps, useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
-import { ModalRootControlProvider, useModalRootControl } from './_context';
+import { ModalRootControlProvider, useModalRootControl } from './_common/context';
 import type {
   ModalBackdropProps,
   ModalRootControlContextValue,

@@ -4,7 +4,7 @@ import type { AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import {
   getDriveNodeLabel,
   getDriveScopeGroupId,
-} from '@/components/business/Drive/common/driveComponentModel';
+} from '@/components/business/Drive/_common/driveComponentModel';
 import { useDriveService, useGroupService } from '@/domains';
 import type { DriveResourceLocation } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';

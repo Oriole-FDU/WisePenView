@@ -31,7 +31,7 @@ const TaskCenter = lazy(() => import('@/views/admin/TaskCenter'));
 const Drive = lazy(() => import('@/views/app/drive/Drive'));
 const PublicGroupsPage = lazy(() => import('@/views/app/public/PublicGroupsPage'));
 const PublicCoursesPage = lazy(() => import('@/views/app/public/PublicCoursesPage'));
-const PublicInvitePage = lazy(() => import('@/views/app/public/Invite'));
+const PublicInvitePage = lazy(() => import('@/views/app/public/PublicInvitePage'));
 const GroupDetail = lazy(() => import('@/views/app/group/GroupDetail'));
 const GroupRoute = lazy(() => import('@/views/app/group/GroupRoute'));
 const GroupFilesPage = lazy(() => import('@/views/app/group/GroupDetail/_pages/GroupFilesPage'));
@@ -51,7 +51,7 @@ const GroupWalletRouteGuard = lazy(
 const Account = lazy(() => import('@/views/app/profile/Account'));
 const Usage = lazy(() => import('@/views/app/profile/Usage'));
 const Appearance = lazy(() => import('@/views/app/profile/Appearance'));
-const AISettings = lazy(() => import('@/views/app/profile/AI'));
+const AISettings = lazy(() => import('@/views/app/profile/AISettings'));
 const Login = lazy(() => import('@/views/app/auth/Login'));
 const Register = lazy(() => import('@/views/app/auth/Register'));
 const AuthBindingOnboarding = lazy(() => import('@/views/app/auth/AuthBindingOnboarding'));
@@ -63,12 +63,8 @@ const ChatPage = lazy(() => import('@/views/app/chat'));
 const NotificationsPage = lazy(() => import('@/views/app/notifications'));
 const CourseRoute = lazy(() => import('@/views/app/course/CourseRoute'));
 const CourseContextPage = lazy(() => import('@/views/app/course/CourseContextPage'));
-const CourseHomePage = lazy(
-  () => import('@/views/app/course/CourseContextPage/_components/CourseHomeTab')
-);
-const CourseInfoPage = lazy(
-  () => import('@/views/app/course/CourseContextPage/_components/CourseInfoTab')
-);
+const CourseHomePage = lazy(() => import('@/views/app/course/CourseHomeTab'));
+const CourseInfoPage = lazy(() => import('@/views/app/course/CourseInfoTab'));
 const CourseMaterialsPage = lazy(() => import('@/views/app/course/CourseMaterialsPage'));
 const CourseMembersPage = lazy(() => import('@/views/app/course/CourseMembersPage'));
 const CourseEditorPage = lazy(() => import('@/views/app/course/CourseEditorPage'));

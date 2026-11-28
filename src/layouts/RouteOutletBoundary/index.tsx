@@ -1,15 +1,11 @@
-import type { ReactNode } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { useLocation } from 'react-router-dom';
 
 import { ErrorPage } from '@/components/business/ErrorPage';
 import { ObservedErrorBoundary } from '@/observability/react';
 
+import type { RouteOutletBoundaryProps } from './index.type';
 import styles from './style.module.scss';
-
-interface RouteOutletBoundaryProps {
-  children: ReactNode;
-}
 
 /** 壳内兜底：主操作交还 resetErrorBoundary，只重试内容区而不整页刷新。 */
 function RouteOutletFallback({ error, resetErrorBoundary }: FallbackProps) {

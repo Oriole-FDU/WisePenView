@@ -1,0 +1,144 @@
+import { clsx } from 'clsx';
+import { Heart, MessageCircle, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+import AppAvatar from '@/components/base/Avatar';
+import { AppButton, AppPressable } from '@/components/base/Button';
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { Tooltip } from '@/components/base/Tooltip';
+import {
+  formatRelativeTimestamp,
+  formatTimestampToDateTime,
+  parseTimestampToDate,
+} from '@/utils/format/formatTime';
+
+import styles from '../../_common/style.module.scss';
+import { getAuthorInitial, hasVisibleCommentContent } from '../../_common/utils';
+import type { ResourceCommentItemProps } from './index.type';
+
+function ResourceCommentItem({
+  comment,
+  currentUserId,
+  resourceOwnerId,
+  liked,
+  likePending,
+  onReply,
+  onLike,
+  onDelete,
+  onPreviewImage,
+}: ResourceCommentItemProps) {
+  const { t, i18n } = useTranslation(['resource', 'common']);
+  const locale = i18n.resolvedLanguage === 'en-US' ? 'en-US' : 'zh-CN';
+  const canDelete = currentUserId === comment.authorId || currentUserId === resourceOwnerId;
+  const unknownTime = t('resource:comment.unknownTime');
+  const commentDate = parseTimestampToDate(comment.createTime);
+  const absoluteTime = commentDate
+    ? formatTimestampToDateTime(commentDate) || unknownTime
+    : unknownTime;
+  const relativeTime = commentDate
+    ? formatRelativeTimestamp(commentDate, locale) || unknownTime
+    : unknownTime;
+  const dateTime = commentDate?.toISOString();
+  const likeLabel = liked ? t('resource:comment.unlike') : t('resource:comment.like');
+
+  const likeButton = (
+    <AppButton
+      variant="ghost"
+      size="sm"
+      className={clsx(styles.commentActionIcon, liked && styles.likedButton)}
+      isDisabled={likePending}
+      aria-label={likeLabel}
+      onPress={() => void onLike(comment)}
+    >
+      <Heart size={14} aria-hidden fill={liked ? 'currentColor' : 'none'} />
+      {comment.likeCount > 0 ? <span className={styles.likeCount}>{comment.likeCount}</span> : null}
+    </AppButton>
+  );
+
+  return (
+    <article className={styles.commentItem}>
+      <AppAvatar aria-label={comment.author.name} className={styles.avatar}>
+        {comment.author.avatar ? (
+          <AppAvatar.Image src={comment.author.avatar} alt={comment.author.name} />
+        ) : null}
+        <AppAvatar.Fallback>{getAuthorInitial(comment.author.name)}</AppAvatar.Fallback>
+      </AppAvatar>
+
+      <div className={styles.commentBody}>
+        <div className={styles.authorLine}>
+          <div className={styles.authorMeta}>
+            <strong>{comment.author.name}</strong>
+            {comment.replyToUser ? (
+              <span>{t('resource:comment.replyTo', { name: comment.replyToUser.name })}</span>
+            ) : null}
+          </div>
+          <time className={styles.commentTime} dateTime={dateTime} title={absoluteTime}>
+            {relativeTime}
+          </time>
+        </div>
+
+        {comment.deleted ? (
+          <p className={styles.deletedText}>{t('resource:comment.deleted')}</p>
+        ) : (
+          <>
+            {hasVisibleCommentContent(comment.content) ? (
+              <p className={styles.commentContent}>{comment.content}</p>
+            ) : null}
+            {comment.imageUrls.length > 0 ? (
+              <div className={styles.commentImages}>
+                {comment.imageUrls.map((url, index) => (
+                  <AppPressable
+                    key={`${url}-${index}`}
+                    className={styles.commentImageButton}
+                    aria-label={t('resource:comment.previewImage')}
+                    onClick={() => onPreviewImage(url)}
+                  >
+                    <img src={url} alt={t('resource:comment.imageAlt')} loading="lazy" />
+                  </AppPressable>
+                ))}
+              </div>
+            ) : null}
+          </>
+        )}
+
+        {!comment.deleted ? (
+          <div className={styles.commentActions}>
+            <AppIconButton
+              icon={<MessageCircle size={14} aria-hidden />}
+              label={t('resource:comment.replyAction', { name: comment.author.name })}
+              size="sm"
+              className={styles.commentActionIcon}
+              tooltip={{ content: t('resource:comment.reply') }}
+              onPress={() => onReply(comment)}
+            />
+            <Tooltip>
+              {likePending ? (
+                <Tooltip.Trigger<'span'>
+                  render={(props) => <span {...props} role={undefined} tabIndex={undefined} />}
+                >
+                  {likeButton}
+                </Tooltip.Trigger>
+              ) : (
+                likeButton
+              )}
+
+              <Tooltip.Content>{likeLabel}</Tooltip.Content>
+            </Tooltip>
+            {canDelete ? (
+              <AppIconButton
+                icon={<Trash2 size={14} aria-hidden />}
+                label={t('resource:comment.delete')}
+                size="sm"
+                className={styles.commentActionIcon}
+                tooltip={{ content: t('common:actions.delete') }}
+                onPress={() => onDelete(comment)}
+              />
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+export default ResourceCommentItem;

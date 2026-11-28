@@ -1,14 +1,14 @@
 import { Tooltip as HeroTooltip } from '@heroui/react';
 import { clsx } from 'clsx';
-import type { ComponentProps } from 'react';
 
+import type { TooltipContentProps, TooltipProps } from './index.type';
 import styles from './style.module.scss';
 
-function TooltipRoot(props: ComponentProps<typeof HeroTooltip>) {
+function TooltipRoot(props: TooltipProps) {
   return <HeroTooltip {...props} />;
 }
 
-function TooltipContent({ className, ...props }: ComponentProps<typeof HeroTooltip.Content>) {
+function TooltipContent({ className, ...props }: TooltipContentProps) {
   return <HeroTooltip.Content className={clsx(styles.content, className)} {...props} />;
 }
 

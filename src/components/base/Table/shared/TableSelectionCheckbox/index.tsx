@@ -2,13 +2,7 @@ import { useRef } from 'react';
 
 import { Checkbox } from '@/components/base/Input';
 
-export interface TableSelectionCheckboxProps {
-  ariaLabel: string;
-  isSelected?: boolean;
-  isIndeterminate?: boolean;
-  isDisabled?: boolean;
-  onChange?: (isSelected: boolean, shiftKey: boolean) => void;
-}
+import type { TableSelectionCheckboxProps } from './index.type';
 
 function TableSelectionCheckbox({
   ariaLabel,
@@ -44,3 +38,5 @@ function TableSelectionCheckbox({
 }
 
 export default TableSelectionCheckbox;
+
+export type { TableSelectionCheckboxProps } from './index.type';

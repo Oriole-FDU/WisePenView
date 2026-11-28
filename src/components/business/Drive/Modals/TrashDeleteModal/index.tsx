@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
-import { clearNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
-import { removePdfPreviewProgress } from '@/components/editors/pdf/components/PdfViewer/_store/usePdfPreviewProgressStore';
+import { clearNewNoteStore } from '@/components/editors/note/_common/store/useNewNoteStore';
+import { removePdfPreviewProgress } from '@/components/editors/pdf/_parts/PdfViewer/_common/store/usePdfPreviewProgressStore';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import type { DriveActionTarget } from '../../common/driveComponentModel';
+import type { DriveActionTarget } from '../../_common/driveComponentModel';
 import type { TrashDeleteModalProps } from './index.type';
 
 function getNodeName(node: DriveActionTarget | undefined, fallback: string): string {

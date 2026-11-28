@@ -16,7 +16,7 @@ import {
   buildDriveTreeData,
   isDriveNodeSelectable,
   replaceDriveTreeNodeChildren,
-} from '../common/buildDriveTreeData';
+} from '../_common/buildDriveTreeData';
 import {
   buildDriveLoadingNode,
   type DriveItemKind,
@@ -25,11 +25,11 @@ import {
   type DriveViewNode,
   resolveDriveScope,
   toDriveSelectionItem,
-} from '../common/driveComponentModel';
-import { useDrivePagedTreeChildren } from '../common/useDrivePagedTreeChildren';
-import DriveNavigatorNodeTitle from './DriveNavigatorNodeTitle';
+} from '../_common/driveComponentModel';
+import { useDrivePagedTreeChildren } from '../_common/useDrivePagedTreeChildren';
+import styles from './_common/style.module.scss';
+import DriveNavigatorNodeTitle from './_parts/DriveNavigatorNodeTitle';
 import type { DriveNavigatorProps } from './index.type';
-import styles from './style.module.scss';
 
 const DEFAULT_RENDERABLE_TYPES: DriveItemKind[] = ['root', 'folder', 'resource', 'link'];
 const DEFAULT_SELECTABLE_TYPES: DriveItemKind[] = ['folder'];

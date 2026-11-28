@@ -6,9 +6,10 @@ import { AppButton } from '@/components/base/Button';
 import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
+import { formatFileType, type UploadQueueRow } from './_common/uploadQueueModel';
+import { useUploadQueue } from './_hooks/useUploadQueue';
+import type { UploadProgressCellProps } from './index.type';
 import styles from './style.module.scss';
-import { formatFileType, type UploadQueueRow } from './uploadQueueModel';
-import { useUploadQueue } from './useUploadQueue';
 
 function UploadQueueTab() {
   const { t } = useTranslation(['drive', 'common']);
@@ -99,7 +100,7 @@ function UploadQueueTab() {
   );
 }
 
-function UploadProgressCell({ row }: { row: UploadQueueRow }) {
+function UploadProgressCell({ row }: UploadProgressCellProps) {
   const { t } = useTranslation('drive');
   const { presentation } = row;
 

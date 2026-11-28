@@ -6,7 +6,7 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useCourseContext } from '@/layouts/Course/_context';
 import { APP_ROUTE_PATH, buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
+import underlineTabs from '@/views/app/_common/style.module.scss';
 
 import styles from './style.module.scss';
 

@@ -11,7 +11,7 @@ import { useDriveService } from '@/domains';
 import type { DriveNode, FolderNode } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
 
-import type { DriveSelectionItem } from '../../common/driveComponentModel';
+import type { DriveSelectionItem } from '../../_common/driveComponentModel';
 import type { UploadFileToGroupModalProps } from './index.type';
 import styles from './style.module.scss';
 

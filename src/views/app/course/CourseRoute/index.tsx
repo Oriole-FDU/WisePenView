@@ -10,7 +10,7 @@ import { CourseProvider } from '@/layouts/Course/_context';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import CourseTourScope from './CourseTourScope';
+import CourseTourScope from './_parts/CourseTourScope';
 import styles from './style.module.scss';
 
 function CourseRoute() {

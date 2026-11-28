@@ -11,19 +11,20 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { EmojiPicker } from '@/components/base/Input';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
-import type { InlineCommentItem, InlineCommentReactionGroup } from '@/domains/InlineComment';
+import type { InlineCommentReactionGroup } from '@/domains/InlineComment';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import CommentComposer from './CommentComposer';
+import styles from './_common/style.module.scss';
+import CommentComposer from './_parts/CommentComposer';
 import type {
+  CommentItemProps,
+  CommentThreadProps,
   InlineCommentDeletePayload,
   InlineCommentProps,
-  InlineCommentReactionPayload,
-  InlineCommentThreadView,
+  ResolvedCommentThreadProps,
 } from './index.type';
-import styles from './style.module.scss';
 
 const INLINE_THREAD_ESTIMATE_SIZE = 240;
 const INLINE_RESOLVED_THREAD_ESTIMATE_SIZE = 180;
@@ -51,16 +52,6 @@ function formatReactionUsers(
   return users.length > 0
     ? new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' }).format(users)
     : fallbackText;
-}
-
-interface CommentItemProps {
-  threadId: string;
-  item: InlineCommentItem;
-  active: boolean;
-  canDelete: boolean;
-  onReactionChange(payload: InlineCommentReactionPayload): Promise<void>;
-  onDelete(payload: InlineCommentDeletePayload): void;
-  onPreviewImage(url: string): void;
 }
 
 function CommentItem({
@@ -201,31 +192,6 @@ function CommentItem({
       </div>
     </div>
   );
-}
-
-interface CommentThreadProps extends Pick<
-  InlineCommentProps,
-  | 'activeThreadId'
-  | 'currentUserId'
-  | 'resourceOwnerId'
-  | 'imageUpload'
-  | 'onThreadSelect'
-  | 'onReply'
-  | 'onReactionChange'
-  | 'onResolve'
-> {
-  thread: InlineCommentThreadView;
-  onDelete(payload: InlineCommentDeletePayload): void;
-  onPreviewImage(url: string): void;
-}
-
-interface ResolvedCommentThreadProps {
-  thread: InlineCommentThreadView;
-  currentUserId?: string;
-  resourceOwnerId?: string | null;
-  onReopen(threadId: string): Promise<void>;
-  onDelete(payload: InlineCommentDeletePayload): void;
-  onPreviewImage(url: string): void;
 }
 
 function ResolvedCommentThread({

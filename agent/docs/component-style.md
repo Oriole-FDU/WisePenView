@@ -5,6 +5,7 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作为主题
 ## 一、样式组织
 
 - 组件使用 SCSS + CSS Modules，文件名为 `style.module.scss`；不得新增 Less 来源、导入或直接编译依赖。
+- 样式文件按需创建并与所属组件就近放置；组件子树共享样式统一放在最近共同组件的 `_common`。具体目录与导入边界见 [组件目录标准](component-structure.md)。
 - 使用 Vite 原生支持的 `sass-embedded`，以具名 namespace 的 `@use` 引用共用定义，不使用 Sass `@import`、`@extend` 或 `additionalData` 隐式注入。
 - 共用 `_*.scss` partial 只包含变量、函数与 mixin，单独加载不得输出 CSS；实际类名保留在所属 CSS Module，不跨组件导入私有样式，不以 `@extend` 取代 mixin 或 CSS Modules composition。
 - 样式类名使用 camelCase。
@@ -27,12 +28,12 @@ WisePenView 使用 SCSS、CSS Modules 和 HeroUI，保留原生 CSS 作为主题
 
 普通 flex 布局声明直接写在所属容器中，不再维护通用布局 mixin；单次使用的全局抽象会增加跳转成本而不形成稳定契约。
 
-推荐结构：
+有自身样式的组件结构：
 
 ```text
 ComponentName/
 ├── index.tsx
-├── index.type.ts
+├── index.type.ts  # 有参数或公开类型契约时需要
 └── style.module.scss
 ```
 
@@ -59,7 +60,7 @@ ComponentName/
 ## 四、Popover 约定
 
 - 操作菜单、单选和多选 Picker 使用 `src/components/base/Dropdown` 与 `src/components/base/ListBox`，复用 HeroUI 的分组、标题、描述、选择指示器、危险态和子菜单能力。
-- 浮层外壳、菜单项、选中态与层级集中在 `src/components/base/Popover/shared/styles.module.scss`，由基础封装通过 `className` 注入 Portal 内容；业务代码不得直接导入 HeroUI 的 `Popover`、`Dropdown`、`ListBox` 或 `Tabs`。
+- 浮层外壳、菜单项、选中态与层级集中在 `src/components/base/_common/overlay/style.module.scss`，由基础封装通过 `className` 注入 Portal 内容；业务代码不得直接导入 HeroUI 的 `Popover`、`Dropdown`、`ListBox` 或 `Tabs`。
 - 业务 Popover 使用 `src/components/base/AppPopover`，不要直接组合底层 `Popover.Content` / `Popover.Dialog`。
 - 标准标题通过 `AppPopover.Content` 的 `title` 传入；无标题轻浮层省略 `title`，两者共用同一内容间距。
 - 危险提示型 Popover 使用 `variant="danger"`；菜单中的删除、退出等危险操作使用 `Dropdown.Item variant="danger"`。
@@ -124,7 +125,7 @@ ComponentName/
 - Sidebar 导航项、hover 和 selected 背景使用 `--app-radius-sidebar-item`；头像、状态点、滚动条、胶囊标签等圆形语义元素使用 `--app-radius-pill`，正方形元素的整圆可以直接写 `50%`。
 - 新增圆角先选择语义 token；语义 token 缺失时在 `src/styles/theme/radius.css` 的应用语义层补一个，再让组件引用。
 - 组件样式不得直接引用 `--radius-*`，也不得硬编码圆角数值；需要更大或更小的几何值时报给应用语义层处理。新增语义 token 时同步更新本节表格。
-- 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
+- 唯一例外是第三方 iframe 等外部契约：drawio 通过 `src/components/editors/drawio/_hooks/useDrawioTheme.ts` 按对方变量名透传主题，必须在代码旁注明原因；项目自有样式即使位于第三方适配目录内也不适用该例外。
 - HeroUI 字段圆角通过 `radius.css` 中的 `--field-radius: var(--app-radius-field)` 单向桥接，不得在组件侧重新建立第二套字段圆角来源。
 - `pnpm check:radius` 在 CI 拦截上述两类写法：扫描 `src/**` 的 `.scss`/`.css`（`src/styles/**` 是 token 与基础设施层，除外），只放行 `0`、百分比整圆和 `--app-radius-*`。守卫亦会扫描误加的 Less；项目仍禁止引入 Less，但不再维护独立的样式迁移验收脚本。
 

@@ -7,69 +7,14 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Checkbox } from '@/components/base/Input';
 
+import type {
+  CheckedKeys,
+  DataNode,
+  TreeDropPosition,
+  TreeExpandInfo,
+  TreeProps,
+} from './index.type';
 import styles from './style.module.scss';
-
-export interface DataNode {
-  key: Key;
-  title?: ReactNode;
-  children?: DataNode[];
-  disabled?: boolean;
-  selectable?: boolean;
-  checkable?: boolean;
-  isLeaf?: boolean;
-  draggable?: boolean;
-}
-
-export type TreeDataNode = DataNode;
-
-type CheckedKeys = Key[] | { checked: Key[]; halfChecked: Key[] };
-
-interface TreeSelectInfo {
-  node: DataNode;
-  selected: boolean;
-}
-
-interface TreeExpandInfo {
-  node: DataNode;
-  expanded: boolean;
-}
-
-export type TreeDropPosition = 'before' | 'inside' | 'after';
-
-export interface TreeAllowDropInfo {
-  dragNode: DataNode;
-  dropNode: DataNode;
-  dropPosition: TreeDropPosition;
-}
-
-export type TreeDropInfo = TreeAllowDropInfo;
-
-export interface TreeProps {
-  treeData?: DataNode[];
-  className?: string;
-  disabled?: boolean;
-  blockNode?: boolean;
-  checkable?: boolean;
-  selectable?: boolean;
-  multiple?: boolean;
-  selectedKeys?: Key[];
-  checkedKeys?: CheckedKeys;
-  expandedKeys?: Key[];
-  defaultExpandedKeys?: Key[];
-  defaultExpandAll?: boolean;
-  expandAction?: 'click' | 'doubleClick' | false;
-  draggable?: boolean | ((node: DataNode) => boolean);
-  allowDrop?: (info: TreeAllowDropInfo) => boolean;
-  loadData?: (node: DataNode) => Promise<void> | void;
-  onLoadError?: (error: unknown, node: DataNode) => void;
-  onSelect?: (selectedKeys: Key[], info: TreeSelectInfo) => void;
-  onCheck?: (
-    checkedKeys: Key[] | { checked: Key[]; halfChecked: Key[] },
-    info: { node: DataNode; checked: boolean }
-  ) => void;
-  onExpand?: (expandedKeys: Key[], info: TreeExpandInfo) => void;
-  onDrop?: (info: TreeDropInfo) => void;
-}
 
 interface FlatNode {
   node: DataNode;
@@ -431,3 +376,12 @@ function Tree({
 }
 
 export default Tree;
+
+export type {
+  DataNode,
+  TreeAllowDropInfo,
+  TreeDataNode,
+  TreeDropInfo,
+  TreeDropPosition,
+  TreeProps,
+} from './index.type';

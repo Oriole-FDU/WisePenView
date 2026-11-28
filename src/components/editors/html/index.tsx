@@ -14,14 +14,10 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorRuntime } from '../_runtime/useEditorRuntime';
-import type { EditorPresentation, EditorSurfaceProps } from '../editor.type';
-import { buildHtmlDocument } from './htmlDocument';
+import type { EditorPresentation } from '../editor.type';
+import { buildHtmlDocument } from './_common/htmlDocument';
+import type { EditorSurfaceProps, HtmlFrameProps } from './index.type';
 import styles from './style.module.scss';
-
-interface HtmlFrameProps {
-  content: string;
-  title: string;
-}
 
 function HtmlFrame({ content, title }: HtmlFrameProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);

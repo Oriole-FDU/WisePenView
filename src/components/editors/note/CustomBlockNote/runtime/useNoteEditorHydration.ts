@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type * as Y from 'yjs';
 
-import { usePendingNoteImportStore } from '@/components/editors/note/_store/usePendingNoteImportStore';
+import { usePendingNoteImportStore } from '@/components/editors/note/_common/store/usePendingNoteImportStore';
 import type { NoteAiDiffPreviewData } from '@/domains/Note';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 

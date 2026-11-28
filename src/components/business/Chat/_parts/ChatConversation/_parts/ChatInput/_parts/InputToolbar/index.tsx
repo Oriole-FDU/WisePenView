@@ -1,0 +1,122 @@
+import { clsx } from 'clsx';
+import { ArrowUp, Bot, Mic, Plus, Settings, SlidersHorizontal, Square } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { GuideAnchor } from '@/components/base/Guide';
+import { GUIDE_TOOL_ID } from '@/constants/tour';
+import { useAppAuth } from '@/layouts/App/_context';
+
+import styles from '../../_common/style.module.scss';
+import AgentPicker from '../AgentPicker';
+import ModelPicker from '../ModelPicker';
+import SkillMenu from '../SkillMenu';
+import UploadMenu from '../UploadMenu';
+import VoiceInput from '../VoiceInput';
+import type { InputToolbarProps } from './index.type';
+
+function InputToolbar({
+  capabilityOptions,
+  capabilityOptionsLoading,
+  sendDisabled,
+  sending,
+  voiceInputProps,
+  injectedAgents,
+  preferredAgent,
+  modelIconOnly,
+  onSend,
+  onCancel,
+}: InputToolbarProps) {
+  const { t } = useTranslation('chat');
+  const { isAuthenticated, requireLogin } = useAppAuth();
+
+  function handlePrimaryAction(): void {
+    if (!isAuthenticated) {
+      requireLogin();
+      return;
+    }
+    if (sending) {
+      void onCancel?.();
+      return;
+    }
+    onSend();
+  }
+
+  return (
+    <div className={styles.actionToolbar}>
+      <div className={styles.toolbarLeft}>
+        {isAuthenticated ? (
+          <>
+            <UploadMenu />
+            <AgentPicker injectedAgents={injectedAgents} preferredAgent={preferredAgent} />
+            <SkillMenu options={capabilityOptions} loading={capabilityOptionsLoading} />
+          </>
+        ) : (
+          <>
+            <AppIconButton
+              icon={<Plus size={18} aria-hidden="true" />}
+              label={t('input.uploadMenu.trigger')}
+              onPress={requireLogin}
+            />
+            <AppIconButton
+              icon={<Bot size={17} aria-hidden="true" />}
+              label={t('input.agentPicker.trigger')}
+              onPress={requireLogin}
+            />
+            <AppIconButton
+              icon={<Settings size={17} aria-hidden="true" />}
+              label={t('input.skillMenu.configure')}
+              onPress={requireLogin}
+            />
+          </>
+        )}
+      </div>
+
+      <div className={styles.toolsRight}>
+        <div
+          className={clsx(
+            styles.modelSelectorShell,
+            modelIconOnly && styles.modelSelectorShellIcon
+          )}
+        >
+          {isAuthenticated ? (
+            <ModelPicker iconOnly={modelIconOnly} />
+          ) : (
+            <AppIconButton
+              icon={<SlidersHorizontal size={17} aria-hidden="true" />}
+              label={t('modelSelector.select')}
+              onPress={requireLogin}
+            />
+          )}
+        </div>
+        {isAuthenticated ? (
+          <VoiceInput {...voiceInputProps} />
+        ) : (
+          <AppIconButton
+            icon={<Mic size={17} aria-hidden="true" />}
+            label={t('input.voice.idle')}
+            onPress={requireLogin}
+          />
+        )}
+        <GuideAnchor id={GUIDE_TOOL_ID.chatSend}>
+          <AppIconButton
+            icon={
+              sending ? (
+                <Square size={14} fill="currentColor" aria-hidden="true" />
+              ) : (
+                <ArrowUp size={18} aria-hidden="true" />
+              )
+            }
+            label={sending ? t('input.stop') : t('input.send')}
+            variant={sending ? 'ghost' : 'primary'}
+            onPress={handlePrimaryAction}
+            isDisabled={sending ? !onCancel : sendDisabled}
+            className={sending ? styles.stopButtonActive : undefined}
+          />
+        </GuideAnchor>
+      </div>
+    </div>
+  );
+}
+
+export default InputToolbar;
