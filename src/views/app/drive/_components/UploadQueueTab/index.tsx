@@ -7,8 +7,8 @@ import { DataTable, type DataTableColumn } from '@/components/base/Table';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
 import styles from './style.module.scss';
-import { formatFileType, type UploadQueueRow } from './uploadQueueModel';
-import { useUploadQueue } from './useUploadQueue';
+import { formatFileType, type UploadQueueRow } from './_common/uploadQueueModel';
+import { useUploadQueue } from './_hooks/useUploadQueue';
 
 function UploadQueueTab() {
   const { t } = useTranslation(['drive', 'common']);

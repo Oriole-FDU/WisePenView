@@ -17,8 +17,8 @@ import {
   buildGroupPath,
   type GroupRoutePage,
 } from '@/utils/navigation/appRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
-import { useGroupContext } from '@/views/app/group/GroupRoute/_context';
+import underlineTabs from '@/views/app/_common/style.module.scss';
+import { useGroupContext } from '@/views/app/group/GroupRoute/_common/context';
 
 import page from './style.module.scss';
 

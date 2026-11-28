@@ -1,0 +1,581 @@
+import { clsx } from 'clsx';
+import type { TFunction } from 'i18next';
+import { Check, X } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import AppIconButton from '@/components/base/Button/AppIconButton';
+import { Spin } from '@/components/base/Feedback';
+import { FormField, Input, Select } from '@/components/base/Input';
+import ListBox from '@/components/base/ListBox';
+import QuotaBar from '@/components/base/QuotaBar';
+import { DataTable, type DataTableColumn } from '@/components/base/Table';
+import { tableStyles } from '@/components/base/Table/shared/styles';
+import TableRowActions from '@/components/base/Table/shared/TableRowActions';
+import TableSelectionCheckbox from '@/components/base/Table/shared/TableSelectionCheckbox';
+import { GROUP_TYPE, type GroupMember, ROLE } from '@/domains/Group';
+import { formatTimestampToDate } from '@/utils/format/formatTime';
+
+import {
+  canEditSelectedMembers,
+  canEditSelectedMembersForQuota,
+  isAdmin,
+  isOwner,
+} from '../../../GroupDisplayConfig';
+import type {
+  MemberListInlineDraft,
+  MemberListPaginationConfig,
+  MemberListTableProps,
+} from '../../MemberListTable/index.type';
+import InlineEditError from './_parts/InlineEditError';
+import styles from './style.module.scss';
+
+type MemberRecord = GroupMember & { key: string };
+type ReadonlyColumn = DataTableColumn<MemberRecord>;
+type EditableColumn = DataTableColumn<MemberRecord> & {
+  renderEditCell?: (row: MemberRecord) => ReactNode;
+};
+
+const EMPTY_TEXT = '-';
+const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;
+
+function getDisplayName(member: GroupMember): string {
+  return member.nickname?.trim() || member.realname?.trim() || '?';
+}
+
+function getMemberSubline(member: GroupMember, showRealName: boolean): string | undefined {
+  if (!showRealName) {
+    return undefined;
+  }
+  const realname = member.realname?.trim();
+  if (!realname || realname === getDisplayName(member)) {
+    return undefined;
+  }
+  return realname;
+}
+
+function getRoleClassName(role: GroupMember['role']): string {
+  switch (role) {
+    case 'OWNER':
+      return styles.roleOwner;
+    case 'ADMIN':
+      return styles.roleAdmin;
+    case 'MEMBER':
+    default:
+      return styles.roleMember;
+  }
+}
+
+function canEditRole(member: GroupMember, props: MemberListTableProps): boolean {
+  return (
+    props.groupDisplayConfig.canModifyPermission &&
+    canEditSelectedMembers([member], props.groupDisplayConfig.editableRoles)
+  );
+}
+
+function canEditQuota(member: GroupMember, props: MemberListTableProps): boolean {
+  return (
+    props.groupDisplayConfig.canAssignQuota &&
+    props.groupDisplayConfig.showQuotas &&
+    canEditSelectedMembersForQuota([member], props.groupDisplayConfig.editableRolesForQuota)
+  );
+}
+
+function canRemoveMember(member: GroupMember, props: MemberListTableProps): boolean {
+  return (
+    props.groupDisplayConfig.canRemoveMember &&
+    canEditSelectedMembers([member], props.groupDisplayConfig.editableRoles)
+  );
+}
+
+function buildPageSizeControl(
+  config: Required<MemberListPaginationConfig>,
+  pageSize: number,
+  onPageChange: (page: number, size: number) => void,
+  t: TFunction<'group'>
+): ReactNode {
+  if (!config.showSizeChanger) {
+    return null;
+  }
+
+  return (
+    <Select
+      aria-label={t('member.table.pageSizeAria')}
+      value={String(pageSize)}
+      onChange={(value) => {
+        if (value == null || Array.isArray(value)) {
+          return;
+        }
+        onPageChange(1, Number(value));
+      }}
+      className={styles.pageSizeSelect}
+    >
+      <Select.Trigger>
+        <Select.Value />
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover>
+        <ListBox>
+          {config.pageSizeOptions.map((value) => (
+            <ListBox.Item
+              key={String(value)}
+              id={String(value)}
+              textValue={t('member.table.pageSize', { count: value })}
+            >
+              {t('member.table.pageSize', { count: value })}
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          ))}
+        </ListBox>
+      </Select.Popover>
+    </Select>
+  );
+}
+
+function renderRole(role: GroupMember['role'], t: TFunction<'group'>) {
+  const roleLabel = isOwner(role)
+    ? t('member.role.owner')
+    : isAdmin(role)
+      ? t('member.role.admin')
+      : t('member.role.member');
+  return <span className={`${styles.roleBadge} ${getRoleClassName(role)}`}>{roleLabel}</span>;
+}
+
+function renderQuota(member: GroupMember) {
+  return (
+    <div className={styles.quotaItem}>
+      <QuotaBar used={member.used ?? 0} limit={member.limit ?? 0} />
+    </div>
+  );
+}
+
+function renderRoleEditor(
+  member: GroupMember,
+  inlineDraft: MemberListInlineDraft,
+  onInlineDraftChange: (draft: MemberListInlineDraft) => void,
+  canPromoteToAdmin: boolean,
+  t: TFunction<'group'>
+) {
+  const value = inlineDraft.role ?? member.role;
+
+  return (
+    <Select
+      aria-label={t('member.table.roleAria')}
+      value={value}
+      onChange={(nextValue) => {
+        if (nextValue == null || Array.isArray(nextValue)) {
+          return;
+        }
+        onInlineDraftChange({ role: nextValue as GroupMember['role'] });
+      }}
+      className={styles.inlineSelect}
+    >
+      <Select.Trigger>
+        <Select.Value />
+        <Select.Indicator />
+      </Select.Trigger>
+      <Select.Popover>
+        <ListBox>
+          {canPromoteToAdmin ? (
+            <ListBox.Item key="ADMIN" id="ADMIN" textValue={t('member.role.admin')}>
+              {t('member.role.admin')}
+              <ListBox.ItemIndicator />
+            </ListBox.Item>
+          ) : null}
+          <ListBox.Item key="MEMBER" id="MEMBER" textValue={t('member.role.member')}>
+            {t('member.role.member')}
+            <ListBox.ItemIndicator />
+          </ListBox.Item>
+        </ListBox>
+      </Select.Popover>
+    </Select>
+  );
+}
+
+function renderQuotaEditor(
+  member: GroupMember,
+  inlineDraft: MemberListInlineDraft,
+  onInlineDraftChange: (draft: MemberListInlineDraft) => void,
+  t: TFunction<'group'>
+) {
+  const min = Math.max(1, member.used ?? 0);
+  const value = inlineDraft.quota ?? String(member.limit ?? min);
+
+  return (
+    <FormField
+      aria-label={t('member.table.quotaAria')}
+      label={t('member.table.quotaLabel')}
+      value={value}
+      onChange={(nextValue) => onInlineDraftChange({ quota: nextValue })}
+      className={styles.inlineNumberField}
+      labelClassName={styles.inlineFieldLabel}
+    >
+      <Input
+        type="number"
+        min={min}
+        max={GROUP_MEMBER_TOKEN_LIMIT_MAX}
+        step={1}
+        placeholder={t('member.table.integerPlaceholder')}
+      />
+    </FormField>
+  );
+}
+
+function buildReadonlyColumns(
+  props: MemberListTableProps,
+  t: TFunction<'group'>
+): ReadonlyColumn[] {
+  const columns: ReadonlyColumn[] = [
+    {
+      id: 'member',
+      label: t('member.table.columns.member'),
+      width: 'lg',
+      align: 'start',
+      isRowHeader: true,
+      allowsSorting: true,
+      getSortValue: (member) => getDisplayName(member),
+      renderCell: (member) => (
+        <DataTable.MemberCell
+          name={getDisplayName(member)}
+          subline={getMemberSubline(member, props.groupDisplayConfig.showRealName)}
+          avatarSrc={member.avatar?.trim() || undefined}
+        />
+      ),
+    },
+  ];
+
+  if (props.groupDisplayConfig.groupType !== GROUP_TYPE.NORMAL) {
+    columns.push({
+      id: 'email',
+      label: t('member.table.columns.email'),
+      width: 'lg',
+      align: 'start',
+      allowsSorting: true,
+      getSortValue: (member) => member.email?.trim() ?? '',
+      renderCell: (member) => {
+        const email = member.email?.trim();
+        return <DataTable.TextCell title={email}>{email || EMPTY_TEXT}</DataTable.TextCell>;
+      },
+    });
+  }
+
+  columns.push(
+    {
+      id: 'role',
+      label: t('member.table.columns.role'),
+      width: 'sm',
+      align: 'center',
+      allowsSorting: true,
+      getSortValue: (member) => ROLE[member.role],
+      renderCell: (member) => renderRole(member.role, t),
+    },
+    {
+      id: 'joinTime',
+      label: t('member.table.columns.joinedAt'),
+      width: 'md',
+      align: 'start',
+      allowsSorting: true,
+      getSortValue: (member) => member.joinTime ?? 0,
+      renderCell: (member) => (
+        <DataTable.TextCell>
+          {formatTimestampToDate(member.joinTime) || EMPTY_TEXT}
+        </DataTable.TextCell>
+      ),
+    }
+  );
+
+  if (props.groupDisplayConfig.showQuotas) {
+    columns.push({
+      id: 'quota',
+      label: t('member.table.columns.quota'),
+      width: 'lg',
+      align: 'center',
+      renderCell: renderQuota,
+    });
+  }
+
+  return columns;
+}
+
+function buildEditableColumns(
+  props: MemberListTableProps,
+  t: TFunction<'group'>
+): EditableColumn[] {
+  const readonlyColumns = buildReadonlyColumns(props, t);
+
+  return readonlyColumns.map((column): EditableColumn => {
+    if (column.id === 'member') {
+      return {
+        ...column,
+        width: 'lg',
+        renderCell: column.renderCell,
+      };
+    }
+
+    if (column.id === 'role') {
+      return {
+        ...column,
+        width: 'sm',
+        className: tableStyles.colEnum,
+        renderCell: column.renderCell,
+        renderEditCell: (member) =>
+          props.editingKind === 'role'
+            ? renderRoleEditor(
+                member,
+                props.inlineDraft,
+                props.onInlineDraftChange,
+                props.groupDisplayConfig.canModifyPermission,
+                t
+              )
+            : column.renderCell(member, { row: member, rowId: member.key }),
+      };
+    }
+
+    if (column.id === 'quota') {
+      return {
+        ...column,
+        width: 'lg',
+        renderCell: column.renderCell,
+        renderEditCell: (member) =>
+          props.editingKind === 'quota'
+            ? renderQuotaEditor(member, props.inlineDraft, props.onInlineDraftChange, t)
+            : column.renderCell(member, { row: member, rowId: member.key }),
+      };
+    }
+
+    return {
+      ...column,
+      renderCell: column.renderCell,
+    };
+  });
+}
+
+function MemberListTable(props: MemberListTableProps) {
+  const { t } = useTranslation('group');
+  const { t: tableT } = useTranslation('table');
+  const {
+    pagination,
+    members,
+    loading,
+    total,
+    currentPage,
+    pageSize,
+    selectedKeys,
+    disabledSelectionKeys,
+    editingRowId,
+    savingRowId,
+    errorRowId,
+    errorMessage,
+    onPageChange,
+    onSelectionChange,
+    onStartInlineEdit,
+    onInlineSave,
+    onInlineCancel,
+    onDismissInlineError,
+    onDeleteMember,
+    toolbar,
+    batchEditMode = false,
+    sortDescriptor,
+    onSortChange,
+  } = props;
+
+  const paginationConfig: Required<MemberListPaginationConfig> = {
+    defaultPageSize: pagination?.defaultPageSize ?? 5,
+    pageSizeOptions: pagination?.pageSizeOptions ?? [5, 10, 20, 50],
+    showSizeChanger: pagination?.showSizeChanger ?? true,
+  };
+
+  const dataSource = members.map((member) => ({
+    ...member,
+    key: member.userId,
+  })) satisfies MemberRecord[];
+
+  const pageSizeControl = buildPageSizeControl(paginationConfig, pageSize, onPageChange, t);
+
+  if (!props.groupDisplayConfig.canEnterEditMode) {
+    return (
+      <DataTable
+        ariaLabel={t('member.table.listAria')}
+        items={dataSource}
+        rowKey="key"
+        columns={buildReadonlyColumns(props, t)}
+        loading={loading}
+        emptyText={t('member.table.empty')}
+        toolbar={toolbar}
+        sortDescriptor={sortDescriptor}
+        onSortChange={onSortChange}
+        pagination={{
+          total,
+          current: currentPage,
+          pageSize,
+          onChange: onPageChange,
+          summary: t('member.table.summary', { count: total }),
+          pageSizeControl,
+        }}
+      />
+    );
+  }
+
+  const disabledKeys = new Set(disabledSelectionKeys);
+  const selectableIds = dataSource
+    .map((member) => member.key)
+    .filter((id) => !disabledKeys.has(id));
+  const selectedIds = new Set(
+    selectedKeys === 'all' ? selectableIds : Array.from(selectedKeys, String)
+  );
+  const selectedCount = selectableIds.filter((id) => selectedIds.has(id)).length;
+  const allSelected = selectableIds.length > 0 && selectedCount === selectableIds.length;
+  const changeSelection = (ids: string[], selected: boolean) => {
+    const nextKeys = new Set(selectedIds);
+    ids.forEach((id) => {
+      if (disabledKeys.has(id)) return;
+      if (selected) nextKeys.add(id);
+      else nextKeys.delete(id);
+    });
+    onSelectionChange(nextKeys, dataSource);
+  };
+  const isEditing = (member: MemberRecord) =>
+    member.key === editingRowId || member.key === savingRowId || member.key === errorRowId;
+  const columns: DataTableColumn<MemberRecord>[] = buildEditableColumns(props, t).map((column) => ({
+    ...column,
+    className: clsx(column.className, column.isRowHeader && styles.memberColumn),
+    getCellClassName: (member) =>
+      clsx(
+        member.key === savingRowId && styles.editFieldDisabled,
+        isEditing(member) && column.isRowHeader && styles.editingMemberCell
+      ),
+    renderCell: (member, ctx) =>
+      isEditing(member) && column.renderEditCell
+        ? column.renderEditCell(member)
+        : column.renderCell(member, ctx),
+  }));
+  if (batchEditMode) {
+    columns.unshift({
+      id: '__selection',
+      align: 'center',
+      className: clsx(styles.selectionColumn, tableStyles.colCheckbox),
+      label: (
+        <TableSelectionCheckbox
+          ariaLabel={tableT('aria.selectAll')}
+          isSelected={allSelected}
+          isIndeterminate={selectedCount > 0 && !allSelected}
+          isDisabled={selectableIds.length === 0}
+          onChange={(selected) => changeSelection(selectableIds, selected)}
+        />
+      ),
+      renderCell: (member) => (
+        <TableSelectionCheckbox
+          ariaLabel={tableT('aria.selectRow', { id: member.key })}
+          isSelected={selectedIds.has(member.key)}
+          isDisabled={disabledKeys.has(member.key)}
+          onChange={(selected) => changeSelection([member.key], selected)}
+        />
+      ),
+    });
+  }
+  columns.push({
+    id: '__actions',
+    label: tableT('column.actions'),
+    align: 'center',
+    className: clsx(styles.actionColumn, tableStyles.colAction),
+    renderCell: (member) => {
+      if (isEditing(member)) {
+        const saving = member.key === savingRowId;
+        return (
+          <div className={styles.inlineEditActions}>
+            <AppIconButton
+              icon={saving ? <Spin size="small" /> : <Check size={16} aria-hidden />}
+              label={tableT(saving ? 'aria.saving' : 'aria.save')}
+              size="sm"
+              variant="primary"
+              isDisabled={saving}
+              onPress={() => {
+                void onInlineSave(member);
+              }}
+            />
+            <AppIconButton
+              icon={<X size={16} aria-hidden />}
+              label={tableT('aria.cancel')}
+              size="sm"
+              isDisabled={saving}
+              onPress={onInlineCancel}
+            />
+          </div>
+        );
+      }
+      const actions = [
+        {
+          key: 'editRole',
+          label: t('member.actions.editPermission'),
+          visible: props.groupDisplayConfig.canModifyPermission,
+          disabled: !canEditRole(member, props),
+        },
+        {
+          key: 'editQuota',
+          label: t('member.actions.assignQuota'),
+          visible: props.groupDisplayConfig.canAssignQuota && props.groupDisplayConfig.showQuotas,
+          disabled: !canEditQuota(member, props),
+        },
+        {
+          key: 'deleteMember',
+          label: t('member.actions.delete'),
+          variant: 'danger' as const,
+          visible: props.groupDisplayConfig.canRemoveMember,
+          disabled: !canRemoveMember(member, props),
+        },
+      ].filter((action) => action.visible);
+      return actions.length > 0 ? (
+        <TableRowActions
+          actions={actions}
+          onAction={(key) => {
+            if (key === 'editRole') onStartInlineEdit(member, 'role');
+            else if (key === 'editQuota') onStartInlineEdit(member, 'quota');
+            else if (key === 'deleteMember') onDeleteMember(member);
+          }}
+        />
+      ) : null;
+    },
+  });
+
+  return (
+    <div className={styles.management}>
+      {errorMessage ? (
+        <InlineEditError message={errorMessage} onDismiss={onDismissInlineError} />
+      ) : null}
+      <DataTable
+        ariaLabel={t('member.table.manageAria')}
+        className={clsx(styles.managementTable, batchEditMode && styles.withSelection)}
+        items={dataSource}
+        rowKey="key"
+        columns={columns}
+        loading={loading}
+        emptyText={t('member.table.empty')}
+        toolbar={toolbar}
+        sortDescriptor={sortDescriptor}
+        onSortChange={onSortChange}
+        virtualized={false}
+        summary={t('member.table.summary', { count: total })}
+        getRowClassName={(member) => (isEditing(member) ? styles.editingRow : undefined)}
+        selection={
+          batchEditMode
+            ? {
+                selectedKeys,
+                disabledKeys,
+                onSelectionChange: (keys) => onSelectionChange(keys, dataSource),
+              }
+            : undefined
+        }
+        pagination={{
+          total,
+          current: currentPage,
+          pageSize,
+          onChange: onPageChange,
+          summary: t('member.table.summary', { count: total }),
+          pageSizeControl,
+        }}
+      />
+    </div>
+  );
+}
+
+export default MemberListTable;

@@ -15,9 +15,9 @@ import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
 import { getVisibleProfileFieldGroups } from '@/views/app/profile/profile.config';
 
 import SettingsList from '../SettingsList';
-import { buildProfileFormValues } from './buildProfileFormValues';
+import { buildProfileFormValues } from './_common/buildProfileFormValues';
 import type { AccountFormProps } from './index.type';
-import { getProfileFieldDisplay } from './profileDisplay';
+import { getProfileFieldDisplay } from './_common/profileDisplay';
 import styles from './style.module.scss';
 
 type FormDraft = {

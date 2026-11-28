@@ -30,7 +30,7 @@ import type { ResourcePermissionResourceType } from '@/domains/ResourceAccess';
 
 import ResourceToolbarOperations, {
   type ResourceToolbarOperationHandlers,
-} from './ResourceToolbarOperations';
+} from './_parts/ResourceToolbarOperations';
 import styles from './style.module.scss';
 
 interface ResourceToolbarMenuItemContentProps {

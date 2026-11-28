@@ -10,7 +10,7 @@ import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import AdminPageHeader from '@/views/admin/_common/AdminPageHeader';
 
 import styles from '../style.module.scss';
-import CreateAnnouncementModal from './CreateAnnouncementModal';
+import CreateAnnouncementModal from './_parts/CreateAnnouncementModal';
 import type {
   AnnouncementManagementProps,
   AnnouncementRecord,

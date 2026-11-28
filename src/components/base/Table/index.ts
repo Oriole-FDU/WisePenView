@@ -1,5 +1,5 @@
 import DataTableComponent from './DataTable';
-import DataTableTabs from './DataTable/parts/UnderlineTabs';
+import DataTableTabs from './DataTable/_parts/UnderlineTabs';
 import FolderTableComponent from './FolderTable';
 import TableMemberCell from './shared/cells/MemberCell';
 import TableTextCell from './shared/cells/TextCell';

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Tabs } from '@/components/base/Tabs';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
-import underlineTabs from '@/views/app/_common/underlineTabs.module.scss';
+import underlineTabs from '@/views/app/_common/style.module.scss';
 
 import styles from './style.module.scss';
 

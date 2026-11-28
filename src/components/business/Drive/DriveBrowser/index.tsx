@@ -1,4 +1,4 @@
-import { useMainShell } from '@/layouts/MainShell/_context';
+import { useMainShell } from '@/layouts/MainShell/_common/context';
 
 import MobileDrive from '../MobileDrive';
 import TableDrive from '../TableDrive';

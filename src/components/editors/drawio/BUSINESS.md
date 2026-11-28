@@ -8,16 +8,16 @@
 
 ## 初始化与入口
 
-- 编辑与保存入口取决于 `canCollaborativeEdit`；历史入口还要求目前用户是 owner。这些是前端 gate，不证明后端授权。依据：[DrawioViewConnected](index.tsx)、[useDrawioEditorSession](hooks/useDrawioEditorSession.ts)。
+- 编辑与保存入口取决于 `canCollaborativeEdit`；历史入口还要求目前用户是 owner。这些是前端 gate，不证明后端授权。依据：[DrawioViewConnected](index.tsx)、[useDrawioEditorSession](_hooks/useDrawioEditorSession.ts)。
 - 初始版本取 Note info 与 snapshot 版本的较大值；初始化只解码 `fullSnapshot`，不回放 DTO 的 deltas。版本徽章或历史清单不证明版本不可变性。依据：[DrawioViewConnected](index.tsx)、[DrawioEditorContent](index.tsx)。
-- 只接受同时符合设置 origin 与目前 iframe window 的消息；autosave 事件只观察 XML／dirty，不调用保存 API。save 事件直接保存 XML，工具栏保存则先要求 export。依据：[useDrawioEditorSession](hooks/useDrawioEditorSession.ts)。
+- 只接受同时符合设置 origin 与目前 iframe window 的消息；autosave 事件只观察 XML／dirty，不调用保存 API。save 事件直接保存 XML，工具栏保存则先要求 export。依据：[useDrawioEditorSession](_hooks/useDrawioEditorSession.ts)。
 
 ## 完整保存任务
 
-- 一次保存 Promise 包含 XML export 等待及 API 请求；已有任务时，并行保存共用该 Promise，不再各自 export。已是 saved 时可直接完成。依据：[createDrawioSaveSession](drawioSaveSession.ts)。
-- 每次成功保存以当前版本加一；只有 revision 与最新 XML 都仍对应本次保存内容，才上报 saved，期间的新修改保留 dirty。不能以较早请求成功宣称当前页面内容已保存。依据：[createDrawioSaveSession](drawioSaveSession.ts)。
-- export 等待 10 秒后失败，API 失败也拒绝同一任务，后续可重试；这个 timeout 不涵盖整个后端请求。无待接收 export 时忽略迟到消息；export 协议没有请求 ID，不承诺能区分跨重试的所有迟到 export。依据：[createDrawioSaveSession](drawioSaveSession.ts)、[useDrawioEditorSession](hooks/useDrawioEditorSession.ts)。
-- session 销毁会拒绝未完成任务；activate 可让重挂后重新保存。后端响应须仍属同一 pending task 且 session 未销毁才更新状态，不会把旧任务结果写进新任务；这不等于取消已送出的后端写入。依据：[createDrawioSaveSession](drawioSaveSession.ts)。
+- 一次保存 Promise 包含 XML export 等待及 API 请求；已有任务时，并行保存共用该 Promise，不再各自 export。已是 saved 时可直接完成。依据：[createDrawioSaveSession](_common/drawioSaveSession.ts)。
+- 每次成功保存以当前版本加一；只有 revision 与最新 XML 都仍对应本次保存内容，才上报 saved，期间的新修改保留 dirty。不能以较早请求成功宣称当前页面内容已保存。依据：[createDrawioSaveSession](_common/drawioSaveSession.ts)。
+- export 等待 10 秒后失败，API 失败也拒绝同一任务，后续可重试；这个 timeout 不涵盖整个后端请求。无待接收 export 时忽略迟到消息；export 协议没有请求 ID，不承诺能区分跨重试的所有迟到 export。依据：[createDrawioSaveSession](_common/drawioSaveSession.ts)、[useDrawioEditorSession](_hooks/useDrawioEditorSession.ts)。
+- session 销毁会拒绝未完成任务；activate 可让重挂后重新保存。后端响应须仍属同一 pending task 且 session 未销毁才更新状态，不会把旧任务结果写进新任务；这不等于取消已送出的后端写入。依据：[createDrawioSaveSession](_common/drawioSaveSession.ts)。
 
 ## 退出与证据限制
 

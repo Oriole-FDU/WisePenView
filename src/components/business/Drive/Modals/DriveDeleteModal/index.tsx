@@ -6,7 +6,7 @@ import { requestDriveRefresh } from '@/components/business/Drive/driveRefresh';
 import { useDriveService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import type { DriveActionTarget } from '../../common/driveComponentModel';
+import type { DriveActionTarget } from '../../_common/driveComponentModel';
 import type { DriveDeleteModalProps } from './index.type';
 
 function getNodeName(node: DriveActionTarget | null, fallback: string): string {

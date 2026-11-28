@@ -6,7 +6,7 @@ import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import ResourceFavoriteButton from './ResourceFavoriteButton';
+import ResourceFavoriteButton from './_parts/ResourceFavoriteButton';
 
 interface ResourceFavoriteActionProps {
   resourceId: string;

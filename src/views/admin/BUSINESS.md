@@ -8,7 +8,7 @@
 
 ## 入口与身份
 
-- 管理路由与侧栏管理入口使用系统 `IDENTITY.ADMIN`，不是群组 ADMIN。guard 等待用户信息，非管理员导向 Chat；认证异常沿用既有 [Auth](../../domains/Auth/BUSINESS.md) 流程。此 gate 不证明后端授权，也不保证每次进页都绕过 [User 缓存](../../domains/User/BUSINESS.md) 刷新。依据：[AdminRouteGuard](guard/AdminRouteGuard.tsx)、[UserProfile](../../components/business/Sidebar/_common/footer/UserProfile/index.tsx)。
+- 管理路由与侧栏管理入口使用系统 `IDENTITY.ADMIN`，不是群组 ADMIN。guard 等待用户信息，非管理员导向 Chat；认证异常沿用既有 [Auth](../../domains/Auth/BUSINESS.md) 流程。此 gate 不证明后端授权，也不保证每次进页都绕过 [User 缓存](../../domains/User/BUSINESS.md) 刷新。依据：[AdminRouteGuard](guard/AdminRouteGuard/index.tsx)、[UserProfile](../../components/business/Sidebar/_common/footer/UserProfile/index.tsx)。
 
 ## 尚未接线的管理能力
 

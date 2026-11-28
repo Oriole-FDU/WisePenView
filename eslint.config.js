@@ -212,13 +212,13 @@ export default defineConfig([
   {
     // ChatInput 与富文本工具栏依赖底层 textarea/input 的特殊组合行为，单独留白名单。
     files: [
-      'src/components/business/Chat/ChatConversation/ChatInput/index.tsx',
+      'src/components/business/Chat/_parts/ChatConversation/_parts/ChatInput/index.tsx',
       'src/components/editors/note/CustomBlockNote/ui/toolbar/components/FileButtons.tsx',
       'src/components/editors/note/CustomBlockNote/ui/toolbar/components/LinkButton.tsx',
-      'src/components/business/Resource/FavoriteCollectionPicker/CollectionPickerModal.tsx',
+      'src/components/business/Resource/FavoriteCollectionPicker/_parts/CollectionPickerModal/index.tsx',
       'src/components/business/UserSearchCombobox/index.tsx',
-      'src/views/app/course/CourseEditorPage/_components/CourseEditorDateFields/index.tsx',
-      'src/components/editors/agent/components/AgentEditor/sections/MemorySection/index.tsx',
+      'src/views/app/course/CourseEditorPage/_parts/CourseEditorDateFields/index.tsx',
+      'src/components/editors/agent/_parts/AgentEditor/_parts/MemorySection/index.tsx',
     ],
     rules: {
       'no-restricted-imports': buildRestrictedImportsRule({ allowInputPrimitive: true }),

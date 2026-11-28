@@ -6,7 +6,7 @@ import { useApi } from '@/hooks/useApi';
 
 import type { ResourceToolbarProps } from './index.type';
 import ResourceToolbarActions from './ResourceToolbarActions';
-import ResourceToolbarBreadcrumb from './ResourceToolbarBreadcrumb';
+import ResourceToolbarBreadcrumb from './_parts/ResourceToolbarBreadcrumb';
 import styles from './style.module.scss';
 
 /**

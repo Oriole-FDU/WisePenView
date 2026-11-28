@@ -15,7 +15,7 @@ import { Tabs } from '@/components/base/Tabs';
 import {
   TAG_PERMISSION_ACTION_PRESET_OPTIONS,
   type TagPermissionResourceStrategy,
-} from '@/components/business/Drive/common/tagPermissionPreset';
+} from '@/components/business/Drive/_common/tagPermissionPreset';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import TagPermissionActionEditor from '@/components/business/Drive/PermissionActionEditor';
 import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
@@ -29,8 +29,8 @@ import {
   PERSONNEL_SCOPE_OPTIONS,
   type PersonnelPolicyConfig,
   type TagPolicyModalMode,
-} from './tagPermissionModalModel';
-import { useTagPermissionModalController } from './useTagPermissionModalController';
+} from './_common/tagPermissionModalModel';
+import { useTagPermissionModalController } from './_hooks/useTagPermissionModalController';
 
 interface TagPolicyModalBaseProps extends TagPermissionModalProps {
   mode: TagPolicyModalMode;

@@ -2,7 +2,7 @@ import { Dropdown as HeroDropdown } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ComponentProps } from 'react';
 
-import overlayStyles from '@/components/base/Popover/shared/styles.module.scss';
+import overlayStyles from '@/components/base/Popover/_common/styles.module.scss';
 
 import styles from './style.module.scss';
 

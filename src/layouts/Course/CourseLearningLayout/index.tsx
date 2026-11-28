@@ -24,11 +24,11 @@ import {
 
 import { useCourseContext } from '../_context';
 import CourseResourceHost from '../CourseResourceHost';
-import CourseOutlineOverview from './_components/CourseOutlineOverview';
-import CourseOutlineSidebar from './_components/CourseOutlineSidebar';
-import CourseResourceIcon from './_components/CourseResourceIcon';
-import { useCourseLearningNavigationController } from './controllers/useCourseLearningNavigationController';
-import styles from './style.module.scss';
+import CourseOutlineOverview from './_parts/CourseOutlineOverview';
+import CourseOutlineSidebar from './_parts/CourseOutlineSidebar';
+import CourseResourceIcon from './_parts/CourseResourceIcon';
+import { useCourseLearningNavigationController } from './_hooks/useCourseLearningNavigationController';
+import styles from './_common/style.module.scss';
 
 const COURSE_LEARNING_MAIN_MIN_WIDTH = 700;
 

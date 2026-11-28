@@ -1,0 +1,98 @@
+import { useTranslation } from 'react-i18next';
+
+import { AppButton } from '@/components/base/Button';
+import { FormField, Input, TextArea } from '@/components/base/Input';
+
+import styles from '../../_common/style.module.scss';
+
+interface SkillConfigPanelProps {
+  name: string;
+  description: string;
+  canEdit: boolean;
+  isDirty: boolean;
+  isLoading: boolean;
+  onNameChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
+  onReset: () => void;
+  onSave: () => void;
+}
+
+function SkillConfigPanel({
+  name,
+  description,
+  canEdit,
+  isDirty,
+  isLoading,
+  onNameChange,
+  onDescriptionChange,
+  onReset,
+  onSave,
+}: SkillConfigPanelProps) {
+  const { t } = useTranslation('skill');
+  const nameMissing = name.trim().length === 0;
+  const descriptionMissing = description.trim().length === 0;
+  const hasMissingConfig = nameMissing || descriptionMissing;
+  const footerStatus = !isLoading && isDirty ? t('config.dirty') : null;
+
+  return (
+    <>
+      <header className={styles.editorHeader}>
+        <span className={styles.editorFileName}>{t('config.title')}</span>
+      </header>
+      <div className={styles.editorBody}>
+        <section className={styles.configPage} aria-label={t('config.ariaLabel')}>
+          <div className={styles.configForm}>
+            <FormField
+              aria-label={t('config.nameAriaLabel')}
+              value={name}
+              onChange={onNameChange}
+              isDisabled={!canEdit || isLoading}
+              isRequired
+              label={t('config.nameLabel')}
+              errorMessage={nameMissing ? t('config.nameRequired') : undefined}
+            >
+              <Input placeholder={t('config.namePlaceholder')} />
+            </FormField>
+
+            <FormField
+              aria-label={t('config.descriptionAriaLabel')}
+              value={description}
+              onChange={onDescriptionChange}
+              isDisabled={!canEdit || isLoading}
+              isRequired
+              label={t('config.descriptionLabel')}
+              errorMessage={descriptionMissing ? t('config.descriptionRequired') : undefined}
+            >
+              <TextArea
+                className={styles.configDescriptionInput}
+                rows={5}
+                placeholder={t('config.descriptionPlaceholder')}
+              />
+            </FormField>
+          </div>
+
+          <footer className={styles.configFooter}>
+            {footerStatus ? <span className={styles.configFooterText}>{footerStatus}</span> : null}
+            {canEdit ? (
+              <span className={styles.configFooterActions}>
+                <AppButton variant="secondary" isDisabled={!isDirty || isLoading} onPress={onReset}>
+                  {t('config.reset')}
+                </AppButton>
+                <AppButton
+                  variant="primary"
+                  isDisabled={!isDirty || hasMissingConfig || isLoading}
+                  aria-busy={isLoading || undefined}
+                  onPress={onSave}
+                >
+                  {isLoading ? t('saveStatus.saving') : t('config.update')}
+                </AppButton>
+              </span>
+            ) : null}
+          </footer>
+        </section>
+      </div>
+    </>
+  );
+}
+
+export default SkillConfigPanel;

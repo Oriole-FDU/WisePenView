@@ -10,8 +10,8 @@ import {
 
 import styles from './ComputeWallet.stories.module.scss';
 import ComputeWallet from './index';
-import WalletBalanceHeader from './WalletBalanceHeader';
-import WalletTransactionTable from './WalletTransactionTable';
+import WalletBalanceHeader from './_parts/WalletBalanceHeader';
+import WalletTransactionTable from './_parts/WalletTransactionTable';
 
 const DEMO_TRANSACTIONS: WalletTransactionRecord[] = [
   {

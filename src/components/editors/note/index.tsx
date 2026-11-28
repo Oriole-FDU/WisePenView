@@ -14,8 +14,8 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
-import NoteWorkspace from './components/NoteWorkspace';
-import styles from './style.module.scss';
+import NoteWorkspace from './_parts/NoteWorkspace';
+import styles from './_common/style.module.scss';
 
 function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
   const { t } = useTranslation('note');

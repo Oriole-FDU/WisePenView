@@ -10,7 +10,7 @@ import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import { type GroupCurrentUserRole, GroupProvider } from './_context';
+import { type GroupCurrentUserRole, GroupProvider } from './_common/context';
 import styles from './style.module.scss';
 
 type GroupRouteLoaded = {

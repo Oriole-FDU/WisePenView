@@ -17,11 +17,11 @@ import { MAIN_SIDEBAR_RAIL_WIDTH } from '@/constants/layoutScale';
 import { SIDEBAR_TOGGLE_BUTTON_PROPS } from '@/constants/sidebarToggle';
 import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 
-import { type MainShellContextValue, MainShellProvider } from './_context';
-import SkipToMainLink, { MAIN_CONTENT_ID } from './SkipToMainLink';
+import { type MainShellContextValue, MainShellProvider } from './_common/context';
+import SkipToMainLink, { MAIN_CONTENT_ID } from './_parts/SkipToMainLink';
 import styles from './style.module.scss';
-import { useMainShellMobileSnapshot } from './useMainShellMobile';
-import { useSystemSidebarPanel } from './useSystemSidebarPanel';
+import { useMainShellMobileSnapshot } from './_hooks/useMainShellMobile';
+import { useSystemSidebarPanel } from './_hooks/useSystemSidebarPanel';
 
 interface MainSidebarRenderState {
   onToggle: () => void;

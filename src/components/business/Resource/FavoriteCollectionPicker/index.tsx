@@ -1,5 +1,5 @@
-import CollectionPickerModal from './CollectionPickerModal';
-import { useFavoriteCollectionPickerController } from './useFavoriteCollectionPickerController';
+import CollectionPickerModal from './_parts/CollectionPickerModal';
+import { useFavoriteCollectionPickerController } from './_hooks/useFavoriteCollectionPickerController';
 
 interface FavoriteCollectionPickerProps {
   resourceId: string;

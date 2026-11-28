@@ -5,7 +5,7 @@ import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useNewNoteStore } from '@/components/editors/note/_store/useNewNoteStore';
+import { useNewNoteStore } from '@/components/editors/note/_common/store/useNewNoteStore';
 import type { NoteSelectionSnapshot, SelectedNoteScope } from '@/domains/Note';
 import { computeNoteBodyContentHash } from '@/domains/Note';
 

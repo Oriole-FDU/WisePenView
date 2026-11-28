@@ -7,7 +7,7 @@ import { AppButton } from '@/components/base/Button';
 import { Spin } from '@/components/base/Feedback';
 import ListBox from '@/components/base/ListBox';
 import { Tabs } from '@/components/base/Tabs';
-import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
+import ResourcePermissionActionIcon from '@/components/business/Drive/_common/resourcePermissionActionIcon';
 import {
   buildResourceOverrideActions,
   buildResourcePermissionActionKeySet,
@@ -20,7 +20,7 @@ import {
   resolveTagInheritedResourceActions,
   RESOURCE_PERMISSION_PRESETS,
   type ResourcePermissionPresetKey,
-} from '@/components/business/Drive/common/resourcePermissionPolicy';
+} from '@/components/business/Drive/_common/resourcePermissionPolicy';
 import { useResourceAccessService, useTagService } from '@/domains';
 import {
   areResourcePermissionActionsEqual,

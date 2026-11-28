@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next';
 
 import PageHeader from '@/components/base/PageHeader';
 
-import ModelSettingsSection from './ModelSettingsSection';
-import ProviderSettingsSection from './ProviderSettingsSection';
+import ModelSettingsSection from './_parts/ModelSettingsSection';
+import ProviderSettingsSection from './_parts/ProviderSettingsSection';
 import styles from './style.module.scss';
-import WebSearchSettingsSection from './WebSearchSettingsSection';
+import WebSearchSettingsSection from './_parts/WebSearchSettingsSection';
 
 function AISettings() {
   const { t } = useTranslation('profile');

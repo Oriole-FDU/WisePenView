@@ -17,7 +17,7 @@ import { IMAGE_UPLOAD_MAX_SIZE_LABEL } from '@/utils/image/uploadLimit';
 
 import type { AccountHeaderProps } from './index.type';
 import styles from './style.module.scss';
-import { resolveVerificationLabelKey } from './verificationLabel';
+import { resolveVerificationLabelKey } from './_common/verificationLabel';
 
 function AccountHeader({ user, onUserInfoReload }: AccountHeaderProps) {
   const { t } = useTranslation(['profile', 'shell', 'common']);

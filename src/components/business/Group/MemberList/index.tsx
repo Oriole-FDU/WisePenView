@@ -11,7 +11,7 @@ import { parseErrorMessage } from '@/utils/error';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { MemberListProps } from './index.type';
-import MemberListTable from './MemberListTable';
+import MemberListTable from './_parts/MemberListTable';
 import type { MemberListInlineDraft, MemberListInlineEditKind } from './MemberListTable/index.type';
 import {
   AssignQuotaModal,

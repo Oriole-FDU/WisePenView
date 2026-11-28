@@ -15,7 +15,7 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorRuntime } from '../_runtime/useEditorRuntime';
 import type { EditorPresentation, EditorSurfaceProps } from '../editor.type';
-import { buildHtmlDocument } from './htmlDocument';
+import { buildHtmlDocument } from './_common/htmlDocument';
 import styles from './style.module.scss';
 
 interface HtmlFrameProps {

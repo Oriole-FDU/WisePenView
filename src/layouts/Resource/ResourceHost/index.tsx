@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect } from 'react';
 
 import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
-import { useMainShell } from '@/layouts/MainShell/_context';
+import { useMainShell } from '@/layouts/MainShell/_common/context';
 import { buildResourceOpenState } from '@/layouts/Resource/_context/chatBinding/resourceChatModel';
 import { ResourceEditorProvider, useResourceEditor } from '@/layouts/Resource/_context/editor';
 import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb';

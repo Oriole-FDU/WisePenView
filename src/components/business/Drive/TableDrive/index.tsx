@@ -25,13 +25,13 @@ import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 import type { ResourceViewer } from '@/domains/Resource/model/resourceTarget';
 import { useViewportLayoutScale } from '@/hooks/useViewportLayoutScale';
 
-import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
+import { buildDriveBreadcrumbItems } from '../_common/driveBreadcrumb';
 import {
   resolveCurrentFolderTagId,
   resolveDriveFolderVariant,
   resolveDriveScope,
-} from '../common/driveComponentModel';
-import { useOpenDriveNode } from '../common/useOpenDriveNode';
+} from '../_common/driveComponentModel';
+import { useOpenDriveNode } from '../_common/useOpenDriveNode';
 import {
   useTableDriveActionsController,
   useTableDriveDndController,
@@ -40,13 +40,13 @@ import {
   useTableDriveNavigationController,
   useTableDriveRowActionsController,
   useTableDriveTrashController,
-} from './controllers';
+} from './_hooks';
 import type { DriveTableRow, TableDriveProps } from './index.type';
-import CreateMenu from './parts/CreateMenu';
-import DriveDetailPanel from './parts/DriveDetailPanel';
-import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './parts/DriveDnd';
-import styles from './style.module.scss';
-import { buildDriveTableColumns, isDrivePinnedFirstRow } from './tableConfig';
+import CreateMenu from './_parts/CreateMenu';
+import DriveDetailPanel from './_parts/DriveDetailPanel';
+import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './_parts/DriveDnd';
+import styles from './_common/style.module.scss';
+import { buildDriveTableColumns, isDrivePinnedFirstRow } from './_common/tableConfig';
 
 const DRIVE_DRAG_OVERLAY_CURSOR_OFFSET = { x: 12, y: 12 };
 

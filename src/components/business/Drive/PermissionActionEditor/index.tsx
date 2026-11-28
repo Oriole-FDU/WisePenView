@@ -2,14 +2,14 @@ import { Check, X } from 'lucide-react';
 
 import { Checkbox } from '@/components/base/Input';
 import { Tabs } from '@/components/base/Tabs';
-import ResourcePermissionActionIcon from '@/components/business/Drive/common/resourcePermissionActionIcon';
+import ResourcePermissionActionIcon from '@/components/business/Drive/_common/resourcePermissionActionIcon';
 import {
   resolveTagPermissionActionPresetKey,
   TAG_PERMISSION_ACTION_PRESET_OPTIONS,
   TAG_PERMISSION_ACTION_ROWS,
   TAG_PERMISSION_RESOURCE_STRATEGIES,
   type TagPermissionResourceStrategy,
-} from '@/components/business/Drive/common/tagPermissionPreset';
+} from '@/components/business/Drive/_common/tagPermissionPreset';
 import { normalizeResourceActions, type ResourceAction } from '@/domains/_shared/access';
 import {
   buildTagPermissionListActionSelectionPatch,

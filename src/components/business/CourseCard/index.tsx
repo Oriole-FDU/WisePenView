@@ -2,7 +2,7 @@ import { Card } from '@heroui/react';
 import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import UserCapsule from '@/components/base/Avatar/UserCapsule';
+import UserCapsule from '@/components/base/Avatar/_parts/UserCapsule';
 import { AppPressable } from '@/components/base/Button';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 import type { CourseSummary } from '@/domains/Course';

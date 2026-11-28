@@ -7,12 +7,12 @@ import { FolderTable } from '@/components/base/Table';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 
-import { buildDriveBreadcrumbItems } from '../common/driveBreadcrumb';
-import { resolveDriveFolderVariant, resolveDriveScope } from '../common/driveComponentModel';
-import { useOpenDriveNode } from '../common/useOpenDriveNode';
-import { useTableDriveNavigationController } from '../TableDrive/controllers';
+import { buildDriveBreadcrumbItems } from '../_common/driveBreadcrumb';
+import { resolveDriveFolderVariant, resolveDriveScope } from '../_common/driveComponentModel';
+import { useOpenDriveNode } from '../_common/useOpenDriveNode';
+import { useTableDriveNavigationController } from '../TableDrive/_hooks';
 import type { DriveTableRow, TableDriveProps } from '../TableDrive/index.type';
-import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/tableConfig';
+import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/_common/tableConfig';
 import styles from './style.module.scss';
 
 function getMobileRowMeta(row: DriveTableRow) {

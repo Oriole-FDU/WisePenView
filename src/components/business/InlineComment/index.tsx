@@ -16,7 +16,7 @@ import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import CommentComposer from './CommentComposer';
+import CommentComposer from './_parts/CommentComposer';
 import type {
   InlineCommentDeletePayload,
   InlineCommentProps,

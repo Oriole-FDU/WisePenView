@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 
 import RouteOutletBoundary from '@/layouts/RouteOutletBoundary';
 
-import CourseNavigationSidebar from './CourseNavigationSidebar';
+import CourseNavigationSidebar from './_parts/CourseNavigationSidebar';
 import styles from './style.module.scss';
 
 function CourseLayout() {

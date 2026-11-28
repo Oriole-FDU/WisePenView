@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { FolderTableRow } from '@/components/base/Table';
 
-import type { DriveScope, DriveViewNode } from '../common/driveComponentModel';
+import type { DriveScope, DriveViewNode } from '../_common/driveComponentModel';
 
 /** TableDrive 行类型：真实节点或组件分页占位节点，可选挂 children。 */
 export type DriveRow = DriveViewNode & { children?: DriveRow[] };

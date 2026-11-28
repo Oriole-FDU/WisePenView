@@ -34,9 +34,9 @@ import {
   decodeBase64Utf8,
   type DrawioSaveState,
   readDrawioEmbedOrigin,
-} from './drawioProtocol';
-import { useDrawioEditorSession } from './hooks/useDrawioEditorSession';
-import { useDrawioTheme } from './hooks/useDrawioTheme';
+} from './_common/drawioProtocol';
+import { useDrawioEditorSession } from './_hooks/useDrawioEditorSession';
+import { useDrawioTheme } from './_hooks/useDrawioTheme';
 import styles from './style.module.scss';
 
 interface DrawioViewData {

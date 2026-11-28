@@ -10,9 +10,9 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import type { EditorSurfaceProps } from '../editor.type';
-import AgentWorkspace from './components/AgentWorkspace';
-import { useAgentVersionController } from './controllers/useAgentVersionController';
-import styles from './style.module.scss';
+import AgentWorkspace from './_parts/AgentWorkspace';
+import { useAgentVersionController } from './_hooks/useAgentVersionController';
+import styles from './_common/style.module.scss';
 
 function AgentEditorContent() {
   const {

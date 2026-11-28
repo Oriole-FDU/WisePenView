@@ -13,11 +13,11 @@ import {
   type MarkdownResourceResolver,
   MarkdownResourceResolverProvider,
   useMarkdownResourceResolver,
-} from './_context';
-import CodeBlock from './CodeBlock';
-import MermaidBlock from './MermaidBlock';
-import { isMermaidLanguage } from './MermaidBlock/language';
-import { MARKDOWN_UNDERLINE_URL, type MarkdownRenderContext } from './runtime';
+} from './_common/context';
+import CodeBlock from './_parts/CodeBlock';
+import MermaidBlock from './_parts/MermaidBlock';
+import { isMermaidLanguage } from './_parts/MermaidBlock/_common/language';
+import { MARKDOWN_UNDERLINE_URL, type MarkdownRenderContext } from './_common/runtime';
 import styles from './style.module.scss';
 
 const SAFE_PROTOCOL = /^(https?|ircs?|mailto|xmpp)$/i;
@@ -35,7 +35,7 @@ interface MarkdownBlockProps {
 
 export type MarkdownLinkMode = 'external' | 'safe';
 
-export type { MarkdownResourceResolver } from './_context';
+export type { MarkdownResourceResolver } from './_common/context';
 
 interface MarkdownRendererProps {
   blocks: ParsedBlock[];

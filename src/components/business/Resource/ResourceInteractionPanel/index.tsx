@@ -20,11 +20,11 @@ import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import CommentComposer from './CommentComposer';
-import ResourceCommentThread from './ResourceCommentThread';
-import ResourceFeedbackSummary from './ResourceFeedbackSummary';
+import CommentComposer from './_parts/CommentComposer';
+import ResourceCommentThread from './_parts/ResourceCommentThread';
+import ResourceFeedbackSummary from './_parts/ResourceFeedbackSummary';
 import styles from './style.module.scss';
-import { updateCommentLikeCount } from './utils';
+import { updateCommentLikeCount } from './_common/utils';
 
 const COMMENT_PAGE_SIZE = 10;
 const COMMENT_THREAD_ESTIMATE_SIZE = 180;

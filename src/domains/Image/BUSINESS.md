@@ -10,7 +10,7 @@
 
 - 图床请求必须带 scene，目前支持 `PUBLIC_IMAGE_FOR_USER`、`PUBLIC_IMAGE_FOR_GROUP`、`PRIVATE_IMAGE_FOR_NOTE`。`bizTag` 用于进一步区分业务路径，只有不为 undefined 且不为空字符串时才加入 FormData；不能从文件名推导 scene。依据：[ImageUploadRequest](service/index.type.ts)、[mapImageUploadRequest](mapper/ImageServices.map.ts)。
 - 当前前端代理上限为 5 MiB（`5 * 1024 * 1024` 字节），等于上限允许，大于上限在 service 中拒绝。UI 校验不能替代 service 校验；该值与后端实际部署配置的一致性仍需部署侧确认。依据：[上传限制常量](../../utils/image/uploadLimit.ts)、[uploadImage](service/ImageServices.impl.ts)。
-- 图床上传使用 60 秒请求超时，成功返回存储记录与拼接地址，不会自动更新用户头像或小组封面字段。图片上传成功后，业务实体更新仍可能失败，不能提前显示整个业务操作成功。依据：[ImageServices](service/ImageServices.impl.ts)、[头像保存调用链](../../views/app/profile/_components/Account/AccountHeader/index.tsx)、[小组封面保存调用链](../../views/app/group/GroupDetail/_components/GroupProfileSection/index.tsx)。
+- 图床上传使用 60 秒请求超时，成功返回存储记录与拼接地址，不会自动更新用户头像或小组封面字段。图片上传成功后，业务实体更新仍可能失败，不能提前显示整个业务操作成功。依据：[ImageServices](service/ImageServices.impl.ts)、[头像保存调用链](../../views/app/profile/_components/Account/AccountHeader/index.tsx)、[小组封面保存调用链](../../views/app/group/GroupDetail/_parts/GroupProfileSection/index.tsx)。
 
 ## 地址与权限边界
 

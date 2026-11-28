@@ -1,7 +1,7 @@
 import type { StoreApi } from 'zustand/vanilla';
 
-import { useChatInputStoreApi } from '../../ChatConversation/ChatInput/_context';
-import type { ChatInputStoreState } from '../../ChatConversation/ChatInput/_context/ChatInputStore';
+import { useChatInputStoreApi } from '../../_parts/ChatConversation/_parts/ChatInput/_common/context';
+import type { ChatInputStoreState } from '../../_parts/ChatConversation/_parts/ChatInput/_common/context/ChatInputStore';
 import { useWelcomeScreenOrchestration, useWelcomeScreenStore } from '../_store/welcomeScreenState';
 import WelcomeStarter from '../Starter';
 import type { WelcomePromptPickMeta } from '../Starter/index.type';

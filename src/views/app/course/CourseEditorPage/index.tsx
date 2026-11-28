@@ -11,15 +11,15 @@ import { useCourseContext } from '@/layouts/Course/_context';
 import { buildCoursePath } from '@/utils/navigation/appRoute';
 import { buildChatSessionLocation, getChatSessionId } from '@/utils/navigation/chatRoute';
 
-import CourseAssessmentSection from './_components/CourseAssessmentSection';
-import CourseBasicSection from './_components/CourseBasicSection';
-import CourseCoverModal from './_components/CourseCoverModal';
-import CourseDangerSection from './_components/CourseDangerSection';
-import CourseGoalsSection from './_components/CourseGoalsSection';
-import CoursePermissionSection from './_components/CoursePermissionSection';
-import CourseScheduleSection from './_components/CourseScheduleSection';
-import { useCourseEditorFormController } from './controllers/useCourseEditorFormController';
-import styles from './style.module.scss';
+import CourseAssessmentSection from './_parts/CourseAssessmentSection';
+import CourseBasicSection from './_parts/CourseBasicSection';
+import CourseCoverModal from './_parts/CourseCoverModal';
+import CourseDangerSection from './_parts/CourseDangerSection';
+import CourseGoalsSection from './_parts/CourseGoalsSection';
+import CoursePermissionSection from './_parts/CoursePermissionSection';
+import CourseScheduleSection from './_parts/CourseScheduleSection';
+import { useCourseEditorFormController } from './_hooks/useCourseEditorFormController';
+import styles from './_common/style.module.scss';
 
 function CourseEditorPage() {
   const { t } = useTranslation('course');

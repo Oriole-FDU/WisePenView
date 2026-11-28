@@ -15,10 +15,10 @@ import HeaderNav from './_common/header/HeaderNav';
 import type { HeaderNavItem } from './_common/header/HeaderNav/index.type';
 import NavigationControls from './_common/header/NavigationControls';
 import SidebarHeader from './_common/header/SidebarHeader';
-import SidebarDriveNodeTitle from './_common/tab/DriveTab/SidebarDriveNodeTitle';
-import SidebarDriveScopeSwitcher from './_common/tab/DriveTab/SidebarDriveScopeSwitcher';
-import SessionMenuItem from './_common/tab/SessionTab/SessionMenuItem';
-import AdminHeaderNav from './AdminSidebar/AdminHeaderNav';
+import SidebarDriveNodeTitle from './_common/tab/_parts/DriveTab/_parts/SidebarDriveNodeTitle';
+import SidebarDriveScopeSwitcher from './_common/tab/_parts/DriveTab/_parts/SidebarDriveScopeSwitcher';
+import SessionMenuItem from './_common/tab/_parts/SessionTab/_parts/SessionMenuItem';
+import AdminHeaderNav from './AdminSidebar/_parts/AdminHeaderNav';
 import styles from './Sidebar.stories.module.scss';
 
 const session: ChatSession = {

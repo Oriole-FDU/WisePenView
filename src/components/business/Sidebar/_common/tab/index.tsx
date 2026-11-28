@@ -7,7 +7,7 @@ import { AppPressable } from '@/components/base/Button';
 import { GuideAnchor, registerGuideActionHandlers } from '@/components/base/Guide';
 import { Tabs } from '@/components/base/Tabs';
 import { Tooltip } from '@/components/base/Tooltip';
-import CommandPaletteTrigger from '@/components/business/CommandPalette/Trigger';
+import CommandPaletteTrigger from '@/components/business/CommandPalette/_parts/CommandPaletteTrigger';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID, type GuideToolId } from '@/constants/tour';
 import { useAppAuth } from '@/layouts/App/_context';
 import { mergeRefs } from '@/utils/react/mergeRefs';
@@ -16,10 +16,10 @@ import {
   SIDEBAR_VIEW_TAB,
   type SidebarViewTabKey,
   useSidebarViewTabStore,
-} from './_store/useSidebarViewTabStore';
-import CourseTab from './CourseTab';
-import DriveTab from './DriveTab';
-import SessionTab from './SessionTab';
+} from './_common/store/useSidebarViewTabStore';
+import CourseTab from './_parts/CourseTab';
+import DriveTab from './_parts/DriveTab';
+import SessionTab from './_parts/SessionTab';
 import styles from './style.module.scss';
 
 interface SidebarViewTabProps {

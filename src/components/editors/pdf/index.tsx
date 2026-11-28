@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '@/components/base/Button';
 import { ResultState, Spin } from '@/components/base/Feedback';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
-import PdfViewer from '@/components/editors/pdf/components/PdfViewer/index';
+import PdfViewer from '@/components/editors/pdf/_parts/PdfViewer/index';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useDocumentService, useResourceInteractionService } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';

@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState, Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
-import FavoriteCollectionList from './components/FavoriteCollectionList';
-import FavoriteResourceTable from './components/FavoriteResourceTable';
-import DeleteCollectionModal from './DeleteCollectionModal';
-import EditCollectionModal from './EditCollectionModal';
-import { useFavoriteCollections } from './hooks/useFavoriteCollections';
+import FavoriteCollectionList from './_parts/FavoriteCollectionList';
+import FavoriteResourceTable from './_parts/FavoriteResourceTable';
+import DeleteCollectionModal from './_parts/DeleteCollectionModal';
+import EditCollectionModal from './_parts/EditCollectionModal';
+import { useFavoriteCollections } from './_hooks/useFavoriteCollections';
 import styles from './style.module.scss';
 
 function resolveDefaultCollection(
