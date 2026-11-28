@@ -23,6 +23,8 @@
     "package:desktop:unsigned:dev": "pnpm build:dev && pnpm build:electron && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg",
     "lint": "node scripts/check-domain-structure.mjs && eslint . --cache --cache-strategy content",
     "lint:fix": "node scripts/check-domain-structure.mjs && eslint . --fix",
+    "lint:contracts": "node scripts/check-contract-lint.mjs",
+    "lint:error": "node scripts/check-contract-lint.mjs error",
     "format:check": "prettier --check \"**/*.{js,jsx,mjs,cjs,ts,tsx,json,md,scss}\" \".github/**/*.{yml,yaml}\"",
     "typecheck": "tsc -b",
     "test": "node --test \"tests/**/*.test.mjs\" \"scripts/observability/*.test.mjs\"",
