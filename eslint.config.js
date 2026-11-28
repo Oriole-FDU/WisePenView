@@ -15,6 +15,7 @@ import {
   projectRestrictedProperties,
   projectRestrictedSyntaxRules,
 } from './eslint-rules/restricted-syntax.js';
+import { contractRuleSettings } from './lint/contracts.js';
 
 export default defineConfig([
   globalIgnores([
@@ -60,9 +61,7 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      'wisepen/no-arbitrary-throw': 'warn',
-      'wisepen/no-direct-error-toast': 'warn',
-      'wisepen/no-direct-wise-pen-error': 'warn',
+      ...contractRuleSettings,
     },
   },
   {
