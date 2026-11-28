@@ -1,3 +1,4 @@
+import { componentRules } from './component.js';
 import {
   domainWisePenErrorRestrictedSyntaxRule,
   errorRules,
@@ -6,6 +7,10 @@ import {
 
 // 专题在此登记一次；插件注册、默认级别和专项检查共用这份定义。
 export const lintContracts = {
+  component: {
+    rules: componentRules,
+    severity: 'error',
+  },
   error: {
     rules: errorRules,
     severity: 'warn',

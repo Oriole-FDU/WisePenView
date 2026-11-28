@@ -101,7 +101,6 @@ export default defineConfig([
       'no-restricted-properties': ['error', ...projectRestrictedProperties],
       'no-restricted-syntax': ['error', ...projectRestrictedSyntaxRules],
       'wisepen/no-use-effect': 'warn',
-      'wisepen/component-conventions': 'warn',
       'wisepen/domain-conventions': 'warn',
       'wisepen/no-memoized-fn': 'warn',
       'wisepen/no-memoization': 'warn',

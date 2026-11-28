@@ -1,5 +1,4 @@
 import { contractRules } from '../lint/contracts.js';
-import { componentConventionRule } from './component-conventions.js';
 import { domainConventionRule } from './domain-conventions.js';
 
 const noUseEffectRule = {
@@ -276,7 +275,6 @@ const noTypeCommentsRule = {
 export const wisePenPlugin = {
   rules: {
     ...contractRules,
-    'component-conventions': componentConventionRule,
     'domain-conventions': domainConventionRule,
     'max-lines-error': fileLengthRule(600),
     'no-hardcoded-frontend-route': noHardcodedFrontendRouteRule,
