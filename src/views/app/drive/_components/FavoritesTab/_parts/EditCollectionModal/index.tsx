@@ -5,16 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { useResourceFavoriteService } from '@/domains';
-import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 import { useApi } from '@/hooks/useApi';
 
+import type { EditCollectionModalProps } from './index.type';
 import styles from './style.module.scss';
-
-interface EditCollectionModalProps {
-  onOpenChange: (open: boolean) => void;
-  collection: FavoriteCollection | null;
-  onSuccess: () => void;
-}
 
 function EditCollectionModal({ onOpenChange, collection, onSuccess }: EditCollectionModalProps) {
   const { t } = useTranslation(['resource', 'common']);

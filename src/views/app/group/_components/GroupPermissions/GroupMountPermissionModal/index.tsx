@@ -5,11 +5,7 @@ import { AppButton } from '@/components/base/Button';
 
 import GroupPolicyShellCard from '../GroupPolicyShellCard';
 import styles from '../style.module.scss';
-
-interface GroupMountPermissionModalProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import type { GroupMountPermissionModalProps } from './index.type';
 
 function GroupMountPermissionModal({ isOpen, onOpenChange }: GroupMountPermissionModalProps) {
   const { t } = useTranslation(['group', 'common']);

@@ -3,15 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { useResourceFavoriteService } from '@/domains';
-import type { FavoriteItem } from '@/domains/ResourceFavorite';
 import { useApi } from '@/hooks/useApi';
 
-interface UnfavoriteResourceModalProps {
-  item: FavoriteItem | undefined;
-  collectionId: string;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
-}
+import type { UnfavoriteResourceModalProps } from './index.type';
 
 function UnfavoriteResourceModal({
   item,

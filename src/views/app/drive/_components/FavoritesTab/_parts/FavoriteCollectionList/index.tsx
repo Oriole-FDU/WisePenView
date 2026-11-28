@@ -5,18 +5,9 @@ import { useTranslation } from 'react-i18next';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
-import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
 import styles from '../../style.module.scss';
-
-interface FavoriteCollectionListProps {
-  collections: FavoriteCollection[];
-  selectedCollectionId?: string;
-  onSelect: (collectionId: string) => void;
-  onCreate: () => void;
-  onEdit: (collection: FavoriteCollection) => void;
-  onDelete: (collection: FavoriteCollection) => void;
-}
+import type { FavoriteCollectionListProps } from './index.type';
 
 function FavoriteCollectionList({
   collections,

@@ -4,8 +4,8 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState } from '@/components/base/Feedback';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 
-import type { UnsupportedResourceProps } from '../../index.type';
 import styles from '../../style.module.scss';
+import type { UnsupportedResourceProps } from './index.type';
 
 export default function UnsupportedResource({
   resourceType,

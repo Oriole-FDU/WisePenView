@@ -4,10 +4,7 @@ import { Tabs } from '@/components/base/Tabs';
 import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
 
 import styles from '../style.module.scss';
-
-interface GroupPolicyShellCardProps {
-  title: string;
-}
+import type { GroupPolicyShellCardProps } from './index.type';
 
 const POLICY_SCOPE_OPTIONS = [
   { scope: ACCESS_CONTROL_SCOPE.ALL, labelKey: 'permission.scope.all' },

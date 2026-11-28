@@ -1,17 +1,11 @@
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { WorkspacePanel } from '@/components/business/WorkspacePanel';
 
 import styles from '../ResourceInlineCommentPanel.module.scss';
+import type { ResourceInlineCommentPanelProps } from './index.type';
 
-function ResourceInlineCommentPanel({
-  children,
-  onClose,
-}: {
-  children: ReactNode;
-  onClose: () => void;
-}) {
+function ResourceInlineCommentPanel({ children, onClose }: ResourceInlineCommentPanelProps) {
   const { t } = useTranslation('resource');
 
   return (

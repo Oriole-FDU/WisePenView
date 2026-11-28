@@ -6,29 +6,12 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { PieChart } from '@/components/base/Chart';
 import { FormField, Input, Select } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
-import type { CourseAssessmentItem, CourseFinalAssessment } from '@/domains/Course';
+import type { CourseFinalAssessment } from '@/domains/Course';
 
-import {
-  COURSE_ASSESSMENT_TYPES,
-  type CourseEditorForm,
-  createAssessmentEditorItem,
-  type UpdateCourseEditorForm,
-} from '../../_common/model';
+import { COURSE_ASSESSMENT_TYPES, createAssessmentEditorItem } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
 import { CourseDateField, CourseTimeField } from '../CourseEditorDateFields';
-
-interface CourseAssessmentSectionProps {
-  form: CourseEditorForm;
-  assessmentTotal: number;
-  assessmentError?: string;
-  noFinalAssessmentValue: string;
-  hasNoFinalAssessment: boolean;
-  onUpdate: UpdateCourseEditorForm;
-  onUpdateAssessment: (editorId: string, patch: Partial<CourseAssessmentItem>) => void;
-  onUpdateDeadlineDate: (value: string) => void;
-  onUpdateDeadlineTime: (value: string) => void;
-  onBlurAssessment: (field: 'assessmentItems') => void;
-}
+import type { CourseAssessmentSectionProps } from './index.type';
 
 function CourseAssessmentSection({
   form,

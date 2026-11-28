@@ -5,13 +5,8 @@ import { Tabs } from '@/components/base/Tabs';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import underlineTabs from '@/views/app/_common/style.module.scss';
 
+import type { PublicSectionKey, PublicSectionTabsProps } from './index.type';
 import styles from './style.module.scss';
-
-export type PublicSectionKey = 'groups' | 'courses';
-
-export interface PublicSectionTabsProps {
-  selectedKey: PublicSectionKey;
-}
 
 function PublicSectionTabs({ selectedKey }: PublicSectionTabsProps) {
   const { t } = useTranslation('group');
@@ -46,3 +41,5 @@ function PublicSectionTabs({ selectedKey }: PublicSectionTabsProps) {
 }
 
 export default PublicSectionTabs;
+
+export type { PublicSectionKey, PublicSectionTabsProps } from './index.type';

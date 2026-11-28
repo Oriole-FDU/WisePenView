@@ -6,24 +6,10 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import type { DriveSelectionItem } from '@/components/business/Drive/_common/driveComponentModel';
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
-import type { DriveNavigatorScopeMode } from '@/components/business/Drive/DriveNavigator/index.type';
-import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
+import type { DriveContainerNode, DriveNode } from '@/domains/Drive';
 
+import type { ResourceTargetModalProps } from './index.type';
 import styles from '../../ResourceTargetModal.module.scss';
-
-interface ResourceTargetModalProps {
-  isOpen: boolean;
-  title: string;
-  hint: string;
-  scopeMode?: DriveNavigatorScopeMode;
-  scope: DriveNodeScope;
-  excludedGroupIds?: string[];
-  submitting: boolean;
-  confirmText?: string;
-  isTargetSelectable?: (target: DriveSelectionItem) => boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: (target: DriveContainerNode) => void;
-}
 
 function ResourceTargetModal({
   isOpen,

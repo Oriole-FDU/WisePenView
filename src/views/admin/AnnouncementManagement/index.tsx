@@ -10,12 +10,12 @@ import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 import AdminPageHeader from '@/views/admin/_common/AdminPageHeader';
 
 import styles from '../style.module.scss';
-import CreateAnnouncementModal from './_parts/CreateAnnouncementModal';
 import type {
   AnnouncementManagementProps,
   AnnouncementRecord,
   PublishAnnouncementRequest,
 } from './index.type';
+import CreateAnnouncementModal from './_parts/CreateAnnouncementModal';
 import pageStyles from './style.module.scss';
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];

@@ -1,16 +1,10 @@
 import { Pagination } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
+import type { PublicListPaginationProps } from './index.type';
 import styles from './style.module.scss';
 
 type PaginationPageItem = number | 'ellipsis';
-
-export interface PublicListPaginationProps {
-  page: number;
-  size: number;
-  total: number;
-  onChange: (page: number, size: number) => void;
-}
 
 const PAGINATION_SIBLING_COUNT = 1;
 
@@ -89,3 +83,5 @@ function PublicListPagination({ page, size, total, onChange }: PublicListPaginat
 }
 
 export default PublicListPagination;
+
+export type { PublicListPaginationProps } from './index.type';

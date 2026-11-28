@@ -7,19 +7,7 @@ import Tree, { type DataNode } from '@/components/base/Tree';
 import type { CourseOutlineNode } from '@/domains/Course';
 
 import styles from '../../../../_common/style.module.scss';
-
-interface CourseOutlineMoveModalProps {
-  isOpen: boolean;
-  title: string;
-  hint: string;
-  nodes: CourseOutlineNode[];
-  currentParentId?: string;
-  isSubmitting: boolean;
-  confirmText: string;
-  cancelText: string;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: (targetNodeId: string) => void;
-}
+import type { CourseOutlineMoveModalProps } from './index.type';
 
 const toTargetTreeData = (nodes: CourseOutlineNode[], currentParentId?: string): DataNode[] =>
   nodes.flatMap((node) => {

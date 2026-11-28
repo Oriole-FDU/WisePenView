@@ -23,13 +23,8 @@ import underlineTabs from '@/views/app/_common/style.module.scss';
 
 import FavoritesTab from '../_components/FavoritesTab';
 import UploadQueueTab from '../_components/UploadQueueTab';
+import type { DriveProps, DriveViewMode } from './index.type';
 import styles from './style.module.scss';
-
-export type DriveViewMode = 'uploadQueue' | 'tableDrive' | 'favorites' | 'trash';
-
-interface DriveProps {
-  viewMode?: DriveViewMode;
-}
 
 function Drive({ viewMode = 'tableDrive' }: DriveProps) {
   const { t } = useTranslation('drive');
@@ -191,3 +186,5 @@ function Drive({ viewMode = 'tableDrive' }: DriveProps) {
 }
 
 export default Drive;
+
+export type { DriveViewMode } from './index.type';

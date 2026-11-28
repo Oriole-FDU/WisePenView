@@ -12,10 +12,7 @@ import {
   type WorkspacePanelId,
 } from '@/layouts/WorkspaceRightPanelLayout';
 
-interface ResourceWorkspacePanelActionsProps {
-  inlineCommentAvailable: boolean;
-  interactAvailable: boolean;
-}
+import type { ResourceWorkspacePanelActionsProps } from './index.type';
 
 function ResourceWorkspacePanelActions({
   inlineCommentAvailable,

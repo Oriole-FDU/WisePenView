@@ -1,13 +1,5 @@
-import type { ReactNode } from 'react';
-
+import type { GroupSettingsSectionProps } from './index.type';
 import styles from './style.module.scss';
-
-interface GroupSettingsSectionProps {
-  title: string;
-  compact?: boolean;
-  actions?: ReactNode;
-  children: ReactNode;
-}
 
 function GroupSettingsSection({
   title,

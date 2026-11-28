@@ -1,10 +1,6 @@
 import EntryIcon from '@/components/business/Icons/EntryIcon';
-import type { CourseOutlineNode } from '@/domains/Course';
 
-interface CourseResourceIconProps {
-  node: CourseOutlineNode;
-  size: number;
-}
+import type { CourseResourceIconProps } from './index.type';
 
 function CourseResourceIcon({ node, size }: CourseResourceIconProps) {
   if (node.nodeType !== 'RESOURCE') {

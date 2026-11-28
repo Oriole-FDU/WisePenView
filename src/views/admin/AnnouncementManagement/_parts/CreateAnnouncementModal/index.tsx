@@ -7,18 +7,9 @@ import ListBox from '@/components/base/ListBox';
 import AppFormDialog from '@/components/business/AppFormDialog';
 import { parseErrorMessage } from '@/utils/error';
 
-import type {
-  AnnouncementDeliveryScope,
-  AnnouncementPublishMessageType,
-  PublishAnnouncementRequest,
-} from '../../index.type';
+import type { AnnouncementDeliveryScope, AnnouncementPublishMessageType } from '../../index.type';
+import type { CreateAnnouncementModalProps } from './index.type';
 import styles from './style.module.scss';
-
-interface CreateAnnouncementModalProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (request: PublishAnnouncementRequest) => Promise<void>;
-}
 
 interface AnnouncementFormValues {
   title: string;

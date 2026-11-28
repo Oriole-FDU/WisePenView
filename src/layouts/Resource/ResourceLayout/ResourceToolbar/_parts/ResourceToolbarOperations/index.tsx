@@ -1,5 +1,5 @@
 import { toast } from '@heroui/react';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isDriveTrashFolderNode } from '@/components/business/Drive/_common/driveComponentModel';
@@ -16,11 +16,7 @@ import {
   useResourceService,
   useSkillService,
 } from '@/domains';
-import {
-  RESOURCE_ACTION,
-  type ResourceAction,
-  resourceActionsInclude,
-} from '@/domains/_shared/access';
+import { RESOURCE_ACTION, resourceActionsInclude } from '@/domains/_shared/access';
 import {
   buildDriveNodeScope,
   type DriveContainerNode,
@@ -33,30 +29,12 @@ import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import ResourceTargetModal from '../ResourceTargetModal';
-
-export interface ResourceToolbarOperationHandlers {
-  deleteLabel?: string;
-  isLocating: boolean;
-  onCopy?: () => void;
-  onCreateLink?: () => void;
-  onMove?: () => void;
-  onShare?: () => void;
-  onOpenOriginal?: () => void;
-  onDelete?: () => void;
-}
+import type {
+  ResourceToolbarOperationHandlers,
+  ResourceToolbarOperationsProps,
+} from './index.type';
 
 type TargetModal = 'copy' | 'link' | 'share' | null;
-
-interface ResourceToolbarOperationsProps {
-  resourceId: string;
-  resourceName: string;
-  resourceType?: string;
-  resourceInfo?: ResourceItem;
-  currentActions?: ResourceAction[] | null;
-  copyVersion?: number;
-  onResolve: (handlers: ResourceToolbarOperationHandlers) => ReactNode;
-  onResourceChanged?: () => unknown | Promise<unknown>;
-}
 
 const normalizeResourceType = (resourceType?: string): string =>
   resourceType?.trim().toLowerCase() ?? '';
@@ -365,3 +343,5 @@ function ResourceToolbarOperations({
 }
 
 export default ResourceToolbarOperations;
+
+export type { ResourceToolbarOperationHandlers } from './index.type';

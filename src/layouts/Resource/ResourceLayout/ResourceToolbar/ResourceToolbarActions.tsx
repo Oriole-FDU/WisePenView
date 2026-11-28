@@ -28,10 +28,10 @@ import type { ResourceAction } from '@/domains/_shared/access';
 import type { ResourceItem } from '@/domains/Resource';
 import type { ResourcePermissionResourceType } from '@/domains/ResourceAccess';
 
+import styles from './style.module.scss';
 import ResourceToolbarOperations, {
   type ResourceToolbarOperationHandlers,
 } from './_parts/ResourceToolbarOperations';
-import styles from './style.module.scss';
 
 interface ResourceToolbarMenuItemContentProps {
   icon: LucideIcon;

@@ -6,7 +6,6 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Input, Select } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 import {
-  type CourseMeeting,
   type CoursePeriod,
   type CourseWeekPattern,
   FUDAN_COURSE_PERIODS,
@@ -14,21 +13,10 @@ import {
   isCoursePeriod,
 } from '@/domains/Course';
 
-import {
-  COURSE_WEEK_PATTERNS,
-  COURSE_WEEKDAYS,
-  type CourseEditorForm,
-  createCourseMeeting,
-  type UpdateCourseEditorForm,
-} from '../../_common/model';
+import { COURSE_WEEK_PATTERNS, COURSE_WEEKDAYS, createCourseMeeting } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
 import { CourseDateRangeField } from '../CourseEditorDateFields';
-
-interface CourseScheduleSectionProps {
-  form: CourseEditorForm;
-  onUpdate: UpdateCourseEditorForm;
-  onUpdateMeeting: (meetingId: string, patch: Partial<CourseMeeting>) => void;
-}
+import type { CourseScheduleSectionProps } from './index.type';
 
 function CourseScheduleSection({ form, onUpdate, onUpdateMeeting }: CourseScheduleSectionProps) {
   const { t } = useTranslation('course');

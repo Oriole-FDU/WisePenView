@@ -5,10 +5,7 @@ import { AppButton } from '@/components/base/Button';
 import { ResultState } from '@/components/base/Feedback';
 import { ErrorPageActions, ErrorPageShell } from '@/components/business/ErrorPage';
 
-export interface ScopedRouteNotFoundProps {
-  homePath: string;
-  homeLabelKey: 'page.backApp' | 'page.backAdmin';
-}
+import type { ScopedRouteNotFoundProps } from './index.type';
 
 function ScopedRouteNotFound({ homePath, homeLabelKey }: ScopedRouteNotFoundProps) {
   const { t } = useTranslation('errors');
@@ -34,3 +31,5 @@ function ScopedRouteNotFound({ homePath, homeLabelKey }: ScopedRouteNotFoundProp
 }
 
 export default ScopedRouteNotFound;
+
+export type { ScopedRouteNotFoundProps } from './index.type';

@@ -7,12 +7,7 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { useResourceFavoriteService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-interface DeleteCollectionModalProps {
-  onOpenChange: (open: boolean) => void;
-  collectionId: string;
-  collectionName: string | null;
-  onSuccess: () => void;
-}
+import type { DeleteCollectionModalProps } from './index.type';
 
 function DeleteCollectionModal({
   onOpenChange,

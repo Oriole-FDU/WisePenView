@@ -4,10 +4,10 @@ import ResourcePermissionModal from '@/components/business/Resource/ResourcePerm
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import type { ResourceToolbarProps } from './index.type';
-import ResourceToolbarActions from './ResourceToolbarActions';
-import ResourceToolbarBreadcrumb from './_parts/ResourceToolbarBreadcrumb';
 import styles from './style.module.scss';
+import type { ResourceToolbarProps } from './index.type';
+import ResourceToolbarBreadcrumb from './_parts/ResourceToolbarBreadcrumb';
+import ResourceToolbarActions from './ResourceToolbarActions';
 
 /**
  * 资源工具栏：在布局顶栏内装配面包屑与动作，不负责顶栏外壳。

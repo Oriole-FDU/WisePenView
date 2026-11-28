@@ -9,12 +9,7 @@ import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import styles from '../../_common/style.module.scss';
-
-interface CoursePermissionSectionProps {
-  courseId: string;
-  outlineRootTagId?: string;
-  onSuccess: () => void;
-}
+import type { CoursePermissionSectionProps } from './index.type';
 
 function CoursePermissionSection({
   courseId,

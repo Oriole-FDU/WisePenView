@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 
 import { RESOURCE_KIND, type ResourceTarget } from '@/domains/Resource/model/resourceTarget';
 import { useResourceEditor } from '@/layouts/Resource/_context/editor';
@@ -9,13 +9,7 @@ import {
 } from '@/layouts/Resource/_context/host';
 import ResourceTargetResolver from '@/views/app/resource/ResourceTargetResolver';
 
-interface CourseResourceHostProps {
-  courseId: string;
-  target: ResourceTarget;
-  fallbackHeader: ReactNode;
-  onTargetChange: (target: ResourceTarget) => void;
-  onClose: () => void;
-}
+import type { CourseResourceHostProps } from './index.type';
 
 function CourseResourceHost({
   courseId,

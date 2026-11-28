@@ -21,36 +21,16 @@ import { parseErrorMessage } from '@/utils/error';
 
 import { type CourseOutlineResourcePageState, findOutlineNode } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
-import CourseOutlineMoveModal from './_parts/CourseOutlineMoveModal';
-import CourseOutlineNodeTitle from './_parts/CourseOutlineNodeTitle';
-import CourseResourcePickerModal from './_parts/CourseResourcePickerModal';
 import {
   type CourseOutlineResourceTarget,
   findCourseOutlineResourceTarget,
   resolveCourseOutlineResourceDrop,
 } from './_common/model';
 import { useCourseOutlineEditingController } from './_hooks/useCourseOutlineEditingController';
-
-interface CourseOutlineSidebarProps {
-  courseId: string;
-  courseName: string;
-  editable: boolean;
-  nodes: CourseOutlineNode[];
-  allNodes: CourseOutlineNode[];
-  selectedNodeId?: string;
-  searchQuery: string;
-  expandSearchResults: boolean;
-  loading: boolean;
-  error?: Error;
-  resourcePageStateMap: Map<string, CourseOutlineResourcePageState>;
-  onSearchQueryChange: (value: string) => void;
-  onSelectNode: (nodeId: string) => void;
-  onOpenCourseHome: () => void;
-  onExpandNode: (nodeId: string) => void;
-  onLoadMoreResources: (nodeId: string) => void;
-  onRefresh: () => void;
-  onRetry: () => void;
-}
+import type { CourseOutlineResourcePageTitleProps, CourseOutlineSidebarProps } from './index.type';
+import CourseOutlineMoveModal from './_parts/CourseOutlineMoveModal';
+import CourseOutlineNodeTitle from './_parts/CourseOutlineNodeTitle';
+import CourseResourcePickerModal from './_parts/CourseResourcePickerModal';
 
 interface CourseOutlineTreeActions {
   canMoveContainer: (node: CourseOutlineContainerNode, offset: -1 | 1) => boolean;
@@ -63,11 +43,6 @@ interface CourseOutlineTreeActions {
   onMoveResource: (target: CourseOutlineResourceTarget) => void;
   onRemoveResource: (target: CourseOutlineResourceTarget) => void;
   onLoadMoreResources: (nodeId: string) => void;
-}
-
-interface CourseOutlineResourcePageTitleProps {
-  state: CourseOutlineResourcePageState;
-  onLoadMore: () => void;
 }
 
 function CourseOutlineResourcePageTitle({

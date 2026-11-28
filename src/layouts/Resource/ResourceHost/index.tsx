@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { clearFrontendStates, FRONTEND_STATE_SOURCE, setFrontendStates } from '@/frontendState';
 import { useMainShell } from '@/layouts/MainShell/_common/context';
@@ -8,22 +8,10 @@ import { useResourceBreadcrumb } from '@/layouts/Resource/useResourceBreadcrumb'
 
 import {
   DEFAULT_RESOURCE_HOST_ID,
-  type OpenResourceFn,
   type ResourceHostContextValue,
-  type ResourceHostDriveNavigationTarget,
   ResourceHostProvider,
-  type ResourceHostRouteContext,
-  type ResourceHostViewerNavigationTarget,
 } from '../_context/host';
-
-interface ResourceHostProps {
-  children: ReactNode;
-  routeContext: ResourceHostRouteContext;
-  openResource: OpenResourceFn;
-  navigateToDrive: (target: ResourceHostDriveNavigationTarget) => void;
-  switchResourceViewer: (target: ResourceHostViewerNavigationTarget) => void;
-  navigateResourceHash?: (hash: string) => void;
-}
+import type { ResourceHostProps } from './index.type';
 
 function ResourceHostContent({
   children,

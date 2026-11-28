@@ -1,24 +1,11 @@
 import { ChevronRight, HardDrive } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
-import type { ResourceIconType } from '@/domains/Resource';
 
 import styles from '../../style.module.scss';
-
-export interface ResourceToolbarBreadcrumbProps {
-  resourceId?: string;
-  resourceName: string;
-  resourceType?: string;
-  resourceIconType?: ResourceIconType;
-  /** 驱动器路径面包屑，最后一项追加当前资源。 */
-  breadcrumbItems: AppBreadcrumbItem[];
-  /** 隐藏面包屑导航（笔记编辑页等场景），只展示当前资源。 */
-  hideBreadcrumb?: boolean;
-  titleMeta?: ReactNode;
-}
+import type { ResourceToolbarBreadcrumbProps } from './index.type';
 
 /** 资源顶栏面包屑区：只负责导航层级与资源标题，不持有任何操作动作。 */
 export default function ResourceToolbarBreadcrumb({
@@ -87,3 +74,5 @@ export default function ResourceToolbarBreadcrumb({
     </div>
   );
 }
+
+export type { ResourceToolbarBreadcrumbProps } from './index.type';

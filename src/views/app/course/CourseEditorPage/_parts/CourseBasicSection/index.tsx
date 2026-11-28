@@ -1,26 +1,12 @@
 import { Pencil, Save } from 'lucide-react';
-import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton, AppPressable } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 import { Tooltip } from '@/components/base/Tooltip';
 
-import type { CourseEditorForm, UpdateCourseEditorForm } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
-
-interface CourseBasicSectionProps {
-  form: CourseEditorForm;
-  saved: boolean;
-  saving: boolean;
-  errors: Partial<Record<'name' | 'term', string>>;
-  coverUrl: string;
-  onUpdate: UpdateCourseEditorForm;
-  onSave: () => void;
-  onBlur: (field: 'name' | 'term') => void;
-  onChangeCover: () => void;
-  onCoverImageError: (event: SyntheticEvent<HTMLImageElement>) => void;
-}
+import type { CourseBasicSectionProps } from './index.type';
 
 function CourseBasicSection({
   form,

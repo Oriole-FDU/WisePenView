@@ -63,12 +63,8 @@ const ChatPage = lazy(() => import('@/views/app/chat'));
 const NotificationsPage = lazy(() => import('@/views/app/notifications'));
 const CourseRoute = lazy(() => import('@/views/app/course/CourseRoute'));
 const CourseContextPage = lazy(() => import('@/views/app/course/CourseContextPage'));
-const CourseHomePage = lazy(
-  () => import('@/views/app/course/CourseContextPage/_parts/CourseHomeTab')
-);
-const CourseInfoPage = lazy(
-  () => import('@/views/app/course/CourseContextPage/_parts/CourseInfoTab')
-);
+const CourseHomePage = lazy(() => import('@/views/app/course/CourseContextPage/_parts/CourseHomeTab'));
+const CourseInfoPage = lazy(() => import('@/views/app/course/CourseContextPage/_parts/CourseInfoTab'));
 const CourseMaterialsPage = lazy(() => import('@/views/app/course/CourseMaterialsPage'));
 const CourseMembersPage = lazy(() => import('@/views/app/course/CourseMembersPage'));
 const CourseEditorPage = lazy(() => import('@/views/app/course/CourseEditorPage'));

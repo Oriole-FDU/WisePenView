@@ -3,22 +3,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
-import { type GroupRole, isAdmin, isOwner } from '@/components/business/Group/GroupDisplayConfig';
-import type { Group, GroupResConfig } from '@/domains/Group';
+import { isAdmin, isOwner } from '@/components/business/Group/GroupDisplayConfig';
 
 import { DissolveGroupModal, ExitGroupModal } from '../../../_components/GroupModals';
 import GroupPermissionSection from '../GroupPermissionSection';
 import GroupProfileSection from '../GroupProfileSection';
 import GroupSettingsSection from '../GroupSettingsSection';
+import type { GroupDescriptionSettingsProps } from './index.type';
 import styles from './style.module.scss';
-
-interface GroupDescriptionSettingsProps {
-  group: Group;
-  groupId: string;
-  groupResConfig: GroupResConfig;
-  currentUserRole: GroupRole;
-  onRefresh: () => void;
-}
 
 function GroupDescriptionSettings({
   group,

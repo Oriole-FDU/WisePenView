@@ -4,13 +4,7 @@ import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { UploadZone } from '@/components/base/Input';
 
-interface CourseCoverModalProps {
-  isOpen: boolean;
-  file: File | null;
-  onOpenChange: (open: boolean) => void;
-  onFileChange: (file: File | null) => void;
-  onConfirm: () => void;
-}
+import type { CourseCoverModalProps } from './index.type';
 
 function CourseCoverModal({
   isOpen,

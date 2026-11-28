@@ -11,11 +11,7 @@ import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import styles from '../../_common/style.module.scss';
-
-interface CourseDangerSectionProps {
-  courseId: string;
-  courseName: string;
-}
+import type { CourseDangerSectionProps } from './index.type';
 
 function CourseDangerSection({ courseId, courseName }: CourseDangerSectionProps) {
   const { t } = useTranslation('course');

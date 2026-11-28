@@ -7,17 +7,10 @@ import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCol
 import type { FavoriteItem } from '@/domains/ResourceFavorite';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
-import { useFavoriteResourceTableController } from '../../_hooks/useFavoriteResourceTableController';
 import styles from '../../style.module.scss';
+import { useFavoriteResourceTableController } from '../../_hooks/useFavoriteResourceTableController';
 import UnfavoriteResourceModal from '../UnfavoriteResourceModal';
-
-interface FavoriteResourceTableProps {
-  collectionId: string;
-  collectionName: string;
-  collectionItemCount: number;
-  onCollectionChanged: () => void;
-  emptyDescription: string;
-}
+import type { FavoriteResourceTableProps } from './index.type';
 
 interface FavoriteResourceTableRow extends FolderTableRow {
   item: FavoriteItem;

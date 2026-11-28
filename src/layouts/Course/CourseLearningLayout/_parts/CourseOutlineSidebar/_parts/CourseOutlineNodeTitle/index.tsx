@@ -15,32 +15,15 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
-import { type KeyboardEvent, type MouseEvent, type ReactNode, useState } from 'react';
+import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
-import type { CourseOutlineNode } from '@/domains/Course';
 
 import styles from '../../../../_common/style.module.scss';
 import CourseResourceIcon from '../../../CourseResourceIcon';
-import type { CourseOutlineContainerNode, CourseOutlineResourceTarget } from '../../_common/model';
-
-interface CourseOutlineNodeTitleProps {
-  node: CourseOutlineNode;
-  parentId?: string;
-  editable: boolean;
-  readIndicator?: ReactNode;
-  canMoveContainer: (node: CourseOutlineContainerNode, offset: -1 | 1) => boolean;
-  onCreateChild: (node: CourseOutlineContainerNode) => void;
-  onMountFromDrive: (node: CourseOutlineContainerNode) => void;
-  onUploadLocal: (node: CourseOutlineContainerNode) => void;
-  onRename: (node: CourseOutlineContainerNode) => void;
-  onMoveContainer: (node: CourseOutlineContainerNode, offset: -1 | 1) => void;
-  onDelete: (node: CourseOutlineContainerNode) => void;
-  onMoveResource: (target: CourseOutlineResourceTarget) => void;
-  onRemoveResource: (target: CourseOutlineResourceTarget) => void;
-}
+import type { CourseOutlineNodeTitleProps } from './index.type';
 
 function stopTreeAction(event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) {
   event.stopPropagation();

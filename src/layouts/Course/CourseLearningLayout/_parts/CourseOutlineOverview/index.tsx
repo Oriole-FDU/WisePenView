@@ -4,20 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { FormField, TextArea } from '@/components/base/Input';
-import type { CourseOutlineContainerNode, CourseOutlineResourceNode } from '@/domains/Course';
 
 import CourseResourceIcon from '../CourseResourceIcon';
-import styles from './style.module.scss';
 import { useCourseOutlineDescriptionController } from './_hooks/useCourseOutlineDescriptionController';
-
-interface CourseOutlineOverviewProps {
-  courseId: string;
-  node: CourseOutlineContainerNode;
-  resources: CourseOutlineResourceNode[];
-  editable: boolean;
-  onOpenResource: (nodeId: string) => void;
-  onSaved: () => void;
-}
+import type { CourseOutlineOverviewProps } from './index.type';
+import styles from './style.module.scss';
 
 function CourseOutlineOverview({
   courseId,

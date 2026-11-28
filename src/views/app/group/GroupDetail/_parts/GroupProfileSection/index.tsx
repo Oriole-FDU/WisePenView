@@ -16,14 +16,8 @@ import { formatTimestampToDate } from '@/utils/format/formatTime';
 import { assertImageProxyUploadLimit } from '@/utils/image/uploadLimit';
 
 import GroupSettingsSection from '../GroupSettingsSection';
+import type { GroupProfileSectionProps } from './index.type';
 import styles from './style.module.scss';
-
-interface GroupProfileSectionProps {
-  group: Group;
-  groupId: string;
-  canEdit: boolean;
-  onSuccess: () => void;
-}
 
 interface GroupProfileDraft {
   groupName: string;

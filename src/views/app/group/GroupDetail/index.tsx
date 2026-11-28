@@ -21,11 +21,7 @@ import underlineTabs from '@/views/app/_common/style.module.scss';
 import { useGroupContext } from '@/views/app/group/GroupRoute/_common/context';
 
 import page from './style.module.scss';
-
-export interface GroupDetailOutletContextValue {
-  walletRefreshVersion: number;
-  refreshWallet: () => void;
-}
+import type { GroupDetailOutletContextValue } from './index.type';
 
 function GroupDetail() {
   const { t } = useTranslation('group');
@@ -151,3 +147,5 @@ function GroupDetail() {
 }
 
 export default GroupDetail;
+
+export type { GroupDetailOutletContextValue } from './index.type';

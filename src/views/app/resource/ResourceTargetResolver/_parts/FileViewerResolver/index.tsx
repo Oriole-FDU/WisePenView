@@ -7,9 +7,9 @@ import { useApi } from '@/hooks/useApi';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { ResourceTargetResolverProps } from '../../index.type';
 import styles from '../../style.module.scss';
 import UnsupportedResource from '../UnsupportedResource';
+import type { ResourceTargetResolverProps } from './index.type';
 
 export default function FileViewerResolver({
   target,

@@ -2,13 +2,8 @@ import { useTranslation } from 'react-i18next';
 
 import { FormField, TextArea } from '@/components/base/Input';
 
-import type { UpdateCourseEditorForm } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
-
-interface CourseGoalsSectionProps {
-  value: string;
-  onUpdate: UpdateCourseEditorForm;
-}
+import type { CourseGoalsSectionProps } from './index.type';
 
 function CourseGoalsSection({ value, onUpdate }: CourseGoalsSectionProps) {
   const { t } = useTranslation('course');

@@ -4,17 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import GroupDefaultAccessPermissionModal from '@/components/business/Group/DefaultAccessPermissionModal';
-import type { GroupResConfig } from '@/domains/Group';
 import GroupMountPermissionModal from '@/views/app/group/_components/GroupPermissions/GroupMountPermissionModal';
 
 import GroupSettingsSection from '../GroupSettingsSection';
+import type { GroupPermissionSectionProps } from './index.type';
 import styles from './style.module.scss';
-
-interface GroupPermissionSectionProps {
-  groupId: string;
-  groupResConfig: GroupResConfig;
-  onSuccess: () => void;
-}
 
 function GroupPermissionSection({
   groupId,

@@ -15,9 +15,9 @@ import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 import { useWorkspaceRightPanel, WorkspacePanelPortal } from '@/layouts/WorkspaceRightPanelLayout';
 
-import type { ResourceWorkspacePresentationProps } from '../../index.type';
 import ResourceInlineCommentPanel from '../ResourceInlineCommentPanel';
 import ResourceWorkspacePanelActions from '../ResourceWorkspacePanelActions';
+import type { ResourceWorkspacePresentationProps } from './index.type';
 
 /** 单独订阅展示信息，保留正文 children 的引用，避免上报触发编辑器重复渲染。 */
 export default function ResourceWorkspacePresentation({

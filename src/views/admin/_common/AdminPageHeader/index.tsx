@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
-import { ADMIN_PAGE_CONFIGS, type AdminPageKey } from '@/views/admin/pages';
+import { ADMIN_PAGE_CONFIGS } from '@/views/admin/pages';
 
+import type { AdminPageHeaderProps } from './index.type';
 import styles from './style.module.scss';
-
-interface AdminPageHeaderProps {
-  page: AdminPageKey;
-}
 
 function AdminPageHeader({ page }: AdminPageHeaderProps) {
   const { t } = useTranslation('admin');

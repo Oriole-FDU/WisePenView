@@ -9,16 +9,8 @@ import { useCourseService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { usePickerSelection } from '@/hooks/usePickerSelection';
 
+import type { CourseResourcePickerModalProps } from './index.type';
 import styles from './style.module.scss';
-
-interface CourseResourcePickerModalProps {
-  isOpen: boolean;
-  courseId: string;
-  targetNodeId: string;
-  targetName: string;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
-}
 
 function CourseResourcePickerModal({
   isOpen,

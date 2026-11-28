@@ -1,9 +1,9 @@
-import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
 import { AppPressable } from '@/components/base/Button';
 import { getSupportErrorId } from '@/observability';
 
+import type { FallbackProps } from './index.type';
 import styles from './style.module.scss';
 
 function RootErrorFallback({ error }: FallbackProps) {

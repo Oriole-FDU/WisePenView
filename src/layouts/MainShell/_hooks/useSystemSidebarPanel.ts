@@ -9,8 +9,8 @@ import type {
 import { clampSidebarWidth, SIDEBAR_MAX_WIDTH, SIDEBAR_MIN_WIDTH } from '@/constants/layoutScale';
 import { useResizablePanelSize } from '@/hooks/useResizablePanelSize';
 
-import { useSystemLayoutStore } from '../_common/store/useSystemLayoutStore';
 import { focusVisibleSidebarToggle } from '../_common/focusSidebarToggle';
+import { useSystemLayoutStore } from '../_common/store/useSystemLayoutStore';
 import { useSidebarCollapseMotion } from './useSidebarCollapseMotion';
 
 type SidebarMotionPhase = 'expanded' | 'collapsing' | 'collapsed' | 'expanding';

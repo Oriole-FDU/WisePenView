@@ -3,27 +3,11 @@ import { parseDate, parseTime } from '@internationalized/date';
 import { DatePickerField, DateRangeField, TimeField } from '@/components/base/Input';
 
 import styles from '../../_common/style.module.scss';
-
-interface CourseDateRangeFieldProps {
-  label: string;
-  startValue: string;
-  endValue: string;
-  onChange: (startValue: string, endValue: string) => void;
-}
-
-interface CourseDateFieldProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}
-
-interface CourseTimeFieldProps {
-  label: string;
-  value: string;
-  ariaLabel?: string;
-  isDisabled?: boolean;
-  onChange: (value: string) => void;
-}
+import type {
+  CourseDateFieldProps,
+  CourseDateRangeFieldProps,
+  CourseTimeFieldProps,
+} from './index.type';
 
 const parseDateValue = (value: string) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
