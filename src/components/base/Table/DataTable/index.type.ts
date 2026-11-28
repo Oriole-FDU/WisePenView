@@ -64,4 +64,4 @@ export interface DataTableProps<T extends object> {
   virtualized?: boolean;
 }
 
-export type { DataTableTab, DataTableTabsProps } from './_parts/UnderlineTabs/index.type';
+export type { DataTableTab, DataTableTabsProps } from '../DataTableTabs/index.type';

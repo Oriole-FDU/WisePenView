@@ -20,7 +20,7 @@ import {
   RESOURCE_PERMISSION_PRESETS,
   type ResourcePermissionPresetKey,
 } from '@/components/business/Drive/_common/resourcePermissionPolicy';
-import ResourcePermissionActionIcon from '@/components/business/Drive/_common/resourcePermissionActionIcon';
+import ResourcePermissionActionIcon from '@/components/business/Drive/ResourcePermissionActionIcon';
 import { useResourceAccessService, useTagService } from '@/domains';
 import {
   areResourcePermissionActionsEqual,

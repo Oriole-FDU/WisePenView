@@ -14,7 +14,7 @@ import { useApi } from '@/hooks/useApi';
 import type { ProfileFieldKey } from '@/views/app/profile/profile.config';
 import { getVisibleProfileFieldGroups } from '@/views/app/profile/profile.config';
 
-import { buildProfileFormValues } from './_common/buildProfileFormValues';
+import { buildProfileFormValues } from '../buildProfileFormValues';
 import SettingsList from '../SettingsList';
 import { getProfileFieldDisplay } from './_common/profileDisplay';
 import type { AccountFormProps } from './index.type';

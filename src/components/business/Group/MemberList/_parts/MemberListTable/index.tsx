@@ -26,7 +26,7 @@ import type {
   MemberListInlineDraft,
   MemberListPaginationConfig,
   MemberListTableProps,
-} from '../../MemberListTable/index.type';
+} from './index.type';
 import InlineEditError from './_parts/InlineEditError';
 import styles from './style.module.scss';
 

@@ -1,4 +1,4 @@
-@use '@/components/base/Input/Checkbox/_common/tokens' as checkboxTokens;
+@use '@/components/base/Input/_common/checkboxTokens' as checkboxTokens;
 
 @mixin controlWrapper() {
   display: inline-flex;

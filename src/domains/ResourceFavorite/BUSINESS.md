@@ -9,7 +9,7 @@
 ## 收藏归属
 
 - 更新收藏提交完整 `collectionIds`，不是单集合增量命令。正规化后非空即 `favorite: true`；空集合即 `favorite: false` 且不提交 collectionIds。移除单一集合前必须保留其他归属。依据：[mapUpdateFavoriteCollectionsRequest](mapper/ResourceFavoriteServices.map.ts)、[updateFavoriteCollections](service/ResourceFavoriteServices.impl.ts)。
-- 从目前集合移除需要先读取完整归属，再写回剩余集合。这是两个请求，前端没有跨请求原子性保证。依据：[UnfavoriteResourceModal](../../views/app/drive/_components/FavoritesTab/_parts/UnfavoriteResourceModal/index.tsx)。
+- 从目前集合移除需要先读取完整归属，再写回剩余集合。这是两个请求，前端没有跨请求原子性保证。依据：[UnfavoriteResourceModal](../../views/app/drive/_components/FavoritesTab/components/UnfavoriteResourceModal.tsx)。
 
 ## 条目与集合
 

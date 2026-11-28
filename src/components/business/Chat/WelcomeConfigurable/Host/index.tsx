@@ -2,7 +2,7 @@ import { useChatInputStoreApi } from '../../_parts/ChatConversation/_parts/ChatI
 import { useWelcomeScreenOrchestration, useWelcomeScreenStore } from '../_store/welcomeScreenState';
 import WelcomeStarter from '../Starter';
 import type { WelcomePromptPickMeta } from '../Starter/index.type';
-import WelcomeTitle from '../Title';
+import WelcomeTitle from '../WelcomeTitle';
 import type { WelcomeScreenHostBodyProps, WelcomeScreenHostProps } from './index.type';
 
 function resolveHero(

@@ -23,7 +23,7 @@ import {
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import type { SidebarDriveCreateAction, SidebarDriveNodeTitleProps } from './index.type';
 
 function stopTreeAction(event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>): void {

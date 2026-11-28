@@ -1,8 +1,8 @@
 import DataTableComponent from './DataTable';
-import DataTableTabs from './DataTable/_parts/UnderlineTabs';
+import DataTableTabs from './DataTableTabs';
 import FolderTableComponent from './FolderTable';
-import TableMemberCell from './shared/cells/MemberCell';
-import TableTextCell from './shared/cells/TextCell';
+import TableMemberCell from './shared/cells/TableMemberCell';
+import TableTextCell from './shared/cells/TableTextCell';
 import { tableCellStyles } from './shared/styles';
 
 export const DataTable = Object.assign(DataTableComponent, {

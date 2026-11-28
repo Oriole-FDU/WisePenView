@@ -7,7 +7,7 @@ import { useApi } from '@/hooks/useApi';
 import { ResourceLayout } from '@/layouts/Resource/ResourceLayout';
 import { parseErrorMessage } from '@/utils/error';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import UnsupportedResource from '../UnsupportedResource';
 import type { ResourceTargetResolverProps } from './index.type';
 

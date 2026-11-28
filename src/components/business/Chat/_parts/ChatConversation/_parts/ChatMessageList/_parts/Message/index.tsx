@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 import type { MessageProps } from './index.type';
-import AssistantMessage from './_parts/Assistant';
+import AssistantMessage from './_parts/AssistantMessage';
 import UserMessage from './_parts/User';
 
 function Message({ message, model, streaming, fullWidth }: MessageProps) {

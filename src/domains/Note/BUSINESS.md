@@ -13,7 +13,7 @@ Note 专用批注的 session、mapper 与 Yjs 锚点桥接统一由 [Note editor
 ## 资源建立与标题
 
 - 新建请求只传送标题、可选的资源类型，以及由 `pathTagId` 映射的 `mountTargetTagId`。类型仍有 `initial_content`／`source`，但目前 mapper 不传送，不能当成已支持正文初始化或来源派生。依据：[mapCreateNoteRequest](mapper/NoteServices.map.ts)、[CreateNoteRequest](service/index.type.ts)。
-- 新建与复制是不同请求；复制走 `forkNote`，资源工具栏可带当前版本，不以新建的 `source` 字段代替。依据：[forkNote](service/NoteServices.impl.ts)、[ForkNoteRequest](service/index.type.ts)、[ResourceToolbarOperations](../../layouts/Resource/ResourceLayout/ResourceToolbar/_parts/ResourceToolbarOperations/index.tsx)。
+- 新建与复制是不同请求；复制走 `forkNote`，资源工具栏可带当前版本，不以新建的 `source` 字段代替。依据：[forkNote](service/NoteServices.impl.ts)、[ForkNoteRequest](service/index.type.ts)、[ResourceToolbarOperations](../../layouts/Resource/ResourceLayout/ResourceToolbar/ResourceToolbarOperations.tsx)。
 - 标题是 Resource 名称，不是 Yjs 正文；`syncTitle` 委派 Resource rename。名称缓存成功更新与生命周期只由 Resource owner 定义。依据：[createNoteServices](service/NoteServices.impl.ts)、[Resource 名称规则](../Resource/BUSINESS.md)。
 
 ## 权限、协同与保存提示

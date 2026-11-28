@@ -16,7 +16,7 @@ import {
   useChatInputStoreApi,
 } from './_common/context';
 import styles from './_common/style.module.scss';
-import { useChatInputController } from './useChatInputController';
+import { useChatInputController } from './_hooks/useChatInputController';
 import type { ChatInputProps } from './index.type';
 import AttachmentStrip from './_parts/AttachmentStrip';
 import DocumentPickerModal from './_parts/DocumentPickerModal';

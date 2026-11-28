@@ -14,7 +14,7 @@ import {
   MarkdownResourceResolverProvider,
   useMarkdownResourceResolver,
 } from './_common/context';
-import { isMermaidLanguage } from './_parts/MermaidBlock/_common/language';
+import { isMermaidLanguage } from './_common/mermaidLanguage';
 import { MARKDOWN_UNDERLINE_URL, type MarkdownRenderContext } from './_common/runtime';
 import CodeBlock from './_parts/CodeBlock';
 import MermaidBlock from './_parts/MermaidBlock';

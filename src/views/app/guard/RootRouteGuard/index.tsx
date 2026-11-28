@@ -6,7 +6,7 @@ import { useApi } from '@/hooks/useApi';
 import { observeUserLoad } from '@/observability/context';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
-import styles from '../AuthenticatedRouteGuard/style.module.scss';
+import styles from '../_common/style.module.scss';
 
 function RootRouteGuard() {
   const userService = useUserService();

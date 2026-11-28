@@ -4,7 +4,7 @@ import { type ComponentProps, useState } from 'react';
 
 import { DeferredContent, DeferredOverlayProvider } from '@/components/base/DeferredContent';
 
-import overlayStyles from './_common/styles.module.scss';
+import overlayStyles from '../_common/overlay/style.module.scss';
 import type { PopoverRootProps } from './index.type';
 
 const DEFAULT_POPOVER_CONTENT_DELAY = 90;

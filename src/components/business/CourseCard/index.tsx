@@ -3,7 +3,7 @@ import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppPressable } from '@/components/base/Button';
-import UserCapsule from '@/components/base/Avatar/_parts/UserCapsule';
+import UserCapsule from '@/components/base/UserCapsule';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
 
 import type { CourseCardProps } from './index.type';

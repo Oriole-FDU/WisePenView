@@ -9,7 +9,7 @@ import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import type { DriveContainerNode, DriveNode } from '@/domains/Drive';
 
 import type { ResourceTargetModalProps } from './index.type';
-import styles from '../../ResourceTargetModal.module.scss';
+import styles from './style.module.scss';
 
 function ResourceTargetModal({
   isOpen,

@@ -6,7 +6,7 @@ import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 import { observeUserLoad } from '@/observability/context';
 
-import styles from './style.module.scss';
+import styles from '../_common/style.module.scss';
 
 function AuthenticatedRouteGuard() {
   const userService = useUserService();

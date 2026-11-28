@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import AppModal from '@/components/base/AppModal';
 import { AppButton } from '@/components/base/Button';
 import { Tabs } from '@/components/base/Tabs';
-import TagPermissionActionEditor from '@/components/business/Drive/PermissionActionEditor';
+import TagPermissionActionEditor from '@/components/business/Drive/TagPermissionActionEditor';
 import { useGroupService } from '@/domains';
 import {
   ACCESS_CONTROL_SCOPE,

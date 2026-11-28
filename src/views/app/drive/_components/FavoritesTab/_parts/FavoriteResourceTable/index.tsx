@@ -7,7 +7,7 @@ import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCol
 import type { FavoriteItem } from '@/domains/ResourceFavorite';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import { useFavoriteResourceTableController } from '../../_hooks/useFavoriteResourceTableController';
 import UnfavoriteResourceModal from '../UnfavoriteResourceModal';
 import type { FavoriteResourceTableProps } from './index.type';

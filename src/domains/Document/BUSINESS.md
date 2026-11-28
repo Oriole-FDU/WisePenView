@@ -23,7 +23,7 @@
 | 可重试 | REGISTERING_RES_TIMEOUT、FAILED；TRANSFER_TIMEOUT 不在当前重试集合中。                                                                        |
 | 可取消 | UPLOADING、UPLOADED、REGISTERING_RES、TRANSFER_TIMEOUT、REGISTERING_RES_TIMEOUT、FAILED；CONVERTING_AND_PARSING 与 READY 不在当前取消集合中。 |
 
-- 待处理记录可以缺少 documentId；此时仅展示，不能发起重试、取消或同步单项状态请求。不要使用名称或前端队列 ID 替代后端 ID。依据：[PendingDocItem](service/index.type.ts)、[上传队列操作条件](../../views/app/drive/_components/UploadQueueTab/_common/uploadQueueModel.ts)。
+- 待处理记录可以缺少 documentId；此时仅展示，不能发起重试、取消或同步单项状态请求。不要使用名称或前端队列 ID 替代后端 ID。依据：[PendingDocItem](service/index.type.ts)、[上传队列操作条件](../../views/app/drive/_components/UploadQueueTab/uploadQueueModel.ts)。
 - 同步、重试与取消调用各自的后端能力，不能仅更新前端队列就当作后端状态已经变化。依据：[DocumentServices](service/DocumentServices.impl.ts)。
 
 ## 详情与权限

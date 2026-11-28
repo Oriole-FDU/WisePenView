@@ -9,7 +9,7 @@ import { useResourceCommentService } from '@/domains';
 import type { ResourceComment } from '@/domains/ResourceComment';
 import { parseErrorMessage } from '@/utils/error';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import { updateCommentLikeCount } from '../../_common/utils';
 import CommentComposer from '../CommentComposer';
 import ResourceCommentItem from '../ResourceCommentItem';

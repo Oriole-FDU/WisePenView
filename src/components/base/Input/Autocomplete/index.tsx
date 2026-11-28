@@ -2,7 +2,7 @@ import { Autocomplete as HeroAutocomplete, Label } from '@heroui/react';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
 
-import overlayStyles from '@/components/base/Popover/_common/styles.module.scss';
+import overlayStyles from '@/components/base/_common/overlay/style.module.scss';
 
 import type {
   AutocompleteClearButtonProps,

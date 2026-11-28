@@ -1,5 +1,5 @@
 import styles from '../../_common/style.module.scss';
-import { NEW_CHAT_WELCOME_CONFIG } from '../../welcome';
+import { NEW_CHAT_WELCOME_CONFIG } from '../../_common/welcome';
 import { useWelcomeScreenStore, WelcomeScreenHost } from '../../WelcomeConfigurable';
 import type { ChatConversationProps } from './index.type';
 import ChatInput from './_parts/ChatInput';

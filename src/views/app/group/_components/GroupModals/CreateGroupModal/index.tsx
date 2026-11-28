@@ -16,7 +16,7 @@ import {
 } from '@/utils/image/uploadLimit';
 
 import type { CreateGroupModalProps } from './index.type';
-import styles from './index.module.scss';
+import styles from './style.module.scss';
 
 type CreateGroupFormValues = Omit<CreateGroupRequest, 'groupCoverUrl'> & {
   cover?: File | null;

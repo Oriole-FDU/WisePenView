@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import AppBreadcrumb, { type AppBreadcrumbItem } from '@/components/base/AppBreadcrumb';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import type { ResourceToolbarBreadcrumbProps } from './index.type';
 
 /** 资源顶栏面包屑区：只负责导航层级与资源标题，不持有任何操作动作。 */

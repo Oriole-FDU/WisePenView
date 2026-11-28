@@ -13,8 +13,8 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import TableCellAlign from '../shared/cells/CellAlign';
-import TableTextCell from '../shared/cells/TextCell';
+import TableCellAlign from '../shared/cells/TableCellAlign';
+import TableTextCell from '../shared/cells/TableTextCell';
 import { tableCellStyles, tableStyles } from '../shared/styles';
 import {
   joinClassNames,
@@ -53,9 +53,9 @@ import type {
   FolderTableRowContext,
   FolderTableVisibleRow,
 } from './index.type';
-import FolderTableLoadingSkeleton from './_parts/LoadingSkeleton';
-import FolderTableNameCell from './_parts/FolderNameCell';
-import TableBatchFooter from './_parts/BatchFooter';
+import FolderTableLoadingSkeleton from './_parts/FolderTableLoadingSkeleton';
+import FolderTableNameCell from './_parts/FolderTableNameCell';
+import TableBatchFooter from './_parts/TableBatchFooter';
 
 const LOAD_MORE_THRESHOLD_PX = 48;
 const VIRTUAL_ROW_ESTIMATE_SIZE = 60;

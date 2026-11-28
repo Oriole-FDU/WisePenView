@@ -12,7 +12,7 @@ import type { Group } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 
 import { useSidebarDriveScopeStore } from '../../_common/store/useSidebarDriveScopeStore';
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 
 const PERSONAL_SCOPE_KEY = '__personal__';
 const GROUP_SCOPE_PAGE_SIZE = 20;

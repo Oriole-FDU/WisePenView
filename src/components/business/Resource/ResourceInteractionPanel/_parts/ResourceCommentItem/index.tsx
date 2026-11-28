@@ -12,7 +12,7 @@ import {
   parseTimestampToDate,
 } from '@/utils/format/formatTime';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import { getAuthorInitial, hasVisibleCommentContent } from '../../_common/utils';
 import type { ResourceCommentItemProps } from './index.type';
 

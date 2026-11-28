@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState, Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
 import { useFavoriteCollections } from './_hooks/useFavoriteCollections';
 import DeleteCollectionModal from './_parts/DeleteCollectionModal';
 import EditCollectionModal from './_parts/EditCollectionModal';

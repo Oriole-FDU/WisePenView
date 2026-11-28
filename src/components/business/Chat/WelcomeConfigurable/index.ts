@@ -5,7 +5,7 @@
 export { default as WelcomeStarter } from './Starter';
 /** @deprecated 使用 WelcomeStarter */
 export { default as WelcomeConfigurable } from './Starter';
-export { default as WelcomeTitle } from './Title';
+export { default as WelcomeTitle } from './WelcomeTitle';
 /** @deprecated 使用 WelcomeTitle */
 export {
   isWelcomeMode,
@@ -35,5 +35,5 @@ export type {
   WelcomeStarterBlock,
   WelcomeStarterProps,
 } from './Starter/index.type';
-export { default as ChatWelcomeHero } from './Title';
-export type { WelcomeTitleProps } from './Title/index.type';
+export { default as ChatWelcomeHero } from './WelcomeTitle';
+export type { WelcomeTitleProps } from './WelcomeTitle/index.type';

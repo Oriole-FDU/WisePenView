@@ -6,7 +6,7 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import type { FavoriteCollectionListProps } from './index.type';
 
 function FavoriteCollectionList({

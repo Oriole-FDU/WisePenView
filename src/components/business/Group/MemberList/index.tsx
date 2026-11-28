@@ -21,7 +21,7 @@ import MemberListTable from './_parts/MemberListTable';
 import type {
   MemberListInlineDraft,
   MemberListInlineEditKind,
-} from './MemberListTable/index.type';
+} from './_parts/MemberListTable/index.type';
 import styles from './style.module.scss';
 
 const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;

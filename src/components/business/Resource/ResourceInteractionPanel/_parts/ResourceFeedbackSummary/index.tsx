@@ -5,7 +5,7 @@ import { AppToggleButton } from '@/components/base/Button';
 import { Tooltip } from '@/components/base/Tooltip';
 import { formatReadCount } from '@/utils/format/formatNumber';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import type { ResourceFeedbackSummaryProps } from './index.type';
 
 function ResourceFeedbackSummary({

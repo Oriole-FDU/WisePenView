@@ -16,7 +16,7 @@ import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
 import type {
   CommentItemProps,
   CommentThreadProps,

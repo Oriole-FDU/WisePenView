@@ -8,7 +8,7 @@ import { WALLET_TRANSACTION_KIND, type WalletTransactionRecord } from '@/domains
 import { formatCompactNumber } from '@/utils/format/formatNumber';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import {
   isInflowKind,
   isNeutralKind,

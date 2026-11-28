@@ -19,7 +19,7 @@ import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
 import { updateCommentLikeCount } from './_common/utils';
 import type { ResourceInteractionPanelProps } from './index.type';
 import CommentComposer from './_parts/CommentComposer';

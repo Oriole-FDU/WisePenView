@@ -6,7 +6,7 @@ import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
 import { getDriveNodeLabel, resolveDriveFolderVariant } from '../../../_common/driveComponentModel';
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import type { DriveNavigatorNodeTitleProps } from './index.type';
 
 function getNodeDisplayName(

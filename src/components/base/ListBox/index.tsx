@@ -1,7 +1,7 @@
 import { ListBox as HeroListBox } from '@heroui/react';
 import { clsx } from 'clsx';
 
-import overlayStyles from '@/components/base/Popover/_common/styles.module.scss';
+import overlayStyles from '@/components/base/_common/overlay/style.module.scss';
 
 import type { ListBoxItemProps, ListBoxProps } from './index.type';
 

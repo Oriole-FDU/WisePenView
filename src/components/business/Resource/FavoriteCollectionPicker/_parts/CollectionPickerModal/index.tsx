@@ -9,7 +9,7 @@ import { Spin } from '@/components/base/Feedback';
 import { InlineInput } from '@/components/base/Input';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 
-import styles from '../../style.module.scss';
+import styles from '../../_common/style.module.scss';
 import type { CollectionPickerModalProps } from './index.type';
 
 function CollectionPickerModal({

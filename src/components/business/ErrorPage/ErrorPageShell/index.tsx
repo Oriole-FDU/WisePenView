@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import type { ErrorPageShellProps } from './index.type';
-import styles from '../ErrorPageShell.module.scss';
+import styles from './style.module.scss';
 
 /** 整页错误页外壳：背景、垂直居中与底部版权，页面级错误视图共用。 */
 function ErrorPageShell({

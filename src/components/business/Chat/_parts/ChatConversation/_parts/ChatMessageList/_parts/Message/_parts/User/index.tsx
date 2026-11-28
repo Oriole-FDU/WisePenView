@@ -17,7 +17,7 @@ import EntryIcon from '@/components/business/Icons/EntryIcon';
 import type { MessageAttachmentSnapshot } from '@/domains/ChatSession';
 
 import ChatMessage from '../ChatMessage';
-import MessageContent from '../Content';
+import MessageContent from '../MessageContent';
 import type {
   UserAttachmentChipProps,
   UserMessageAttachmentsProps,

@@ -4,7 +4,7 @@ import ResourcePermissionModal from '@/components/business/Resource/ResourcePerm
 import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
 import type { ResourceToolbarProps } from './index.type';
 import ResourceToolbarBreadcrumb from './_parts/ResourceToolbarBreadcrumb';
 import ResourceToolbarActions from './ResourceToolbarActions';

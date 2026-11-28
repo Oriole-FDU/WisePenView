@@ -9,7 +9,7 @@ import { useApi } from '@/hooks/useApi';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import type { ExitGroupModalProps } from './index.type';
-import styles from './index.module.scss';
+import styles from './style.module.scss';
 
 function ExitGroupModal({
   isOpen,

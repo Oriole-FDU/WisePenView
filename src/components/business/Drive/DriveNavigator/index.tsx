@@ -27,7 +27,7 @@ import {
   toDriveSelectionItem,
 } from '../_common/driveComponentModel';
 import { useDrivePagedTreeChildren } from '../_common/useDrivePagedTreeChildren';
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
 import type { DriveNavigatorProps } from './index.type';
 import DriveNavigatorNodeTitle from './_parts/DriveNavigatorNodeTitle';
 

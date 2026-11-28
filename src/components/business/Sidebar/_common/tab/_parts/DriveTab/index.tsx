@@ -39,7 +39,7 @@ import {
   SIDEBAR_SELECTABLE_TYPES,
 } from './_common/sidebarDriveModel';
 import { useSidebarDriveScopeStore } from './_common/store/useSidebarDriveScopeStore';
-import styles from './style.module.scss';
+import styles from './_common/style.module.scss';
 import { useSidebarDriveTreeController } from './_hooks/useSidebarDriveTreeController';
 import type { SidebarDriveCreateAction } from './_parts/SidebarDriveNodeTitle';
 import SidebarDriveNodeTitle from './_parts/SidebarDriveNodeTitle';

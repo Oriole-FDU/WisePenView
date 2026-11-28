@@ -7,7 +7,7 @@ import { AppPressable } from '@/components/base/Button';
 import { GuideAnchor, registerGuideActionHandlers } from '@/components/base/Guide';
 import { Tabs } from '@/components/base/Tabs';
 import { Tooltip } from '@/components/base/Tooltip';
-import CommandPaletteTrigger from '@/components/business/CommandPalette/_parts/CommandPaletteTrigger';
+import CommandPaletteTrigger from '@/components/business/CommandPaletteTrigger';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 import { useAppAuth } from '@/layouts/App/_context';
 import { mergeRefs } from '@/utils/react/mergeRefs';

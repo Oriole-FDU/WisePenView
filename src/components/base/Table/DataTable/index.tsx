@@ -4,7 +4,7 @@ import { ArrowUpDown } from 'lucide-react';
 import { type CSSProperties, type UIEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import TableCellAlign from '../shared/cells/CellAlign';
+import TableCellAlign from '../shared/cells/TableCellAlign';
 import {
   joinClassNames,
   resolveColumnAlign,
@@ -22,7 +22,7 @@ import { renderSortableColumnLabel } from '../shared/TableSortHeader/renderSorta
 import { TableLoadMoreRow, TableRefreshIndicator } from '../shared/TableStatusRows';
 import TableSummaryFooter from '../shared/TableSummaryFooter';
 import type { DataTableProps, DataTableRowContext } from './index.type';
-import DataTableLoadingSkeleton from './_parts/LoadingSkeleton';
+import DataTableLoadingSkeleton from './_parts/DataTableLoadingSkeleton';
 import styles from './style.module.scss';
 
 const LOAD_MORE_THRESHOLD_PX = 48;
