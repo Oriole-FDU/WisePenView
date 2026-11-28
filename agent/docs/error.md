@@ -94,4 +94,4 @@ reportError(error, 'silence'); // 只要上报
 pnpm lint:error
 ```
 
-有命中时退出码为 1。规则实现见 [`lint/error.js`](../../lint/error.js)。
+有命中时退出码为 1。规则实现见 [`lint/error.js`](../../lint/error.js)；规则注册、语法诊断归属与专项检查共用 [契约 lint 基础设施](lint.md)，不再维护错误专题的独立扫描脚本。
