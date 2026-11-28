@@ -6,10 +6,11 @@ import { CommandGroup, CommandItem } from '@/components/_shadcn';
 import { EmptyState, Spin } from '@/components/base/Feedback';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceService } from '@/domains';
-import type { SearchHitItem, SearchResultPage } from '@/domains/Resource';
+import type { SearchHitItem } from '@/domains/Resource';
 import { SEARCH_SCOPE } from '@/domains/Resource';
 import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
+import { parseErrorMessage } from '@/utils/error';
 import { sanitizeHtml, SEARCH_HIGHLIGHT_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtml';
 
 import styles from './style.module.scss';
@@ -20,25 +21,12 @@ const RESOURCE_ITEM_OVERSCAN = 6;
 const RESOURCE_GROUP_ID = 'resource-search-results';
 const RESOURCE_GROUP_SELECTOR = '[data-resource-search-group]';
 
-interface CommandSearchResultPage extends SearchResultPage {
-  query: string;
-}
-
 interface ResourceSearchResultsProps {
   keyword: string;
   layoutKeyword: string;
   onSelect: () => void;
   viewportRef: RefObject<HTMLDivElement | null>;
 }
-
-const createEmptySearchResult = (query: string): CommandSearchResultPage => ({
-  query,
-  list: [],
-  total: 0,
-  page: 1,
-  size: PAGE_SIZE,
-  totalPage: 0,
-});
 
 const toPlainText = (markup: string): string => {
   return new DOMParser().parseFromString(markup, 'text/html').body.textContent ?? '';
@@ -114,42 +102,29 @@ function ResourceSearchResults({
   const query = keyword.trim();
   const [resourceListOffset, setResourceListOffset] = useState(0);
 
-  const { data, loading, loadingMore, noMore, mutate } =
-    useApiInfiniteScroll<CommandSearchResultPage>(
-      async (current) => {
-        if (!query) return createEmptySearchResult(query);
-
-        const currentList = current?.query === query ? current.list : [];
-        const nextPage = Math.floor(currentList.length / PAGE_SIZE) + 1;
-        const result = await resourceService.globalSearch({
-          keyword: query,
-          scope: SEARCH_SCOPE.ALL,
-          page: nextPage,
-          size: PAGE_SIZE,
-        });
-        return { ...result, query };
-      },
-      {
-        target: viewportRef,
-        isNoMore: (result) => !!result && result.page >= result.totalPage,
-        reloadDeps: [query],
-        manual: !query,
-      }
-    );
-
-  const items = data?.query === query ? data.list : [];
-  const initialLoading = loading && items.length === 0;
+  const { data, state, loadingMore, noMore, retry } = useApiInfiniteScroll(
+    ({ page, size }) =>
+      resourceService.globalSearch({ keyword: query, scope: SEARCH_SCOPE.ALL, page, size }),
+    {
+      queryKey: ['resource-search', query],
+      pageSize: PAGE_SIZE,
+      getKey: (item) => item.resourceId,
+      target: viewportRef,
+      ready: Boolean(query),
+    }
+  );
+  const items = data?.list ?? [];
+  const initialLoading = state.status === 'loading';
 
   /**
    * @wisepen-manual-effect
-   * 执行时机：标准化搜索词变化时复位滚动位置与无限列表缓存。
-   * 不可替代原因：滚动位置和 useInfiniteScroll 缓存属于 React 渲染之外的命令式状态。
+   * 执行时机：标准化搜索词变化时复位滚动位置。
+   * 不可替代原因：滚动位置属于 DOM 实例状态，查询结果由 query key 自动重置。
    * cleanup：没有持续订阅或延迟任务，无需清理。
    */
   useEffect(() => {
     if (viewportRef.current) viewportRef.current.scrollTop = 0;
-    mutate(createEmptySearchResult(query));
-  }, [query, mutate, viewportRef]);
+  }, [query, viewportRef]);
 
   /**
    * @wisepen-manual-effect
@@ -175,7 +150,7 @@ function ResourceSearchResults({
         (heading?.offsetHeight ?? 0)
     );
     setResourceListOffset((current) => (current === nextOffset ? current : nextOffset));
-  }, [layoutKeyword, query, items.length, loading, loadingMore, noMore, viewportRef]);
+  }, [layoutKeyword, query, items.length, initialLoading, loadingMore, noMore, viewportRef]);
 
   // eslint-disable-next-line react-hooks/incompatible-library -- 资源结果高度包含摘要，虚拟列表需要动态测量真实高度。
   const resourceVirtualizer = useVirtualizer({
@@ -208,6 +183,17 @@ function ResourceSearchResults({
       heading={t('commandPalette.groups.resources', { ns: 'shell' })}
       data-resource-search-group="true"
     >
+      {state.status === 'error' ? (
+        <CommandItem
+          value="resource-search-error"
+          onSelect={retry}
+          className={styles.resourceState}
+        >
+          <span role="alert">
+            {parseErrorMessage(state.error)} · {t('common:actions.retry')}
+          </span>
+        </CommandItem>
+      ) : null}
       {initialLoading ? (
         <CommandItem
           value="resource-search-loading"
@@ -274,7 +260,7 @@ function ResourceSearchResults({
             </CommandItem>
           ) : null}
         </>
-      ) : (
+      ) : state.status === 'empty' ? (
         <CommandItem
           value="resource-search-empty"
           textValue={t('search.noResults', { ns: 'resource' })}
@@ -287,7 +273,7 @@ function ResourceSearchResults({
             size="compact"
           />
         </CommandItem>
-      )}
+      ) : null}
     </CommandGroup>
   );
 }

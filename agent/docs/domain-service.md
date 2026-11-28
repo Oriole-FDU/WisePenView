@@ -72,6 +72,7 @@ export const createXxxServices = (deps?: XxxServiceDeps): IXxxService => ({
 ## 四、请求触发
 
 - React 组件或 Hook 中调用 service 的异步请求，默认使用 `@/hooks/useApi`、`useApiPagination` 或 `useApiInfiniteScroll`。
+- 查询身份、分页追加和结果消费遵循 [query.md](query.md)；service 不计算组件当前页或维护加载状态。
 - 用户交互触发请求使用 `useApi(fn, { manual: true })`。
 - 初始化请求使用 `ready`、`refreshDeps` 或领域 session hook 管理时机。
 - 新建后跳转必须遵循：`create -> 获取后端 ID -> navigate`。

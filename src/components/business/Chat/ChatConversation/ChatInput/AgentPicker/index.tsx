@@ -1,11 +1,12 @@
 import { Description, Header, Label, Separator, Skeleton } from '@heroui/react';
-import { useInfiniteScroll, useLatest } from 'ahooks';
+import { useLatest } from 'ahooks';
 import { Bot, BotOff, ChevronDown, Folder } from 'lucide-react';
 import type { Key } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppModal from '@/components/base/AppModal';
+import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
 import { GuideAnchor } from '@/components/base/Guide';
@@ -13,8 +14,9 @@ import type { DriveSelectionItem } from '@/components/business/Drive/common/driv
 import DriveNavigator from '@/components/business/Drive/DriveNavigator';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useChatConfigService } from '@/domains';
-import type { PageResult } from '@/domains/_shared/entity/page';
 import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatConfig';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
 
 import { useChatInputStore, useChatInputStoreApi } from '../_context';
 import styles from '../style.module.scss';
@@ -28,10 +30,6 @@ const AGENT_SKELETON_ROWS = [0, 1] as const;
 const AGENT_PAGE_SIZE = 30;
 const LOAD_MORE_PERSONAL_ACTION = 'agent-action:load-more-personal';
 const SELECT_FROM_GROUP_ACTION = 'agent-action:select-from-group';
-
-interface AgentPageState extends PageResult<ChatAgentOption> {
-  list: ChatAgentOption[];
-}
 
 function mergeAgentOptions(
   agents: ChatAgentOption[],
@@ -73,24 +71,26 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const {
     data: personalPage,
-    loading: loadingPersonal,
+    state: personalState,
     loadingMore: loadingMorePersonal,
     noMore: noMorePersonal,
     loadMore: loadMorePersonal,
-  } = useInfiniteScroll<AgentPageState>(
-    async (current) =>
+    retry: retryPersonal,
+  } = useApiInfiniteScroll(
+    async ({ page, size }) =>
       chatConfigService.listChatInputAgents({
         scope: 'PERSONAL',
-        page: Math.floor((current?.list.length ?? 0) / AGENT_PAGE_SIZE) + 1,
-        size: AGENT_PAGE_SIZE,
+        page,
+        size,
       }),
     {
-      manual: !agentOpen,
-      reloadDeps: [agentOpen],
-      isNoMore: (page) => Boolean(page && (page.total === 0 || page.list.length >= page.total)),
+      ready: agentOpen,
+      queryKey: ['chat-input-agents', 'PERSONAL'],
+      pageSize: AGENT_PAGE_SIZE,
+      getKey: (agent) => agent.agentId,
     }
   );
-  const showSkeleton = personalPage == null && loadingPersonal;
+  const showSkeleton = personalState.status === 'loading';
   const personalAgents = personalPage?.list ?? [];
   // 保持列表顺序；选中项只补充来源信息，不在点击后移到列表前面。
   const displayAgents = mergeAgentOptions(
@@ -203,6 +203,14 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
         />
         <GuideAnchor id={GUIDE_TOOL_ID.chatAgentOpen} asChild>
           <Dropdown.Popover className={styles.popoverPanelAgent} placement="top">
+            {personalState.status === 'error' ? (
+              <div role="alert">
+                {parseErrorMessage(personalState.error)}
+                <AppButton size="sm" onPress={retryPersonal}>
+                  {t('common:actions.retry')}
+                </AppButton>
+              </div>
+            ) : null}
             {showSkeleton ? (
               skeleton
             ) : (

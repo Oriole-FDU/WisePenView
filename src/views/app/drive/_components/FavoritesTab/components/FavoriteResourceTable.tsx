@@ -1,10 +1,13 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
+import { AppButton } from '@/components/base/Button';
+import { ErrorState } from '@/components/base/Feedback';
 import { FolderTable, type FolderTableColumn, type FolderTableRow } from '@/components/base/Table';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import FavoriteCollectionPicker from '@/components/business/Resource/FavoriteCollectionPicker';
 import type { FavoriteItem } from '@/domains/ResourceFavorite';
+import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDate } from '@/utils/format/formatTime';
 
 import { useFavoriteResourceTableController } from '../hooks/useFavoriteResourceTableController';
@@ -88,56 +91,64 @@ function FavoriteResourceTable({
           </p>
         </div>
       </header>
-      <FolderTable<FavoriteResourceTableRow>
-        ariaLabel={t('favorite.resource.tableAria')}
-        items={rows}
-        onRowActivate={(row) => controller.onOpenResource(row.item)}
-        renderEntryIcon={(row) => (
-          <EntryIcon
-            entryType="resource"
-            resourceType={row.item.resourceInfo?.resourceType}
-            resourceIconType={row.item.resourceInfo?.resourceIconType}
-          />
-        )}
-        columns={buildFavoriteResourceColumns(t)}
-        renderNameContent={(content, row) =>
-          row.item.resourceInfo ? (
-            content
-          ) : (
-            <span className={styles.resourceCellDisabled}>{content}</span>
-          )
-        }
-        rowActions={(row) => [
-          {
-            key: 'open',
-            label: t('favorite.resource.open'),
-            disabled: !row.item.resourceInfo,
-            onPress: () => controller.onRowAction(row.item, 'open'),
-          },
-          {
-            key: 'manage',
-            label: t('favorite.resource.manage'),
-            disabled: !row.item.resourceInfo,
-            onPress: () => controller.onRowAction(row.item, 'manage'),
-          },
-          {
-            key: 'remove',
-            label: t('favorite.resource.remove'),
-            variant: 'danger',
-            onPress: () => controller.onRowAction(row.item, 'remove'),
-          },
-        ]}
-        loading={controller.loading}
-        emptyText={t('favorite.resource.empty')}
-        emptyDescription={emptyDescription}
-        totalCount={controller.total}
-        loadMore={{
-          hasMore: controller.hasMore,
-          loading: controller.loadingMore,
-          onLoadMore: controller.loadMore,
-        }}
-        className={styles.resourceTable}
-      />
+      {controller.state.status === 'error' ? (
+        <ErrorState
+          title={parseErrorMessage(controller.state.error)}
+          action={<AppButton onPress={controller.retry}>{t('common:actions.retry')}</AppButton>}
+        />
+      ) : null}
+      {controller.state.status !== 'error' || controller.list.length > 0 ? (
+        <FolderTable<FavoriteResourceTableRow>
+          ariaLabel={t('favorite.resource.tableAria')}
+          items={rows}
+          onRowActivate={(row) => controller.onOpenResource(row.item)}
+          renderEntryIcon={(row) => (
+            <EntryIcon
+              entryType="resource"
+              resourceType={row.item.resourceInfo?.resourceType}
+              resourceIconType={row.item.resourceInfo?.resourceIconType}
+            />
+          )}
+          columns={buildFavoriteResourceColumns(t)}
+          renderNameContent={(content, row) =>
+            row.item.resourceInfo ? (
+              content
+            ) : (
+              <span className={styles.resourceCellDisabled}>{content}</span>
+            )
+          }
+          rowActions={(row) => [
+            {
+              key: 'open',
+              label: t('favorite.resource.open'),
+              disabled: !row.item.resourceInfo,
+              onPress: () => controller.onRowAction(row.item, 'open'),
+            },
+            {
+              key: 'manage',
+              label: t('favorite.resource.manage'),
+              disabled: !row.item.resourceInfo,
+              onPress: () => controller.onRowAction(row.item, 'manage'),
+            },
+            {
+              key: 'remove',
+              label: t('favorite.resource.remove'),
+              variant: 'danger',
+              onPress: () => controller.onRowAction(row.item, 'remove'),
+            },
+          ]}
+          loading={controller.loading}
+          emptyText={t('favorite.resource.empty')}
+          emptyDescription={emptyDescription}
+          totalCount={controller.total}
+          loadMore={{
+            hasMore: controller.hasMore,
+            loading: controller.loadingMore,
+            onLoadMore: controller.loadMore,
+          }}
+          className={styles.resourceTable}
+        />
+      ) : null}
       <UnfavoriteResourceModal
         item={controller.unfavoriteItem}
         collectionId={collectionId}

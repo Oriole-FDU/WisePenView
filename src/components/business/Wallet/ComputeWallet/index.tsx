@@ -2,16 +2,18 @@
  * 通用计算点钱包：个人余额走 /user/wallet；小组余额走 groupService.getGroupWalletInfo。
  * 点卡充值仅个人（redeemVoucher）；小组余额由组长通过「token 划拨」转入。
  * 交易明细 Tab：全部 / 收入 / 支出。
- * 数据请求使用 ahooks（不使用 useEffect）。
+ * 数据请求统一经过项目查询入口。
  */
 import { toast } from '@heroui/react';
-import { usePagination, useUnmount } from 'ahooks';
+import { useUnmount } from 'ahooks';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AppButton } from '@/components/base/Button';
 import { useGroupService, useWalletService } from '@/domains';
 import { WALLET_BUSINESS_TYPE, WALLET_TARGET_TYPE } from '@/domains/Wallet';
-import { useApi } from '@/hooks/useApi';
+import { useApi, useApiPagination } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
 
 import RechargeModal from '../RechargeModal';
 import type { ComputeWalletProps } from './index.type';
@@ -38,7 +40,6 @@ function ComputeWallet({
   const [displayBalance, setDisplayBalance] = useState(0);
   const [loadingWallet, setLoadingWallet] = useState(true);
   const [txTab, setTxTab] = useState<TxTabKey>('all');
-  const txTabRef = useRef<TxTabKey>('all');
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [flashFirstRow, setFlashFirstRow] = useState(false);
   const firstBalanceRef = useRef(true);
@@ -83,7 +84,9 @@ function ComputeWallet({
     },
     {
       ready: walletReady,
-      refreshDeps: [walletService, groupService, targetType, effectiveGroupId, refreshVersion],
+      queryKey: ['wallet-balance', targetType, effectiveGroupId],
+      isEmpty: () => false,
+      refreshDeps: [refreshVersion],
       onBefore: (params) => {
         const options = params?.[0];
         if (!options?.silent) {
@@ -116,14 +119,15 @@ function ComputeWallet({
   const {
     data: txData,
     loading: loadingTx,
+    state: txState,
+    refresh: refreshTransactions,
     pagination: { current: page = 1, total = 0, onChange: onTxPageChange },
-  } = usePagination(
+  } = useApiPagination(
     async ({ current, pageSize }) => {
-      const tab = txTabRef.current;
       const gid =
         targetType === WALLET_TARGET_TYPE.GROUP && effectiveGroupId ? effectiveGroupId : undefined;
 
-      const transactionTypes = tabToTransactionTypes(tab);
+      const transactionTypes = tabToTransactionTypes(txTab);
       const { total: nextTotal, records } = await walletService.listTransactions({
         groupId: gid,
         page: current,
@@ -137,7 +141,8 @@ function ComputeWallet({
       ready: walletReady,
       defaultCurrent: 1,
       defaultPageSize: PAGE_SIZE,
-      refreshDeps: [walletService, targetType, effectiveGroupId, txTab, refreshVersion],
+      queryKey: ['wallet-transactions', targetType, effectiveGroupId, txTab],
+      refreshDeps: [refreshVersion],
     }
   );
 
@@ -173,9 +178,7 @@ function ComputeWallet({
 
   const handleTxTabChange = (key: string) => {
     const next = key as TxTabKey;
-    txTabRef.current = next;
     setTxTab(next);
-    onTxPageChange(1, PAGE_SIZE);
   };
 
   const rootClass = surface === 'plain' ? styles.plain : styles.card;
@@ -189,18 +192,28 @@ function ComputeWallet({
         onRecharge={() => setRechargeOpen(true)}
       />
 
-      <WalletTransactionTable
-        activeTab={txTab}
-        records={txData?.list ?? []}
-        loading={loadingTx}
-        flashFirstRow={flashFirstRow}
-        showOperatorColumn={showOperatorColumn}
-        current={page}
-        total={total}
-        pageSize={PAGE_SIZE}
-        onPageChange={onTxPageChange}
-        onTabChange={handleTxTabChange}
-      />
+      {txState.status === 'error' ? (
+        <div role="alert">
+          {parseErrorMessage(txState.error)}
+          <AppButton size="sm" onPress={refreshTransactions}>
+            {t('common:actions.retry')}
+          </AppButton>
+        </div>
+      ) : null}
+      {txState.status !== 'idle' && (txState.status !== 'error' || txData) ? (
+        <WalletTransactionTable
+          activeTab={txTab}
+          records={txData?.list ?? []}
+          loading={loadingTx}
+          flashFirstRow={flashFirstRow}
+          showOperatorColumn={showOperatorColumn}
+          current={page}
+          total={total}
+          pageSize={PAGE_SIZE}
+          onPageChange={onTxPageChange}
+          onTabChange={handleTxTabChange}
+        />
+      ) : null}
 
       <RechargeModal
         isOpen={rechargeOpen}

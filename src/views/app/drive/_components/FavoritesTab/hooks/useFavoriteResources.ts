@@ -1,61 +1,28 @@
-import { useInfiniteScroll } from 'ahooks';
-import { useEffect } from 'react';
-
 import { useResourceFavoriteService } from '@/domains';
-import type { FavoriteItem } from '@/domains/ResourceFavorite';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 
 const PAGE_SIZE = 20;
 
-interface FavoriteResourcesPage {
-  list: FavoriteItem[];
-  total: number;
-  totalPage: number;
-}
-
 export function useFavoriteResources(collectionId: string) {
   const favoriteService = useResourceFavoriteService();
-  const { data, loading, loadingMore, noMore, loadMore, reload, mutate } =
-    useInfiniteScroll<FavoriteResourcesPage>(
-      async (current) => {
-        const nextPage = Math.floor((current?.list.length ?? 0) / PAGE_SIZE) + 1;
-        const result = await favoriteService.listFavoritedResources({
-          collectionId,
-          page: nextPage,
-          size: PAGE_SIZE,
-        });
-        return result;
-      },
-      {
-        isNoMore: (result) =>
-          Boolean(result && (result.total === 0 || result.list.length >= result.total)),
-        reloadDeps: [collectionId],
-      }
-    );
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：收藏集合切换或重载时，先清空旧页数据，避免短暂展示前一个集合的内容。
-   * 不可替代原因：useInfiniteScroll 的 reloadDeps 只负责重新拉取，不会自动清空已累积列表。
-   * cleanup：没有订阅或延迟任务，无需清理。
-   */
-  useEffect(() => {
-    mutate(undefined);
-  }, [collectionId, mutate]);
-
-  const refresh = () => {
-    reload();
-  };
-
-  const list = data?.list ?? [];
-  const total = data?.total ?? 0;
+  const query = useApiInfiniteScroll(
+    ({ page, size }) => favoriteService.listFavoritedResources({ collectionId, page, size }),
+    {
+      queryKey: ['favorite-resources', collectionId],
+      pageSize: PAGE_SIZE,
+      getKey: (item) => item.resourceId,
+    }
+  );
 
   return {
-    list,
-    total,
-    loading,
-    loadingMore,
-    hasMore: Boolean(data) && !noMore,
-    loadMore,
-    refresh,
+    state: query.state,
+    list: query.data?.list ?? [],
+    total: query.data?.total ?? 0,
+    loading: query.loading,
+    loadingMore: query.loadingMore,
+    hasMore: query.hasMore,
+    loadMore: query.loadMore,
+    refresh: query.reload,
+    retry: query.retry,
   };
 }

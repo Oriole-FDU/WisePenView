@@ -1,11 +1,12 @@
-import { useInfiniteScroll, useKeyPress } from 'ahooks';
+import { useKeyPress } from 'ahooks';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 
-import { AppPressable } from '@/components/base/Button';
+import { AppButton, AppPressable } from '@/components/base/Button';
 import { useChatSessionService } from '@/domains';
-import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
+import { parseErrorMessage } from '@/utils/error';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import styles from '../../style.module.scss';
@@ -28,18 +29,21 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
   const chatSessionService = useChatSessionService();
   const {
     data: sessionPage,
-    loading,
+    state,
     loadingMore,
     noMore,
     loadMore,
-  } = useInfiniteScroll<PageResult<ChatSession>>(
-    (current) =>
+    retry,
+  } = useApiInfiniteScroll(
+    ({ page, size }) =>
       chatSessionService.listSessions({
-        page: Math.floor((current?.list.length ?? 0) / SESSION_PAGE_SIZE) + 1,
-        size: SESSION_PAGE_SIZE,
+        page,
+        size,
       }),
     {
-      isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
+      queryKey: ['chat-sessions'],
+      pageSize: SESSION_PAGE_SIZE,
+      getKey: (session) => session.id,
     }
   );
 
@@ -54,7 +58,7 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
   );
 
   const sessions = sessionPage?.list ?? [];
-  const initialLoading = loading && sessions.length === 0;
+  const initialLoading = state.status === 'loading';
   const canLoadMore = Boolean(sessionPage) && !loadingMore && !noMore;
 
   return (
@@ -63,7 +67,15 @@ function ChatSessionBar({ activeSessionId, onClose, onSelectSession }: ChatSessi
         {initialLoading ? (
           <div className={styles.sessionStateText}>{t('session.loading')}</div>
         ) : null}
-        {!initialLoading && sessions.length === 0 ? (
+        {state.status === 'error' ? (
+          <div className={styles.sessionStateText} role="alert">
+            {parseErrorMessage(state.error)}
+            <AppButton size="sm" onPress={retry}>
+              {t('common:actions.retry')}
+            </AppButton>
+          </div>
+        ) : null}
+        {state.status === 'empty' ? (
           <div className={styles.sessionStateText}>{t('session.empty')}</div>
         ) : null}
 

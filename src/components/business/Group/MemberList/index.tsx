@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
+import { ErrorState } from '@/components/base/Feedback';
 import { useGroupService } from '@/domains';
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
@@ -47,6 +48,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
   const defaultPageSize = pagination?.defaultPageSize ?? 5;
   const {
     data: membersData,
+    state: membersState,
     loading,
     refresh,
     pagination: { current: currentPage = 1, pageSize = defaultPageSize, onChange: onPageChange },
@@ -62,7 +64,7 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
     {
       defaultCurrent: 1,
       defaultPageSize,
-      refreshDeps: [groupId],
+      queryKey: ['group-members', groupId],
     }
   );
 
@@ -285,37 +287,45 @@ function MemberList({ groupDisplayConfig, pagination, groupId, inviteCode }: Mem
 
   return (
     <div>
-      <MemberListTable
-        groupDisplayConfig={groupDisplayConfig}
-        pagination={pagination}
-        members={members}
-        loading={loading}
-        total={total}
-        currentPage={currentPage}
-        pageSize={pageSize}
-        selectedKeys={currentPageSelectedKeys}
-        editingRowId={editingRowId}
-        editingKind={editingKind}
-        savingRowId={savingRowId}
-        errorRowId={errorRowId}
-        errorMessage={inlineErrorMessage}
-        inlineDraft={inlineDraft}
-        onPageChange={onPageChange}
-        onSelectionChange={handleSelectionChange}
-        onStartInlineEdit={handleStartInlineEdit}
-        onInlineDraftChange={setInlineDraft}
-        onInlineSave={handleInlineSave}
-        onInlineCancel={clearInlineEdit}
-        onDismissInlineError={() => {
-          setErrorRowId(null);
-          setInlineErrorMessage(null);
-        }}
-        onDeleteMember={handleDeleteSingleMember}
-        toolbar={toolbar}
-        batchEditMode={batchEditMode}
-        sortDescriptor={sortDescriptor}
-        onSortChange={setSortDescriptor}
-      />
+      {membersState.status === 'error' ? (
+        <ErrorState
+          title={parseErrorMessage(membersState.error)}
+          action={<AppButton onPress={refresh}>{t('common:actions.retry')}</AppButton>}
+        />
+      ) : null}
+      {membersState.status !== 'error' || membersData ? (
+        <MemberListTable
+          groupDisplayConfig={groupDisplayConfig}
+          pagination={pagination}
+          members={members}
+          loading={loading}
+          total={total}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          selectedKeys={currentPageSelectedKeys}
+          editingRowId={editingRowId}
+          editingKind={editingKind}
+          savingRowId={savingRowId}
+          errorRowId={errorRowId}
+          errorMessage={inlineErrorMessage}
+          inlineDraft={inlineDraft}
+          onPageChange={onPageChange}
+          onSelectionChange={handleSelectionChange}
+          onStartInlineEdit={handleStartInlineEdit}
+          onInlineDraftChange={setInlineDraft}
+          onInlineSave={handleInlineSave}
+          onInlineCancel={clearInlineEdit}
+          onDismissInlineError={() => {
+            setErrorRowId(null);
+            setInlineErrorMessage(null);
+          }}
+          onDeleteMember={handleDeleteSingleMember}
+          toolbar={toolbar}
+          batchEditMode={batchEditMode}
+          sortDescriptor={sortDescriptor}
+          onSortChange={setSortDescriptor}
+        />
+      ) : null}
 
       <InviteUserModal
         isOpen={activeModal === 'invite'}

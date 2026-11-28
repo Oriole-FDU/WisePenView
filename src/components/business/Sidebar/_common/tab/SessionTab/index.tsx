@@ -1,17 +1,17 @@
 import { ListBoxSection } from '@heroui/react';
-import { useInfiniteScroll, useMemoizedFn } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { clsx } from 'clsx';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { AppButton } from '@/components/base/Button';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { useChatSessionService } from '@/domains';
-import type { PageResult } from '@/domains/_shared/entity/page';
 import type { ChatSession } from '@/domains/ChatSession';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useChatSessionHistoryRefreshStore } from '@/layouts/AppLayout/_store/useChatSessionHistoryRefreshStore';
+import { parseErrorMessage } from '@/utils/error';
 import { buildChatPath } from '@/utils/navigation/appRoute';
 
 import { useSidebarSessionHistoryStore } from './_store/useSidebarSessionHistoryStore';
@@ -22,6 +22,7 @@ const SESSION_PAGE_SIZE = 20;
 
 const useSessionTab = () => {
   const chatSessionService = useChatSessionService();
+  const refreshVersion = useChatSessionHistoryRefreshStore((state) => state.refreshVersion);
   const { sessionId: currentSessionId, selectSession: selectRouteSession } = useChatSessionRoute();
   const sessionItems = useSidebarSessionHistoryStore((state) => state.sessionItems);
   const setSessionPageResult = useSidebarSessionHistoryStore((state) => state.setSessionPageResult);
@@ -30,20 +31,24 @@ const useSessionTab = () => {
 
   const {
     data: sessionPageData,
+    state,
     loading: sessionListLoading,
     loadingMore: loadingMoreSessions,
     noMore: noMoreSessions,
     loadMore: loadMoreSessions,
     reloadAsync: reloadSessions,
-  } = useInfiniteScroll<PageResult<ChatSession>>(
-    async (current) =>
+    retry,
+  } = useApiInfiniteScroll(
+    async ({ page, size }) =>
       chatSessionService.listSessions({
-        page: Math.floor((current?.list.length ?? 0) / SESSION_PAGE_SIZE) + 1,
-        size: SESSION_PAGE_SIZE,
+        page,
+        size,
       }),
     {
-      manual: true,
-      isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
+      refreshDeps: [refreshVersion],
+      queryKey: ['chat-sessions'],
+      pageSize: SESSION_PAGE_SIZE,
+      getKey: (session) => session.id,
       onSuccess: (payload) => {
         setSessionPageResult(payload, payload.page > 1);
       },
@@ -68,6 +73,8 @@ const useSessionTab = () => {
   };
 
   return {
+    state,
+    retry,
     hasMoreSessions,
     handleDeleted,
     loadMoreSessions,
@@ -82,8 +89,9 @@ const useSessionTab = () => {
 
 function SessionTab() {
   const { t } = useTranslation('chat');
-  const refreshVersion = useChatSessionHistoryRefreshStore((state) => state.refreshVersion);
   const {
+    state,
+    retry,
     handleDeleted,
     hasMoreSessions,
     loadMoreSessions,
@@ -96,78 +104,86 @@ function SessionTab() {
   } = useSessionTab();
   const selectedKeys = currentSessionId ? [`session-${currentSessionId}`] : [];
 
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：组件挂载或外部刷新版本递增时重新加载会话列表。
-   * 不可替代原因：列表数据来自服务端，刷新版本是父组件可声明的同步信号。
-   * cleanup：请求由 ahooks 管理，无额外订阅需要清理。
-   */
-  useEffect(() => {
-    void refresh();
-  }, [refresh, refreshVersion]);
+  const errorState =
+    state.status === 'error' ? (
+      <div role="alert">
+        {parseErrorMessage(state.error)}
+        <AppButton size="sm" onPress={retry}>
+          {t('common:actions.retry')}
+        </AppButton>
+      </div>
+    ) : null;
+  if (errorState && sessionItems.length === 0) return errorState;
 
-  if (!sessionListLoading && sessionItems.length === 0) {
+  if (state.status === 'empty') {
     return <div className={styles.sessionEmptyState}>{t('session.empty')}</div>;
   }
 
   return (
-    <ListBox
-      aria-label={t('session.listAria')}
-      selectionMode="single"
-      className={styles.sessionMenu}
-      selectedKeys={selectedKeys}
-    >
-      <ListBoxSection id="recent-session" className={styles.sessionSection}>
-        {sessionListLoading && sessionItems.length === 0 ? (
-          <ListBoxItem
-            key="session-loading"
-            id="session-loading"
-            textValue={t('session.loading')}
-            isDisabled
-            className={styles.sessionItem}
-          >
-            {t('session.loading')}
-          </ListBoxItem>
-        ) : (
-          <>
-            {sessionItems.map((session) => (
-              <ListBoxItem
-                key={session.id}
-                id={`session-${session.id}`}
-                textValue={session.title || t('session.untitled')}
-                className={clsx(styles.sessionItem, styles.sessionItemWithActions)}
-                onPress={() => selectSession(session)}
-              >
-                <SessionMenuItem session={session} onUpdated={refresh} onDeleted={handleDeleted} />
-              </ListBoxItem>
-            ))}
-            {(hasMoreSessions || loadingMoreSessions) && (
-              <ListBoxItem
-                key="session-load-more"
-                id="session-load-more"
-                textValue={hasMoreSessions ? t('session.loadMore') : t('session.noMore')}
-                className={styles.sessionItem}
-              >
-                <AppButton
-                  variant="secondary"
-                  isDisabled={loadingMoreSessions}
-                  className={styles.sessionLoadMoreBtn}
-                  onPress={() => {
-                    loadMoreSessions();
-                  }}
-                  onPointerDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  }}
+    <>
+      {errorState}
+      <ListBox
+        aria-label={t('session.listAria')}
+        selectionMode="single"
+        className={styles.sessionMenu}
+        selectedKeys={selectedKeys}
+      >
+        <ListBoxSection id="recent-session" className={styles.sessionSection}>
+          {sessionListLoading && sessionItems.length === 0 ? (
+            <ListBoxItem
+              key="session-loading"
+              id="session-loading"
+              textValue={t('session.loading')}
+              isDisabled
+              className={styles.sessionItem}
+            >
+              {t('session.loading')}
+            </ListBoxItem>
+          ) : (
+            <>
+              {sessionItems.map((session) => (
+                <ListBoxItem
+                  key={session.id}
+                  id={`session-${session.id}`}
+                  textValue={session.title || t('session.untitled')}
+                  className={clsx(styles.sessionItem, styles.sessionItemWithActions)}
+                  onPress={() => selectSession(session)}
                 >
-                  {hasMoreSessions ? t('session.loadMore') : t('session.noMore')}
-                </AppButton>
-              </ListBoxItem>
-            )}
-          </>
-        )}
-      </ListBoxSection>
-    </ListBox>
+                  <SessionMenuItem
+                    session={session}
+                    onUpdated={refresh}
+                    onDeleted={handleDeleted}
+                  />
+                </ListBoxItem>
+              ))}
+              {(hasMoreSessions || loadingMoreSessions) && (
+                <ListBoxItem
+                  key="session-load-more"
+                  id="session-load-more"
+                  textValue={hasMoreSessions ? t('session.loadMore') : t('session.noMore')}
+                  className={styles.sessionItem}
+                >
+                  <AppButton
+                    variant="secondary"
+                    isDisabled={loadingMoreSessions}
+                    className={styles.sessionLoadMoreBtn}
+                    onPress={() => {
+                      loadMoreSessions();
+                    }}
+                    onPointerDown={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }}
+                  >
+                    {hasMoreSessions ? t('session.loadMore') : t('session.noMore')}
+                  </AppButton>
+                </ListBoxItem>
+              )}
+            </>
+          )}
+        </ListBoxSection>
+      </ListBox>
+    </>
   );
 }
 

@@ -1,12 +1,12 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useInfiniteScroll } from 'ahooks';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { type RefObject, useEffect, useState } from 'react';
+import { type RefObject, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import { useResourceCommentService } from '@/domains';
 import type { ResourceComment } from '@/domains/ResourceComment';
+import { useApiInfiniteScroll } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
@@ -63,21 +63,20 @@ function ResourceCommentThread({
 
   const {
     data: replyPageData,
-    error: repliesError,
-    loading: repliesLoading,
+    state: repliesState,
     loadingMore: repliesLoadingMore,
     noMore: repliesNoMore,
     loadMore: loadMoreReplies,
     reload: reloadReplies,
+    retry: retryReplies,
     reloadAsync: reloadRepliesAsync,
     mutate: mutateReplies,
-  } = useInfiniteScroll<ReplyListPage>(
-    async (current) => {
-      const nextPage = Math.floor((current?.list.length ?? 0) / REPLY_PAGE_SIZE) + 1;
+  } = useApiInfiniteScroll<ReplyListPage>(
+    async ({ page, size }) => {
       const data = await commentService.listReplies({
         rootCommentId: rootComment.commentId,
-        page: nextPage,
-        size: REPLY_PAGE_SIZE,
+        page,
+        size,
       });
       return {
         list: data.items,
@@ -87,19 +86,11 @@ function ResourceCommentThread({
     },
     {
       manual: true,
-      isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
+      queryKey: ['resource-comments', resourceId, rootComment.commentId],
+      pageSize: REPLY_PAGE_SIZE,
+      getKey: (comment) => comment.commentId,
     }
   );
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：根评论变化时清空回复缓存，避免复用组件时显示旧线程回复。
-   * 不可替代原因：useInfiniteScroll 不会根据业务主键自动丢弃已累积列表。
-   * cleanup：没有持续订阅或延迟任务，无需清理。
-   */
-  useEffect(() => {
-    mutateReplies(undefined);
-  }, [rootComment.commentId, mutateReplies]);
 
   const replies = replyPageData?.list ?? [];
   // eslint-disable-next-line react-hooks/incompatible-library -- 回复内容含图片且高度不固定，虚拟列表需要动态测量真实高度。
@@ -186,7 +177,7 @@ function ResourceCommentThread({
 
       {expanded ? (
         <div className={styles.replyList}>
-          {repliesLoading && !replyPageData?.list.length ? (
+          {repliesState.status === 'loading' ? (
             <p className={styles.mutedText}>{t('comment.loadingReplies')}</p>
           ) : null}
           {virtualReplyTopPadding > 0 ? (
@@ -230,8 +221,13 @@ function ResourceCommentThread({
               aria-hidden
             />
           ) : null}
-          {repliesError ? (
-            <p className={styles.errorText}>{parseErrorMessage(repliesError)}</p>
+          {repliesState.status === 'error' ? (
+            <div role="alert">
+              <p className={styles.errorText}>{parseErrorMessage(repliesState.error)}</p>
+              <AppButton size="sm" onPress={retryReplies}>
+                {t('common:actions.retry')}
+              </AppButton>
+            </div>
           ) : null}
           {replyPageData && !repliesNoMore ? (
             <AppButton

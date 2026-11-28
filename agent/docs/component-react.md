@@ -26,6 +26,7 @@
 优先方案：
 
 - 用户操作触发的逻辑，写在事件处理函数中。
+- 服务端读取的 query key、分页、结果状态与错误消费遵循 [query.md](query.md)。
 - 接口请求副作用使用 `@/hooks/useApi`、`useApiPagination` 或 `useApiInfiniteScroll`，默认错误提示在 wrapper 内统一处理；非接口型异步任务可继续使用 `ahooks` 的原生 hook。
 - 生命周期语义使用 `useMount`、`useUnmount` 或已有领域 Hook。
 - 订阅、长连接、协同会话等复杂逻辑优先封装为领域 Hook。

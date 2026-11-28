@@ -10,12 +10,13 @@
 - `eslint.config.js`：通过 `contractRuleSettings` 启用规则；适用文件范围与目录例外仍由配置或专题规则负责。
 - `scripts/check-contract-lint.mjs`：运行项目 ESLint 配置，统一筛选、格式化诊断并设置退出码。
 
-当前 `error` 专题已接入错误契约的六条规则与原生错误语法限制。后续专题扩展自己的规则，公共注册和专项检查会直接读取新的规则对象，不复制检查脚本。
+当前 `error` 专题已接入错误契约的六条规则与原生错误语法限制，`query` 专题接入服务端查询入口规则。后续专题扩展自己的规则，公共注册和专项检查会直接读取新的规则对象，不复制检查脚本。
 
 ```bash
 pnpm lint                    # 全项目检查，遵守配置中的 error / warn 级别
 pnpm lint:contracts          # 一次扫描，检查所有已登记契约
 pnpm lint:error              # 等价于 node scripts/check-contract-lint.mjs error
+pnpm lint:query              # 等价于 node scripts/check-contract-lint.mjs query
 ```
 
 专项检查可以同时接受多个专题名；未知专题直接失败。只有已经登记的专题才可以被检查，尚未接入的查询规则不能被报告为检查通过。
@@ -32,7 +33,7 @@ pnpm lint:error              # 等价于 node scripts/check-contract-lint.mjs er
 
 ## 新专题接入范例
 
-查询分支新增 `lint/query.js` 后，在 `lint/contracts.js` 导入 `queryRules` 并添加：
+查询专题已通过 `lint/query.js` 导出 `queryRules`，在 `lint/contracts.js` 按下面的方式登记；新专题沿用同一模式：
 
 ```js
 query: {
@@ -53,4 +54,4 @@ query: {
 
 ## 分支顺序
 
-基础设施先合入 `main`，error 与 query 分支随后各自基于更新后的 `main` 处理。错误分支保留本专题的行为变更，查询分支使用同一套基础设施接入查询规则。两个分支均删除自有的专项扫描脚本，避免再次分叉。
+基础设施已先合入 `main`。错误分支基于更新后的 `main` 完成 rebase；查询分支依赖错误分支的 `createError/reportError`，先以错误分支为 PR base，待错误 PR 合入后再更新到 `main`。两个专题均使用公共检查入口，不保留自有扫描脚本。

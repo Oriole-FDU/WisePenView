@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { EmptyState, Spin } from '@/components/base/Feedback';
+import { AppButton } from '@/components/base/Button';
+import { EmptyState, ErrorState, Spin } from '@/components/base/Feedback';
 import type { FavoriteCollection } from '@/domains/ResourceFavorite';
+import { parseErrorMessage } from '@/utils/error';
 
 import FavoriteCollectionList from './components/FavoriteCollectionList';
 import FavoriteResourceTable from './components/FavoriteResourceTable';
@@ -24,14 +26,26 @@ function FavoritesTab() {
     FavoriteCollection | null | undefined
   >();
   const [deletingCollection, setDeletingCollection] = useState<FavoriteCollection>();
-  const { collections, hasLoaded, loading, refresh } = useFavoriteCollections();
+  const { data: collectionData, state, refresh } = useFavoriteCollections();
+  const collections = collectionData ?? [];
 
   const defaultCollection = resolveDefaultCollection(collections);
   const activeCollection =
     collections.find((collection) => collection.collectionId === selectedCollectionId) ??
     defaultCollection;
 
-  if (loading && !hasLoaded) {
+  if (state.status === 'error' && !activeCollection) {
+    return (
+      <div className={styles.feedbackState}>
+        <ErrorState
+          title={parseErrorMessage(state.error)}
+          action={<AppButton onPress={refresh}>{t('common:actions.retry')}</AppButton>}
+        />
+      </div>
+    );
+  }
+
+  if (state.status === 'loading' || state.status === 'idle') {
     return (
       <div className={styles.container}>
         <div className={styles.feedbackState}>
@@ -57,6 +71,12 @@ function FavoritesTab() {
 
   return (
     <div className={styles.container}>
+      {state.status === 'error' ? (
+        <ErrorState
+          title={parseErrorMessage(state.error)}
+          action={<AppButton onPress={refresh}>{t('common:actions.retry')}</AppButton>}
+        />
+      ) : null}
       <div className={styles.favoriteFrame}>
         <div className={styles.splitLayout}>
           <FavoriteCollectionList

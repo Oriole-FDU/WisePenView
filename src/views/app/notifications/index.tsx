@@ -60,17 +60,18 @@ function NotificationsPage() {
   const messageListRef = useRef<HTMLDivElement>(null);
 
   const messagesRequest = useApiInfiniteScroll<UserMessageInfinitePage>(
-    async (current) => {
-      const nextPage = Math.floor((current?.list.length ?? 0) / MESSAGE_PAGE_SIZE) + 1;
+    async ({ page, size }) => {
       const data = await messageService.listUserMessages({
-        page: nextPage,
-        size: MESSAGE_PAGE_SIZE,
+        page,
+        size,
       });
       return toUserMessageInfinitePage(data);
     },
     {
       target: messageListRef,
-      isNoMore: (data) => Boolean(data && data.page >= data.totalPage),
+      queryKey: ['user-messages'],
+      pageSize: MESSAGE_PAGE_SIZE,
+      getKey: (message) => message.messageId,
       showErrorToast: false,
       onErrorEffect: (error) => {
         const reportedError = createError(error);
@@ -81,8 +82,8 @@ function NotificationsPage() {
 
   const messages = messagesRequest.data?.list ?? [];
   const selectedMessage = messages.find((message) => message.messageId === selectedMessageId);
-  const isInitialLoading = messagesRequest.loading && messagesRequest.data == null;
-  const hasMoreMessages = !messagesRequest.noMore;
+  const isInitialLoading = messagesRequest.state.status === 'loading';
+  const hasMoreMessages = messagesRequest.hasMore;
   // eslint-disable-next-line react-hooks/incompatible-library -- 虚拟列表需要读取滚动容器尺寸与动态行高，属于命令式测量。
   const messageVirtualizer = useVirtualizer({
     count: messages.length,
@@ -193,11 +194,11 @@ function NotificationsPage() {
       />
 
       <div className={styles.pageBody}>
-        {messagesRequest.error ? (
+        {messagesRequest.state.status === 'error' && !messagesRequest.data ? (
           <div className={styles.pageState}>
             <ErrorState
               title={t('page.loadFailed')}
-              description={parseErrorMessage(messagesRequest.error)}
+              description={parseErrorMessage(messagesRequest.state.error)}
               action={
                 <AppButton variant="primary" size="sm" onPress={handleRefreshMessages}>
                   <RotateCw size={16} />
@@ -210,7 +211,7 @@ function NotificationsPage() {
           <div className={styles.pageState} role="status" aria-live="polite" aria-busy="true">
             <Spin size="large" tip={t('page.loading')} />
           </div>
-        ) : messages.length === 0 ? (
+        ) : messagesRequest.state.status === 'empty' ? (
           <div className={styles.pageState}>
             <EmptyState
               title={t('page.emptyTitle')}
@@ -228,6 +229,9 @@ function NotificationsPage() {
           </div>
         ) : (
           <div className={styles.messageList} ref={messageListRef}>
+            {messagesRequest.state.status === 'error' ? (
+              <p role="alert">{parseErrorMessage(messagesRequest.state.error)}</p>
+            ) : null}
             {virtualTopPadding > 0 ? (
               <div
                 className={styles.virtualSpacer}

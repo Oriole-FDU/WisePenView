@@ -1,6 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useInfiniteScroll } from 'ahooks';
-import { type Key, useEffect, useRef, useState } from 'react';
+import { type Key, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
@@ -16,7 +15,7 @@ import {
 } from '@/domains';
 import type { ResourceItem } from '@/domains/Resource';
 import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
-import { useApi } from '@/hooks/useApi';
+import { useApi, useApiInfiniteScroll } from '@/hooks/useApi';
 import { createError, parseErrorMessage, reportError } from '@/utils/error';
 
 import CommentComposer from './CommentComposer';
@@ -109,21 +108,20 @@ function ResourceInteractionPanel({
 
   const {
     data: commentPageData,
-    error: commentsError,
-    loading: commentsLoading,
+    state: commentsState,
     loadingMore: commentsLoadingMore,
     noMore: commentsNoMore,
     loadMore: loadMoreComments,
+    retry: retryComments,
     reloadAsync: reloadComments,
     mutate: mutateComments,
-  } = useInfiniteScroll<CommentListPage>(
-    async (current) => {
-      const nextPage = Math.floor((current?.list.length ?? 0) / COMMENT_PAGE_SIZE) + 1;
+  } = useApiInfiniteScroll<CommentListPage>(
+    async ({ page, size }) => {
       const data = await commentService.listComments({
         resourceId,
         sortBy,
-        page: nextPage,
-        size: COMMENT_PAGE_SIZE,
+        page,
+        size,
       });
       return {
         list: data.items,
@@ -132,20 +130,11 @@ function ResourceInteractionPanel({
       };
     },
     {
-      reloadDeps: [resourceId, sortBy],
-      isNoMore: (data) => Boolean(data && (data.total === 0 || data.list.length >= data.total)),
+      queryKey: ['resource-comments', resourceId, sortBy],
+      pageSize: COMMENT_PAGE_SIZE,
+      getKey: (comment) => comment.commentId,
     }
   );
-
-  /**
-   * @wisepen-manual-effect
-   * 执行时机：资源或排序切换时先清空评论缓存，避免短暂显示旧资源的评论。
-   * 不可替代原因：useInfiniteScroll 的 reloadDeps 只负责重新拉取，不会自动清理已累积列表。
-   * cleanup：没有订阅或延迟任务，无需清理。
-   */
-  useEffect(() => {
-    mutateComments(undefined);
-  }, [resourceId, sortBy, mutateComments]);
 
   const refreshComments = async () => {
     await reloadComments();
@@ -304,13 +293,18 @@ function ResourceInteractionPanel({
             />
           </div>
 
-          {commentsError ? (
-            <p className={styles.errorText}>{parseErrorMessage(commentsError)}</p>
+          {commentsState.status === 'error' ? (
+            <div role="alert">
+              <p className={styles.errorText}>{parseErrorMessage(commentsState.error)}</p>
+              <AppButton size="sm" onPress={retryComments}>
+                {t('common:actions.retry')}
+              </AppButton>
+            </div>
           ) : null}
-          {commentsLoading && !commentPageData?.list.length ? (
+          {commentsState.status === 'loading' ? (
             <p className={styles.mutedText}>{t('resource:comment.loading')}</p>
           ) : null}
-          {!commentsLoading && !comments.length ? (
+          {commentsState.status === 'empty' ? (
             <p className={styles.emptyText}>{t('resource:comment.empty')}</p>
           ) : null}
 

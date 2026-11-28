@@ -15,7 +15,7 @@ export function useFavoriteResourceTableController({
   onCollectionChanged,
 }: UseFavoriteResourceTableControllerOptions) {
   const navigateResource = useOpenResource();
-  const { list, total, loading, loadingMore, hasMore, loadMore, refresh } =
+  const { state, list, total, loading, loadingMore, hasMore, loadMore, refresh, retry } =
     useFavoriteResources(collectionId);
   const [unfavoriteItem, setUnfavoriteItem] = useState<FavoriteItem>();
   const [manageFavoriteItem, setManageFavoriteItem] = useState<FavoriteItem>();
@@ -48,6 +48,8 @@ export function useFavoriteResourceTableController({
   };
 
   return {
+    state,
+    retry,
     list,
     total,
     loading,
