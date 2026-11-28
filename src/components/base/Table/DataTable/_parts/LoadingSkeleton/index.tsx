@@ -7,22 +7,8 @@ import {
   resolveReadonlyColumnWidthClass,
   resolveReadonlySkeletonBarWidth,
 } from '../../../shared/TableBase/columnWidth';
-import type { TableColumnWidth } from '../../../shared/TableBase/index.type';
+import type { DataTableLoadingSkeletonProps } from './index.type';
 import styles from './style.module.scss';
-
-interface DataTableSkeletonColumn {
-  id: string;
-  width?: TableColumnWidth;
-  align?: 'start' | 'center' | 'end';
-  isRowHeader?: boolean;
-  className?: string;
-}
-
-export interface DataTableLoadingSkeletonProps {
-  rowCount?: number;
-  columns: DataTableSkeletonColumn[];
-  equalLayout?: boolean;
-}
 
 function DataTableLoadingSkeleton({
   rowCount = 4,
@@ -69,3 +55,5 @@ function DataTableLoadingSkeleton({
 }
 
 export default DataTableLoadingSkeleton;
+
+export type { DataTableLoadingSkeletonProps } from './index.type';

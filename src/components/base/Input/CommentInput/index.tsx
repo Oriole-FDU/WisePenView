@@ -7,20 +7,12 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { HiddenFileInput, TextArea } from '@/components/base/Input';
 import EmojiPicker from '@/components/base/Input/EmojiPicker';
 
-import type { CommentInputImage, CommentInputProps } from './index.type';
+import type { CommentInputProps, PendingImagePreviewProps } from './index.type';
 import styles from './style.module.scss';
 
 export type { CommentInputImage, CommentInputProps } from './index.type';
 
-function PendingImagePreview({
-  image,
-  removeLabel,
-  onRemove,
-}: {
-  image: CommentInputImage;
-  removeLabel: string;
-  onRemove(): void;
-}) {
+function PendingImagePreview({ image, removeLabel, onRemove }: PendingImagePreviewProps) {
   const [previewUrl] = useState(() => URL.createObjectURL(image.file));
   useUnmount(() => URL.revokeObjectURL(previewUrl));
 

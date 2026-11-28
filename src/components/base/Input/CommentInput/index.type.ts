@@ -27,3 +27,9 @@ export interface CommentInputProps {
   onCancel?: () => void;
   onSubmit(): void;
 }
+
+export type PendingImagePreviewProps = {
+  image: CommentInputImage;
+  removeLabel: string;
+  onRemove(): void;
+};

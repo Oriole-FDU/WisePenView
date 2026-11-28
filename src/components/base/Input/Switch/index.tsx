@@ -1,9 +1,8 @@
 import { Switch as HeroSwitch } from '@heroui/react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
+import type { SwitchProps } from './index.type';
 import styles from './style.module.scss';
-
-export type SwitchProps = ComponentProps<typeof HeroSwitch>;
 
 function SwitchRoot({ children, ...props }: SwitchProps) {
   return (
@@ -27,3 +26,5 @@ const Switch = Object.assign(SwitchRoot, {
 });
 
 export default Switch;
+
+export type { SwitchProps } from './index.type';

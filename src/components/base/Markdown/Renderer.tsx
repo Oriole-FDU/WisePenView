@@ -14,10 +14,10 @@ import {
   MarkdownResourceResolverProvider,
   useMarkdownResourceResolver,
 } from './_common/context';
-import CodeBlock from './_parts/CodeBlock';
-import MermaidBlock from './_parts/MermaidBlock';
 import { isMermaidLanguage } from './_parts/MermaidBlock/_common/language';
 import { MARKDOWN_UNDERLINE_URL, type MarkdownRenderContext } from './_common/runtime';
+import CodeBlock from './_parts/CodeBlock';
+import MermaidBlock from './_parts/MermaidBlock';
 import styles from './style.module.scss';
 
 const SAFE_PROTOCOL = /^(https?|ircs?|mailto|xmpp)$/i;

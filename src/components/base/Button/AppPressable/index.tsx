@@ -1,6 +1,6 @@
-import type { ComponentPropsWithRef } from 'react';
+import type { AppPressableProps } from './index.type';
 
-function AppPressable({ type = 'button', ...props }: ComponentPropsWithRef<'button'>) {
+function AppPressable({ type = 'button', ...props }: AppPressableProps) {
   return <button {...props} type={type} />;
 }
 

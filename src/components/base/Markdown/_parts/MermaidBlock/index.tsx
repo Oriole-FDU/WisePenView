@@ -7,15 +7,10 @@ import { sanitizeHtml, SVG_HTML_SANITIZE_CONFIG } from '@/utils/html/sanitizeHtm
 
 import { CodeBlockFrame, HighlightedCode } from '../CodeBlock';
 import { renderMermaidDiagram } from './_common/mermaidRuntime';
+import type { MermaidBlockProps } from './index.type';
 import styles from './style.module.scss';
 
 type MermaidView = 'code' | 'graph';
-
-interface MermaidBlockProps {
-  code: string;
-  language?: string;
-  streaming: boolean;
-}
 
 function readRenderError(error: unknown, fallbackMessage: string): string {
   if (error instanceof Error && error.message) return error.message;

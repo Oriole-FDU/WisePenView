@@ -1,11 +1,8 @@
 import { Avatar as HeroAvatar } from '@heroui/react';
 import { clsx } from 'clsx';
-import type { ComponentProps } from 'react';
 
+import type { AppAvatarImageProps, AppAvatarProps } from './index.type';
 import styles from './style.module.scss';
-
-type AppAvatarProps = ComponentProps<typeof HeroAvatar>;
-type AppAvatarImageProps = ComponentProps<typeof HeroAvatar.Image>;
 
 function AppAvatarRoot({ className, ...props }: AppAvatarProps) {
   return <HeroAvatar className={className} {...props} />;

@@ -1,7 +1,7 @@
 import { Slider as HeroSlider } from '@heroui/react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
-export type SliderProps = ComponentProps<typeof HeroSlider>;
+import type { SliderProps } from './index.type';
 
 function SliderRoot({ children, ...props }: SliderProps) {
   return (
@@ -26,3 +26,5 @@ const Slider = Object.assign(SliderRoot, {
 });
 
 export default Slider;
+
+export type { SliderProps } from './index.type';

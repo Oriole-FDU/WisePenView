@@ -44,6 +44,7 @@ import {
   isFolderContainerRow,
   normalizeTreeSelection,
 } from './_common/folderTableModel';
+import styles from './_common/style.module.scss';
 import type {
   FolderTableColumn,
   FolderTableProps,
@@ -52,10 +53,9 @@ import type {
   FolderTableRowContext,
   FolderTableVisibleRow,
 } from './index.type';
-import TableBatchFooter from './_parts/BatchFooter';
-import FolderTableNameCell from './_parts/FolderNameCell';
 import FolderTableLoadingSkeleton from './_parts/LoadingSkeleton';
-import styles from './_common/style.module.scss';
+import FolderTableNameCell from './_parts/FolderNameCell';
+import TableBatchFooter from './_parts/BatchFooter';
 
 const LOAD_MORE_THRESHOLD_PX = 48;
 const VIRTUAL_ROW_ESTIMATE_SIZE = 60;

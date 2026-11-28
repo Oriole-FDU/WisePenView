@@ -1,12 +1,13 @@
 import { Tabs as HeroTabs } from '@heroui/react';
 import { clsx } from 'clsx';
-import { type ComponentProps, createContext, useContext } from 'react';
+import { createContext, useContext } from 'react';
 
+import type { TabsIndicatorProps, TabsListProps, TabsProps } from './index.type';
 import styles from './style.module.scss';
 
 const TabsDefaultSurfaceContext = createContext(true);
 
-function TabsRoot({ className, variant, ...props }: ComponentProps<typeof HeroTabs>) {
+function TabsRoot({ className, variant, ...props }: TabsProps) {
   return (
     <TabsDefaultSurfaceContext.Provider value={variant !== 'secondary'}>
       <HeroTabs className={className} variant={variant} {...props} />
@@ -14,13 +15,13 @@ function TabsRoot({ className, variant, ...props }: ComponentProps<typeof HeroTa
   );
 }
 
-function TabsList({ className, ...props }: ComponentProps<typeof HeroTabs.List>) {
+function TabsList({ className, ...props }: TabsListProps) {
   const hasDefaultSurface = useContext(TabsDefaultSurfaceContext);
 
   return <HeroTabs.List className={clsx(hasDefaultSurface && styles.list, className)} {...props} />;
 }
 
-function TabsIndicator({ className, ...props }: ComponentProps<typeof HeroTabs.Indicator>) {
+function TabsIndicator({ className, ...props }: TabsIndicatorProps) {
   const hasDefaultSurface = useContext(TabsDefaultSurfaceContext);
 
   return (

@@ -1,10 +1,7 @@
 import { clsx } from 'clsx';
 
+import type { ColorTextIconProps } from './index.type';
 import styles from './style.module.scss';
-
-interface ColorTextIconProps {
-  textClassName?: string;
-}
 
 function ColorTextIcon({ textClassName }: ColorTextIconProps) {
   return (

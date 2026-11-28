@@ -1,13 +1,8 @@
 import { Table } from '@heroui/react';
-import type { ReactNode } from 'react';
 
 import { joinClassNames } from '../TableBase/cellAlign';
+import type { TableSummaryFooterProps } from './index.type';
 import styles from './style.module.scss';
-
-export interface TableSummaryFooterProps {
-  summary?: ReactNode;
-  className?: string;
-}
 
 function TableSummaryFooter({ summary, className }: TableSummaryFooterProps) {
   if (!summary) {
@@ -22,3 +17,5 @@ function TableSummaryFooter({ summary, className }: TableSummaryFooterProps) {
 }
 
 export default TableSummaryFooter;
+
+export type { TableSummaryFooterProps } from './index.type';
