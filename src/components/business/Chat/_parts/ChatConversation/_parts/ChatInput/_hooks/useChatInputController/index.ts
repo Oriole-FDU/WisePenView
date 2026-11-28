@@ -20,8 +20,8 @@ import {
   selectChatInputCompletionState,
   selectChatInputSelectedModel,
 } from '../../_common/context/ChatInputStore';
-import type { ChatInputProps } from '../../index.type';
 import { useVoiceInput } from '../../_parts/VoiceInput/_hooks/useVoiceInput';
+import type { ChatInputProps } from '../../index.type';
 
 interface UseChatInputControllerOptions {
   onSend: ChatInputProps['onSend'];

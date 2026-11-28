@@ -5,13 +5,13 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 
 import styles from '../../_common/style.module.scss';
 import { useAgentAssetsController } from './_hooks/useAgentAssetsController';
-import type { AgentEditorProps } from './index.type';
 import AssetsSection from './_parts/AssetsSection';
 import BasicInfoSection from './_parts/BasicInfoSection';
 import CapabilitiesSection from './_parts/CapabilitiesSection';
 import MemorySection from './_parts/MemorySection';
 import ModelSection from './_parts/ModelSection';
 import SystemPromptSection from './_parts/SystemPromptSection';
+import type { AgentEditorProps } from './index.type';
 
 const anchorSections = [
   ['agent-info', 'basic'],

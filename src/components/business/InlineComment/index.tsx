@@ -17,6 +17,7 @@ import { parseErrorMessage } from '@/utils/error';
 import { formatRelativeTimestamp, formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import styles from './_common/style.module.scss';
+import CommentComposer from './_parts/CommentComposer';
 import type {
   CommentItemProps,
   CommentThreadProps,
@@ -24,7 +25,6 @@ import type {
   InlineCommentProps,
   ResolvedCommentThreadProps,
 } from './index.type';
-import CommentComposer from './_parts/CommentComposer';
 
 const INLINE_THREAD_ESTIMATE_SIZE = 240;
 const INLINE_RESOLVED_THREAD_ESTIMATE_SIZE = 180;

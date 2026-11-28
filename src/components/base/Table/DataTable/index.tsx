@@ -21,8 +21,8 @@ import TablePaginationFooter from '../shared/TablePaginationFooter';
 import { renderSortableColumnLabel } from '../shared/TableSortHeader/renderSortableColumnLabel';
 import { TableLoadMoreRow, TableRefreshIndicator } from '../shared/TableStatusRows';
 import TableSummaryFooter from '../shared/TableSummaryFooter';
-import type { DataTableProps, DataTableRowContext } from './index.type';
 import DataTableLoadingSkeleton from './_parts/DataTableLoadingSkeleton';
+import type { DataTableProps, DataTableRowContext } from './index.type';
 import styles from './style.module.scss';
 
 const LOAD_MORE_THRESHOLD_PX = 48;

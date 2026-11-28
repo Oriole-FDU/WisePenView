@@ -43,10 +43,10 @@ import {
   useTableDriveRowActionsController,
   useTableDriveTrashController,
 } from './_hooks';
-import type { DriveTableRow, TableDriveProps } from './index.type';
 import CreateMenu from './_parts/CreateMenu';
 import DriveDetailPanel from './_parts/DriveDetailPanel';
 import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './_parts/DriveDnd';
+import type { DriveTableRow, TableDriveProps } from './index.type';
 
 const DRIVE_DRAG_OVERLAY_CURSOR_OFFSET = { x: 12, y: 12 };
 

@@ -5,8 +5,8 @@ import { useUserService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
 import styles from './_common/style.module.scss';
-import type { ResourceToolbarProps } from './index.type';
 import ResourceToolbarBreadcrumb from './_parts/ResourceToolbarBreadcrumb';
+import type { ResourceToolbarProps } from './index.type';
 import ResourceToolbarActions from './ResourceToolbarActions';
 
 /**

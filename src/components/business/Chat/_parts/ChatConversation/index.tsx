@@ -1,11 +1,11 @@
 import styles from '../../_common/style.module.scss';
 import { NEW_CHAT_WELCOME_CONFIG } from '../../_common/welcome';
 import { useWelcomeScreenStore, WelcomeScreenHost } from '../../WelcomeConfigurable';
-import type { ChatConversationProps } from './index.type';
 import ChatInput from './_parts/ChatInput';
 import { ChatInputStoreProvider } from './_parts/ChatInput/_common/context';
 import ChatMessageList from './_parts/ChatMessageList';
 import ChatSessionBar from './_parts/ChatSessionBar';
+import type { ChatConversationProps } from './index.type';
 
 /** 对话区：把对话域与会话域拆成消息列表、输入区和会话浮层，自身不持有业务状态。 */
 function ChatConversation({

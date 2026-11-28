@@ -11,8 +11,8 @@ import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState } from '../_runtime/useEditorRuntime';
 import styles from './_common/style.module.scss';
 import { useAgentVersionController } from './_hooks/useAgentVersionController';
-import type { EditorSurfaceProps } from './index.type';
 import AgentWorkspace from './_parts/AgentWorkspace';
+import type { EditorSurfaceProps } from './index.type';
 
 function AgentEditorContent() {
   const {

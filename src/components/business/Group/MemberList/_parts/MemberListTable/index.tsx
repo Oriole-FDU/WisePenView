@@ -22,12 +22,12 @@ import {
   isAdmin,
   isOwner,
 } from '../../../GroupDisplayConfig';
+import InlineEditError from './_parts/InlineEditError';
 import type {
   MemberListInlineDraft,
   MemberListPaginationConfig,
   MemberListTableProps,
 } from './index.type';
-import InlineEditError from './_parts/InlineEditError';
 import styles from './style.module.scss';
 
 type MemberRecord = GroupMember & { key: string };

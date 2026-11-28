@@ -7,10 +7,10 @@ import {
   type TraceHeadline,
 } from '../../_common/traceModel';
 import { useTraceReasoningDurations } from './_hooks/useTraceReasoningDurations';
-import type { ProcessTraceProps } from './index.type';
 import ReasoningBlock from './_parts/ReasoningBlock';
 import TraceRow from './_parts/TraceRow';
 import TraceStepDetail from './_parts/TraceStepDetail';
+import type { ProcessTraceProps } from './index.type';
 import styles from './style.module.scss';
 
 /**

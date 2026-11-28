@@ -13,8 +13,8 @@ import styles from '../../_common/style.module.scss';
 import AgentEditor from '../AgentEditor';
 import { useAgentDebugSendGuardController } from './_hooks/useAgentDebugSendGuardController';
 import { useAgentDraftSessionController } from './_hooks/useAgentDraftSessionController';
-import type { AgentWorkspaceProps } from './index.type';
 import AgentHeaderActions from './_parts/AgentHeaderActions';
+import type { AgentWorkspaceProps } from './index.type';
 
 export default function AgentWorkspace({
   agent,

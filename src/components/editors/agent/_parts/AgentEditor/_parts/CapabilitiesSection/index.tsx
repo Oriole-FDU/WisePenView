@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import AppForm from '@/components/base/AppForm';
 import type { ToolOption } from '@/domains/ChatConfig';
 
-import type { Props } from './index.type';
 import CapabilityPolicyPanel, { type CapabilityPolicyOption } from './_parts/CapabilityPolicyPanel';
+import type { Props } from './index.type';
 
 export default function CapabilitiesSection({ spec, tools, skills, disabled, onChange }: Props) {
   const { t } = useTranslation('agent');

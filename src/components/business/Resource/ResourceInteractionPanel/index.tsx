@@ -21,10 +21,10 @@ import { parseErrorMessage } from '@/utils/error';
 
 import styles from './_common/style.module.scss';
 import { updateCommentLikeCount } from './_common/utils';
-import type { ResourceInteractionPanelProps } from './index.type';
 import CommentComposer from './_parts/CommentComposer';
 import ResourceCommentThread from './_parts/ResourceCommentThread';
 import ResourceFeedbackSummary from './_parts/ResourceFeedbackSummary';
+import type { ResourceInteractionPanelProps } from './index.type';
 
 const COMMENT_PAGE_SIZE = 10;
 const COMMENT_THREAD_ESTIMATE_SIZE = 180;

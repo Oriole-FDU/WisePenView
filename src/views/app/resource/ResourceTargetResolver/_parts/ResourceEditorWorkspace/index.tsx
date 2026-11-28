@@ -7,8 +7,8 @@ import { useResourceHostContext } from '@/layouts/Resource/_context/host';
 import { workspaceRightPanelActions } from '@/layouts/WorkspaceRightPanelLayout';
 
 import { createWorkspacePresentationStore } from './_common/workspacePresentationStore';
-import type { ResourceEditorWorkspaceProps } from './index.type';
 import ResourceWorkspacePresentation from './_parts/ResourceWorkspacePresentation';
+import type { ResourceEditorWorkspaceProps } from './index.type';
 
 /** 组合外层资源布局与编辑器实例；展示信息由独立子树订阅。 */
 export default function ResourceEditorWorkspace({ target }: ResourceEditorWorkspaceProps) {

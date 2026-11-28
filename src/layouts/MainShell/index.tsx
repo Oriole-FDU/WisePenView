@@ -20,8 +20,8 @@ import { useDesktopWindowState } from '@/hooks/useDesktopWindowState';
 import { type MainShellContextValue, MainShellProvider } from './_common/context';
 import { useMainShellMobileSnapshot } from './_hooks/useMainShellMobile';
 import { useSystemSidebarPanel } from './_hooks/useSystemSidebarPanel';
-import type { MainShellProps } from './index.type';
 import SkipToMainLink, { MAIN_CONTENT_ID } from './_parts/SkipToMainLink';
+import type { MainShellProps } from './index.type';
 import styles from './style.module.scss';
 
 interface DrawerOpenState {

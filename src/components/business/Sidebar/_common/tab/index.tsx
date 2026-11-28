@@ -17,10 +17,10 @@ import {
   type SidebarViewTabKey,
   useSidebarViewTabStore,
 } from './_common/store/useSidebarViewTabStore';
-import type { SidebarViewTabProps } from './index.type';
 import CourseTab from './_parts/CourseTab';
 import DriveTab from './_parts/DriveTab';
 import SessionTab from './_parts/SessionTab';
+import type { SidebarViewTabProps } from './index.type';
 import styles from './style.module.scss';
 
 function SidebarViewTab({ id, label, icon: Icon, selected, toolId }: SidebarViewTabProps) {

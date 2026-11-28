@@ -17,12 +17,12 @@ import {
 } from './_common/context';
 import styles from './_common/style.module.scss';
 import { useChatInputController } from './_hooks/useChatInputController';
-import type { ChatInputProps } from './index.type';
 import AttachmentStrip from './_parts/AttachmentStrip';
 import DocumentPickerModal from './_parts/DocumentPickerModal';
 import DropOverlay from './_parts/DropOverlay';
 import InputToolbar from './_parts/InputToolbar';
 import OtherSkillModal from './_parts/OtherSkillModal';
+import type { ChatInputProps } from './index.type';
 
 function ChatInputContent({
   onSend,

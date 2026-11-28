@@ -38,10 +38,10 @@ import {
 import { useSkillResourceController } from './_hooks/useSkillResourceController';
 import { useSkillSaveController } from './_hooks/useSkillSaveController';
 import { useSkillWorkspaceDraftController } from './_hooks/useSkillWorkspaceDraftController';
-import type { EditorSurfaceProps } from './index.type';
 import SkillActionDialogs from './_parts/SkillActionDialogs';
 import SkillEditorPanel from './_parts/SkillEditorPanel';
 import SkillFileTreePanel from './_parts/SkillFileTreePanel';
+import type { EditorSurfaceProps } from './index.type';
 
 function SkillEditorContent() {
   const {

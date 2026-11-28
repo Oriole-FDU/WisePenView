@@ -27,10 +27,10 @@ import {
   resolveCourseOutlineResourceDrop,
 } from './_common/model';
 import { useCourseOutlineEditingController } from './_hooks/useCourseOutlineEditingController';
-import type { CourseOutlineResourcePageTitleProps, CourseOutlineSidebarProps } from './index.type';
 import CourseOutlineMoveModal from './_parts/CourseOutlineMoveModal';
 import CourseOutlineNodeTitle from './_parts/CourseOutlineNodeTitle';
 import CourseResourcePickerModal from './_parts/CourseResourcePickerModal';
+import type { CourseOutlineResourcePageTitleProps, CourseOutlineSidebarProps } from './index.type';
 
 interface CourseOutlineTreeActions {
   canMoveContainer: (node: CourseOutlineContainerNode, offset: -1 | 1) => boolean;

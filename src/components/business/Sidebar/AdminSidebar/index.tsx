@@ -1,8 +1,8 @@
 import UserProfile from '../_common/footer/UserProfile';
 import SidebarHeader from '../_common/header/SidebarHeader';
 import shellStyles from '../_common/style.module.scss';
-import type { AdminSidebarProps } from './index.type';
 import AdminHeaderNav from './_parts/AdminHeaderNav';
+import type { AdminSidebarProps } from './index.type';
 import styles from './style.module.scss';
 
 function AdminSidebar({

@@ -9,9 +9,9 @@ import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../MessageContent';
 import { buildAssistantSegments } from './_common/traceModel';
-import type { AssistantMessageProps } from './index.type';
 import LoadingText from './_parts/LoadingText';
 import ProcessTrace from './_parts/ProcessTrace';
+import type { AssistantMessageProps } from './index.type';
 import styles from './style.module.scss';
 
 function AssistantMessage({ message, model, streaming }: AssistantMessageProps) {

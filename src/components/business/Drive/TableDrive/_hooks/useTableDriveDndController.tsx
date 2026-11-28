@@ -20,8 +20,8 @@ import {
   isDriveActionTarget,
   isDriveSystemFolderNode,
 } from '../../_common/driveComponentModel';
-import type { DriveTableRow } from '../index.type';
 import { DriveDndRow, DriveDroppableBreadcrumb } from '../_parts/DriveDnd';
+import type { DriveTableRow } from '../index.type';
 
 interface UseTableDriveDndControllerParams {
   rowMap: Map<string, DriveTableRow>;

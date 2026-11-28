@@ -8,10 +8,10 @@ import {
   type WalletTransactionRecord,
 } from '@/domains/Wallet';
 
-import styles from './ComputeWallet.stories.module.scss';
-import ComputeWallet from './index';
 import WalletBalanceHeader from './_parts/WalletBalanceHeader';
 import WalletTransactionTable from './_parts/WalletTransactionTable';
+import styles from './ComputeWallet.stories.module.scss';
+import ComputeWallet from './index';
 
 const DEMO_TRANSACTIONS: WalletTransactionRecord[] = [
   {
