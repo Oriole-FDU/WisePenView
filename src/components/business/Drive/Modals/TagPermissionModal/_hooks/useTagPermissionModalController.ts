@@ -8,7 +8,6 @@ import type { TagTreeNode } from '@/domains/Tag';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import type { TagPermissionModalProps } from '../index.type';
 import {
   buildFormFromTag,
   buildMemberOptions,
@@ -24,6 +23,7 @@ import {
   type TagPermissionFormValues,
   type TagPolicyModalMode,
 } from '../_common/tagPermissionModalModel';
+import type { TagPermissionModalProps } from '../index.type';
 
 interface TagPolicyModalControllerProps extends TagPermissionModalProps {
   mode: TagPolicyModalMode;

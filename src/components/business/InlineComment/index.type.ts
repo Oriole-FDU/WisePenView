@@ -51,3 +51,38 @@ export interface InlineCommentProps {
   onReopen(threadId: string): Promise<void>;
   onDelete(payload: InlineCommentDeletePayload): Promise<void>;
 }
+
+export interface CommentItemProps {
+  threadId: string;
+  item: InlineCommentItem;
+  active: boolean;
+  canDelete: boolean;
+  onReactionChange(payload: InlineCommentReactionPayload): Promise<void>;
+  onDelete(payload: InlineCommentDeletePayload): void;
+  onPreviewImage(url: string): void;
+}
+
+export interface CommentThreadProps extends Pick<
+  InlineCommentProps,
+  | 'activeThreadId'
+  | 'currentUserId'
+  | 'resourceOwnerId'
+  | 'imageUpload'
+  | 'onThreadSelect'
+  | 'onReply'
+  | 'onReactionChange'
+  | 'onResolve'
+> {
+  thread: InlineCommentThreadView;
+  onDelete(payload: InlineCommentDeletePayload): void;
+  onPreviewImage(url: string): void;
+}
+
+export interface ResolvedCommentThreadProps {
+  thread: InlineCommentThreadView;
+  currentUserId?: string;
+  resourceOwnerId?: string | null;
+  onReopen(threadId: string): Promise<void>;
+  onDelete(payload: InlineCommentDeletePayload): void;
+  onPreviewImage(url: string): void;
+}

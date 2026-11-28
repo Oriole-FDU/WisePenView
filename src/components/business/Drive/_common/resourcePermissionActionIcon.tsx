@@ -14,11 +14,7 @@ import {
 
 import { RESOURCE_ACTION, type ResourceAction } from '@/domains/_shared/access';
 
-interface ResourcePermissionActionIconProps {
-  action: ResourceAction;
-  className?: string;
-  size?: number;
-}
+import type { ResourcePermissionActionIconProps } from './resourcePermissionActionIcon.type';
 
 const RESOURCE_PERMISSION_ACTION_ICON_MAP: Record<ResourceAction, LucideIcon> = {
   [RESOURCE_ACTION.DISCOVER]: ListTree,

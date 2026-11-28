@@ -2,7 +2,7 @@ import { useMainShell } from '@/layouts/MainShell/_common/context';
 
 import MobileDrive from '../MobileDrive';
 import TableDrive from '../TableDrive';
-import type { TableDriveProps } from '../TableDrive/index.type';
+import type { TableDriveProps } from './index.type';
 
 function DriveBrowser(props: TableDriveProps) {
   const { isMobileLayout } = useMainShell();

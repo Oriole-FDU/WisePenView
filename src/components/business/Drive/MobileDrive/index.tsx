@@ -10,9 +10,10 @@ import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { buildDriveBreadcrumbItems } from '../_common/driveBreadcrumb';
 import { resolveDriveFolderVariant, resolveDriveScope } from '../_common/driveComponentModel';
 import { useOpenDriveNode } from '../_common/useOpenDriveNode';
-import { useTableDriveNavigationController } from '../TableDrive/_hooks';
-import type { DriveTableRow, TableDriveProps } from '../TableDrive/index.type';
 import { isDrivePinnedFirstRow, toDriveTableRow } from '../TableDrive/_common/tableConfig';
+import { useTableDriveNavigationController } from '../TableDrive/_hooks';
+import type { DriveTableRow } from '../TableDrive/index.type';
+import type { TableDriveProps } from './index.type';
 import styles from './style.module.scss';
 
 function getMobileRowMeta(row: DriveTableRow) {

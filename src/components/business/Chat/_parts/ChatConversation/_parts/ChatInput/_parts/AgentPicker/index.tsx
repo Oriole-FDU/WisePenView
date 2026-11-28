@@ -18,11 +18,11 @@ import { buildDefaultPersonalAgent, type ChatAgentOption } from '@/domains/ChatC
 
 import { useChatInputStore, useChatInputStoreApi } from '../../_common/context';
 import styles from '../../_common/style.module.scss';
-
-interface AgentPickerProps {
-  injectedAgents?: ChatAgentOption[];
-  preferredAgent?: ChatAgentOption | null;
-}
+import type {
+  AgentMenuSkeletonProps,
+  AgentPickerProps,
+  GroupAgentPickerModalProps,
+} from './index.type';
 
 const AGENT_SKELETON_ROWS = [0, 1] as const;
 const AGENT_PAGE_SIZE = 30;
@@ -45,7 +45,7 @@ function mergeAgentOptions(
   });
 }
 
-function AgentMenuSkeleton({ ariaLabel }: { ariaLabel: string }) {
+function AgentMenuSkeleton({ ariaLabel }: AgentMenuSkeletonProps) {
   return (
     <div className={styles.popoverPanelAgentSkeleton} aria-busy="true" aria-label={ariaLabel}>
       <Skeleton className={styles.popoverSkeletonSection} />
@@ -272,13 +272,6 @@ function AgentPicker({ injectedAgents, preferredAgent }: AgentPickerProps) {
       />
     </>
   );
-}
-
-interface GroupAgentPickerModalProps {
-  open: boolean;
-  selectedAgentId: string;
-  onOpenChange: (open: boolean) => void;
-  onSelect: (agent: ChatAgentOption) => void;
 }
 
 function GroupAgentPickerModal({

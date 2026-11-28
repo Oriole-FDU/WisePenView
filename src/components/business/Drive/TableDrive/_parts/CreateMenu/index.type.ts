@@ -9,3 +9,5 @@ export interface CreateMenuProps {
   items: CreateMenuItem[];
   onSelect: (id: CreateMenuItem['id']) => void;
 }
+
+export type CreateMenuIconProps = { id: CreateMenuItem['id'] };

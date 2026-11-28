@@ -7,11 +7,11 @@ import { AppPressable } from '@/components/base/Button';
 
 import { welcomeModeFromBlockCount } from '../_store/welcomeScreenState';
 import type {
-  WelcomeIconTone,
-  WelcomePromptCardItem,
-  WelcomePromptCardsBlock,
-  WelcomeQuestionItem,
-  WelcomeQuestionsBlock,
+  FeatureIconOrbProps,
+  PillScrollStripProps,
+  QuestionPillButtonProps,
+  WelcomePromptCardsSectionProps,
+  WelcomeQuestionsSectionProps,
   WelcomeQuestionsVariant,
   WelcomeStarterBlock,
   WelcomeStarterProps,
@@ -27,15 +27,7 @@ function normalizeQuestionVariant(
   return 'list';
 }
 
-function QuestionPillButton({
-  item,
-  variant,
-  onPick,
-}: {
-  item: WelcomeQuestionItem;
-  variant: 'list' | 'bubbles' | 'pillWrap' | 'pillScroll';
-  onPick: () => void;
-}) {
+function QuestionPillButton({ item, variant, onPick }: QuestionPillButtonProps) {
   const ItemIcon = item.icon;
   const showPillIcon = ItemIcon && variant !== 'list';
 
@@ -62,13 +54,7 @@ function QuestionPillButton({
   );
 }
 
-function PillScrollStrip({
-  items,
-  onPick,
-}: {
-  items: WelcomeQuestionsBlock['items'];
-  onPick: (item: WelcomeQuestionsBlock['items'][number]) => void;
-}) {
+function PillScrollStrip({ items, onPick }: PillScrollStripProps) {
   const scrollRef = useRef<HTMLUListElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -147,13 +133,7 @@ function PillScrollStrip({
   );
 }
 
-function WelcomeQuestionsSection({
-  block,
-  onPick,
-}: {
-  block: WelcomeQuestionsBlock;
-  onPick: WelcomeStarterProps['onPromptPick'];
-}) {
+function WelcomeQuestionsSection({ block, onPick }: WelcomeQuestionsSectionProps) {
   const titleId = useId();
   const variant = normalizeQuestionVariant(block.variant);
   const HeaderIcon = block.headerIcon;
@@ -224,13 +204,7 @@ function WelcomeQuestionsSection({
   );
 }
 
-function FeatureIconOrb({
-  icon: Icon,
-  tone,
-}: {
-  icon: NonNullable<WelcomePromptCardItem['icon']>;
-  tone: WelcomeIconTone | undefined;
-}) {
+function FeatureIconOrb({ icon: Icon, tone }: FeatureIconOrbProps) {
   return (
     <span className={styles.featureIconOrb} data-tone={tone ?? 'violet'} aria-hidden>
       <Icon />
@@ -238,13 +212,7 @@ function FeatureIconOrb({
   );
 }
 
-function WelcomePromptCardsSection({
-  block,
-  onPick,
-}: {
-  block: WelcomePromptCardsBlock;
-  onPick: WelcomeStarterProps['onPromptPick'];
-}) {
+function WelcomePromptCardsSection({ block, onPick }: WelcomePromptCardsSectionProps) {
   const titleId = useId();
   const columns = block.columns ?? 2;
   const appearance = block.appearance ?? 'template';

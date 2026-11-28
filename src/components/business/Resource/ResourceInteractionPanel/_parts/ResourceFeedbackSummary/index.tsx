@@ -1,5 +1,4 @@
 import { Eye, ThumbsUp } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppToggleButton } from '@/components/base/Button';
@@ -7,17 +6,7 @@ import { Tooltip } from '@/components/base/Tooltip';
 import { formatReadCount } from '@/utils/format/formatNumber';
 
 import styles from '../../style.module.scss';
-
-/** 资源阅读、收藏与点赞摘要。 */
-interface ResourceFeedbackSummaryProps {
-  readCount?: number | null;
-  favoriteCount?: number | null;
-  liked: boolean;
-  likeCount: number;
-  likePending: boolean;
-  onLikeChange(liked: boolean): void;
-  favoriteAction: ReactNode;
-}
+import type { ResourceFeedbackSummaryProps } from './index.type';
 
 function ResourceFeedbackSummary({
   readCount,

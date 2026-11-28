@@ -1,13 +1,8 @@
 import Markdown from '@/components/base/Markdown';
 import { useNoteLinkResolver } from '@/components/business/Chat/_hooks/useNoteLinkResolver';
 
+import type { MessageContentProps } from './index.type';
 import styles from './style.module.scss';
-
-interface MessageContentProps {
-  content: string;
-  markdown?: boolean;
-  streaming?: boolean;
-}
 
 function MessageContent({ content, markdown = false, streaming = false }: MessageContentProps) {
   const noteLinkResolver = useNoteLinkResolver();

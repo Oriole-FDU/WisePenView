@@ -14,10 +14,10 @@ import { WALLET_BUSINESS_TYPE, WALLET_TARGET_TYPE } from '@/domains/Wallet';
 import { useApi } from '@/hooks/useApi';
 
 import RechargeModal from '../RechargeModal';
-import type { ComputeWalletProps } from './index.type';
 import styles from './style.module.scss';
-import WalletBalanceHeader from './_parts/WalletBalanceHeader';
 import { PAGE_SIZE, tabToTransactionTypes, type TxTabKey } from './_common/walletHelpers';
+import type { ComputeWalletProps } from './index.type';
+import WalletBalanceHeader from './_parts/WalletBalanceHeader';
 import WalletTransactionTable from './_parts/WalletTransactionTable';
 
 function ComputeWallet({

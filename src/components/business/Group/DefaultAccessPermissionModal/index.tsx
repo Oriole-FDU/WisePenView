@@ -12,9 +12,12 @@ import {
   normalizeResourceActions,
   type ResourceAction,
 } from '@/domains/_shared/access';
-import type { GroupResConfig } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 
+import type {
+  DefaultMemberScopePreviewProps,
+  GroupDefaultAccessPermissionModalProps,
+} from './index.type';
 import styles from './style.module.scss';
 
 const PRESET_LABEL_KEYS = {
@@ -49,18 +52,6 @@ const POLICY_SCOPE_OPTIONS = [
   { scope: ACCESS_CONTROL_SCOPE.BLACKLIST, labelKey: 'permission.scope.blacklist' },
   { scope: ACCESS_CONTROL_SCOPE.WHITELIST, labelKey: 'permission.scope.whitelist' },
 ] as const;
-
-interface GroupDefaultAccessPermissionModalProps {
-  isOpen: boolean;
-  groupId: string;
-  groupResConfig: GroupResConfig;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
-}
-
-interface DefaultMemberScopePreviewProps {
-  title: string;
-}
 
 function DefaultMemberScopePreview({ title }: DefaultMemberScopePreviewProps) {
   const { t } = useTranslation('group');

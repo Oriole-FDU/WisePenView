@@ -12,7 +12,6 @@ import {
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { ResourcePermissionPanelProps } from '../index.type';
 import {
   createSpecifiedUserSubject,
   getSubjectActionsForDisplay,
@@ -21,6 +20,7 @@ import {
   type SpecifiedUserCandidate,
   updateSubjectActions,
 } from '../_common/resourcePermissionPanelModel';
+import type { ResourcePermissionPanelProps } from '../index.type';
 
 const EMPTY_ACTION_OPTIONS: ResourcePermissionActionOption[] = [];
 const GROUP_PERMISSION_PAGE_SIZE = 10;

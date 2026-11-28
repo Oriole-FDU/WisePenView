@@ -3,11 +3,11 @@ import { useMemo } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
 
 import type { MarkdownResourceResolver } from '@/components/base/Markdown';
-import { useNoteExternalNavigationStore } from '@/components/editors/note/_common/store/useNoteExternalNavigationStore';
 import {
   parseNoteLinkUrl,
   resolveNoteLinkAction,
 } from '@/components/editors/note/_common/noteLinkProtocol';
+import { useNoteExternalNavigationStore } from '@/components/editors/note/_common/store/useNoteExternalNavigationStore';
 import { normalizeResourceKind, RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';

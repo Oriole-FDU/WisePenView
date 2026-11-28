@@ -15,16 +15,16 @@ import {
   useResourceInteractionService,
   useUserService,
 } from '@/domains';
-import type { ResourceItem } from '@/domains/Resource';
 import type { CommentSortBy, ResourceComment } from '@/domains/ResourceComment';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
+import styles from './style.module.scss';
+import { updateCommentLikeCount } from './_common/utils';
+import type { ResourceInteractionPanelProps } from './index.type';
 import CommentComposer from './_parts/CommentComposer';
 import ResourceCommentThread from './_parts/ResourceCommentThread';
 import ResourceFeedbackSummary from './_parts/ResourceFeedbackSummary';
-import styles from './style.module.scss';
-import { updateCommentLikeCount } from './_common/utils';
 
 const COMMENT_PAGE_SIZE = 10;
 const COMMENT_THREAD_ESTIMATE_SIZE = 180;
@@ -35,13 +35,6 @@ interface CommentListPage {
   list: ResourceComment[];
   total: number;
   totalPage: number;
-}
-
-/** 资源点赞、收藏、阅读与一般评论的统一互动面板。 */
-interface ResourceInteractionPanelProps {
-  resource: ResourceItem;
-  onResourceChanged?: () => unknown | Promise<unknown>;
-  onClose?: () => void;
 }
 
 interface OptimisticLikeState {

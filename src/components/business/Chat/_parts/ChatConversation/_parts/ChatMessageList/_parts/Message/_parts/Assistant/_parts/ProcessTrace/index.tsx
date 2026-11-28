@@ -6,12 +6,12 @@ import {
   getToolOutputText,
   type TraceHeadline,
 } from '../../_common/traceModel';
+import { useTraceReasoningDurations } from './_hooks/useTraceReasoningDurations';
 import type { ProcessTraceProps } from './index.type';
 import ReasoningBlock from './_parts/ReasoningBlock';
-import styles from './style.module.scss';
 import TraceRow from './_parts/TraceRow';
 import TraceStepDetail from './_parts/TraceStepDetail';
-import { useTraceReasoningDurations } from './_hooks/useTraceReasoningDurations';
+import styles from './style.module.scss';
 
 /**
  * 思考、工具调用与 Skill 加载的统一过程行。

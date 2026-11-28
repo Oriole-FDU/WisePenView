@@ -8,26 +8,9 @@ import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Spin } from '@/components/base/Feedback';
 import { InlineInput } from '@/components/base/Input';
 import ListBox, { ListBoxItem } from '@/components/base/ListBox';
-import type { FavoriteCollection } from '@/domains/ResourceFavorite';
 
 import styles from '../../style.module.scss';
-
-export interface CollectionPickerModalProps {
-  collections: FavoriteCollection[];
-  selectedIds: string[];
-  newCollectionName: string;
-  showCreateInput: boolean;
-  loadingCollections: boolean;
-  loadingStatus: boolean;
-  loadingConfirm: boolean;
-  loadingCreate: boolean;
-  onOpenChange: (open: boolean) => void;
-  onToggle: (collectionId: string, selected: boolean) => void;
-  onConfirm: () => void;
-  onShowCreateInput: (show: boolean) => void;
-  onNewCollectionNameChange: (name: string) => void;
-  onCreateCollection: () => void;
-}
+import type { CollectionPickerModalProps } from './index.type';
 
 function CollectionPickerModal({
   collections,
@@ -160,3 +143,5 @@ function CollectionPickerModal({
 }
 
 export default CollectionPickerModal;
+
+export type { CollectionPickerModalProps } from './index.type';

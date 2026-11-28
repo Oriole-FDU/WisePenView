@@ -32,6 +32,8 @@ import {
   resolveDriveScope,
 } from '../_common/driveComponentModel';
 import { useOpenDriveNode } from '../_common/useOpenDriveNode';
+import styles from './_common/style.module.scss';
+import { buildDriveTableColumns, isDrivePinnedFirstRow } from './_common/tableConfig';
 import {
   useTableDriveActionsController,
   useTableDriveDndController,
@@ -45,8 +47,6 @@ import type { DriveTableRow, TableDriveProps } from './index.type';
 import CreateMenu from './_parts/CreateMenu';
 import DriveDetailPanel from './_parts/DriveDetailPanel';
 import { DriveDragOverlay, ExternalFileDroppableBreadcrumb } from './_parts/DriveDnd';
-import styles from './_common/style.module.scss';
-import { buildDriveTableColumns, isDrivePinnedFirstRow } from './_common/tableConfig';
 
 const DRIVE_DRAG_OVERLAY_CURSOR_OFFSET = { x: 12, y: 12 };
 

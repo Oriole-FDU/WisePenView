@@ -12,9 +12,9 @@ import { ROLE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
 import type { EnumKey, EnumValue } from '@/utils/type/enum';
 
-import type { EditPermissionModalProps } from '../index.type';
 import styles from '../style.module.scss';
 import { useMemberEditGuard } from '../useMemberEditGuard';
+import type { EditPermissionModalProps } from './index.type';
 
 function EditPermissionModal({
   isOpen,

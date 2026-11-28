@@ -8,16 +8,12 @@ import { useMessageScroller, useMessageScrollerVisibility } from '@/components/_
 import { AppPressable } from '@/components/base/Button';
 import type { WisePenUIMessage } from '@/domains/ChatSession';
 
+import type { HistoryBarProps, MessageHistoryNavigatorProps } from './index.type';
 import styles from './style.module.scss';
 
 const PREVIEW_LENGTH = 28;
 const OPEN_DELAY_MS = 24;
 const CLOSE_DELAY_MS = 140;
-
-interface MessageHistoryNavigatorProps {
-  messages: readonly WisePenUIMessage[];
-  scrollAnchorOffsetRatio: number;
-}
 
 interface UserMessageAnchor {
   id: string;
@@ -72,7 +68,7 @@ function scrollActiveItemIntoView(container: HTMLElement | null, activeAnchorId:
   activeItem?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 }
 
-function HistoryBar({ active, anchorId }: { active: boolean; anchorId?: string }) {
+function HistoryBar({ active, anchorId }: HistoryBarProps) {
   return (
     <span
       className={styles.historyNavigatorBar}

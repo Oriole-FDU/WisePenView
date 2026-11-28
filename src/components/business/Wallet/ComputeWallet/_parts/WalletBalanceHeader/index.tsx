@@ -5,13 +5,7 @@ import { AppButton } from '@/components/base/Button';
 import { formatMillionNumber } from '@/utils/format';
 
 import styles from '../../style.module.scss';
-
-interface WalletBalanceHeaderProps {
-  balance: number;
-  loading: boolean;
-  canRecharge: boolean;
-  onRecharge: () => void;
-}
+import type { WalletBalanceHeaderProps } from './index.type';
 
 function WalletBalanceHeader({
   balance,

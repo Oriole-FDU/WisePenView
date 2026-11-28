@@ -6,9 +6,9 @@ import { AppButton } from '@/components/base/Button';
 
 import LoadingText from '../../../LoadingText';
 import TraceIcon from '../TraceIcon';
+import { useCollapseHeight } from './_hooks/useCollapseHeight';
 import type { TraceRowProps } from './index.type';
 import styles from './style.module.scss';
-import { useCollapseHeight } from './_hooks/useCollapseHeight';
 
 /**
  * 过程行的公共骨架：一行提示 + 横向箭头 + 可折叠正文。

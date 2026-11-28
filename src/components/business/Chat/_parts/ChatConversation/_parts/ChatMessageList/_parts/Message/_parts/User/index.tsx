@@ -14,10 +14,15 @@ import AppPopover from '@/components/base/AppPopover';
 import { AppPressable } from '@/components/base/Button';
 import CopyButton from '@/components/base/Button/CopyButton';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
-import type { MessageAttachmentSnapshot, WisePenUIMessage } from '@/domains/ChatSession';
+import type { MessageAttachmentSnapshot } from '@/domains/ChatSession';
 
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
+import type {
+  UserAttachmentChipProps,
+  UserMessageAttachmentsProps,
+  UserMessageProps,
+} from './index.type';
 import styles from './style.module.scss';
 
 /** fullWidth 默认展示数；侧栏 panel 收窄时最多 1 个 */
@@ -31,7 +36,7 @@ function getAttachmentDescriptionKey(attachment: MessageAttachmentSnapshot): str
     : 'message.attachments.attachment';
 }
 
-function UserAttachmentChip({ attachment }: { attachment: MessageAttachmentSnapshot }) {
+function UserAttachmentChip({ attachment }: UserAttachmentChipProps) {
   const { t } = useTranslation('chat');
   return (
     <Attachment
@@ -50,13 +55,7 @@ function UserAttachmentChip({ attachment }: { attachment: MessageAttachmentSnaps
   );
 }
 
-function UserMessageAttachments({
-  attachments,
-  visibleCount,
-}: {
-  attachments: MessageAttachmentSnapshot[];
-  visibleCount: number;
-}) {
+function UserMessageAttachments({ attachments, visibleCount }: UserMessageAttachmentsProps) {
   const { t } = useTranslation('chat');
   const [moreOpen, setMoreOpen] = useState(false);
   const visibleAttachments = attachments.slice(0, visibleCount);
@@ -111,7 +110,7 @@ function UserMessageAttachments({
   );
 }
 
-function UserMessage({ message, fullWidth }: { message: WisePenUIMessage; fullWidth: boolean }) {
+function UserMessage({ message, fullWidth }: UserMessageProps) {
   const content = message.parts
     .filter(isTextUIPart)
     .map((part) => part.text)

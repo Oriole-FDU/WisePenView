@@ -7,8 +7,8 @@ import {
   isDriveActionTarget,
   isDriveSystemFolderNode,
 } from '../../_common/driveComponentModel';
-import type { DriveRow } from '../index.type';
 import { buildDriveTableRowMap, toDriveTableRow } from '../_common/tableConfig';
+import type { DriveRow } from '../index.type';
 
 interface UseTableDriveInteractionControllerParams {
   dataSource: DriveRow[];

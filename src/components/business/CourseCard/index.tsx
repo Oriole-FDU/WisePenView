@@ -2,17 +2,12 @@ import { Card } from '@heroui/react';
 import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import UserCapsule from '@/components/base/Avatar/_parts/UserCapsule';
 import { AppPressable } from '@/components/base/Button';
+import UserCapsule from '@/components/base/Avatar/_parts/UserCapsule';
 import { PLACEHOLDER_IMAGE } from '@/constants/placeholderImage';
-import type { CourseSummary } from '@/domains/Course';
 
+import type { CourseCardProps } from './index.type';
 import styles from './style.module.scss';
-
-interface CourseCardProps {
-  course: CourseSummary;
-  onClick: (course: CourseSummary) => void;
-}
 
 function CourseCard({ course, onClick }: CourseCardProps) {
   const { t } = useTranslation('course');

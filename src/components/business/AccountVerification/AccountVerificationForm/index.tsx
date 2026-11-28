@@ -1,27 +1,13 @@
 import { Form } from '@heroui/react';
 import { Mail, ShieldUser } from 'lucide-react';
-import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FormField, Input, InputGroup } from '@/components/base/Input';
 import { Tabs } from '@/components/base/Tabs';
 
-import type { VerifyFormErrors, VerifyModalMode } from '../index.type';
+import type { VerifyModalMode } from '../index.type';
 import styles from '../style.module.scss';
-
-export interface AccountVerificationFormProps {
-  formId?: string;
-  verifyMode: VerifyModalMode;
-  email: string;
-  uisAccount: string;
-  uisPassword: string;
-  verifyFormErrors: VerifyFormErrors;
-  onModeChange: (mode: VerifyModalMode) => void;
-  onEmailChange: (email: string) => void;
-  onUisAccountChange: (account: string) => void;
-  onUisPasswordChange: (password: string) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}
+import type { AccountVerificationFormProps } from './index.type';
 
 function AccountVerificationForm({
   formId,
@@ -120,3 +106,5 @@ function AccountVerificationForm({
 }
 
 export default AccountVerificationForm;
+
+export type { AccountVerificationFormProps } from './index.type';

@@ -14,8 +14,8 @@ import {
 } from '@/utils/error';
 
 import { useChatInputStoreApi } from '../../../_common/context';
-import type { VoiceInputProps, VoiceInputState } from '../index.type';
 import pcmProcessorModuleUrl from '../_common/pcmProcessor.worklet.ts?worker&url';
+import type { VoiceInputProps, VoiceInputState } from '../index.type';
 
 interface UseVoiceInputOptions {
   disabled: boolean;

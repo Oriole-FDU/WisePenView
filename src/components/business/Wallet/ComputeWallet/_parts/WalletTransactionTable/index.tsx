@@ -14,8 +14,8 @@ import {
   isNeutralKind,
   normalizeMaskDisplayText,
   TX_TABS,
-  type TxTabKey,
 } from '../../_common/walletHelpers';
+import type { WalletTransactionTableProps } from './index.type';
 
 type WalletTransactionRow = WalletTransactionRecord & { key: string };
 type WalletTransactionTone = 'inflow' | 'outflow' | 'record';
@@ -58,19 +58,6 @@ function getToneAmountClassName(tone: WalletTransactionTone): string {
   if (tone === 'inflow') return styles.amountInflow;
   if (tone === 'outflow') return styles.amountOutflow;
   return styles.amountRecord;
-}
-
-interface WalletTransactionTableProps {
-  activeTab: TxTabKey;
-  records: WalletTransactionRecord[];
-  loading: boolean;
-  flashFirstRow: boolean;
-  showOperatorColumn: boolean;
-  current: number;
-  total: number;
-  pageSize: number;
-  onPageChange: (page: number, pageSize: number) => void;
-  onTabChange: (key: TxTabKey) => void;
 }
 
 function WalletTransactionTable({

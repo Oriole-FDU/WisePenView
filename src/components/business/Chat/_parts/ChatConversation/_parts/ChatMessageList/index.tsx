@@ -10,9 +10,9 @@ import {
   MessageScrollerViewport,
 } from '@/components/_shadcn';
 
+import type { ChatMessageListProps } from './index.type';
 import ConversationLoading from './_parts/ConversationLoading';
 import HistoryLoader from './_parts/HistoryLoader';
-import type { ChatMessageListProps } from './index.type';
 import Message from './_parts/Message';
 import MessageHistoryNavigator from './_parts/MessageHistoryNavigator';
 import StreamingScrollFollower from './_parts/StreamingScrollFollower';

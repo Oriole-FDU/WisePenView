@@ -1,12 +1,8 @@
 import { useEffect, useRef } from 'react';
 
 import { useMessageScroller } from '@/components/_shadcn';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
 
-interface StreamingScrollFollowerProps {
-  active: boolean;
-  messages: readonly WisePenUIMessage[];
-}
+import type { StreamingScrollFollowerProps } from './index.type';
 
 /** 生成开始时定位到底部，后续内容更新尊重用户主动滚动中断。 */
 function StreamingScrollFollower({ active, messages }: StreamingScrollFollowerProps) {

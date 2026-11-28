@@ -13,8 +13,8 @@ import { useAppAuth } from '@/layouts/App/_context';
 import { captureException } from '@/observability';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { ChatProps } from '../index.type';
 import type { SendOptions } from '../_common/send.type';
+import type { ChatProps } from '../index.type';
 import { hasRenderableChatContent } from './chatTurnModel';
 import { useChatToolApproval } from './useChatToolApproval';
 import { useChatTurnHistory } from './useChatTurnHistory';

@@ -31,7 +31,6 @@ import { useApi } from '@/hooks/useApi';
 import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { useSidebarDriveScopeStore } from './_common/store/useSidebarDriveScopeStore';
 import {
   getSidebarExistingFolderNames,
   isSidebarNodeInTrash,
@@ -39,11 +38,12 @@ import {
   SIDEBAR_RENDERABLE_TYPES,
   SIDEBAR_SELECTABLE_TYPES,
 } from './_common/sidebarDriveModel';
+import { useSidebarDriveScopeStore } from './_common/store/useSidebarDriveScopeStore';
+import styles from './style.module.scss';
+import { useSidebarDriveTreeController } from './_hooks/useSidebarDriveTreeController';
 import type { SidebarDriveCreateAction } from './_parts/SidebarDriveNodeTitle';
 import SidebarDriveNodeTitle from './_parts/SidebarDriveNodeTitle';
 import SidebarDriveScopeSwitcher from './_parts/SidebarDriveScopeSwitcher';
-import styles from './style.module.scss';
-import { useSidebarDriveTreeController } from './_hooks/useSidebarDriveTreeController';
 
 interface SidebarDriveCreateTarget {
   type: DriveCreateType;

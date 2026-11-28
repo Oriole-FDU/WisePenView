@@ -6,8 +6,8 @@ import SelectedMemberList from '@/components/business/SelectedMemberList';
 import { useGroupService } from '@/domains';
 import { useApi } from '@/hooks/useApi';
 
-import type { DeleteMemberModalProps } from '../index.type';
 import { useMemberEditGuard } from '../useMemberEditGuard';
+import type { DeleteMemberModalProps } from './index.type';
 
 function DeleteMemberModal({
   isOpen,

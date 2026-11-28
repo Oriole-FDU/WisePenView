@@ -8,8 +8,8 @@ import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 import { buildAbsoluteAppUrl, copyText } from '@/utils/browser';
 import { buildInvitePath } from '@/utils/navigation/appRoute';
 
-import type { InviteUserModalProps } from '../index.type';
 import styles from '../style.module.scss';
+import type { InviteUserModalProps } from './index.type';
 
 const buildInviteUrl = (inviteCode?: string): string =>
   inviteCode ? buildAbsoluteAppUrl(buildInvitePath(inviteCode)) : '';

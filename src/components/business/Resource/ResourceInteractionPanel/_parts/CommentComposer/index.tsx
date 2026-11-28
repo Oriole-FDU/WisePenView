@@ -8,16 +8,10 @@ import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
 
 import styles from '../../style.module.scss';
+import type { CommentComposerProps } from './index.type';
 
 /** 资源互动面板的一般评论输入框。 */
 const IMAGE_ONLY_CONTENT = '\u200B';
-
-interface CommentComposerProps {
-  placeholder: string;
-  autoFocus?: boolean;
-  onCancel?: () => void;
-  onSubmit(content: string, imageUrls: string[]): Promise<void>;
-}
 
 function CommentComposer({ placeholder, autoFocus, onCancel, onSubmit }: CommentComposerProps) {
   const { t } = useTranslation(['resource', 'common']);

@@ -5,18 +5,9 @@ import { AppPressable } from '@/components/base/Button';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
 
-import {
-  type DriveViewNode,
-  getDriveNodeLabel,
-  resolveDriveFolderVariant,
-} from '../../../_common/driveComponentModel';
+import { getDriveNodeLabel, resolveDriveFolderVariant } from '../../../_common/driveComponentModel';
 import styles from '../../style.module.scss';
-
-interface DriveNavigatorNodeTitleProps {
-  node: DriveViewNode;
-  displayName?: string;
-  onLoadMore?: () => void;
-}
+import type { DriveNavigatorNodeTitleProps } from './index.type';
 
 function getNodeDisplayName(
   node: DriveNavigatorNodeTitleProps['node'],

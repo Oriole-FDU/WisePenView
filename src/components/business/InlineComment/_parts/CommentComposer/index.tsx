@@ -7,17 +7,10 @@ import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 import { createUuid } from '@/utils/random/createUuid';
 
-import type { InlineCommentProps, InlineCommentSubmitPayload } from '../../index.type';
 import styles from '../../style.module.scss';
+import type { CommentComposerProps } from './index.type';
 
 const IMAGE_ONLY_CONTENT = '\u200B';
-
-interface CommentComposerProps {
-  placeholder: string;
-  imageUpload: InlineCommentProps['imageUpload'];
-  onCancel?: () => void;
-  onSubmit(payload: InlineCommentSubmitPayload): Promise<void>;
-}
 
 function CommentComposer({ placeholder, imageUpload, onCancel, onSubmit }: CommentComposerProps) {
   const { t } = useTranslation('common');

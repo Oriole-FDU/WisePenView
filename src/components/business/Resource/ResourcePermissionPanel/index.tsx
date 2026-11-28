@@ -7,8 +7,8 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import Dropdown from '@/components/base/Dropdown';
-import ResourcePermissionActionIcon from '@/components/business/Drive/_common/resourcePermissionActionIcon';
 import { buildResourcePermissionActionKeySet } from '@/components/business/Drive/_common/resourcePermissionPolicy';
+import ResourcePermissionActionIcon from '@/components/business/Drive/_common/resourcePermissionActionIcon';
 import UserSearchCombobox from '@/components/business/UserSearchCombobox';
 import {
   type ResourcePermissionActionOption,
@@ -17,23 +17,14 @@ import {
 } from '@/domains/ResourceAccess';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { ResourcePermissionPanelProps } from './index.type';
 import {
   getAvatarSrc,
   getSubjectActionsForDisplay,
   getSubjectRenderKey,
 } from './_common/resourcePermissionPanelModel';
-import styles from './style.module.scss';
 import { useResourcePermissionPanelController } from './_hooks/useResourcePermissionPanelController';
-
-interface SubjectPermissionPopoverProps {
-  subject: ResourcePermissionSubject;
-  actionOptions: ResourcePermissionActionOption[];
-  onActionToggle: (
-    subject: ResourcePermissionSubject,
-    action: ResourcePermissionActionOption['action']
-  ) => void;
-}
+import type { ResourcePermissionPanelProps, SubjectPermissionPopoverProps } from './index.type';
+import styles from './style.module.scss';
 
 const sourceLabelKeyMap: Record<ResourcePermissionSource, string> = {
   owner: 'permission.source.owner',

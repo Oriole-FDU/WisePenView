@@ -4,12 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AppToggleButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 
-interface ResourceFavoriteButtonProps {
-  isFavorited: boolean;
-  isDisabled: boolean;
-  showLabel?: boolean;
-  onPress: () => void;
-}
+import type { ResourceFavoriteButtonProps } from './index.type';
 
 function ResourceFavoriteButton({
   isFavorited,

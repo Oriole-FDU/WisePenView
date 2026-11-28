@@ -10,22 +10,8 @@ import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import type { ChatModel } from '@/domains/ChatConfig';
 
+import type { ModelSelectorProps } from './index.type';
 import styles from './style.module.scss';
-
-export type ModelSelectorTriggerVariant = 'default' | 'icon';
-
-interface ModelSelectorProps {
-  models: ChatModel[];
-  selectedId?: string | null;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onChange: (model: ChatModel) => void;
-  loading?: boolean;
-  disabled?: boolean;
-  placement?: 'top' | 'bottom';
-  /** default：图标+名称；icon：仅图标（窄侧栏） */
-  triggerVariant?: ModelSelectorTriggerVariant;
-}
 
 const renderProviderText = (model: ChatModel): string => {
   if (model.providerName && model.providerModelName) {
@@ -155,3 +141,5 @@ function ModelSelector({
 }
 
 export default ModelSelector;
+
+export type { ModelSelectorTriggerVariant } from './index.type';

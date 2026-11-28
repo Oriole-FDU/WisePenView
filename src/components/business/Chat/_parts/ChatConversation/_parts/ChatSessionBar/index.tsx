@@ -9,12 +9,7 @@ import type { ChatSession } from '@/domains/ChatSession';
 import { formatTimestampToDateTime } from '@/utils/format/formatTime';
 
 import styles from '../../../../_common/style.module.scss';
-
-interface ChatSessionBarProps {
-  activeSessionId?: string | null;
-  onClose: () => void;
-  onSelectSession: (session: ChatSession) => void;
-}
+import type { ChatSessionBarProps } from './index.type';
 
 const SESSION_PAGE_SIZE = 20;
 

@@ -27,9 +27,9 @@ import {
   toDriveSelectionItem,
 } from '../_common/driveComponentModel';
 import { useDrivePagedTreeChildren } from '../_common/useDrivePagedTreeChildren';
-import DriveNavigatorNodeTitle from './_parts/DriveNavigatorNodeTitle';
-import type { DriveNavigatorProps } from './index.type';
 import styles from './style.module.scss';
+import type { DriveNavigatorProps } from './index.type';
+import DriveNavigatorNodeTitle from './_parts/DriveNavigatorNodeTitle';
 
 const DEFAULT_RENDERABLE_TYPES: DriveItemKind[] = ['root', 'folder', 'resource', 'link'];
 const DEFAULT_SELECTABLE_TYPES: DriveItemKind[] = ['folder'];

@@ -6,7 +6,6 @@ import AppAvatar from '@/components/base/Avatar';
 import { AppButton, AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { Tooltip } from '@/components/base/Tooltip';
-import type { ResourceComment } from '@/domains/ResourceComment';
 import {
   formatRelativeTimestamp,
   formatTimestampToDateTime,
@@ -15,19 +14,7 @@ import {
 
 import styles from '../../style.module.scss';
 import { getAuthorInitial, hasVisibleCommentContent } from '../../_common/utils';
-
-/** 资源互动面板中的单条评论。 */
-interface ResourceCommentItemProps {
-  comment: ResourceComment;
-  currentUserId?: string;
-  resourceOwnerId?: string | null;
-  liked: boolean;
-  likePending: boolean;
-  onReply(comment: ResourceComment): void;
-  onLike(comment: ResourceComment): Promise<boolean>;
-  onDelete(comment: ResourceComment): void;
-  onPreviewImage(url: string): void;
-}
+import type { ResourceCommentItemProps } from './index.type';
 
 function ResourceCommentItem({
   comment,

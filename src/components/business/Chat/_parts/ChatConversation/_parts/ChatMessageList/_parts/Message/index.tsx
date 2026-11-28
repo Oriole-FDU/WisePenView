@@ -1,17 +1,8 @@
 import { memo } from 'react';
 
-import type { ChatModel } from '@/domains/ChatConfig';
-import type { WisePenUIMessage } from '@/domains/ChatSession';
-
+import type { MessageProps } from './index.type';
 import AssistantMessage from './_parts/Assistant';
 import UserMessage from './_parts/User';
-
-interface MessageProps {
-  message: WisePenUIMessage;
-  model: ChatModel | null;
-  streaming: boolean;
-  fullWidth: boolean;
-}
 
 function Message({ message, model, streaming, fullWidth }: MessageProps) {
   if (message.role === 'user') return <UserMessage message={message} fullWidth={fullWidth} />;

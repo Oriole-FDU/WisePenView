@@ -21,6 +21,7 @@ import {
 } from '../../../_common/driveComponentModel';
 import { resolveTagPermissionActionPresetKey } from '../../../_common/tagPermissionPreset';
 import type { DriveTableRow } from '../../index.type';
+import type { DetailMetaLoadingProps, DriveDetailPanelProps } from './index.type';
 import styles from './style.module.scss';
 
 const EMPTY_META = '—';
@@ -31,12 +32,6 @@ const ACCESS_SCOPE_LABEL_KEYS = {
   [ACCESS_CONTROL_SCOPE.BLACKLIST]: 'permission.tag.scope.blacklist',
   [ACCESS_CONTROL_SCOPE.WHITELIST]: 'permission.tag.scope.whitelist',
 } satisfies Record<AccessControlScope, string>;
-
-interface DriveDetailPanelProps {
-  selectedRow?: DriveTableRow;
-  isEditMode: boolean;
-  selectedCount: number;
-}
 
 interface DetailMetaItem {
   key: string;
@@ -61,7 +56,7 @@ function formatActionList(
   return actions.map(getActionLabel).join('、');
 }
 
-function DetailMetaLoading({ label }: { label: string }) {
+function DetailMetaLoading({ label }: DetailMetaLoadingProps) {
   return <span className={styles.detailMetaLoading}>{label}</span>;
 }
 

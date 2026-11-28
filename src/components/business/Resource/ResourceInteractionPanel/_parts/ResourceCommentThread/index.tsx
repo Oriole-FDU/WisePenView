@@ -1,7 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useInfiniteScroll } from 'ahooks';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { type RefObject, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
@@ -9,10 +9,11 @@ import { useResourceCommentService } from '@/domains';
 import type { ResourceComment } from '@/domains/ResourceComment';
 import { parseErrorMessage } from '@/utils/error';
 
-import CommentComposer from '../CommentComposer';
-import ResourceCommentItem from '../ResourceCommentItem';
 import styles from '../../style.module.scss';
 import { updateCommentLikeCount } from '../../_common/utils';
+import CommentComposer from '../CommentComposer';
+import ResourceCommentItem from '../ResourceCommentItem';
+import type { ResourceCommentThreadProps } from './index.type';
 
 const REPLY_PAGE_SIZE = 10;
 const REPLY_ITEM_ESTIMATE_SIZE = 132;
@@ -23,22 +24,6 @@ interface ReplyListPage {
   list: ResourceComment[];
   total: number;
   totalPage: number;
-}
-
-interface ResourceCommentThreadProps {
-  dataIndex: number;
-  measureElement: (element: Element | null) => void;
-  scrollElementRef: RefObject<HTMLDivElement | null>;
-  resourceId: string;
-  rootComment: ResourceComment;
-  currentUserId?: string;
-  resourceOwnerId?: string | null;
-  likedCommentIds: ReadonlySet<string>;
-  pendingLikeIds: ReadonlySet<string>;
-  onLike(comment: ResourceComment): Promise<boolean>;
-  onDelete(comment: ResourceComment, onDeleted?: () => void | Promise<void>): void;
-  onCommentsChanged(): Promise<void>;
-  onPreviewImage(url: string): void;
 }
 
 function ResourceCommentThread({

@@ -8,11 +8,11 @@ import ProviderLogo from '@/components/business/Icons/ProviderLogo';
 
 import ChatMessage from '../ChatMessage';
 import MessageContent from '../Content';
+import { buildAssistantSegments } from './_common/traceModel';
 import type { AssistantMessageProps } from './index.type';
 import LoadingText from './_parts/LoadingText';
 import ProcessTrace from './_parts/ProcessTrace';
 import styles from './style.module.scss';
-import { buildAssistantSegments } from './_common/traceModel';
 
 function AssistantMessage({ message, model, streaming }: AssistantMessageProps) {
   const { t } = useTranslation('chat');

@@ -10,7 +10,10 @@ import { useOpenResource } from '@/hooks/useOpenResource';
 import { useAppAuth } from '@/layouts/App/_context';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
-import { APP_SIDEBAR_HEADER_ITEMS, type AppSidebarNavigateItem } from '../_common/appSidebarNavigation';
+import {
+  APP_SIDEBAR_HEADER_ITEMS,
+  type AppSidebarNavigateItem,
+} from '../_common/appSidebarNavigation';
 
 interface UseAppSidebarHeaderNavOptions {
   onNavigate?: () => void;

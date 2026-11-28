@@ -9,10 +9,10 @@ import { GuideAnchor, registerGuideActionHandler } from '@/components/base/Guide
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 
+import type { CreateMenuIconProps, CreateMenuItem, CreateMenuProps } from './index.type';
 import styles from './index.module.scss';
-import type { CreateMenuItem, CreateMenuProps } from './index.type';
 
-function CreateMenuIcon({ id }: { id: CreateMenuItem['id'] }) {
+function CreateMenuIcon({ id }: CreateMenuIconProps) {
   switch (id) {
     case 'folder':
       return <EntryIcon entryType="folder" size={16} color="currentColor" />;

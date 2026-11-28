@@ -5,16 +5,8 @@ import { useTranslation } from 'react-i18next';
 import AppBanner from '@/components/base/AppBanner';
 import AppDisplayDialog from '@/components/business/AppDisplayDialog';
 
-import type { UisOutcomeState } from '../index.type';
 import styles from '../style.module.scss';
-
-export interface AccountVerificationOutcomeDialogProps {
-  isOpen: boolean;
-  uisOutcome: UisOutcomeState | null;
-  uisAwaitingScan: boolean;
-  uisQrImageSrc: string | null;
-  onClose: () => void;
-}
+import type { AccountVerificationOutcomeDialogProps } from './index.type';
 
 function AccountVerificationOutcomeDialog({
   isOpen,
@@ -97,3 +89,5 @@ function AccountVerificationOutcomeDialog({
 }
 
 export default AccountVerificationOutcomeDialog;
+
+export type { AccountVerificationOutcomeDialogProps } from './index.type';

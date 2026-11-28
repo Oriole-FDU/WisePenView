@@ -11,14 +11,17 @@ import { parseErrorMessage } from '@/utils/error';
 import type { EnumKey } from '@/utils/type/enum';
 
 import type { MemberListProps } from './index.type';
-import MemberListTable from './_parts/MemberListTable';
-import type { MemberListInlineDraft, MemberListInlineEditKind } from './MemberListTable/index.type';
 import {
   AssignQuotaModal,
   DeleteMemberModal,
   EditPermissionModal,
   InviteUserModal,
 } from './Modals';
+import MemberListTable from './_parts/MemberListTable';
+import type {
+  MemberListInlineDraft,
+  MemberListInlineEditKind,
+} from './MemberListTable/index.type';
 import styles from './style.module.scss';
 
 const GROUP_MEMBER_TOKEN_LIMIT_MAX = 100_000_000;

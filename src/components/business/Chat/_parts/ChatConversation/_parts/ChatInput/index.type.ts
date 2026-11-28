@@ -19,4 +19,8 @@ export interface ChatInputProps {
   useExternalStore?: boolean;
 }
 
-export type { LocalAttachmentPayload, LocalAttachmentUpload, SendOptions } from '../../../../_common/send.type';
+export type {
+  LocalAttachmentPayload,
+  LocalAttachmentUpload,
+  SendOptions,
+} from '../../../../_common/send.type';

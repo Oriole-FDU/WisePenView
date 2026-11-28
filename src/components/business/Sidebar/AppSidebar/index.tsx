@@ -8,8 +8,8 @@ import HeaderNav from '../_common/header/HeaderNav';
 import SidebarHeader from '../_common/header/SidebarHeader';
 import styles from '../_common/style.module.scss';
 import AppSidebarTabs from '../_common/tab';
-import type { AppSidebarProps } from './index.type';
 import { useAppSidebarHeaderNav } from './_hooks/useAppSidebarHeaderNav';
+import type { AppSidebarProps } from './index.type';
 
 function AppSidebar({
   canGoBack,

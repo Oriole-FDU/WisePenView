@@ -7,10 +7,10 @@ import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 import { useAppAuth } from '@/layouts/App/_context';
 
+import styles from '../../_common/style.module.scss';
 import AgentPicker from '../AgentPicker';
 import ModelPicker from '../ModelPicker';
 import SkillMenu from '../SkillMenu';
-import styles from '../../_common/style.module.scss';
 import UploadMenu from '../UploadMenu';
 import VoiceInput from '../VoiceInput';
 import type { InputToolbarProps } from './index.type';

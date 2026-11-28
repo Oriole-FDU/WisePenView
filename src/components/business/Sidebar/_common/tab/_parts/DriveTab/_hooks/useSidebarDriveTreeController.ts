@@ -15,8 +15,8 @@ import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
 import { parseErrorMessage } from '@/utils/error';
 
-import { useSidebarDriveExpansionStore } from '../_common/store/useSidebarDriveExpansionStore';
 import { isSidebarResourceNode } from '../_common/sidebarDriveModel';
+import { useSidebarDriveExpansionStore } from '../_common/store/useSidebarDriveExpansionStore';
 
 const SIDEBAR_DRIVE_RESOURCE_PAGE_SIZE = 50;
 

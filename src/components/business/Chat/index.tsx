@@ -6,12 +6,12 @@ import { useFrontendStateValue } from '@/frontendState';
 import { useChatSessionRoute } from '@/hooks/useChatSessionRoute';
 import { useAppAuth } from '@/layouts/App/_context';
 
+import type { SendOptions } from './_common/send.type';
+import styles from './_common/style.module.scss';
 import { useChatSessionController } from './_hooks/useChatSessionController';
 import { useChatTurnController } from './_hooks/useChatTurnController';
 import ChatConversation from './_parts/ChatConversation';
 import ChatHeader from './_parts/ChatHeader';
-import type { SendOptions } from './_common/send.type';
-import styles from './_common/style.module.scss';
 import ToolApprovalDialog from './_parts/ToolApprovalDialog';
 
 function Chat({

@@ -21,20 +21,19 @@ import TagPermissionActionEditor from '@/components/business/Drive/PermissionAct
 import { ACCESS_CONTROL_SCOPE } from '@/domains/_shared/access';
 import { parseErrorMessage } from '@/utils/error';
 
-import type { TagMountPermissionModalProps, TagPermissionModalProps } from './index.type';
-import styles from './style.module.scss';
 import {
   getDisplayInitial,
   isSpecifiedUserScope,
   PERSONNEL_SCOPE_OPTIONS,
   type PersonnelPolicyConfig,
-  type TagPolicyModalMode,
 } from './_common/tagPermissionModalModel';
 import { useTagPermissionModalController } from './_hooks/useTagPermissionModalController';
-
-interface TagPolicyModalBaseProps extends TagPermissionModalProps {
-  mode: TagPolicyModalMode;
-}
+import type {
+  TagMountPermissionModalProps,
+  TagPermissionModalProps,
+  TagPolicyModalBaseProps,
+} from './index.type';
+import styles from './style.module.scss';
 
 const TagPolicyModalBase = ({
   isOpen,

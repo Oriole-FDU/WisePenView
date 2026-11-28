@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { BookOpen, FolderOpen, type LucideIcon, MessageSquare } from 'lucide-react';
+import { BookOpen, FolderOpen, MessageSquare } from 'lucide-react';
 import { type ComponentPropsWithRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,7 @@ import { GuideAnchor, registerGuideActionHandlers } from '@/components/base/Guid
 import { Tabs } from '@/components/base/Tabs';
 import { Tooltip } from '@/components/base/Tooltip';
 import CommandPaletteTrigger from '@/components/business/CommandPalette/_parts/CommandPaletteTrigger';
-import { GUIDE_ACTION_ID, GUIDE_TOOL_ID, type GuideToolId } from '@/constants/tour';
+import { GUIDE_ACTION_ID, GUIDE_TOOL_ID } from '@/constants/tour';
 import { useAppAuth } from '@/layouts/App/_context';
 import { mergeRefs } from '@/utils/react/mergeRefs';
 
@@ -17,18 +17,11 @@ import {
   type SidebarViewTabKey,
   useSidebarViewTabStore,
 } from './_common/store/useSidebarViewTabStore';
+import type { SidebarViewTabProps } from './index.type';
 import CourseTab from './_parts/CourseTab';
 import DriveTab from './_parts/DriveTab';
 import SessionTab from './_parts/SessionTab';
 import styles from './style.module.scss';
-
-interface SidebarViewTabProps {
-  id: SidebarViewTabKey;
-  label: string;
-  icon: LucideIcon;
-  selected: boolean;
-  toolId?: GuideToolId;
-}
 
 function SidebarViewTab({ id, label, icon: Icon, selected, toolId }: SidebarViewTabProps) {
   return (

@@ -36,15 +36,11 @@ import { useOpenResource } from '@/hooks/useOpenResource';
 import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
+import type { CommandPaletteProps } from './index.type';
 import ResourceSearchResults from './ResourceSearchResults';
 import styles from './style.module.scss';
 
 type CreateResourceType = 'note' | Exclude<DriveCreateType, 'folder'>;
-
-interface CommandPaletteProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 interface PaletteItem {
   id: string;

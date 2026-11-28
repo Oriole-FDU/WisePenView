@@ -1,3 +1,4 @@
+// TODO：该入口同时导出 DriveDndRow、DriveDroppableBreadcrumb、ExternalFileDroppableBreadcrumb、DriveDragOverlay，需先明确各组件的类型归属；本轮保留原声明。
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { clsx } from 'clsx';
 import {
@@ -13,8 +14,8 @@ import { useTranslation } from 'react-i18next';
 import EntryIcon from '@/components/business/Icons/EntryIcon';
 
 import { resolveDriveFolderVariant } from '../../../_common/driveComponentModel';
-import type { DriveTableRow } from '../../index.type';
 import styles from '../../_common/style.module.scss';
+import type { DriveTableRow } from '../../index.type';
 
 const ROW_DND_IGNORE_TARGET_SELECTOR = [
   'a',

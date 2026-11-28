@@ -36,13 +36,8 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import UserCheckIn from '../UserCheckIn';
 import UserFeedbackModal from '../UserFeedbackModal';
 import UserInviteModal from '../UserInviteModal';
+import type { UserProfileProps } from './index.type';
 import styles from './style.module.scss';
-
-interface UserProfileProps {
-  collapsed: boolean;
-  labelsHidden?: boolean;
-  menuMode?: 'app' | 'admin';
-}
 
 function UserProfile({ collapsed, labelsHidden = false, menuMode = 'app' }: UserProfileProps) {
   const { t } = useTranslation(['shell', 'common']);

@@ -1,16 +1,9 @@
 import UserProfile from '../_common/footer/UserProfile';
 import SidebarHeader from '../_common/header/SidebarHeader';
 import shellStyles from '../_common/style.module.scss';
+import type { AdminSidebarProps } from './index.type';
 import AdminHeaderNav from './_parts/AdminHeaderNav';
 import styles from './style.module.scss';
-
-type SidebarMotionPhase = 'expanded' | 'collapsing' | 'collapsed' | 'expanding';
-
-interface AdminSidebarProps {
-  onToggle: () => void;
-  collapsed?: boolean;
-  motionPhase?: SidebarMotionPhase;
-}
 
 function AdminSidebar({
   onToggle,

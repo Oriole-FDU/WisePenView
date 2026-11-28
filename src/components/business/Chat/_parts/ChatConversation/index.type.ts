@@ -1,8 +1,8 @@
 import type { ChatAgentOption } from '@/domains/ChatConfig';
 
+import type { SendOptions } from '../../_common/send.type';
 import type { useChatSessionController } from '../../_hooks/useChatSessionController';
 import type { useChatTurnController } from '../../_hooks/useChatTurnController';
-import type { SendOptions } from '../../_common/send.type';
 import type { WelcomeScreenConfig } from '../../WelcomeConfigurable/Starter/index.type';
 
 export interface ChatConversationProps {
