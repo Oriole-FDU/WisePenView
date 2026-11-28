@@ -4,7 +4,7 @@ import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
 import { createTtlCache } from '@/domains/_shared/ttlCache';
 import { TAG_META_SCHEMA, type TagTreeNode } from '@/domains/Tag';
 import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { TagServicesMap } from '../mapper/TagServices.map';
 import type {
@@ -183,8 +183,12 @@ export const createTagServices = (): ITagService => {
       nodes.some((node) => !node) ||
       parentIds.size > 1
     ) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, {
-        field: 'orderedTagIds',
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: {
+          field: 'orderedTagIds',
+        },
       });
     }
 

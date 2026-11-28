@@ -1,4 +1,4 @@
-import { Toast, toast } from '@heroui/react';
+import { Toast } from '@heroui/react';
 import { useMount, useUnmount } from 'ahooks';
 import { Suspense, useRef } from 'react';
 import { type ClientOnErrorFunction, RouterProvider } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { captureException } from '@/observability';
 import { resetSessionStores } from '@/store/lifecycle';
 import { DEFAULT_HEROUI_THEME, ThemeApplier } from '@/theme';
 import { authSessionCoordinator, type AuthSessionEvent } from '@/utils/auth/authSessionCoordinator';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { clearIndexedDbDatabases } from '@/utils/storage/localData';
 
@@ -75,7 +76,11 @@ function App() {
       const now = Date.now();
       if (now - lastUnauthorizedToastAt >= UNAUTHORIZED_TOAST_DEBOUNCE_MS) {
         lastUnauthorizedToastAt = now;
-        toast.danger('无权访问');
+        const error = createError({
+          code: FRONTEND_CLIENT_ERROR.ACCESS_DENIED,
+          source: 'client',
+        });
+        reportError(error);
       }
     }
     redirectToLogin();

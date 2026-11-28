@@ -1,4 +1,3 @@
-import { toast } from '@heroui/react';
 import { type Key, useState } from 'react';
 
 import type { DataNode } from '@/components/base/Tree';
@@ -13,7 +12,7 @@ import { useDriveRefreshVersion } from '@/components/business/Drive/driveRefresh
 import { useDriveService } from '@/domains';
 import type { DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 
 import { useSidebarDriveExpansionStore } from './_store/useSidebarDriveExpansionStore';
 import { isSidebarResourceNode } from './sidebarDriveModel';
@@ -176,7 +175,8 @@ export function useSidebarDriveTreeController({
       });
       setTreeData((current) => replaceSidebarTreeChildren(current, node.id, childData));
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     }
   };
   async function handleLoadMore(parentNodeId: string): Promise<void> {
@@ -194,7 +194,8 @@ export function useSidebarDriveTreeController({
       });
       setTreeData((current) => replaceSidebarTreeChildren(current, parentNode.id, childData));
     } catch (error) {
-      toast.danger(parseErrorMessage(error));
+      const reportedError = createError(error);
+      reportError(reportedError);
     }
   }
   const handleSelect = (_keys: Key[], info: { node: DataNode }) => {

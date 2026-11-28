@@ -9,7 +9,7 @@ import { useGroupService, useImageService } from '@/domains';
 import type { CreateGroupRequest } from '@/domains/Group';
 import { GROUP_TYPE } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
-import { parseErrorMessage } from '@/utils/error';
+import { createError, reportError } from '@/utils/error';
 import {
   assertImageProxyUploadLimit,
   IMAGE_UPLOAD_MAX_SIZE_LABEL,
@@ -60,7 +60,8 @@ function CreateGroupModal({ isOpen, onOpenChange, onSuccess }: CreateGroupModalP
       assertImageProxyUploadLimit(file);
       updateFormValue('cover', file);
     } catch (err) {
-      toast.danger(parseErrorMessage(err));
+      const reportedError = createError(err);
+      reportError(reportedError);
     }
   };
 

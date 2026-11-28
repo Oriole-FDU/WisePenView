@@ -1,6 +1,6 @@
 'use client';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import * as React from 'react';
 
 type RenderState = Record<string, unknown>;
@@ -1802,8 +1802,12 @@ function useMessageScrollerContext() {
   const context = React.useContext(MessageScrollerContext);
 
   if (!context) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'useMessageScroller must be used within a MessageScroller.',
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+      source: 'client',
+      meta: {
+        reason: 'useMessageScroller must be used within a MessageScroller.',
+      },
     });
   }
 
@@ -1814,8 +1818,12 @@ function useMessageScrollerItemContext() {
   const context = React.useContext(MessageScrollerItemContext);
 
   if (!context) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-      reason: 'MessageScrollerItem must be used within a MessageScroller.',
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+      source: 'client',
+      meta: {
+        reason: 'MessageScrollerItem must be used within a MessageScroller.',
+      },
     });
   }
 

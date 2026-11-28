@@ -1,6 +1,6 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
 import { getMockGroup } from '@/domains/Group/mock/GroupApi.mock';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { WalletApi as WalletApiContract } from '../apis/WalletApi';
 import type {
@@ -38,11 +38,14 @@ export const WalletApi: typeof WalletApiContract = {
   redeemVoucher: async ({ voucherCode }) => {
     const code = voucherCode.replace(/[\s-]/g, '').toUpperCase();
     if (code.length !== 16)
-      throw createClientError(FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_CODE_INVALID);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_CODE_INVALID,
+        source: 'client',
+      });
     if (code === '0000000000000000')
-      throw createClientError(FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_USED);
+      throw createError({ code: FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_USED, source: 'client' });
     if (code === 'FFFFFFFFFFFFFFFF')
-      throw createClientError(FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_INVALID);
+      throw createError({ code: FRONTEND_CLIENT_ERROR.WALLET_VOUCHER_INVALID, source: 'client' });
     balance += 500;
     records.unshift({
       traceId: `mock-${crypto.randomUUID()}`,
@@ -95,7 +98,11 @@ export const WalletApi: typeof WalletApiContract = {
       tokenCount <= 0 ||
       (isGroupInflow ? balance : groupBalance) < tokenCount
     ) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'tokenCount' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'tokenCount' },
+      });
     }
     const amount = isGroupInflow ? -tokenCount : tokenCount;
     balance += amount;

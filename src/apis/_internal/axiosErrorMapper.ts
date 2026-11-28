@@ -1,8 +1,7 @@
 import type { AxiosError } from 'axios';
 
 import { parseApiErrorBody } from '@/apis/apiError';
-import { FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
-import { WisePenError } from '@/utils/error/WisePenError';
+import { createError, FRONTEND_NETWORK_ERROR, type WisePenError } from '@/utils/error';
 
 export type AuthSessionErrorState = 'handled' | 'stale' | 'unrelated';
 
@@ -30,7 +29,7 @@ const mapHttpCode = (status: number): number => {
 };
 
 const createNetworkWisePenError = (error: AxiosError): WisePenError =>
-  new WisePenError({
+  createError({
     code: mapNetworkCode(error),
     source: 'network',
     cause: error,
@@ -42,7 +41,7 @@ const createHttpWisePenError = (
   serverMsg: string | undefined,
   authSessionState: AuthSessionErrorState
 ): WisePenError =>
-  new WisePenError({
+  createError({
     code: mapHttpCode(status),
     source: 'http',
     serverMsg,
@@ -60,7 +59,7 @@ const createApiWisePenError = (
   serverMsg: string | undefined,
   authSessionState: AuthSessionErrorState
 ): WisePenError =>
-  new WisePenError({
+  createError({
     code: businessCode,
     source: status === 400 || status === 500 ? 'api' : 'http',
     serverMsg,

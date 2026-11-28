@@ -47,7 +47,7 @@ const loadObservability = async (context) => {
       export { startPipeline } from '@/observability/pipeline';
       export { sanitizeDiagnosticText, sanitizeRequestUrl } from '@/observability/privacy';
       export { sanitizeSpanUrl } from '@/observability/otel';
-      export { createClientError } from '@/utils/error/createClientError';
+      export { createError } from '@/utils/error/createError';
       export { FRONTEND_CLIENT_ERROR, FRONTEND_NETWORK_ERROR } from '@/utils/error/codes';
       export { WisePenError } from '@/utils/error/WisePenError';
     `
@@ -165,7 +165,7 @@ test('异常进入统一聚合管线并过滤未提供的可选属性', async (c
 
   const error = new Error('render failed');
   telemetry.captureException(error, {
-    detector: 'application-handled',
+    detector: 'error-consumed',
     operation: 'chat.send',
   });
   assert.equal(logs.length, 1);
@@ -189,7 +189,7 @@ test('异常进入统一聚合管线并过滤未提供的可选属性', async (c
       code: telemetry.FRONTEND_NETWORK_ERROR.CANCELED,
       source: 'network',
     }),
-    { detector: 'application-handled', operation: 'chat.stream' }
+    { detector: 'error-consumed', operation: 'chat.stream' }
   );
   assert.equal(logs.length, 1);
 
@@ -206,7 +206,7 @@ test('异常进入统一聚合管线并过滤未提供的可选属性', async (c
   });
 });
 
-test('客户端错误在创建时立即上报，后续捕获不重复记录', async (context) => {
+test('客户端错误创建时不上报，消费后捕获且同一对象不重复记录', async (context) => {
   const telemetry = await loadObservability(context);
   const logs = [];
   const attributes = telemetry.createInitialContextAttributes('test');
@@ -228,13 +228,17 @@ test('客户端错误在创建时立即上报，后续捕获不重复记录', as
   );
   context.after(stop);
 
-  const error = telemetry.createClientError(telemetry.FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-    operation: 'resource.move',
+  const error = telemetry.createError({
+    code: telemetry.FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+    source: 'client',
+    meta: { operation: 'resource.move' },
   });
 
+  assert.equal(logs.length, 0);
+  telemetry.captureException(error, { detector: 'error-consumed' });
   assert.equal(logs.length, 1);
   assert.equal(logs[0].attributes['event.name'], 'frontend.error');
-  assert.equal(logs[0].attributes['error.detector'], 'error-created');
+  assert.equal(logs[0].attributes['error.detector'], 'error-consumed');
   assert.equal(logs[0].attributes['error.code'], telemetry.FRONTEND_CLIENT_ERROR.INTERNAL_STATE);
   assert.equal(logs[0].attributes['error.source'], 'client');
   assert.equal(logs[0].attributes['operation.name'], undefined);

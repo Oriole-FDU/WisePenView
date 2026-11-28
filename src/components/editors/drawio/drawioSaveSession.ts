@@ -1,5 +1,3 @@
-import { captureException } from '@/observability';
-
 import type { DrawioSaveState } from './drawioProtocol';
 
 export interface DrawioSaveSnapshot {
@@ -43,12 +41,6 @@ export function createDrawioSaveSession(options: DrawioSaveSessionOptions) {
     if (!task) return;
     clearTimeout(task.timer);
     pending = undefined;
-    if (!disposed) {
-      captureException(error, {
-        detector: 'application-handled',
-        operation: 'drawio.save',
-      });
-    }
     publish('failed', error);
     task.reject(error);
   };

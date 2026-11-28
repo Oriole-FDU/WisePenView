@@ -1,6 +1,6 @@
 import { AgentApi, putOssPresignedUrl } from '@domain-apis';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 import { computeFileMd5 } from '@/utils/file/computeFileMd5';
 
 import { AgentServicesMap } from '../mapper/AgentServices.map';
@@ -15,7 +15,10 @@ export const createAgentServices = (): IAgentService => ({
       mountTargetTagId: pathTagId,
     });
     if (!resourceId) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.AGENT_CREATE_RESOURCE_ID_MISSING);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.AGENT_CREATE_RESOURCE_ID_MISSING,
+        source: 'client',
+      });
     }
     return resourceId;
   },
@@ -57,7 +60,10 @@ export const createAgentServices = (): IAgentService => ({
     });
     const ticket = response.assetUploadTickets[0];
     if (!ticket?.assetId) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.AGENT_UPLOAD_ASSET_ID_MISSING);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.AGENT_UPLOAD_ASSET_ID_MISSING,
+        source: 'client',
+      });
     }
     try {
       if (ticket.putUrl && ticket.callbackHeader) {

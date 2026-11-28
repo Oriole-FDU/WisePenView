@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSkillService } from '@/domains';
 import type { SkillDetail, UploadSkillAssetResult } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
-import { captureException } from '@/observability';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage, reportError } from '@/utils/error';
 
 import type { SkillSaveQueueItem } from '../components/SkillSaveQueueDock/index.type';
 import { resolveSkillSavePhase } from '../model';
@@ -128,10 +127,6 @@ export function useSkillSaveController({
           }
         );
       } catch (error) {
-        captureException(error, {
-          detector: 'application-handled',
-          operation: 'skill.save',
-        });
         onFileSaveFailed(snapshots);
         const errorMessage = parseErrorMessage(error);
         const snapshotKeys = new Set(snapshots.map((snapshot) => snapshot.editorKey));
@@ -150,16 +145,17 @@ export function useSkillSaveController({
       for (const snapshot of snapshots) {
         const result = resultByKey.get(snapshot.editorKey);
         if (result && !result.error) continue;
-        captureException(
+        const error = createError(
           result?.error ??
-            createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-              reason: 'Skill 保存结果缺失',
-            }),
-          {
-            detector: 'application-handled',
-            operation: 'skill.save',
-          }
+            createError({
+              code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+              source: 'client',
+              meta: {
+                reason: 'Skill 保存结果缺失',
+              },
+            })
         );
+        reportError(error, 'silence');
       }
       setExecutionItems((current) =>
         current.flatMap((item) => {
@@ -185,8 +181,12 @@ export function useSkillSaveController({
         return !result || Boolean(result.error);
       });
       if (failedResults.length > 0) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_BATCH_SAVE_FAILED, {
-          failedCount: failedResults.length,
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.SKILL_BATCH_SAVE_FAILED,
+          source: 'client',
+          meta: {
+            failedCount: failedResults.length,
+          },
         });
       }
       return { options };
@@ -210,7 +210,7 @@ export function useSkillSaveController({
       };
       setExecutionItems((current) => replaceQueueItems(current, [queueItem]));
       if (!snapshot.name || !snapshot.description) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_CONFIG_REQUIRED);
+        throw createError({ code: FRONTEND_CLIENT_ERROR.SKILL_CONFIG_REQUIRED, source: 'client' });
       }
       await skillService.updateSkillInfo(skill.resourceId, snapshot.name, snapshot.description);
       onConfigSaved(snapshot);

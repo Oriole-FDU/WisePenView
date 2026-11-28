@@ -1,7 +1,7 @@
 import { NoteApi } from '@domain-apis';
 
 import type { IResourceService } from '@/domains/Resource';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { NoteServicesMap } from '../mapper/NoteServices.map';
 import type {
@@ -32,7 +32,7 @@ const createNote = async (params: CreateNoteRequest): Promise<CreateNoteResponse
 const getNoteInfoDisplay = async (params: GetNoteInfoRequest): Promise<NoteInfoDisplayData> => {
   const noteInfoData = await NoteApi.getNoteInfo(params);
   if (!noteInfoData?.resourceInfo) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_NOT_FOUND);
+    throw createError({ code: FRONTEND_CLIENT_ERROR.NOTE_NOT_FOUND, source: 'client' });
   }
   return NoteServicesMap.mapNoteInfoDisplayFromApi(noteInfoData);
 };

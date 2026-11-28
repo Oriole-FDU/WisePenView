@@ -1,12 +1,13 @@
 import type { GroupMember } from '@/domains/Group';
 import { ROLE } from '@/domains/Group';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { GroupMemberDetailApi } from '../apis/GroupApi.schema';
 
 const mapRoleFromApi = (value: GroupMemberDetailApi['role']): GroupMember['role'] => {
   const role = ROLE.getOption(value);
-  if (!role) throw createClientError(FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED);
+  if (!role)
+    throw createError({ code: FRONTEND_CLIENT_ERROR.GROUP_INFO_FETCH_FAILED, source: 'client' });
   return role.key;
 };
 

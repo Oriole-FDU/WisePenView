@@ -1,4 +1,4 @@
-import { WisePenError } from '@/utils/error';
+import { createError } from '@/utils/error';
 
 import type {
   CancelUploadAssetsApiRequest,
@@ -100,6 +100,6 @@ export function assertMockVersionUploadsComplete(target: VersionBundleApi) {
     )
   ) {
     // 与后端 AIResourceError.AI_RESOURCE_ASSET_NOT_READY 保持一致。
-    throw new WisePenError({ code: 9321, source: 'api', serverMsg: 'AI资源的Asset未就绪' });
+    throw createError({ code: 9321, source: 'api', serverMsg: 'AI资源的Asset未就绪' });
   }
 }

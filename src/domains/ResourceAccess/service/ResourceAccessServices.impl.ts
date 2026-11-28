@@ -8,7 +8,7 @@ import type { IHtmlPageService } from '@/domains/HtmlPage';
 import type { INoteService } from '@/domains/Note';
 import type { ISkillService } from '@/domains/Skill';
 import type { ITagService } from '@/domains/Tag';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import { ResourceAccessServicesMap } from '../mapper/ResourceAccessServices.map';
 import type {
@@ -95,8 +95,12 @@ const loadResourceInfo = (
     case 'html':
       return deps.htmlPageService.getResourceAccessInfo(params.resourceId);
     default:
-      throw createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, {
-        reason: `不支持权限概览的资源类型：${params.resourceType}`,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE,
+        source: 'client',
+        meta: {
+          reason: `不支持权限概览的资源类型：${params.resourceType}`,
+        },
       });
   }
 };

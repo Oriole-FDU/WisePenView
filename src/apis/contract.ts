@@ -1,11 +1,6 @@
 import type { ZodType } from 'zod';
 
-import {
-  createClientError,
-  FRONTEND_CLIENT_ERROR,
-  FRONTEND_NETWORK_ERROR,
-  WisePenError,
-} from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, FRONTEND_NETWORK_ERROR } from '@/utils/error';
 
 export type ApiHttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type ApiRequestPlacement = 'body' | 'query' | 'none';
@@ -48,16 +43,17 @@ export const parseApiRequest = <Request, Response>(
   const result = contract.request.safeParse(value);
   if (result.success) return result.data;
 
-  throw createClientError(
-    FRONTEND_CLIENT_ERROR.VALIDATION,
-    {
+  throw createError({
+    code: FRONTEND_CLIENT_ERROR.VALIDATION,
+    source: 'client',
+    meta: {
       direction: 'request',
       endpoint: contract.endpoint,
       contract: contract.name,
       issues: summarizeIssues(result.error.issues),
     },
-    result.error
-  );
+    cause: result.error,
+  });
 };
 
 /** 后端响应解包后立即校验消费契约，禁止非法 payload 继续进入 mapper。 */
@@ -70,7 +66,7 @@ export const parseApiResponse = <Request, Response>(
 
   const issues = summarizeIssues(result.error.issues);
   const issueSummary = issues.map((issue) => `${issue.path}:${issue.code}`).join(', ');
-  throw new WisePenError({
+  throw createError({
     code: FRONTEND_NETWORK_ERROR.INVALID_RESPONSE,
     source: 'http',
     message: `API 响应契约不匹配：${contract.name} (${issueSummary})`,

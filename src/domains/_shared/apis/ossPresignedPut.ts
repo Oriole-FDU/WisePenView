@@ -1,4 +1,4 @@
-import { FRONTEND_NETWORK_ERROR, WisePenError } from '@/utils/error';
+import { createError, FRONTEND_NETWORK_ERROR } from '@/utils/error';
 
 export interface OssPresignedPutParams {
   putUrl: string;
@@ -39,7 +39,7 @@ export const putOssPresignedUrl = (params: OssPresignedPutParams): Promise<void>
         resolve();
       } else {
         reject(
-          new WisePenError({
+          createError({
             code: FRONTEND_NETWORK_ERROR.HTTP,
             source: 'http',
             meta: { status: xhr.status },
@@ -48,11 +48,11 @@ export const putOssPresignedUrl = (params: OssPresignedPutParams): Promise<void>
       }
     };
     xhr.onerror = () =>
-      reject(new WisePenError({ code: FRONTEND_NETWORK_ERROR.NETWORK, source: 'network' }));
+      reject(createError({ code: FRONTEND_NETWORK_ERROR.NETWORK, source: 'network' }));
     xhr.ontimeout = () =>
-      reject(new WisePenError({ code: FRONTEND_NETWORK_ERROR.TIMEOUT, source: 'network' }));
+      reject(createError({ code: FRONTEND_NETWORK_ERROR.TIMEOUT, source: 'network' }));
     xhr.onabort = () =>
-      reject(new WisePenError({ code: FRONTEND_NETWORK_ERROR.CANCELED, source: 'network' }));
+      reject(createError({ code: FRONTEND_NETWORK_ERROR.CANCELED, source: 'network' }));
     xhr.send(body);
   });
 };

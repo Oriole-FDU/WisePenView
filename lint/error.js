@@ -1,4 +1,23 @@
-// 错误契约规则；本次仅从现有配置抽取，保留主干行为与提示。
+// =============================================================================
+// lint/error — 前端错误契约（createError / reportError）
+// docs: agent/docs/error.md
+// updated: 2026-11-27
+//
+// 检查项：
+// - 禁止 throw / reject 字面量或未登记的错误构造器（应 createError 后抛）
+// - 禁止任何位置直接 new WisePenError（仅 createError.ts 可构造）
+// - 禁止直接 new Error() / Error()（可预期失败走 createError）
+// - 禁止 createClientError / notifyError / notifyErrorMessage（改 createError / reportError）
+// - 禁止业务侧直接 captureException（改 reportError；基础设施与 reportError 除外）
+// - 禁止 Domain / API / 共享工具内 reportError（只抛不报）
+// - 禁止业务侧 toast.danger，以及错误路径上的 toast.warning / toast.info
+// =============================================================================
+
+const toPosix = (filename) => filename.replaceAll('\\', '/');
+
+const isCallNamed = (node, name) =>
+  node.type === 'CallExpression' && node.callee.type === 'Identifier' && node.callee.name === name;
+
 const noArbitraryThrowRule = {
   meta: {
     type: 'problem',
@@ -8,7 +27,7 @@ const noArbitraryThrowRule = {
     schema: [],
     messages: {
       forbidden:
-        '禁止抛出字面量或未登记的错误构造器；新错误请使用 createClientError，API 传输边界使用 WisePenError，重抛时保留原错误对象。',
+        '禁止抛出字面量或未登记的错误构造器；请 createError 后 throw，或重抛已有错误对象。',
     },
   },
   create(context) {
@@ -74,12 +93,14 @@ const noDirectErrorToastRule = {
     },
     schema: [],
     messages: {
-      forbidden:
-        '错误提示必须通过 useApi 或 notifyError / notifyErrorMessage 统一处理，不要在业务代码直接调用 toast.danger 或错误路径中的 toast.warning。',
+      forbidden: '错误提示必须通过 reportError 统一处理，不要直接 toast + parseErrorMessage。',
     },
   },
   create(context) {
     const sourceCode = context.sourceCode;
+    const filename = toPosix(context.filename);
+    if (/\/src\/utils\/error\/reportError\.ts$/.test(filename)) return {};
+
     const isToastMethod = (node, method) =>
       node.type === 'MemberExpression' &&
       !node.computed &&
@@ -118,13 +139,12 @@ const noDirectErrorToastRule = {
     return {
       CallExpression(node) {
         if (node.callee.type !== 'MemberExpression') return;
-        if (context.filename.endsWith('/src/utils/error/notifyError.ts')) return;
         if (isToastMethod(node.callee, 'danger')) {
           context.report({ node, messageId: 'forbidden' });
           return;
         }
         if (
-          isToastMethod(node.callee, 'warning') &&
+          (isToastMethod(node.callee, 'warning') || isToastMethod(node.callee, 'info')) &&
           (isErrorHandlingContext(node) ||
             (node.arguments[0] != null &&
               sourceCode.getText(node.arguments[0]).includes('parseErrorMessage')))
@@ -140,23 +160,16 @@ const noDirectWisePenErrorRule = {
   meta: {
     type: 'problem',
     docs: {
-      description: '客户端代码统一通过 createClientError 创建错误',
+      description: '禁止直接 new WisePenError',
     },
     schema: [],
     messages: {
-      forbidden:
-        '客户端代码禁止直接 new WisePenError；请使用 createClientError。网络、HTTP、API 边界除外。',
+      forbidden: '禁止直接 new WisePenError；请使用 createError。',
     },
   },
   create(context) {
-    const filename = context.filename.replaceAll('\\', '/');
-    const allowedPathPatterns = [
-      /\/src\/apis\//,
-      /\/src\/domains\/_shared\/apis\//,
-      /\/src\/domains\/_shared\/mock\//,
-      /\/src\/utils\/error\/createClientError\.ts$/,
-    ];
-    if (allowedPathPatterns.some((pattern) => pattern.test(filename))) return {};
+    const filename = toPosix(context.filename);
+    if (/\/src\/utils\/error\/createError\.ts$/.test(filename)) return {};
 
     return {
       NewExpression(node) {
@@ -168,27 +181,140 @@ const noDirectWisePenErrorRule = {
   },
 };
 
+const noLegacyErrorApiRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: '禁止旧错误入口 createClientError / notifyError',
+    },
+    schema: [],
+    messages: {
+      createClientError: '禁止 createClientError；请使用 createError。',
+      notifyError: '禁止 notifyError / notifyErrorMessage；请使用 reportError。',
+    },
+  },
+  create(context) {
+    const filename = toPosix(context.filename);
+    if (/\/src\/utils\/error\/(createClientError|notifyError)\.ts$/.test(filename)) return {};
+
+    return {
+      CallExpression(node) {
+        if (isCallNamed(node, 'createClientError')) {
+          context.report({ node, messageId: 'createClientError' });
+          return;
+        }
+        if (isCallNamed(node, 'notifyError') || isCallNamed(node, 'notifyErrorMessage')) {
+          context.report({ node, messageId: 'notifyError' });
+        }
+      },
+      ImportSpecifier(node) {
+        const name = node.imported.type === 'Identifier' ? node.imported.name : null;
+        if (name === 'createClientError') {
+          context.report({ node, messageId: 'createClientError' });
+          return;
+        }
+        if (name === 'notifyError' || name === 'notifyErrorMessage') {
+          context.report({ node, messageId: 'notifyError' });
+        }
+      },
+    };
+  },
+};
+
+const noDirectCaptureExceptionRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: '禁止业务侧直接 captureException',
+    },
+    schema: [],
+    messages: {
+      forbidden: '禁止直接 captureException；消费边界请使用 reportError。',
+    },
+  },
+  create(context) {
+    const filename = toPosix(context.filename);
+    const allowed = [
+      /\/src\/observability\//,
+      /\/src\/utils\/error\/reportError\.ts$/,
+      /\/src\/main\.tsx$/,
+      /\/src\/bootstrap\//,
+    ];
+    if (allowed.some((pattern) => pattern.test(filename))) return {};
+
+    return {
+      CallExpression(node) {
+        if (isCallNamed(node, 'captureException')) {
+          context.report({ node, messageId: 'forbidden' });
+        }
+      },
+      ImportSpecifier(node) {
+        if (node.imported.type === 'Identifier' && node.imported.name === 'captureException') {
+          context.report({ node, messageId: 'forbidden' });
+        }
+      },
+    };
+  },
+};
+
+const noReportErrorOutsideBoundaryRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Domain / API / 工具层禁止 reportError',
+    },
+    schema: [],
+    messages: {
+      forbidden:
+        'Domain / API / 共享工具只抛不报；请 createError 后 throw，由消费边界 reportError。',
+    },
+  },
+  create(context) {
+    const filename = toPosix(context.filename);
+    const forbiddenLayers = [/\/src\/domains\//, /\/src\/apis\//, /\/src\/utils\//];
+    const isForbiddenLayer = forbiddenLayers.some((pattern) => pattern.test(filename));
+    if (!isForbiddenLayer) return {};
+    if (/\/src\/utils\/error\/reportError\.ts$/.test(filename)) return {};
+
+    return {
+      CallExpression(node) {
+        if (isCallNamed(node, 'reportError')) {
+          context.report({ node, messageId: 'forbidden' });
+        }
+      },
+      ImportSpecifier(node) {
+        if (node.imported.type === 'Identifier' && node.imported.name === 'reportError') {
+          context.report({ node, messageId: 'forbidden' });
+        }
+      },
+    };
+  },
+};
+
+/** wisepen 插件规则：error 关注点 */
 export const errorRules = {
   'no-arbitrary-throw': noArbitraryThrowRule,
   'no-direct-error-toast': noDirectErrorToastRule,
   'no-direct-wise-pen-error': noDirectWisePenErrorRule,
+  'no-legacy-error-api': noLegacyErrorApiRule,
+  'no-direct-capture-exception': noDirectCaptureExceptionRule,
+  'no-report-error-outside-boundary': noReportErrorOutsideBoundaryRule,
 };
 
+/** no-restricted-syntax：禁止原生 Error */
 export const nativeErrorRestrictedSyntaxRules = [
   {
     selector: "NewExpression[callee.name='Error']",
-    message:
-      '禁止直接创建原生 Error；客户端错误使用 createClientError，网络、HTTP、API 边界使用 WisePenError。',
+    message: '禁止直接创建原生 Error；请使用 createError。',
   },
   {
     selector: "CallExpression[callee.name='Error']",
-    message:
-      '禁止直接创建原生 Error；客户端错误使用 createClientError，网络、HTTP、API 边界使用 WisePenError。',
+    message: '禁止直接创建原生 Error；请使用 createError。',
   },
 ];
 
+/** no-restricted-syntax：Domain 内禁止 new WisePenError（含 apis / mock） */
 export const domainWisePenErrorRestrictedSyntaxRule = {
   selector: "NewExpression[callee.name='WisePenError']",
-  message:
-    'Domain 内禁止直接 new WisePenError；请使用 createClientError。网络/HTTP 边界（apis、domains/_shared/apis）除外。',
+  message: 'Domain 内禁止直接 new WisePenError；请使用 createError。',
 };

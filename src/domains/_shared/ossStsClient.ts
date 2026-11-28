@@ -2,7 +2,7 @@ import { createOssClient } from '@domain-apis';
 
 import type { OssStsTokenApi } from '@/domains/_shared/apis/ossStsApi.schema';
 import { registerServiceCacheCleaner } from '@/domains/_shared/cacheRegistry';
-import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 import { isRecord } from '@/utils/type/typeGuards';
 
 import type { OssReadClient } from './apis/ossClient';
@@ -85,10 +85,13 @@ export const createOssStsClientManager = <Key>(
       .loadToken(key)
       .then((token) => {
         if (!token) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID);
+          throw createError({
+            code: FRONTEND_CLIENT_ERROR.OSS_CREDENTIAL_INVALID,
+            source: 'client',
+          });
         }
         if (requestGeneration !== cacheGeneration) {
-          throw createClientError(FRONTEND_CLIENT_ERROR.AUTH_SESSION_CHANGED);
+          throw createError({ code: FRONTEND_CLIENT_ERROR.AUTH_SESSION_CHANGED, source: 'client' });
         }
 
         const client = createOssClient(token);
@@ -116,13 +119,21 @@ export const createOssStsClientManager = <Key>(
     } catch (error) {
       if (isWisePenError(error)) throw error;
       if (!isOssAuthExpiredError(error)) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.OSS_OPERATION_FAILED, undefined, error);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.OSS_OPERATION_FAILED,
+          source: 'client',
+          cause: error,
+        });
       }
       try {
         return await operation(await getClient(key, { forceRefresh: true }));
       } catch (retryError) {
         if (isWisePenError(retryError)) throw retryError;
-        throw createClientError(FRONTEND_CLIENT_ERROR.OSS_OPERATION_FAILED, undefined, retryError);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.OSS_OPERATION_FAILED,
+          source: 'client',
+          cause: retryError,
+        });
       }
     }
   };

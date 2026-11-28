@@ -33,10 +33,10 @@
   operation、资源、用户和会话聚合。
 - 主动取消和 `CanceledError` 不记录。
 - `WisePenError` 记录 `source`、`code` 和脱敏诊断，不复制 `meta` 或服务端正文。
-- `createClientError` 创建客户端错误后立即以 `error-created` detector 上报；同一错误对象
-  后续被业务或全局异常入口再次捕获时不会重复产生 `frontend.error`。
-- `useApi` 的普通、分页和无限滚动变体在错误被消费时统一以 `error-consumed`
-  detector 上报。最终请求失败和客户端错误已经标记为 observed，因此不会重复记录。
+- `createError` 只创建或规范化错误，不产生遥测；`reportError` 是业务消费入口，以
+  `error-consumed` detector 上报并按需展示 toast。
+- `useApi` 的普通、分页和无限滚动变体在错误被消费时统一调用 `reportError`。请求层已记录的
+  最终请求失败不会重复产生 `frontend.error`。
 
 ### 请求与自动网络 span
 
@@ -75,21 +75,18 @@
 
 ### 业务故障
 
-`application-handled` 用于已经被业务消费的故障，当前 operation 为：
+View / Controller / `useApi` 在发起用户可见操作的 catch 终点调用 `reportError`。需要用户提示时
+使用默认级别或指定的 `warning` / `info` 级别；已经在界面内消费、无需再次提示的故障使用
+`silence`。同一 `WisePenError` 对象重复上报只形成一次 occurrence。
 
-- `chat.send`、`chat.stream`、`chat.recover`、`chat.resume`
-- `office.sdk`
-- `drawio.save`
-- `skill.save`
-
-`application-handled` 下的前置条件不满足、权限拒绝、主动取消、dispose 和未 ready
-拒绝不额外记录。通过 `createClientError` 产生的客户端错误不区分业务是否恢复，均立即
-上报；主动取消仍需由调用方使用标准取消错误表达，不能包装成普通客户端错误。
+Service、Mapper、API 和共享工具只通过 `createError` 创建并抛出错误，不调用 `captureException`、
+`reportError` 或 toast。根 Boundary、Router error 和 `window.error` /
+`unhandledrejection` 继续由可观测性基础设施兜底未捕获异常。
 
 ## 事件流
 
 ```text
-captureException / request observation
+reportError / request observation
   -> 捕获时上下文快照
   -> Error 规范化和统一脱敏
   -> fingerprint 聚合与预算

@@ -32,7 +32,7 @@ import {
   type ResourcePermissionOverview,
 } from '@/domains/ResourceAccess';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
 import type { ResourcePermissionModalProps } from './index.type';
 import styles from './style.module.scss';
@@ -97,7 +97,10 @@ function ResourcePermissionModal({
   } = useApi(
     async (): Promise<ResourcePermissionModalData> => {
       if (!target || !groupId) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.RESOURCE_PERMISSION_CONTEXT_MISSING,
+          source: 'client',
+        });
       }
 
       const overview = await resourceAccessService.getResourcePermissionOverview({

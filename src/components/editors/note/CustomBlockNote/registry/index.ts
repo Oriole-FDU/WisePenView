@@ -2,7 +2,7 @@ import type { BlockSpecs, ExtensionFactoryInstance } from '@blocknote/core';
 import { BlockNoteSchema } from '@blocknote/core';
 import type { EditorProps } from '@tiptap/pm/view';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type {
   NoteBlockPlugin,
@@ -27,7 +27,7 @@ type DOMEventName = keyof DOMEventHandlers;
 type DOMEventHandler = NonNullable<DOMEventHandlers[DOMEventName]>;
 
 const createRegistryError = (reason: string) =>
-  createClientError(FRONTEND_CLIENT_ERROR.INTERNAL_STATE, { reason });
+  createError({ code: FRONTEND_CLIENT_ERROR.INTERNAL_STATE, source: 'client', meta: { reason } });
 
 function flattenPluginTree(root: NotePluginBundle): NotePluginNode[] {
   const nodes: NotePluginNode[] = [];

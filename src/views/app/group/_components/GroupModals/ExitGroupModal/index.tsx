@@ -6,6 +6,7 @@ import AppAlertDialog from '@/components/business/AppAlertDialog';
 import { useGroupService } from '@/domains';
 import type { QuitGroupRequest } from '@/domains/Group';
 import { useApi } from '@/hooks/useApi';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import styles from './index.module.scss';
@@ -40,7 +41,12 @@ function ExitGroupModal({
 
   const handleConfirm = () => {
     if (!groupId) {
-      toast.danger(t('exit.missingId'));
+      const error = createError({
+        code: FRONTEND_CLIENT_ERROR.USER_MESSAGE,
+        source: 'client',
+        meta: { message: t('exit.missingId') },
+      });
+      reportError(error);
       return;
     }
     runExitGroup();

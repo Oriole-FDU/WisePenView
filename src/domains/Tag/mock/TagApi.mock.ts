@@ -1,5 +1,5 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { TagApi as TagApiContract } from '../apis/TagApi';
 import type { TagTreeApiResponse } from '../apis/TagApi.schema';
@@ -79,7 +79,12 @@ const detach = (nodes: TagTreeApiResponse, id: string): TagTreeApiResponse[numbe
 };
 const requireTag = (id: string, groupId?: string) => {
   const node = findTag(roots(groupId), id);
-  if (!node) throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'tagId' });
+  if (!node)
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.VALIDATION,
+      source: 'client',
+      meta: { field: 'tagId' },
+    });
   return node;
 };
 const children = (parentId?: string, groupId?: string) =>
@@ -128,7 +133,11 @@ export const TagApi: typeof TagApiContract = {
         (node) => node.tagId === newParentId || (newParentId && findTag(node.children, newParentId))
       )
     ) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'newParentId' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'newParentId' },
+      });
     }
     for (const node of moving) {
       detach(roots(groupId), node.tagId);

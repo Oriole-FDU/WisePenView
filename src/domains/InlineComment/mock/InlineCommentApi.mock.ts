@@ -1,5 +1,5 @@
 import { mockResponse } from '@/domains/_shared/mock/response';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { InlineCommentApi as InlineCommentApiContract } from '../apis/InlineCommentApi';
 import type {
@@ -32,12 +32,13 @@ const userInfo = {
 const thread = (resourceId: string, id: string) => {
   const value = threads.get(id);
   if (!value || value.resourceId !== resourceId)
-    throw createClientError(FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND);
+    throw createError({ code: FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND, source: 'client' });
   return value;
 };
 const item = (resourceId: string, id: string, itemId: string) => {
   const value = thread(resourceId, id).items.find((i) => i.itemId === itemId);
-  if (!value) throw createClientError(FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND);
+  if (!value)
+    throw createError({ code: FRONTEND_CLIENT_ERROR.INTERACT_COMMENT_NOT_FOUND, source: 'client' });
   return value;
 };
 const createItem = (

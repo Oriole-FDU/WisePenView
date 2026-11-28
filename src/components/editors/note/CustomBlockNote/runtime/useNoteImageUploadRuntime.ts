@@ -1,11 +1,10 @@
 import type { useCreateBlockNote } from '@blocknote/react';
-import { toast } from '@heroui/react';
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 
 import { useImageService } from '@/domains';
 import { assertImageProxyUploadLimit } from '@/domains/Image';
-import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, reportError } from '@/utils/error';
 
 import type { CustomBlockNoteProps } from '../index.type';
 import type { CustomBlockNoteEditor } from '../registry/noteEditorComposition';
@@ -19,6 +18,7 @@ type NoteImageUploadEditor = CustomBlockNoteEditor & {
 
 interface NoteImageUploadTask {
   failed: boolean;
+  error?: unknown;
 }
 
 export interface NoteImageUploadRuntime {
@@ -53,10 +53,13 @@ export function useNoteImageUploadRuntime({
     syncPendingCount();
   });
 
-  const markUploadFailed = useMemoizedFn((blockId: string | undefined) => {
+  const markUploadFailed = useMemoizedFn((blockId: string | undefined, error: unknown) => {
     if (!blockId) return;
     const task = tasksRef.current.get(blockId);
-    if (task) task.failed = true;
+    if (task) {
+      task.failed = true;
+      task.error = error;
+    }
   });
 
   const finishUpload = useMemoizedFn((blockId: string | undefined) => {
@@ -65,6 +68,10 @@ export function useNoteImageUploadRuntime({
     if (!task) return false;
     tasksRef.current.delete(blockId);
     syncPendingCount();
+    if (task.failed && task.error) {
+      const reportedError = createError(task.error);
+      reportError(reportedError);
+    }
     return task.failed;
   });
 
@@ -78,10 +85,13 @@ export function useNoteImageUploadRuntime({
 
     try {
       if (readOnly) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.NOTE_READ_ONLY_IMAGE_UPLOAD,
+          source: 'client',
+        });
       }
       if (!file.type.startsWith('image/')) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.IMAGE_ONLY);
+        throw createError({ code: FRONTEND_CLIENT_ERROR.IMAGE_ONLY, source: 'client' });
       }
 
       assertImageProxyUploadLimit(file);
@@ -92,8 +102,7 @@ export function useNoteImageUploadRuntime({
       });
       return publicUrl;
     } catch (error) {
-      markUploadFailed(blockId);
-      toast.danger(parseErrorMessage(error));
+      markUploadFailed(blockId, error);
       throw error;
     }
   });

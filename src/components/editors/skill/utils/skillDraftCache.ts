@@ -1,5 +1,5 @@
 import { INDEXED_DB_NAMES } from '@/constants/storageKeys';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { SkillWorkspaceDraftState } from '../models/workspaceDraft';
 
@@ -42,11 +42,12 @@ function openSkillDraftDb(): Promise<IDBDatabase> {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () =>
       reject(
-        createClientError(
-          FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
-          { operation: 'open' },
-          request.error
-        )
+        createError({
+          code: FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
+          source: 'client',
+          meta: { operation: 'open' },
+          cause: request.error,
+        })
       );
   });
 }
@@ -63,21 +64,23 @@ async function withSkillDraftStore<T>(
     request.onsuccess = () => resolve(request.result);
     request.onerror = () =>
       reject(
-        createClientError(
-          FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
-          { operation: 'request' },
-          request.error
-        )
+        createError({
+          code: FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
+          source: 'client',
+          meta: { operation: 'request' },
+          cause: request.error,
+        })
       );
     transaction.oncomplete = () => db.close();
     transaction.onerror = () => {
       db.close();
       reject(
-        createClientError(
-          FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
-          { operation: 'write' },
-          transaction.error
-        )
+        createError({
+          code: FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
+          source: 'client',
+          meta: { operation: 'write' },
+          cause: transaction.error,
+        })
       );
     };
   });
@@ -145,13 +148,21 @@ async function pruneSkillDraftCache(): Promise<void> {
 export async function saveSkillDraftCache(snapshot: SkillDraftCacheSnapshot): Promise<IDBValidKey> {
   const accountId = snapshot.accountId.trim();
   if (!accountId) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED, {
-      operation: 'account',
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
+      source: 'client',
+      meta: {
+        operation: 'account',
+      },
     });
   }
   if (estimateSkillDraftCacheBytes(snapshot) > MAX_DRAFT_CACHE_BYTES) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED, {
-      operation: 'capacity',
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_DRAFT_CACHE_FAILED,
+      source: 'client',
+      meta: {
+        operation: 'capacity',
+      },
     });
   }
   await pruneSkillDraftCache().catch(() => undefined);

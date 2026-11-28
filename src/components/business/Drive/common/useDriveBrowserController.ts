@@ -3,7 +3,7 @@ import { startTransition, useState } from 'react';
 import { useDriveService } from '@/domains';
 import type { DriveContainerNode, DriveNode, DriveNodeScope } from '@/domains/Drive';
 import { useApi } from '@/hooks/useApi';
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 import type { DriveViewNode } from './driveComponentModel';
 import { useDrivePagedTreeChildren } from './useDrivePagedTreeChildren';
@@ -92,8 +92,12 @@ export function useDriveBrowserController({
     const path = await driveService.getNodePath({ nodeId: currentNodeId, scope });
     const node = path.at(-1);
     if (!node || !isContainer(node)) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
-        nodeId: currentNodeId,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND,
+        source: 'client',
+        meta: {
+          nodeId: currentNodeId,
+        },
       });
     }
     return node;

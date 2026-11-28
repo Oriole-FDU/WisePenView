@@ -11,11 +11,7 @@ import type { IResourceService, ResourceItem } from '@/domains/Resource';
 import { RESOURCE_SORT_BY, RESOURCE_SORT_DIR } from '@/domains/Resource';
 import type { ITagService, TagTreeNode } from '@/domains/Tag';
 import { normalizeTagGroupId } from '@/domains/Tag/utils/normalizeTagGroupId';
-import {
-  createClientError,
-  FRONTEND_CLIENT_ERROR,
-  type FrontendClientErrorCode,
-} from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, type FrontendClientErrorCode } from '@/utils/error';
 
 import {
   buildDriveRootNode,
@@ -97,12 +93,21 @@ const decodeResourceCursor = (value: string): ResourceCursor => {
       !Number.isInteger((parsed as ResourceCursor).page) ||
       !Number.isInteger((parsed as ResourceCursor).pageSize)
     ) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'cursor' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'cursor' },
+      });
     }
     return parsed as ResourceCursor;
   } catch (error) {
     if (error instanceof Error && error.name === 'WisePenError') throw error;
-    throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'cursor' }, error);
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.VALIDATION,
+      source: 'client',
+      meta: { field: 'cursor' },
+      cause: error,
+    });
   }
 };
 
@@ -126,7 +131,10 @@ export const createDriveServices = (
     const roots = await tagService.getRawTagTree(undefined, { refresh });
     const root = roots.find((tag) => tag.tagName === '/');
     if (!root) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_PERSONAL_ROOT_NOT_FOUND);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_PERSONAL_ROOT_NOT_FOUND,
+        source: 'client',
+      });
     }
     return root;
   };
@@ -193,7 +201,11 @@ export const createDriveServices = (
     const resolvedSize = normalizePageSize(pageSize, defaultPageSize);
     const cursorState = cursor ? decodeResourceCursor(cursor) : undefined;
     if (cursorState && cursorState.parentId !== parent.id) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'cursor' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'cursor' },
+      });
     }
 
     const includeFolders = !cursor && kinds.includes('folder');
@@ -280,8 +292,12 @@ export const createDriveServices = (
     const chain: TagTreeNode[] = [];
     let current = tagService.getRawTagById(mountTagId, groupId);
     if (!current) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
-        nodeId: mountTagId,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND,
+        source: 'client',
+        meta: {
+          nodeId: mountTagId,
+        },
       });
     }
     while (current) {
@@ -308,7 +324,11 @@ export const createDriveServices = (
     if (nodeId === root.id) return [root];
     const decoded = decodeNodeId(nodeId);
     if (decoded.kind !== 'folder') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, { nodeId });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND,
+        source: 'client',
+        meta: { nodeId },
+      });
     }
     return getMountPath({ location: { scope, mountTagId: decoded.tagId } });
   };
@@ -325,16 +345,24 @@ export const createDriveServices = (
         Object.prototype.hasOwnProperty.call(bind.tags ?? {}, mountTagId)
     );
     if (!tagBind) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_RESOURCE_TAG_INFO_MISSING, {
-        resourceId: resource.resourceId,
-        tagId: mountTagId,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_RESOURCE_TAG_INFO_MISSING,
+        source: 'client',
+        meta: {
+          resourceId: resource.resourceId,
+          tagId: mountTagId,
+        },
       });
     }
     const path = await getMountPath({ location });
     const parent = path.at(-1);
     if (!parent) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, {
-        nodeId: mountTagId,
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND,
+        source: 'client',
+        meta: {
+          nodeId: mountTagId,
+        },
       });
     }
     const primaryTagId = tagBind.primaryTagId ?? Object.keys(tagBind.tags ?? {})[0];
@@ -346,7 +374,7 @@ export const createDriveServices = (
     type,
   }: GetDriveSystemFolderParams) => {
     const notFoundCode = DRIVE_SYSTEM_FOLDER_NOT_FOUND_CODES[type];
-    if (scope.type !== 'personal') throw createClientError(notFoundCode);
+    if (scope.type !== 'personal') throw createError({ code: notFoundCode, source: 'client' });
     const { tagName: systemTagName } = getDriveSystemFolderDefinition(type);
     const roots = await tagService.getRawTagTree();
     const queue = [...roots];
@@ -356,23 +384,33 @@ export const createDriveServices = (
       if (tag.tagName === systemTagName) return mapFolder(tag, scope.rootId, scope);
       queue.push(...(tag.children ?? []));
     }
-    throw createClientError(notFoundCode);
+    throw createError({ code: notFoundCode, source: 'client' });
   };
 
   const assertActionScope = (nodes: DriveMutableNode[]): DriveNodeScope => {
     if (nodes.length === 0) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'nodes' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'nodes' },
+      });
     }
     const [first] = nodes;
     if (nodes.some((node) => !sameScope(node.scope, first.scope))) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     return first.scope;
   };
 
   const assertNoSystemFolder = (nodes: DriveMutableNode[]): void => {
     if (nodes.some((node) => node.type === 'folder' && node.systemType)) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_SELECTION_CONTAINS_SYSTEM_FOLDER);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_SELECTION_CONTAINS_SYSTEM_FOLDER,
+        source: 'client',
+      });
     }
   };
 
@@ -408,7 +446,10 @@ export const createDriveServices = (
       (group) => new Set(group.map((node) => node.mountTagId)).size > 1
     );
     if (containsMultipleMounts) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_MULTIPLE_MOUNTS_MOVE_UNSUPPORTED);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_MULTIPLE_MOUNTS_MOVE_UNSUPPORTED,
+        source: 'client',
+      });
     }
   };
 
@@ -441,17 +482,26 @@ export const createDriveServices = (
   const getTargetTagIdOrThrow = (target: DriveContainerNode): string => {
     const tagId = target.tagId;
     if (!tagId) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_TARGET_TAG_ID_MISSING,
+        source: 'client',
+      });
     }
     if (target.type === 'folder' && target.systemType) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     return tagId;
   };
 
   const assertValidMoveTarget = (folders: FolderNode[], target: DriveContainerNode): void => {
     if (target.type === 'folder' && target.systemType) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     if (
       target.type === 'folder' &&
@@ -459,7 +509,10 @@ export const createDriveServices = (
         (folder) => folder.id === target.id || target.ancestorTagIds.includes(folder.tagId)
       )
     ) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
   };
 
@@ -471,7 +524,10 @@ export const createDriveServices = (
     assertNoSystemFolder(normalizedNodes);
     const scope = assertActionScope(normalizedNodes);
     if (!sameScope(scope, target.scope)) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     const groupId = getGroupId(scope);
     const resources = normalizedNodes.filter(isResourceNode);
@@ -521,7 +577,10 @@ export const createDriveServices = (
     assertNoSystemFolder(normalizedNodes);
     const scope = assertActionScope(normalizedNodes);
     if (scope.type !== 'personal') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE,
+        source: 'client',
+      });
     }
     const resources = normalizedNodes.filter(isResourceNode);
     const folders = normalizedNodes.filter((node): node is FolderNode => node.type === 'folder');
@@ -547,7 +606,10 @@ export const createDriveServices = (
     assertNoSystemFolder(normalizedNodes);
     const scope = assertActionScope(normalizedNodes);
     if (scope.type !== 'group') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE,
+        source: 'client',
+      });
     }
     const groupId = scope.groupId;
     const resources = normalizedNodes.filter(isResourceNode);
@@ -576,11 +638,17 @@ export const createDriveServices = (
     assertNoSystemFolder(normalizedNodes);
     const scope = assertActionScope(normalizedNodes);
     if (scope.type !== 'personal') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE,
+        source: 'client',
+      });
     }
     const trash = await getSystemFolder({ scope, type: 'trash' });
     if (normalizedNodes.some((node) => !isDescendantOfFolder(node, trash))) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_DELETE,
+        source: 'client',
+      });
     }
     const resources = normalizedNodes.filter(isResourceNode);
     const folders = normalizedNodes.filter(
@@ -607,7 +675,10 @@ export const createDriveServices = (
   }: SetPersonalResourcesLocationParams) => {
     const ids = normalizeIds(inputResourceIds);
     if (target.scope.type !== 'personal') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     const targetTagId = getTargetTagIdOrThrow(target);
     let affectedCount = 0;
@@ -626,7 +697,10 @@ export const createDriveServices = (
     target,
   }: AddResourcesToGroupParams) => {
     if (target.scope.type !== 'group') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     const ids = normalizeIds(inputResourceIds);
     let affectedCount = 0;
@@ -647,10 +721,17 @@ export const createDriveServices = (
   }: CreateFolderParams) => {
     const tagName = name.trim();
     if (!tagName) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'name' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'name' },
+      });
     }
     if (parent.type === 'folder' && parent.systemType) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_MOVE,
+        source: 'client',
+      });
     }
     const tagId = await tagService.addTag({
       groupId: getGroupId(parent.scope),
@@ -660,7 +741,11 @@ export const createDriveServices = (
     await tagService.getRawTagTree(getGroupId(parent.scope), { refresh: true });
     const tag = tagService.getRawTagById(tagId, getGroupId(parent.scope));
     if (!tag) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND, { nodeId: tagId });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_NOT_FOUND,
+        source: 'client',
+        meta: { nodeId: tagId },
+      });
     }
 
     return mapFolder(tag, parent.id, parent.scope);
@@ -669,12 +754,19 @@ export const createDriveServices = (
   const renameNode: IDriveService['renameNode'] = async ({ node, newName }: RenameNodeParams) => {
     const name = newName.trim();
     if (!name) {
-      throw createClientError(FRONTEND_CLIENT_ERROR.VALIDATION, { field: 'newName' });
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.VALIDATION,
+        source: 'client',
+        meta: { field: 'newName' },
+      });
     }
     const groupId = getGroupId(node.scope);
     if (node.type === 'folder') {
       if (node.systemType) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_RENAME);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_RENAME,
+          source: 'client',
+        });
       }
       await tagService.updateTag({
         groupId,
@@ -685,14 +777,20 @@ export const createDriveServices = (
       return;
     }
     if (node.type === 'link') {
-      throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_LINK_UNSUPPORTED_RENAME);
+      throw createError({
+        code: FRONTEND_CLIENT_ERROR.DRIVE_LINK_UNSUPPORTED_RENAME,
+        source: 'client',
+      });
     }
     if (node.type === 'resource') {
       await resourceService.renameResource({ resourceId: node.resourceId, newName: name });
 
       return;
     }
-    throw createClientError(FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_RENAME);
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.DRIVE_NODE_UNSUPPORTED_RENAME,
+      source: 'client',
+    });
   };
 
   return {

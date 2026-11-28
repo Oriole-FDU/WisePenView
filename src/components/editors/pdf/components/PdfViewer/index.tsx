@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { buildApiUrl } from '@/apis/buildApiUrl';
-import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 
 import type { PdfViewerProps } from './index.type';
 import { DEFAULT_PDF_VIEWER_CONFIG } from './pdf.config';
@@ -55,7 +55,10 @@ function PdfViewer({ resourceId, sourceUrl, config, className, onLoadError }: Pd
       if (!registry) return;
       const docManager = registry.getPlugin<DocumentManagerPlugin>('document-manager')?.provides();
       if (!docManager) {
-        const err = createClientError(FRONTEND_CLIENT_ERROR.PDF_MANAGER_UNAVAILABLE);
+        const err = createError({
+          code: FRONTEND_CLIENT_ERROR.PDF_MANAGER_UNAVAILABLE,
+          source: 'client',
+        });
         onLoadError?.(err);
         return;
       }
@@ -66,7 +69,11 @@ function PdfViewer({ resourceId, sourceUrl, config, className, onLoadError }: Pd
           onLoadError?.(
             isWisePenError(error)
               ? error
-              : createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_LOAD_FAILED, undefined, error)
+              : createError({
+                  code: FRONTEND_CLIENT_ERROR.DOCUMENT_LOAD_FAILED,
+                  source: 'client',
+                  cause: error,
+                })
           );
         });
         if (typeof cleanup === 'function') {
@@ -96,7 +103,11 @@ function PdfViewer({ resourceId, sourceUrl, config, className, onLoadError }: Pd
       onLoadError?.(
         isWisePenError(error)
           ? error
-          : createClientError(FRONTEND_CLIENT_ERROR.DOCUMENT_LOAD_FAILED, undefined, error)
+          : createError({
+              code: FRONTEND_CLIENT_ERROR.DOCUMENT_LOAD_FAILED,
+              source: 'client',
+              cause: error,
+            })
       );
     }
   };

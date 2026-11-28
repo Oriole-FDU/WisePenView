@@ -1,5 +1,5 @@
 import {
-  createClientError,
+  createError,
   FRONTEND_CLIENT_ERROR,
   isWisePenError,
   type WisePenError,
@@ -55,9 +55,13 @@ function readProviderError(payload: UnknownRecord): WisePenError | null {
   if (payload.code === 0) return null;
   const code = typeof payload.code === 'number' ? payload.code : 'unknown';
   const message = typeof payload.message === 'string' ? payload.message : '未知错误';
-  return createClientError(FRONTEND_CLIENT_ERROR.SPEECH_PROVIDER_FAILED, {
-    providerCode: code,
-    providerMessage: message,
+  return createError({
+    code: FRONTEND_CLIENT_ERROR.SPEECH_PROVIDER_FAILED,
+    source: 'client',
+    meta: {
+      providerCode: code,
+      providerMessage: message,
+    },
   });
 }
 
@@ -84,7 +88,9 @@ export class XfyunSpeechRecognizer {
 
   start(): Promise<void> {
     if (recognitionActive) {
-      return Promise.reject(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_ALREADY_ACTIVE));
+      return Promise.reject(
+        createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_ALREADY_ACTIVE, source: 'client' })
+      );
     }
     recognitionActive = true;
     this.ownsActiveSlot = true;
@@ -100,15 +106,26 @@ export class XfyunSpeechRecognizer {
         socket.onopen = () => void this.handleSocketOpen();
         socket.onmessage = (event) => this.handleSocketMessage(event);
         socket.onerror = () =>
-          this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_FAILED));
+          this.fail(
+            createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_FAILED, source: 'client' })
+          );
         socket.onclose = () => {
           if (!this.terminated) {
-            this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_CLOSED));
+            this.fail(
+              createError({
+                code: FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_CLOSED,
+                source: 'client',
+              })
+            );
           }
         };
       } catch (error) {
         this.fail(
-          createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_FAILED, undefined, error)
+          createError({
+            code: FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_FAILED,
+            source: 'client',
+            cause: error,
+          })
         );
       }
     });
@@ -121,7 +138,10 @@ export class XfyunSpeechRecognizer {
     this.releaseAudioCapture();
     this.sendEndFrame();
     this.finishTimer = window.setTimeout(
-      () => this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_FINISH_TIMEOUT)),
+      () =>
+        this.fail(
+          createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_FINISH_TIMEOUT, source: 'client' })
+        ),
       FINISH_TIMEOUT_MS
     );
   }
@@ -131,7 +151,7 @@ export class XfyunSpeechRecognizer {
     const reject = this.startReject;
     this.releaseAll();
     this.setState('idle');
-    reject?.(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CANCELED));
+    reject?.(createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_CANCELED, source: 'client' }));
   }
 
   private async handleSocketOpen(): Promise<void> {
@@ -139,7 +159,10 @@ export class XfyunSpeechRecognizer {
       const audioContext = new AudioContext();
       this.audioContext = audioContext;
       if (audioContext.sampleRate < IFLYTEK_AUDIO_CONFIG.sampleRate) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_SAMPLE_RATE_UNSUPPORTED);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.SPEECH_SAMPLE_RATE_UNSUPPORTED,
+          source: 'client',
+        });
       }
       await audioContext.audioWorklet.addModule(this.options.processorModuleUrl);
       if (this.terminated) return;
@@ -177,7 +200,11 @@ export class XfyunSpeechRecognizer {
       this.fail(
         isWisePenError(error)
           ? error
-          : createClientError(FRONTEND_CLIENT_ERROR.SPEECH_START_FAILED, undefined, error)
+          : createError({
+              code: FRONTEND_CLIENT_ERROR.SPEECH_START_FAILED,
+              source: 'client',
+              cause: error,
+            })
       );
     }
   }
@@ -186,7 +213,10 @@ export class XfyunSpeechRecognizer {
     try {
       const payload: unknown = JSON.parse(String(event.data));
       if (!isRecord(payload)) {
-        throw createClientError(FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID);
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID,
+          source: 'client',
+        });
       }
 
       const providerError = readProviderError(payload);
@@ -201,7 +231,11 @@ export class XfyunSpeechRecognizer {
       this.fail(
         isWisePenError(error)
           ? error
-          : createClientError(FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID, undefined, error)
+          : createError({
+              code: FRONTEND_CLIENT_ERROR.SPEECH_RESPONSE_INVALID,
+              source: 'client',
+              cause: error,
+            })
       );
     }
   }
@@ -209,7 +243,9 @@ export class XfyunSpeechRecognizer {
   private sendAudioFrame(buffer: ArrayBuffer): void {
     const socket = this.socket;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-      this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_UNAVAILABLE));
+      this.fail(
+        createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_UNAVAILABLE, source: 'client' })
+      );
       return;
     }
     const status = this.sentFirstFrame ? 1 : 0;
@@ -221,7 +257,9 @@ export class XfyunSpeechRecognizer {
   private sendEndFrame(): void {
     const socket = this.socket;
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-      this.fail(createClientError(FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_UNAVAILABLE));
+      this.fail(
+        createError({ code: FRONTEND_CLIENT_ERROR.SPEECH_CONNECTION_UNAVAILABLE, source: 'client' })
+      );
       return;
     }
 

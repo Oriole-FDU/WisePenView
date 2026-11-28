@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 
-import { createClientError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
+import { createError, FRONTEND_CLIENT_ERROR } from '@/utils/error';
 
 export interface ParsedSkillZipFile {
   name: string;
@@ -54,20 +54,36 @@ const TEXT_FILE_EXTENSIONS = new Set([
 function normalizeZipPath(rawPath: string): string {
   const trimmed = rawPath.trim();
   if (!trimmed) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_INVALID, { path: rawPath });
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_INVALID,
+      source: 'client',
+      meta: { path: rawPath },
+    });
   }
   if (trimmed.includes('\\')) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_INVALID, { path: rawPath });
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_INVALID,
+      source: 'client',
+      meta: { path: rawPath },
+    });
   }
 
   const withoutLeadingSlash = trimmed.replace(/^\/+/, '');
   if (!withoutLeadingSlash || withoutLeadingSlash.endsWith('/')) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_INVALID, { path: rawPath });
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_INVALID,
+      source: 'client',
+      meta: { path: rawPath },
+    });
   }
 
   const parts = withoutLeadingSlash.split('/');
   if (parts.some((part) => part === '' || part === '.' || part === '..')) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_UNSAFE, { path: rawPath });
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_PATH_UNSAFE,
+      source: 'client',
+      meta: { path: rawPath },
+    });
   }
   return withoutLeadingSlash;
 }
@@ -101,7 +117,7 @@ function stripSingleTopFolder(entries: ZipEntryCandidate[], mainSkillFileName: s
 
 function validateZipEntries(entries: ZipEntryCandidate[], options: ParseSkillZipOptions) {
   if (entries.length === 0) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_EMPTY);
+    throw createError({ code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_EMPTY, source: 'client' });
   }
 
   const duplicatedPaths = new Set<string>();
@@ -112,13 +128,21 @@ function validateZipEntries(entries: ZipEntryCandidate[], options: ParseSkillZip
   }
 
   if (duplicatedPaths.size > 0) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_DUPLICATE_FILE, {
-      paths: [...duplicatedPaths].slice(0, 3).join('、'),
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_DUPLICATE_FILE,
+      source: 'client',
+      meta: {
+        paths: [...duplicatedPaths].slice(0, 3).join('、'),
+      },
     });
   }
   if (!entries.some((entry) => entry.entryPath === options.mainSkillFileName)) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_MAIN_FILE_MISSING, {
-      fileName: options.mainSkillFileName,
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_MAIN_FILE_MISSING,
+      source: 'client',
+      meta: {
+        fileName: options.mainSkillFileName,
+      },
     });
   }
 }
@@ -146,7 +170,11 @@ export async function parseSkillZip(
   try {
     zip = await JSZip.loadAsync(zipFile);
   } catch (error) {
-    throw createClientError(FRONTEND_CLIENT_ERROR.SKILL_ZIP_READ_FAILED, undefined, error);
+    throw createError({
+      code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_READ_FAILED,
+      source: 'client',
+      cause: error,
+    });
   }
   const candidates: ZipEntryCandidate[] = [];
 
@@ -174,11 +202,12 @@ export async function parseSkillZip(
           size: contentBlob.size,
         };
       } catch (error) {
-        throw createClientError(
-          FRONTEND_CLIENT_ERROR.SKILL_ZIP_READ_FAILED,
-          { path: entry.entryPath },
-          error
-        );
+        throw createError({
+          code: FRONTEND_CLIENT_ERROR.SKILL_ZIP_READ_FAILED,
+          source: 'client',
+          meta: { path: entry.entryPath },
+          cause: error,
+        });
       }
     })
   );
