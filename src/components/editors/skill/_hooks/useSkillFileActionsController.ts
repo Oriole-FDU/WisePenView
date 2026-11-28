@@ -12,11 +12,6 @@ import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
-import type {
-  ApplySkillMoveOptions,
-  SkillFileDraft,
-  SkillFileSaveSnapshot,
-} from '../_common/workspaceDraft';
 import {
   appendFileNodeByPath,
   appendTreeNode,
@@ -38,6 +33,11 @@ import {
   ROOT_PATH,
 } from '../_common/skillFileTree';
 import { parseSkillZip } from '../_common/skillZip';
+import type {
+  ApplySkillMoveOptions,
+  SkillFileDraft,
+  SkillFileSaveSnapshot,
+} from '../_common/workspaceDraft';
 
 interface PendingSkillMove {
   moveResult: MoveTreeNodeResult;

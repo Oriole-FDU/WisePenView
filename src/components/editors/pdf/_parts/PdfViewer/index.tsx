@@ -12,8 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { buildApiUrl } from '@/apis/buildApiUrl';
 import { createClientError, FRONTEND_CLIENT_ERROR, isWisePenError } from '@/utils/error';
 
-import type { PdfViewerProps } from './index.type';
 import { DEFAULT_PDF_VIEWER_CONFIG } from './_common/pdf.config';
+import type { PdfViewerProps } from './index.type';
 import styles from './style.module.scss';
 
 function readConfigSection(value: unknown): Record<string, unknown> {

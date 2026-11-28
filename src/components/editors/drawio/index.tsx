@@ -1,7 +1,7 @@
 import { toast } from '@heroui/react';
 import { useMemoizedFn } from 'ahooks';
 import { History, Save } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -12,13 +12,6 @@ import EditorPresentationBinding from '@/components/editors/_runtime/EditorPrese
 import type { EditorPresentation } from '@/components/editors/editor.type';
 import { publicAppConfig } from '@/config/runtimeConfig';
 import { useNoteService, useResourceInteractionService, useUserService } from '@/domains';
-import type { ResourceAction } from '@/domains/_shared/access';
-import type {
-  DrawIoLatestSnapshotData,
-  NoteInfoDisplayData,
-  NoteVersionListPage,
-} from '@/domains/Note';
-import type { ResourceItem } from '@/domains/Resource';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
 import { useResourceDisplayName } from '@/hooks/useResourceDisplayName';
@@ -28,28 +21,17 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { prepareDraftExit } from '../_runtime/draftExit';
 import { useEditorLoadState, useEditorRuntime } from '../_runtime/useEditorRuntime';
-import type { EditorSurfaceProps } from '../editor.type';
-import {
-  buildDrawioUrl,
-  decodeBase64Utf8,
-  type DrawioSaveState,
-  readDrawioEmbedOrigin,
-} from './_common/drawioProtocol';
+import { buildDrawioUrl, decodeBase64Utf8, readDrawioEmbedOrigin } from './_common/drawioProtocol';
 import { useDrawioEditorSession } from './_hooks/useDrawioEditorSession';
 import { useDrawioTheme } from './_hooks/useDrawioTheme';
+import type {
+  DrawioPresentationBindingProps,
+  DrawioViewConnectedProps,
+  EditorSurfaceProps,
+  SaveStatusTextProps,
+  VersionModalProps,
+} from './index.type';
 import styles from './style.module.scss';
-
-interface DrawioViewData {
-  noteInfoDisplay: NoteInfoDisplayData;
-  snapshot: DrawIoLatestSnapshotData;
-  initialXml: string;
-}
-
-interface DrawioViewConnectedProps {
-  resourceId: string;
-  data: DrawioViewData;
-  onRefreshDrawioInfo: () => void;
-}
 
 function DrawioPresentationBinding({
   resourceId,
@@ -62,18 +44,7 @@ function DrawioPresentationBinding({
   onResourceChanged,
   titleMeta,
   actions,
-}: {
-  resourceId?: string;
-  resourceName?: string;
-  ownerId?: string | null;
-  currentActions?: ResourceAction[] | null;
-  resourceInfo?: ResourceItem;
-  copyVersion?: number;
-  onPermissionSuccess?: () => void;
-  onResourceChanged?: () => unknown | Promise<unknown>;
-  titleMeta?: ReactNode;
-  actions?: ReactNode;
-}) {
+}: DrawioPresentationBindingProps) {
   const { t } = useTranslation('workspace');
   const displayResourceName = resourceName ?? t('drawio.defaultName');
   const frameConfig = {
@@ -99,24 +70,12 @@ function DrawioPresentationBinding({
   return <EditorPresentationBinding {...frameConfig} />;
 }
 
-function SaveStatusText({ state }: { state: DrawioSaveState }) {
+function SaveStatusText({ state }: SaveStatusTextProps) {
   const { t } = useTranslation('workspace');
   return <span className={styles.saveStatus}>{t(`drawio.status.${state}`)}</span>;
 }
 
-function VersionModal({
-  open,
-  loading,
-  error,
-  versions,
-  onClose,
-}: {
-  open: boolean;
-  loading: boolean;
-  error?: unknown;
-  versions?: NoteVersionListPage;
-  onClose: () => void;
-}) {
+function VersionModal({ open, loading, error, versions, onClose }: VersionModalProps) {
   const { t } = useTranslation(['workspace', 'common']);
 
   return (

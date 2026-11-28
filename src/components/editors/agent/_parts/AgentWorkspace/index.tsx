@@ -4,31 +4,17 @@ import { useTranslation } from 'react-i18next';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 import EditorPresentationBinding from '@/components/editors/_runtime/EditorPresentationBinding';
 import type { EditorPresentation } from '@/components/editors/editor.type';
-import type { AgentDetail } from '@/domains/Agent';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 
 import { useEditorSurface } from '../../../_context';
 import { prepareDraftExit } from '../../../_runtime/draftExit';
 import { useEditorRuntime } from '../../../_runtime/useEditorRuntime';
-import type { AgentVersionItem, AgentWorkspaceData } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
 import AgentEditor from '../AgentEditor';
-import AgentHeaderActions from './_parts/AgentHeaderActions';
 import { useAgentDebugSendGuardController } from './_hooks/useAgentDebugSendGuardController';
 import { useAgentDraftSessionController } from './_hooks/useAgentDraftSessionController';
-
-interface AgentWorkspaceProps {
-  agent: AgentDetail;
-  data: AgentWorkspaceData;
-  disabledVersionKeys: Set<string>;
-  isOwner: boolean;
-  resourceId: string;
-  versionItems: AgentVersionItem[];
-  versionLoading: boolean;
-  viewingVersion: number | null;
-  onRefresh: () => void;
-  onVersionSelect: (version: number) => void;
-}
+import type { AgentWorkspaceProps } from './index.type';
+import AgentHeaderActions from './_parts/AgentHeaderActions';
 
 export default function AgentWorkspace({
   agent,

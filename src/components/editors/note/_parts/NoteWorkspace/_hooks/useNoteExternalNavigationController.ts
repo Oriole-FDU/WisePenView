@@ -2,13 +2,13 @@ import { toast } from '@heroui/react';
 import { type RefObject, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useNoteExternalNavigationStore } from '@/components/editors/note/_common/store/useNoteExternalNavigationStore';
-import type { NoteBodyEditorHandle } from '@/components/editors/note/CustomBlockNote/index.type';
 import {
   isNoteExternalNavigationRequestExpired,
   NOTE_EXTERNAL_NAVIGATION_RETRY_INTERVAL_MS,
   NOTE_EXTERNAL_NAVIGATION_RETRY_TIMEOUT_MS,
 } from '@/components/editors/note/_common/noteExternalNavigationModel';
+import { useNoteExternalNavigationStore } from '@/components/editors/note/_common/store/useNoteExternalNavigationStore';
+import type { NoteBodyEditorHandle } from '@/components/editors/note/CustomBlockNote/index.type';
 
 interface UseNoteExternalNavigationOptions {
   resourceId: string;

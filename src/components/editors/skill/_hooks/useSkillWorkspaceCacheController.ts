@@ -3,13 +3,13 @@ import { useEffect, useRef, useState } from 'react';
 
 import i18n from '@/i18n';
 
-import type { SkillWorkspaceDraftState } from '../_common/workspaceDraft';
 import {
   clearSkillDraftCache,
   loadSkillDraftCache,
   saveSkillDraftCache,
   type SkillDraftCacheSnapshot,
 } from '../_common/skillDraftCache';
+import type { SkillWorkspaceDraftState } from '../_common/workspaceDraft';
 
 function isMatchingCache(
   snapshot: SkillDraftCacheSnapshot,

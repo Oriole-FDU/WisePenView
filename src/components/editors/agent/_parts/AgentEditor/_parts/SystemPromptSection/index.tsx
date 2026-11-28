@@ -16,12 +16,9 @@ import {
   syncGuidedPrompt,
 } from '../../../../_common/guidedPrompt';
 import PresetRestoreConfirmDialog from '../../_common/PresetRestoreConfirmDialog';
+import type { Props } from './index.type';
 import styles from './style.module.scss';
-interface Props {
-  markdown: string;
-  disabled: boolean;
-  onMarkdownChange: (value: string) => void;
-}
+
 type PromptMode = 'guided' | 'free';
 const textFields: Array<{
   key: keyof GuidedPromptFields;

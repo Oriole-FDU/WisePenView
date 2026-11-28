@@ -6,7 +6,7 @@ import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote } from '@blocknote/react';
 import { toast } from '@heroui/react';
 import { useDebounceFn, useLatest, useMemoizedFn, useMount, useUnmount } from 'ahooks';
-import { type KeyboardEvent, type Ref, useEffect, useImperativeHandle, useRef } from 'react';
+import { type KeyboardEvent, useEffect, useImperativeHandle, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { GuideAnchor } from '@/components/base/Guide';
@@ -16,28 +16,11 @@ import { useNoteService } from '@/domains';
 import { useAppTheme } from '@/theme';
 import { parseErrorMessage } from '@/utils/error';
 
+import type { NoteTitleProps } from './index.type';
 import styles from './style.module.scss';
-
-export interface NoteTitleHandle {
-  /** 当前标题编辑区纯文本，空则“未命名笔记”。 */
-  getPlainTitle: () => string;
-  /** 滚动到标题并聚焦标题编辑器。 */
-  scrollIntoView: () => void;
-}
-
-export type NoteTitleSaveStatus = 'saving' | 'saved' | 'failed';
 
 type CreateBlockNoteOptions = NonNullable<Parameters<typeof useCreateBlockNote>[0]>;
 type NoteTitlePasteHandler = NonNullable<CreateBlockNoteOptions['pasteHandler']>;
-
-interface NoteTitleProps {
-  id: string;
-  initialContent: string;
-  onEnterKey: () => void;
-  focusOnMount: boolean;
-  readOnly: boolean;
-  onSaveStatusChange: (status: NoteTitleSaveStatus) => void;
-}
 
 /** 与 Pipeline 一致的防抖时长（ms） */
 const TITLE_DEBOUNCE_MS = 500;
@@ -104,7 +87,7 @@ function NoteTitle({
   readOnly,
   onSaveStatusChange,
   ref,
-}: NoteTitleProps & { ref?: Ref<NoteTitleHandle> }) {
+}: NoteTitleProps) {
   const { i18n, t } = useTranslation('note');
   const { resolvedTheme } = useAppTheme();
   const noteService = useNoteService();
@@ -335,3 +318,5 @@ function NoteTitle({
 }
 
 export default NoteTitle;
+
+export type { NoteTitleHandle, NoteTitleSaveStatus } from './index.type';

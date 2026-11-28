@@ -2,16 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import UnsavedChangesDialog from '@/components/business/UnsavedChangesDialog';
 
-export type UnsavedSkillChangesMode = 'publish' | 'leave' | 'switchVersion' | 'cancelEditing';
-
-interface UnsavedSkillChangesModalProps {
-  isOpen: boolean;
-  mode: UnsavedSkillChangesMode;
-  isLoading?: boolean;
-  onCancel: () => void;
-  onDiscard?: () => void;
-  onConfirm: () => void;
-}
+import type { UnsavedSkillChangesModalProps } from './index.type';
 
 function UnsavedSkillChangesModal({
   isOpen,
@@ -48,3 +39,5 @@ function UnsavedSkillChangesModal({
 }
 
 export default UnsavedSkillChangesModal;
+
+export type { UnsavedSkillChangesMode } from './index.type';

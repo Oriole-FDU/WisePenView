@@ -3,22 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import { AppButton } from '@/components/base/Button';
 import VersionDropdown from '@/components/business/VersionDropdown';
-import type { VersionDropdownItem } from '@/components/business/VersionDropdown/index.type';
 
 import styles from '../../../../_common/style.module.scss';
-
-interface AgentHeaderActionsProps {
-  disabledVersionKeys: Set<string>;
-  isDirty: boolean;
-  publishLoading: boolean;
-  saveLoading: boolean;
-  versionItems: VersionDropdownItem[];
-  versionLoading: boolean;
-  viewingVersion: number | null;
-  onPublish: () => void;
-  onSave: () => void;
-  onVersionSelect: (version: number) => void;
-}
+import type { AgentHeaderActionsProps } from './index.type';
 
 export default function AgentHeaderActions({
   disabledVersionKeys,

@@ -13,11 +13,11 @@ import { APP_ROUTE_PATH } from '@/utils/navigation/appRoute';
 
 import { EditorSurfaceProvider, useEditorSurface } from '../_context';
 import { useEditorLoadState } from '../_runtime/useEditorRuntime';
-import type { EditorSurfaceProps } from '../editor.type';
-import NoteWorkspace from './_parts/NoteWorkspace';
 import styles from './_common/style.module.scss';
+import type { EditorSurfaceProps, NoteOpenFailureProps } from './index.type';
+import NoteWorkspace from './_parts/NoteWorkspace';
 
-function NoteOpenFailure({ subTitle }: { subTitle?: string }) {
+function NoteOpenFailure({ subTitle }: NoteOpenFailureProps) {
   const { t } = useTranslation('note');
   return (
     <>

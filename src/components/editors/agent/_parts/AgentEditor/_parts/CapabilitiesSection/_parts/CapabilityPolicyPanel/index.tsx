@@ -10,32 +10,8 @@ import FieldHelp from '@/components/base/FieldHelp';
 import { Autocomplete, SearchField } from '@/components/base/Input';
 import ListBox from '@/components/base/ListBox';
 
+import type { Props } from './index.type';
 import styles from './style.module.scss';
-
-export type CapabilityPolicyKind = 'tool' | 'skill';
-
-export interface CapabilityPolicyOption {
-  id: string;
-  name: string;
-  internalName?: string;
-  description?: string;
-  disabled?: boolean;
-  disabledReason?: string;
-}
-
-interface Props {
-  kind: CapabilityPolicyKind;
-  title: string;
-  description: string;
-  addLabel: string;
-  searchPlaceholder: string;
-  emptyText: string;
-  selectedEmptyText: string;
-  options: CapabilityPolicyOption[];
-  selectedIds: string[];
-  disabled?: boolean;
-  onChange: (ids: string[]) => void;
-}
 
 export default function CapabilityPolicyPanel({
   kind,
@@ -191,3 +167,5 @@ export default function CapabilityPolicyPanel({
     </div>
   );
 }
+
+export type { CapabilityPolicyKind, CapabilityPolicyOption } from './index.type';

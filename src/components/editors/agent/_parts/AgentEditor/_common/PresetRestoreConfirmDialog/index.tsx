@@ -2,13 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
-interface PresetRestoreConfirmDialogProps {
-  isOpen: boolean;
-  title: string;
-  description: string;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-}
+import type { PresetRestoreConfirmDialogProps } from './index.type';
 
 export default function PresetRestoreConfirmDialog({
   isOpen,

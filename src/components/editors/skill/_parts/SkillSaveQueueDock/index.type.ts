@@ -16,3 +16,5 @@ export interface SkillSaveQueueDockProps {
   items: SkillSaveQueueItem[];
   onRetry?: () => void;
 }
+
+export type QueuePhaseIconProps = { item: SkillSaveQueueItem };

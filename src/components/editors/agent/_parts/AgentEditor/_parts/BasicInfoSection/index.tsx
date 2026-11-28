@@ -2,19 +2,9 @@ import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import { FormField, Input, TextArea } from '@/components/base/Input';
-import type { AgentSpec } from '@/domains/Agent';
 
+import type { Props } from './index.type';
 import styles from './style.module.scss';
-
-interface Props {
-  name: string;
-  description: string;
-  spec: AgentSpec;
-  disabled: boolean;
-  onNameChange: (value: string) => void;
-  onDescriptionChange: (value: string) => void;
-  onSpecChange: (spec: AgentSpec) => void;
-}
 
 export default function BasicInfoSection({
   name,

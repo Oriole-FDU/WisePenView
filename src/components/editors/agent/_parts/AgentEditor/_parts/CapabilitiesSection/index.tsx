@@ -1,19 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
-import type { AgentSpec } from '@/domains/Agent';
 import type { ToolOption } from '@/domains/ChatConfig';
-import type { SkillSummary } from '@/domains/Skill';
 
+import type { Props } from './index.type';
 import CapabilityPolicyPanel, { type CapabilityPolicyOption } from './_parts/CapabilityPolicyPanel';
-
-interface Props {
-  spec: AgentSpec;
-  tools: ToolOption[];
-  skills: SkillSummary[];
-  disabled: boolean;
-  onChange: (spec: AgentSpec) => void;
-}
 
 export default function CapabilitiesSection({ spec, tools, skills, disabled, onChange }: Props) {
   const { t } = useTranslation('agent');

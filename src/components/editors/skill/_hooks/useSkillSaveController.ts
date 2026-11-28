@@ -8,9 +8,9 @@ import { useApi } from '@/hooks/useApi';
 import { captureException } from '@/observability';
 import { createClientError, FRONTEND_CLIENT_ERROR, parseErrorMessage } from '@/utils/error';
 
-import type { SkillSaveQueueItem } from '../_parts/SkillSaveQueueDock/index.type';
 import { resolveSkillSavePhase } from '../_common/model';
 import type { SkillConfigSaveSnapshot, SkillFileSaveSnapshot } from '../_common/workspaceDraft';
+import type { SkillSaveQueueItem } from '../_parts/SkillSaveQueueDock/index.type';
 
 const CONFIG_QUEUE_ID = '__skill_config_save__';
 

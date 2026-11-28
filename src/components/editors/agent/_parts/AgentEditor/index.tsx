@@ -2,34 +2,16 @@ import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import AppAlertDialog from '@/components/business/AppAlertDialog';
-import type { AgentAsset, AgentSpec } from '@/domains/Agent';
-import type { ChatModel, ToolOption } from '@/domains/ChatConfig';
-import type { SkillSummary } from '@/domains/Skill';
 
-import type { AgentDraft } from '../../_common/model';
 import styles from '../../_common/style.module.scss';
 import { useAgentAssetsController } from './_hooks/useAgentAssetsController';
+import type { AgentEditorProps } from './index.type';
 import AssetsSection from './_parts/AssetsSection';
 import BasicInfoSection from './_parts/BasicInfoSection';
 import CapabilitiesSection from './_parts/CapabilitiesSection';
 import MemorySection from './_parts/MemorySection';
 import ModelSection from './_parts/ModelSection';
 import SystemPromptSection from './_parts/SystemPromptSection';
-
-interface AgentEditorProps {
-  assets: AgentAsset[];
-  draft: AgentDraft;
-  draftVersion: number;
-  models: ChatModel[];
-  readOnly: boolean;
-  resourceId: string;
-  skills: SkillSummary[];
-  tools: ToolOption[];
-  onDescriptionChange: (description: string) => void;
-  onNameChange: (name: string) => void;
-  onSpecChange: (spec: AgentSpec) => void;
-  onSystemPromptChange: (systemPrompt: string) => void;
-}
 
 const anchorSections = [
   ['agent-info', 'basic'],

@@ -3,15 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import AppForm from '@/components/base/AppForm';
 import ModelSelector from '@/components/business/ModelSelector';
-import type { AgentSpec } from '@/domains/Agent';
 import type { ChatModel } from '@/domains/ChatConfig';
 
-interface Props {
-  spec: AgentSpec;
-  models: ChatModel[];
-  disabled: boolean;
-  onChange: (spec: AgentSpec) => void;
-}
+import type { Props } from './index.type';
 
 export default function ModelSection({ spec, models, disabled, onChange }: Props) {
   const { t } = useTranslation('agent');

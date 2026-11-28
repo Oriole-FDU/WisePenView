@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { AppPressable } from '@/components/base/Button';
 
 import type {
+  QueuePhaseIconProps,
   SkillSaveQueueDockProps,
   SkillSaveQueueItem,
   SkillSaveQueuePhase,
@@ -83,7 +84,7 @@ function resolvePhaseText(item: SkillSaveQueueItem, t: TFunction<'skill'>): stri
   return item.errorMessage ?? t('queue.phase.failed');
 }
 
-function QueuePhaseIcon({ item }: { item: SkillSaveQueueItem }) {
+function QueuePhaseIcon({ item }: QueuePhaseIconProps) {
   if (item.phase === 'done') return <CheckCircle2 size={13} />;
   if (item.phase === 'failed') return <AlertCircle size={13} />;
   if (isActivePhase(item.phase)) return <LoaderCircle className={styles.spinningIcon} size={13} />;

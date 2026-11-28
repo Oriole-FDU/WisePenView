@@ -5,21 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { AppPressable } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { GuideAnchor } from '@/components/base/Guide';
-import type { NoteOutlineItem } from '@/components/editors/note/CustomBlockNote/index.type';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
 
+import type { NoteOutlineProps } from './index.type';
 import styles from './style.module.scss';
 
 export const NOTE_OUTLINE_TITLE_ID = '__note_title__';
-
-interface NoteOutlineProps {
-  items: NoteOutlineItem[];
-  activeId?: string;
-  onNavigate: (id: string) => void;
-  title: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 function resolveLevelClass(level: number): string {
   const l = Math.min(6, Math.max(0, Math.floor(level)));

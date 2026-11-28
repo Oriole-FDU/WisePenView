@@ -4,18 +4,7 @@ import { AppButton } from '@/components/base/Button';
 import { FormField, Input, TextArea } from '@/components/base/Input';
 
 import styles from '../../_common/style.module.scss';
-
-interface SkillConfigPanelProps {
-  name: string;
-  description: string;
-  canEdit: boolean;
-  isDirty: boolean;
-  isLoading: boolean;
-  onNameChange: (value: string) => void;
-  onDescriptionChange: (value: string) => void;
-  onReset: () => void;
-  onSave: () => void;
-}
+import type { SkillConfigPanelProps } from './index.type';
 
 function SkillConfigPanel({
   name,

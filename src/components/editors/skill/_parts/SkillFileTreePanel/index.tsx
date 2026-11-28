@@ -1,34 +1,12 @@
-import type { TFunction } from 'i18next';
 import { FolderPlus, Plus, Upload } from 'lucide-react';
-import type { RefObject } from 'react';
 
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { EmptyState } from '@/components/base/Feedback';
-import type { DataNode } from '@/components/base/Tree';
 import SkillFileTree from '@/components/editors/skill/_parts/SkillFileTree';
-import type { SkillFileNode } from '@/domains/Skill';
 
-import type { useSkillFileActionsController } from '../../_hooks/useSkillFileActionsController';
 import styles from '../../_common/style.module.scss';
 import SkillSaveQueueDock from '../SkillSaveQueueDock';
-import type { SkillSaveQueueItem } from '../SkillSaveQueueDock/index.type';
-
-type SkillFileActions = ReturnType<typeof useSkillFileActionsController>;
-
-interface SkillFileTreePanelProps {
-  canEdit: boolean;
-  configTreeNodes: DataNode[];
-  dirtyNodeIds: Set<string>;
-  fileActions: SkillFileActions;
-  fileInputRef: RefObject<HTMLInputElement | null>;
-  files: SkillFileNode[];
-  onTreeSelect: (nodeId: string) => void;
-  saveQueueItems: SkillSaveQueueItem[];
-  selectedFileId: string;
-  selectedTreeNodeId: string;
-  t: TFunction<'skill'>;
-  onRetrySave: () => void;
-}
+import type { SkillFileTreePanelProps } from './index.type';
 
 function SkillFileTreePanel({
   canEdit,

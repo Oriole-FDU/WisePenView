@@ -4,13 +4,9 @@ import { useTranslation } from 'react-i18next';
 import AppAvatar from '@/components/base/Avatar';
 import { GuideAnchor } from '@/components/base/Guide';
 import { GUIDE_TOOL_ID } from '@/constants/tour';
-import type { NoteInfoDisplayData } from '@/domains/Note';
 
+import type { NoteInfoBarProps } from './index.type';
 import styles from './style.module.scss';
-
-interface NoteInfoBarProps {
-  noteInfoDisplay: NoteInfoDisplayData;
-}
 
 const getAvatarText = (name: string): string => {
   const displayName = name.trim();

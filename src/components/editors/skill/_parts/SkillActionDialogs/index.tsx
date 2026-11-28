@@ -1,19 +1,7 @@
-import type { TFunction } from 'i18next';
-
 import AppAlertDialog from '@/components/business/AppAlertDialog';
 
-import type { useSkillFileActionsController } from '../../_hooks/useSkillFileActionsController';
-import type { useSkillNavigationController } from '../../_hooks/useSkillNavigationController';
 import UnsavedSkillChangesModal from '../UnsavedSkillChangesModal';
-
-type SkillFileActions = ReturnType<typeof useSkillFileActionsController>;
-type SkillNavigation = ReturnType<typeof useSkillNavigationController>;
-
-interface SkillActionDialogsProps {
-  fileActions: SkillFileActions;
-  navigation: SkillNavigation;
-  t: TFunction<'skill'>;
-}
+import type { SkillActionDialogsProps } from './index.type';
 
 function SkillActionDialogs({ fileActions, navigation, t }: SkillActionDialogsProps) {
   return (

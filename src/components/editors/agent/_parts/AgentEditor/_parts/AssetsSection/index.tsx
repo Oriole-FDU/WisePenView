@@ -7,17 +7,11 @@ import AppForm from '@/components/base/AppForm';
 import { AppButton } from '@/components/base/Button';
 import AppIconButton from '@/components/base/Button/AppIconButton';
 import { HiddenFileInput } from '@/components/base/Input';
-import type { AgentAsset } from '@/domains/Agent';
 import { formatFileSize } from '@/utils/format/formatFileSize';
 
+import type { Props } from './index.type';
 import styles from './style.module.scss';
-interface Props {
-  assets: AgentAsset[];
-  disabled: boolean;
-  uploading: boolean;
-  onUpload: (files: File[]) => void;
-  onDelete: (id: string) => void;
-}
+
 const isFileDrag = (event: DragEvent<HTMLElement>) =>
   Array.from(event.dataTransfer.types).includes('Files');
 

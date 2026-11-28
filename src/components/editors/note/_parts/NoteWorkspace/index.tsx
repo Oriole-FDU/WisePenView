@@ -19,7 +19,6 @@ import { NoteEditorSlot } from '@/components/editors/note/CustomBlockNote/NoteEd
 import { useNoteEditorStatus } from '@/components/editors/note/CustomBlockNote/useNoteEditorStatus';
 import { GUIDE_ACTION_ID } from '@/constants/tour';
 import { useResourceInteractionService } from '@/domains';
-import type { NoteInfoDisplayData } from '@/domains/Note';
 import { encodeNoteClientContentSignature } from '@/domains/Note';
 import { RESOURCE_KIND } from '@/domains/Resource/model/resourceTarget';
 import { useApi } from '@/hooks/useApi';
@@ -37,12 +36,7 @@ import { resolveNoteHeaderSaveStatus } from './_common/noteWorkspaceModel';
 import { useNoteActionsController } from './_hooks/useNoteActionsController';
 import { useNoteCommentsController } from './_hooks/useNoteCommentsController';
 import { useNoteExternalNavigationController } from './_hooks/useNoteExternalNavigationController';
-
-interface NoteWorkspaceProps {
-  resourceId: string;
-  noteInfoDisplay: NoteInfoDisplayData;
-  onRefreshNoteInfo: () => unknown | Promise<unknown>;
-}
+import type { NoteWorkspaceProps } from './index.type';
 
 function NoteWorkspace({ resourceId, noteInfoDisplay, onRefreshNoteInfo }: NoteWorkspaceProps) {
   const { t } = useTranslation('note');

@@ -7,21 +7,16 @@ import ListBox, { ListBoxItem } from '@/components/base/ListBox';
 import { useNoteEditorReadOnlyContext } from '@/components/editors/note/CustomBlockNote/engines/editor/_context';
 
 import { blockNoteSchema, type CustomBlockNoteEditor } from '../../registry/noteEditorComposition';
-import type { NoteContentPlugin } from '../../registry/types';
 import {
   getNoteSlashMenuItems,
   getSlashMenuItemKey,
   NOTE_EDITOR_HIDDEN_DEFAULT_SLASH_MENU_KEY_SET,
 } from './buildSlashMenuItems';
+import type { NoteSlashMenuProps } from './index.type';
 import { sortSuggestionItemsForDisplay } from './slashMenuModel';
 import { SlashMenuListBoxItems } from './slashMenuView';
 import styles from './style.module.scss';
 import { getSlashMenuItemId, useSlashMenuNavigation } from './useSlashMenuNavigation';
-
-interface NoteSlashMenuProps {
-  editor: CustomBlockNoteEditor;
-  plugins: readonly NoteContentPlugin[];
-}
 
 function getSuggestionMenuContentKey(items: DefaultReactSuggestionItem[]) {
   return items

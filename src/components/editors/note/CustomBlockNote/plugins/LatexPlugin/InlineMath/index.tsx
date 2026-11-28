@@ -1,3 +1,4 @@
+// TODO：该入口导出 inlineMathContentSpec，内部渲染参数依赖 typeof inlineMathConfig 与 DefaultStyleSchema 的泛型推导；需结合插件契约单独处理。
 /* eslint-disable react-refresh/only-export-components -- BlockNote inline spec 与展示组件同文件 */
 import 'katex/dist/katex.min.css';
 

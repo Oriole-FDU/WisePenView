@@ -6,9 +6,9 @@ import { useSkillService } from '@/domains';
 import type { SkillDetail, SkillFileNode } from '@/domains/Skill';
 import { useApi } from '@/hooks/useApi';
 
-import type { UnsavedSkillChangesMode } from '../_parts/UnsavedSkillChangesModal';
-import type { SkillWorkspacePendingIntent } from '../_common/workspaceDraft';
 import { findRootMainSkillFile } from '../_common/skillFileTree';
+import type { SkillWorkspacePendingIntent } from '../_common/workspaceDraft';
+import type { UnsavedSkillChangesMode } from '../_parts/UnsavedSkillChangesModal';
 
 export const SKILL_CONFIG_NODE_ID = '__skill_config__';
 

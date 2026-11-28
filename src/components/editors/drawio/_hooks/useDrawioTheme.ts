@@ -3,7 +3,11 @@ import { type RefObject, useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '@/constants/storageKeys';
 import { COLOR_SCHEME, DEFAULT_COLOR_SCHEME } from '@/theme';
 
-import { type DrawioThemeCommand, readDrawioMessage, type WisePenTheme } from '../_common/drawioProtocol';
+import {
+  type DrawioThemeCommand,
+  readDrawioMessage,
+  type WisePenTheme,
+} from '../_common/drawioProtocol';
 
 const COLOR_SCHEMES = new Set<string>(Object.values(COLOR_SCHEME));
 
