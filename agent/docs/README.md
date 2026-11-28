@@ -11,6 +11,10 @@
 - 提交规范：`agent/docs/commit.md`
 - 发布与分支：`agent/docs/release.md`
 
+## 架构盘点
+
+- [跨模块写法收束清单](cross-cutting-contracts.md)：以 error 重构为参照，记录跨模块竞争写法、候选收束边界和实施顺序；属于治理建议，不替代各专题的现行规范。
+
 ## Domain 任务
 
 - `domain-api.md`：API 薄层、DTO 和请求边界。
@@ -25,6 +29,7 @@
 
 - `architecture-guidelines.md`：ESLint 文件长度告警、拆分决策、目录归属与高内聚低耦合。
 - `component-boundary.md`：组件放置、复用范围和 base/business 边界。
+- `component-structure.md`：组件固定入口、有参数时的类型契约、按需就近样式，以及 `_parts`、`_hooks`、`_common` 的统一目录与依赖边界。
 - `component-react.md`：React、Hooks、JSX、TypeScript 和副作用治理。
 - `context.md`：Context 的组成、归属、Provider 和消费规范。
 - `component-controller.md`：复杂组件和 Controller 拆分。

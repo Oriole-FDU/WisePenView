@@ -4,10 +4,10 @@ Context 用于表达明确的组件树作用域，不作为通用全局状态容
 
 ## 目录和文件
 
-每个项目自有 Context 跟随其 Provider 所属的模块，在该模块下建立 `_context` 目录；不建立全局 `src/contexts`。一个 Context 严格分成三个文件，并通过第四个 `index.ts` 导出：
+每个项目自有 Context 跟随其 Provider 所属的模块，不建立全局 `src/contexts`。组件内部 Context 按 [组件目录标准](component-structure.md) 放在 `ComponentName/_common/context/`；应用壳、路由作用域、主题与服务注入等独立模块仍在所属模块的 `_context` 组织。一个 Context 严格分成三个文件，并通过第四个 `index.ts` 导出：
 
 ```text
-Feature/_context/
+ComponentName/_common/context/
   FeatureContext.ts       # value 协议和 createContext
   FeatureProvider.tsx     # Provider 装配与生命周期
   useFeature.ts           # 消费入口和缺失 Provider 校验
@@ -22,7 +22,9 @@ export { FeatureProvider } from './FeatureProvider';
 export { useFeature } from './useFeature';
 ```
 
-一个目录可以容纳多个 Context，各自仍保持定义、Provider、use hook 三文件。只为该实例型 Context 服务的 store、reducer 等实现可作为附加文件放在同一 `_context` 目录，但不与定义文件混写；共享状态实现则按所属模块另放。不创建旧路径转发层；调用方统一从 `_context` 的 `index.ts` 引入 Provider 和 hook。
+一个目录可以容纳多个 Context，各自仍保持定义、Provider、use hook 三文件。只为该实例型 Context 服务的 store、reducer 等实现可作为附加文件放在同一协议目录，但不与定义文件混写；共享状态实现则按所属模块另放。不创建旧路径转发层；调用方统一从该 Context 目录的 `index.ts` 引入 Provider 和 hook。
+
+上述 Provider 和消费 hook 属于 Context 专用协议模块，保持这套分工；普通 UI 子组件仍放在 `_parts`，普通交互 hook 仍放在 `_hooks`。存量组件 `_context` 按组件范围迁移到 `_common/context`，不要求同时改名非组件模块的目录。
 
 ## 模板
 
@@ -70,7 +72,7 @@ export function useFeature() {
 ## 归属和更新
 
 - 应用壳、主题、服务注入分别归属 `layouts/<Layout>/_context`、`theme/_context`、`domains/_registry/_context`。
-- 路由作用域归属对应 route 目录；组件实例状态归属对应组件或其运行时目录的 `_context`。
+- 路由作用域归属对应 route 目录；组件实例状态归属对应组件的 `_common/context`，独立 runtime 的上下文仍归 runtime 模块。
 - 作用域由 Provider 的拥有者和生命周期决定，不按消费者位置移动，也不让 layout 反向依赖 view。
 - 高频更新且需要独立订阅的状态可在 Context 中提供 Zustand store 实例，由 hook 使用 selector 订阅。
 - Provider value 的引用变化会通知消费者；按实际性能问题治理，不为普通 value 预先加入 memo。

@@ -48,3 +48,6 @@ CLAUDE.md
 .env.development
 
 .impeccable/
+
+# 本地审查记录不纳入版本控制
+/agent/reviews/

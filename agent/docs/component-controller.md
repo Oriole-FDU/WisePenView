@@ -2,6 +2,8 @@
 
 本规范用于处理同时包含多组状态、异步请求、交互流程和复杂渲染的大型组件。拆分的目标不是减少单个文件的行数，而是让状态归属、变化原因和依赖方向清晰，使一次需求更改尽量只影响一个行为域。
 
+文件位置遵循 [组件目录标准](component-structure.md)：Controller 表示行为职责，其 hook 实现统一放在组件的 `_hooks/`，不新增 `controllers/` 或 `_controllers/`。多个内部单元共享的纯模型和配置放在 `_common/`；单一实现的私有内容就近保留。
+
 ## 一、核心模型
 
 将大组件视为一个组合根，而不是把全部逻辑藏进一个总 Controller。推荐结构是：
@@ -12,7 +14,7 @@
 ├── controller B（一个内聚的行为域）
 ├── controller C（第三方交互或独立子流程）
 ├── 纯函数 / config（无状态映射和策略）
-└── parts（可独立理解的展示区域）
+└── _parts（可独立理解的展示区域）
 ```
 
 各层职责：
@@ -20,7 +22,7 @@
 - 顶层组件读取 Props 和页面上下文，初始化各 Controller，显式连接它们，派生少量渲染参数，并表达最终 UI 结构。
 - Controller 维护一个行为域内共同变化的状态、refs、派生数据、请求和事件，向组件暴露以用户意图命名的接口。
 - 纯函数或 config 承担无状态的数据映射、列配置、规则判断和索引构建，不因使用了业务类型就包装成 Hook。
-- parts 承担有独立视觉语义的 UI 区域，通过 Props 接收数据和事件，不接管不属于它的业务流程。
+- _parts 承担有独立视觉语义的 UI 区域，通过 Props 接收数据和事件，不接管不属于它的业务流程。
 - service 承担领域能力和后端操作编排；Controller 只组织当前 UI 场景，不复制领域规则。
 
 ## 二、按行为域拆分
@@ -70,18 +72,18 @@ Controller 的边界由“哪些状态和行为必须共同维护一组不变量
 ### 依赖方向
 
 ```text
-顶层组件 -> controllers -> service / 纯模型 / 第三方适配
-顶层组件 -> parts
+顶层组件 -> _hooks 中的行为 Controller -> service / 纯模型 / 第三方适配
+顶层组件 -> _parts
 controllers -X-> 兄弟 controller
-parts -X-> 页面 controller
+_parts -X-> 页面 controller
 ```
 
 同层行为域的 Controller 之间不要互相 import、调用或共享可变对象。确需共享的无状态规则下沉到最近的纯模型模块；需要协调的运行时行为提升到顶层组件。父 Controller 可以组合只服务自身的外部 I/O 子 Hook，例如工作区草稿的 IndexedDB 持久化；子 Hook 不编排兄弟流程，也不向 UI 暴露内部 ref 或缓存状态。
 
 ## 五、JSX 与弹窗归属
 
-- 可独立描述、复用或单独测试的视觉区域拆成 parts。不要为了缩短文件，把每段 JSX 都变成只有一次使用的薄组件。
-- 普通展示 JSX 留在组件或 parts，Controller 不应成为任意 JSX 的收纳处。
+- 可独立描述、复用或单独测试的视觉区域拆成 _parts。不要为了缩短文件，把每段 JSX 都变成只有一次使用的薄组件。
+- 普通展示 JSX 留在组件或 _parts，Controller 不应成为任意 JSX 的收纳处。
 - 当一组弹窗与某个动作 Controller 的目标状态、打开关闭和成功回调强绑定时，Controller 可以返回一个语义明确的 Host 作为挂载点；Host 只负责该行为域的 overlay，不应包含页面布局。
 - 静态列定义、类型到文案的映射、菜单策略等无状态内容优先放 config 或普通函数。不要仅因为它们服务于组件就命名为 Controller。
 

@@ -4,7 +4,7 @@
 
 - `src/store` 只放生命周期注册和持久化基础设施，不放业务 store，不提供统一业务导出。
 - `src/frontendState` 是跨业务的聊天请求状态协议层：当前标签页只保留一组状态，写者按来源写入，发送前统一读取；它不是 `src/store` 的业务导出目录。
-- 组件状态放到对应组件的 `_store` 目录，例如 `src/components/business/Chat/_store`。
+- 单一 hook 拥有的组件状态就近留在该 hook；组件子树内部共享的 store 按 [组件目录标准](component-structure.md) 放在对应组件的 `_common/store`，不新增组件 `_store`。存量按组件范围迁移。
 - 页面私有状态放到对应 view 的 `_store` 目录。
 - 布局状态放到对应 layout 的 `_store` 目录。
 - 只有由 service 维护、表达稳定业务缓存语义的状态才进入 domain；不要因为调用方较多就把 UI 状态提升到 domain。
@@ -13,7 +13,7 @@
 
 ## 二、跨模块协议
 
-- 同级业务组件之间不直接 import 对方的 `_store`。
+- 同级业务组件之间不直接 import 对方的私有状态，包括 `_common/store` 和存量 `_store`。
 - 跨组件通信由共同所有者的 view/layout 编排；需要异步消息状态时，在共同所有者下定义 protocol store。
 - Protocol 类型与 store 实现分离。通用组件只接收公开 protocol port 或 callback，不依赖上层 store 实现。
 - 领域间协作通过 service 接口和 registry 注入，不通过跨 domain Zustand store 共享内部缓存。
@@ -46,5 +46,5 @@
 - 不新增 `src/store/index.ts` 或其它业务 store barrel。
 - 不维护手工枚举全部 store 的 `clearAllStores`。
 - 不把只服务单一业务或页面的状态提升为根级全局 store。
-- Domain service 不反向 import `components`、`views` 或 `layouts` 下的 `_store`。
+- Domain service 不反向 import `components`、`views` 或 `layouts` 下的私有 store，包括 `_common/store` 和 `_store`。
 - 不为迁移保留旧 store alias、wrapper 或双路径导出。

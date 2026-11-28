@@ -10,12 +10,13 @@
 - `eslint.config.js`：通过 `contractRuleSettings` 启用规则；适用文件范围与目录例外仍由配置或专题规则负责。
 - `scripts/check-contract-lint.mjs`：运行项目 ESLint 配置，统一筛选、格式化诊断并设置退出码。
 
-当前 `error` 专题原样承接主干已有的三条规则与原生错误语法限制。后续错误契约和查询契约分别扩展自己的专题规则，不复制检查脚本。
+当前 `error` 专题承接主干已有的错误规则与原生错误语法限制；`component` 专题已接入组件目录、类型和私有边界契约，默认级别为 error。后续专题扩展自己的规则，公共注册和专项检查会直接读取新的规则对象，不复制检查脚本。
 
 ```bash
 pnpm lint                    # 全项目检查，遵守配置中的 error / warn 级别
 pnpm lint:contracts          # 一次扫描，检查所有已登记契约
 pnpm lint:error              # 等价于 node scripts/check-contract-lint.mjs error
+pnpm lint:component          # 等价于 node scripts/check-contract-lint.mjs component
 ```
 
 专项检查可以同时接受多个专题名；未知专题直接失败。只有已经登记的专题才可以被检查，尚未接入的查询规则不能被报告为检查通过。
